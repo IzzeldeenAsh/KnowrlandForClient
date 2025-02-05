@@ -20,7 +20,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" className="scroll-smooth">
-      <body className={`${inter.variable} font-inter antialiased tracking-tight`}>
+      <body className={`${inter.variable} font-inter antialiased tracking-tight`} suppressHydrationWarning>
       <AOSProvider>
         <div className="flex flex-col min-h-screen overflow-hidden supports-[overflow:clip]:overflow-clip">
           {children}
