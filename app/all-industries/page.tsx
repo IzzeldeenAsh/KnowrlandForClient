@@ -3,6 +3,7 @@ import PageIllustration from "@/components/page-illustration"
 import IndustriesGrid from '@/components/industries-grid'
 import HeaderLight from '@/components/ui/header-light'
 import FooterLight from '@/components/ui/footer-light'
+import Breadcrumb from '@/components/ui/breadcrumb'
 
 export const metadata: Metadata = {
   title: 'All Industries - ForesightA',
@@ -71,42 +72,55 @@ export default async function AllIndustries() {
 
   const industries = data?.data || mockIndustries
 
-  return (
-    <>
-    <HeaderLight />
-      <section className="relative">
-      <PageIllustration />
-      <div className="mx-auto max-w-6xl px-4 sm:px-6">
-        <div className="pt-32 pb-12 md:pt-40 md:pb-20">
-          {/* Section header */}
-          <div className="mx-auto max-w-3xl text-center pb-12 md:pb-16">
-            <h1 
-              className="h1 mb-4 font-bold text-5xl md:text-6xl bg-clip-text text-transparent bg-gradient-to-r from-blue-500 to-teal-400" 
-              data-aos="zoom-y-out"
-            >
-              All Industries
-            </h1>
-            <p 
-              className="text-xl text-gray-600"
-              data-aos="zoom-y-out" 
-              data-aos-delay="150"
-            >
-              Explore our comprehensive list of industries and their sub-categories.
-            </p>
-            {error && (
-              <div className="mt-4 text-sm text-red-500 bg-red-50 p-3 rounded-lg">
-                {error}
-              </div>
-            )}
-          </div>
+  const breadcrumbItems = [
+    { label: 'All Industries', href: '/all-industries' }
+  ]
 
-          {/* Industries grid */}
-          <IndustriesGrid industries={industries} />
+  return (
+    <div className="flex flex-col min-h-screen">
+      <HeaderLight />
+      <main className="grow">
+           <PageIllustration />
+                {/* Section header */}
+              <div className="section-header   px-4 sm:px-6 lg:px-8 py-8 lg:py-12 relative overflow-hidden rounded-lg">
+                  <div className="relative z-10 max-w-6xl relative mx-auto mt-20 w-full ">
+                   <Breadcrumb items={breadcrumbItems} />
+                  <div className="mx-auto  max-w-3xl text-center pb-12 md:pb-16">
+                    <h1 
+                      className="h1 mb-4 font-bold text-5xl md:text-6xl bg-clip-text text-transparent bg-gradient-to-r from-blue-500 to-teal-400" 
+                      data-aos="zoom-y-out"
+                    >
+                      All Industries
+                    </h1>
+                    <p 
+                      className="text-xl text-gray-600"
+                      data-aos="zoom-y-out" 
+                      data-aos-delay="150"
+                    >
+                      Explore our comprehensive list of industries and their sub-categories.
+                    </p>
+                    {error && (
+                      <div className="mt-4 text-sm text-red-500 bg-red-50 p-3 rounded-lg">
+                        {error}
+                      </div>
+                    )}
+                  </div>
+                  </div>
+               </div>
+        <div className="max-w-6xl mx-auto px-4 sm:px-6">
+          <div className="pb-12 ">
+            <section className="relative">
+              <div className="mx-auto max-w-6xl px-4 sm:px-6">
+                <div className=" pb-12 md:pb-20">
+                  {/* Industries grid */}
+                  <IndustriesGrid industries={industries} />
+                </div>
+              </div>
+            </section>
+          </div>
         </div>
-      </div>
-    </section>
-    <FooterLight />
-    </>
-  
+      </main>
+      <FooterLight />
+    </div>
   )
 }
