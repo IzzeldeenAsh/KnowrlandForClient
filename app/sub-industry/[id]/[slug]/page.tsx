@@ -34,7 +34,7 @@ interface Params {
 }
 
 interface Props {
-  params: Promise<Params> | Params;
+  params: Promise<Params>;
 }
 
 async function fetchSubIndustryData(id: string, slug: string) {
