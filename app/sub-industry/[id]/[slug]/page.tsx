@@ -28,11 +28,13 @@ interface SubIndustryDetails {
   topic: Topic[]
 }
 
+interface Params {
+  id: string;
+  slug: string;
+}
+
 interface Props {
-  params: {
-    id: string
-    slug: string
-  }
+  params: Promise<Params> | Params;
 }
 
 async function fetchSubIndustryData(id: string, slug: string) {
