@@ -32,7 +32,7 @@ interface Params {
 }
 
 interface Props {
-  params: Params;
+  params: Promise<Params>;
 }
 
 async function fetchIndustryData(id: string, slug: string) {
@@ -67,7 +67,7 @@ async function fetchIndustryData(id: string, slug: string) {
 
 // Generate metadata for SEO
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
- const { id , slug} = params
+ const { id, slug } = await params
 
   try {
     const { data } = await fetchIndustryData(id, slug)
@@ -90,7 +90,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 }
 
 export default async function IndustryPage({ params }: Props) {
-const { id , slug} = params
+const { id, slug } = await params
 
   try {
     const { data: industry } = await fetchIndustryData(id, slug)
