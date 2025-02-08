@@ -11,6 +11,7 @@ interface KnowledgeSideBoxProps {
   language: string;
   isic_code?: {
     name: string;
+    key: number;
   };
   hs_code?: any;
   published_at: string;
@@ -32,10 +33,10 @@ const KnowledgeSideBox = ({
   }, {});
 
   return (
-    <div className="tp-course-details2-widget">
+    <div className="tp-course-details2-widget sticky ">
       <div className="p-4">
         <div className="text-center mb-4">
-     <span className='text-3xl font-bold'>  ${total_price}</span>   
+          <span className='text-3xl font-bold'>  ${total_price}</span>   
           <span className="text-md text-gray-500 ml-2 capitalize">One time purchase</span>
         </div>
 
@@ -55,23 +56,23 @@ const KnowledgeSideBox = ({
               Documents
             </span>
             <div className="flex flex-wrap gap-2 mt-2">
-            {Object.entries(documentCounts).map(([ext, count]) => {
-  let bgColor = "bg-gray-100";
-  if (["doc", "docx"].includes(ext)) {
-    bgColor = "bg-blue-100 text-blue-700";
-  } else if (["ppt", "pptx", "pdf"].includes(ext)) {
-    bgColor = "bg-red-100 text-red-700";
-  } else if (["csv", "xls", "xlsx"].includes(ext)) {
-    bgColor = "bg-green-100 text-green-700";
-  } else {
-    bgColor = "bg-gray-100 text-gray-700";
-  }
-  return (
-    <span key={ext} className={`px-2 py-1 uppercase ${bgColor} rounded-full text-sm`}>
-      {count} {ext}
-    </span>
-  );
-})}
+              {Object.entries(documentCounts).map(([ext, count]) => {
+                let bgColor = "bg-gray-100";
+                if (["doc", "docx"].includes(ext)) {
+                  bgColor = "bg-blue-100 text-blue-700";
+                } else if (["ppt", "pptx", "pdf"].includes(ext)) {
+                  bgColor = "bg-red-100 text-red-700";
+                } else if (["csv", "xls", "xlsx"].includes(ext)) {
+                  bgColor = "bg-green-100 text-green-700";
+                } else {
+                  bgColor = "bg-gray-100 text-gray-700";
+                }
+                return (
+                  <span key={ext} className={`px-2 py-1 uppercase ${bgColor} rounded-full text-sm`}>
+                    {count} {ext}
+                  </span>
+                );
+              })}
             </div>
           </div>
 
@@ -85,11 +86,18 @@ const KnowledgeSideBox = ({
 
           {isic_code && (
             <div className="tp-course-details2-widget-list-item flex items-center justify-between">
-              <span>
+              <span className="flex items-center gap-2 font-medium text-gray-700">
                 <BuildingLibraryIcon className="w-5 h-5 mr-2" />
                 ISIC Code
               </span>
-              <span className="block mt-1">{isic_code.name}</span>
+              <div className="group relative inline-block">
+                <span className="inline-flex items-center rounded-md bg-blue-50 px-2 py-1 text-xs font-medium text-blue-700 ring-1 ring-inset ring-blue-700/10 mt-1">
+                  {isic_code.key}
+                </span>
+                <span className="absolute bottom-full left-1/2 mb-2 hidden -translate-x-1/2 transform rounded bg-white p-2 text-xs text-gray-700 shadow-lg border border-gray-200 group-hover:block">
+                  {isic_code.name}
+                </span>
+              </div>
             </div>
           )}
 
@@ -108,9 +116,9 @@ const KnowledgeSideBox = ({
               <CalendarIcon className="w-5 h-5 mr-2" />
               Published At
             </span>
-          <span className="block mt-1">
-            {published_at ? new Date(published_at).toLocaleDateString() : "N/A"}
-          </span>
+            <span className="block mt-1">
+              {published_at ? new Date(published_at).toLocaleDateString() : "N/A"}
+            </span>
           </div>
 
           <div className="tp-course-details2-widget-list-item flex items-center justify-between">
