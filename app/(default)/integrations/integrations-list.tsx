@@ -287,7 +287,7 @@ export default function IntegrationsList() {
 
                 {items.map((item, index) => (
                   item.category === 'Engineering' && (
-                    <IntegrationCard item={item} index={index} />
+                    <IntegrationCard item={item} index={index} key={index} />
                   )
                 ))}
 
@@ -300,7 +300,7 @@ export default function IntegrationsList() {
 
                 {items.map((item, index) => (
                   item.category === 'No-code' && (
-                    <IntegrationCard item={item} index={index} />
+                    <IntegrationCard item={item} index={index} key={index} />
                   )
                 ))}
 
@@ -313,7 +313,7 @@ export default function IntegrationsList() {
 
                 {items.map((item, index) => (
                   item.category === 'Collaboration' && (
-                    <IntegrationCard item={item} index={index} />
+                    <IntegrationCard item={item} index={index} key={index} />
                   )
                 ))}
 
@@ -326,7 +326,7 @@ export default function IntegrationsList() {
 
                 {items.map((item, index) => (
                   item.category === 'Productivity' && (
-                    <IntegrationCard item={item} index={index} />
+                    <IntegrationCard item={item} index={index } key={index} />
                   )
                 ))}
 
