@@ -6,6 +6,7 @@ import { Metadata } from 'next'
 import IndustryIcon from "@/components/icons/industry-icon";
 import Link from 'next/link';
 import FolderIcon from '@/components/icons/folder-icon'
+import KnowledgeIcon from '@/components/icons/knowledge-icon'
 import { fetchBreadcrumb } from '@/utils/breadcrumb'
 
 interface Knowledge {
@@ -38,9 +39,9 @@ interface Props {
   params: Promise<Params>;
 }
 
-async function fetchSubIndustryData(id: string, slug: string) {
+async function fetchTopicData(id: string, slug: string) {
   const response = await fetch(
-    `https://api.foresighta.co/api/industries/sub/${id}/${slug}`,
+    `https://api.foresighta.co/api/industries/topics/${id}/${slug}`,
     {
       method: 'POST',
       headers: {
@@ -48,8 +49,6 @@ async function fetchSubIndustryData(id: string, slug: string) {
         "Accept": "application/json",
         "Accept-Language": "en",
       },
-      body: JSON.stringify({ top_knowledge: 10 }),
-      next: { revalidate: 3600 } // Cache for 1 hour
     }
   )
 
@@ -61,7 +60,7 @@ async function fetchSubIndustryData(id: string, slug: string) {
     })
     const errorText = await response.text()
     console.error('Error response:', errorText)
-    throw new Error(`Failed to fetch sub-industry details: ${response.status} ${response.statusText}`)
+    throw new Error(`Failed to fetch topic details: ${response.status} ${response.statusText}`)
   }
 
   const data = await response.json()
@@ -73,35 +72,31 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { id, slug } = await params
 
   try {
-    const { data } = await fetchSubIndustryData(id, slug)
+    const { data } = await fetchTopicData(id, slug)
     
     return {
-      title: `${data.name} Sub-Industry Analysis | Foresighta`,
-      description: `Detailed analysis and insights about ${data.name} sub-industry, including ${data.topic.map((topic: Topic) => topic.name).join(', ')}`,
+      title: `${data.name} Topic Analysis | Foresighta`,
+      description: `Detailed analysis and insights about ${data.name} topic.`,
       openGraph: {
-        title: `${data.name} Sub-Industry Analysis | Foresighta`,
-        description: `Detailed analysis and insights about ${data.name} sub-industry, including ${data.topic.map((topic: Topic) => topic.name).join(', ')}`,
+        title: `${data.name} Topic Analysis | Foresighta`,
+        description: `Detailed analysis and insights about ${data.name} topic.`,
       }
     }
   } catch (error) {
     console.error('Metadata generation error:', error)
     return {
-      title: 'Sub-Industry Analysis | Foresighta',
-      description: 'Detailed sub-industry analysis and insights'
+      title: 'Topic Analysis | Foresighta',
+      description: 'Detailed topic analysis and insights'
     }
   }
 }
 
-export default async function SubIndustryPage({ params }: Props) {
+export default async function TopicPage({ params }: Props) {
   const { id, slug } = await params
 
   try {
-    const { data: subIndustry } = await fetchSubIndustryData(id, slug)
-    const breadcrumbData = await fetchBreadcrumb('sub-industry', parseInt(id))
-    const breadcrumbItems = breadcrumbData.map(item => ({
-      label: item.label,
-      href: item.url
-    }))
+    const { data: topic } = await fetchTopicData(id, slug)
+    const breadcrumbItems = await fetchBreadcrumb('topic', parseInt(id))
 
     return (
       <>
@@ -118,17 +113,22 @@ export default async function SubIndustryPage({ params }: Props) {
             <div className="relative z-10 max-w-6xl relative mx-auto mt-20 w-full">
               {/* Breadcrumb */}
               <div className="mb-8">
-                <Breadcrumb items={breadcrumbItems} />
+                <Breadcrumb 
+                  items={breadcrumbItems.map(item => ({
+                    label: item.label,
+                    href: item.url
+                  }))} 
+                />
               </div>
               {/* Header */}
               <div className="text-start mb-4" data-aos="fade-down">
                 <div className="flex flex-row gap-4">
                 <div className="mb-4 mt-1">
-                <IndustryIcon width={32} height={32}/>
+                <FolderIcon width={32} height={32} />
                 </div>
                  <div className="flex flex-col items-start ">
                  <h3 className="text-md bg-gradient-to-r from-blue-500 to-teal-400 md:text-3xl font-extrabold text-transparent bg-clip-text mb-4">
-                    {subIndustry.name}
+                    {topic.name}
                   </h3>
                
                  </div>
@@ -145,52 +145,43 @@ export default async function SubIndustryPage({ params }: Props) {
           <div className="max-w-container relative mx-auto mt-10 w-full px-4 sm:px-6 lg:px-8 pb-12">
             <div className="max-w-6xl mx-auto">
               <div className="mb-8 text-start">
-                <h2 className="text-2xl font-bold text-gray-900 mb-2">Topics & Knowledge</h2>
-                <p className="text-gray-600">Explore topics and insights within {subIndustry.name}</p>
+                <h2 className="text-2xl font-bold text-gray-900 mb-2">Knowledge</h2>
+                <p className="text-gray-600">Explore insights within {topic.name}</p>
               </div>
 
               {/* Topics Grid */}
-              <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-2 max-w-7xl mx-auto">
-                {subIndustry.topic.map((topic: Topic) => (
-                  <div
-                    key={topic.id}
-                    className="relative bg-white rounded-sm p-6 shadow-sm hover:shadow-md transition-all duration-300"
-                    data-aos="fade-up"
-                  >
-                    <div className="space-y-2">
-                      <div className="flex items-center gap-2">
-                        <FolderIcon width={20} height={20} />
-                        <Link href={`/topic/${topic.id}/${topic.slug}`}>
-                          <h3 className="text-sm font-semibold text-gray-900">
-                            {topic.name}
-                          </h3>
-                        </Link>
-                      </div>
-
-                      {topic.knowledge.length > 0 ? (
-                        <ul className="space-y-1">
-                          {topic.knowledge.map((item: Knowledge, index: number) => (
-                            <li
-                              key={`${item.id}-${index}`}
-                              className="text-xs text-gray-600 hover:text-blue-600 transition-colors flex items-center"
-                            >
-                              <span className="mr-2">•</span>
-                              <Link href={`/knowledge/${item.type}/${item.slug}`}>
-                                {item.title}
-                              </Link>
-                            </li>
-                          ))}
-                        </ul>
-                      ) : (
-                        <div className="text-xs text-gray-500 italic flex items-center">
-                          <span className="mr-2">•</span>
-                          <p>No knowledge items available</p>
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                ))}
-              </div>
+              <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4 max-w-7xl mx-auto">
+  {topic.knowledge.map((item: Knowledge) => (
+    <div
+      key={item.id}
+      className="bg-white rounded-sm p-6 shadow-sm hover:shadow-md transition-all duration-300"
+      data-aos="fade-up"
+    >
+      <div className="space-y-3">
+        <div className="flex items-center gap-2">
+          <KnowledgeIcon width={20} height={20} />
+          <h3 className="text-sm font-semibold text-gray-900">
+            {item.title}
+          </h3>
+        </div>
+        <p className="text-xs text-gray-600">
+          {item.type}
+        </p>
+        <Link 
+          href={`/knowledge/${item.type}/${item.slug}`}
+          className="text-xs text-blue-600 hover:text-blue-800 transition-colors"
+        >
+          Learn more →
+        </Link>
+      </div>
+    </div>
+  ))}
+  {topic.knowledge.length === 0 && (
+    <div className="col-span-full text-center py-8">
+      <p className="text-gray-500 italic">No knowledge items available</p>
+    </div>
+  )}
+</div>
             </div>
           </div>
         </div>
