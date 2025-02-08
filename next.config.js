@@ -11,6 +11,10 @@ const nextConfig = {
         protocol: 'https',
         hostname: 'res.cloudinary.com',
       },
+      {
+        protocol: 'https',
+        hostname: '4sighta-common.s3.eu-north-1.amazonaws.com',
+      },
     ],
   },
   // Optionally, add any other Next.js config below

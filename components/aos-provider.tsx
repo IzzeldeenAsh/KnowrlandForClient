@@ -26,5 +26,5 @@ export default function AOSProvider({
     return <>{children}</>
   }
 
-  return <div data-aos-initialized="true">{children}</div>
+  return <div data-aos-initialized="true" style={{ position: 'relative' }}>{children}</div>
 }
