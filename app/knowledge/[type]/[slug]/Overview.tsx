@@ -11,11 +11,11 @@ interface Document {
   price: string
   description: string | null
   file_extension: string
-  table_of_content: {
+  table_of_content: Array<{
     chapter: {
       title: string
     }
-  }[] | null
+  }>
 }
 
 export interface KnowledgeDetails {
@@ -149,13 +149,15 @@ export default function Overview({ knowledge }: OverviewProps) {
                           <tr>
                             <th>Chapter</th>
                             <th>Title</th>
+                            <th>Page</th>
                           </tr>
                         </thead>
                         <tbody>
-                          {doc.table_of_content.map((item, index) => (
+                          {doc.table_of_content.map((toc, index) => (
                             <tr key={index}>
                               <td>Chapter {index + 1}</td>
-                              <td>{item.chapter.title}</td>
+                              <td>{toc.chapter.title}</td>
+                              <td></td>
                             </tr>
                           ))}
                         </tbody>
