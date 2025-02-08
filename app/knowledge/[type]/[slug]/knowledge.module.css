@@ -1,5 +1,5 @@
 .breadcrumbBg {
-   background-image: url('https://res.cloudinary.com/dsiku9ipv/image/upload/v1737266454/breadcrumb-bg-2_anwto8.png');
+  background-image: url('https://res.cloudinary.com/dsiku9ipv/image/upload/v1737266454/breadcrumb-bg-2_anwto8.png');
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
@@ -57,56 +57,56 @@
 }
 
 .tpCourseDetails2Widget {
-    top: 180px;
-    padding: 15px;
-    border-radius: 10px;
-    background-color: #fff;
-    box-shadow: 0 0 24px 0 rgba(3, 31, 66, 0.05);
-    margin-top: -300px;
-    position: sticky;
-    border: 1px solid #DFDFDF;
-    z-index: 1;
+  top: 180px;
+  padding: 15px;
+  border-radius: 10px;
+  background-color: #fff;
+  box-shadow: 0 0 24px 0 rgba(3, 31, 66, 0.05);
+  margin-top: -300px;
+  position: sticky;
+  border: 1px solid #DFDFDF;
+  z-index: 1;
 }
 
 @media (max-width: 991px) {
-    .tpCourseDetails2Widget {
-        position: relative;
-        top: 0;
-        margin-top: 0;
-        box-shadow: none;
-    }
+  .tpCourseDetails2Widget {
+    position: relative;
+    top: 0;
+    margin-top: 0;
+    box-shadow: none;
+  }
 }
 
 .tpCourseDetails2WidgetList {
-    list-style: none;
-    padding: 0;
-    margin: 0;
+  list-style: none;
+  padding: 0;
+  margin: 0;
 }
 
 .tpCourseDetails2WidgetListItem {
-    margin-bottom: 15px;
-    padding-bottom: 15px;
-    border-bottom: 1px solid rgba(3, 31, 66, 0.1);
+  margin-bottom: 15px;
+  padding-bottom: 15px;
+  border-bottom: 1px solid rgba(3, 31, 66, 0.1);
 }
 
 .tpCourseDetails2WidgetListItem:last-child {
-    border-bottom: none;
-    margin-bottom: 0;
-    padding-bottom: 0;
+  border-bottom: none;
+  margin-bottom: 0;
+  padding-bottom: 0;
 }
 
 .tpCourseDetails2WidgetListItemSpan {
-    font-size: 13px;
-    font-weight: 500;
+  font-size: 13px;
+  font-weight: 500;
 }
 
 .tpCourseDetails2WidgetListItemIcon {
-    display: flex;
-    align-items: center;
+  display: flex;
+  align-items: center;
 }
 
 .tpCourseDetails2WidgetListItemIcon i {
-    color: #4f5158;
+  color: #4f5158;
 }
 
 .tpCourseDetails2WidgetContent {
@@ -295,7 +295,6 @@
 
 .documentHeader:hover .fileIcon {
   transform: scale(1.05);
-
 }
 
 .mb1 {
