@@ -73,12 +73,14 @@ export default async function AllIndustries() {
   const industries = data?.data || mockIndustries
 
   const breadcrumbItems = [
-    { label: 'All Industries', href: '/all-industries' }
+    { label: 'Industries', href: '/all-industries' }
   ]
 
   return (
+    <>
+    <HeaderLight />
     <div className="flex flex-col min-h-screen">
-      <HeaderLight />
+     
       <main className="grow">
            <PageIllustration />
                 {/* Section header */}
@@ -120,7 +122,9 @@ export default async function AllIndustries() {
           </div>
         </div>
       </main>
-      <FooterLight />
+     
     </div>
+     <FooterLight />
+     </>
   )
 }

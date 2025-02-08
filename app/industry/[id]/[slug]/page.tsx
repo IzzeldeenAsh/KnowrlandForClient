@@ -5,6 +5,7 @@ import Image from 'next/image'
 import { Metadata } from 'next'
 import IndustryIcon from "@/components/icons/industry-icon";
 import Link from 'next/link'
+import { fetchBreadcrumb } from '@/utils/breadcrumb'
 
 interface Topic {
   id: number
@@ -94,11 +95,7 @@ const { id, slug } = await params
 
   try {
     const { data: industry } = await fetchIndustryData(id, slug)
-
-    const breadcrumbItems = [
-      { label: 'All Industries', href: '/all-industries' },
-      { label: industry.name, href: `/industry/${industry.id}/${industry.slug}` }
-    ]
+    const breadcrumbItems = await fetchBreadcrumb('industry', parseInt(id))
 
     return (
       <>
@@ -115,7 +112,7 @@ const { id, slug } = await params
                 <div className="relative z-10 max-w-6xl relative mx-auto mt-20 w-full ">
                   {/* Breadcrumb */}
                   <div className="mb-8">
-                    <Breadcrumb items={breadcrumbItems} />
+                    <Breadcrumb items={breadcrumbItems.map(item => ({ ...item, href: item.url }))} />
                   </div>
                   {/* Header */}
                   <div className="text-start  mb-4" data-aos="fade-down">
@@ -144,18 +141,19 @@ const { id, slug } = await params
                   className="relative bg-white rounded-sm p-6 shadow-sm hover:shadow-md transition-all duration-300"
                   data-aos="fade-up"
                 >
-                  <Link href={`/sub-industry/${child.id}/${child.slug}`} className="block">
                     <div className="space-y-2">
+                  <Link href={`/sub-industry/${child.id}/${child.slug}`} className="block">
                       <div className="flex items-center gap-2">
                         <IndustryIcon />
                         <h3 className="text-sm font-semibold text-gray-900 hover:text-blue-600">
                           {child.name}
                         </h3>
                       </div>
-                  
+                      </Link>
                       {child.topic.length > 0 ? (
                         <ul className="space-y-1">
                           {child.topic.map((topic: Topic) => (
+                            <Link href={`/topic/${topic.id}/${topic.slug}`} key={topic.id} className="block">
                             <li
                               key={topic.id}
                               className="text-xs text-gray-600 hover:text-blue-600 transition-colors flex items-center"
@@ -163,6 +161,7 @@ const { id, slug } = await params
                               <span className="mr-2">•</span>
                               {topic.name}
                             </li>
+                            </Link>
                           ))}
                         </ul>
                       ) : (
@@ -172,7 +171,7 @@ const { id, slug } = await params
                         </div>
                       )}
                     </div>
-                  </Link>
+                
                 </div>
               ))}
             </div>

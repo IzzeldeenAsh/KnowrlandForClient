@@ -1,6 +1,5 @@
-'use client'
 
-import { useRouter } from 'next/navigation'
+import Link from 'next/link'
 
 interface Industry {
   id: number
@@ -8,7 +7,8 @@ interface Industry {
   slug: string
   children: {
     id: number
-    name: string
+    name: string,
+    slug: string
   }[]
 }
 
@@ -17,11 +17,7 @@ interface IndustriesGridProps {
 }
 
 export default function IndustriesGrid({ industries }: IndustriesGridProps) {
-  const router = useRouter()
 
-  const handleIndustryClick = (industryId: number, slug: string) => {
-    router.push(`/industry/${industryId}/${slug}`)
-  }
 
   return (
     <div 
@@ -33,20 +29,23 @@ export default function IndustriesGrid({ industries }: IndustriesGridProps) {
         <div 
           key={industry.id} 
           className="relative bg-white rounded-sm p-6 shadow-sm hover:shadow-md transition-all duration-300 cursor-pointer"
-          onClick={() => handleIndustryClick(industry.id, industry.slug)}
         >
           <div className="space-y-2">
+            <Link href={`/industry/${industry.id}/${industry.slug}`}>
             <h3 className="text-sm font-semibold text-gray-900  hover:text-blue-600 " >
               {industry.name}
             </h3>
+            </Link>
             <ul className="space-y-1">
               {industry.children.map((child) => (
                 <li 
                   key={child.id} 
                   className="text-xs text-gray-600 hover:text-blue-600 transition-colors flex items-center"
                 >
-                  <span className="mr-2">•</span>
-                  {child.name}
+               <Link href={`/sub-industry/${child.id}/${child.slug}`}>
+               <span className="mr-2">•</span>
+               {child.name}
+               </Link>
                 </li>
               ))}
             </ul>

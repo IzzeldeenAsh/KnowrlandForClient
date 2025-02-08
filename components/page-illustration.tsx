@@ -14,6 +14,7 @@ export default function PageIllustration() {
           src={Stripes}
           width={768}
           height={768}
+          style={{ width: 'auto', height: 'auto' }}
           alt="Stripes"
           priority
         />
