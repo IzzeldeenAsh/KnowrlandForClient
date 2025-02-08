@@ -35,7 +35,7 @@ const getFileIconByExtension = (extension: string) => {
     doc: '/file-icons/doc.svg',
     docx: '/file-icons/doc.svg',
     xls: '/file-icons/xls.svg',
-    xlsx: '/file-icons/xls.svg',
+    xlsx: '/file-icons/xlsx.svg',
     ppt: '/file-icons/ppt.svg',
     pptx: '/file-icons/ppt.svg',
     csv: '/file-icons/csv.svg',
@@ -141,7 +141,7 @@ export default function Overview({ knowledge }: OverviewProps) {
                       <p>{doc.description}</p>
                     </div>
                   )}
-                  {doc.table_of_content && (
+                  {doc.table_of_content && Array.isArray(doc.table_of_content) && (
                     <div className={styles.tableOfContents}>
                       <h6>Table of Contents</h6>
                       <table className={styles.tocTable}>

@@ -49,7 +49,6 @@ async function fetchSubIndustryData(id: string, slug: string) {
         "Accept-Language": "en",
       },
       body: JSON.stringify({ top_knowledge: 10 }),
-      next: { revalidate: 3600 } // Cache for 1 hour
     }
   )
 

@@ -3,7 +3,13 @@ import HeaderLight from "@/components/ui/header-light";
 import Breadcrumb from "@/components/ui/breadcrumb";
 import Image from "next/image";
 import { Metadata } from "next";
-import FolderIcon from "@/components/icons/folder-icon";
+import { notFound } from "next/navigation";
+import DataIcon from "@/components/icons/DataIcon";
+import InsightIcon from "@/components/icons/InsightIcon";
+import ManualIcon from "@/components/icons/ManualIcon";
+import ReportIcon from "@/components/icons/ReportIcon";
+import KnowledgeIcon from "@/components/icons/knowledge-icon";
+import IndustryIcon from "@/components/icons/industry-icon";
 import { fetchBreadcrumb } from "@/utils/breadcrumb";
 import KnowledgeSideBox from './KnowledgeSideBox';
 import { StarIcon } from "@heroicons/react/20/solid";
@@ -75,7 +81,6 @@ async function fetchKnowledgeData(type: string, slug: string) {
         Accept: "application/json",
         "Accept-Language": "en",
       },
-      next: { revalidate: 3600 }, // Cache for 1 hour
     }
   );
 
@@ -85,6 +90,11 @@ async function fetchKnowledgeData(type: string, slug: string) {
       statusText: response.statusText,
       url: response.url,
     });
+    
+    if (response.status === 404) {
+      notFound();
+    }
+    
     const errorText = await response.text();
     console.error("Error response:", errorText);
     throw new Error(
@@ -153,7 +163,11 @@ export default async function KnowledgePage({ params }: Props) {
               <div className="text-start mb-4" data-aos="fade-down">
                 <div className="flex flex-row gap-4">
                   <div className="mb-4 mt-1">
-                    <FolderIcon width={32} height={32} />
+                    {knowledge.type === 'data' &&<div className="bg-white p-3 rounded  flex items-center justify-center"> <DataIcon width={40} height={40} /> </div>}
+                    {knowledge.type === 'insight' && <div className="bg-white p-2 rounded  flex items-center justify-center"> <InsightIcon width={50} height={50} /> </div>}
+                    {knowledge.type === 'manual' && <div className="bg-white p-2 rounded  flex items-center justify-center"> <ManualIcon width={50} height={50} /> </div>}
+                    {knowledge.type === 'report' && <div className="bg-white p-2 rounded  flex items-center justify-center"> <ReportIcon width={50} height={50} /> </div>}
+                    {knowledge.type === 'course' && <div className="bg-white p-2 rounded  flex items-center justify-center"> <KnowledgeIcon width={50} height={50} /> </div>}
                   </div>
                   <div className="flex flex-col items-start">
                     <div className="flex flex-col items-start mb-10">
@@ -168,13 +182,12 @@ export default async function KnowledgePage({ params }: Props) {
                   </div>
                 </div>
                 <div className="flex gap-6 text-sm ">
-                      <div className="relative">
+                      <div className="relative w-[50px] h-[50px]">
                         <Image
                           src={knowledge.insighter.profile_photo_url}
                           alt={knowledge.insighter.name}
-                          width={50}
-                          height={50}
-                          className="rounded-full"
+                          layout="fill"
+                          className="rounded-full object-cover"
                         />
                       </div>
                       <span className="flex flex-col">
