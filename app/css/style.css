@@ -4,7 +4,7 @@
 /* Additional styles */
 @import 'additional-styles/utility-patterns.css';
 @import 'additional-styles/theme.css';
-
+@import 'additional-styles/custom.css';
 @import 'tailwindcss/utilities';
 
 /* Additional Tailwind directives: https://tailwindcss.com/docs/functions-and-directives/#responsive */

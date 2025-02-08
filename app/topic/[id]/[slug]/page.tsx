@@ -6,7 +6,11 @@ import { Metadata } from 'next'
 import IndustryIcon from "@/components/icons/industry-icon";
 import Link from 'next/link';
 import FolderIcon from '@/components/icons/folder-icon'
-import KnowledgeIcon from '@/components/icons/knowledge-icon'
+import KnowledgeIcon from "@/components/icons/knowledge-icon";
+import DataIcon from "@/components/icons/DataIcon";
+import InsightIcon from "@/components/icons/InsightIcon";
+import ManualIcon from "@/components/icons/ManualIcon";
+import ReportIcon from "@/components/icons/ReportIcon";
 import { fetchBreadcrumb } from '@/utils/breadcrumb'
 
 interface Knowledge {
@@ -115,6 +119,7 @@ export default async function TopicPage({ params }: Props) {
               <div className="mb-8">
                 <Breadcrumb 
                   items={breadcrumbItems.map(item => ({
+                    key: item.url,
                     label: item.label,
                     href: item.url
                   }))} 
@@ -150,31 +155,39 @@ export default async function TopicPage({ params }: Props) {
               </div>
 
               {/* Topics Grid */}
-              <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4 max-w-7xl mx-auto">
+              <div className="grid  lg:grid-cols-2 gap-4 max-w-7xl mx-auto">
   {topic.knowledge.map((item: Knowledge) => (
-    <div
-      key={item.id}
-      className="bg-white rounded-sm p-6 shadow-sm hover:shadow-md transition-all duration-300"
-      data-aos="fade-up"
+      <Link 
+      href={`/knowledge/${item.type}/${item.slug}`}
+      className="text-xs text-blue-600 hover:text-blue-800 transition-colors"
     >
-      <div className="space-y-3">
-        <div className="flex items-center gap-2">
-          <KnowledgeIcon width={20} height={20} />
-          <h3 className="text-sm font-semibold text-gray-900">
+      <div className="flex bg-white rounded-sm gap-4 p-6 shadow-sm hover:shadow-md transition-all duration-300"      
+      data-aos="fade-up">
+      <div className="flex flex-col items-center gap-4">
+          {item.type === 'data' && <DataIcon width={30} height={30} />}
+          {item.type === 'insight' && <InsightIcon width={30} height={30} />}
+          {item.type === 'manual' && <ManualIcon width={40} height={40} />}
+          {item.type === 'report' && <ReportIcon width={40} height={40} />}
+          {item.type === 'course' && <KnowledgeIcon width={40} height={40} />}
+     
+        </div>
+        <div
+        className='flex flex-col gap-2'
+      key={item.id}
+    >
+        
+      <h3 className="text-sm font-semibold text-gray-900">
             {item.title}
           </h3>
-        </div>
-        <p className="text-xs text-gray-600">
+          <div className="space-y-3">
+        <span className="inline-flex items-center justify-center px-2 py-1  font-bold leading-none text-white bg-blue-600 rounded-full uppercase">
           {item.type}
-        </p>
-        <Link 
-          href={`/knowledge/${item.type}/${item.slug}`}
-          className="text-xs text-blue-600 hover:text-blue-800 transition-colors"
-        >
-          Learn more →
-        </Link>
+        </span>
       </div>
     </div>
+      </div>
+
+    </Link>
   ))}
   {topic.knowledge.length === 0 && (
     <div className="col-span-full text-center py-8">
