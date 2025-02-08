@@ -32,15 +32,10 @@ export interface KnowledgeDetails {
     file_extension: string;
     price: string;
     description: string | null;
-    table_of_content: {
+    table_of_content: Array<{
       chapter: {
         title: string;
-        page: number;
-        sub_child: {
-          title: string;
-          page: number;
-        };
       };
-    };
+    }>;
   }>;
 }
