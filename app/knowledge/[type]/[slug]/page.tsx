@@ -186,7 +186,8 @@ export default async function KnowledgePage({ params }: Props) {
                         <Image
                           src={knowledge.insighter.profile_photo_url}
                           alt={knowledge.insighter.name}
-                          layout="fill"
+                          fill={true}
+                          sizes="50px"
                           className="rounded-full object-cover"
                         />
                       </div>
@@ -240,7 +241,10 @@ export default async function KnowledgePage({ params }: Props) {
             </div>
           </div>
         </div>
+
         <FooterLight />
+
+
       </>
     );
   } catch (error) {

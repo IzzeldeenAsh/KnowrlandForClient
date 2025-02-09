@@ -49,14 +49,6 @@ const getFileIconByExtension = (extension: string) => {
 }
 
 export default function Overview({ knowledge }: OverviewProps) {
-  useEffect(() => {
-    if (knowledge.documents) {
-      knowledge.documents.forEach((doc) => {
-        console.log('Document:', doc);
-        console.log('Table of Contents:', doc.table_of_content);
-      });
-    }
-  }, [knowledge.documents]);
 
   return (
     <div className={styles.container}>
@@ -164,6 +156,21 @@ export default function Overview({ knowledge }: OverviewProps) {
                       </table>
                     </div>
                   )}
+                  <div className="max-w-xs mx-auto sm:max-w-none sm:inline-flex sm:justify-start space-y-2 sm:space-y-0 sm:space-x-2 mt-4">
+                    <div>
+                      <a className="btn-sm text-white bg-[#1C7CBB] text-sm hover:bg-opacity-90 transition duration-150 ease-in-out group text-sm px-3 py-1 cursor-pointer">
+                        Add to Cart <span className="tracking-normal text-white group-hover:translate-x-0.5 transition-transform duration-150 ease-in-out ml-1">-&gt;</span>
+                      </a>
+                    </div>
+                    <div>
+                      <a className="btn-sm text-slate-600 hover:text-slate-900 bg-slate-200 hover:bg-slate-300 transition duration-150 ease-in-out text-sm px-3 py-1 flex items-center border border-slate-300 cursor-pointer">
+                        <svg className="shrink-0 fill-slate-600 mr-2" xmlns="http://www.w3.org/2000/svg" width="12" height="12">
+                          <path d="m1.999 0 1 2-1 2 2-1 2 1-1-2 1-2-2 1zM11.999 0l1 2-1 2 2-1 2 1-1-2 1-2-2 1zM11.999 10l1 2-1 2 2-1 2 1-1-2 1-2-2 1zM6.292 7.586l2.646-2.647L11.06 7.06 8.413 9.707zM0 13.878l5.586-5.586 2.122 2.121L2.12 16z" />
+                        </svg>
+                        <span>Preview</span>
+                      </a>
+                    </div>
+                  </div>
                 </div>
               </div>
             ))
