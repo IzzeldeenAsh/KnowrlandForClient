@@ -1,11 +1,22 @@
+'use client';
+
 import Link from "next/link";
 import Logo from "./logo";
+import { useEffect, useState } from 'react';
+import Image from 'next/image';
 
 interface Industry {
   id: number;
   name: string;
   slug: string;
   children?: Industry[];
+}
+
+interface User {
+  name: string;
+  profile_photo_url: string | null;
+  first_name: string;
+  last_name: string;
 }
 
 async function getIndustries() {
@@ -32,8 +43,26 @@ async function getIndustries() {
   return json.data as Industry[];
 }
 
-export default async function Header() {
-  const industries = await getIndustries();
+export default function Header() {
+  const [industries, setIndustries] = useState<Industry[]>([]);
+  const [user, setUser] = useState<User | null>(null);
+
+  useEffect(() => {
+    const fetchIndustries = async () => {
+      const data = await getIndustries();
+      setIndustries(data);
+    };
+    fetchIndustries();
+
+    const userData = localStorage.getItem('user');
+    if (userData) {
+      setUser(JSON.parse(userData));
+    }
+  }, []);
+
+  const getInitials = (firstName: string, lastName: string) => {
+    return `${firstName[0]}${lastName[0]}`.toUpperCase();
+  };
 
   return (
     <header className="fixed top-2 z-30 w-full md:top-6">
@@ -87,7 +116,7 @@ export default async function Header() {
                           </div>
 
                           <div className="w-full lg:w-7/12 px-4">
-                          <div 
+                            <div 
                               className="flex flex-col justify-between items-center gap-5 pt-10 px-5 min-h-[250px] rounded shadow relative overflow-hidden"
                               style={{
                                 backgroundSize: 'cover',
@@ -124,24 +153,43 @@ export default async function Header() {
             </div>
           </div>
 
-          <ul className="flex flex-1 items-center justify-end gap-3">
-            <li>
-              <Link
-                href="https://foresighta.vercel.app/auth/login"
-                className="btn-sm bg-white text-gray-800 shadow hover:bg-gray-50"
-              >
-                Sign in
-              </Link>
-            </li>
-            <li>
-              <Link
-               href="https://foresighta.vercel.app/auth/sign-up"
+          {/* User profile or sign in/up links */}
+          <div className="flex items-center space-x-4">
+            {user ? (
+              <div>
+                {user.profile_photo_url ? (
+                  <div className="w-8 h-8 rounded-full overflow-hidden">
+                    <Image
+                      src={user.profile_photo_url}
+                      alt={user.name}
+                      width={32}
+                      height={32}
+                      className="object-cover"
+                    />
+                  </div>
+                ) : (
+                  <div className="w-8 h-8 rounded-full bg-blue-600 flex items-center justify-center text-white text-sm font-medium">
+                    {getInitials(user.first_name, user.last_name)}
+                  </div>
+                )}
+              </div>
+            ) : (
+              <>
+                <Link
+                  href="https://foresighta.vercel.app/auth/login"
+                  className="text-sm font-medium text-gray-700 hover:text-gray-900"
+                >
+                  Sign in
+                </Link>
+                <Link
+                  href="https://foresighta.vercel.app/auth/sign-up"
                 className="btn-sm bg-gray-800 text-gray-200 shadow hover:bg-gray-900"
-              >
-                Sign up
-              </Link>
-            </li>
-          </ul>
+                >
+                  Sign up
+                </Link>
+              </>
+            )}
+          </div>
         </div>
       </div>
     </header>
