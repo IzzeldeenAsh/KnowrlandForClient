@@ -127,18 +127,18 @@ export default async function Header() {
           <ul className="flex flex-1 items-center justify-end gap-3">
             <li>
               <Link
-                href="/signin"
+                href="https://foresighta.vercel.app/auth/login"
                 className="btn-sm bg-white text-gray-800 shadow hover:bg-gray-50"
               >
-                Login
+                Sign in
               </Link>
             </li>
             <li>
               <Link
-                href="/signup"
+               href="https://foresighta.vercel.app/auth/sign-up"
                 className="btn-sm bg-gray-800 text-gray-200 shadow hover:bg-gray-900"
               >
-                Register
+                Sign up
               </Link>
             </li>
           </ul>
