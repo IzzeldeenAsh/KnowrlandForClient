@@ -34,7 +34,8 @@ export default function AuthCallback() {
         const response = await fetch('https://api.foresighta.co/api/account/profile', {
           headers: {
             'Authorization': `Bearer ${token}`,
-            'Accept': 'application/json',
+            "Content-Type": "application/json",
+            "Accept-Language": "en",
           }
         });
 
