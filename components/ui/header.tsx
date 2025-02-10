@@ -16,11 +16,16 @@ export default function Header() {
   const [user, setUser] = useState<User | null>(null);
   const [roles, setRoles] = useState<string[]>([]);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     const fetchProfile = async () => {
       const token = localStorage.getItem('token');
-      if (!token) return;
+      setIsLoading(true);
+      if (!token) {
+        setIsLoading(false);
+        return;
+      }
 
       try {
         const response = await fetch('https://api.foresighta.co/api/account/profile', {
@@ -51,6 +56,8 @@ export default function Header() {
         setUser(userData);
       } catch (error) {
         console.error('Error fetching profile:', error);
+      } finally {
+        setIsLoading(false);
       }
     };
 
@@ -105,7 +112,9 @@ export default function Header() {
 
           {/* Desktop sign in links */}
           <ul className="flex-1 flex justify-end items-center">
-            {user ? (
+            {isLoading ? (
+              <div className="w-16 h-8 bg-slate-700/30 animate-pulse rounded"></div>
+            ) : user ? (
               <li className="relative group">
                 <div className="flex items-center cursor-pointer">
                   {user.profile_photo_url ? (
