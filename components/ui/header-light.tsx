@@ -49,6 +49,7 @@ export default function Header() {
   const [user, setUser] = useState<User | null>(null);
   const [roles, setRoles] = useState<string[]>([]);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     const fetchIndustries = async () => {
@@ -59,7 +60,11 @@ export default function Header() {
 
     const fetchProfile = async () => {
       const token = localStorage.getItem("token");
-      if (!token) return;
+      setIsLoading(true);
+      if (!token) {
+        setIsLoading(false);
+        return;
+      }
 
       try {
         const response = await fetch(
@@ -93,6 +98,8 @@ export default function Header() {
         setUser(userData);
       } catch (error) {
         console.error("Error fetching profile:", error);
+      } finally {
+        setIsLoading(false);
       }
     };
 
@@ -207,7 +214,9 @@ export default function Header() {
 
           {/* User profile or sign in/up links */}
           <div className="flex items-center space-x-4">
-            {user ? (
+            {isLoading ? (
+              <div className="w-16 h-8 bg-gray-200 animate-pulse rounded"></div>
+            ) : user ? (
               <div className="relative group">
                 <div className="flex items-center cursor-pointer">
                   {user.profile_photo_url ? (
@@ -341,7 +350,7 @@ export default function Header() {
                         </div>
                       </div>
                     </div>
-                    {roles.includes('client') && (
+                    {roles.includes('client') && !roles.includes('insighter') && !roles.includes('company') && (
                       <Link
                         href="https://foresighta.vercel.app/app/insighter-register/vertical"
                         className="block px-4 py-2 text-sm font-semibold bg-clip-text text-transparent bg-gradient-to-r from-blue-500 to-teal-400 "
