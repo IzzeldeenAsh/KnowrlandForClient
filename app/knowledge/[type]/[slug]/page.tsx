@@ -183,13 +183,25 @@ export default async function KnowledgePage({ params }: Props) {
                 </div>
                 <div className="flex gap-6 text-sm ">
                       <div className="relative w-[50px] h-[50px]">
-                        <Image
-                          src={knowledge.insighter.profile_photo_url}
-                          alt={knowledge.insighter.name}
-                          fill={true}
-                          sizes="50px"
-                          className="rounded-full object-cover"
-                        />
+                        {knowledge.insighter.profile_photo_url ? (
+                          <Image
+                            src={knowledge.insighter.profile_photo_url}
+                            alt={knowledge.insighter.name}
+                            fill={true}
+                            sizes="50px"
+                            className="rounded-full object-cover"
+                          />
+                        ) : (
+                          <div className="w-[50px] h-[50px] rounded-full bg-blue-500 flex items-center justify-center">
+                            <span className="text-lg text-white font-semibold">
+                              {knowledge.insighter.name
+                                .split(" ")
+                                .map((word:any) => word[0])
+                                .join("")
+                                .toUpperCase()}
+                            </span>
+                          </div>
+                        )}
                       </div>
                       <span className="flex flex-col">
                         <span className="text-sm text-gray-500">Insighter</span>

@@ -307,6 +307,7 @@ export default function Header() {
                         </Link>
                       </>
                     )}
+                 
                     <div className="relative group/settings">
                       <div className="block px-4 py-2 text-sm font-semibold text-slate-500 hover:bg-gray-100 cursor-pointer flex items-center justify-between">
                         Account Settings
@@ -340,7 +341,14 @@ export default function Header() {
                         </div>
                       </div>
                     </div>
-
+                    {roles.includes('client') && (
+                      <Link
+                        href="https://foresighta.vercel.app/app/insighter-register/vertical"
+                        className="block px-4 py-2 text-sm font-semibold bg-clip-text text-transparent bg-gradient-to-r from-blue-500 to-teal-400 "
+                      >
+                        Become an Insighter
+                      </Link>
+                    )}
                     <div className="border-t border-slate-100">
                       <button
                         onClick={handleSignOut}
