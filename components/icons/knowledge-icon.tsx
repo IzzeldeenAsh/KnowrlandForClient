@@ -1,11 +1,12 @@
 interface KnowledgeIconProps {
     width?: number;
     height?: number;
+    className?: string;
   }
   
-  export default function KnowledgeIcon({ width = 38, height = 44 }: KnowledgeIconProps) {
+  export default function KnowledgeIcon({ width = 38, height = 44, className }: KnowledgeIconProps) {
     return (
-      <svg width={width} height={height} viewBox="0 0 38 44" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <svg className={className} width={width} height={height} viewBox="0 0 38 44" fill="none" xmlns="http://www.w3.org/2000/svg">
         <rect x="38" y="3.9111" width="40.0889" height="38" rx="5" transform="rotate(90 38 3.9111)" fill="url(#paint0_linear_28_51)"/>
         <rect x="5.95911" y="28" width="16.8841" height="3" rx="1.5" fill="white"/>
         <rect x="5.95911" y="34" width="8.93864" height="3" rx="1.5" fill="white"/>
