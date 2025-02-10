@@ -155,46 +155,51 @@ export default async function TopicPage({ params }: Props) {
               </div>
 
               {/* Topics Grid */}
-              <div className="grid  lg:grid-cols-2 gap-4 max-w-7xl mx-auto">
-  {topic.knowledge.map((item: Knowledge) => (
-      <Link 
-      href={`/knowledge/${item.type}/${item.slug}`}
-      className="text-xs text-blue-600 hover:text-blue-800 transition-colors"
-    >
-      <div className="flex bg-white rounded-sm gap-4 p-6 shadow-sm hover:shadow-md transition-all duration-300"      
-      data-aos="fade-up">
-      <div className="flex flex-col items-center gap-4">
-          {item.type === 'data' && <DataIcon width={30} height={30} />}
-          {item.type === 'insight' && <InsightIcon width={30} height={30} />}
-          {item.type === 'manual' && <ManualIcon width={40} height={40} />}
-          {item.type === 'report' && <ReportIcon width={40} height={40} />}
-          {item.type === 'course' && <KnowledgeIcon width={40} height={40} />}
-     
-        </div>
-        <div
-        className='flex flex-col gap-2'
-      key={item.id}
-    >
-        
-      <h3 className="text-sm font-semibold text-gray-900">
-            {item.title}
-          </h3>
-          <div className="space-y-3">
-        <span className="inline-flex items-center justify-center px-2 py-1  font-bold leading-none text-white bg-blue-600 rounded-full uppercase">
-          {item.type}
-        </span>
-      </div>
-    </div>
-      </div>
-
-    </Link>
-  ))}
-  {topic.knowledge.length === 0 && (
-    <div className="col-span-full text-center py-8">
-      <p className="text-gray-500 italic">No knowledge items available</p>
-    </div>
-  )}
-</div>
+              <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4 max-w-7xl mx-auto">
+                {topic.knowledge.map((item: Knowledge, index: number) => (
+                  <Link
+                    href={`/knowledge/${item.type}/${item.slug}`}
+                    key={item.id + index}
+                    className="group relative flex flex-col overflow-hidden rounded-lg border border-gray-100 bg-white shadow-sm transition-all duration-300 hover:shadow-lg hover:border-blue-100"
+                  >
+                    <div 
+                      className="flex flex-col p-4 h-full relative z-10 bg-gradient-to-br from-white/95 to-white/80"
+                      style={{
+                        backgroundImage: 'url(https://res.cloudinary.com/dsiku9ipv/image/upload/v1739196782/bg-5-ol_2_zquwnb.png)',
+                        backgroundSize: '160%',
+                        backgroundPosition: '-30% 10%'
+                      }}
+                    >
+                      <div className="flex items-center gap-3 mb-3">
+                        <div className="rounded-lg bg-gradient-to-br from-blue-50/90 to-blue-100/90 backdrop-blur-sm p-2 w-fit group-hover:from-blue-100/90 group-hover:to-blue-200/90 transition-all duration-300">
+                          {item.type === 'data' && <DataIcon width={20} height={20} />}
+                          {item.type === 'insight' && <InsightIcon width={20} height={20} />}
+                          {item.type === 'manual' && <ManualIcon width={20} height={20} />}
+                          {item.type === 'report' && <ReportIcon width={20} height={20} />}
+                          {item.type === 'course' && <KnowledgeIcon width={20} height={20} />}
+                        </div>
+                        <span className="text-xs font-medium text-blue-600 capitalize bg-white/80 px-2 py-1 rounded-full backdrop-blur-sm">
+                          {item.type}
+                        </span>
+                      </div>
+                      
+                      <div className="flex flex-col flex-grow">
+                        <h3 className="text-sm font-semibold text-gray-900 group-hover:text-blue-600 transition-colors duration-300  p-2 rounded-lg ">
+                          {item.title}
+                        </h3>
+                      </div>
+                    </div>
+                  </Link>
+                ))}
+                {topic.knowledge.length === 0 && (
+                  <div className="col-span-full flex flex-col items-center justify-center py-12 px-4">
+                    <div className="rounded-full bg-gray-50 p-4 mb-3">
+                    
+                    </div>
+                    <p className="text-gray-500 text-sm">No knowledge items available yet</p>
+                  </div>
+                )}
+              </div>
             </div>
           </div>
         </div>
