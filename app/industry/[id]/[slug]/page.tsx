@@ -6,6 +6,7 @@ import { Metadata } from 'next'
 import IndustryIcon from "@/components/icons/industry-icon";
 import Link from 'next/link'
 import { fetchBreadcrumb } from '@/utils/breadcrumb'
+import styles from './industry.module.css'
 
 interface Topic {
   id: number
@@ -100,7 +101,7 @@ const { id, slug } = await params
       <>
       <HeaderLight />
       <div className="min-h-screen bg-gray-50  ">
-        <div className="section-header px-4 sm:px-6 lg:px-8 py-8 lg:py-12 relative overflow-hidden rounded-lg">
+        <div className="section-header px-4 sm:px-6 lg:px-8 py-8  relative overflow-hidden rounded-lg">
                 <Image
                   alt="Section background"
                   src="https://res.cloudinary.com/dsiku9ipv/image/upload/v1737266454/breadcrumb-bg-2_anwto8.png"
@@ -113,15 +114,37 @@ const { id, slug } = await params
                   <div className="mb-8">
                     <Breadcrumb items={breadcrumbItems.map(item => ({ ...item, href: item.url }))} />
                   </div>
+                
                   {/* Header */}
-                  <div className="text-start  mb-4" data-aos="fade-down">
-                    <h3 className="text-md  bg-gradient-to-r from-blue-500 to-teal-400 md:text-3xl font-extrabold text-transparent bg-clip-text mb-4">
+                  <div className="flex flex-col md:flex-row items-start justify-between">
+                  <div className="text-start mb-4" data-aos="fade-down">
+                    <span className="inline-block px-5 py-1 text-xs font-semibold text-blue-500 bg-blue-100 rounded-md mb-2 uppercase">
+                      Industry
+                    </span>
+                    <h3 className="text-md bg-gradient-to-r from-blue-500 to-teal-400 md:text-3xl font-extrabold text-transparent bg-clip-text mb-4">
                       {industry.name}
                     </h3>
                     <p className="text-gray-600 text-sm md:text-base leading-relaxed max-w-3xl">
                       Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
                     </p>
                   </div>
+                      {/* Stats Cards */}
+                  <div className={`${styles.statsContainer} flex-row md:flex-col`}>
+                    <div className={`${styles.statsCard}`}>
+                      <div className={styles.statsNumber}>20</div>
+                      <div className={styles.statsLabel}>Reports</div>
+                    </div>
+                    <div className={styles.statsCard}>
+                      <div className={styles.statsNumber}>10</div>
+                      <div className={styles.statsLabel}>Data</div>
+                    </div>
+                    <div className={styles.statsCard}>
+                      <div className={styles.statsNumber}>4</div>
+                      <div className={styles.statsLabel}>Insights</div>
+                    </div>
+                  </div>
+                  </div>
+                 
                 </div>
         </div>
         

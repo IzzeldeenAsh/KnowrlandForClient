@@ -3,6 +3,9 @@ import Logo from './logo'
 import MobileMenu from './mobile-menu'
 import { useEffect, useState } from 'react'
 import Image from 'next/image'
+import { IconBook, IconChartPie3, IconCoin, IconFingerprint, IconNotification, IconChevronDown } from '@tabler/icons-react'
+import { CodeBracketIcon } from '@heroicons/react/24/outline'
+import { HoverCard, Group, Text, Anchor, Divider, SimpleGrid, ThemeIcon, rem, Button } from '@mantine/core'
 
 interface User {
   name: string;
@@ -12,9 +15,74 @@ interface User {
   email: string;
 }
 
+interface Industry {
+  id: number;
+  name: string;
+  slug: string;
+  children?: Industry[];
+}
+
+async function getIndustries() {
+  const res = await fetch("https://api.foresighta.co/api/industries/menu", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Accept: "application/json",
+      "Accept-Language": "en",
+    },
+    body: JSON.stringify({
+      top_industry: 5,
+      top_sub_industry: 2,
+    }),
+    cache: "force-cache",
+    next: { revalidate: 3600 },
+  });
+
+  if (!res.ok) {
+    return [];
+  }
+
+  const json = await res.json();
+  return json.data as Industry[];
+}
+
+const mockdata = [
+  {
+    icon: CodeBracketIcon,
+    title: 'Technology',
+    description: 'Explore cutting-edge tech trends and innovations',
+  },
+  {
+    icon: IconCoin,
+    title: 'Finance',
+    description: 'Stay updated with financial markets and strategies',
+  },
+  {
+    icon: IconBook,
+    title: 'Education',
+    description: 'Discover modern educational approaches and tools',
+  },
+  {
+    icon: IconFingerprint,
+    title: 'Healthcare',
+    description: 'Learn about medical advances and healthcare solutions',
+  },
+  {
+    icon: IconChartPie3,
+    title: 'Business',
+    description: 'Get insights on business strategies and management',
+  },
+  {
+    icon: IconNotification,
+    title: 'Media',
+    description: 'Keep up with media trends and digital communications',
+  },
+];
+
 export default function Header() {
   const [user, setUser] = useState<User | null>(null);
   const [roles, setRoles] = useState<string[]>([]);
+  const [industries, setIndustries] = useState<Industry[]>([]);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -61,11 +129,17 @@ export default function Header() {
       }
     };
 
+    const fetchIndustries = async () => {
+      const data = await getIndustries();
+      setIndustries(data);
+    };
+
     const userData = localStorage.getItem('user');
     if (userData) {
       setUser(JSON.parse(userData));
     }
     fetchProfile();
+    fetchIndustries();
   }, []);
 
   const getInitials = (firstName: string, lastName: string) => {
@@ -92,11 +166,73 @@ export default function Header() {
           <nav className="hidden md:flex md:grow">
             {/* Desktop menu links */}
             <ul className="flex grow justify-center flex-wrap items-center">
+          
               <li>
-                <Link className="font-medium text-sm text-slate-300 hover:text-white mx-4 lg:mx-5 transition duration-150 ease-in-out" href="/home">Home</Link>
-              </li>
-              <li>
-                <Link className="font-medium text-sm text-slate-300 hover:text-white mx-4 lg:mx-5 transition duration-150 ease-in-out" href="/all-industries">Industries</Link>
+                <HoverCard width={800} 
+                 position="bottom" 
+                 radius="sm" shadow="md" withinPortal>
+                  <HoverCard.Target>
+                    <button className="font-medium text-sm text-slate-300 hover:text-white mx-4 lg:mx-5 transition duration-150 ease-in-out flex items-center">
+                      <span className="mr-1">Industries</span>
+                      <IconChevronDown size={16} />
+                    </button>
+                  </HoverCard.Target>
+
+                  <HoverCard.Dropdown style={{background: 'linear-gradient(to right, #0f172b, #242B6A)',borderColor: '#2F378A'}}>
+                    <Group justify="space-between" px="md">
+                      <Text fw={500} c={'white'}>Featured Industries</Text>
+                      <Anchor href="/all-industries" fz="xs" className="text-blue-300">
+                        View all industries
+                      </Anchor>
+                    </Group>
+
+                    <Divider my="sm" />
+
+                    <SimpleGrid cols={2} spacing={0}>
+                      {industries.map((industry) => (
+                        <Link 
+                          key={industry.id} 
+                          href={`/industry/${industry.id}/${industry.slug}`}
+                          className="block"
+                        >
+                          <div className="p-3 rounded transition-colors industry-nav hover:bg-slate-800/50">
+                            <Group wrap="nowrap" align="flex-start">
+                              <div>
+                                <Text size="sm" fw={500} c={'white'}>
+                                  {industry.name}
+                                </Text>
+                                <Text size="xs" c="dimmed">
+                                  Explore insights and trends
+                                </Text>
+                              </div>
+                            </Group>
+                          </div>
+                        </Link>
+                      ))}
+                    </SimpleGrid>
+
+                    <div className="mt-4  p-4 rounded-lg" style={{backgroundColor: '#2F378A'}}>
+                      <Group justify="space-between">
+                        <div>
+                          <Text fw={500} fz="sm" c={'white'}>
+                            Explore All Industries
+                          </Text>
+                          <Text size="xs" c="dimmed">
+                            Discover comprehensive insights across various sectors
+                          </Text>
+                        </div>
+                        <Button 
+                          variant="light" 
+                          component={Link} 
+                          href="/all-industries"
+                          className="bg-blue-50 text-blue-600 hover:bg-blue-100"
+                        >
+                          Browse All
+                        </Button>
+                      </Group>
+                    </div>
+                  </HoverCard.Dropdown>
+                </HoverCard>
               </li>
               <li>
                 <Link className="font-medium text-sm text-slate-300 hover:text-white mx-4 lg:mx-5 transition duration-150 ease-in-out" href="/pricing">Lorem</Link>

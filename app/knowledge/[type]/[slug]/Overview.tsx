@@ -2,6 +2,8 @@ import React, { useEffect } from 'react'
 import Image from 'next/image'
 import styles from './knowledge.module.css'
 import { SparklesIcon } from '@heroicons/react/20/solid'
+import { IconFiles } from '@tabler/icons-react'
+import { Group, Text, Badge } from '@mantine/core'
 
 // Define interfaces for minimal typing, you can expand these as needed
 interface Document {
@@ -21,6 +23,7 @@ interface Document {
 export interface KnowledgeDetails {
   description: string
   documents: Document[]
+  type: string
   // Add other fields if needed
 }
 
@@ -61,15 +64,23 @@ export default function Overview({ knowledge }: OverviewProps) {
           />
         </div>
 
+      
+
         <div className="flex items-center gap-2 px-4 py-2 mb-4 ">
           <div className="flex items-center justify-center w-6 h-6">
             <SparklesIcon className="w-full h-full text-yellow-400" />
           </div>
           <span className="text-sm font-semibold text-gray-900">
-            Choose report sections that fit your needs!
+            Choose report sections that fit your needs and budget!
           </span>
         </div>
-
+        <Group gap="xs" className="px-4 pt-3 bg-slate-50/50 rounded-lg">
+          <IconFiles size={20} className="text-slate-600" />
+          <Text size="sm" c="dimmed" className='capitalize'>This {knowledge.type} includes</Text>
+          <Badge variant="light" color="blue" size="sm">
+            {knowledge.documents.length} documents
+          </Badge>
+        </Group>
         {/* Documents Section */}
         <div className={styles.documentsContainer}>
           {knowledge.documents && knowledge.documents.length > 0 ? (
@@ -167,7 +178,7 @@ export default function Overview({ knowledge }: OverviewProps) {
                         <svg className="shrink-0 fill-slate-600 mr-2" xmlns="http://www.w3.org/2000/svg" width="12" height="12">
                           <path d="m1.999 0 1 2-1 2 2-1 2 1-1-2 1-2-2 1zM11.999 0l1 2-1 2 2-1 2 1-1-2 1-2-2 1zM11.999 10l1 2-1 2 2-1 2 1-1-2 1-2-2 1zM6.292 7.586l2.646-2.647L11.06 7.06 8.413 9.707zM0 13.878l5.586-5.586 2.122 2.121L2.12 16z" />
                         </svg>
-                        <span>Preview</span>
+                        <span>Evaluate with AI</span>
                       </a>
                     </div>
                   </div>

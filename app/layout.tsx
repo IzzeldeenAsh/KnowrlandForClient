@@ -1,6 +1,8 @@
 import './css/style.css'
 import AOSProvider from "@/components/aos-provider";
 import { Inter } from 'next/font/google'
+import { MantineProvider } from '@mantine/core'
+import '@mantine/core/styles.css'
 
 const inter = Inter({
   subsets: ['latin'],
@@ -21,11 +23,13 @@ export default function RootLayout({
   return (
     <html lang="en" className="scroll-smooth">
       <body className={`${inter.variable} font-inter antialiased tracking-tight`} suppressHydrationWarning>
-      <AOSProvider>
-        <div className="flex flex-col min-h-screen overflow-hidden supports-[overflow:clip]:overflow-clip">
-          {children}
-        </div>
-        </AOSProvider>
+        <MantineProvider >
+          <AOSProvider>
+            <div className="flex flex-col min-h-screen overflow-hidden supports-[overflow:clip]:overflow-clip">
+              {children}
+            </div>
+          </AOSProvider>
+        </MantineProvider>
       </body>
     </html>
   )
