@@ -4,6 +4,8 @@ import Link from "next/link";
 import Logo from "./logo";
 import { useEffect, useState } from "react";
 import Image from "next/image";
+import { IconChevronDown } from '@tabler/icons-react';
+import { HoverCard, Group, Text, Anchor, Divider, SimpleGrid, Button } from '@mantine/core';
 
 interface Industry {
   id: number;
@@ -48,7 +50,6 @@ export default function Header() {
   const [industries, setIndustries] = useState<Industry[]>([]);
   const [user, setUser] = useState<User | null>(null);
   const [roles, setRoles] = useState<string[]>([]);
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
@@ -126,90 +127,84 @@ export default function Header() {
         <div className="relative flex h-14 items-center justify-between gap-3 rounded-2xl bg-white/90 px-3 shadow-lg shadow-black/[0.03] backdrop-blur-sm">
           <div className="flex flex-1 items-center">
             <Logo />
-            <div className="relative ml-4">
-              <div className="group inline-block relative">
-                <button className="inline-flex items-center px-3 py-2 text-sm font-medium text-gray-700 hover:text-gray-900 transition-colors">
-                  Industries
-                  <svg
-                    className="w-4 h-4 ml-1 transform group-hover:rotate-180 transition-transform duration-150"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth="2"
-                      d="M19 9l-7 7-7-7"
-                    />
-                  </svg>
-                </button>
-                <div className="hidden group-hover:block absolute top-full left-0 z-[108] p-0 min-w-[800px]">
-                  <div className="px-4 lg:px-0 bg-white shadow-xl ring-1 ring-black ring-opacity-5 rounded-lg">
-                    <div className="py-4 lg:py-8 lg:px-7">
-                      <div
-                        id="industries"
-                        role="tabpanel"
-                        className="lg:w-[800px]"
-                      >
-                        <div className="flex flex-wrap -mx-4">
-                          <div className="w-full lg:w-5/12 px-4">
-                            <div className="mb-6 lg:mb-0">
-                              <h4 className="ml-4 text-base font-bold mb-3">
-                                Industries
-                              </h4>
-                              {industries.map((industry) => (
-                                <div key={industry.id}>
-                                  <Link
-                                    href={`/industry/${industry.id}/${industry.slug}`}
-                                    className="block border-b border-gray-200 px-4 py-2 text-sm hover:bg-blue-50 transition-colors"
-                                  >
-                                    <span className="text-gray-700 hover:text-gray-900">
-                                      {industry.name}
-                                    </span>
-                                  </Link>
-                                </div>
-                              ))}
-                            </div>
-                          </div>
+            <nav className="hidden md:flex md:grow">
+              <ul className="flex grow justify-start flex-wrap items-center">
+                <li>
+                  <HoverCard width={800} position="bottom" radius="md"  shadow="md" withinPortal  >
+                    <HoverCard.Target>
+                      <button className="font-medium text-sm text-gray-600 hover:text-gray-900 mx-4 lg:mx-5 transition duration-150 ease-in-out flex items-center">
+                        <span className="mr-1">Industries</span>
+                        <IconChevronDown size={16} />
+                      </button>
+                    </HoverCard.Target>
 
-                          <div className="w-full lg:w-7/12 px-4">
-                            <div
-                              className="flex flex-col justify-between items-center gap-5 pt-10 px-5 min-h-[250px] rounded shadow relative overflow-hidden"
-                              style={{
-                                backgroundSize: "cover",
-                                backgroundPosition: "center top 1.3rem",
-                                backgroundRepeat: "no-repeat",
-                                backgroundImage:
-                                  "url(https://res.cloudinary.com/dsiku9ipv/image/upload/v1739029302/bg-5_ldbnui.png)",
-                              }}
-                            >
-                              <div className="text-center">
-                                <h4 className="text-gray-900 font-bold mb-2">
-                                  Explore All Industries
-                                  <br />
-                                  Discover Endless Opportunities
-                                </h4>
-                                <span className="block text-gray-600 text-sm mb-5">
-                                  Browse through various sectors and find the
-                                  perfect match for your business needs.
-                                </span>
-                                <Link
-                                  href="/all-industries"
-                                  className="inline-block bg-blue-500 text-white text-xs px-3 py-2 rounded hover:bg-blue-600"
-                                >
-                                  Explore Now
-                                </Link>
-                              </div>
+                    <HoverCard.Dropdown style={{ background: 'white', borderColor: '#e5e7eb' }}>
+                      <Group justify="space-between" px="md">
+                        <Text fw={500} c="dark">Featured Industries</Text>
+                        <Anchor href="/all-industries" fz="xs" c="blue">
+                          View all industries
+                        </Anchor>
+                      </Group>
+
+                      <Divider my="sm" />
+
+                      <SimpleGrid cols={2} spacing={0}>
+                        {industries.map((industry) => (
+                          <Link 
+                            key={industry.id} 
+                            href={`/industry/${industry.id}/${industry.slug}`}
+                            className="block"
+                          >
+                            <div className="p-3 rounded transition-colors hover:bg-gray-50">
+                              <Group wrap="nowrap" align="flex-start">
+                                <div>
+                                  <Text size="sm" fw={500} c="dark">
+                                    {industry.name}
+                                  </Text>
+                                  <Text size="xs" c="dimmed">
+                                    Explore insights and trends
+                                  </Text>
+                                </div>
+                              </Group>
                             </div>
+                          </Link>
+                        ))}
+                      </SimpleGrid>
+
+                      <div className="mt-4 p-4 rounded-lg bg-gray-50">
+                        <Group justify="space-between">
+                          <div>
+                            <Text fw={500} fz="sm" c="dark">
+                              Explore All Industries
+                            </Text>
+                            <Text size="xs" c="dimmed">
+                              Discover comprehensive insights across various sectors
+                            </Text>
                           </div>
-                        </div>
+                          <Button 
+                            variant="light" 
+                            component={Link} 
+                            href="/all-industries"
+                            className="bg-blue-50 text-blue-600 hover:bg-blue-100"
+                          >
+                            Browse All
+                          </Button>
+                        </Group>
                       </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
+                    </HoverCard.Dropdown>
+                  </HoverCard>
+                </li>
+                <li>
+                  <Link className="font-medium text-sm text-gray-600 hover:text-gray-900 mx-4 lg:mx-5 transition duration-150 ease-in-out" href="/pricing">Lorem</Link>
+                </li>
+                <li>
+                  <Link className="font-medium text-sm text-gray-600 hover:text-gray-900 mx-4 lg:mx-5 transition duration-150 ease-in-out" href="/customers">Lorem</Link>
+                </li>
+                <li>
+                  <Link className="font-medium text-sm text-gray-600 hover:text-gray-900 mx-4 lg:mx-5 transition duration-150 ease-in-out" href="/changelog">Lorem</Link>
+                </li>
+              </ul>
+            </nav>
           </div>
 
           {/* User profile or sign in/up links */}

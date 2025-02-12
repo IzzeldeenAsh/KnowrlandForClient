@@ -13,4 +13,10 @@
         direction: rtl;
     }
 }
-
+.industry-nav{
+    padding: 8px;
+    border-radius: 4px;
+}
+.industry-nav:hover{
+    background-color: #232C66 !important;
+}
