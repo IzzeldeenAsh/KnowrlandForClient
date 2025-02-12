@@ -31,7 +31,7 @@ async function getIndustries() {
       "Accept-Language": "en",
     },
     body: JSON.stringify({
-      top_industry: 5,
+      top_industry: 6,
       top_sub_industry: 2,
     }),
     cache: "force-cache",
