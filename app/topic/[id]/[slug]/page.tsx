@@ -128,11 +128,13 @@ export default async function TopicPage({ params }: Props) {
               {/* Header */}
               <div className="text-start mb-4" data-aos="fade-down">
                 <div className="flex flex-row gap-4">
-                <div className="mb-4 mt-1">
-                <FolderIcon width={32} height={32} />
-                </div>
+             
                  <div className="flex flex-col items-start ">
+                 <span className="inline-block px-5 py-1 text-xs font-semibold text-blue-500 bg-blue-100 rounded-md mb-2 uppercase">
+                      Topic
+                    </span>
                  <h3 className="text-md bg-gradient-to-r from-blue-500 to-teal-400 md:text-3xl font-extrabold text-transparent bg-clip-text mb-4">
+                  
                     {topic.name}
                   </h3>
                
