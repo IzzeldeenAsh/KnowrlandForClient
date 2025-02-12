@@ -122,10 +122,11 @@ export default async function SubIndustryPage({ params }: Props) {
               {/* Header */}
               <div className="text-start mb-4" data-aos="fade-down">
                 <div className="flex flex-row gap-4">
-                <div className="mb-4 mt-1">
-                <IndustryIcon width={32} height={32}/>
-                </div>
+               
                  <div className="flex flex-col items-start ">
+                 <span className="inline-block px-5 py-1 text-xs font-semibold text-blue-500 bg-blue-100 rounded-md mb-2 uppercase">
+                      Sub Industry
+                    </span>
                  <h3 className="text-md bg-gradient-to-r from-blue-500 to-teal-400 md:text-3xl font-extrabold text-transparent bg-clip-text mb-4">
                     {subIndustry.name}
                   </h3>
@@ -144,7 +145,7 @@ export default async function SubIndustryPage({ params }: Props) {
           <div className="max-w-container relative mx-auto mt-10 w-full px-4 sm:px-6 lg:px-8 pb-12">
             <div className="max-w-6xl mx-auto">
               <div className="mb-8 text-start">
-                <h2 className="text-2xl font-bold text-gray-900 mb-2">Topics & Knowledge</h2>
+                <h2 className="text-2xl font-bold text-gray-900 mb-2">Topics</h2>
                 <p className="text-gray-600">Explore topics and insights within {subIndustry.name}</p>
               </div>
 
