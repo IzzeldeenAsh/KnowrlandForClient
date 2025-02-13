@@ -6,6 +6,7 @@ import { Metadata } from 'next'
 import Link from 'next/link'
 import { fetchBreadcrumb } from '@/utils/breadcrumb'
 import KnowledgeGrid from './KnowledgeGrid'
+import StatisticsCards from '@/components/industry/statistics-cards'
 
 interface Knowledge {
   id: number
@@ -127,21 +128,21 @@ export default async function TopicPage({ params }: Props) {
                 />
               </div>
               {/* Header */}
-              <div className="text-start mb-4" data-aos="fade-down">
-                <div className="flex flex-row gap-4">
-                  <div className="flex flex-col items-start">
+              <div className="flex flex-col md:flex-row items-start justify-between">
+                  <div className="text-start mb-4" data-aos="fade-down">
                     <span className="inline-block px-5 py-1 text-xs font-semibold text-blue-500 bg-blue-100 rounded-md mb-2 uppercase">
-                      Topic
+                     Topic
                     </span>
                     <h3 className="text-md bg-gradient-to-r from-blue-500 to-teal-400 md:text-3xl font-extrabold text-transparent bg-clip-text mb-4">
-                      {topic.name}
+                      { topic.name}
                     </h3>
+                    <p className="text-gray-600 text-sm md:text-base leading-relaxed max-w-3xl">
+                      Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
+                    </p>
                   </div>
-                </div>
-                <p className="text-gray-600 text-sm md:text-base leading-relaxed max-w-3xl">
-                  Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
-                </p>
-              </div>
+                      {/* Stats Cards */}
+                      <StatisticsCards type="topic" id={parseInt(id)} />
+                  </div>
             </div>
           </div>
 

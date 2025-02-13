@@ -158,13 +158,13 @@ export default function Header() {
         <div className="flex items-center justify-between h-16 md:h-20">
 
           {/* Site branding */}
-          <div className="flex-1">
+          <div className="w-[200px]">
             <Logo />
           </div>
 
           {/* Desktop navigation */}
-          <nav className="hidden md:flex md:grow">
-            <ul className="flex grow justify-start flex-wrap items-center">
+          <nav className="hidden md:flex flex-1">
+            <ul className="flex justify-center items-center w-full">
               <li>
                 <HoverCard width={800} 
                  position="bottom" 
@@ -233,25 +233,25 @@ export default function Header() {
                 </HoverCard>
               </li>
               <li>
-                <Link className="font-medium text-sm text-gray-600 hover:text-gray-900 mx-4 lg:mx-5 transition duration-150 ease-in-out" href="/industries/report">Reports</Link>
+                <Link className="font-medium text-sm text-gray-200 hover:text-gray-100 mx-4 lg:mx-5 transition duration-150 ease-in-out" href="/industries/report">Reports</Link>
               </li>
               <li>
-                <Link className="font-medium text-sm text-gray-600 hover:text-gray-900 mx-4 lg:mx-5 transition duration-150 ease-in-out" href="/industries/data">Data</Link>
+                <Link className="font-medium text-sm text-gray-200 hover:text-gray-100 mx-4 lg:mx-5 transition duration-150 ease-in-out" href="/industries/data">Data</Link>
               </li>
               <li>
-                <Link className="font-medium text-sm text-gray-600 hover:text-gray-900 mx-4 lg:mx-5 transition duration-150 ease-in-out" href="/industries/insight">Insights</Link>
+                <Link className="font-medium text-sm text-gray-200 hover:text-gray-100 mx-4 lg:mx-5 transition duration-150 ease-in-out" href="/industries/insight">Insights</Link>
               </li>
               <li>
-                <Link className="font-medium text-sm text-gray-600 hover:text-gray-900 mx-4 lg:mx-5 transition duration-150 ease-in-out" href="/industries/manual">Manual</Link>
+                <Link className="font-medium text-sm text-gray-200 hover:text-gray-100 mx-4 lg:mx-5 transition duration-150 ease-in-out" href="/industries/manual">Manual</Link>
               </li>
               <li>
-                <Link className="font-medium text-sm text-gray-600 hover:text-gray-900 mx-4 lg:mx-5 transition duration-150 ease-in-out" href="/industries/course">Course</Link>
+                <Link className="font-medium text-sm text-gray-200 hover:text-gray-100 mx-4 lg:mx-5 transition duration-150 ease-in-out" href="/industries/course">Course</Link>
               </li>
             </ul>
           </nav>
 
           {/* Desktop sign in links */}
-          <ul className="flex-1 flex justify-end items-center">
+          <ul className="w-[200px] flex justify-end items-center">
             {isLoading ? (
               <div className="w-16 h-8 bg-slate-700/30 animate-pulse rounded"></div>
             ) : user ? (
