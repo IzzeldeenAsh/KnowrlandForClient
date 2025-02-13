@@ -1,7 +1,6 @@
 .statsContainer {
-  display: flex;
-  gap: 0.75rem;
   margin-bottom: 1.5rem;
+  max-width: 320px;
 }
 
 .statsCard {
@@ -13,8 +12,7 @@
   border-radius: 0.75rem;
   transition: all 0.2s ease-in-out;
   flex: 1;
-  max-width: 250px;
-  min-width: 230px;
+  width: 100px;
   position: relative;
   overflow: hidden;
   box-shadow: 
