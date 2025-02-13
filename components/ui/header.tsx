@@ -164,9 +164,7 @@ export default function Header() {
 
           {/* Desktop navigation */}
           <nav className="hidden md:flex md:grow">
-            {/* Desktop menu links */}
-            <ul className="flex grow justify-center flex-wrap items-center">
-          
+            <ul className="flex grow justify-start flex-wrap items-center">
               <li>
                 <HoverCard width={800} 
                  position="bottom" 
@@ -235,13 +233,19 @@ export default function Header() {
                 </HoverCard>
               </li>
               <li>
-                <Link className="font-medium text-sm text-slate-300 hover:text-white mx-4 lg:mx-5 transition duration-150 ease-in-out" href="/pricing">Lorem</Link>
+                <Link className="font-medium text-sm text-gray-600 hover:text-gray-900 mx-4 lg:mx-5 transition duration-150 ease-in-out" href="/industries/report">Reports</Link>
               </li>
               <li>
-                <Link className="font-medium text-sm text-slate-300 hover:text-white mx-4 lg:mx-5 transition duration-150 ease-in-out" href="/customers">Lorem</Link>
+                <Link className="font-medium text-sm text-gray-600 hover:text-gray-900 mx-4 lg:mx-5 transition duration-150 ease-in-out" href="/industries/data">Data</Link>
               </li>
               <li>
-                <Link className="font-medium text-sm text-slate-300 hover:text-white mx-4 lg:mx-5 transition duration-150 ease-in-out" href="/changelog">Lorem</Link>
+                <Link className="font-medium text-sm text-gray-600 hover:text-gray-900 mx-4 lg:mx-5 transition duration-150 ease-in-out" href="/industries/insight">Insights</Link>
+              </li>
+              <li>
+                <Link className="font-medium text-sm text-gray-600 hover:text-gray-900 mx-4 lg:mx-5 transition duration-150 ease-in-out" href="/industries/manual">Manual</Link>
+              </li>
+              <li>
+                <Link className="font-medium text-sm text-gray-600 hover:text-gray-900 mx-4 lg:mx-5 transition duration-150 ease-in-out" href="/industries/course">Course</Link>
               </li>
             </ul>
           </nav>

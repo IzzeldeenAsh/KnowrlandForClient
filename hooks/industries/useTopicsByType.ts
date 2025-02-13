@@ -2,25 +2,69 @@
 import { useState, useEffect } from 'react';
 import { IndustryType } from './types';
 
-interface Knowledge {
-  id: number;
-  title: string;
-  slug: string;
-  type: string;
+interface Chapter {
+  chapter: {
+    title: string;
+    page?: number;
+  };
 }
 
-interface Topic {
+interface Document {
+  id: number;
+  file_name: string;
+  file_size: number;
+  file_extension: string;
+  price: string;
+  description: string;
+  table_of_content: Chapter[];
+}
+
+interface Insighter {
+  name: string;
+  profile_photo_url: string | null;
+  roles: string[];
+}
+
+interface Code {
+  id: number;
+  key: number;
+  name: string;
+}
+
+interface Region {
   id: number;
   name: string;
+}
+
+interface EconomicBloc {
+  id: number;
+  name: string;
+}
+
+interface Knowledge {
   slug: string;
-  knowledge: Knowledge[];
+  type: string;
+  title: string;
+  description: string;
+  isic_code: Code | null;
+  hs_code: Code | null;
+  language: string;
+  total_price: string;
+  countries: Region[];
+  regions: Region[];
+  economic_blocs: EconomicBloc[];
+  status: string;
+  published_at: string;
+  review: any[];
+  insighter: Insighter;
+  documents: Document[];
 }
 
 interface SubIndustry {
   id: number;
   name: string;
   slug: string;
-  topic: Topic[];
+  knowledge: Knowledge[];
 }
 
 interface TopicsByTypeResponse {
@@ -46,7 +90,7 @@ export function useTopicsByType({ type, id, slug, topKnowledge = 10 }: UseTopics
         setError(null);
         
         const response = await fetch(
-          `https://api.foresighta.co/api/industries/type/sub/${type}/${id}/${slug}`,
+          `https://api.foresighta.co/api/industries/type/topics/${type}/${id}/${slug}`,
           {
             method: 'POST',
             headers: {
@@ -78,7 +122,7 @@ export function useTopicsByType({ type, id, slug, topKnowledge = 10 }: UseTopics
 
   return {
     subIndustry: data?.data,
-    topics: data?.data.topic || [],
+    knowledge: data?.data.knowledge || [],
     isLoading,
     error
   };

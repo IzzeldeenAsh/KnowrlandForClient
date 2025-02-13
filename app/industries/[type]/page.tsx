@@ -1,7 +1,7 @@
 'use client';
 
 import { useIndustriesByType, IndustryType, Industry } from '@/hooks/industries';
-import { Container, Title, Text, Skeleton } from '@mantine/core';
+import { Container, Text, Skeleton } from '@mantine/core';
 import HeaderLight from '@/components/ui/header-light';
 import FooterLight from '@/components/ui/footer-light';
 import Link from 'next/link';
@@ -116,7 +116,7 @@ export default function IndustriesByTypePage({ params }: Props) {
                     data-aos="fade-up"
                   >
                     <div className="space-y-2">
-                      <Link href={`/industry/${type}/${industry.slug}`} className="block">
+                      <Link href={`/industry-by-type/${type}/${industry.id}/${industry.slug}`} className="block">
                         <div className="flex items-center gap-2">
                           <IndustryIcon />
                           <h3 className="text-sm font-semibold text-gray-900 hover:text-blue-600">
@@ -127,7 +127,7 @@ export default function IndustriesByTypePage({ params }: Props) {
                       {industry.children && industry.children.length > 0 ? (
                         <ul className="space-y-1">
                           {industry.children.map((child: Industry) => (
-                            <Link href={`/sub-industry/${type}/${child.slug}`} key={child.id} className="block">
+                            <Link href={`/sub-industry-by-type/${type}/${child.id}/${child.slug}`} key={child.id} className="block">
                               <li
                                 className="text-xs text-gray-600 hover:text-blue-600 transition-colors flex items-center"
                               >
