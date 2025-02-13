@@ -14,6 +14,10 @@ import AOS from 'aos';
 import 'aos/dist/aos.css';
 import { formatDistanceToNow } from 'date-fns';
 import { useTopicsByType } from '@/hooks/industries/useTopicsByType';
+import ReportIcon from '@/components/icons/ReportIcon';
+import InsightIcon from '@/components/icons/InsightIcon';
+import ManualIcon from '@/components/icons/ManualIcon';
+import DataIcon from '@/components/icons/DataIcon';
 
 const validTypes: IndustryType[] = ['report', 'insight', 'data', 'manual', 'course'];
 
@@ -110,49 +114,61 @@ export default function TopicByTypePage({ params }: Props) {
               <h2 className="text-2xl font-bold mb-4">Knowledge</h2>
               <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
                 {knowledge?.map((item) => (
-                  <Card
-                    key={item.slug}
-                    withBorder
-                    padding="lg"
-                    radius="md"
-                    className={cardStyles.card}
-                    data-aos="fade-up"
-                  >
-                    <Link href={`/knowledge/${item.type}/${item.slug}`} className="block">
-                      <Badge w="fit-content" variant="light">
-                        {capitalizeFirstLetter(item.type)}
-                      </Badge>
-
-                      <Text fw={700} className={cardStyles.title} mt="xs" lineClamp={2}>
-                        {item.title}
-                      </Text>
-
-                      <Group mt="lg">
-                        <Avatar
-                          src={item.insighter.profile_photo_url}
-                          radius="sm"
-                          alt={item.insighter.name}
-                        />
-                        <div>
-                          <Text fw={500}>{item.insighter.name}</Text>
-                          <Text fz="xs" c="dimmed">
-                            posted {formatPublishedDate(item.published_at)}
-                          </Text>
-                        </div>
-                      </Group>
-
-                      <Card.Section className={cardStyles.footer}>
-                        <Group justify="space-between">
-                          <Badge 
-                            color={item.total_price === "0" ? "green" : "yellow"}
-                            variant="light"
-                          >
-                            {item.total_price === "0" ? "FREE" : "PAID"}
-                          </Badge>
-                        </Group>
-                      </Card.Section>
-                    </Link>
-                  </Card>
+                   <Card
+                   key={`${item.type}-${item.slug}`}
+                   withBorder
+                   padding="lg"
+                   radius="md"
+                   className={cardStyles.card}
+                   data-aos="fade-up"
+                 >
+                   <Link href={`/knowledge/${item.type}/${item.slug}`} className="block">
+                     <Group gap="xs">
+                       {item.type === 'report' && <ReportIcon width={24} height={24} />}
+                       {item.type === 'manual' && <ManualIcon width={24} height={24} />}
+                       {item.type === 'insight' && <InsightIcon width={24} height={24} />}
+                       {item.type === 'data' && <DataIcon width={24} height={24} />}
+                       <Badge w="fit-content" className='capitalize' variant="light">
+                         {item.type}
+                       </Badge>
+                     </Group>
+       
+                     <Text fw={700} className={cardStyles.title} mt="xs" lineClamp={2}>
+                       {item.title}
+                     </Text>
+       
+                     <Group mt="lg">
+                       <Avatar
+                         src={item.insighter.profile_photo_url}
+                         radius="sm"
+                         alt={item.insighter.name}
+                         size={'sm'}
+                       />
+                       <div>
+                       <Text  c="dimmed" size='xs'>
+                      {item.insighter.roles.includes('insighter') && ('Insighter')}
+                      {item.insighter.roles.includes('company') && ('Company')}
+                         </Text> 
+                       
+                         <Text fw={500} size='xs'>{item.insighter.name}</Text>
+                       </div>
+                     </Group>
+       
+                     <Card.Section className={cardStyles.footer}>
+                       <Group justify="space-between">
+                       <Text  c="dimmed" size='xs'>
+                           Posted {formatPublishedDate(item.published_at)}
+                         </Text>
+                         <Badge 
+                           color={item.total_price === "0" ? "green" : "yellow"}
+                           variant="light"
+                         >
+                           {item.total_price === "0" ? "FREE" : "PAID"}
+                         </Badge>
+                       </Group>
+                     </Card.Section>
+                   </Link>
+                 </Card>
                 ))}
               </div>
             </div>
