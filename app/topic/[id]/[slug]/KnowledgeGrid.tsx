@@ -62,7 +62,7 @@ export default function KnowledgeGrid({ knowledge, topicName }: KnowledgeGridPro
                 </Badge>
               </Group>
 
-              <Text fw={700} className={cardStyles.title} mt="xs" lineClamp={2}>
+              <Text fw={700} className={cardStyles.title} mt="xs" fz={'xl'} lineClamp={2}>
                 {item.title}
               </Text>
 

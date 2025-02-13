@@ -32,7 +32,7 @@ export default function StatisticsCards({ type, id }: StatisticsCardsProps) {
 
   if (isLoading) {
     return (
-      <div className={`${styles.statsContainer} flex-row `}>
+      <div className={`${styles.statsContainer} flex-row`}>
         <div className={styles.statsCard}>
           <div className="animate-pulse bg-gray-200 h-8 w-16 rounded mb-2"></div>
           <div className="animate-pulse bg-gray-200 h-4 w-20 rounded"></div>
@@ -52,7 +52,7 @@ export default function StatisticsCards({ type, id }: StatisticsCardsProps) {
   return (
     <Grid gutter="sm" className={`${styles.statsContainer} `}>
       {statistics.map((stat) => (
-        <Grid.Col key={stat.type} span={4} >
+        <Grid.Col key={stat.type} span={5} >
           <div className={styles.statsCard}>
             <div className={styles.statsNumber}>{stat.count}</div>
             <div className={styles.statsLabel}>{stat.type}</div>
