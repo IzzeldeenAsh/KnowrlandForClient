@@ -7,6 +7,7 @@ import IndustryIcon from "@/components/icons/industry-icon";
 import Link from 'next/link'
 import { fetchBreadcrumb } from '@/utils/breadcrumb'
 import styles from './industry.module.css'
+import StatisticsCards from '@/components/industry/statistics-cards'
 
 interface Topic {
   id: number
@@ -129,20 +130,7 @@ const { id, slug } = await params
                     </p>
                   </div>
                       {/* Stats Cards */}
-                  <div className={`${styles.statsContainer} flex-row md:flex-col`}>
-                    <div className={`${styles.statsCard}`}>
-                      <div className={styles.statsNumber}>20</div>
-                      <div className={styles.statsLabel}>Reports</div>
-                    </div>
-                    <div className={styles.statsCard}>
-                      <div className={styles.statsNumber}>10</div>
-                      <div className={styles.statsLabel}>Data</div>
-                    </div>
-                    <div className={styles.statsCard}>
-                      <div className={styles.statsNumber}>4</div>
-                      <div className={styles.statsLabel}>Insights</div>
-                    </div>
-                  </div>
+                      <StatisticsCards type="industry" id={parseInt(id)} />
                   </div>
                  
                 </div>
