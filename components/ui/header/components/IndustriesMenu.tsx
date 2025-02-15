@@ -7,7 +7,7 @@ export function IndustriesMenu() {
   const { industries } = useIndustries();
 
   return (
-    <HoverCard width={800} position="bottom" radius="sm" shadow="md" withinPortal>
+    <HoverCard width={'100%'} position="bottom" radius="sm" shadow="md" withinPortal>
       <HoverCard.Target>
         <button className="font-medium text-sm text-gray-600 hover:text-gray-900 mx-4 lg:mx-5 transition duration-150 ease-in-out flex items-center">
           <span className="mr-1">Industries</span>
@@ -25,7 +25,7 @@ export function IndustriesMenu() {
 
         <Divider my="sm" />
 
-        <SimpleGrid cols={2} spacing={0}>
+        <SimpleGrid cols={3} spacing={0}>
           {industries.map((industry) => (
             <Link 
               key={industry.id} 

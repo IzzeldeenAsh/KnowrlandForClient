@@ -12,7 +12,7 @@ import styles from './industries.module.css';
 import IndustryIcon from "@/components/icons/industry-icon";
 import AOS from 'aos';
 import 'aos/dist/aos.css';
-
+import Stripes from "@/public/images/stripes-dark.svg";
 interface Topic {
   id: number;
   name: string;
@@ -73,8 +73,28 @@ export default function IndustriesByTypePage({ params }: Props) {
 
   return (
     <>
+    
       <HeaderLight />
+      <div className="relative z-10 max-w-6xl relative mx-auto  w-full ">
+      <div
+        className="pointer-events-none absolute z-10 -translate-x-1/2 transform hidden md:block"
+        style={{ left: '28%' }}
+        aria-hidden="true"
+      >
+        <Image
+          className="max-w-none opacity-50"
+          src={Stripes}
+          width={768}
+          height={768}
+          style={{ width: 'auto', height: 'auto' }}
+          alt="Stripes"
+          priority
+        />
+      </div>
+      </div>
+    
       <div className="min-h-screen bg-gray-50">
+
         <div className="section-header px-4 sm:px-6 lg:px-8 py-8 relative overflow-hidden rounded-lg">
           <Image
             alt="Section background"

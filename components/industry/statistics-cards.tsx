@@ -50,15 +50,13 @@ export default function StatisticsCards({ type, id }: StatisticsCardsProps) {
   }
 
   return (
-    <Grid gutter="sm" className={`${styles.statsContainer} `}>
+    <div className={`grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 ${styles.statsContainer}`}>
       {statistics.map((stat) => (
-        <Grid.Col key={stat.type} span={5} >
-          <div className={styles.statsCard}>
-            <div className={styles.statsNumber}>{stat.count}</div>
-            <div className={styles.statsLabel}>{stat.type}</div>
-          </div>
-        </Grid.Col>
+        <div key={stat.type} className={styles.statsCard}>
+          <div className={styles.statsNumber}>{stat.count}</div>
+          <div className={styles.statsLabel}>{stat.type}</div>
+        </div>
       ))}
-    </Grid>
+    </div>
   );
 }

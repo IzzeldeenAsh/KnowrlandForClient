@@ -20,3 +20,25 @@
 .industry-nav:hover{
     background-color: #232C66 !important;
 }
+/* Add this class to any <li> that needs the separator */
+.separator::before {
+    content: "";
+    position: absolute;
+    left: -19px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 1px;
+    height: 10px;
+    background-color: #cbd5e1;
+  }
+  .separator-dark::before {
+    content: "";
+    position: absolute;
+    left: -19px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 1px;
+    height: 10px;
+    background-color: #e7e7e7;
+  }
+  

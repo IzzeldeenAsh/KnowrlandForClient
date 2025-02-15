@@ -1,6 +1,7 @@
 import Image from 'next/image'
 import Particles from './particles'
 import Illustration from '@/public/images/glow-bottom.svg'
+import Link from 'next/link'
 
 export default function Hero() {
   return (
@@ -23,11 +24,11 @@ export default function Hero() {
           <div className="max-w-3xl mx-auto text-center">
             <div className="mb-6" data-aos="fade-down">
               <div className="inline-flex relative before:absolute before:inset-0 before:bg-blue-500 before:blur-md">
-                <a className="btn-sm py-0.5 text-slate-300 hover:text-white transition duration-150 ease-in-out group [background:linear-gradient(theme(colors.blue.500),_theme(colors.blue.500))_padding-box,_linear-gradient(theme(colors.blue.500),_theme(colors.blue.200)_75%,_theme(colors.transparent)_100%)_border-box] relative before:absolute before:inset-0 before:bg-slate-800/50 before:rounded-full before:pointer-events-none shadow" href="#0">
+                <Link href="https://foresighta.vercel.app/app/add-knowledge/stepper" className="btn-sm py-0.5 text-slate-300 hover:text-white transition duration-150 ease-in-out group [background:linear-gradient(theme(colors.blue.500),_theme(colors.blue.500))_padding-box,_linear-gradient(theme(colors.blue.500),_theme(colors.blue.200)_75%,_theme(colors.transparent)_100%)_border-box] relative before:absolute before:inset-0 before:bg-slate-800/50 before:rounded-full before:pointer-events-none shadow">
                   <span className="relative inline-flex items-center">
-                    Lorem ipsum dolor sit. <span className="tracking-normal text-blue-500 group-hover:translate-x-0.5 transition-transform duration-150 ease-in-out ml-1">-&gt;</span>
+                    Share your knowledge <span className="tracking-normal text-blue-500 group-hover:translate-x-0.5 transition-transform duration-150 ease-in-out ml-1">-&gt;</span>
                   </span>
-                </a>
+                </Link>
               </div>
             </div>
             <h1 className="h1 bg-clip-text text-transparent bg-gradient-to-r from-slate-200/60 via-slate-200 to-slate-200/60 pb-4" data-aos="fade-down">Lorem ipsum dolor sit amet.</h1>
