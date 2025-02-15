@@ -14,7 +14,7 @@ import { fetchBreadcrumb } from "@/utils/breadcrumb";
 import KnowledgeSideBox from './KnowledgeSideBox';
 import { StarIcon } from "@heroicons/react/20/solid";
 import TabsContent from "./TabsContent";
-
+import Stripes from "@/public/images/stripes-dark.svg";
 interface KnowledgeDetails {
   type: string;
   title: string;
@@ -92,7 +92,7 @@ async function fetchKnowledgeData(type: string, slug: string) {
     });
     
     if (response.status === 404) {
-      notFound();
+      return notFound();
     }
     
     const errorText = await response.text();
@@ -144,6 +144,24 @@ export default async function KnowledgePage({ params }: Props) {
     return (
       <>
         <HeaderLight />
+        <div className="relative z-10 max-w-6xl relative mx-auto  w-full ">
+      <div
+        className="pointer-events-none absolute z-10 -translate-x-1/2 transform hidden md:block"
+        style={{ left: '10%' }}
+        aria-hidden="true"
+      >
+        <Image
+          className="max-w-none opacity-50"
+          src={Stripes}
+          width={768}
+          height={768}
+          style={{ width: 'auto', height: 'auto' }}
+          alt="Stripes"
+          priority
+        />
+      </div>
+      </div>
+    
         <div className="min-h-screen bg-gray-50">
           <div className="section-header px-4 sm:px-6 lg:px-8 py-8 lg:py-12 relative overflow-hidden rounded-lg">
          
@@ -248,6 +266,9 @@ export default async function KnowledgePage({ params }: Props) {
                   isic_code={knowledge.isic_code}
                   hs_code={knowledge.hs_code}
                   published_at={knowledge.published_at}
+                  economic_blocs={knowledge.economic_blocs}
+                  regions={knowledge.regions}
+                  countries={knowledge.countries}
                 />
               </div>
             </div>
