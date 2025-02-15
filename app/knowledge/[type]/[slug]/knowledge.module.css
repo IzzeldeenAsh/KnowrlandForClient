@@ -245,6 +245,10 @@
   background: #f5f5f5;
   color: #666;
 }
+.badgeFree{
+  color: #06b826;
+  background: rgba(4, 161, 33, 0.1);
+}
 
 .badgeInactive {
   background: #f5f5f5;
@@ -253,6 +257,12 @@
 
 .badgeActive {
   background: #147aba;
+  color: white;
+  box-shadow: 0 0 15px rgba(20, 122, 186, 0.3);
+  animation: glowEffect 2s infinite;
+}
+.badgeActiveFree {
+  background: #14ba6a;
   color: white;
   box-shadow: 0 0 15px rgba(20, 122, 186, 0.3);
   animation: glowEffect 2s infinite;
@@ -278,6 +288,14 @@
   color: white;
   transform: scale(1.05);
   box-shadow: 0 0 15px rgba(20, 122, 186, 0.3);
+  text-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+  animation: glowEffect 2s infinite;
+}
+.documentCard.active .badgeFree {
+  background: #14ba5f;
+  color: white;
+  transform: scale(1.05);
+  box-shadow: 0 0 15px rgba(20, 186, 75, 0.3);
   text-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
   animation: glowEffect 2s infinite;
 }

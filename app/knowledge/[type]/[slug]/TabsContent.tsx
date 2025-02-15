@@ -15,13 +15,20 @@ function TabContent({ activeTab, knowledge }: { activeTab: string; knowledge: Kn
           <p className="text-gray-600">No reviews available yet.</p>
         </div>
       );
-    case "Comments":
+    case "Ask":
       return (
         <div className="bg-white p-6 rounded-lg shadow-sm">
-          <h3 className="text-xl font-semibold mb-4">Comments</h3>
+          <h3 className="text-xl font-semibold mb-4">Ask</h3>
           <p className="text-gray-600">No comments available yet.</p>
         </div>
       );
+      case "Meet":
+        return (
+          <div className="bg-white p-6 rounded-lg shadow-sm">
+            <h3 className="text-xl font-semibold mb-4">Meet the insighter</h3>
+            <p className="text-gray-600">No comments available yet.</p>
+          </div>
+        );
     default:
       return null;
   }
@@ -35,7 +42,7 @@ export default function TabsContent({ knowledge }: { knowledge: KnowledgeDetails
       <div className="border-b border-gray-200">
         <nav className="-mb-px flex space-x-8 knowledge-tab-nav relative " aria-label="Tabs">
       
-          {["Overview", "Reviews", "Comments"].map((tab) => (
+          {["Overview", "Reviews", "Ask Insighter", "Meet the insighter"].map((tab) => (
             <button
               key={tab}
               onClick={() => setActiveTab(tab)}
