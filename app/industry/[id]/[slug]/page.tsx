@@ -6,9 +6,8 @@ import { Metadata } from 'next'
 import IndustryIcon from "@/components/icons/industry-icon";
 import Link from 'next/link'
 import { fetchBreadcrumb } from '@/utils/breadcrumb'
-import styles from './industry.module.css'
 import StatisticsCards from '@/components/industry/statistics-cards'
-
+import Stripes from "@/public/images/stripes-dark.svg";
 interface Topic {
   id: number
   name: string
@@ -101,6 +100,25 @@ const { id, slug } = await params
     return (
       <>
       <HeaderLight />
+      <div className="relative z-10 max-w-6xl relative mx-auto  w-full ">
+      <div
+        className="pointer-events-none absolute z-10 -translate-x-1/2 transform hidden md:block"
+        style={{ left: '28%' }}
+        aria-hidden="true"
+      >
+        <Image
+          className="max-w-none opacity-50"
+          src={Stripes}
+          width={768}
+          height={768}
+          style={{ width: 'auto', height: 'auto' }}
+          alt="Stripes"
+          priority
+        />
+      </div>
+      </div>
+    
+
       <div className="min-h-screen bg-gray-50  ">
         <div className="section-header px-4 sm:px-6 lg:px-8 py-8  relative overflow-hidden rounded-lg">
                 <Image

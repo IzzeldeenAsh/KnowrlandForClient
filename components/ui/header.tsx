@@ -6,7 +6,6 @@ import Image from 'next/image'
 import { IconBook, IconChartPie3, IconCoin, IconFingerprint, IconNotification, IconChevronDown } from '@tabler/icons-react'
 import { CodeBracketIcon } from '@heroicons/react/24/outline'
 import { HoverCard, Group, Text, Anchor, Divider, SimpleGrid, ThemeIcon, rem, Button } from '@mantine/core'
-
 interface User {
   name: string;
   profile_photo_url: string | null;
@@ -31,7 +30,7 @@ async function getIndustries() {
       "Accept-Language": "en",
     },
     body: JSON.stringify({
-      top_industry: 6,
+      top_industry: 9,
       top_sub_industry: 2,
     }),
     cache: "force-cache",
@@ -165,15 +164,16 @@ export default function Header() {
           {/* Desktop navigation */}
           <nav className="hidden md:flex flex-1">
             <ul className="flex justify-center items-center w-full">
-              <li>
-                <HoverCard width={800} 
+              <li className='separator-dark'>
+                <HoverCard width={'100%'} 
                  position="bottom" 
                  radius="sm" shadow="md" withinPortal>
                   <HoverCard.Target>
-                    <button className="font-medium text-sm text-slate-300 hover:text-white mx-4 lg:mx-5 transition duration-150 ease-in-out flex items-center">
+                   <Link href={'/all-industries'}>
+                   <button className="font-medium text-sm text-slate-300 hover:text-white mx-4 lg:mx-5 transition duration-150 ease-in-out flex items-center">
                       <span className="mr-1">Industries</span>
                       <IconChevronDown size={16} />
-                    </button>
+                    </button></Link>
                   </HoverCard.Target>
 
                   <HoverCard.Dropdown style={{background: 'linear-gradient(to right, #0f172b, #242B6A)',borderColor: '#2F378A'}}>
@@ -186,7 +186,7 @@ export default function Header() {
 
                     <Divider my="sm" />
 
-                    <SimpleGrid cols={2} spacing={0}>
+                    <SimpleGrid cols={3} spacing={0}>
                       {industries.map((industry) => (
                         <Link 
                           key={industry.id} 
@@ -232,19 +232,19 @@ export default function Header() {
                   </HoverCard.Dropdown>
                 </HoverCard>
               </li>
-              <li>
-                <Link className="font-medium text-sm text-gray-200 hover:text-gray-100 mx-4 lg:mx-5 transition duration-150 ease-in-out" href="/industries/report">Reports</Link>
+              <li className='separator-dark'>
+                <Link className="font-medium  text-sm text-gray-200 hover:text-gray-100 mx-4 lg:mx-5 transition duration-150 ease-in-out" href="/industries/report">Reports</Link>
               </li>
-              <li>
+              <li className='separator-dark'>
                 <Link className="font-medium text-sm text-gray-200 hover:text-gray-100 mx-4 lg:mx-5 transition duration-150 ease-in-out" href="/industries/data">Data</Link>
               </li>
-              <li>
+              <li className='separator-dark'>
                 <Link className="font-medium text-sm text-gray-200 hover:text-gray-100 mx-4 lg:mx-5 transition duration-150 ease-in-out" href="/industries/insight">Insights</Link>
               </li>
-              <li>
+              <li className='separator-dark'>
                 <Link className="font-medium text-sm text-gray-200 hover:text-gray-100 mx-4 lg:mx-5 transition duration-150 ease-in-out" href="/industries/manual">Manual</Link>
               </li>
-              <li>
+              <li className='separator-dark'>
                 <Link className="font-medium text-sm text-gray-200 hover:text-gray-100 mx-4 lg:mx-5 transition duration-150 ease-in-out" href="/industries/course">Course</Link>
               </li>
             </ul>

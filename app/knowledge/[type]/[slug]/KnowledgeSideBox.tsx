@@ -1,8 +1,13 @@
-import { DocumentTextIcon, GlobeAltIcon, CalendarIcon, ClockIcon, BuildingLibraryIcon, TruckIcon } from '@heroicons/react/24/outline';
+import { DocumentTextIcon, GlobeAltIcon, CalendarIcon, ClockIcon, BuildingLibraryIcon, TruckIcon, GlobeAsiaAustraliaIcon } from '@heroicons/react/24/outline';
 import styles from './knowledge.module.css';
 
 interface Document {
   file_extension: string;
+}
+
+interface EconomicBloc {
+  id: number;
+  name: string;
 }
 
 interface KnowledgeSideBoxProps {
@@ -15,6 +20,9 @@ interface KnowledgeSideBoxProps {
   };
   hs_code?: any;
   published_at: string;
+  economic_blocs?: EconomicBloc[];
+  regions?: any;
+  countries?: any;
 }
 
 const KnowledgeSideBox = ({
@@ -24,8 +32,11 @@ const KnowledgeSideBox = ({
   isic_code,
   hs_code,
   published_at,
+  economic_blocs,
+  regions,
+  countries
+
 }: KnowledgeSideBoxProps) => {
-  // Count documents by extension
   const documentCounts = documents.reduce((acc: { [key: string]: number }, doc) => {
     const ext = doc.file_extension.toLowerCase();
     acc[ext] = (acc[ext] || 0) + 1;
@@ -49,7 +60,7 @@ const KnowledgeSideBox = ({
           </button>
         </div>
 
-        <div className="space-y-4">
+        <div className="space-y-3">
           <div className="tp-course-details2-widget-list-item flex items-center justify-between">
             <span>
               <DocumentTextIcon className="w-5 h-5 mr-2" />
@@ -81,7 +92,7 @@ const KnowledgeSideBox = ({
               <GlobeAltIcon className="w-5 h-5 mr-2" />
               Documents Language
             </span>
-            <span className="block mt-1">{language}</span>
+            <span className="block mt-1 capitalize">{language}</span>
           </div>
 
           {isic_code && (
@@ -110,6 +121,53 @@ const KnowledgeSideBox = ({
               <span className="block mt-1">{hs_code}</span>
             </div>
           )}
+
+          {
+            economic_blocs && economic_blocs.length > 0 && (
+              economic_blocs.map((economicBloc) => (
+               
+                <div key={economicBloc.id} className="tp-course-details2-widget-list-item flex items-center justify-between">
+                  <span className="flex items-center gap-2 font-medium text-gray-700">
+                    <GlobeAsiaAustraliaIcon className="w-5 h-5 mr-2" />
+                    Economic Block
+                  </span>
+                  <span className="badge bg-[#f1f1f4] text-[#4b5675] text-xs font-medium px-2.5 py-0.5 rounded">
+                    {economicBloc.name}
+                  </span>
+                </div>
+              ))
+            )
+          }
+          {
+            regions && regions.length > 0 && (
+              regions.map((region:any) => (
+                <div key={region.id} className="tp-course-details2-widget-list-item flex items-center justify-between">
+                  <span className="flex items-center gap-2 font-medium text-gray-700">
+                    <GlobeAsiaAustraliaIcon className="w-5 h-5 mr-2" />
+                    Region
+                  </span>
+                  <span className="badge bg-[#f1f1f4] text-[#4b5675] text-xs font-medium px-2.5 py-0.5 rounded">
+                    {region.name}
+                  </span>
+                </div>
+              ))
+            )
+          }
+          {
+            countries && countries.length > 0 && (
+              countries.map((country:any) => (
+                <div key={country.id} className="tp-course-details2-widget-list-item flex items-center justify-between">
+                  <span className="flex items-center gap-2 font-medium text-gray-700">
+                    <GlobeAsiaAustraliaIcon className="w-5 h-5 mr-2" />
+                    Country
+                  </span>
+                  <span className="badge bg-[#f1f1f4] text-[#4b5675] text-xs font-medium px-2.5 py-0.5 rounded">
+                    {country.name}
+                  </span>
+                </div>
+              ))
+            )
+          }
 
           <div className="tp-course-details2-widget-list-item flex items-center justify-between">
             <span>

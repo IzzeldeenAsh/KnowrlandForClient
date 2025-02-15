@@ -33,10 +33,10 @@ export default function Clients() {
           <Particles className="absolute inset-0 -z-10" quantity={5} />
         </div>
 
-        <div className="py-12 md:py-1">
+        <div className="py-12">
           <div className="overflow-hidden">
             <div className="inline-flex w-full flex-nowrap overflow-hidden [mask-image:_linear-gradient(to_right,transparent_0,_black_128px,_black_calc(100%-128px),transparent_100%)]">
-              {/* <ul className="flex animate-infinite-scroll items-center justify-center md:justify-start [&_img]:max-w-none [&_li]:mx-8">
+              <ul className="flex animate-infinite-scroll items-center justify-center md:justify-start [&_img]:max-w-none [&_li]:mx-8">
                 {logos.map((logo, index) => (
                   <li key={index}>
                     <Image src={logo.src} alt={logo.alt} />
@@ -52,7 +52,7 @@ export default function Clients() {
                     <Image src={logo.src} alt={logo.alt} />
                   </li>
                 ))}
-              </ul> */}
+              </ul>
             </div>
           </div>
         </div>

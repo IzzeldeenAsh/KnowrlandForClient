@@ -118,10 +118,12 @@ export default function Overview({ knowledge }: OverviewProps) {
                     <small className="text-xs text-gray-400 ">{(doc.file_size / 1024).toFixed(2)} KB</small>
                   </div>
                   <div className={styles.priceTag}>
-                    <span className={styles.badge}>
-                      ${parseFloat(doc.price).toFixed(2)}
-                    </span>
-                  </div>
+  {parseFloat(doc.price) === 0 ? (
+    <span className={`${styles.badge} ${styles.badgeFree}`}>Free</span>
+  ) : (
+    <span className={styles.badge}>${parseFloat(doc.price).toFixed(2)}</span>
+  )}
+</div>
                   <div className={styles.expandIcon}>
                     <svg 
                       width="24" 
@@ -169,9 +171,16 @@ export default function Overview({ knowledge }: OverviewProps) {
                   )}
                   <div className="max-w-xs mx-auto sm:max-w-none sm:inline-flex sm:justify-start space-y-2 sm:space-y-0 sm:space-x-2 mt-4">
                     <div>
-                      <a className="btn-sm text-white bg-[#1C7CBB] text-sm hover:bg-opacity-90 transition duration-150 ease-in-out group text-sm px-3 py-1 cursor-pointer">
-                        Add to Cart <span className="tracking-normal text-white group-hover:translate-x-0.5 transition-transform duration-150 ease-in-out ml-1">-&gt;</span>
-                      </a>
+                    { doc.price === "0" && (
+  <a  className="btn-sm text-white bg-[#1C7CBB] text-sm hover:bg-opacity-90 transition duration-150 ease-in-out group text-sm px-3 py-1 cursor-pointer">
+  Download <span className="tracking-normal text-white group-hover:translate-x-0.5 transition-transform duration-150 ease-in-out ml-1">-&gt;</span>
+</a>
+)}
+{doc.price !== "0" && (
+    <a  className="btn-sm text-white bg-[#1C7CBB] text-sm hover:bg-opacity-90 transition duration-150 ease-in-out group text-sm px-3 py-1 cursor-pointer">
+    Add to Cart <span className="tracking-normal text-white group-hover:translate-x-0.5 transition-transform duration-150 ease-in-out ml-1">-&gt;</span>
+  </a>
+)}
                     </div>
                     <div>
                       <a className="btn-sm text-slate-600 hover:text-slate-900 bg-slate-200 hover:bg-slate-300 transition duration-150 ease-in-out text-sm px-3 py-1 flex items-center border border-slate-300 cursor-pointer">
