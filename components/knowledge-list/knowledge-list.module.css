@@ -19,7 +19,7 @@
 .title {
   font-family: "Greycliff CF", var(--mantine-font-family);
   font-weight: 600;
-  font-size: 1.125rem;
+  font-size: 1.7rem;
   transition: color 0.2s ease;
 }
 
@@ -35,6 +35,6 @@
 
 .description {
   font-size: 0.875rem;
-  margin-top: 0.5rem;
+  margin-bottom: 0.5rem;
   display: block;
 }
