@@ -148,7 +148,7 @@ const { id, slug } = await params
                     </p>
                   </div>
                       {/* Stats Cards */}
-                      <StatisticsCards type="industry" id={parseInt(id)} />
+                      <StatisticsCards type="industry" id={parseInt(id)}  />
                   </div>
                  
                 </div>
