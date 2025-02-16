@@ -1,6 +1,6 @@
 'use client';
 import { useState, useEffect } from 'react';
-import { KnowledgeDetails } from '@/app/knowledge/[type]/[slug]/types';
+import { KnowledgeDetails } from '@/app/[locale]/knowledge/[type]/[slug]/types';
 
 interface PaginationLink {
   url: string | null;

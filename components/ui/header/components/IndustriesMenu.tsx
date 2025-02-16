@@ -18,7 +18,7 @@ export function IndustriesMenu() {
       <HoverCard.Dropdown style={{ background: 'white', borderColor: '#e5e7eb' }}>
         <Group justify="space-between" px="md">
           <Text fw={600} c="dark" size="sm">Featured Industries</Text>
-          <Anchor href="/all-industries" fz="xs" c="blue">
+          <Anchor href="/en/all-industries" fz="xs" c="blue">
             View all industries
           </Anchor>
         </Group>
@@ -29,7 +29,7 @@ export function IndustriesMenu() {
           {industries.map((industry) => (
             <Link 
               key={industry.id} 
-              href={`/industry/${industry.id}/${industry.slug}`}
+              href={`/en/industry/${industry.id}/${industry.slug}`}
               className="block"
             >
               <div className="p-3 rounded transition-colors hover:bg-gray-50">
