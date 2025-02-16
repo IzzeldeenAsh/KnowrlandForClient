@@ -190,7 +190,7 @@ export default function Header() {
                       {industries.map((industry) => (
                         <Link 
                           key={industry.id} 
-                          href={`/industry/${industry.id}/${industry.slug}`}
+                          href={`/en/industry/${industry.id}/${industry.slug}`}
                           className="block"
                         >
                           <div className="p-3 rounded transition-colors industry-nav hover:bg-slate-800/50">
@@ -222,7 +222,7 @@ export default function Header() {
                         <Button 
                           variant="light" 
                           component={Link} 
-                          href="/all-industries"
+                          href="/en/all-industries"
                           className="bg-blue-50 text-blue-600 hover:bg-blue-100"
                         >
                           Browse All
@@ -233,19 +233,19 @@ export default function Header() {
                 </HoverCard>
               </li>
               <li className='separator-dark'>
-                <Link className="font-medium  text-sm text-gray-200 hover:text-gray-100 mx-4 lg:mx-5 transition duration-150 ease-in-out" href="/industries/report">Reports</Link>
+                <Link className="font-medium  text-sm text-gray-200 hover:text-gray-100 mx-4 lg:mx-5 transition duration-150 ease-in-out" href="/en/industries/report">Reports</Link>
               </li>
               <li className='separator-dark'>
-                <Link className="font-medium text-sm text-gray-200 hover:text-gray-100 mx-4 lg:mx-5 transition duration-150 ease-in-out" href="/industries/data">Data</Link>
+                <Link className="font-medium text-sm text-gray-200 hover:text-gray-100 mx-4 lg:mx-5 transition duration-150 ease-in-out" href="/en/industries/data">Data</Link>
               </li>
               <li className='separator-dark'>
-                <Link className="font-medium text-sm text-gray-200 hover:text-gray-100 mx-4 lg:mx-5 transition duration-150 ease-in-out" href="/industries/insight">Insights</Link>
+                <Link className="font-medium text-sm text-gray-200 hover:text-gray-100 mx-4 lg:mx-5 transition duration-150 ease-in-out" href="/en/industries/insight">Insights</Link>
               </li>
               <li className='separator-dark'>
-                <Link className="font-medium text-sm text-gray-200 hover:text-gray-100 mx-4 lg:mx-5 transition duration-150 ease-in-out" href="/industries/manual">Manual</Link>
+                <Link className="font-medium text-sm text-gray-200 hover:text-gray-100 mx-4 lg:mx-5 transition duration-150 ease-in-out" href="/en/industries/manual">Manual</Link>
               </li>
               <li className='separator-dark'>
-                <Link className="font-medium text-sm text-gray-200 hover:text-gray-100 mx-4 lg:mx-5 transition duration-150 ease-in-out" href="/industries/course">Course</Link>
+                <Link className="font-medium text-sm text-gray-200 hover:text-gray-100 mx-4 lg:mx-5 transition duration-150 ease-in-out" href="/en/industries/course">Course</Link>
               </li>
             </ul>
           </nav>

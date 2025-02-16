@@ -12,7 +12,7 @@ import {
   Grid,
 } from '@mantine/core';
 import { useKnowledge } from '@/hooks/knowledgs/useKnowledge';
-import KnowledgeGrid from '@/app/topic/[id]/[slug]/KnowledgeGrid';
+import KnowledgeGrid from '@/app/[locale]/topic/[id]/[slug]/KnowledgeGrid';
 import KnowledgeList from '@/components/knowledge-list/KnowledgeList';
 import PageIllustration from '@/components/page-illustration';
 import HeaderLight from '@/components/ui/header-light';

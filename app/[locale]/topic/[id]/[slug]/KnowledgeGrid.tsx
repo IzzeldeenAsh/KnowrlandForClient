@@ -8,7 +8,7 @@ import ManualIcon from "@/components/icons/ManualIcon";
 import ReportIcon from "@/components/icons/ReportIcon";
 import { formatDistanceToNow } from 'date-fns';
 import cardStyles from './knowledge-card.module.css';
-import { KnowledgeDetails } from '@/app/knowledge/[type]/[slug]/types';
+import { KnowledgeDetails } from '@/app/[locale]/knowledge/[type]/[slug]/types';
 
 
 
@@ -43,7 +43,7 @@ export default function KnowledgeGrid({ knowledge, topicName, showHeader=true }:
             className={cardStyles.card}
             data-aos="fade-up"
           >
-            <Link href={`/knowledge/${item.type}/${item.slug}`} className="block">
+            <Link href={`/en/knowledge/${item.type}/${item.slug}`} className="block">
               <Group gap="xs">
                 {item.type === 'report' && <ReportIcon width={24} height={24} />}
                 {item.type === 'manual' && <ManualIcon width={24} height={24} />}
