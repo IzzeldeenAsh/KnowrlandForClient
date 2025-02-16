@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { Card, Group, Text, Badge, Avatar } from "@mantine/core";
 import { formatDistanceToNow } from "date-fns";
-import { KnowledgeDetails } from "@/app/knowledge/[type]/[slug]/types";
+import { KnowledgeDetails } from "@/app/[locale]/knowledge/[type]/[slug]/types";
 import listStyles from "./knowledge-list.module.css";
 import DataIcon from "../icons/DataIcon";
 import InsightIcon from "../icons/InsightIcon";
@@ -45,7 +45,7 @@ export default function KnowledgeList({ knowledge }: KnowledgeListProps) {
           </div>
           <Group>
             <div className="flex flex-col ">
-              <Link href={`/knowledge/${item.type}/${item.slug}`}>
+              <Link href={`/en/knowledge/${item.type}/${item.slug}`}>
                 <Text  className={listStyles.title}>{item.title}</Text>
               </Link>
 
