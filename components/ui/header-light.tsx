@@ -18,23 +18,23 @@ export default function Header() {
                   <IndustriesMenu />
                 </li>
                 <li className="mx-4 lg:mx-5 relative group  separator">    
-                  <Link className="font-medium text-sm text-gray-600 hover:text-blue-500 transition duration-150 ease-in-out" href="/industries/report">Reports</Link>
+                  <Link className="font-medium text-sm text-gray-600 hover:text-blue-500 transition duration-150 ease-in-out" href="/en/industries/report">Reports</Link>
                
                 </li>
                 <li className="mx-4 lg:mx-5 relative group separator">
-                  <Link className="font-medium text-sm text-gray-600 hover:text-blue-500 transition duration-150 ease-in-out" href="/industries/data">Data</Link>
+                  <Link className="font-medium text-sm text-gray-600 hover:text-blue-500 transition duration-150 ease-in-out" href="/en/industries/data">Data</Link>
                
                 </li>
                 <li className="mx-4 lg:mx-5 relative group separator">
-                  <Link className="font-medium text-sm text-gray-600 hover:text-blue-500 transition duration-150 ease-in-out" href="/industries/insight">Insights</Link>
+                  <Link className="font-medium text-sm text-gray-600 hover:text-blue-500 transition duration-150 ease-in-out" href="/en/industries/insight">Insights</Link>
                
                 </li>
                 <li className="mx-4 lg:mx-5 relative group separator">
-                  <Link className="font-medium text-sm text-gray-600 hover:text-blue-500 transition duration-150 ease-in-out" href="/industries/manual">Manual</Link>
+                  <Link className="font-medium text-sm text-gray-600 hover:text-blue-500 transition duration-150 ease-in-out" href="/en/industries/manual">Manual</Link>
                
                 </li>
                 <li className="mx-4 lg:mx-5 relative group separator">
-                  <Link className="font-medium text-sm text-gray-600 hover:text-blue-500 transition duration-150 ease-in-out" href="/industries/course">Course</Link>
+                  <Link className="font-medium text-sm text-gray-600 hover:text-blue-500 transition duration-150 ease-in-out" href="/en/industries/course">Course</Link>
                 </li>
              
                 <li className="mx-4 lg:mx-5 relative group separator">

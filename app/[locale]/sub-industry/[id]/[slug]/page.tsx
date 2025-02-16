@@ -190,7 +190,7 @@ export default async function SubIndustryPage({ params }: Props) {
                               className="text-xs text-gray-600 hover:text-blue-600 transition-colors flex items-center"
                             >
                               <span className="mr-2">•</span>
-                              <Link href={`/knowledge/${item.type}/${item.slug}`}>
+                              <Link href={`/en/knowledge/${item.type}/${item.slug}`}>
                                 {item.title}
                               </Link>
                             </li>
