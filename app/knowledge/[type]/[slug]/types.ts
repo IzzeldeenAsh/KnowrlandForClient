@@ -1,4 +1,5 @@
 export interface KnowledgeDetails {
+  id?: number;
   type: string;
   title: string;
   slug: string;
@@ -24,6 +25,7 @@ export interface KnowledgeDetails {
   insighter: {
     name: string;
     profile_photo_url: string;
+    roles: string[];
   };
   documents: Array<{
     id: number;
