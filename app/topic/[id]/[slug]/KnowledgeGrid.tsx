@@ -8,24 +8,14 @@ import ManualIcon from "@/components/icons/ManualIcon";
 import ReportIcon from "@/components/icons/ReportIcon";
 import { formatDistanceToNow } from 'date-fns';
 import cardStyles from './knowledge-card.module.css';
+import { KnowledgeDetails } from '@/app/knowledge/[type]/[slug]/types';
 
-interface Knowledge {
-  id: number;
-  type: string;
-  title: string;
-  slug: string;
-  insighter: {
-    name: string;
-    profile_photo_url: string;
-    roles: string[];
-  };
-  published_at: string;
-  total_price: string;
-}
+
 
 interface KnowledgeGridProps {
-  knowledge: Knowledge[];
+  knowledge: KnowledgeDetails[];
   topicName: string;
+  showHeader?: boolean;
 }
 
 function formatPublishedDate(dateString: string) {
@@ -33,16 +23,18 @@ function formatPublishedDate(dateString: string) {
   return formatDistanceToNow(date, { addSuffix: true });
 }
 
-export default function KnowledgeGrid({ knowledge, topicName }: KnowledgeGridProps) {
+export default function KnowledgeGrid({ knowledge, topicName, showHeader=true }: KnowledgeGridProps) {
   return (
     <div className="max-w-6xl mx-auto">
-      <div className="mb-8 text-start">
-        <h2 className="text-2xl font-bold text-gray-900 mb-2">Knowledge</h2>
-        <p className="text-gray-600">Explore insights within {topicName}</p>
-      </div>
+      {showHeader && (
+        <div className="mb-8 text-start">
+          <h2 className="text-2xl font-bold text-gray-900 mb-2">Knowledge</h2>
+          <p className="text-gray-600">Explore insights within {topicName}</p>
+        </div>
+      )}
 
       <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4 max-w-7xl mx-auto">
-        {knowledge.map((item: Knowledge) => (
+        {knowledge.map((item: KnowledgeDetails) => (
           <Card
             key={`${item.type}-${item.slug}`}
             withBorder

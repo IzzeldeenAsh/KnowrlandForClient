@@ -44,7 +44,7 @@ const KnowledgeSideBox = ({
   }, {});
 
   return (
-    <div className="tp-course-details2-widget sticky ">
+    <div className="tp-course-details2-widget sticky max-w-[400px] ">
       <div className="p-4">
         <div className="text-center mb-4">
           <span className='text-3xl font-bold'>  ${total_price}</span>   
@@ -124,48 +124,53 @@ const KnowledgeSideBox = ({
 
           {
             economic_blocs && economic_blocs.length > 0 && (
-              economic_blocs.map((economicBloc) => (
-               
-                <div key={economicBloc.id} className="tp-course-details2-widget-list-item flex items-center justify-between">
-                  <span className="flex items-center gap-2 font-medium text-gray-700">
-                    <GlobeAsiaAustraliaIcon className="w-5 h-5 mr-2" />
-                    Economic Block
-                  </span>
-                  <span className="badge bg-[#f1f1f4] text-[#4b5675] text-xs font-medium px-2.5 py-0.5 rounded">
-                    {economicBloc.name}
-                  </span>
+              <div className="tp-course-details2-widget-list-item flex items-center justify-between">
+                <span className="flex items-center gap-2 font-medium text-gray-700">
+                  <GlobeAsiaAustraliaIcon className="w-5 h-5 mr-2" />
+                  Economic Block
+                </span>
+                <div className="flex flex-wrap gap-1">
+                  {economic_blocs.map((economicBloc) => (
+                    <span key={economicBloc.id} className="badge bg-[#f1f1f4] text-[#4b5675] text-xs font-medium px-2.5 py-0.5 rounded">
+                      {economicBloc.name}
+                    </span>
+                  ))}
                 </div>
-              ))
+              </div>
             )
           }
           {
             regions && regions.length > 0 && (
-              regions.map((region:any) => (
-                <div key={region.id} className="tp-course-details2-widget-list-item flex items-center justify-between">
-                  <span className="flex items-center gap-2 font-medium text-gray-700">
-                    <GlobeAsiaAustraliaIcon className="w-5 h-5 mr-2" />
-                    Region
-                  </span>
-                  <span className="badge bg-[#f1f1f4] text-[#4b5675] text-xs font-medium px-2.5 py-0.5 rounded">
-                    {region.name}
-                  </span>
+              <div className="tp-course-details2-widget-list-item flex items-center justify-between">
+                <span className="flex items-center gap-2 font-medium text-gray-700">
+                  <GlobeAsiaAustraliaIcon className="w-5 h-5 mr-2" />
+                  Region
+                </span>
+                <div className="flex flex-wrap gap-1">
+                  {regions.map((region:any) => (
+                    <span key={region.id} className="badge bg-[#f1f1f4] text-[#4b5675] text-xs font-medium px-2.5 py-0.5 rounded">
+                      {region.name}
+                    </span>
+                  ))}
                 </div>
-              ))
+              </div>
             )
           }
           {
             countries && countries.length > 0 && (
-              countries.map((country:any) => (
-                <div key={country.id} className="tp-course-details2-widget-list-item flex items-center justify-between">
-                  <span className="flex items-center gap-2 font-medium text-gray-700">
-                    <GlobeAsiaAustraliaIcon className="w-5 h-5 mr-2" />
-                    Country
-                  </span>
-                  <span className="badge bg-[#f1f1f4] text-[#4b5675] text-xs font-medium px-2.5 py-0.5 rounded">
-                    {country.name}
-                  </span>
+              <div className="tp-course-details2-widget-list-item flex items-center justify-between">
+                <span className="flex items-center gap-2 font-medium text-gray-700">
+                  <GlobeAsiaAustraliaIcon className="w-5 h-5 mr-2" />
+                  Country
+                </span>
+                <div className="flex flex-wrap justify-end gap-1">
+                  {countries.map((country:any) => (
+                    <span key={country.id} className="badge bg-[#f1f1f4] text-[#4b5675] text-xs font-medium px-2.5 py-0.5 rounded">
+                      {country.name}
+                    </span>
+                  ))}
                 </div>
-              ))
+              </div>
             )
           }
 
