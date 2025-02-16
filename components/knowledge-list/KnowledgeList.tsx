@@ -46,10 +46,10 @@ export default function KnowledgeList({ knowledge }: KnowledgeListProps) {
           <Group>
             <div className="flex flex-col ">
               <Link href={`/knowledge/${item.type}/${item.slug}`}>
-                <Text className={listStyles.title}>{item.title}</Text>
+                <Text  className={listStyles.title}>{item.title}</Text>
               </Link>
 
-              <Text className={listStyles.description} mt="sm">
+              <Text className={listStyles.description}>
                 {item.description}
               </Text>
             </div>
