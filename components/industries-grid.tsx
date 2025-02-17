@@ -31,7 +31,7 @@ export default function IndustriesGrid({ industries }: IndustriesGridProps) {
           className="relative bg-white rounded-sm p-6 shadow-sm hover:shadow-md transition-all duration-300 cursor-pointer"
         >
           <div className="space-y-2">
-            <Link href={`/industry/${industry.id}/${industry.slug}`}>
+            <Link href={`/en/industry/${industry.id}/${industry.slug}`}>
             <h3 className="text-sm font-semibold text-gray-900  hover:text-blue-600 " >
               {industry.name}
             </h3>
@@ -42,7 +42,7 @@ export default function IndustriesGrid({ industries }: IndustriesGridProps) {
                   key={child.id} 
                   className="text-xs text-gray-600 hover:text-blue-600 transition-colors flex items-center"
                 >
-               <Link href={`/sub-industry/${child.id}/${child.slug}`}>
+               <Link href={`/en/sub-industry/${child.id}/${child.slug}`}>
                <span className="mr-2">•</span>
                {child.name}
                </Link>

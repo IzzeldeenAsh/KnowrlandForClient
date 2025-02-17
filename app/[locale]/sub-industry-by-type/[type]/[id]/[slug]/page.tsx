@@ -142,7 +142,7 @@ export default function SubIndustryByTypePage({ params }: Props) {
                     data-aos="fade-up"
                   >
                     <div className="space-y-3">
-                      <Link href={`/topic-by-type/${type}/${topic.id}/${topic.slug}`} className="block">
+                      <Link href={`/en/topic-by-type/${type}/${topic.id}/${topic.slug}`} className="block">
                         <div className="flex items-center gap-2">
                           <IndustryIcon />
                           <h3 className="text-sm font-semibold text-gray-900 hover:text-blue-600">

@@ -170,7 +170,7 @@ const { id, slug } = await params
                   data-aos="fade-up"
                 >
                     <div className="space-y-2">
-                  <Link href={`/sub-industry/${child.id}/${child.slug}`} className="block">
+                  <Link href={`/en/sub-industry/${child.id}/${child.slug}`} className="block">
                       <div className="flex items-center gap-2">
                         <IndustryIcon />
                         <h3 className="text-sm font-semibold text-gray-900 hover:text-blue-600">
@@ -181,7 +181,7 @@ const { id, slug } = await params
                       {child.topic.length > 0 ? (
                         <ul className="space-y-1">
                           {child.topic.map((topic: Topic) => (
-                            <Link href={`/topic/${topic.id}/${topic.slug}`} key={topic.id} className="block">
+                            <Link href={`/en/topic/${topic.id}/${topic.slug}`} key={topic.id} className="block">
                             <li
                               key={topic.id}
                               className="text-xs text-gray-600 hover:text-blue-600 transition-colors flex items-center"

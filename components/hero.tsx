@@ -24,15 +24,15 @@ export default function Hero() {
           <div className="max-w-3xl mx-auto text-center">
             <div className="mb-6" data-aos="fade-down">
               <div className="inline-flex relative before:absolute before:inset-0 before:bg-blue-500 before:blur-md">
-                <Link href="https://foresighta.vercel.app/app/add-knowledge/stepper" className="btn-sm py-0.5 text-slate-300 hover:text-white transition duration-150 ease-in-out group [background:linear-gradient(theme(colors.blue.500),_theme(colors.blue.500))_padding-box,_linear-gradient(theme(colors.blue.500),_theme(colors.blue.200)_75%,_theme(colors.transparent)_100%)_border-box] relative before:absolute before:inset-0 before:bg-slate-800/50 before:rounded-full before:pointer-events-none shadow">
+                <Link href='/' className="btn-sm py-0.5 text-slate-300 hover:text-white transition duration-150 ease-in-out group [background:linear-gradient(theme(colors.blue.500),_theme(colors.blue.500))_padding-box,_linear-gradient(theme(colors.blue.500),_theme(colors.blue.200)_75%,_theme(colors.transparent)_100%)_border-box] relative before:absolute before:inset-0 before:bg-slate-800/50 before:rounded-full before:pointer-events-none shadow">
                   <span className="relative inline-flex items-center">
-                    Share your knowledge <span className="tracking-normal text-blue-500 group-hover:translate-x-0.5 transition-transform duration-150 ease-in-out ml-1">-&gt;</span>
+                  Knowledge Beyond Boundaries
                   </span>
                 </Link>
               </div>
             </div>
-            <h1 className="h1 bg-clip-text text-transparent bg-gradient-to-r from-slate-200/60 via-slate-200 to-slate-200/60 pb-4" data-aos="fade-down">Lorem ipsum dolor sit amet.</h1>
-            <p className="text-lg text-slate-300 mb-8" data-aos="fade-down" data-aos-delay="200">Lorem ipsum dolor sit amet consectetur adipisicing elit. Nam pariatur eum modi laudantium quisquam aspernatur! Nulla distinctio facere voluptatibus hic.</p>
+            <h1 className="h1 bg-clip-text text-transparent bg-gradient-to-r from-slate-200/60 via-slate-200 to-slate-200/60 pb-4" data-aos="fade-down">A Universe of Knowledge at Your Fingertips</h1>
+            <p className="text-lg text-slate-300 mb-8" data-aos="fade-down" data-aos-delay="200">Tap into expertise from different sectors and specializations, and unlock insights in business, science, technology, and beyond.</p>
             <div className="max-w-3xl mx-auto w-full pb-4" data-aos="fade-down" data-aos-delay="300">
               <div className="relative">
                 <input
@@ -58,7 +58,7 @@ export default function Hero() {
                 </button>
               </div>
             </div>
-            <div className="max-w-xs mx-auto sm:max-w-none sm:inline-flex sm:justify-center space-y-4 sm:space-y-0 sm:space-x-4" data-aos="fade-down" data-aos-delay="400">
+            {/* <div className="max-w-xs mx-auto sm:max-w-none sm:inline-flex sm:justify-center space-y-4 sm:space-y-0 sm:space-x-4" data-aos="fade-down" data-aos-delay="400">
               <div>
                 <a className="btn text-slate-900 bg-gradient-to-r from-white/80 via-white to-white/80 hover:bg-white w-full transition duration-150 ease-in-out group" href="#0">
                   Search <span className="tracking-normal text-blue-500 group-hover:translate-x-0.5 transition-transform duration-150 ease-in-out ml-1">-&gt;</span>
@@ -72,7 +72,7 @@ export default function Hero() {
                   <span>Get Started</span>
                 </a>
               </div>
-            </div>
+            </div> */}
 
           </div>
 
