@@ -7,7 +7,7 @@ export function IndustriesMenu() {
   const { industries } = useIndustries();
 
   return (
-    <HoverCard width={'100%'} position="bottom" radius="sm" shadow="md" withinPortal>
+    <HoverCard  position="bottom" radius="sm" shadow="md" withinPortal>
       <HoverCard.Target>
         <button className="font-medium text-sm text-gray-600 hover:text-gray-900 mx-4 lg:mx-5 transition duration-150 ease-in-out flex items-center">
           <span className="mr-1">Industries</span>

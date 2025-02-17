@@ -3,9 +3,8 @@ import Logo from './logo'
 import MobileMenu from './mobile-menu'
 import { useEffect, useState } from 'react'
 import Image from 'next/image'
-import { IconBook, IconChartPie3, IconCoin, IconFingerprint, IconNotification, IconChevronDown } from '@tabler/icons-react'
-import { CodeBracketIcon } from '@heroicons/react/24/outline'
-import { HoverCard, Group, Text, Anchor, Divider, SimpleGrid, ThemeIcon, rem, Button } from '@mantine/core'
+import {IconChevronDown } from '@tabler/icons-react'
+import { HoverCard, Group, Text, Anchor, Divider, SimpleGrid, Button } from '@mantine/core'
 interface User {
   name: string;
   profile_photo_url: string | null;
@@ -30,7 +29,7 @@ async function getIndustries() {
       "Accept-Language": "en",
     },
     body: JSON.stringify({
-      top_industry: 9,
+      top_industry: 6,
       top_sub_industry: 2,
     }),
     cache: "force-cache",
@@ -45,38 +44,6 @@ async function getIndustries() {
   return json.data as Industry[];
 }
 
-const mockdata = [
-  {
-    icon: CodeBracketIcon,
-    title: 'Technology',
-    description: 'Explore cutting-edge tech trends and innovations',
-  },
-  {
-    icon: IconCoin,
-    title: 'Finance',
-    description: 'Stay updated with financial markets and strategies',
-  },
-  {
-    icon: IconBook,
-    title: 'Education',
-    description: 'Discover modern educational approaches and tools',
-  },
-  {
-    icon: IconFingerprint,
-    title: 'Healthcare',
-    description: 'Learn about medical advances and healthcare solutions',
-  },
-  {
-    icon: IconChartPie3,
-    title: 'Business',
-    description: 'Get insights on business strategies and management',
-  },
-  {
-    icon: IconNotification,
-    title: 'Media',
-    description: 'Keep up with media trends and digital communications',
-  },
-];
 
 export default function Header() {
   const [user, setUser] = useState<User | null>(null);
@@ -165,8 +132,8 @@ export default function Header() {
           <nav className="hidden md:flex flex-1">
             <ul className="flex justify-center items-center w-full">
               <li className='separator-dark'>
-                <HoverCard width={'100%'} 
-                 position="bottom" 
+                <HoverCard  
+                  position='bottom'
                  radius="sm" shadow="md" withinPortal>
                   <HoverCard.Target>
                    <Link href={'/all-industries'}>
@@ -186,7 +153,7 @@ export default function Header() {
 
                     <Divider my="sm" />
 
-                    <SimpleGrid cols={3} spacing={0}>
+                    <SimpleGrid cols={2} spacing={0}>
                       {industries.map((industry) => (
                         <Link 
                           key={industry.id} 
@@ -242,10 +209,10 @@ export default function Header() {
                 <Link className="font-medium text-sm text-gray-200 hover:text-gray-100 mx-4 lg:mx-5 transition duration-150 ease-in-out" href="/en/industries/insight">Insights</Link>
               </li>
               <li className='separator-dark'>
-                <Link className="font-medium text-sm text-gray-200 hover:text-gray-100 mx-4 lg:mx-5 transition duration-150 ease-in-out" href="/en/industries/manual">Manual</Link>
+                <Link className="font-medium text-sm text-gray-200 hover:text-gray-100 mx-4 lg:mx-5 transition duration-150 ease-in-out" href="/en/industries/manual">Manuals</Link>
               </li>
               <li className='separator-dark'>
-                <Link className="font-medium text-sm text-gray-200 hover:text-gray-100 mx-4 lg:mx-5 transition duration-150 ease-in-out" href="/en/industries/course">Course</Link>
+                <Link className="font-medium text-sm text-gray-200 hover:text-gray-100 mx-4 lg:mx-5 transition duration-150 ease-in-out" href="/en/industries/course">Courses</Link>
               </li>
             </ul>
           </nav>
@@ -408,13 +375,11 @@ export default function Header() {
               </li>
             ) : (
               <>
-                <li>
-                  <Link className="font-medium text-sm text-slate-300 hover:text-white whitespace-nowrap transition duration-150 ease-in-out" href="https://foresighta.vercel.app/auth/login">Sign in</Link>
-                </li>
+
                 <li className="ml-6">
-                  <Link className="btn-sm text-slate-300 hover:text-white transition duration-150 ease-in-out w-full group [background:linear-gradient(theme(colors.slate.900),_theme(colors.slate.900))_padding-box,_conic-gradient(theme(colors.slate.400),_theme(colors.slate.700)_25%,_theme(colors.slate.700)_75%,_theme(colors.slate.400)_100%)_border-box] relative before:absolute before:inset-0 before:bg-slate-800/30 before:rounded-full before:pointer-events-none" href="https://foresighta.vercel.app/auth/sign-up">
+                  <Link className="btn-sm text-slate-300 hover:text-white transition duration-150 ease-in-out w-full group [background:linear-gradient(theme(colors.slate.900),_theme(colors.slate.900))_padding-box,_conic-gradient(theme(colors.slate.400),_theme(colors.slate.700)_25%,_theme(colors.slate.700)_75%,_theme(colors.slate.400)_100%)_border-box] relative before:absolute before:inset-0 before:bg-slate-800/30 before:rounded-full before:pointer-events-none" href="https://foresighta.vercel.app/auth/login">
                     <span className="relative inline-flex items-center">
-                      Sign up <span className="tracking-normal text-blue-500 group-hover:translate-x-0.5 transition-transform duration-150 ease-in-out ml-1">-&gt;</span>
+                      Login <span className="tracking-normal text-blue-500 group-hover:translate-x-0.5 transition-transform duration-150 ease-in-out ml-1">-&gt;</span>
                     </span>
                   </Link>
                 </li>
