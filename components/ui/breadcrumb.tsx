@@ -26,7 +26,7 @@ export default function Breadcrumb({ items }: BreadcrumbProps) {
           <li key={item.href} className="flex items-center">
             <ChevronRightIcon className="h-4 w-4 text-gray-400 flex-shrink-0" />
             <Link
-              href={item.label === "Industries" ? "/all-industries" : item.href}
+              href={item.label === "Industries" ? "/en/all-industries" : `/en/${item.href}`}
               className={`ml-2 text-xs font-light ${
                 index === items.length - 1
                   ? 'text-gray-900'

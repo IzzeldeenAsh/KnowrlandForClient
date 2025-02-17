@@ -57,11 +57,11 @@ export default function AuthCallback() {
         }));
 
         // Redirect to home page
-        router.push('/home');
+        router.push('/en/home');
       } catch (error) {
         console.error('Error fetching profile:', error);
         // Handle error - maybe redirect to login
-        router.push('/login');
+        router.push('/en/login');
       }
     };
 

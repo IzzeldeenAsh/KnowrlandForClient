@@ -175,7 +175,7 @@ export default async function SubIndustryPage({ params }: Props) {
                     <div className="space-y-2">
                       <div className="flex items-center gap-2">
                         <FolderIcon width={20} height={20} />
-                        <Link href={`/topic/${topic.id}/${topic.slug}`}>
+                        <Link href={`/en/topic/${topic.id}/${topic.slug}`}>
                           <h3 className="text-sm font-semibold text-gray-900">
                             {topic.name}
                           </h3>
