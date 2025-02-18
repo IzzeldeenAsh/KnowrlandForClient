@@ -26,7 +26,7 @@ export default function Hero() {
               <div className="inline-flex relative before:absolute before:inset-0 before:bg-blue-500 before:blur-md">
                 <Link href='/' className="btn-sm py-0.5 text-slate-300 hover:text-white transition duration-150 ease-in-out group [background:linear-gradient(theme(colors.blue.500),_theme(colors.blue.500))_padding-box,_linear-gradient(theme(colors.blue.500),_theme(colors.blue.200)_75%,_theme(colors.transparent)_100%)_border-box] relative before:absolute before:inset-0 before:bg-slate-800/50 before:rounded-full before:pointer-events-none shadow">
                   <span className="relative inline-flex items-center">
-                  Knowledge Beyond Boundaries
+                  Beyond Research Boundaries
                   </span>
                 </Link>
               </div>
