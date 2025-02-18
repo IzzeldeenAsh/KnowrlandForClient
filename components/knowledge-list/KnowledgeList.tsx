@@ -14,6 +14,15 @@ interface KnowledgeListProps {
   knowledge: KnowledgeDetails[];
 }
 
+// Helper function to get initials from a name
+function getInitials(name: string) {
+  return name
+    .split(" ")
+    .map((word) => word[0])
+    .join("")
+    .toUpperCase();
+}
+
 export default function KnowledgeList({ knowledge }: KnowledgeListProps) {
   return (
     <div className="max-w-6xl mx-auto">
@@ -22,7 +31,7 @@ export default function KnowledgeList({ knowledge }: KnowledgeListProps) {
           key={`${item.type}-${item.slug}`}
           withBorder
           className={listStyles.card}
-           data-aos="fade-up"
+          data-aos="fade-up"
         >
           <div className="flex justify-between w-100 mb-4">
             <Group gap="xs">
@@ -46,7 +55,7 @@ export default function KnowledgeList({ knowledge }: KnowledgeListProps) {
           <Group>
             <div className="flex flex-col ">
               <Link href={`/en/knowledge/${item.type}/${item.slug}`}>
-                <Text  className={listStyles.title}>{item.title}</Text>
+                <Text className={listStyles.title}>{item.title}</Text>
               </Link>
 
               <Text className={listStyles.description}>
@@ -59,7 +68,11 @@ export default function KnowledgeList({ knowledge }: KnowledgeListProps) {
               src={item.insighter?.profile_photo_url || undefined}
               radius="xl"
               size="sm"
-            />
+             
+            >
+              {!item.insighter?.profile_photo_url &&
+                getInitials(item.insighter.name)}
+            </Avatar>
             <Text size="sm">{item.insighter?.name}</Text>
           </Group>
           <Text className={listStyles.meta} mt="xs">

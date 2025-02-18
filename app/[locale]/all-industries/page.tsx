@@ -73,7 +73,7 @@ export default async function AllIndustries() {
   const industries = data?.data || mockIndustries
 
   const breadcrumbItems = [
-    { label: 'Industries', href: '/all-industries' }
+    { label: 'Industries', href: '/en/all-industries' }
   ]
 
   return (
