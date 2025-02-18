@@ -28,7 +28,7 @@ export default function Cta() {
                 Replacement (4 words): "Lorem ipsum dolor sit"
               */}
               <div className="inline-flex font-medium bg-clip-text text-transparent bg-gradient-to-r from-blue-500 to-blue-200 pb-3">
-                Lorem ipsum dolor sit
+              The SMEs Platform
               </div>
             </div>
             {/*
@@ -36,7 +36,7 @@ export default function Cta() {
               Replacement (5 words): "Lorem ipsum dolor sit amet"
             */}
             <h2 className="h2 bg-clip-text text-transparent bg-gradient-to-r from-slate-200/60 via-slate-200 to-slate-200/60 pb-4">
-              Lorem ipsum dolor sit amet
+            Share Your Expertise. Shape the Future.
             </h2>
             {/*
               Original paragraph (24 words):
@@ -46,7 +46,7 @@ export default function Cta() {
               "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna. Ut enim ad minim lorem ipsum."
             */}
             <p className="text-lg text-slate-400 mb-8">
-              Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna. Ut enim ad minim lorem ipsum.
+            This is where top minds share insights that transform industries. Turn your knowledge into impact and start publishing reports, manuals, and valuable resources on Knowledge.
             </p>
             {/*
               Original link text (2 words): "Get Started"
@@ -54,7 +54,7 @@ export default function Cta() {
             */}
             <div>
               <a className="btn text-slate-900 bg-gradient-to-r from-white/80 via-white to-white/80 hover:bg-white transition duration-150 ease-in-out group" href="#0">
-                Lorem Ipsum <span className="tracking-normal text-blue-500 group-hover:translate-x-0.5 transition-transform duration-150 ease-in-out ml-1">-&gt;</span>
+               Get Started <span className="tracking-normal text-blue-500 group-hover:translate-x-0.5 transition-transform duration-150 ease-in-out ml-1">-&gt;</span>
               </a>
             </div>
           </div>
