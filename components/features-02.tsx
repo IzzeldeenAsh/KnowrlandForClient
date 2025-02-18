@@ -22,14 +22,14 @@ export default function Features02() {
           <div className="max-w-3xl mx-auto text-center pb-12 md:pb-20">
             {/* Original text: "Faster. Smarter." (2 words) */}
             <h2 className="h2 bg-clip-text text-transparent bg-gradient-to-r from-slate-200/60 via-slate-200 to-slate-200/60 pb-4">
-              Lorem Ipsum.
+            Exclusive Reports From Subject Matter Experts
             </h2>
             {/*
               Original paragraph (26 words):
               "There are many variations available, but the majority have suffered alteration in some form, by injected humour, or randomised words which don't look even slightly believable."
             */}
             <p className="text-lg text-slate-400">
-              Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam quis nostrud.
+            From industry veterans and technical specialists to frontline professionals, the platform delivers practical expertise straight from the source, not just analyzing trends.
             </p>
           </div>
 
@@ -79,14 +79,14 @@ export default function Features02() {
                               Original heading (3 words): "Optimized for security"
                             */}
                             <h3 className="inline-flex text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-slate-200/60 via-slate-200 to-slate-200/60 pb-1">
-                              Lorem ipsum dolor
+                            Not Just Data
                             </h3>
                             {/*
                               Original paragraph (21 words):
                               "Optimize for user experience and privacy. Use social login integrations, lower user friction, incorporate rich user profiling, and facilitate more transactions."
                             */}
                             <p className="text-slate-400">
-                              Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua in tincidunt.
+                            Make informed decisions by accessing  firsthand expertise that include practical manuals, step-by-step instructions, and exclusive industry documents.
                             </p>
                           </div>
                         </div>
@@ -96,7 +96,7 @@ export default function Features02() {
                           */}
                           <a className="btn-sm text-slate-300 hover:text-white transition duration-150 ease-in-out group [background:linear-gradient(theme(colors.slate.900),_theme(colors.slate.900))_padding-box,_conic-gradient(theme(colors.slate.400),_theme(colors.slate.700)_25%,_theme(colors.slate.700)_75%,_theme(colors.slate.400)_100%)_border-box] relative before:absolute before:inset-0 before:bg-slate-800/30 before:rounded-full before:pointer-events-none" href="#0">
                             <span className="relative inline-flex items-center">
-                              Lorem ipsum <span className="tracking-normal text-blue-500 group-hover:translate-x-0.5 transition-transform duration-150 ease-in-out ml-1">-&gt;</span>
+                              Discover <span className="tracking-normal text-blue-500 group-hover:translate-x-0.5 transition-transform duration-150 ease-in-out ml-1">-&gt;</span>
                             </span>
                           </a>
                         </div>
@@ -125,14 +125,14 @@ export default function Features02() {
                             Original heading (1 word): "Extensibility"
                           */}
                           <h3 className="inline-flex text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-slate-200/60 via-slate-200 to-slate-200/60 pb-1">
-                            Lorem
+                          Stay Informed
                           </h3>
                           {/*
                             Original paragraph (14 words):
                             "Your login box must find the right balance between user convenience, privacy and security."
                           */}
                           <p className="text-slate-400">
-                            Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut.
+                          Get notified instantly when new reports, insights, and valuable resources are published on topics that matters to you.
                           </p>
                         </div>
                       </div>
@@ -160,14 +160,14 @@ export default function Features02() {
                             Original heading (2 words): "Infinite options"
                           */}
                           <h3 className="inline-flex text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-slate-200/60 via-slate-200 to-slate-200/60 pb-1">
-                            Lorem Ipsum
+                          Connect Directly
                           </h3>
                           {/*
                             Original paragraph (12 words):
                             "Quickly apply filters to refine your issues lists and create custom views."
                           */}
                           <p className="text-slate-400">
-                            Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed tempor incididunt ut.
+                          Knowledge Engages you directly with SMEs for additional details, inquiries, and tailored guidance.
                           </p>
                         </div>
                       </div>
