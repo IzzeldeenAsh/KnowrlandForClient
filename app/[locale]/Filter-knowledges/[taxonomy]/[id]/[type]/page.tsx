@@ -91,7 +91,7 @@ export default function FilterKnowledgesPage() {
               className="h2 mb-4 font-bold text-5xl md:text-6xl py-2 bg-clip-text text-transparent bg-gradient-to-r from-blue-500 to-teal-400"
               data-aos="zoom-y-out"
             >
-              Filtered Knowledge - {selectedKnowledgeType}
+              Filtered Knowledge - <span className='capitalize'>{selectedKnowledgeType}</span>
             </h2>
             <p
               className="text-xl text-gray-600"
@@ -107,31 +107,59 @@ export default function FilterKnowledgesPage() {
       <Container py="sm" w="100%" size={'lg'}>
         <Grid gutter="xl">
           {/* Side Filters */}
-          <Grid.Col span={3} >
+          <Grid.Col span={3}>
             <div className='mt-14'>
-            <div className="p-4  border rounded-md shadow-sm ">
-              <Text fw={500} mb="sm">
-                Filters
-              </Text>
-              <Select
-                label="Knowledge Type"
-                placeholder="Select type"
-                data={[
-                  { value: 'data', label: 'Data' },
-                  { value: 'insight', label: 'Insight' },
-                  { value: 'manual', label: 'Manual' },
-                  { value: 'course', label: 'Course' },
-                  { value: 'report', label: 'Report' },
-                ]}
-                value={selectedKnowledgeType}
-                onChange={(value) => {
-                  if (value) handleKnowledgeTypeChange(value);
-                }}
-              />
-              {/* Other filters can be added here later */}
+              <div className="p-4 border rounded-md shadow-sm">
+                <Text fw={500} mb="sm">
+                  Filters
+                </Text>
+                <Select
+                  label="Knowledge Type"
+                  placeholder="Select type"
+                  data={[
+                    { value: 'data', label: 'Data' },
+                    { value: 'insight', label: 'Insight' },
+                    { value: 'manual', label: 'Manual' },
+                    { value: 'course', label: 'Course' },
+                    { value: 'report', label: 'Report' },
+                  ]}
+                  value={selectedKnowledgeType}
+                  onChange={(value) => {
+                    if (value) handleKnowledgeTypeChange(value);
+                  }}
+                />
+                  <Select
+                  label="Industry"
+                  placeholder="Select sub industry"
+                  data={[
+                    { value: 'sub1', label: 'Sub Industry 1' },
+                    { value: 'sub2', label: 'Sub Industry 2' },
+                    { value: 'sub3', label: 'Sub Industry 3' },
+                  ]}
+                  mt="md"
+                />
+                <Select
+                  label="Sub Industry"
+                  placeholder="Select sub industry"
+                  data={[
+                    { value: 'sub1', label: 'Sub Industry 1' },
+                    { value: 'sub2', label: 'Sub Industry 2' },
+                    { value: 'sub3', label: 'Sub Industry 3' },
+                  ]}
+                  mt="md"
+                />
+                <Select
+                  label="Topic"
+                  placeholder="Select topic"
+                  data={[
+                    { value: 'topic1', label: 'Topic 1' },
+                    { value: 'topic2', label: 'Topic 2' },
+                    { value: 'topic3', label: 'Topic 3' },
+                  ]}
+                  mt="md"
+                />
+              </div>
             </div>
-            </div>
-            
           </Grid.Col>
 
           {/* Main Content */}
