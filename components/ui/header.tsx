@@ -136,7 +136,7 @@ export default function Header() {
                   position='bottom'
                  radius="sm" shadow="md" withinPortal>
                   <HoverCard.Target>
-                   <Link href={'/all-industries'}>
+                   <Link href={'/en/all-industries'}>
                    <button className="font-medium text-sm text-slate-300 hover:text-white mx-4 lg:mx-5 transition duration-150 ease-in-out flex items-center">
                       <span className="mr-1">Industries</span>
                       <IconChevronDown size={16} />
@@ -146,7 +146,7 @@ export default function Header() {
                   <HoverCard.Dropdown style={{background: 'linear-gradient(to right, #0f172b, #242B6A)',borderColor: '#2F378A'}}>
                     <Group justify="space-between" px="md">
                       <Text fw={500} c={'white'}>Featured Industries</Text>
-                      <Anchor href="/all-industries" fz="xs" className="text-blue-300">
+                      <Anchor href="/en/all-industries" fz="xs" className="text-blue-300">
                         View all industries
                       </Anchor>
                     </Group>
