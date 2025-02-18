@@ -10,12 +10,15 @@ export function useAllIndustries() {
     const fetchIndustries = async () => {
       try {
         const res = await fetch('https://api.foresighta.co/api/industries', {
-          method: 'GET',
+          method: 'POST',
           headers: {
             'Content-Type': 'application/json',
             Accept: 'application/json',
             'Accept-Language': 'en',
           },
+          body: JSON.stringify({
+            top_sub_industry: 10
+          }),
           cache: 'force-cache',
           next: { revalidate: 3600 },
         });

@@ -160,14 +160,14 @@ export default function Features02() {
                             Original heading (2 words): "Infinite options"
                           */}
                           <h3 className="inline-flex text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-slate-200/60 via-slate-200 to-slate-200/60 pb-1">
-                          Connect Directly
+                          Connect with Experts
                           </h3>
                           {/*
                             Original paragraph (12 words):
                             "Quickly apply filters to refine your issues lists and create custom views."
                           */}
                           <p className="text-slate-400">
-                          Knowledge Engages you directly with SMEs for additional details, inquiries, and tailored guidance.
+                          The platform engages you directly with SMEs for additional details, inquiries, and tailored guidance.
                           </p>
                         </div>
                       </div>

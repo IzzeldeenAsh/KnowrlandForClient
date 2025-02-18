@@ -16,6 +16,14 @@ interface KnowledgeGridProps {
   knowledge: KnowledgeDetails[];
   topicName: string;
   showHeader?: boolean;
+  colNumbers?: number;
+}
+function getInitials(name: string) {
+  return name
+    .split(' ')
+    .map((word) => word[0])
+    .join('')
+    .toUpperCase();
 }
 
 function formatPublishedDate(dateString: string) {
@@ -23,7 +31,7 @@ function formatPublishedDate(dateString: string) {
   return formatDistanceToNow(date, { addSuffix: true });
 }
 
-export default function KnowledgeGrid({ knowledge, topicName, showHeader=true }: KnowledgeGridProps) {
+export default function KnowledgeGrid({ knowledge, topicName, showHeader=true, colNumbers=3 }: KnowledgeGridProps) {
   return (
     <div className="max-w-6xl mx-auto">
       {showHeader && (
@@ -33,7 +41,7 @@ export default function KnowledgeGrid({ knowledge, topicName, showHeader=true }:
         </div>
       )}
 
-      <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4 max-w-7xl mx-auto">
+      <div className={`grid sm:grid-cols-2 lg:grid-cols-${colNumbers} gap-4 max-w-7xl mx-auto`}>
         {knowledge.map((item: KnowledgeDetails) => (
           <Card
             key={`${item.type}-${item.slug}`}
@@ -53,24 +61,29 @@ export default function KnowledgeGrid({ knowledge, topicName, showHeader=true }:
                   {item.type}
                 </Badge>
               </Group>
-
+              <div className="flex flex-col ">
               <Text fw={700} className={cardStyles.title} mt="xs" lineClamp={2}>
                 {item.title}
               </Text>
-
+              <Text className={`${cardStyles.description} text-gray-500`}>
+                {item.description}
+              </Text>
+            </div>
               <Group mt="lg">
-                <Avatar
-                  src={item.insighter.profile_photo_url}
-                  radius="sm"
-                  alt={item.insighter.name}
-                  size={'sm'}
-                />
+              <Avatar
+  src={item.insighter.profile_photo_url}
+  radius="lg"
+  alt={item.insighter.name}
+  size="sm"
+>
+  {!item.insighter.profile_photo_url && getInitials(item.insighter.name)}
+</Avatar>
+
                 <div>
                 <Text  c="dimmed" size='xs'>
                {item.insighter.roles.includes('insighter') && ('Insighter')}
                {item.insighter.roles.includes('company') && ('Company')}
                   </Text> 
-                
                   <Text fw={500} size='xs'>{item.insighter.name}</Text>
                 </div>
               </Group>

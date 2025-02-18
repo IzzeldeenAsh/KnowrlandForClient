@@ -61,7 +61,7 @@ export function IndustriesMenu() {
             <Button 
               variant="light" 
               component={Link} 
-              href="/all-industries"
+              href="/en/all-industries"
               className="bg-blue-50 text-blue-600 hover:bg-blue-100"
             >
               Browse All
