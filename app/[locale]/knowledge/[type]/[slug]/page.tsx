@@ -37,7 +37,13 @@ interface KnowledgeDetails {
   economic_blocs: any[];
   status: string;
   published_at: string;
-  review: any[];
+  review: Array<{
+    id: number;
+    rate: number;
+    comment: string;
+    user_name: string;
+    created_date: string;
+  }>;
   insighter: {
     name: string;
     profile_photo_url: string;
