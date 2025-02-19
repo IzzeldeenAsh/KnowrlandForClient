@@ -16,17 +16,12 @@ export function UserProfile() {
   if (!user) {
     return (
       <>
+   
         <Link
           href="https://foresighta.vercel.app/auth/login"
-          className="text-sm font-medium text-gray-700 hover:text-gray-900"
-        >
-          Sign in
-        </Link>
-        <Link
-          href="https://foresighta.vercel.app/auth/sign-up"
           className="btn-sm bg-gray-800 text-gray-200 shadow hover:bg-gray-900"
         >
-          Sign up
+       Login
         </Link>
       </>
     );
