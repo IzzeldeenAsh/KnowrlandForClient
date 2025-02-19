@@ -34,15 +34,14 @@ export default function Features() {
                 {/* Content #1 */}
                 <div>
                   <div className="inline-flex font-medium bg-clip-text text-transparent bg-gradient-to-r from-blue-500 to-blue-200 pb-3">
-                  Precision at your fingertips
+                  Precision at its best
                   </div>
                 </div>
                 <h3 className="h3 bg-clip-text text-transparent bg-gradient-to-r from-slate-200/60 via-slate-200 to-slate-200/60 pb-3">
                 Move Beyond Research. <br></br>Make Smarter, Faster Decisions.
                 </h3>
                 <p className="text-lg text-slate-400 mb-8">
-                Skip the time-consuming analysis—instantly access
-                precise, diverse insights and act confidently.
+                Cut through the complexity of analysis—instantly access precise, diverse insights and act with confidence.
                 </p>
                 <div className="mt-8 max-w-xs max-md:mx-auto space-y-2">
                   <button className={`flex items-center text-sm font-medium text-slate-50 rounded border bg-slate-800/25 w-full px-3 py-2 transition duration-150 ease-in-out hover:opacity-100 ${tab !== 1 ? 'border-slate-700 opacity-50' : 'border-blue-700 shadow shadow-blue-500/25'}`} onClick={() => setTab(1)}>

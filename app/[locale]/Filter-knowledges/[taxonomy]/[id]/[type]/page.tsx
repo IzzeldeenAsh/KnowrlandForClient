@@ -30,39 +30,50 @@ export default function FilterKnowledgesPage() {
   // taxonomy can be 'industry', 'sub_industry', or 'topic'
   const taxonomy = (taxonomyParam ?? 'industry') as 'industry' | 'sub_industry' | 'topic';
 
-  // The "id" in the URL is interpreted as:
-  // - the industry id when taxonomy is 'industry'
-  // - the sub-industry id when taxonomy is 'sub_industry' or 'topic'
+  // The URL "id" represents:
+  // - industry id if taxonomy is "industry"
+  // - sub‑industry id if taxonomy is "sub_industry"
+  // - topic id if taxonomy is "topic"
   const id = Array.isArray(params.id)
     ? parseInt(params.id[0], 10)
     : parseInt(params.id ?? '0', 10);
 
-  // Get the initial knowledge type from the URL (default: 'report')
+  // Get initial knowledge type (default: 'report')
   const typeParam = Array.isArray(params.type) ? params.type[0] : params.type;
   const initialKnowledgeType = typeParam ?? 'report';
 
-  // States
+  // ---------------- States ----------------
   const [selectedKnowledgeType, setSelectedKnowledgeType] = useState<string>(initialKnowledgeType);
   const [page, setPage] = useState(1);
   const [viewMode, setViewMode] = useState<'cards' | 'list'>('cards');
-  
-  // The industry dropdown holds the industry slug
+
+  // For the Industry dropdown (holds industry slug)
   const [selectedIndustry, setSelectedIndustry] = useState<string>('');
 
-  // For sub-industry filtering:
+  // For Sub‑Industry filtering (applies to both sub_industry and topic pages)
   const [subIndustries, setSubIndustries] = useState<
     { id: number; name: string; slug: string }[]
   >([]);
   const [selectedSubIndustry, setSelectedSubIndustry] = useState<string>('');
-  // For sub_industry (or topic) pages, we fetch the sub-industry details (which include parent info)
+  // For sub_industry pages, we fetch details to get the main industry.
   const [parentIndustry, setParentIndustry] = useState<
     { id: number; name: string; slug: string } | null
   >(null);
 
-  // Fetch the list of industries
+  // For taxonomy "topic" we add additional states:
+  const [topics, setTopics] = useState<{ id: number; name: string; slug: string }[]>([]);
+  const [selectedTopic, setSelectedTopic] = useState<string>('');
+  // This holds the sub‑industry that is the parent for topics.
+  // For taxonomy "topic", it comes from the topic details;
+  // for taxonomy "sub_industry", it will be the sub-industry selected.
+  const [parentSubIndustry, setParentSubIndustry] = useState<
+    { id: number; name: string; slug: string } | null
+  >(null);
+
+  // ---------------- Fetch Industries ----------------
   const { industries, isLoading: isIndustriesLoading } = useAllIndustries();
 
-
+  // Auto‑select Industry when taxonomy is "industry"
   useEffect(() => {
     if (taxonomy === 'industry' && industries.length > 0) {
       const matchedIndustry = industries.find((industry) => industry.id === id);
@@ -72,25 +83,38 @@ export default function FilterKnowledgesPage() {
     }
   }, [taxonomy, id, industries]);
 
+  // ---------------- Fetch Details ----------------
+  // For taxonomy "sub_industry": fetch sub‑industry details (and its parent) using:
+  // GET https://api.foresighta.co/api/common/industry/details/{subIndustryId}
   useEffect(() => {
-    if ((taxonomy === 'sub_industry' || taxonomy === 'topic') && id) {
+    if (taxonomy === 'sub_industry' && id) {
       const fetchSubIndustryDetails = async () => {
         try {
-          const res = await fetch(`https://api.foresighta.co/api/common/industry/details/${id}`, {
-            headers: {
-              "Content-Type": "application/json",
-              "Accept": "application/json",
-              "Accept-Language": "en",
-            },
-          });
+          const res = await fetch(`https://api.foresighta.co/api/common/industry/details/${id}`,
+            {
+              headers: {
+                "Content-Type": "application/json",
+                Accept: "application/json",
+                "Accept-Language": "en",
+              },
+            }
+          );
           const data = await res.json();
           if (data && data.data) {
             const subIndustryDetails = data.data;
             setSelectedSubIndustry(subIndustryDetails.slug);
+            // For sub_industry taxonomy, we want to show the Topic dropdown with no value selected.
+            // We do NOT pre-select a topic.
             if (subIndustryDetails.parent) {
               setParentIndustry(subIndustryDetails.parent);
               setSelectedIndustry(subIndustryDetails.parent.slug);
             }
+            // Also, for sub_industry taxonomy, set parentSubIndustry to the current sub-industry.
+            setParentSubIndustry({
+              id: subIndustryDetails.id,
+              name: subIndustryDetails.name,
+              slug: subIndustryDetails.slug,
+            });
           }
         } catch (error) {
           console.error('Error fetching sub industry details:', error);
@@ -100,9 +124,59 @@ export default function FilterKnowledgesPage() {
     }
   }, [taxonomy, id]);
 
-  // --- Fetch the list of sub industries ---  
-  // For industry mode: use the current industry id.
-  // For sub_industry (or topic) mode: use the parent industry id.
+  // For taxonomy "topic": fetch topic details using the dedicated endpoint.
+  // This returns topic details along with its parent sub‑industry.
+  useEffect(() => {
+    if (taxonomy === 'topic' && id) {
+      const fetchTopicDetails = async () => {
+        try {
+          const res = await fetch(
+            `https://api.foresighta.co/api/common/industry/details/topic/${id}`,
+            {
+              headers: {
+                'Content-Type': 'application/json',
+                Accept: 'application/json',
+                'Accept-Language': 'en',
+              },
+            }
+          );
+          const data = await res.json();
+          if (data && data.data) {
+            const topicDetails = data.data;
+            setSelectedTopic(topicDetails.slug);
+            // The topic's "industry" field represents its parent sub‑industry.
+            setSelectedSubIndustry(topicDetails.industry.slug);
+            setParentSubIndustry(topicDetails.industry);
+            // Now, fetch the sub‑industry details to get the main industry.
+            const res2 = await fetch(
+              `https://api.foresighta.co/api/common/industry/details/${topicDetails.industry.id}`, {
+                headers: {
+                  "Content-Type": "application/json",
+                  Accept: "application/json",
+                  "Accept-Language": "en",
+                },
+              }
+            );
+            const data2 = await res2.json();
+            if (data2 && data2.data) {
+              const subIndustryDetails = data2.data;
+              if (subIndustryDetails.parent) {
+                setParentIndustry(subIndustryDetails.parent);
+                setSelectedIndustry(subIndustryDetails.parent.slug);
+              }
+            }
+          }
+        } catch (error) {
+          console.error('Error fetching topic details:', error);
+        }
+      };
+      fetchTopicDetails();
+    }
+  }, [taxonomy, id]);
+
+  // ---------------- Fetch Sub‑Industries List ----------------
+  // For "industry" mode, use the current industry id.
+  // For "sub_industry" or "topic", use the main industry id (from parentIndustry).
   useEffect(() => {
     const fetchSubIndustries = async () => {
       try {
@@ -115,15 +189,14 @@ export default function FilterKnowledgesPage() {
           return;
         }
         const res = await fetch(
-          `https://api.foresighta.co/api/common/setting/industry/sub/list/${fetchId}`, {
+          `https://api.foresighta.co/api/common/setting/industry/sub/list/${fetchId}`,{
             headers: {
               "Content-Type": "application/json",
-              "Accept": "application/json",
+              Accept: "application/json",
               "Accept-Language": "en",
             },
           }
         );
-        
         const data = await res.json();
         if (data && data.data) {
           setSubIndustries(data.data);
@@ -135,31 +208,67 @@ export default function FilterKnowledgesPage() {
     fetchSubIndustries();
   }, [taxonomy, id, parentIndustry]);
 
-  // --- Knowledge items fetching ---
-  const { response, isLoading, error } = useKnowledge({
+  // ---------------- Fetch Topic List ----------------
+  // For both "sub_industry" and "topic" taxonomies, fetch topics from the sub‑industry.
+  useEffect(() => {
+    if ((taxonomy === 'sub_industry' || taxonomy === 'topic')) {
+      let fetchId: number | null = null;
+      if (taxonomy === 'sub_industry') {
+        // Use the sub‑industry id from the URL.
+        fetchId = id;
+      } else if (taxonomy === 'topic' && parentSubIndustry) {
+        fetchId = parentSubIndustry.id;
+      }
+      if (fetchId) {
+        const fetchTopics = async () => {
+          try {
+            const res = await fetch(
+              `https://api.foresighta.co/api/common/setting/topic/industry/${fetchId}`,
+              {
+                headers: {
+                  'Content-Type': 'application/json',
+                  Accept: 'application/json',
+                  'Accept-Language': 'en',
+                },
+              }
+            );
+            const data = await res.json();
+            if (data && data.data) {
+              setTopics(data.data);
+            }
+          } catch (error) {
+            console.error('Error fetching topics:', error);
+          }
+        };
+        fetchTopics();
+      }
+    }
+  }, [taxonomy, id, parentSubIndustry]);
+
+  // ---------------- Fetch Knowledge Items ----------------
+  const { response, isLoading, error: knowledgeError } = useKnowledge({
     taxonomy,
     id,
     knowledgeType: selectedKnowledgeType,
     page,
   });
 
-  // Reset page when knowledge type changes
   const handleKnowledgeTypeChange = (value: string) => {
     setSelectedKnowledgeType(value);
     setPage(1);
   };
 
-  // --- Handle dropdown changes ---
+  // -------------- Dropdown Change Handlers --------------
 
   // When the Industry dropdown changes:
-  // - Always reset any sub-industry selection.
-  // - Redirect to the **industry** route.
+  // - Reset Sub‑Industry, Topic selections.
+  // - Always redirect to the industry URL.
   const handleIndustryChange = (value: string | null) => {
     if (value) {
       setSelectedIndustry(value);
-      // Reset sub-industry state
       setSelectedSubIndustry('');
-      setSubIndustries([]);
+      setTopics([]);
+      setSelectedTopic('');
       const selected = industries.find((industry) => industry.slug === value);
       if (selected) {
         router.push(`/en/filter-knowledges/industry/${selected.id}/${selectedKnowledgeType}`);
@@ -167,19 +276,41 @@ export default function FilterKnowledgesPage() {
     }
   };
 
-  // When the Sub Industry dropdown changes:
-  // - Always redirect to a sub_industry URL.
+  // When the Sub‑Industry dropdown changes:
+  // For taxonomy "sub_industry" and "topic": update state to show topics for the selected sub‑industry,
+  // but do not redirect.
   const handleSubIndustryChange = (value: string | null) => {
     if (value) {
       setSelectedSubIndustry(value);
+      setTopics([]);
+      setSelectedTopic('');
       const selectedSub = subIndustries.find((sub) => sub.slug === value);
-      if (selectedSub) {
-        router.push(`/en/filter-knowledges/sub_industry/${selectedSub.id}/${selectedKnowledgeType}`);
+      if (taxonomy === 'sub_industry' || taxonomy === 'topic') {
+        if (selectedSub) {
+          // Update parentSubIndustry to trigger topic fetching.
+          setParentSubIndustry(selectedSub);
+        }
+      } else {
+        if (selectedSub) {
+          router.push(`/en/filter-knowledges/sub_industry/${selectedSub.id}/${selectedKnowledgeType}`);
+        }
       }
     }
   };
 
-  if (error) {
+  // When the Topic dropdown changes (applies when taxonomy is "sub_industry" or "topic"):
+  const handleTopicChange = (value: string | null) => {
+    if (value) {
+      setSelectedTopic(value);
+      const selectedT = topics.find((t) => t.slug === value);
+      if (selectedT) {
+        router.push(`/en/filter-knowledges/topic/${selectedT.id}/${selectedKnowledgeType}`);
+      }
+    }
+  };
+
+  // ---------------- UI Rendering ----------------
+  if (knowledgeError) {
     return (
       <Container py="xl">
         <Text color="red">Error loading knowledge items.</Text>
@@ -211,7 +342,9 @@ export default function FilterKnowledgesPage() {
               Filtered Knowledge
             </span>
             <h3 className="text-md bg-gradient-to-r from-blue-500 to-teal-400 md:text-3xl font-extrabold text-transparent bg-clip-text mb-4">
-              {selectedKnowledgeType.charAt(0).toUpperCase() + selectedKnowledgeType.slice(1)} Knowledges
+              {selectedKnowledgeType.charAt(0).toUpperCase() +
+                selectedKnowledgeType.slice(1)}{' '}
+              Knowledges
             </h3>
             <p className="text-gray-600 text-sm md:text-base leading-relaxed max-w-3xl">
               Explore our comprehensive list of knowledge items across various industries and topics.
@@ -255,7 +388,6 @@ export default function FilterKnowledgesPage() {
                   value={selectedIndustry || null}
                   onChange={handleIndustryChange}
                 />
-                {/* Render the Sub Industry dropdown if there are items available */}
                 {subIndustries.length > 0 && (
                   <Select
                     label="Sub Industry"
@@ -269,16 +401,21 @@ export default function FilterKnowledgesPage() {
                     onChange={handleSubIndustryChange}
                   />
                 )}
-                <Select
-                  label="Topic"
-                  placeholder="Select topic"
-                  data={[
-                    { value: 'topic1', label: 'Topic 1' },
-                    { value: 'topic2', label: 'Topic 2' },
-                    { value: 'topic3', label: 'Topic 3' },
-                  ]}
-                  mt="md"
-                />
+                {/* Show Topic dropdown only for sub_industry and topic taxonomies */}
+                {(taxonomy === 'sub_industry' || taxonomy === 'topic') &&
+                  topics.length > 0 && (
+                    <Select
+                      label="Topic"
+                      placeholder="Select topic"
+                      data={topics.map((t) => ({
+                        value: t.slug,
+                        label: t.name,
+                      }))}
+                      mt="md"
+                      value={selectedTopic || null}
+                      onChange={handleTopicChange}
+                    />
+                  )}
               </div>
             </div>
           </Grid.Col>
@@ -307,7 +444,6 @@ export default function FilterKnowledgesPage() {
               <KnowledgeList knowledge={knowledge} />
             )}
 
-            {/* Pagination */}
             <div className="flex justify-center mt-8">
               <Pagination value={page} onChange={setPage} total={totalPages} />
             </div>
