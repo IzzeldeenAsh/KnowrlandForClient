@@ -56,12 +56,12 @@ export default function TestimonialsCarousel() {
             {/* Original (4 words): "The security first platform" */}
             <div>
               <div className="inline-flex font-medium bg-clip-text text-transparent bg-gradient-to-r from-blue-500 to-blue-200 pb-3">
-                Lorem ipsum dolor sit
+                Bringing you closer to insights
               </div>
             </div>
             {/* Original (3 words): "Spot issues faster" */}
             <h2 className="h2 bg-clip-text text-transparent bg-gradient-to-r from-slate-200/60 via-slate-200 to-slate-200/60 pb-4">
-              Lorem ipsum dolor
+            Latest reports
             </h2>
             {/*
               Original paragraph (24 words):
@@ -70,8 +70,7 @@ export default function TestimonialsCarousel() {
               Replacement (24 words):
               "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam."
             */}
-            <p className="text-lg text-slate-400">
-              Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam.
+            <p className="text-lg text-slate-400">Stay ahead with newly uploaded expert reports, technical guides, and real-world analyses—updated in real time.
             </p>
           </div>
 

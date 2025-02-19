@@ -31,8 +31,9 @@ export default function Hero() {
                 </Link>
               </div>
             </div>
-            <h1 className="h1 bg-clip-text text-transparent bg-gradient-to-r from-slate-200/60 via-slate-200 to-slate-200/60 pb-4" data-aos="fade-down">A Universe of Knowledge at Your Fingertips</h1>
-            <p className="text-lg text-slate-300 mb-8" data-aos="fade-down" data-aos-delay="200">Tap into expertise from different sectors and specializations, and unlock insights in business, science, technology, and beyond.</p>
+            <h1 className="h1 bg-clip-text text-transparent bg-gradient-to-r from-slate-200/60 via-slate-200 to-slate-200/60 pb-4" data-aos="fade-down">A Universe of Knowledge Awaits You</h1>
+            <p className="text-lg text-slate-300 mb-8" data-aos="fade-down" data-aos-delay="200">
+            From expert reports to technical insights, tap into expertise from different sectors and specializations to unlock insights in business, science, technology and beyond.</p>
             <div className="max-w-3xl mx-auto w-full pb-4" data-aos="fade-down" data-aos-delay="300">
               <div className="relative">
                 <input
