@@ -23,38 +23,46 @@ export default function FilterKnowledgesPage() {
   const params = useParams();
   const router = useRouter();
 
-  // Extract and default the route parameters
+  // Extract route parameters
   const taxonomyParam = Array.isArray(params.taxonomy)
     ? params.taxonomy[0]
     : params.taxonomy;
-  // Default taxonomy to 'industry' if not provided
+  // taxonomy can be 'industry', 'sub_industry', or 'topic'
   const taxonomy = (taxonomyParam ?? 'industry') as 'industry' | 'sub_industry' | 'topic';
 
-  // The id from the URL will be the industry id if taxonomy is 'industry'
+  // The "id" in the URL is interpreted as:
+  // - the industry id when taxonomy is 'industry'
+  // - the sub-industry id when taxonomy is 'sub_industry' or 'topic'
   const id = Array.isArray(params.id)
     ? parseInt(params.id[0], 10)
     : parseInt(params.id ?? '0', 10);
 
-  // Get the initial knowledge type from the URL parameters, defaulting to 'report'
+  // Get the initial knowledge type from the URL (default: 'report')
   const typeParam = Array.isArray(params.type) ? params.type[0] : params.type;
   const initialKnowledgeType = typeParam ?? 'report';
 
-  // State for the selected knowledge type (for the side filter)
+  // States
   const [selectedKnowledgeType, setSelectedKnowledgeType] = useState<string>(initialKnowledgeType);
-
-  // State for pagination
   const [page, setPage] = useState(1);
-
-  // View mode state for grid vs list view
   const [viewMode, setViewMode] = useState<'cards' | 'list'>('cards');
-
-  // State for the selected industry dropdown value (holds the industry slug)
+  
+  // The industry dropdown holds the industry slug
   const [selectedIndustry, setSelectedIndustry] = useState<string>('');
 
-  // Fetch industries using custom hook for the "Industry" dropdown
+  // For sub-industry filtering:
+  const [subIndustries, setSubIndustries] = useState<
+    { id: number; name: string; slug: string }[]
+  >([]);
+  const [selectedSubIndustry, setSelectedSubIndustry] = useState<string>('');
+  // For sub_industry (or topic) pages, we fetch the sub-industry details (which include parent info)
+  const [parentIndustry, setParentIndustry] = useState<
+    { id: number; name: string; slug: string } | null
+  >(null);
+
+  // Fetch the list of industries
   const { industries, isLoading: isIndustriesLoading } = useAllIndustries();
 
-  // When taxonomy is 'industry', auto-select the industry from the URL id
+
   useEffect(() => {
     if (taxonomy === 'industry' && industries.length > 0) {
       const matchedIndustry = industries.find((industry) => industry.id === id);
@@ -64,7 +72,70 @@ export default function FilterKnowledgesPage() {
     }
   }, [taxonomy, id, industries]);
 
-  // Call hook using the selected knowledge type from the dropdown
+  useEffect(() => {
+    if ((taxonomy === 'sub_industry' || taxonomy === 'topic') && id) {
+      const fetchSubIndustryDetails = async () => {
+        try {
+          const res = await fetch(`https://api.foresighta.co/api/common/industry/details/${id}`, {
+            headers: {
+              "Content-Type": "application/json",
+              "Accept": "application/json",
+              "Accept-Language": "en",
+            },
+          });
+          const data = await res.json();
+          if (data && data.data) {
+            const subIndustryDetails = data.data;
+            setSelectedSubIndustry(subIndustryDetails.slug);
+            if (subIndustryDetails.parent) {
+              setParentIndustry(subIndustryDetails.parent);
+              setSelectedIndustry(subIndustryDetails.parent.slug);
+            }
+          }
+        } catch (error) {
+          console.error('Error fetching sub industry details:', error);
+        }
+      };
+      fetchSubIndustryDetails();
+    }
+  }, [taxonomy, id]);
+
+  // --- Fetch the list of sub industries ---  
+  // For industry mode: use the current industry id.
+  // For sub_industry (or topic) mode: use the parent industry id.
+  useEffect(() => {
+    const fetchSubIndustries = async () => {
+      try {
+        let fetchId: number;
+        if (taxonomy === 'industry' && id) {
+          fetchId = id;
+        } else if ((taxonomy === 'sub_industry' || taxonomy === 'topic') && parentIndustry) {
+          fetchId = parentIndustry.id;
+        } else {
+          return;
+        }
+        const res = await fetch(
+          `https://api.foresighta.co/api/common/setting/industry/sub/list/${fetchId}`, {
+            headers: {
+              "Content-Type": "application/json",
+              "Accept": "application/json",
+              "Accept-Language": "en",
+            },
+          }
+        );
+        
+        const data = await res.json();
+        if (data && data.data) {
+          setSubIndustries(data.data);
+        }
+      } catch (error) {
+        console.error('Error fetching sub industries:', error);
+      }
+    };
+    fetchSubIndustries();
+  }, [taxonomy, id, parentIndustry]);
+
+  // --- Knowledge items fetching ---
   const { response, isLoading, error } = useKnowledge({
     taxonomy,
     id,
@@ -76,6 +147,36 @@ export default function FilterKnowledgesPage() {
   const handleKnowledgeTypeChange = (value: string) => {
     setSelectedKnowledgeType(value);
     setPage(1);
+  };
+
+  // --- Handle dropdown changes ---
+
+  // When the Industry dropdown changes:
+  // - Always reset any sub-industry selection.
+  // - Redirect to the **industry** route.
+  const handleIndustryChange = (value: string | null) => {
+    if (value) {
+      setSelectedIndustry(value);
+      // Reset sub-industry state
+      setSelectedSubIndustry('');
+      setSubIndustries([]);
+      const selected = industries.find((industry) => industry.slug === value);
+      if (selected) {
+        router.push(`/en/filter-knowledges/industry/${selected.id}/${selectedKnowledgeType}`);
+      }
+    }
+  };
+
+  // When the Sub Industry dropdown changes:
+  // - Always redirect to a sub_industry URL.
+  const handleSubIndustryChange = (value: string | null) => {
+    if (value) {
+      setSelectedSubIndustry(value);
+      const selectedSub = subIndustries.find((sub) => sub.slug === value);
+      if (selectedSub) {
+        router.push(`/en/filter-knowledges/sub_industry/${selectedSub.id}/${selectedKnowledgeType}`);
+      }
+    }
   };
 
   if (error) {
@@ -151,37 +252,23 @@ export default function FilterKnowledgesPage() {
                   }))}
                   mt="md"
                   disabled={isIndustriesLoading}
-                  value={selectedIndustry}
-                  onChange={(value) => {
-                    if (value) {
-                      setSelectedIndustry(value);
-                      if (taxonomy === 'industry') {
-                        const selected = industries.find((industry) => industry.slug === value);
-                        if (selected) {
-                          // Determine the URL part for knowledge type.
-                          const redirectKnowledgeType =
-                            selectedKnowledgeType === 'subIndustry'
-                              ? 'sub_industry'
-                              : selectedKnowledgeType;
-                          // Redirect to the new URL with the selected knowledge type, taxonomy, industry id and slug.
-                          router.push(
-                            `/en/filter-knowledges/${taxonomy}/${selected.id}/${redirectKnowledgeType}`
-                          );
-                        }
-                      }
-                    }
-                  }}
+                  value={selectedIndustry || null}
+                  onChange={handleIndustryChange}
                 />
-                <Select
-                  label="Sub Industry"
-                  placeholder="Select sub industry"
-                  data={[
-                    { value: 'sub1', label: 'Sub Industry 1' },
-                    { value: 'sub2', label: 'Sub Industry 2' },
-                    { value: 'sub3', label: 'Sub Industry 3' },
-                  ]}
-                  mt="md"
-                />
+                {/* Render the Sub Industry dropdown if there are items available */}
+                {subIndustries.length > 0 && (
+                  <Select
+                    label="Sub Industry"
+                    placeholder="Select sub industry"
+                    data={subIndustries.map((sub) => ({
+                      value: sub.slug,
+                      label: sub.name,
+                    }))}
+                    mt="md"
+                    value={selectedSubIndustry || null}
+                    onChange={handleSubIndustryChange}
+                  />
+                )}
                 <Select
                   label="Topic"
                   placeholder="Select topic"
@@ -220,7 +307,7 @@ export default function FilterKnowledgesPage() {
               <KnowledgeList knowledge={knowledge} />
             )}
 
-            {/* Pagination Component */}
+            {/* Pagination */}
             <div className="flex justify-center mt-8">
               <Pagination value={page} onChange={setPage} total={totalPages} />
             </div>
