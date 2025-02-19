@@ -1,5 +1,4 @@
 import { DocumentTextIcon, GlobeAltIcon, CalendarIcon, ClockIcon, BuildingLibraryIcon, TruckIcon, GlobeAsiaAustraliaIcon } from '@heroicons/react/24/outline';
-import styles from './knowledge.module.css';
 
 interface Document {
   file_extension: string;

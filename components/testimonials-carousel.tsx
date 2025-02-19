@@ -56,7 +56,7 @@ export default function TestimonialsCarousel() {
             {/* Original (4 words): "The security first platform" */}
             <div>
               <div className="inline-flex font-medium bg-clip-text text-transparent bg-gradient-to-r from-blue-500 to-blue-200 pb-3">
-                Bringing you closer to insights
+                Bringing you closer to Resolution
               </div>
             </div>
             {/* Original (3 words): "Spot issues faster" */}
