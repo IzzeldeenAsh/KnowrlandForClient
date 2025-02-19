@@ -46,7 +46,7 @@ export default function Cta() {
               "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna. Ut enim ad minim lorem ipsum."
             */}
             <p className="text-lg text-slate-400 mb-8">
-            This is where top minds share insights that transform industries. Turn your knowledge into impact and start publishing reports, manuals, and valuable resources on Knowledge.
+            This is where top minds transform industries. Turn your knowledge into impact and start publishing reports, manuals, and valuable resources.
             </p>
             {/*
               Original link text (2 words): "Get Started"

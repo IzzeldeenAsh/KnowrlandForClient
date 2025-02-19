@@ -3,18 +3,14 @@
 import { useState } from "react";
 import Overview from "./Overview";
 import { KnowledgeDetails } from "./types";
+import Reviews from "./Reviews";
 
 function TabContent({ activeTab, knowledge }: { activeTab: string; knowledge: KnowledgeDetails }) {
   switch (activeTab) {
     case "Overview":
       return <Overview knowledge={knowledge} />;
-    case "Reviews":
-      return (
-        <div className="bg-white p-6 rounded-lg shadow-sm">
-          <h3 className="text-xl font-semibold mb-4">Reviews</h3>
-          <p className="text-gray-600">No reviews available yet.</p>
-        </div>
-      );
+      case "Reviews":
+        return <Reviews knowledgeSlug={knowledge.slug} reviews={knowledge.review} />;
     case "Ask":
       return (
         <div className="bg-white p-6 rounded-lg shadow-sm">

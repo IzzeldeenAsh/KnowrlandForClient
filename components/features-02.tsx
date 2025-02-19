@@ -160,7 +160,7 @@ export default function Features02() {
                             Original heading (2 words): "Infinite options"
                           */}
                           <h3 className="inline-flex text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-slate-200/60 via-slate-200 to-slate-200/60 pb-1">
-                          Connect with Experts
+                          Connect With an Expert
                           </h3>
                           {/*
                             Original paragraph (12 words):
