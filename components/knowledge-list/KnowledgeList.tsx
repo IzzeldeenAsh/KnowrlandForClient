@@ -58,9 +58,7 @@ export default function KnowledgeList({ knowledge }: KnowledgeListProps) {
                 <Text className={listStyles.title}>{item.title}</Text>
               </Link>
 
-              <Text className={listStyles.description}>
-                {item.description}
-              </Text>
+              <Text className={listStyles.description} dangerouslySetInnerHTML={{ __html: item.description }} />
             </div>
           </Group>
           <Group mt="xs">
