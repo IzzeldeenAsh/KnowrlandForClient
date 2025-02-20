@@ -11,7 +11,22 @@ import ManualIcon from "../icons/ManualIcon";
 import ReportIcon from "../icons/ReportIcon";
 
 interface KnowledgeListProps {
-  knowledge: KnowledgeDetails[];
+  knowledge: KnowledgeItem[];
+}
+
+
+export interface KnowledgeItem {
+  slug: string;
+  type: string;
+  title: string;
+  description: string;
+  total_price: string;
+  published_at: string;
+  insighter: {
+    name: string;
+    profile_photo_url: string | null;
+    roles: string[];
+  };
 }
 
 // Helper function to get initials from a name

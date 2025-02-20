@@ -1,0 +1,20 @@
+/* Container for the package page */
+.container {
+    position: relative;
+    z-index: 1;
+    min-height: 100vh;
+    background: #f9f9f9;
+    padding-bottom: 2rem;
+  }
+  
+  /* Section header with background image */
+  .sectionHeader {
+    position: relative;
+    overflow: hidden;
+    border-radius: 8px;
+    height: 400px;
+    padding-top: 55px;
+  }
+  
+  /* You can add additional custom styles here if needed */
+  
