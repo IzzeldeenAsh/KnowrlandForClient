@@ -28,6 +28,7 @@ export interface KnowledgeDetails {
     user_name: string;
     created_date: string;
   }>;
+  is_review?: boolean;
   insighter: {
     name: string;
     profile_photo_url: string;

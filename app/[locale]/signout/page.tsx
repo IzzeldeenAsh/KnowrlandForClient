@@ -12,7 +12,8 @@ export default function SignOutPage() {
     
     // Clear sessionStorage
     sessionStorage.clear();
-    
+    // Remove the token cookie
+    document.cookie = 'token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
     // Redirect to home page
     router.push('/home');
   }, [router]);
