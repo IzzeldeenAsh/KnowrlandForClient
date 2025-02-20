@@ -65,9 +65,7 @@ export default function KnowledgeGrid({ knowledge, topicName, showHeader=true, c
               <Text fw={700} className={cardStyles.title} mt="xs" lineClamp={2}>
                 {item.title}
               </Text>
-              <Text className={`${cardStyles.description} text-gray-500`}>
-                {item.description}
-              </Text>
+              <Text className={`${cardStyles.description} text-gray-500`} lineClamp={3} dangerouslySetInnerHTML={{ __html: item.description }} />
             </div>
               <Group mt="lg">
               <Avatar
@@ -88,7 +86,9 @@ export default function KnowledgeGrid({ knowledge, topicName, showHeader=true, c
                 </div>
               </Group>
 
-              <Card.Section className={cardStyles.footer}>
+         
+            </Link>
+            <Card.Section className={cardStyles.footer}>
                 <Group justify="space-between">
                 <Text  c="dimmed" size='xs'>
                     Posted {formatPublishedDate(item.published_at)}
@@ -101,7 +101,6 @@ export default function KnowledgeGrid({ knowledge, topicName, showHeader=true, c
                   </Badge>
                 </Group>
               </Card.Section>
-            </Link>
           </Card>
         ))}
         {knowledge.length === 0 && (

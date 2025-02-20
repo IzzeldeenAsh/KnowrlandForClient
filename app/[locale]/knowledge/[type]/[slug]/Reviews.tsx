@@ -62,7 +62,7 @@ export default function Reviews({ knowledgeSlug, reviews }: ReviewsProps) {
                       readOnly
                     />
                     <span className="ml-2 text-sm">
-                      {review.rate}/10
+                      {review.rate}/5
                     </span>
                   </div>
                   <p className="mt-2 text-gray-700">
