@@ -427,7 +427,7 @@ export default function FilterKnowledgesPage() {
                 value={viewMode}
                 onChange={(value) => setViewMode(value as 'cards' | 'list')}
                 data={[
-                  { label: <Squares2X2Icon color="gray" className="w-5 h-5" />, value: 'cards' },
+                  { label: <Squares2X2Icon color="gray"  className="w-5 h-5" />, value: 'cards' },
                   { label: <ListBulletIcon color="gray" className="w-5 h-5" />, value: 'list' },
                 ]}
               />

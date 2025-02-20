@@ -8,16 +8,29 @@ import ManualIcon from "@/components/icons/ManualIcon";
 import ReportIcon from "@/components/icons/ReportIcon";
 import { formatDistanceToNow } from 'date-fns';
 import cardStyles from './knowledge-card.module.css';
-import { KnowledgeDetails } from '@/app/[locale]/knowledge/[type]/[slug]/types';
-
-
 
 interface KnowledgeGridProps {
-  knowledge: KnowledgeDetails[];
+  knowledge: KnowledgeItem[];
   topicName: string;
   showHeader?: boolean;
   colNumbers?: number;
 }
+export interface KnowledgeItem {
+  slug: string;
+  type: string;
+  title: string;
+  description: string;
+  total_price: string;
+  published_at: string;
+  insighter: {
+    name: string;
+    profile_photo_url: string | null;
+    roles: string[];
+  };
+}
+
+
+
 function getInitials(name: string) {
   return name
     .split(' ')
@@ -32,6 +45,8 @@ function formatPublishedDate(dateString: string) {
 }
 
 export default function KnowledgeGrid({ knowledge, topicName, showHeader=true, colNumbers=3 }: KnowledgeGridProps) {
+
+  
   return (
     <div className="max-w-6xl mx-auto">
       {showHeader && (
@@ -42,7 +57,7 @@ export default function KnowledgeGrid({ knowledge, topicName, showHeader=true, c
       )}
 
       <div className={`grid sm:grid-cols-2 lg:grid-cols-${colNumbers} gap-4 max-w-7xl mx-auto`}>
-        {knowledge.map((item: KnowledgeDetails) => (
+        {knowledge.map((item: KnowledgeItem) => (
           <Card
             key={`${item.type}-${item.slug}`}
             withBorder

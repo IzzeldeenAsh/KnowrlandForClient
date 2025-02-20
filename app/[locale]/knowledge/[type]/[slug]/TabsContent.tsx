@@ -10,7 +10,7 @@ function TabContent({ activeTab, knowledge }: { activeTab: string; knowledge: Kn
     case "Overview":
       return <Overview knowledge={knowledge} />;
       case "Reviews":
-        return <Reviews knowledgeSlug={knowledge.slug} reviews={knowledge.review} />;
+        return <Reviews knowledgeSlug={knowledge.slug} reviews={knowledge.review}   is_review={knowledge.is_review ? true : false} />;
     case "Ask":
       return (
         <div className="bg-white p-6 rounded-lg shadow-sm">

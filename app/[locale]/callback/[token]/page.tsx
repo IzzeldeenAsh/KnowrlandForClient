@@ -29,6 +29,8 @@ export default function AuthCallback() {
       try {
         // Store token
         localStorage.setItem('token', token);
+        //store in cookie
+        document.cookie = `token=${token}; path=/; secure; samesite=strict;`;
 
         // Fetch profile
         const response = await fetch('https://api.foresighta.co/api/account/profile', {
