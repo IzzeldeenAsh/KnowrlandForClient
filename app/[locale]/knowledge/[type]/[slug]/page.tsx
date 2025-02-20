@@ -15,6 +15,7 @@ import KnowledgeSideBox from './KnowledgeSideBox';
 import { StarIcon } from "@heroicons/react/20/solid";
 import TabsContent from "./TabsContent";
 import Stripes from "@/public/images/stripes-dark.svg";
+import { cookies } from "next/headers";
 interface KnowledgeDetails {
   type: string;
   title: string;
@@ -44,6 +45,7 @@ interface KnowledgeDetails {
     user_name: string;
     created_date: string;
   }>;
+  is_review?: boolean;
   insighter: {
     name: string;
     profile_photo_url: string;
@@ -78,6 +80,10 @@ interface Props {
 }
 
 async function fetchKnowledgeData(type: string, slug: string) {
+  const cookieStore = await cookies();
+  const tokenCookie = cookieStore.get("token");
+  const token = tokenCookie?.value;
+  
   const response = await fetch(
     `https://api.foresighta.co/api/industries/knowledge/${slug}`,
     {
@@ -86,6 +92,7 @@ async function fetchKnowledgeData(type: string, slug: string) {
         "Content-Type": "application/json",
         Accept: "application/json",
         "Accept-Language": "en",
+        ...(token && { Authorization: `Bearer ${token}` }),
       },
     }
   );
@@ -109,6 +116,7 @@ async function fetchKnowledgeData(type: string, slug: string) {
   }
 
   const data = await response.json();
+  console.log(data)
   return data;
 }
 

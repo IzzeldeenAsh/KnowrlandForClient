@@ -4,6 +4,7 @@ import React, { useState } from "react";
 import { Rating, Textarea, Button, Notification, Card, Text } from "@mantine/core";
 import { IconX, IconCheck } from "@tabler/icons-react";
 import { useReview } from "@/hooks/knowledgs/useReview";
+import { useRouter } from "next/navigation";
 
 interface ReviewItem {
   id: number;
@@ -16,9 +17,10 @@ interface ReviewItem {
 interface ReviewsProps {
   knowledgeSlug: string;
   reviews: ReviewItem[];
+  is_review: boolean;
 }
 
-export default function Reviews({ knowledgeSlug, reviews }: ReviewsProps) {
+export default function Reviews({ knowledgeSlug, reviews, is_review }: ReviewsProps) {
   // Retrieve the token from localStorage
   const token = typeof window !== "undefined" ? localStorage.getItem("token") : null;
 
@@ -27,10 +29,13 @@ export default function Reviews({ knowledgeSlug, reviews }: ReviewsProps) {
   const { postReview, loading, error, success } = useReview(knowledgeSlug);
   const [rate, setRate] = useState(0);
   const [comment, setComment] = useState("");
-
+  const router = useRouter();
+  const [submit, setSubmit] = useState(false);
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     await postReview(rate, comment);
+    router.refresh(); // This will trigger a re-fetch of the page data
+    setSubmit(true);
   };
 
   return (
@@ -77,9 +82,9 @@ export default function Reviews({ knowledgeSlug, reviews }: ReviewsProps) {
         )}
       </div>
       </Card>
-
+      {token && !is_review && !submit && (
       <Card  padding="lg" radius="md" withBorder mt={'md'}>
-        {token ? (
+       
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
               <Text fw={500} fs="sm" mb={5}>
@@ -108,7 +113,6 @@ export default function Reviews({ knowledgeSlug, reviews }: ReviewsProps) {
               <Notification
                 icon={<IconX size={20} />}
                 color="red"
-                title="Bummer!"
                 onClose={() => {}}
                 mt="sm"
               >
@@ -130,12 +134,17 @@ export default function Reviews({ knowledgeSlug, reviews }: ReviewsProps) {
               Submit Review
             </Button>
           </form>
-        ) : (
-          <Text color="dimmed">
+      
+      </Card>
+        )}
+      { !token && (
+        <Card>
+           <Text color="dimmed">
             You must be signed in to leave a review.
           </Text>
-        )}
-      </Card>
+        </Card>
+      )}  
       </>
   );
 }
+
