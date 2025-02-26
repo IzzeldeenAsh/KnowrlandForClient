@@ -12,11 +12,11 @@
     @apply opacity-50 cursor-default pointer-events-none;
 }
 
-.stellar-carousel .swiper-slide {
+.Knoldg-carousel .swiper-slide {
     @apply opacity-80;
 }
 
-.stellar-carousel .swiper-slide.swiper-slide-active {
+.Knoldg-carousel .swiper-slide.swiper-slide-active {
     @apply opacity-100;
 }
 

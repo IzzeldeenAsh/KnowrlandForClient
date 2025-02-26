@@ -25,19 +25,19 @@ export default function Testimonials() {
   const items: Item[] = [
     {
       img: TestimonialImg01,
-      quote: "Knowrland has revolutionized how I share insights about renewable energy. Its platform allows me to connect with professionals worldwide, fostering collaboration and innovation in our industry.",
+      quote: "Knoldg has revolutionized how I share insights about renewable energy. Its platform allows me to connect with professionals worldwide, fostering collaboration and innovation in our industry.",
       name: "Emad Nasser",
       role: "Renewable Energy Expert"
     },
     {
       img: TestimonialImg02,
-      quote: "As a fintech specialist, I've found Knowrland to be an invaluable resource for expanding my network and knowledge base. It's become an essential tool for staying ahead in this rapidly evolving field.",
+      quote: "As a fintech specialist, I've found Knoldg to be an invaluable resource for expanding my network and knowledge base. It's become an essential tool for staying ahead in this rapidly evolving field.",
       name: "Awad Salem",
       role: "Fintech Specialist"
     },
     {
       img: TestimonialImg03,
-      quote: "Knowrland has transformed the way I disseminate research findings in biotechnology. It's not just a platform; it's a community that fosters growth and innovation in our industry.",
+      quote: "Knoldg has transformed the way I disseminate research findings in biotechnology. It's not just a platform; it's a community that fosters growth and innovation in our industry.",
       name: "Ahmad Abuassi",
       role: "Biotechnology Researcher"
     }
@@ -64,7 +64,7 @@ export default function Testimonials() {
 
   return (
     <section>
-      <div className="max-w-3xl mx-auto px-4 sm:px-6">
+      <div className="max-w-3xl mx-auto px-4 sm:px-6 pb-10">
         <div className="relative pb-12 md:pb-20">
 
           {/* Particles animation */}
