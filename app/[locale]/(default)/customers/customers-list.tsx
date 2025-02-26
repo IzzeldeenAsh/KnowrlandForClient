@@ -115,7 +115,7 @@ export default function CustomersList() {
       <div className="flex flex-col items-center justify-center text-center p-4">
         <p className="font-medium bg-clip-text text-transparent bg-gradient-to-r from-slate-200/60 via-slate-200 to-slate-200/60 pb-3">
           <span className="line-clamp-4">
-            “We struggled to bring all our conversations into one place until we found Stellar. The UI is very clean and we love the integration with Spark.”
+            “We struggled to bring all our conversations into one place until we found Knoldg. The UI is very clean and we love the integration with Spark.”
           </span>
         </p>
         <div className="inline-flex mb-2">
@@ -129,7 +129,7 @@ export default function CustomersList() {
       <div className="flex flex-col items-center justify-center text-center p-4">
         <p className="font-medium bg-clip-text text-transparent bg-gradient-to-r from-slate-200/60 via-slate-200 to-slate-200/60 pb-3">
           <span className="line-clamp-4">
-            “We struggled to bring all our conversations into one place until we found Stellar. The UI is very clean and we love the integration with Spark.”
+            “We struggled to bring all our conversations into one place until we found Knoldg. The UI is very clean and we love the integration with Spark.”
           </span>
         </p>
         <div className="inline-flex mb-2">

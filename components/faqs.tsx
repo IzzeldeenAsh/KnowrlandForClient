@@ -21,7 +21,7 @@ export default function Faqs() {
         {/* Section header */}
         <div className="max-w-3xl mx-auto text-center pb-12 md:pb-20">
           <div>
-            <div className="inline-flex font-medium bg-clip-text text-transparent bg-gradient-to-r from-blue-500 to-blue-200 pb-3">Getting started with Stellar</div>
+            <div className="inline-flex font-medium bg-clip-text text-transparent bg-gradient-to-r from-blue-500 to-blue-200 pb-3">Getting started with Knoldg</div>
           </div>
           <h2 className="h2 bg-clip-text text-transparent bg-gradient-to-r from-slate-200/60 via-slate-200 to-slate-200/60 pb-4">Everything you need to know</h2>
         </div>
@@ -34,19 +34,19 @@ export default function Faqs() {
 
             {/* Item */}
             <div className="space-y-2">
-              <h4 className="font-semibold">What is Stellar?</h4>
+              <h4 className="font-semibold">What is Knoldg?</h4>
               <p className="text-slate-400">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Quis enim lobortis scelerisque fermentum.</p>
             </div>
 
             {/* Item */}
             <div className="space-y-2">
-              <h4 className="font-semibold">What's an affordable alternative to Stellar?</h4>
+              <h4 className="font-semibold">What's an affordable alternative to Knoldg?</h4>
               <p className="text-slate-400">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Quis enim lobortis scelerisque fermentum.</p>
             </div>
 
             {/* Item */}
             <div className="space-y-2">
-              <h4 className="font-semibold">Can I remove the 'Powered by Stellar' branding?</h4>
+              <h4 className="font-semibold">Can I remove the 'Powered by Knoldg' branding?</h4>
               <p className="text-slate-400">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Quis enim lobortis scelerisque fermentum.</p>
             </div>
 
@@ -63,13 +63,13 @@ export default function Faqs() {
 
             {/* Item */}
             <div className="space-y-2">
-              <h4 className="font-semibold">Can I use Stellar for free?</h4>
+              <h4 className="font-semibold">Can I use Knoldg for free?</h4>
               <p className="text-slate-400">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Quis enim lobortis scelerisque fermentum.</p>
             </div>
 
             {/* Item */}
             <div className="space-y-2">
-              <h4 className="font-semibold">Is Stellar affordable for small businesses?</h4>
+              <h4 className="font-semibold">Is Knoldg affordable for small businesses?</h4>
               <p className="text-slate-400">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Quis enim lobortis scelerisque fermentum.</p>
             </div>
 

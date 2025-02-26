@@ -51,3 +51,29 @@
 .tp-course-details2-widget-content {
     padding: 30px 10px;
 }
+
+@keyframes infinite-scroll {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-100%);
+  }
+}
+
+@keyframes infinite-scroll-rtl {
+  from {
+    transform: translateX(-100%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+
+.animate-infinite-scroll {
+  animation: infinite-scroll 25s linear infinite;
+}
+
+.animate-infinite-scroll-rtl {
+  animation: infinite-scroll-rtl 25s linear infinite;
+}

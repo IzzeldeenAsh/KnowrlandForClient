@@ -1,5 +1,5 @@
 export const metadata = {
-  title: 'Reset Password - Stellar',
+  title: 'Reset Password - Knoldg',
   description: 'Page description',
 }
 
