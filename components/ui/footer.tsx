@@ -1,6 +1,11 @@
+'use client'
+
+import { useTranslations } from 'next-intl'
 import Logo from './logo'
 
 export default function Footer() {
+  const t = useTranslations('Footer')
+
   return (
     <footer className='bg-slate-900 text-slate-400'>
       <div className="max-w-6xl mx-auto px-4 sm:px-6">
@@ -15,7 +20,7 @@ export default function Footer() {
                 <div className="mb-4">
                   <Logo />
                 </div>
-                <div className="text-sm text-slate-300">© Knowrland.com <span className="text-slate-500">-</span> All rights reserved.</div>
+                <div className="text-sm text-slate-300">{t('copyright')}</div>
               </div>
               {/* Social links */}
               <ul className="flex">
@@ -46,79 +51,61 @@ export default function Footer() {
 
           {/* 2nd block */}
           <div className="sm:col-span-6 md:col-span-3 lg:col-span-2">
-            <h6 className="text-sm text-slate-50 font-medium mb-2">Products</h6>
+            <h6 className="text-sm text-slate-50 font-medium mb-2">{t('knowledge.title')}</h6>
             <ul className="text-sm space-y-2">
               <li>
-                <a className="text-slate-400 hover:text-slate-200 transition duration-150 ease-in-out" href="#0">Features</a>
+                <a className="text-slate-400 hover:text-slate-200 transition duration-150 ease-in-out" href="#0">{t('knowledge.insights')}</a>
               </li>
               <li>
-                <a className="text-slate-400 hover:text-slate-200 transition duration-150 ease-in-out" href="#0">Integrations</a>
+                <a className="text-slate-400 hover:text-slate-200 transition duration-150 ease-in-out" href="#0">{t('knowledge.reports')}</a>
               </li>
               <li>
-                <a className="text-slate-400 hover:text-slate-200 transition duration-150 ease-in-out" href="#0">Pricing & Plans</a>
+                <a className="text-slate-400 hover:text-slate-200 transition duration-150 ease-in-out" href="#0">{t('knowledge.data')}</a>
               </li>
               <li>
-                <a className="text-slate-400 hover:text-slate-200 transition duration-150 ease-in-out" href="#0">Changelog</a>
+                <a className="text-slate-400 hover:text-slate-200 transition duration-150 ease-in-out" href="#0">{t('knowledge.manual')}</a>
               </li>
               <li>
-                <a className="text-slate-400 hover:text-slate-200 transition duration-150 ease-in-out" href="#0">Our method</a>
+                <a className="text-slate-400 hover:text-slate-200 transition duration-150 ease-in-out" href="#0">{t('knowledge.courses')}</a>
               </li>
             </ul>
           </div>
 
           {/* 3rd block */}
           <div className="sm:col-span-6 md:col-span-3 lg:col-span-2">
-            <h6 className="text-sm text-slate-50 font-medium mb-2">Company</h6>
+            <h6 className="text-sm text-slate-50 font-medium mb-2">{t('company.title')}</h6>
             <ul className="text-sm space-y-2">
               <li>
-                <a className="text-slate-400 hover:text-slate-200 transition duration-150 ease-in-out" href="#0">About us</a>
+                <a className="text-slate-400 hover:text-slate-200 transition duration-150 ease-in-out" href="#0">{t('company.about')}</a>
               </li>
               <li>
-                <a className="text-slate-400 hover:text-slate-200 transition duration-150 ease-in-out" href="#0">Diversity & Inclusion</a>
+                <a className="text-slate-400 hover:text-slate-200 transition duration-150 ease-in-out" href="#0">{t('company.blog')}</a>
               </li>
               <li>
-                <a className="text-slate-400 hover:text-slate-200 transition duration-150 ease-in-out" href="#0">Blog</a>
-              </li>
-              <li>
-                <a className="text-slate-400 hover:text-slate-200 transition duration-150 ease-in-out" href="#0">Careers</a>
-              </li>
-              <li>
-                <a className="text-slate-400 hover:text-slate-200 transition duration-150 ease-in-out" href="#0">Financial statements</a>
+                <a className="text-slate-400 hover:text-slate-200 transition duration-150 ease-in-out" href="#0">{t('company.contact')}</a>
               </li>
             </ul>
           </div>
 
           {/* 4th block */}
           <div className="sm:col-span-6 md:col-span-3 lg:col-span-2">
-            <h6 className="text-sm text-slate-50 font-medium mb-2">Resources</h6>
+            <h6 className="text-sm text-slate-50 font-medium mb-2">{t('resources.title')}</h6>
             <ul className="text-sm space-y-2">
               <li>
-                <a className="text-slate-400 hover:text-slate-200 transition duration-150 ease-in-out" href="#0">Community</a>
-              </li>
-              <li>
-                <a className="text-slate-400 hover:text-slate-200 transition duration-150 ease-in-out" href="#0">Terms of service</a>
-              </li>
-              <li>
-                <a className="text-slate-400 hover:text-slate-200 transition duration-150 ease-in-out" href="#0">Report a vulnerability</a>
+                <a className="text-slate-400 hover:text-slate-200 transition duration-150 ease-in-out" href="#0">{t('resources.terms')}</a>
               </li>
             </ul>
           </div>
 
           {/* 5th block */}
           <div className="sm:col-span-6 md:col-span-3 lg:col-span-2">
-            <h6 className="text-sm text-slate-50 font-medium mb-2">Legals</h6>
+            <h6 className="text-sm text-slate-50 font-medium mb-2">{t('legals.title')}</h6>
             <ul className="text-sm space-y-2">
               <li>
-                <a className="text-slate-400 hover:text-slate-200 transition duration-150 ease-in-out" href="#0">Refund policy</a>
+                <a className="text-slate-400 hover:text-slate-200 transition duration-150 ease-in-out" href="#0">{t('legals.terms')}</a>
               </li>
               <li>
-                <a className="text-slate-400 hover:text-slate-200 transition duration-150 ease-in-out" href="#0">Terms & Conditions</a>
-              </li>
-              <li>
-                <a className="text-slate-400 hover:text-slate-200 transition duration-150 ease-in-out" href="#0">Privacy policy</a>
-              </li>
-              <li>
-                <a className="text-slate-400 hover:text-slate-200 transition duration-150 ease-in-out" href="#0">Brand Kit</a>
+                <a className="text-slate-400 hover:text-slate-200 transition duration-150 ease-in-out" href="#0">{t('legals.privacy')}</a>
               </li>
             </ul>
           </div>

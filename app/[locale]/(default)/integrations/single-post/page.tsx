@@ -1,5 +1,5 @@
 export const metadata = {
-  title: 'Integrations Post - Stellar',
+  title: 'Integrations Post - Knoldg',
   description: 'Page description',
 }
 
@@ -67,14 +67,14 @@ export default function IntegrationsSingle() {
                       <div className="prose max-w-none text-slate-400 prose-headings:text-slate-50 prose-h2:text-xl prose-h2:mt-8 prose-h2:mb-4 prose-p:leading-relaxed prose-a:text-blue-500 prose-a:no-underline hover:prose-a:underline prose-strong:text-slate-50 prose-strong:font-medium prose-blockquote:pl-5 prose-blockquote:xl:-ml-5 prose-blockquote:border-l-2 prose-blockquote:border-blue-500 prose-blockquote:font-medium prose-blockquote:text-slate-300 prose-blockquote:italic">
                         <h2>Overview</h2>
                         <p>
-                          This powerful GitHub integration keeps your work in sync in both applications. It links features to Pull Requests so that details update automatically from In Progress to Done as the PR moves from drafted to merged - there is no need to update the issue in Stellar at all.
+                          This powerful GitHub integration keeps your work in sync in both applications. It links features to Pull Requests so that details update automatically from In Progress to Done as the PR moves from drafted to merged - there is no need to update the issue in Knoldg at all.
                         </p>
                         <p>
                           Move even faster by using a keyboard shortcut that creates the issue's git branch name, assigns the issue and moves the issue to In Progress in one step. This integration supports <a href="#0">GitHub Enterprise</a>.
                         </p>
                         <h2>How it works</h2>
                         <p>
-                          Configure the GitHub integration <strong className="text-slate-50 font-medium">in a couple of minutes</strong> by authenticating and selecting which repos to connect to Stellar. Once you do, anyone in the workspace can start linking PRs.
+                          Configure the GitHub integration <strong className="text-slate-50 font-medium">in a couple of minutes</strong> by authenticating and selecting which repos to connect to Knoldg. Once you do, anyone in the workspace can start linking PRs.
                         </p>
                         <p>
                           Link PRs to issues in a few ways. Use the issue ID in the branch name or PR title before creating the PR. To link multiple PRs, or link issues after creating the PR, use magic words along with the issue ID in the PR description.
@@ -117,7 +117,7 @@ export default function IntegrationsSingle() {
                         </div>
                         <button className="btn-sm text-slate-300 hover:text-white transition duration-150 ease-in-out group [background:linear-gradient(theme(colors.slate.900),_theme(colors.slate.900))_padding-box,_conic-gradient(theme(colors.slate.400),_theme(colors.slate.700)_25%,_theme(colors.slate.700)_75%,_theme(colors.slate.400)_100%)_border-box] relative before:absolute before:inset-0 before:bg-slate-800/70 before:rounded-full before:pointer-events-none">
                           <span className="relative inline-flex items-center">
-                            Install Integration <span className="tracking-normal text-blue-500 group-hover:translate-x-0.5 transition-transform duration-150 ease-in-out ml-1">-&gt;</span>
+                            Install Integration <span className="tracking-normal text-blue-500 group-hover:translate-x-0.5 transition-transform duration-150 ease-in-out mx-1">-&gt;</span>
                           </span>
                         </button>
                       </div>
