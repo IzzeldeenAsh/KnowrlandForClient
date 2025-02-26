@@ -1,6 +1,152 @@
 {
-    "HomePage":{
-        "title":"Home Page",
-        "description":"Home Page Description"
+    "HomePage": {
+        "title": "Home Page",
+        "description": "Home Page Description"
+    },
+    "Hero": {
+        "tagline": "Beyond Research Boundaries",
+        "title": "Business Growth Thrives on Expert Knowledge",
+        "description":"A Vast Business knowledge hub of expert reports, economic insights, and more is now at your fingertips.",
+        "searchPlaceholder": "Search business reports, insights, data... and more",
+        "direction": "ltr"
+    },
+    "Header": {
+        "navigation": {
+            "industries": "Industries",
+            "reports": "Reports",
+            "data": "Data",
+            "insights": "Insights",
+            "manuals": "Manuals",
+            "courses": "Courses"
+        },
+        "industriesDropdown": {
+            "featuredTitle": "Featured Industries",
+            "viewAll": "View all industries",
+            "exploreText": "Explore insights and trends",
+            "exploreAllTitle": "Explore All Industries",
+            "exploreAllDescription": "Discover comprehensive insights across various sectors",
+            "browseAll": "Browse All"
+        },
+        "auth": {
+            "login": "Login"
+        }
+    },
+    "Features": {
+        "tagline": "We pave the way",
+        "title": "Make Smarter, Faster Decisions",
+        "description": "Access the business report and insight that matters, quickly and efficiently",
+        "tabs": {
+            "preciseResults": {
+                "title": "Smart Search Engine",
+                "alt": "Features Illustration"
+            },
+            "variableData": {
+                "title": "Knowledge Base Built on an International Database Structure (ISIC, HS Code)"
+            },
+            "fasterDecisions": {
+                "title": "AI-Powered Assistance"
+            }
+        },
+        "direction": "ltr"
+    },
+    "Testimonials": {
+        "tagline": "Bringing You Closer to Resolution",
+        "title":"Latest Reports",
+        "description":"Stay ahead with newly uploaded expert reports, technical guides, and real-world analyses",
+        "insights": {
+            "title": "Insights",
+            "description": "Explore the latest insights and analysis in your field",
+            "alt": "Insights Icon"
+        },
+        "reports": {
+            "title": "Reports",
+            "description": "Access comprehensive, specialized reports across various domains",
+            "alt": "Reports Icon"
+        },
+        "manuals": {
+            "title": "Manuals",
+            "description": "Your comprehensive guide to professional practices and best methods",
+            "alt": "Manuals Icon"
+        },
+        "data": {
+            "title": "Data",
+            "description": "Accurate data and statistics to support your decisions",
+            "alt": "Data Icon"
+        },
+        "courses": {
+            "title": "Courses",
+            "description": "Learn from industry experts and develop your professional skills",
+            "alt": "Courses Icon"
+        },
+        "common": {
+            "learnMore": "Learn More"
+        },
+        "navigation": {
+            "previous": "Previous",
+            "next": "Next"
+        }
+    },
+    "Features2": {
+        "tagline": "Quality and Reliability",
+        "title": "Reliable, High-Quality Business Reports from Industry Specialists",
+        "description": "Our platform provides expert-crafted business reports, industry data and insights to ensure optimal business results for registered visitors.",
+        "direction": "ltr",
+        "tabs": {
+            "directExpertEngagement": {
+                "title": "Direct Expert Engagement – Connect and communicate with Subject Matter Expert authors"
+            },
+            "expertRatings": {
+                "title": "Transparent Ratings & Quality Assurance – Access expert ratings for trusted insights"
+            },
+            "consultingSessions": {
+                "title": "Personalized Consulting Sessions – Request one-on-one consultations with expert authors"
+            }
+        }
+    },
+    "Features3": {
+        "tagline": "Value for the Money",
+        "title": "Knoldg lets you purchase exactly what you need, without paying the price of full reports",
+        "description": "",
+        "direction": "ltr",
+        "tabs": {
+            "payAsYouGo": {
+                "title": "No Monthly Fees—Pay as You Go"
+            },
+            "purchaseSpecific": {
+                "title": "Purchase Specific Sections, Files, or Datasets That Matter to You"
+            }
+        }
+    },
+    "Cta": {
+        "tagline": "",
+        "title": "Turn Your Expertise into Profit—Share Your Knowledge with the World!",
+        "description": "Start monetizing your knowledge and connect with prospective clients who need your expertise.",
+        "button": "Get Started"
+    },
+    "Footer": {
+        "copyright": " Knoldg.com - All rights reserved",
+        "knowledge": {
+            "title": "Knowledge",
+            "insights": "Insights",
+            "reports": "Reports",
+            "data": "Data",
+            "manual": "Manual",
+            "courses": "Courses"
+        },
+        "company": {
+            "title": "Company",
+            "about": "About us",
+            "blog": "Blog",
+            "contact": "Contact"
+        },
+        "resources": {
+            "title": "Resources",
+            "terms": "Terms of service"
+        },
+        "legals": {
+            "title": "Legals",
+            "terms": "Terms & Conditions",
+            "privacy": "Privacy policy"
+        }
     }
 }

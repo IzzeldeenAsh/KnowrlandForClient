@@ -1,4 +1,10 @@
+'use client'
+
+import { useTranslations } from 'next-intl'
+
 export default function Cta() {
+  const t = useTranslations('Cta')
+
   return (
     <section>
       <div className="max-w-6xl mx-auto px-4 sm:px-6">
@@ -28,7 +34,7 @@ export default function Cta() {
                 Replacement (4 words): "Lorem ipsum dolor sit"
               */}
               <div className="inline-flex font-medium bg-clip-text text-transparent bg-gradient-to-r from-blue-500 to-blue-200 pb-3">
-              The SMEs Platform
+                {t('tagline')}
               </div>
             </div>
             {/*
@@ -36,7 +42,7 @@ export default function Cta() {
               Replacement (5 words): "Lorem ipsum dolor sit amet"
             */}
             <h2 className="h2 bg-clip-text text-transparent bg-gradient-to-r from-slate-200/60 via-slate-200 to-slate-200/60 pb-4">
-            Share Your Expertise. Shape the Future.
+              {t('title')}
             </h2>
             {/*
               Original paragraph (24 words):
@@ -46,7 +52,7 @@ export default function Cta() {
               "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna. Ut enim ad minim lorem ipsum."
             */}
             <p className="text-lg text-slate-400 mb-8">
-            This is where top minds transform industries. Turn your knowledge into impact and start publishing reports, manuals, and valuable resources.
+              {t('description')}
             </p>
             {/*
               Original link text (2 words): "Get Started"
@@ -54,7 +60,7 @@ export default function Cta() {
             */}
             <div>
               <a className="btn text-slate-900 bg-gradient-to-r from-white/80 via-white to-white/80 hover:bg-white transition duration-150 ease-in-out group" href="#0">
-               Get Started <span className="tracking-normal text-blue-500 group-hover:translate-x-0.5 transition-transform duration-150 ease-in-out ml-1">-&gt;</span>
+                {t('button')} <span className="tracking-normal text-blue-500 group-hover:translate-x-0.5 transition-transform duration-150 ease-in-out mx-1">-&gt;</span>
               </a>
             </div>
           </div>

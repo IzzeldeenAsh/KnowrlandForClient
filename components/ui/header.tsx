@@ -6,6 +6,8 @@ import Image from 'next/image'
 import {IconChevronDown } from '@tabler/icons-react'
 import { HoverCard, Group, Text, Anchor, Divider, SimpleGrid, Button } from '@mantine/core'
 import { UserProfile } from './header/components/UserProfile'
+import { useTranslations } from 'next-intl'
+
 interface User {
   name: string;
   profile_photo_url: string | null;
@@ -45,8 +47,8 @@ async function getIndustries() {
   return json.data as Industry[];
 }
 
-
 export default function Header() {
+  const t = useTranslations('Header');
   const [user, setUser] = useState<User | null>(null);
   const [roles, setRoles] = useState<string[]>([]);
   const [industries, setIndustries] = useState<Industry[]>([]);
@@ -132,23 +134,24 @@ export default function Header() {
           {/* Desktop navigation */}
           <nav className="hidden md:flex flex-1">
             <ul className="flex justify-center items-center w-full">
-              <li className='separator-dark'>
+              <li className=''>
                 <HoverCard  
                   position='bottom'
-                 radius="sm" shadow="md" withinPortal>
+                  radius="sm" shadow="md" withinPortal>
                   <HoverCard.Target>
-                   <Link href={'/en/all-industries'}>
-                   <button className="font-medium text-sm text-slate-300 hover:text-white mx-4 lg:mx-5 transition duration-150 ease-in-out flex items-center">
-                      <span className="mr-1">Industries</span>
-                      <IconChevronDown size={16} />
-                    </button></Link>
+                    <Link href={'/en/all-industries'}>
+                      <button className="font-medium text-sm text-slate-300 hover:text-white mx-4 lg:mx-5 transition duration-150 ease-in-out flex items-center">
+                        <span className="mr-1">{t('navigation.industries')}</span>
+                        <IconChevronDown size={16} />
+                      </button>
+                    </Link>
                   </HoverCard.Target>
 
                   <HoverCard.Dropdown style={{background: 'linear-gradient(to right, #0f172b, #242B6A)',borderColor: '#2F378A'}}>
                     <Group justify="space-between" px="md">
-                      <Text fw={500} c={'white'}>Featured Industries</Text>
+                      <Text fw={500} c={'white'}>{t('industriesDropdown.featuredTitle')}</Text>
                       <Anchor href="/en/all-industries" fz="xs" className="text-blue-300">
-                        View all industries
+                        {t('industriesDropdown.viewAll')}
                       </Anchor>
                     </Group>
 
@@ -168,7 +171,7 @@ export default function Header() {
                                   {industry.name}
                                 </Text>
                                 <Text size="xs" c="dimmed">
-                                  Explore insights and trends
+                                  {t('industriesDropdown.exploreText')}
                                 </Text>
                               </div>
                             </Group>
@@ -177,14 +180,14 @@ export default function Header() {
                       ))}
                     </SimpleGrid>
 
-                    <div className="mt-4  p-4 rounded-lg" style={{backgroundColor: '#2F378A'}}>
+                    <div className="mt-4 p-4 rounded-lg" style={{backgroundColor: '#2F378A'}}>
                       <Group justify="space-between">
                         <div>
                           <Text fw={500} fz="sm" c={'white'}>
-                            Explore All Industries
+                            {t('industriesDropdown.exploreAllTitle')}
                           </Text>
                           <Text size="xs" c="dimmed">
-                            Discover comprehensive insights across various sectors
+                            {t('industriesDropdown.exploreAllDescription')}
                           </Text>
                         </div>
                         <Button 
@@ -193,27 +196,27 @@ export default function Header() {
                           href="/en/all-industries"
                           className="bg-blue-50 text-blue-600 hover:bg-blue-100"
                         >
-                          Browse All
+                          {t('industriesDropdown.browseAll')}
                         </Button>
                       </Group>
                     </div>
                   </HoverCard.Dropdown>
                 </HoverCard>
               </li>
-              <li className='separator-dark'>
-                <Link className="font-medium  text-sm text-gray-200 hover:text-gray-100 mx-4 lg:mx-5 transition duration-150 ease-in-out" href="/en/industries/report">Reports</Link>
+              <li className=''>
+                <Link className="font-medium text-sm text-gray-200 hover:text-gray-100 mx-4 lg:mx-5 transition duration-150 ease-in-out" href="/en/industries/report">{t('navigation.reports')}</Link>
               </li>
-              <li className='separator-dark'>
-                <Link className="font-medium text-sm text-gray-200 hover:text-gray-100 mx-4 lg:mx-5 transition duration-150 ease-in-out" href="/en/industries/data">Data</Link>
+              <li className=''>
+                <Link className="font-medium text-sm text-gray-200 hover:text-gray-100 mx-4 lg:mx-5 transition duration-150 ease-in-out" href="/en/industries/data">{t('navigation.data')}</Link>
               </li>
-              <li className='separator-dark'>
-                <Link className="font-medium text-sm text-gray-200 hover:text-gray-100 mx-4 lg:mx-5 transition duration-150 ease-in-out" href="/en/industries/insight">Insights</Link>
+              <li className=''>
+                <Link className="font-medium text-sm text-gray-200 hover:text-gray-100 mx-4 lg:mx-5 transition duration-150 ease-in-out" href="/en/industries/insight">{t('navigation.insights')}</Link>
               </li>
-              <li className='separator-dark'>
-                <Link className="font-medium text-sm text-gray-200 hover:text-gray-100 mx-4 lg:mx-5 transition duration-150 ease-in-out" href="/en/industries/manual">Manuals</Link>
+              <li className=''>
+                <Link className="font-medium text-sm text-gray-200 hover:text-gray-100 mx-4 lg:mx-5 transition duration-150 ease-in-out" href="/en/industries/manual">{t('navigation.manuals')}</Link>
               </li>
-              <li className='separator-dark'>
-                <Link className="font-medium text-sm text-gray-200 hover:text-gray-100 mx-4 lg:mx-5 transition duration-150 ease-in-out" href="/en/industries/course">Courses</Link>
+              <li className=''>
+                <Link className="font-medium text-sm text-gray-200 hover:text-gray-100 mx-4 lg:mx-5 transition duration-150 ease-in-out" href="/en/industries/course">{t('navigation.courses')}</Link>
               </li>
             </ul>
           </nav>
@@ -224,15 +227,14 @@ export default function Header() {
               <div className="w-16 h-8 bg-slate-700/30 animate-pulse rounded"></div>
             ) : user ? (
               <div className="flex items-center space-x-4">
-              <UserProfile />
-            </div>
+                <UserProfile />
+              </div>
             ) : (
               <>
-
                 <li className="ml-6">
                   <Link className="btn-sm text-slate-300 hover:text-white transition duration-150 ease-in-out w-full group [background:linear-gradient(theme(colors.slate.900),_theme(colors.slate.900))_padding-box,_conic-gradient(theme(colors.slate.400),_theme(colors.slate.700)_25%,_theme(colors.slate.700)_75%,_theme(colors.slate.400)_100%)_border-box] relative before:absolute before:inset-0 before:bg-slate-800/30 before:rounded-full before:pointer-events-none" href="https://foresighta.vercel.app/auth/login">
                     <span className="relative inline-flex items-center">
-                      Login <span className="tracking-normal text-blue-500 group-hover:translate-x-0.5 transition-transform duration-150 ease-in-out ml-1">-&gt;</span>
+                      {t('auth.login')} <span className="tracking-normal text-blue-500 group-hover:translate-x-0.5 transition-transform duration-150 ease-in-out mx-1">-&gt;</span>
                     </span>
                   </Link>
                 </li>

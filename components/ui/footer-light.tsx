@@ -15,7 +15,7 @@ export default function Footer({ border = false }: { border?: boolean }) {
               <Logo />
             </div>
             <div className="text-sm text-gray-600">
-              &copy; Knowrland.com - All rights reserved.
+              &copy; Knoldg.com - All rights reserved.
             </div>
           </div>
 

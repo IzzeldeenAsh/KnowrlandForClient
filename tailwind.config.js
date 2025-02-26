@@ -9,6 +9,7 @@ module.exports = {
     extend: {
       fontFamily: {
         inter: ['var(--font-inter)', 'sans-serif'],
+        tajawal: ['var(--font-tajawal)', 'sans-serif'],
       },
       fontSize: {
         xs: ['0.75rem', { lineHeight: '1.5' }],
