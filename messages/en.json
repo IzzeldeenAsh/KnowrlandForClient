@@ -105,10 +105,13 @@
     },
     "Features3": {
         "tagline": "Value for the Money",
-        "title": "Knoldg lets you purchase exactly what you need, without paying the price of full reports",
-        "description": "",
+        "title": "Pay Only for What You Need",
+        "description": "Knoldg lets you purchase exactly what you need, without paying the price of full reports. Our platform offers flexible payment options tailored to your specific needs.",
         "direction": "ltr",
         "tabs": {
+            "no-monthly-subscription": {
+                "title": "Pay only for what you need"
+            },
             "payAsYouGo": {
                 "title": "No Monthly Fees—Pay as You Go"
             },
@@ -116,6 +119,17 @@
                 "title": "Purchase Specific Sections, Files, or Datasets That Matter to You"
             }
         }
+    },
+    "Features02": {
+        "stayInformed": {
+            "title": "Stay Informed",
+            "description": "Get notified instantly when new reports, insights, and valuable resources are published on topics that matters to you."
+        },
+        "connectWithExpert": {
+            "title": "Connect With an Expert",
+            "description": "The platform engages you directly with SMEs for additional details, inquiries, and tailored guidance."
+        },
+        "discover": "Discover"
     },
     "Cta": {
         "tagline": "",
