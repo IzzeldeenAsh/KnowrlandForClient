@@ -215,6 +215,19 @@ export default function Features() {
                   {t3("description")}
                 </p>
                 <div className="mt-8 max-w-md space-y-2">
+                <button
+                    className={`flex items-start justify-start rtl:text-start ltr:text-end text-sm font-medium text-slate-50 rounded border bg-slate-800/25 w-full px-3 py-2 transition duration-150 ease-in-out hover:opacity-100 border-slate-700 opacity-70`}
+                  >
+                    <svg
+                      className="shrink-0 fill-slate-300 mx-3 rtl:rotate-180"
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="16"
+                      height="16"
+                    >
+                      <path d="M14 0a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V2a2 2 0 0 1 2-2h12Zm0 14V2H2v12h12Zm-3-7H5a1 1 0 1 1 0-2h6a1 1 0 0 1 0 2Zm0 4H5a1 1 0 0 1 0-2h6a1 1 0 0 1 0 2Z" />
+                    </svg>
+                    <span>{t3("tabs.no-monthly-subscription.title")}</span>
+                  </button>
                   <button
                     className={`flex items-start justify-start rtl:text-start ltr:text-end text-sm font-medium text-slate-50 rounded border bg-slate-800/25 w-full px-3 py-2 transition duration-150 ease-in-out hover:opacity-100 border-slate-700 opacity-70`}
                   >
