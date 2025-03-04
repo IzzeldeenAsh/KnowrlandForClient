@@ -5,8 +5,8 @@
     },
     "Hero": {
         "tagline": "Beyond Research Boundaries",
-        "title": "Business Growth Thrives on Expert Knowledge",
-        "description":"A Vast Business knowledge hub of expert reports, economic insights, and more is now at your fingertips.",
+        "title": "Unlock Business Success with Expert Knowledge",
+        "description":"Explore a hub of expert data, insights, and business intelligence tailored for your business growth.",
         "searchPlaceholder": "Search business reports, insights, data... and more",
         "direction": "ltr"
     },
@@ -34,7 +34,7 @@
     "Features": {
         "tagline": "We pave the way",
         "title": "Make Smarter, Faster Decisions",
-        "description": "Access the business report and insight that matters, quickly and efficiently",
+        "description": "Accelerate your decisions with AI-powered assistance and a smart search engine for instant, reliable insights",
         "tabs": {
             "preciseResults": {
                 "title": "Smart Search Engine",
@@ -88,8 +88,8 @@
     },
     "Features2": {
         "tagline": "Quality and Reliability",
-        "title": "Reliable, High-Quality Business Reports from Industry Specialists",
-        "description": "Our platform provides expert-crafted business reports, industry data and insights to ensure optimal business results for registered visitors.",
+        "title": "Reliable, High-quality Resources from Business Specialists",
+        "description": "Access verified insights and engage with rated business expert professionals",
         "direction": "ltr",
         "tabs": {
             "directExpertEngagement": {
@@ -105,8 +105,8 @@
     },
     "Features3": {
         "tagline": "Value for the Money",
-        "title": "Pay Only for What You Need",
-        "description": "Knoldg lets you purchase exactly what you need, without paying the price of full reports. Our platform offers flexible payment options tailored to your specific needs.",
+        "title": "Tailored Pricing,  Pay only for what Matters",
+        "description": "Purchase exactly what you need without paying the price of full reports. Our platform offers on-demand buying options tailored to your specific needs.",
         "direction": "ltr",
         "tabs": {
             "no-monthly-subscription": {
