@@ -29,6 +29,10 @@
         },
         "auth": {
             "login": "Login"
+        },
+        "language": {
+            "switchToArabic": "العربية",
+            "switchToEnglish": "English"
         }
     },
     "Features": {

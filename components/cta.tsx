@@ -41,7 +41,7 @@ export default function Cta() {
               Original h2 text (5 words): "Take control of your business"
               Replacement (5 words): "Lorem ipsum dolor sit amet"
             */}
-            <h2 className="h2 bg-clip-text text-transparent bg-gradient-to-r from-slate-200/60 via-slate-200 to-slate-200/60 pb-4">
+            <h2 className="h3 bg-clip-text text-transparent bg-gradient-to-r from-slate-200/60 via-slate-200 to-slate-200/60 pb-4 leading-[1.5]">
               {t('title')}
             </h2>
             {/*

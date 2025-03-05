@@ -2,9 +2,21 @@
 
 import { useState, useRef, useEffect } from 'react'
 import Link from 'next/link'
+import { usePathname } from 'next/navigation'
+import { useRouter } from '@/i18n/routing'
+import { IconLanguage } from '@tabler/icons-react'
+import { useTranslations } from 'next-intl'
 
 export default function MobileMenu() {
   const [mobileNavOpen, setMobileNavOpen] = useState<boolean>(false)
+  const t = useTranslations('Header');
+  const pathname = usePathname();
+  const router = useRouter();
+
+  // Function to switch locale
+  const switchLocale = (locale: string) => {
+    router.push('/', { locale });
+  };
 
   const trigger = useRef<HTMLButtonElement>(null)
   const mobileNav = useRef<HTMLDivElement>(null)
@@ -75,19 +87,36 @@ export default function MobileMenu() {
       >
         <ul className="border border-transparent [background:linear-gradient(theme(colors.slate.900),_theme(colors.slate.900))_padding-box,_conic-gradient(theme(colors.slate.400),_theme(colors.slate.700)_25%,_theme(colors.slate.700)_75%,_theme(colors.slate.400)_100%)_border-box] rounded-lg px-4 py-1.5">
           <li>
-            <Link className="flex font-medium text-sm text-slate-300 hover:text-white py-1.5" href="/about">About</Link>
+            <Link className="flex font-medium text-sm text-slate-300 hover:text-white py-1.5" href="/en/all-industries">{t('navigation.industries')}</Link>
           </li>
           <li>
-            <Link className="flex font-medium text-sm text-slate-300 hover:text-white py-1.5" href="/integrations">Integrations</Link>
+            <Link className="flex font-medium text-sm text-slate-300 hover:text-white py-1.5" href="/en/industries/report">{t('navigation.reports')}</Link>
           </li>
           <li>
-            <Link className="flex font-medium text-sm text-slate-300 hover:text-white py-1.5" href="/pricing">Pricing</Link>
+            <Link className="flex font-medium text-sm text-slate-300 hover:text-white py-1.5" href="/en/industries/data">{t('navigation.data')}</Link>
           </li>
           <li>
-            <Link className="flex font-medium text-sm text-slate-300 hover:text-white py-1.5" href="/customers">Customers</Link>
+            <Link className="flex font-medium text-sm text-slate-300 hover:text-white py-1.5" href="/en/industries/insight">{t('navigation.insights')}</Link>
           </li>
           <li>
-            <Link className="flex font-medium text-sm text-slate-300 hover:text-white py-1.5" href="/changelog">Changelog</Link>
+            <Link className="flex font-medium text-sm text-slate-300 hover:text-white py-1.5" href="/en/industries/manual">{t('navigation.manuals')}</Link>
+          </li>
+          <li>
+            <Link className="flex font-medium text-sm text-slate-300 hover:text-white py-1.5" href="/en/industries/course">{t('navigation.courses')}</Link>
+          </li>
+          <li className="border-t border-slate-700/50 mt-1.5 pt-1.5">
+            <button 
+              onClick={() => {
+                switchLocale(pathname.split('/')[1] === 'en' ? 'ar' : 'en');
+                setMobileNavOpen(false);
+              }}
+              className="flex items-center font-medium text-sm text-slate-300 hover:text-white py-1.5 w-full text-left"
+            >
+              <IconLanguage size={18} className="mr-2" />
+              <span>
+                {pathname.split('/')[1] === 'en' ? t('language.switchToArabic') : t('language.switchToEnglish')}
+              </span>
+            </button>
           </li>
         </ul>
       </nav>
