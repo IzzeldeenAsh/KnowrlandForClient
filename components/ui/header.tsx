@@ -3,10 +3,12 @@ import Logo from './logo'
 import MobileMenu from './mobile-menu'
 import { useEffect, useState } from 'react'
 import Image from 'next/image'
-import {IconChevronDown } from '@tabler/icons-react'
+import {IconChevronDown, IconLanguage } from '@tabler/icons-react'
 import { HoverCard, Group, Text, Anchor, Divider, SimpleGrid, Button } from '@mantine/core'
 import { UserProfile } from './header/components/UserProfile'
 import { useTranslations } from 'next-intl'
+import { usePathname } from 'next/navigation'
+import { useRouter } from '@/i18n/routing'
 
 interface User {
   name: string;
@@ -54,6 +56,13 @@ export default function Header() {
   const [industries, setIndustries] = useState<Industry[]>([]);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  const pathname = usePathname();
+  const router = useRouter();
+
+  // Function to switch locale
+  const switchLocale = (locale: string) => {
+    router.push('/', { locale });
+  };
 
   useEffect(() => {
     const fetchProfile = async () => {
@@ -223,6 +232,21 @@ export default function Header() {
 
           {/* Desktop sign in links */}
           <ul className="w-[200px] flex justify-end items-center">
+            {/* Language Switch Button */}
+            <li className="mx-4">
+              <div className="flex items-center">
+                <button
+                  onClick={() => switchLocale(pathname.split('/')[1] === 'en' ? 'ar' : 'en')}
+                  className="flex items-center text-slate-300 hover:text-white transition duration-150 ease-in-out"
+                >
+                  <IconLanguage size={20} className="mx-1" />
+                  <span className="text-sm font-medium">
+                    {pathname.split('/')[1] === 'en' ? t('language.switchToArabic') : t('language.switchToEnglish')}
+                  </span>
+                </button>
+              </div>
+            </li>
+            
             {isLoading ? (
               <div className="w-16 h-8 bg-slate-700/30 animate-pulse rounded"></div>
             ) : user ? (
