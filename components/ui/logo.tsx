@@ -1,21 +1,21 @@
+'use client'
+
 import Link from 'next/link'
 import Image from 'next/image'
 import LogoImgEn from '@/public/images/KNOLDG- LOGO-28.png'
 import LogoImgAr from '@/public/images/KNOLDG- LOGO-29-29.png'
 import { useEffect, useState } from 'react'
+import { usePathname } from 'next/navigation'
 
 export default function Logo() {
   const [logoImg, setLogoImg] = useState(LogoImgAr) // Default to Arabic
+  const pathname = usePathname()
 
   useEffect(() => {
-    // Client-side only code
-    if (typeof window !== 'undefined') {
-      const path = window.location.pathname
-      const locale = path.startsWith('/en') ? 'en' : 'ar'
-      console.log('Current path:', path, 'Detected locale:', locale)
-      setLogoImg(locale === 'en' ? LogoImgEn : LogoImgAr)
-    }
-  }, [])
+    // Detect locale from pathname
+    const locale = pathname.split('/')[1] === 'en' ? 'en' : 'ar'
+    setLogoImg(locale === 'en' ? LogoImgEn : LogoImgAr)
+  }, [pathname])
 
   return (
     <Link className="inline-flex" href="/" aria-label="Knoldg">
