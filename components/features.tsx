@@ -148,7 +148,7 @@ export default function Features() {
                 </p>
                 <div className="mt-8 max-w-md space-y-2">
                   <button
-                    className={`flex items-start justify-start rtl:text-start ltr:text-end text-sm font-medium text-slate-50 rounded border bg-slate-800/25 w-full px-3 py-2 transition duration-150 ease-in-out hover:opacity-100 border-slate-700 opacity-70`}
+                    className={`flex items-start justify-start text-start text-sm font-medium text-slate-50 rounded border bg-slate-800/25 w-full px-3 py-2 transition duration-150 ease-in-out hover:opacity-100 border-slate-700 opacity-70`}
                   >
                     <svg
                       className="shrink-0 fill-slate-300 mx-3 rtl:rotate-180"
@@ -174,7 +174,7 @@ export default function Features() {
                     <span>{t2("tabs.consultingSessions.title")}</span>
                   </button>
                   <button
-                    className={`flex items-start justify-start rtl:text-start ltr:text-end text-sm font-medium text-slate-50 rounded border bg-slate-800/25 w-full px-3 py-2 transition duration-150 ease-in-out hover:opacity-100 border-slate-700 opacity-70`}
+                    className={`flex items-start justify-start text-start text-sm font-medium text-slate-50 rounded border bg-slate-800/25 w-full px-3 py-2 transition duration-150 ease-in-out hover:opacity-100 border-slate-700 opacity-70`}
                   >
                     <svg
                       className="shrink-0 fill-slate-300 mx-3 rtl:rotate-180"
