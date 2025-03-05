@@ -110,13 +110,13 @@
         "direction": "ltr",
         "tabs": {
             "no-monthly-subscription": {
-                "title": "Pay only for what you need"
+                "title":"Purchase part of a report, section or file"
             },
             "payAsYouGo": {
-                "title": "No Monthly Fees—Pay as You Go"
+                "title": "No monthly fees- Pay as You Go"
             },
             "purchaseSpecific": {
-                "title": "Purchase Specific Sections, Files, or Datasets That Matter to You"
+                "title": "Pay for Only for the Targeted Insight or Data"
             }
         }
     },
