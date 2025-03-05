@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useTranslations } from "next-intl";
 import Image from "next/image";
-import Illustration from "@/public/images/glow-top.svg";
+import Illustration from "@/public/images/glow-top-blue.svg";
 import ChangelogImg01 from "@/public/images/changelog-02.png";
 export default function Features() {
   const t = useTranslations("Features");

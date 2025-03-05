@@ -1,7 +1,7 @@
 'use client';
 
 import Image from "next/image";
-import Illustration from "@/public/images/glow-top.svg";
+import Illustration from "@/public/images/glow-top-blue.svg";
 import { useTranslations } from "next-intl";
 
 export default function PostItem() {
