@@ -1,6 +1,6 @@
 import Image from 'next/image'
 import Particles from './particles'
-import Illustration from '@/public/images/glow-bottom.svg'
+import Illustration from '@/public/images/glow-bottom-blue.svg'
 import Link from 'next/link'
 import { useTranslations } from 'next-intl'
 
