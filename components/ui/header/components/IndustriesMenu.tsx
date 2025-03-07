@@ -9,7 +9,7 @@ export function IndustriesMenu() {
   return (
     <HoverCard  position="bottom" radius="sm" shadow="md" withinPortal>
       <HoverCard.Target>
-        <button className="font-medium text-sm text-gray-600 hover:text-gray-900 mx-4 lg:mx-5 transition duration-150 ease-in-out flex items-center">
+        <button className="font-medium text-xs text-gray-600 hover:text-gray-900 hover:text-blue-500 hover:bg-gray-100 px-3.5 py-2.5 rounded-md  transition duration-150 ease-in-out flex items-center">
           <span className="mr-1">Industries</span>
           <IconChevronDown size={16} />
         </button>
@@ -30,7 +30,7 @@ export function IndustriesMenu() {
             <Link 
               key={industry.id} 
               href={`/en/industry/${industry.id}/${industry.slug}`}
-              className="block"
+              className="block "
             >
               <div className="p-3 rounded transition-colors hover:bg-gray-50">
                 <Group wrap="nowrap" align="flex-start">

@@ -6,7 +6,7 @@ const getInitials = (firstName: string, lastName: string) => {
   return `${firstName[0]}${lastName[0]}`.toUpperCase();
 };
 
-export function UserProfile() {
+export function UserProfile({ isHome }: { isHome: boolean }) {
   const { user, roles, isLoading, handleSignOut } = useUserProfile();
 
   if (isLoading) {
@@ -28,15 +28,16 @@ export function UserProfile() {
   }
 
   return (
-    <div className="relative group">
+    <div className="relative group p-5">
       <div className="flex items-center cursor-pointer">
         {user.profile_photo_url ? (
-          <div className="w-10 h-10 rounded-lg overflow-hidden">
+          <div className="w-10 h-10 rounded-full overflow-hidden">
             <Image
               src={user.profile_photo_url}
               alt={user.name}
-              width={40}
-              height={40}
+              width={100}
+              height={100}
+              quality={100}
               className="w-full h-full object-cover"
             />
           </div>
@@ -45,18 +46,23 @@ export function UserProfile() {
             {getInitials(user.first_name, user.last_name)}
           </div>
         )}
+        {!isHome && <div className="ml-2 hidden md:block">
+          <p className="text-xs font-semibold text-gray-900">{user.first_name}</p>
+          <p className="text-xs text-gray-500 ">{user.email}</p>
+        </div>}
       </div>
 
-      <div className="invisible group-hover:visible opacity-0 group-hover:opacity-100 absolute right-0 mt-2 w-100 bg-white rounded-lg shadow-lg py-2 z-50 transition-all duration-300 ease-in-out">
+      <div className="invisible group-hover:visible opacity-0 group-hover:opacity-100 absolute p-3 right-0 mt-2 w-100 bg-white rounded-lg shadow-lg py-3 z-50 transition-all duration-300 ease-in-out">
         <div className="px-4 py-3 border-b border-gray-100">
           <div className="flex items-center flex-1 gap-3">
             {user.profile_photo_url ? (
-              <div className="w-10 h-10 rounded-lg overflow-hidden">
+              <div className="w-12 h-12 rounded-lg overflow-hidden">
                 <Image
                   src={user.profile_photo_url}
                   alt={user.name}
-                  width={40}
-                  height={40}
+                  width={100}
+                  height={100}
+                  quality={100}
                   className="w-full h-full object-cover"
                 />
               </div>
@@ -66,9 +72,27 @@ export function UserProfile() {
               </div>
             )}
             <div>
-              <p className="text-sm font-bold text-gray-900">
+            <div className="flex justify-between">
+            <p className="text-sm font-bold text-gray-900">
                 {user.first_name} {user.last_name}
               </p>
+{roles.includes('insighter') && (
+  <span className="bg-[#F0F8FF] text-[#0978B9] text-xs font-bold me-2 px-1.5  rounded-sm dark:bg-blue-900 dark:text-blue-300 h-5">
+    Insighter
+  </span>
+)}
+{(roles.includes('company') || roles.includes('company-insighter')) && (
+  <span className="bg-yellow-100 text-yellow-800 text-xs font-medium me-2 px-2.5 py-0.5 rounded-sm dark:bg-yellow-900 dark:text-yellow-300 h-5">
+    {roles.includes('company-insighter') ? 'Company-Insighter' : 'Company'}
+  </span>
+)}
+{roles.includes('client') && !roles.some(role => ['insighter', 'company', 'company-insighter'].includes(role)) && (
+  <span className="bg-green-100 text-green-800 text-xs font-medium me-2 px-2.5 py-0.5 rounded-sm dark:bg-green-900 dark:text-green-300 h-5">
+    Client
+  </span>
+)}
+              
+            </div>
               <p className="text-xs font-semibold text-gray-400">{user.email}</p>
             </div>
           </div>
@@ -77,7 +101,7 @@ export function UserProfile() {
         <div className="py-1">
           <Link
             href="https://foresighta.vercel.app/app/profile/overview"
-            className="block px-4 py-2 text-sm font-semibold text-slate-500 hover:bg-gray-100"
+            className="block px-4 py-3 text-sm font-semibold text-slate-900 hover:bg-gray-100"
           >
             My Profile
           </Link>
@@ -86,10 +110,10 @@ export function UserProfile() {
             <>
               <div className="relative group/dashboard">
                 <Link href="https://foresighta.vercel.app/app/insighter-dashboard/my-dashboard">
-                  <div className="block px-4 py-2 text-sm font-semibold text-slate-500 hover:bg-gray-100 cursor-pointer flex items-center justify-between">
+                  <div className="block px-4 py-2.5 text-sm font-semibold text-slate-900 hover:bg-gray-100 cursor-pointer flex items-center justify-between">
                     Dashboard
                     <svg
-                      className="w-4 h-4 ml-1"
+                      className="w-3 h-3 ml-1"
                       fill="none"
                       stroke="currentColor"
                       viewBox="0 0 24 24"
@@ -104,17 +128,17 @@ export function UserProfile() {
                   </div>
                 </Link>
                 <div className="absolute left-full top-0 ml-0.5 invisible group-hover/dashboard:visible opacity-0 group-hover/dashboard:opacity-100 transition-all duration-200 ease-in-out">
-                  <div className="bg-white rounded-lg shadow-lg py-2 w-48">
-                    <Link href="https://foresighta.vercel.app/app/insighter-dashboard/my-knowledge/general" className="block px-4 py-2 text-sm font-semibold text-slate-500 hover:bg-gray-100">
+                  <div className="bg-white rounded-lg shadow-lg py-2.5 w-48">
+                    <Link href="https://foresighta.vercel.app/app/insighter-dashboard/my-knowledge/general" className="block px-4 py-2.5 text-sm font-semibold text-slate-900 hover:bg-gray-100">
                       General
                     </Link>
-                    <Link href="https://foresighta.vercel.app/app/insighter-dashboard/my-knowledge/scheduled" className="block px-4 py-2 text-sm font-semibold text-slate-500 hover:bg-gray-100">
+                    <Link href="https://foresighta.vercel.app/app/insighter-dashboard/my-knowledge/scheduled" className="block px-4 py-2.5 text-sm font-semibold text-slate-900 hover:bg-gray-100">
                       Scheduled
                     </Link>
-                    <Link href="https://foresighta.vercel.app/app/insighter-dashboard/my-knowledge/posted" className="block px-4 py-2 text-sm font-semibold text-slate-500 hover:bg-gray-100">
+                    <Link href="https://foresighta.vercel.app/app/insighter-dashboard/my-knowledge/posted" className="block px-4 py-2.5 text-sm font-semibold text-slate-900 hover:bg-gray-100">
                       Posted
                     </Link>
-                    <Link href="https://foresighta.vercel.app/app/insighter-dashboard/my-knowledge/packages" className="block px-4 py-2 text-sm font-semibold text-slate-500 hover:bg-gray-100">
+                    <Link href="https://foresighta.vercel.app/app/insighter-dashboard/my-knowledge/packages" className="block px-4 py-2.5 text-sm font-semibold text-slate-900 hover:bg-gray-100">
                       Packages
                     </Link>
                   </div>
@@ -122,18 +146,18 @@ export function UserProfile() {
               </div>
               <Link
                 href="https://foresighta.vercel.app/app/add-knowledge/stepper"
-                className="block px-4 py-2 text-sm font-semibold text-sky-600 hover:bg-gray-100"
+                className="block px-4 py-2.5 text-sm font-semibold text-sky-600 hover:bg-gray-100"
               >
-               + Add Knowledge
+                Add Knowledge +
               </Link>
             </>
           )}
 
           <div className="relative group/settings">
-            <div className="block px-4 py-2 text-sm font-semibold text-slate-500 hover:bg-gray-100 cursor-pointer flex items-center justify-between">
+            <div className="block px-4 py-2.5 text-sm font-semibold text-slate-900 hover:bg-gray-100 cursor-pointer flex items-center justify-between">
               Account Settings
               <svg
-                className="w-4 h-4 ml-1"
+                className="w-3 h-3 ml-1"
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
@@ -147,15 +171,15 @@ export function UserProfile() {
               </svg>
             </div>
             <div className="absolute left-full top-0 ml-0.5 invisible group-hover/settings:visible opacity-0 group-hover/settings:opacity-100 transition-all duration-200 ease-in-out">
-              <div className="bg-white rounded-lg shadow-lg py-2 w-48">
-                <Link href="https://foresighta.vercel.app/app/profile/settings/personal-info" className="block px-4 py-2 text-sm font-semibold text-slate-500 hover:bg-gray-100">
+              <div className="bg-white rounded-lg shadow-lg py-2.5 w-48">
+                <Link href="https://foresighta.vercel.app/app/profile/settings/personal-info" className="block px-4 py-2.5 text-sm font-semibold text-slate-500 hover:bg-gray-100">
                   Personal Info
                 </Link>
-                <Link href="https://foresighta.vercel.app/app/profile/settings/reset-password" className="block px-4 py-2 text-sm font-semibold text-slate-500 hover:bg-gray-100">
+                <Link href="https://foresighta.vercel.app/app/profile/settings/reset-password" className="block px-4 py-2.5 text-sm font-semibold text-slate-500 hover:bg-gray-100">
                   Reset Password
                 </Link>
                 {roles.includes('insighter') && (
-                  <Link href="https://foresighta.vercel.app/app/insighter-dashboard/account-settings/general-settings" className="block px-4 py-2 text-sm font-semibold text-slate-500 hover:bg-gray-100">
+                  <Link href="https://foresighta.vercel.app/app/insighter-dashboard/account-settings/general-settings" className="block px-4 py-2.5 text-sm font-semibold text-slate-500 hover:bg-gray-100">
                     Settings
                   </Link>
                 )}
@@ -166,7 +190,7 @@ export function UserProfile() {
           {roles.includes('client') && !roles.includes('insighter') && !roles.includes('company') && (
             <Link
               href="https://foresighta.vercel.app/app/insighter-register/vertical"
-              className="block px-4 py-2 text-sm font-semibold bg-clip-text text-transparent bg-gradient-to-r from-blue-500 to-teal-400"
+              className="block px-4 py-2.5 text-sm font-semibold bg-clip-text text-transparent bg-gradient-to-r from-blue-500 to-teal-400"
             >
               Become an Insighter
             </Link>
@@ -175,7 +199,7 @@ export function UserProfile() {
           <div className="border-t border-slate-100">
             <button
               onClick={handleSignOut}
-              className="block w-full text-left px-4 py-2 text-sm font-semibold text-slate-500 hover:bg-gray-100"
+              className="block w-full text-left px-4 py-2.5 text-sm font-semibold text-slate-900 hover:bg-gray-100"
             >
               Sign Out
             </button>
