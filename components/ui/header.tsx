@@ -132,11 +132,11 @@ export default function Header() {
 
   return (
     <header className="absolute top-0 w-full z-30">
-      <div className="max-w-6xl mx-auto px-4 sm:px-6">
+      <div className=" mx-auto px-4 sm:px-6">
         <div className="flex items-center justify-between h-16 md:h-20">
 
           {/* Site branding */}
-          <div className="w-[200px]">
+          <div className="w-[140px]">
             <Logo />
           </div>
 
@@ -149,7 +149,7 @@ export default function Header() {
                   radius="sm" shadow="md" withinPortal>
                   <HoverCard.Target>
                     <Link href={'/en/all-industries'}>
-                      <button className="font-medium text-sm text-slate-300 hover:text-white mx-4 lg:mx-5 transition duration-150 ease-in-out flex items-center">
+                      <button className="font-medium text-xs text-slate-300 hover:text-white mx-4 lg:mx-5 transition duration-150 ease-in-out flex items-center">
                         <span className="mr-1">{t('navigation.industries')}</span>
                         <IconChevronDown size={16} />
                       </button>
@@ -213,19 +213,19 @@ export default function Header() {
                 </HoverCard>
               </li>
               <li className=''>
-                <Link className="font-medium text-sm text-gray-200 hover:text-gray-100 mx-4 lg:mx-5 transition duration-150 ease-in-out" href="/en/industries/report">{t('navigation.reports')}</Link>
+                <Link className="font-medium text-xs text-gray-200 hover:text-gray-100 mx-4 lg:mx-5 transition duration-150 ease-in-out" href="/en/industries/report">{t('navigation.reports')}</Link>
               </li>
               <li className=''>
-                <Link className="font-medium text-sm text-gray-200 hover:text-gray-100 mx-4 lg:mx-5 transition duration-150 ease-in-out" href="/en/industries/data">{t('navigation.data')}</Link>
+                <Link className="font-medium text-xs text-gray-200 hover:text-gray-100 mx-4 lg:mx-5 transition duration-150 ease-in-out" href="/en/industries/data">{t('navigation.data')}</Link>
               </li>
               <li className=''>
-                <Link className="font-medium text-sm text-gray-200 hover:text-gray-100 mx-4 lg:mx-5 transition duration-150 ease-in-out" href="/en/industries/insight">{t('navigation.insights')}</Link>
+                <Link className="font-medium text-xs text-gray-200 hover:text-gray-100 mx-4 lg:mx-5 transition duration-150 ease-in-out" href="/en/industries/insight">{t('navigation.insights')}</Link>
               </li>
               <li className=''>
-                <Link className="font-medium text-sm text-gray-200 hover:text-gray-100 mx-4 lg:mx-5 transition duration-150 ease-in-out" href="/en/industries/manual">{t('navigation.manuals')}</Link>
+                <Link className="font-medium text-xs text-gray-200 hover:text-gray-100 mx-4 lg:mx-5 transition duration-150 ease-in-out" href="/en/industries/manual">{t('navigation.manuals')}</Link>
               </li>
               <li className=''>
-                <Link className="font-medium text-sm text-gray-200 hover:text-gray-100 mx-4 lg:mx-5 transition duration-150 ease-in-out" href="/en/industries/course">{t('navigation.courses')}</Link>
+                <Link className="font-medium text-xs text-gray-200 hover:text-gray-100 mx-4 lg:mx-5 transition duration-150 ease-in-out" href="/en/industries/course">{t('navigation.courses')}</Link>
               </li>
             </ul>
           </nav>
@@ -251,7 +251,7 @@ export default function Header() {
               <div className="w-16 h-8 bg-slate-700/30 animate-pulse rounded"></div>
             ) : user ? (
               <div className="flex items-center space-x-4">
-                <UserProfile />
+                <UserProfile isHome={true} />
               </div>
             ) : (
               <>
