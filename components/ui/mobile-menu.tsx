@@ -12,6 +12,7 @@ export default function MobileMenu() {
   const t = useTranslations('Header');
   const pathname = usePathname();
   const router = useRouter();
+  const isRtl = pathname.startsWith('/ar');
 
   // Function to switch locale
   const switchLocale = (locale: string) => {
@@ -82,10 +83,10 @@ export default function MobileMenu() {
       <nav
         id="mobile-nav"
         ref={mobileNav}
-        className="absolute top-full z-20 left-0 w-full px-4 sm:px-6 overflow-hidden transition-all duration-300 ease-in-out"
+        className={`absolute top-full z-20 ${isRtl ? 'right-0' : 'left-0'} w-full px-4 sm:px-6 overflow-hidden transition-all duration-300 ease-in-out`}
         style={mobileNavOpen ? { maxHeight: mobileNav.current?.scrollHeight, opacity: 1 } : { maxHeight: 0, opacity: 0.8 }}
       >
-        <ul className="border border-transparent [background:linear-gradient(theme(colors.slate.900),_theme(colors.slate.900))_padding-box,_conic-gradient(theme(colors.slate.400),_theme(colors.slate.700)_25%,_theme(colors.slate.700)_75%,_theme(colors.slate.400)_100%)_border-box] rounded-lg px-4 py-1.5">
+        <ul className="border border-transparent [background:linear-gradient(theme(colors.slate.900),_theme(colors.slate.900))_padding-box,_conic-gradient(theme(colors.slate.400),_theme(colors.slate.700)_25%,_theme(colors.slate.700)_75%,_theme(colors.slate.400)_100%)_border-box] rounded-lg px-4 py-1.5 max-w-full">
           <li>
             <Link className="flex font-medium text-sm text-slate-300 hover:text-white py-1.5" href="/en/all-industries">{t('navigation.industries')}</Link>
           </li>
@@ -112,7 +113,7 @@ export default function MobileMenu() {
               }}
               className="flex items-center font-medium text-sm text-slate-300 hover:text-white py-1.5 w-full text-left"
             >
-              <IconLanguage size={18} className="mr-2" />
+              <IconLanguage size={18} className={`${isRtl ? 'ml-2' : 'mr-2'}`} />
               <span>
                 {pathname.split('/')[1] === 'en' ? t('language.switchToArabic') : t('language.switchToEnglish')}
               </span>

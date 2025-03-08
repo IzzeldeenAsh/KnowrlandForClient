@@ -25,14 +25,9 @@ const logos = [
 ];
 
 export default function Clients() {
-  const locale = useLocale()
-  const isRTL = locale === 'ar'
-  
-  const gradientMask = isRTL
-    ? '[mask-image:_linear-gradient(to_left,transparent_0,_black_128px,_black_calc(100%-128px),transparent_100%)]'
-    : '[mask-image:_linear-gradient(to_right,transparent_0,_black_128px,_black_calc(100%-128px),transparent_100%)]'
-  
-  const scrollDirection = isRTL ? 'animate-infinite-scroll-rtl' : 'animate-infinite-scroll'
+  // Always use LTR for this component regardless of page locale
+  const gradientMask = '[mask-image:_linear-gradient(to_right,transparent_0,_black_128px,_black_calc(100%-128px),transparent_100%)]'
+  const scrollDirection = 'animate-infinite-scroll'
 
   return (
     <section>
@@ -44,7 +39,8 @@ export default function Clients() {
 
         <div className="py-12">
           <div className="overflow-hidden">
-            <div className={`inline-flex w-full flex-nowrap overflow-hidden ${gradientMask}`}>
+            {/* Force LTR direction on this component */}
+            <div className={`inline-flex w-full flex-nowrap overflow-hidden ${gradientMask} ltr`} dir="ltr">
               <ul className={`flex ${scrollDirection} items-center justify-center md:justify-start [&_img]:max-w-none [&_li]:mx-8`}>
                 {logos.map((logo, index) => (
                   <li key={index}>

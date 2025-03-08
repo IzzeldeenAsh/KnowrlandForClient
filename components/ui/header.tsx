@@ -132,24 +132,24 @@ export default function Header() {
 
   return (
     <header className="absolute top-0 w-full z-30">
-      <div className=" mx-auto px-4 sm:px-6">
+      <div className="mx-auto px-4 sm:px-6 max-w-full overflow-hidden">
         <div className="flex items-center justify-between h-16 md:h-20">
 
           {/* Site branding */}
-          <div className="w-[140px]">
+          <div className="flex-shrink-0 w-[140px]">
             <Logo />
           </div>
 
           {/* Desktop navigation */}
-          <nav className="hidden md:flex flex-1">
+          <nav className="hidden md:flex flex-1 overflow-hidden">
             <ul className="flex justify-center items-center w-full">
-              <li className=''>
+              <li>
                 <HoverCard  
                   position='bottom'
                   radius="sm" shadow="md" withinPortal>
                   <HoverCard.Target>
                     <Link href={'/en/all-industries'}>
-                      <button className="font-medium text-xs text-slate-300 hover:text-white mx-4 lg:mx-5 transition duration-150 ease-in-out flex items-center">
+                      <button className="font-medium text-sm text-slate-300 hover:text-white mx-2 lg:mx-4 transition duration-150 ease-in-out flex items-center">
                         <span className="mr-1">{t('navigation.industries')}</span>
                         <IconChevronDown size={16} />
                       </button>
@@ -212,35 +212,35 @@ export default function Header() {
                   </HoverCard.Dropdown>
                 </HoverCard>
               </li>
-              <li className=''>
-                <Link className="font-medium text-xs text-gray-200 hover:text-gray-100 mx-4 lg:mx-5 transition duration-150 ease-in-out" href="/en/industries/report">{t('navigation.reports')}</Link>
+              <li>
+                <Link className="font-medium text-sm text-gray-200 hover:text-gray-100 mx-2 lg:mx-4 transition duration-150 ease-in-out" href="/en/industries/report">{t('navigation.reports')}</Link>
               </li>
-              <li className=''>
-                <Link className="font-medium text-xs text-gray-200 hover:text-gray-100 mx-4 lg:mx-5 transition duration-150 ease-in-out" href="/en/industries/data">{t('navigation.data')}</Link>
+              <li>
+                <Link className="font-medium text-sm text-gray-200 hover:text-gray-100 mx-2 lg:mx-4 transition duration-150 ease-in-out" href="/en/industries/data">{t('navigation.data')}</Link>
               </li>
-              <li className=''>
-                <Link className="font-medium text-xs text-gray-200 hover:text-gray-100 mx-4 lg:mx-5 transition duration-150 ease-in-out" href="/en/industries/insight">{t('navigation.insights')}</Link>
+              <li>
+                <Link className="font-medium text-sm text-gray-200 hover:text-gray-100 mx-2 lg:mx-4 transition duration-150 ease-in-out" href="/en/industries/insight">{t('navigation.insights')}</Link>
               </li>
-              <li className=''>
-                <Link className="font-medium text-xs text-gray-200 hover:text-gray-100 mx-4 lg:mx-5 transition duration-150 ease-in-out" href="/en/industries/manual">{t('navigation.manuals')}</Link>
+              <li>
+                <Link className="font-medium text-sm text-gray-200 hover:text-gray-100 mx-2 lg:mx-4 transition duration-150 ease-in-out" href="/en/industries/manual">{t('navigation.manuals')}</Link>
               </li>
-              <li className=''>
-                <Link className="font-medium text-xs text-gray-200 hover:text-gray-100 mx-4 lg:mx-5 transition duration-150 ease-in-out" href="/en/industries/course">{t('navigation.courses')}</Link>
+              <li>
+                <Link className="font-medium text-sm text-gray-200 hover:text-gray-100 mx-2 lg:mx-4 transition duration-150 ease-in-out" href="/en/industries/course">{t('navigation.courses')}</Link>
               </li>
             </ul>
           </nav>
 
           {/* Desktop sign in links */}
-          <ul className="w-[200px] flex justify-end items-center">
+          <ul className="flex justify-end items-center flex-shrink-0">
             {/* Language Switch Button */}
-            <li className="mx-4">
+            <li className="mr-2 md:mr-4">
               <div className="flex items-center">
                 <button
                   onClick={() => switchLocale(pathname.split('/')[1] === 'en' ? 'ar' : 'en')}
-                  className="flex items-center text-slate-300 hover:text-white transition duration-150 ease-in-out"
+                  className="mx-2 flex items-center text-slate-300 hover:text-white transition duration-150 ease-in-out"
                 >
-                  <IconLanguage size={20} className="mx-1" />
-                  <span className="text-sm font-medium">
+                  <IconLanguage size={18} className="mx-1" />
+                  <span className="text-sm md:text-sm font-medium whitespace-nowrap">
                     {pathname.split('/')[1] === 'en' ? t('language.switchToArabic') : t('language.switchToEnglish')}
                   </span>
                 </button>
@@ -250,19 +250,17 @@ export default function Header() {
             {isLoading ? (
               <div className="w-16 h-8 bg-slate-700/30 animate-pulse rounded"></div>
             ) : user ? (
-              <div className="flex items-center space-x-4">
+              <li>
                 <UserProfile isHome={true} />
-              </div>
+              </li>
             ) : (
-              <>
-                <li className="ml-6">
-                  <Link className="btn-sm text-slate-300 hover:text-white transition duration-150 ease-in-out w-full group [background:linear-gradient(theme(colors.slate.900),_theme(colors.slate.900))_padding-box,_conic-gradient(theme(colors.slate.400),_theme(colors.slate.700)_25%,_theme(colors.slate.700)_75%,_theme(colors.slate.400)_100%)_border-box] relative before:absolute before:inset-0 before:bg-slate-800/30 before:rounded-full before:pointer-events-none" href="https://foresighta.vercel.app/auth/login">
-                    <span className="relative inline-flex items-center">
-                      {t('auth.login')} <span className="tracking-normal text-blue-500 group-hover:translate-x-0.5 transition-transform duration-150 ease-in-out mx-1">-&gt;</span>
-                    </span>
-                  </Link>
-                </li>
-              </>
+              <li>
+                <Link className="btn-sm text-slate-300 hover:text-white transition duration-150 ease-in-out group [background:linear-gradient(theme(colors.slate.900),_theme(colors.slate.900))_padding-box,_conic-gradient(theme(colors.slate.400),_theme(colors.slate.700)_25%,_theme(colors.slate.700)_75%,_theme(colors.slate.400)_100%)_border-box] relative before:absolute before:inset-0 before:bg-slate-800/30 before:rounded-full before:pointer-events-none" href="https://foresighta.vercel.app/auth/login">
+                  <span className="relative inline-flex items-center">
+                    {t('auth.login')} <span className="tracking-normal text-blue-500 group-hover:translate-x-0.5 transition-transform duration-150 ease-in-out ml-1">-&gt;</span>
+                  </span>
+                </Link>
+              </li>
             )}
           </ul>
 
