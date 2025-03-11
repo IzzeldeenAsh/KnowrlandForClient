@@ -5,6 +5,14 @@ import HeaderLight from '@/components/ui/header-light'
 import FooterLight from '@/components/ui/footer-light'
 import Breadcrumb from '@/components/ui/breadcrumb'
 
+interface Params {
+  locale: string;
+}
+
+interface Props {
+  params: Promise<Params>;
+}
+
 export const metadata: Metadata = {
   title: 'All Industries - ForesightA',
   description: 'Explore all industries and their sub-categories.',
@@ -46,27 +54,29 @@ async function getAllIndustries(locale: string) {
   }
 }
 
-export default async function AllIndustries({ params }: { params: { locale: string } }) {
-  const { locale } = params;
+export default async function AllIndustries({ params }: Props) {
+  const { locale = 'en' } = await params;
   const { data, error } = await getAllIndustries(locale)
   
   const mockIndustries = [
     {
       id: 1,
       name: "Technology",
+      slug: "technology",
       children: [
-        { id: 1, name: "Software Development" },
-        { id: 2, name: "Cloud Computing" },
-        { id: 3, name: "Artificial Intelligence" },
+        { id: 1, name: "Software Development", slug: "software-development" },
+        { id: 2, name: "Cloud Computing", slug: "cloud-computing" },
+        { id: 3, name: "Artificial Intelligence", slug: "artificial-intelligence" },
       ]
     },
     {
       id: 2,
       name: "Healthcare",
+      slug: "healthcare",
       children: [
-        { id: 4, name: "Medical Devices" },
-        { id: 5, name: "Pharmaceuticals" },
-        { id: 6, name: "Healthcare IT" },
+        { id: 4, name: "Medical Devices", slug: "medical-devices" },
+        { id: 5, name: "Pharmaceuticals", slug: "pharmaceuticals" },
+        { id: 6, name: "Healthcare IT", slug: "healthcare-it" },
       ]
     },
   ]
