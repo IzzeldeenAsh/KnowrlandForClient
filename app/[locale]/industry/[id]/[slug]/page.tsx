@@ -31,13 +31,14 @@ interface IndustryDetails {
 interface Params {
   id: string;
   slug: string;
+  locale?: string;
 }
 
 interface Props {
   params: Promise<Params>;
 }
 
-async function fetchIndustryData(id: string, slug: string) {
+async function fetchIndustryData(id: string, slug: string, locale: string = 'en') {
   const response = await fetch(
     `https://api.foresighta.co/api/industries/${id}/${slug}`,
     {
@@ -45,7 +46,7 @@ async function fetchIndustryData(id: string, slug: string) {
       headers: {
         "Content-Type": "application/json",
         "Accept": "application/json",
-        "Accept-Language": "en",
+        "Accept-Language": locale,
       },
       body: JSON.stringify({ top_topic: 2 }),
     }
@@ -68,10 +69,10 @@ async function fetchIndustryData(id: string, slug: string) {
 
 // Generate metadata for SEO
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
- const { id, slug } = await params
+ const { id, slug, locale = 'en' } = await params
 
   try {
-    const { data } = await fetchIndustryData(id, slug)
+    const { data } = await fetchIndustryData(id, slug, locale)
     
     return {
       title: `${data.name} Industry Analysis | Foresighta`,
@@ -91,10 +92,10 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 }
 
 export default async function IndustryPage({ params }: Props) {
-const { id, slug } = await params
+  const { id, slug, locale = 'en' } = await params
 
   try {
-    const { data: industry } = await fetchIndustryData(id, slug)
+    const { data: industry } = await fetchIndustryData(id, slug, locale)
     const breadcrumbItems = await fetchBreadcrumb('industry', parseInt(id))
 
     return (
@@ -170,7 +171,7 @@ const { id, slug } = await params
                   data-aos="fade-up"
                 >
                     <div className="space-y-2">
-                  <Link href={`/en/sub-industry/${child.id}/${child.slug}`} className="block">
+                  <Link href={`/${locale}/sub-industry/${child.id}/${child.slug}`} className="block">
                       <div className="flex items-center gap-2">
                         <IndustryIcon />
                         <h3 className="text-sm font-semibold text-gray-900 hover:text-blue-600">
@@ -181,7 +182,7 @@ const { id, slug } = await params
                       {child.topic.length > 0 ? (
                         <ul className="space-y-1">
                           {child.topic.map((topic: Topic) => (
-                            <Link href={`/en/topic/${topic.id}/${topic.slug}`} key={topic.id} className="block">
+                            <Link href={`/${locale}/topic/${topic.id}/${topic.slug}`} key={topic.id} className="block">
                             <li
                               key={topic.id}
                               className="text-xs text-gray-600 hover:text-blue-600 transition-colors flex items-center"

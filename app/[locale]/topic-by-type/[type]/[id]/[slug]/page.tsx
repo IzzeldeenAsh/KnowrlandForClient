@@ -26,6 +26,7 @@ interface Props {
     type: string;
     id: string;
     slug: string;
+    locale?: string;
   }>;
 }
 
@@ -43,6 +44,7 @@ export default function TopicByTypePage({ params }: Props) {
   const type = resolvedParams.type as IndustryType;
   const id = parseInt(resolvedParams.id, 10);
   const slug = resolvedParams.slug;
+  const locale = resolvedParams.locale || 'en';
 
   useEffect(() => {
     AOS.init({
@@ -122,7 +124,7 @@ export default function TopicByTypePage({ params }: Props) {
                    className={cardStyles.card}
                    data-aos="fade-up"
                  >
-                   <Link href={`/en/knowledge/${item.type}/${item.slug}`} className="block">
+                   <Link href={`/${locale}/knowledge/${item.type}/${item.slug}`} className="block">
                      <Group gap="xs">
                        {item.type === 'report' && <ReportIcon width={24} height={24} />}
                        {item.type === 'manual' && <ManualIcon width={24} height={24} />}

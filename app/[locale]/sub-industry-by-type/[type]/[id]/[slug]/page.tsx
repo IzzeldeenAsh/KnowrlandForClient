@@ -35,6 +35,7 @@ interface Props {
     type: string;
     id: string;
     slug: string;
+    locale?: string;
   }>;
 }
 
@@ -47,6 +48,7 @@ export default function SubIndustryByTypePage({ params }: Props) {
   const type = resolvedParams.type as IndustryType;
   const id = parseInt(resolvedParams.id, 10);
   const slug = resolvedParams.slug;
+  const locale = resolvedParams.locale || 'en';
 
   useEffect(() => {
     AOS.init({
@@ -142,7 +144,7 @@ export default function SubIndustryByTypePage({ params }: Props) {
                     data-aos="fade-up"
                   >
                     <div className="space-y-3">
-                      <Link href={`/en/topic-by-type/${type}/${topic.id}/${topic.slug}`} className="block">
+                      <Link href={`/${locale}/topic-by-type/${type}/${topic.id}/${topic.slug}`} className="block">
                         <div className="flex items-center gap-2">
                           <IndustryIcon />
                           <h3 className="text-sm font-semibold text-gray-900 hover:text-blue-600">
@@ -155,12 +157,12 @@ export default function SubIndustryByTypePage({ params }: Props) {
                           <h3 className="text-sm font-bold mb-2">Knowledge</h3>
                           <ul className="space-y-2">
                             {topic.knowledge.map((item: any) => (
-                                <Link href={`/en/knowledge/${item.id}/${item.slug}`} key={item.id} className="block">
-                                  <li className="text-xs text-gray-600 hover:text-blue-600 transition-colors flex items-center">
-                                    <span className="mr-2">•</span>
-                                    {item.title}
-                                  </li>
-                                </Link>
+                              <Link href={`/${locale}/knowledge/${item.id}/${item.slug}`} key={item.id} className="block">
+                                <li className="text-xs text-gray-600 hover:text-blue-600 transition-colors flex items-center">
+                                  <span className="mr-2">•</span>
+                                  {item.title}
+                                </li>
+                              </Link>
                             ))}
                           </ul>
                         </div>

@@ -10,7 +10,7 @@ export const metadata: Metadata = {
   description: 'Explore all industries and their sub-categories.',
 }
 
-async function getAllIndustries() {
+async function getAllIndustries(locale: string) {
   
   const apiUrl = 'https://api.foresighta.co/api/industries'
   
@@ -20,7 +20,7 @@ async function getAllIndustries() {
       headers: {
         "Content-Type": "application/json",
         "Accept": "application/json",
-        "Accept-Language": "en",
+        "Accept-Language": locale,
       },
       body: JSON.stringify({
         top_sub_industry: 10,
@@ -46,8 +46,9 @@ async function getAllIndustries() {
   }
 }
 
-export default async function AllIndustries() {
-  const { data, error } = await getAllIndustries()
+export default async function AllIndustries({ params }: { params: { locale: string } }) {
+  const { locale } = params;
+  const { data, error } = await getAllIndustries(locale)
   
   const mockIndustries = [
     {
@@ -73,7 +74,7 @@ export default async function AllIndustries() {
   const industries = data?.data || mockIndustries
 
   const breadcrumbItems = [
-    { label: 'Industries', href: '/en/all-industries' }
+    { label: 'Industries', href: `/${locale}/all-industries` }
   ]
 
   return (

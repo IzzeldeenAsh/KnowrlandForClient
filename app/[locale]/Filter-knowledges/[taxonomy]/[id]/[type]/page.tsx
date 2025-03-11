@@ -23,6 +23,9 @@ export default function FilterKnowledgesPage() {
   const params = useParams();
   const router = useRouter();
 
+  // Get the current locale from params
+  const locale = params.locale as string || 'en';
+
   // Extract route parameters
   const taxonomyParam = Array.isArray(params.taxonomy)
     ? params.taxonomy[0]
@@ -95,7 +98,7 @@ export default function FilterKnowledgesPage() {
               headers: {
                 "Content-Type": "application/json",
                 Accept: "application/json",
-                "Accept-Language": "en",
+                "Accept-Language": locale,
               },
             }
           );
@@ -122,7 +125,7 @@ export default function FilterKnowledgesPage() {
       };
       fetchSubIndustryDetails();
     }
-  }, [taxonomy, id]);
+  }, [taxonomy, id, locale]);
 
   // For taxonomy "topic": fetch topic details using the dedicated endpoint.
   // This returns topic details along with its parent sub‑industry.
@@ -136,7 +139,7 @@ export default function FilterKnowledgesPage() {
               headers: {
                 'Content-Type': 'application/json',
                 Accept: 'application/json',
-                'Accept-Language': 'en',
+                'Accept-Language': locale,
               },
             }
           );
@@ -153,7 +156,7 @@ export default function FilterKnowledgesPage() {
                 headers: {
                   "Content-Type": "application/json",
                   Accept: "application/json",
-                  "Accept-Language": "en",
+                  "Accept-Language": locale,
                 },
               }
             );
@@ -172,7 +175,7 @@ export default function FilterKnowledgesPage() {
       };
       fetchTopicDetails();
     }
-  }, [taxonomy, id]);
+  }, [taxonomy, id, locale]);
 
   // ---------------- Fetch Sub‑Industries List ----------------
   // For "industry" mode, use the current industry id.
@@ -193,7 +196,7 @@ export default function FilterKnowledgesPage() {
             headers: {
               "Content-Type": "application/json",
               Accept: "application/json",
-              "Accept-Language": "en",
+              "Accept-Language": locale,
             },
           }
         );
@@ -206,7 +209,7 @@ export default function FilterKnowledgesPage() {
       }
     };
     fetchSubIndustries();
-  }, [taxonomy, id, parentIndustry]);
+  }, [taxonomy, id, parentIndustry, locale]);
 
   // ---------------- Fetch Topic List ----------------
   // For both "sub_industry" and "topic" taxonomies, fetch topics from the sub‑industry.
@@ -228,7 +231,7 @@ export default function FilterKnowledgesPage() {
                 headers: {
                   'Content-Type': 'application/json',
                   Accept: 'application/json',
-                  'Accept-Language': 'en',
+                  'Accept-Language': locale,
                 },
               }
             );
@@ -243,7 +246,7 @@ export default function FilterKnowledgesPage() {
         fetchTopics();
       }
     }
-  }, [taxonomy, id, parentSubIndustry]);
+  }, [taxonomy, id, parentSubIndustry, locale]);
 
   // ---------------- Fetch Knowledge Items ----------------
   const { response, isLoading, error: knowledgeError } = useKnowledge({
@@ -271,7 +274,7 @@ export default function FilterKnowledgesPage() {
       setSelectedTopic('');
       const selected = industries.find((industry) => industry.slug === value);
       if (selected) {
-        router.push(`/en/filter-knowledges/industry/${selected.id}/${selectedKnowledgeType}`);
+        router.push(`/${locale}/filter-knowledges/industry/${selected.id}/${selectedKnowledgeType}`);
       }
     }
   };
@@ -292,7 +295,7 @@ export default function FilterKnowledgesPage() {
         }
       } else {
         if (selectedSub) {
-          router.push(`/en/filter-knowledges/sub_industry/${selectedSub.id}/${selectedKnowledgeType}`);
+          router.push(`/${locale}/filter-knowledges/sub_industry/${selectedSub.id}/${selectedKnowledgeType}`);
         }
       }
     }
@@ -304,7 +307,7 @@ export default function FilterKnowledgesPage() {
       setSelectedTopic(value);
       const selectedT = topics.find((t) => t.slug === value);
       if (selectedT) {
-        router.push(`/en/filter-knowledges/topic/${selectedT.id}/${selectedKnowledgeType}`);
+        router.push(`/${locale}/filter-knowledges/topic/${selectedT.id}/${selectedKnowledgeType}`);
       }
     }
   };
