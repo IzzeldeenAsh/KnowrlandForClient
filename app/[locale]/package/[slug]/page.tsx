@@ -83,13 +83,13 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   try {
     const packageData: PackageData = await fetchPackageData(slug, locale);
     return {
-      title: `${packageData.name} Package | Foresighta`,
+      title: `${packageData.name} Package | KNOLDG`,
       description: `Explore the ${packageData.name} package, including exclusive knowledge and insights.`,
     };
   } catch (error) {
     console.error("Metadata generation error:", error);
     return {
-      title: "Package | Foresighta",
+      title: "Package | KNOLDG",
       description: "Exclusive packages and insights",
     };
   }
