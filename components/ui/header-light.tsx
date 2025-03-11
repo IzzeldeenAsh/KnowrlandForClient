@@ -6,8 +6,30 @@ import Logo from "../../public/images/KNOLDG-LOGO-26.png";
 import { IndustriesMenu } from "./header/components/IndustriesMenu";
 import { UserProfile } from "./header/components/UserProfile";
 import Image from "next/image";
+import { IconLanguage } from '@tabler/icons-react';
+import { usePathname } from 'next/navigation';
+import { useRouter } from '@/i18n/routing';
+import { useTranslations } from 'next-intl';
+
 export default function Header() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const pathname = usePathname();
+  const router = useRouter();
+  const t = useTranslations('Header');
+  
+  // Function to switch locale and store in cookie
+  const switchLocale = (locale: string) => {
+    // Set the language preference in a cookie - expires in 1 year
+    document.cookie = `preferred_language=${locale}; max-age=${60 * 60 * 24 * 365}; path=/;`;
+    
+    // Get the current path without locale prefix
+    const currentPath = pathname.split('/').slice(2).join('/');
+    
+    // Navigate to the same route with the new locale
+    // If we're on the home page (or empty path), just use '/'
+    const newPath = currentPath ? `/${currentPath}` : '/';
+    router.push(newPath, { locale });
+  };
   
   // Close mobile menu when screen size changes to desktop
   useEffect(() => {
@@ -20,6 +42,26 @@ export default function Header() {
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
   }, [isMobileMenuOpen]);
+
+  // Get preferred language from cookie and set it if needed
+  useEffect(() => {
+    // Helper function to get cookie value
+    const getCookie = (name: string) => {
+      const value = `; ${document.cookie}`;
+      const parts = value.split(`; ${name}=`);
+      if (parts.length === 2) return parts.pop()?.split(';').shift();
+      return null;
+    };
+
+    // Check if user has a preferred language cookie that's different from current
+    const preferredLanguage = getCookie('preferred_language');
+    const currentLanguage = pathname.split('/')[1];
+    
+    if (preferredLanguage && preferredLanguage !== currentLanguage) {
+      // Automatically switch to preferred language
+      switchLocale(preferredLanguage);
+    }
+  }, [pathname, router]);
 
   // Close mobile menu when clicking outside
   useEffect(() => {
@@ -58,7 +100,7 @@ export default function Header() {
       <div className="mx-auto">
         <div className="relative flex h-14 items-center justify-between gap-3 bg-white/90 px-3 shadow-lg shadow-black/[0.03] backdrop-blur-sm">
           <div className="flex flex-1 items-center">
-          <Link href="/en/home">
+          <Link href={`/${pathname.split('/')[1]}/home`}>
             <Image src={Logo} alt="Logo" width={120} height={60} priority className="mx-5" />
           </Link>
             {/* Desktop Navigation */}
@@ -68,22 +110,35 @@ export default function Header() {
                   <IndustriesMenu />
                 </li>
                 <li className="relative group">    
-                  <Link className="font-medium text-xs text-gray-600 hover:text-blue-500 hover:bg-gray-100 px-3.5 py-2.5 rounded-md transition duration-150 ease-in-out" href="/en/industries/report">Reports</Link>
+                  <Link className="font-medium text-xs text-gray-600 hover:text-blue-500 hover:bg-gray-100 px-3.5 py-2.5 rounded-md transition duration-150 ease-in-out" href={`/${pathname.split('/')[1]}/industries/report`}>Reports</Link>
                 </li>
                 <li className="relative group">
-                  <Link className="font-medium text-xs text-gray-600 hover:text-blue-500 hover:bg-gray-100 px-3.5 py-2.5 rounded-md transition duration-150 ease-in-out" href="/en/industries/data">Data</Link>
+                  <Link className="font-medium text-xs text-gray-600 hover:text-blue-500 hover:bg-gray-100 px-3.5 py-2.5 rounded-md transition duration-150 ease-in-out" href={`/${pathname.split('/')[1]}/industries/data`}>Data</Link>
                 </li>
                 <li className="relative group">
-                  <Link className="font-medium text-xs text-gray-600 hover:text-blue-500 hover:bg-gray-100 px-3.5 py-2.5 rounded-md transition duration-150 ease-in-out" href="/en/industries/insight">Insights</Link>
+                  <Link className="font-medium text-xs text-gray-600 hover:text-blue-500 hover:bg-gray-100 px-3.5 py-2.5 rounded-md transition duration-150 ease-in-out" href={`/${pathname.split('/')[1]}/industries/insight`}>Insights</Link>
                 </li>
                 <li className="relative group">
-                  <Link className="font-medium text-xs text-gray-600 hover:text-blue-500 hover:bg-gray-100 px-3.5 py-2.5 rounded-md transition duration-150 ease-in-out" href="/en/industries/manual">Manual</Link>
+                  <Link className="font-medium text-xs text-gray-600 hover:text-blue-500 hover:bg-gray-100 px-3.5 py-2.5 rounded-md transition duration-150 ease-in-out" href={`/${pathname.split('/')[1]}/industries/manual`}>Manual</Link>
                 </li>
               </ul>
             </nav>
           </div>
 
           <div className="flex items-center space-x-4">
+            {/* Language Switcher */}
+            <div className="hidden md:flex items-center">
+              <button
+                onClick={() => switchLocale(pathname.split('/')[1] === 'en' ? 'ar' : 'en')}
+                className="flex items-center text-gray-600 hover:text-blue-500 hover:bg-gray-100 px-3 py-2 rounded-md transition duration-150 ease-in-out"
+              >
+                <IconLanguage size={18} className="mr-1" />
+                <span className="text-xs font-medium">
+                  {pathname.split('/')[1] === 'en' ? 'العربية' : 'English'}
+                </span>
+              </button>
+            </div>
+            
             {/* Mobile Menu Toggle Button */}
             <button
               id="mobile-menu-toggle"
@@ -117,11 +172,26 @@ export default function Header() {
         </div>
         <nav className="mt-5">
           <ul className="space-y-2 px-3">
+            {/* Language Switcher in Mobile Menu */}
+            <li>
+              <button 
+                onClick={() => {
+                  switchLocale(pathname.split('/')[1] === 'en' ? 'ar' : 'en');
+                  setIsMobileMenuOpen(false);
+                }}
+                className="flex w-full items-center px-3 py-2 text-sm font-medium text-gray-600 hover:bg-gray-100 hover:text-blue-500 rounded-md"
+              >
+                <IconLanguage size={18} className="mr-2" />
+                <span>
+                  {pathname.split('/')[1] === 'en' ? 'Switch to Arabic' : 'Switch to English'}
+                </span>
+              </button>
+            </li>
             <li className="py-2">
               <div className="mb-3">
                 <span className="font-medium text-sm text-gray-800 block px-3 py-2">Industries</span>
                 <Link 
-                  href="/en/all-industries" 
+                  href={`/${pathname.split('/')[1]}/all-industries`}
                   className="block px-3 py-2 text-sm text-gray-600 hover:bg-gray-100 hover:text-blue-500 rounded-md"
                   onClick={() => setIsMobileMenuOpen(false)}
                 >
@@ -129,9 +199,11 @@ export default function Header() {
                 </Link>
               </div>
             </li>
+            
+            {/* Existing mobile menu items */}
             <li>
               <Link 
-                href="/en/industries/report" 
+                href={`/${pathname.split('/')[1]}/industries/report`}
                 className="block px-3 py-2 text-sm font-medium text-gray-600 hover:bg-gray-100 hover:text-blue-500 rounded-md"
                 onClick={() => setIsMobileMenuOpen(false)}
               >
@@ -140,7 +212,7 @@ export default function Header() {
             </li>
             <li>
               <Link 
-                href="/en/industries/data" 
+                href={`/${pathname.split('/')[1]}/industries/data`}
                 className="block px-3 py-2 text-sm font-medium text-gray-600 hover:bg-gray-100 hover:text-blue-500 rounded-md"
                 onClick={() => setIsMobileMenuOpen(false)}
               >
@@ -149,7 +221,7 @@ export default function Header() {
             </li>
             <li>
               <Link 
-                href="/en/industries/insight" 
+                href={`/${pathname.split('/')[1]}/industries/insight`}
                 className="block px-3 py-2 text-sm font-medium text-gray-600 hover:bg-gray-100 hover:text-blue-500 rounded-md"
                 onClick={() => setIsMobileMenuOpen(false)}
               >
@@ -158,7 +230,7 @@ export default function Header() {
             </li>
             <li>
               <Link 
-                href="/en/industries/manual" 
+                href={`/${pathname.split('/')[1]}/industries/manual`}
                 className="block px-3 py-2 text-sm font-medium text-gray-600 hover:bg-gray-100 hover:text-blue-500 rounded-md"
                 onClick={() => setIsMobileMenuOpen(false)}
               >

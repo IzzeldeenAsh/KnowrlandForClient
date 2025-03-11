@@ -1,9 +1,15 @@
+'use client'
 import Link from "next/link";
 import Logo from "../../public/images/KNOLDG-LOGO-26.png";
 import Image from "next/image";
 import { useTranslations } from 'next-intl'
+import { usePathname } from 'next/navigation';
+
 export default function Footer({ border = false }: { border?: boolean }) {
   const t = useTranslations('Footer')
+  const pathname = usePathname();
+  const currentLocale = pathname.split('/')[1];
+  
   return (
     <footer style={{backgroundColor:"#F9FAFB"}}>
       <div className="mx-auto max-w-6xl px-4 sm:px-6" >
@@ -13,7 +19,7 @@ export default function Footer({ border = false }: { border?: boolean }) {
         >
           {/* 1st block */}
           <div className="space-y-2 sm:col-span-12 lg:col-span-4">
-          <Link href="/en/home">
+          <Link href={`/${currentLocale}/home`}>
             <Image src={Logo} alt="Logo" width={120} height={60} priority  />
           </Link>
             <div className="text-sm text-gray-600">

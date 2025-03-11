@@ -1,3 +1,5 @@
+"use client"
+
 import Image from "next/image";
 import PageIllustration from "@/components/page-illustration";
 import Avatar01 from "@/public/images/avatar-01.jpg";
@@ -7,8 +9,12 @@ import Avatar04 from "@/public/images/avatar-04.jpg";
 import Avatar05 from "@/public/images/avatar-05.jpg";
 import Avatar06 from "@/public/images/avatar-06.jpg";
 import Link from "next/link";
+import { usePathname } from 'next/navigation';
 
 export default function HeroHomeLight() {
+  const pathname = usePathname();
+  const currentLocale = pathname.split('/')[1];
+
   return (
     <section className="relative">
       <PageIllustration />
@@ -41,7 +47,7 @@ export default function HeroHomeLight() {
                 >
                   <Link
                     className="btn group mb-4 w-full bg-gradient-to-t from-blue-600 to-blue-500 bg-[length:100%_100%] bg-[bottom] text-white shadow hover:bg-[length:100%_150%] sm:mb-0 sm:w-auto"
-                    href="/en/all-industries"
+                    href={`/${currentLocale}/all-industries`}
                   >
                     <span className="relative inline-flex items-center">
                       View Industries{" "}
