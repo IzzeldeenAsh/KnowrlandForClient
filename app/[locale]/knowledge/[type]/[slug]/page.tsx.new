@@ -225,17 +225,7 @@ export default async function KnowledgePage({ params }: Props) {
                 <TabsContent knowledge={knowledge} />
               </div>
               <div className="md:col-span-1">
-                <KnowledgeSideBox 
-                  total_price={knowledge.total_price}
-                  documents={knowledge.documents}
-                  language={knowledge.language}
-                  isic_code={knowledge.isic_code}
-                  hs_code={knowledge.hs_code}
-                  published_at={knowledge.published_at}
-                  economic_blocs={knowledge.economic_blocs}
-                  regions={knowledge.regions}
-                  countries={knowledge.countries}
-                />
+                <KnowledgeSideBox knowledge={knowledge} />
               </div>
             </div>
           </div>
