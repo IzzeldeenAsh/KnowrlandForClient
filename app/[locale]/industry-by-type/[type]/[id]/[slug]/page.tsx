@@ -34,6 +34,7 @@ interface Props {
     type: string;
     id: string;
     slug: string;
+    locale?: string;
   }>;
 }
 
@@ -46,6 +47,7 @@ export default function IndustryByTypePage({ params }: Props) {
   const type = resolvedParams.type as IndustryType;
   const id = parseInt(resolvedParams.id, 10);
   const slug = resolvedParams.slug;
+  const locale = resolvedParams.locale || 'en';
 
   useEffect(() => {
     AOS.init({
@@ -141,7 +143,7 @@ export default function IndustryByTypePage({ params }: Props) {
                     data-aos="fade-up"
                   >
                     <div className="space-y-3">
-                      <Link href={`/en/sub-industry-by-type/${type}/${subIndustry.id}/${subIndustry.slug}`} className="block">
+                      <Link href={`/${locale}/sub-industry-by-type/${type}/${subIndustry.id}/${subIndustry.slug}`} className="block">
                         <div className="flex items-center gap-2">
                           <IndustryIcon />
                           <h3 className="text-sm font-semibold text-gray-900 hover:text-blue-600">
@@ -154,7 +156,7 @@ export default function IndustryByTypePage({ params }: Props) {
                           <h3 className="text-sm font-bold mb-2">Topics</h3>
                           <ul className="space-y-2">
                             {subIndustry.topic.map((topic: Topic) => (
-                              <Link href={`/en/topic-by-type/${type}/${topic.id}/${topic.slug}`} key={topic.id} className="block">
+                              <Link href={`/${locale}/topic-by-type/${type}/${topic.id}/${topic.slug}`} key={topic.id} className="block">
                                 <li className="text-xs text-gray-600 hover:text-blue-600 transition-colors flex items-center">
                                   <span className="mr-2">•</span>
                                   {topic.name}

@@ -1,5 +1,8 @@
+"use client"
+
 import Link from 'next/link';
 import { ChevronRightIcon, HomeIcon } from '@heroicons/react/20/solid';
+import { usePathname } from 'next/navigation';
 
 interface BreadcrumbItem {
   label: string;
@@ -11,12 +14,15 @@ interface BreadcrumbProps {
 }
 
 export default function Breadcrumb({ items }: BreadcrumbProps) {
+  const pathname = usePathname();
+  const currentLocale = pathname.split('/')[1];
+  
   return (
     <nav className="flex" aria-label="Breadcrumb">
       <ol className="flex items-center space-x-2">
         <li>
           <Link
-            href="/"
+            href={`/${currentLocale}`}
             className="text-gray-500 hover:text-gray-700 text-sm font-medium flex items-center"
           >
             <HomeIcon className="h-4 w-4 mr-1" />
@@ -26,7 +32,7 @@ export default function Breadcrumb({ items }: BreadcrumbProps) {
           <li key={item.href} className="flex items-center">
             <ChevronRightIcon className="h-4 w-4 text-gray-400 flex-shrink-0" />
             <Link
-              href={item.label === "Industries" ? "/en/all-industries" : `/en/${item.href}`}
+              href={item.label === "Industries" ? `/${currentLocale}/all-industries` : `/${currentLocale}/${item.href}`}
               className={`ml-2 text-xs font-light ${
                 index === items.length - 1
                   ? 'text-gray-900'

@@ -9,9 +9,11 @@ import DataIcon from "../icons/DataIcon";
 import InsightIcon from "../icons/InsightIcon";
 import ManualIcon from "../icons/ManualIcon";
 import ReportIcon from "../icons/ReportIcon";
+import { useParams } from "next/navigation";
 
 interface KnowledgeListProps {
   knowledge: KnowledgeItem[];
+  locale?: string;
 }
 
 
@@ -38,7 +40,10 @@ function getInitials(name: string) {
     .toUpperCase();
 }
 
-export default function KnowledgeList({ knowledge }: KnowledgeListProps) {
+export default function KnowledgeList({ knowledge, locale }: KnowledgeListProps) {
+  const params = useParams();
+  const currentLocale = locale || (params?.locale as string) || 'en';
+  
   return (
     <div className="max-w-6xl mx-auto">
       {knowledge.map((item) => (
@@ -69,7 +74,7 @@ export default function KnowledgeList({ knowledge }: KnowledgeListProps) {
           </div>
           <Group>
             <div className="flex flex-col ">
-              <Link href={`/en/knowledge/${item.type}/${item.slug}`}>
+              <Link href={`/${currentLocale}/knowledge/${item.type}/${item.slug}`}>
                 <Text className={listStyles.title}>{item.title}</Text>
               </Link>
 

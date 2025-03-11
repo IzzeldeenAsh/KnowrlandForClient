@@ -2,9 +2,12 @@ import Link from "next/link";
 import { IconChevronDown } from '@tabler/icons-react';
 import { HoverCard, Group, Text, Anchor, Divider, SimpleGrid, Button } from '@mantine/core';
 import { useIndustries } from '@/hooks/industries';
+import { usePathname } from 'next/navigation';
 
 export function IndustriesMenu() {
   const { industries } = useIndustries();
+  const pathname = usePathname();
+  const currentLocale = pathname.split('/')[1];
 
   return (
     <HoverCard  position="bottom" radius="sm" shadow="md" withinPortal>
@@ -18,7 +21,7 @@ export function IndustriesMenu() {
       <HoverCard.Dropdown style={{ background: 'white', borderColor: '#e5e7eb' }}>
         <Group justify="space-between" px="md">
           <Text fw={600} c="dark" size="sm">Featured Industries</Text>
-          <Anchor href="/en/all-industries" fz="xs" c="blue">
+          <Anchor href={`/${currentLocale}/all-industries`} fz="xs" c="blue">
             View all industries
           </Anchor>
         </Group>
@@ -29,7 +32,7 @@ export function IndustriesMenu() {
           {industries.map((industry) => (
             <Link 
               key={industry.id} 
-              href={`/en/industry/${industry.id}/${industry.slug}`}
+              href={`/${currentLocale}/industry/${industry.id}/${industry.slug}`}
               className="block "
             >
               <div className="p-3 rounded transition-colors hover:bg-gray-50">
@@ -61,7 +64,7 @@ export function IndustriesMenu() {
             <Button 
               variant="light" 
               component={Link} 
-              href="/en/all-industries"
+              href={`/${currentLocale}/all-industries`}
               className="bg-blue-50 text-blue-600 hover:bg-blue-100"
             >
               Browse All

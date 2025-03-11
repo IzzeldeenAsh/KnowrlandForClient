@@ -38,6 +38,7 @@ interface SubIndustryDetails {
 interface Params {
   id: string;
   slug: string;
+  locale?: string;
 }
 
 interface Props {
@@ -45,7 +46,7 @@ interface Props {
 }
 
 
-async function fetchTopicData(id: string, slug: string) {
+async function fetchTopicData(id: string, slug: string, locale: string = 'en') {
   const response = await fetch(
     `https://api.foresighta.co/api/industries/topics/${id}/${slug}`,
     {
@@ -53,7 +54,7 @@ async function fetchTopicData(id: string, slug: string) {
       headers: {
         "Content-Type": "application/json",
         "Accept": "application/json",
-        "Accept-Language": "en",
+        "Accept-Language": locale,
       },
     }
   )
@@ -75,10 +76,10 @@ async function fetchTopicData(id: string, slug: string) {
 
 // Generate metadata for SEO
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const { id, slug } = await params
+  const { id, slug, locale = 'en' } = await params
 
   try {
-    const { data } = await fetchTopicData(id, slug)
+    const { data } = await fetchTopicData(id, slug, locale)
     
     return {
       title: `${data.name} Topic Analysis | Foresighta`,
@@ -98,10 +99,10 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 }
 
 export default async function TopicPage({ params }: Props) {
-  const { id, slug } = await params
+  const { id, slug, locale = 'en' } = await params
 
   try {
-    const { data: topic } = await fetchTopicData(id, slug)
+    const { data: topic } = await fetchTopicData(id, slug, locale)
     const breadcrumbItems = await fetchBreadcrumb('topic', parseInt(id))
 
     return (

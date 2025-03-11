@@ -33,13 +33,14 @@ interface PackageData {
 
 interface Params {
   slug: string;
+  locale?: string;
 }
 
 interface Props {
   params: Promise<Params>; // Note: params is a Promise
 }
 
-async function fetchPackageData(slug: string) {
+async function fetchPackageData(slug: string, locale: string = 'en') {
   const cookieStore = await cookies();
   const tokenCookie = cookieStore.get("token");
   const token = tokenCookie?.value;
@@ -51,7 +52,7 @@ async function fetchPackageData(slug: string) {
       headers: {
         "Content-Type": "application/json",
         Accept: "application/json",
-        "Accept-Language": "en",
+        "Accept-Language": locale,
         ...(token && { Authorization: `Bearer ${token}` }),
       },
     }
@@ -78,9 +79,9 @@ async function fetchPackageData(slug: string) {
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const { slug } = await params;
+  const { slug, locale = 'en' } = await params;
   try {
-    const packageData: PackageData = await fetchPackageData(slug);
+    const packageData: PackageData = await fetchPackageData(slug, locale);
     return {
       title: `${packageData.name} Package | Foresighta`,
       description: `Explore the ${packageData.name} package, including exclusive knowledge and insights.`,
@@ -96,10 +97,10 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
 export default async function PackagePage({ params }: Props) {
   // Await params to access its properties
-  const { slug } = await params;
+  const { slug, locale = 'en' } = await params;
   
   try {
-    const packageData: PackageData = await fetchPackageData(slug);
+    const packageData: PackageData = await fetchPackageData(slug, locale);
   
     return (
       <div className={styles.container}>

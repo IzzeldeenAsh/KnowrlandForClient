@@ -8,12 +8,14 @@ import ManualIcon from "@/components/icons/ManualIcon";
 import ReportIcon from "@/components/icons/ReportIcon";
 import { formatDistanceToNow } from 'date-fns';
 import cardStyles from './knowledge-card.module.css';
+import { useParams } from 'next/navigation';
 
 interface KnowledgeGridProps {
   knowledge: KnowledgeItem[];
   topicName: string;
   showHeader?: boolean;
   colNumbers?: number;
+  locale?: string;
 }
 export interface KnowledgeItem {
   slug: string;
@@ -44,8 +46,9 @@ function formatPublishedDate(dateString: string) {
   return formatDistanceToNow(date, { addSuffix: true });
 }
 
-export default function KnowledgeGrid({ knowledge, topicName, showHeader=true, colNumbers=3 }: KnowledgeGridProps) {
-
+export default function KnowledgeGrid({ knowledge, topicName, showHeader=true, colNumbers=3, locale }: KnowledgeGridProps) {
+  const params = useParams();
+  const currentLocale = locale || params.locale || 'en';
   
   return (
     <div className="max-w-6xl mx-auto">
@@ -66,7 +69,7 @@ export default function KnowledgeGrid({ knowledge, topicName, showHeader=true, c
             className={cardStyles.card}
             data-aos="fade-up"
           >
-            <Link href={`/en/knowledge/${item.type}/${item.slug}`} className="block">
+            <Link href={`/${currentLocale}/knowledge/${item.type}/${item.slug}`} className="block">
               <Group gap="xs">
                 {item.type === 'report' && <ReportIcon width={24} height={24} />}
                 {item.type === 'manual' && <ManualIcon width={24} height={24} />}

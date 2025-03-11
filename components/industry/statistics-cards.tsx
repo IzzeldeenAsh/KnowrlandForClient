@@ -5,6 +5,7 @@ import { useSubIndustryStatistic } from '@/hooks/industries/useSubIndustryStatis
 import { useTopicStatistic } from '@/hooks/industries/useTopicStatistic';
 import styles from '@/app/[locale]/industry/[id]/[slug]/industry.module.css';
 import Link from 'next/link';
+import { useParams } from 'next/navigation';
 
 interface StatisticsCardsProps {
   type: 'industry' | 'subIndustry' | 'topic';
@@ -12,6 +13,9 @@ interface StatisticsCardsProps {
 }
 
 export default function StatisticsCards({ type, id }: StatisticsCardsProps) {
+  const params = useParams();
+  const locale = params.locale as string || 'en';
+  
   const useStatisticHook = {
     industry: useIndustryStatistic,
     subIndustry: useSubIndustryStatistic,
@@ -52,7 +56,7 @@ export default function StatisticsCards({ type, id }: StatisticsCardsProps) {
   return (
     <div className={`grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 ${styles.statsContainer}`}>
       {statistics.map((stat) => (
-        <Link key={stat.type} href={`/en/filter-knowledges/${type =='subIndustry' ? 'sub_industry' : type}/${id}/${stat.type}`}>
+        <Link key={stat.type} href={`/${locale}/filter-knowledges/${type =='subIndustry' ? 'sub_industry' : type}/${id}/${stat.type}`}>
           <div key={stat.type} className={styles.statsCard}>
             <div className={styles.statsNumber}>{stat.count}</div>
             <div className={styles.statsLabel}>{stat.type}</div>

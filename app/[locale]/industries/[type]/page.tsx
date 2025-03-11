@@ -6,13 +6,14 @@ import HeaderLight from '@/components/ui/header-light';
 import FooterLight from '@/components/ui/footer-light';
 import Link from 'next/link';
 import Image from 'next/image';
-import { notFound } from 'next/navigation';
+import { notFound, useParams } from 'next/navigation';
 import { use, useEffect } from 'react';
 import styles from './industries.module.css';
 import IndustryIcon from "@/components/icons/industry-icon";
 import AOS from 'aos';
 import 'aos/dist/aos.css';
 import Stripes from "@/public/images/stripes-dark.svg";
+
 interface Topic {
   id: number;
   name: string;
@@ -41,6 +42,8 @@ function capitalizeFirstLetter(string: string) {
 export default function IndustriesByTypePage({ params }: Props) {
   const resolvedParams = use(params);
   const type = resolvedParams.type as IndustryType;
+  const routeParams = useParams();
+  const locale = routeParams.locale as string || 'en';
 
   useEffect(() => {
     AOS.init({
@@ -136,7 +139,7 @@ export default function IndustriesByTypePage({ params }: Props) {
                     data-aos="fade-up"
                   >
                     <div className="space-y-2">
-                      <Link href={`/en/industry-by-type/${type}/${industry.id}/${industry.slug}`} className="block">
+                      <Link href={`/${locale}/industry-by-type/${type}/${industry.id}/${industry.slug}`} className="block">
                         <div className="flex items-center gap-2">
                           <IndustryIcon />
                           <h3 className="text-sm font-semibold text-gray-900 hover:text-blue-600">
@@ -147,7 +150,7 @@ export default function IndustriesByTypePage({ params }: Props) {
                       {industry.children && industry.children.length > 0 ? (
                         <ul className="space-y-1">
                           {industry.children.map((child: Industry) => (
-                            <Link href={`/en/sub-industry-by-type/${type}/${child.id}/${child.slug}`} key={child.id} className="block">
+                            <Link href={`/${locale}/sub-industry-by-type/${type}/${child.id}/${child.slug}`} key={child.id} className="block">
                               <li
                                 className="text-xs text-gray-600 hover:text-blue-600 transition-colors flex items-center"
                               >
