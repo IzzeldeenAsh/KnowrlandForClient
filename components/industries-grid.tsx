@@ -1,5 +1,6 @@
-
+'use client'
 import Link from 'next/link'
+import { useParams } from 'next/navigation'
 
 interface Industry {
   id: number
@@ -14,10 +15,13 @@ interface Industry {
 
 interface IndustriesGridProps {
   industries: Industry[]
+  locale?: string
 }
 
-export default function IndustriesGrid({ industries }: IndustriesGridProps) {
-
+export default function IndustriesGrid({ industries, locale }: IndustriesGridProps) {
+  // Get locale from params if not passed as prop
+  const params = useParams();
+  const currentLocale = locale || (params?.locale as string) || 'en';
 
   return (
     <div 
@@ -31,7 +35,7 @@ export default function IndustriesGrid({ industries }: IndustriesGridProps) {
           className="relative bg-white rounded-sm p-6 shadow-sm hover:shadow-md transition-all duration-300 cursor-pointer"
         >
           <div className="space-y-2">
-            <Link href={`/en/industry/${industry.id}/${industry.slug}`}>
+            <Link href={`/${currentLocale}/industry/${industry.id}/${industry.slug}`}>
             <h3 className="text-sm font-semibold text-gray-900  hover:text-blue-600 " >
               {industry.name}
             </h3>
@@ -42,7 +46,7 @@ export default function IndustriesGrid({ industries }: IndustriesGridProps) {
                   key={child.id} 
                   className="text-xs text-gray-600 hover:text-blue-600 transition-colors flex items-center"
                 >
-               <Link href={`/en/sub-industry/${child.id}/${child.slug}`}>
+               <Link href={`/${currentLocale}/sub-industry/${child.id}/${child.slug}`}>
                <span className="mr-2">•</span>
                {child.name}
                </Link>

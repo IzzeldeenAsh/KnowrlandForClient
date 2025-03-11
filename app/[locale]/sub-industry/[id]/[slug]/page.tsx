@@ -33,13 +33,14 @@ interface SubIndustryDetails {
 interface Params {
   id: string;
   slug: string;
+  locale?: string;
 }
 
 interface Props {
   params: Promise<Params>;
 }
 
-async function fetchSubIndustryData(id: string, slug: string) {
+async function fetchSubIndustryData(id: string, slug: string, locale: string = 'en') {
   const response = await fetch(
     `https://api.foresighta.co/api/industries/sub/${id}/${slug}`,
     {
@@ -47,7 +48,7 @@ async function fetchSubIndustryData(id: string, slug: string) {
       headers: {
         "Content-Type": "application/json",
         "Accept": "application/json",
-        "Accept-Language": "en",
+        "Accept-Language": locale,
       },
       body: JSON.stringify({ top_knowledge: 10 }),
     }
@@ -70,10 +71,10 @@ async function fetchSubIndustryData(id: string, slug: string) {
 
 // Generate metadata for SEO
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const { id, slug } = await params
+  const { id, slug, locale = 'en' } = await params
 
   try {
-    const { data } = await fetchSubIndustryData(id, slug)
+    const { data } = await fetchSubIndustryData(id, slug, locale)
     
     return {
       title: `${data.name} Sub-Industry Analysis | Foresighta`,
@@ -93,10 +94,10 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 }
 
 export default async function SubIndustryPage({ params }: Props) {
-  const { id, slug } = await params
+  const { id, slug, locale = 'en' } = await params
 
   try {
-    const { data: subIndustry } = await fetchSubIndustryData(id, slug)
+    const { data: subIndustry } = await fetchSubIndustryData(id, slug, locale)
     const breadcrumbData = await fetchBreadcrumb('sub-industry', parseInt(id))
     const breadcrumbItems = breadcrumbData.map(item => ({
       label: item.label,
@@ -175,7 +176,7 @@ export default async function SubIndustryPage({ params }: Props) {
                     <div className="space-y-2">
                       <div className="flex items-center gap-2">
                         <FolderIcon width={20} height={20} />
-                        <Link href={`/en/topic/${topic.id}/${topic.slug}`}>
+                        <Link href={`/${locale}/topic/${topic.id}/${topic.slug}`}>
                           <h3 className="text-sm font-semibold text-gray-900">
                             {topic.name}
                           </h3>
@@ -190,7 +191,7 @@ export default async function SubIndustryPage({ params }: Props) {
                               className="text-xs text-gray-600 hover:text-blue-600 transition-colors flex items-center"
                             >
                               <span className="mr-2">•</span>
-                              <Link href={`/en/knowledge/${item.type}/${item.slug}`}>
+                              <Link href={`/${locale}/knowledge/${item.type}/${item.slug}`}>
                                 {item.title}
                               </Link>
                             </li>

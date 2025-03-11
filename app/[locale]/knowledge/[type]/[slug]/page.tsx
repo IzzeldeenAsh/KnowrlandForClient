@@ -73,13 +73,14 @@ interface KnowledgeDetails {
 interface Params {
   type: string;
   slug: string;
+  locale: string;
 }
 
 interface Props {
   params: Promise<Params>;
 }
 
-async function fetchKnowledgeData(type: string, slug: string) {
+async function fetchKnowledgeData(type: string, slug: string, locale: string = 'en') {
   const cookieStore = await cookies();
   const tokenCookie = cookieStore.get("token");
   const token = tokenCookie?.value;
@@ -91,7 +92,7 @@ async function fetchKnowledgeData(type: string, slug: string) {
       headers: {
         "Content-Type": "application/json",
         Accept: "application/json",
-        "Accept-Language": "en",
+        "Accept-Language": locale,
         ...(token && { Authorization: `Bearer ${token}` }),
       },
     }
@@ -121,11 +122,11 @@ async function fetchKnowledgeData(type: string, slug: string) {
 }
 
 // Generate metadata for SEO
-export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const { type, slug } = await params;
+export async function generateMetadata({ params }: { params: { type: string; slug: string; locale: string } }): Promise<Metadata> {
+  const { type, slug, locale = 'en' } = params;
 
   try {
-    const { data } = await fetchKnowledgeData(type, slug);
+    const { data } = await fetchKnowledgeData(type, slug, locale);
 
     return {
       title: `${data.title} | Foresighta Knowledge`,
@@ -144,11 +145,11 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   }
 }
 
-export default async function KnowledgePage({ params }: Props) {
-  const { type, slug } = await params;
+export default async function KnowledgePage({ params }: { params: { type: string; slug: string; locale: string } }) {
+  const { type, slug, locale = 'en' } = params;
 
   try {
-    const { data: knowledge } = await fetchKnowledgeData(type, slug);
+    const { data: knowledge } = await fetchKnowledgeData(type, slug, locale);
     const breadcrumbData = await fetchBreadcrumb("knowledge", slug);
     const breadcrumbItems = breadcrumbData.map((item) => ({
       label: item.label,

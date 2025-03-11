@@ -23,6 +23,7 @@ export default function AuthCallback() {
   const router = useRouter();
   const params = useParams();
   const token = params.token as string;
+  const locale = params.locale as string || 'en';
 
   useEffect(() => {
     const fetchProfile = async () => {
@@ -38,7 +39,7 @@ export default function AuthCallback() {
             'Authorization': `Bearer ${token}`,
             "Content-Type": "application/json",
             "Accept": "application/json",
-            "Accept-Language": "en",
+            "Accept-Language": locale,
           }
         });
 
@@ -58,19 +59,19 @@ export default function AuthCallback() {
           last_name: data.data.last_name,
         }));
 
-        // Redirect to home page
-        router.push('/en/home');
+        // Redirect to home page using current locale
+        router.push(`/${locale}/home`);
       } catch (error) {
         console.error('Error fetching profile:', error);
-        // Handle error - maybe redirect to login
-        router.push('/en/login');
+        // Handle error - redirect to login with current locale
+        router.push(`/${locale}/login`);
       }
     };
 
     if (token) {
       fetchProfile();
     }
-  }, [token, router]);
+  }, [token, router, locale]);
 
   return (
     <div className="min-h-screen flex items-center justify-center">

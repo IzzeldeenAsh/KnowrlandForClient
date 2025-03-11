@@ -13,10 +13,20 @@ export default function MobileMenu() {
   const pathname = usePathname();
   const router = useRouter();
   const isRtl = pathname.startsWith('/ar');
+  const currentLocale = pathname.split('/')[1];
 
   // Function to switch locale
   const switchLocale = (locale: string) => {
-    router.push('/', { locale });
+    // Set the language preference in a cookie - expires in 1 year
+    document.cookie = `preferred_language=${locale}; max-age=${60 * 60 * 24 * 365}; path=/;`;
+    
+    // Get the current path without locale prefix
+    const currentPath = pathname.split('/').slice(2).join('/');
+    
+    // Navigate to the same route with the new locale
+    // If we're on the home page (or empty path), just use '/'
+    const newPath = currentPath ? `/${currentPath}` : '/';
+    router.push(newPath, { locale });
   };
 
   const trigger = useRef<HTMLButtonElement>(null)
@@ -88,34 +98,34 @@ export default function MobileMenu() {
       >
         <ul className="border border-transparent [background:linear-gradient(theme(colors.slate.900),_theme(colors.slate.900))_padding-box,_conic-gradient(theme(colors.slate.400),_theme(colors.slate.700)_25%,_theme(colors.slate.700)_75%,_theme(colors.slate.400)_100%)_border-box] rounded-lg px-4 py-1.5 max-w-full">
           <li>
-            <Link className="flex font-medium text-sm text-slate-300 hover:text-white py-1.5" href="/en/all-industries">{t('navigation.industries')}</Link>
+            <Link className="flex font-medium text-sm text-slate-300 hover:text-white py-1.5" href={`/${currentLocale}/all-industries`}>{t('navigation.industries')}</Link>
           </li>
           <li>
-            <Link className="flex font-medium text-sm text-slate-300 hover:text-white py-1.5" href="/en/industries/report">{t('navigation.reports')}</Link>
+            <Link className="flex font-medium text-sm text-slate-300 hover:text-white py-1.5" href={`/${currentLocale}/industries/report`}>{t('navigation.reports')}</Link>
           </li>
           <li>
-            <Link className="flex font-medium text-sm text-slate-300 hover:text-white py-1.5" href="/en/industries/data">{t('navigation.data')}</Link>
+            <Link className="flex font-medium text-sm text-slate-300 hover:text-white py-1.5" href={`/${currentLocale}/industries/data`}>{t('navigation.data')}</Link>
           </li>
           <li>
-            <Link className="flex font-medium text-sm text-slate-300 hover:text-white py-1.5" href="/en/industries/insight">{t('navigation.insights')}</Link>
+            <Link className="flex font-medium text-sm text-slate-300 hover:text-white py-1.5" href={`/${currentLocale}/industries/insight`}>{t('navigation.insights')}</Link>
           </li>
           <li>
-            <Link className="flex font-medium text-sm text-slate-300 hover:text-white py-1.5" href="/en/industries/manual">{t('navigation.manuals')}</Link>
+            <Link className="flex font-medium text-sm text-slate-300 hover:text-white py-1.5" href={`/${currentLocale}/industries/manual`}>{t('navigation.manuals')}</Link>
           </li>
           <li>
-            <Link className="flex font-medium text-sm text-slate-300 hover:text-white py-1.5" href="/en/industries/course">{t('navigation.courses')}</Link>
+            <Link className="flex font-medium text-sm text-slate-300 hover:text-white py-1.5" href={`/${currentLocale}/industries/course`}>{t('navigation.courses')}</Link>
           </li>
           <li className="border-t border-slate-700/50 mt-1.5 pt-1.5">
             <button 
               onClick={() => {
-                switchLocale(pathname.split('/')[1] === 'en' ? 'ar' : 'en');
+                switchLocale(currentLocale === 'en' ? 'ar' : 'en');
                 setMobileNavOpen(false);
               }}
               className="flex items-center font-medium text-sm text-slate-300 hover:text-white py-1.5 w-full text-left"
             >
               <IconLanguage size={18} className={`${isRtl ? 'ml-2' : 'mr-2'}`} />
               <span>
-                {pathname.split('/')[1] === 'en' ? t('language.switchToArabic') : t('language.switchToEnglish')}
+                {currentLocale === 'en' ? t('language.switchToArabic') : t('language.switchToEnglish')}
               </span>
             </button>
           </li>

@@ -61,10 +61,36 @@ export default function Header() {
 
   // Function to switch locale
   const switchLocale = (locale: string) => {
-    router.push('/', { locale });
+    // Set the language preference in a cookie - expires in 1 year
+    document.cookie = `preferred_language=${locale}; max-age=${60 * 60 * 24 * 365}; path=/;`;
+    
+    // Get the current path without locale prefix
+    const currentPath = pathname.split('/').slice(2).join('/');
+    
+    // Navigate to the same route with the new locale
+    // If we're on the home page (or empty path), just use '/'
+    const newPath = currentPath ? `/${currentPath}` : '/';
+    router.push(newPath, { locale });
   };
 
   useEffect(() => {
+    // Get preferred language from cookie
+    const getCookie = (name: string) => {
+      const value = `; ${document.cookie}`;
+      const parts = value.split(`; ${name}=`);
+      if (parts.length === 2) return parts.pop()?.split(';').shift();
+      return null;
+    };
+
+    // Check if user has a preferred language cookie that's different from current
+    const preferredLanguage = getCookie('preferred_language');
+    const currentLanguage = pathname.split('/')[1];
+    
+    if (preferredLanguage && preferredLanguage !== currentLanguage) {
+      // Automatically switch to preferred language
+      switchLocale(preferredLanguage);
+    }
+
     const fetchProfile = async () => {
       const token = localStorage.getItem('token');
       setIsLoading(true);
@@ -82,6 +108,13 @@ export default function Header() {
             "Accept-Language": "en",
           }
         });
+
+        if (response.status === 401) {
+          // Handle unauthorized - token expired or invalid
+          console.log('Session expired or unauthorized access');
+          handleSignOut();
+          return;
+        }
 
         if (!response.ok) {
           throw new Error('Failed to fetch profile');
@@ -118,15 +151,22 @@ export default function Header() {
     }
     fetchProfile();
     fetchIndustries();
-  }, []);
+  }, [pathname, router]);
 
   const getInitials = (firstName: string, lastName: string) => {
     return `${firstName[0]}${lastName[0]}`.toUpperCase();
   };
 
   const handleSignOut = () => {
+    // Clear localStorage
     localStorage.removeItem('token');
     localStorage.removeItem('user');
+    
+    // Clear any auth cookies that might exist
+    document.cookie = 'token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
+    document.cookie = 'user=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
+    
+    // Redirect to home page
     window.location.href = '/';
   };
 
@@ -148,7 +188,7 @@ export default function Header() {
                   position='bottom'
                   radius="sm" shadow="md" withinPortal>
                   <HoverCard.Target>
-                    <Link href={'/en/all-industries'}>
+                    <Link href={`/${pathname.split('/')[1]}/all-industries`}>
                       <button className="font-medium text-sm text-slate-300 hover:text-white mx-2 lg:mx-4 transition duration-150 ease-in-out flex items-center">
                         <span className="mr-1">{t('navigation.industries')}</span>
                         <IconChevronDown size={16} />
@@ -159,7 +199,7 @@ export default function Header() {
                   <HoverCard.Dropdown style={{background: 'linear-gradient(to right, #0f172b, #242B6A)',borderColor: '#2F378A'}}>
                     <Group justify="space-between" px="md">
                       <Text fw={500} c={'white'}>{t('industriesDropdown.featuredTitle')}</Text>
-                      <Anchor href="/en/all-industries" fz="xs" className="text-blue-300">
+                      <Anchor href={`/${pathname.split('/')[1]}/all-industries`} fz="xs" className="text-blue-300">
                         {t('industriesDropdown.viewAll')}
                       </Anchor>
                     </Group>
@@ -170,7 +210,7 @@ export default function Header() {
                       {industries.map((industry) => (
                         <Link 
                           key={industry.id} 
-                          href={`/en/industry/${industry.id}/${industry.slug}`}
+                          href={`/${pathname.split('/')[1]}/industry/${industry.id}/${industry.slug}`}
                           className="block"
                         >
                           <div className="p-3 rounded transition-colors industry-nav hover:bg-slate-800/50">
@@ -202,7 +242,7 @@ export default function Header() {
                         <Button 
                           variant="light" 
                           component={Link} 
-                          href="/en/all-industries"
+                          href={`/${pathname.split('/')[1]}/all-industries`}
                           className="bg-blue-50 text-blue-600 hover:bg-blue-100"
                         >
                           {t('industriesDropdown.browseAll')}
@@ -213,19 +253,19 @@ export default function Header() {
                 </HoverCard>
               </li>
               <li>
-                <Link className="font-medium text-sm text-gray-200 hover:text-gray-100 mx-2 lg:mx-4 transition duration-150 ease-in-out" href="/en/industries/report">{t('navigation.reports')}</Link>
+                <Link className="font-medium text-sm text-gray-200 hover:text-gray-100 mx-2 lg:mx-4 transition duration-150 ease-in-out" href={`/${pathname.split('/')[1]}/industries/report`}>{t('navigation.reports')}</Link>
               </li>
               <li>
-                <Link className="font-medium text-sm text-gray-200 hover:text-gray-100 mx-2 lg:mx-4 transition duration-150 ease-in-out" href="/en/industries/data">{t('navigation.data')}</Link>
+                <Link className="font-medium text-sm text-gray-200 hover:text-gray-100 mx-2 lg:mx-4 transition duration-150 ease-in-out" href={`/${pathname.split('/')[1]}/industries/data`}>{t('navigation.data')}</Link>
               </li>
               <li>
-                <Link className="font-medium text-sm text-gray-200 hover:text-gray-100 mx-2 lg:mx-4 transition duration-150 ease-in-out" href="/en/industries/insight">{t('navigation.insights')}</Link>
+                <Link className="font-medium text-sm text-gray-200 hover:text-gray-100 mx-2 lg:mx-4 transition duration-150 ease-in-out" href={`/${pathname.split('/')[1]}/industries/insight`}>{t('navigation.insights')}</Link>
               </li>
               <li>
-                <Link className="font-medium text-sm text-gray-200 hover:text-gray-100 mx-2 lg:mx-4 transition duration-150 ease-in-out" href="/en/industries/manual">{t('navigation.manuals')}</Link>
+                <Link className="font-medium text-sm text-gray-200 hover:text-gray-100 mx-2 lg:mx-4 transition duration-150 ease-in-out" href={`/${pathname.split('/')[1]}/industries/manual`}>{t('navigation.manuals')}</Link>
               </li>
               <li>
-                <Link className="font-medium text-sm text-gray-200 hover:text-gray-100 mx-2 lg:mx-4 transition duration-150 ease-in-out" href="/en/industries/course">{t('navigation.courses')}</Link>
+                <Link className="font-medium text-sm text-gray-200 hover:text-gray-100 mx-2 lg:mx-4 transition duration-150 ease-in-out" href={`/${pathname.split('/')[1]}/industries/course`}>{t('navigation.courses')}</Link>
               </li>
             </ul>
           </nav>
