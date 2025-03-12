@@ -15,7 +15,7 @@ import { useKnowledge } from '@/hooks/knowledgs/useKnowledge';
 import KnowledgeGrid from '@/app/[locale]/topic/[id]/[slug]/KnowledgeGrid';
 import KnowledgeList from '@/components/knowledge-list/KnowledgeList';
 import PageIllustration from '@/components/page-illustration';
-import HeaderLight from '@/components/ui/header-light';
+;
 import { ListBulletIcon, Squares2X2Icon } from '@heroicons/react/24/outline';
 import { useAllIndustries } from '@/hooks/industries/useAllIndustries';
 
@@ -334,7 +334,7 @@ export default function FilterKnowledgesPage() {
 
   return (
     <>
-      <HeaderLight />
+    
       <PageIllustration />
 
       {/* Header Section */}

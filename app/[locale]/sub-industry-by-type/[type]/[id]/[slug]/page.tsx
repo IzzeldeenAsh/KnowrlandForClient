@@ -2,7 +2,7 @@
 
 import { useSubIndustry, IndustryType } from '@/hooks/industries';
 import { Container, Text, Skeleton } from '@mantine/core';
-import HeaderLight from '@/components/ui/header-light';
+;
 import FooterLight from '@/components/ui/footer-light';
 import Link from 'next/link';
 import Image from 'next/image';
@@ -72,7 +72,7 @@ export default function SubIndustryByTypePage({ params }: Props) {
   if (error) {
     return (
       <>
-        <HeaderLight />
+      
         <Container className={styles.container}>
           <Text color="red">{error}</Text>
         </Container>
@@ -83,7 +83,7 @@ export default function SubIndustryByTypePage({ params }: Props) {
 
   return (
     <>
-      <HeaderLight />
+    
       <div className="relative z-10 max-w-6xl relative mx-auto  w-full ">
       <div
         className="pointer-events-none absolute z-10 -translate-x-1/2 transform hidden md:block"
