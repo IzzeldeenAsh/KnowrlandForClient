@@ -1,5 +1,5 @@
 import { Metadata } from 'next';
-import HeaderLight from '@/components/ui/header-light';
+;
 import FooterLight from '@/components/ui/footer-light';
 import Breadcrumb from '@/components/ui/breadcrumb';
 import { notFound } from 'next/navigation';
@@ -159,7 +159,7 @@ export default async function KnowledgePage({ params }: Props) {
 
     return (
       <>
-        <HeaderLight />
+      
         <div className="relative z-10 max-w-6xl relative mx-auto  w-full ">
           <div
             className="pointer-events-none absolute z-10 -translate-x-1/2 transform hidden md:block"

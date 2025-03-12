@@ -1,7 +1,7 @@
 import { Metadata } from 'next'
 import PageIllustration from "@/components/page-illustration"
 import IndustriesGrid from '@/components/industries-grid'
-import HeaderLight from '@/components/ui/header-light'
+
 import FooterLight from '@/components/ui/footer-light'
 import Breadcrumb from '@/components/ui/breadcrumb'
 
@@ -89,7 +89,7 @@ export default async function AllIndustries({ params }: Props) {
 
   return (
     <>
-    <HeaderLight />
+  
     <div className="flex flex-col min-h-screen">
      
       <main className="grow">

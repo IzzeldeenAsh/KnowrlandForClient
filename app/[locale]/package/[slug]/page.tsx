@@ -1,4 +1,3 @@
-import HeaderLight from "@/components/ui/header-light";
 import FooterLight from "@/components/ui/footer-light";
 import Breadcrumb from "@/components/ui/breadcrumb";
 import Image from "next/image";
@@ -104,7 +103,7 @@ export default async function PackagePage({ params }: Props) {
   
     return (
       <div className={styles.container}>
-        <HeaderLight />
+      
   
         {/* Header Section with Background Image and Breadcrumb */}
         <div className={styles.sectionHeader}>
