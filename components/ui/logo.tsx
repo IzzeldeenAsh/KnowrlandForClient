@@ -2,20 +2,33 @@
 
 import Link from 'next/link'
 import Image from 'next/image'
-import LogoImgEn from '@/public/images/KNOLDG- LOGO-28.png'
-import LogoImgAr from '@/public/images/KNOLDG- LOGO-29-29.png'
+import HomeLogoImgEn from '@/public/images/KNOLDG- LOGO-28.png'
+import HomeLogoImgAr from '@/public/images/KNOLDG- LOGO-29-29.png'
+import InnerLogoImgEn from '@/public/images/KNOLDG-LOGO-26.png'
+import InnerLogoImgAr from '@/public/images/KNOLDG-LOGO-12.png'
 import { useEffect, useState } from 'react'
 import { usePathname } from 'next/navigation'
 
-export default function Logo() {
-  const [logoImg, setLogoImg] = useState(LogoImgAr) // Default to Arabic
+interface LogoProps {
+  isHomePage?: boolean;
+}
+
+export default function Logo({ isHomePage = true }: LogoProps) {
+  const [logoImg, setLogoImg] = useState(HomeLogoImgAr) // Default to Arabic home logo
   const pathname = usePathname()
 
   useEffect(() => {
     // Detect locale from pathname
     const locale = pathname.split('/')[1] === 'en' ? 'en' : 'ar'
-    setLogoImg(locale === 'en' ? LogoImgEn : LogoImgAr)
-  }, [pathname])
+    
+    if (isHomePage) {
+      // Use home page logos
+      setLogoImg(locale === 'en' ? HomeLogoImgEn : HomeLogoImgAr)
+    } else {
+      // Use inner page logos
+      setLogoImg(locale === 'en' ? InnerLogoImgEn : InnerLogoImgAr)
+    }
+  }, [pathname, isHomePage])
 
   return (
     <Link className="inline-flex" href="/" aria-label="Knoldg">

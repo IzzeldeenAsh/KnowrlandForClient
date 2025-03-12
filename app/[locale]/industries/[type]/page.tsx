@@ -2,7 +2,6 @@
 
 import { useIndustriesByType, IndustryType, Industry } from '@/hooks/industries';
 import { Container, Text, Skeleton } from '@mantine/core';
-import HeaderLight from '@/components/ui/header-light';
 import FooterLight from '@/components/ui/footer-light';
 import Link from 'next/link';
 import Image from 'next/image';
@@ -64,20 +63,17 @@ export default function IndustriesByTypePage({ params }: Props) {
 
   if (error) {
     return (
-      <>
-        <HeaderLight />
+      <div className="flex flex-col min-h-screen bg-white dark:bg-slate-900">
         <Container className={styles.container}>
           <Text color="red">{error}</Text>
         </Container>
         <FooterLight />
-      </>
+      </div>
     );
   }
 
   return (
-    <>
-    
-      <HeaderLight />
+    <div className="flex flex-col min-h-screen bg-white dark:bg-slate-900">
       <div className="relative z-10 max-w-6xl relative mx-auto  w-full ">
       <div
         className="pointer-events-none absolute z-10 -translate-x-1/2 transform hidden md:block"
@@ -175,6 +171,6 @@ export default function IndustriesByTypePage({ params }: Props) {
         </div>
       </div>
       <FooterLight />
-    </>
+    </div>
   );
 }

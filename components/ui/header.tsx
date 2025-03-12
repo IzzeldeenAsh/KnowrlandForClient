@@ -1,3 +1,4 @@
+'use client'
 import Link from 'next/link'
 import Logo from './logo'
 import MobileMenu from './mobile-menu'
@@ -56,8 +57,21 @@ export default function Header() {
   const [industries, setIndustries] = useState<Industry[]>([]);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  const [isLocaleReady, setIsLocaleReady] = useState(false);
   const pathname = usePathname();
   const router = useRouter();
+  
+  // Check if we're on the homepage
+  const isHomePage = pathname === '/en' || pathname === '/ar' || pathname === '/';
+  
+  // Define text color classes based on current page
+  const textColorClass = isHomePage 
+    ? 'text-slate-300 hover:text-white' 
+    : 'text-slate-700 hover:text-slate-900';
+  
+  const menuTextColorClass = isHomePage
+    ? 'text-gray-200 hover:text-gray-100'
+    : 'text-gray-700 hover:text-gray-900';
 
   // Function to switch locale
   const switchLocale = (locale: string) => {
@@ -89,6 +103,9 @@ export default function Header() {
     if (preferredLanguage && preferredLanguage !== currentLanguage) {
       // Automatically switch to preferred language
       switchLocale(preferredLanguage);
+    } else {
+      // If no redirect is needed, mark locale as ready
+      setIsLocaleReady(true);
     }
 
     const fetchProfile = async () => {
@@ -170,6 +187,11 @@ export default function Header() {
     window.location.href = '/';
   };
 
+  if (!isLocaleReady) {
+    // Return a minimal placeholder or nothing while checking locale
+    return <div className="absolute top-0 w-full z-30 h-16 md:h-20"></div>;
+  }
+
   return (
     <header className="absolute top-0 w-full z-30">
       <div className="mx-auto px-4 sm:px-6 max-w-full overflow-hidden">
@@ -177,7 +199,7 @@ export default function Header() {
 
           {/* Site branding */}
           <div className="flex-shrink-0 w-[140px]">
-            <Logo />
+            <Logo isHomePage={isHomePage} />
           </div>
 
           {/* Desktop navigation */}
@@ -189,22 +211,22 @@ export default function Header() {
                   radius="sm" shadow="md" withinPortal>
                   <HoverCard.Target>
                     <Link href={`/${pathname.split('/')[1]}/all-industries`}>
-                      <button className="font-medium text-sm text-slate-300 hover:text-white mx-2 lg:mx-4 transition duration-150 ease-in-out flex items-center">
+                      <button className={`font-medium text-sm ${textColorClass} mx-2 lg:mx-4 transition duration-150 ease-in-out flex items-center`}>
                         <span className="mr-1">{t('navigation.industries')}</span>
                         <IconChevronDown size={16} />
                       </button>
                     </Link>
                   </HoverCard.Target>
 
-                  <HoverCard.Dropdown style={{background: 'linear-gradient(to right, #0f172b, #242B6A)',borderColor: '#2F378A'}}>
+                  <HoverCard.Dropdown style={isHomePage ? {background: 'linear-gradient(to right, #0f172b, #242B6A)', borderColor: '#2F378A'} : {background: 'white', borderColor: '#e5e7eb'}}>
                     <Group justify="space-between" px="md">
-                      <Text fw={500} c={'white'}>{t('industriesDropdown.featuredTitle')}</Text>
-                      <Anchor href={`/${pathname.split('/')[1]}/all-industries`} fz="xs" className="text-blue-300">
+                      <Text fw={500} c={isHomePage ? 'white' : 'black'}>{t('industriesDropdown.featuredTitle')}</Text>
+                      <Anchor href={`/${pathname.split('/')[1]}/all-industries`} fz="xs" className={isHomePage ? "text-blue-300" : "text-blue-600"}>
                         {t('industriesDropdown.viewAll')}
                       </Anchor>
                     </Group>
 
-                    <Divider my="sm" />
+                    <Divider my="sm" color={isHomePage ? "dark.5" : "gray.3"} />
 
                     <SimpleGrid cols={2} spacing={0}>
                       {industries.map((industry) => (
@@ -213,13 +235,17 @@ export default function Header() {
                           href={`/${pathname.split('/')[1]}/industry/${industry.id}/${industry.slug}`}
                           className="block"
                         >
-                          <div className="p-3 rounded transition-colors industry-nav hover:bg-slate-800/50">
+                          <div className={`p-3 rounded transition-colors ${
+                            isHomePage 
+                              ? 'industry-nav hover:bg-slate-800/50' 
+                              : 'industry-nav-light hover:bg-blue-50'
+                          }`}>
                             <Group wrap="nowrap" align="flex-start">
                               <div>
-                                <Text size="sm" fw={500} c={'white'}>
+                                <Text size="sm" fw={500} c={isHomePage ? 'white' : 'dark'}>
                                   {industry.name}
                                 </Text>
-                                <Text size="xs" c="dimmed">
+                                <Text size="xs" c={isHomePage ? "dimmed" : "gray.6"}>
                                   {t('industriesDropdown.exploreText')}
                                 </Text>
                               </div>
@@ -229,13 +255,13 @@ export default function Header() {
                       ))}
                     </SimpleGrid>
 
-                    <div className="mt-4 p-4 rounded-lg" style={{backgroundColor: '#2F378A'}}>
+                    <div className={`mt-4 p-4 rounded-lg ${isHomePage ? 'bg-[#2F378A]' : 'bg-blue-50'}`}>
                       <Group justify="space-between">
                         <div>
-                          <Text fw={500} fz="sm" c={'white'}>
+                          <Text fw={500} fz="sm" c={isHomePage ? 'white' : 'black'}>
                             {t('industriesDropdown.exploreAllTitle')}
                           </Text>
-                          <Text size="xs" c="dimmed">
+                          <Text size="xs" c={isHomePage ? "dimmed" : "gray.6"}>
                             {t('industriesDropdown.exploreAllDescription')}
                           </Text>
                         </div>
@@ -243,7 +269,7 @@ export default function Header() {
                           variant="light" 
                           component={Link} 
                           href={`/${pathname.split('/')[1]}/all-industries`}
-                          className="bg-blue-50 text-blue-600 hover:bg-blue-100"
+                          className={isHomePage ? "bg-blue-50 text-blue-600 hover:bg-blue-100" : "bg-white text-blue-600 hover:bg-blue-50 border border-blue-100"}
                         >
                           {t('industriesDropdown.browseAll')}
                         </Button>
@@ -253,19 +279,19 @@ export default function Header() {
                 </HoverCard>
               </li>
               <li>
-                <Link className="font-medium text-sm text-gray-200 hover:text-gray-100 mx-2 lg:mx-4 transition duration-150 ease-in-out" href={`/${pathname.split('/')[1]}/industries/report`}>{t('navigation.reports')}</Link>
+                <Link className={`font-medium text-sm ${menuTextColorClass} mx-2 lg:mx-4 transition duration-150 ease-in-out`} href={`/${pathname.split('/')[1]}/industries/report`}>{t('navigation.reports')}</Link>
               </li>
               <li>
-                <Link className="font-medium text-sm text-gray-200 hover:text-gray-100 mx-2 lg:mx-4 transition duration-150 ease-in-out" href={`/${pathname.split('/')[1]}/industries/data`}>{t('navigation.data')}</Link>
+                <Link className={`font-medium text-sm ${menuTextColorClass} mx-2 lg:mx-4 transition duration-150 ease-in-out`} href={`/${pathname.split('/')[1]}/industries/data`}>{t('navigation.data')}</Link>
               </li>
               <li>
-                <Link className="font-medium text-sm text-gray-200 hover:text-gray-100 mx-2 lg:mx-4 transition duration-150 ease-in-out" href={`/${pathname.split('/')[1]}/industries/insight`}>{t('navigation.insights')}</Link>
+                <Link className={`font-medium text-sm ${menuTextColorClass} mx-2 lg:mx-4 transition duration-150 ease-in-out`} href={`/${pathname.split('/')[1]}/industries/insight`}>{t('navigation.insights')}</Link>
               </li>
               <li>
-                <Link className="font-medium text-sm text-gray-200 hover:text-gray-100 mx-2 lg:mx-4 transition duration-150 ease-in-out" href={`/${pathname.split('/')[1]}/industries/manual`}>{t('navigation.manuals')}</Link>
+                <Link className={`font-medium text-sm ${menuTextColorClass} mx-2 lg:mx-4 transition duration-150 ease-in-out`} href={`/${pathname.split('/')[1]}/industries/manual`}>{t('navigation.manuals')}</Link>
               </li>
               <li>
-                <Link className="font-medium text-sm text-gray-200 hover:text-gray-100 mx-2 lg:mx-4 transition duration-150 ease-in-out" href={`/${pathname.split('/')[1]}/industries/course`}>{t('navigation.courses')}</Link>
+                <Link className={`font-medium text-sm ${menuTextColorClass} mx-2 lg:mx-4 transition duration-150 ease-in-out`} href={`/${pathname.split('/')[1]}/industries/course`}>{t('navigation.courses')}</Link>
               </li>
             </ul>
           </nav>
@@ -277,7 +303,7 @@ export default function Header() {
               <div className="flex items-center">
                 <button
                   onClick={() => switchLocale(pathname.split('/')[1] === 'en' ? 'ar' : 'en')}
-                  className="mx-2 flex items-center text-slate-300 hover:text-white transition duration-150 ease-in-out"
+                  className={`mx-2 flex items-center ${textColorClass} transition duration-150 ease-in-out`}
                 >
                   <IconLanguage size={18} className="mx-1" />
                   <span className="text-sm md:text-sm font-medium whitespace-nowrap">
@@ -291,20 +317,20 @@ export default function Header() {
               <div className="w-16 h-8 bg-slate-700/30 animate-pulse rounded"></div>
             ) : user ? (
               <li>
-                <UserProfile isHome={true} />
+                <UserProfile isHome={isHomePage} />
               </li>
             ) : (
               <li>
-                <Link className="btn-sm text-slate-300 hover:text-white transition duration-150 ease-in-out group [background:linear-gradient(theme(colors.slate.900),_theme(colors.slate.900))_padding-box,_conic-gradient(theme(colors.slate.400),_theme(colors.slate.700)_25%,_theme(colors.slate.700)_75%,_theme(colors.slate.400)_100%)_border-box] relative before:absolute before:inset-0 before:bg-slate-800/30 before:rounded-full before:pointer-events-none" href="https://foresighta.vercel.app/auth/login">
+                <Link className={`btn-sm ${isHomePage ? 'text-slate-300 hover:text-white [background:linear-gradient(theme(colors.slate.900),_theme(colors.slate.900))_padding-box,_conic-gradient(theme(colors.slate.400),_theme(colors.slate.700)_25%,_theme(colors.slate.700)_75%,_theme(colors.slate.400)_100%)_border-box] before:bg-slate-800/30' : 'text-slate-700 hover:text-slate-900 bg-white border border-slate-300 hover:border-slate-400'} transition duration-150 ease-in-out group relative before:absolute before:inset-0 before:rounded-full before:pointer-events-none`} href="https://foresighta.vercel.app/auth/login">
                   <span className="relative inline-flex items-center">
-                    {t('auth.login')} <span className="tracking-normal text-blue-500 group-hover:translate-x-0.5 transition-transform duration-150 ease-in-out ml-1">-&gt;</span>
+                    {t('auth.login')} <span className={`tracking-normal ${isHomePage ? 'text-blue-500' : 'text-blue-600'} group-hover:translate-x-0.5 transition-transform duration-150 ease-in-out ml-1`}>-&gt;</span>
                   </span>
                 </Link>
               </li>
             )}
           </ul>
 
-          <MobileMenu />
+          <MobileMenu isHomePage={isHomePage} />
 
         </div>
       </div>
