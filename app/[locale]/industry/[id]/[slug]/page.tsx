@@ -1,5 +1,4 @@
 import FooterLight from '@/components/ui/footer-light'
-import HeaderLight from '@/components/ui/header-light'
 import Breadcrumb from '@/components/ui/breadcrumb'
 import Image from 'next/image'
 import { Metadata } from 'next'
@@ -100,7 +99,6 @@ export default async function IndustryPage({ params }: Props) {
 
     return (
       <>
-      <HeaderLight />
       <div className="relative z-10 max-w-6xl relative mx-auto  w-full ">
       <div
         className="pointer-events-none absolute z-10 -translate-x-1/2 transform hidden md:block"
