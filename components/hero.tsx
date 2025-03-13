@@ -43,11 +43,11 @@ export default function Hero() {
                 <input
                   type="text"
                   placeholder={t('searchPlaceholder')}
-                  className="w-full px-6 py-4 text-lg bg-white/10 border border-slate-600 rounded-md placeholder-slate-400 text-white focus:outline-none focus:border-slate-300 transition duration-300"
+                  className="w-full px-6 py-4 text-lg bg-gradient-to-r from-gray-100 via-gray-200 to-gray-100 border border-gray-300 rounded-md placeholder-gray-500 text-gray-800 focus:outline-none focus:border-blue-300 focus:ring-2 focus:ring-blue-100 shadow-lg transition duration-300"
                 />
-                <button className={`absolute ${t('direction') === 'rtl' ? 'left-4' : 'right-4'} top-1/2 -translate-y-1/2 p-2 hover:bg-white/10 rounded-full transition duration-300`}>
+                <button className={`absolute ${t('direction') === 'rtl' ? 'left-4' : 'right-4'} top-1/2 -translate-y-1/2 p-2 hover:bg-gray-200/50 rounded-full transition duration-300`}>
                   <svg
-                    className="w-6 h-6 text-slate-300"
+                    className="w-6 h-6 text-blue-600"
                     fill="none"
                     stroke="currentColor"
                     viewBox="0 0 24 24"
