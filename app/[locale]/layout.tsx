@@ -9,6 +9,7 @@ import {getMessages} from 'next-intl/server';
 import {notFound} from 'next/navigation';
 import {Locale, routing} from '@/i18n/routing';
 import Header from '@/components/ui/header';
+import { LoadingProvider } from '@/components/context/LoadingContext';
 
 const inter = Inter({
   subsets: ['latin'],
@@ -57,10 +58,12 @@ export default async function LocaleLayout({
         <MantineProvider>
           <AOSProvider>
             <NextIntlClientProvider messages={messages}>
-              <Header />
-              <div className="flex flex-col min-h-screen overflow-hidden supports-[overflow:clip]:overflow-clip">
-                {children}
-              </div>
+              <LoadingProvider>
+                <Header />
+                <div className="flex flex-col min-h-screen overflow-hidden supports-[overflow:clip]:overflow-clip">
+                  {children}
+                </div>
+              </LoadingProvider>
             </NextIntlClientProvider>
           </AOSProvider>
         </MantineProvider>
