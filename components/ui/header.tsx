@@ -9,6 +9,8 @@ import { UserProfile } from './header/components/UserProfile'
 import { useTranslations } from 'next-intl'
 import { usePathname } from 'next/navigation'
 import { useRouter } from '@/i18n/routing'
+import AppLoader from './AppLoader'
+import { useLoading } from '@/components/context/LoadingContext'
 
 interface User {
   name: string;
@@ -56,7 +58,7 @@ export default function Header() {
   const [industries, setIndustries] = useState<Industry[]>([]);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
-  const [isLocaleReady, setIsLocaleReady] = useState(false);
+  const { isLoading: isAppLoading, setIsLoading: setAppLoading } = useLoading();
   const pathname = usePathname();
   const router = useRouter();
   
@@ -74,6 +76,9 @@ export default function Header() {
 
   // Function to switch locale
   const switchLocale = (locale: string) => {
+    // Set loading state before switching locale
+    setAppLoading(true);
+    
     // Set the language preference in a cookie - expires in 1 year
     document.cookie = `preferred_language=${locale}; max-age=${60 * 60 * 24 * 365}; path=/;`;
     
@@ -102,9 +107,6 @@ export default function Header() {
     if (preferredLanguage && preferredLanguage !== currentLanguage) {
       // Automatically switch to preferred language
       switchLocale(preferredLanguage);
-    } else {
-      // If no redirect is needed, mark locale as ready
-      setIsLocaleReady(true);
     }
 
     const fetchProfile = async () => {
@@ -185,11 +187,6 @@ export default function Header() {
     // Redirect to home page
     window.location.href = '/';
   };
-
-  if (!isLocaleReady) {
-    // Return a minimal placeholder or nothing while checking locale
-    return <div className="absolute top-0 w-full z-30 h-16 md:h-20"></div>;
-  }
 
   return (
     <header className="absolute top-0 w-full z-30">
