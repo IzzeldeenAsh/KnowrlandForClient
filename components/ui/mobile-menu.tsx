@@ -6,6 +6,7 @@ import { usePathname } from 'next/navigation'
 import { useRouter } from '@/i18n/routing'
 import { IconLanguage } from '@tabler/icons-react'
 import { useTranslations } from 'next-intl'
+import { useLoading } from '@/components/context/LoadingContext'
 
 interface MobileMenuProps {
   isHomePage?: boolean;
@@ -13,6 +14,7 @@ interface MobileMenuProps {
 
 export default function MobileMenu({ isHomePage = true }: MobileMenuProps) {
   const [mobileNavOpen, setMobileNavOpen] = useState<boolean>(false)
+  const { setIsLoading } = useLoading();
   const t = useTranslations('Header');
   const pathname = usePathname();
   const router = useRouter();
@@ -36,6 +38,9 @@ export default function MobileMenu({ isHomePage = true }: MobileMenuProps) {
 
   // Function to switch locale
   const switchLocale = (locale: string) => {
+    // Set loading state before switching locale
+    setIsLoading(true);
+    
     // Set the language preference in a cookie - expires in 1 year
     document.cookie = `preferred_language=${locale}; max-age=${60 * 60 * 24 * 365}; path=/;`;
     
