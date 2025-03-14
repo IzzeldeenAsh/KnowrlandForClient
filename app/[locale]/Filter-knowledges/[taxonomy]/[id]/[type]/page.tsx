@@ -1,40 +1,28 @@
-import { useKnowledge } from '@/hooks/knowledgs/useKnowledge';
-import { useAllIndustries } from '@/hooks/industries/useAllIndustries';
-import FilterKnowledgesClient from './FilterKnowledgesClient';
+'use client';
 
-// This function helps Next.js know about the dynamic routes during build
-export async function generateStaticParams() {
-  // List known taxonomies
-  const taxonomies = ['industry', 'sub_industry', 'topic'];
-  
-  // List known knowledge types
-  const knowledgeTypes = ['data', 'insight', 'manual', 'course', 'report'];
-  
-  // You can either fetch all possible IDs from your API or define some initial ones
-  // For example, if you know industry ID 9 is important:
-  const initialIds = ['9']; 
-  
-  // Generate combinations
-  const params = [];
-  
-  for (const taxonomy of taxonomies) {
-    for (const id of initialIds) {
-      for (const type of knowledgeTypes) {
-        // Add English locale as default
-        params.push({
-          locale: 'en',
-          taxonomy,
-          id,
-          type
-        });
-      }
-    }
-  }
-  
-  return params;
-}
+import { useEffect } from 'react';
+import { useRouter, useParams } from 'next/navigation';
 
+// Client component page that handles redirect
 export default function FilterKnowledgesPage() {
-  // This is now a server component that renders the client component
-  return <FilterKnowledgesClient />;
+  const params = useParams();
+  const router = useRouter();
+  
+  // Extract the parameters
+  const locale = params.locale as string;
+  const taxonomy = params.taxonomy as string;
+  const id = params.id as string;
+  const type = params.type as string;
+  
+  // Use useEffect to trigger the redirect on the client side
+  useEffect(() => {
+    router.replace(`/${locale}/knowledges?taxonomy=${taxonomy}&id=${id}&type=${type}`);
+  }, [router, locale, taxonomy, id, type]);
+  
+  // Show a loading message while redirecting
+  return (
+    <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
+      <p>Redirecting to filter page...</p>
+    </div>
+  );
 }
