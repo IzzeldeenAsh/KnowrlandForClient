@@ -28,10 +28,12 @@ export default function AuthCallback() {
   useEffect(() => {
     const fetchProfile = async () => {
       try {
-        // Store token
+        // Store token in localStorage as fallback
         localStorage.setItem('token', token);
-        //store in cookie
-        document.cookie = `token=${token}; path=/; secure; samesite=strict;`;
+        
+        // Set cookie for the root domain (.knoldg.com) to be accessible by all subdomains
+        // Set secure cookie with max-age of 30 days (or adjust as needed)
+        document.cookie = `auth_token=${token}; domain=.knoldg.com; path=/; max-age=${60*60*24*30}; secure; samesite=lax;`;
 
         // Fetch profile
         const response = await fetch('https://api.foresighta.co/api/account/profile', {
@@ -49,7 +51,7 @@ export default function AuthCallback() {
 
         const data: ProfileResponse = await response.json();
         
-        // Store user data
+        // Store user data in localStorage as fallback
         localStorage.setItem('user', JSON.stringify({
           id: data.data.id,
           name: data.data.name,
@@ -58,6 +60,14 @@ export default function AuthCallback() {
           first_name: data.data.first_name,
           last_name: data.data.last_name,
         }));
+        
+        // Also store minimal user info in cookie for cross-domain access
+        const userData = JSON.stringify({
+          id: data.data.id,
+          name: data.data.name,
+          email: data.data.email,
+        });
+        document.cookie = `auth_user=${encodeURIComponent(userData)}; domain=.knoldg.com; path=/; max-age=${60*60*24*30}; secure; samesite=lax;`;
 
         // Redirect to home page using current locale
         router.push(`/${locale}/home`);
