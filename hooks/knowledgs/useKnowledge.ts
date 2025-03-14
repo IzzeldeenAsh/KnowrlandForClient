@@ -1,6 +1,7 @@
 'use client';
 import { useState, useEffect } from 'react';
 import { KnowledgeDetails } from '@/app/[locale]/knowledge/[type]/[slug]/types';
+import { useParams } from 'next/navigation';
 
 interface PaginationLink {
   url: string | null;
@@ -41,6 +42,9 @@ export function useKnowledge({ taxonomy, id, knowledgeType, page }: UseKnowledge
   const [response, setResponse] = useState<KnowledgeResponse | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<any>(null);
+  const params = useParams();
+  // Get the current locale from params
+  const locale = params.locale as string || 'en';
 
   useEffect(() => {
     const params = new URLSearchParams();
@@ -53,7 +57,7 @@ export function useKnowledge({ taxonomy, id, knowledgeType, page }: UseKnowledge
       headers: {
         "Content-Type": "application/json",
         "Accept": "application/json",
-        "Accept-Language": "en",
+        "Accept-Language": locale, // Use dynamic locale instead of hardcoded 'en'
       },
     })
       .then((res) => {
@@ -70,7 +74,7 @@ export function useKnowledge({ taxonomy, id, knowledgeType, page }: UseKnowledge
         setError(err);
         setIsLoading(false);
       });
-  }, [taxonomy, id, knowledgeType, page]);
+  }, [taxonomy, id, knowledgeType, page, locale]);
 
   return { response, isLoading, error };
 }
