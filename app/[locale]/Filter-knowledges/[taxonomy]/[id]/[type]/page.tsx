@@ -15,7 +15,6 @@ import { useKnowledge } from '@/hooks/knowledgs/useKnowledge';
 import KnowledgeGrid from '@/app/[locale]/topic/[id]/[slug]/KnowledgeGrid';
 import KnowledgeList from '@/components/knowledge-list/KnowledgeList';
 import PageIllustration from '@/components/page-illustration';
-;
 import { ListBulletIcon, Squares2X2Icon } from '@heroicons/react/24/outline';
 import { useAllIndustries } from '@/hooks/industries/useAllIndustries';
 
@@ -44,6 +43,18 @@ export default function FilterKnowledgesPage() {
   // Get initial knowledge type (default: 'report')
   const typeParam = Array.isArray(params.type) ? params.type[0] : params.type;
   const initialKnowledgeType = typeParam ?? 'report';
+
+  // Add logging to help debug production issues
+  useEffect(() => {
+    console.log('FilterKnowledgesPage: Route Parameters', {
+      locale,
+      taxonomy,
+      id,
+      typeParam,
+      initialKnowledgeType,
+      fullParams: params
+    });
+  }, [locale, taxonomy, id, typeParam, initialKnowledgeType, params]);
 
   // ---------------- States ----------------
   const [selectedKnowledgeType, setSelectedKnowledgeType] = useState<string>(initialKnowledgeType);
@@ -256,6 +267,16 @@ export default function FilterKnowledgesPage() {
     page,
   });
 
+  // Add logging for API response
+  useEffect(() => {
+    if (knowledgeError) {
+      console.error('Knowledge API Error:', knowledgeError);
+    }
+    if (response) {
+      console.log('Knowledge API Response Meta:', response.meta);
+    }
+  }, [response, knowledgeError]);
+
   const handleKnowledgeTypeChange = (value: string) => {
     setSelectedKnowledgeType(value);
     setPage(1);
@@ -316,7 +337,7 @@ export default function FilterKnowledgesPage() {
   if (knowledgeError) {
     return (
       <Container py="xl">
-        <Text color="red">Error loading knowledge items.</Text>
+        <Text color="red">Error loading knowledge items: {knowledgeError.message}</Text>
       </Container>
     );
   }
