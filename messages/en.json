@@ -1,0 +1,170 @@
+{
+    "HomePage": {
+        "title": "Home Page",
+        "description": "Home Page Description"
+    },
+    "Hero": {
+        "tagline": "Beyond Research Boundaries",
+        "title": "Unlock Business Success with Expert Knowledge",
+        "description":"Explore a hub of expert data, insights, and business intelligence tailored for your business growth.",
+        "searchPlaceholder":"Search business data, reports, insights... and more",
+        "direction": "ltr"
+    },
+    "Header": {
+        "navigation": {
+            "industries": "Industries",
+            "reports": "Reports",
+            "data": "Data",
+            "insights": "Insights",
+            "manuals": "Manuals",
+            "courses": "Courses"
+        },
+        "industriesDropdown": {
+            "featuredTitle": "Featured Industries",
+            "viewAll": "View all industries",
+            "exploreText": "Explore insights and trends",
+            "exploreAllTitle": "Explore All Industries",
+            "exploreAllDescription": "Discover comprehensive insights across various sectors",
+            "browseAll": "Browse All"
+        },
+        "auth": {
+            "login": "Login"
+        },
+        "language": {
+            "switchToArabic": "العربية",
+            "switchToEnglish": "English"
+        }
+    },
+    "Features": {
+        "tagline": "We pave the way",
+        "title": "Make Smarter, Faster Decisions",
+        "description": "Accelerate your decisions with AI-powered assistance and a smart search engine for instant, reliable insights",
+        "tabs": {
+            "preciseResults": {
+                "title": "Smart Search Engine",
+                "alt": "Features Illustration"
+            },
+            "variableData": {
+                "title": "Knowledge Base Built on an International Database Structure (ISIC, HS Code)"
+            },
+            "fasterDecisions": {
+                "title": "AI-Powered Assistance"
+            }
+        },
+        "direction": "ltr"
+    },
+    "Testimonials": {
+        "tagline": "Bringing You Closer to Resolution",
+        "title":"Latest Reports",
+        "description":"Stay ahead with newly uploaded expert reports, technical guides, and real-world analyses",
+        "insights": {
+            "title": "Insights",
+            "description": "Explore the latest insights and analysis in your field",
+            "alt": "Insights Icon"
+        },
+        "reports": {
+            "title": "Reports",
+            "description": "Access comprehensive, specialized reports across various domains",
+            "alt": "Reports Icon"
+        },
+        "manuals": {
+            "title": "Manuals",
+            "description": "Your comprehensive guide to professional practices and best methods",
+            "alt": "Manuals Icon"
+        },
+        "data": {
+            "title": "Data",
+            "description": "Accurate data and statistics to support your decisions",
+            "alt": "Data Icon"
+        },
+        "courses": {
+            "title": "Courses",
+            "description": "Learn from industry experts and develop your professional skills",
+            "alt": "Courses Icon"
+        },
+        "common": {
+            "learnMore": "Learn More"
+        },
+        "navigation": {
+            "previous": "Previous",
+            "next": "Next"
+        }
+    },
+    "Features2": {
+        "tagline": "Quality and Reliability",
+        "title": "Reliable, High-quality Resources from Business Specialists",
+        "description": "Access verified insights and engage with rated business expert professionals",
+        "direction": "ltr",
+        "tabs": {
+            "directExpertEngagement": {
+                "title": "Direct Expert Engagement – Connect and communicate with Subject Matter Expert authors"
+            },
+            "expertRatings": {
+                "title": "Transparent Ratings & Quality Assurance – Access expert ratings for trusted insights"
+            },
+            "consultingSessions": {
+                "title": "Personalized Consulting Sessions – Request one-on-one consultations with expert authors"
+            }
+        }
+    },
+    "Features3": {
+        "tagline": "Value for the Money",
+        "title": "Tailored Pricing,  Pay only for what Matters",
+        "description": "Purchase exactly what you need without paying the price of full reports. Our platform offers on-demand buying options tailored to your specific needs.",
+        "direction": "ltr",
+        "tabs": {
+            "no-monthly-subscription": {
+                "title":"Purchase part of a report, section or file"
+            },
+            "payAsYouGo": {
+                "title": "No monthly fees- Pay as You Go"
+            },
+            "purchaseSpecific": {
+                "title": "Pay for Only for the Targeted Insight or Data"
+            }
+        }
+    },
+    "Features02": {
+        "stayInformed": {
+            "title": "Stay Informed",
+            "description": "Get notified instantly when new reports, insights, and valuable resources are published on topics that matters to you."
+        },
+        "connectWithExpert": {
+            "title": "Connect With an Expert",
+            "description": "The platform engages you directly with SMEs for additional details, inquiries, and tailored guidance."
+        },
+        "discover": "Discover"
+    },
+    "Cta": {
+        "tagline": "",
+        "title": "Turn Your Expertise into Profit—Share Your Knowledge with the World!",
+        "description": "Start monetizing your knowledge and connect with prospective clients who need your expertise.",
+        "button": "Get Started"
+    },
+    "Footer": {
+        "copyright": " Knoldg.com - All rights reserved",
+        "knowledge": {
+            "title": "Knowledge",
+            "insights": "Insights",
+            "reports": "Reports",
+            "data": "Data",
+            "manual": "Manual",
+            "courses": "Courses"
+        },
+        "company": {
+            "title": "Company",
+            "about": "About us",
+            "blog": "Blog",
+            "contact": "Contact"
+        },
+        "resources": {
+            "title": "Resources",
+            "terms": "Terms of service"
+        },
+        "legals": {
+            "title": "Legals",
+            "terms": "Terms & Conditions",
+            "privacy": "Privacy policy"
+        }
+    }
+}

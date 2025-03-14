@@ -1,0 +1,36 @@
+.card {
+  background-color: var(--mantine-color-body);
+  background-image: url(https://res.cloudinary.com/dsiku9ipv/image/upload/v1739196782/bg-5-ol_2_zquwnb.png);
+  background-size: 160%;
+  background-position: -30% 10%;
+  transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
+  cursor: pointer;
+  border: 1px solid #DFDFDF;
+}
+
+.card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 25px rgba(51, 154, 240, 0.15);
+  border-color: rgba(51, 154, 240, 0.3);
+}
+
+.title {
+  font-family: 'Greycliff CF', var(--mantine-font-family);
+  line-height: 1.2;
+  transition: color 0.2s ease;
+}
+
+.card:hover .title {
+  color: var(--mantine-color-blue-6);
+}
+
+.footer {
+  padding: var(--mantine-spacing-xs) var(--mantine-spacing-lg);
+  margin-top: var(--mantine-spacing-md);
+  border-top: 1px solid var(--mantine-color-gray-2);
+  transition: border-color 0.2s ease;
+}
+
+.card:hover .footer {
+  border-color: rgba(51, 154, 240, 0.3);
+}
