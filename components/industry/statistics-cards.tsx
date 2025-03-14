@@ -56,7 +56,10 @@ export default function StatisticsCards({ type, id }: StatisticsCardsProps) {
   return (
     <div className={`grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 ${styles.statsContainer}`}>
       {statistics.map((stat) => (
-        <Link key={stat.type} href={`/${locale}/filter-knowledges/${type =='subIndustry' ? 'sub_industry' : type}/${id}/${stat.type}`}>
+        <Link 
+          key={stat.type} 
+          href={`/${locale}/knowledges?taxonomy=${type =='subIndustry' ? 'sub_industry' : type}&id=${id}&type=${stat.type}`}
+        >
           <div key={stat.type} className={styles.statsCard}>
             <div className={styles.statsNumber}>{stat.count}</div>
             <div className={styles.statsLabel}>{stat.type}</div>
