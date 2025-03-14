@@ -13,10 +13,9 @@ export default createMiddleware({
 });
 
 export const config = {
-  // Match internationalized pathnames with explicit support for filter-knowledges routes
+  // Match internationalized pathnames
   matcher: [
     '/', 
-    '/(ar|en)/:path*',
-    '/(ar|en)/filter-knowledges/:taxonomy/:id/:type'
+    '/(ar|en)/:path*'
   ]
 };
