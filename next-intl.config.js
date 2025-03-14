@@ -1,9 +1,8 @@
 const { getRequestConfig } = require('next-intl/server');
 
-module.exports = getRequestConfig(async ({locale}) => {
-  return {
-    messages: (await import(`./messages/${locale}.json`)).default,
-    defaultLocale: 'ar',
-    locales: ['en', 'ar']
-  };
-});
+
+module.exports = {
+  defaultLocale: 'ar',
+  locales: ['en', 'ar'],
+};
+

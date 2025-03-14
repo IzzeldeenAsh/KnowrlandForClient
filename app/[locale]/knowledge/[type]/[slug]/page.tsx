@@ -87,40 +87,38 @@ async function fetchKnowledgeData(type: string, slug: string, locale: string = '
   const tokenCookie = cookieStore.get("token");
   const token = tokenCookie?.value;
   
-  const response = await fetch(
-    `https://api.foresighta.co/api/industries/knowledge/${slug}`,
-    {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-        Accept: "application/json",
-        "Accept-Language": locale,
-        ...(token && { Authorization: `Bearer ${token}` }),
-      },
-    }
-  );
-
-  if (!response.ok) {
-    console.error("API Error:", {
-      status: response.status,
-      statusText: response.statusText,
-      url: response.url,
-    });
-    
-    if (response.status === 404) {
-      return notFound();
-    }
-    
-    const errorText = await response.text();
-    console.error("Error response:", errorText);
-    throw new Error(
-      `Failed to fetch knowledge details: ${response.status} ${response.statusText}`
+  try {
+    const response = await fetch(
+      `https://api.foresighta.co/api/industries/knowledge/${slug}`,
+      {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+          "Accept-Language": locale,
+          ...(token && { Authorization: `Bearer ${token}` }),
+        },
+      }
     );
+
+    if (!response.ok) {
+      if (response.status === 404) {
+        notFound();
+      }
+      
+      const errorText = await response.text();
+      throw new Error(
+        `Failed to fetch knowledge details: ${response.status} ${response.statusText}. ${errorText}`
+      );
+    }
+
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error("Knowledge data fetch error:", error instanceof Error ? error.message : String(error));
+    throw error; // Re-throw to be handled by the calling function
   }
 
-  const data = await response.json();
-  return data;
-}
 
 // Generate metadata for SEO
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
