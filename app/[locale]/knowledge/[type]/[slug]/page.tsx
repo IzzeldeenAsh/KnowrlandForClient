@@ -118,7 +118,7 @@ async function fetchKnowledgeData(type: string, slug: string, locale: string = '
     console.error("Knowledge data fetch error:", error instanceof Error ? error.message : String(error));
     throw error; // Re-throw to be handled by the calling function
   }
-}
+
 
 // Generate metadata for SEO
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
