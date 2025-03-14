@@ -47,7 +47,7 @@ export default async function LocaleLayout({
   // Get messages for translations
   const messages = await getMessages();
 
-  // Choose font based on direction
+  // Choose font based on directions
   const fontClass = direction === 'rtl' ? tajawal.variable : inter.variable;
   const fontFamily = direction === 'rtl' ? 'font-tajawal' : 'font-inter';
   
