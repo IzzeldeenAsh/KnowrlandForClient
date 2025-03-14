@@ -154,7 +154,6 @@ export default function Overview({ knowledge }: OverviewProps) {
                           <tr>
                             <th>Chapter</th>
                             <th>Title</th>
-                            <th>Page</th>
                           </tr>
                         </thead>
                         <tbody>
@@ -162,7 +161,6 @@ export default function Overview({ knowledge }: OverviewProps) {
                             <tr key={index}>
                               <td>Chapter {index + 1}</td>
                               <td>{toc.chapter.title}</td>
-                              <td></td>
                             </tr>
                           ))}
                         </tbody>
