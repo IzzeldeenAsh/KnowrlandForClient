@@ -40,20 +40,57 @@ export default function FilterKnowledgesPage() {
     ? parseInt(params.id[0], 10)
     : parseInt(params.id ?? '0', 10);
 
-  // Get initial knowledge type (default: 'report')
+  // Get initial knowledge type with better fallback handling
   const typeParam = Array.isArray(params.type) ? params.type[0] : params.type;
-  const initialKnowledgeType = typeParam ?? 'report';
+  // Add more robust type handling that doesn't depend on the route pattern working perfectly
+  let initialKnowledgeType = typeParam ?? 'report';
+  
+  // If we're on a URL like /topic/139/insight, ensure 'insight' is recognized as the type
+  // This helps in case the Next.js router isn't parsing the dynamic segments correctly
+  const validTypes = ['data', 'insight', 'manual', 'course', 'report'];
+  if (typeof window !== 'undefined') {
+    const pathParts = window.location.pathname.split('/');
+    const lastSegment = pathParts[pathParts.length - 1];
+    if (validTypes.includes(lastSegment)) {
+      initialKnowledgeType = lastSegment;
+      console.log('Type detected from URL path:', initialKnowledgeType);
+    }
+  }
 
   // Add logging to help debug production issues
   useEffect(() => {
-    console.log('FilterKnowledgesPage: Route Parameters', {
+    // Only run enhanced logging in production
+    const isProd = process.env.NODE_ENV === 'production';
+    const logPrefix = isProd ? '[PROD]' : '[DEV]';
+    
+    console.log(`${logPrefix} FilterKnowledgesPage: Route Parameters`, {
       locale,
       taxonomy,
       id,
       typeParam,
       initialKnowledgeType,
-      fullParams: params
+      fullParams: params,
+      url: typeof window !== 'undefined' ? window.location.href : 'SSR',
+      pathname: typeof window !== 'undefined' ? window.location.pathname : 'SSR',
+      environment: process.env.NODE_ENV
     });
+    
+    // If in production, add a fallback mechanism
+    if (isProd && typeof window !== 'undefined') {
+      // Check if we're getting a 404 in production for a valid URL pattern
+      const pathParts = window.location.pathname.split('/');
+      if (pathParts.length >= 6) {
+        const [empty, localeSegment, filterKnowledges, taxonomySegment, idSegment, typeSegment] = pathParts;
+        console.log(`${logPrefix} URL Analysis:`, { 
+          pathParts, 
+          localeSegment, 
+          filterKnowledges, 
+          taxonomySegment, 
+          idSegment, 
+          typeSegment 
+        });
+      }
+    }
   }, [locale, taxonomy, id, typeParam, initialKnowledgeType, params]);
 
   // ---------------- States ----------------
