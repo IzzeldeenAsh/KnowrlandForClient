@@ -99,7 +99,7 @@ export function UserProfile({ isHome }: { isHome: boolean }) {
     return (
       <>
         <Link
-          href="https://foresighta.vercel.app/auth/login"
+          href="https://app.knoldg.com/auth/login"
           className="btn-sm bg-gray-800 text-gray-200 shadow hover:bg-gray-900"
         >
        Login
@@ -190,7 +190,7 @@ export function UserProfile({ isHome }: { isHome: boolean }) {
 
           <div className="py-1">
             <Link
-              href="https://foresighta.vercel.app/app/profile/overview"
+              href="https://app.knoldg.com/app/profile/overview"
               className="block px-4 py-3 text-sm font-semibold text-slate-900 hover:bg-gray-100"
               onClick={() => setMenuOpen(false)}
             >
@@ -222,35 +222,35 @@ export function UserProfile({ isHome }: { isHome: boolean }) {
                   {dashboardOpen && (
                     <div className="bg-gray-50 pl-6">
                       <Link 
-                        href="https://foresighta.vercel.app/app/insighter-dashboard/my-dashboard"
+                        href="https://app.knoldg.com/app/insighter-dashboard/my-dashboard"
                         className="block px-4 py-2.5 text-sm font-semibold text-slate-900 hover:bg-gray-100"
                         onClick={() => setMenuOpen(false)}
                       >
                         My Dashboard
                       </Link>
                       <Link 
-                        href="https://foresighta.vercel.app/app/insighter-dashboard/my-knowledge/general" 
+                        href="https://app.knoldg.com/app/insighter-dashboard/my-knowledge/general" 
                         className="block px-4 py-2.5 text-sm font-semibold text-slate-900 hover:bg-gray-100"
                         onClick={() => setMenuOpen(false)}
                       >
                         General
                       </Link>
                       <Link 
-                        href="https://foresighta.vercel.app/app/insighter-dashboard/my-knowledge/scheduled" 
+                        href="https://app.knoldg.com/app/insighter-dashboard/my-knowledge/scheduled" 
                         className="block px-4 py-2.5 text-sm font-semibold text-slate-900 hover:bg-gray-100"
                         onClick={() => setMenuOpen(false)}
                       >
                         Scheduled
                       </Link>
                       <Link 
-                        href="https://foresighta.vercel.app/app/insighter-dashboard/my-knowledge/posted" 
+                        href="https://app.knoldg.com/app/insighter-dashboard/my-knowledge/posted" 
                         className="block px-4 py-2.5 text-sm font-semibold text-slate-900 hover:bg-gray-100"
                         onClick={() => setMenuOpen(false)}
                       >
                         Posted
                       </Link>
                       <Link 
-                        href="https://foresighta.vercel.app/app/insighter-dashboard/my-knowledge/packages" 
+                        href="https://app.knoldg.com/app/insighter-dashboard/my-knowledge/packages" 
                         className="block px-4 py-2.5 text-sm font-semibold text-slate-900 hover:bg-gray-100"
                         onClick={() => setMenuOpen(false)}
                       >
@@ -260,7 +260,7 @@ export function UserProfile({ isHome }: { isHome: boolean }) {
                   )}
                 </div>
                 <Link
-                  href="https://foresighta.vercel.app/app/add-knowledge/stepper"
+                  href="https://app.knoldg.com/app/add-knowledge/stepper"
                   className="block px-4 py-2.5 text-sm font-semibold text-sky-600 hover:bg-gray-100"
                   onClick={() => setMenuOpen(false)}
                 >
@@ -292,14 +292,14 @@ export function UserProfile({ isHome }: { isHome: boolean }) {
               {settingsOpen && (
                 <div className="bg-gray-50 pl-6">
                   <Link 
-                    href="https://foresighta.vercel.app/app/profile/settings/personal-info" 
+                    href="https://app.knoldg.com/app/profile/settings/personal-info" 
                     className="block px-4 py-2.5 text-sm font-semibold text-slate-500 hover:bg-gray-100"
                     onClick={() => setMenuOpen(false)}
                   >
                     Personal Info
                   </Link>
                   <Link 
-                    href="https://foresighta.vercel.app/app/profile/settings/reset-password" 
+                    href="https://app.knoldg.com/app/profile/settings/reset-password" 
                     className="block px-4 py-2.5 text-sm font-semibold text-slate-500 hover:bg-gray-100"
                     onClick={() => setMenuOpen(false)}
                   >
@@ -307,7 +307,7 @@ export function UserProfile({ isHome }: { isHome: boolean }) {
                   </Link>
                   {roles.includes('insighter') && (
                     <Link 
-                      href="https://foresighta.vercel.app/app/insighter-dashboard/account-settings/general-settings" 
+                      href="https://app.knoldg.com/app/insighter-dashboard/account-settings/general-settings" 
                       className="block px-4 py-2.5 text-sm font-semibold text-slate-500 hover:bg-gray-100"
                       onClick={() => setMenuOpen(false)}
                     >
@@ -320,7 +320,7 @@ export function UserProfile({ isHome }: { isHome: boolean }) {
 
             {roles.includes('client') && !roles.includes('insighter') && !roles.includes('company') && (
               <Link
-                href="https://foresighta.vercel.app/app/insighter-register/vertical"
+                href="https://app.knoldg.com/app/insighter-register/vertical"
                 className="block px-4 py-2.5 text-sm font-semibold bg-clip-text text-transparent bg-gradient-to-r from-blue-500 to-teal-400"
                 onClick={() => setMenuOpen(false)}
               >

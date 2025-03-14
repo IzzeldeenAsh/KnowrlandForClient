@@ -317,7 +317,7 @@ export default function Header() {
               </li>
             ) : (
               <li>
-                <Link className={`btn-sm ${isHomePage ? 'text-slate-300 hover:text-white [background:linear-gradient(theme(colors.slate.900),_theme(colors.slate.900))_padding-box,_conic-gradient(theme(colors.slate.400),_theme(colors.slate.700)_25%,_theme(colors.slate.700)_75%,_theme(colors.slate.400)_100%)_border-box] before:bg-slate-800/30' : 'text-slate-700 hover:text-slate-900 bg-white border border-slate-300 hover:border-slate-400'} transition duration-150 ease-in-out group relative before:absolute before:inset-0 before:rounded-full before:pointer-events-none`} href="https://foresighta.vercel.app/auth/login">
+                <Link className={`btn-sm ${isHomePage ? 'text-slate-300 hover:text-white [background:linear-gradient(theme(colors.slate.900),_theme(colors.slate.900))_padding-box,_conic-gradient(theme(colors.slate.400),_theme(colors.slate.700)_25%,_theme(colors.slate.700)_75%,_theme(colors.slate.400)_100%)_border-box] before:bg-slate-800/30' : 'text-slate-700 hover:text-slate-900 bg-white border border-slate-300 hover:border-slate-400'} transition duration-150 ease-in-out group relative before:absolute before:inset-0 before:rounded-full before:pointer-events-none`} href="https://app.knoldg.com/auth/login">
                   <span className="relative inline-flex items-center">
                     {t('auth.login')} <span className={`tracking-normal ${isHomePage ? 'text-blue-500' : 'text-blue-600'} group-hover:translate-x-0.5 transition-transform duration-150 ease-in-out ml-1`}>-&gt;</span>
                   </span>
