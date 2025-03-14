@@ -110,7 +110,10 @@ export default function Header() {
     }
 
     const fetchProfile = async () => {
-      const token = localStorage.getItem('token');
+      // Try to get token from cookie first, then fallback to localStorage
+      const authTokenCookie = getCookie('auth_token');
+      const token = authTokenCookie || localStorage.getItem('token');
+      
       setIsLoading(true);
       if (!token) {
         setIsLoading(false);
@@ -163,10 +166,22 @@ export default function Header() {
       setIndustries(data);
     };
 
-    const userData = localStorage.getItem('user');
-    if (userData) {
-      setUser(JSON.parse(userData));
+    // Try to get user data from cookie first, then fallback to localStorage
+    const authUserCookie = getCookie('auth_user');
+    if (authUserCookie) {
+      try {
+        const decodedUser = JSON.parse(decodeURIComponent(authUserCookie));
+        setUser(decodedUser);
+      } catch (e) {
+        console.error('Error parsing user cookie:', e);
+      }
+    } else {
+      const userData = localStorage.getItem('user');
+      if (userData) {
+        setUser(JSON.parse(userData));
+      }
     }
+    
     fetchProfile();
     fetchIndustries();
   }, [pathname, router]);
@@ -176,13 +191,23 @@ export default function Header() {
   };
 
   const handleSignOut = () => {
+    // Helper function to remove cookies properly
+    const removeCookie = (name: string) => {
+      // Remove from current domain
+      document.cookie = `${name}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;`;
+      
+      // Remove from root domain
+      document.cookie = `${name}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/; domain=.knoldg.com;`;
+    };
+    
     // Clear localStorage
     localStorage.removeItem('token');
     localStorage.removeItem('user');
     
-    // Clear any auth cookies that might exist
-    document.cookie = 'token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
-    document.cookie = 'user=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
+    // Clear any auth cookies
+    removeCookie('token');
+    removeCookie('auth_token');
+    removeCookie('auth_user');
     
     // Redirect to home page
     window.location.href = '/';
