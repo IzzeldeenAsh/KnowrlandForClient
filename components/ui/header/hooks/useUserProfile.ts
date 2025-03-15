@@ -1,5 +1,6 @@
 'use client';
 import { useState, useEffect } from 'react';
+import { usePathname } from 'next/navigation';
 
 export interface User {
   name: string;
@@ -13,6 +14,7 @@ export function useUserProfile() {
   const [user, setUser] = useState<User | null>(null);
   const [roles, setRoles] = useState<string[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const pathname = usePathname();
 
   useEffect(() => {
     const fetchProfile = async () => {
@@ -69,9 +71,33 @@ export function useUserProfile() {
   }, []);
 
   const handleSignOut = () => {
-    localStorage.removeItem("token");
-    localStorage.removeItem("user");
-    window.location.href = "/";
+    // Helper function to remove cookies properly
+    const removeCookie = (name: string) => {
+      // Remove from current domain
+      document.cookie = `${name}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;`;
+      
+      // Remove from root domain (affects both knoldg.com and app.knoldg.com)
+      document.cookie = `${name}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/; domain=.knoldg.com;`;
+    };
+    
+    // Clear localStorage in current app
+    localStorage.removeItem('token');
+    localStorage.removeItem('user');
+    
+    // Clear any auth cookies
+    removeCookie('token');
+    removeCookie('auth_token');
+    removeCookie('auth_user');
+    
+    // Get the current locale for the redirect
+    const locale = pathname.split('/')[1] || 'en';
+    
+    // Create a logout timestamp to prevent caching issues
+    const timestamp = new Date().getTime();
+    
+    // Perform a coordinated logout by redirecting to the Angular app's logout endpoint
+    // After the Angular app processes the logout, it will redirect back to our homepage
+    window.location.href = `https://app.knoldg.com/auth/logout?redirect_uri=${encodeURIComponent(`https://knoldg.com/${locale}?t=${timestamp}`)}`;
   };
 
   return { user, roles, isLoading, handleSignOut };
