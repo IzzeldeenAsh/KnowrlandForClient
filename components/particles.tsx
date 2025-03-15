@@ -150,7 +150,10 @@ export default function Particles({
   }
 
   const animate = () => {
-    clearContext()
+    clearContext();
+    // Create a new array for circles to be removed
+    const circlesToRemove: number[] = [];
+    
     circles.current.forEach((circle: Circle, i: number) => {
       // Handle the alpha value
       const edge = [
@@ -171,6 +174,7 @@ export default function Particles({
       circle.y += circle.dy
       circle.translateX += ((mouse.current.x / (staticity / circle.magnetism)) - circle.translateX) / ease
       circle.translateY += ((mouse.current.y / (staticity / circle.magnetism)) - circle.translateY) / ease
+      
       // circle gets out of the canvas
       if (
         circle.x < -circle.size ||
@@ -178,12 +182,8 @@ export default function Particles({
         circle.y < -circle.size ||
         circle.y > canvasSize.current.h + circle.size
       ) {
-        // remove the circle from the array
-        circles.current.splice(i, 1)
-        // create a new circle
-        const newCircle = circleParams()
-        drawCircle(newCircle)
-        // update the circle position
+        // Mark this circle for removal instead of removing it immediately
+        circlesToRemove.push(i);
       } else {
         drawCircle(
           {
@@ -198,6 +198,16 @@ export default function Particles({
         )
       }
     })
+    
+    // Remove circles in reverse order so indices stay valid
+    for (let i = circlesToRemove.length - 1; i >= 0; i--) {
+      const index = circlesToRemove[i];
+      circles.current.splice(index, 1);
+      // Create a new circle to replace the removed one
+      const newCircle = circleParams();
+      drawCircle(newCircle);
+    }
+    
     window.requestAnimationFrame(animate)
   }
 
