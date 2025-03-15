@@ -1,18 +1,16 @@
 'use client';
 
 import { useEffect } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useParams, useSearchParams } from 'next/navigation';
 
-export default function SignOutPage() {
+export default function SignoutPage() {
   const router = useRouter();
+  const params = useParams();
+  const searchParams = useSearchParams();
+  const locale = params.locale as string || 'en';
+  const redirectUri = searchParams.get('redirect_uri');
 
   useEffect(() => {
-    // Clear localStorage
-    localStorage.clear();
-    
-    // Clear sessionStorage
-    sessionStorage.clear();
-    
     // Helper function to remove cookies properly
     const removeCookie = (name: string) => {
       // Remove from current domain
@@ -22,18 +20,29 @@ export default function SignOutPage() {
       document.cookie = `${name}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/; domain=.knoldg.com;`;
     };
     
-    // Remove all authentication cookies
+    // Clear localStorage
+    localStorage.removeItem('token');
+    localStorage.removeItem('user');
+    
+    // Clear any auth cookies
     removeCookie('token');
     removeCookie('auth_token');
     removeCookie('auth_user');
     
-    // Redirect to home page
-    router.push('/home');
-  }, [router]);
+    // Redirect to the specified redirect URI or home page
+    if (redirectUri) {
+      window.location.href = redirectUri;
+    } else {
+      router.push(`/${locale}`);
+    }
+  }, [router, locale, redirectUri]);
 
   return (
     <div className="min-h-screen flex items-center justify-center">
-      <p className="text-gray-600">Signing out...</p>
+      <div className="text-center">
+        <h1 className="text-2xl font-bold mb-4">Signing Out...</h1>
+        <p>Please wait while we log you out.</p>
+      </div>
     </div>
   );
 }
