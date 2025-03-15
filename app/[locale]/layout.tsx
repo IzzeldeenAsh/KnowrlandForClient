@@ -10,6 +10,7 @@ import {notFound} from 'next/navigation';
 import {Locale, routing} from '@/i18n/routing';
 import Header from '@/components/ui/header';
 import { LoadingProvider } from '@/components/context/LoadingContext';
+import ClientLogoutHandler from './ClientLogoutHandler';
 
 const inter = Inter({
   subsets: ['latin'],
@@ -29,14 +30,13 @@ export const metadata = {
   description: 'KNOLDG is a platform for buying and selling knowledge resources, insights and expertise.',
 };
 
-export default async function LocaleLayout({
+export default async function RootLayout({
   children,
-  params
+  params: { locale }
 }: {
   children: React.ReactNode;
   params: { locale: string };
 }) {
-  const { locale } = await params;
   const direction = locale === 'ar' ? 'rtl' : 'ltr';
   
   // Ensure that the incoming `locale` is valid
@@ -102,6 +102,7 @@ export default async function LocaleLayout({
           <AOSProvider>
             <NextIntlClientProvider messages={messages}>
               <LoadingProvider>
+                <ClientLogoutHandler />
                 <Header />
                 <div className="flex flex-col min-h-screen overflow-hidden supports-[overflow:clip]:overflow-clip">
                   {children}
