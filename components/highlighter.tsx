@@ -22,8 +22,10 @@ export default function Highlighter({
   const [boxes, setBoxes] = useState<Array<HTMLElement>>([])
 
   useEffect(() => {    
-    containerRef.current && setBoxes(Array.from(containerRef.current.children).map((el) => el as HTMLElement))
-  }, [])
+    if (containerRef.current) {
+      setBoxes(Array.from(containerRef.current.children).map((el) => el as HTMLElement))
+    }
+  }, [children])
   
   useEffect(() => {    
     initContainer()
@@ -32,7 +34,7 @@ export default function Highlighter({
     return () => {
       window.removeEventListener('resize', initContainer)
     }
-  }, [setBoxes])  
+  }, [])
 
   useEffect(() => {
     onMouseMove()
@@ -60,10 +62,12 @@ export default function Highlighter({
         mouse.current.x = x
         mouse.current.y = y
         boxes.forEach((box) => {
-          const boxX = -(box.getBoundingClientRect().left - rect.left) + mouse.current.x
-          const boxY = -(box.getBoundingClientRect().top - rect.top) + mouse.current.y
-          box.style.setProperty('--mouse-x', `${boxX}px`)
-          box.style.setProperty('--mouse-y', `${boxY}px`)
+          if (box && box.isConnected) {
+            const boxX = -(box.getBoundingClientRect().left - rect.left) + mouse.current.x
+            const boxY = -(box.getBoundingClientRect().top - rect.top) + mouse.current.y
+            box.style.setProperty('--mouse-x', `${boxX}px`)
+            box.style.setProperty('--mouse-y', `${boxY}px`)
+          }
         })
       }
     }
