@@ -73,8 +73,8 @@ export default function AuthCallback() {
         router.push(`/${locale}/home`);
       } catch (error) {
         console.error('Error fetching profile:', error);
-        // Handle error - redirect to login with current locale
-        router.push(`/${locale}/login`);
+        // Redirect to app login page
+        window.location.href = 'https://app.knoldg.com/auth/login';
       }
     };
 
