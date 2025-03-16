@@ -19,7 +19,7 @@ export function useTopicStatistic(topicId: number) {
     const fetchStatistics = async () => {
       try {
         setIsLoading(true);
-        const response = await fetch(`https://api.foresighta.co/api/industries/statistic/topic/${topicId}`, {
+        const response = await fetch(`https://api.knoldg.com/api/industries/statistic/topic/${topicId}`, {
           headers: {
             "Content-Type": "application/json",
             "Accept": "application/json",
