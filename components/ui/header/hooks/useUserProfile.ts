@@ -28,7 +28,7 @@ export function useUserProfile() {
 
       try {
         const response = await fetch(
-          "https://api.foresighta.co/api/account/profile",
+          "https://api.knoldg.com/api/account/profile",
           {
             headers: {
               'Authorization': `Bearer ${token}`,

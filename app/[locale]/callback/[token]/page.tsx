@@ -36,7 +36,7 @@ export default function AuthCallback() {
         document.cookie = `auth_token=${token}; domain=.knoldg.com; path=/; max-age=${60*60*24*30}; secure; samesite=lax;`;
 
         // Fetch profile
-        const response = await fetch('https://api.foresighta.co/api/account/profile', {
+        const response = await fetch('https://api.knoldg.com/api/account/profile', {
           headers: {
             'Authorization': `Bearer ${token}`,
             "Content-Type": "application/json",
