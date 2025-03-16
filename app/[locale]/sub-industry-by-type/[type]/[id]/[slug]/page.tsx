@@ -157,12 +157,12 @@ export default function SubIndustryByTypePage({ params }: Props) {
                           <h3 className="text-sm font-bold mb-2">Knowledge</h3>
                           <ul className="space-y-2">
                             {topic.knowledge.map((item: any) => (
-                              <Link href={`/${locale}/knowledge/${item.type}/${item.slug}`} key={item.id} className="block">
-                                <li className="text-xs text-gray-600 hover:text-blue-600 transition-colors flex items-center">
-                                  <span className="mr-2">•</span>
+                              <li key={item.id} className="text-xs text-gray-600 hover:text-blue-600 transition-colors flex items-center">
+                                <span className="mr-2">•</span>
+                                <Link href={`/${locale}/knowledge/${item.type}/${item.slug}`} className="block">
                                   {item.title}
-                                </li>
-                              </Link>
+                                </Link>
+                              </li>
                             ))}
                           </ul>
                         </div>
