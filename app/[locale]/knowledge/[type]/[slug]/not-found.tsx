@@ -1,9 +1,21 @@
+'use client';
+
+import { useEffect } from 'react';
 import Link from 'next/link';
 import { Button } from '@mantine/core';
 import FooterLight from '@/components/ui/footer-light';
 import KnowledgeIcon from '@/components/icons/knowledge-icon';
+import { useParams } from 'next/navigation';
 
 export default function KnowledgeNotFound() {
+  const params = useParams();
+  const locale = params.locale as string || 'en';
+  
+  useEffect(() => {
+    // Log for debugging
+    console.log('Knowledge not found page rendered with locale:', locale);
+  }, [locale]);
+
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col">
       <div className="flex-grow flex items-center justify-center px-4 sm:px-6 lg:px-8 py-10">
@@ -15,11 +27,13 @@ export default function KnowledgeNotFound() {
           </div>
           
           <h1 className="text-4xl font-extrabold text-gray-900 tracking-tight sm:text-5xl mb-4">
-            Knowledge Not Found
+            {locale === 'ar' ? 'المعرفة غير موجودة' : 'Knowledge Not Found'}
           </h1>
           
           <p className="text-xl text-gray-500 mb-8">
-            We couldn't find the knowledge resource you're looking for. It may have been removed, renamed, or is temporarily unavailable.
+            {locale === 'ar' 
+              ? 'لم نتمكن من العثور على مورد المعرفة الذي تبحث عنه. ربما تمت إزالته أو إعادة تسميته أو أنه غير متاح مؤقتًا.'
+              : 'We couldn\'t find the knowledge resource you\'re looking for. It may have been removed, renamed, or is temporarily unavailable.'}
           </p>
           
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
@@ -29,16 +43,16 @@ export default function KnowledgeNotFound() {
               color="blue"
               className="py-3 px-6"
             >
-              Go Back
+              {locale === 'ar' ? 'العودة' : 'Go Back'}
             </Button>
             
-            <Link href="/en/knowledges" passHref>
+            <Link href={`/${locale}/knowledges`} passHref>
               <Button
                 variant="filled"
                 color="blue"
                 className="py-3 px-6"
               >
-                Browse Knowledge
+                {locale === 'ar' ? 'تصفح المعرفة' : 'Browse Knowledge'}
               </Button>
             </Link>
           </div>
