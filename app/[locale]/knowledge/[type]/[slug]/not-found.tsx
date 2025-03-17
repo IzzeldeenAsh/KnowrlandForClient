@@ -1,15 +1,9 @@
-'use client';
-
 import Link from 'next/link';
-import Image from 'next/image';
-import { useRouter } from 'next/navigation';
 import { Button } from '@mantine/core';
 import FooterLight from '@/components/ui/footer-light';
 import KnowledgeIcon from '@/components/icons/knowledge-icon';
 
 export default function KnowledgeNotFound() {
-  const router = useRouter();
-
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col">
       <div className="flex-grow flex items-center justify-center px-4 sm:px-6 lg:px-8 py-10">
@@ -30,7 +24,7 @@ export default function KnowledgeNotFound() {
           
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Button
-              onClick={() => router.back()}
+              onClick={() => window.history.back()}
               variant="outline"
               color="blue"
               className="py-3 px-6"

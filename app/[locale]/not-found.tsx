@@ -2,7 +2,7 @@ import Link from 'next/link';
 import { Button } from '@mantine/core';
 import FooterLight from '@/components/ui/footer-light';
 
-export default function GlobalNotFound() {
+export default function LocaleNotFound() {
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col">
       <div className="flex-grow flex items-center justify-center px-4 sm:px-6 lg:px-8 py-10">
