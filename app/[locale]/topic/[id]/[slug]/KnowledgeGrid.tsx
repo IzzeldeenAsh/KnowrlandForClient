@@ -46,6 +46,18 @@ function formatPublishedDate(dateString: string) {
   return formatDistanceToNow(date, { addSuffix: true });
 }
 
+function truncateDescription(description: string, wordLimit: number = 20): string {
+  if (!description) return '';
+  
+  // Remove HTML tags to get plain text
+  const plainText = description.replace(/<[^>]*>/g, '');
+  
+  const words = plainText.split(/\s+/);
+  if (words.length <= wordLimit) return plainText;
+  
+  return words.slice(0, wordLimit).join(' ') + '...';
+}
+
 export default function KnowledgeGrid({ knowledge, topicName, showHeader=true, colNumbers=3, locale }: KnowledgeGridProps) {
   const params = useParams();
   const currentLocale = locale || params.locale || 'en';
@@ -83,7 +95,9 @@ export default function KnowledgeGrid({ knowledge, topicName, showHeader=true, c
               <Text fw={700} className={cardStyles.title} mt="xs" lineClamp={2}>
                 {item.title}
               </Text>
-              <Text className={`${cardStyles.description} text-gray-500`} lineClamp={3} dangerouslySetInnerHTML={{ __html: item.description }} />
+              <Text className={`${cardStyles.description} text-gray-500`} mt="sm">
+                {truncateDescription(item.description, 25)}
+              </Text>
             </div>
               <Group mt="lg">
               <Avatar
