@@ -212,6 +212,7 @@ export function UserProfile({ isHome }: { isHome: boolean }) {
             {(roles.includes("insighter") ||
               roles.includes("company") ||
               roles.includes("company-insighter")) && (
+            <>
               <Link
                 href="https://app.knoldg.com/app/add-knowledge/stepper"
                 className="block px-4 py-2.5 text-sm font-medium text-sky-600 hover:bg-indigo-50 hover:text-sky-700"
@@ -220,6 +221,15 @@ export function UserProfile({ isHome }: { isHome: boolean }) {
               >
                 Add Knowledge +
               </Link>
+               <Link
+               href="https://app.knoldg.com/app/insighter-dashboard/my-knowledge/general"
+               className="block px-4 py-2.5  font-medium text-slate-900 hover:bg-indigo-50 hover:text-sky-700"
+               onClick={() => setMenuOpen(false)}
+               style={{fontSize: '13px'}}
+             >
+               Knowledge Base
+             </Link>
+             </>
             )}
             <Link
               href="https://app.knoldg.com/app/profile/overview"
@@ -239,7 +249,7 @@ export function UserProfile({ isHome }: { isHome: boolean }) {
                   onClick={() => setMenuOpen(false)}
                   style={{fontSize: '13px'}}
                 >
-                  Overview
+                  Dashboard
                 </Link>
                 <Link
                   href="https://app.knoldg.com/app/insighter-dashboard/my-requests"
@@ -249,14 +259,7 @@ export function UserProfile({ isHome }: { isHome: boolean }) {
                 >
                   My Requests
                 </Link>
-                <Link
-                  href="https://app.knoldg.com/app/insighter-dashboard/my-knowledge/general"
-                  className="block px-4 py-2.5  font-medium text-slate-900 hover:bg-indigo-50 hover:text-sky-700"
-                  onClick={() => setMenuOpen(false)}
-                  style={{fontSize: '13px'}}
-                >
-                  Knowledge Base
-                </Link>
+               
                 <Link
                   href="https://app.knoldg.com/app/insighter-dashboard/account-settings/general-settings"
                   className="block px-4 py-2.5  font-medium text-slate-900 hover:bg-indigo-50 hover:text-sky-700"
@@ -270,7 +273,8 @@ export function UserProfile({ isHome }: { isHome: boolean }) {
 
             {roles.includes("client") &&
               !roles.includes("insighter") &&
-              !roles.includes("company") && (
+              !roles.includes("company") &&
+              !roles.includes("company-insighter") && (
                 <Link
                   href="https://app.knoldg.com/app/insighter-register/vertical"
                   className="block px-4 py-2.5  font-semibold bg-clip-text text-transparent bg-gradient-to-r from-blue-500 to-teal-400"
