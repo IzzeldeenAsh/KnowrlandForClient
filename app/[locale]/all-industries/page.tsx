@@ -14,7 +14,7 @@ interface Props {
 }
 
 export const metadata: Metadata = {
-  title: 'All Industries - KNOLDG',
+  title: 'Industries - KNOLDG',
   description: 'Explore all industries and their sub-categories.',
 }
 
@@ -103,7 +103,7 @@ export default async function AllIndustries({ params }: Props) {
                       className="h1 mb-4 font-bold text-5xl md:text-6xl bg-clip-text text-transparent bg-gradient-to-r from-blue-500 to-teal-400" 
                       data-aos="zoom-y-out"
                     >
-                      All Industries
+                       Industries
                     </h1>
                     <p 
                       className="text-xl text-gray-600"
