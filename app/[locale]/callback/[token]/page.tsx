@@ -69,8 +69,17 @@ export default function AuthCallback() {
         });
         document.cookie = `auth_user=${encodeURIComponent(userData)}; domain=.knoldg.com; path=/; max-age=${60*60*24*30}; secure; samesite=lax;`;
 
-        // Redirect to home page using current locale
-        router.push(`/${locale}/home`);
+        // Check if user has special roles for conditional redirect
+        if (data.data.roles && 
+            (data.data.roles.includes('insighter') || 
+             data.data.roles.includes('company') || 
+             data.data.roles.includes('company-insighter'))) {
+          // Redirect to insighter dashboard
+          window.location.href = 'https://app.knoldg.com/app/insighter-dashboard/my-dashboard';
+        } else {
+          // Redirect to home page using current locale
+          router.push(`/${locale}/home`);
+        }
       } catch (error) {
         console.error('Error fetching profile:', error);
         // Redirect to app login page
