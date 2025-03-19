@@ -1,6 +1,7 @@
 import Image from 'next/image'
 import Particles from './particles'
 import Illustration from '@/public/images/glow-bottom-blue.svg'
+import LogoIcon from '@/public/images/SVG/Logo-icon-white.svg'
 import Link from 'next/link'
 import { useTranslations } from 'next-intl'
 
@@ -21,10 +22,10 @@ export default function Hero() {
           </div>
         </div>
 
-        <div className="pt-32 pb-16 md:pt-52 md:pb-32">
+        <div className="pt-32 pb-16 md:pt-52 md:pb-32" >
 
           {/* Hero content */}
-          <div className="max-w-3xl mx-auto text-center">
+          <div className="max-w-3xl mx-auto text-center" >
             <div className="mb-6" data-aos="fade-down">
               <div className="inline-flex relative before:absolute before:inset-0 before:bg-blue-500 before:blur-md">
                 {/* <Link href='/' className="btn-sm py-0.5 text-slate-300 hover:text-white transition duration-150 ease-in-out group [background:linear-gradient(theme(colors.blue.500),_theme(colors.blue.500))_padding-box,_linear-gradient(theme(colors.blue.500),_theme(colors.blue.200)_75%,_theme(colors.transparent)_100%)_border-box] relative before:absolute before:inset-0 before:bg-slate-800/50 before:rounded-full before:pointer-events-none shadow">
@@ -34,7 +35,10 @@ export default function Hero() {
                 </Link> */}
               </div>
             </div>
-            <h1 className="h1 bg-clip-text text-transparent bg-gradient-to-r from-slate-200/60 via-slate-200 to-slate-200/60 pb-5 leading-[1.2]" data-aos="fade-down">{t('title')}</h1>
+            <div className="flex justify-center mb-6" data-aos="fade-down" data-aos-delay="100">
+              <Image src={LogoIcon} width={80} height={80} alt="Logo" priority />
+            </div>
+            <h2 className="h2 bg-clip-text text-transparent bg-gradient-to-r from-slate-200/60 via-slate-200 to-slate-200/60 pb-5 leading-[1.2]" data-aos="fade-down">{t('title')}</h2>
             <p className="text-lg text-slate-300 mb-8" data-aos="fade-down" data-aos-delay="200">
               {t('description')}
             </p>
