@@ -143,10 +143,10 @@ export default function Overview({ knowledge }: OverviewProps) {
                   {doc.description && (
                     <div className={styles.description}>
                       <h6>Description</h6>
-                      <p>{doc.description}</p>
+                      <p dangerouslySetInnerHTML={{ __html: doc.description }}></p>
                     </div>
                   )}
-                  {doc.table_of_content && Array.isArray(doc.table_of_content) && (
+                  {doc.table_of_content && Array.isArray(doc.table_of_content) && doc.table_of_content.length > 0 && (
                     <div className={styles.tableOfContents}>
                       <h6>Table of Contents</h6>
                       <table className={styles.tocTable}>
