@@ -28,7 +28,7 @@ interface Industry {
 }
 
 async function getIndustries() {
-  const res = await fetch("https://api.knoldg.com/api/industries/menu", {
+  const res = await fetch("https://api.foresighta.co/api/industries/menu", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -62,8 +62,8 @@ export default function Header() {
   const pathname = usePathname();
   const router = useRouter();
   
-  // Check if we're on the homepage
-  const isHomePage = pathname === '/en' || pathname === '/ar' || pathname === '/';
+  // Check if we're on the homepage or about page
+  const isHomePage = pathname === '/en' || pathname === '/ar' || pathname === '/' || pathname === '/en/about' || pathname === '/ar/about';
   
   // Define text color classes based on current page
   const textColorClass = isHomePage 
@@ -121,7 +121,7 @@ export default function Header() {
       }
 
       try {
-        const response = await fetch('https://api.knoldg.com/api/account/profile', {
+        const response = await fetch('https://api.foresighta.co/api/account/profile', {
           headers: {
             'Authorization': `Bearer ${token}`,
             "Content-Type": "application/json",
@@ -315,10 +315,10 @@ export default function Header() {
               <li>
                 <Link className={`font-medium text-sm ${menuTextColorClass} mx-2 lg:mx-4 transition duration-150 ease-in-out`} href={`/${pathname.split('/')[1]}/industries/insight`}>{t('navigation.insights')}</Link>
               </li>
-              <li>
+              <li className='lg:block hidden'>
                 <Link className={`font-medium text-sm ${menuTextColorClass} mx-2 lg:mx-4 transition duration-150 ease-in-out`} href={`/${pathname.split('/')[1]}/industries/manual`}>{t('navigation.manuals')}</Link>
               </li>
-              <li>
+              <li className='lg:block hidden'>
                 <Link className={`font-medium text-sm ${menuTextColorClass} mx-2 lg:mx-4 transition duration-150 ease-in-out`} href={`/${pathname.split('/')[1]}/industries/course`}>{t('navigation.courses')}</Link>
               </li>
             </ul>

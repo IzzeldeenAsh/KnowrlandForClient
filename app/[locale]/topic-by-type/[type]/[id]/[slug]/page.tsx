@@ -97,9 +97,7 @@ export default function TopicByTypePage({ params }: Props) {
               <h3 className={styles.headerTitle}>
                 {subIndustry?.name || 'Loading...'}
               </h3>
-              <p className={styles.description}>
-                Explore our comprehensive collection of {type}s for {subIndustry?.name}. Get detailed insights and analysis to support your business decisions.
-              </p>
+             
             </div>
           </div>
         </div>

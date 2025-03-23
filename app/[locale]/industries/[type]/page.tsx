@@ -110,9 +110,7 @@ export default function IndustriesByTypePage({ params }: Props) {
               <h3 className="text-md bg-gradient-to-r from-blue-500 to-teal-400 md:text-3xl font-extrabold text-transparent bg-clip-text mb-4">
                 Industries by {capitalizeFirstLetter(type)}
               </h3>
-              <p className="text-gray-600 text-sm md:text-base leading-relaxed max-w-3xl">
-                Explore our comprehensive collection of industry {type}s. Get detailed insights and analysis across various sectors to support your business decisions.
-              </p>
+           
             </div>
           </div>
         </div>

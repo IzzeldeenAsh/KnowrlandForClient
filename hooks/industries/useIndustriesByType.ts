@@ -18,7 +18,7 @@ export function useIndustriesByType({ type, topSubIndustry = 2 }: UseIndustriesB
         setIsLoading(true);
         setError(null);
         
-        const res = await fetch(`https://api.knoldg.com/api/industries/type/${type}`, {
+        const res = await fetch(`https://api.foresighta.co/api/industries/type/${type}`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
