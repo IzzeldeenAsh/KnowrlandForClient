@@ -22,8 +22,7 @@ export default function Hero() {
           </div>
         </div>
 
-        <div className="pt-32 pb-16 md:pt-52 md:pb-32" >
-
+        <div className="pt-32 pb-16  md:pb-32" >
           {/* Hero content */}
           <div className="max-w-3xl mx-auto text-center" >
             <div className="mb-6" data-aos="fade-down">

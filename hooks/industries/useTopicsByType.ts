@@ -90,7 +90,7 @@ export function useTopicsByType({ type, id, slug, topKnowledge = 10 }: UseTopics
         setError(null);
         
         const response = await fetch(
-          `https://api.knoldg.com/api/industries/type/topics/${type}/${id}/${slug}`,
+          `https://api.foresighta.co/api/industries/type/topics/${type}/${id}/${slug}`,
           {
             method: 'POST',
             headers: {

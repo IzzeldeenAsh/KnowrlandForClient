@@ -70,7 +70,7 @@ async function fetchKnowledgeItems({ taxonomy, id, type, page, locale }: FetchKn
   if (taxonomy && id) params.append(taxonomy, id);
   params.append('page', page.toString());
 
-  const response = await fetch(`https://api.knoldg.com/api/industries/type/knowledge?${params.toString()}`, {
+  const response = await fetch(`https://api.foresighta.co/api/industries/type/knowledge?${params.toString()}`, {
     headers: {
       "Content-Type": "application/json",
       "Accept": "application/json",
@@ -128,7 +128,7 @@ export default function KnowledgesClient() {
   useEffect(() => {
     if (selectedId && taxonomy === 'industry') {
       // Fetch sub-industries for the selected industry
-      fetch(`https://api.knoldg.com/api/industries/${selectedId}/subindustries`, {
+      fetch(`https://api.foresighta.co/api/industries/${selectedId}/subindustries`, {
         headers: {
           "Accept-Language": locale,
         },
@@ -147,7 +147,7 @@ export default function KnowledgesClient() {
   useEffect(() => {
     if (selectedId && taxonomy === 'sub_industry') {
       // Fetch topics for the selected sub-industry
-      fetch(`https://api.knoldg.com/api/subindustries/${selectedId}/topics`, {
+      fetch(`https://api.foresighta.co/api/subindustries/${selectedId}/topics`, {
         headers: {
           "Accept-Language": locale,
         },
@@ -248,15 +248,14 @@ export default function KnowledgesClient() {
   return (
     <>
        <PageIllustration />
-       <Container size="xl" py="xl" style={{position: 'relative', zIndex: 1}}>
+       <Container size="xl" py="xl" mt="xl" style={{position: 'relative', zIndex: 1}}>
    
       
    <Title order={1} mb="xl"></Title>
    
    {/* Filters Section */}
-   <Box mb="xl" >
+   {/* <Box mb="xl" >
      <Grid >
-       {/* Taxonomy Filter */}
        <Grid.Col span={{ base: 12, md: 4 }}>
          <Select
            label="Filter By"
@@ -272,7 +271,6 @@ export default function KnowledgesClient() {
          />
        </Grid.Col>
        
-       {/* ID Filter (dynamic based on taxonomy) */}
        <Grid.Col span={{ base: 12, md: 4 }}>
          {taxonomy === 'industry' && (
            <Select
@@ -311,7 +309,6 @@ export default function KnowledgesClient() {
          )}
        </Grid.Col>
        
-       {/* Knowledge Type Filter */}
        <Grid.Col span={{ base: 12, md: 4 }}>
          <Select
            label="Knowledge Type"
@@ -323,7 +320,7 @@ export default function KnowledgesClient() {
          />
        </Grid.Col>
      </Grid>
-   </Box>
+   </Box> */}
    
    {/* Results Controls */}
    <Flex justify="space-between" align="center" mb="md">

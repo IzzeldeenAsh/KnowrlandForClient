@@ -38,7 +38,7 @@ export default function TabsContent({ knowledge }: { knowledge: KnowledgeDetails
       <div className="border-b border-gray-200">
         <nav className="-mb-px flex space-x-8 knowledge-tab-nav relative " aria-label="Tabs">
       
-          {["Overview", "Reviews", "Ask Insighter", "Meet the insighter"].map((tab) => (
+          {["Overview", "Reviews", "Ask Insighter"].map((tab) => (
             <button
               key={tab}
               onClick={() => setActiveTab(tab)}

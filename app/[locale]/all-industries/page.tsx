@@ -20,7 +20,7 @@ export const metadata: Metadata = {
 
 async function getAllIndustries(locale: string) {
   
-  const apiUrl = 'https://api.knoldg.com/api/industries'
+  const apiUrl = 'https://api.foresighta.co/api/industries'
   
   try {
     const res = await fetch(apiUrl, {
@@ -98,20 +98,13 @@ export default async function AllIndustries({ params }: Props) {
               <div className="section-header   px-4 sm:px-6 lg:px-8 py-8 lg:py-12 relative overflow-hidden rounded-lg">
                   <div className="relative z-10 max-w-6xl relative mx-auto mt-20 w-full ">
                    <Breadcrumb items={breadcrumbItems} />
-                  <div className="mx-auto  max-w-3xl text-center pb-12 md:pb-16">
+                  <div className="mx-auto  max-w-3xl text-center pb-12 ">
                     <h1 
-                      className="h1 mb-4 font-bold text-5xl md:text-6xl bg-clip-text text-transparent bg-gradient-to-r from-blue-500 to-teal-400" 
+                      className="h1 font-bold text-5xl md:text-6xl bg-clip-text text-transparent bg-gradient-to-r from-blue-500 to-teal-400" 
                       data-aos="zoom-y-out"
                     >
                        Industries
                     </h1>
-                    <p 
-                      className="text-xl text-gray-600"
-                      data-aos="zoom-y-out" 
-                      data-aos-delay="150"
-                    >
-                      Explore our comprehensive list of industries and their sub-categories.
-                    </p>
                     {error && (
                       <div className="mt-4 text-sm text-red-500 bg-red-50 p-3 rounded-lg">
                         {error}
