@@ -42,7 +42,7 @@ interface Props {
 
 async function fetchSubIndustryData(id: string, slug: string, locale: string = 'en') {
   const response = await fetch(
-    `https://api.knoldg.com/api/industries/sub/${id}/${slug}`,
+    `https://api.foresighta.co/api/industries/sub/${id}/${slug}`,
     {
       method: 'POST',
       headers: {
@@ -141,16 +141,14 @@ export default async function SubIndustryPage({ params }: Props) {
               </div>
               {/* Header */}
                  <div className="flex flex-col md:flex-row items-start justify-between">
-                  <div className="text-start mb-4" data-aos="fade-down">
+                  <div className="text-start " data-aos="fade-down">
                     <span className="inline-block px-5 py-1 text-xs font-semibold text-blue-500 bg-blue-100 rounded-md mb-2 uppercase">
                      Sub Industry
                     </span>
-                    <h3 className="text-md bg-gradient-to-r from-blue-500 to-teal-400 md:text-3xl font-extrabold text-transparent bg-clip-text mb-4">
+                    <h3 className="text-md bg-gradient-to-r from-blue-500 to-teal-400 md:text-3xl font-extrabold text-transparent bg-clip-text ">
                       { subIndustry.name}
                     </h3>
-                    <p className="text-gray-600 text-sm md:text-base leading-relaxed max-w-3xl">
-                      Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
-                    </p>
+                   
                   </div>
                       {/* Stats Cards */}
                       <StatisticsCards type="subIndustry" id={parseInt(id)} />

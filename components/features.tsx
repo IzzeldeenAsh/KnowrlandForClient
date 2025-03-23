@@ -79,13 +79,13 @@ export default function Features() {
               {/* Image */}
               <div className="" data-aos="fade-up" data-aos-delay="100">
                 <figure className="bg-gradient-to-b from-slate-300/20 to-transparent rounded-3xl p-px mb-8">
-                  <Image
+                  {/* <Image
                     className="w-full rounded-[inherit]"
                     src={ChangelogImg01}
                     width={350}
                     height={250}
                     alt="Feature 1"
-                  />
+                  /> */}
                 </figure>
               </div>
             </div>
