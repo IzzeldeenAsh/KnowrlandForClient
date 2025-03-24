@@ -8,7 +8,7 @@ export default function HomePage() {
    <main className=''>
     < Header />
     <HeroLight />
-    <FooterLight/>
+    <Footer/>
     </main>
   )
 }
