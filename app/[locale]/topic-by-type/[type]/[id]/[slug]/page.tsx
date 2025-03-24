@@ -3,7 +3,7 @@
 import {  IndustryType } from '@/hooks/industries';
 import { Container, Text, Skeleton, Card, Badge, Group, Avatar } from '@mantine/core';
 ;
-import FooterLight from '@/components/ui/footer-light';
+import Footer from '@/components/ui/footer';
 import Link from 'next/link';
 import Image from 'next/image';
 import { notFound } from 'next/navigation';
@@ -72,7 +72,7 @@ export default function TopicByTypePage({ params }: Props) {
         <Container className={styles.container}>
           <Text color="red">{error}</Text>
         </Container>
-        <FooterLight />
+        <Footer />
       </>
     );
   }
@@ -175,7 +175,7 @@ export default function TopicByTypePage({ params }: Props) {
           )}
         </div>
       </div>
-      <FooterLight />
+      <Footer />
     </>
   );
 }
