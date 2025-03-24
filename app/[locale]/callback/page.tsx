@@ -33,18 +33,10 @@ export default function QueryParamAuthCallback() {
           throw new Error('No token provided');
         }
 
-        // Set cookie with appropriate domain based on environment
-        const domain = window.location.hostname === 'localhost' ? '' : 
-                     window.location.hostname.includes('knoldg.com') ? '.knoldg.com' : 
-                     window.location.hostname;
-        
-        // Store token in localStorage as fallback
+        // Store token in localStorage only
+        console.log('[callback] Storing token in localStorage');
         localStorage.setItem('token', token);
         
-        // Set cookies with appropriate domain
-        const cookieDomain = domain ? `domain=${domain};` : '';
-        document.cookie = `auth_token=${token}; ${cookieDomain} path=/; max-age=${60*60*24*30}; ${window.location.protocol === 'https:' ? 'secure;' : ''} samesite=lax;`;
-
         // Fetch profile
         const response = await fetch('https://api.foresighta.co/api/account/profile', {
           headers: {
@@ -61,7 +53,8 @@ export default function QueryParamAuthCallback() {
 
         const data: ProfileResponse = await response.json();
         
-        // Store user data in localStorage as fallback
+        // Store user data in localStorage only
+        console.log('[callback] Storing user data in localStorage');
         localStorage.setItem('user', JSON.stringify({
           id: data.data.id,
           name: data.data.name,
@@ -71,14 +64,6 @@ export default function QueryParamAuthCallback() {
           last_name: data.data.last_name,
         }));
         
-        // Also store minimal user info in cookie for cross-domain access
-        const userData = JSON.stringify({
-          id: data.data.id,
-          name: data.data.name,
-          email: data.data.email,
-        });
-        document.cookie = `auth_user=${encodeURIComponent(userData)}; ${cookieDomain} path=/; max-age=${60*60*24*30}; ${window.location.protocol === 'https:' ? 'secure;' : ''} samesite=lax;`;
-
         // Check if user has special roles for conditional redirect
         if (data.data.roles && 
             (data.data.roles.includes('insighter') || 
