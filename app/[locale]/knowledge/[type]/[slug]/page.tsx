@@ -1,4 +1,4 @@
-import FooterLight from "@/components/ui/footer-light";
+import Footer from '@/components/ui/footer'
 import Breadcrumb from "@/components/ui/breadcrumb";
 import Image from "next/image";
 import { Metadata } from "next";
@@ -158,7 +158,7 @@ export default async function KnowledgePage({ params }: Props) {
       </div>
       
       {/* Header Section */}
-      <div className="section-header px-4 sm:px-6 lg:px-8 py-8 lg:py-12 relative overflow-hidden rounded-lg">
+      <div className="section-header px-4 sm:px-6 lg:px-8 py-8  relative overflow-hidden rounded-lg">
         <Image
           alt="Section background"
           src="https://res.cloudinary.com/dsiku9ipv/image/upload/v1737266454/breadcrumb-bg-2_anwto8.png"
@@ -265,7 +265,7 @@ export default async function KnowledgePage({ params }: Props) {
         </div>
       </div>
 
-      <FooterLight />
+      <Footer />
     </div>
   );
 }

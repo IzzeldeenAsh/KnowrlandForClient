@@ -3,7 +3,7 @@
 import { useEffect } from 'react';
 import Link from 'next/link';
 import { Button } from '@mantine/core';
-import FooterLight from '@/components/ui/footer-light';
+import Footer from '@/components/ui/footer';
 import KnowledgeIcon from '@/components/icons/knowledge-icon';
 import { useParams } from 'next/navigation';
 
@@ -59,7 +59,7 @@ export default function KnowledgeNotFound() {
         </div>
       </div>
       
-      <FooterLight />
+      <Footer />
     </div>
   );
 } 

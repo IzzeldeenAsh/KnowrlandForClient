@@ -3,7 +3,7 @@
 import { useEffect } from 'react';
 import Link from 'next/link';
 import { Button } from '@mantine/core';
-import FooterLight from '@/components/ui/footer-light';
+import Footer from '@/components/ui/footer';
 
 export default function GlobalError({
   error,
@@ -60,7 +60,7 @@ export default function GlobalError({
         </div>
       </div>
       
-      <FooterLight />
+      <Footer />
     </div>
   );
 } 

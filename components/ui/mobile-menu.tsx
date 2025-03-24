@@ -21,20 +21,14 @@ export default function MobileMenu({ isHomePage = true }: MobileMenuProps) {
   const isRtl = pathname.startsWith('/ar');
   const currentLocale = pathname.split('/')[1];
 
-  // Text colors based on home page or inner page
-  const menuTextColorClass = isHomePage
-    ? 'text-slate-300 hover:text-white'
-    : 'text-slate-700 hover:text-slate-900';
-
-  // Background styles for the menu
-  const menuBgStyle = isHomePage
-    ? "border border-transparent [background:linear-gradient(theme(colors.slate.900),_theme(colors.slate.900))_padding-box,_conic-gradient(theme(colors.slate.400),_theme(colors.slate.700)_25%,_theme(colors.slate.700)_75%,_theme(colors.slate.400)_100%)_border-box]"
-    : "bg-white border border-slate-200 shadow-lg";
-
-  // Border color for dividers
-  const borderColorClass = isHomePage
-    ? "border-slate-700/50"
-    : "border-slate-200";
+  // Always use dark style with white text (matching the updated header)
+  const menuTextColorClass = 'text-slate-300 hover:text-white';
+  
+  // Always use dark style background (matching the updated header)
+  const menuBgStyle = "border border-transparent [background:linear-gradient(theme(colors.slate.900),_theme(colors.slate.900))_padding-box,_conic-gradient(theme(colors.slate.400),_theme(colors.slate.700)_25%,_theme(colors.slate.700)_75%,_theme(colors.slate.400)_100%)_border-box]";
+  
+  // Dark border color for dividers
+  const borderColorClass = "border-slate-700/50";
 
   // Function to switch locale
   const switchLocale = (locale: string) => {
@@ -117,10 +111,10 @@ export default function MobileMenu({ isHomePage = true }: MobileMenuProps) {
       <nav
         id="mobile-nav"
         ref={mobileNav}
-        className={`absolute top-full z-20 ${isRtl ? 'right-0' : 'left-0'} w-full px-4 sm:px-6 overflow-hidden transition-all duration-300 ease-in-out`}
+        className={`fixed top-16 z-50 ${isRtl ? 'right-0' : 'left-0'} w-full px-4 sm:px-6 overflow-hidden transition-all duration-300 ease-in-out`}
         style={mobileNavOpen ? { maxHeight: mobileNav.current?.scrollHeight, opacity: 1 } : { maxHeight: 0, opacity: 0.8 }}
       >
-        <ul className={`rounded-lg px-4 py-1.5 max-w-full ${menuBgStyle}`}>
+        <ul className={`rounded-lg px-4 py-1.5 max-w-full ${menuBgStyle} bg-opacity-95 backdrop-blur-sm`}>
           <li>
             <Link className={`flex font-medium text-sm ${menuTextColorClass} py-1.5`} href={`/${currentLocale}/all-industries`}>{t('navigation.industries')}</Link>
           </li>

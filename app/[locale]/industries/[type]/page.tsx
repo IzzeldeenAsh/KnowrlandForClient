@@ -2,7 +2,7 @@
 
 import { useIndustriesByType, IndustryType, Industry } from '@/hooks/industries';
 import { Container, Text, Skeleton } from '@mantine/core';
-import FooterLight from '@/components/ui/footer-light';
+import Footer from '@/components/ui/footer';
 import Link from 'next/link';
 import Image from 'next/image';
 import { notFound, useParams } from 'next/navigation';
@@ -67,7 +67,7 @@ export default function IndustriesByTypePage({ params }: Props) {
         <Container className={styles.container}>
           <Text color="red">{error}</Text>
         </Container>
-        <FooterLight />
+        <Footer />
       </div>
     );
   }
@@ -168,7 +168,7 @@ export default function IndustriesByTypePage({ params }: Props) {
           </div>
         </div>
       </div>
-      <FooterLight />
+      <Footer />
     </div>
   );
 }
