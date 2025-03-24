@@ -72,7 +72,7 @@ interface Props {
 async function fetchKnowledgeData(type: string, slug: string) {
   try {
     const response = await fetch(
-      `https://api.foresighta.co/api/industries/knowledge/${slug}`,
+      `https://api.knoldg.com/api/industries/knowledge/${slug}`,
       {
         method: "GET",
         headers: {

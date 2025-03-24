@@ -33,7 +33,7 @@ export default function AuthCallback() {
         localStorage.setItem('token', token);
         
         // Fetch profile
-        const response = await fetch('https://api.foresighta.co/api/account/profile', {
+        const response = await fetch('https://api.knoldg.com/api/account/profile', {
           headers: {
             'Authorization': `Bearer ${token}`,
             "Content-Type": "application/json",
@@ -64,8 +64,9 @@ export default function AuthCallback() {
             (data.data.roles.includes('insighter') || 
              data.data.roles.includes('company') || 
              data.data.roles.includes('company-insighter'))) {
-          // Redirect to insighter dashboard
-          window.location.href = 'https://app.knoldg.com/app/insighter-dashboard/my-dashboard';
+          // Redirect to insighter dashboard with token
+          console.log('[token-callback] Redirecting to Angular app with token parameter');
+          window.location.href = `https://app.knoldg.com/app/insighter-dashboard/my-dashboard?nextjs_token=${encodeURIComponent(token)}`;
         } else {
           // Redirect to home page using current locale
           router.push(`/${locale}/home`);

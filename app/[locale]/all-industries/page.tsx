@@ -20,7 +20,7 @@ export const metadata: Metadata = {
 
 async function getAllIndustries(locale: string) {
   
-  const apiUrl = 'https://api.foresighta.co/api/industries'
+  const apiUrl = 'https://api.knoldg.com/api/industries'
   
   try {
     const res = await fetch(apiUrl, {
