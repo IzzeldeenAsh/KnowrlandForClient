@@ -21,12 +21,16 @@ export function useUserProfile() {
       const token = localStorage.getItem("token");
       setIsLoading(true);
 
+      console.log("[useUserProfile] Checking authentication state", { hasToken: !!token });
+
       if (!token) {
         setIsLoading(false);
+        console.log("[useUserProfile] No token found in localStorage");
         return;
       }
 
       try {
+        console.log("[useUserProfile] Fetching profile with token");
         const response = await fetch(
           "https://api.foresighta.co/api/account/profile",
           {
@@ -38,6 +42,11 @@ export function useUserProfile() {
             },
           }
         );
+
+        console.log("[useUserProfile] Profile fetch response", { 
+          status: response.status,
+          ok: response.ok 
+        });
 
         if (!response.ok) {
           throw new Error("Failed to fetch profile");
@@ -54,10 +63,18 @@ export function useUserProfile() {
           last_name: data.data.last_name,
         };
 
+        console.log("[useUserProfile] Successfully retrieved profile", { 
+          userId: data.data.id,
+          roles: data.data.roles 
+        });
+
         localStorage.setItem("user", JSON.stringify(userData));
         setUser(userData);
       } catch (error) {
-        console.error("Error fetching profile:", error);
+        console.error("[useUserProfile] Error fetching profile:", error);
+        // Remove token if it's invalid to prevent authentication loops
+        localStorage.removeItem('token');
+        localStorage.removeItem('user');
       } finally {
         setIsLoading(false);
       }
@@ -65,29 +82,16 @@ export function useUserProfile() {
 
     const userData = localStorage.getItem("user");
     if (userData) {
+      console.log("[useUserProfile] Found cached user data in localStorage");
       setUser(JSON.parse(userData));
     }
     fetchProfile();
   }, []);
 
   const handleSignOut = () => {
-    // Helper function to remove cookies properly
-    const removeCookie = (name: string) => {
-      // Remove from current domain
-      document.cookie = `${name}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;`;
-      
-      // Remove from root domain (affects both knoldg.com and app.knoldg.com)
-      document.cookie = `${name}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/; domain=.knoldg.com;`;
-    };
-    
-    // Clear localStorage in current app
+    // Clear localStorage only
     localStorage.removeItem('token');
     localStorage.removeItem('user');
-    
-    // Clear any auth cookies
-    removeCookie('token');
-    removeCookie('auth_token');
-    removeCookie('auth_user');
     
     // Get the current locale for the redirect
     const locale = pathname.split('/')[1] || 'en';
@@ -97,7 +101,7 @@ export function useUserProfile() {
     
     // Perform a coordinated logout by redirecting to the Angular app's logout endpoint
     // After the Angular app processes the logout, it will redirect back to our homepage
-    window.location.href = `https://app.knoldg.com/auth/logout?redirect_uri=${encodeURIComponent(`https://knoldg.com/${locale}?t=${timestamp}`)}`;
+    window.location.href = `https://app.knoldg.com/auth/logout?redirect_uri=${encodeURIComponent(`https://knoldg.com/${locale}?t=${timestamp}`)}`;  
   };
 
   return { user, roles, isLoading, handleSignOut };
