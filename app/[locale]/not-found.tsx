@@ -3,7 +3,7 @@
 import { useEffect } from 'react';
 import Link from 'next/link';
 import { Button } from '@mantine/core';
-import FooterLight from '@/components/ui/footer-light';
+import Footer from '@/components/ui/footer';
 import { useParams } from 'next/navigation';
 
 export default function LocaleNotFound() {
@@ -56,7 +56,7 @@ export default function LocaleNotFound() {
         </div>
       </div>
       
-      <FooterLight />
+      <Footer />
     </div>
   );
 } 

@@ -2,7 +2,7 @@ import { Metadata } from 'next'
 import PageIllustration from "@/components/page-illustration"
 import IndustriesGrid from '@/components/industries-grid'
 
-import FooterLight from '@/components/ui/footer-light'
+import Footer from '@/components/ui/footer'
 import Breadcrumb from '@/components/ui/breadcrumb'
 
 interface Params {
@@ -128,7 +128,7 @@ export default async function AllIndustries({ params }: Props) {
       </main>
      
     </div>
-     <FooterLight />
+     <Footer />
      </>
   )
 }
