@@ -28,12 +28,17 @@ export default function AuthCallback() {
   useEffect(() => {
     const fetchProfile = async () => {
       try {
+        // Set cookie with appropriate domain based on environment
+        const domain = window.location.hostname === 'localhost' ? '' : 
+                     window.location.hostname.includes('knoldg.com') ? '.knoldg.com' : 
+                     window.location.hostname;
+                     
         // Store token in localStorage as fallback
         localStorage.setItem('token', token);
         
-        // Set cookie for the root domain (.knoldg.com) to be accessible by all subdomains
-        // Set secure cookie with max-age of 30 days (or adjust as needed)
-        document.cookie = `auth_token=${token}; domain=.knoldg.com; path=/; max-age=${60*60*24*30}; secure; samesite=lax;`;
+        // Set cookies with appropriate domain
+        const cookieDomain = domain ? `domain=${domain};` : '';
+        document.cookie = `auth_token=${token}; ${cookieDomain} path=/; max-age=${60*60*24*30}; ${window.location.protocol === 'https:' ? 'secure;' : ''} samesite=lax;`;
 
         // Fetch profile
         const response = await fetch('https://api.foresighta.co/api/account/profile', {
@@ -67,7 +72,7 @@ export default function AuthCallback() {
           name: data.data.name,
           email: data.data.email,
         });
-        document.cookie = `auth_user=${encodeURIComponent(userData)}; domain=.knoldg.com; path=/; max-age=${60*60*24*30}; secure; samesite=lax;`;
+        document.cookie = `auth_user=${encodeURIComponent(userData)}; ${cookieDomain} path=/; max-age=${60*60*24*30}; ${window.location.protocol === 'https:' ? 'secure;' : ''} samesite=lax;`;
 
         // Check if user has special roles for conditional redirect
         if (data.data.roles && 
