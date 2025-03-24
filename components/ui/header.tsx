@@ -11,6 +11,9 @@ import { usePathname } from 'next/navigation'
 import { useRouter } from '@/i18n/routing'
 import AppLoader from './AppLoader'
 import { useLoading } from '@/components/context/LoadingContext'
+import Particles from '@/components/particles'
+import Image from 'next/image'
+import Illustration from '@/public/images/glow-bottom-blue.svg'
 
 interface User {
   name: string;
@@ -62,17 +65,9 @@ export default function Header() {
   const pathname = usePathname();
   const router = useRouter();
   
-  // Check if we're on the homepage or about page
-  const isHomePage = pathname === '/en' || pathname === '/ar' || pathname === '/' || pathname === '/en/about' || pathname === '/ar/about';
-  
-  // Define text color classes based on current page
-  const textColorClass = isHomePage 
-    ? 'text-slate-300 hover:text-white' 
-    : 'text-slate-700 hover:text-slate-900';
-  
-  const menuTextColorClass = isHomePage
-    ? 'text-gray-200 hover:text-gray-100'
-    : 'text-gray-700 hover:text-gray-900';
+  // Always use dark style with white text, as requested
+  const textColorClass = 'text-slate-300 hover:text-white';
+  const menuTextColorClass = 'text-gray-200 hover:text-gray-100';
 
   // Function to switch locale
   const switchLocale = (locale: string) => {
@@ -110,9 +105,8 @@ export default function Header() {
     }
 
     const fetchProfile = async () => {
-      // Try to get token from cookie first, then fallback to localStorage
-      const authTokenCookie = getCookie('auth_token');
-      const token = authTokenCookie || localStorage.getItem('token');
+      // Try to get token from localStorage
+      const token = localStorage.getItem('token');
       
       setIsLoading(true);
       if (!token) {
@@ -166,20 +160,10 @@ export default function Header() {
       setIndustries(data);
     };
 
-    // Try to get user data from cookie first, then fallback to localStorage
-    const authUserCookie = getCookie('auth_user');
-    if (authUserCookie) {
-      try {
-        const decodedUser = JSON.parse(decodeURIComponent(authUserCookie));
-        setUser(decodedUser);
-      } catch (e) {
-        console.error('Error parsing user cookie:', e);
-      }
-    } else {
-      const userData = localStorage.getItem('user');
-      if (userData) {
-        setUser(JSON.parse(userData));
-      }
+    // Try to get user data from localStorage
+    const userData = localStorage.getItem('user');
+    if (userData) {
+      setUser(JSON.parse(userData));
     }
     
     fetchProfile();
@@ -191,23 +175,9 @@ export default function Header() {
   };
 
   const handleSignOut = () => {
-    // Helper function to remove cookies properly
-    const removeCookie = (name: string) => {
-      // Remove from current domain
-      document.cookie = `${name}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;`;
-      
-      // Remove from root domain (affects both knoldg.com and app.knoldg.com)
-      document.cookie = `${name}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/; domain=.knoldg.com;`;
-    };
-    
     // Clear localStorage in current app
     localStorage.removeItem('token');
     localStorage.removeItem('user');
-    
-    // Clear any auth cookies
-    removeCookie('token');
-    removeCookie('auth_token');
-    removeCookie('auth_user');
     
     // Get the current locale for the redirect
     const locale = pathname.split('/')[1] || 'en';
@@ -216,18 +186,29 @@ export default function Header() {
     const timestamp = new Date().getTime();
     
     // Perform a coordinated logout by redirecting to the Angular app's logout endpoint
-    // After the Angular app processes the logout, it will redirect back to our homepage
-    window.location.href = `https://app.knoldg.com/auth/logout?redirect_uri=${encodeURIComponent(`https://knoldg.com/${locale}?t=${timestamp}`)}`;
+    window.location.href = `https://app.knoldg.com/auth/logout?redirect_uri=${encodeURIComponent(`https://knoldg.com/${locale}?t=${timestamp}`)}`;    
   };
 
   return (
-    <header className="absolute top-0 w-full z-30">
-      <div className="mx-auto px-4 sm:px-6 max-w-full overflow-hidden">
+    <header className="relative w-full z-30 bg-[#0F1629]">
+      {/* Particles animation - reduced effects */}
+      <div style={{opacity: 0.2}}>
+      <Particles 
+        className="absolute inset-0 -z-1" 
+      
+      />
+      </div>
+     
+
+      {/* Illustration */}
+   
+      
+      <div className="mx-auto px-4 sm:px-6 max-w-full overflow-hidden relative z-30">
         <div className="flex items-center justify-between h-16 md:h-20">
 
           {/* Site branding */}
           <div className="flex-shrink-0 w-[140px]">
-            <Logo isHomePage={isHomePage} />
+            <Logo isHomePage={true} />
           </div>
 
           {/* Desktop navigation */}
@@ -246,15 +227,15 @@ export default function Header() {
                     </Link>
                   </HoverCard.Target>
 
-                  <HoverCard.Dropdown style={isHomePage ? {background: 'linear-gradient(to right, #0f172b, #242B6A)', borderColor: '#2F378A'} : {background: 'white', borderColor: '#e5e7eb'}}>
+                  <HoverCard.Dropdown style={{background: 'linear-gradient(to right, #1C2F67, #242B6A)', borderColor: '#2F378A'}}>
                     <Group justify="space-between" px="md">
-                      <Text fw={500} c={isHomePage ? 'white' : 'black'}>{t('industriesDropdown.featuredTitle')}</Text>
-                      <Anchor href={`/${pathname.split('/')[1]}/all-industries`} fz="xs" className={isHomePage ? "text-blue-300" : "text-blue-600"}>
+                      <Text fw={500} c='white'>{t('industriesDropdown.featuredTitle')}</Text>
+                      <Anchor href={`/${pathname.split('/')[1]}/all-industries`} fz="xs" className="text-blue-300">
                         {t('industriesDropdown.viewAll')}
                       </Anchor>
                     </Group>
 
-                    <Divider my="sm" color={isHomePage ? "dark.5" : "gray.3"} />
+                    <Divider my="sm" color="dark.5" />
 
                     <SimpleGrid cols={2} spacing={0}>
                       {industries.map((industry) => (
@@ -263,17 +244,13 @@ export default function Header() {
                           href={`/${pathname.split('/')[1]}/industry/${industry.id}/${industry.slug}`}
                           className="block"
                         >
-                          <div className={`p-3 rounded transition-colors ${
-                            isHomePage 
-                              ? 'industry-nav hover:bg-slate-800/50' 
-                              : 'industry-nav-light hover:bg-blue-50'
-                          }`}>
+                          <div className="p-3 rounded transition-colors industry-nav hover:bg-slate-800/50">
                             <Group wrap="nowrap" align="flex-start">
                               <div>
-                                <Text size="sm" fw={500} c={isHomePage ? 'white' : 'dark'}>
+                                <Text size="sm" fw={500} c='white'>
                                   {industry.name}
                                 </Text>
-                                <Text size="xs" c={isHomePage ? "dimmed" : "gray.6"}>
+                                <Text size="xs" c="dimmed">
                                   {t('industriesDropdown.exploreText')}
                                 </Text>
                               </div>
@@ -283,13 +260,13 @@ export default function Header() {
                       ))}
                     </SimpleGrid>
 
-                    <div className={`mt-4 p-4 rounded-lg ${isHomePage ? 'bg-[#2F378A]' : 'bg-blue-50'}`}>
+                    <div className="mt-4 p-4 rounded-lg bg-[#010a23]">
                       <Group justify="space-between">
                         <div>
-                          <Text fw={500} fz="sm" c={isHomePage ? 'white' : 'black'}>
+                          <Text fw={500} fz="sm" c='white'>
                             {t('industriesDropdown.exploreAllTitle')}
                           </Text>
-                          <Text size="xs" c={isHomePage ? "dimmed" : "gray.6"}>
+                          <Text size="xs" c="dimmed">
                             {t('industriesDropdown.exploreAllDescription')}
                           </Text>
                         </div>
@@ -297,7 +274,7 @@ export default function Header() {
                           variant="light" 
                           component={Link} 
                           href={`/${pathname.split('/')[1]}/all-industries`}
-                          className={isHomePage ? "bg-blue-50 text-blue-600 hover:bg-blue-100" : "bg-white text-blue-600 hover:bg-blue-50 border border-blue-100"}
+                          className="bg-blue-50 text-blue-600 hover:bg-blue-100"
                         >
                           {t('industriesDropdown.browseAll')}
                         </Button>
@@ -345,20 +322,20 @@ export default function Header() {
               <div className="w-16 h-8 bg-slate-700/30 animate-pulse rounded"></div>
             ) : user ? (
               <li>
-                <UserProfile isHome={isHomePage} />
+                <UserProfile isHome={true} />
               </li>
             ) : (
               <li>
-                <Link className={`btn-sm ${isHomePage ? 'text-slate-300 hover:text-white [background:linear-gradient(theme(colors.slate.900),_theme(colors.slate.900))_padding-box,_conic-gradient(theme(colors.slate.400),_theme(colors.slate.700)_25%,_theme(colors.slate.700)_75%,_theme(colors.slate.400)_100%)_border-box] before:bg-slate-800/30' : 'text-slate-700 hover:text-slate-900 bg-white border border-slate-300 hover:border-slate-400'} transition duration-150 ease-in-out group relative before:absolute before:inset-0 before:rounded-full before:pointer-events-none`} href="https://app.knoldg.com/auth/login">
+                <Link className="btn-sm text-slate-300 hover:text-white [background:linear-gradient(theme(colors.slate.900),_theme(colors.slate.900))_padding-box,_conic-gradient(theme(colors.slate.400),_theme(colors.slate.700)_25%,_theme(colors.slate.700)_75%,_theme(colors.slate.400)_100%)_border-box] before:bg-slate-800/30 transition duration-150 ease-in-out group relative before:absolute before:inset-0 before:rounded-full before:pointer-events-none" href="https://app.knoldg.com/auth/login">
                   <span className="relative inline-flex items-center">
-                    {t('auth.login')} <span className={`tracking-normal ${isHomePage ? 'text-blue-500' : 'text-blue-600'} group-hover:translate-x-0.5 transition-transform duration-150 ease-in-out ml-1`}>-&gt;</span>
+                    {t('auth.login')} <span className="tracking-normal text-blue-500 group-hover:translate-x-0.5 transition-transform duration-150 ease-in-out ml-1">-&gt;</span>
                   </span>
                 </Link>
               </li>
             )}
           </ul>
 
-          <MobileMenu isHomePage={isHomePage} />
+          <MobileMenu isHomePage={true} />
 
         </div>
       </div>

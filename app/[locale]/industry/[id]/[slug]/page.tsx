@@ -1,4 +1,4 @@
-import FooterLight from '@/components/ui/footer-light'
+import Footer from '@/components/ui/footer'
 import Breadcrumb from '@/components/ui/breadcrumb'
 import Image from 'next/image'
 import { Metadata } from 'next'
@@ -203,7 +203,7 @@ export default async function IndustryPage({ params }: Props) {
           </div>
         </div>
       </div>
-      <FooterLight />
+      <Footer />
       </>
     )
   } catch (error) {
