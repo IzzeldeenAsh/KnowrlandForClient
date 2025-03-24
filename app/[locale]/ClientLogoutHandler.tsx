@@ -10,32 +10,10 @@ export default function ClientLogoutHandler() {
   // Handle logout parameter from Angular app redirect
   useEffect(() => {
     if (loggedOut === 'true') {
-      // Helper function to remove cookies properly with domain detection
-      const removeCookie = (name: string) => {
-        // Detect domain for cookie deletion
-        const domain = window.location.hostname === 'localhost' ? '' : 
-                     window.location.hostname.includes('knoldg.com') ? '.knoldg.com' : 
-                     window.location.hostname;
-                     
-        const cookieDomain = domain ? `domain=${domain};` : '';
-        
-        // Remove from current domain
-        document.cookie = `${name}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;`;
-        
-        // Remove from root domain if applicable
-        if (domain) {
-          document.cookie = `${name}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/; ${cookieDomain}`;
-        }
-      };
-      
-      // Clear localStorage in Next.js app
+      // Clear localStorage only
+      console.log('[ClientLogoutHandler] Clearing localStorage auth data');
       localStorage.removeItem('token');
       localStorage.removeItem('user');
-      
-      // Clear cookies
-      removeCookie('token');
-      removeCookie('auth_token');
-      removeCookie('auth_user');
       
       console.log('Logged out successfully from Angular app redirect');
       
