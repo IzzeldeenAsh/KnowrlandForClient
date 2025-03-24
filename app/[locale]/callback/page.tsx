@@ -38,7 +38,7 @@ export default function QueryParamAuthCallback() {
         localStorage.setItem('token', token);
         
         // Fetch profile
-        const response = await fetch('https://api.foresighta.co/api/account/profile', {
+        const response = await fetch('https://api.knoldg.com/api/account/profile', {
           headers: {
             'Authorization': `Bearer ${token}`,
             "Content-Type": "application/json",

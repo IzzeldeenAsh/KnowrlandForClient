@@ -32,7 +32,7 @@ export function useUserProfile() {
       try {
         console.log("[useUserProfile] Fetching profile with token");
         const response = await fetch(
-          "https://api.foresighta.co/api/account/profile",
+          "https://api.knoldg.com/api/account/profile",
           {
             headers: {
               'Authorization': `Bearer ${token}`,
@@ -45,11 +45,24 @@ export function useUserProfile() {
 
         console.log("[useUserProfile] Profile fetch response", { 
           status: response.status,
-          ok: response.ok 
+          ok: response.ok,
+          statusText: response.statusText
         });
 
         if (!response.ok) {
-          throw new Error("Failed to fetch profile");
+          // Instead of throwing, log the error but don't remove token on first failure
+          // This prevents immediate logout if API temporarily fails
+          console.error(`[useUserProfile] Profile fetch failed with status ${response.status}`);
+          
+          // If we already have user data, keep using it instead of logging out
+          const existingUser = localStorage.getItem("user");
+          if (existingUser) {
+            console.log("[useUserProfile] Using cached user data despite API failure");
+            setIsLoading(false);
+            return;
+          }
+          
+          throw new Error(`Failed to fetch profile: ${response.status} ${response.statusText}`);
         }
 
         const data = await response.json();
@@ -72,9 +85,15 @@ export function useUserProfile() {
         setUser(userData);
       } catch (error) {
         console.error("[useUserProfile] Error fetching profile:", error);
-        // Remove token if it's invalid to prevent authentication loops
-        localStorage.removeItem('token');
-        localStorage.removeItem('user');
+        
+        // Only remove token on critical errors, not on network/API temporary failures
+        if (error instanceof TypeError || (error instanceof Error && error.message.includes('Failed to fetch'))) {
+          console.log('[useUserProfile] Network error, not clearing auth data');
+        } else {
+          console.log('[useUserProfile] Auth error, clearing invalid token');
+          localStorage.removeItem('token');
+          localStorage.removeItem('user');
+        }
       } finally {
         setIsLoading(false);
       }
