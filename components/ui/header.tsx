@@ -66,24 +66,15 @@ export default function Header() {
   const router = useRouter();
   
   // Always use dark style with white text, as requested
-  const textColorClass = 'text-slate-300 hover:text-white';
-  const menuTextColorClass = 'text-gray-200 hover:text-gray-100';
+  const textColorClass = 'text-slate-300 hover:text-white transition-all duration-300 ease-in-out px-3 py-2 rounded-md hover:bg-slate-700/50';
+  const menuTextColorClass = 'text-gray-200 hover:text-gray-100 transition-all duration-300 ease-in-out px-3 py-2 rounded-md hover:bg-[#3B8AEF]/20';
 
-  // Function to switch locale
-  const switchLocale = (locale: string) => {
-    // Set loading state before switching locale
-    setAppLoading(true);
-    
-    // Set the language preference in a cookie - expires in 1 year
-    document.cookie = `preferred_language=${locale}; max-age=${60 * 60 * 24 * 365}; path=/;`;
-    
-    // Get the current path without locale prefix
-    const currentPath = pathname.split('/').slice(2).join('/');
-    
-    // Navigate to the same route with the new locale
-    // If we're on the home page (or empty path), just use '/'
-    const newPath = currentPath ? `/${currentPath}` : '/';
-    router.push(newPath, { locale });
+  // Add active link styling function
+  const isActiveLink = (path: string): string => {
+    if (pathname.includes(path)) {
+      return 'bg-[#3B8AEF] text-white';
+    }
+    return '';
   };
 
   useEffect(() => {
@@ -189,6 +180,23 @@ export default function Header() {
     window.location.href = `https://app.knoldg.com/auth/logout?redirect_uri=${encodeURIComponent(`https://knoldg.com/${locale}?t=${timestamp}`)}`;    
   };
 
+  // Function to switch locale
+  const switchLocale = (locale: string) => {
+    // Set loading state before switching locale
+    setAppLoading(true);
+    
+    // Set the language preference in a cookie - expires in 1 year
+    document.cookie = `preferred_language=${locale}; max-age=${60 * 60 * 24 * 365}; path=/;`;
+    
+    // Get the current path without locale prefix
+    const currentPath = pathname.split('/').slice(2).join('/');
+    
+    // Navigate to the same route with the new locale
+    // If we're on the home page (or empty path), just use '/'
+    const newPath = currentPath ? `/${currentPath}` : '/';
+    router.push(newPath, { locale });
+  };
+
   return (
     <header className="relative w-full z-30 bg-[#0F1629]">
       {/* Particles animation - reduced effects */}
@@ -220,9 +228,9 @@ export default function Header() {
                   radius="sm" shadow="md" withinPortal>
                   <HoverCard.Target>
                     <Link href={`/${pathname.split('/')[1]}/all-industries`}>
-                      <button className={`font-medium text-sm ${textColorClass} mx-2 lg:mx-4 transition duration-150 ease-in-out flex items-center`}>
+                      <button className={`font-medium text-sm ${textColorClass} mx-1 lg:mx-2 flex items-center group ${isActiveLink('all-industries')}`}>
                         <span className="mr-1">{t('navigation.industries')}</span>
-                        <IconChevronDown size={16} />
+                        <IconChevronDown size={16} className="group-hover:translate-y-0.5 transition-transform duration-200" />
                       </button>
                     </Link>
                   </HoverCard.Target>
@@ -284,19 +292,19 @@ export default function Header() {
                 </HoverCard>
               </li>
               <li>
-                <Link className={`font-medium text-sm ${menuTextColorClass} mx-2 lg:mx-4 transition duration-150 ease-in-out`} href={`/${pathname.split('/')[1]}/industries/report`}>{t('navigation.reports')}</Link>
+                <Link className={`font-medium text-sm ${menuTextColorClass} mx-1 lg:mx-2 ${isActiveLink('report')}`} href={`/${pathname.split('/')[1]}/industries/report`}>{t('navigation.reports')}</Link>
               </li>
               <li>
-                <Link className={`font-medium text-sm ${menuTextColorClass} mx-2 lg:mx-4 transition duration-150 ease-in-out`} href={`/${pathname.split('/')[1]}/industries/data`}>{t('navigation.data')}</Link>
+                <Link className={`font-medium text-sm ${menuTextColorClass} mx-1 lg:mx-2 ${isActiveLink('data')}`} href={`/${pathname.split('/')[1]}/industries/data`}>{t('navigation.data')}</Link>
               </li>
               <li>
-                <Link className={`font-medium text-sm ${menuTextColorClass} mx-2 lg:mx-4 transition duration-150 ease-in-out`} href={`/${pathname.split('/')[1]}/industries/insight`}>{t('navigation.insights')}</Link>
+                <Link className={`font-medium text-sm ${menuTextColorClass} mx-1 lg:mx-2 ${isActiveLink('insight')}`} href={`/${pathname.split('/')[1]}/industries/insight`}>{t('navigation.insights')}</Link>
               </li>
               <li className='lg:block hidden'>
-                <Link className={`font-medium text-sm ${menuTextColorClass} mx-2 lg:mx-4 transition duration-150 ease-in-out`} href={`/${pathname.split('/')[1]}/industries/manual`}>{t('navigation.manuals')}</Link>
+                <Link className={`font-medium text-sm ${menuTextColorClass} mx-1 lg:mx-2 ${isActiveLink('manual')}`} href={`/${pathname.split('/')[1]}/industries/manual`}>{t('navigation.manuals')}</Link>
               </li>
               <li className='lg:block hidden'>
-                <Link className={`font-medium text-sm ${menuTextColorClass} mx-2 lg:mx-4 transition duration-150 ease-in-out`} href={`/${pathname.split('/')[1]}/industries/course`}>{t('navigation.courses')}</Link>
+                <Link className={`font-medium text-sm ${menuTextColorClass} mx-1 lg:mx-2 ${isActiveLink('course')}`} href={`/${pathname.split('/')[1]}/industries/course`}>{t('navigation.courses')}</Link>
               </li>
             </ul>
           </nav>
@@ -308,9 +316,9 @@ export default function Header() {
               <div className="flex items-center">
                 <button
                   onClick={() => switchLocale(pathname.split('/')[1] === 'en' ? 'ar' : 'en')}
-                  className={`mx-2 flex items-center ${textColorClass} transition duration-150 ease-in-out`}
+                  className={`mx-2 flex items-center px-3 py-2 rounded-md text-slate-300 hover:text-white hover:bg-[#3B8AEF]/20 transition-all duration-300 ease-in-out group`}
                 >
-                  <IconLanguage size={18} className="mx-1" />
+                  <IconLanguage size={18} className="mx-1 group-hover:rotate-12 transition-transform duration-300" />
                   <span className="text-sm md:text-sm font-medium whitespace-nowrap">
                     {pathname.split('/')[1] === 'en' ? t('language.switchToArabic') : t('language.switchToEnglish')}
                   </span>
@@ -326,9 +334,9 @@ export default function Header() {
               </li>
             ) : (
               <li>
-                <Link className="btn-sm text-slate-300 hover:text-white [background:linear-gradient(theme(colors.slate.900),_theme(colors.slate.900))_padding-box,_conic-gradient(theme(colors.slate.400),_theme(colors.slate.700)_25%,_theme(colors.slate.700)_75%,_theme(colors.slate.400)_100%)_border-box] before:bg-slate-800/30 transition duration-150 ease-in-out group relative before:absolute before:inset-0 before:rounded-full before:pointer-events-none" href="https://app.knoldg.com/auth/login">
+                <Link className="btn-sm text-slate-300 hover:text-white [background:linear-gradient(theme(colors.slate.900),_theme(colors.slate.900))_padding-box,_conic-gradient(theme(colors.slate.400),_theme(colors.slate.700)_25%,_theme(colors.slate.700)_75%,_theme(colors.slate.400)_100%)_border-box] before:bg-slate-800/30 hover:scale-105 active:scale-95 transition-all duration-150 ease-in-out group relative before:absolute before:inset-0 before:rounded-full before:pointer-events-none" href="https://app.knoldg.com/auth/login">
                   <span className="relative inline-flex items-center">
-                    {t('auth.login')} <span className="tracking-normal text-blue-500 group-hover:translate-x-0.5 transition-transform duration-150 ease-in-out ml-1">-&gt;</span>
+                    {t('auth.login')} <span className="tracking-normal text-blue-500 group-hover:translate-x-1 transition-transform duration-150 ease-in-out ml-1">-&gt;</span>
                   </span>
                 </Link>
               </li>
