@@ -327,7 +327,7 @@ export default function Header() {
             </li>
             
             {isLoading ? (
-              <div className="w-16 h-8 bg-slate-700/30 animate-pulse rounded"></div>
+              <div className="w-10 h-10 bg-slate-700/30 animate-pulse rounded-full overflow-hidden"></div>
             ) : user ? (
               <li>
                 <UserProfile isHome={true} />

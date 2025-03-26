@@ -151,7 +151,7 @@ export default async function IndustryPage({ params }: Props) {
                 </div>
         </div>
         
-        <div className="max-w-container relative mx-auto mt-10 w-full px-4 sm:px-6 lg:px-8">
+        <div className="max-w-container relative mx-auto mt-10 w-full px-4 sm:px-6 lg:px-8 pb-32">
           <div className="max-w-6xl mx-auto">
             <div className="mb-8 text-start">
               <h2 className="text-2xl font-bold text-gray-900 mb-2">Sub Industries</h2>
