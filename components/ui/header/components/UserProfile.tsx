@@ -100,7 +100,7 @@ export function UserProfile({ isHome }: { isHome: boolean }) {
   }, [menuOpen]);
 
   if (isLoading) {
-    return <div className="w-16 h-8 bg-gray-200 animate-pulse rounded"></div>;
+    return <div className="w-10 h-10 bg-gray-200 animate-pulse rounded-full overflow-hidden"></div>;
   }
 
   if (!user) {
@@ -131,7 +131,7 @@ export function UserProfile({ isHome }: { isHome: boolean }) {
                 width={100}
                 height={100}
                 quality={100}
-                className="w-full h-full object-cover"
+                className="w-full h-full object-cover object-top"
               />
             </div>
           ) : (
@@ -164,7 +164,7 @@ export function UserProfile({ isHome }: { isHome: boolean }) {
                     width={100}
                     height={100}
                     quality={100}
-                    className="w-full h-full object-cover"
+                    className="w-full h-full object-cover object-top"
                   />
                 </div>
               ) : (

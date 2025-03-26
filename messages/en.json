@@ -159,12 +159,34 @@
         },
         "resources": {
             "title": "Resources",
-            "terms": "Terms of service"
+            "helpCenter": "Help Center",
+            "faqs": "FAQs",
+            "userGuide": "User Guide"
         },
         "legals": {
             "title": "Legals",
             "terms": "Terms & Conditions",
-            "privacy": "Privacy policy"
+            "privacy": "Privacy Policy",
+            "dataLicensing": "Data Licensing Agreement",
+            "cookies": "Cookies Policy"
+        }
+    },
+    "Legals": {
+        "terms": {
+            "title": "Terms of Service",
+            "lastUpdated": "Last Updated"
+        },
+        "privacy": {
+            "title": "Privacy Policy",
+            "lastUpdated": "Last Updated"
+        },
+        "dataLicensing": {
+            "title": "Data Licensing Agreement",
+            "lastUpdated": "Last Updated"
+        },
+        "cookies": {
+            "title": "Cookies Policy",
+            "lastUpdated": "Last Updated"
         }
     }
 }

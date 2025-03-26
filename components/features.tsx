@@ -196,15 +196,16 @@ export default function Features() {
                 </div>
               </div>
 
-              {/* Image */}
+              {/* Video */}
               <div className="" data-aos="fade-up" data-aos-delay="100">
-                <figure className="  rounded-3xl p-px mb-8">
-                  <Image
+                <figure className="rounded-3xl p-px mb-8 overflow-hidden mt-10 max-w-[600px] mx-auto">
+                  <video 
                     className="w-full rounded-[inherit]"
-                    src={ChangelogImg04}
-                    width={600}
-                    height={120}
-                    alt="Feature 3"
+                    autoPlay 
+                    loop 
+                    muted 
+                    playsInline
+                    src="/images/Pay-for-what-you-need.mp4"
                   />
                 </figure>
               </div>
