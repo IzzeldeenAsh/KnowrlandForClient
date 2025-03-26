@@ -34,13 +34,13 @@ export default function Footer() {
                   </a>
                 </li>
                 {/* Twitter */}
-                {/* <li>
-                  <a className="flex justify-center items-center text-blue-500 hover:text-blue-400 transition duration-150 ease-in-out" href="#0" aria-label="Twitter">
-                    <svg className="w-8 h-8 fill-current" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg">
-                      <path d="m13.063 9 3.495 4.475L20.601 9h2.454l-5.359 5.931L24 23h-4.938l-3.866-4.893L10.771 23H8.316l5.735-6.342L8 9h5.063Zm-.74 1.347h-1.457l8.875 11.232h1.36l-8.778-11.232Z" />
+                <li>
+                  <a className="flex justify-center items-center text-blue-500 hover:text-blue-400 transition duration-150 ease-in-out" href="https://x.com/knoldg75651" target="_blank" rel="noopener noreferrer" aria-label="Twitter">
+                    <svg className="w-6 h-6 fill-current" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                      <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
                     </svg>
                   </a>
-                </li> */}
+                </li>
              
               </ul>
             </div>
@@ -83,6 +83,22 @@ export default function Footer() {
               </li>
             </ul>
           </div>
+          
+          {/* 4th block - Resources */}
+          <div className="sm:col-span-6 md:col-span-3 lg:col-span-2">
+            <h6 className="text-sm text-slate-50 font-medium mb-2">{t('resources.title')}</h6>
+            <ul className="text-sm space-y-2">
+              <li>
+                <a className="text-slate-400 hover:text-slate-200 transition duration-150 ease-in-out" href={`/${locale}/resources/help-center`}>{t('resources.helpCenter')}</a>
+              </li>
+              <li>
+                <a className="text-slate-400 hover:text-slate-200 transition duration-150 ease-in-out" href={`/${locale}/resources/faqs`}>{t('resources.faqs')}</a>
+              </li>
+              <li>
+                <a className="text-slate-400 hover:text-slate-200 transition duration-150 ease-in-out" href={`/${locale}/resources/user-guide`}>{t('resources.userGuide')}</a>
+              </li>
+            </ul>
+          </div>
 
           {/* 5th block */}
           <div className="sm:col-span-6 md:col-span-3 lg:col-span-2">
@@ -93,6 +109,12 @@ export default function Footer() {
               </li>
               <li>
                 <a className="text-slate-400 hover:text-slate-200 transition duration-150 ease-in-out" href={`/${locale}/legals/privacy`}>{t('legals.privacy')}</a>
+              </li>
+              <li>
+                <a className="text-slate-400 hover:text-slate-200 transition duration-150 ease-in-out" href={`/${locale}/legals/licensing`}>{t('legals.dataLicensing')}</a>
+              </li>
+              <li>
+                <a className="text-slate-400 hover:text-slate-200 transition duration-150 ease-in-out" href={`/${locale}/legals/cookies`}>{t('legals.cookies')}</a>
               </li>
             </ul>
           </div>
