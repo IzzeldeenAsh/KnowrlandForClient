@@ -6,7 +6,6 @@ import Header from '@/components/ui/header'
 export default function HomePage() {
   return (
    <main className=''>
-    < Header />
     <HeroLight />
     <Footer/>
     </main>

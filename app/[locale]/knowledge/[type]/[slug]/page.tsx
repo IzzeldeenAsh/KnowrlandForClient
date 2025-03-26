@@ -244,7 +244,7 @@ export default async function KnowledgePage({ params }: Props) {
       </div>
       
       {/* Main Content */}
-      <div className="container mx-auto px-4">
+      <div className="container mx-auto px-4 pb-20">
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           <div className="lg:col-span-2">
             <TabsContent knowledge={knowledge} />

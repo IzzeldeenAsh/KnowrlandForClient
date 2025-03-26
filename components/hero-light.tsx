@@ -16,7 +16,7 @@ export default function HeroHomeLight() {
   const currentLocale = pathname.split('/')[1];
 
   return (
-    <section className="relative">
+    <section className="relative pb-32">
       <PageIllustration />
       <div className="mx-auto max-w-6xl px-4 sm:px-6">
         {/* Hero content */}
