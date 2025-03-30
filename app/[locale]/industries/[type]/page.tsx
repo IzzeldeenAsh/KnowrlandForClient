@@ -102,7 +102,7 @@ export default function IndustriesByTypePage({ params }: Props) {
             className="object-cover z-0"
             priority
           />
-          <div className="relative z-10 max-w-6xl relative mx-auto mt-20 w-full">
+          <div className="relative z-10 max-w-6xl relative mx-auto mt-5 w-full">
             <div className="text-start" data-aos="fade-down">
               <span className="inline-block px-5 py-1 text-xs font-semibold text-blue-500 bg-blue-100 rounded-md mb-2 uppercase">
                 {capitalizeFirstLetter(type)}s
