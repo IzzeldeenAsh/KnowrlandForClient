@@ -96,7 +96,7 @@ export default async function AllIndustries({ params }: Props) {
            <PageIllustration />
                 {/* Section header */}
               <div className="section-header   px-4 sm:px-6 lg:px-8 py-8 lg:py-12 relative overflow-hidden rounded-lg">
-                  <div className="relative z-10 max-w-6xl relative mx-auto mt-20 w-full ">
+                  <div className="relative z-10 max-w-6xl relative mx-auto mt-5 w-full ">
                    <Breadcrumb items={breadcrumbItems} />
                   <div className="mx-auto  max-w-3xl text-center pb-12 ">
                     <h1 
