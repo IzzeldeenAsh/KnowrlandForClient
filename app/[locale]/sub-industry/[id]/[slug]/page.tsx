@@ -134,13 +134,13 @@ export default async function SubIndustryPage({ params }: Props) {
               className="object-cover z-0"
               priority
             />
-            <div className="relative z-10 max-w-6xl relative mx-auto mt-20 w-full">
+            <div className="relative z-10 max-w-6xl relative mx-auto mt-5 w-full">
               {/* Breadcrumb */}
               <div className="mb-8">
                 <Breadcrumb items={breadcrumbItems} />
               </div>
               {/* Header */}
-                 <div className="flex flex-col md:flex-row items-start justify-between">
+                 <div className="min-h-[100px] flex flex-col md:flex-row items-start justify-between">
                   <div className="text-start " data-aos="fade-down">
                     <span className="inline-block px-5 py-1 text-xs font-semibold text-blue-500 bg-blue-100 rounded-md mb-2 uppercase">
                      Sub Industry

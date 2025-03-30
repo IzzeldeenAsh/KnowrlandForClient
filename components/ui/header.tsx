@@ -15,6 +15,9 @@ import Particles from '@/components/particles'
 import Image from 'next/image'
 import Illustration from '@/public/images/glow-bottom-blue.svg'
 
+// Add CSS for text glow effect
+import './text-glow.css'
+
 interface User {
   name: string;
   profile_photo_url: string | null;
@@ -185,6 +188,9 @@ export default function Header() {
     // Set loading state before switching locale
     setAppLoading(true);
     
+    // Store current locale in localStorage before switching
+    localStorage.setItem('preferred_language', locale);
+    
     // Set the language preference in a cookie - expires in 1 year
     document.cookie = `preferred_language=${locale}; max-age=${60 * 60 * 24 * 365}; path=/;`;
     
@@ -194,7 +200,10 @@ export default function Header() {
     // Navigate to the same route with the new locale
     // If we're on the home page (or empty path), just use '/'
     const newPath = currentPath ? `/${currentPath}` : '/';
-    router.push(newPath, { locale });
+    
+    // Force a complete page reload to prevent client-side errors
+    // This ensures all components are properly re-rendered with the new locale
+    window.location.href = `/${locale}${newPath}`;
   };
 
   return (
@@ -235,15 +244,22 @@ export default function Header() {
                     </Link>
                   </HoverCard.Target>
 
-                  <HoverCard.Dropdown style={{background: 'linear-gradient(to right, #1C2F67, #242B6A)', borderColor: '#2F378A'}}>
-                    <Group justify="space-between" px="md">
-                      <Text fw={500} c='white'>{t('industriesDropdown.featuredTitle')}</Text>
-                      <Anchor href={`/${pathname.split('/')[1]}/all-industries`} fz="xs" className="text-blue-300">
+                  <HoverCard.Dropdown 
+                    style={{background: 'linear-gradient(to right, #1C2F67, #242B6A)', borderColor: '#2F378A'}}
+                    className="transition-all duration-300 ease-in-out transform hover:scale-[1.01] shadow-xl"
+                  >
+                    <Group justify="space-between" px="md" className="transition-colors duration-200 hover:bg-slate-800/20 rounded p-2">
+                      <Text fw={500} c='white' className="text-glow">{t('industriesDropdown.featuredTitle')}</Text>
+                      <Anchor 
+                        href={`/${pathname.split('/')[1]}/all-industries`} 
+                        fz="xs" 
+                        className="text-blue-300 hover:text-blue-200 transition-all duration-200 hover:underline hover:translate-x-0.5"
+                      >
                         {t('industriesDropdown.viewAll')}
                       </Anchor>
                     </Group>
 
-                    <Divider my="sm" color="dark.5" />
+                    <Divider my="sm" color="dark.5" className="opacity-50 hover:opacity-80 transition-opacity duration-200" />
 
                     <SimpleGrid cols={2} spacing={0}>
                       {industries.map((industry) => (
@@ -252,13 +268,13 @@ export default function Header() {
                           href={`/${pathname.split('/')[1]}/industry/${industry.id}/${industry.slug}`}
                           className="block"
                         >
-                          <div className="p-3 rounded transition-colors industry-nav hover:bg-slate-800/50">
+                          <div className="p-3 rounded transition-all duration-200 industry-nav  hover:shadow-inner hover:translate-y-[-2px] hover:bg-blue-400/50 group">
                             <Group wrap="nowrap" align="flex-start">
                               <div>
-                                <Text size="sm" fw={500} c='white'>
+                                <Text size="sm" fw={500} c='white' className="group-hover:text-blue-200 transition-colors duration-200">
                                   {industry.name}
                                 </Text>
-                                <Text size="xs" c="dimmed">
+                                <Text size="xs" c="dimmed" className="group-hover:text-slate-300 transition-colors duration-200">
                                   {t('industriesDropdown.exploreText')}
                                 </Text>
                               </div>
@@ -268,13 +284,13 @@ export default function Header() {
                       ))}
                     </SimpleGrid>
 
-                    <div className="mt-4 p-4 rounded-lg bg-[#010a23]">
+                    <div className="mt-4 p-4 rounded-lg bg-[#010a23] hover:bg-[#0a1432] transition-colors duration-300 transform hover:scale-[1.02] hover:shadow-md">
                       <Group justify="space-between">
                         <div>
-                          <Text fw={500} fz="sm" c='white'>
+                          <Text fw={500} fz="sm" c='white' className="hover:text-blue-100 transition-colors duration-200">
                             {t('industriesDropdown.exploreAllTitle')}
                           </Text>
-                          <Text size="xs" c="dimmed">
+                          <Text size="xs" c="dimmed" className="hover:text-slate-300 transition-colors duration-200">
                             {t('industriesDropdown.exploreAllDescription')}
                           </Text>
                         </div>
@@ -282,7 +298,7 @@ export default function Header() {
                           variant="light" 
                           component={Link} 
                           href={`/${pathname.split('/')[1]}/all-industries`}
-                          className="bg-blue-50 text-blue-600 hover:bg-blue-100"
+                          className="bg-blue-50 text-blue-600 hover:bg-blue-200 hover:text-blue-800 transition-all duration-300 transform hover:scale-105 hover:shadow-lg"
                         >
                           {t('industriesDropdown.browseAll')}
                         </Button>
