@@ -166,7 +166,7 @@ export default async function KnowledgePage({ params }: Props) {
           className="object-cover z-0"
           priority
         />
-        <div className="container mx-auto px-4 relative z-10 mt-20">
+        <div className="container mx-auto px-4 relative z-10 mt-5">
           {/* Breadcrumb */}
           <div className="mb-8">
             <Breadcrumb items={breadcrumbItems} />
