@@ -1,14 +1,14 @@
-'use client'
+"use client";
 
-import { Text, Card, Badge, Group, Avatar } from '@mantine/core';
-import Link from 'next/link';
+import { Text, Card, Badge, Group, Avatar } from "@mantine/core";
+import Link from "next/link";
 import DataIcon from "@/components/icons/DataIcon";
 import InsightIcon from "@/components/icons/InsightIcon";
 import ManualIcon from "@/components/icons/ManualIcon";
 import ReportIcon from "@/components/icons/ReportIcon";
-import { formatDistanceToNow } from 'date-fns';
-import cardStyles from './knowledge-card.module.css';
-import { useParams } from 'next/navigation';
+import { formatDistanceToNow } from "date-fns";
+import cardStyles from "./knowledge-card.module.css";
+import { useParams } from "next/navigation";
 
 interface KnowledgeGridProps {
   knowledge: KnowledgeItem[];
@@ -31,13 +31,11 @@ export interface KnowledgeItem {
   };
 }
 
-
-
 function getInitials(name: string) {
   return name
-    .split(' ')
+    .split(" ")
     .map((word) => word[0])
-    .join('')
+    .join("")
     .toUpperCase();
 }
 
@@ -46,22 +44,31 @@ function formatPublishedDate(dateString: string) {
   return formatDistanceToNow(date, { addSuffix: true });
 }
 
-function truncateDescription(description: string, wordLimit: number = 20): string {
-  if (!description) return '';
-  
+function truncateDescription(
+  description: string,
+  wordLimit: number = 20
+): string {
+  if (!description) return "";
+
   // Remove HTML tags to get plain text
-  const plainText = description.replace(/<[^>]*>/g, '');
-  
+  const plainText = description.replace(/<[^>]*>/g, "");
+
   const words = plainText.split(/\s+/);
   if (words.length <= wordLimit) return plainText;
-  
-  return words.slice(0, wordLimit).join(' ') + '...';
+
+  return words.slice(0, wordLimit).join(" ") + "...";
 }
 
-export default function KnowledgeGrid({ knowledge, topicName, showHeader=true, colNumbers=3, locale }: KnowledgeGridProps) {
+export default function KnowledgeGrid({
+  knowledge,
+  topicName,
+  showHeader = true,
+  colNumbers = 3,
+  locale,
+}: KnowledgeGridProps) {
   const params = useParams();
-  const currentLocale = locale || params.locale || 'en';
-  
+  const currentLocale = locale || params.locale || "en";
+
   return (
     <div className="max-w-6xl mx-auto">
       {showHeader && (
@@ -71,7 +78,9 @@ export default function KnowledgeGrid({ knowledge, topicName, showHeader=true, c
         </div>
       )}
 
-      <div className={`grid sm:grid-cols-2 lg:grid-cols-${colNumbers} gap-4 max-w-7xl mx-auto`}>
+      <div
+        className={`grid sm:grid-cols-2 lg:grid-cols-${colNumbers} gap-4 max-w-7xl mx-auto`}
+      >
         {knowledge.map((item: KnowledgeItem) => (
           <Card
             key={`${item.type}-${item.slug}`}
@@ -81,51 +90,71 @@ export default function KnowledgeGrid({ knowledge, topicName, showHeader=true, c
             className={cardStyles.card}
             data-aos="fade-up"
           >
-            <Link href={`/${currentLocale}/knowledge/${item.type}/${item.slug}`} className="block">
+            <Link
+              href={`/${currentLocale}/knowledge/${item.type}/${item.slug}`}
+              className="block"
+            >
               <Group gap="xs">
-                {item.type === 'report' && <ReportIcon width={24} height={24} />}
-                {item.type === 'manual' && <ManualIcon width={24} height={24} />}
-                {item.type === 'insight' && <InsightIcon width={24} height={24} />}
-                {item.type === 'data' && <DataIcon width={24} height={24} />}
-                <Badge w="fit-content" className='capitalize' variant="light">
+                {item.type === "report" && (
+                  <ReportIcon width={24} height={24} />
+                )}
+                {item.type === "manual" && (
+                  <ManualIcon width={24} height={24} />
+                )}
+                {item.type === "insight" && (
+                  <InsightIcon width={24} height={24} />
+                )}
+                {item.type === "data" && <DataIcon width={24} height={24} />}
+                <Badge w="fit-content" className="capitalize" variant="light">
                   {item.type}
                 </Badge>
               </Group>
               <div className="flex flex-col ">
-              <Text fw={700} className={cardStyles.title} mt="xs" lineClamp={2}>
-                {item.title}
-              </Text>
-              <Text className={`${cardStyles.description} text-gray-500`} mt="sm">
-                {truncateDescription(item.description, 25)}
-              </Text>
-            </div>
+                <Text
+                  fw={700}
+                  className={cardStyles.title}
+                  mt="xs"
+                  lineClamp={2}
+                >
+                  {item.title}
+                </Text>
+                <Text
+                  className={`${cardStyles.description} text-gray-500`}
+                  mt="sm"
+                >
+                  {truncateDescription(item.description, 25)}
+                </Text>
+              </div>
+            </Link>
+            <div>
               <Group mt="lg">
-              <Avatar
-  src={item.insighter.profile_photo_url}
-  radius="lg"
-  alt={item.insighter.name}
-  size="sm"
->
-  {!item.insighter.profile_photo_url && getInitials(item.insighter.name)}
-</Avatar>
+                <Avatar
+                  src={item.insighter.profile_photo_url}
+                  radius="lg"
+                  alt={item.insighter.name}
+                  size="sm"
+                >
+                  {!item.insighter.profile_photo_url &&
+                    getInitials(item.insighter.name)}
+                </Avatar>
 
                 <div>
-                <Text  c="dimmed" size='xs'>
-               {item.insighter.roles.includes('insighter') && ('Insighter')}
-               {item.insighter.roles.includes('company') && ('Company')}
-                  </Text> 
-                  <Text fw={500} size='xs'>{item.insighter.name}</Text>
+                  <Text c="dimmed" size="xs">
+                    {item.insighter.roles.includes("insighter") && "Insighter"}
+                    {item.insighter.roles.includes("company") && "Company"}
+                  </Text>
+                  <Text fw={500} size="xs">
+                    {item.insighter.name}
+                  </Text>
                 </div>
               </Group>
 
-         
-            </Link>
-            <Card.Section className={cardStyles.footer}>
+              <Card.Section className={cardStyles.footer}>
                 <Group justify="space-between">
-                <Text  c="dimmed" size='xs'>
+                  <Text c="dimmed" size="xs">
                     Posted {formatPublishedDate(item.published_at)}
                   </Text>
-                  <Badge 
+                  <Badge
                     color={item.total_price === "0" ? "green" : "yellow"}
                     variant="light"
                   >
@@ -133,12 +162,15 @@ export default function KnowledgeGrid({ knowledge, topicName, showHeader=true, c
                   </Badge>
                 </Group>
               </Card.Section>
+            </div>
           </Card>
         ))}
         {knowledge.length === 0 && (
           <div className="col-span-full flex flex-col items-center justify-center py-12 px-4">
             <div className="rounded-full bg-gray-50 p-4 mb-3"></div>
-            <p className="text-gray-500 text-sm">No knowledge items available yet</p>
+            <p className="text-gray-500 text-sm">
+              No knowledge items available yet
+            </p>
           </div>
         )}
       </div>
