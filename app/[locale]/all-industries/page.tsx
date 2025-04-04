@@ -5,6 +5,9 @@ import IndustriesGrid from '@/components/industries-grid'
 import Footer from '@/components/ui/footer'
 import Breadcrumb from '@/components/ui/breadcrumb'
 
+// Import translation utilities
+import { getMessages } from '@/app/utils/get-messages'
+
 interface Params {
   locale: string;
 }
@@ -58,6 +61,10 @@ export default async function AllIndustries({ params }: Props) {
   const { locale = 'en' } = await params;
   const { data, error } = await getAllIndustries(locale)
   
+  // Get translations
+  const messages = await getMessages(locale);
+  const isRTL = locale === 'ar';
+  
   const mockIndustries = [
     {
       id: 1,
@@ -84,30 +91,30 @@ export default async function AllIndustries({ params }: Props) {
   const industries = data?.data || mockIndustries
 
   const breadcrumbItems = [
-    { label: 'Industries', href: `/${locale}/all-industries` }
+    { label: messages?.Header?.navigation?.industries || 'Industries', href: `/${locale}/all-industries` }
   ]
 
   return (
     <>
   
-    <div className="flex flex-col min-h-screen">
+    <div className="flex flex-col min-h-screen" dir={isRTL ? 'rtl' : 'ltr'}>
      
       <main className="grow">
            <PageIllustration />
                 {/* Section header */}
-              <div className="section-header   px-4 sm:px-6 lg:px-8 py-8 lg:py-12 relative overflow-hidden rounded-lg">
+              <div className="section-header px-4 sm:px-6 lg:px-8 py-8 lg:py-12 relative overflow-hidden rounded-lg">
                   <div className="relative z-10 max-w-6xl relative mx-auto mt-5 w-full ">
                    <Breadcrumb items={breadcrumbItems} />
-                  <div className="mx-auto  max-w-3xl text-center pb-12 ">
+                  <div className="mx-auto max-w-3xl text-center pb-12 ">
                     <h1 
                       className="h1 font-bold text-5xl md:text-6xl bg-clip-text text-transparent bg-gradient-to-r from-blue-500 to-teal-400" 
                       data-aos="zoom-y-out"
                     >
-                       Industries
+                      {messages?.Header?.navigation?.industries || 'Industries'}
                     </h1>
                     {error && (
                       <div className="mt-4 text-sm text-red-500 bg-red-50 p-3 rounded-lg">
-                        {error}
+                        {locale === 'ar' ? 'حدث خطأ أثناء تحميل البيانات' : error}
                       </div>
                     )}
                   </div>
