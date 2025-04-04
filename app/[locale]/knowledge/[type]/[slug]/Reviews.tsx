@@ -4,7 +4,7 @@ import React, { useState } from "react";
 import { Rating, Textarea, Button, Notification, Card, Text } from "@mantine/core";
 import { IconX, IconCheck } from "@tabler/icons-react";
 import { useReview } from "@/hooks/knowledgs/useReview";
-import { useRouter } from "next/navigation";
+import { useRouter, useParams } from "next/navigation";
 
 interface ReviewItem {
   id: number;
@@ -21,6 +21,24 @@ interface ReviewsProps {
 }
 
 export default function Reviews({ knowledgeSlug, reviews, is_review }: ReviewsProps) {
+  // Get locale and determine RTL
+  const params = useParams();
+  const locale = params.locale as string;
+  const isRTL = locale === 'ar';
+  
+  // Translations
+  const translations = {
+    allReviews: isRTL ? 'جميع المراجعات' : 'All Reviews',
+    noReviewsYet: isRTL ? 'لا توجد مراجعات حتى الآن.' : 'No reviews yet.',
+    rateKnowledge: isRTL ? 'قيّم هذه المعرفة' : 'Rate This Knowledge',
+    comment: isRTL ? 'التعليق' : 'Comment',
+    writeReview: isRTL ? 'اكتب مراجعتك...' : 'Write your review...',
+    submitReview: isRTL ? 'إرسال المراجعة' : 'Submit Review',
+    allGood: isRTL ? 'كل شيء جيد!' : 'All good!',
+    reviewSuccess: isRTL ? 'تم إرسال المراجعة بنجاح!' : 'Review submitted successfully!',
+    signInRequired: isRTL ? 'يجب أن تكون مسجلاً للإضافة مراجعة.' : 'You must be signed in to leave a review.'
+  };
+
   // Retrieve the token from localStorage
   const token = typeof window !== "undefined" ? localStorage.getItem("token") : null;
 
@@ -39,56 +57,55 @@ export default function Reviews({ knowledgeSlug, reviews, is_review }: ReviewsPr
   };
 
   return (
-    <>
-    <Card   radius="md" withBorder>
-      <div >
-        <h4 className="text-lg font-semibold mb-4">All Reviews</h4>
-        {reviews.length > 0 ? (
-          <div className="space-y-4">
-            {reviews.map((review) => (
-              <div
-                key={review.id}
-                className="p-4 border rounded shadow-sm"
-              >
-                <div className="flex items-center justify-between">
-                  <span className="font-semibold">
-                    {review.user_name}
-                  </span>
-                  <span className="text-sm text-gray-500">
-                    {review.created_date}
-                  </span>
-                </div>
-                <div className="mt-2">
-                  <div className="flex items-center">
-                    {/* @ts-ignore: The current Rating type doesn't include the `max` prop */}
-                    <Rating
-                      fractions={1}
-                      value={review.rate}
-                      readOnly
-                    />
-                    <span className="ml-2 text-sm">
-                      {review.rate}/5
+    <div dir={isRTL ? 'rtl' : 'ltr'}>
+      <Card radius="md" withBorder>
+        <div>
+          <h4 className={`text-lg font-semibold mb-4 ${isRTL ? 'text-right' : 'text-start'}`}>{translations.allReviews}</h4>
+          {reviews.length > 0 ? (
+            <div className="space-y-4">
+              {reviews.map((review) => (
+                <div
+                  key={review.id}
+                  className="p-4 border rounded shadow-sm"
+                >
+                  <div className="flex items-center justify-between">
+                    <span className="font-semibold">
+                      {review.user_name}
+                    </span>
+                    <span className="text-sm text-gray-500">
+                      {new Date(review.created_date).toLocaleDateString(isRTL ? 'en-US' : undefined)}
                     </span>
                   </div>
-                  <p className="mt-2 text-gray-700">
-                    {review.comment}
-                  </p>
+                  <div className="mt-2">
+                    <div className="flex items-center">
+                      {/* @ts-ignore: The current Rating type doesn't include the `max` prop */}
+                      <Rating
+                        fractions={1}
+                        value={review.rate}
+                        readOnly
+                      />
+                      <span className={`${isRTL ? 'mr-2' : 'ml-2'} text-sm`}>
+                        {review.rate}/5
+                      </span>
+                    </div>
+                    <p className={`mt-2 text-gray-700 ${isRTL ? 'text-right' : 'text-start'}`}>
+                      {review.comment}
+                    </p>
+                  </div>
                 </div>
-              </div>
-            ))}
-          </div>
-        ) : (
-          <p className="text-gray-600">No reviews yet.</p>
-        )}
-      </div>
+              ))}
+            </div>
+          ) : (
+            <p className={`text-gray-600 ${isRTL ? 'text-right' : 'text-start'}`}>{translations.noReviewsYet}</p>
+          )}
+        </div>
       </Card>
       {token && !is_review && !submit && (
-      <Card  padding="lg" radius="md" withBorder mt={'md'}>
-       
+        <Card padding="lg" radius="md" withBorder mt={'md'}>
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
-              <Text fw={500} fs="sm" mb={5}>
-                Rate This Knowledge
+              <Text fw={500} fs="sm" mb={5} className={isRTL ? 'text-right' : 'text-start'}>
+                {translations.rateKnowledge}
               </Text>
               {/* @ts-ignore: The current Rating type doesn't include the `max` prop */}
               <Rating
@@ -98,11 +115,11 @@ export default function Reviews({ knowledgeSlug, reviews, is_review }: ReviewsPr
               />
             </div>
             <div>
-              <Text fw={500} size="sm" mb={5}>
-                Comment
+              <Text fw={500} size="sm" mb={5} className={isRTL ? 'text-right' : 'text-start'}>
+                {translations.comment}
               </Text>
               <Textarea
-                placeholder="Write your review..."
+                placeholder={translations.writeReview}
                 value={comment}
                 onChange={(e) => setComment(e.currentTarget.value)}
                 autosize
@@ -123,28 +140,26 @@ export default function Reviews({ knowledgeSlug, reviews, is_review }: ReviewsPr
               <Notification
                 icon={<IconCheck size={20} />}
                 color="teal"
-                title="All good!"
+                title={translations.allGood}
                 onClose={() => {}}
                 mt="sm"
               >
-                Review submitted successfully!
+                {translations.reviewSuccess}
               </Notification>
             )}
             <Button type="submit" loading={loading} mt="md">
-              Submit Review
+              {translations.submitReview}
             </Button>
           </form>
-      
-      </Card>
-        )}
-      { !token && (
-        <Card>
-           <Text color="dimmed">
-            You must be signed in to leave a review.
+        </Card>
+      )}
+      {!token && (
+        <Card className="mt-4">
+          <Text color="dimmed" className={isRTL ? 'text-right' : 'text-start'}>
+            {translations.signInRequired}
           </Text>
         </Card>
-      )}  
-      </>
+      )}
+    </div>
   );
 }
-

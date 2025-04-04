@@ -1,9 +1,12 @@
+'use client';
+
 import React, { useEffect } from 'react'
 import Image from 'next/image'
 import styles from './knowledge.module.css'
 import { SparklesIcon } from '@heroicons/react/20/solid'
 import { IconFiles } from '@tabler/icons-react'
 import { Group, Text, Badge } from '@mantine/core'
+import { useParams } from 'next/navigation'
 
 // Define interfaces for minimal typing, you can expand these as needed
 interface Document {
@@ -52,9 +55,28 @@ const getFileIconByExtension = (extension: string) => {
 }
 
 export default function Overview({ knowledge }: OverviewProps) {
+  const params = useParams();
+  const locale = params.locale;
+  const isRTL = locale === 'ar';
+
+  // Translations
+  const translations = {
+    chooseReportSections: isRTL ? 'اختر أقسام التقرير التي تناسب احتياجاتك وميزانيتك!' : 'Choose report sections that fit your needs and budget!',
+    thisIncludes: isRTL ? `هذا ${knowledge.type} يتضمن` : `This ${knowledge.type} includes`,
+    documents: isRTL ? 'مستندات' : 'documents',
+    free: isRTL ? 'مجاني' : 'Free',
+    download: isRTL ? 'تحميل' : 'Download',
+    addToCart: isRTL ? 'إضافة إلى السلة' : 'Add to Cart',
+    evaluateWithAI: isRTL ? 'تقييم باستخدام الذكاء الاصطناعي' : 'Evaluate with AI',
+    description: isRTL ? 'الوصف' : 'Description',
+    tableOfContents: isRTL ? 'جدول المحتويات' : 'Table of Contents',
+    chapter: isRTL ? 'الفصل' : 'Chapter',
+    title: isRTL ? 'العنوان' : 'Title',
+    noDocumentsAvailable: isRTL ? 'لا توجد مستندات متاحة.' : 'No documents available.'
+  };
 
   return (
-    <div className={styles.container}>
+    <div className={styles.container} dir={isRTL ? 'rtl' : 'ltr'}>
       <div className={styles.py10}>
         {/* Description Section */}
         <div className="bg-transparent p-3 rounded mb-3">
@@ -71,14 +93,14 @@ export default function Overview({ knowledge }: OverviewProps) {
             <SparklesIcon className="w-full h-full text-yellow-400" />
           </div>
           <span className="text-sm font-semibold text-gray-900">
-            Choose report sections that fit your needs and budget!
+            {translations.chooseReportSections}
           </span>
         </div>
         <Group gap="xs" className="px-4 pt-3 bg-slate-50/50 rounded-lg">
           <IconFiles size={20} className="text-slate-600" />
-          <Text size="sm" c="dimmed" className='capitalize'>This {knowledge.type} includes</Text>
+          <Text size="sm" c="dimmed" className='capitalize'>{translations.thisIncludes}</Text>
           <Badge variant="light" color="blue" size="sm">
-            {knowledge.documents.length} documents
+            {knowledge.documents.length} {translations.documents}
           </Badge>
         </Group>
         {/* Documents Section */}
@@ -119,7 +141,7 @@ export default function Overview({ knowledge }: OverviewProps) {
                   </div>
                   <div className={styles.priceTag}>
   {parseFloat(doc.price) === 0 ? (
-    <span className={`${styles.badge} ${styles.badgeFree}`}>Free</span>
+    <span className={`${styles.badge} ${styles.badgeFree}`}>{translations.free}</span>
   ) : (
     <span className={styles.badge}>${parseFloat(doc.price).toFixed(2)}</span>
   )}
@@ -142,24 +164,24 @@ export default function Overview({ knowledge }: OverviewProps) {
                 <div id={`doc-content-${doc.id}`} className={styles.documentContent}>
                   {doc.description && (
                     <div className={styles.description}>
-                      <h6>Description</h6>
+                      <h6>{translations.description}</h6>
                       <p dangerouslySetInnerHTML={{ __html: doc.description }}></p>
                     </div>
                   )}
                   {doc.table_of_content && Array.isArray(doc.table_of_content) && doc.table_of_content.length > 0 && (
                     <div className={styles.tableOfContents}>
-                      <h6>Table of Contents</h6>
+                      <h6>{translations.tableOfContents}</h6>
                       <table className={styles.tocTable}>
                         <thead>
                           <tr>
-                            <th>Chapter</th>
-                            <th>Title</th>
+                            <th>{translations.chapter}</th>
+                            <th>{translations.title}</th>
                           </tr>
                         </thead>
                         <tbody>
                           {doc.table_of_content.map((toc, index) => (
                             <tr key={index}>
-                              <td>Chapter {index + 1}</td>
+                              <td>{translations.chapter} {index + 1}</td>
                               <td>{toc.chapter.title}</td>
                             </tr>
                           ))}
@@ -171,12 +193,12 @@ export default function Overview({ knowledge }: OverviewProps) {
                     <div>
                     { doc.price === "0" && (
   <a  className="btn-sm text-white bg-[#1C7CBB] text-sm hover:bg-opacity-90 transition duration-150 ease-in-out group text-sm px-3 py-1 cursor-pointer">
-  Download <span className="tracking-normal text-white group-hover:translate-x-0.5 transition-transform duration-150 ease-in-out ml-1">-&gt;</span>
+  {translations.download} <span className="tracking-normal text-white group-hover:translate-x-0.5 transition-transform duration-150 ease-in-out ml-1">-&gt;</span>
 </a>
 )}
 {doc.price !== "0" && (
     <a  className="btn-sm text-white bg-[#1C7CBB] text-sm hover:bg-opacity-90 transition duration-150 ease-in-out group text-sm px-3 py-1 cursor-pointer">
-    Add to Cart <span className="tracking-normal text-white group-hover:translate-x-0.5 transition-transform duration-150 ease-in-out ml-1">-&gt;</span>
+    {translations.addToCart} <span className="tracking-normal text-white group-hover:translate-x-0.5 transition-transform duration-150 ease-in-out ml-1">-&gt;</span>
   </a>
 )}
                     </div>
@@ -185,7 +207,7 @@ export default function Overview({ knowledge }: OverviewProps) {
                         <svg className="shrink-0 fill-slate-600 mr-2" xmlns="http://www.w3.org/2000/svg" width="12" height="12">
                           <path d="m1.999 0 1 2-1 2 2-1 2 1-1-2 1-2-2 1zM11.999 0l1 2-1 2 2-1 2 1-1-2 1-2-2 1zM11.999 10l1 2-1 2 2-1 2 1-1-2 1-2-2 1zM6.292 7.586l2.646-2.647L11.06 7.06 8.413 9.707zM0 13.878l5.586-5.586 2.122 2.121L2.12 16z" />
                         </svg>
-                        <span>Evaluate with AI</span>
+                        <span>{translations.evaluateWithAI}</span>
                       </a>
                     </div>
                   </div>
@@ -193,7 +215,7 @@ export default function Overview({ knowledge }: OverviewProps) {
               </div>
             ))
           ) : (
-            <p className={styles.textGray600}>No documents available.</p>
+            <p className={styles.textGray600}>{translations.noDocumentsAvailable}</p>
           )}
         </div>
       </div>

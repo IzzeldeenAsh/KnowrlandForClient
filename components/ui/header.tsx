@@ -33,13 +33,13 @@ interface Industry {
   children?: Industry[];
 }
 
-async function getIndustries() {
+async function getIndustries(locale: string = 'en') {
   const res = await fetch("https://api.knoldg.com/api/industries/menu", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
       Accept: "application/json",
-      "Accept-Language": "en",
+      "Accept-Language": locale,
     },
     body: JSON.stringify({
       top_industry: 6,
@@ -114,7 +114,7 @@ export default function Header() {
             'Authorization': `Bearer ${token}`,
             "Content-Type": "application/json",
             "Accept": "application/json",
-            "Accept-Language": "en",
+            "Accept-Language": pathname.split('/')[1] || 'en',
           }
         });
 
@@ -150,7 +150,7 @@ export default function Header() {
     };
 
     const fetchIndustries = async () => {
-      const data = await getIndustries();
+      const data = await getIndustries(pathname.split('/')[1] || 'en');
       setIndustries(data);
     };
 

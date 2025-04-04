@@ -68,13 +68,26 @@ export default function KnowledgeGrid({
 }: KnowledgeGridProps) {
   const params = useParams();
   const currentLocale = locale || params.locale || "en";
+  const isRTL = currentLocale === "ar";
+
+  // Localized strings
+  const translations = {
+    knowledge: isRTL ? "المعرفة" : "Knowledge",
+    exploreInsights: isRTL ? `استكشف الرؤى ضمن ${topicName}` : `Explore insights within ${topicName}`,
+    noItems: isRTL ? "لا توجد عناصر معرفية متاحة بعد" : "No knowledge items available yet",
+    posted: isRTL ? "نُشر" : "Posted",
+    free: isRTL ? "مجاني" : "FREE",
+    paid: isRTL ? "مدفوع" : "PAID",
+    insighter: isRTL ? "إنسايتر" : "Insighter",
+    company: isRTL ? "شركة" : "Company"
+  };
 
   return (
-    <div className="max-w-6xl mx-auto">
+    <div className="max-w-6xl mx-auto" dir={isRTL ? "rtl" : "ltr"}>
       {showHeader && (
-        <div className="mb-8 text-start">
-          <h2 className="text-2xl font-bold text-gray-900 mb-2">Knowledge</h2>
-          <p className="text-gray-600">Explore insights within {topicName}</p>
+        <div className={`mb-8 ${isRTL ? 'text-right' : 'text-start'}`}>
+          <h2 className="text-2xl font-bold text-gray-900 mb-2">{translations.knowledge}</h2>
+          <p className="text-gray-600">{translations.exploreInsights}</p>
         </div>
       )}
 
@@ -140,8 +153,8 @@ export default function KnowledgeGrid({
 
                 <div>
                   <Text c="dimmed" size="xs">
-                    {item.insighter.roles.includes("insighter") && "Insighter"}
-                    {item.insighter.roles.includes("company") && "Company"}
+                    {item.insighter.roles.includes("insighter") && translations.insighter}
+                    {item.insighter.roles.includes("company") && translations.company}
                   </Text>
                   <Text fw={500} size="xs">
                     {item.insighter.name}
@@ -152,13 +165,13 @@ export default function KnowledgeGrid({
               <Card.Section className={cardStyles.footer}>
                 <Group justify="space-between">
                   <Text c="dimmed" size="xs">
-                    Posted {formatPublishedDate(item.published_at)}
+                    {translations.posted} {formatPublishedDate(item.published_at)}
                   </Text>
                   <Badge
                     color={item.total_price === "0" ? "green" : "yellow"}
                     variant="light"
                   >
-                    {item.total_price === "0" ? "FREE" : "PAID"}
+                    {item.total_price === "0" ? translations.free : translations.paid}
                   </Badge>
                 </Group>
               </Card.Section>
@@ -169,7 +182,7 @@ export default function KnowledgeGrid({
           <div className="col-span-full flex flex-col items-center justify-center py-12 px-4">
             <div className="rounded-full bg-gray-50 p-4 mb-3"></div>
             <p className="text-gray-500 text-sm">
-              No knowledge items available yet
+              {translations.noItems}
             </p>
           </div>
         )}
