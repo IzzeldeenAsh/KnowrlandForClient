@@ -13,6 +13,8 @@ import KnowledgeSideBox from './KnowledgeSideBox';
 import { StarIcon } from "@heroicons/react/20/solid";
 import TabsContent from "./TabsContent";
 import Stripes from "@/public/images/stripes-dark.svg";
+import { getMessages } from '@/utils/get-messages';
+
 interface KnowledgeDetails {
   type: string;
   title: string;
@@ -36,6 +38,7 @@ interface KnowledgeDetails {
   status: string;
   published_at: string;
   review: any[];
+  is_review: boolean;
   insighter: {
     name: string;
     profile_photo_url: string;
@@ -63,13 +66,14 @@ interface KnowledgeDetails {
 interface Params {
   type: string;
   slug: string;
+  locale: string;
 }
 
 interface Props {
-  params: Promise<Params>;
+  params: Params;
 }
 
-async function fetchKnowledgeData(type: string, slug: string) {
+async function fetchKnowledgeData(type: string, slug: string, locale: string = 'en') {
   try {
     const response = await fetch(
       `https://api.knoldg.com/api/industries/knowledge/${slug}`,
@@ -78,7 +82,7 @@ async function fetchKnowledgeData(type: string, slug: string) {
         headers: {
           "Content-Type": "application/json",
           Accept: "application/json",
-          "Accept-Language": "en",
+          "Accept-Language": locale,
         },
       }
     );
@@ -109,41 +113,52 @@ async function fetchKnowledgeData(type: string, slug: string) {
 
 // Generate metadata for SEO
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const { type, slug } = await params;
+  const { type, slug, locale } = params;
 
   try {
-    const { data } = await fetchKnowledgeData(type, slug);
+    const { data } = await fetchKnowledgeData(type, slug, locale);
 
     return {
-      title: `${data.title} | Foresighta Knowledge`,
+      title: `${data.title} | KNOLDG Knowledge`,
       description: `Detailed knowledge and insights about ${data.title}`,
       openGraph: {
-        title: `${data.title} | Foresighta Knowledge`,
+        title: `${data.title} | KNOLDG Knowledge`,
         description: `Detailed knowledge and insights about ${data.title}`,
       },
     };
   } catch (error) {
     // Let the not-found page handle this
     return {
-      title: "Knowledge Not Found | Foresighta",
+      title: "Knowledge Not Found | KNOLDG",
       description: "The requested knowledge resource could not be found",
     };
   }
 }
 
 export default async function KnowledgePage({ params }: Props) {
-  const { type, slug } = await params;
+  const { type, slug, locale } = params;
+  const isRTL = locale === 'ar';
+  
+  // Get translations
+  const messages = await getMessages(locale);
+  
+  // Translations
+  const translations = {
+    insighter: isRTL ? 'إنسايتر' : 'Insighter',
+    published: isRTL ? 'نُشر في' : 'Published',
+    rating: isRTL ? 'التقييم' : 'Rating',
+  };
 
   // No try/catch here - let any errors be caught by the not-found page
-  const { data: knowledge } = await fetchKnowledgeData(type, slug);
-  const breadcrumbData = await fetchBreadcrumb("knowledge", slug);
+  const { data: knowledge } = await fetchKnowledgeData(type, slug, locale);
+  const breadcrumbData = await fetchBreadcrumb("knowledge", slug, locale);
   const breadcrumbItems = breadcrumbData.map((item) => ({
     label: item.label,
     href: item.url,
   }));
 
   return (
-    <div className="min-h-screen bg-gray-50 relative">
+    <div className="min-h-screen bg-gray-50 relative" dir={isRTL ? 'rtl' : 'ltr'}>
       {/* Background decoration */}
       <div className="pointer-events-none absolute z-10 left-[10%] top-0 hidden md:block" aria-hidden="true">
         <Image
@@ -173,7 +188,7 @@ export default async function KnowledgePage({ params }: Props) {
           </div>
           
           {/* Header */}
-          <div className="text-start mb-4" data-aos="fade-down">
+          <div className={`${isRTL ? 'text-right' : 'text-start'} mb-4`} data-aos="fade-down">
             <div className="flex flex-row gap-4">
               <div className="mb-4 mt-1">
                 {knowledge.type === 'data' && <div className="bg-white p-3 rounded flex items-center justify-center"><DataIcon width={40} height={40} /></div>}
@@ -188,7 +203,12 @@ export default async function KnowledgePage({ params }: Props) {
                     {knowledge.title}
                   </h3>
                   <div className="text-sm font-bold text-gray-700 capitalize">
-                    {knowledge.type}
+                    {messages && knowledge.type === 'data' ? messages?.Header?.navigation?.data || knowledge.type : 
+                     knowledge.type === 'insight' ? messages?.Header?.navigation?.insights || knowledge.type : 
+                     knowledge.type === 'manual' ? messages?.Header?.navigation?.manuals || knowledge.type : 
+                     knowledge.type === 'report' ? messages?.Header?.navigation?.reports || knowledge.type : 
+                     knowledge.type === 'course' ? messages?.Header?.navigation?.courses || knowledge.type : 
+                     knowledge.type}
                   </div>
                 </div>
               </div>
@@ -216,23 +236,23 @@ export default async function KnowledgePage({ params }: Props) {
                 )}
               </div>
               <span className="flex flex-col">
-                <span className="text-sm text-gray-500">Insighter</span>
+                <span className="text-sm text-gray-500">{translations.insighter}</span>
                 <span className="text-sm font-bold text-gray-700">
                   {knowledge.insighter.name}
                 </span>
               </span>
               <div className="flex flex-col ps-8">
-                <span className="text-gray-500 text-sm">Published</span>
+                <span className="text-gray-500 text-sm">{translations.published}</span>
                 <span className="text-sm font-bold text-gray-700">
                   {knowledge.published_at === null
                     ? "N/A"
                     : new Date(
                         knowledge.published_at
-                      ).toLocaleDateString()}
+                      ).toLocaleDateString(isRTL ? 'en-US' : undefined)}
                 </span>
               </div>
               <div className="flex flex-col ps-8">
-                <span className="text-gray-500 text-sm">Rating</span>
+                <span className="text-gray-500 text-sm">{translations.rating}</span>
                 <span className="text-sm font-bold text-gray-700 flex items-center">
                   4.8
                   <StarIcon className="h-4 w-4 text-yellow-400 ml-1" />
@@ -260,6 +280,7 @@ export default async function KnowledgePage({ params }: Props) {
               economic_blocs={knowledge.economic_blocs}
               regions={knowledge.regions}
               countries={knowledge.countries}
+              locale={locale}
             />
           </div>
         </div>

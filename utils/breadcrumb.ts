@@ -3,13 +3,17 @@ interface BreadcrumbItem {
   url: string;
 }
 
-export async function fetchBreadcrumb(type: 'industry' | 'sub-industry' | 'topic' | 'knowledge', identifier: number | string): Promise<BreadcrumbItem[]> {
+export async function fetchBreadcrumb(
+  type: 'industry' | 'sub-industry' | 'topic' | 'knowledge',
+  identifier: number | string,
+  locale: string = 'en'
+): Promise<BreadcrumbItem[]> {
   const response = await fetch('https://api.knoldg.com/api/common/setting/breadcrumb', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
       'Accept': 'application/json',
-      'Accept-Language': 'en',
+      'Accept-Language': locale,
     },
     body: JSON.stringify({
       type,

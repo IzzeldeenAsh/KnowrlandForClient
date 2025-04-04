@@ -23,6 +23,7 @@ export default function IndustriesGrid({ industries, locale }: IndustriesGridPro
   // Get locale from params if not passed as prop
   const params = useParams();
   const currentLocale = locale || (params?.locale as string) || 'en';
+  const isRTL = currentLocale === 'ar';
 
   return (
     <div 
@@ -48,16 +49,21 @@ export default function IndustriesGrid({ industries, locale }: IndustriesGridPro
                   className="text-xs text-gray-600 hover:text-blue-600 transition-colors flex items-center"
                 >
                <Link href={`/${currentLocale}/sub-industry/${child.id}/${child.slug}`}>
-               <span className="mr-2">•</span>
+               <span className={isRTL ? "ml-2" : "mr-2"}>•</span>
                {child.name}
                </Link>
                 </li>
               ))}
             </ul>
           </div>
-          <div className="absolute top-6 right-6">
+          <div className={`absolute top-6 ${isRTL ? 'left-6' : 'right-6'}`}>
             <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7" />
+              <path 
+                strokeLinecap="round" 
+                strokeLinejoin="round" 
+                strokeWidth="2" 
+                d={isRTL ? "M15 5l-7 7 7 7" : "M9 5l7 7-7 7"} 
+              />
             </svg>
           </div>
         </div>
