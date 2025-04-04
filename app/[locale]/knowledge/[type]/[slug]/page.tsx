@@ -2,6 +2,7 @@ import Footer from '@/components/ui/footer'
 import Breadcrumb from "@/components/ui/breadcrumb";
 import Image from "next/image";
 import { Metadata } from "next";
+import { use } from "react";
 import { notFound } from "next/navigation";
 import DataIcon from "@/components/icons/DataIcon";
 import InsightIcon from "@/components/icons/InsightIcon";
@@ -63,14 +64,12 @@ interface KnowledgeDetails {
   }>;
 }
 
-interface Params {
-  type: string;
-  slug: string;
-  locale: string;
-}
-
 interface Props {
-  params: Params;
+  params: Promise<{
+    type: string;
+    slug: string;
+    locale: string;
+  }>;
 }
 
 async function fetchKnowledgeData(type: string, slug: string, locale: string = 'en') {
@@ -113,7 +112,9 @@ async function fetchKnowledgeData(type: string, slug: string, locale: string = '
 
 // Generate metadata for SEO
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const { type, slug, locale } = params;
+  // We need to await the promise in async context
+  const resolvedParams = await params;
+  const { type, slug, locale } = resolvedParams;
 
   try {
     const { data } = await fetchKnowledgeData(type, slug, locale);
@@ -135,12 +136,13 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   }
 }
 
-export default async function KnowledgePage({ params }: Props) {
-  const { type, slug, locale } = params;
+export default function KnowledgePage({ params }: Props) {
+  const resolvedParams = use(params);
+  const { type, slug, locale } = resolvedParams;
   const isRTL = locale === 'ar';
   
-  // Get translations
-  const messages = await getMessages(locale);
+  // Get translations - use the use() hook instead of await since we're in a client component
+  const messages = use(getMessages(locale));
   
   // Translations
   const translations = {
@@ -150,8 +152,9 @@ export default async function KnowledgePage({ params }: Props) {
   };
 
   // No try/catch here - let any errors be caught by the not-found page
-  const { data: knowledge } = await fetchKnowledgeData(type, slug, locale);
-  const breadcrumbData = await fetchBreadcrumb("knowledge", slug, locale);
+  // Use the use() hook instead of await since we're in a client component
+  const { data: knowledge } = use(fetchKnowledgeData(type, slug, locale));
+  const breadcrumbData = use(fetchBreadcrumb("knowledge", slug, locale));
   const breadcrumbItems = breadcrumbData.map((item) => ({
     label: item.label,
     href: item.url,
