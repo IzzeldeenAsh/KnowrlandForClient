@@ -90,6 +90,36 @@ export default function KnowledgesClient() {
   const router = useRouter();
   const params = useParams();
   const locale = params.locale as string || 'en';
+  const isRTL = locale === 'ar';
+  
+  // Translations
+  const translations = {
+    loading: isRTL ? 'جاري تحميل عناصر المعرفة...' : 'Loading knowledge items...',
+    noItemsFound: isRTL ? 'لم يتم العثور على عناصر للمرشحات المحددة.' : 'No knowledge items found for the selected filters.',
+    resetFilters: isRTL ? 'إعادة ضبط المرشحات' : 'Reset Filters',
+    showing: isRTL ? 'عرض' : 'Showing',
+    of: isRTL ? 'من' : 'of',
+    items: isRTL ? 'عنصر' : 'items',
+    noItems: isRTL ? 'لم يتم العثور على عناصر' : 'No items found',
+    grid: isRTL ? 'شبكة' : 'Grid',
+    list: isRTL ? 'قائمة' : 'List',
+    filterBy: isRTL ? 'تصفية حسب' : 'Filter By',
+    selectCategory: isRTL ? 'حدد الفئة' : 'Select category',
+    industry: isRTL ? 'الصناعة' : 'Industry',
+    subIndustry: isRTL ? 'الصناعة الفرعية' : 'Sub-Industry',
+    topic: isRTL ? 'الموضوع' : 'Topic',
+    selectIndustry: isRTL ? 'حدد صناعة' : 'Select an industry',
+    selectSubIndustry: isRTL ? 'حدد صناعة فرعية' : 'Select a sub-industry',
+    selectTopic: isRTL ? 'حدد موضوعًا' : 'Select a topic',
+    knowledgeType: isRTL ? 'نوع المعرفة' : 'Knowledge Type',
+    selectType: isRTL ? 'حدد النوع' : 'Select type',
+    data: isRTL ? 'بيانات' : 'Data',
+    insight: isRTL ? 'رؤى' : 'Insight',
+    manual: isRTL ? 'أدلة' : 'Manual',
+    course: isRTL ? 'دورات' : 'Course',
+    report: isRTL ? 'تقارير' : 'Report',
+    filteredResults: isRTL ? 'نتائج المرشحات' : 'Filtered Results'
+  };
 
   // Get filter values from URL query parameters
   const taxonomyParam = searchParams.get('taxonomy') || 'industry';
@@ -117,11 +147,11 @@ export default function KnowledgesClient() {
 
   // Knowledge type options
   const knowledgeTypes = [
-    { value: 'data', label: 'Data' },
-    { value: 'insight', label: 'Insight' },
-    { value: 'manual', label: 'Manual' },
-    { value: 'course', label: 'Course' },
-    { value: 'report', label: 'Report' },
+    { value: 'data', label: translations.data },
+    { value: 'insight', label: translations.insight },
+    { value: 'manual', label: translations.manual },
+    { value: 'course', label: translations.course },
+    { value: 'report', label: translations.report },
   ];
 
   // Fetch sub-industries when industry changes
@@ -230,7 +260,7 @@ export default function KnowledgesClient() {
       <Container size="xl" py="xl">
         <Flex justify="center" align="center" direction="column" h={400}>
           <Loader size="lg" />
-          <Text mt="md">Loading knowledge items...</Text>
+          <Text mt="md">{translations.loading}</Text>
         </Flex>
       </Container>
     );
@@ -248,7 +278,7 @@ export default function KnowledgesClient() {
   return (
     <>
        <PageIllustration />
-       <Container size="xl" py="xl" mt="xl" style={{position: 'relative', zIndex: 1}}>
+       <Container size="xl" py="xl" mt="xl" style={{position: 'relative', zIndex: 1}} dir={isRTL ? 'rtl' : 'ltr'}>
    
       
    <Title order={1} mb="xl"></Title>
@@ -258,12 +288,12 @@ export default function KnowledgesClient() {
      <Grid >
        <Grid.Col span={{ base: 12, md: 4 }}>
          <Select
-           label="Filter By"
-           placeholder="Select category"
+           label={translations.filterBy}
+           placeholder={translations.selectCategory}
            data={[
-             { value: 'industry', label: 'Industry' },
-             { value: 'sub_industry', label: 'Sub-Industry' },
-             { value: 'topic', label: 'Topic' }
+             { value: 'industry', label: translations.industry },
+             { value: 'sub_industry', label: translations.subIndustry },
+             { value: 'topic', label: translations.topic }
            ]}
            value={taxonomy}
            onChange={(value) => handleTaxonomyChange(value || 'industry')}
@@ -274,8 +304,8 @@ export default function KnowledgesClient() {
        <Grid.Col span={{ base: 12, md: 4 }}>
          {taxonomy === 'industry' && (
            <Select
-             label="Industry"
-             placeholder="Select an industry"
+             label={translations.industry}
+             placeholder={translations.selectIndustry}
              data={industries.map(i => ({ value: i.id.toString(), label: i.name }))}
              value={selectedId}
              onChange={handleIdChange}
@@ -286,8 +316,8 @@ export default function KnowledgesClient() {
          
          {taxonomy === 'sub_industry' && (
            <Select
-             label="Sub-Industry"
-             placeholder="Select a sub-industry"
+             label={translations.subIndustry}
+             placeholder={translations.selectSubIndustry}
              data={subIndustries.map(i => ({ value: i.id.toString(), label: i.name }))}
              value={selectedId}
              onChange={handleIdChange}
@@ -298,8 +328,8 @@ export default function KnowledgesClient() {
          
          {taxonomy === 'topic' && (
            <Select
-             label="Topic"
-             placeholder="Select a topic"
+             label={translations.topic}
+             placeholder={translations.selectTopic}
              data={topics.map(i => ({ value: i.id.toString(), label: i.name }))}
              value={selectedId}
              onChange={handleIdChange}
@@ -311,8 +341,8 @@ export default function KnowledgesClient() {
        
        <Grid.Col span={{ base: 12, md: 4 }}>
          <Select
-           label="Knowledge Type"
-           placeholder="Select type"
+           label={translations.knowledgeType}
+           placeholder={translations.selectType}
            data={knowledgeTypes}
            value={selectedType}
            onChange={(value) => handleTypeChange(value || 'data')}
@@ -326,8 +356,8 @@ export default function KnowledgesClient() {
    <Flex justify="space-between" align="center" mb="md">
      <Text>
        {pagination && pagination.total > 0 
-         ? `Showing ${pagination.from}-${pagination.to} of ${pagination.total} items` 
-         : 'No items found'}
+         ? `${translations.showing} ${pagination.from}-${pagination.to} ${translations.of} ${pagination.total} ${translations.items}` 
+         : translations.noItems}
      </Text>
      
      <SegmentedControl
@@ -339,7 +369,7 @@ export default function KnowledgesClient() {
            label: (
              <Flex align="center" gap={8}>
                <Squares2X2Icon width={18} height={18} />
-               <span>Grid</span>
+               <span>{translations.grid}</span>
              </Flex>
            ),
          },
@@ -348,7 +378,7 @@ export default function KnowledgesClient() {
            label: (
              <Flex align="center" gap={8}>
                <ListBulletIcon width={18} height={18} />
-               <span>List</span>
+               <span>{translations.list}</span>
              </Flex>
            ),
          },
@@ -362,7 +392,7 @@ export default function KnowledgesClient() {
        {view === 'grid' ? (
          <KnowledgeGrid 
            knowledge={knowledgeItems} 
-           topicName="Filtered Results" 
+           topicName={translations.filteredResults}
            locale={locale}
          />
        ) : (
@@ -385,14 +415,14 @@ export default function KnowledgesClient() {
      </>
    ) : (
      <Flex justify="center" align="center" direction="column" h={200} mt="xl">
-       <Text size="lg" mb="md">No knowledge items found for the selected filters.</Text>
+       <Text size="lg" mb="md">{translations.noItemsFound}</Text>
        <Button variant="outline" onClick={() => {
          setTaxonomy('industry');
          setSelectedId('');
          setSelectedType('data');
          setPage(1);
        }}>
-         Reset Filters
+         {translations.resetFilters}
        </Button>
      </Flex>
    )}

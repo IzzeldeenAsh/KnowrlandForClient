@@ -7,6 +7,8 @@ import Link from 'next/link'
 import { fetchBreadcrumb } from '@/utils/breadcrumb'
 import StatisticsCards from '@/components/industry/statistics-cards'
 import Stripes from "@/public/images/stripes-dark.svg";
+import { getMessages } from '@/utils/get-messages'
+
 interface Topic {
   id: number
   name: string
@@ -92,10 +94,14 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
 export default async function IndustryPage({ params }: Props) {
   const { id, slug, locale = 'en' } = await params
+  const isRTL = locale === 'ar';
+  
+  // Get translations
+  const messages = await getMessages(locale);
 
   try {
     const { data: industry } = await fetchIndustryData(id, slug, locale)
-    const breadcrumbItems = await fetchBreadcrumb('industry', parseInt(id))
+    const breadcrumbItems = await fetchBreadcrumb('industry', parseInt(id), locale)
 
     return (
       <>
@@ -118,7 +124,7 @@ export default async function IndustryPage({ params }: Props) {
       </div>
     
 
-      <div className="min-h-screen bg-gray-50  ">
+      <div className="min-h-screen bg-gray-50" dir={isRTL ? 'rtl' : 'ltr'}>
         <div className="section-header px-4 sm:px-6 lg:px-8 py-8  relative overflow-hidden rounded-lg">
                 <Image
                   alt="Section background"
@@ -135,9 +141,9 @@ export default async function IndustryPage({ params }: Props) {
                 
                   {/* Header */}
                   <div className="min-h-[100px] flex flex-col md:flex-row items-start justify-between">
-                  <div className="text-start mb-4" data-aos="fade-down">
+                  <div className={`${isRTL ? 'text-right' : 'text-start'} mb-4`} data-aos="fade-down">
                     <span className="inline-block px-5 py-1 text-xs font-semibold text-blue-500 bg-blue-100 rounded-md mb-2 uppercase">
-                      Industry
+                      {messages?.Header?.navigation?.industries || 'Industry'}
                     </span>
                     <h3 className="text-md bg-gradient-to-r from-blue-500 to-teal-400 md:text-3xl font-extrabold text-transparent bg-clip-text mb-4">
                       {industry.name}
@@ -153,9 +159,13 @@ export default async function IndustryPage({ params }: Props) {
         
         <div className="max-w-container relative mx-auto mt-10 w-full px-4 sm:px-6 lg:px-8 pb-32">
           <div className="max-w-6xl mx-auto">
-            <div className="mb-8 text-start">
-              <h2 className="text-2xl font-bold text-gray-900 mb-2">Sub Industries</h2>
-              <p className="text-gray-600">Explore specialized sectors within {industry.name}</p>
+            <div className={`mb-8 ${isRTL ? 'text-right' : 'text-start'}`}>
+              <h2 className="text-2xl font-bold text-gray-900 mb-2">
+                {locale === 'ar' ? 'الصناعات الفرعية' : 'Sub Industries'}
+              </h2>
+              <p className="text-gray-600">
+                {locale === 'ar' ? `استكشف القطاعات المتخصصة داخل ${industry.name}` : `Explore specialized sectors within ${industry.name}`}
+              </p>
             </div>
             
             {/* Industry Children */}
@@ -183,7 +193,7 @@ export default async function IndustryPage({ params }: Props) {
                               key={topic.id}
                               className="text-xs text-gray-600 hover:text-blue-600 transition-colors flex items-center"
                             >
-                              <span className="mr-2">•</span>
+                              <span className={isRTL ? "ml-2" : "mr-2"}></span>
                               {topic.name}
                             </li>
                             </Link>
@@ -191,8 +201,8 @@ export default async function IndustryPage({ params }: Props) {
                         </ul>
                       ) : (
                         <div className="text-xs text-gray-500 italic flex items-center">
-                          <span className="mr-2">•</span>
-                          <p>No topics available</p>
+                          <span className={isRTL ? "ml-2" : "mr-2"}></span>
+                          <p>{locale === 'ar' ? 'لا توجد مواضيع متاحة' : 'No topics available'}</p>
                         </div>
                       )}
                     </div>

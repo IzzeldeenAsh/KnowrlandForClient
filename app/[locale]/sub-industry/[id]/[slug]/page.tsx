@@ -9,6 +9,8 @@ import FolderIcon from '@/components/icons/folder-icon'
 import { fetchBreadcrumb } from '@/utils/breadcrumb'
 import StatisticsCards from '@/components/industry/statistics-cards'
 import Stripes from "@/public/images/stripes-dark.svg";
+import { getMessages } from '@/utils/get-messages'
+
 interface Knowledge {
   id: number
   type: string
@@ -95,10 +97,14 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
 export default async function SubIndustryPage({ params }: Props) {
   const { id, slug, locale = 'en' } = await params
+  const isRTL = locale === 'ar';
+  
+  // Get translations
+  const messages = await getMessages(locale);
 
   try {
     const { data: subIndustry } = await fetchSubIndustryData(id, slug, locale)
-    const breadcrumbData = await fetchBreadcrumb('sub-industry', parseInt(id))
+    const breadcrumbData = await fetchBreadcrumb('sub-industry', parseInt(id), locale)
     const breadcrumbItems = breadcrumbData.map(item => ({
       label: item.label,
       href: item.url
@@ -125,7 +131,7 @@ export default async function SubIndustryPage({ params }: Props) {
       </div>
       </div>
     
-        <div className="min-h-screen bg-gray-50">
+        <div className="min-h-screen bg-gray-50" dir={isRTL ? 'rtl' : 'ltr'}>
           <div className="section-header px-4 sm:px-6 lg:px-8 py-8  relative overflow-hidden rounded-lg">
             <Image
               alt="Section background"
@@ -141,9 +147,9 @@ export default async function SubIndustryPage({ params }: Props) {
               </div>
               {/* Header */}
                  <div className="min-h-[100px] flex flex-col md:flex-row items-start justify-between">
-                  <div className="text-start " data-aos="fade-down">
+                  <div className={`${isRTL ? 'text-right' : 'text-start'}`} data-aos="fade-down">
                     <span className="inline-block px-5 py-1 text-xs font-semibold text-blue-500 bg-blue-100 rounded-md mb-2 uppercase">
-                     Sub Industry
+                     {locale === 'ar' ? 'الصناعة الفرعية' : 'Sub Industry'}
                     </span>
                     <h3 className="text-md bg-gradient-to-r from-blue-500 to-teal-400 md:text-3xl font-extrabold text-transparent bg-clip-text ">
                       { subIndustry.name}
@@ -158,9 +164,13 @@ export default async function SubIndustryPage({ params }: Props) {
 
           <div className="max-w-container relative mx-auto mt-10 w-full px-4 sm:px-6 lg:px-8 pb-12">
             <div className="max-w-6xl mx-auto">
-              <div className="mb-8 text-start">
-                <h2 className="text-2xl font-bold text-gray-900 mb-2">Topics</h2>
-                <p className="text-gray-600">Explore topics and insights within {subIndustry.name}</p>
+              <div className={`mb-8 ${isRTL ? 'text-right' : 'text-start'}`}>
+                <h2 className="text-2xl font-bold text-gray-900 mb-2">
+                  {locale === 'ar' ? 'المواضيع' : 'Topics'}
+                </h2>
+                <p className="text-gray-600">
+                  {locale === 'ar' ? `استكشف المواضيع والرؤى ضمن ${subIndustry.name}` : `Explore topics and insights within ${subIndustry.name}`}
+                </p>
               </div>
 
               {/* Topics Grid */}
@@ -188,7 +198,7 @@ export default async function SubIndustryPage({ params }: Props) {
                               key={`${item.id}-${index}`}
                               className="text-xs text-gray-600 hover:text-blue-600 transition-colors flex items-center"
                             >
-                              <span className="mr-2">•</span>
+                              <span className={isRTL ? "ml-2" : "mr-2"}>•</span>
                               <Link href={`/${locale}/knowledge/${item.type}/${item.slug}`}>
                                 {item.title}
                               </Link>
@@ -197,8 +207,8 @@ export default async function SubIndustryPage({ params }: Props) {
                         </ul>
                       ) : (
                         <div className="text-xs text-gray-500 italic flex items-center">
-                          <span className="mr-2">•</span>
-                          <p>No knowledge items available</p>
+                          <span className={isRTL ? "ml-2" : "mr-2"}>•</span>
+                          <p>{locale === 'ar' ? 'لا توجد عناصر معرفية متاحة' : 'No knowledge items available'}</p>
                         </div>
                       )}
                     </div>
