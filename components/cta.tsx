@@ -1,6 +1,8 @@
 'use client'
 
 import { useTranslations } from 'next-intl'
+import { useParams } from 'next/navigation'
+import Link from 'next/link'
 
 export default function Cta() {
   const t = useTranslations('Cta')
@@ -59,9 +61,9 @@ export default function Cta() {
               Replacement (2 words): "Lorem Ipsum"
             */}
             <div>
-              <a className="btn text-slate-900 bg-gradient-to-r from-white/80 via-white to-white/80 hover:bg-white transition duration-150 ease-in-out group" href="#0">
+              <Link className="btn text-slate-900 bg-gradient-to-r from-white/80 via-white to-white/80 hover:bg-white transition duration-150 ease-in-out group" href={`/${useParams().locale}/insighter`}>
                 {t('button')} <span className="tracking-normal text-blue-500 group-hover:translate-x-0.5 transition-transform duration-150 ease-in-out mx-1">-&gt;</span>
-              </a>
+              </Link>
             </div>
           </div>
         </div>
