@@ -44,9 +44,9 @@ export default function Changelog() {
 
             {/* Page header */}
             <div className="text-center pb-12 md:pb-20">
-              <h1 className="h1 bg-clip-text text-transparent bg-gradient-to-r from-slate-200/60 via-slate-200 to-slate-200/60 pb-4">What's New</h1>
+              <h2 className="h2 bg-clip-text text-transparent bg-gradient-to-r from-slate-200/60 via-slate-200 to-slate-200/60 pb-4">All Knowledge Counts</h2>
               <div className="max-w-3xl mx-auto">
-                <p className="text-lg text-slate-400">New updates and improvements to Knoldg.</p>
+                <h4 className="h4   bg-clip-text text-transparent bg-gradient-to-r from-slate-200/60 via-slate-200 to-slate-200/60 ">Someone out there is searching for the exact thing you know. Don’t keep them waiting.</h4>
               </div>
             </div>
 
@@ -61,7 +61,7 @@ export default function Changelog() {
             </div>
 
             {/* Pagination */}
-            <div className="max-w-3xl mx-auto">
+            {/* <div className="max-w-3xl mx-auto">
               <ul className="flex items-center justify-between mt-12 pl-8 md:pl-48">
                 <li>
                   <span className="btn-sm text-slate-700 transition duration-150 ease-in-out group [background:linear-gradient(theme(colors.slate.900),_theme(colors.slate.900))_padding-box,_conic-gradient(theme(colors.slate.400),_theme(colors.slate.700)_25%,_theme(colors.slate.700)_75%,_theme(colors.slate.400)_100%)_border-box] relative before:absolute before:inset-0 before:bg-slate-800/30 before:rounded-full before:pointer-events-none cursor-not-allowed">
@@ -78,7 +78,7 @@ export default function Changelog() {
                   </a>
                 </li>
               </ul>
-            </div>
+            </div> */}
 
           </div>
         </div>

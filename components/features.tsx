@@ -16,6 +16,7 @@ export default function Features() {
 
   return (
     <section>
+      
       <div className="relative max-w-6xl mx-auto px-4 sm:px-6">
         {/* Illustration */}
         <div

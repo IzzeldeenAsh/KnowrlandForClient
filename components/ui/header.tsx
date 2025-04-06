@@ -74,7 +74,20 @@ export default function Header() {
 
   // Add active link styling function
   const isActiveLink = (path: string): string => {
-    if (pathname.includes(path)) {
+    // Split the pathname into segments
+    const pathSegments = pathname.split('/');
+    // Get the last segment or check against specific routes
+    const currentPath = pathSegments[pathSegments.length - 1] || pathSegments[pathSegments.length - 2];
+    
+    // Check for exact match in segment or specific path cases
+    if (currentPath === path || 
+        (path === 'insight' && currentPath === 'insight') || 
+        (path === 'data' && currentPath === 'data') ||
+        (path === 'report' && currentPath === 'report') ||
+        (path === 'manual' && currentPath === 'manual') ||
+        (path === 'course' && currentPath === 'course') ||
+        (path === 'all-industries' && pathname.includes('/all-industries'))
+    ) {
       return 'bg-[#3B8AEF] text-white';
     }
     return '';
