@@ -195,6 +195,38 @@
             "cookies": "Cookies Policy"
         }
     },
+    "Resources": {
+        "user-guide": "User Guide",
+        "user-guide-title": "KNOLDG User Guide",
+        "user-guide-description": "Welcome to the KNOLDG User Guide. Here you'll find everything you need to know about using our platform.",
+        "welcome-to-user-guide": "Welcome to the User Guide",
+        "user-guide-welcome-message": "This guide will help you navigate through all the features and functionalities of KNOLDG platform.",
+        "user-guide-navigation-instruction": "Use the sidebar navigation to find specific topics you're interested in.",
+        "user-guide-help-instruction": "If you can't find what you're looking for, don't hesitate to contact our support team.",
+        "getting-started": "Getting Started",
+        "getting-started-description": "Learn the basics of using KNOLDG platform and start your journey.",
+        "quick-start": "Quick Start Guide",
+        "create-account-step": "Create an account or sign in to your existing account",
+        "complete-profile-step": "Complete your profile with relevant information",
+        "explore-content-step": "Start exploring content from the home page",
+        "save-content-step": "Save interesting content for later reference",
+        "next-steps": "Next Steps",
+        "next-steps-description": "After getting familiar with the basics, continue exploring:",
+        "account-management-next": "Learn more about account management options",
+        "content-features-next": "Discover advanced content features",
+        "search-tips-next": "Check out search tips to find exactly what you need",
+        "account-management": "Account Management",
+        "profile-setup": "Profile Setup",
+        "security": "Security",
+        "subscriptions": "Subscriptions",
+        "content-features": "Content Features",
+        "browsing-content": "Browsing Content",
+        "saving-content": "Saving Content",
+        "sharing": "Sharing",
+        "search-tips": "Search Tips",
+        "faqs": "FAQs",
+        "troubleshooting": "Troubleshooting"
+    },
     "Legals": {
         "terms": {
             "title": "Terms of Service",
@@ -212,5 +244,21 @@
             "title": "Cookies Policy",
             "lastUpdated": "Last Updated"
         }
+    },
+    "UserProfile": {
+        "login": "Login",
+        "insighter": "Insighter",
+        "companyInsighter": "Company-Insighter",
+        "company": "Company",
+        "client": "Client",
+        "addKnowledge": "Add Knowledge +",
+        "knowledgeBase": "Knowledge Base",
+        "myProfile": "My Profile",
+        "dashboard": "Dashboard",
+        "myRequests": "My Requests",
+        "accountSettings": "Account Settings",
+        "becomeInsighter": "Become an Insighter",
+        "myCompany": "My Company",
+        "signOut": "Sign Out"
     }
 }

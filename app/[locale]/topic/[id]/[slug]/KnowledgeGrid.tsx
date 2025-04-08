@@ -127,7 +127,7 @@ export default function KnowledgeGrid({
                   fw={700}
                   className={cardStyles.title}
                   mt="xs"
-                  lineClamp={2}
+                  lineClamp={3}
                 >
                   {item.title}
                 </Text>
