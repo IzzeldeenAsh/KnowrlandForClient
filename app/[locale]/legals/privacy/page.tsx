@@ -1,5 +1,6 @@
 'use client'
 
+import Footer from '@/components/ui/footer'
 import { useTranslations } from 'next-intl'
 
 export default function PrivacyPolicy() {
@@ -8,7 +9,6 @@ export default function PrivacyPolicy() {
   return (
     <div className="bg-slate-900 text-slate-100">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 py-12">
-        <h1 className="text-3xl md:text-4xl font-bold mb-6 text-white">{t('privacy.title')}</h1>
         <div className="prose prose-invert max-w-none text-slate-300">
           <h2 className="text-2xl font-semibold mt-8 mb-4 text-white">Privacy Policy</h2>
           
@@ -66,6 +66,7 @@ export default function PrivacyPolicy() {
           {t('privacy.lastUpdated')}: March 26, 2025
         </p>
       </div>
+      <Footer/>
     </div>
   )
 }

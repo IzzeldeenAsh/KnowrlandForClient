@@ -3,6 +3,7 @@ import Image from "next/image";
 import { useUserProfile } from "../hooks/useUserProfile";
 import { usePathname } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
+import { useTranslations } from "next-intl";
 
 const getInitials = (firstName: string, lastName: string) => {
   return `${firstName[0]}${lastName[0]}`.toUpperCase();
@@ -15,6 +16,7 @@ interface MenuPosition {
 }
 
 export function UserProfile({ isHome }: { isHome: boolean }) {
+  const t = useTranslations("UserProfile");
   const { user, roles, isLoading, handleSignOut } = useUserProfile();
   const pathname = usePathname();
   const isRtl = pathname.startsWith("/ar");
@@ -110,7 +112,7 @@ export function UserProfile({ isHome }: { isHome: boolean }) {
           href="https://app.knoldg.com/auth/login"
           className="btn-sm bg-gray-800 text-gray-200 shadow hover:bg-gray-900"
         >
-          Login
+          {t("login")}
         </Link>
       </>
     );
@@ -179,15 +181,15 @@ export function UserProfile({ isHome }: { isHome: boolean }) {
                   </p>
                   {roles.includes("insighter") && (
                     <span className="bg-[#F0F8FF] text-[#0978B9] text-xs font-bold px-1.5 rounded-sm dark:bg-blue-900 dark:text-blue-300 whitespace-nowrap">
-                      Insighter
+                      {t("insighter")}
                     </span>
                   )}
                   {(roles.includes("company") ||
                     roles.includes("company-insighter")) && (
                     <span className="bg-yellow-100 text-yellow-800 text-xs font-medium px-1.5 rounded-sm dark:bg-yellow-900 dark:text-yellow-300 whitespace-nowrap">
                       {roles.includes("company-insighter")
-                        ? "Company-Insighter"
-                        : "Company"}
+                        ? t("companyInsighter")
+                        : t("company")}
                     </span>
                   )}
                   {roles.includes("client") &&
@@ -197,7 +199,7 @@ export function UserProfile({ isHome }: { isHome: boolean }) {
                       )
                     ) && (
                       <span className="bg-green-100 text-green-800 text-xs font-medium px-1.5 rounded-sm dark:bg-green-900 dark:text-green-300 whitespace-nowrap">
-                        Client
+                        {t("client")}
                       </span>
                     )}
                 </div>
@@ -219,7 +221,7 @@ export function UserProfile({ isHome }: { isHome: boolean }) {
                 onClick={() => setMenuOpen(false)}
                 style={{fontSize: '13px'}}
               >
-                Add Knowledge +
+                {t("addKnowledge")}
               </Link>
                <Link
                href="https://app.knoldg.com/app/insighter-dashboard/my-knowledge/general"
@@ -227,7 +229,7 @@ export function UserProfile({ isHome }: { isHome: boolean }) {
                onClick={() => setMenuOpen(false)}
                style={{fontSize: '13px'}}
              >
-               Knowledge Base
+               {t("knowledgeBase")}
              </Link>
              </>
             )}
@@ -237,7 +239,7 @@ export function UserProfile({ isHome }: { isHome: boolean }) {
               style={{fontSize: '13px'}}
               onClick={() => setMenuOpen(false)}
             >
-              My Profile
+              {t("myProfile")}
             </Link>
             {(roles.includes("insighter") ||
               roles.includes("company") ||
@@ -249,7 +251,7 @@ export function UserProfile({ isHome }: { isHome: boolean }) {
                   onClick={() => setMenuOpen(false)}
                   style={{fontSize: '13px'}}
                 >
-                  Dashboard
+                  {t("dashboard")}
                 </Link>
                 <Link
                   href="https://app.knoldg.com/app/insighter-dashboard/my-requests"
@@ -257,7 +259,7 @@ export function UserProfile({ isHome }: { isHome: boolean }) {
                   onClick={() => setMenuOpen(false)}
                   style={{fontSize: '13px'}}
                 >
-                  My Requests
+                  {t("myRequests")}
                 </Link>
                
                 <Link
@@ -266,7 +268,7 @@ export function UserProfile({ isHome }: { isHome: boolean }) {
                   onClick={() => setMenuOpen(false)}
                   style={{fontSize: '13px'}}
                 >
-                  Account Settings
+                  {t("accountSettings")}
                 </Link>
               </>
             )}
@@ -281,7 +283,7 @@ export function UserProfile({ isHome }: { isHome: boolean }) {
                   onClick={() => setMenuOpen(false)}
                   style={{fontSize: '13px'}}
                 >
-                  Become an Insighter
+                  {t("becomeInsighter")}
                 </Link>
               )}
               {roles.includes('company') && 
@@ -291,7 +293,7 @@ export function UserProfile({ isHome }: { isHome: boolean }) {
                   onClick={() => setMenuOpen(false)}
                   style={{fontSize: '13px'}}
                 >
-                  My Company
+                  {t("myCompany")}
                 </Link>
               }
 
@@ -304,7 +306,7 @@ export function UserProfile({ isHome }: { isHome: boolean }) {
                 className="block w-full text-left px-4 py-2.5  font-semibold text-slate-900 hover:bg-indigo-50 hover:text-sky-700"
                 style={{fontSize: '13px'}}
               >
-                Sign Out
+                {t("signOut")}
               </button>
             </div>
           </div>

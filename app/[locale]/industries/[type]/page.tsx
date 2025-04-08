@@ -108,7 +108,7 @@ export default function IndustriesByTypePage({ params }: Props) {
                 {capitalizeFirstLetter(type)}s
               </span>
               <h3 className="text-md bg-gradient-to-r from-blue-500 to-teal-400 md:text-3xl font-extrabold text-transparent bg-clip-text mb-4">
-                Industries by {capitalizeFirstLetter(type)}
+                  {capitalizeFirstLetter(type)} by Industries
               </h3>
            
             </div>

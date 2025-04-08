@@ -57,7 +57,8 @@ const KnowledgeSideBox = ({
     oneTimePurchase: isRTL ? '\u0634\u0631\u0627\u0621 \u0644\u0645\u0631\u0629 \u0648\u0627\u062d\u062f\u0629' : 'One time purchase',
     buyNow: isRTL ? '\u0627\u0634\u062a\u0631\u064a \u0627\u0644\u0622\u0646' : 'Buy Now',
     addToCart: isRTL ? '\u0623\u0636\u0641 \u0625\u0644\u0649 \u0627\u0644\u0633\u0644\u0629' : 'Add to Cart',
-    na: isRTL ? '\u063a\u064a\u0631 \u0645\u062a\u0648\u0641\u0631' : 'N/A'
+    na: isRTL ? '\u063a\u064a\u0631 \u0645\u062a\u0648\u0641\u0631' : 'N/A',
+    free: isRTL ? '\u0645\u062c\u0627\u0646\u064a' : 'Free'
   };
 
   const documentCounts = documents.reduce((acc: { [key: string]: number }, doc) => {
@@ -66,12 +67,21 @@ const KnowledgeSideBox = ({
     return acc;
   }, {});
 
+  // Check if price is 0 or a string representing 0
+  const isFree = total_price === '0' || parseFloat(String(total_price)) === 0;
+
   return (
     <div className="tp-course-details2-widget sticky max-w-[400px] " dir={isRTL ? 'rtl' : 'ltr'}>
       <div className="p-4">
         <div className="text-center mb-4">
-          <span className='text-3xl font-bold'>  ${total_price}</span>   
-          <span className="text-md text-gray-500 ml-2 capitalize">{translations.oneTimePurchase}</span>
+          {isFree ? (
+            <span className='text-3xl font-bold text-green-600'>{translations.free}</span>
+          ) : (
+            <span className='text-3xl font-bold'>  ${total_price}</span>   
+          )}
+          {!isFree && (
+            <span className="text-md text-gray-500 ml-2 capitalize">{translations.oneTimePurchase}</span>
+          )}
         </div>
 
         <div className="space-y-3 mb-4">
@@ -118,7 +128,7 @@ const KnowledgeSideBox = ({
             <span className="block mt-1 capitalize">{language}</span>
           </div>
 
-          {isic_code && (
+          {isic_code && isic_code.key && (
             <div className="tp-course-details2-widget-list-item flex items-center justify-between">
               <span className="flex items-center gap-2 font-medium text-gray-700">
                 <BuildingLibraryIcon className="w-5 h-5 mr-2" />
@@ -207,13 +217,16 @@ const KnowledgeSideBox = ({
             </span>
           </div>
 
-          <div className="tp-course-details2-widget-list-item flex items-center justify-between">
-            <span>
-              <ClockIcon className="w-5 h-5 mr-2" />
-              {translations.lastUpdate}
-            </span>
-            <span className="block mt-1">{translations.na}</span>
-          </div>
+          {/* Only show Last Update if it has a value */}
+          {false && (
+            <div className="tp-course-details2-widget-list-item flex items-center justify-between">
+              <span>
+                <ClockIcon className="w-5 h-5 mr-2" />
+                {translations.lastUpdate}
+              </span>
+              <span className="block mt-1">{translations.na}</span>
+            </div>
+          )}
         </div>
       </div>
     </div>
