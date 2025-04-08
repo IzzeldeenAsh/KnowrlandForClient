@@ -38,7 +38,7 @@ export default function Breadcrumb({ items }: BreadcrumbProps) {
             )}
             <Link
               href={(item.label === "Industries" || item.label === "الصناعات") ? `/${currentLocale}/all-industries` : `/${currentLocale}/${item.href}`}
-              className={`${isRTL ? 'mr-2' : 'ml-2'} text-xs font-light ${
+              className={`${isRTL ? 'mr-2' : 'ml-2'} text-sm  ${
                 index === items.length - 1
                   ? 'text-gray-900'
                   : 'text-gray-500 hover:text-gray-700'

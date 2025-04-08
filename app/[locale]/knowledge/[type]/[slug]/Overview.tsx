@@ -61,7 +61,7 @@ export default function Overview({ knowledge }: OverviewProps) {
 
   // Translations
   const translations = {
-    chooseReportSections: isRTL ? 'اختر أقسام التقرير التي تناسب احتياجاتك وميزانيتك!' : 'Choose report sections that fit your needs and budget!',
+    chooseReportSections: isRTL ? 'اختر أقسام التقرير التي تناسب احتياجاتك وميزانيتك!' : 'Choose the report section that fits your needs and budget!',
     thisIncludes: isRTL ? `هذا ${knowledge.type} يتضمن` : `This ${knowledge.type} includes`,
     documents: isRTL ? 'مستندات' : 'documents',
     free: isRTL ? 'مجاني' : 'Free',
