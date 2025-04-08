@@ -26,6 +26,19 @@ async function getAllIndustries(locale: string) {
   const apiUrl = 'https://api.knoldg.com/api/industries'
   
   try {
+    console.log('Fetching industries from:', apiUrl)
+    console.log('Request params:', {
+      method: 'POST',
+      headers: {
+        "Content-Type": "application/json", 
+        "Accept": "application/json",
+        "Accept-Language": locale,
+      },
+      body: JSON.stringify({
+        top_sub_industry: 10,
+      })
+    })
+
     const res = await fetch(apiUrl, {
       method: 'POST',
       headers: {
@@ -41,18 +54,21 @@ async function getAllIndustries(locale: string) {
       }
     })
 
-
     if (!res.ok) {
-      throw new Error(`Failed to fetch industries: ${res.status} ${res.statusText}`)
+      const error = `Failed to fetch industries: ${res.status} ${res.statusText}`
+      console.error(error)
+      throw new Error(error)
     }
 
     const data = await res.json()
+    console.log('API Response:', data)
     return { data, error: null }
   } catch (error) {
-    
+    const errorMessage = error instanceof Error ? error.message : 'Failed to fetch industries'
+    console.error('Error fetching industries:', errorMessage)
     return { 
       data: null, 
-      error: error instanceof Error ? error.message : 'Failed to fetch industries' 
+      error: errorMessage
     }
   }
 }
@@ -112,6 +128,11 @@ export default async function AllIndustries({ params }: Props) {
                     >
                       {messages?.Header?.navigation?.industries || 'Industries'}
                     </h1>
+                    
+                    <p className="mt-4 text-lg text-gray-600 dark:text-gray-400">
+                      Build your advantage with industry breakthroughs developed and proven by experts.
+                    </p>
+                    
                     {error && (
                       <div className="mt-4 text-sm text-red-500 bg-red-50 p-3 rounded-lg">
                         {locale === 'ar' ? 'حدث خطأ أثناء تحميل البيانات' : error}
