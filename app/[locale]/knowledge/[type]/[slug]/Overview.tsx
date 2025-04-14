@@ -17,9 +17,10 @@ interface Document {
   description: string | null
   file_extension: string
   table_of_content: Array<{
-    chapter: {
+    chapter?: {
       title: string
     }
+    title?: string
   }>
 }
 
@@ -182,7 +183,7 @@ export default function Overview({ knowledge }: OverviewProps) {
                           {doc.table_of_content.map((toc, index) => (
                             <tr key={index}>
                               <td>{translations.chapter} {index + 1}</td>
-                              <td>{toc.chapter.title}</td>
+                              <td>{toc.chapter?.title || toc.title}</td>
                             </tr>
                           ))}
                         </tbody>
