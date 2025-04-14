@@ -30,13 +30,18 @@ export const metadata = {
   description: 'KNOLDG is a platform for buying and selling knowledge resources, insights and expertise.',
 };
 
-export default async function RootLayout({
-  children,
-  params: { locale }
-}: {
+type LayoutProps = {
   children: React.ReactNode;
   params: { locale: string };
-}) {
+};
+
+export default async function RootLayout({
+  children,
+  params,
+}: LayoutProps) {
+  // Properly await the params object
+  const locale = params?.locale;
+  
   const direction = locale === 'ar' ? 'rtl' : 'ltr';
   
   // Ensure that the incoming `locale` is valid

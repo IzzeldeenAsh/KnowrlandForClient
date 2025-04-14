@@ -171,20 +171,20 @@ export default async function IndustryPage({ params }: Props) {
             {/* Industry Children */}
             <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-2 max-w-7xl mx-auto ">
               {industry.children.map((child: IndustryChild) => (
+                 <Link key={child.id} href={`/${locale}/sub-industry/${child.id}/${child.slug}`} className="block">
                 <div
-                  key={child.id}
-                  className="relative bg-white rounded-sm p-6 shadow-sm hover:shadow-md transition-all duration-300"
+                  className="relative min-h-[140px] bg-white rounded-sm p-6 shadow-sm hover:shadow-md transition-all duration-300"
                   data-aos="fade-up"
                 >
                     <div className="space-y-2">
-                  <Link href={`/${locale}/sub-industry/${child.id}/${child.slug}`} className="block">
+                 
                       <div className="flex items-center gap-2">
                         <IndustryIcon />
                         <h3 className="text-sm font-semibold text-gray-900 hover:text-blue-600">
                           {child.name}
                         </h3>
                       </div>
-                      </Link>
+                     
                       {child.topic.length > 0 ? (
                         <ul className="space-y-1">
                           {child.topic.map((topic: Topic) => (
@@ -208,6 +208,7 @@ export default async function IndustryPage({ params }: Props) {
                     </div>
                 
                 </div>
+                </Link>
               ))}
             </div>
           </div>

@@ -86,7 +86,9 @@ export default function KnowledgeList({ knowledge, locale }: KnowledgeListProps)
               src={item.insighter?.profile_photo_url || undefined}
               radius="xl"
               size="sm"
-             
+              bg="white"
+              color="blue"
+              styles={{ root: { border: '1px solid #e5e7eb' } }}
             >
               {!item.insighter?.profile_photo_url &&
                 getInitials(item.insighter.name)}

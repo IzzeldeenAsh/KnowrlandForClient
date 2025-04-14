@@ -43,10 +43,8 @@ async function getIndustries(locale: string = 'en') {
     },
     body: JSON.stringify({
       top_industry: 6,
-      top_sub_industry: 2,
+      top_sub_industry: 6,
     }),
-    cache: "force-cache",
-    next: { revalidate: 3600 },
   });
 
   if (!res.ok) {
@@ -356,7 +354,7 @@ export default function Header() {
             </li>
             
             {isLoading ? (
-              <div className="w-10 h-10 bg-slate-700/30 animate-pulse rounded-full overflow-hidden"></div>
+              <div className="w-10 h-10 bg-white animate-pulse rounded-full overflow-hidden border border-gray-200"></div>
             ) : user ? (
               <li>
                 <UserProfile isHome={true} />

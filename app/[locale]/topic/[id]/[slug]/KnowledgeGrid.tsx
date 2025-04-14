@@ -40,8 +40,17 @@ function getInitials(name: string) {
 }
 
 function formatPublishedDate(dateString: string) {
+  // Ensure we're working with UTC time to avoid server/client mismatches
   const date = new Date(dateString);
-  return formatDistanceToNow(date, { addSuffix: true });
+  const utcDate = new Date(Date.UTC(
+    date.getUTCFullYear(),
+    date.getUTCMonth(),
+    date.getUTCDate(),
+    date.getUTCHours(),
+    date.getUTCMinutes()
+  ));
+  
+  return formatDistanceToNow(utcDate, { addSuffix: true });
 }
 
 function truncateDescription(
@@ -102,6 +111,8 @@ export default function KnowledgeGrid({
             radius="md"
             className={cardStyles.card}
             data-aos="fade-up"
+            component={Link}
+            href={`/${currentLocale}/knowledge/${item.type}/${item.slug}`}
           >
             <Link
               href={`/${currentLocale}/knowledge/${item.type}/${item.slug}`}
@@ -135,7 +146,7 @@ export default function KnowledgeGrid({
                   className={`${cardStyles.description} text-gray-500`}
                   mt="sm"
                 >
-                  {truncateDescription(item.description, 25)}
+                  {truncateDescription(item.description, 13)}
                 </Text>
               </div>
             </Link>
