@@ -176,19 +176,20 @@ export default async function SubIndustryPage({ params }: Props) {
               {/* Topics Grid */}
               <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-2 max-w-7xl mx-auto">
                 {subIndustry.topic.map((topic: Topic) => (
+                    <Link href={`/${locale}/topic/${topic.id}/${topic.slug}`}>
                   <div
                     key={topic.id}
-                    className="relative bg-white rounded-sm p-6 shadow-sm hover:shadow-md transition-all duration-300"
+                    className="relative min-h-[140px] bg-white rounded-sm p-6 shadow-sm hover:shadow-md transition-all duration-300"
                     data-aos="fade-up"
                   >
                     <div className="space-y-2">
                       <div className="flex items-center gap-2">
                         <FolderIcon width={20} height={20} />
-                        <Link href={`/${locale}/topic/${topic.id}/${topic.slug}`}>
+                      
                           <h3 className="text-sm font-semibold text-gray-900">
                             {topic.name}
                           </h3>
-                        </Link>
+                       
                       </div>
 
                       {topic.knowledge.length > 0 ? (
@@ -213,6 +214,7 @@ export default async function SubIndustryPage({ params }: Props) {
                       )}
                     </div>
                   </div>
+                   </Link>
                 ))}
               </div>
             </div>

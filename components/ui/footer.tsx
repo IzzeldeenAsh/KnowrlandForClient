@@ -85,7 +85,7 @@ export default function Footer() {
           </div>
           
           {/* 4th block - Resources */}
-          <div className="sm:col-span-6 md:col-span-3 lg:col-span-2">
+          {/* <div className="sm:col-span-6 md:col-span-3 lg:col-span-2">
             <h6 className="text-sm text-slate-50 font-medium mb-2">{t('resources.title')}</h6>
             <ul className="text-sm space-y-2">
               <li>
@@ -98,10 +98,10 @@ export default function Footer() {
                 <a className="text-slate-400 hover:text-slate-200 transition duration-150 ease-in-out" href={`/${locale}/resources/user-guide`}>{t('resources.userGuide')}</a>
               </li>
             </ul>
-          </div>
+          </div> */}
 
           {/* 5th block */}
-          <div className="sm:col-span-6 md:col-span-3 lg:col-span-2">
+          <div className="sm:col-span-6 md:col-span-3 lg:col-span-3">
             <h6 className="text-sm text-slate-50 font-medium mb-2">{t('legals.title')}</h6>
             <ul className="text-sm space-y-2">
               <li>
