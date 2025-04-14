@@ -31,6 +31,17 @@
     height: 10px;
     background-color: #cbd5e1;
   }
+
+ @media screen and (min-width: 1024px) {
+    .max-w-75{
+        max-width: 70%;
+    }
+ }
+ @media screen and (min-width: 1308px) {
+    .max-w-75{
+        max-width: 65%;
+    }
+ }
   .separator-dark::before {
     content: "";
     position: absolute;
