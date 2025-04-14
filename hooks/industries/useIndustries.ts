@@ -18,7 +18,7 @@ export function useIndustries() {
           },
           body: JSON.stringify({
             top_industry: 9,
-            top_sub_industry: 2,
+            top_sub_industry: 6,
           }),
           cache: "force-cache",
           next: { revalidate: 3600 },

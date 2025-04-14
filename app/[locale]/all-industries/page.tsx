@@ -7,6 +7,7 @@ import Breadcrumb from '@/components/ui/breadcrumb'
 
 // Import translation utilities
 import { getMessages } from '@/app/utils/get-messages'
+import { getApiUrl } from '@/app/config'
 
 interface Params {
   locale: string;
@@ -23,7 +24,7 @@ export const metadata: Metadata = {
 
 async function getAllIndustries(locale: string) {
   
-  const apiUrl = 'https://api.knoldg.com/api/industries'
+  const apiUrl = getApiUrl('/api/industries')
   
   try {
     console.log('Fetching industries from:', apiUrl)
@@ -35,7 +36,7 @@ async function getAllIndustries(locale: string) {
         "Accept-Language": locale,
       },
       body: JSON.stringify({
-        top_sub_industry: 10,
+        top_sub_industry: 3,
       })
     })
 
@@ -47,7 +48,7 @@ async function getAllIndustries(locale: string) {
         "Accept-Language": locale,
       },
       body: JSON.stringify({
-        top_sub_industry: 10,
+        top_sub_industry: 3,
       }),
       next: {
         revalidate: 0

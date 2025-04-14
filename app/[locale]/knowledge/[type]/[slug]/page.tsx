@@ -202,7 +202,7 @@ export default function KnowledgePage({ params }: Props) {
               </div>
               <div className="flex flex-col items-start">
                 <div className="flex flex-col items-start mb-10">
-                  <h3 className="text-md bg-gradient-to-r from-blue-500 to-teal-400 md:text-4xl font-extrabold text-transparent bg-clip-text max-w-3xl">
+                  <h3 className="text-md bg-gradient-to-r from-blue-500 to-teal-400 md:text-4xl font-extrabold text-transparent bg-clip-text max-w-75">
                     {knowledge.title}
                   </h3>
                   <div className="text-sm font-bold text-gray-700 capitalize">
@@ -277,8 +277,8 @@ export default function KnowledgePage({ params }: Props) {
               total_price={knowledge.total_price}
               documents={knowledge.documents}
               language={knowledge.language}
-              isic_code={knowledge.isic_code}
-              hs_code={knowledge.hs_code}
+              isic_code={knowledge.isic_code ? knowledge.isic_code : null}
+              hs_code={knowledge.hs_code ? knowledge.hs_code : null}
               published_at={knowledge.published_at}
               economic_blocs={knowledge.economic_blocs}
               regions={knowledge.regions}
