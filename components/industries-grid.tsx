@@ -32,16 +32,17 @@ export default function IndustriesGrid({ industries, locale }: IndustriesGridPro
       data-aos-delay="300"
     >
       {industries.map((industry) => (
+            <Link href={`/${currentLocale}/industry/${industry.id}/${industry.slug}`}>
         <div 
           key={industry.id} 
-          className="relative bg-white rounded-sm p-6 shadow-sm hover:shadow-md transition-all duration-300 cursor-pointer"
+          className="relative bg-white min-h-[140px] rounded-sm p-6 shadow-sm hover:shadow-md transition-all duration-300 cursor-pointer"
         >
           <div className="space-y-2">
-            <Link href={`/${currentLocale}/industry/${industry.id}/${industry.slug}`}>
+        
             <h3 className="text-sm font-semibold text-gray-900  hover:text-blue-600 " >
               {industry.name}
             </h3>
-            </Link>
+          
             <ul className="space-y-1">
               {industry.children.map((child) => (
                 <li 
@@ -67,6 +68,7 @@ export default function IndustriesGrid({ industries, locale }: IndustriesGridPro
             </svg>
           </div>
         </div>
+        </Link>
       ))}
     </div>
   )

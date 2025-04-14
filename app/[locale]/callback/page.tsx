@@ -2,6 +2,7 @@
 
 import { useEffect } from 'react';
 import { useRouter, useParams, useSearchParams } from 'next/navigation';
+import { getApiUrl, getAppUrl } from '@/app/config';
 
 interface ProfileResponse {
   data: {
@@ -38,7 +39,7 @@ export default function QueryParamAuthCallback() {
         localStorage.setItem('token', token);
         
         // Fetch profile
-        const response = await fetch('https://api.knoldg.com/api/account/profile', {
+        const response = await fetch(getApiUrl('/api/account/profile'), {
           headers: {
             'Authorization': `Bearer ${token}`,
             "Content-Type": "application/json",
@@ -70,7 +71,7 @@ export default function QueryParamAuthCallback() {
              data.data.roles.includes('company') || 
              data.data.roles.includes('company-insighter'))) {
           // Redirect to insighter dashboard
-          window.location.href = 'https://app.knoldg.com/app/insighter-dashboard/my-dashboard';
+          window.location.href = getAppUrl('/app/insighter-dashboard/my-dashboard');
         } else {
           // Redirect to home page using current locale
           router.push(`/${locale}/home`);
@@ -78,7 +79,7 @@ export default function QueryParamAuthCallback() {
       } catch (error) {
         console.error('Error fetching profile:', error);
         // Redirect to app login page
-        window.location.href = 'https://app.knoldg.com/auth/login';
+        window.location.href = getAppUrl('/auth/login');
       }
     };
 

@@ -18,7 +18,7 @@ interface KnowledgeSideBoxProps {
   isic_code?: {
     name: string;
     key: number;
-  };
+  } | any[];
   hs_code?: any;
   published_at: string;
   economic_blocs?: EconomicBloc[];
@@ -128,7 +128,7 @@ const KnowledgeSideBox = ({
             <span className="block mt-1 capitalize">{language}</span>
           </div>
 
-          {isic_code && isic_code.key && (
+          {isic_code && !Array.isArray(isic_code) && isic_code.key && (
             <div className="tp-course-details2-widget-list-item flex items-center justify-between">
               <span className="flex items-center gap-2 font-medium text-gray-700">
                 <BuildingLibraryIcon className="w-5 h-5 mr-2" />
@@ -141,6 +141,21 @@ const KnowledgeSideBox = ({
                 <span className="absolute bottom-full left-1/2 mb-2 hidden -translate-x-1/2 transform rounded bg-white p-2 text-xs text-gray-700 shadow-lg border border-gray-200 group-hover:block">
                   {isic_code.name}
                 </span>
+              </div>
+            </div>
+          )}
+          {isic_code && Array.isArray(isic_code) && isic_code.length > 0 && (
+            <div className="tp-course-details2-widget-list-item flex items-center justify-between">
+              <span className="flex items-center gap-2 font-medium text-gray-700">
+                <BuildingLibraryIcon className="w-5 h-5 mr-2" />
+                {translations.isicCode}
+              </span>
+              <div className="flex flex-wrap gap-1">
+                {isic_code.map((code, index) => (
+                  <span key={index} className="badge bg-[#f1f1f4] text-[#4b5675] text-xs font-medium px-2.5 py-0.5 rounded">
+                    {code.name || code.key || JSON.stringify(code)}
+                  </span>
+                ))}
               </div>
             </div>
           )}

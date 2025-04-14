@@ -5,9 +5,9 @@
     },
     "Hero": {
         "tagline": "Beyond Research Boundaries",
-        "title": "Unlock Business Success with Expert Knowledge",
-        "description":"Explore a hub of expert data, insights, and business intelligence tailored for your business growth.",
-        "searchPlaceholder":"Search business data, reports, insights... and more",
+        "title": "Unlock Business Success with Shared Expert Knowledge",
+        "description":"A hub of data, insights, and business intelligence tailored for your business growth.",
+        "searchPlaceholder":"Search business data, reports, insights, HS Code, ISIC Code... and more",
         "direction": "ltr"
     },
     "HeroInsighter":{
@@ -30,7 +30,7 @@
             "description":"Start earning today by Bringing your data, studies, reports, and insights out from the confines of your desk. Share them with the world to discover, value, and invest in."
         },
         "section4":{
-            "title":"Don't let your expertise fade to silence; let it bloom into profit",
+            "title":"Don't let your expertise fade to silence; let it bloom into sustainable revenue",
             "description":"Start earning by sharing your knowledge and experience on Knoldg. You Set the Value: Choose your price, and every time your work is downloaded, you're paid Directly"
         }
     },
@@ -62,7 +62,7 @@
     "Features": {
         "tagline": "We pave the way",
         "title": "Make Smarter, Faster Decisions",
-        "description": "Accelerate your decisions with AI-powered assistance and a smart search engine for instant, reliable insights",
+        "description": "Accelerate your decision-making by instantly accessing authentic subject matter expertise through AI-enhanced search capabilities.",
         "tabs": {
             "preciseResults": {
                 "title": "Smart Search Engine",
@@ -116,7 +116,7 @@
     },
     "Features2": {
         "tagline": "Quality and Reliability",
-        "title": "Reliable, High-quality Resources from Business Specialists",
+        "title": "Reliable, High-quality insights from Business Specialists",
         "description": "Access verified insights and engage with rated business expert professionals",
         "direction": "ltr",
         "tabs": {
@@ -124,7 +124,7 @@
                 "title": "Direct Expert Engagement – Connect and communicate with Subject Matter Expert authors"
             },
             "expertRatings": {
-                "title": "Transparent Ratings & Quality Assurance – Access expert ratings for trusted insights"
+                "title": "Transparent Expert Ratings and AI-verified Content"
             },
             "consultingSessions": {
                 "title": "Personalized Consulting Sessions – Request one-on-one consultations with expert authors"
