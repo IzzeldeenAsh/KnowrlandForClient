@@ -6,7 +6,7 @@ This document explains how to use the new environment configuration to handle di
 
 The configuration is centralized in `/app/config.ts` and provides:
 
-- `apiBaseUrl`: In development, uses `https://api.foresighta.co`; in production, uses `https://api.knoldg.com`
+- `apiBaseUrl`: In development, uses `https://api.knoldg.com`; in production, uses `https://api.knoldg.com`
 - `appBaseUrl`: In development, uses `http://localhost:4000`; in production, uses `https://app.knoldg.com`
 
 ## Helper Functions
@@ -54,7 +54,7 @@ window.location.href = getAppUrl('/auth/login');
 
 2. The environment is automatically detected based on Node.js' `process.env.NODE_ENV`.
 
-3. When running in development, APIs will use `https://api.foresighta.co` and app redirects will use `http://localhost:4000`.
+3. When running in development, APIs will use `https://api.knoldg.com` and app redirects will use `http://localhost:4000`.
 
 ## Files That Need to Be Updated
 
@@ -85,7 +85,7 @@ const isDevelopment = process.env.NODE_ENV === 'development';
 
 ### API and App URLs based on environment
 export const apiBaseUrl = isDevelopment 
-  ? 'https://api.foresighta.co' 
+  ? 'https://api.knoldg.com' 
   : 'https://api.knoldg.com';
 
 export const appBaseUrl = isDevelopment 

@@ -1,11 +1,11 @@
 'use client';
 import { useState, useEffect } from 'react';
 import { Industry } from './types';
-
+import { useLocale } from 'next-intl';
 export function useIndustries() {
   const [industries, setIndustries] = useState<Industry[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-
+  const locale = useLocale();
   useEffect(() => {
     const fetchIndustries = async () => {
       try {
@@ -14,7 +14,7 @@ export function useIndustries() {
           headers: {
             "Content-Type": "application/json",
             Accept: "application/json",
-            "Accept-Language": "en",
+            "Accept-Language": locale,
           },
           body: JSON.stringify({
             top_industry: 9,

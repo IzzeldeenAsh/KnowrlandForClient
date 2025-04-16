@@ -1,13 +1,17 @@
 'use client';
 import { useState, useEffect } from 'react';
 import { usePathname } from 'next/navigation';
-
+import { useLocale } from 'next-intl';
 export interface User {
   name: string;
   profile_photo_url: string | null;
   first_name: string;
   last_name: string;
   email: string;
+  company?: {
+    logo: string;
+    name?: string;
+  };
 }
 
 export function useUserProfile() {
@@ -15,7 +19,7 @@ export function useUserProfile() {
   const [roles, setRoles] = useState<string[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const pathname = usePathname();
-
+  const locale = useLocale();
   useEffect(() => {
     const fetchProfile = async () => {
       const token = localStorage.getItem("token");
@@ -38,7 +42,7 @@ export function useUserProfile() {
               'Authorization': `Bearer ${token}`,
               "Content-Type": "application/json",
               "Accept": "application/json",
-              "Accept-Language": "en",
+              "Accept-Language": locale,
             },
           }
         );
@@ -74,6 +78,7 @@ export function useUserProfile() {
           profile_photo_url: data.data.profile_photo_url,
           first_name: data.data.first_name,
           last_name: data.data.last_name,
+          company: data.data.company,
         };
 
         console.log("[useUserProfile] Successfully retrieved profile", { 
