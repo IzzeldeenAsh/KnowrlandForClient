@@ -1,7 +1,7 @@
 'use client';
 import { useState, useEffect } from 'react';
 import { IndustryType } from './types';
-
+import { useLocale } from 'next-intl';
 interface StatisticItem {
   type: IndustryType;
   count: number;
@@ -15,7 +15,7 @@ export function useIndustryStatistic(industryId: number) {
   const [statistics, setStatistics] = useState<StatisticItem[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-
+  const locale = useLocale();
   useEffect(() => {
     const fetchStatistics = async () => {
       try {
@@ -24,7 +24,7 @@ export function useIndustryStatistic(industryId: number) {
           headers: {
             "Content-Type": "application/json",
             "Accept": "application/json",
-            "Accept-Language": "en",
+            "Accept-Language": locale,
           },
         });
         
