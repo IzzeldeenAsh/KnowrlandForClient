@@ -125,7 +125,18 @@ export function UserProfile({ isHome }: { isHome: boolean }) {
           className="flex items-center cursor-pointer"
           onClick={() => setMenuOpen(!menuOpen)}
         >
-          {user.profile_photo_url ? (
+          {roles.includes('company') && user.company?.logo ? (
+            <div className="w-8 h-8 md:w-10 md:h-10 rounded-full overflow-hidden">
+              <Image
+                src={user.company.logo}
+                alt={user.company.name || "Company Logo"}
+                width={100}
+                height={100}
+                quality={100}
+                className="w-full h-full object-cover object-center"
+              />
+            </div>
+          ) : user.profile_photo_url ? (
             <div className="w-8 h-8 md:w-10 md:h-10 rounded-full overflow-hidden">
               <Image
                 src={user.profile_photo_url}
@@ -158,7 +169,18 @@ export function UserProfile({ isHome }: { isHome: boolean }) {
         >
           <div className="px-4 py-3 border-b border-gray-100">
             <div className="flex items-center gap-3">
-              {user.profile_photo_url ? (
+              {roles.includes('company') && user.company?.logo ? (
+                <div className="w-10 h-10 rounded-lg overflow-hidden flex-shrink-0">
+                  <Image
+                    src={user.company.logo}
+                    alt={user.company.name || "Company Logo"}
+                    width={100}
+                    height={100}
+                    quality={100}
+                    className="w-full h-full object-cover object-center"
+                  />
+                </div>
+              ) : user.profile_photo_url ? (
                 <div className="w-10 h-10 rounded-lg overflow-hidden flex-shrink-0">
                   <Image
                     src={user.profile_photo_url}

@@ -1,6 +1,7 @@
 'use client';
 import { useState, useEffect } from 'react';
 import { Industry, IndustryType } from './types';
+import { useLocale } from 'next-intl';
 
 interface UseIndustriesByTypeProps {
   type: IndustryType;
@@ -11,6 +12,7 @@ export function useIndustriesByType({ type, topSubIndustry = 2 }: UseIndustriesB
   const [industries, setIndustries] = useState<Industry[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const locale = useLocale();
 
   useEffect(() => {
     const fetchIndustriesByType = async () => {
@@ -23,7 +25,7 @@ export function useIndustriesByType({ type, topSubIndustry = 2 }: UseIndustriesB
           headers: {
             "Content-Type": "application/json",
             Accept: "application/json",
-            "Accept-Language": "en",
+            "Accept-Language": locale,
           },
           body: JSON.stringify({
             top_sub_industry: topSubIndustry,
@@ -48,7 +50,7 @@ export function useIndustriesByType({ type, topSubIndustry = 2 }: UseIndustriesB
     };
 
     fetchIndustriesByType();
-  }, [type, topSubIndustry]);
+  }, [type, topSubIndustry, locale]);
 
   return { industries, isLoading, error };
 }

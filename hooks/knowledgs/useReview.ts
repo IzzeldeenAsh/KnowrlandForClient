@@ -1,5 +1,5 @@
 import { useState } from "react";
-
+import { useLocale } from "next-intl";
 interface UseReviewReturn {
   postReview: (rate: number, comment: string) => Promise<void>;
   loading: boolean;
@@ -11,7 +11,7 @@ export function useReview(knowledgeSlug: string): UseReviewReturn {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
-
+  const locale = useLocale();
   const postReview = async (rate: number, comment: string) => {
     setLoading(true);
     setError(null);
@@ -28,7 +28,7 @@ export function useReview(knowledgeSlug: string): UseReviewReturn {
           headers: {
             "Content-Type": "application/json",
             "Accept": "application/json",
-            "Accept-Language": "en",
+            "Accept-Language": locale,
             Authorization: `Bearer ${token}`,
           },
           body: JSON.stringify({ rate, comment }),
