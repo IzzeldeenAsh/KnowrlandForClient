@@ -34,7 +34,7 @@ interface Industry {
 }
 
 async function getIndustries(locale: string = 'en') {
-  const res = await fetch("https://api.knoldg.com/api/industries/menu", {
+  const res = await fetch("https://api.foresighta.co/api/industries/menu", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -120,7 +120,7 @@ export default function Header() {
       }
 
       try {
-        const response = await fetch('https://api.knoldg.com/api/account/profile', {
+        const response = await fetch('https://api.foresighta.co/api/account/profile', {
           headers: {
             'Authorization': `Bearer ${token}`,
             "Content-Type": "application/json",
@@ -191,7 +191,7 @@ export default function Header() {
     const timestamp = new Date().getTime();
     
     // Perform a coordinated logout by redirecting to the Angular app's logout endpoint
-    window.location.href = `https://app.knoldg.com/auth/logout?redirect_uri=${encodeURIComponent(`https://knoldg.com/${locale}?t=${timestamp}`)}`;    
+    window.location.href = `https://app.knoldg.com/auth/logout?redirect_uri=${encodeURIComponent(`https://knoldg.com /${locale}?t=${timestamp}`)}`;    
   };
 
   // Function to switch locale
