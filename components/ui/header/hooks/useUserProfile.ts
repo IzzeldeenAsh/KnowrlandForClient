@@ -36,7 +36,7 @@ export function useUserProfile() {
       try {
         console.log("[useUserProfile] Fetching profile with token");
         const response = await fetch(
-          "https://api.knoldg.com/api/account/profile",
+          "https://api.foresighta.co/api/account/profile",
           {
             headers: {
               'Authorization': `Bearer ${token}`,
@@ -125,7 +125,7 @@ export function useUserProfile() {
     
     // Perform a coordinated logout by redirecting to the Angular app's logout endpoint
     // After the Angular app processes the logout, it will redirect back to our homepage
-    window.location.href = `https://app.knoldg.com/auth/logout?redirect_uri=${encodeURIComponent(`https://knoldg.com/${locale}?t=${timestamp}`)}`;  
+    window.location.href = `https://app.knoldg.com/auth/logout?redirect_uri=${encodeURIComponent(`https://knoldg.com /${locale}?t=${timestamp}`)}`;  
   };
 
   return { user, roles, isLoading, handleSignOut };
