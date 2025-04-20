@@ -62,7 +62,7 @@ async function getAllIndustries(locale: string) {
     }
 
     const data = await res.json()
-    console.log('API Response:', data)
+    console.log('API Response All Industries:', data)
     return { data, error: null }
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : 'Failed to fetch industries'
