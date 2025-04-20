@@ -11,7 +11,7 @@
       }
 
       .cls-2, .cls-3, .cls-4 {
-        fill-rule: evenodd;
+        fillRule: evenodd;
       }
 
       .cls-3 {

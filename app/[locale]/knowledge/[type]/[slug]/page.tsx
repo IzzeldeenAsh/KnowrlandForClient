@@ -76,7 +76,7 @@ interface Props {
 async function fetchKnowledgeData(type: string, slug: string, locale: string = 'en') {
   try {
     const response = await fetch(
-      `https://api.knoldg.com/api/platform/industries/knowledge/${slug}`,
+      `https://api.foresighta.co/api/platform/industries/knowledge/${slug}`,
       {
         method: "GET",
         headers: {
@@ -245,7 +245,7 @@ export default function KnowledgePage({ params }: Props) {
               
                 <span className="text-sm text-gray-500">{translations.insighter}</span>
                 <span className="text-sm font-bold text-gray-700">
-                <Link href={`/${locale}/profile/${knowledge.insighter.uuid}`}>
+                <Link className="hover:text-blue-600" href={`/${locale}/profile/${knowledge.insighter.uuid}`}>
                   {knowledge.insighter.name}
                 </Link>
                 </span>

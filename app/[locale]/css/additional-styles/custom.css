@@ -1,14 +1,16 @@
 .tp-course-details2-widget {
     top: 180px;
-    padding: 15px;
-    border-radius: 10px;
-    background-color: #fff;
-    box-shadow: 0 0 24px 0 rgba(3, 31, 66, 0.05);
     margin-top: -300px;
     position: sticky;
-    border: 1px solid #DFDFDF;
     z-index: 1;
     max-width: 400px;
+}
+.tp-course-details2-widget-child {
+  background-color: #fff;
+  box-shadow: 0 0 24px 0 rgba(3, 31, 66, 0.05);
+  border: 1px solid #DFDFDF;
+
+  
 }
 
 @media (max-width: 991px) {
