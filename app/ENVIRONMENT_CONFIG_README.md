@@ -6,7 +6,7 @@ This document explains how to use the new environment configuration to handle di
 
 The configuration is centralized in `/app/config.ts` and provides:
 
-- `apiBaseUrl`: In development, uses `https://api.foresighta.co`; in production, uses `https://api.foresighta.co`
+- `apiBaseUrl`: In development, uses `https://api.knoldg.com`; in production, uses `https://api.knoldg.com`
 - `appBaseUrl`: In development, uses `http://localhost:4000`; in production, uses `https://app.knoldg.com`
 
 ## Helper Functions
@@ -22,14 +22,14 @@ The configuration file provides two helper functions:
 
 Replace hardcoded API URLs like:
 ```typescript
-const response = await fetch('https://api.foresighta.co/api/industries', {...});
+const response = await fetch('https://api.knoldg.com/api/platform/industries', {...});
 ```
 
 With:
 ```typescript
 import { getApiUrl } from '@/app/config';
 
-const response = await fetch(getApiUrl('/api/industries'), {...});
+const response = await fetch(getApiUrl('/api/platform/industries'), {...});
 ```
 
 ### For App URLs
@@ -49,12 +49,12 @@ window.location.href = getAppUrl('/auth/login');
 ## Important Notes
 
 1. When using the helper functions, remove the base URL and start the path with a slash:
-   - ❌ `getApiUrl('https://api.foresighta.co/api/industries')` 
-   - ✅ `getApiUrl('/api/industries')`
+   - ❌ `getApiUrl('https://api.knoldg.com/api/platform/industries')` 
+   - ✅ `getApiUrl('/api/platform/industries')`
 
 2. The environment is automatically detected based on Node.js' `process.env.NODE_ENV`.
 
-3. When running in development, APIs will use `https://api.foresighta.co` and app redirects will use `http://localhost:4000`.
+3. When running in development, APIs will use `https://api.knoldg.com` and app redirects will use `http://localhost:4000`.
 
 ## Files That Need to Be Updated
 
@@ -85,8 +85,8 @@ const isDevelopment = process.env.NODE_ENV === 'development';
 
 ### API and App URLs based on environment
 export const apiBaseUrl = isDevelopment 
-  ? 'https://api.foresighta.co' 
-  : 'https://api.foresighta.co';
+  ? 'https://api.knoldg.com' 
+  : 'https://api.knoldg.com';
 
 export const appBaseUrl = isDevelopment 
   ? 'http://localhost:4000' 

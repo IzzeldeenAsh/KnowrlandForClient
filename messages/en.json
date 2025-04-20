@@ -5,33 +5,33 @@
     },
     "Hero": {
         "tagline": "Beyond Research Boundaries",
-        "title": "Unlock Business Success with Shared Expert Knowledge",
-        "description":"A hub of data, insights, and business intelligence tailored for your business growth.",
+        "title": "Unlock Business Success with Shared Expert Knowldge",
+        "description":"Explore a hub of data, insights, and business intelligence tailored for your business growth.",
         "searchPlaceholder":"Search business data, reports, insights, HS Code, ISIC Code... and more",
         "direction": "ltr"
     },
     "HeroInsighter":{
-        "title":"All Knowledge Counts",
-        "description":"Someone out there is searching for the exact thing you know. Don't keep them waiting"
+        "title":"Welcome to Knoldg",
+        "description":"Where your expertise becomes a valuable currency"
     },
     "InsighterFeatures":{
-        "title":"All Knowledge Counts",
-        "description":"Someone out there is searching for the exact thing you know. Don't keep them waiting",
-        "section1":{
+        "title":"Welcome to Knoldg",
+        "description":"Where your expertise becomes a valuable currency",
+        "section3":{
             "title":"A Sustainable Knowledge Ecosystem",
             "description":"Knoldg empowers experts like you to share knowledge continuously—turning expertise into sustainable income with every upload, whether new or updated."
         },
-        "section2":{
-            "title":"What insights, reports, or expertise are you holding back?",
-            "description":"From studies and reports to industry insights, Knoldg is your platform to showcase and monetize your intellectual assets. The platform organizes all published materials— including data, research, insights by category, making it easy for global audiences to find and purchase your work."
+        "section4":{
+            "title":"A Sustainable Revenue Stream",
+            "description":"Start earning by sharing your insights and experience on Knoldg. You Set the Value: Choose your price, and every time your work is downloaded, you’re paid directly."
         },
-        "section3":{
+        "section1":{
             "title":"Bring your knowledge to light by sharing it on the platform",
             "description":"Start earning today by Bringing your data, studies, reports, and insights out from the confines of your desk. Share them with the world to discover, value, and invest in."
         },
-        "section4":{
+        "section2":{
             "title":"Don't let your expertise fade to silence; let it bloom into sustainable revenue",
-            "description":"Start earning by sharing your knowledge and experience on Knoldg. You Set the Value: Choose your price, and every time your work is downloaded, you're paid Directly"
+            "description":"Start earning by sharing your knowledge and experience on Knoldg. You Set the Value: Choose your price, and every time your work is downloaded, you're paid Directly."
         }
     },
     "Header": {
@@ -62,7 +62,7 @@
     "Features": {
         "tagline": "We pave the way",
         "title": "Make Smarter, Faster Decisions",
-        "description": "Accelerate your decision-making by instantly accessing authentic subject matter expertise through AI-enhanced search capabilities.",
+        "description": "Accelerate your decision-making by accessing authentic subject matter expertise instantly through AI-enhanced search capabilities.",
         "tabs": {
             "preciseResults": {
                 "title": "Smart Search Engine",
@@ -73,6 +73,9 @@
             },
             "fasterDecisions": {
                 "title": "AI-Powered Assistance"
+            },
+            "titleIndustry":{
+                    "title":"Build your advantage with industry breakthroughs developed and proven by experts."
             }
         },
         "direction": "ltr"
@@ -147,6 +150,31 @@
                 "title": "Pay for Only for the Targeted Insight or Data"
             }
         }
+    },
+    "Features4": {
+        "searchTitle": "Search all assets",
+        "searchButton": "Search",
+        "searchResult": "Search All Results",
+        "searchFilters": "Filters",
+        "searchFilterPrice": "Price",
+        "searchFilterAll": "All",
+        "searchFilterFree": "Free",
+        "searchFilterPaid": "Paid",
+        "searchIndustries": "Industries",
+        "searchIndustriesPlaceHolder": "Choose Industries",
+        "searchCounsulting": "Counsulting Field",
+        "searchCounsultingPlaceHolder": "Choose Counsulting Field",
+        "searchRegions": "Regions",
+        "searchRegionsPlaceHolder": "Choose Regions",
+        "searchCountries": "Countries",
+        "searchCountriesPlaceHolder": "Choose Countries",
+        "searchEconomicBlocks": "Economic Blocks",
+        "searchEconomicBlocksPlaceHolder": "Choose Economic Blocks",
+        "searchISIC": "ISIC Code",
+        "searchISICPlaceHolder": "Choose ISIC Code",
+        "searchHSCode": "HS Code",
+        "searchHSCodePlaceHolder": "Choose HS Code",
+        "searchTags": "Tags"
     },
     "Features02": {
         "stayInformed": {
@@ -258,7 +286,54 @@
         "myRequests": "My Requests",
         "accountSettings": "Account Settings",
         "becomeInsighter": "Become an Insighter",
+        "becomeInsighterDescription": "Register as a knowledge provider and start uploading reports and data on the platform",
         "myCompany": "My Company",
         "signOut": "Sign Out"
-    }
+    },
+    "ProfilePage": {
+        "profileNotFound": "Profile not found",
+        "bio": "Personal Bio",
+        "industries": "Industries",
+        "certifications": "Certifications",
+        "consultingFields": "Consulting Fields",
+        "knowledgeItems": "Knowledge Items",
+        "showMore": "Show More",
+        "noKnowledgeItems": "No knowledge content available yet",
+        "filterByType": "Filter by type",
+        "all": "All",
+        "insights": "Insights",
+        "reports": "Reports",
+        "data": "Data",
+        "manuals": "Manuals",
+        "courses": "Courses",
+        "loadMore": "Load More",
+        "companyInfo": "Company Information",
+        "websiteLabel": "Website",
+        "aboutUs": "About Us",
+        "address": "Address",
+        "verified": "Verified",
+        "notVerified": "Not Verified",
+        "follow": "Follow",
+        "scheduleAMeeting": "Schedule a Meeting",
+        "publishedKnowledge": "Published <br/> Knowledge",
+        "consultingSessions": "Sessions <br/> Held",
+        "aboutMe": "About Me",
+        "location": "Location",
+        "country": "Country",
+        "knowledge": "Knowledge",
+        "previous": "Previous",
+        "next": "Next",
+        "socialMedia": "Social Media",
+        "noBioAvailable": "No bio available",
+        "comingSoon": "Coming Soon",
+        "contentUpdateSoon": "This section will be updated soon with insightful content"
+    },
+    "industries": "Industries",
+    "reports": "Reports",
+    "data": "Data",
+    "insights": "Insights",
+    "manuals": "Manuals",
+    "courses": "Courses",
+    "byIndustry": "by Industry",
+    "noSubIndustries": "No sub-industries available"
 }

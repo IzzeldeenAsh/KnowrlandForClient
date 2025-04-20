@@ -45,7 +45,7 @@ export function useIndustryByType({ type, id, slug, topTopic = 2 }: UseIndustryB
         setError(null);
         
         const response = await fetch(
-          `https://api.foresighta.co/api/industries/type/${type}/${id}/${slug}`,
+          `https://api.knoldg.com/api/platform/industries/type/${type}/${id}/${slug}`,
           {
             method: 'POST',
             headers: {
