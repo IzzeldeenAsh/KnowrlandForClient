@@ -15,6 +15,7 @@ import { StarIcon } from "@heroicons/react/20/solid";
 import TabsContent from "./TabsContent";
 import Stripes from "@/public/images/stripes-dark.svg";
 import { getMessages } from '@/utils/get-messages';
+import Link from 'next/link';
 
 interface KnowledgeDetails {
   type: string;
@@ -75,7 +76,7 @@ interface Props {
 async function fetchKnowledgeData(type: string, slug: string, locale: string = 'en') {
   try {
     const response = await fetch(
-      `https://api.foresighta.co/api/industries/knowledge/${slug}`,
+      `https://api.knoldg.com/api/platform/industries/knowledge/${slug}`,
       {
         method: "GET",
         headers: {
@@ -202,7 +203,7 @@ export default function KnowledgePage({ params }: Props) {
               </div>
               <div className="flex flex-col items-start">
                 <div className="flex flex-col items-start mb-10">
-                  <h3 className="text-md bg-gradient-to-r from-blue-500 to-teal-400 md:text-4xl font-extrabold text-transparent bg-clip-text max-w-75">
+                  <h3 className="text-md bg-gradient-to-r from-blue-500 to-teal-400 md:text-4xl font-extrabold text-transparent bg-clip-text lg:max-w-xl">
                     {knowledge.title}
                   </h3>
                   <div className="text-sm font-bold text-gray-700 capitalize">
@@ -218,6 +219,7 @@ export default function KnowledgePage({ params }: Props) {
             </div>
             <div className="flex gap-6 text-sm">
               <div className="relative w-[50px] h-[50px]">
+              <Link  href={`/${locale}/profile/${knowledge.insighter.uuid}`}>
                 {knowledge.insighter.profile_photo_url ? (
                   <Image
                     src={knowledge.insighter.profile_photo_url}
@@ -237,12 +239,17 @@ export default function KnowledgePage({ params }: Props) {
                     </span>
                   </div>
                 )}
+                </Link>
               </div>
               <span className="flex flex-col">
+              
                 <span className="text-sm text-gray-500">{translations.insighter}</span>
                 <span className="text-sm font-bold text-gray-700">
+                <Link href={`/${locale}/profile/${knowledge.insighter.uuid}`}>
                   {knowledge.insighter.name}
+                </Link>
                 </span>
+                
               </span>
               <div className="flex flex-col ps-8">
                 <span className="text-gray-500 text-sm">{translations.published}</span>
@@ -254,13 +261,13 @@ export default function KnowledgePage({ params }: Props) {
                       ).toLocaleDateString(isRTL ? 'en-US' : undefined)}
                 </span>
               </div>
-              <div className="flex flex-col ps-8">
+              {/* <div className="flex flex-col ps-8">
                 <span className="text-gray-500 text-sm">{translations.rating}</span>
                 <span className="text-sm font-bold text-gray-700 flex items-center">
                   4.8
                   <StarIcon className="h-4 w-4 text-yellow-400 ml-1" />
                 </span>
-              </div>
+              </div> */}
             </div>
           </div>
         </div>

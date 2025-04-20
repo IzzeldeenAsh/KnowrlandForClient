@@ -6,7 +6,11 @@ import { useTopicStatistic } from '@/hooks/industries/useTopicStatistic';
 import styles from '@/app/[locale]/industry/[id]/[slug]/industry.module.css';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
-
+import DataIcon from "@/components/icons/DataIcon";
+import InsightIcon from "@/components/icons/InsightIcon";
+import ManualIcon from "@/components/icons/ManualIcon";
+import ReportIcon from "@/components/icons/ReportIcon";
+import CourseIcon from "@/components/icons/CourseIcon";
 interface StatisticsCardsProps {
   type: 'industry' | 'subIndustry' | 'topic';
   id: number;
@@ -25,19 +29,48 @@ export default function StatisticsCards({ type, id }: StatisticsCardsProps) {
 
   const { statistics, isLoading, error } = useStatisticHook(id);
 
-  // Translations for stat types
+  // Translations for stat types - handle both singular and plural forms
   const getStatLabel = (statType: string) => {
     if (locale !== 'ar') return statType;
     
+    const typeLower = statType.toLowerCase();
+    
     const translations: Record<string, string> = {
+      'report': 'تقرير',
       'reports': 'تقارير',
+      'insight': 'رؤية',
       'insights': 'رؤى',
       'data': 'بيانات',
+      'manual': 'دليل',
       'manuals': 'أدلة',
+      'course': 'دورة',
       'courses': 'دورات'
     };
     
-    return translations[statType.toLowerCase()] || statType;
+    return translations[typeLower] || statType;
+  };
+
+  // Function to get the appropriate icon based on type
+  const getStatIcon = (statType: string) => {
+    const typeLower = statType.toLowerCase();
+    switch (typeLower) {
+      case 'reports':
+      case 'report':
+        return <ReportIcon width={24} height={24} />;
+      case 'insights':
+      case 'insight':
+        return <InsightIcon width={24} height={24} />;
+      case 'data':
+        return <DataIcon width={21} height={21} />;
+      case 'manuals':
+      case 'manual':
+        return <ManualIcon width={24} height={24} />;
+      case 'courses':
+      case 'course':
+        return <CourseIcon width={24} height={24} />;
+      default:
+        return null;
+    }
   };
 
   if (error) {
@@ -79,7 +112,10 @@ export default function StatisticsCards({ type, id }: StatisticsCardsProps) {
           href={`/${locale}/knowledges?taxonomy=${type =='subIndustry' ? 'sub_industry' : type}&id=${id}&type=${stat.type}`}
         >
           <div key={stat.type} className={styles.statsCard}>
-            <div className={styles.statsNumber}>{stat.count}</div>
+            <div className="flex items-center gap-2 mb-1">
+              {getStatIcon(stat.type)}
+              <div className={styles.statsNumber}>{stat.count}</div>
+            </div>
             <div className={styles.statsLabel}>{getStatLabel(stat.type)}</div>
           </div>
         </Link>
