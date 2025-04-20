@@ -5,7 +5,7 @@ interface DataIconProps {
   height?: number;
 }
 
-export default function DataIcon({ width = 32, height = 34 }: DataIconProps) {
+export default function DataIcon({ width = 27, height = 29 }: DataIconProps) {
   return (
     <svg
       width={width}

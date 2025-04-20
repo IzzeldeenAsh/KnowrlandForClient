@@ -60,14 +60,27 @@ export default function Overview({ knowledge }: OverviewProps) {
   const locale = params.locale;
   const isRTL = locale === 'ar';
 
+  const typeTranslations: Record<
+  string, { en: string; ar: string; gender: 'masculine' | 'feminine' } > = {
+  course: { en: 'course', ar: 'دورة', gender: 'feminine' },
+  report: { en: 'report', ar: 'تقرير', gender: 'masculine' },
+  data: { en: 'data', ar: 'بيانات', gender: 'feminine' },
+  insight: { en: 'insight', ar: 'رؤية', gender: 'feminine' },
+  manual: { en: 'manual', ar: 'دليل', gender: 'masculine' },
+  industry: { en: 'industry', ar: 'صناعة', gender: 'feminine' },
+  };
+
+  const typeInfo = typeTranslations[knowledge.type];
+  const localizedType = typeInfo?.[isRTL ? 'ar' : 'en'] || knowledge.type;
+
   // Translations
   const translations = {
     chooseReportSections: isRTL ? 'اختر أقسام التقرير التي تناسب احتياجاتك وميزانيتك!' : 'Choose the report section that fits your needs and budget!',
-    thisIncludes: isRTL ? `هذا ${knowledge.type} يتضمن` : `This ${knowledge.type} includes`,
+    thisIncludes: isRTL ? `${typeInfo?.gender === 'feminine' ? 'هذه' : 'هذا'} ${localizedType} يتضمن`:`This ${localizedType} includes`,   
     documents: isRTL ? 'مستندات' : 'documents',
     free: isRTL ? 'مجاني' : 'Free',
     download: isRTL ? 'تحميل' : 'Download',
-    addToCart: isRTL ? 'إضافة إلى السلة' : 'Add to Cart',
+    addToCart: isRTL ? 'إضافة إلى حقيبة المشتريات' : 'Add to Cart',
     evaluateWithAI: isRTL ? 'تقييم باستخدام الذكاء الاصطناعي' : 'Evaluate with AI',
     description: isRTL ? 'الوصف' : 'Description',
     tableOfContents: isRTL ? 'جدول المحتويات' : 'Table of Contents',
@@ -198,7 +211,7 @@ export default function Overview({ knowledge }: OverviewProps) {
 </a>
 )}
 {doc.price !== "0" && (
-    <a  className="btn-sm text-white bg-[#1C7CBB] text-sm hover:bg-opacity-90 transition duration-150 ease-in-out group text-sm px-3 py-1 cursor-pointer">
+    <a  className="btn-sm mx-4 text-white bg-[#1C7CBB] text-sm hover:bg-opacity-90 transition duration-150 ease-in-out group text-sm px-3 py-1 cursor-pointer">
     {translations.addToCart} <span className="tracking-normal text-white group-hover:translate-x-0.5 transition-transform duration-150 ease-in-out ml-1">-&gt;</span>
   </a>
 )}

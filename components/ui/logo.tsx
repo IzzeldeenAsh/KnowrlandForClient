@@ -15,23 +15,25 @@ interface LogoProps {
 
 export default function Logo({ isHomePage = true }: LogoProps) {
   const [logoImg, setLogoImg] = useState(HomeLogoImgAr) // Default to Arabic home logo
+  const [locale, setLocale] = useState('ar') // Default to Arabic locale
   const pathname = usePathname()
 
   useEffect(() => {
     // Detect locale from pathname
-    const locale = pathname.split('/')[1] === 'en' ? 'en' : 'ar'
+    const currentLocale = pathname.split('/')[1] === 'en' ? 'en' : 'ar'
+    setLocale(currentLocale)
     
     if (isHomePage) {
       // Use home page logos
-      setLogoImg(locale === 'en' ? HomeLogoImgEn : HomeLogoImgAr)
+      setLogoImg(currentLocale === 'en' ? HomeLogoImgEn : HomeLogoImgAr)
     } else {
       // Use inner page logos
-      setLogoImg(locale === 'en' ? InnerLogoImgEn : InnerLogoImgAr)
+      setLogoImg(currentLocale === 'en' ? InnerLogoImgEn : InnerLogoImgAr)
     }
   }, [pathname, isHomePage])
 
   return (
-    <Link className="inline-flex" href="/" aria-label="Knoldg">
+    <Link className="inline-flex" href={locale === 'en' ? '/' : '/ar'} aria-label="Knoldg">
       <Image className="max-w-none" src={logoImg} width={120} height={60} priority alt="Knoldg" />
     </Link>
   )
