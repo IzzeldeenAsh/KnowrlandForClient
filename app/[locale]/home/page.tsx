@@ -21,6 +21,7 @@ import { IconSearch, IconFilter } from '@tabler/icons-react';
 import dynamic from 'next/dynamic'
 import { useParams } from 'next/navigation';
 import type { KnowledgeItem } from '../topic/[id]/[slug]/KnowledgeGrid';
+import { useTranslations } from 'next-intl'
 
 // Dynamically import KnowledgeGrid with no SSR to avoid hydration issues
 const KnowledgeGrid = dynamic(
@@ -58,6 +59,17 @@ export default function HomePage() {
   const [priceFilter, setPriceFilter] = useState<'all' | 'free' | 'paid'>('all');
   const params = useParams();
   const locale = params.locale as string || 'en';
+  const t4 = useTranslations('Features4')
+  const feature = t4("Features4", { default: "الميزة ٤ (احتياطي)" });
+
+  const tags = [
+    { id: 'industry', en: 'Industry', ar: 'الصناعات' },
+    { id: 'report', en: 'Reports', ar: 'التقارير' },
+    { id: 'data', en: 'Data', ar: 'البيانات' },
+    { id: 'insight', en: 'Insights', ar: 'الرؤى' },
+    { id: 'manual', en: 'Manuals', ar: 'الأدلة' },
+    { id: 'course', en: 'Courses', ar: 'الدورات' }
+  ];
 
   useEffect(() => {
     const fetchData = async () => {
@@ -65,7 +77,7 @@ export default function HomePage() {
       setLoading(true);
       try {
         console.log('Making API request for locale:', locale);
-        const url = new URL('https://api.foresighta.co/api/industries/type/knowledge');
+        const url = new URL('https://api.foresighta.co/api/platform/industries/type/knowledge');
         url.searchParams.append('page', currentPage.toString());
         
         // Update price filtering logic
@@ -127,7 +139,7 @@ export default function HomePage() {
               className="flex-1"
               size="lg"
               radius="md"
-              placeholder="Search all assets"
+              placeholder={t4("searchTitle")}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.currentTarget.value)}
               leftSection={<IconSearch size={18} className="text-gray-500" />}
@@ -138,7 +150,7 @@ export default function HomePage() {
                     variant="filled" 
                     color="blue"
                   >
-                    Search
+                    {t4("searchButton")}
                   </Button>
                 </Group>
               }
@@ -154,7 +166,7 @@ export default function HomePage() {
         <div className="w-80 shrink-0 border-r border-gray-200 bg-white sticky top-0 self-start h-screen">
           <div className="p-4 h-[calc(100vh-150px)] overflow-y-auto custom-scrollbar">
             <Group justify="space-between" mb="md">
-              <Text fw={500}>Filters</Text>
+              <Text fw={500}>{t4("searchFilters")}</Text>
               <IconFilter size={16} />
             </Group>
             
@@ -162,7 +174,7 @@ export default function HomePage() {
             
             <Stack gap="md">
               <div >
-                <Text size="sm" fw={500} mb="xs">Price</Text>
+                <Text size="sm" fw={500} mb="xs">{t4("searchFilterPrice")}</Text>
                 <Group gap="xs">
                   <Button
                     variant={priceFilter === 'all' ? 'filled' : 'outline'}
@@ -174,7 +186,7 @@ export default function HomePage() {
                     }
                     onClick={() => setPriceFilter('all')}
                   >
-                    All
+                    {t4("searchFilterAll")}
                   </Button>
                   <Button
                     variant={priceFilter === 'free' ? 'filled' : 'outline'}
@@ -186,7 +198,7 @@ export default function HomePage() {
                     }
                     onClick={() => setPriceFilter('free')}
                   >
-                    Free
+                    {t4("searchFilterFree")}
                   </Button>
                   <Button
                     variant={priceFilter === 'paid' ? 'filled' : 'outline'}
@@ -198,13 +210,13 @@ export default function HomePage() {
                     }
                     onClick={() => setPriceFilter('paid')}
                   >
-                    Paid
+                     {t4("searchFilterPaid")}
                   </Button>
                 </Group>
               </div>
 
               <div>
-                <Text size="sm" fw={500} mb="xs">Industries</Text>
+                <Text size="sm" fw={500} mb="xs"> {t4("searchIndustries")}</Text>
                 <MultiSelect
                   data={[
                     { value: 'agriculture', label: 'Agriculture' },
@@ -215,7 +227,7 @@ export default function HomePage() {
                     { value: 'retail', label: 'Retail' },
                     { value: 'energy', label: 'Energy' },
                   ]}
-                  placeholder="Select industries"
+                  placeholder={t4("searchIndustriesPlaceHolder")}
                   searchable
                   nothingFoundMessage="Nothing found..."
                   clearable
@@ -223,7 +235,7 @@ export default function HomePage() {
               </div>
               
               <div>
-                <Text size="sm" fw={500} mb="xs">Consulting Field</Text>
+                <Text size="sm" fw={500} mb="xs">{t4("searchCounsulting")}</Text>
                 <MultiSelect
                   data={[
                     { value: 'strategy', label: 'Strategy' },
@@ -234,7 +246,7 @@ export default function HomePage() {
                     { value: 'it', label: 'IT Consulting' },
                     { value: 'management', label: 'Management' },
                   ]}
-                  placeholder="Select consulting fields"
+                  placeholder={t4("searchCounsultingPlaceHolder")}
                   searchable
                   nothingFoundMessage="Nothing found..."
                   clearable
@@ -242,7 +254,7 @@ export default function HomePage() {
               </div>
               
               <div>
-                <Text size="sm" fw={500} mb="xs">Regions</Text>
+                <Text size="sm" fw={500} mb="xs">{t4("searchRegions")}</Text>
                 <MultiSelect
                   data={[
                     { value: 'europe', label: 'Europe' },
@@ -252,7 +264,7 @@ export default function HomePage() {
                     { value: 'middle_east', label: 'Middle East' },
                     { value: 'africa', label: 'Africa' },
                   ]}
-                  placeholder="Select regions"
+                  placeholder={t4("searchRegionsPlaceHolder")}
                   searchable
                   nothingFoundMessage="Nothing found..."
                   clearable
@@ -260,7 +272,7 @@ export default function HomePage() {
               </div>
               
               <div>
-                <Text size="sm" fw={500} mb="xs">Countries</Text>
+                <Text size="sm" fw={500} mb="xs">{t4("searchRegions")}</Text>
                 <MultiSelect
                   data={[
                     { value: 'us', label: 'United States' },
@@ -272,7 +284,7 @@ export default function HomePage() {
                     { value: 'india', label: 'India' },
                     { value: 'brazil', label: 'Brazil' },
                   ]}
-                  placeholder="Select countries"
+                  placeholder={t4("searchRegionsPlaceHolder")}
                   searchable
                   nothingFoundMessage="Nothing found..."
                   clearable
@@ -280,7 +292,7 @@ export default function HomePage() {
               </div>
               
               <div>
-                <Text size="sm" fw={500} mb="xs">Economic Blocks</Text>
+                <Text size="sm" fw={500} mb="xs">{t4("searchEconomicBlocks")}</Text>
                 <MultiSelect
                   data={[
                     { value: 'eu', label: 'European Union (EU)' },
@@ -289,7 +301,7 @@ export default function HomePage() {
                     { value: 'mercosur', label: 'Mercosur' },
                     { value: 'gcc', label: 'Gulf Cooperation Council' },
                   ]}
-                  placeholder="Select economic blocks"
+                  placeholder={t4("searchEconomicBlocksPlaceHolder")}
                   searchable
                   nothingFoundMessage="Nothing found..."
                   clearable
@@ -297,7 +309,7 @@ export default function HomePage() {
               </div>
               
               <div>
-                <Text size="sm" fw={500} mb="xs">ISIC Code</Text>
+                <Text size="sm" fw={500} mb="xs">{t4("searchISIC")}</Text>
                 <MultiSelect
                   data={[
                     { value: 'A', label: 'A - Agriculture, forestry and fishing' },
@@ -307,7 +319,7 @@ export default function HomePage() {
                     { value: 'E', label: 'E - Water supply' },
                     { value: 'F', label: 'F - Construction' },
                   ]}
-                  placeholder="Select ISIC codes"
+                  placeholder={t4("searchISICPlaceHolder")}
                   searchable
                   nothingFoundMessage="Nothing found..."
                   clearable
@@ -315,7 +327,7 @@ export default function HomePage() {
               </div>
               
               <div>
-                <Text size="sm" fw={500} mb="xs">HS Code</Text>
+                <Text size="sm" fw={500} mb="xs">{t4("searchHSCode")}</Text>
                 <MultiSelect
                   data={[
                     { value: '01', label: '01 - Live animals' },
@@ -324,7 +336,7 @@ export default function HomePage() {
                     { value: '04', label: '04 - Dairy produce' },
                     { value: '05', label: '05 - Products of animal origin' },
                   ]}
-                  placeholder="Select HS codes"
+                  placeholder={t4("searchHSCodePlaceHolder")}
                   searchable
                   nothingFoundMessage="Nothing found..."
                   clearable
@@ -332,30 +344,21 @@ export default function HomePage() {
               </div>
               
               <div>
-                <Text size="sm" fw={500} mb="xs">Tags</Text>
+                <Text size="sm" fw={500} mb="xs">{t4("searchTags")}</Text>
                 <div className="flex flex-wrap gap-2">
-                  {[
-                    { id: 'soccer', label: 'Soccer' },
-                    { id: 'badminton', label: 'Badminton' },
-                    { id: 'boxing', label: 'Boxing' },
-                    { id: 'formula1', label: 'Formula 1' },
-                    { id: 'cricket', label: 'Cricket' },
-                    { id: 'baseball', label: 'Baseball' },
-                    { id: 'football', label: 'American football' },
-                    { id: 'swimming', label: 'Swimming' }
-                  ].map((tag) => (
-                    <Chip
-                      key={tag.id}
-                      value={tag.id}
-                      variant="outline"
-                      radius="xl"
-                      size="sm"
-                      color="blue"
-                    >
-                      {tag.label}
-                    </Chip>
-                  ))}
-                </div>
+                    {tags.map((tag) => (
+                      <Chip
+                        key={tag.id}
+                        value={tag.id}
+                        variant="outline"
+                        radius="xl"
+                        size="sm"
+                        color="blue"
+                      >
+                      {locale === 'ar' ? tag.ar : tag.en}
+                      </Chip>
+                    ))}
+                  </div>
               </div>
             </Stack>
           </div>
@@ -365,7 +368,7 @@ export default function HomePage() {
         <div className="flex-1 p-6">
           <div className="mx-auto max-w-6xl">
             <Group justify="space-between" align="center" mb="md">
-              <Title order={3}>Search Results</Title>
+               <Title order={3}>{t4("searchResult")}</Title>
             </Group>
             
             <Suspense fallback={<LoadingState />}>

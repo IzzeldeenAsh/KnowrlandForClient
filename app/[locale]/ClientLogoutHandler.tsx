@@ -7,7 +7,7 @@ export default function ClientLogoutHandler() {
   const searchParams = useSearchParams();
   const loggedOut = searchParams.get('logged_out');
   
-  // Handle logout parameter from Angular app redirect
+  // Handle logout parameter from Angular sapp redirect
   useEffect(() => {
     if (loggedOut === 'true') {
       // Clear localStorage only

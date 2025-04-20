@@ -70,7 +70,7 @@ async function fetchKnowledgeItems({ taxonomy, id, type, page, locale }: FetchKn
   if (taxonomy && id) params.append(taxonomy, id);
   params.append('page', page.toString());
 
-  const response = await fetch(`https://api.foresighta.co/api/industries/type/knowledge?${params.toString()}`, {
+  const response = await fetch(`https://api.foresighta.co/api/platform/industries/type/knowledge?${params.toString()}`, {
     headers: {
       "Content-Type": "application/json",
       "Accept": "application/json",
@@ -158,7 +158,7 @@ export default function KnowledgesClient() {
   useEffect(() => {
     if (selectedId && taxonomy === 'industry') {
       // Fetch sub-industries for the selected industry
-      fetch(`https://api.foresighta.co/api/industries/${selectedId}/subindustries`, {
+      fetch(`https://api.foresighta.co/api/platform/industries/${selectedId}/subindustries`, {
         headers: {
           "Accept-Language": locale,
         },
