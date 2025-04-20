@@ -16,6 +16,7 @@ import FacebookIcon from '@/public/file-icons/facebook';
 import YoutubeIcon from '@/public/file-icons/youtube';
 import LinkedinIcon from '@/public/file-icons/linkedin';
 import InstagramIcon from '@/public/file-icons/instagram';
+import WhatsappIcon from '@/public/file-icons/whatsapp';
 import { useTranslations } from 'next-intl';
 
 interface SocialLink {
