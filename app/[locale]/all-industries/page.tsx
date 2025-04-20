@@ -24,7 +24,7 @@ export const metadata: Metadata = {
 
 async function getAllIndustries(locale: string) {
   
-  const apiUrl = getApiUrl('/api/industries')
+  const apiUrl = getApiUrl('/api/platform/industries')
   
   try {
     console.log('Fetching industries from:', apiUrl)
@@ -123,15 +123,16 @@ export default async function AllIndustries({ params }: Props) {
                   <div className="relative z-10 max-w-6xl relative mx-auto mt-5 w-full ">
                    <Breadcrumb items={breadcrumbItems} />
                   <div className="mx-auto max-w-3xl text-center pb-12 ">
-                    <h1 
-                      className="h1 font-bold text-5xl md:text-6xl bg-clip-text text-transparent bg-gradient-to-r from-blue-500 to-teal-400" 
+                    <h2 
+                      className="h2 font-bold text-4xl md:text-6xl bg-clip-text text-transparent bg-gradient-to-r from-blue-500 to-teal-400 " 
                       data-aos="zoom-y-out"
+                      style={{lineHeight: '1.2'}}
                     >
                       {messages?.Header?.navigation?.industries || 'Industries'}
-                    </h1>
+                    </h2>
                     
                     <p className="mt-4 text-lg text-gray-600 dark:text-gray-400">
-                      Build your advantage with industry breakthroughs developed and proven by experts.
+                    <span>{messages?.Features?.tabs?.titleIndustry?.title || 'Default text'}</span>
                     </p>
                     
                     {error && (

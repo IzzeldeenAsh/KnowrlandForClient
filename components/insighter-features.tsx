@@ -42,7 +42,7 @@ export default function InsighterFeatures() {
           </div>
         </div>
         {/* Fourth Section (Now First) */}
-        <div className="pt-16 pb-12 md:pt-25 md:pb-20">
+        <div className="pt-10 pb-10 md:pt-25 ">
           <div>
             {/* Section content */}
             <div className="max-w-xl mx-auto md:max-w-none flex flex-col md:flex-row space-y-8 space-y-reverse md:space-y-0 gap-8 items-center justify-between">
@@ -50,6 +50,12 @@ export default function InsighterFeatures() {
               <div className="" data-aos="fade-up" data-aos-delay="100">
                 <figure className="rounded-3xl p-px mb-8 overflow-hidden mt-10 max-w-[600px] mx-auto">
                   {/* Video placeholder */}
+                    <Image
+                      src="/images/insighter_3.png"
+                      alt="insighter_1.png"
+                      width={500}
+                      height={400}
+                    />
                 </figure>
               </div>
 
@@ -70,7 +76,7 @@ export default function InsighterFeatures() {
         </div>
 
         {/* First Section */}
-        <div className=" pb-12 md:pt-40 md:pb-20">
+        <div className=" pb-10  ">
           <div>
             {/* Section content */}
             <div className="max-w-xl mx-auto md:max-w-none flex flex-col md:flex-row space-y-8 space-y-reverse md:space-y-0 gap-8 items-center justify-between">
@@ -91,6 +97,12 @@ export default function InsighterFeatures() {
               <div className="" data-aos="fade-up" data-aos-delay="100">
                 <figure className="bg-gradient-to-b from-slate-300/20 to-transparent rounded-3xl p-px mb-8">
                   {/* Image placeholder */}
+                  <Image
+                      src="/images/insighter_2.png"
+                      alt="insighter_2.png"
+                      width={500}
+                      height={400}
+                    />
                 </figure>
               </div>
             </div>
@@ -98,7 +110,7 @@ export default function InsighterFeatures() {
         </div>
 
         {/* Second Section */}
-        <div className="pt-16 pb-12 md:pt-25 md:pb-20">
+        <div className="pt-10 pb-12 md:pt-25 ">
           <div>
             {/* Section content */}
             <div className="max-w-xl mx-auto md:max-w-none flex flex-col md:flex-row space-y-8 space-y-reverse md:space-y-0 gap-8 items-center justify-between">
@@ -106,6 +118,12 @@ export default function InsighterFeatures() {
               <div className="" data-aos="fade-up" data-aos-delay="100">
                 <figure className="bg-gradient-to-b from-slate-300/20 to-transparent rounded-3xl p-px mb-8">
                   {/* Image placeholder */}
+                  <Image
+                      src="/images/insighter_1.png"
+                      alt="insighter_3.png"
+                      width={500}
+                      height={400}
+                    />
                 </figure>
               </div>
 
@@ -125,33 +143,7 @@ export default function InsighterFeatures() {
           </div>
         </div>
 
-        {/* Third Section */}
-        <div className="pt-16 pb-12 md:pt-25 md:pb-20">
-          <div>
-            {/* Section content */}
-            <div className="max-w-xl mx-auto md:max-w-none flex flex-col md:flex-row space-y-8 space-y-reverse md:space-y-0 gap-8 items-center justify-between">
-              {/* Content */}
-              <div
-                className="flex-1 order-1 md:order-none max-md:text-center max-w-lg"
-                data-aos="fade-down"
-              >
-                <h3 className="h3 bg-clip-text text-transparent bg-gradient-to-r from-slate-200/60 via-slate-200 to-slate-200/60 pb-3">
-                  {t("section3.title")}
-                </h3>
-                <p className="text-lg text-slate-400 mb-8">
-                  {t("section3.description")}
-                </p>
-              </div>
-
-              {/* Image */}
-              <div className="" data-aos="fade-up" data-aos-delay="100">
-                <figure className="bg-gradient-to-b from-slate-300/20 to-transparent rounded-3xl p-px mb-8">
-                  {/* Image placeholder */}
-                </figure>
-              </div>
-            </div>
-          </div>
-        </div>
+      
       </div>
     </section>
   );

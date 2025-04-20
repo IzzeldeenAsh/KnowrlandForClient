@@ -7,7 +7,7 @@ This document explains how to use the new environment configuration to handle di
 The configuration is centralized in `/app/config.ts` and provides:
 
 - `apiBaseUrl`: In development, uses `https://api.foresighta.co`; in production, uses `https://api.foresighta.co`
-- `appBaseUrl`: In development, uses `http://localhost:4000`; in production, uses `https://app.knoldg.com`
+- `appBaseUrl`: In development, uses `http://localhost:4000`; in production, uses `http://localhost:4200`
 
 ## Helper Functions
 
@@ -22,21 +22,21 @@ The configuration file provides two helper functions:
 
 Replace hardcoded API URLs like:
 ```typescript
-const response = await fetch('https://api.foresighta.co/api/industries', {...});
+const response = await fetch('https://api.foresighta.co/api/platform/industries', {...});
 ```
 
 With:
 ```typescript
 import { getApiUrl } from '@/app/config';
 
-const response = await fetch(getApiUrl('/api/industries'), {...});
+const response = await fetch(getApiUrl('/api/platform/industries'), {...});
 ```
 
 ### For App URLs
 
 Replace hardcoded app URLs like:
 ```typescript
-window.location.href = 'https://app.knoldg.com/auth/login';
+window.location.href = 'http://localhost:4200/auth/login';
 ```
 
 With:
@@ -49,8 +49,8 @@ window.location.href = getAppUrl('/auth/login');
 ## Important Notes
 
 1. When using the helper functions, remove the base URL and start the path with a slash:
-   - ❌ `getApiUrl('https://api.foresighta.co/api/industries')` 
-   - ✅ `getApiUrl('/api/industries')`
+   - ❌ `getApiUrl('https://api.foresighta.co/api/platform/industries')` 
+   - ✅ `getApiUrl('/api/platform/industries')`
 
 2. The environment is automatically detected based on Node.js' `process.env.NODE_ENV`.
 
@@ -90,4 +90,4 @@ export const apiBaseUrl = isDevelopment
 
 export const appBaseUrl = isDevelopment 
   ? 'http://localhost:4000' 
-  : 'https://app.knoldg.com'; 
+  : 'http://localhost:4200'; 

@@ -66,7 +66,7 @@ export default function AuthCallback() {
              data.data.roles.includes('company-insighter'))) {
           // Redirect to insighter dashboard with token
           console.log('[token-callback] Redirecting to Angular app with token parameter');
-          window.location.href = `https://app.knoldg.com/app/insighter-dashboard/my-dashboard?nextjs_token=${encodeURIComponent(token)}`;
+          window.location.href = `http://localhost:4200/app/insighter-dashboard/my-dashboard?nextjs_token=${encodeURIComponent(token)}`;
         } else {
           // Redirect to home page using current locale
           router.push(`/${locale}/home`);
@@ -74,7 +74,7 @@ export default function AuthCallback() {
       } catch (error) {
         console.error('Error fetching profile:', error);
         // Redirect to app login page
-        window.location.href = 'https://app.knoldg.com/auth/login';
+        window.location.href = 'http://localhost:4200/auth/login';
       }
     };
 
