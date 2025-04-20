@@ -41,7 +41,7 @@ interface Props {
 
 async function fetchIndustryData(id: string, slug: string, locale: string = 'en') {
   const response = await fetch(
-    `https://api.foresighta.co/api/platform/industries/${id}/${slug}`,
+    `https://api.knoldg.com/api/platform/industries/${id}/${slug}`,
     {
       method: 'POST',
       headers: {
