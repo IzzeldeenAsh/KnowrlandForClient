@@ -7,6 +7,7 @@ interface Industry {
   id: number
   name: string
   slug: string
+  weight?: number
   children: {
     id: number
     name: string,
@@ -31,25 +32,35 @@ export default function IndustriesGrid({ industries, locale }: IndustriesGridPro
       data-aos="zoom-y-out" 
       data-aos-delay="300"
     >
-      {industries.map((industry) => (
-        <Link key={industry.id} href={`/${currentLocale}/industry/${industry.id}/${industry.slug}`}>
+      {industries.map((industry) => {
+        const isDisabled = industry.weight === 0;
+        
+        const cardContent = (
           <div 
-            className="relative bg-white min-h-[140px] rounded-sm p-6 shadow-sm hover:shadow-md transition-all duration-300 cursor-pointer"
+            className={`relative bg-white min-h-[140px] rounded-sm p-6 shadow-sm ${!isDisabled ? 'hover:shadow-md transition-all duration-300 cursor-pointer' : 'opacity-70 cursor-not-allowed'}`}
           >
             <div className="space-y-2">
-              <h3 className="text-sm font-semibold text-gray-900  hover:text-blue-600 " >
+              <h3 className={`text-sm font-semibold text-gray-900 ${!isDisabled ? 'hover:text-blue-600' : ''}`}>
                 {industry.name}
+                {isDisabled && <span className="ml-2 text-xs text-gray-500"></span>}
               </h3>
               <ul className="space-y-1">
                 {industry.children.map((child) => (
                   <li 
                     key={child.id} 
-                    className="text-xs text-gray-600 hover:text-blue-600 transition-colors flex items-center"
+                    className={`text-xs text-gray-600 ${!isDisabled ? 'hover:text-blue-600 transition-colors' : ''} flex items-center`}
                   >
-                    <Link href={`/${currentLocale}/sub-industry/${child.id}/${child.slug}`}>
-                      <span className={isRTL ? "ml-2" : "mr-2"}>•</span>
-                      {child.name}
-                    </Link>
+                    {!isDisabled ? (
+                      <Link href={`/${currentLocale}/sub-industry/${child.id}/${child.slug}`}>
+                        <span className={isRTL ? "ml-2" : "mr-2"}>•</span>
+                        {child.name}
+                      </Link>
+                    ) : (
+                      <>
+                        <span className={isRTL ? "ml-2" : "mr-2"}>•</span>
+                        {child.name}
+                      </>
+                    )}
                   </li>
                 ))}
               </ul>
@@ -65,8 +76,16 @@ export default function IndustriesGrid({ industries, locale }: IndustriesGridPro
               </svg>
             </div>
           </div>
-        </Link>
-      ))}
+        );
+        
+        return isDisabled ? (
+          <div key={industry.id}>{cardContent}</div>
+        ) : (
+          <Link key={industry.id} href={`/${currentLocale}/industry/${industry.id}/${industry.slug}`}>
+            {cardContent}
+          </Link>
+        );
+      })}
     </div>
   )
 }
