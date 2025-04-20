@@ -134,7 +134,7 @@ export default function ProfilePage() {
   useEffect(() => {
     const fetchProfileData = async () => {
       try {
-        const response = await fetch(`https://api.foresighta.co/api/platform/insighter/profile/${uuid}`, {
+        const response = await fetch(`https://api.knoldg.com/api/platform/insighter/profile/${uuid}`, {
           headers: {
             "Content-Type": "application/json",
             "Accept": "application/json",
@@ -164,7 +164,7 @@ export default function ProfilePage() {
       
       setLoadingKnowledge(true);
       try {
-        let url = `https://api.foresighta.co/api/platform/insighter/knowledge/${uuid}?page=${knowledgePage}&per_page=12`;
+        let url = `https://api.knoldg.com/api/platform/insighter/knowledge/${uuid}?page=${knowledgePage}&per_page=12`;
         
         if (selectedType) {
           url += `&type=${selectedType}`;
