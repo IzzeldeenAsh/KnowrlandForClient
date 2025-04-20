@@ -89,7 +89,7 @@ const KnowledgeSideBox = ({
     lastUpdate: isRTL ? '\u0622\u062e\u0631 \u062a\u062d\u062f\u064a\u062b' : 'Last Update',
     oneTimePurchase: isRTL ? '\u0634\u0631\u0627\u0621 \u0644\u0645\u0631\u0629 \u0648\u0627\u062d\u062f\u0629' : 'One time purchase',
     buyNow: isRTL ? '\u0627\u0634\u062a\u0631\u064a \u0627\u0644\u0622\u0646' : 'Buy Now',
-    addToCart: isRTL ? '\u0623\u0636\u0641 \u0625\u0644\u0649 \u0627\u0644\u0633\u0644\u0629' : 'Add to Cart',
+    addToCart: isRTL ?  'إضافة إلى حقيبة المشتريات' : 'Add to Cart',
     na: isRTL ? '\u063a\u064a\u0631 \u0645\u062a\u0648\u0641\u0631' : 'N/A',
     free: isRTL ? '\u0645\u062c\u0627\u0646\u064a' : 'Free',
     share: isRTL ? '\u0645\u0634\u0627\u0631\u0643\u0629' : 'Share'
@@ -130,7 +130,7 @@ const KnowledgeSideBox = ({
         <div className="space-y-3">
           <div className="tp-course-details2-widget-list-item flex items-center justify-between">
             <span>
-              <DocumentTextIcon className="w-5 h-5 mr-2" />
+              <DocumentTextIcon className="w-5 h-5 mx-4" />
               {translations.documents}
             </span>
             <div className="flex flex-wrap gap-2 mt-2">
@@ -156,7 +156,7 @@ const KnowledgeSideBox = ({
 
           <div className="tp-course-details2-widget-list-item flex items-center justify-between">
             <span>
-              <GlobeAltIcon className="w-5 h-5 mr-2" />
+              <GlobeAltIcon className="w-5 h-5 mx-4" />
               {translations.documentsLanguage}
             </span>
             <span className="block mt-1 capitalize">{language}</span>
@@ -165,7 +165,7 @@ const KnowledgeSideBox = ({
           {isic_code && !Array.isArray(isic_code) && isic_code.key && (
             <div className="tp-course-details2-widget-list-item flex items-center justify-between">
               <span className="flex items-center gap-2 font-medium text-gray-700">
-                <BuildingLibraryIcon className="w-5 h-5 mr-2" />
+                <BuildingLibraryIcon className="w-5 h-5 mx-4" />
                 {translations.isicCode}
               </span>
               <div className="group relative inline-block">
@@ -181,7 +181,7 @@ const KnowledgeSideBox = ({
           {isic_code && Array.isArray(isic_code) && isic_code.length > 0 && (
             <div className="tp-course-details2-widget-list-item flex items-center justify-between">
               <span className="flex items-center gap-2 font-medium text-gray-700">
-                <BuildingLibraryIcon className="w-5 h-5 mr-2" />
+                <BuildingLibraryIcon className="w-5 h-5 mx-4" />
                 {translations.isicCode}
               </span>
               <div className="flex flex-wrap gap-1">
@@ -197,7 +197,7 @@ const KnowledgeSideBox = ({
           {hs_code && (
             <div className="tp-course-details2-widget-list-item flex items-center justify-between">
               <span>
-                <TruckIcon className="w-5 h-5 mr-2" />
+                <TruckIcon className="w-5 h-5 mx-4" />
                 {translations.hsCode}
               </span>
               <span className="block mt-1">{hs_code}</span>
@@ -208,7 +208,7 @@ const KnowledgeSideBox = ({
             economic_blocs && economic_blocs.length > 0 && (
               <div className="tp-course-details2-widget-list-item flex items-center justify-between">
                 <span className="flex items-center gap-2 font-medium text-gray-700">
-                  <GlobeAsiaAustraliaIcon className="w-5 h-5 mr-2" />
+                  <GlobeAsiaAustraliaIcon className="w-5 h-5 mx-4" />
                   {translations.economicBloc}
                 </span>
                 <div className="flex flex-wrap gap-1">
@@ -225,10 +225,10 @@ const KnowledgeSideBox = ({
             regions && regions.length > 0 && (
               <div className="tp-course-details2-widget-list-item flex items-center justify-between">
                 <span className="flex items-center gap-2 font-medium text-gray-700">
-                  <GlobeAsiaAustraliaIcon className="w-5 h-5 mr-2" />
+                  <GlobeAsiaAustraliaIcon className="w-5 h-5 mx-4" />
                   {translations.region}
                 </span>
-                <div className="flex flex-wrap gap-1">
+                <div className="flex flex-wrap justify-end  gap-1">
                   {regions.map((region:any) => (
                     <span key={region.id} className="badge bg-[#f1f1f4] text-[#4b5675] text-xs font-medium px-2.5 py-0.5 rounded">
                       {region.name}
@@ -242,7 +242,7 @@ const KnowledgeSideBox = ({
             countries && countries.length > 0 && (
               <div className="tp-course-details2-widget-list-item flex items-center justify-between">
                 <span className="flex items-center gap-2 font-medium text-gray-700">
-                  <GlobeAsiaAustraliaIcon className="w-5 h-5 mr-2" />
+                  <GlobeAsiaAustraliaIcon className="w-5 h-5 mx-4" />
                   {translations.country}
                 </span>
                 <div className="flex flex-wrap justify-end gap-1">
@@ -258,11 +258,11 @@ const KnowledgeSideBox = ({
 
           <div className="tp-course-details2-widget-list-item flex items-center justify-between">
             <span>
-              <CalendarIcon className="w-5 h-5 mr-2" />
+              <CalendarIcon className="w-5 h-5 mx-4" />
               {translations.publishedAt}
             </span>
             <span className="block mt-1">
-              {published_at ? new Date(published_at).toLocaleDateString(isRTL ? 'ar-SA' : undefined) : translations.na}
+              {published_at ? new Date(published_at).toLocaleDateString(isRTL ? 'en-US' : undefined) : translations.na}
             </span>
           </div>
 
@@ -270,7 +270,7 @@ const KnowledgeSideBox = ({
           {false && (
             <div className="tp-course-details2-widget-list-item flex items-center justify-between">
               <span>
-                <ClockIcon className="w-5 h-5 mr-2" />
+                <ClockIcon className="w-5 h-5 mx-4" />
                 {translations.lastUpdate}
               </span>
               <span className="block mt-1">{translations.na}</span>
@@ -280,10 +280,10 @@ const KnowledgeSideBox = ({
           {/* Share Button with Animation */}
           <div className="mt-5 flex justify-center">
             <button 
-              className="share-button w-[200px] relative w-full py-3 px-6 font-medium text-sm text-white bg-none border-none outline-none overflow-hidden cursor-pointer rounded-[24px]"
+              className="share-button max-w-[200px] relative w-full py-3 px-6 font-medium text-sm text-white bg-none border-none outline-none overflow-hidden cursor-pointer rounded-[24px]"
               onClick={handleShare}
             >
-              <span className="btn-text inline-flex align-middle transition-all duration-300 ease-out-cubic">{translations.share}</span>
+              <span className="btn-text inline-flex align-middle transition-all duration-300 px-4 ease-out-cubic">{translations.share}</span>
               <span className="btn-icon inline-flex align-middle ml-2 transition-all duration-300 ease-out-cubic">
                 <svg
                   className="w-4 h-4"
@@ -308,7 +308,7 @@ const KnowledgeSideBox = ({
                        window.open(getShareLinks().facebook, 'facebook-share', 'width=580,height=296');
                        return false;
                      }}
-                     className="social-icon inline-flex align-middle transform translate-y-[55px] transition-all duration-300 ease-out-cubic hover:opacity-50">
+                     className="social-icon  inline-flex align-middle transform translate-y-[55px] transition-all duration-300 ease-out-cubic hover:opacity-50">
                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="white">
                       <path d="M9 8h-3v4h3v12h5v-12h3.642l.358-4h-4v-1.667c0-.955.192-1.333 1.115-1.333h2.885v-5h-3.808c-3.596 0-5.192 1.583-5.192 4.615v3.385z"/>
                     </svg>

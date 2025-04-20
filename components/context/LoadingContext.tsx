@@ -1,19 +1,24 @@
 'use client';
 
 import React, { createContext, useState, useContext, useEffect } from 'react';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import AppLoader from '../ui/AppLoader';
 
 type LoadingContextType = {
   isLoading: boolean;
   setIsLoading: React.Dispatch<React.SetStateAction<boolean>>;
+  startPageLoading: () => void;
+  stopPageLoading: () => void;
 };
 
 const LoadingContext = createContext<LoadingContextType | undefined>(undefined);
 
 export function LoadingProvider({ children }: { children: React.ReactNode }) {
   const [isLoading, setIsLoading] = useState(true);
+  const [isNavigating, setIsNavigating] = useState(false);
+  const [isManualLoading, setIsManualLoading] = useState(false);
   const pathname = usePathname();
+  const router = useRouter();
 
   // Check for preferred language cookie and determine if loading should be shown
   useEffect(() => {
@@ -41,9 +46,53 @@ export function LoadingProvider({ children }: { children: React.ReactNode }) {
     return () => clearTimeout(timeout);
   }, [pathname]);
 
+  // Handle navigation state
+  useEffect(() => {
+    // When pathname changes, mark navigation as complete
+    setIsNavigating(false);
+    
+    // Listen for navigation start events
+    const handleNavigationStart = () => {
+      setIsNavigating(true);
+    };
+
+    // For client-side navigation, we need to listen for click events on links
+    const handleLinkClick = (e: MouseEvent) => {
+      const target = e.target as HTMLElement;
+      const link = target.closest('a');
+      
+      if (link && 
+          link.href && 
+          !link.target && 
+          !link.download && 
+          !link.rel?.includes('external') &&
+          link.origin === window.location.origin) {
+        setIsNavigating(true);
+      }
+    };
+
+    document.addEventListener('click', handleLinkClick);
+    
+    return () => {
+      document.removeEventListener('click', handleLinkClick);
+    };
+  }, [pathname]);
+
+  // Functions to manually control loading state
+  const startPageLoading = () => setIsManualLoading(true);
+  const stopPageLoading = () => setIsManualLoading(false);
+
+  // Show loader either during initial load, during navigation, or when manually triggered
+  const showLoader = isLoading || isNavigating || isManualLoading;
+
   return (
-    <LoadingContext.Provider value={{ isLoading, setIsLoading }}>
-      {isLoading ? <AppLoader /> : children}
+    <LoadingContext.Provider value={{ 
+      isLoading: showLoader, 
+      setIsLoading,
+      startPageLoading,
+      stopPageLoading
+    }}>
+      {showLoader ? <AppLoader /> : children}
     </LoadingContext.Provider>
   );
 }
@@ -54,4 +103,9 @@ export function useLoading() {
     throw new Error('useLoading must be used within a LoadingProvider');
   }
   return context;
+}
+
+export function usePageLoading() {
+  const { startPageLoading, stopPageLoading } = useLoading();
+  return { startPageLoading, stopPageLoading };
 } 

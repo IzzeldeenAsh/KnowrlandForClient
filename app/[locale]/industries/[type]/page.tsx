@@ -43,6 +43,15 @@ export default function IndustriesByTypePage({ params }: Props) {
   const type = resolvedParams.type as IndustryType;
   const routeParams = useParams();
   const locale = routeParams.locale as string || 'en';
+  const messages = require(`@/messages/${locale}.json`);
+
+  const translationKeys: { [key in IndustryType]: string } = {
+    report: 'reports',
+    insight: 'insights',
+    data: 'data',
+    manual: 'manuals',
+    course: 'courses',
+  };
 
   useEffect(() => {
     AOS.init({
@@ -105,10 +114,10 @@ export default function IndustriesByTypePage({ params }: Props) {
           <div className="relative z-10 max-w-6xl relative mx-auto mt-5 w-full">
             <div className="text-start" data-aos="fade-down">
               <span className="inline-block px-5 py-1 text-xs font-semibold text-blue-500 bg-blue-100 rounded-md mb-2 uppercase">
-                {capitalizeFirstLetter(type)}
+              {messages[translationKeys[type]]}
               </span>
               <h3 className="text-md bg-gradient-to-r from-blue-500 to-teal-400 md:text-3xl font-extrabold text-transparent bg-clip-text mb-4">
-                  {capitalizeFirstLetter(type)} by Industry
+              {messages[translationKeys[type]]} {messages.byIndustry}
               </h3>
            
             </div>

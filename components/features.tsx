@@ -138,14 +138,14 @@ export default function Features() {
 
               {/* Image */}
               <div className="" data-aos="fade-up" data-aos-delay="100">
-                <figure className="bg-gradient-to-b from-slate-300/20 to-transparent rounded-3xl p-px mb-8">
-                  {/* <Image
+                <figure className=" rounded-3xl p-px mb-8">
+                  <Image
                     className="w-full rounded-[inherit]"
-                    src={ChangelogImg01}
-                    width={350}
+                    src={'https://res.cloudinary.com/dsiku9ipv/image/upload/v1744967310/Group_15_kqgqol.png'}
+                    width={500}
                     height={250}
                     alt="Feature 1"
-                  /> */}
+                  />
                 </figure>
               </div>
             </div>
