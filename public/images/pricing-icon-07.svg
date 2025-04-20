@@ -5,7 +5,7 @@
       <stop offset="100%" stop-color="#94A3B8"/>
     </linearGradient>
   </defs>
-  <g fill="none" fill-rule="evenodd" transform="translate(.154 .154)">
+  <g fill="none" fillRule="evenodd" transform="translate(.154 .154)">
     <rect width="79" height="79" x=".5" y=".5" fill="#1E293B" stroke="url(#a)" rx="16"/>
     <path stroke="#E2E8F0" stroke-linecap="square" stroke-width="2" d="m27 45.765 9.412-9.412 7.059 7.059L52.882 34"/>
   </g>

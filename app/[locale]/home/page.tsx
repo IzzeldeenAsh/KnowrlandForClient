@@ -77,7 +77,7 @@ export default function HomePage() {
       setLoading(true);
       try {
         console.log('Making API request for locale:', locale);
-        const url = new URL('https://api.knoldg.com/api/platform/industries/type/knowledge');
+        const url = new URL('https://api.foresighta.co/api/platform/industries/type/knowledge');
         url.searchParams.append('page', currentPage.toString());
         
         // Update price filtering logic

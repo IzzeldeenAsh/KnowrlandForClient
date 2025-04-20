@@ -4,7 +4,7 @@
     <style>
       .cls-1 {
         fill: url(#linear-gradient);
-        fill-rule: evenodd;
+        fillRule: evenodd;
       }
     </style>
     <linearGradient id="linear-gradient" x1="219.9" y1="714.59" x2="220.2" y2="713.73" gradientTransform="translate(-100304 -304737) scale(461 427)" gradientUnits="userSpaceOnUse">

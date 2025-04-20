@@ -25,7 +25,7 @@ export function useSubIndustry({ type, id, slug, topTopic = 2 }: UseSubIndustryP
         setError(null);
         
         const response = await fetch(
-          `https://api.knoldg.com/api/platform/industries/type/sub/${type}/${id}/${slug}`,
+          `https://api.foresighta.co/api/platform/industries/type/sub/${type}/${id}/${slug}`,
           {
             method: 'POST',
             headers: {

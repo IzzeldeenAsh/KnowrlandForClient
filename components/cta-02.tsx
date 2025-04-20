@@ -29,7 +29,7 @@ export default function Cta02() {
             <h2 className="h2 bg-clip-text text-transparent bg-gradient-to-r from-slate-200/60 via-slate-200 to-slate-200/60 pb-4">Join Us in Redefining Knowledge</h2>
             <p className="text-lg text-slate-400 mb-6">At Knoldg, we believe that knowledge should be an asset that benefits both creators and consumers. Join our growing community of experts and professionals to explore, share, and gain valuable insights that drive progress.</p>
             <div className="mb-6">
-              <Link href="https://app.knoldg.com/auth/sign-up" className="btn text-slate-900 bg-gradient-to-r from-white/80 via-white to-white/80 hover:bg-white transition duration-150 ease-in-out group">
+              <Link href="http://localhost:4200/auth/sign-up" className="btn text-slate-900 bg-gradient-to-r from-white/80 via-white to-white/80 hover:bg-white transition duration-150 ease-in-out group">
                 Join Now <span className="tracking-normal text-blue-500 group-hover:translate-x-0.5 transition-transform duration-150 ease-in-out mx-1">-&gt;</span>
               </Link>
             </div>

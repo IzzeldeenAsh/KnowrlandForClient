@@ -17,10 +17,10 @@
 		.s0 { fill: url(#g1) } 
 		.s1 { filter: url(#f1);fill: url(#g2) } 
 	</style>
-	<path id="b" fill-rule="evenodd" class="s0" d="m-460 0h2324v658h-2324z"/>
+	<path id="b" fillRule="evenodd" class="s0" d="m-460 0h2324v658h-2324z"/>
 	<g>
 		<g>
-			<path fill-rule="evenodd" class="s1" d="m169-216l461 369-284 58-177-427z"/>
+			<path fillRule="evenodd" class="s1" d="m169-216l461 369-284 58-177-427z"/>
 		</g>
 	</g>
 </svg>
