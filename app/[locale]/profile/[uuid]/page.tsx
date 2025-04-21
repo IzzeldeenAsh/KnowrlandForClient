@@ -124,6 +124,7 @@ export default function ProfilePage() {
   const isRTL = locale === 'ar';
   const t = useTranslations('ProfilePage');
   const userProfileT = useTranslations('UserProfile');
+  const filterT = useTranslations('Filters');
 
   useEffect(() => {
     AOS.init({
@@ -248,12 +249,12 @@ export default function ProfilePage() {
 
   // Filter types for knowledge
   const knowledgeTypes = [
-    { id: null, label: 'All', icon: <IconClearAll size={18} stroke={2.5} />, color: 'blue' },
-    { id: 'data', label: 'Data', icon: <IconDatabase size={18} stroke={2.5} />, color: 'blue' },
-    { id: 'insight', label: 'Insight', icon: <IconBulb size={18} stroke={2.5} />, color: 'blue' },
-    { id: 'report', label: 'Report', icon: <IconFileReport size={18} stroke={2.5} />, color: 'blue' },
-    { id: 'manual', label: 'Manual', icon: <IconBook size={18} stroke={2.5} />, color: 'blue' },
-    { id: 'course', label: 'Course', icon: <IconSchool size={18} stroke={2.5} />, color: 'blue' },
+    { id: null, label: filterT('all'), icon: <IconClearAll size={18} stroke={2.5} />, color: 'blue' },
+    { id: 'data', label: filterT('data'), icon: <IconDatabase size={18} stroke={2.5} />, color: 'blue' },
+    { id: 'insight', label: filterT('insight'), icon: <IconBulb size={18} stroke={2.5} />, color: 'blue' },
+    { id: 'report', label: filterT('report'), icon: <IconFileReport size={18} stroke={2.5} />, color: 'blue' },
+    { id: 'manual', label: filterT('manual'), icon: <IconBook size={18} stroke={2.5} />, color: 'blue' },
+    { id: 'course', label: filterT('course'), icon: <IconSchool size={18} stroke={2.5} />, color: 'blue' },
   ];
 
   const handleTypeChange = (type: string | null) => {
@@ -416,7 +417,7 @@ export default function ProfilePage() {
 
                       <div className="text-start bg-gradient-to-br from-white to-emerald-50 dark:from-slate-700 dark:to-slate-600 p-5 rounded-xl  hover:shadow-lg transition-all duration-300 transform hover:-translate-y-1 border border-gray-100 dark:border-slate-600 group">
                         <div className="flex items-center mb-3">
-                          <div className="p-2.5 bg-emerald-100 dark:bg-emerald-900/30 rounded-full mr-3 group-hover:scale-110 transition-transform">
+                          <div className="p-2.5 bg-emerald-100 dark:bg-emerald-900/30 rounded-full me-3 group-hover:scale-110 transition-transform">
                             <IconFileReport 
                               size={24} 
                               className="text-emerald-500 dark:text-emerald-400" 
@@ -430,7 +431,7 @@ export default function ProfilePage() {
                       </div>
                       <div className="text-start bg-gradient-to-br from-white to-blue-50 dark:from-slate-700 dark:to-slate-600 p-5 rounded-xl  hover:shadow-lg transition-all duration-300 transform hover:-translate-y-1 border border-gray-100 dark:border-slate-600 group">
                         <div className="flex items-center mb-3">
-                          <div className="p-2.5 bg-blue-100 dark:bg-blue-900/30 rounded-full mr-3 group-hover:scale-110 transition-transform">
+                          <div className="p-2.5 bg-blue-100 dark:bg-blue-900/30 rounded-full me-3 group-hover:scale-110 transition-transform">
                             <IconSchool 
                               size={24} 
                               className="text-blue-500 dark:text-blue-400" 
@@ -488,7 +489,7 @@ export default function ProfilePage() {
                 <div className="mb-10 flex items-center flex-wrap gap-2 justify-end">
                   <div className="mr-1 opacity-60 flex items-center">
                     <IconFilter size={16} className="mr-1" />
-                    <span className="text-xs font-medium">Filter by:</span>
+                    <span className="text-xs font-medium">{filterT('filterBy')}:</span>
                   </div>
                   {knowledgeTypes.map((type) => {
                     // Define the color for non-selected items
@@ -521,7 +522,7 @@ export default function ProfilePage() {
                               : React.cloneElement(type.icon, { color: iconColor, stroke: 2.5 })
                             }
                           </span>
-                          <span className={`${isRTL ? 'mr-2' : 'ml-2'} font-medium text-xs`}>{type.label}</span>
+                          <span className={`${isRTL ? 'me-2' : 'ml-2'} font-medium text-xs`}>{type.label}</span>
                         </span>
                       </button>
                     );
