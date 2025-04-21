@@ -43,7 +43,7 @@ export default function TestimonialsCarousel() {
       },
 
       autoplay: {
-        delay: 1000,            // ٤ ثوانٍ بين كل انزلاق
+        delay: 2000,            // ٤ ثوانٍ بين كل انزلاق
         disableOnInteraction: false,
       },
     })
