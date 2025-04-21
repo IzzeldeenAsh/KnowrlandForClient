@@ -23,7 +23,7 @@
         },
         "section4":{
             "title":"A Sustainable Revenue Stream",
-            "description":"Start earning by sharing your insights and experience on Knoldg. You Set the Value: Choose your price, and every time your work is downloaded, you’re paid directly."
+            "description":"Start earning by sharing your insights and experience on Knoldg. You Set the Value: Choose your price, and every time your work is downloaded, you're paid Directly."
         },
         "section1":{
             "title":"Bring your knowledge to light by sharing it on the platform",
@@ -335,5 +335,14 @@
     "manuals": "Manuals",
     "courses": "Courses",
     "byIndustry": "by Industry",
-    "noSubIndustries": "No sub-industries available"
+    "noSubIndustries": "No sub-industries available",
+    "Filters": {
+        "filterBy": "Filter by",
+        "all": "All",
+        "data": "Data",
+        "insight": "Insight",
+        "report": "Report",
+        "manual": "Manual",
+        "course": "Course"
+    }
 }

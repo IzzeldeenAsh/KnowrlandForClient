@@ -320,5 +320,14 @@
     "manuals": "الأدلة",
     "courses": "الدورات",
     "byIndustry": "حسب القطاع",
-    "noSubIndustries": "لا توجد صناعات فرعية"
+    "noSubIndustries": "لا توجد صناعات فرعية",
+    "Filters": {
+        "filterBy": "تصفية حسب",
+        "all": "الكل",
+        "data": "البيانات",
+        "insight": "رؤى",
+        "report": "تقرير",
+        "manual": "دليل",
+        "course": "دورة"
+    }
 }
