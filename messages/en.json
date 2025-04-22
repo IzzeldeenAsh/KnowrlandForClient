@@ -191,7 +191,8 @@
         "tagline": "",
         "title": "Turn Your Expertise into Profit—Share Your Knowledge with the World!",
         "description": "Start monetizing your knowledge and connect with prospective clients who need your expertise.",
-        "button": "Get Started"
+        "button": "Get Started",
+        "contact": "For inquiries and collaborations, reach out to us at"
     },
     "Footer": {
         "copyright": " Knoldg.com - All rights reserved",
@@ -222,6 +223,40 @@
             "dataLicensing": "Data Licensing Agreement",
             "cookies": "Cookies Policy"
         }
+    },
+    "aboutUsPage":{
+        "mainTitle":"About Knoldg",
+        "mainSubTitle":"Where Knowledge Meets Opportunity",
+        "firstParagraph":"Knoldg is a pioneering digital platform that provides individuals and businesses with access to high-quality business knowledge, such as data, reports, insights, and manuals across various industries. Our mission is to facilitate seamless knowledge sharing by offering a structured and accessible marketplace for expert-driven content.",
+        "firstParagraphPartTwo": "Whether you're a professional seeking valuable knowledge or an industry expert looking to monetize your expertise, Knoldg is your gateway to trusted insights.",
+        "ourVision": "Our Vision",
+        "ourVisionPart1": "At Knoldg, we envision a world where expertise is easily accessible, enabling businesses and professionals to make informed decisions with confidence.",
+        "ourVisionPart2": "We aim to bridge the gap between knowledge seekers and knowledge creators",
+        "ourVisionPart3": ", fostering a dynamic ecosystem of learning and growth.",
+        "whatOffer": "What We Offer",
+        "whatOffer1": "Flexible Knowledge Access",
+        "whatOffer1P": " – Users can browse and access a variety of knowledge types, including reports, data sets, insights, and manuals. Knowledge files are available for both personal and business use, with some being free and others available for purchase. Additionally, users can buy full reports or specific sections, such as individual chapters or particular datasets, on a pay-as-you-go basis.",
+        "whatOffer2": "Expert Consultation & Inquiries",
+        "whatOffer2P": " – Users can connect directly with knowledge experts for additional insights related to a particular uploaded knowledge file. They can also book consultation sessions with experts for deeper discussions and personalized guidance.",
+        "whatOffer3": "AI-Powered Search & Data Structuring",
+        "whatOffer3P": " – Knoldg features an advanced AI-supported search engine that enhances discoverability and accessibility of insights, making it easier for users to find relevant information. Our data is structured based on international standards such as ISIC and HS Codes, ensuring seamless integration into global business frameworks.",
+        "whatOffer4": "Monetization for Experts",
+        "whatOffer4P": " – Subject matter experts, consultants, and analysts can publish and sell their data, report and insights, earning revenue from their knowledge contributions.",
+         "whatOffer5": "Company & Expert Collaboration",
+        "whatOffer5P": " – Experts on Knoldg can be individual professionals or companies. The platform supports company creation, allowing company owners to invite experts—both from within the platform and external professionals—to contribute knowledge, upload insights, and sell data and reports.",
+        "whatOffer6": "Global Accessibility",
+        "whatOffer6P": " – Serving professionals and businesses worldwide, with a focus on the EU, GCC region, U.S., and Jordan.",
+        "benefitKnoldg":"Who Can Benefit from Knoldg?",
+        "benefitKnoldg1":"Businesses & Investors",
+        "benefitKnoldgp1":" – Gain access to industry reports, market research, and expert analyses.",
+        "benefitKnoldg2":"Consultants & Experts",
+        "benefitKnoldgp2":" – Share your expertise, grow your audience, and earn from your knowledge.",
+        "benefitKnoldg3":"Academics & Researchers",
+        "benefitKnoldgp3":" – Distribute valuable insights to a wider professional audience.",
+        "benefitKnoldg4":"Government & Policy Makers",
+        "benefitKnoldgp4":" – Utilize expert insights for informed policymaking and economic development.",
+        "parentCompanyTitle":"Our Parent Company - A&B Consulting",
+        "parentCompanyParagraph":"Knoldg is proudly owned and operated by A&B Consulting, a firm dedicated to driving business success through strategic insights and sustainable solutions. With a strong foundation in consulting and research, A&B Consulting ensures that Knoldg remains a trusted and professional platform for knowledge exchange."
     },
     "Resources": {
         "user-guide": "User Guide",

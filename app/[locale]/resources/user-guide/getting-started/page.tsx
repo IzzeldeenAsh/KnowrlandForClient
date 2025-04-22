@@ -45,7 +45,7 @@ export default function GettingStarted() {
               
               <ul className="space-y-3 ml-6">
                 <li className="flex items-start">
-                  <div className="flex items-center justify-center rounded-full bg-blue-500 w-2 h-2 mt-2.5 mr-3 shrink-0"></div>
+                  <div className="flex items-center justify-center rounded-full bg-blue-500 w-2 h-2 mt-2.5 me-3 shrink-0"></div>
                   <div>
                     <strong className="text-slate-50 font-medium">
                       {t('create-account-step') || 'Create an account or sign in to your existing account'}
@@ -53,7 +53,7 @@ export default function GettingStarted() {
                   </div>
                 </li>
                 <li className="flex items-start">
-                  <div className="flex items-center justify-center rounded-full bg-blue-500 w-2 h-2 mt-2.5 mr-3 shrink-0"></div>
+                  <div className="flex items-center justify-center rounded-full bg-blue-500 w-2 h-2 mt-2.5 me-3 shrink-0"></div>
                   <div>
                     <strong className="text-slate-50 font-medium">
                       {t('complete-profile-step') || 'Complete your profile with relevant information'}
@@ -61,7 +61,7 @@ export default function GettingStarted() {
                   </div>
                 </li>
                 <li className="flex items-start">
-                  <div className="flex items-center justify-center rounded-full bg-blue-500 w-2 h-2 mt-2.5 mr-3 shrink-0"></div>
+                  <div className="flex items-center justify-center rounded-full bg-blue-500 w-2 h-2 mt-2.5 me-3 shrink-0"></div>
                   <div>
                     <strong className="text-slate-50 font-medium">
                       {t('explore-content-step') || 'Start exploring content from the home page'}
@@ -69,7 +69,7 @@ export default function GettingStarted() {
                   </div>
                 </li>
                 <li className="flex items-start">
-                  <div className="flex items-center justify-center rounded-full bg-blue-500 w-2 h-2 mt-2.5 mr-3 shrink-0"></div>
+                  <div className="flex items-center justify-center rounded-full bg-blue-500 w-2 h-2 mt-2.5 me-3 shrink-0"></div>
                   <div>
                     <strong className="text-slate-50 font-medium">
                       {t('save-content-step') || 'Save interesting content for later reference'}
@@ -88,7 +88,7 @@ export default function GettingStarted() {
               
               <ul className="space-y-3 ml-6">
                 <li className="flex items-start">
-                  <div className="flex items-center justify-center rounded-full bg-blue-500 w-2 h-2 mt-2.5 mr-3 shrink-0"></div>
+                  <div className="flex items-center justify-center rounded-full bg-blue-500 w-2 h-2 mt-2.5 me-3 shrink-0"></div>
                   <div>
                     <strong className="text-slate-50 font-medium">
                       {t('account-management-next') || 'Learn more about account management options'}
@@ -96,7 +96,7 @@ export default function GettingStarted() {
                   </div>
                 </li>
                 <li className="flex items-start">
-                  <div className="flex items-center justify-center rounded-full bg-blue-500 w-2 h-2 mt-2.5 mr-3 shrink-0"></div>
+                  <div className="flex items-center justify-center rounded-full bg-blue-500 w-2 h-2 mt-2.5 me-3 shrink-0"></div>
                   <div>
                     <strong className="text-slate-50 font-medium">
                       {t('content-features-next') || 'Discover advanced content features'}
@@ -104,7 +104,7 @@ export default function GettingStarted() {
                   </div>
                 </li>
                 <li className="flex items-start">
-                  <div className="flex items-center justify-center rounded-full bg-blue-500 w-2 h-2 mt-2.5 mr-3 shrink-0"></div>
+                  <div className="flex items-center justify-center rounded-full bg-blue-500 w-2 h-2 mt-2.5 me-3 shrink-0"></div>
                   <div>
                     <strong className="text-slate-50 font-medium">
                       {t('search-tips-next') || 'Check out search tips to find exactly what you need'}
