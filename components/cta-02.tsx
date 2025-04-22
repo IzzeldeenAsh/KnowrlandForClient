@@ -1,7 +1,14 @@
+'use client'
+
 import Particles from './particles'
 import Link from 'next/link'
+import { useLocale, useTranslations } from 'next-intl'
 
 export default function Cta02() {
+  const t = useTranslations('Cta')
+  const locale = useLocale()
+  const isRTL = locale === 'ar'
+
   return (
     <section className="relative">
 
@@ -25,15 +32,15 @@ export default function Cta02() {
             </svg>
           </div>
           {/* Content */}
-          <div className="max-w-3xl mx-auto text-center">
-            <h2 className="h2 bg-clip-text text-transparent bg-gradient-to-r from-slate-200/60 via-slate-200 to-slate-200/60 pb-4">Join Us in Redefining Knowledge</h2>
-            <p className="text-lg text-slate-400 mb-6">At Knoldg, we believe that knowledge should be an asset that benefits both creators and consumers. Join our growing community of experts and professionals to explore, share, and gain valuable insights that drive progress.</p>
+          <div className={`max-w-3xl mx-auto text-center ${isRTL ? 'rtl' : 'ltr'}`}>
+            <h2 className="h2 bg-clip-text text-transparent bg-gradient-to-r from-slate-200/60 via-slate-200 to-slate-200/60 pb-4">{t('title')}</h2>
+            <p className="text-lg text-slate-400 mb-6">{t('description')}</p>
             <div className="mb-6">
               <Link href="https://app.knoldg.com/auth/sign-up" className="btn text-slate-900 bg-gradient-to-r from-white/80 via-white to-white/80 hover:bg-white transition duration-150 ease-in-out group">
-                Join Now <span className="tracking-normal text-blue-500 group-hover:translate-x-0.5 transition-transform duration-150 ease-in-out mx-1">-&gt;</span>
+                {t('button')} 
               </Link>
             </div>
-            <p className="text-sm text-slate-500">For inquiries and collaborations, reach out to us at <a href="mailto:info@knoldg.com" className="text-blue-400 hover:text-blue-300 transition-colors duration-150 ease-in-out">info@knoldg.com</a></p>
+            <p className="text-sm text-slate-500">{t('contact')} <a href="mailto:info@knoldg.com" className="text-blue-400 hover:text-blue-300 transition-colors duration-150 ease-in-out">info@knoldg.com</a></p>
           </div>
         </div>
       </div>
