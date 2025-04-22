@@ -2,9 +2,9 @@
 
 import Link from 'next/link'
 import Image from 'next/image'
-import HomeLogoImgEn from '@/public/images/KNOLDG- LOGO-28.png'
+import HomeLogoImgEn from '@/public/images/Business-white.png'
 import HomeLogoImgAr from '@/public/images/KNOLDG- LOGO-29-29.png'
-import InnerLogoImgEn from '@/public/images/KNOLDG-LOGO-26.png'
+import InnerLogoImgEn from '@/public/images/Business-colored.png'
 import InnerLogoImgAr from '@/public/images/KNOLDG-LOGO-12.png'
 import { useEffect, useState } from 'react'
 import { usePathname } from 'next/navigation'
