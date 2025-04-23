@@ -319,10 +319,10 @@ export default function Header() {
                 </HoverCard>
               </li>
               <li>
-                <Link className={`font-medium text-sm ${menuTextColorClass} mx-1 lg:mx-2 ${isActiveLink('report')}`} href={`/${pathname.split('/')[1]}/industries/report`}>{t('navigation.reports')}</Link>
+                <Link className={`font-medium text-sm ${menuTextColorClass} mx-1 lg:mx-2 ${isActiveLink('data')}`} href={`/${pathname.split('/')[1]}/industries/data`}>{t('navigation.data')}</Link>
               </li>
               <li>
-                <Link className={`font-medium text-sm ${menuTextColorClass} mx-1 lg:mx-2 ${isActiveLink('data')}`} href={`/${pathname.split('/')[1]}/industries/data`}>{t('navigation.data')}</Link>
+                <Link className={`font-medium text-sm ${menuTextColorClass} mx-1 lg:mx-2 ${isActiveLink('report')}`} href={`/${pathname.split('/')[1]}/industries/report`}>{t('navigation.reports')}</Link>
               </li>
               <li>
                 <Link className={`font-medium text-sm ${menuTextColorClass} mx-1 lg:mx-2 ${isActiveLink('insight')}`} href={`/${pathname.split('/')[1]}/industries/insight`}>{t('navigation.insights')}</Link>
