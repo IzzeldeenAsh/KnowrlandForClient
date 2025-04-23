@@ -33,7 +33,7 @@ export default function Logo({ isHomePage = true }: LogoProps) {
   }, [pathname, isHomePage])
 
   return (
-    <Link className="inline-flex" href={locale === 'en' ? '/' : '/ar'} aria-label="Knoldg">
+    <Link className="inline-flex" href={`/${locale}`} aria-label="Knoldg">
       <Image className="max-w-none" src={logoImg} width={120} height={60} priority alt="Knoldg" />
     </Link>
   )

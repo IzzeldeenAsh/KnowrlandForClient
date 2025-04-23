@@ -113,9 +113,9 @@ export default function IndustriesByTypePage({ params }: Props) {
           />
           <div className="relative z-10 max-w-6xl relative mx-auto mt-5 w-full">
             <div className="text-start" data-aos="fade-down">
-              <span className="inline-block px-5 py-1 text-xs font-semibold text-blue-500 bg-blue-100 rounded-md mb-2 uppercase">
+              {/* <span className="inline-block px-5 py-1 text-xs font-semibold text-blue-500 bg-blue-100 rounded-md mb-2 uppercase">
               {messages[translationKeys[type]]}
-              </span>
+              </span> */}
               <h3 className="text-md bg-gradient-to-r from-blue-500 to-teal-400 md:text-3xl font-extrabold text-transparent bg-clip-text mb-4">
               {messages[translationKeys[type]]} {messages.byIndustry}
               </h3>
