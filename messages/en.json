@@ -7,7 +7,7 @@
         "tagline": "Beyond Research Boundaries",
         "title": "Unlock Business Success with Shared Expert Knowldge",
         "description":"Explore a hub of data, insights, and business intelligence tailored for your business growth.",
-        "searchPlaceholder":"Search business data, reports, insights, HS Code, ISIC Code... and more",
+        "searchPlaceholder":"Search data, reports, insights, HS Code, ISIC Code... and more",
         "direction": "ltr"
     },
     "HeroInsighter":{
@@ -75,7 +75,7 @@
                 "title": "AI-Powered Assistance"
             },
             "titleIndustry":{
-                    "title":"Build your advantage with industry breakthroughs developed and proven by experts."
+                    "title":""
             }
         },
         "direction": "ltr"
@@ -124,7 +124,7 @@
         "direction": "ltr",
         "tabs": {
             "directExpertEngagement": {
-                "title": "Direct Expert Engagement – Connect and communicate with Subject Matter Expert authors"
+                "title": "Direct Expert Engagement – Connect and communicate with Subject Matter Experts"
             },
             "expertRatings": {
                 "title": "Transparent Expert Ratings and AI-verified Content"

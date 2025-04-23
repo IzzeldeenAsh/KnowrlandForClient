@@ -41,7 +41,7 @@
             "data": "البيانات",
             "insights": "الرؤى",
             "manuals": "الأدلة",
-            "courses": "الدورات"
+            "courses": "دوات"
         },
         "industriesDropdown": {
             "featuredTitle": "أبرز الصناعات",
@@ -114,7 +114,7 @@
                 "alt": "توضيح الميزات"
             },
             "titleIndustry":{
-                    "title":"ابنِ ميزتك التنافسية اليوم باطلاعك على أحدث ما تم رفعه من بيانات وتقارير في المجالات المتعددة"
+                    "title":""
             }
         },
         "direction": "rtl"
