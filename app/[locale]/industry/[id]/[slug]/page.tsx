@@ -163,9 +163,7 @@ export default async function IndustryPage({ params }: Props) {
               <h2 className="text-2xl font-bold text-gray-900 mb-2">
                 {locale === 'ar' ? 'الصناعات الفرعية' : 'Sub Industries'}
               </h2>
-              <p className="text-gray-600">
-                {locale === 'ar' ? `استكشف القطاعات المتخصصة داخل ${industry.name}` : `Explore specialized sectors within ${industry.name}`}
-              </p>
+           
             </div>
             
             {/* Industry Children */}
