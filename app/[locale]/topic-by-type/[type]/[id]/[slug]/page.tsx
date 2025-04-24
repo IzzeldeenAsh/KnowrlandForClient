@@ -78,7 +78,7 @@ export default function TopicByTypePage({ params }: Props) {
           <div className={styles.headerContent}>
             <div data-aos="fade-down">
               <span className={styles.typeLabel}>
-                {capitalizeFirstLetter(type)}s
+                {capitalizeFirstLetter(type)}
               </span>
               <h3 className={styles.headerTitle}>
                 {subIndustry?.name || 'Loading...'}
