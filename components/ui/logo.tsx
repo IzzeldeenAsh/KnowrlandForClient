@@ -32,8 +32,14 @@ export default function Logo({ isHomePage = true }: LogoProps) {
     }
   }, [pathname, isHomePage])
 
+  const handleLogoClick = (e: React.MouseEvent) => {
+    e.preventDefault()
+    // Use the same navigation approach as in header.tsx for consistency
+    window.location.href = `/${locale}`
+  }
+
   return (
-    <Link className="inline-flex" href={`/${locale}`} aria-label="Knoldg">
+    <Link className="inline-flex" href={`/${locale}`} aria-label="Knoldg" onClick={handleLogoClick}>
       <Image className="max-w-none" src={logoImg} width={120} height={60} priority alt="Knoldg" />
     </Link>
   )
