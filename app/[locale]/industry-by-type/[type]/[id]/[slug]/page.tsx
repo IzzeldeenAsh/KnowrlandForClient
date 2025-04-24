@@ -113,7 +113,7 @@ export default function IndustryByTypePage({ params }: Props) {
           <div className={styles.headerContent}>
             <div data-aos="fade-down">
               <span className={styles.typeLabel}>
-                {capitalizeFirstLetter(type)}s
+                {capitalizeFirstLetter(type)}
               </span>
               <h3 className={styles.headerTitle}>
                 {industry?.name || 'Loading...'}
@@ -132,7 +132,6 @@ export default function IndustryByTypePage({ params }: Props) {
             </div>
           ) : (
             <div>
-              <h2 className="text-2xl font-bold mb-4">Sub-Industries</h2>
               <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
                 {industry?.children?.map((subIndustry: SubIndustry) => (
                   <div
@@ -151,7 +150,7 @@ export default function IndustryByTypePage({ params }: Props) {
                       </Link>
                       {subIndustry.topic && subIndustry.topic.length > 0 ? (
                         <div>
-                          <h3 className="text-sm font-bold mb-2">Topics</h3>
+                          <h3 className="text-sm font-bold mb-2">{locale === 'ar' ? 'المواضيع' : 'Topics'}</h3>
                           <ul className="space-y-2">
                             {subIndustry.topic.map((topic: Topic) => (
                               <Link href={`/${locale}/topic-by-type/${type}/${topic.id}/${topic.slug}`} key={topic.id} className="block">

@@ -4,50 +4,53 @@ import Footer from '@/components/ui/footer'
 import { useTranslations } from 'next-intl'
 
 export default function DataLicensingAgreement() {
-  const t = useTranslations('Legals')
+  const t = useTranslations('dataLicenseAgreement')
   
   return (
     <div className="bg-slate-900 text-slate-100">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 py-12">
         <div className="prose prose-invert max-w-none text-slate-300">
-          <h2 className="text-2xl font-semibold mt-8 mb-4 text-white">Data Licensing Agreement</h2>
+          <h2 className="text-2xl font-semibold mt-8 mb-4 text-white">{t('mainTitle')}</h2>
           
-          <h3 className="text-xl font-medium mt-6 mb-3 text-slate-200">Scope of Licensing</h3>
-          <p className="mb-4">Contributors grant Knoldg a non-exclusive, worldwide license to:</p>
+          <h3 className="text-xl font-medium mt-6 mb-3 text-slate-200">{t('scopeTitle')}</h3>
+          <p className="mb-4">{t('scopeLine1')}</p>
           <ul className="list-disc pl-6 mb-4 space-y-2">
-            <li>Distribute and sell insights</li>
-            <li>Display and promote content</li>
-            <li>Use insights for platform analytics</li>
+            <li>{t('scopeLine2')}</li>
+            <li>{t('scopeLine3')}</li>
+            <li>{t('scopeLine4')}</li>
           </ul>
           
-          <h3 className="text-xl font-medium mt-6 mb-3 text-slate-200">Contributor Payments & Revenue Sharing</h3>
+          <h3 className="text-xl font-medium mt-6 mb-3 text-slate-200">{t('paymentsTitle')}</h3>
           <ul className="list-disc pl-6 mb-4 space-y-2">
-            <li>Contributors earn a royalty per sale from each transaction.</li>
-            <li>Knoldg will issue payouts within X days after each transaction.</li>
-            <li>Taxes are the responsibility of the contributor.</li>
+            <li>{t('paymentsLine1')}</li>
+            <li>{t('paymentsLine2')}</li>
+            <li>{t('paymentsLine3')}</li>
           </ul>
           
-          <h3 className="text-xl font-medium mt-6 mb-3 text-slate-200">Intellectual Property Protection</h3>
+          <h3 className="text-xl font-medium mt-6 mb-3 text-slate-200">{t('ipProtectionTitle')}</h3>
           <ul className="list-disc pl-6 mb-4 space-y-2">
-            <li>Contributors must own or have rights to any content they upload.</li>
-            <li>Knoldg reserves the right to remove any content that infringes IP laws.</li>
+            <li>{t('ipLine1')}</li>
+            <li>{t('ipLine2')}</li>
           </ul>
           
-          <h3 className="text-xl font-medium mt-6 mb-3 text-slate-200">Liability & Indemnification</h3>
+          <h3 className="text-xl font-medium mt-6 mb-3 text-slate-200">{t('liabilityTitle')}</h3>
           <ul className="list-disc pl-6 mb-4 space-y-2">
-            <li>Experts must ensure content accuracy and comply with all applicable laws.</li>
-            <li>Knoldg is not liable for damages resulting from reliance on purchased insights.</li>
-            <li>Experts agree to indemnify Knoldg against legal claims arising from misleading or false content.</li>
+            <li>{t('liabilityLine1')}</li>
+            <li>{t('liabilityLine2')}</li>
+            <li>{t('liabilityLine3')}</li>
           </ul>
           
-          <h3 className="text-xl font-medium mt-6 mb-3 text-slate-200">Termination of License</h3>
+          <h3 className="text-xl font-medium mt-6 mb-3 text-slate-200">{t('terminationTitle')}</h3>
           <ul className="list-disc pl-6 mb-4 space-y-2">
-            <li>Contributors may request content removal, but existing sales and licenses remain valid.</li>
-            <li>Knoldg may terminate agreements with contributors who violate policies.</li>
+            <li>{t('terminationLine1')}</li>
+            <li>{t('terminationLine2')}</li>
           </ul>
         </div>
+        <p className="text-sm text-slate-400 mt-8 pt-6 border-t border-slate-700">
+          {t('lastUpdatedLicensing')}: March 26, 2025
+        </p>
       </div>
-       <Footer/>
+      <Footer/>
     </div>
   )
 }

@@ -107,7 +107,6 @@ export default function KnowledgeGrid({
       {showHeader && (
         <div className={`mb-8 ${isRTL ? 'text-right' : 'text-start'}`}>
           <h2 className="text-2xl font-bold text-gray-900 mb-2">{translations.knowledge}</h2>
-          <p className="text-gray-600">{translations.exploreInsights}</p>
         </div>
       )}
 
