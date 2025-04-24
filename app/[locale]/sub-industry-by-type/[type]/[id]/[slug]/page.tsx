@@ -114,7 +114,7 @@ export default function SubIndustryByTypePage({ params }: Props) {
           <div className={styles.headerContent}>
             <div data-aos="fade-down">
               <span className={styles.typeLabel}>
-                {capitalizeFirstLetter(type)}s
+                {capitalizeFirstLetter(type)}
               </span>
               <h3 className={styles.headerTitle}>
                 {subIndustry?.name || 'Loading...'}
@@ -133,7 +133,6 @@ export default function SubIndustryByTypePage({ params }: Props) {
             </div>
           ) : (
             <div>
-              <h2 className="text-2xl font-bold mb-4">Topics & Knowledge</h2>
               <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
                 {subIndustry?.topic?.map((topic: any) => (
                   <div
@@ -152,7 +151,6 @@ export default function SubIndustryByTypePage({ params }: Props) {
                       </Link>
                       {topic?.knowledge && topic.knowledge.length > 0 ? (
                         <div>
-                          <h3 className="text-sm font-bold mb-2">Knowledge</h3>
                           <ul className="space-y-2">
                             {topic.knowledge.map((item: any) => (
                               <li key={item.id} className="text-xs text-gray-600 hover:text-blue-600 transition-colors flex items-center">

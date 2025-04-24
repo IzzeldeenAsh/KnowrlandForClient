@@ -131,10 +131,7 @@ export default async function AllIndustries({ params }: Props) {
                       {messages?.Header?.navigation?.industries || 'Industries'}
                     </h2>
                     
-                    <p className="mt-4 text-lg text-gray-600 dark:text-gray-400">
-                    <span>{messages?.Features?.tabs?.titleIndustry?.title || 'Default text'}</span>
-                    </p>
-                    
+                  
                     {error && (
                       <div className="mt-4 text-sm text-red-500 bg-red-50 p-3 rounded-lg">
                         {locale === 'ar' ? 'حدث خطأ أثناء تحميل البيانات' : error}
