@@ -32,7 +32,13 @@ export interface KnowledgeDetails {
   insighter: {
     name: string;
     profile_photo_url: string;
+    uuid: string;
     roles: string[];
+    company?: {
+      legal_name: string;
+      logo: string;
+      uuid: string;
+    };
   };
   documents: Array<{
     id: number;

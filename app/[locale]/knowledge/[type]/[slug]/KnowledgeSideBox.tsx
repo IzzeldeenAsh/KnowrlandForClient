@@ -206,7 +206,11 @@ const KnowledgeSideBox = ({
                 <TruckIcon className="w-5 h-5 mx-4" />
                 {translations.hsCode}
               </span>
-              <span className="block mt-1">{hs_code}</span>
+              <span className="block mt-1">
+                {typeof hs_code === 'object' ? 
+                  (hs_code.name || hs_code.key || JSON.stringify(hs_code)) : 
+                  hs_code}
+              </span>
             </div>
           )}
 
