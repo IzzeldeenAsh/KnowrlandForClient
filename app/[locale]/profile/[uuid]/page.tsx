@@ -125,7 +125,7 @@ export default function ProfilePage() {
   const t = useTranslations('ProfilePage');
   const userProfileT = useTranslations('UserProfile');
   const filterT = useTranslations('Filters');
-
+  const [enterpriseType, setEnterpriseType] = useState<string | null>(null);
   useEffect(() => {
     AOS.init({
       duration: 800,
@@ -136,18 +136,131 @@ export default function ProfilePage() {
   useEffect(() => {
     const fetchProfileData = async () => {
       try {
-        const response = await fetch(`https://api.knoldg.com/api/platform/insighter/profile/${uuid}`, {
-          headers: {
-            "Content-Type": "application/json",
-            "Accept": "application/json",
-            "Accept-Language": locale
+        // Check for searchParams to determine which API to try first
+        const urlParams = new URLSearchParams(window.location.search);
+        const entityType = urlParams.get('entity');
+        setEnterpriseType(entityType);
+        // If entity=insighter is specified, try insighter API first
+        if (entityType === 'insighter') {
+          // Try insighter API first
+          let response = await fetch(`https://api.knoldg.com/api/platform/insighter/profile/${uuid}`, {
+            headers: {
+              "Content-Type": "application/json",
+              "Accept": "application/json",
+              "Accept-Language": locale
+            }
+          });
+          
+          if (response.ok) {
+            const data = await response.json();
+            setProfileData(data.data);
+          } else {
+            // Fall back to company API if insighter fails
+            response = await fetch(`https://api.knoldg.com/api/platform/company/profile/${uuid}`, {
+              headers: {
+                "Content-Type": "application/json",
+                "Accept": "application/json",
+                "Accept-Language": locale
+              }
+            });
+            
+            if (!response.ok) {
+              throw new Error('Failed to fetch profile data');
+            }
+            
+            const data = await response.json();
+            
+            // Create a ProfileData object from company data
+            const companyProfileData: ProfileData = {
+              uuid: data.data.uuid,
+              name: data.data.legal_name,
+              first_name: '',
+              last_name: '',
+              email: '',
+              roles: ['company'],
+              profile_photo_url: data.data.logo,
+              country_id: null,
+              country: null,
+              bio: data.data.about_us,
+              certifications: data.data.certifications || [],
+              industries: data.data.industries || [],
+              consulting_field: data.data.consulting_field || [],
+              social: data.data.social || [],
+              company: {
+                legal_name: data.data.legal_name,
+                website: data.data.website,
+                about_us: data.data.about_us,
+                register_document: data.data.register_document,
+                logo: data.data.logo,
+                address: data.data.address,
+                verified: data.data.verified,
+                social: data.data.social || []
+              }
+            };
+            
+            setProfileData(companyProfileData);
           }
-        });
-        if (!response.ok) {
-          throw new Error('Failed to fetch profile data');
+        } else {
+          // Default behavior: try company API first
+          let response = await fetch(`https://api.knoldg.com/api/platform/company/profile/${uuid}`, {
+            headers: {
+              "Content-Type": "application/json",
+              "Accept": "application/json",
+              "Accept-Language": locale
+            }
+          });
+
+          if (response.ok) {
+            // It's a company profile
+            const data = await response.json();
+            
+            // Create a ProfileData object from company data
+            const companyProfileData: ProfileData = {
+              uuid: data.data.uuid,
+              name: data.data.legal_name,
+              first_name: '',
+              last_name: '',
+              email: '',
+              roles: ['company'],
+              profile_photo_url: data.data.logo,
+              country_id: null,
+              country: null,
+              bio: data.data.about_us,
+              certifications: data.data.certifications || [],
+              industries: data.data.industries || [],
+              consulting_field: data.data.consulting_field || [],
+              social: data.data.social || [],
+              company: {
+                legal_name: data.data.legal_name,
+                website: data.data.website,
+                about_us: data.data.about_us,
+                register_document: data.data.register_document,
+                logo: data.data.logo,
+                address: data.data.address,
+                verified: data.data.verified,
+                social: data.data.social || []
+              }
+            };
+            
+            setProfileData(companyProfileData);
+          } else {
+            // Try insighter API if company API fails
+            response = await fetch(`https://api.knoldg.com/api/platform/insighter/profile/${uuid}`, {
+              headers: {
+                "Content-Type": "application/json",
+                "Accept": "application/json",
+                "Accept-Language": locale
+              }
+            });
+            
+            if (!response.ok) {
+              throw new Error('Failed to fetch profile data');
+            }
+            
+            const data = await response.json();
+            setProfileData(data.data);
+          }
         }
-        const data = await response.json();
-        setProfileData(data.data);
       } catch (error) {
         console.error('Error fetching profile data:', error);
       } finally {
@@ -162,11 +275,18 @@ export default function ProfilePage() {
 
   useEffect(() => {
     const fetchKnowledgeData = async () => {
-      if (!uuid) return;
+      if (!uuid || !profileData) return;
       
       setLoadingKnowledge(true);
       try {
-        let url = `https://api.knoldg.com/api/platform/insighter/knowledge/${uuid}?page=${knowledgePage}&per_page=12`;
+        // Check URL query parameter to determine which API to use
+        const urlParams = new URLSearchParams(window.location.search);
+        const entityType = urlParams.get('entity');
+        
+        // Determine API endpoint based on entity parameter instead of roles
+        let url = (entityType === 'insighter') 
+          ? `https://api.knoldg.com/api/platform/insighter/knowledge/${uuid}?page=${knowledgePage}&per_page=12`
+          : `https://api.knoldg.com/api/platform/company/knowledge/${uuid}?page=${knowledgePage}&per_page=12`;
         
         if (selectedType) {
           url += `&type=${selectedType}`;
@@ -194,7 +314,7 @@ export default function ProfilePage() {
     };
 
     fetchKnowledgeData();
-  }, [uuid, locale, knowledgePage, selectedType]);
+  }, [uuid, locale, knowledgePage, selectedType, profileData]);
 
   const getSocialIcon = (type: string) => {
     switch (type) {
@@ -352,9 +472,8 @@ export default function ProfilePage() {
                     <div>
                       {/* Name and Badges */}
                       <div className="flex flex-wrap items-center gap-3 mb-2">
-                        {isCompany && (    <h1 className="text-3xl font-bold">{profileData.company?.legal_name}</h1> )}
-                        {isInsighter && (    <h1 className="text-3xl font-bold">{profileData.first_name || ''} {profileData.last_name || ''}</h1> )}
-                        {isCompanyInsighter && (    <h1 className="text-3xl font-bold">{profileData.first_name || ''} {profileData.last_name || ''}</h1> )}
+                        {enterpriseType === 'insighter' && (    <h1 className="text-3xl font-bold">{profileData.first_name || ''} {profileData.last_name || ''}</h1> )}
+                        {enterpriseType !== 'insighter' && (    <h1 className="text-3xl font-bold">{profileData.company?.legal_name || ''}</h1> )}
                         
                      
 
@@ -372,17 +491,13 @@ export default function ProfilePage() {
                         )}
                         {isCompanyInsighter && (
                           <span className="bg-amber-100 font-bold text-yellow-500 uppercase text-xs px-3 py-1 rounded-full inline-flex items-center">
-                            {userProfileT('companyInsighter')}
+                            {profileData.company?.legal_name} Company
                           </span>
                         )}
                       </div>
                        
                       {/* Title/Role & Location */}
                       <div className="mb-4">
-                        <p className="text-md font-bold text-gray-600 dark:text-gray-300">
-                          {isCompany ? 
-                            `${profileData.first_name || ''} ${profileData.last_name || ''}` : ''}
-                        </p>
                           {/* 5-Star Rating */}
                           <div className="flex items-center">
                           {[1, 2, 3, 4, 5].map((star) => (
@@ -485,49 +600,51 @@ export default function ProfilePage() {
               </Tabs.List>
 
               <Tabs.Panel value="knowledge" className="py-8 px-6 md:px-10">
-                {/* Knowledge Type Filters */}
-                <div className="mb-10 flex items-center flex-wrap gap-2 justify-end">
-                  <div className="mr-1 opacity-60 flex items-center">
-                    <IconFilter size={16} className="mr-1" />
-                    <span className="text-xs font-medium">{filterT('filterBy')}:</span>
-                  </div>
-                  {knowledgeTypes.map((type) => {
-                    // Define the color for non-selected items
-                    const iconColor = (() => {
-                      switch(type.color) {
-                        case 'blue': return '#3b82f6';
-                        case 'amber': return '#f59e0b';
-                        case 'emerald': return '#10b981';
-                        case 'indigo': return '#6366f1';
-                        case 'purple': return '#9333ea';
-                        case 'rose': return '#e11d48';
-                        default: return '#3b82f6';
-                      }
-                    })();
-                    
-                    return (
-                      <button
-                        key={type.id || 'all'}
-                        onClick={() => handleTypeChange(type.id)}
-                        className={`flex text-xs items-center space-x-2 px-4 py-2 rounded-full transition-all duration-200 ${
-                          selectedType === type.id 
-                            ? 'bg-blue-500 text-white shadow-sm' 
-                            : 'bg-gray-100 hover:bg-gray-200 dark:bg-slate-700/80 dark:hover:bg-slate-600 dark:text-white shadow-sm'
-                        }`}
-                      >
-                        <span className={`flex text-xs items-center ${isRTL ? 'flex-row-reverse' : ''}`}>
-                          <span>
-                            {selectedType === type.id 
-                              ? React.cloneElement(type.icon, { color: "white", stroke: 2.5 })
-                              : React.cloneElement(type.icon, { color: iconColor, stroke: 2.5 })
-                            }
+                {/* Knowledge Type Filters - only shown when knowledge data exists */}
+                {knowledgeData && knowledgeData.data.length > 0 && (
+                  <div className="mb-10 flex items-center flex-wrap gap-2 justify-end">
+                    <div className="mr-1 opacity-60 flex items-center">
+                      <IconFilter size={16} className="mr-1" />
+                      <span className="text-xs font-medium">{filterT('filterBy')}:</span>
+                    </div>
+                    {knowledgeTypes.map((type) => {
+                      // Define the color for non-selected items
+                      const iconColor = (() => {
+                        switch(type.color) {
+                          case 'blue': return '#3b82f6';
+                          case 'amber': return '#f59e0b';
+                          case 'emerald': return '#10b981';
+                          case 'indigo': return '#6366f1';
+                          case 'purple': return '#9333ea';
+                          case 'rose': return '#e11d48';
+                          default: return '#3b82f6';
+                        }
+                      })();
+                      
+                      return (
+                        <button
+                          key={type.id || 'all'}
+                          onClick={() => handleTypeChange(type.id)}
+                          className={`flex text-xs items-center space-x-2 px-4 py-2 rounded-full transition-all duration-200 ${
+                            selectedType === type.id 
+                              ? 'bg-blue-500 text-white shadow-sm' 
+                              : 'bg-gray-100 hover:bg-gray-200 dark:bg-slate-700/80 dark:hover:bg-slate-600 dark:text-white shadow-sm'
+                          }`}
+                        >
+                          <span className={`flex text-xs items-center ${isRTL ? 'flex-row-reverse' : ''}`}>
+                            <span>
+                              {selectedType === type.id 
+                                ? React.cloneElement(type.icon, { color: "white", stroke: 2.5 })
+                                : React.cloneElement(type.icon, { color: iconColor, stroke: 2.5 })
+                              }
+                            </span>
+                            <span className={`${isRTL ? 'me-2' : 'ml-2'} font-medium text-xs`}>{type.label}</span>
                           </span>
-                          <span className={`${isRTL ? 'me-2' : 'ml-2'} font-medium text-xs`}>{type.label}</span>
-                        </span>
-                      </button>
-                    );
-                  })}
-                </div>
+                        </button>
+                      );
+                    })}
+                  </div>
+                )}
 
                 {loadingKnowledge ? (
                   <div className="flex justify-center items-center py-12">
@@ -761,49 +878,71 @@ export default function ProfilePage() {
                       </div>
                     </div>
                   )}
-                  {/* Bio Section with Contact Info */}
-                  <div className="bg-gray-50 dark:bg-slate-700/30 p-6 rounded-xl mb-10 mt-10" data-aos="fade-up">
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                      <div className="md:col-span-2">
-                        <h3 className="text-xl font-semibold mb-4 text-gray-800 dark:text-white flex items-center">
-                          <svg xmlns="http://www.w3.org/2000/svg" className={`h-5 w-5 ${isRTL ? 'ml-2' : 'mr-2'} text-blue-500`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                          </svg>
-                          {t('bio')}
-                        </h3>
-                        {profileData.bio ? (
+                  {/* Bio Section - only shown for non-company profiles with bio */}
+                  {!isCompany && profileData.bio && (
+                    <div className="bg-gray-50 dark:bg-slate-700/30 p-6 rounded-xl mb-10 mt-10" data-aos="fade-up">
+                      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        <div className="md:col-span-2">
+                          <h3 className="text-xl font-semibold mb-4 text-gray-800 dark:text-white flex items-center">
+                            <svg xmlns="http://www.w3.org/2000/svg" className={`h-5 w-5 ${isRTL ? 'ml-2' : 'mr-2'} text-blue-500`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                            </svg>
+                            {t('bio')}
+                          </h3>
                           <p className="whitespace-pre-line text-gray-700 dark:text-gray-300">{profileData.bio}</p>
-                        ) : (
-                          <p className="text-gray-500 italic">{t('noBioAvailable')}</p>
-                        )}
-                      </div>
-                      
-                      {/* Contact Information in Small Rows */}
-                      <div className="flex flex-col gap-4">
-                 
+                        </div>
                         
-                        {/* Social Media */}
-                        {profileData.social && profileData.social.length > 0 && (
-                          <div className="bg-white dark:bg-slate-800 p-4 rounded-xl shadow-sm">
-                            <p className="text-sm text-gray-500 dark:text-gray-400 mb-2">{t('socialMedia')}</p>
-                            <div className="flex flex-wrap gap-3">
-                              {profileData.social.map((social) => (
-                                <a
-                                  key={social.id}
-                                  href={social.link}
-                                  target="_blank"
-                                  rel="noopener noreferrer"
-                                  className="text-xl hover:opacity-80 transition transform hover:scale-110"
-                                >
-                                  {getSocialIcon(social.type)}
-                                </a>
-                              ))}
+                        {/* Contact Information */}
+                        <div className="flex flex-col gap-4">
+                          {/* Social Media */}
+                          {profileData.social && profileData.social.length > 0 && (
+                            <div className="bg-white dark:bg-slate-800 p-4 rounded-xl shadow-sm">
+                              <p className="text-sm text-gray-500 dark:text-gray-400 mb-2">{t('socialMedia')}</p>
+                              <div className="flex flex-wrap gap-3">
+                                {profileData.social.map((social) => (
+                                  <a
+                                    key={social.id}
+                                    href={social.link}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="text-xl hover:opacity-80 transition transform hover:scale-110"
+                                  >
+                                    {getSocialIcon(social.type)}
+                                  </a>
+                                ))}
+                              </div>
                             </div>
-                          </div>
-                        )}
+                          )}
+                        </div>
                       </div>
                     </div>
-                  </div>
+                  )}
+
+                  {/* Show only Social Media when there's no bio but social media exists */}
+                  {!isCompany && !profileData.bio && profileData.social && profileData.social.length > 0 && (
+                    <div className="bg-gray-50 dark:bg-slate-700/30 p-6 rounded-xl mb-10 mt-10" data-aos="fade-up">
+                      <div className="grid grid-cols-1 gap-6">
+                        <div className="bg-white dark:bg-slate-800 p-4 rounded-xl shadow-sm">
+                          <h3 className="text-xl font-semibold mb-4 text-gray-800 dark:text-white flex items-center">
+                            {t('socialMedia')}
+                          </h3>
+                          <div className="flex flex-wrap gap-3">
+                            {profileData.social.map((social) => (
+                              <a
+                                key={social.id}
+                                href={social.link}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="text-xl hover:opacity-80 transition transform hover:scale-110"
+                              >
+                                {getSocialIcon(social.type)}
+                              </a>
+                            ))}
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  )}
 
                  
                 </div>

@@ -208,7 +208,7 @@
             "title": "Company",
             "about": "About us",
             "blog": "Blog",
-            "contact": "Contact"
+            "contact": "Contact us"
         },
         "resources": {
             "title": "Resources",
@@ -501,7 +501,24 @@
         "manageLine1": "You can manage or disable cookies through your browser settings.",
         "manageLine2": "However, disabling some cookies may affect the functionality of certain parts of the platform.",
         "lastUpdatedCookies": "Last Updated: March 26, 2025"
+        },
+        "contactUsPage": {
+                "contactUsTitle": "Message us now — We’d be happy to help!",
+                "contactUsFirstName": "First Name",
+                "contactUsFirstNameplaceholder": "E.g., Mark",
+                "contactUsLastName": "Last Name",
+                "contactUsLastNameplaceholder": "E.g., Rossi",
+                "contactUsPhone": "Phone Number",
+                "contactUsPhoneplaceholder": "+9***********",
+                "contactUsEmail": "Email Address",
+                "contactUsEmailplaceholder": "example@email.com",
+                "contactUsMessage": "Message",
+                "contactUsMessageplaceholder": "Type your message here...",
+                "send": "Send Message",
+                "regionalOperations": "Regional Operations - Jordan",
+                "jordanPhone": "+962777771429"
         }
+
 
 
 }
