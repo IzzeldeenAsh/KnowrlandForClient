@@ -203,7 +203,14 @@ export default function Header() {
     localStorage.setItem('preferred_language', locale);
     
     // Set the language preference in a cookie - expires in 1 year
-    document.cookie = `preferred_language=${locale}; max-age=${60 * 60 * 24 * 365}; path=/;`;
+    document.cookie = [
+      `preferred_language=${locale}`,
+      `Domain=.knoldg.com`,           // leading dot = include subdomains
+      `Path=/`,                       // send on all paths
+      `Max-Age=${60 * 60 * 24 * 365}`,// one year
+      `SameSite=Lax`,                 // prevent CSRF, still send on top-level nav
+      `Secure`                        // HTTPS only
+    ].join('; ');
     
     // Get the current path without locale prefix
     const currentPath = pathname.split('/').slice(2).join('/');
