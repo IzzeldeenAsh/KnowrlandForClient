@@ -44,6 +44,13 @@ interface KnowledgeDetails {
   insighter: {
     name: string;
     profile_photo_url: string;
+    uuid: string;
+    roles: string[];
+    company?: {
+      legal_name: string;
+      logo: string;
+      uuid: string;
+    };
   };
   documents: Array<{
     id: number;
@@ -104,6 +111,7 @@ async function fetchKnowledgeData(type: string, slug: string, locale: string = '
     }
 
     const data = await response.json();
+    console.log(data);
     return data;
   } catch (error) {
     console.error("Error fetching knowledge data:", error);
@@ -218,39 +226,106 @@ export default function KnowledgePage({ params }: Props) {
               </div>
             </div>
             <div className="flex gap-6 text-sm">
-              <div className="relative w-[50px] h-[50px]">
-              <Link  href={`/${locale}/profile/${knowledge.insighter.uuid}`}>
-                {knowledge.insighter.profile_photo_url ? (
-                  <Image
-                    src={knowledge.insighter.profile_photo_url}
-                    alt={knowledge.insighter.name}
-                    fill={true}
-                    sizes="50px"
-                    className="rounded-full object-cover"
-                  />
-                ) : (
-                  <div className="w-[50px] h-[50px] rounded-full bg-blue-500 flex items-center justify-center">
-                    <span className="text-lg text-white font-semibold">
-                      {knowledge.insighter.name
-                        .split(" ")
-                        .map((word:any) => word[0])
-                        .join("")
-                        .toUpperCase()}
-                    </span>
+              {(knowledge.insighter.roles?.includes('company') || knowledge.insighter.roles?.includes('company-insighter')) ? (
+                // Company display
+                <>
+                  <div className="relative w-[50px] h-[50px]">
+                    <Link href={`/${locale}/profile/${knowledge.insighter.company?.uuid || knowledge.insighter.uuid}`}>
+                      {knowledge.insighter.company?.logo ? (
+                        <Image
+                          src={knowledge.insighter.company.logo}
+                          alt={knowledge.insighter.company.legal_name || 'Company'}
+                          fill={true}
+                          sizes="50px"
+                          className="rounded-full object-cover"
+                        />
+                      ) : (
+                        <div className="w-[50px] h-[50px] rounded-full bg-blue-500 flex items-center justify-center">
+                          <span className="text-lg text-white font-semibold">
+                            {(knowledge.insighter.company?.legal_name || 'C')
+                              .split(" ")
+                              .map((word:any) => word[0])
+                              .join("")
+                              .toUpperCase()}
+                          </span>
+                        </div>
+                      )}
+                    </Link>
                   </div>
-                )}
-                </Link>
-              </div>
-              <span className="flex flex-col">
-              
-                <span className="text-sm text-gray-500">{translations.insighter}</span>
-                <span className="text-sm font-bold text-gray-700">
-                <Link className="hover:text-blue-600" href={`/${locale}/profile/${knowledge.insighter.uuid}`}>
-                  {knowledge.insighter.name}
-                </Link>
-                </span>
-                
-              </span>
+                  <span className="flex flex-col">
+                    <span className="text-sm text-gray-500">Company</span>
+                    <span className="text-sm font-bold text-gray-700">
+                      <Link className="hover:text-blue-600" href={`/${locale}/profile/${knowledge.insighter.company?.uuid || knowledge.insighter.uuid}`}>
+                        {knowledge.insighter.company?.legal_name || knowledge.insighter.name}
+                      </Link>
+                    </span>
+                  </span>
+                  <div className="flex flex-col ps-8">
+                    <span className="text-gray-500 text-sm">Published By</span>
+                    <div className="flex items-center gap-2">
+                      <div className="relative w-[20px] h-[20px]">
+                        {knowledge.insighter.profile_photo_url ? (
+                          <Image
+                            src={knowledge.insighter.profile_photo_url}
+                            alt={knowledge.insighter.name}
+                            fill={true}
+                            sizes="20px"
+                            className="rounded-full object-cover"
+                          />
+                        ) : (
+                          <div className="w-[20px] h-[20px] rounded-full bg-blue-500 flex items-center justify-center">
+                            <span className="text-[8px] text-white font-semibold">
+                              {knowledge.insighter.name
+                                .split(" ")
+                                .map((word:any) => word[0])
+                                .join("")
+                                .toUpperCase()}
+                            </span>
+                          </div>
+                        )}
+                      </div>
+                      <Link className="hover:text-blue-600 text-sm" href={`/${locale}/profile/${knowledge.insighter.uuid}?entity=insighter`}>
+                        {knowledge.insighter.name}
+                      </Link>
+                    </div>
+                  </div>
+                </>
+              ) : (
+                // Original insighter display
+                <>
+                  <div className="relative w-[50px] h-[50px]">
+                    <Link href={`/${locale}/profile/${knowledge.insighter.uuid}`}>
+                      {knowledge.insighter.profile_photo_url ? (
+                        <Image
+                          src={knowledge.insighter.profile_photo_url}
+                          alt={knowledge.insighter.name}
+                          fill={true}
+                          sizes="50px"
+                          className="rounded-full object-cover"
+                        />
+                      ) : (
+                        <div className="w-[50px] h-[50px] rounded-full bg-blue-500 flex items-center justify-center">
+                          <span className="text-lg text-white font-semibold">
+                            {knowledge.insighter.name
+                              .split(" ")
+                              .map((word:any) => word[0])
+                              .join("")
+                              .toUpperCase()}
+                          </span>
+                        </div>
+                      )}
+                    </Link>
+                  </div>
+                  <span className="flex flex-col">
+                    <span className="text-sm text-gray-500">{translations.insighter}</span>
+                    <span className="text-sm font-bold text-gray-700">
+                      <Link className="hover:text-blue-600" href={`/${locale}/profile/${knowledge.insighter.uuid}?entity=insighter`}>
+                        {knowledge.insighter.name}
+                      </Link>
+                    </span>
+                  </span>
+                </>
+              )}
               <div className="flex flex-col ps-8">
                 <span className="text-gray-500 text-sm">{translations.published}</span>
                 <span className="text-sm font-bold text-gray-700">
