@@ -199,9 +199,6 @@ export default function Header() {
     // Set loading state before switching locale
     setAppLoading(true);
     
-    // Store current locale in localStorage before switching
-    localStorage.setItem('preferred_language', locale);
-    
     // Set the language preference in a cookie - expires in 1 year
     document.cookie = [
       `preferred_language=${locale}`,
