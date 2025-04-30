@@ -125,7 +125,7 @@ const KnowledgeSideBox = ({
         </div>
 
         <div className="space-y-3 mb-4">
-          <button className="w-full font-semibold bg-gradient-to-r from-sky-400 to-sky-500 text-white py-2 px-4 rounded-lg hover:from-blue-700 hover:to-blue-900 transition-colors">
+          <button className="w-full font-semibold bg-gradient-to-r from-blue-500 to-teal-400 text-white py-2 px-4 rounded-lg hover:from-blue-700 hover:to-blue-900 transition-colors">
             {translations.buyNow}
           </button>
           <button className="w-full font-semibold  bg-gray-100 text-gray-600 py-2 px-4 rounded-lg hover:bg-blue-50 transition-colors">
@@ -296,7 +296,7 @@ const KnowledgeSideBox = ({
             {/* Share Button with Animation */}
             <div className="mt-5 flex justify-center">
       <button 
-        className="share-button border-sky-500 border-2 max-w-[200px] relative w-full py-3 px-6 font-medium text-sm text-sky-500 border-none outline-none overflow-hidden cursor-pointer rounded-[24px]"
+        className="share-button border-2 border-gradient-to-r from-blue-500 to-teal-400 max-w-[200px] relative w-full py-3 px-6 font-medium text-sm text-sky-500 outline-none overflow-hidden cursor-pointer rounded-[24px]"
         onClick={handleShare}
       >
         <span className="btn-text inline-flex align-middle transition-all duration-300 px-4 ease-out-cubic text-sky-600">{translations.share}</span>
@@ -387,7 +387,7 @@ const KnowledgeSideBox = ({
           z-index: -1;
           width: 100%;
           height: 100%;
-          border: 1px solid #147aba;
+      
           background: #ffffff;
           border-radius: 24px;
           transition: 0.3s cubic-bezier(0.215, 0.61, 0.355, 1);
