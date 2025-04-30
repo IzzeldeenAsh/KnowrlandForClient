@@ -185,33 +185,34 @@ export default function KnowledgePage({ params }: Props) {
       </div>
       
       {/* Header Section */}
-      <div className="section-header px-4 sm:px-6 lg:px-8 py-8  relative overflow-hidden rounded-lg">
+      <div className="section-header px-4 sm:px-6 lg:px-8 py-6 sm:py-8 relative overflow-hidden rounded-lg">
         <Image
           alt="Section background"
           src="https://res.cloudinary.com/dsiku9ipv/image/upload/v1737266454/breadcrumb-bg-2_anwto8.png"
           fill
           className="object-cover z-0"
           priority
+          sizes="100vw"
         />
-        <div className="container mx-auto px-4 relative z-10 mt-5">
+        <div className="container mx-auto px-2 sm:px-4 relative z-10 mt-3 sm:mt-5">
           {/* Breadcrumb */}
           <div className="mb-8">
             <Breadcrumb items={breadcrumbItems} />
           </div>
           
           {/* Header */}
-          <div className={`${isRTL ? 'text-right' : 'text-start'} mb-4`} data-aos="fade-down">
-            <div className="flex flex-row gap-4">
-              <div className="mb-4 mt-1">
-                {knowledge.type === 'data' && <div className="bg-white p-3 rounded flex items-center justify-center"><DataIcon width={40} height={40} /></div>}
-                {knowledge.type === 'insight' && <div className="bg-white p-2 rounded flex items-center justify-center"><InsightIcon width={50} height={50} /></div>}
-                {knowledge.type === 'manual' && <div className="bg-white p-2 rounded flex items-center justify-center"><ManualIcon width={50} height={50} /></div>}
-                {knowledge.type === 'report' && <div className="bg-white p-2 rounded flex items-center justify-center"><ReportIcon width={50} height={50} /></div>}
-                {knowledge.type === 'course' && <div className="bg-white p-2 rounded flex items-center justify-center"><KnowledgeIcon width={50} height={50} /></div>}
+          <div className={`${isRTL ? 'text-right' : 'text-start'} mb-4 w-full`} data-aos="fade-down">
+            <div className="flex-row gap-3 sm:gap-4 flex-wrap sm:flex-nowrap sm:flex">
+              <div className="mb-4 mt-1 hidden sm:block">
+                {knowledge.type === 'data' && <div className="bg-white p-2 sm:p-3 rounded flex items-center justify-center"><span className="hidden sm:block"><DataIcon width={40} height={40} /></span><span className="sm:hidden"><DataIcon width={30} height={30} /></span></div>}
+                {knowledge.type === 'insight' && <div className="bg-white p-2 rounded flex items-center justify-center"><span className="hidden sm:block"><InsightIcon width={50} height={50} /></span><span className="sm:hidden"><InsightIcon width={30} height={30} /></span></div>}
+                {knowledge.type === 'manual' && <div className="bg-white p-2 rounded flex items-center justify-center"><span className="hidden sm:block"><ManualIcon width={50} height={50} /></span><span className="sm:hidden"><ManualIcon width={30} height={30} /></span></div>}
+                {knowledge.type === 'report' && <div className="bg-white p-2 rounded flex items-center justify-center"><span className="hidden sm:block"><ReportIcon width={50} height={50} /></span><span className="sm:hidden"><ReportIcon width={30} height={30} /></span></div>}
+                {knowledge.type === 'course' && <div className="bg-white p-2 rounded flex items-center justify-center"><span className="hidden sm:block"><KnowledgeIcon width={50} height={50} /></span><span className="sm:hidden"><KnowledgeIcon width={30} height={30} /></span></div>}
               </div>
               <div className="flex flex-col items-start">
-                <div className="flex flex-col items-start mb-10">
-                  <h3 className="text-md bg-gradient-to-r from-blue-500 to-teal-400 md:text-4xl font-extrabold text-transparent bg-clip-text lg:max-w-xl">
+                <div className="flex flex-col items-start mb-6 sm:mb-10">
+                  <h3 className="text-md sm:text-2xl md:text-4xl bg-gradient-to-r from-blue-500 to-teal-400 font-extrabold text-transparent bg-clip-text w-full break-words">
                     {knowledge.title}
                   </h3>
                   <div className="text-sm font-bold text-gray-700 capitalize">
@@ -225,23 +226,23 @@ export default function KnowledgePage({ params }: Props) {
                 </div>
               </div>
             </div>
-            <div className="flex gap-6 text-sm">
+            <div className="flex flex-wrap gap-4 sm:gap-6 text-sm mt-4">
               {(knowledge.insighter.roles?.includes('company') || knowledge.insighter.roles?.includes('company-insighter')) ? (
                 // Company display
                 <>
-                  <div className="relative w-[50px] h-[50px]">
-                    <Link href={`/${locale}/profile/${knowledge.insighter.company?.uuid || knowledge.insighter.uuid}`}>
+                  <div className="relative w-[40px] h-[40px] sm:w-[50px] sm:h-[50px]">
+                    <Link href={`/${locale}/profile/${knowledge.insighter.company?.uuid || knowledge.insighter.uuid}`} className="block h-full">
                       {knowledge.insighter.company?.logo ? (
                         <Image
                           src={knowledge.insighter.company.logo}
                           alt={knowledge.insighter.company.legal_name || 'Company'}
                           fill={true}
-                          sizes="50px"
+                          sizes="(max-width: 640px) 40px, 50px"
                           className="rounded-full object-cover"
                         />
                       ) : (
-                        <div className="w-[50px] h-[50px] rounded-full bg-blue-500 flex items-center justify-center">
-                          <span className="text-lg text-white font-semibold">
+                        <div className="w-full h-full rounded-full bg-blue-500 flex items-center justify-center">
+                          <span className="text-sm sm:text-lg text-white font-semibold">
                             {(knowledge.insighter.company?.legal_name || 'C')
                               .split(" ")
                               .map((word:any) => word[0])
@@ -260,10 +261,10 @@ export default function KnowledgePage({ params }: Props) {
                       </Link>
                     </span>
                   </span>
-                  <div className="flex flex-col ps-8">
+                  <div className="flex flex-col ps-4 sm:ps-8">
                     <span className="text-gray-500 text-sm">Published By</span>
                     <div className="flex items-center gap-2">
-                      <div className="relative w-[20px] h-[20px]">
+                      <div className="relative w-[18px] h-[18px] sm:w-[20px] sm:h-[20px]">
                         {knowledge.insighter.profile_photo_url ? (
                           <Image
                             src={knowledge.insighter.profile_photo_url}
@@ -273,8 +274,8 @@ export default function KnowledgePage({ params }: Props) {
                             className="rounded-full object-cover"
                           />
                         ) : (
-                          <div className="w-[20px] h-[20px] rounded-full bg-blue-500 flex items-center justify-center">
-                            <span className="text-[8px] text-white font-semibold">
+                          <div className="w-full h-full rounded-full bg-blue-500 flex items-center justify-center">
+                            <span className="text-[6px] sm:text-[8px] text-white font-semibold">
                               {knowledge.insighter.name
                                 .split(" ")
                                 .map((word:any) => word[0])
@@ -293,19 +294,19 @@ export default function KnowledgePage({ params }: Props) {
               ) : (
                 // Original insighter display
                 <>
-                  <div className="relative w-[50px] h-[50px]">
-                    <Link href={`/${locale}/profile/${knowledge.insighter.uuid}`}>
+                  <div className="relative w-[40px] h-[40px] sm:w-[50px] sm:h-[50px]">
+                    <Link href={`/${locale}/profile/${knowledge.insighter.uuid}`} className="block h-full">
                       {knowledge.insighter.profile_photo_url ? (
                         <Image
                           src={knowledge.insighter.profile_photo_url}
                           alt={knowledge.insighter.name}
                           fill={true}
-                          sizes="50px"
+                          sizes="(max-width: 640px) 40px, 50px"
                           className="rounded-full object-cover"
                         />
                       ) : (
-                        <div className="w-[50px] h-[50px] rounded-full bg-blue-500 flex items-center justify-center">
-                          <span className="text-lg text-white font-semibold">
+                        <div className="w-full h-full rounded-full bg-blue-500 flex items-center justify-center">
+                          <span className="text-sm sm:text-lg text-white font-semibold">
                             {knowledge.insighter.name
                               .split(" ")
                               .map((word:any) => word[0])
@@ -326,7 +327,7 @@ export default function KnowledgePage({ params }: Props) {
                   </span>
                 </>
               )}
-              <div className="flex flex-col ps-8">
+              <div className="flex flex-col ps-4 sm:ps-8 mt-2 sm:mt-0">
                 <span className="text-gray-500 text-sm">{translations.published}</span>
                 <span className="text-sm font-bold text-gray-700">
                   {knowledge.published_at === null
@@ -349,8 +350,8 @@ export default function KnowledgePage({ params }: Props) {
       </div>
       
       {/* Main Content */}
-      <div className="container mx-auto px-4 pb-20">
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+      <div className="container mx-auto px-3 sm:px-4 pb-12 sm:pb-16 md:pb-20">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-8">
           <div className="lg:col-span-2">
             <TabsContent knowledge={knowledge} />
           </div>
