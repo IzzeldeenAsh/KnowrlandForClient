@@ -8,6 +8,7 @@
         "title": "Unlock Business Success with Shared Expert Knowldge",
         "description":"Explore a hub of data, insights, and business intelligence tailored for your business growth.",
         "searchPlaceholder":"Search data, reports, insights, HS Code, ISIC Code... and more",
+        "searchPlaceholderMobile":"Search in data, reports, insights...",
         "direction": "ltr"
     },
     "HeroInsighter":{
