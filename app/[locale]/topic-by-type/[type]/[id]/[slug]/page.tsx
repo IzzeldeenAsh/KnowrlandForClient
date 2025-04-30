@@ -8,7 +8,6 @@ import { notFound } from 'next/navigation';
 import { use, useEffect } from 'react';
 import styles from './topic-by-type.module.css';
 import AOS from 'aos';
-import 'aos/dist/aos.css';
 import { useTopicsByType } from '@/hooks/industries/useTopicsByType';
 import KnowledgeGrid from '../../../../topic/[id]/[slug]/KnowledgeGrid';
 
