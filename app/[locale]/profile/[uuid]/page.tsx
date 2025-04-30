@@ -534,7 +534,7 @@ export default function ProfilePage() {
                       <div className="flex flex-wrap gap-4 mb-6">
                        {
                         enterpriseType === 'insighter' && (
-                          <button className="px-4 py-2 text-sm bg-gradient-to-r from-blue-500 to-sky-400 text-white rounded-lg font-medium shadow-md hover:shadow-lg transition transform hover:translate-y-[-2px]">
+                          <button className="px-4 py-2 text-sm bg-gradient-to-r from-blue-500 to-teal-400 text-white rounded-lg font-medium shadow-md hover:shadow-lg transition transform hover:translate-y-[-2px]">
                             {t('meet')} {profileData.first_name || ''} {profileData.last_name || ''}
                           </button>
                         )
@@ -571,9 +571,9 @@ export default function ProfilePage() {
                               stroke={2} 
                             />
                           </div>
-                          <span className="text-sm font-medium text-blue-600 dark:text-blue-300" dangerouslySetInnerHTML={{ __html: t('consultingSessions') }} />
+                          <span className="text-sm font-medium text-transparent bg-clip-text bg-gradient-to-r from-blue-500 to-teal-500" dangerouslySetInnerHTML={{ __html: t('consultingSessions') }} />
                         </div>
-                        <p className="bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-indigo-500 font-bold text-5xl">0</p>
+                        <p className="bg-clip-text text-transparent bg-gradient-to-r from-blue-500 to-teal-500 font-bold text-5xl">0</p>
                        
                       </div>
                
