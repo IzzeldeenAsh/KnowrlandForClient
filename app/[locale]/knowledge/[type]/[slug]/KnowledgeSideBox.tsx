@@ -296,10 +296,10 @@ const KnowledgeSideBox = ({
             {/* Share Button with Animation */}
             <div className="mt-5 flex justify-center">
       <button 
-        className="share-button bg-gradient-to-r from-sky-400 to-sky-500 max-w-[200px] relative w-full py-3 px-6 font-medium text-sm text-white border-none outline-none overflow-hidden cursor-pointer rounded-[24px]"
+        className="share-button border-sky-500 border-2 max-w-[200px] relative w-full py-3 px-6 font-medium text-sm text-sky-500 border-none outline-none overflow-hidden cursor-pointer rounded-[24px]"
         onClick={handleShare}
       >
-        <span className="btn-text inline-flex align-middle transition-all duration-300 px-4 ease-out-cubic">{translations.share}</span>
+        <span className="btn-text inline-flex align-middle transition-all duration-300 px-4 ease-out-cubic text-sky-600">{translations.share}</span>
         <span className="btn-icon inline-flex align-middle ml-2 transition-all duration-300 ease-out-cubic">
           <svg
             className="w-4 h-4"
@@ -309,11 +309,11 @@ const KnowledgeSideBox = ({
           >
             <path
               d="M767.99994 585.142857q75.995429 0 129.462857 53.394286t53.394286 129.462857-53.394286 129.462857-129.462857 53.394286-129.462857-53.394286-53.394286-129.462857q0-6.875429 1.170286-19.456l-205.677714-102.838857q-52.589714 49.152-124.562286 49.152-75.995429 0-129.462857-53.394286t-53.394286-129.462857 53.394286-129.462857 129.462857-53.394286q71.972571 0 124.562286 49.152l205.677714-102.838857q-1.170286-12.580571-1.170286-19.456 0-75.995429 53.394286-129.462857t129.462857-53.394286 129.462857 53.394286 53.394286 129.462857-53.394286 129.462857-129.462857 53.394286q-71.972571 0-124.562286-49.152l-205.677714 102.838857q1.170286 12.580571 1.170286 19.456t-1.170286 19.456l205.677714 102.838857q52.589714-49.152 124.562286-49.152z"
-              fill="#ffffff"
+              fill="#147aba"
             ></path>
           </svg>
         </span>
-        <ul className="social-icons absolute top-1/2 left-0 right-0 flex m-0 p-0 list-none transform -translate-y-1/2">
+        <ul className="social-icons  absolute top-1/2 left-0 right-0 flex m-0 p-0 list-none transform -translate-y-1/2">
           {/* Facebook */}
           <li className="flex-1">
             <a href={typeof window !== 'undefined' ? getShareLinks().facebook : '#'} 
@@ -349,7 +349,7 @@ const KnowledgeSideBox = ({
                  return false;
                }}
                className="social-icon inline-flex align-middle transform translate-y-[55px] transition-all duration-300 ease-out-cubic hover:opacity-50">
-              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="22" height="22" fill="white">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="22" height="22" fill="black">
                 <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
               </svg>
             </a>
@@ -376,6 +376,7 @@ const KnowledgeSideBox = ({
           position: relative;
           font-family: Roboto, sans-serif;
           transition: 0.3s cubic-bezier(0.215, 0.61, 0.355, 1);
+          border: 1px solid #147aba;
         }
         
         .share-button::before {
@@ -386,7 +387,8 @@ const KnowledgeSideBox = ({
           z-index: -1;
           width: 100%;
           height: 100%;
-          background: var(--btn-color);
+          border: 1px solid #147aba;
+          background: #ffffff;
           border-radius: 24px;
           transition: 0.3s cubic-bezier(0.215, 0.61, 0.355, 1);
         }
