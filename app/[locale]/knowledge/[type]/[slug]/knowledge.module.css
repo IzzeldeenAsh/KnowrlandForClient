@@ -186,6 +186,7 @@
   max-height: 500px;
   opacity: 1;
   padding: 1rem;
+  overflow: scroll;
 }
 
 .documentCard.expandable .documentHeader:hover .expandIcon {
