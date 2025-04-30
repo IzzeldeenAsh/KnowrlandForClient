@@ -119,8 +119,8 @@ export default function Features02() {
                         </div>
                       </div>
                       {/* Image */}
-                      <div className="relative w-full h-64 md:h-auto overflow-hidden md:pb-8">
-                        <Image className="absolute bottom-0 left-1/2 -translate-x-1/2 mx-auto max-w-none md:max-w-full md:relative md:left-0 md:translate-x-0" src={FeatureImg02} width={536} height={230} alt="Stay Informed" />
+                      <div className="relative w-full h-56 md:h-auto overflow-hidden md:pb-8">
+                        <Image className="absolute bottom-0 left-1/2 -translate-x-1/2 mx-auto max-w-none w-[85%] md:w-auto md:max-w-full md:relative md:left-0 md:translate-x-0" src={FeatureImg02} width={536} height={230} alt="Stay Informed" />
                       </div>
                     </div>
                   </div>

@@ -47,7 +47,7 @@ export default function Hero() {
                 }}>
                   <input
                     type="text"
-                    placeholder={t('searchPlaceholder')}
+                    placeholder={window.innerWidth < 768 ? t('searchPlaceholderMobile') : t('searchPlaceholder')}
                     className="w-full px-6 py-4 text-lg bg-gradient-to-r from-gray-100 via-gray-200 to-gray-100 border border-gray-300 rounded-md placeholder-gray-500 text-gray-800 focus:outline-none focus:border-blue-300 focus:ring-2 focus:ring-blue-100 shadow-lg transition duration-300"
                   />
                   <button
