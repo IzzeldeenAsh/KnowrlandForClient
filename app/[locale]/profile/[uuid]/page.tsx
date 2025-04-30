@@ -1,10 +1,12 @@
 'use client';
 
+// Import necessary for safe use of useSearchParams
+import { useSearchParams } from 'next/navigation';
+
 import Footer from '@/components/ui/footer';
 import Image from 'next/image';
 import React, { useEffect, useState } from 'react';
-import AOS from 'aos';
-import 'aos/dist/aos.css';
+
 import Stripes from "@/public/images/stripes-dark.svg";
 import { Tabs } from '@mantine/core';
 import { useParams } from 'next/navigation';
@@ -119,6 +121,7 @@ export default function ProfilePage() {
   const [loadingKnowledge, setLoadingKnowledge] = useState(false);
   const [selectedType, setSelectedType] = useState<string | null>(null);
   const params = useParams();
+  const searchParams = useSearchParams();
   const uuid = params.uuid as string;
   const locale = params.locale as string;
   const isRTL = locale === 'ar';
@@ -126,18 +129,16 @@ export default function ProfilePage() {
   const userProfileT = useTranslations('UserProfile');
   const filterT = useTranslations('Filters');
   const [enterpriseType, setEnterpriseType] = useState<string | null>(null);
-  useEffect(() => {
-    AOS.init({
-      duration: 800,
-      once: true,
-    });
-  }, []);
+  
+  // Get entity type from search params (safe for SSR)
+  const entityParam = searchParams.get('entity');
+
 
   useEffect(() => {
     const fetchProfileData = async () => {
       try {
-        // Check for searchParams to determine which API to try first
-        const urlParams = new URLSearchParams(window.location.search);
+        // Use a safe way to access window object
+        const urlParams = typeof window !== 'undefined' ? new URLSearchParams(window.location.search) : new URLSearchParams('');
         const entityType = urlParams.get('entity');
         setEnterpriseType(entityType);
         // If entity=insighter is specified, try insighter API first
@@ -357,14 +358,27 @@ export default function ProfilePage() {
     }));
   };
 
-  // Function to format published date
+  // Function to format published date - use a more consistent approach
   const formatPublishedDate = (dateString: string) => {
+    // Create a stable date representation that won't differ between server and client
     const date = new Date(dateString);
-    return date.toLocaleDateString(locale === 'ar' ? 'ar-SA' : 'en-US', {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric'
-    });
+    
+    // For consistent server/client rendering, avoid locale-dependent formatting
+    // or implement a solution with next-intl that handles this consistently
+    if (typeof window === 'undefined') {
+      // Server-side - use a simple format that doesn't depend on locale
+      const year = date.getFullYear();
+      const month = date.getMonth() + 1;
+      const day = date.getDate();
+      return `${year}-${month.toString().padStart(2, '0')}-${day.toString().padStart(2, '0')}`;
+    } else {
+      // Client-side - can use locale-specific formatting
+      return date.toLocaleDateString(locale === 'ar' ? 'ar-SA' : 'en-US', {
+        year: 'numeric',
+        month: 'short',
+        day: 'numeric'
+      });
+    }
   };
 
   // Filter types for knowledge
@@ -518,9 +532,13 @@ export default function ProfilePage() {
                       
                       {/* Action Buttons */}
                       <div className="flex flex-wrap gap-4 mb-6">
-                        <button className="px-4 py-2 text-sm bg-gradient-to-r from-blue-500 to-sky-400 text-white rounded-lg font-medium shadow-md hover:shadow-lg transition transform hover:translate-y-[-2px]">
-                          {t('scheduleAMeeting')}
-                        </button>
+                       {
+                        enterpriseType === 'insighter' && (
+                          <button className="px-4 py-2 text-sm bg-gradient-to-r from-blue-500 to-sky-400 text-white rounded-lg font-medium shadow-md hover:shadow-lg transition transform hover:translate-y-[-2px]">
+                            {t('meet')} {profileData.first_name || ''} {profileData.last_name || ''}
+                          </button>
+                        )
+                       }
                         <button className="px-4 py-2 text-sm bg-white dark:bg-slate-700 text-gray-800 dark:text-white rounded-lg font-medium border border-gray-200 dark:border-slate-600 hover:border-gray-300 dark:hover:border-slate-500 shadow-sm hover:shadow-md transition transform hover:translate-y-[-2px]">
                           {t('follow')}
                         </button>
@@ -555,7 +573,7 @@ export default function ProfilePage() {
                           </div>
                           <span className="text-sm font-medium text-blue-600 dark:text-blue-300" dangerouslySetInnerHTML={{ __html: t('consultingSessions') }} />
                         </div>
-                        <p className="bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-indigo-500 font-bold text-5xl">30</p>
+                        <p className="bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-indigo-500 font-bold text-5xl">0</p>
                        
                       </div>
                
@@ -573,7 +591,7 @@ export default function ProfilePage() {
           <div className="bg-white max-w-6xl mx-auto dark:bg-slate-800 rounded-xl shadow-lg overflow-hidden" data-aos="fade-up" data-aos-delay="100">
             <Tabs defaultValue="knowledge" styles={{
               tab: {
-                '&[data-active]': {
+                '&[dataActive]': {
                   borderColor: '#3b82f6',
                   color: '#3b82f6',
                   fontWeight: 'bold'
@@ -595,7 +613,7 @@ export default function ProfilePage() {
                   value="about"
                   className="text-base font-medium px-8 py-4 transition"
                 >
-                  {t('aboutMe')}
+                 {enterpriseType === 'insighter' ? t('aboutMe') : t('aboutCompany')}
                 </Tabs.Tab>
               </Tabs.List>
 

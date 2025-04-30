@@ -11,7 +11,6 @@ import { use, useEffect } from 'react';
 import styles from './sub-industry-by-type.module.css';
 import IndustryIcon from "@/components/icons/industry-icon";
 import AOS from 'aos';
-import 'aos/dist/aos.css';
 import Stripes from "@/public/images/stripes-dark.svg";
 interface Topic {
   id: number;
