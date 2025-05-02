@@ -2,12 +2,29 @@
 
 import { useTranslations } from "next-intl";
 import Image from "next/image";
+import Link from "next/link";
 import Illustration from "@/public/images/glow-top-blue.svg";
+import IllustrationTop from '@/public/images/pricing-illustration-top.svg'
+import Particles from '@/components/particles'
+import { useLocale } from 'next-intl';
 import { ParallaxProvider, Parallax } from 'react-scroll-parallax';
+import { ReactElement, JSXElementConstructor, ReactNode, ReactPortal, Key } from "react";
+
+type InsighterItem = {
+  title: string;
+  description: string;
+  image: string;
+  icon: string;
+  position: "left" | "right";
+};
 
 export default function InsighterFeatures() {
   const t = useTranslations("InsighterFeatures");
-
+  const items = t.raw("items") as InsighterItem[]; 
+  const ctaButton = t("ctaButton");
+  const locale = useLocale();
+  const isRTL = locale === 'ar'; 
+  
   return (
     <ParallaxProvider>
       <section>
@@ -59,122 +76,255 @@ export default function InsighterFeatures() {
               </p>
             </div>
           </div>
-          {/* Fourth Section (Now First) */}
-          <div className="pt-10 pb-10 md:pt-25 ">
+          {/* Section First */}
+          <div className="pb-10">
             <div>
-              {/* Section content */}
-              <div className="max-w-xl mx-auto md:max-w-none flex flex-col md:flex-row space-y-8 space-y-reverse md:space-y-0 gap-8 items-center justify-between">
-                {/* Image with Parallax */}
-                <div className="" data-aos="fade-up" data-aos-delay="100">
-                  <Parallax translateY={[-20, 20]} className="overflow-hidden">
-                    <figure className="rounded-3xl p-px mb-8 overflow-hidden mt-10 max-w-[600px] mx-auto cursor-pointer relative group">
-                      <div className="absolute inset-0 bg-blue-500/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-10 rounded-3xl"></div>
-                      <div className="overflow-hidden rounded-3xl">
-                        <Image
-                          src="https://res.cloudinary.com/dahiaq28x/image/upload/v1745308106/A_Sustainable_Revenue_Stream_vshfwt.png"
-                          alt="insighter_1.png"
-                          width={500}
-                          height={400}
-                          className="transition-transform duration-500 ease-in-out group-hover:scale-110 group-hover:brightness-110"
-                        />
-                      </div>
-                    </figure>
-                  </Parallax>
-                </div>
-
-                {/* Content */}
-                <div
-                  className="flex-1 order-1 md:order-none max-md:text-center max-w-lg"
-                  data-aos="fade-down"
+              <div className="max-w-4xl mx-auto text-center" data-aos="fade-down">
+                 <h5
+                  className={`pb-4 text-lg sm:text-xl md:text-2xl text-slate-200 ${
+                    isRTL ? "text-right" : "text-left"
+                  }`}
                 >
-                  <h3 className="h3 bg-clip-text text-transparent bg-gradient-to-r from-slate-200/60 via-slate-200 to-slate-200/60 pb-3">
-                    {t("section4.title")}
-                  </h3>
-                  <p className="text-lg text-slate-400 mb-8">
-                    {t("section4.description")}
-                  </p>
+                  {t("insighter.title")}{" "}
+                  <span className="text-[#2ECFC3] font-semibold text-xl sm:text-3xl">
+                    {t("insighter.insighterText")}
+                  </span>
+                </h5>
+                <ul className="text-lg text-slate-300 space-y-4 pt-6 text-left ltr:ml-5 rtl:mr-5">
+                  <li className="flex items-start gap-3">
+                    <Image src="/images/triangle.svg" alt="triangle" width={16} height={16} className={`${isRTL ? "rotate-180" : ""}`} />
+                    <span className="text-[18px] font-light">{t("insighter.point1")}</span>
+                  </li>
+                  <li className="flex items-start gap-3">
+                    <Image src="/images/triangle.svg" alt="triangle" width={16} height={16} className={`${isRTL ? "rotate-180" : ""}`} />
+                    <span className="text-[18px] font-light">{t("insighter.point2")}</span>
+                  </li>
+                  <li className="flex items-start gap-3">
+                    <Image src="/images/triangle.svg" alt="triangle" width={16} height={16} className={`${isRTL ? "rotate-180" : ""}`} />
+                    <span className="text-[18px] font-light">{t("insighter.point3")}</span>
+                  </li>
+                </ul>
+              </div>
+
+              {/* Button Options */}
+              <div className="text-center pb-8">
+                <div className="inline-flex items-center justify-center relative">
+                  {/* Particles animation */}
+                  <Particles className="absolute inset-0 -z-10" quantity={10} />
+                  <div className="inline-flex opacity-50">
+                    <Image src={IllustrationTop} width="334" height="334" alt="Features illustration" />
+                  </div>
+                  <Image className="absolute -mt-[40%]" src={IllustrationTop} width="396" height="328" alt="Features illustration top" aria-hidden="true" />
+                  
+                  {/* Role buttons with floating animation - column on small screens, row on larger screens */}
+                  <div className="absolute w-full z-20">
+                    <div className="flex flex-col md:flex-row justify-center items-center gap-4 md:gap-6 lg:gap-8 mt-8 md:mt-0">
+                      {/* Field Expert */}
+                      <div className="animate-[float_4s_ease-in-out_infinite]">
+                        <div className="border border-white border-opacity-30 w-[160px] bg-slate-900/40 backdrop-blur-sm text-slate-300 px-6 py-3 rounded-xl text-lg cursor-default hover:border-opacity-50 transition-all duration-300 mb-3 md:mb-0">
+                          <span className="text-[18px] font-extralight tracking-[0.02em]">
+                            {t("insighter.roles.fieldExpert")}
+                          </span>
+                        </div>
+                      </div>
+                      
+                      {/* Strategist */}
+                      <div className="animate-[float_3.5s_ease-in-out_0.5s_infinite]">
+                        <div className="border border-white border-opacity-30 w-[160px] bg-slate-900/40 backdrop-blur-sm text-slate-300 px-6 py-3 rounded-xl text-lg cursor-default hover:border-opacity-50 transition-all duration-300 mb-3 md:mb-0">
+                          <span className="text-[18px] font-extralight tracking-[0.02em]">
+                            {t("insighter.roles.strategist")}
+                          </span>
+                        </div>
+                      </div>
+
+                      {/* Consultant */}
+                      <div className="animate-[float_4.2s_ease-in-out_0.7s_infinite]">
+                        <div className="border border-white border-opacity-30 w-[160px] bg-slate-900/40 backdrop-blur-sm text-slate-300 px-6 py-3 rounded-xl text-lg cursor-default hover:border-opacity-50 transition-all duration-300 mb-3 md:mb-0">
+                          <span className="text-[18px] font-extralight tracking-[0.02em]">
+                            {t("insighter.roles.consultant")}
+                          </span>
+                        </div>
+                      </div>
+
+                      {/* Technician */}
+                      <div className="animate-[float_3.8s_ease-in-out_0.3s_infinite]">
+                        <div className="border border-white border-opacity-30 w-[160px] bg-slate-900/40 backdrop-blur-sm text-slate-300 px-6 py-3 rounded-xl text-lg cursor-default hover:border-opacity-50 transition-all duration-300 mb-3 md:mb-0">
+                          <span className="text-[18px] font-extralight tracking-[0.02em]">
+                            {t("insighter.roles.technician")}
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
           </div>
+            {/* Section Second */}
+           <div className="bg-[#151F34] py-20 w-screen relative left-1/2 right-1/2 -mx-[50vw]">
+            <div className="max-w-6xl mx-auto px-4 sm:px-6" data-aos="fade-down">
+                  <h5
+                    className={`${
+                      isRTL ? "text-right" : "text-left"
+                    } text-lg sm:text-xl md:text-2xl text-slate-200 pb-8`}
+                  >
+                    {t("insighter.uploadTitle")}{" "}
+                    <span className="text-[#2ECFC3] font-semibold text-xl sm:text-3xl">
+                      {t("insighter.insighterText")}
+                    </span>
+                  </h5>
 
-          {/* First Section */}
-          <div className=" pb-10  ">
-            <div>
-              {/* Section content */}
-              <div className="max-w-xl mx-auto md:max-w-none flex flex-col md:flex-row space-y-8 space-y-reverse md:space-y-0 gap-8 items-center justify-between">
-                {/* Content */}
-                <div
-                  className="flex-1 order-1 md:order-none max-md:text-center max-w-lg"
-                  data-aos="fade-down"
-                >
-                  <h3 className="h3 bg-clip-text text-transparent bg-gradient-to-r from-slate-200/60 via-slate-200 to-slate-200/60 pb-3">
-                    {t("section1.title")}
-                  </h3>
-                  <p className="text-lg text-slate-400 mb-8">
-                    {t("section1.description")}
-                  </p>
-                </div>
+                <div className="grid gap-6 md:grid-cols-3 xl:gap-8">
+                  {[
+                    {
+                      key: "businessReports",
+                      icon: "/images/report.svg",
+                    },
+                    {
+                      key: "playbooks",
+                      icon: "/images/strategy.svg",
+                    },
+                    {
+                      key: "manuals",
+                      icon: "/images/sop.svg",
+                    },
+                    {
+                      key: "technicalGuides",
+                      icon: "/images/technical.svg",
+                    },
+                    {
+                      key: "trainingMaterials",
+                      icon: "/images/training.svg",
+                    },
+                    {
+                      key: "dataSets",
+                      icon: "/images/data.svg",
+                    },
+                  ].map((item, index) => (
+                    <div key={index} data-aos="fade-up" data-aos-delay={index * 100}>
+                      <div className="relative h-full group">
+                        <div className="relative h-full bg-slate-900 rounded-3xl z-20 overflow-hidden p-px
+                             before:absolute before:w-96 before:h-96 before:-left-48 before:-top-48 before:bg-blue-500 before:rounded-full before:opacity-0 before:pointer-events-none before:transition-opacity before:duration-500 before:translate-x-[var(--mouse-x)] before:translate-y-[var(--mouse-y)] before:hover:opacity-20 before:z-30 before:blur-[100px]
+                             after:absolute after:inset-0 after:rounded-[inherit] after:opacity-0 after:transition-opacity after:duration-500 after:[background:_radial-gradient(250px_circle_at_var(--mouse-x)_var(--mouse-y),theme(colors.slate.400),transparent)] after:group-hover:opacity-100 after:z-10">
+                          <div className="flex flex-col h-full bg-slate-800 rounded-3xl relative overflow-hidden p-6">
+                            {/* Radial gradient */}
+                            <div className="absolute bottom-0 translate-y-1/2 left-1/2 -translate-x-1/2 pointer-events-none -z-10 w-1/2 aspect-square" aria-hidden="true">
+                              <div className="absolute inset-0 translate-z-0 bg-slate-800 rounded-full blur-[50px]" />
+                            </div>
+                            {/* Content */}
+                            <div className="flex flex-col h-full justify-between">
+                              <div className="flex flex-col items-center text-center mb-4">
+                                <Image
+                                  src={item.icon}
+                                  alt={t(`insighter.uploadTypes.${item.key}`)}
+                                  width={60}
+                                  height={60}
+                                  className="mb-4"
+                                />
+                                <h3 className="inline-flex text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-slate-200/60 via-slate-200 to-slate-200/60 pb-1">
+                                  {t(`insighter.uploadTypes.${item.key}`)}
+                                </h3>
+                              </div>
 
-                {/* Image with Parallax */}
-                <div className="" data-aos="fade-up" data-aos-delay="100">
-                  <Parallax translateY={[15, -15]} className="overflow-hidden">
-                    <figure className="bg-gradient-to-b from-slate-300/20 to-transparent rounded-3xl p-px mb-8 cursor-pointer group">
-                      <div className="overflow-hidden rounded-3xl relative">
-                        <div className="absolute inset-0 bg-purple-500/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-10"></div>
-                        <Image
-                          src="https://res.cloudinary.com/dahiaq28x/image/upload/v1745308106/Bring_your_knowledge_to_light_by_sharing_it_on_the_platform_fjfhca.png"
-                          alt="insighter_2.png"
-                          width={500}
-                          height={400}
-                          className="transition-all duration-500 ease-in-out group-hover:scale-105 group-hover:rotate-1 group-hover:brightness-110"
-                        />
+                            </div>
+                          </div>
+                        </div>
                       </div>
-                    </figure>
-                  </Parallax>
+                    </div>
+                  ))}
                 </div>
-              </div>
+
+                <div className="mt-12 text-center">
+                  <div className="mb-4">
+                    <span className="text-lg font-light text-slate-300">
+                      {t("insighter.joinUs")}
+                    </span>
+                  </div>
+                  <Link href="https://app.knoldg.com/auth/sign-up" className="btn text-slate-900 bg-gradient-to-r from-white/80 via-white to-white/80 hover:bg-white transition duration-150 ease-in-out group">
+                    {t("insighter.cta")}
+                    <span className="ml-2">
+              
+                    </span>
+                  </Link>
+                </div>
             </div>
           </div>
 
-          {/* Second Section */}
-          <div className="pt-10 pb-12 md:pt-25 ">
-            <div>
-              {/* Section content */}
-              <div className="max-w-xl mx-auto md:max-w-none flex flex-col md:flex-row space-y-8 space-y-reverse md:space-y-0 gap-8 items-center justify-between">
-                {/* Image with Parallax */}
-                <div className="" data-aos="fade-up" data-aos-delay="100">
-                  <Parallax translateY={[-20, 20]} className="overflow-hidden">
-                    <figure className="bg-gradient-to-b from-slate-300/20 to-transparent rounded-3xl p-px mb-8 cursor-pointer relative group">
-                      <div className="overflow-hidden rounded-3xl">
-                        <Image
-                          src="https://res.cloudinary.com/dahiaq28x/image/upload/v1745308106/Don_t_let_your_expertise_fade_to_silence__let_it_bloom_into_sustainable_revenue_qgqpms.png"
-                          alt="insighter_3.png"
-                          width={500}
-                          height={400}
-                          className="transition-all duration-500 ease-in-out group-hover:scale-105"
-                        />
-                        <div className="absolute inset-0 shadow-[inset_0_0_20px_rgba(56,189,248,0.3)] opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-3xl"></div>
-                      </div>
-                    </figure>
-                  </Parallax>
-                </div>
+          <section className="relative w-full bg-[#0D1729] py-20 overflow-hidden">
+            <div className="max-w-6xl mx-auto px-4 relative z-10">
+              <div className="relative">
+                <div className="absolute top-36 bottom-36 left-1/2 transform -translate-x-1/2 w-[2px] bg-[#829DD8] z-0" />
+                {items.map((item, index) => {
+                  const isRight = item.position === "right";
 
-                {/* Content */}
-                <div
-                  className="flex-1 order-1 md:order-none max-md:text-center max-w-lg"
-                  data-aos="fade-down"
-                >
-                  <h3 className="h3 bg-clip-text text-transparent bg-gradient-to-r from-slate-200/60 via-slate-200 to-slate-200/60 pb-3">
-                    {t("section2.title")}
-                  </h3>
-                  <p className="text-lg text-slate-400 mb-8">
-                    {t("section2.description")}
-                  </p>
-                </div>
+                  return (
+                    <div
+                      key={index}
+                      className={`relative flex flex-col md:flex-row items-center mb-24 ${
+                        isRight ? "md:flex-row-reverse" : "md:flex-row"
+                      }`}
+                      data-aos="fade-up"
+                      data-aos-delay={index * 200}
+                      data-aos-duration="800"
+                    >
+                      <div className="relative w-full md:w-5/12 p-4 z-10">
+                        <div
+                          className="rounded-md overflow-hidden shadow-md border border-white/60 bg-cover bg-center h-60 md:h-72 relative"
+                          style={{ backgroundImage: `url(${item.image})` }}
+                        >
+                          <div className="absolute inset-0 bg-black/50 z-0" />
+                          <div className="relative z-10 p-6 text-white">
+                            <h4 className="text-lg sm:text-xl font-bold mb-2">{item.title}</h4>
+                            <p className="text-sm text-slate-300">{item.description}</p>
+                          </div>
+                        </div>
+                      </div>
+
+                      <div
+                        className={`relative md:flex justify-center items-center z-10 ${
+                          isRight ? "flex-row" : "flex-row-reverse"
+                        }`}
+                        style={
+                          isRTL
+                            ? isRight
+                              ? { left: 69 }
+                              : { right: 69 }
+                            : isRight
+                            ? { right: 69 }
+                            : { left: 69 }
+                        } 
+                        >
+                      <img
+                            src={item.icon}
+                            alt="icon"
+                            className={`w-16 h-16 ${
+                              isRTL
+                                ? isRight
+                                  ? "ml-8"
+                                  : "mr-8"
+                                : isRight
+                                ? "mr-8"
+                                : "ml-8"
+                            }`}
+                          />
+                        <div className="relative w-10 h-10 rounded-full border-[2px] border-white flex items-center justify-center bg-[#0D1729]">
+                          <div className="w-4 h-4 bg-[#00A3B2] rounded-full" />
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+
+              <div className="text-center mt-10">
+                <Link href="https://app.knoldg.com/auth/sign-up" className="btn text-slate-900 bg-gradient-to-r from-white/80 via-white to-white/80 hover:bg-white transition duration-150 ease-in-out group">
+                  {ctaButton}
+                </Link>
               </div>
             </div>
-          </div>
+          </section>
+
+
         </div>
       </section>
     </ParallaxProvider>

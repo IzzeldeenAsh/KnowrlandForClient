@@ -181,17 +181,7 @@
   border-top: 1px solid rgba(0, 123, 255, 0.1);
   padding: 0;
 }
-@media (max-width: 1200px) {
-  .max-w-80-per{
-    max-width: 80%  !important;
-  }
- }
 
- @media screen and (max-width: 575px) {
-  .max-w-80-per{
-    max-width: 100%   !important;
-  }
- }
 .documentContent.expanded {
   max-height: 500px;
   opacity: 1;
