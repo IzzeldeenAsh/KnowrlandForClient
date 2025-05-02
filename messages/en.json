@@ -33,7 +33,56 @@
         "section2":{
             "title":"Don't let your expertise fade to silence; let it bloom into sustainable revenue",
             "description":"Start earning by sharing your knowledge and experience on Knoldg. You Set the Value: Choose your price, and every time your work is downloaded, you're paid Directly."
-        }
+        },
+        "insighter": {
+            "title": "What is an ",
+            "insighterText": "Insighter ?",
+            "point1": "A subject matter expert, practitioner, consultant, strategist, technician, or field professional with hands-on experience,",
+            "point2": "who shares valuable data, reports, insights, case studies, or practical tools on Knoldg platform to empower others and help businesses grow;",
+            "point3": "A knowledge contributor who earns income each time their expertise is accessed.",
+            "roles": {
+              "fieldExpert": "Field expert",
+              "strategist": "Strategist",
+              "consultant": "Consultant",
+              "technician": "Technician"
+            },
+            "uploadTitle": "What Can You Upload as an",
+            "cta": "Become an Insighter",
+            "readMore": "Read more",
+            "joinUs": "You can join now, it's easy,free, and worth it.",
+            "uploadTypes": {
+            "businessReports": "Business Reports & Market Insights",
+            "playbooks": "Playbooks & Strategy Documents",
+            "manuals": "Operational Manuals & SOPs",
+            "technicalGuides": "Technical Guides & Field Knowledge",
+            "trainingMaterials": "Training Materials & Courses",
+            "dataSets": "Data Sets & Templates"
+          }
+        },
+        "items": [
+            {
+                "title": "A Sustainable Revenue Stream",
+                "description": "Start earning by sharing your insights and experience on Knoldiq. You Set the Value: Choose your price, and every time your work is downloaded, you’re paid directly.",
+                "image": "/images/insighter-2.png",
+                "icon": "/images/insighter-2-icon.svg",
+                "position": "right"
+            },
+            {
+              "title": "Bring your knowledge to light by sharing it on the platform",
+              "description": "Start earning today by bringing your data, studies, reports, and insights out from the confines of your desk. Share them with the world to discover, value, and invest in.",
+              "image": "/images/insighter-1.png",
+              "icon": "/images/insighter-1-icon.svg",
+              "position": "left"
+            },
+            {
+              "title": "Don't let your expertise fade to silence; let it bloom into sustainable revenue",
+              "description": "Start earning by sharing your knowledge and experience on Knoldiq. You Set the Value: Choose your price, and every time your work is downloaded, you’re paid directly.",
+              "image": "/images/insighter-3.png",
+              "icon": "/images/insighter-3-icon.svg",
+              "position": "right"
+            }
+          ],
+          "ctaButton": "Get Started"
     },
     "Header": {
         "navigation": {
