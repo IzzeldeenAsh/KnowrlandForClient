@@ -459,7 +459,7 @@ export default function ProfilePage() {
                         alt={profileData.company?.legal_name || profileData.name}
                         width={400}
                         height={400}
-                        className="w-full h-full object-cover"
+                        className="w-full h-full object-contain"
                       />
                     ) : profileData.profile_photo_url ? (
                       <Image
@@ -467,7 +467,7 @@ export default function ProfilePage() {
                         alt={profileData.name}
                         width={400}
                         height={400}
-                        className="w-full h-full object-cover"
+                        className="w-full h-full object-contain"
                       />
                     ) : (
                       <div className="w-full h-full bg-gray-100 dark:bg-slate-700 flex items-center justify-center">
@@ -618,8 +618,8 @@ export default function ProfilePage() {
               </Tabs.List>
 
               <Tabs.Panel value="knowledge" className="py-8 px-6 md:px-10">
-                {/* Knowledge Type Filters - only shown when knowledge data exists */}
-                {knowledgeData && knowledgeData.data.length > 0 && (
+                {/* Knowledge Type Filters - always shown when knowledgeData exists */}
+                {knowledgeData && (
                   <div className="mb-10 flex items-center flex-wrap gap-2 justify-end">
                     <div className="mr-1 opacity-60 flex items-center">
                       <IconFilter size={16} className="mr-1" />
