@@ -1,13 +1,13 @@
 'use client';
 
-import { useState } from "react";
+import { useState, useCallback, useEffect } from "react";
 import Overview from "./Overview";
 import { KnowledgeDetails } from "./types";
 import Reviews from "./Reviews";
 import AskInsighter from "./AskInsighter";
-import { useParams } from "next/navigation";
+import { useParams, useRouter, useSearchParams } from "next/navigation";
 
-function TabContent({ activeTab, knowledge }: { activeTab: string; knowledge: KnowledgeDetails }) {
+function TabContent({ activeTab, knowledge, onRefreshData }: { activeTab: string; knowledge: KnowledgeDetails; onRefreshData?: () => void }) {
   const params = useParams();
   const locale = params.locale as string;
   const isRTL = locale === 'ar';
@@ -24,7 +24,7 @@ function TabContent({ activeTab, knowledge }: { activeTab: string; knowledge: Kn
     case "Reviews":
       return <Reviews knowledgeSlug={knowledge.slug} reviews={knowledge.review} is_review={knowledge.is_review ? true : false} />;
     case "Ask":
-      return'';
+      return <AskInsighter knowledgeSlug={knowledge.slug} questions={knowledge.questions} is_owner={knowledge.is_owner} onRefreshData={onRefreshData} />;
     case "Meet":
       return (
         <div className="bg-white p-6 rounded-lg shadow-sm">
@@ -42,6 +42,23 @@ export default function TabsContent({ knowledge }: { knowledge: KnowledgeDetails
   const params = useParams();
   const locale = params.locale as string;
   const isRTL = locale === 'ar';
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  
+  // Check for tab query parameter on mount
+  useEffect(() => {
+    const tabParam = searchParams.get('tab');
+    if (tabParam === 'ask') {
+      setActiveTab("Ask");
+    }
+  }, [searchParams]);
+
+  // Function to refresh the knowledge data by reloading the page
+  const refreshData = useCallback(() => {
+    console.log('[TabsContent] Refreshing knowledge data...');
+    // Force a refresh of the current page
+    router.refresh();
+  }, [router]);
   
   // Translations for tab labels
   const translations = {
@@ -81,7 +98,7 @@ export default function TabsContent({ knowledge }: { knowledge: KnowledgeDetails
         </nav>
       </div>
       <div className="mt-6">
-        <TabContent activeTab={activeTab} knowledge={knowledge} />
+        <TabContent activeTab={activeTab} knowledge={knowledge} onRefreshData={refreshData} />
       </div>
     </div>
   );
