@@ -28,9 +28,29 @@ export default function AuthCallback() {
   useEffect(() => {
     const fetchProfile = async () => {
       try {
-        // Store token in localStorage only
-        console.log('[token-callback] Storing token in localStorage');
+        // Store token in both localStorage and cookies
+        console.log('[token-callback] Storing token in localStorage and cookies');
         localStorage.setItem('token', token);
+        
+        // Set the token in a cookie to make it accessible for SSR functions
+        // Check if we're on localhost for development
+        const isLocalhost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+        
+        // Create cookie settings array based on environment
+        const cookieSettings = [
+          `token=${token}`,
+          `Path=/`,                 // send on all paths
+          `Max-Age=${60 * 60 * 24}`, // expires in 24 hours
+          `SameSite=Lax`           // allows token to be sent during navigation
+        ];
+        
+        // Only add domain and secure flag in production environments
+        if (!isLocalhost) {
+          cookieSettings.push(`Domain=.knoldg.com`); // leading dot = include subdomains
+          cookieSettings.push(`Secure`);             // HTTPS only
+        }
+        
+        document.cookie = cookieSettings.join('; ');
         
         // Fetch profile
         const response = await fetch('https://api.knoldg.com/api/account/profile', {
