@@ -4,6 +4,7 @@ import { useState } from "react";
 import Overview from "./Overview";
 import { KnowledgeDetails } from "./types";
 import Reviews from "./Reviews";
+import AskInsighter from "./AskInsighter";
 import { useParams } from "next/navigation";
 
 function TabContent({ activeTab, knowledge }: { activeTab: string; knowledge: KnowledgeDetails }) {
@@ -14,7 +15,6 @@ function TabContent({ activeTab, knowledge }: { activeTab: string; knowledge: Kn
   // Translations for tab content
   const translations = {
     noCommentsYet: isRTL ? 'لا توجد تعليقات بعد.' : 'No comments available yet.',
-    askInsighter: isRTL ? 'اسأل الخبير' : 'Ask Insighter', 
     meetInsighter: isRTL ? 'قابل الخبير' : 'Meet the insighter'
   };
 
@@ -24,12 +24,7 @@ function TabContent({ activeTab, knowledge }: { activeTab: string; knowledge: Kn
     case "Reviews":
       return <Reviews knowledgeSlug={knowledge.slug} reviews={knowledge.review} is_review={knowledge.is_review ? true : false} />;
     case "Ask":
-      return (
-        <div className="bg-white p-6 rounded-lg shadow-sm">
-          <h3 className="text-xl font-semibold mb-4">{translations.askInsighter}</h3>
-          <p className="text-gray-600">{translations.noCommentsYet}</p>
-        </div>
-      );
+      return'';
     case "Meet":
       return (
         <div className="bg-white p-6 rounded-lg shadow-sm">
