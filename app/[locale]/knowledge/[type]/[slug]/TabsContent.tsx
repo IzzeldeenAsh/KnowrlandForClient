@@ -24,7 +24,7 @@ function TabContent({ activeTab, knowledge }: { activeTab: string; knowledge: Kn
     case "Reviews":
       return <Reviews knowledgeSlug={knowledge.slug} reviews={knowledge.review} is_review={knowledge.is_review ? true : false} />;
     case "Ask":
-      return <AskInsighter knowledge={knowledge} />;
+      return'';
     case "Meet":
       return (
         <div className="bg-white p-6 rounded-lg shadow-sm">
