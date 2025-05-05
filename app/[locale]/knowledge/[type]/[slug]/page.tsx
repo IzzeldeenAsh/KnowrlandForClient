@@ -4,6 +4,7 @@ import Image from "next/image";
 import { Metadata } from "next";
 import { use } from "react";
 import { notFound } from "next/navigation";
+import { cookies } from "next/headers";
 import DataIcon from "@/components/icons/DataIcon";
 import InsightIcon from "@/components/icons/InsightIcon";
 import ManualIcon from "@/components/icons/ManualIcon";
@@ -82,15 +83,27 @@ interface Props {
 
 async function fetchKnowledgeData(type: string, slug: string, locale: string = 'en') {
   try {
+    // Get auth token from cookies for server-side requests
+    const cookieStore = await cookies();
+    const token = cookieStore.get('token')?.value;
+    
+    // Prepare headers with auth token if available
+    const headers: HeadersInit = {
+      "Content-Type": "application/json",
+      Accept: "application/json",
+      "Accept-Language": locale,
+    };
+    
+    // Add Authorization header if token exists
+    if (token) {
+      headers.Authorization = `Bearer ${token}`;
+    }
+    
     const response = await fetch(
       `https://api.knoldg.com/api/platform/industries/knowledge/${slug}`,
       {
         method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-          Accept: "application/json",
-          "Accept-Language": locale,
-        },
+        headers,
       }
     );
 
