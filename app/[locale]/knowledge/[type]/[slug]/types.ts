@@ -1,3 +1,55 @@
+export interface User {
+  uuid?: string;
+  name: string;
+  first_name: string;
+  last_name: string;
+  email?: string;
+  profile_image?: string;
+  profile_photo_url?: string;
+}
+
+export interface Question {
+  id: number;
+  question: {
+    question: string;
+    question_date: string;
+    user: User;
+  };
+  answer: {
+    answer: string | null;
+    answer_date: string | null;
+    user: User;
+  };
+  knowledge: {
+    id: number;
+    type: string;
+    title: string;
+    slug: string;
+    description: string;
+    language: string;
+    published_at: string;
+    status: string;
+    insighter: {
+      id: number;
+      uuid: string;
+      phone: string;
+      bio: string;
+      status: string;
+      user?: {
+        id: number;
+        name: string;
+        email: string;
+        first_name: string;
+        last_name: string;
+        profile_photo?: {
+          url: string;
+        };
+      };
+    };
+  };
+  children: Question[];
+}
+
 export interface KnowledgeDetails {
   id?: number;
   type: string;
@@ -8,7 +60,7 @@ export interface KnowledgeDetails {
     id: number;
     key: number;
     name: string;
-  };
+  } | null;
   hs_code: any;
   language: string;
   total_price: string;
@@ -29,6 +81,8 @@ export interface KnowledgeDetails {
     created_date: string;
   }>;
   is_review?: boolean;
+  questions?: Question[];
+  is_owner?: boolean;
   insighter: {
     name: string;
     profile_photo_url: string;
