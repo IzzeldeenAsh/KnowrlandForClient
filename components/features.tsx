@@ -36,11 +36,11 @@ export default function Features() {
             />
           </div>
         </div>
-   {/* Second */}
+   {/* First */}
    <div className="pt-16 pb-12 sm:pt-20 md:pt-24 lg:pt-28 sm:pb-16 md:pb-20">
           <div>
             {/* Section content */}
-            <div className="max-w-xl mx-auto md:max-w-none flex flex-col sm:flex-col md:flex-row space-y-8 space-y-reverse md:space-y-0 gap-8 items-center justify-between">
+            <div className="max-w-xl mx-auto md:max-w-none flex flex-col sm:flex-col md:flex-row-reverse space-y-8 space-y-reverse md:space-y-0 gap-8 items-center justify-between">
               {/* Image */}
               <div className="w-full sm:w-4/5 md:w-1/2" data-aos="fade-up" data-aos-delay="100">
                 <figure className="bg-gradient-to-b from-slate-300/20 to-transparent rounded-3xl p-px mb-8">
@@ -56,7 +56,7 @@ export default function Features() {
 
               {/* Content */}
               <div
-                className="flex-1 order-1 md:order-2 max-md:text-center sm:max-w-xl md:max-w-lg"
+                className="flex-1 order-1 max-md:text-center sm:max-w-xl md:max-w-lg"
                 data-aos="fade-down"
               >
                 {/* Content #1 */}
@@ -96,14 +96,17 @@ export default function Features() {
           </div>
         </div>
 
-        {/* First */}
+     
+
+        {/* Second */}
+   
         <div className="pt-16 pb-12 sm:pt-20 md:pt-28 lg:pt-32 sm:pb-16 md:pb-20">
           <div>
             {/* Section content */}
             <div className="max-w-xl mx-auto md:max-w-none flex flex-col sm:flex-col md:flex-row space-y-8 space-y-reverse md:space-y-0 gap-8 items-center justify-between">
               {/* Content */}
               <div
-                className="flex-1 order-1 md:order-1 max-md:text-center sm:max-w-xl md:max-w-lg"
+                className="flex-1 order-1 max-md:text-center sm:max-w-xl md:max-w-lg"
                 data-aos="fade-down"
               >
                 {/* Content #1 */}
@@ -154,27 +157,13 @@ export default function Features() {
             </div>
           </div>
         </div>
-
-     
         {/* Third */}
         <div className="pt-16 pb-12 sm:pt-20 md:pt-24 lg:pt-28 sm:pb-16 md:pb-20">
           <div>
             {/* Section content */}
             <div className="max-w-xl mx-auto md:max-w-none flex flex-col sm:flex-col md:flex-row space-y-8 space-y-reverse md:space-y-0 gap-8 items-center justify-between">
-               {/* Video */}
-               <div className="w-full sm:w-4/5 md:w-1/2" data-aos="fade-up" data-aos-delay="100">
-                <figure className="rounded-3xl p-px mb-8 overflow-hidden mt-10 max-w-[600px] mx-auto">
-                  <video 
-                    className="w-full rounded-[inherit]"
-                    autoPlay 
-                    loop 
-                    muted 
-                    playsInline
-                    src="/images/Pay-for-what-you-need.mp4"
-                  />
-                </figure>
-              </div>
-              {/* Content */}
+            
+                 {/* Content */}
               <div
                 className="flex-1 order-1 md:order-2 max-md:text-center sm:max-w-xl md:max-w-lg"
                 data-aos="fade-down"
@@ -212,8 +201,20 @@ export default function Features() {
                   </button>
                 </div>
               </div>
-
-             
+                 {/* Video */}
+                 <div className="w-full sm:w-4/5 md:w-1/2 order-2" data-aos="fade-up" data-aos-delay="100">
+                <figure className=" rounded-3xl p-px mb-8 overflow-hidden mt-10 max-w-[600px] mx-auto">
+                  <video 
+                    className="w-full rounded-[inherit]"
+                    autoPlay 
+                    loop 
+                    muted 
+                    playsInline
+                    src="/images/Pay-for-what-you-need.mp4"
+                  />
+                </figure>
+              </div>
+           
             </div>
           </div>
         </div>

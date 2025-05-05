@@ -1,5 +1,5 @@
 'use client'
-import { DocumentTextIcon, GlobeAltIcon, CalendarIcon, ClockIcon, BuildingLibraryIcon, TruckIcon, GlobeAsiaAustraliaIcon } from '@heroicons/react/24/outline';
+import { DocumentTextIcon, GlobeAltIcon, CalendarIcon, ClockIcon, BuildingLibraryIcon, TruckIcon, GlobeAsiaAustraliaIcon, ChevronDownIcon, ChevronUpIcon } from '@heroicons/react/24/outline';
 import { useParams } from 'next/navigation';
 import { useState, useEffect } from 'react';
 import FacebookIcon from '@/public/file-icons/facebook';
@@ -48,6 +48,28 @@ const KnowledgeSideBox = ({
   const currentLocale = locale || params.locale as string || 'en';
   const isRTL = currentLocale === 'ar';
   
+  // State to track which sections are expanded
+  const [expandedSections, setExpandedSections] = useState<{
+    economicBlocs: boolean;
+    regions: boolean;
+    countries: boolean;
+  }>({
+    economicBlocs: false,
+    regions: false,
+    countries: false,
+  });
+  
+  // Function to toggle section expansion
+  const toggleSection = (section: 'economicBlocs' | 'regions' | 'countries') => {
+    setExpandedSections({
+      ...expandedSections,
+      [section]: !expandedSections[section],
+    });
+  };
+  
+  // Maximum number of items to show initially
+  const MAX_VISIBLE_ITEMS = 3;
+  
   // Share functionality
   const handleShare = () => {
     // Get current URL
@@ -82,21 +104,24 @@ const KnowledgeSideBox = ({
   
   // Translations
   const translations = {
-    documents: isRTL ? '\u0627\u0644\u0645\u0633\u062a\u0646\u062f\u0627\u062a' : 'Documents',
-    documentsLanguage: isRTL ? '\u0644\u063a\u0629 \u0627\u0644\u0645\u0633\u062a\u0646\u062f\u0627\u062a' : 'Documents Language',
-    isicCode: isRTL ? '\u0631\u0645\u0632 ISIC' : 'ISIC Code',
-    hsCode: isRTL ? '\u0631\u0645\u0632 HS' : 'HS Code',
-    economicBloc: isRTL ? '\u0627\u0644\u0643\u062a\u0644\u0629 \u0627\u0644\u0627\u0642\u062a\u0635\u0627\u062f\u064a\u0629' : 'Economic Block',
-    region: isRTL ? '\u0627\u0644\u0645\u0646\u0637\u0642\u0629' : 'Region',
-    country: isRTL ? '\u0627\u0644\u062f\u0648\u0644\u0629' : 'Country',
-    publishedAt: isRTL ? '\u062a\u0627\u0631\u064a\u062e \u0627\u0644\u0646\u0634\u0631' : 'Published At',
-    lastUpdate: isRTL ? '\u0622\u062e\u0631 \u062a\u062d\u062f\u064a\u062b' : 'Last Update',
-    oneTimePurchase: isRTL ? '\u0634\u0631\u0627\u0621 \u0644\u0645\u0631\u0629 \u0648\u0627\u062d\u062f\u0629' : 'One time purchase',
-    buyNow: isRTL ? '\u0627\u0634\u062a\u0631\u064a \u0627\u0644\u0622\u0646' : 'Buy Now',
+    documents: isRTL ? 'المستندات' : 'Documents',
+    documentsLanguage: isRTL ? 'لغة المستندات' : 'Documents Language',
+    isicCode: isRTL ? 'رمز ISIC' : 'ISIC Code',
+    hsCode: isRTL ? 'رمز HS' : 'HS Code',
+    economicBloc: isRTL ? 'الكتلة الاقتصادية' : 'Economic Block',
+    region: isRTL ? 'المنطقة' : 'Region',
+    country: isRTL ? 'الدولة' : 'Country',
+    publishedAt: isRTL ? 'تاريخ النشر' : 'Published At',
+    lastUpdate: isRTL ? 'آخر تحديث' : 'Last Update',
+    oneTimePurchase: isRTL ? 'شراء لمرة واحدة' : 'One time purchase',
+    buyNow: isRTL ? 'اشتري الآن' : 'Buy Now',
     addToCart: isRTL ?  'إضافة إلى حقيبة المشتريات' : 'Add to Cart',
-    na: isRTL ? '\u063a\u064a\u0631 \u0645\u062a\u0648\u0641\u0631' : 'N/A',
-    free: isRTL ? '\u0645\u062c\u0627\u0646\u064a' : 'Free',
-    share: isRTL ? '\u0645\u0634\u0627\u0631\u0643\u0629' : 'Share'
+    na: isRTL ? 'غير متوفر' : 'N/A',
+    free: isRTL ? 'مجاني' : 'Free',
+    share: isRTL ? 'مشاركة' : 'Share',
+    showMore: isRTL ? 'عرض المزيد' : 'Show more',
+    showLess: isRTL ? 'عرض أقل' : 'Show less',
+    more: isRTL ? 'المزيد' : 'more'
   };
 
   const documentCounts = documents.reduce((acc: { [key: string]: number }, doc) => {
@@ -221,12 +246,30 @@ const KnowledgeSideBox = ({
                   <GlobeAsiaAustraliaIcon className="w-5 h-5 mx-4" />
                   {translations.economicBloc}
                 </span>
-                <div className="flex flex-wrap gap-1">
-                  {economic_blocs.map((economicBloc) => (
-                    <span key={economicBloc.id} className="badge bg-[#f1f1f4] text-[#4b5675] text-xs font-medium px-2.5 py-0.5 rounded">
-                      {economicBloc.name}
-                    </span>
-                  ))}
+                <div className="flex flex-wrap gap-1 justify-end max-w-[60%]">
+                  {economic_blocs
+                    .slice(0, expandedSections.economicBlocs ? economic_blocs.length : MAX_VISIBLE_ITEMS)
+                    .map((economicBloc) => (
+                      <span key={economicBloc.id} className="badge bg-[#f1f1f4] text-[#4b5675] text-xs font-medium px-2.5 py-0.5 rounded">
+                        {economicBloc.name}
+                      </span>
+                    ))}
+                  {economic_blocs.length > MAX_VISIBLE_ITEMS && !expandedSections.economicBlocs && (
+                    <button 
+                      className="text-blue-500 text-xs flex items-center whitespace-nowrap ml-1"
+                      onClick={() => toggleSection('economicBlocs')}
+                    >
+                      +{economic_blocs.length - MAX_VISIBLE_ITEMS} {translations.more} <ChevronDownIcon className="w-3 h-3 ml-1" />
+                    </button>
+                  )}
+                  {expandedSections.economicBlocs && economic_blocs.length > MAX_VISIBLE_ITEMS && (
+                    <button 
+                      className="text-blue-500 text-xs flex items-center whitespace-nowrap ml-1"
+                      onClick={() => toggleSection('economicBlocs')}
+                    >
+                      {translations.showLess} <ChevronUpIcon className="w-3 h-3 ml-1" />
+                    </button>
+                  )}
                 </div>
               </div>
             )
@@ -238,12 +281,30 @@ const KnowledgeSideBox = ({
                   <GlobeAsiaAustraliaIcon className="w-5 h-5 mx-4" />
                   {translations.region}
                 </span>
-                <div className="flex flex-wrap justify-end  gap-1">
-                  {regions.map((region:any) => (
-                    <span key={region.id} className="badge bg-[#f1f1f4] text-[#4b5675] text-xs font-medium px-2.5 py-0.5 rounded">
-                      {region.name}
-                    </span>
-                  ))}
+                <div className="flex flex-wrap justify-end gap-1 max-w-[60%]">
+                  {regions
+                    .slice(0, expandedSections.regions ? regions.length : MAX_VISIBLE_ITEMS)
+                    .map((region:any) => (
+                      <span key={region.id} className="badge bg-[#f1f1f4] text-[#4b5675] text-xs font-medium px-2.5 py-0.5 rounded">
+                        {region.name}
+                      </span>
+                    ))}
+                  {regions.length > MAX_VISIBLE_ITEMS && !expandedSections.regions && (
+                    <button 
+                      className="text-blue-500 text-xs flex items-center whitespace-nowrap ml-1"
+                      onClick={() => toggleSection('regions')}
+                    >
+                      +{regions.length - MAX_VISIBLE_ITEMS} {translations.more} <ChevronDownIcon className="w-3 h-3 ml-1" />
+                    </button>
+                  )}
+                  {expandedSections.regions && regions.length > MAX_VISIBLE_ITEMS && (
+                    <button 
+                      className="text-blue-500 text-xs flex items-center whitespace-nowrap ml-1"
+                      onClick={() => toggleSection('regions')}
+                    >
+                      {translations.showLess} <ChevronUpIcon className="w-3 h-3 ml-1" />
+                    </button>
+                  )}
                 </div>
               </div>
             )
@@ -255,12 +316,30 @@ const KnowledgeSideBox = ({
                   <GlobeAsiaAustraliaIcon className="w-5 h-5 mx-4" />
                   {translations.country}
                 </span>
-                <div className="flex flex-wrap justify-end gap-1">
-                  {countries.map((country:any) => (
-                    <span key={country.id} className="badge bg-[#f1f1f4] text-[#4b5675] text-xs font-medium px-2.5 py-0.5 rounded">
-                      {country.name}
-                    </span>
-                  ))}
+                <div className="flex flex-wrap justify-end gap-1 max-w-[60%]">
+                  {countries
+                    .slice(0, expandedSections.countries ? countries.length : MAX_VISIBLE_ITEMS)
+                    .map((country:any) => (
+                      <span key={country.id} className="badge bg-[#f1f1f4] text-[#4b5675] text-xs font-medium px-2.5 py-0.5 rounded">
+                        {country.name}
+                      </span>
+                    ))}
+                  {countries.length > MAX_VISIBLE_ITEMS && !expandedSections.countries && (
+                    <button 
+                      className="text-blue-500 text-xs flex items-center whitespace-nowrap ml-1"
+                      onClick={() => toggleSection('countries')}
+                    >
+                      +{countries.length - MAX_VISIBLE_ITEMS} {translations.more} <ChevronDownIcon className="w-3 h-3 ml-1" />
+                    </button>
+                  )}
+                  {expandedSections.countries && countries.length > MAX_VISIBLE_ITEMS && (
+                    <button 
+                      className="text-blue-500 text-xs flex items-center whitespace-nowrap ml-1"
+                      onClick={() => toggleSection('countries')}
+                    >
+                      {translations.showLess} <ChevronUpIcon className="w-3 h-3 ml-1" />
+                    </button>
+                  )}
                 </div>
               </div>
             )
