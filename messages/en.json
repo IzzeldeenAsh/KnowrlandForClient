@@ -119,7 +119,7 @@
                 "alt": "Features Illustration"
             },
             "variableData": {
-                "title": "Knowledge Base Built on an International Database Structure (ISIC, HS Code)"
+                "title": "knowledge library Built on an International Database Structure (ISIC, HS Code)"
             },
             "fasterDecisions": {
                 "title": "AI-Powered Assistance"
@@ -365,7 +365,7 @@
         "company": "Company",
         "client": "Client",
         "addKnowledge": "Add Knowledge +",
-        "knowledgeBase": "Knowledge Base",
+        "knowledgeBase": "knowledge library",
         "myProfile": "My Profile",
         "dashboard": "Dashboard",
         "myRequests": "My Requests",
