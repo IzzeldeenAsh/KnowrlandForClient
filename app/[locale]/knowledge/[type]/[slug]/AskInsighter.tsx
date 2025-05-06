@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import Image from 'next/image';
 import { useParams } from 'next/navigation';
+import Link from 'next/link';
 import { formatDistanceToNow } from 'date-fns';
 import { enUS, ar } from 'date-fns/locale';
 import { Notification } from '@mantine/core';
@@ -294,7 +295,13 @@ export default function AskInsighter({ knowledgeSlug, questions = [], is_owner =
                   src={userImage}
                   alt={userName}
                 />
-                {userName}
+                {question.question.user.uuid ? (
+                  <Link href={`/${locale}/profile/${question.question.user.uuid}`} className="hover:underline">
+                    {userName}
+                  </Link>
+                ) : (
+                  userName
+                )}
               </p>
               <p className="text-sm text-gray-600 dark:text-gray-400">
                 <time dateTime={question.question.question_date} title={question.question.question_date}>
@@ -363,7 +370,15 @@ export default function AskInsighter({ knowledgeSlug, questions = [], is_owner =
                   alt={question.answer.user.name || `${question.answer.user.first_name} ${question.answer.user.last_name}`.trim()}
                 />
                 <div className="flex items-center">
-                  <p className="text-sm font-semibold">{question.answer.user.name || `${question.answer.user.first_name} ${question.answer.user.last_name}`.trim()}</p>
+                  <p className="text-sm font-semibold">
+                    {question.answer.user.uuid ? (
+                      <Link href={`/${locale}/profile/${question.answer.user.uuid}`} className="hover:underline">
+                        {question.answer.user.name || `${question.answer.user.first_name} ${question.answer.user.last_name}`.trim()}
+                      </Link>
+                    ) : (
+                      question.answer.user.name || `${question.answer.user.first_name} ${question.answer.user.last_name}`.trim()
+                    )}
+                  </p>
                   <span className="ml-2 px-2 py-0.5 text-xs font-medium bg-amber-100 text-amber-700 rounded-full">{translations.author}</span>
                   {question.answer.answer_date && (
                     <p className="text-xs text-gray-500 ml-2">{formatDate(question.answer.answer_date)}</p>
