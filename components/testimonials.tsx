@@ -31,7 +31,7 @@ export default function Testimonials() {
     },
     {
       img: TestimonialImg02,
-      quote: "As a fintech specialist, I've found Knoldg to be an invaluable resource for expanding my network and knowledge base. It's become an essential tool for staying ahead in this rapidly evolving field.",
+      quote: "As a fintech specialist, I've found Knoldg to be an invaluable resource for expanding my network and knowledge library. It's become an essential tool for staying ahead in this rapidly evolving field.",
       name: "Awad Salem",
       role: "Fintech Specialist"
     },
