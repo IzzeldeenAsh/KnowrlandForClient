@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect } from 'react';
-import { useRouter, useParams } from 'next/navigation';
+import { useRouter, useParams, useSearchParams } from 'next/navigation';
 
 interface ProfileResponse {
   data: {
@@ -22,18 +22,34 @@ interface ProfileResponse {
 export default function AuthCallback() {
   const router = useRouter();
   const params = useParams();
-  const token = params.token as string;
-  const locale = params.locale as string || 'en';
+  const searchParams = useSearchParams();
+  
+  // Get token from either path parameter or query parameter
+  const pathToken = params.token as string;
+  const queryToken = searchParams.get('token');
+  const token = pathToken || queryToken;
+  const locale = (params.locale as string) || 'en';
 
   useEffect(() => {
     const fetchProfile = async () => {
       try {
-        // Store token in both localStorage and cookies
+        if (!token) {
+          throw new Error('No token provided');
+        }
+
         console.log('[token-callback] Storing token in localStorage and cookies');
+        
+        // Store token in both formats for compatibility with both apps
         localStorage.setItem('token', token);
         
+        // Also store in Angular app format
+        const angularAuthData = {
+          authToken: token,
+          refreshToken: ''
+        };
+        localStorage.setItem('foresighta-creds', JSON.stringify(angularAuthData));
+        
         // Set the token in a cookie to make it accessible for SSR functions
-        // Check if we're on localhost for development
         const isLocalhost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
         
         // Create cookie settings array based on environment
@@ -41,7 +57,7 @@ export default function AuthCallback() {
           `token=${token}`,
           `Path=/`,                 // send on all paths
           `Max-Age=${60 * 60 * 24}`, // expires in 24 hours
-          `SameSite=Lax`           // allows token to be sent during navigation
+          `SameSite=None`           // works across domains
         ];
         
         // Only add domain and secure flag in production environments
@@ -86,6 +102,7 @@ export default function AuthCallback() {
              data.data.roles.includes('company-insighter'))) {
           // Redirect to insighter dashboard with token
           console.log('[token-callback] Redirecting to Angular app with token parameter');
+          // Pass token in both formats for compatibility
           window.location.href = `https://app.knoldg.com/app/insighter-dashboard/my-dashboard?nextjs_token=${encodeURIComponent(token)}`;
         } else {
           // Redirect to home page using current locale
@@ -100,6 +117,9 @@ export default function AuthCallback() {
 
     if (token) {
       fetchProfile();
+    } else {
+      console.error('No token found in URL parameters');
+      window.location.href = 'https://app.knoldg.com/auth/login';
     }
   }, [token, router, locale]);
 
