@@ -84,7 +84,22 @@ export default function TabsContent({ knowledge }: { knowledge: KnowledgeDetails
           {tabs.map((tab) => (
             <button
               key={tab}
-              onClick={() => setActiveTab(tabMapping[tab])}
+              onClick={() => {
+                const tabKey = tabMapping[tab];
+                setActiveTab(tabKey);
+                
+                // Update URL with tab query parameter when changing tabs
+                const url = new URL(window.location.href);
+                if (tabKey === 'Ask') {
+                  url.searchParams.set('tab', 'ask');
+                } else {
+                  // Remove tab parameter for other tabs
+                  url.searchParams.delete('tab');
+                }
+                
+                // Update URL without refreshing the page
+                window.history.pushState({}, '', url);
+              }}
               className={`
                 whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm mx-4
                 ${tabMapping[tab] === activeTab
