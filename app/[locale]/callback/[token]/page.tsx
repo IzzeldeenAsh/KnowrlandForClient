@@ -53,17 +53,26 @@ export default function AuthCallback() {
         const isLocalhost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
         
         // Create cookie settings array based on environment
-        const cookieSettings = [
-          `token=${token}`,
-          `Path=/`,                 // send on all paths
-          `Max-Age=${60 * 60 * 24}`, // expires in 24 hours
-          `SameSite=None`           // works across domains
-        ];
+        let cookieSettings;
         
-        // Only add domain and secure flag in production environments
-        if (!isLocalhost) {
-          cookieSettings.push(`Domain=.knoldg.com`); // leading dot = include subdomains
-          cookieSettings.push(`Secure`);             // HTTPS only
+        if (isLocalhost) {
+          // For localhost: Use Lax SameSite without Secure flag
+          cookieSettings = [
+            `token=${token}`,
+            `Path=/`,                 // send on all paths
+            `Max-Age=${60 * 60 * 24}`, // expires in 24 hours
+            `SameSite=Lax`            // default value, works on same site
+          ];
+        } else {
+          // For production: Use None SameSite with Secure flag and domain
+          cookieSettings = [
+            `token=${token}`,
+            `Path=/`,
+            `Max-Age=${60 * 60 * 24}`,
+            `SameSite=None`,          // works across domains
+            `Domain=.foresighta.co`,  // leading dot = include subdomains
+            `Secure`                  // HTTPS only
+          ];
         }
         
         document.cookie = cookieSettings.join('; ');
