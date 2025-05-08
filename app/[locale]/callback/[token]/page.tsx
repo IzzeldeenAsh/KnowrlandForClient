@@ -70,7 +70,7 @@ export default function AuthCallback() {
             `Path=/`,
             `Max-Age=${60 * 60 * 24}`,
             `SameSite=None`,          // works across domains
-            `Domain=.foresighta.co`,  // leading dot = include subdomains
+            `Domain=.knoldg.com`,     // leading dot = include subdomains
             `Secure`                  // HTTPS only
           ];
         }
