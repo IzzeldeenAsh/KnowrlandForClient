@@ -9,6 +9,10 @@ import ChangelogImg02 from "@/public/images/changelog-01.png";
 import ChangelogImg03 from "@/public/images/experts-meeting.png";
 import ChangelogImg04 from "@/public/images/Budget.png";
 import { useLocale } from "next-intl";
+import { UserGroupIcon } from '@heroicons/react/24/outline';
+import { CalendarIcon } from '@heroicons/react/24/outline';
+import { StarIcon } from '@heroicons/react/24/outline';
+
 export default function Features() {
   const t = useTranslations("Features");
   const t2 = useTranslations("Features2");
@@ -16,6 +20,11 @@ export default function Features() {
   const [tab, setTab] = useState<number>(1);
   const locale = useLocale();
   const isRTL = locale === "ar";
+  
+  // States to track which tab is being hovered for each section
+  const [hoveredTab1, setHoveredTab1] = useState<number | null>(null);
+  const [hoveredTab2, setHoveredTab2] = useState<number | null>(null);
+  const [hoveredTab3, setHoveredTab3] = useState<number | null>(null);
 
   return (
     <section>
@@ -43,14 +52,33 @@ export default function Features() {
             <div className="max-w-xl mx-auto md:max-w-none flex flex-col sm:flex-col md:flex-row-reverse space-y-8 space-y-reverse md:space-y-0 gap-8 items-center justify-between">
               {/* Image */}
               <div className="w-full sm:w-4/5 md:w-1/2" data-aos="fade-up" data-aos-delay="100">
-                <figure className="bg-gradient-to-b from-slate-300/20 to-transparent rounded-3xl p-px mb-8">
-                  <Image
-                    className="w-full rounded-[inherit]"
-                    src={ChangelogImg03}
-                    width={500}
-                    height={250}
-                    alt="Feature 2"
-                  />
+                <figure className=" rounded-3xl p-px mb-8">
+                  <div className="relative flex items-center justify-center" style={{ width: '100%', height: '500px', overflow: 'hidden' }}>
+                    <Image
+                      className={`w-full h-full rounded-[inherit] transition-all duration-700 ease-in-out absolute ${hoveredTab1 === 1 || hoveredTab1 === null ? 'opacity-100' : 'opacity-0'}`}
+                      src={'https://res.cloudinary.com/dsiku9ipv/image/upload/v1746878996/Group_13438_1_ydenox.png'}
+                      width={500}
+                      height={500}
+                      alt="Feature 2 - Image 1"
+                      style={{ objectFit: 'contain' }}
+                    />
+                    <Image
+                      className={`w-full h-full rounded-[inherit] transition-all duration-700 ease-in-out absolute ${hoveredTab1 === 2 ? 'opacity-100' : 'opacity-0'}`}
+                      src={'https://res.cloudinary.com/dsiku9ipv/image/upload/v1746879543/Group_13440_soctoz.webp'}
+                      width={500}
+                      height={500}
+                      alt="Feature 2 - Image 2"
+                      style={{ objectFit: 'contain' }}
+                    />
+                    <Image
+                      className={`w-full h-full rounded-[inherit] transition-all duration-700 ease-in-out absolute ${hoveredTab1 === 3 ? 'opacity-100' : 'opacity-0'}`}
+                      src={ChangelogImg04}
+                      width={500}
+                      height={500}
+                      alt="Feature 2 - Image 3"
+                      style={{ objectFit: 'contain' }}
+                    />
+                  </div>
                 </figure>
               </div>
 
@@ -73,21 +101,29 @@ export default function Features() {
                 </p>
                 <div className="mt-8 max-w-md space-y-2">
                   <button
-                    className={`flex items-start ${isRTL ? 'justify-end text-end' : 'justify-start text-start'} text-sm font-medium text-slate-50 rounded border bg-slate-800/25 w-full px-3 py-2 transition duration-150 ease-in-out hover:opacity-100 border-slate-700 opacity-70`}
+                    onMouseEnter={() => setHoveredTab1(1)}
+                    onMouseLeave={() => setHoveredTab1(null)}
+                    className={`flex items-top gap-2 ${isRTL ? 'justify-end text-end' : 'justify-start text-start'} text-sm font-medium text-slate-50 rounded border bg-slate-800/25 w-full px-3 py-2 transition duration-150 ease-in-out hover:opacity-100 border-slate-700 opacity-70`}
                   >
-               
+                    <UserGroupIcon className="h-7 w-7 text-blue-300" />
                     <span>{t2("tabs.directExpertEngagement.title")}</span>
                   </button>
+
                   <button
-                    className={`flex items-start ${isRTL ? 'justify-end text-end' : 'justify-start text-start'} text-sm font-medium text-slate-50 rounded border bg-slate-800/25 w-full px-3 py-2 transition duration-150 ease-in-out hover:opacity-100 border-slate-700 opacity-70`}
+                    onMouseEnter={() => setHoveredTab1(2)}
+                    onMouseLeave={() => setHoveredTab1(null)}
+                    className={`flex items-top gap-2 ${isRTL ? 'justify-end text-end' : 'justify-start text-start'} text-sm font-medium text-slate-50 rounded border bg-slate-800/25 w-full px-3 py-2 transition duration-150 ease-in-out hover:opacity-100 border-slate-700 opacity-70`}
                   >
-            
+                    <CalendarIcon className="h-7 w-7 text-blue-300" />
                     <span>{t2("tabs.consultingSessions.title")}</span>
                   </button>
+
                   <button
-                    className={`flex items-start ${isRTL ? 'justify-end text-end' : 'justify-start text-start'} text-sm font-medium text-slate-50 rounded border bg-slate-800/25 w-full px-3 py-2 transition duration-150 ease-in-out hover:opacity-100 border-slate-700 opacity-70`}
+                    onMouseEnter={() => setHoveredTab1(3)}
+                    onMouseLeave={() => setHoveredTab1(null)}
+                    className={`flex items-top gap-2 ${isRTL ? 'justify-end text-end' : 'justify-start text-start'} text-sm font-medium text-slate-50 rounded border bg-slate-800/25 w-full px-3 py-2 transition duration-150 ease-in-out hover:opacity-100 border-slate-700 opacity-70`}
                   >
-       
+                    <StarIcon className="h-5 w-5 text-blue-300" />
                     <span>{t2("tabs.expertRatings.title")}</span>
                   </button>
                 </div>
@@ -103,7 +139,7 @@ export default function Features() {
         <div className="pt-16 pb-12 sm:pt-20 md:pt-28 lg:pt-32 sm:pb-16 md:pb-20">
           <div>
             {/* Section content */}
-            <div className="max-w-xl mx-auto md:max-w-none flex flex-col sm:flex-col md:flex-row space-y-8 space-y-reverse md:space-y-0 gap-8 items-center justify-between">
+            <div className="max-w-xl mx-auto md:max-w-none flex flex-col sm:flex-col md:flex-row space-y-8 space-y-reverse md:space-y-0 gap-8 items-start justify-between">
               {/* Content */}
               <div
                 className="flex-1 order-1 max-md:text-center sm:max-w-xl md:max-w-lg"
@@ -124,18 +160,24 @@ export default function Features() {
                 <div className="mt-8 max-w-md space-y-2">
                   <button
                     className={`flex items-start ${isRTL ? 'justify-end text-end' : 'justify-start text-start'} text-sm font-medium text-slate-50 rounded border bg-slate-800/25 w-full px-3 py-2 transition duration-150 ease-in-out hover:opacity-100 border-slate-700 opacity-70`}
+                    onMouseEnter={() => setHoveredTab2(1)}
+                    onMouseLeave={() => setHoveredTab2(null)}
                   >
                
                     <span>{t("tabs.preciseResults.title")}</span>
                   </button>
                   <button
                     className={`flex items-start ${isRTL ? 'justify-end text-end' : 'justify-start text-start'} text-sm font-medium text-slate-50 rounded border bg-slate-800/25 w-full px-3 py-2 transition duration-150 ease-in-out hover:opacity-100 border-slate-700 opacity-70`}
+                    onMouseEnter={() => setHoveredTab2(2)}
+                    onMouseLeave={() => setHoveredTab2(null)}
                   >
                    
                     <span>{t("tabs.variableData.title")}</span>
                   </button>
                   <button
                     className={`flex items-start ${isRTL ? 'justify-end text-end' : 'justify-start text-start'} text-sm font-medium text-slate-50 rounded border bg-slate-800/25 w-full px-3 py-2 transition duration-150 ease-in-out hover:opacity-100 border-slate-700 opacity-70`}
+                    onMouseEnter={() => setHoveredTab2(3)}
+                    onMouseLeave={() => setHoveredTab2(null)}
                   >
                     <span>{t("tabs.fasterDecisions.title")}</span>
                   </button>
@@ -145,13 +187,32 @@ export default function Features() {
               {/* Image */}
               <div className="w-full sm:w-4/5 md:w-1/2" data-aos="fade-up" data-aos-delay="100">
                 <figure className="rounded-3xl p-px mb-8">
-                  <Image
-                    className="w-full rounded-[inherit]"
-                    src={'https://res.cloudinary.com/dsiku9ipv/image/upload/v1744967310/Group_15_kqgqol.png'}
-                    width={500}
-                    height={250}
-                    alt="Feature 1"
-                  />
+                <div className="relative flex items-center justify-center" style={{ width: '100%', height: '500px', overflow: 'hidden' }}>
+                    <Image
+                      className={`w-full rounded-[inherit] transition-all duration-700 ease-in-out absolute inset-0 ${hoveredTab2 === 1 || hoveredTab2 === null ? 'opacity-100' : 'opacity-0'}`}
+                      src={'https://res.cloudinary.com/dsiku9ipv/image/upload/v1744967310/Group_15_kqgqol.png'}
+                      width={500}
+                      height={500}
+                      alt="Feature 1 - Image 1"
+                      style={{ objectFit: 'cover' }}
+                    />
+                    {/* <Image
+                      className={`w-full rounded-[inherit] transition-all duration-700 ease-in-out absolute inset-0 ${hoveredTab2 === 2 ? 'opacity-100' : 'opacity-0'}`}
+                      src={ChangelogImg02}
+                      width={500}
+                      height={500}
+                      alt="Feature 1 - Image 2"
+                      style={{ objectFit: 'cover' }}
+                    />
+                    <Image
+                      className={`w-full rounded-[inherit] transition-all duration-700 ease-in-out absolute inset-0 ${hoveredTab2 === 3 ? 'opacity-100' : 'opacity-0'}`}
+                      src={ChangelogImg01}
+                      width={500}
+                      height={500}
+                      alt="Feature 1 - Image 3"
+                      style={{ objectFit: 'cover' }}
+                    /> */}
+                  </div>
                 </figure>
               </div>
             </div>
@@ -161,7 +222,7 @@ export default function Features() {
         <div className="pt-16 pb-12 sm:pt-20 md:pt-24 lg:pt-28 sm:pb-16 md:pb-20">
           <div>
             {/* Section content */}
-            <div className="max-w-xl mx-auto md:max-w-none flex flex-col sm:flex-col md:flex-row space-y-8 space-y-reverse md:space-y-0 gap-8 items-center justify-between">
+            <div className="max-w-xl mx-auto md:max-w-none flex flex-col sm:flex-col md:flex-row space-y-8 space-y-reverse md:space-y-0 gap-8 items-start justify-between">
             
                  {/* Content */}
               <div
@@ -183,35 +244,71 @@ export default function Features() {
                 <div className="mt-8 max-w-md space-y-2">
                 <button
                     className={`flex items-start ${isRTL ? 'justify-end text-end' : 'justify-start text-start'} text-sm font-medium text-slate-50 rounded border bg-slate-800/25 w-full px-3 py-2 transition duration-150 ease-in-out hover:opacity-100 border-slate-700 opacity-70`}
+                    onMouseEnter={() => setHoveredTab3(1)}
+                    onMouseLeave={() => setHoveredTab3(null)}
                   >
                
                     <span>{t3("tabs.no-monthly-subscription.title")}</span>
                   </button>
                   <button
                     className={`flex items-start ${isRTL ? 'justify-end text-end' : 'justify-start text-start'} text-sm font-medium text-slate-50 rounded border bg-slate-800/25 w-full px-3 py-2 transition duration-150 ease-in-out hover:opacity-100 border-slate-700 opacity-70`}
+                    onMouseEnter={() => setHoveredTab3(2)}
+                    onMouseLeave={() => setHoveredTab3(null)}
                   >
                  
                     <span>{t3("tabs.payAsYouGo.title")}</span>
                   </button>
                   <button
                     className={`flex items-start ${isRTL ? 'justify-end text-end' : 'justify-start text-start'} text-sm font-medium text-slate-50 rounded border bg-slate-800/25 w-full px-3 py-2 transition duration-150 ease-in-out hover:opacity-100 border-slate-700 opacity-70`}
+                    onMouseEnter={() => setHoveredTab3(3)}
+                    onMouseLeave={() => setHoveredTab3(null)}
                   >
                    
                     <span>{t3("tabs.purchaseSpecific.title")}</span>
                   </button>
                 </div>
               </div>
-                 {/* Video */}
-                 <div className="w-full sm:w-4/5 md:w-1/2 order-2" data-aos="fade-up" data-aos-delay="100">
+                 {/* Image */}
+              <div className="w-full sm:w-4/5 md:w-1/2" data-aos="fade-up" data-aos-delay="100">
+                <figure className="bg-gradient-to-b from-slate-300/20 to-transparent rounded-3xl p-px mb-8">
+                <div className="relative flex items-center justify-center" style={{ width: '100%', height: '500px', overflow: 'hidden' }}>
+                    {/* <Image
+                      className={`w-full rounded-[inherit] transition-all duration-700 ease-in-out absolute inset-0 ${hoveredTab3 === 1 || hoveredTab3 === null ? 'opacity-100' : 'opacity-0'}`}
+                      src={ChangelogImg04}
+                      width={500}
+                      height={500}
+                      alt="Feature 3 - Image 1"
+                      style={{ objectFit: 'cover' }}
+                    /> */}
+                         {/* Video */}
                 <figure className=" rounded-3xl p-px mb-8 overflow-hidden mt-10 max-w-[600px] mx-auto">
                   <video 
-                    className="w-full rounded-[inherit]"
+                    className={`w-full rounded-[inherit] transition-all duration-700 ease-in-out absolute inset-0 ${hoveredTab3 === 1 || hoveredTab3 === null ? 'opacity-100' : 'opacity-0'}`}
                     autoPlay 
                     loop 
                     muted 
                     playsInline
                     src="/images/Pay-for-what-you-need.mp4"
                   />
+                </figure>
+
+                    {/* <Image
+                      className={`w-full rounded-[inherit] transition-all duration-700 ease-in-out absolute inset-0 ${hoveredTab3 === 2 ? 'opacity-100' : 'opacity-0'}`}
+                      src={ChangelogImg03}
+                      width={500}
+                      height={500}
+                      alt="Feature 3 - Image 2"
+                      style={{ objectFit: 'cover' }}
+                    />
+                    <Image
+                      className={`w-full rounded-[inherit] transition-all duration-700 ease-in-out absolute inset-0 ${hoveredTab3 === 3 ? 'opacity-100' : 'opacity-0'}`}
+                      src={ChangelogImg02}
+                      width={500}
+                      height={500}
+                      alt="Feature 3 - Image 3"
+                      style={{ objectFit: 'cover' }}
+                    /> */}
+                  </div>
                 </figure>
               </div>
            
@@ -222,3 +319,4 @@ export default function Features() {
     </section>
   );
 }
+            
