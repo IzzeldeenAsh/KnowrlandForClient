@@ -10,6 +10,7 @@ import { fetchBreadcrumb } from '@/utils/breadcrumb'
 import StatisticsCards from '@/components/industry/statistics-cards'
 import Stripes from "@/public/images/stripes-dark.svg";
 import { getMessages } from '@/utils/get-messages'
+import { IntlMessageFormat } from 'intl-messageformat';
 
 interface Knowledge {
   id: number
@@ -132,7 +133,7 @@ export default async function SubIndustryPage({ params }: Props) {
       </div>
     
         <div className="min-h-screen bg-gray-50" dir={isRTL ? 'rtl' : 'ltr'}>
-          <div className="section-header px-4 sm:px-6 lg:px-8 py-8  relative overflow-hidden rounded-lg">
+            <div className="section-header px-4 sm:px-6 lg:px-8 py-8 relative overflow-hidden rounded-lg">
             <Image
               alt="Section background"
               src="https://res.cloudinary.com/dsiku9ipv/image/upload/v1737266454/breadcrumb-bg-2_anwto8.png"
@@ -140,34 +141,52 @@ export default async function SubIndustryPage({ params }: Props) {
               className="object-cover z-0"
               priority
             />
-            <div className="relative z-10 max-w-6xl relative mx-auto mt-5 w-full">
+
+            <div className="relative z-10 max-w-6xl mx-auto mt-5 w-full">
               {/* Breadcrumb */}
-              <div className="mb-8">
-                <Breadcrumb items={breadcrumbItems} />
-              </div>
-              {/* Header */}
-                 <div className="min-h-[100px] flex flex-col md:flex-row items-start justify-between">
-                  <div className={`${isRTL ? 'text-right' : 'text-start'}`} data-aos="fade-down">
+                 <div className="mb-8">
+                    <Breadcrumb items={breadcrumbItems} />
+                  </div>
+
+              {/* Header Wrapper Split */}
+              <div className="flex row w-100 justify-between">
+                
+                {/* Left Side: Title */}
+                <div className="min-h-[100px] flex flex-col md:flex-row items-start justify-between w-50">
+                  <div className={`${isRTL ? 'text-right' : 'text-start'} mb-4`} data-aos="fade-down">
                     <span className="inline-block px-5 py-1 text-xs font-semibold text-blue-500 bg-blue-100 rounded-md mb-2 uppercase">
-                     {locale === 'ar' ? 'الصناعة الفرعية' : 'Sub Industry'}
+                      {messages?.Header?.navigation?.subIndustry || (locale === 'ar' ? 'الصناعة الفرعية' : 'Sub Industry')}
                     </span>
-                    <h3 className="text-md bg-gradient-to-r from-blue-500 to-teal-400 md:text-3xl font-extrabold text-transparent bg-clip-text ">
-                      { subIndustry.name}
+                    <h3 className="text-md bg-gradient-to-r from-blue-500 to-teal-400 md:text-5xl font-extrabold text-transparent bg-clip-text mb-4">
+                      {subIndustry.name}
                     </h3>
-                   
                   </div>
-                      {/* Stats Cards */}
-                      <StatisticsCards type="subIndustry" id={parseInt(id)} />
-                  </div>
+                </div>
+
+                {/* Right Side: Interpolated message + Stats */}
+                <div className="flex flex-col items-start justify-between w-50">
+                  <span className="inline-block px-5 py-1 text-xs font-semibold text-blue-500 bg-blue-100 rounded-md mb-2 capitalize w-100">
+                    {
+                      new IntlMessageFormat(
+                        messages?.subIndustryKnowledge || 'Type of knowledge available in {subIndustry}',
+                        locale
+                      ).format({ subIndustry: subIndustry.name })
+                    }
+                  </span>
+
+                  <StatisticsCards type="subIndustry" id={parseInt(id)} />
+                </div>
+              </div>
             </div>
           </div>
+
 
           <div className="max-w-container relative mx-auto mt-10 w-full px-4 sm:px-6 lg:px-8 pb-12">
             <div className="max-w-6xl mx-auto">
               <div className={`mb-8 ${isRTL ? 'text-right' : 'text-start'}`}>
-                <h2 className="text-2xl font-bold text-gray-900 mb-2">
+                {/* <h2 className="text-2xl font-bold text-gray-900 mb-2">
                   {locale === 'ar' ? 'المواضيع' : 'Topics'}
-                </h2>
+                </h2> */}
                 <p className="text-gray-600">
                   {locale === 'ar' ? `استكشف المواضيع والرؤى ضمن ${subIndustry.name}` : `Explore topics and insights within ${subIndustry.name}`}
                 </p>
