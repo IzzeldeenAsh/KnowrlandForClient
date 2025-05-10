@@ -8,6 +8,7 @@ import { fetchBreadcrumb } from '@/utils/breadcrumb'
 import StatisticsCards from '@/components/industry/statistics-cards'
 import Stripes from "@/public/images/stripes-dark.svg";
 import { getMessages } from '@/utils/get-messages'
+import { IntlMessageFormat } from 'intl-messageformat';
 
 interface Topic {
   id: number
@@ -138,31 +139,44 @@ export default async function IndustryPage({ params }: Props) {
                   <div className="mb-8">
                     <Breadcrumb items={breadcrumbItems.map(item => ({ ...item, href: item.url }))} />
                   </div>
-                
+
+                  <div className='flex row w-100 justify-between'>
+
                   {/* Header */}
-                  <div className="min-h-[100px] flex flex-col md:flex-row items-start justify-between">
+                  <div className="min-h-[100px] flex flex-col md:flex-row items-start justify-between w-50">
                   <div className={`${isRTL ? 'text-right' : 'text-start'} mb-4`} data-aos="fade-down">
                     <span className="inline-block px-5 py-1 text-xs font-semibold text-blue-500 bg-blue-100 rounded-md mb-2 uppercase">
                       {messages?.Header?.navigation?.industries || 'Industry'}
                     </span>
-                    <h3 className="text-md bg-gradient-to-r from-blue-500 to-teal-400 md:text-3xl font-extrabold text-transparent bg-clip-text mb-4">
+                    <h3 className="text-md bg-gradient-to-r from-blue-500 to-teal-400 md:text-5xl font-extrabold text-transparent bg-clip-text mb-4">
                       {industry.name}
                     </h3>
                   
+                   </div>
                   </div>
-                      {/* Stats Cards */}
-                      <StatisticsCards type="industry" id={parseInt(id)}  />
+                  <div className="flex flex-col items-start justify-between w-50">
+                  <span className="inline-block px-5 py-1 text-xs font-semibold text-blue-500 bg-blue-100 rounded-md mb-2 capitalize w-100">
+                    {
+                      new IntlMessageFormat(
+                        messages?.industryKnowledge || 'Type of knowledge available in {industry}',
+                        locale
+                      ).format({ industry: industry.name })
+                    }
+                  </span>
+                    {/* Stats Cards */}
+                    <StatisticsCards type="industry" id={parseInt(id)}  />
                   </div>
-                 
+                  
+                  </div>
                 </div>
         </div>
         
         <div className="max-w-container relative mx-auto mt-10 w-full px-4 sm:px-6 lg:px-8 pb-32">
           <div className="max-w-6xl mx-auto">
             <div className={`mb-8 ${isRTL ? 'text-right' : 'text-start'}`}>
-              <h2 className="text-2xl font-bold text-gray-900 mb-2">
+              {/* <h2 className="text-2xl font-bold text-gray-900 mb-2">
                 {locale === 'ar' ? 'الصناعات الفرعية' : 'Sub Industries'}
-              </h2>
+              </h2> */}
            
             </div>
             
@@ -191,7 +205,7 @@ export default async function IndustryPage({ params }: Props) {
                               key={topic.id}
                               className="text-xs text-gray-600 hover:text-blue-600 transition-colors flex items-center"
                             >
-                              <span className={isRTL ? "ml-2" : "mr-2"}></span>
+                              <span className={isRTL ? "ml-2" : "mr-2"}>•</span>
                               {topic.name}
                             </li>
                             </Link>

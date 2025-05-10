@@ -1,0 +1,9 @@
+<svg width="200" height="200" viewBox="0 0 512 512" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="blueGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#3B82F6"/> <!-- Tailwind blue-500 -->
+      <stop offset="100%" stop-color="#BFDBFE"/> <!-- Tailwind blue-200 -->
+    </linearGradient>
+  </defs>
+  <path fill="url(#blueGradient)" d="M96 52v408c0 28 32 44 55 26l273-204c19-14 19-38 0-52L151 26C128 8 96 24 96 52z"/>
+</svg>

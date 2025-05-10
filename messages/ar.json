@@ -554,6 +554,10 @@
             "send": "إرسال الرسالة",
             "regionalOperations": "العمليات الإقليمية - الأردن",
             "jordanPhone": "+962777771429"
-            }
-
+        },
+        "dataNotAvailable": "البيانات غير متوفرة",
+        "industryKnowledge": "نوع المعرفة المتوفرة في {industry}",
+        "subIndustry": "الصناعة الفرعية",
+        "subIndustryKnowledge": "نوع المعرفة المتوفرة في {subIndustry}",
+        "topicLabel": "الموضوع"
 }
