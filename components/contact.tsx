@@ -112,11 +112,7 @@ export default function ContactContent() {
                 </button>
               </div>
 
-              {/* Company Info */}
-              <div className="pt-6 border-t  border-slate-700 text-slate-400 text-sm space-y-1">
-                <p className="font-semibold text-center">{t('regionalOperations')}</p>
-                {/* <p className="text-[#2196F3] font-medium">{t('jordanPhone')}</p> */}
-                </div>
+         
             </div>
           </form>
         </div>

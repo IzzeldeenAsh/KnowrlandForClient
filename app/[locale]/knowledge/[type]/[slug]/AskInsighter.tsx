@@ -42,6 +42,8 @@ export default function AskInsighter({ knowledgeSlug, questions = [], is_owner =
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState('');
   const [submitSuccess, setSubmitSuccess] = useState(false);
+  // Track which question's reply form is currently visible
+  const [visibleReplyForm, setVisibleReplyForm] = useState<number | null>(null);
   const [authToken, setAuthToken] = useState<string | null>(null);
   const params = useParams();
   const locale = params.locale as string;
@@ -190,7 +192,8 @@ export default function AskInsighter({ knowledgeSlug, questions = [], is_owner =
       }
       
       if (is_owner) {
-        // Author answering a question - use the specific question ID, not the parent
+        // For authors/owners, always use the specific question ID provided
+        // For insighters, this will be the deepest question ID in the thread
         console.log(`[AskInsighter] Owner answering question ID: ${questionId}`);
         response = await fetch(
           `https://api.knoldg.com/api/insighter/library/knowledge/answer/${questionId}`,
@@ -204,9 +207,14 @@ export default function AskInsighter({ knowledgeSlug, questions = [], is_owner =
         );
       } else {
         // Regular user replying to a question (creating a nested question)
-        // Use the parent question ID for API requests (top-level question IDs)
-        const questionIdForApi = parentId || questionId;
-        console.log(`[AskInsighter] Submitting reply to parent question ID: ${questionIdForApi}`);
+        // parentId should always be the top-level parent question ID
+        if (!parentId) {
+          console.error('[AskInsighter] Error: Missing parent_id for nested question');
+          setSubmitError('Missing parent question reference');
+          return;
+        }
+        
+        console.log(`[AskInsighter] Submitting reply to parent question ID: ${parentId}`);
         response = await fetch(
           `https://api.knoldg.com/api/account/ask/insighter/knowledge/${knowledgeSlug}`,
           {
@@ -214,7 +222,7 @@ export default function AskInsighter({ knowledgeSlug, questions = [], is_owner =
             headers,
             body: JSON.stringify({
               question: replyText,
-              parent_id: questionIdForApi
+              parent_id: parentId  // Always use the explicit parent ID
             }),
           }
         );
@@ -286,6 +294,71 @@ export default function AskInsighter({ knowledgeSlug, questions = [], is_owner =
     }
   };
 
+  // Helper function to find the deepest unanswered question in a thread
+  const findDeepestUnansweredQuestion = (question: Question): Question => {
+    // If the question has children (replies)
+    if (question.children && question.children.length > 0) {
+      // Sort children by date (newest last)
+      const sortedChildren = [...question.children].sort((a, b) => {
+        const dateA = new Date(a.question.question_date).getTime();
+        const dateB = new Date(b.question.question_date).getTime();
+        return dateA - dateB; // Ascending order (oldest first)
+      });
+      
+      // Get the last child (most recent)
+      const lastChild = sortedChildren[sortedChildren.length - 1];
+      
+      // If the last child doesn't have an answer, return the result of recursively checking it
+      if (!lastChild.answer || !lastChild.answer.answer) {
+        return findDeepestUnansweredQuestion(lastChild);
+      }
+    }
+    
+    // If no children or all children have answers, return this question
+    return question;
+  };
+  
+  // Helper function to find the original top-level parent of a question
+  const findTopLevelParent = (questions: Question[], targetId: number): number => {
+    // First check if this question is a direct top-level question
+    const foundQuestion = questions.find(q => q.id === targetId);
+    if (foundQuestion) {
+      return foundQuestion.id; // It's already a top-level question
+    }
+    
+    // Search through all top-level questions and their children recursively
+    for (const question of questions) {
+      if (findQuestionInChildren(question, targetId)) {
+        return question.id; // Return the ID of the top-level parent
+      }
+    }
+    
+    // If not found, default to the target ID itself as a fallback
+    // This should rarely happen but provides a safe default
+    console.warn(`[AskInsighter] Could not find top-level parent for question ID: ${targetId}`);
+    return targetId;
+  };
+  
+  // Helper function to search for a question ID in the children hierarchy
+  const findQuestionInChildren = (question: Question, targetId: number): boolean => {
+    // Check if any direct child matches the target ID
+    if (question.children && question.children.length > 0) {
+      // Direct child match
+      if (question.children.some(child => child.id === targetId)) {
+        return true;
+      }
+      
+      // Recursive search in each child's children
+      for (const child of question.children) {
+        if (findQuestionInChildren(child, targetId)) {
+          return true;
+        }
+      }
+    }
+    
+    return false;
+  };
+  
   const renderQuestions = (questionsToRender: Question[], isReply = false) => {
     if (questionsToRender.length === 0 && !isReply) {
       return (
@@ -309,14 +382,15 @@ export default function AskInsighter({ knowledgeSlug, questions = [], is_owner =
       const userImage = question.question.user.profile_photo_url || question.question.user.profile_image || 'https://flowbite.com/docs/images/people/profile-picture-2.jpg';
       const userName = question.question.user.name || `${question.question.user.first_name} ${question.question.user.last_name}`.trim();
       const questionDate = formatDate(question.question.question_date);
-      const hasAnswer = question.answer && question.answer.answer;
+      // Check if the question has a valid answer (ensure we handle null/undefined/empty strings properly)
+      const hasAnswer = Boolean(question.answer?.answer);
       const hasReplies = question.children && question.children.length > 0;
       
       return (
         <div className={styles.commentContainer} key={question.id} dir={isRTL ? 'rtl' : 'ltr'}>
           {/* Add line terminator to the last reply in a thread */}
           {isLastReply(index) && (
-            <div className={styles.lineTerminator} aria-hidden="true" />
+            <div className={styles.replyTerminator} aria-hidden="true" />
           )}
           
           {/* Child comments have curved connectors */}
@@ -327,10 +401,18 @@ export default function AskInsighter({ knowledgeSlug, questions = [], is_owner =
             />
           )}
           
-          {/* Parent thread line - only for non-replies that have children */}
-          {!isReply && hasReplies && (
+          {/* Parent thread line - for questions with answers or replies */}
+          {!isReply && (hasReplies || hasAnswer) && (
             <span
               className={styles.parentThreadLine}
+              aria-hidden="true"
+            />
+          )}
+          
+          {/* Child thread line - only for child comments that have answers or replies */}
+          {isReply && (hasAnswer || hasReplies) && (
+            <span
+              className={styles.childThreadLine}
               aria-hidden="true"
             />
           )}
@@ -349,7 +431,7 @@ export default function AskInsighter({ knowledgeSlug, questions = [], is_owner =
           
           <footer className="flex justify-between items-center mb-2">
             <div className="flex items-center">
-              <p className="inline-flex items-center me-3 text-sm text-gray-900 dark:text-white font-semibold">
+              <p className="inline-flex items-start me-3 text-sm text-gray-900 dark:text-white font-semibold capitalize" >
                 {question.question.user.uuid ? (
                   <Link 
                     href={
@@ -357,10 +439,10 @@ export default function AskInsighter({ knowledgeSlug, questions = [], is_owner =
                     } 
                     className="hover:underline"
                   >
-                    <span className="ms-2">{userName}</span>
+                    <span className="capitalize">{userName.toLowerCase()}</span>
                   </Link>
                 ) : (
-                  userName
+                  userName.toLowerCase()
                 )}
               </p>
               <p className="text-xs text-gray-600 dark:text-gray-400">
@@ -417,13 +499,15 @@ export default function AskInsighter({ knowledgeSlug, questions = [], is_owner =
           </footer>
           
           {/* Question content */}
-          <p className="text-gray-800 mb-4 text-sm ps-2">{question.question?.question}</p>
+          <p className="text-gray-800 mb-4 text-sm ">{question.question?.question}</p>
           
           {/* Answer if exists */}
           {hasAnswer && (
-            <div className={`${styles.commentContainer} ${styles.answer}`} dir={isRTL ? 'rtl' : 'ltr'}>
-              <span className={styles.childConnector} aria-hidden="true" />
-              
+            <div className={`${styles.commentContainer} ${styles.answer} `} dir={isRTL ? 'rtl' : 'ltr'}>
+              <span
+                className={`${styles.answerConnector} ${isReply ? styles.childAnswerConnector : ''}`}
+                aria-hidden="true"
+              />
               <img
                 className={`${styles.commentAvatar} ${styles.childAvatar}`}
                 src={question.answer.user.profile_photo_url || question.answer.user.profile_image || 'https://flowbite.com/docs/images/people/profile-picture-5.jpg'}
@@ -442,10 +526,10 @@ export default function AskInsighter({ knowledgeSlug, questions = [], is_owner =
                           } 
                           className="hover:underline"
                         >
-                          <span className="ms-2">{question.answer.user.name || `${question.answer.user.first_name} ${question.answer.user.last_name}`.trim()}</span>
+                          <span className=" capitalize">{question.answer.user.name?.toLowerCase() || `${question.answer.user.first_name.toLowerCase()} ${question.answer.user.last_name.toLowerCase()}`.trim()}</span>
                         </Link>
                       ) : (
-                        <span className="ms-2">{question.answer.user.name || `${question.answer.user.first_name} ${question.answer.user.last_name}`.trim()}</span>
+                        <span className=" capitalize">{question.answer.user.name?.toLowerCase() || `${question.answer.user.first_name.toLowerCase()} ${question.answer.user.last_name.toLowerCase()}`.trim()}</span>
                       )}
                     </p>
                     <span className="me-2 px-2 py-0.5 text-xs font-medium bg-amber-100 text-amber-700 rounded-full">{translations.author}</span>
@@ -464,7 +548,7 @@ export default function AskInsighter({ knowledgeSlug, questions = [], is_owner =
               </article>
               
               {!hasReplies && (
-                <div className={styles.lineTerminator} aria-hidden="true" />
+                <div className={`${styles.lineTerminator} ${styles.parentTerminator}`} aria-hidden="true" />
               )}
             </div>
           )}
@@ -472,73 +556,72 @@ export default function AskInsighter({ knowledgeSlug, questions = [], is_owner =
           {/* Render children/replies */}
           {hasReplies && renderQuestions(question.children, true)}
           
-          {/* For sub-questions/replies, show Answer button for owners if there's no answer */}
-          {/* {isReply && is_owner && isLoggedIn && !hasAnswer && (
-            <div className="flex justify-end mt-2">
-              <button
-                type="button"
-                onClick={() => {
-                  setReplyingTo(question.id);
-                  setParentQuestionId(null);
-                }}
-                className="flex items-center text-xs text-blue-600 hover:underline dark:text-blue-500 font-medium"
-              >
-                <svg className={`${isRTL ? 'ml-1.5' : 'mr-1.5'} w-3 h-3`} aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 18">
-                  <path
-                    stroke="currentColor"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth="2"
-                    d="M5 5h5M5 8h2m6-3h2m-5 3h6m2-7H2a1 1 0 0 0-1 1v9a1 1 0 0 0 1 1h3v5l5-5h8a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1Z"
-                  />
-                </svg>
-                {translations.answer}
-              </button>
-            </div>
-          )} */}
+          {/* No Answer button for owners - answer box is always visible */}
           
-          {/* Reply form - only shown for top-level comments if user is authenticated */}
-          {isLoggedIn && !isReply && (
-            <div className="mt-4 p-4 bg-gray-50 rounded-lg dark:bg-gray-800">
-              {/* Removed informational text boxes */}
-              <form onSubmit={(e) => handleReplySubmit(e, question.id, isReply ? parentQuestionId : question.id)}>
-                <div className="mb-4 relative">
-                  <label htmlFor={`replyText-${question.id}`} className="sr-only">
-                    {is_owner ? translations.writeAnswer : translations.writeReply}
-                  </label>
-                  <textarea
-                    id={`replyText-${question.id}`}
-                    rows={2}
-                    className="px-3 py-2 pe-20 w-full text-sm text-gray-900 bg-white rounded-lg border border-gray-200 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white min-h-[100px]"
-                    placeholder={is_owner ? translations.writeAnswer : translations.writeReply}
-                    value={replyTexts[question.id] || ''}
-                    onChange={(e) => setReplyTexts(prev => ({ ...prev, [question.id]: e.target.value }))}
-                    disabled={isSubmitting}
-                  />
-                  <button
-                    type="submit"
-                    className="absolute mb-2 bottom-2 end-5 inline-flex items-center py-1.5 px-3 text-xs font-medium text-center text-white bg-gradient-to-r from-blue-500 to-teal-400 rounded-lg focus:ring-2 focus:ring-blue-200 dark:focus:ring-blue-900 hover:bg-blue-800 disabled:opacity-50 disabled:cursor-not-allowed"
-                    disabled={isSubmitting}
-                  >
-                    {isSubmitting && replyingTo === question.id
-                      ? (is_owner ? translations.submittingAnswer : translations.submittingReply) 
-                      : (is_owner ? translations.postAnswer : translations.postReply)}
-                  </button>
+          {/* Reply form - shown for the appropriate questions based on user role */}
+          {isLoggedIn && (
+            <>
+              {/* Show form if:*/}
+              {/* 1. For regular users - only on last reply (or parent if no replies)*/}
+              {/* 2. For owners - always show for ANY unanswered question */}
+              {((!is_owner && ((isReply && isLastReply(index)) || (!isReply && !hasReplies))) || 
+                (is_owner && !hasAnswer)) && (
+                <div className="mt-4 bg-gray-50 rounded-lg dark:bg-gray-800">
+                  <form onSubmit={(e) => {
+                    // Different handling for owners vs regular users
+                    if (is_owner) {
+                      // For owners/authors, directly use the current question's ID
+                      // No need to find deepest question since we're showing answer forms for all unanswered questions
+                      handleReplySubmit(e, question.id, null);
+                    } else {
+                      // For regular users, ALWAYS find the top-level parent question ID
+                      // This ensures replies are always attached to the original parent question, not an immediate parent
+                      const topLevelParentId = findTopLevelParent(questions, question.id);
+                      handleReplySubmit(e, question.id, topLevelParentId);
+                    }
+                  }}>
+                    <div className="mb-4 relative " >
+                      <div className={`${styles.lineTerminatorBox} ${styles.parentTerminator}`} aria-hidden="true" />
+                      <label htmlFor={`replyText-${question.id}`} className="sr-only">
+                        {is_owner ? translations.writeAnswer : translations.writeReply}
+                      </label>
+                      <textarea
+                        id={`replyText-${question.id}`}
+                        rows={2}
+                        className="px-3 py-2 pe-20 w-full text-sm text-gray-900 bg-white rounded-lg border border-gray-200 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white min-h-[100px]"
+                        placeholder={is_owner ? translations.writeAnswer : translations.writeReply}
+                        value={replyTexts[question.id] || ''}
+                        onChange={(e) => setReplyTexts(prev => ({ ...prev, [question.id]: e.target.value }))}
+                        disabled={isSubmitting}
+                      />
+                      <div className="absolute mb-2 bottom-2 end-5 flex gap-2">
+                        <button
+                          type="submit"
+                          className="inline-flex items-center py-1.5 px-3 text-xs font-medium text-center text-white bg-gradient-to-r from-blue-500 to-teal-400 rounded-lg focus:ring-2 focus:ring-blue-200 dark:focus:ring-blue-900 hover:bg-blue-800 disabled:opacity-50 disabled:cursor-not-allowed"
+                          disabled={isSubmitting}
+                        >
+                          {isSubmitting && replyingTo === question.id
+                            ? (is_owner ? translations.submittingAnswer : translations.submittingReply) 
+                            : (is_owner ? translations.postAnswer : translations.postReply)}
+                        </button>
+                      </div>
+                    </div>
+                    {question.id === replyingTo && submitError && (
+                      <Notification
+                        icon={<IconX size={20} />}
+                        color="red"
+                        onClose={() => setSubmitError('')}
+                        mt="sm"
+                        mb="md"
+                        withCloseButton
+                      >
+                        {submitError}
+                      </Notification>
+                    )}
+                  </form>
                 </div>
-                {question.id === replyingTo && submitError && (
-                  <Notification
-                    icon={<IconX size={20} />}
-                    color="red"
-                    onClose={() => setSubmitError('')}
-                    mt="sm"
-                    mb="md"
-                    withCloseButton
-                  >
-                    {submitError}
-                  </Notification>
-                )}
-              </form>
-            </div>
+              )}
+            </>
           )}
           
           {/* Login button for non-logged in users - only show for top-level questions */}
