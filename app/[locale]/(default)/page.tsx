@@ -20,7 +20,6 @@ export default function Home() {
       <Features/>
       <Features02 />
       <Cta />
-      <Clients />
-    </>
+     </>
   )
 }
