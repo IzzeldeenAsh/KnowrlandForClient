@@ -7,6 +7,9 @@ import { fetchBreadcrumb } from '@/utils/breadcrumb'
 import KnowledgeGrid from './KnowledgeGrid'
 import StatisticsCards from '@/components/industry/statistics-cards'
 import Stripes from "@/public/images/stripes-dark.svg";
+import IntlMessageFormat from 'intl-messageformat';
+import { getMessages } from '@/utils/get-messages'
+
 interface Knowledge {
   id: number
   type: string
@@ -103,6 +106,8 @@ export default async function TopicPage({ params }: Props) {
   try {
     const { data: topic } = await fetchTopicData(id, slug, locale)
     const breadcrumbItems = await fetchBreadcrumb('topic', parseInt(id))
+    const messages = await getMessages(locale);
+    const showStatistics = !!topic?.knowledge?.length;
 
     return (
       <>
@@ -124,47 +129,55 @@ export default async function TopicPage({ params }: Props) {
       </div>
       </div>
     
-        <div className="min-h-screen bg-gray-50">
-          <div className="section-header px-4 sm:px-6 lg:px-8 py-8  relative overflow-hidden rounded-lg">
-            <Image
-              alt="Section background"
-              src="https://res.cloudinary.com/dsiku9ipv/image/upload/v1737266454/breadcrumb-bg-2_anwto8.png"
-              fill
-              className="object-cover z-0"
-              priority
+        <div className="relative z-10 max-w-6xl relative mx-auto mt-5 w-full">
+          {/* Breadcrumb */}
+          <div className="mb-8">
+            <Breadcrumb
+              items={breadcrumbItems.map(item => ({
+                label: item.label,
+                href: item.url,
+              }))}
             />
-            <div className="relative z-10 max-w-6xl relative mx-auto mt-5 w-full">
-              {/* Breadcrumb */}
-              <div className="mb-8">
-                <Breadcrumb 
-                  items={breadcrumbItems.map(item => ({
-                    key: item.url,
-                    label: item.label,
-                    href: item.url
-                  }))} 
-                />
-              </div>
-              {/* Header */}
-              <div className="min-h-[100px] flex flex-col md:flex-row items-start justify-between">
-                  <div className="text-start " data-aos="fade-down">
-                    <span className="inline-block px-5 py-1 text-xs font-semibold text-blue-500 bg-blue-100 rounded-md mb-2 uppercase">
-                     Topic
-                    </span>
-                    <h3 className="text-md bg-gradient-to-r from-blue-500 to-teal-400 md:text-3xl font-extrabold text-transparent bg-clip-text ">
-                      { topic.name}
-                    </h3>
-                  
-                  </div>
-                      {/* Stats Cards */}
-                      <StatisticsCards type="topic" id={parseInt(id)} />
-                  </div>
-            </div>
           </div>
 
-          <div className="max-w-container relative mx-auto mt-10 w-full px-4 sm:px-6 lg:px-8 pb-12">
-            <KnowledgeGrid knowledge={topic.knowledge} topicName={topic.name} />
+          <div className="flex flex-row w-full justify-between">
+            {/* Header */}
+            <div className="min-h-[100px] flex flex-col md:flex-row items-start justify-between w-50">
+              <div className={`${locale == 'ar' ? 'text-right' : 'text-start'} mb-4`} data-aos="fade-down">
+                <span className="inline-block px-5 py-1 text-xs font-semibold text-blue-500 bg-blue-100 rounded-md mb-2 uppercase">
+                  {
+                    new IntlMessageFormat(
+                      messages?.topicLabel || 'Topic',
+                      locale
+                    ).format()
+                  }
+                </span>
+                <h3 className="text-md bg-gradient-to-r from-blue-500 to-teal-400 md:text-5xl font-extrabold text-transparent bg-clip-text mb-4">
+                  {topic.name}
+                </h3>
+              </div>
+            </div>
+
+            {showStatistics && (
+                <div className="flex flex-col items-start justify-between w-50">
+                  <span className="inline-block px-5 py-1 text-xs font-semibold text-blue-500 bg-blue-100 rounded-md mb-2 uppercase w-100">
+                    {
+                      new IntlMessageFormat(
+                        messages?.topicKnowledge || 'Type of knowledge available in {topic}',
+                        locale
+                      ).format({ topic: topic.name })
+                    }
+                  </span>
+
+                  <StatisticsCards type="topic" id={parseInt(id)} />
+                </div>
+              )}
           </div>
         </div>
+
+      <div className="max-w-container relative mx-auto mt-10 w-full px-4 sm:px-6 lg:px-8 pb-12">
+        <KnowledgeGrid knowledge={topic.knowledge} topicName={topic.name} />
+      </div>
         <Footer />
       </>
     )

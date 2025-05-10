@@ -569,8 +569,10 @@
                 "send": "Send Message",
                 "regionalOperations": "Regional Operations - Jordan",
                 "jordanPhone": "+962777771429"
-        }
-
-
-
+        },
+    "dataNotAvailable": "Data not available",
+    "industryKnowledge": "Type of knowledge available in {industry}",
+    "subIndustry": "Sub Industry",
+    "subIndustryKnowledge": "Type of knowledge available in {subIndustry}",
+    "topicLabel": "Topic"
 }

@@ -86,21 +86,21 @@ export default function InsighterFeatures() {
                   }`}
                 >
                   {t("insighter.title")}{" "}
-                  <span className="text-[#2ECFC3] font-semibold text-xl sm:text-3xl">
+                  <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-500 to-blue-200 font-semibold text-xl sm:text-3xl">
                     {t("insighter.insighterText")}
                   </span>
                 </h5>
                 <ul className="text-lg text-slate-300 space-y-4 pt-6 text-left ltr:ml-5 rtl:mr-5">
                   <li className="flex items-start gap-3">
-                    <Image src="/images/triangle.svg" alt="triangle" width={16} height={16} className={`${isRTL ? "rotate-180" : ""}`} />
+                    <Image src="/images/triangle2.svg" alt="triangle" width={16} height={16} className={`${isRTL ? "rotate-180" : ""} mt-1`} />
                     <span className="text-[18px] font-light">{t("insighter.point1")}</span>
                   </li>
                   <li className="flex items-start gap-3">
-                    <Image src="/images/triangle.svg" alt="triangle" width={16} height={16} className={`${isRTL ? "rotate-180" : ""}`} />
+                    <Image src="/images/triangle2.svg" alt="triangle" width={16} height={16} className={`${isRTL ? "rotate-180" : ""} mt-1`} />
                     <span className="text-[18px] font-light">{t("insighter.point2")}</span>
                   </li>
                   <li className="flex items-start gap-3">
-                    <Image src="/images/triangle.svg" alt="triangle" width={16} height={16} className={`${isRTL ? "rotate-180" : ""}`} />
+                    <Image src="/images/triangle2.svg" alt="triangle" width={16} height={16} className={`${isRTL ? "rotate-180" : ""} mt-1`} />
                     <span className="text-[18px] font-light">{t("insighter.point3")}</span>
                   </li>
                 </ul>
@@ -169,7 +169,7 @@ export default function InsighterFeatures() {
                     } text-lg sm:text-xl md:text-2xl text-slate-200 pb-8`}
                   >
                     {t("insighter.uploadTitle")}{" "}
-                    <span className="text-[#2ECFC3] font-semibold text-xl sm:text-3xl">
+                    <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-500 to-blue-200 font-semibold text-xl sm:text-3xl">
                       {t("insighter.insighterText")}
                     </span>
                   </h5>

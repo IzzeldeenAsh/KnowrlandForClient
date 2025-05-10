@@ -104,11 +104,11 @@ export default function KnowledgeGrid({
 
   return (
     <div className="max-w-6xl mx-auto" dir={isRTL ? "rtl" : "ltr"}>
-      {showHeader && (
+      {/* {showHeader && (
         <div className={`mb-8 ${isRTL ? 'text-right' : 'text-start'}`}>
           <h2 className="text-2xl font-bold text-gray-900 mb-2">{translations.knowledge}</h2>
         </div>
-      )}
+      )} */}
 
       <div
         className={`grid sm:grid-cols-2 lg:grid-cols-${colNumbers} gap-4 max-w-7xl mx-auto`}
