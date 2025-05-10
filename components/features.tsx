@@ -9,9 +9,15 @@ import ChangelogImg02 from "@/public/images/changelog-01.png";
 import ChangelogImg03 from "@/public/images/experts-meeting.png";
 import ChangelogImg04 from "@/public/images/Budget.png";
 import { useLocale } from "next-intl";
-import { UserGroupIcon } from '@heroicons/react/24/outline';
-import { CalendarIcon } from '@heroicons/react/24/outline';
-import { StarIcon } from '@heroicons/react/24/outline';
+import { UserGroupIcon, 
+  CalendarIcon,
+  StarIcon,
+  DocumentArrowDownIcon,
+  CurrencyDollarIcon,
+  ShoppingBagIcon,
+  MagnifyingGlassCircleIcon,
+  GlobeAltIcon, 
+  RocketLaunchIcon } from '@heroicons/react/24/outline';
 
 export default function Features() {
   const t = useTranslations("Features");
@@ -159,26 +165,27 @@ export default function Features() {
                 </p>
                 <div className="mt-8 max-w-md space-y-2">
                   <button
-                    className={`flex items-start ${isRTL ? 'justify-end text-end' : 'justify-start text-start'} text-sm font-medium text-slate-50 rounded border bg-slate-800/25 w-full px-3 py-2 transition duration-150 ease-in-out hover:opacity-100 border-slate-700 opacity-70`}
+                    className={`flex items-start gap-2 ${isRTL ? 'justify-end text-end' : 'justify-start text-start'} text-sm font-medium text-slate-50 rounded border bg-slate-800/25 w-full px-3 py-2 transition duration-150 ease-in-out hover:opacity-100 border-slate-700 opacity-70`}
                     onMouseEnter={() => setHoveredTab2(1)}
                     onMouseLeave={() => setHoveredTab2(null)}
                   >
-               
+                    <MagnifyingGlassCircleIcon className="w-5 h-5 flex-shrink-0 text-blue-300" />
                     <span>{t("tabs.preciseResults.title")}</span>
                   </button>
                   <button
-                    className={`flex items-start ${isRTL ? 'justify-end text-end' : 'justify-start text-start'} text-sm font-medium text-slate-50 rounded border bg-slate-800/25 w-full px-3 py-2 transition duration-150 ease-in-out hover:opacity-100 border-slate-700 opacity-70`}
+                    className={`flex items-start gap-2 ${isRTL ? 'justify-end text-end' : 'justify-start text-start'} text-sm font-medium text-slate-50 rounded border bg-slate-800/25 w-full px-3 py-2 transition duration-150 ease-in-out hover:opacity-100 border-slate-700 opacity-70`}
                     onMouseEnter={() => setHoveredTab2(2)}
                     onMouseLeave={() => setHoveredTab2(null)}
                   >
-                   
+                    <GlobeAltIcon className="w-5 h-5 flex-shrink-0 text-blue-300" />
                     <span>{t("tabs.variableData.title")}</span>
                   </button>
                   <button
-                    className={`flex items-start ${isRTL ? 'justify-end text-end' : 'justify-start text-start'} text-sm font-medium text-slate-50 rounded border bg-slate-800/25 w-full px-3 py-2 transition duration-150 ease-in-out hover:opacity-100 border-slate-700 opacity-70`}
+                    className={`flex items-start gap-2 ${isRTL ? 'justify-end text-end' : 'justify-start text-start'} text-sm font-medium text-slate-50 rounded border bg-slate-800/25 w-full px-3 py-2 transition duration-150 ease-in-out hover:opacity-100 border-slate-700 opacity-70`}
                     onMouseEnter={() => setHoveredTab2(3)}
                     onMouseLeave={() => setHoveredTab2(null)}
                   >
+                    <RocketLaunchIcon className="w-5 h-5 flex-shrink-0 text-blue-300" />
                     <span>{t("tabs.fasterDecisions.title")}</span>
                   </button>
                 </div>
@@ -243,27 +250,27 @@ export default function Features() {
                 </p>
                 <div className="mt-8 max-w-md space-y-2">
                 <button
-                    className={`flex items-start ${isRTL ? 'justify-end text-end' : 'justify-start text-start'} text-sm font-medium text-slate-50 rounded border bg-slate-800/25 w-full px-3 py-2 transition duration-150 ease-in-out hover:opacity-100 border-slate-700 opacity-70`}
+                    className={`flex items-start gap-2 ${isRTL ? 'justify-end text-end' : 'justify-start text-start'} text-sm font-medium text-slate-50 rounded border bg-slate-800/25 w-full px-3 py-2 transition duration-150 ease-in-out hover:opacity-100 border-slate-700 opacity-70`}
                     onMouseEnter={() => setHoveredTab3(1)}
                     onMouseLeave={() => setHoveredTab3(null)}
                   >
-               
+                    <DocumentArrowDownIcon className="w-5 h-5 flex-shrink-0 text-blue-300" />
                     <span>{t3("tabs.no-monthly-subscription.title")}</span>
                   </button>
                   <button
-                    className={`flex items-start ${isRTL ? 'justify-end text-end' : 'justify-start text-start'} text-sm font-medium text-slate-50 rounded border bg-slate-800/25 w-full px-3 py-2 transition duration-150 ease-in-out hover:opacity-100 border-slate-700 opacity-70`}
+                    className={`flex items-start gap-2 ${isRTL ? 'justify-end text-end' : 'justify-start text-start'} text-sm font-medium text-slate-50 rounded border bg-slate-800/25 w-full px-3 py-2 transition duration-150 ease-in-out hover:opacity-100 border-slate-700 opacity-70`}
                     onMouseEnter={() => setHoveredTab3(2)}
                     onMouseLeave={() => setHoveredTab3(null)}
                   >
-                 
+                    <CurrencyDollarIcon className="w-5 h-5 flex-shrink-0 text-blue-300" />
                     <span>{t3("tabs.payAsYouGo.title")}</span>
                   </button>
                   <button
-                    className={`flex items-start ${isRTL ? 'justify-end text-end' : 'justify-start text-start'} text-sm font-medium text-slate-50 rounded border bg-slate-800/25 w-full px-3 py-2 transition duration-150 ease-in-out hover:opacity-100 border-slate-700 opacity-70`}
+                    className={`flex items-start gap-2 ${isRTL ? 'justify-end text-end' : 'justify-start text-start'} text-sm font-medium text-slate-50 rounded border bg-slate-800/25 w-full px-3 py-2 transition duration-150 ease-in-out hover:opacity-100 border-slate-700 opacity-70`}
                     onMouseEnter={() => setHoveredTab3(3)}
                     onMouseLeave={() => setHoveredTab3(null)}
                   >
-                   
+                    <ShoppingBagIcon className="w-5 h-5 flex-shrink-0 text-blue-300" />
                     <span>{t3("tabs.purchaseSpecific.title")}</span>
                   </button>
                 </div>
