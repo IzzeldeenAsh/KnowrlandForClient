@@ -177,8 +177,9 @@ export default function InsighterFeatures() {
                 <div className="grid gap-6 md:grid-cols-3 xl:gap-8">
                   {[
                     {
-                      key: "businessReports",
-                      icon: "/images/report.svg",
+                      key: "dataSets",
+                      icon: "/images/data.svg",
+                     
                     },
                     {
                       key: "playbooks",
@@ -197,8 +198,8 @@ export default function InsighterFeatures() {
                       icon: "/images/training.svg",
                     },
                     {
-                      key: "dataSets",
-                      icon: "/images/data.svg",
+                      key: "businessReports",
+                      icon: "/images/report.svg",
                     },
                   ].map((item, index) => (
                     <div key={index} data-aos="fade-up" data-aos-delay={index * 100}>
