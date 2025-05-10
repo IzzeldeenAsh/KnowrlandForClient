@@ -428,7 +428,7 @@ export default function ProfilePage() {
           {/* Profile Header - Card Style */}
           <div className="bg-white dark:bg-slate-800 overflow-hidden mb-4 pb-10">
             {/* Banner */}
-            <div className="h-40  dark:from-blue-700 dark:to-indigo-800 relative">
+            <div className="h-[100px] dark:from-blue-700 dark:to-indigo-800 relative">
               <div
                 className="pointer-events-none absolute z-10 -translate-x-1/2 transform hidden md:block"
                 style={{ left: '28%' }}
@@ -447,12 +447,12 @@ export default function ProfilePage() {
             </div>
             
             {/* Profile Container */}
-            <div className="max-w-6xl z-20 mx-auto px-4 sm:px-6 relative -mt-20">
+            <div className="max-w-6xl z-20 mx-auto px-4 sm:px-6 relative -mt-16">
               {/* Profile Layout - Image, Info, Stats */}
-              <div className="flex flex-col md:flex-row gap-8">
+              <div className="flex flex-col md:flex-row gap-6">
                 {/* Profile Image */}
                 <div className="flex-shrink-0">
-                  <div className="w-40 h-40 md:w-48 md:h-48 rounded-2xl overflow-hidden border-4 border-white dark:border-slate-800 shadow-lg bg-white dark:bg-slate-700">
+                  <div className="w-32 h-32 md:w-40 md:h-40 rounded-xl overflow-hidden border-3 border-white dark:border-slate-800 shadow-md bg-white dark:bg-slate-700">
                     {(isCompany || isCompanyInsighter) && profileData.company?.logo ? (
                       <Image
                         src={profileData.company.logo}
@@ -485,95 +485,95 @@ export default function ProfilePage() {
                   <div className="flex flex-col md:flex-row h-full justify-between items-center">
                     <div>
                       {/* Name and Badges */}
-                      <div className="flex flex-wrap items-center gap-3 mb-2">
-                        {enterpriseType === 'insighter' && (    <h1 className="text-3xl font-bold">{profileData.first_name || ''} {profileData.last_name || ''}</h1> )}
-                        {enterpriseType !== 'insighter' && (    <h1 className="text-3xl font-bold">{profileData.company?.legal_name || ''}</h1> )}
+                      <div className="flex flex-wrap items-center gap-2 mb-1">
+                        {enterpriseType === 'insighter' && (    <h1 className="text-2xl font-bold">{profileData.first_name || ''} {profileData.last_name || ''}</h1> )}
+                        {enterpriseType !== 'insighter' && (    <h1 className="text-2xl font-bold">{profileData.company?.legal_name || ''}</h1> )}
                         
                      
 
-                        <IconRosetteDiscountCheckFilled className="w-6 h-6 text-blue-500" />
+                        <IconRosetteDiscountCheckFilled className="w-5 h-5 text-blue-500" />
                         {isCompany && (
                     
-                          <span className="bg-amber-100 font-bold text-yellow-500 text-xs px-3 py-1 rounded-full inline-flex items-center">
+                          <span className="bg-amber-100 font-bold text-yellow-500 text-xs px-2 py-0.5 rounded-full inline-flex items-center">
                           {userProfileT('company')}
                         </span>
                         )}
                         {isInsighter && (
-                          <span className="bg-blue-100 text-blue-500 font-bold uppercase text-xs px-3 py-1 rounded-full inline-flex items-center">
+                          <span className="bg-blue-100 text-blue-500 font-bold uppercase text-xs px-2 py-0.5 rounded-full inline-flex items-center">
                             {userProfileT('insighter')}
                           </span>
                         )}
                         {isCompanyInsighter && (
-                          <span className="bg-amber-100 font-bold text-yellow-500 uppercase text-xs px-3 py-1 rounded-full inline-flex items-center">
+                          <span className="bg-amber-100 font-bold text-yellow-500 uppercase text-xs px-2 py-0.5 rounded-full inline-flex items-center">
                             {profileData.company?.legal_name} Company
                           </span>
                         )}
                       </div>
                        
                       {/* Title/Role & Location */}
-                      <div className="mb-4">
+                      <div className="mb-3">
                           {/* 5-Star Rating */}
                           <div className="flex items-center">
                           {[1, 2, 3, 4, 5].map((star) => (
                             <svg 
                               key={star} 
                               xmlns="http://www.w3.org/2000/svg" 
-                              className={`h-5 w-5 ${star <= 4 ? 'text-yellow-400' : 'text-gray-300'}`} 
+                              className={`h-4 w-4 ${star <= 4 ? 'text-yellow-400' : 'text-gray-300'}`} 
                               viewBox="0 0 20 20" 
                               fill="currentColor"
                             >
                               <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118l-2.8-2.034c-.783-.57-.38-1.81.588-1.81h3.462a1 1 0 00.95-.69l1.07-3.292z" />
                             </svg>
                           ))}
-                          <span className="ml-2 text-sm text-gray-600 dark:text-gray-400">(4.0)</span>
+                          <span className="ml-1 text-xs text-gray-600 dark:text-gray-400">(4.0)</span>
                         </div>
                        
                       </div>
                       
                       {/* Action Buttons */}
-                      <div className="flex flex-wrap gap-4 mb-6">
+                      <div className="flex flex-wrap gap-3 mb-4">
                        {
                         enterpriseType === 'insighter' && (
-                          <button className="px-4 py-2 text-sm bg-gradient-to-r from-blue-500 to-teal-400 text-white rounded-lg font-medium shadow-md hover:shadow-lg transition transform hover:translate-y-[-2px]">
+                          <button className="px-3 py-1.5 text-xs bg-gradient-to-r from-blue-500 to-teal-400 text-white rounded-md font-medium shadow-sm hover:shadow-md transition transform hover:translate-y-[-1px]">
                             {t('meet')} {profileData.first_name || ''} {profileData.last_name || ''}
                           </button>
                         )
                        }
-                        <button className="px-4 py-2 text-sm bg-white dark:bg-slate-700 text-gray-800 dark:text-white rounded-lg font-medium border border-gray-200 dark:border-slate-600 hover:border-gray-300 dark:hover:border-slate-500 shadow-sm hover:shadow-md transition transform hover:translate-y-[-2px]">
+                        <button className="px-3 py-1.5 text-xs bg-white dark:bg-slate-700 text-gray-800 dark:text-white rounded-md font-medium border border-gray-200 dark:border-slate-600 hover:border-gray-300 dark:hover:border-slate-500 shadow-sm hover:shadow-md transition transform hover:translate-y-[-1px]">
                           {t('follow')}
                         </button>
                       </div>
                     </div>
                     
                     {/* Stats Section */}
-                    <div className={`flex justify-center gap-6 mt-8`}>
+                    <div className={`flex justify-center gap-4 mt-5`}>
 
-                      <div className="text-start bg-gradient-to-br from-white to-emerald-50 dark:from-slate-700 dark:to-slate-600 p-5 rounded-xl  hover:shadow-lg transition-all duration-300 transform hover:-translate-y-1 border border-gray-100 dark:border-slate-600 group">
-                        <div className="flex items-center mb-3">
-                          <div className="p-2.5 bg-emerald-100 dark:bg-emerald-900/30 rounded-full me-3 group-hover:scale-110 transition-transform">
+                      <div className="text-start bg-gradient-to-br from-white to-emerald-50 dark:from-slate-700 dark:to-slate-600 p-3 rounded-lg hover:shadow-md transition-all duration-300 transform hover:-translate-y-1 border border-gray-100 dark:border-slate-600 group">
+                        <div className="flex items-center mb-2">
+                          <div className="p-1.5 bg-emerald-100 dark:bg-emerald-900/30 rounded-full me-2 group-hover:scale-110 transition-transform">
                             <IconFileReport 
-                              size={24} 
+                              size={18} 
                               className="text-emerald-500 dark:text-emerald-400" 
                               stroke={2} 
                             />
                           </div>
-                          <span className="text-sm font-medium text-emerald-600 dark:text-emerald-300" dangerouslySetInnerHTML={{ __html: t('publishedKnowledge') }} />
+                          <span className="text-xs font-medium text-emerald-600 dark:text-emerald-300" dangerouslySetInnerHTML={{ __html: t('publishedKnowledge') }} />
                         </div>
-                        <p className="bg-clip-text text-transparent bg-gradient-to-r from-emerald-600 to-teal-500 font-bold text-5xl">{knowledgeData?.meta.total || 0}</p>
+                        <p className="bg-clip-text text-transparent bg-gradient-to-r from-emerald-600 to-teal-500 font-bold text-4xl">{knowledgeData?.meta.total || 0}</p>
                       
                       </div>
-                      <div className="text-start bg-gradient-to-br from-white to-blue-50 dark:from-slate-700 dark:to-slate-600 p-5 rounded-xl  hover:shadow-lg transition-all duration-300 transform hover:-translate-y-1 border border-gray-100 dark:border-slate-600 group">
-                        <div className="flex items-center mb-3">
-                          <div className="p-2.5 bg-blue-100 dark:bg-blue-900/30 rounded-full me-3 group-hover:scale-110 transition-transform">
+                      <div className="text-start bg-gradient-to-br from-white to-blue-50 dark:from-slate-700 dark:to-slate-600 p-3 rounded-lg hover:shadow-md transition-all duration-300 transform hover:-translate-y-1 border border-gray-100 dark:border-slate-600 group">
+                        <div className="flex items-center mb-2">
+                          <div className="p-1.5 bg-blue-100 dark:bg-blue-900/30 rounded-full me-2 group-hover:scale-110 transition-transform">
                             <IconSchool 
-                              size={24} 
+                              size={18} 
                               className="text-blue-500 dark:text-blue-400" 
                               stroke={2} 
                             />
                           </div>
-                          <span className="text-sm font-medium text-transparent bg-clip-text bg-gradient-to-r from-blue-500 to-teal-500" dangerouslySetInnerHTML={{ __html: t('consultingSessions') }} />
+                          <span className="text-xs font-medium text-transparent bg-clip-text bg-gradient-to-r from-blue-500 to-teal-500" dangerouslySetInnerHTML={{ __html: t('consultingSessions') }} />
                         </div>
-                        <p className="bg-clip-text text-transparent bg-gradient-to-r from-blue-500 to-teal-500 font-bold text-5xl">0</p>
+                        <p className="bg-clip-text text-transparent bg-gradient-to-r from-blue-500 to-teal-500 font-bold text-4xl">0</p>
                        
                       </div>
                
