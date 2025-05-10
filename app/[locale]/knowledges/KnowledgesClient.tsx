@@ -360,30 +360,7 @@ export default function KnowledgesClient() {
          : translations.noItems}
      </Text>
      
-     <SegmentedControl
-       value={view}
-       onChange={(value) => setView(value as 'grid' | 'list')}
-       data={[
-         {
-           value: 'grid',
-           label: (
-             <Flex align="center" gap={8}>
-               <Squares2X2Icon width={18} height={18} />
-               <span>{translations.grid}</span>
-             </Flex>
-           ),
-         },
-         {
-           value: 'list',
-           label: (
-             <Flex align="center" gap={8}>
-               <ListBulletIcon width={18} height={18} />
-               <span>{translations.list}</span>
-             </Flex>
-           ),
-         },
-       ]}
-     />
+  
    </Flex>
    
    {/* Results Display */}

@@ -29,28 +29,81 @@
   position: absolute;
   width: 1px;
   background-color: #d1d5db;
-  left: 0;
+  left: -8px;     /* Aligned to match connector position */
   top: 20px;
   bottom: 0;  /* Let it extend all the way down */
   z-index: 1;
-  height: calc(100% - 200px);
+  height:80%;
+}
+
+.childThreadLine {
+  position: absolute;
+  width: 1px;
+  background-color: #d1d5db;
+  left: -8px;     /* Aligned to match connector position */
+  top: 20px;
+  bottom: 0;      /* Let it extend all the way down */
+  z-index: 1;
+  height: 95%;   /* Full height for child thread line */
+}
+
+[dir='rtl'] .childThreadLine {
+  left: auto;
+  right: -5px;
 }
 
 /* Line terminator - masks the parent thread line at the middle of the last avatar */
 .lineTerminator {
   position: absolute;
-  width: 3px;
-  height: 100%;
-  left: -49px;
-  top: 37px;
+  width: 4px;
+  height: 115%;
+  left: -3.55rem;
+  top: 31px;
   background-color: #f9fafb;
   z-index: 2;
+}
+
+/* Reply-specific line terminator with all properties */
+.replyTerminator {
+  position: absolute;
+  width: 10px;
+  height: 112%;
+  left: -3.55rem;
+  top: 31px;
+  background-color: #f9fafb;
+  z-index: 2;
+}
+
+/* RTL version of replyTerminator */
+[dir='rtl'] .replyTerminator {
+  left: auto;
+  right: -3.55rem;
+}
+
+.parentTerminator {
+  height: 115%;
+  top: 31px;
 }
 
 /* RTL version of line terminator */
 [dir='rtl'] .lineTerminator {
   left: auto;
-  right: -49px;
+  right: -3.55rem;
+}
+.lineTerminatorBox {
+  position: absolute;
+  width: 4px;
+  height: 100%;
+  left: -1.5rem;
+  top: -1px;
+  background-color: #f9fafb;
+  z-index: 2;
+}
+
+/* RTL version of line terminator */
+[dir='rtl'] .lineTerminatorBox {
+  left: auto;
+  right: -1.5rem;
 }
 
 /* Dark mode for line terminator */
@@ -61,12 +114,25 @@
 /* Curved connector for child comments - Reddit style */
 .childConnector {
   position: absolute;
-  width: calc(1.6rem + 1px);
+  width: calc(1.6rem + 10px);
   height: 1.25rem;  /* Match Reddit's height */
   border-left: 1px solid #d1d5db;
   border-bottom: 1px solid #d1d5db;
-  left: -3rem;
-  top: 1.1rem;     /* Align with avatar */
+  left: -56px;
+  top: 11px;     /* Fixed position to match avatar */
+  z-index: 1;
+  background-color: transparent;
+}
+
+/* Curved connector specifically for answers */
+.answerConnector {
+  position: absolute;
+  width: calc(1.6rem + 10px);
+  height: 1.25rem;
+  border-left: 1px solid #d1d5db;
+  border-bottom: 1px solid #d1d5db;
+  left: -57px;
+  top: 11px;     /* Exact same position as childConnector */
   z-index: 1;
   background-color: transparent;
 }
@@ -74,16 +140,20 @@
 /* RTL versions of thread lines */
 [dir='rtl'] .parentThreadLine {
   left: auto;
-  right: 0;
+  right: -1px;
 }
-
-[dir='rtl'] .childConnector {
+[dir='rtl'] .childConnector,
+[dir='rtl'] .answerConnector {
   left: auto;
-  right: -3rem;
   border-left: none;
   border-right: 1px solid #d1d5db;
 }
-
+[dir='rtl'] .childConnector{
+right: -49px;
+}
+[dir='rtl'] .answerConnector{
+right: -50px;
+}
 /* Dark mode for thread lines and connectors */
 :global(.dark) .parentThreadLine {
   background-color: #4b5563;
@@ -101,19 +171,19 @@
   border-radius: 9999px;
   object-fit: cover;
   border: 1px solid #d1d5db;
-  top: 1rem;
+  top: 13px;     /* Fixed position for consistent alignment */
   z-index: 2;
-  background-color: white;
+  background-color: #fff;
 }
 
 /* Parent comment avatar */
 .parentAvatar {
-  left: -1rem;
+  left: -1.5rem;
 }
 
 /* Child comment avatar */
 .childAvatar {
-  left: -1rem;
+  left: -1.5rem;
 }
 
 /* RTL avatar positioning */
@@ -128,11 +198,14 @@
 }
 [dir='rtl'] .childAvatar {
   left: auto;
-  right: -1rem;
+  right: -1.5rem;
 }
 
 /* Dark mode avatar */
 :global(.dark) .commentAvatar {
   border-color: #4b5563;
   background-color: #1f2937;
+}
+.childAnswerConnector{
+  right: -54px !important;
 }
