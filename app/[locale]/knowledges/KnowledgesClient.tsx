@@ -278,7 +278,7 @@ export default function KnowledgesClient() {
   return (
     <>
        <PageIllustration />
-       <Container size="xl" py="xl" mt="xl" style={{position: 'relative', zIndex: 1}} dir={isRTL ? 'rtl' : 'ltr'}>
+       <div className='container mx-auto px-3 sm:px-4 pb-12 sm:pb-16 md:pb-20'  style={{position: 'relative', zIndex: 1}} >
    
       
    <Title order={1} mb="xl"></Title>
@@ -353,7 +353,7 @@ export default function KnowledgesClient() {
    </Box> */}
    
    {/* Results Controls */}
-   <Flex justify="space-between" align="center" mb="md">
+   <Flex justify="space-between" align="center" mb="md" style={{paddingInlineStart: '3rem'}}>
      <Text>
        {pagination && pagination.total > 0 
          ? `${translations.showing} ${pagination.from}-${pagination.to} ${translations.of} ${pagination.total} ${translations.items}` 
@@ -403,7 +403,7 @@ export default function KnowledgesClient() {
        </Button>
      </Flex>
    )}
- </Container></>
+ </div></>
 
   );
 } 
