@@ -1,33 +1,33 @@
 .card {
-  background-color: var(--mantine-color-body);
-  background-image: url(https://res.cloudinary.com/dsiku9ipv/image/upload/v1746774672/Artboard_2_qzimiu.png);
-  background-size: 120%;
-  background-repeat: no-repeat;
-  background-position: 90% 10%;
-  opacity: 0%;
+  background-color: white;
   transition: transform .3s, box-shadow .3s, border-color .3s;
   cursor: pointer;
-  border: 1px solid #dfdfdf;
-  display: flex
-;
-  justify-content: space-between;
+  border: 1px solid #e9ecef;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  padding: 0;
+  overflow: hidden;
+  border-radius: 4px;
 }
 
 .card:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 8px 25px rgba(51, 154, 240, 0.15);
-  border-color: rgba(51, 154, 240, 0.3);
+  transform: translateY(-3px);
+  box-shadow: 0 4px 8px rgba(51, 154, 240, 0.15);
+  border-color: rgba(51, 154, 240, 0.4);
 }
 
 .title {
   font-family: 'Greycliff CF', var(--mantine-font-family);
   line-height: 1.2;
   transition: color 0.2s ease;
-  font-size: 1.4rem;
+  font-size: 1.5rem;
+  color: white;
+  margin-bottom: 0.5rem;
 }
 
 .card:hover .title {
-  color: var(--mantine-color-blue-6);
+  color: var(--mantine-color-blue-2);
 }
 
 .footer {
@@ -42,6 +42,62 @@
 }
 .description {
   font-size: 0.875rem;
-  margin-bottom: 0.5rem;
   display: block;
+  margin-bottom: 1rem;
+}
+
+.typeBadge {
+  display: flex;
+  align-items: center;
+  background-color: #228BE6 !important;
+  color: white;
+  border-radius: 4px;
+  font-size: 0.8rem;
+  padding: 5px 10px;
+}
+
+.priceBadge {
+  font-weight: 600;
+}
+
+.actionButton {
+  width: 2.2rem;
+  height: 2.2rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: rgba(34, 139, 230, 0.1);
+  border-radius: 6px;
+  transition: background-color 0.2s ease;
+}
+
+.actionButton:hover {
+  background-color: rgba(34, 139, 230, 0.2);
+}
+
+.avatar {
+  border: 2px solid #228BE6;
+}
+
+.darkSection {
+  background-color: #111;
+  background-image: url(/images/test2.png);
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-position: center;
+  padding: 25px 20px;
+  color: white;
+  min-height: 180px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.whiteSection {
+  background-color: white;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+  justify-content: space-between;
 }
