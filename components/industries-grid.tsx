@@ -30,7 +30,7 @@ export default function IndustriesGrid({ industries, locale }: IndustriesGridPro
 
   return (
     <div 
-      className="grid sm:grid-cols-2 lg:grid-cols-3 gap-2 max-w-7xl mx-auto"
+      className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4 max-w-7xl mx-auto"
       data-aos="zoom-y-out" 
       data-aos-delay="300"
     >
@@ -39,10 +39,10 @@ export default function IndustriesGrid({ industries, locale }: IndustriesGridPro
         
         const cardContent = (
           <div 
-            className={`relative group bg-white min-h-[140px] rounded-sm p-6 shadow-sm ${!isDisabled ? 'hover:shadow-md transition-all duration-300 cursor-pointer' : 'opacity-50 cursor-not-allowed'}`}
+            className={`relative group bg-gradient-to-br from-white to-slate-50 min-h-[140px] rounded-sm p-6 shadow-md border border-slate-100 ${!isDisabled ? 'hover:shadow-lg hover:border-blue-100 hover:from-white hover:to-blue-50 transition-all duration-300 cursor-pointer' : 'opacity-50 cursor-not-allowed'}`}
           >
             <div className="space-y-2">
-              <h3 className={`text-sm font-semibold ${!isDisabled ? 'text-transparent bg-gradient-to-r from-blue-500 to-teal-400 bg-clip-text' : 'text-gray-900'}`}>
+              <h3 className={`text-base font-bold ${!isDisabled ? 'text-transparent bg-gradient-to-r from-blue-500 to-teal-400 bg-clip-text' : 'text-gray-900'}`}>
                 {industry.name}
                 {isDisabled && <span className="ml-2 text-xs text-gray-500"></span>}
               </h3>
@@ -50,7 +50,7 @@ export default function IndustriesGrid({ industries, locale }: IndustriesGridPro
                 {industry.children.map((child) => (
                   <li 
                     key={child.id} 
-                    className={`text-xs text-gray-600 ${!isDisabled ? 'hover:text-blue-600 transition-colors' : ''} flex items-center`}
+                    className={`text-sm text-gray-700 ${!isDisabled ? 'hover:text-blue-600 transition-colors' : ''} flex items-center`}
                   >
                     {!isDisabled ? (
                       <Link href={`/${currentLocale}/sub-industry/${child.id}/${child.slug}`}>
