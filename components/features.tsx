@@ -4,9 +4,6 @@ import { useState } from "react";
 import { useTranslations } from "next-intl";
 import Image from "next/image";
 import Illustration from "@/public/images/glow-top-blue.svg";
-import ChangelogImg01 from "@/public/images/AI-Search.png";
-import ChangelogImg02 from "@/public/images/changelog-01.png";
-import ChangelogImg03 from "@/public/images/experts-meeting.png";
 import ChangelogImg04 from "@/public/images/Budget.png";
 import { useLocale } from "next-intl";
 import { UserGroupIcon, 
@@ -76,14 +73,14 @@ export default function Features() {
                       alt="Feature 2 - Image 2"
                       style={{ objectFit: 'contain' }}
                     />
-                    <Image
+                    {/* <Image
                       className={`w-full h-full rounded-[inherit] transition-all duration-700 ease-in-out absolute ${hoveredTab1 === 3 ? 'opacity-100' : 'opacity-0'}`}
                       src={ChangelogImg04}
                       width={500}
                       height={500}
                       alt="Feature 2 - Image 3"
                       style={{ objectFit: 'contain' }}
-                    />
+                    /> */}
                   </div>
                 </figure>
               </div>
@@ -197,7 +194,7 @@ export default function Features() {
                 <div className="relative flex items-center justify-center" style={{ width: '100%', height: '500px', overflow: 'hidden' }}>
                     <Image
                       className={`w-full rounded-[inherit] transition-all duration-700 ease-in-out absolute inset-0 ${hoveredTab2 === 1 || hoveredTab2 === null ? 'opacity-100' : 'opacity-0'}`}
-                      src={'https://res.cloudinary.com/dsiku9ipv/image/upload/v1744967310/Group_15_kqgqol.png'}
+                      src={'https://res.cloudinary.com/dsiku9ipv/image/upload/v1746977594/tre_iskrzf.png'}
                       width={500}
                       height={500}
                       alt="Feature 1 - Image 1"
