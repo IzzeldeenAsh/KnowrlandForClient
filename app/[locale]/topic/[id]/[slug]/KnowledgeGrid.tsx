@@ -34,6 +34,11 @@ export interface KnowledgeItem {
     name: string;
     profile_photo_url: string | null;
     roles: string[];
+    company?: {
+      uuid: string;
+      legal_name: string;
+      logo: string;
+    };
   };
 }
 
@@ -168,19 +173,22 @@ export default function KnowledgeGrid({
                   {showInsighter && (
                     <div className="flex items-center">
                       <Avatar
-                        src={item.insighter.profile_photo_url}
+                        src={item.insighter.roles.includes("company") && item.insighter.company?.logo ? 
+                             item.insighter.company.logo : 
+                             item.insighter.profile_photo_url}
                         radius="xl"
                         alt={item.insighter.name}
                         size="md"
                         className={cardStyles.avatar}
                       >
-                        {!item.insighter.profile_photo_url &&
+                        {!(item.insighter.roles.includes("company") && item.insighter.company?.logo) && 
+                         !item.insighter.profile_photo_url &&
                           getInitials(item.insighter.name)}
                       </Avatar>
 
                       <div className="ms-3">
-                        <Text fw={600} size="sm">
-                          {item.insighter.name}
+                        <Text fw={600} size="sm" className="capitalize">
+                          {item.insighter.name.toLowerCase()}
                         </Text>
                         <Text c="dimmed" size="xs">
                           {item.insighter.roles.includes("insighter") && translations.insighter}
