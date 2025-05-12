@@ -227,11 +227,11 @@ const KnowledgeSideBox = ({
 
           {hs_code && (
             <div className="tp-course-details2-widget-list-item flex items-center justify-between">
-              <span>
+              <span className="flex items-center gap-2 font-medium text-gray-700">
                 <TruckIcon className="w-5 h-5 mx-4" />
                 {translations.hsCode}
               </span>
-              <span className="block mt-1">
+              <span className={`block ${isRTL ? 'text-left' : 'text-right'}`}>
                 {typeof hs_code === 'object' ? 
                   (hs_code.name || hs_code.key || JSON.stringify(hs_code)) : 
                   hs_code}
