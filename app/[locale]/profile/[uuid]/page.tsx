@@ -452,7 +452,7 @@ export default function ProfilePage() {
               <div className="flex flex-col md:flex-row gap-6">
                 {/* Profile Image */}
                 <div className="flex-shrink-0">
-                  <div className="w-32 h-32 md:w-40 md:h-40 rounded-xl overflow-hidden border-3 border-white dark:border-slate-800 shadow-md bg-white dark:bg-slate-700">
+                  <div className="w-32 h-32   rounded-xl overflow-hidden border-3 border-white dark:border-slate-800 shadow-md bg-white dark:bg-slate-700">
                     {(isCompany || isCompanyInsighter) && profileData.company?.logo ? (
                       <Image
                         src={profileData.company.logo}
@@ -485,8 +485,8 @@ export default function ProfilePage() {
                   <div className="flex flex-col md:flex-row h-full justify-between items-center">
                     <div>
                       {/* Name and Badges */}
-                      <div className="flex flex-wrap items-center gap-2 mb-1">
-                        {enterpriseType === 'insighter' && (    <h1 className="text-2xl font-bold">{profileData.first_name || ''} {profileData.last_name || ''}</h1> )}
+                      <div className="flex flex-wrap items-center gap-2 mb-1 capitalize">
+                        {enterpriseType === 'insighter' && (    <h1 className="text-2xl font-bold">{profileData.first_name.toLowerCase() || ''} {profileData.last_name.toLowerCase() || ''}</h1> )}
                         {enterpriseType !== 'insighter' && (    <h1 className="text-2xl font-bold">{profileData.company?.legal_name || ''}</h1> )}
                         
                      
