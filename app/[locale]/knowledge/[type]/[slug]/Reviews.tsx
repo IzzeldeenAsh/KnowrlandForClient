@@ -1,16 +1,22 @@
 'use client';
 
 import React, { useState } from "react";
-import { Rating, Textarea, Button, Notification, Card, Text } from "@mantine/core";
+import { Rating, Textarea, Button, Notification, Card, Text, Avatar } from "@mantine/core";
 import { IconX, IconCheck } from "@tabler/icons-react";
 import { useReview } from "@/hooks/knowledgs/useReview";
 import { useRouter, useParams } from "next/navigation";
+import Link from "next/link";
 
 interface ReviewItem {
   id: number;
   rate: number;
   comment: string;
   user_name: string;
+  first_name?: string;
+  last_name?: string;
+  profile_photo_url?: string;
+  uuid?: string;
+  roles?: string[];
   created_date: string;
 }
 
@@ -18,6 +24,15 @@ interface ReviewsProps {
   knowledgeSlug: string;
   reviews: ReviewItem[];
   is_review: boolean;
+}
+
+// Helper function to get initials from name
+function getInitials(name: string) {
+  return name
+    .split(" ")
+    .map((word) => word[0])
+    .join("")
+    .toUpperCase();
 }
 
 export default function Reviews({ knowledgeSlug, reviews, is_review }: ReviewsProps) {
@@ -58,9 +73,7 @@ export default function Reviews({ knowledgeSlug, reviews, is_review }: ReviewsPr
 
   return (
     <div dir={isRTL ? 'rtl' : 'ltr'}>
-      <Card radius="md" withBorder>
         <div>
-          <h4 className={`text-lg font-semibold mb-4 ${isRTL ? 'text-right' : 'text-start'}`}>{translations.allReviews}</h4>
           {reviews.length > 0 ? (
             <div className="space-y-4">
               {reviews.map((review) => (
@@ -68,10 +81,26 @@ export default function Reviews({ knowledgeSlug, reviews, is_review }: ReviewsPr
                   key={review.id}
                   className="p-4 border rounded shadow-sm"
                 >
-                  <div className="flex items-center justify-between">
-                    <span className="font-semibold">
-                      {review.user_name}
-                    </span>
+                  <div className="flex items-center text-xs justify-between">
+                    <div className="flex items-center gap-2">
+                      <Avatar
+                        src={review.profile_photo_url}
+                        size="sm"
+                        radius="xl"
+                        alt={review.user_name}
+                      >
+                        {!review.profile_photo_url && getInitials(review.user_name)}
+                      </Avatar>
+                      {review.uuid ? (
+                        <Link href={`/${locale}/profile/${review.uuid}?entity=insighter`} className="font-semibold capitalize hover:text-blue-600">
+                          {review.user_name.toLowerCase()}
+                        </Link>
+                      ) : (
+                        <span className="font-semibold capitalize">
+                          {review.user_name.toLowerCase()}
+                        </span>
+                      )}
+                    </div>
                     <span className="text-sm text-gray-500">
                       {new Date(review.created_date).toLocaleDateString(isRTL ? 'en-US' : undefined)}
                     </span>
@@ -88,7 +117,7 @@ export default function Reviews({ knowledgeSlug, reviews, is_review }: ReviewsPr
                         {review.rate}/5
                       </span>
                     </div>
-                    <p className={`mt-2 text-gray-700 ${isRTL ? 'text-right' : 'text-start'}`}>
+                    <p className={`mt-2 text-gray-700 text-sm ${isRTL ? 'text-right' : 'text-start'}`}>
                       {review.comment}
                     </p>
                   </div>
@@ -99,7 +128,6 @@ export default function Reviews({ knowledgeSlug, reviews, is_review }: ReviewsPr
             <p className={`text-gray-600 ${isRTL ? 'text-right' : 'text-start'}`}>{translations.noReviewsYet}</p>
           )}
         </div>
-      </Card>
       {token && !is_review && !submit && (
         <Card padding="lg" radius="md" withBorder mt={'md'}>
           <form onSubmit={handleSubmit} className="space-y-4">
@@ -115,7 +143,7 @@ export default function Reviews({ knowledgeSlug, reviews, is_review }: ReviewsPr
               />
             </div>
             <div>
-              <Text fw={500} size="sm" mb={5} className={isRTL ? 'text-right' : 'text-start'}>
+              <Text fw={500} size="md" mb={5} className={isRTL ? 'text-right' : 'text-start'}>
                 {translations.comment}
               </Text>
               <Textarea
