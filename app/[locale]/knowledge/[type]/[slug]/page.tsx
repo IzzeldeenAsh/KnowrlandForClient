@@ -17,6 +17,7 @@ import TabsContent from "./TabsContent";
 import Stripes from "@/public/images/stripes-dark.svg";
 import { getMessages } from '@/utils/get-messages';
 import Link from 'next/link';
+import { Rating, Text } from "@mantine/core";
 
 interface KnowledgeDetails {
   type: string;
@@ -298,8 +299,8 @@ export default function KnowledgePage({ params }: Props) {
                           </div>
                         )}
                       </div>
-                      <Link className="hover:text-blue-600 text-sm" href={`/${locale}/profile/${knowledge.insighter.uuid}?entity=insighter`}>
-                        {knowledge.insighter.name}
+                      <Link className="hover:text-blue-600 text-sm capitalize" href={`/${locale}/profile/${knowledge.insighter.uuid}?entity=insighter`}>
+                        {knowledge.insighter.name.toLowerCase()}
                       </Link>
                     </div>
                   </div>
@@ -353,7 +354,7 @@ export default function KnowledgePage({ params }: Props) {
               {knowledge.review && knowledge.review.length > 0 && (
                 <div className="flex flex-col ps-4 sm:ps-8 mt-2 sm:mt-0">
                   <span className="text-gray-500 text-sm">{translations.rating}</span>
-                  <span className="text-sm font-bold text-gray-700 flex items-center">
+                  <div className="flex items-center">
                     {(() => {
                       // Calculate average rating, capping individual ratings at 5
                       const validRatings = knowledge.review
@@ -364,30 +365,14 @@ export default function KnowledgePage({ params }: Props) {
                         ? validRatings.reduce((sum: number, rate: number) => sum + rate, 0) / validRatings.length
                         : 0;
                       
-                      // Create an array of 5 stars
-                      const stars = [];
-                      for (let i = 1; i <= 5; i++) {
-                        if (i <= Math.round(avgRating)) {
-                          // Filled star
-                          stars.push(
-                            <StarIcon key={i} className="h-4 w-4 text-yellow-400" />
-                          );
-                        } else {
-                          // Gray/muted star
-                          stars.push(
-                            <StarIcon key={i} className="h-4 w-4 text-gray-300" />
-                          );
-                        }
-                      }
-                      
                       return (
                         <>
-                          {stars}
+                          <Rating value={avgRating} fractions={2} readOnly size="sm" />
                           <span className="text-xs text-gray-500 ml-1">{avgRating.toFixed(1)} ({knowledge.review.length})</span>
                         </>
                       );
                     })()} 
-                  </span>
+                  </div>
                 </div>
               )}
             </div>
