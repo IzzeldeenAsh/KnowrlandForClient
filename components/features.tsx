@@ -26,7 +26,7 @@ export default function Features() {
   
   // States to track which tab is being hovered for each section
   const [hoveredTab1, setHoveredTab1] = useState<number | null>(null);
-  const [hoveredTab2, setHoveredTab2] = useState<number | null>(null);
+  // const [hoveredTab2, setHoveredTab2] = useState<number | null>(null);
   const [hoveredTab3, setHoveredTab3] = useState<number | null>(null);
 
   return (
@@ -59,9 +59,9 @@ export default function Features() {
                   <div className="relative flex items-center justify-center" style={{ width: '100%', height: '500px', overflow: 'hidden' }}>
                     <Image
                       className={`w-full h-full rounded-[inherit] transition-all duration-700 ease-in-out absolute ${hoveredTab1 === 1 || hoveredTab1 === null ? 'opacity-100' : 'opacity-0'}`}
-                      src={'https://res.cloudinary.com/dsiku9ipv/image/upload/v1746878996/Group_13438_1_ydenox.png'}
-                      width={500}
-                      height={500}
+                      src={'https://res.cloudinary.com/dsiku9ipv/image/upload/v1747036866/New_Project_8_tqsmzg.png'}
+                      width={700}
+                      height={700}
                       alt="Feature 2 - Image 1"
                       style={{ objectFit: 'contain' }}
                     />
@@ -106,25 +106,25 @@ export default function Features() {
                   <button
                     onMouseEnter={() => setHoveredTab1(1)}
                     onMouseLeave={() => setHoveredTab1(null)}
-                    className={`flex items-top gap-2 ${isRTL ? 'justify-end text-end' : 'justify-start text-start'} text-sm font-medium text-slate-50 rounded border bg-slate-800/25 w-full px-3 py-2 transition duration-150 ease-in-out hover:opacity-100 border-slate-700 opacity-70`}
+                    className={`flex items-center gap-2 text-start text-sm font-medium text-slate-50 rounded border bg-slate-800/25 w-full px-3 py-2 transition duration-150 ease-in-out hover:opacity-100 border-slate-700 opacity-70 min-h-[60px]`}
                   >
-                    <UserGroupIcon className="h-7 w-7 text-blue-300" />
+                    <UserGroupIcon className="h-5 w-5 text-blue-300" />
                     <span>{t2("tabs.directExpertEngagement.title")}</span>
                   </button>
 
                   <button
                     onMouseEnter={() => setHoveredTab1(2)}
                     onMouseLeave={() => setHoveredTab1(null)}
-                    className={`flex items-top gap-2 ${isRTL ? 'justify-end text-end' : 'justify-start text-start'} text-sm font-medium text-slate-50 rounded border bg-slate-800/25 w-full px-3 py-2 transition duration-150 ease-in-out hover:opacity-100 border-slate-700 opacity-70`}
+                    className={`flex items-center gap-2 text-start text-sm font-medium text-slate-50 rounded border bg-slate-800/25 w-full px-3 py-2 transition duration-150 ease-in-out hover:opacity-100 border-slate-700 opacity-70 min-h-[60px]` }
                   >
-                    <CalendarIcon className="h-7 w-7 text-blue-300" />
+                    <CalendarIcon className="h-5 w-5 text-blue-300" />
                     <span>{t2("tabs.consultingSessions.title")}</span>
                   </button>
 
                   <button
                     onMouseEnter={() => setHoveredTab1(3)}
                     onMouseLeave={() => setHoveredTab1(null)}
-                    className={`flex items-top gap-2 ${isRTL ? 'justify-end text-end' : 'justify-start text-start'} text-sm font-medium text-slate-50 rounded border bg-slate-800/25 w-full px-3 py-2 transition duration-150 ease-in-out hover:opacity-100 border-slate-700 opacity-70`}
+                    className={`flex items-center gap-2 text-start text-sm font-medium text-slate-50 rounded border bg-slate-800/25 w-full px-3 py-2 transition duration-150 ease-in-out hover:opacity-100 border-slate-700 opacity-70 min-h-[60px]`}
                   >
                     <StarIcon className="h-5 w-5 text-blue-300" />
                     <span>{t2("tabs.expertRatings.title")}</span>
@@ -162,25 +162,22 @@ export default function Features() {
                 </p>
                 <div className="mt-8 max-w-md space-y-2">
                   <button
-                    className={`flex items-start gap-2 ${isRTL ? 'justify-end text-end' : 'justify-start text-start'} text-sm font-medium text-slate-50 rounded border bg-slate-800/25 w-full px-3 py-2 transition duration-150 ease-in-out hover:opacity-100 border-slate-700 opacity-70`}
-                    onMouseEnter={() => setHoveredTab2(1)}
-                    onMouseLeave={() => setHoveredTab2(null)}
+                    className={`flex items-center gap-2 text-start text-sm font-medium text-slate-50 rounded border bg-slate-800/25 w-full px-3 py-2 transition duration-150 ease-in-out hover:opacity-100 border-slate-700 opacity-70 min-h-[60px]`}
+                   
                   >
                     <MagnifyingGlassCircleIcon className="w-5 h-5 flex-shrink-0 text-blue-300" />
                     <span>{t("tabs.preciseResults.title")}</span>
                   </button>
                   <button
-                    className={`flex items-start gap-2 ${isRTL ? 'justify-end text-end' : 'justify-start text-start'} text-sm font-medium text-slate-50 rounded border bg-slate-800/25 w-full px-3 py-2 transition duration-150 ease-in-out hover:opacity-100 border-slate-700 opacity-70`}
-                    onMouseEnter={() => setHoveredTab2(2)}
-                    onMouseLeave={() => setHoveredTab2(null)}
+                    className={`flex items-center gap-2 text-start text-sm font-medium text-slate-50 rounded border bg-slate-800/25 w-full px-3 py-2 transition duration-150 ease-in-out hover:opacity-100 border-slate-700 opacity-70 min-h-[60px]`}
+                 
                   >
                     <GlobeAltIcon className="w-5 h-5 flex-shrink-0 text-blue-300" />
                     <span>{t("tabs.variableData.title")}</span>
                   </button>
                   <button
-                    className={`flex items-start gap-2 ${isRTL ? 'justify-end text-end' : 'justify-start text-start'} text-sm font-medium text-slate-50 rounded border bg-slate-800/25 w-full px-3 py-2 transition duration-150 ease-in-out hover:opacity-100 border-slate-700 opacity-70`}
-                    onMouseEnter={() => setHoveredTab2(3)}
-                    onMouseLeave={() => setHoveredTab2(null)}
+                    className={`flex items-center gap-2 text-start text-sm font-medium text-slate-50 rounded border bg-slate-800/25 w-full px-3 py-2 transition duration-150 ease-in-out hover:opacity-100 border-slate-700 opacity-70 min-h-[60px]`}
+                 
                   >
                     <RocketLaunchIcon className="w-5 h-5 flex-shrink-0 text-blue-300" />
                     <span>{t("tabs.fasterDecisions.title")}</span>
@@ -193,7 +190,7 @@ export default function Features() {
                 <figure className="rounded-3xl p-px mb-8">
                 <div className="relative flex items-center justify-center" style={{ width: '100%', height: '500px', overflow: 'hidden' }}>
                     <Image
-                      className={`w-full rounded-[inherit] transition-all duration-700 ease-in-out absolute inset-0 ${hoveredTab2 === 1 || hoveredTab2 === null ? 'opacity-100' : 'opacity-0'}`}
+                      className={`w-full rounded-[inherit] transition-all duration-700 ease-in-out absolute inset-0`}
                       src={'https://res.cloudinary.com/dsiku9ipv/image/upload/v1746977594/tre_iskrzf.png'}
                       width={500}
                       height={500}
@@ -230,7 +227,7 @@ export default function Features() {
             
                  {/* Content */}
               <div
-                className="flex-1 order-1 md:order-2 max-md:text-center sm:max-w-xl md:max-w-lg"
+                className="flex-1 order-1 max-md:text-center sm:max-w-xl md:max-w-lg"
                 data-aos="fade-down"
               >
                 {/* Content #1 */}
@@ -247,7 +244,7 @@ export default function Features() {
                 </p>
                 <div className="mt-8 max-w-md space-y-2">
                 <button
-                    className={`flex items-start gap-2 ${isRTL ? 'justify-end text-end' : 'justify-start text-start'} text-sm font-medium text-slate-50 rounded border bg-slate-800/25 w-full px-3 py-2 transition duration-150 ease-in-out hover:opacity-100 border-slate-700 opacity-70`}
+                    className={`flex items-center gap-2 text-start text-sm font-medium text-slate-50 rounded border bg-slate-800/25 w-full px-3 py-2 transition duration-150 ease-in-out hover:opacity-100 border-slate-700 opacity-70 min-h-[60px]`}
                     onMouseEnter={() => setHoveredTab3(1)}
                     onMouseLeave={() => setHoveredTab3(null)}
                   >
@@ -255,7 +252,7 @@ export default function Features() {
                     <span>{t3("tabs.no-monthly-subscription.title")}</span>
                   </button>
                   <button
-                    className={`flex items-start gap-2 ${isRTL ? 'justify-end text-end' : 'justify-start text-start'} text-sm font-medium text-slate-50 rounded border bg-slate-800/25 w-full px-3 py-2 transition duration-150 ease-in-out hover:opacity-100 border-slate-700 opacity-70`}
+                    className={`flex items-center gap-2 text-start text-sm font-medium text-slate-50 rounded border bg-slate-800/25 w-full px-3 py-2 transition duration-150 ease-in-out hover:opacity-100 border-slate-700 opacity-70 min-h-[60px]`}
                     onMouseEnter={() => setHoveredTab3(2)}
                     onMouseLeave={() => setHoveredTab3(null)}
                   >
@@ -263,7 +260,7 @@ export default function Features() {
                     <span>{t3("tabs.payAsYouGo.title")}</span>
                   </button>
                   <button
-                    className={`flex items-start gap-2 ${isRTL ? 'justify-end text-end' : 'justify-start text-start'} text-sm font-medium text-slate-50 rounded border bg-slate-800/25 w-full px-3 py-2 transition duration-150 ease-in-out hover:opacity-100 border-slate-700 opacity-70`}
+                    className={`flex items-center gap-2 text-start text-sm font-medium text-slate-50 rounded border bg-slate-800/25 w-full px-3 py-2 transition duration-150 ease-in-out hover:opacity-100 border-slate-700 opacity-70 min-h-[60px]`}
                     onMouseEnter={() => setHoveredTab3(3)}
                     onMouseLeave={() => setHoveredTab3(null)}
                   >
@@ -273,7 +270,7 @@ export default function Features() {
                 </div>
               </div>
                  {/* Image */}
-              <div className="w-full sm:w-4/5 md:w-1/2" data-aos="fade-up" data-aos-delay="100">
+              <div className="w-full sm:w-4/5 md:w-1/2 order-2" data-aos="fade-up" data-aos-delay="100">
                 <figure className="bg-gradient-to-b from-slate-300/20 to-transparent rounded-3xl p-px mb-8">
                 <div className="relative flex items-center justify-center" style={{ width: '100%', height: '500px', overflow: 'hidden' }}>
                     {/* <Image

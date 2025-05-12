@@ -16,7 +16,7 @@ export default function Features02() {
     <section className="relative">
 
       {/* Particles animation */}
-      <div className="absolute left-1/2 -translate-x-1/2 top-0 -z-10 w-80 h-80 -mt-24 -ml-32">
+      <div className="absolute left-1/2 -translate-x-1/2 top-0 -z-10 w-80 h-80 -mt-24 -ms-32">
         <Particles className="absolute inset-0 -z-10" quantity={6} staticity={30} />    
       </div>
 

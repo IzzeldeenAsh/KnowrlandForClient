@@ -431,7 +431,7 @@ export default function AskInsighter({ knowledgeSlug, questions = [], is_owner =
           
           <footer className="flex justify-between items-center mb-2">
             <div className="flex items-center">
-              <p className="inline-flex items-start me-3 text-sm text-gray-900 dark:text-white font-semibold capitalize" >
+              <p className="inline-flex items-start mx-3 text-sm text-gray-900 dark:text-white font-semibold capitalize" >
                 {question.question.user.uuid ? (
                   <Link 
                     href={
