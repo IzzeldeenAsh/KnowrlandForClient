@@ -57,7 +57,7 @@
 }
 
 .priceBadge {
-  font-weight: 600;
+  font-weight: 800;
 }
 
 .actionButton {
@@ -76,7 +76,7 @@
 }
 
 .avatar {
-  border: 2px solid #228BE6;
+  border: 1px solid #228BE6;
 }
 
 .darkSection {

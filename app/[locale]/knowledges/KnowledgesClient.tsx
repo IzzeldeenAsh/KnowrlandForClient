@@ -40,6 +40,10 @@ interface KnowledgeItem {
   image: string;
   total_price: string;
   published_at: string;
+  review_summary?: {
+    count: number;
+    average: number;
+  };
   insighter: {
     name: string;
     profile_photo_url: string | null;
@@ -157,19 +161,28 @@ export default function KnowledgesClient() {
   // Fetch sub-industries when industry changes
   useEffect(() => {
     if (selectedId && taxonomy === 'industry') {
-      // Fetch sub-industries for the selected industry
-      fetch(`https://api.knoldg.com/api/platform/industries/${selectedId}/subindustries`, {
-        headers: {
-          "Accept-Language": locale,
-        },
-      })
-        .then((res) => res.json())
-        .then((data) => {
+      const fetchSubIndustries = async () => {
+        try {
+          const response = await fetch(`https://api.knoldg.com/api/platform/industries/${selectedId}/subindustries`, {
+            method: 'POST',
+            headers: {
+              "Content-Type": "application/json",
+              "Accept": "application/json",
+              "Accept-Language": locale,
+            },
+          });
+          if (!response.ok) {
+            throw new Error('Failed to fetch sub-industries');
+          }
+          const data = await response.json();
           setSubIndustries(data.data || []);
-        })
-        .catch(() => {
+        } catch (error) {
+          console.error('Error fetching sub-industries:', error);
           setSubIndustries([]);
-        });
+        }
+      };
+
+      fetchSubIndustries();
     }
   }, [selectedId, taxonomy, locale]);
 
@@ -178,7 +191,10 @@ export default function KnowledgesClient() {
     if (selectedId && taxonomy === 'sub_industry') {
       // Fetch topics for the selected sub-industry
       fetch(`https://api.knoldg.com/api/subindustries/${selectedId}/topics`, {
+        method: 'POST',
         headers: {
+          "Content-Type": "application/json",
+          "Accept": "application/json",
           "Accept-Language": locale,
         },
       })
