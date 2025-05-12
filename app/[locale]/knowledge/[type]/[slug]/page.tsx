@@ -350,13 +350,46 @@ export default function KnowledgePage({ params }: Props) {
                       ).toLocaleDateString(isRTL ? 'en-US' : undefined)}
                 </span>
               </div>
-              {/* <div className="flex flex-col ps-8">
-                <span className="text-gray-500 text-sm">{translations.rating}</span>
-                <span className="text-sm font-bold text-gray-700 flex items-center">
-                  4.8
-                  <StarIcon className="h-4 w-4 text-yellow-400 ml-1" />
-                </span>
-              </div> */}
+              {knowledge.review && knowledge.review.length > 0 && (
+                <div className="flex flex-col ps-4 sm:ps-8 mt-2 sm:mt-0">
+                  <span className="text-gray-500 text-sm">{translations.rating}</span>
+                  <span className="text-sm font-bold text-gray-700 flex items-center">
+                    {(() => {
+                      // Calculate average rating, capping individual ratings at 5
+                      const validRatings = knowledge.review
+                        .map((review: any) => Math.min(5, review.rate))
+                        .filter((rate: number) => !isNaN(rate));
+                      
+                      const avgRating = validRatings.length > 0
+                        ? validRatings.reduce((sum: number, rate: number) => sum + rate, 0) / validRatings.length
+                        : 0;
+                      
+                      // Create an array of 5 stars
+                      const stars = [];
+                      for (let i = 1; i <= 5; i++) {
+                        if (i <= Math.round(avgRating)) {
+                          // Filled star
+                          stars.push(
+                            <StarIcon key={i} className="h-4 w-4 text-yellow-400" />
+                          );
+                        } else {
+                          // Gray/muted star
+                          stars.push(
+                            <StarIcon key={i} className="h-4 w-4 text-gray-300" />
+                          );
+                        }
+                      }
+                      
+                      return (
+                        <>
+                          {stars}
+                          <span className="text-xs text-gray-500 ml-1">{avgRating.toFixed(1)} ({knowledge.review.length})</span>
+                        </>
+                      );
+                    })()} 
+                  </span>
+                </div>
+              )}
             </div>
           </div>
         </div>

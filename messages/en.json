@@ -56,7 +56,10 @@
             "manuals": "Operational Manuals & SOPs",
             "technicalGuides": "Technical Guides & Field Knowledge",
             "trainingMaterials": "Training Materials & Courses",
-            "dataSets": "Data Sets & Templates"
+            "dataSets": "Data Sets & Templates",
+            "supplyChain": "Supply Chain",
+            "marketSize": "Market Size",
+            "customerBehavior": "Customer Behavior"
           }
         },
         "items": [
@@ -119,7 +122,7 @@
                 "alt": "Features Illustration"
             },
             "variableData": {
-                "title": "knowledge library Built on an International Database Structure (ISIC, HS Code)"
+                "title": "International Database Structure (ISIC, HS Code)"
             },
             "fasterDecisions": {
                 "title": "AI-Powered Assistance"

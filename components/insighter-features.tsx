@@ -179,7 +179,6 @@ export default function InsighterFeatures() {
                     {
                       key: "dataSets",
                       icon: "/images/data.svg",
-                     
                     },
                     {
                       key: "playbooks",
@@ -200,6 +199,18 @@ export default function InsighterFeatures() {
                     {
                       key: "businessReports",
                       icon: "/images/report.svg",
+                    },
+                    {
+                      key: "supplyChain",
+                      icon: "/images/supply-chain.svg",
+                    },
+                    {
+                      key: "marketSize",
+                      icon: "/images/market-size.svg",
+                    },
+                    {
+                      key: "customerBehavior",
+                      icon: "/images/customer-behavior.svg",
                     },
                   ].map((item, index) => (
                     <div key={index} data-aos="fade-up" data-aos-delay={index * 100}>
@@ -250,9 +261,6 @@ export default function InsighterFeatures() {
                 </div>
             </div>
           </div>
-
-     
-
 
         </div>
       </section>
