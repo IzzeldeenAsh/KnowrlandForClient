@@ -64,7 +64,7 @@ export default function SignUp() {
         <div className="flex items-center my-6">
           <div className="border-t border-slate-800 grow mr-3" aria-hidden="true" />
           <div className="text-sm text-slate-500 italic">or</div>
-          <div className="border-t border-slate-800 grow ml-3" aria-hidden="true" />
+          <div className="border-t border-slate-800 grow ms-3" aria-hidden="true" />
         </div>
 
         {/* Social login */}

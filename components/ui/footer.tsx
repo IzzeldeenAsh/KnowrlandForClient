@@ -49,8 +49,8 @@ export default function Footer() {
 
           {/* 2nd block */}
           <div className="sm:col-span-6 md:col-span-3 lg:col-span-2 text-center sm:text-left">
-            <h6 className="text-sm text-slate-50 font-medium mb-2">{t('knowledge.title')}</h6>
-            <ul className="text-sm space-y-2">
+            <h6 className="text-sm text-slate-50 font-medium mb-2 text-start">{t('knowledge.title')}</h6>
+            <ul className="text-sm space-y-2 text-start">
               <li>
                 <a className="text-slate-400 hover:text-slate-200 transition duration-150 ease-in-out" href={`/${locale}/industries/insight`}>{t('knowledge.insights')}</a>
               </li>
@@ -71,8 +71,8 @@ export default function Footer() {
 
           {/* 3rd block */}
           <div className="sm:col-span-6 md:col-span-3 lg:col-span-2 text-center sm:text-left">
-            <h6 className="text-sm text-slate-50 font-medium mb-2">{t('company.title')}</h6>
-            <ul className="text-sm space-y-2">
+            <h6 className="text-sm text-slate-50 font-medium mb-2 text-start">{t('company.title')}</h6>
+            <ul className="text-sm space-y-2 text-start">
               <li>
                 <a className="text-slate-400 hover:text-slate-200 transition duration-150 ease-in-out" href={`/${locale}/about`}>{t('company.about')}</a>
               </li>
@@ -87,8 +87,8 @@ export default function Footer() {
           
           {/* 4th block - Resources */}
           {/* <div className="sm:col-span-6 md:col-span-3 lg:col-span-2 text-center sm:text-left">
-            <h6 className="text-sm text-slate-50 font-medium mb-2">{t('resources.title')}</h6>
-            <ul className="text-sm space-y-2">
+            <h6 className="text-sm text-slate-50 font-medium mb-2 text-start">{t('resources.title')}</h6>
+            <ul className="text-sm space-y-2 text-start">
               <li>
                 <a className="text-slate-400 hover:text-slate-200 transition duration-150 ease-in-out" href={`/${locale}/resources/help-center`}>{t('resources.helpCenter')}</a>
               </li>
@@ -103,8 +103,8 @@ export default function Footer() {
 
           {/* 5th block */}
           <div className="sm:col-span-6 md:col-span-3 lg:col-span-3 text-center sm:text-left">
-            <h6 className="text-sm text-slate-50 font-medium mb-2">{t('legals.title')}</h6>
-            <ul className="text-sm space-y-2">
+            <h6 className="text-sm text-slate-50 font-medium mb-2 text-start">{t('legals.title')}</h6>
+            <ul className="text-sm space-y-2 text-start">
               <li>
                 <a className="text-slate-400 hover:text-slate-200 transition duration-150 ease-in-out" href={`/${locale}/legals/terms`}>{t('legals.terms')}</a>
               </li>
