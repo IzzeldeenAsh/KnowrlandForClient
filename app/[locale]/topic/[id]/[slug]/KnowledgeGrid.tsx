@@ -26,8 +26,10 @@ export interface KnowledgeItem {
   description: string;
   total_price: string;
   published_at: string;
-  rating?: number;
-  reviewCount?: number;
+  review_summary?: {
+    count: number;
+    average: number;
+  };
   insighter: {
     name: string;
     profile_photo_url: string | null;
@@ -138,7 +140,7 @@ export default function KnowledgeGrid({
                     {item.type === "manual" && <ManualIcon width={20} height={20} />}
                     {item.type === "insight" && <InsightIcon width={20} height={20} />}
                     {item.type === "data" && <DataIcon width={20} height={20} />}
-                    <span className="ml-2 px-0">{typeTranslations[item.type.toLowerCase()] || item.type}</span>
+                    <span className="mx-2 px-0">{typeTranslations[item.type.toLowerCase()] || item.type}</span>
                     </span>
                   </Badge>
                   
@@ -151,10 +153,13 @@ export default function KnowledgeGrid({
                   </Text>
                 </div>
                 
-                <div className="flex items-center mt-auto">
-                  <Rating value={item.rating || 4} fractions={2} readOnly size="sm" />
-                  <Text size="xs" c="dimmed" className="ml-2 text-gray-300">({item.reviewCount || '44k'})</Text>
-                </div>
+                {item.review_summary && item.review_summary.count >= 1 && item.review_summary.average > 0 && (
+                  <div className="flex items-center mt-auto gap-1">
+                    <Rating value={item.review_summary.average} fractions={2} readOnly size="sm" />
+                    <Text size="xs" fw={500} className="mx-2 text-sky-500">{item.review_summary.average.toFixed(1)}</Text>
+                    <Text size="xs" c="dimmed" className="mx-2 text-gray-300">({item.review_summary.count})</Text>
+                  </div>
+                )}
               </div>
               
               <div className={cardStyles.whiteSection}>
@@ -173,7 +178,7 @@ export default function KnowledgeGrid({
                           getInitials(item.insighter.name)}
                       </Avatar>
 
-                      <div className="ml-3">
+                      <div className="ms-3">
                         <Text fw={600} size="sm">
                           {item.insighter.name}
                         </Text>
@@ -215,7 +220,7 @@ export default function KnowledgeGrid({
                   
                   <Badge
                     color={item.total_price === "0" ? "green" : "yellow"}
-                    variant="filled"
+                    variant="light"
                     className={cardStyles.priceBadge}
                   >
                     {item.total_price === "0" ? translations.free : translations.paid}

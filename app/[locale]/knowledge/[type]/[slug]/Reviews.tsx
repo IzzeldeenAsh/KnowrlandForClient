@@ -147,7 +147,12 @@ export default function Reviews({ knowledgeSlug, reviews, is_review }: ReviewsPr
                 {translations.reviewSuccess}
               </Notification>
             )}
-            <Button type="submit" loading={loading} mt="md">
+            <Button
+              type="submit"
+              loading={loading}
+              mt="md"
+              className="bg-gradient-to-r from-blue-500 to-teal-400 hover:shadow-md transition-all duration-200 hover:-translate-y-1"
+            >
               {translations.submitReview}
             </Button>
           </form>

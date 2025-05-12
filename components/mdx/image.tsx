@@ -10,7 +10,7 @@ interface PostImageProps {
 
 export default function PostImage({ alt, caption, size, ...props }: PostImageProps) {
 
-  const classes = (size === 'lg') ? 'lg:-ml-32 lg:-mr-32' : ''
+  const classes = (size === 'lg') ? 'lg:-ms-32 lg:-mr-32' : ''
 
   return (
     <figure className={classes}>
