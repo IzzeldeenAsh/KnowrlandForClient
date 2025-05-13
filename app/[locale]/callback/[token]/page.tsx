@@ -39,7 +39,12 @@ export default function AuthCallback() {
 
         console.log('[token-callback] Storing token in localStorage and cookies');
         
-        // Store token in both formats for compatibility with both apps
+        // Clear any existing tokens to avoid conflicts
+        // This ensures we're starting with a clean state
+        localStorage.removeItem('token');
+        localStorage.removeItem('foresighta-creds');
+        
+        // Store token in Next.js format
         localStorage.setItem('token', token);
         
         // Also store in Angular app format
