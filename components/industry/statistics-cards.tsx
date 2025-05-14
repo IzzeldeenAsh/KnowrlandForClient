@@ -41,6 +41,8 @@ export default function StatisticsCards({ type, id, entityName }: StatisticsCard
 
   // Get the appropriate message key based on the type
   const getMessageKey = () => {
+    if (!messages) return 'Explore knowledge';
+    
     switch(type) {
       case 'industry': return messages?.industryKnowledge || 'Explore knowledge in {industry}';
       case 'subIndustry': return messages?.subIndustryKnowledge || 'Explore knowledge in {subIndustry}';
