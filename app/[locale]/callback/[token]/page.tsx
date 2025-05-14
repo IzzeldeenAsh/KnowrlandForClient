@@ -109,8 +109,23 @@ export default function AuthCallback() {
           last_name: data.data.last_name,
         }));
         
-        // Check if user has special roles for conditional redirect
-        if (data.data.roles && 
+        // Check for returnUrl parameter first
+        const returnUrl = searchParams.get('returnUrl');
+        
+        if (returnUrl && returnUrl !== '/' && !returnUrl.includes('/login') && !returnUrl.includes('/auth/')) {
+          console.log('[token-callback] Redirecting to returnUrl:', returnUrl);
+          
+          // Handle both relative and absolute URLs
+          if (returnUrl.startsWith('http')) {
+            // For absolute URLs (like coming from knoldg.com)
+            window.location.href = returnUrl;
+          } else {
+            // For relative URLs within the app
+            window.location.href = returnUrl;
+          }
+        }
+        // Only use role-based redirect if there's no valid returnUrl
+        else if (data.data.roles && 
             (data.data.roles.includes('insighter') || 
              data.data.roles.includes('company') || 
              data.data.roles.includes('company-insighter'))) {

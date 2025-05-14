@@ -134,6 +134,14 @@ export default function MobileMenu({ isHomePage = true }: MobileMenuProps) {
             <Link className={`flex font-medium text-sm ${menuTextColorClass} py-1.5`} href={`/${currentLocale}/industries/course`}>{t('navigation.courses')}</Link>
           </li>
           <li className={`border-t ${borderColorClass} mt-1.5 pt-1.5`}>
+            <Link 
+              className={`flex font-medium text-sm ${menuTextColorClass} py-1.5 items-center`} 
+              href={`https://app.knoldg.com/auth/login?returnUrl=${encodeURIComponent(typeof window !== 'undefined' ? window.location.href : '')}`}
+            >
+              {t('auth.login')} <span className="text-blue-500 ml-1">→</span>
+            </Link>
+          </li>
+          <li className={`border-t ${borderColorClass} mt-1.5 pt-1.5`}>
             <button 
               onClick={() => {
                 switchLocale(currentLocale === 'en' ? 'ar' : 'en');
