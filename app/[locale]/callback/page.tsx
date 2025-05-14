@@ -25,6 +25,7 @@ export default function QueryParamAuthCallback() {
   const params = useParams();
   const searchParams = useSearchParams();
   const token = searchParams.get('token');
+  const returnUrl = searchParams.get('returnUrl');
   const locale = params.locale as string || 'en';
 
   useEffect(() => {
@@ -65,16 +66,32 @@ export default function QueryParamAuthCallback() {
           last_name: data.data.last_name,
         }));
         
-        // Check if user has special roles for conditional redirect
-        if (data.data.roles && 
-            (data.data.roles.includes('insighter') || 
-             data.data.roles.includes('company') || 
-             data.data.roles.includes('company-insighter'))) {
-          // Redirect to insighter dashboard
-          window.location.href = getAppUrl('/app/insighter-dashboard/my-dashboard');
+        // ALWAYS check for a valid return URL first, regardless of user role
+        if (returnUrl && returnUrl !== '/' && !returnUrl.includes('/login') && !returnUrl.includes('/auth/')) {
+          console.log('[callback] Redirecting to returnUrl:', returnUrl);
+          // Redirect to the previous page for all user types
+          
+          // Handle both relative and absolute URLs
+          if (returnUrl.startsWith('http')) {
+            // For absolute URLs (like coming from knoldg.com)
+            window.location.href = returnUrl;
+          } else {
+            // For relative URLs within the app
+            window.location.href = returnUrl;
+          }
         } else {
-          // Redirect to home page using current locale
-          router.push(`/${locale}/home`);
+          console.log('[callback] No valid returnUrl, using role-based redirect');
+          // Only use role-based redirects if there's no valid returnUrl
+          if (data.data.roles && 
+              (data.data.roles.includes('insighter') || 
+               data.data.roles.includes('company') || 
+               data.data.roles.includes('company-insighter'))) {
+            // Redirect to insighter dashboard
+            window.location.href = getAppUrl('/app/insighter-dashboard/my-dashboard');
+          } else {
+            // Fall back to default home page using current locale
+            router.push(`/${locale}/home`);
+          }
         }
       } catch (error) {
         console.error('Error fetching profile:', error);
@@ -89,7 +106,7 @@ export default function QueryParamAuthCallback() {
       // Redirect to login if no token
       router.push(`/${locale}/login`);
     }
-  }, [token, router, locale]);
+  }, [token, router, locale, returnUrl]);
 
   return (
     <div className="min-h-screen flex items-center justify-center">

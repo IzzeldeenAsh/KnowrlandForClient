@@ -154,17 +154,9 @@ export default async function IndustryPage({ params }: Props) {
                   
                    </div>
                   </div>
-                  <div className="flex flex-col items-start justify-between w-50">
-                  <span className="inline-block px-5 py-1 text-xs font-semibold text-blue-500 bg-blue-100 rounded-md mb-2 capitalize w-100">
-                    {
-                      new IntlMessageFormat(
-                        messages?.industryKnowledge || 'Type of knowledge available in {industry}',
-                        locale
-                      ).format({ industry: industry.name })
-                    }
-                  </span>
+                  <div className="flex flex-col items-start justify-between w-50 gap-2">
                     {/* Stats Cards */}
-                    <StatisticsCards type="industry" id={parseInt(id)}  />
+                    <StatisticsCards type="industry" id={parseInt(id)} entityName={industry.name} />
                   </div>
                   
                   </div>

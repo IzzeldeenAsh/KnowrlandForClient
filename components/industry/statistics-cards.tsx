@@ -11,15 +11,20 @@ import InsightIcon from "@/components/icons/InsightIcon";
 import ManualIcon from "@/components/icons/ManualIcon";
 import ReportIcon from "@/components/icons/ReportIcon";
 import CourseIcon from "@/components/icons/CourseIcon";
+import IntlMessageFormat from 'intl-messageformat';
+import { useMessages } from '@/hooks/useMessages';
+
 interface StatisticsCardsProps {
   type: 'industry' | 'subIndustry' | 'topic';
   id: number;
+  entityName?: string;
 }
 
-export default function StatisticsCards({ type, id }: StatisticsCardsProps) {
+export default function StatisticsCards({ type, id, entityName }: StatisticsCardsProps) {
   const params = useParams();
   const locale = params.locale as string || 'en';
   const isRTL = locale === 'ar';
+  const { messages } = useMessages();
   
   const useStatisticHook = {
     industry: useIndustryStatistic,
@@ -28,6 +33,32 @@ export default function StatisticsCards({ type, id }: StatisticsCardsProps) {
   }[type];
 
   const { statistics, isLoading, error } = useStatisticHook(id);
+
+  // Return null if there are no statistics to display
+  if (!isLoading && (!statistics || statistics.length === 0)) {
+    return null;
+  }
+
+  // Get the appropriate message key based on the type
+  const getMessageKey = () => {
+    switch(type) {
+      case 'industry': return messages?.industryKnowledge || 'Explore knowledge in {industry}';
+      case 'subIndustry': return messages?.subIndustryKnowledge || 'Explore knowledge in {subIndustry}';
+      case 'topic': return messages?.topicKnowledge || 'Explore knowledge in {topic}';
+      default: return 'Explore knowledge';
+    }
+  };
+
+  // Get the format parameter name based on the type
+  const getFormatParam = () => {
+    const paramMap = {
+      'industry': 'industry',
+      'subIndustry': 'subIndustry',
+      'topic': 'topic'
+    };
+    
+    return { [paramMap[type]]: entityName };
+  };
 
   // Translations for stat types - handle both singular and plural forms
   const getStatLabel = (statType: string) => {
@@ -105,21 +136,34 @@ export default function StatisticsCards({ type, id }: StatisticsCardsProps) {
   }
 
   return (
-    <div className={`grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 ${styles.statsContainer}`} dir={isRTL ? 'rtl' : 'ltr'}>
-      {statistics.map((stat) => (
-        <Link 
-          key={stat.type} 
-          href={`/${locale}/knowledges?taxonomy=${type =='subIndustry' ? 'sub_industry' : type}&id=${id}&type=${stat.type}`}
-        >
-          <div key={stat.type} className={styles.statsCard}>
-            <div className="flex items-center gap-2 mb-1">
-              {getStatIcon(stat.type)}
-              <div className={styles.statsNumber}>{stat.count}</div>
+    <div className="flex flex-col w-full">
+      {entityName && (
+        <span className="inline-block px-5 py-1 text-xs font-semibold text-blue-500 bg-blue-100 rounded-md mb-2 uppercase w-100">
+          {
+            new IntlMessageFormat(
+              getMessageKey(),
+              locale
+            ).format(getFormatParam())
+          }
+        </span>
+      )}
+      
+      <div className={`grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 ${styles.statsContainer}`} dir={isRTL ? 'rtl' : 'ltr'}>
+        {statistics.map((stat) => (
+          <Link 
+            key={stat.type} 
+            href={`/${locale}/knowledges?taxonomy=${type =='subIndustry' ? 'sub_industry' : type}&id=${id}&type=${stat.type}`}
+          >
+            <div key={stat.type} className={styles.statsCard}>
+              <div className="flex items-center gap-2 mb-1">
+                {getStatIcon(stat.type)}
+                <div className={styles.statsNumber}>{stat.count}</div>
+              </div>
+              <div className={styles.statsLabel}>{getStatLabel(stat.type)}</div>
             </div>
-            <div className={styles.statsLabel}>{getStatLabel(stat.type)}</div>
-          </div>
-        </Link>
-      ))}
+          </Link>
+        ))}
+      </div>
     </div>
   );
 }
