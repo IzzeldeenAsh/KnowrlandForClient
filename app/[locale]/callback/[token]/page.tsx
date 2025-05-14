@@ -112,16 +112,58 @@ export default function AuthCallback() {
         // Check for returnUrl parameter first
         const returnUrl = searchParams.get('returnUrl');
         
-        if (returnUrl && returnUrl !== '/' && !returnUrl.includes('/login') && !returnUrl.includes('/auth/')) {
-          console.log('[token-callback] Redirecting to returnUrl:', returnUrl);
+        // Function to get cookie value
+        const getCookie = (name: string): string | null => {
+          if (typeof document === 'undefined') return null;
+          
+          const cookies = document.cookie.split(';');
+          for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            if (cookie.startsWith(name + '=')) {
+              return decodeURIComponent(cookie.substring(name.length + 1));
+            }
+          }
+          return null;
+        };
+        
+        // Check for stored returnUrl in cookie as fallback (for social auth)
+        const storedReturnUrl = getCookie('auth_return_url');
+        const finalReturnUrl = returnUrl || storedReturnUrl;
+        
+        // Clean up the stored return URL cookie
+        if (storedReturnUrl) {
+          const isLocalhost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+          let cookieSettings;
+          
+          if (isLocalhost) {
+            cookieSettings = [
+              'auth_return_url=',
+              'Path=/',
+              'Max-Age=-1'  // expire immediately
+            ];
+          } else {
+            cookieSettings = [
+              'auth_return_url=',
+              'Path=/',
+              'Max-Age=-1',
+              'SameSite=None',
+              'Domain=.knoldg.com',
+              'Secure'
+            ];
+          }
+          document.cookie = cookieSettings.join('; ');
+        }
+        
+        if (finalReturnUrl && finalReturnUrl !== '/' && !finalReturnUrl.includes('/login') && !finalReturnUrl.includes('/auth/')) {
+          console.log('[token-callback] Redirecting to returnUrl:', finalReturnUrl);
           
           // Handle both relative and absolute URLs
-          if (returnUrl.startsWith('http')) {
+          if (finalReturnUrl.startsWith('http')) {
             // For absolute URLs (like coming from knoldg.com)
-            window.location.href = returnUrl;
+            window.location.href = finalReturnUrl;
           } else {
             // For relative URLs within the app
-            window.location.href = returnUrl;
+            window.location.href = finalReturnUrl;
           }
         }
         // Only use role-based redirect if there's no valid returnUrl
