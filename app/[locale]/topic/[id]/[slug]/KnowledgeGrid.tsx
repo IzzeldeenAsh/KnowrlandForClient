@@ -109,7 +109,8 @@ export default function KnowledgeGrid({
     free: isRTL ? "مجاني" : "FREE",
     paid: isRTL ? "مدفوع" : "PAID",
     insighter: isRTL ? "إنسايتر" : "Insighter",
-    company: isRTL ? "شركة" : "Company"
+    company: isRTL ? "شركة" : "Company" ,
+    by: isRTL ? "من قبل" : "By"
   };
 
   return (
@@ -135,19 +136,19 @@ export default function KnowledgeGrid({
           >
             <Link
               href={`/${currentLocale}/knowledge/${item.type}/${item.slug}`}
-              className="block relative h-full"
+              className="block relative h-full flex flex-col"
             >
               <div className={cardStyles.darkSection}>
                 <div>
-                  <Badge w="fit-content" className="capitalize mb-3  reflex items-center" variant="light" style={{padding: '0'}}>
-                    <span className="flex items-center px-0">
+                  <div className="flex items-center mb-3">
                     {item.type === "report" && <ReportIcon width={20} height={20} />}
                     {item.type === "manual" && <ManualIcon width={20} height={20} />}
                     {item.type === "insight" && <InsightIcon width={20} height={20} />}
                     {item.type === "data" && <DataIcon width={20} height={20} />}
-                    <span className="mx-2 px-0">{typeTranslations[item.type.toLowerCase()] || item.type}</span>
-                    </span>
-                  </Badge>
+                    <Badge w="fit-content" className="capitalize ml-2" variant="light">
+                      {typeTranslations[item.type.toLowerCase()] || item.type}
+                    </Badge>
+                  </div>
                   
                   <Text
                     fw={700}
@@ -167,9 +168,9 @@ export default function KnowledgeGrid({
                 )}
               </div>
               
-              <div className={cardStyles.whiteSection}>
+              <div className={cardStyles.whiteSection + " flex flex-col h-full "}>
                 {/* Top row with insighter info and action buttons */}
-                <div className="flex justify-between items-center">
+                <div className="flex justify-between items-center pb-4">
                   {showInsighter && (
                     <div className="flex items-center">
                       <Avatar
@@ -188,11 +189,30 @@ export default function KnowledgeGrid({
 
                       <div className="ms-3">
                         <Text fw={600} size="sm" className="capitalize">
-                          {item.insighter.name.toLowerCase()}
+                          { item.insighter.roles.includes("insighter") && item.insighter.name.toLowerCase()}
+                          {item.insighter.roles.includes("company") && (
+                            item.insighter.company ? 
+                            `${item.insighter.company.legal_name} ${translations.company}` : 
+                            translations.company
+                          )}
+                           {item.insighter.roles.includes("company-insighter") && (
+                            item.insighter.company ? 
+                            `${item.insighter.company.legal_name} ${translations.company}` : 
+                            translations.company
+                          )}
                         </Text>
-                        <Text c="dimmed" size="xs">
+                        <Text c="dimmed" size="xs" className="capitalize">
                           {item.insighter.roles.includes("insighter") && translations.insighter}
-                          {item.insighter.roles.includes("company") && translations.company}
+                           {item.insighter.roles.includes("company") && (
+                            item.insighter.company ? 
+                            `${translations.by} ${item.insighter.name.toLowerCase()}` : 
+                            translations.company
+                          )}
+                           {item.insighter.roles.includes("company-insighter") && (
+                            item.insighter.company ? 
+                            `${translations.by} ${item.insighter.name.toLowerCase()}` : 
+                            translations.company
+                          )}
                         </Text>
                       </div>
                     </div>
@@ -221,7 +241,7 @@ export default function KnowledgeGrid({
                 </div>
                 
                 {/* Bottom row with published date and price badge */}
-                <div className="flex justify-between items-center mt-4 pt-3 border-t border-gray-100">
+                <div className="flex justify-between items-center  pt-2 mt-auto mt-6 border-t border-gray-100 w-full">
                   <Text c="dimmed" size="xs">
                     {translations.posted} {formatPublishedDate(item.published_at)}
                   </Text>

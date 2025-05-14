@@ -133,7 +133,7 @@ export function UserProfile({ isHome }: { isHome: boolean }) {
                 width={100}
                 height={100}
                 quality={100}
-                className="w-full h-full object-cover object-center"
+                className="w-full h-full object-contain object-center"
               />
             </div>
           ) : user.profile_photo_url ? (
@@ -177,7 +177,7 @@ export function UserProfile({ isHome }: { isHome: boolean }) {
                     width={100}
                     height={100}
                     quality={100}
-                    className="w-full h-full object-cover object-center"
+                    className="w-full h-full object-contain object-center"
                   />
                 </div>
               ) : user.profile_photo_url ? (
@@ -188,7 +188,7 @@ export function UserProfile({ isHome }: { isHome: boolean }) {
                     width={100}
                     height={100}
                     quality={100}
-                    className="w-full h-full object-cover object-top"
+                    className="w-full h-full object-contain object-center"
                   />
                 </div>
               ) : (
