@@ -164,17 +164,8 @@ export default async function SubIndustryPage({ params }: Props) {
                 </div>
 
                 {/* Right Side: Interpolated message + Stats */}
-                <div className="flex flex-col items-start justify-between w-50">
-                  <span className="inline-block px-5 py-1 text-xs font-semibold text-blue-500 bg-blue-100 rounded-md mb-2 capitalize w-100">
-                    {
-                      new IntlMessageFormat(
-                        messages?.subIndustryKnowledge || 'Type of knowledge available in {subIndustry}',
-                        locale
-                      ).format({ subIndustry: subIndustry.name })
-                    }
-                  </span>
-
-                  <StatisticsCards type="subIndustry" id={parseInt(id)} />
+                <div className="flex flex-col items-start justify-between w-50 gap-2">
+                  <StatisticsCards type="subIndustry" id={parseInt(id)} entityName={subIndustry.name} />
                 </div>
               </div>
             </div>
