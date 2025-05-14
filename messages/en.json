@@ -205,6 +205,7 @@
         }
     },
     "Features4": {
+        "Features4": "Feature 4 (Backup)",
         "searchTitle": "Search all assets",
         "searchButton": "Search",
         "searchResult": "Search All Results",
@@ -573,9 +574,9 @@
                 "regionalOperations": "Regional Operations - Jordan",
                 "jordanPhone": "+962777771429"
         },
-    "dataNotAvailable": "Data not available",
-    "industryKnowledge": "Type of knowledge available in {industry}",
+    "dataNotAvailable": "No Knowledge Available",
+    "industryKnowledge": "Explore knowledge in {industry}",
     "subIndustry": "Sub Industry",
-    "subIndustryKnowledge": "Type of knowledge available in {subIndustry}",
+    "subIndustryKnowledge": "Explore knowledge in {subIndustry}",
     "topicLabel": "Topic"
 }
