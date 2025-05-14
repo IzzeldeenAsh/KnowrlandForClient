@@ -6,7 +6,7 @@ import { useParams } from 'next/navigation';
 import Link from 'next/link';
 import { formatDistanceToNow } from 'date-fns';
 import { enUS, ar } from 'date-fns/locale';
-import { Notification } from '@mantine/core';
+import { Notification, Avatar } from '@mantine/core';
 import { IconX } from '@tabler/icons-react';
 
 // Import CSS module for thread connectors
@@ -67,7 +67,7 @@ export default function AskInsighter({ knowledgeSlug, questions = [], is_owner =
     postReply: isRTL ? '\u0625\u0631\u0633\u0627\u0644 \u0627\u0644\u0631\u062f' : 'Reply',
     postAnswer: isRTL ? '\u0625\u0631\u0633\u0627\u0644 \u0627\u0644\u0625\u062c\u0627\u0628\u0629' : 'Reply',
     cancelReply: isRTL ? '\u0625\u0644\u063a\u0627\u0621' : 'Cancel',
-    reply: isRTL ? '\u0631\u062f' : 'Reply',
+    reply: isRTL ? '\u0631\u062f' : 'Comment',
     answer: isRTL ? '\u0625\u062c\u0627\u0628\u0629' : 'Answer',
     edit: isRTL ? '\u062a\u0639\u062f\u064a\u0644' : 'Edit',
     remove: isRTL ? '\u062d\u0630\u0641' : 'Remove',
@@ -379,15 +379,22 @@ export default function AskInsighter({ knowledgeSlug, questions = [], is_owner =
     const isLastReply = (index: number) => isReply && index === sortedQuestions.length - 1;
 
     return sortedQuestions.map((question, index) => {
-      const userImage = question.question.user.profile_photo_url || question.question.user.profile_image || 'https://flowbite.com/docs/images/people/profile-picture-2.jpg';
+      const userImage = question.question.user.profile_photo_url || question.question.user.profile_image;
       const userName = question.question.user.name || `${question.question.user.first_name} ${question.question.user.last_name}`.trim();
+const userInitials = userName
+  ? userName
+      .split(' ')
+      .map(name => name.charAt(0).toUpperCase())
+      .join('')
+  : 'U';
       const questionDate = formatDate(question.question.question_date);
       // Check if the question has a valid answer (ensure we handle null/undefined/empty strings properly)
       const hasAnswer = Boolean(question.answer?.answer);
       const hasReplies = question.children && question.children.length > 0;
       
       return (
-        <div className={styles.commentContainer} key={question.id} dir={isRTL ? 'rtl' : 'ltr'}>
+      <div className={`${isReply ? '' : 'border shadow-sm'} bg-white rounded  mb-5`}>
+          <div className={styles.commentContainer} key={question.id} dir={isRTL ? 'rtl' : 'ltr'}>
           {/* Add line terminator to the last reply in a thread */}
           {isLastReply(index) && (
             <div className={styles.replyTerminator} aria-hidden="true" />
@@ -418,12 +425,14 @@ export default function AskInsighter({ knowledgeSlug, questions = [], is_owner =
           )}
           
           {/* Avatar - different position for parent vs child */}
-          <img
+          <Avatar
             className={`${styles.commentAvatar} ${isReply ? styles.childAvatar : styles.parentAvatar}`}
             src={userImage}
             alt={userName}
-            data-testid={`avatar-${question.id}`} /* Add a test ID to help identify the avatar */
-          />
+            data-testid={`avatar-${question.id}`}
+          >
+            {!userImage && userInitials}
+          </Avatar>
           
           <article 
             className={`${styles.commentBox} ${isReply ? 'dark:bg-gray-800' : 'dark:bg-gray-900'}`}
@@ -508,12 +517,19 @@ export default function AskInsighter({ knowledgeSlug, questions = [], is_owner =
                 className={`${styles.answerConnector} ${isReply ? styles.childAnswerConnector : ''}`}
                 aria-hidden="true"
               />
-              <img
+              <Avatar
                 className={`${styles.commentAvatar} ${styles.childAvatar}`}
-                src={question.answer.user.profile_photo_url || question.answer.user.profile_image || 'https://flowbite.com/docs/images/people/profile-picture-5.jpg'}
+                src={question.answer.user.profile_photo_url || question.answer.user.profile_image}
                 alt={question.answer.user.name || `${question.answer.user.first_name} ${question.answer.user.last_name}`.trim()}
                 data-testid={`avatar-answer-${question.id}`}
-              />
+              >
+                {!(question.answer.user.profile_photo_url || question.answer.user.profile_image) &&
+                  (question.answer.user.name || `${question.answer.user.first_name} ${question.answer.user.last_name}`.trim())
+                    .split(' ')
+                    .map(name => name.charAt(0).toUpperCase())
+                    .join('')
+                }
+              </Avatar>
               
               <article className={`${styles.commentBox} dark:bg-gray-800`}>
                 <footer className="flex justify-between items-center mb-2">
@@ -647,6 +663,7 @@ export default function AskInsighter({ knowledgeSlug, questions = [], is_owner =
            <div className="mt-3 border-t border-gray-200 dark:border-gray-700"></div>
           </article>
         </div>
+      </div>
       );
     });
   };

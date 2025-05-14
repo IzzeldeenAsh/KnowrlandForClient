@@ -175,76 +175,76 @@ export default function InsighterFeatures() {
                   </h5>
 
                 <div className="grid gap-6 md:grid-cols-3 xl:gap-8">
-                  {[
-                    {
-                      key: "dataSets",
-                      icon: "/images/data.svg",
-                    },
-                    {
-                      key: "playbooks",
-                      icon: "/images/strategy.svg",
-                    },
-                    {
-                      key: "manuals",
-                      icon: "/images/sop.svg",
-                    },
-                    {
-                      key: "technicalGuides",
-                      icon: "/images/technical.svg",
-                    },
-                    {
-                      key: "trainingMaterials",
-                      icon: "/images/training.svg",
-                    },
-                    {
-                      key: "businessReports",
-                      icon: "/images/report.svg",
-                    },
-                    {
-                      key: "supplyChain",
-                      icon: "/images/supply-chain.svg",
-                    },
-                    {
-                      key: "marketSize",
-                      icon: "/images/market-size.svg",
-                    },
-                    {
-                      key: "customerBehavior",
-                      icon: "/images/customer-behavior.svg",
-                    },
-                  ].map((item, index) => (
-                    <div key={index} data-aos="fade-up" data-aos-delay={index * 100}>
-                      <div className="relative h-full group">
-                        <div className="relative h-full bg-slate-900 rounded-3xl z-20 overflow-hidden p-px
-                             before:absolute before:w-96 before:h-96 before:-left-48 before:-top-48 before:bg-blue-500 before:rounded-full before:opacity-0 before:pointer-events-none before:transition-opacity before:duration-500 before:translate-x-[var(--mouse-x)] before:translate-y-[var(--mouse-y)] before:hover:opacity-20 before:z-30 before:blur-[100px]
-                             after:absolute after:inset-0 after:rounded-[inherit] after:opacity-0 after:transition-opacity after:duration-500 after:[background:_radial-gradient(250px_circle_at_var(--mouse-x)_var(--mouse-y),theme(colors.slate.400),transparent)] after:group-hover:opacity-100 after:z-10">
-                          <div className="flex flex-col h-full bg-slate-800 rounded-3xl relative overflow-hidden p-6">
-                            {/* Radial gradient */}
-                            <div className="absolute bottom-0 translate-y-1/2 left-1/2 -translate-x-1/2 pointer-events-none -z-10 w-1/2 aspect-square" aria-hidden="true">
-                              <div className="absolute inset-0 translate-z-0 bg-slate-800 rounded-full blur-[50px]" />
-                            </div>
-                            {/* Content */}
-                            <div className="flex flex-col h-full justify-between">
-                              <div className="flex flex-col items-center text-center mb-4">
-                                <Image
-                                  src={item.icon}
-                                  alt={t(`insighter.uploadTypes.${item.key}`)}
-                                  width={60}
-                                  height={60}
-                                  className="mb-4"
-                                />
-                                <h3 className="inline-flex text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-slate-200/60 via-slate-200 to-slate-200/60 pb-1">
-                                  {t(`insighter.uploadTypes.${item.key}`)}
-                                </h3>
-                              </div>
-
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
+  {[
+    {
+      key: "dataSets",
+      icon: "/images/data.svg",
+    },
+    {
+      key: "playbooks",
+      icon: "/images/strategy.svg",
+    },
+    {
+      key: "manuals",
+      icon: "/images/sop.svg",
+    },
+    {
+      key: "technicalGuides",
+      icon: "/images/technical.svg",
+    },
+    {
+      key: "trainingMaterials",
+      icon: "/images/training.svg",
+    },
+    {
+      key: "businessReports",
+      icon: "/images/report.svg",
+    },
+    {
+      key: "supplyChain",
+      icon: "/images/supply-chain.svg",
+    },
+    {
+      key: "marketSize",
+      icon: "/images/market-size.svg",
+    },
+    {
+      key: "customerBehavior",
+      icon: "/images/customer-behavior.svg",
+    },
+  ].map((item, index) => (
+    <div key={index} data-aos="fade-up" data-aos-delay={index * 100}>
+      <div className="relative h-full group">
+        <div className="relative h-full bg-slate-900 rounded-3xl z-20 overflow-hidden p-px
+             before:absolute before:w-96 before:h-96 before:-left-48 before:-top-48 before:bg-blue-500 before:rounded-full before:opacity-0 before:pointer-events-none before:transition-opacity before:duration-500 before:translate-x-[var(--mouse-x)] before:translate-y-[var(--mouse-y)] before:hover:opacity-20 before:z-30 before:blur-[100px]
+             after:absolute after:inset-0 after:rounded-[inherit] after:opacity-0 after:transition-opacity after:duration-500 after:[background:_radial-gradient(250px_circle_at_var(--mouse-x)_var(--mouse-y),theme(colors.slate.400),transparent)] after:group-hover:opacity-100 after:z-10">
+          <div className="flex flex-col justify-center align-center h-[200px] bg-slate-800 rounded-3xl relative overflow-hidden p-6">
+            {/* Radial gradient */}
+            <div className="absolute bottom-0 translate-y-1/2 left-1/2 -translate-x-1/2 pointer-events-none -z-10 w-1/2 aspect-square" aria-hidden="true">
+              <div className="absolute inset-0 translate-z-0 bg-slate-800 rounded-full blur-[50px]" />
+            </div>
+            {/* Content */}
+            <div className="flex flex-col h-full justify-between">
+              <div className="flex flex-col items-center text-center mb-4">
+                <Image
+                  src={item.icon}
+                  alt={t(`insighter.uploadTypes.${item.key}`)}
+                  width={60}
+                  height={60}
+                  className="mb-4"
+                />
+                <h3 className="inline-flex text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-slate-200/60 via-slate-200 to-slate-200/60 pb-1">
+                  {t(`insighter.uploadTypes.${item.key}`)}
+                </h3>
+              </div>
+              <div className="flex-1" />
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  ))}
+</div>
 
                 <div className="mt-12 text-center">
                   <div className="mb-4">

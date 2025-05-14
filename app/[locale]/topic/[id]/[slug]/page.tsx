@@ -159,17 +159,8 @@ export default async function TopicPage({ params }: Props) {
             </div>
 
             {showStatistics && (
-                <div className="flex flex-col items-start justify-between w-50">
-                  <span className="inline-block px-5 py-1 text-xs font-semibold text-blue-500 bg-blue-100 rounded-md mb-2 uppercase w-100">
-                    {
-                      new IntlMessageFormat(
-                        messages?.topicKnowledge || 'Type of knowledge available in {topic}',
-                        locale
-                      ).format({ topic: topic.name })
-                    }
-                  </span>
-
-                  <StatisticsCards type="topic" id={parseInt(id)} />
+                <div className="flex flex-col items-start justify-between w-50 gap-2">
+                  <StatisticsCards type="topic" id={parseInt(id)} entityName={topic.name} />
                 </div>
               )}
           </div>
