@@ -644,7 +644,7 @@ const userInitials = userName
           {!isLoggedIn && !isReply && (
             <div className={`flex items-center mt-4 ${isRTL ? 'space-x-reverse' : 'space-x-4'}`}>
               <a
-                href={loginUrl}
+                href={getLoginUrl()}
                 className="flex items-center text-sm text-blue-500 hover:underline dark:text-blue-400 font-medium"
               >
                 <svg className={`${isRTL ? 'ml-1.5' : 'mr-1.5'} w-3.5 h-3.5`} aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 18">
@@ -668,8 +668,10 @@ const userInitials = userName
     });
   };
 
-  // Redirect URL for login button
-  const loginUrl = 'https://app.knoldg.com/auth/login';
+  // Redirect URL for login button with returnUrl parameter
+  const getLoginUrl = () => {
+    return `https://app.knoldg.com/auth/login?returnUrl=${encodeURIComponent(typeof window !== 'undefined' ? window.location.href : '')}`;
+  };
   
   // Determine if user is logged in
   const isLoggedIn = authToken !== null;
@@ -697,7 +699,7 @@ const userInitials = userName
           <div className="mb-6 p-6 bg-gray-50 border border-gray-200 rounded-lg text-center">
             <p className="mb-4 text-gray-700">{translations.loginRequired}</p>
             <a 
-              href={loginUrl}
+              href={getLoginUrl()}
               className="inline-flex items-center py-2.5 px-4 text-xs font-medium text-center text-white bg-blue-700 rounded-lg hover:bg-blue-800 focus:ring-4 focus:ring-blue-300"
             >
               {translations.loginButton}
