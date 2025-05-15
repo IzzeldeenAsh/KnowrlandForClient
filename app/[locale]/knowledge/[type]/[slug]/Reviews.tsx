@@ -132,7 +132,7 @@ export default function Reviews({ knowledgeSlug, reviews, is_review }: ReviewsPr
         <Card padding="lg" radius="md" withBorder mt={'md'}>
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
-              <Text fw={500} fs="sm" mb={5} className={isRTL ? 'text-right' : 'text-start'}>
+              <Text fw={500} fs="xs" mb={5} className={isRTL ? 'text-right' : 'text-start'}>
                 {translations.rateKnowledge}
               </Text>
               {/* @ts-ignore: The current Rating type doesn't include the `max` prop */}
@@ -143,9 +143,7 @@ export default function Reviews({ knowledgeSlug, reviews, is_review }: ReviewsPr
               />
             </div>
             <div>
-              <Text fw={500} size="md" mb={5} className={isRTL ? 'text-right' : 'text-start'}>
-                {translations.comment}
-              </Text>
+          
               <Textarea
                 placeholder={translations.writeReview}
                 value={comment}

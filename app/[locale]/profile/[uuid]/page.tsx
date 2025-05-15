@@ -452,14 +452,14 @@ export default function ProfilePage() {
               <div className="flex flex-col md:flex-row gap-6">
                 {/* Profile Image */}
                 <div className="flex-shrink-0">
-                  <div className="w-32 h-32   rounded-xl overflow-hidden border-3 border-white dark:border-slate-800 shadow-md bg-white dark:bg-slate-700">
+                  <div className="w-32 h-32 rounded-xl overflow-hidden border-3 border-white dark:border-slate-800 shadow-md bg-white dark:bg-slate-700">
                     {(isCompany || isCompanyInsighter) && profileData.company?.logo ? (
                       <Image
                         src={profileData.company.logo}
                         alt={profileData.company?.legal_name || profileData.name}
                         width={400}
                         height={400}
-                        className="w-full h-full object-contain"
+                        className="w-full h-full object-cover"
                       />
                     ) : profileData.profile_photo_url ? (
                       <Image
@@ -467,7 +467,7 @@ export default function ProfilePage() {
                         alt={profileData.name}
                         width={400}
                         height={400}
-                        className="w-full h-full object-contain"
+                        className="w-full h-full object-cover"
                       />
                     ) : (
                       <div className="w-full h-full bg-gray-100 dark:bg-slate-700 flex items-center justify-center">
