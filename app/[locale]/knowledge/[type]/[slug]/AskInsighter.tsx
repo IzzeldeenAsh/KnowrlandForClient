@@ -378,53 +378,34 @@ export default function AskInsighter({ knowledgeSlug, questions = [], is_owner =
     // Function to check if this is the last reply in a thread
     const isLastReply = (index: number) => isReply && index === sortedQuestions.length - 1;
 
-    return sortedQuestions.map((question, index) => {
+    return sortedQuestions.map((question, index, array) => {
       const userImage = question.question.user.profile_photo_url || question.question.user.profile_image;
       const userName = question.question.user.name || `${question.question.user.first_name} ${question.question.user.last_name}`.trim();
-const userInitials = userName
-  ? userName
-      .split(' ')
-      .map(name => name.charAt(0).toUpperCase())
-      .join('')
-  : 'U';
+      const userInitials = userName
+        ? userName
+            .split(' ')
+            .map(name => name.charAt(0).toUpperCase())
+            .join('')
+        : 'U';
       const questionDate = formatDate(question.question.question_date);
       // Check if the question has a valid answer (ensure we handle null/undefined/empty strings properly)
       const hasAnswer = Boolean(question.answer?.answer);
       const hasReplies = question.children && question.children.length > 0;
       
+      // Check if this is the last item in the array
+      const isLastItem = index === array.length - 1;
+      
       return (
-      <div className={`${isReply ? '' : 'border shadow-sm'} bg-white rounded  mb-5`}>
+      <div className={`${isReply ? '' : 'border shadow-sm p-5'} bg-white rounded mb-5 overflow-hidden`}>
           <div className={styles.commentContainer} key={question.id} dir={isRTL ? 'rtl' : 'ltr'}>
-          {/* Add line terminator to the last reply in a thread */}
-          {isLastReply(index) && (
-            <div className={styles.replyTerminator} aria-hidden="true" />
-          )}
+       
+          <article 
+            className={`${styles.commentBox} ${isReply ? 'dark:bg-gray-800' : 'dark:bg-gray-900'}`}
+          >
           
-          {/* Child comments have curved connectors */}
-          {isReply && (
-            <span
-              className={styles.childConnector}
-              aria-hidden="true"
-            />
-          )}
-          
-          {/* Parent thread line - for questions with answers or replies */}
-          {!isReply && (hasReplies || hasAnswer) && (
-            <span
-              className={styles.parentThreadLine}
-              aria-hidden="true"
-            />
-          )}
-          
-          {/* Child thread line - only for child comments that have answers or replies */}
-          {isReply && (hasAnswer || hasReplies) && (
-            <span
-              className={styles.childThreadLine}
-              aria-hidden="true"
-            />
-          )}
-          
-          {/* Avatar - different position for parent vs child */}
+          <footer className="flex justify-between items-center mb-2">
+            <div className="flex items-center">
+                 {/* Avatar - different position for parent vs child */}
           <Avatar
             className={`${styles.commentAvatar} ${isReply ? styles.childAvatar : styles.parentAvatar}`}
             src={userImage}
@@ -434,12 +415,6 @@ const userInitials = userName
             {!userImage && userInitials}
           </Avatar>
           
-          <article 
-            className={`${styles.commentBox} ${isReply ? 'dark:bg-gray-800' : 'dark:bg-gray-900'}`}
-          >
-          
-          <footer className="flex justify-between items-center mb-2">
-            <div className="flex items-center">
               <p className="inline-flex items-start mx-3 text-sm text-gray-900 dark:text-white font-semibold capitalize" >
                 {question.question.user.uuid ? (
                   <Link 
@@ -460,63 +435,23 @@ const userInitials = userName
                 </time>
               </p>
             </div>
-            {/* <button
-              id={`dropdownQuestion${question.id}Button`}
-              data-dropdown-toggle={`dropdownQuestion${question.id}`}
-              className="inline-flex items-center p-2 text-sm font-medium text-center text-gray-500 dark:text-gray-400 bg-white rounded-lg hover:bg-gray-100 focus:ring-4 focus:outline-none focus:ring-gray-50 dark:bg-gray-900 dark:hover:bg-gray-700 dark:focus:ring-gray-600"
-              type="button"
-            >
-              <svg className="w-4 h-4" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 16 3">
-                <path d="M2 0a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3Zm6.041 0a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3ZM14 0a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3Z" />
-              </svg>
-              <span className="sr-only">{translations.commentSettings}</span>
-            </button>
-            <div
-              id={`dropdownQuestion${question.id}`}
-              className="hidden z-10 w-36 bg-white rounded divide-y divide-gray-100 shadow dark:bg-gray-700 dark:divide-gray-600"
-            >
-              <ul
-                className="py-1 text-sm text-gray-700 dark:text-gray-200"
-                aria-labelledby={`dropdownMenuIconHorizontalButton${question.id}`}
-              >
-                <li>
-                  <a
-                    href="#"
-                    className="block py-2 px-4 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white"
-                  >
-                    {translations.edit}
-                  </a>
-                </li>
-                <li>
-                  <a
-                    href="#"
-                    className="block py-2 px-4 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white"
-                  >
-                    {translations.remove}
-                  </a>
-                </li>
-                <li>
-                  <a
-                    href="#"
-                    className="block py-2 px-4 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white"
-                  >
-                    {translations.report}
-                  </a>
-                </li>
-              </ul>
-            </div> */}
           </footer>
-          
+        <div className="flex pb-4">
+        <div aria-hidden="true" className={(hasAnswer || hasReplies) ? styles.commentsThreadLine : 'ps-10'} role="button"></div>
           {/* Question content */}
-          <p className="text-gray-800 mb-4 text-sm ">{question.question?.question}</p>
+          <p className="text-gray-800 mb-4 text-sm px-3">{question.question?.question}</p>
+       
+        </div>
           
           {/* Answer if exists */}
           {hasAnswer && (
             <div className={`${styles.commentContainer} ${styles.answer} `} dir={isRTL ? 'rtl' : 'ltr'}>
-              <span
-                className={`${styles.answerConnector} ${isReply ? styles.childAnswerConnector : ''}`}
-                aria-hidden="true"
-              />
+            
+              
+              <article className={`${styles.commentBox} dark:bg-gray-800`}>
+                <footer className="flex justify-between items-center mb-2">
+                  <div className="flex items-center ">
+                  <div aria-hidden="true" className={styles.curveElement} role="button"></div>
               <Avatar
                 className={`${styles.commentAvatar} ${styles.childAvatar}`}
                 src={question.answer.user.profile_photo_url || question.answer.user.profile_image}
@@ -530,11 +465,7 @@ const userInitials = userName
                     .join('')
                 }
               </Avatar>
-              
-              <article className={`${styles.commentBox} dark:bg-gray-800`}>
-                <footer className="flex justify-between items-center mb-2">
-                  <div className="flex items-center">
-                    <p className="inline-flex items-center me-3 text-sm text-gray-900 dark:text-white font-semibold">
+                    <p className="inline-flex items-center mx-3 text-sm text-gray-900 dark:text-white font-semibold">
                       {question.answer.user.uuid ? (
                         <Link 
                           href={
@@ -559,20 +490,17 @@ const userInitials = userName
                   </div>
                 </footer>
                 
-                <p className="text-gray-800 dark:text-gray-300 text-sm ps-2">{question.answer.answer}</p>
-                
+             <div className="flex pb-4">
+             <div aria-hidden="true" className={styles.emptyThread} role="button"/>
+             <p className="text-gray-800 dark:text-gray-300 text-sm ps-4">{question.answer.answer}</p>
+             </div>
               </article>
-              
-              {!hasReplies && (
-                <div className={`${styles.lineTerminator} ${styles.parentTerminator}`} aria-hidden="true" />
-              )}
+          
             </div>
           )}
           
           {/* Render children/replies */}
           {hasReplies && renderQuestions(question.children, true)}
-          
-          {/* No Answer button for owners - answer box is always visible */}
           
           {/* Reply form - shown for the appropriate questions based on user role */}
           {isLoggedIn && (
@@ -582,7 +510,7 @@ const userInitials = userName
               {/* 2. For owners - always show for ANY unanswered question */}
               {((!is_owner && ((isReply && isLastReply(index)) || (!isReply && !hasReplies))) || 
                 (is_owner && !hasAnswer)) && (
-                <div className="mt-4 bg-gray-50 rounded-lg dark:bg-gray-800">
+                <div className="rounded-lg">
                   <form onSubmit={(e) => {
                     // Different handling for owners vs regular users
                     if (is_owner) {
@@ -596,8 +524,7 @@ const userInitials = userName
                       handleReplySubmit(e, question.id, topLevelParentId);
                     }
                   }}>
-                    <div className="mb-4 relative " >
-                      <div className={`${styles.lineTerminatorBox} ${styles.parentTerminator}`} aria-hidden="true" />
+                    <div className="relative" >
                       <label htmlFor={`replyText-${question.id}`} className="sr-only">
                         {is_owner ? translations.writeAnswer : translations.writeReply}
                       </label>
@@ -642,7 +569,7 @@ const userInitials = userName
           
           {/* Login button for non-logged in users - only show for top-level questions */}
           {!isLoggedIn && !isReply && (
-            <div className={`flex items-center mt-4 ${isRTL ? 'space-x-reverse' : 'space-x-4'}`}>
+            <div className={`flex items-center ${isRTL ? 'space-x-reverse' : 'space-x-4'}`}>
               <a
                 href={getLoginUrl()}
                 className="flex items-center text-sm text-blue-500 hover:underline dark:text-blue-400 font-medium"
@@ -660,9 +587,10 @@ const userInitials = userName
               </a>
             </div>
           )}
-           <div className="mt-3 border-t border-gray-200 dark:border-gray-700"></div>
           </article>
         </div>
+        {/* Only add the border divider if this is not the last item */}
+        {!isLastItem && <div className="mt-3 border-t border-gray-200 dark:border-gray-700"></div>}
       </div>
       );
     });
@@ -746,7 +674,7 @@ const userInitials = userName
                 {submitError}
               </Notification>
             )}
-            <div className="mt-3 border-t border-gray-200 dark:border-gray-700"></div>
+   
           </form>
         )}
         

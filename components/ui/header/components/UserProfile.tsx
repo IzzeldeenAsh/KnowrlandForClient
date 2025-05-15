@@ -125,15 +125,15 @@ export function UserProfile({ isHome }: { isHome: boolean }) {
           className="flex items-center cursor-pointer"
           onClick={() => setMenuOpen(!menuOpen)}
         >
-          {(roles.includes('company') || roles.includes('company-insighter')) && user.company?.logo ? (
+          {(roles.includes('company') || roles.includes('company-insighter')) && user.profile_photo_url ? (
             <div className="w-8 h-8 md:w-10 md:h-10 rounded-full overflow-hidden">
               <Image
-                src={user.company.logo}
-                alt={user.company.legal_name || "Company Logo"}
+                src={user.profile_photo_url}
+                alt={user.name}
                 width={100}
                 height={100}
                 quality={100}
-                className="w-full h-full object-contain object-center"
+                className="w-full h-full object-cover object-center"
               />
             </div>
           ) : user.profile_photo_url ? (
@@ -177,7 +177,7 @@ export function UserProfile({ isHome }: { isHome: boolean }) {
                     width={100}
                     height={100}
                     quality={100}
-                    className="w-full h-full object-contain object-center"
+                    className="w-full h-full object-cover object-center"
                   />
                 </div>
               ) : user.profile_photo_url ? (
@@ -188,7 +188,7 @@ export function UserProfile({ isHome }: { isHome: boolean }) {
                     width={100}
                     height={100}
                     quality={100}
-                    className="w-full h-full object-contain object-center"
+                    className="w-full h-full object-cover object-center"
                   />
                 </div>
               ) : (
