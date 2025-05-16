@@ -403,17 +403,32 @@ export default function AskInsighter({ knowledgeSlug, questions = [], is_owner =
             className={`${styles.commentBox} ${isReply ? 'dark:bg-gray-800' : 'dark:bg-gray-900'}`}
           >
           
-          <footer className="flex justify-between items-center mb-2">
+          <footer className="flex justify-between items-center ">
             <div className="flex items-center">
                  {/* Avatar - different position for parent vs child */}
-          <Avatar
-            className={`${styles.commentAvatar} ${isReply ? styles.childAvatar : styles.parentAvatar}`}
-            src={userImage}
-            alt={userName}
-            data-testid={`avatar-${question.id}`}
-          >
-            {!userImage && userInitials}
-          </Avatar>
+          {question.question.user.uuid ? (
+            <Link 
+              href={`/${locale}/profile/${question.question.user.uuid}${getEntityParam(question.question.user)}`}
+            >
+              <Avatar
+                className={`${styles.commentAvatar} ${isReply ? styles.childAvatar : styles.parentAvatar}`}
+                src={userImage}
+                alt={userName}
+                data-testid={`avatar-${question.id}`}
+              >
+                {!userImage && userInitials}
+              </Avatar>
+            </Link>
+          ) : (
+            <Avatar
+              className={`${styles.commentAvatar} ${isReply ? styles.childAvatar : styles.parentAvatar}`}
+              src={userImage}
+              alt={userName}
+              data-testid={`avatar-${question.id}`}
+            >
+              {!userImage && userInitials}
+            </Avatar>
+          )}
           
               <p className="inline-flex items-start mx-3 text-sm text-gray-900 dark:text-white font-semibold capitalize" >
                 {question.question.user.uuid ? (
@@ -437,7 +452,7 @@ export default function AskInsighter({ knowledgeSlug, questions = [], is_owner =
             </div>
           </footer>
         <div className="flex pb-4">
-        <div aria-hidden="true" className={(hasAnswer || hasReplies) ? styles.commentsThreadLine : 'ps-10'} role="button"></div>
+        <div aria-hidden="true" className={hasAnswer ? styles.commentsThreadLine : 'ps-10'} role="button"></div>
           {/* Question content */}
           <p className="text-gray-800 mb-4 text-sm px-3">{question.question?.question}</p>
        
@@ -449,22 +464,42 @@ export default function AskInsighter({ knowledgeSlug, questions = [], is_owner =
             
               
               <article className={`${styles.commentBox} dark:bg-gray-800`}>
-                <footer className="flex justify-between items-center mb-2">
+                <footer className="flex justify-between items-center ">
                   <div className="flex items-center ">
                   <div aria-hidden="true" className={styles.curveElement} role="button"></div>
-              <Avatar
-                className={`${styles.commentAvatar} ${styles.childAvatar}`}
-                src={question.answer.user.profile_photo_url || question.answer.user.profile_image}
-                alt={question.answer.user.name || `${question.answer.user.first_name} ${question.answer.user.last_name}`.trim()}
-                data-testid={`avatar-answer-${question.id}`}
-              >
-                {!(question.answer.user.profile_photo_url || question.answer.user.profile_image) &&
-                  (question.answer.user.name || `${question.answer.user.first_name} ${question.answer.user.last_name}`.trim())
-                    .split(' ')
-                    .map(name => name.charAt(0).toUpperCase())
-                    .join('')
-                }
-              </Avatar>
+              {question.answer.user.uuid ? (
+                <Link 
+                  href={`/${locale}/profile/${question.answer.user.uuid}${getEntityParam(question.answer.user)}`}
+                >
+                  <Avatar
+                    className={`${styles.commentAvatar} ${styles.childAvatar}`}
+                    src={question.answer.user.profile_photo_url || question.answer.user.profile_image}
+                    alt={question.answer.user.name || `${question.answer.user.first_name} ${question.answer.user.last_name}`.trim()}
+                    data-testid={`avatar-answer-${question.id}`}
+                  >
+                    {!(question.answer.user.profile_photo_url || question.answer.user.profile_image) &&
+                      (question.answer.user.name || `${question.answer.user.first_name} ${question.answer.user.last_name}`.trim())
+                        .split(' ')
+                        .map(name => name.charAt(0).toUpperCase())
+                        .join('')
+                    }
+                  </Avatar>
+                </Link>
+              ) : (
+                <Avatar
+                  className={`${styles.commentAvatar} ${styles.childAvatar}`}
+                  src={question.answer.user.profile_photo_url || question.answer.user.profile_image}
+                  alt={question.answer.user.name || `${question.answer.user.first_name} ${question.answer.user.last_name}`.trim()}
+                  data-testid={`avatar-answer-${question.id}`}
+                >
+                  {!(question.answer.user.profile_photo_url || question.answer.user.profile_image) &&
+                    (question.answer.user.name || `${question.answer.user.first_name} ${question.answer.user.last_name}`.trim())
+                      .split(' ')
+                      .map(name => name.charAt(0).toUpperCase())
+                      .join('')
+                  }
+                </Avatar>
+              )}
                     <p className="inline-flex items-center mx-3 text-sm text-gray-900 dark:text-white font-semibold">
                       {question.answer.user.uuid ? (
                         <Link 
@@ -499,17 +534,63 @@ export default function AskInsighter({ knowledgeSlug, questions = [], is_owner =
             </div>
           )}
           
+          {/* Reply form for answering the current question - shown before replies for owners */}
+          {isLoggedIn && is_owner && !hasAnswer && (
+            <div className="rounded-lg mb-4">
+              <form onSubmit={(e) => {
+                handleReplySubmit(e, question.id, null);
+              }}>
+                <div className="relative">
+                  <label htmlFor={`replyText-${question.id}`} className="sr-only">
+                    {translations.writeAnswer}
+                  </label>
+                  <textarea
+                    id={`replyText-${question.id}`}
+                    rows={2}
+                    className="px-3 py-2 pe-20 w-full text-sm text-gray-900 bg-white rounded-lg border border-gray-200 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white min-h-[100px]"
+                    placeholder={translations.writeAnswer}
+                    value={replyTexts[question.id] || ''}
+                    onChange={(e) => setReplyTexts(prev => ({ ...prev, [question.id]: e.target.value }))}
+                    disabled={isSubmitting}
+                  />
+                  <div className="absolute mb-2 bottom-2 end-5 flex gap-2">
+                    <button
+                      type="submit"
+                      className="inline-flex items-center py-1.5 px-3 text-xs font-medium text-center text-white bg-gradient-to-r from-blue-500 to-teal-400 rounded-lg focus:ring-2 focus:ring-blue-200 dark:focus:ring-blue-900 hover:bg-blue-800 disabled:opacity-50 disabled:cursor-not-allowed"
+                      disabled={isSubmitting}
+                    >
+                      {isSubmitting && replyingTo === question.id
+                        ? translations.submittingAnswer
+                        : translations.postAnswer}
+                    </button>
+                  </div>
+                </div>
+                {question.id === replyingTo && submitError && (
+                  <Notification
+                    icon={<IconX size={20} />}
+                    color="red"
+                    onClose={() => setSubmitError('')}
+                    mt="sm"
+                    mb="md"
+                    withCloseButton
+                  >
+                    {submitError}
+                  </Notification>
+                )}
+              </form>
+            </div>
+          )}
+
           {/* Render children/replies */}
           {hasReplies && renderQuestions(question.children, true)}
           
-          {/* Reply form - shown for the appropriate questions based on user role */}
+          {/* Reply form - shown for regular users */}
           {isLoggedIn && (
             <>
-              {/* Show form if:*/}
-              {/* 1. For regular users - only on last reply (or parent if no replies)*/}
-              {/* 2. For owners - always show for ANY unanswered question */}
-              {((!is_owner && ((isReply && isLastReply(index)) || (!isReply && !hasReplies))) || 
-                (is_owner && !hasAnswer)) && (
+              {/* Show form if user is not owner and it's either:
+                  1. The last reply in a thread
+                  2. A parent with no replies */}
+              {(!is_owner && ((isReply && isLastReply(index)) || (!isReply && !hasReplies))) && (
                 <div className="rounded-lg">
                   <form onSubmit={(e) => {
                     // Different handling for owners vs regular users
