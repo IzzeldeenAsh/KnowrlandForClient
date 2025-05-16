@@ -1,0 +1,107 @@
+.iconWrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.icon {
+  transition: color 0.2s ease-in-out;
+}
+
+/* Default icon colors */
+.iconAll {
+  color: #3b82f6; /* blue-500 */
+}
+
+.iconData {
+  color: #3b82f6; /* blue-500 */
+}
+
+.iconInsight {
+  color: #0181FC; /* custom insight blue */
+}
+
+.iconReport {
+  color: #3699FF; /* custom report blue */
+}
+
+.iconManual {
+  color: #FF9F43; /* custom manual orange */
+}
+
+.iconCourse {
+  color: #0ABB87; /* custom course green */
+}
+
+/* Active icon colors (white for all when active) */
+.iconActive {
+  color: white !important;
+}
+
+/* Type counter badge */
+.countBadge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin-left: 6px;
+  padding: 2px 6px;
+  font-size: 10px;
+  font-weight: 600;
+  background-color: rgba(0, 0, 0, 0.08);
+  border-radius: 10px;
+  color: inherit;
+}
+
+/* Filter button container */
+.filterButton {
+  display: flex;
+  align-items: center;
+  padding: 0.5rem 1rem;
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  font-weight: 500;
+  transition: all 0.2s ease-in-out;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+}
+
+/* Default filter button */
+.filterButton {
+  background-color: #f3f4f6;
+  color: #4b5563;
+}
+
+/* Dark mode default filter button */
+:global(.dark) .filterButton {
+  background-color: rgba(51, 65, 85, 0.5);
+  color: #e5e7eb;
+}
+
+/* Active filter button styles */
+.filterButtonActive {
+  color: white;
+}
+
+/* Type-specific active background colors */
+.filterAllActive {
+  background-color: #3b82f6 !important; /* blue-500 */
+}
+
+.filterDataActive {
+  background-color: #3b82f6 !important; /* blue-500 */
+}
+
+.filterInsightActive {
+  background-color: #0181FC !important; /* custom insight blue */
+}
+
+.filterReportActive {
+  background-color: #3699FF !important; /* custom report blue */
+}
+
+.filterManualActive {
+  background-color: #FF9F43 !important; /* custom manual orange */
+}
+
+.filterCourseActive {
+  background-color: #0ABB87 !important; /* custom course green */
+}

@@ -8,7 +8,7 @@ import IllustrationTop from '@/public/images/pricing-illustration-top.svg'
 import Particles from '@/components/particles'
 import { useLocale } from 'next-intl';
 import { ParallaxProvider, Parallax } from 'react-scroll-parallax';
-import { ReactElement, JSXElementConstructor, ReactNode, ReactPortal, Key } from "react";
+import { ReactElement, JSXElementConstructor, ReactNode, ReactPortal, Key, useState } from "react";
 
 type InsighterItem = {
   title: string;
@@ -24,6 +24,7 @@ export default function InsighterFeatures() {
   const ctaButton = t("ctaButton");
   const locale = useLocale();
   const isRTL = locale === 'ar'; 
+  const [visibleItems, setVisibleItems] = useState(9);
   
   return (
     <ParallaxProvider>
@@ -212,39 +213,181 @@ export default function InsighterFeatures() {
       key: "customerBehavior",
       icon: "/images/customer-behavior.svg",
     },
-  ].map((item, index) => (
+    {
+      key: "internationalTrade",
+      icon: "",
+    },
+    {
+      key: "investmentOpportunities",
+      icon: "",
+    },
+    {
+      key: "investmentGrowthStrategies",
+      icon: "",
+    },
+    {
+      key: "businessStrategiesPlans",
+      icon: "",
+    },
+    {
+      key: "currentStateAnalysis",
+      icon: "",
+    },
+    {
+      key: "benchmarkingStudies",
+      icon: "",
+    },
+    {
+      key: "statistics",
+      icon: "",
+    },
+    {
+      key: "regulatoryPolicies",
+      icon: "",
+    },
+    {
+      key: "technicalStudies",
+      icon: "",
+    },
+    {
+      key: "supplierListsPriceQuotes",
+      icon: "",
+    },
+    {
+      key: "pricingStrategies",
+      icon: "",
+    },
+    {
+      key: "marketTrendsPriceForecasts",
+      icon: "",
+    },
+    {
+      key: "periodicReportsMarketInsights",
+      icon: "",
+    },
+    {
+      key: "competitorAnalysis",
+      icon: "",
+    },
+    {
+      key: "marketEntryStrategies",
+      icon: "",
+    },
+    {
+      key: "exportOpportunities",
+      icon: "",
+    },
+    {
+      key: "feasibilityStudies",
+      icon: "",
+    },
+    {
+      key: "digitalTransformation",
+      icon: "",
+    },
+    {
+      key: "complianceGovernance",
+      icon: "",
+    },
+    {
+      key: "organizationalChangePlans",
+      icon: "",
+    },
+    {
+      key: "projectIdeasSolutions",
+      icon: "",
+    },
+    {
+      key: "focusGroupWorkshopOutputs",
+      icon: "",
+    },
+    {
+      key: "supplyChainSources",
+      icon: "",
+    },
+    {
+      key: "salesDataConsumerBehavior",
+      icon: "",
+    },
+    {
+      key: "operationalWorkEnvironment",
+      icon: "",
+    },
+    {
+      key: "qualityMetrics",
+      icon: "",
+    },
+    {
+      key: "operationalCaseStudies",
+      icon: "",
+    },
+    {
+      key: "rootCauseAnalysis",
+      icon: "",
+    },
+    {
+      key: "productionAssessment",
+      icon: "",
+    },
+    {
+      key: "financialAnalysis",
+      icon: "",
+    },
+    {
+      key: "businessNews",
+      icon: "",
+    },
+    {
+      key: "trainingContent",
+      icon: "",
+    },
+    {
+      key: "skillDevelopmentPlans",
+      icon: "",
+    },
+    {
+      key: "businessTemplates",
+      icon: "",
+    },
+    {
+      key: "decisionMakingTools",
+      icon: "",
+    },
+  ].slice(0, visibleItems).map((item, index) => (
     <div key={index} data-aos="fade-up" data-aos-delay={index * 100}>
-      <div className="relative h-full group">
-        <div className="relative h-full bg-slate-900 rounded-3xl z-20 overflow-hidden p-px
-             before:absolute before:w-96 before:h-96 before:-left-48 before:-top-48 before:bg-blue-500 before:rounded-full before:opacity-0 before:pointer-events-none before:transition-opacity before:duration-500 before:translate-x-[var(--mouse-x)] before:translate-y-[var(--mouse-y)] before:hover:opacity-20 before:z-30 before:blur-[100px]
-             after:absolute after:inset-0 after:rounded-[inherit] after:opacity-0 after:transition-opacity after:duration-500 after:[background:_radial-gradient(250px_circle_at_var(--mouse-x)_var(--mouse-y),theme(colors.slate.400),transparent)] after:group-hover:opacity-100 after:z-10">
-          <div className="flex flex-col justify-center align-center h-[200px] bg-slate-800 rounded-3xl relative overflow-hidden p-6">
-            {/* Radial gradient */}
-            <div className="absolute bottom-0 translate-y-1/2 left-1/2 -translate-x-1/2 pointer-events-none -z-10 w-1/2 aspect-square" aria-hidden="true">
-              <div className="absolute inset-0 translate-z-0 bg-slate-800 rounded-full blur-[50px]" />
-            </div>
-            {/* Content */}
-            <div className="flex flex-col h-full justify-between">
-              <div className="flex flex-col items-center text-center mb-4">
-                <Image
-                  src={item.icon}
-                  alt={t(`insighter.uploadTypes.${item.key}`)}
-                  width={60}
-                  height={60}
-                  className="mb-4"
-                />
-                <h3 className="inline-flex text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-slate-200/60 via-slate-200 to-slate-200/60 pb-1">
-                  {t(`insighter.uploadTypes.${item.key}`)}
-                </h3>
-              </div>
-              <div className="flex-1" />
-            </div>
+      <div className="relative h-full group rounded-md">
+        <div className="relative h-full bg-slate-900 rounded-[inherit] z-20 overflow-hidden">
+          <Particles className="absolute inset-0 -z-10 opacity-0 group-hover:opacity-100 transition-opacity duration-500 ease-in-out" quantity={3} />
+          <div className="absolute bottom-0 translate-y-1/2 left-1/2 -translate-x-1/2 pointer-events-none -z-10 w-1/3 aspect-square" aria-hidden="true">
+            <div className="absolute inset-0 translate-z-0 rounded-full bg-slate-800 group-hover:bg-blue-500 transition-colors duration-500 ease-in-out blur-[60px]" />
+          </div>
+          <div className="flex flex-col p-6 h-[140px] items-center text-center justify-center">
+          {item.icon && (
+            <Image src={item.icon} alt={item.key} width={40} height={40} />
+          )}
+            <h3 className="font-bold text-lg bg-clip-text text-transparent bg-gradient-to-r from-slate-200/60 via-slate-200 to-slate-200/60 line-clamp-2">
+              {t(`insighter.uploadTypes.${item.key}`)}
+            </h3>
           </div>
         </div>
       </div>
     </div>
   ))}
 </div>
+
+                {visibleItems < 45 && (
+                  <div className={`mt-6 flex ${isRTL ? 'justify-start' : 'justify-end'}`}>
+                    <button 
+                      onClick={() => setVisibleItems(prev => Math.min(prev + 9, 45))}
+                      className="text-blue-400 hover:text-blue-300 transition duration-150 ease-in-out flex items-center text-md font-medium"
+                    >
+                      {t("showMore")}
+                      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={`ml-1 rtl:rotate-180 ${isRTL ? 'mr-1 rotate-180' : 'ml-1'}`}>
+                        <polyline points="9 18 15 12 9 6"></polyline>
+                      </svg>
+                    </button>
+                  </div>
+                )}
 
                 <div className="mt-12 text-center">
                   <div className="mb-4">
