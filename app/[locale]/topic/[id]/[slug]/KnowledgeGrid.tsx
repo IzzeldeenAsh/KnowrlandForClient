@@ -10,6 +10,7 @@ import { formatDistanceToNow } from "date-fns";
 import cardStyles from "./knowledge-card.module.css";
 import { useParams } from "next/navigation";
 import Image from "next/image";
+import CourseIcon from "@/components/icons/CourseIcon";
 
 interface KnowledgeGridProps {
   knowledge: KnowledgeItem[];
@@ -145,6 +146,9 @@ export default function KnowledgeGrid({
                     {item.type === "manual" && <ManualIcon width={20} height={20} />}
                     {item.type === "insight" && <InsightIcon width={20} height={20} />}
                     {item.type === "data" && <DataIcon width={20} height={20} />}
+                    {item.type === "article" && <CourseIcon width={20} height={20} />}
+                    {item.type === "course" && <CourseIcon width={20} height={20} />}
+
                     <Badge w="fit-content" className="capitalize ml-2" variant="light">
                       {typeTranslations[item.type.toLowerCase()] || item.type}
                     </Badge>

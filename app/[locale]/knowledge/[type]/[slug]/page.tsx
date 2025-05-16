@@ -9,6 +9,7 @@ import DataIcon from "@/components/icons/DataIcon";
 import InsightIcon from "@/components/icons/InsightIcon";
 import ManualIcon from "@/components/icons/ManualIcon";
 import ReportIcon from "@/components/icons/ReportIcon";
+import CourseIcon from "@/components/icons/CourseIcon";
 import KnowledgeIcon from "@/components/icons/knowledge-icon";
 import { fetchBreadcrumb } from "@/utils/breadcrumb";
 import KnowledgeSideBox from './KnowledgeSideBox';
@@ -222,7 +223,7 @@ export default function KnowledgePage({ params }: Props) {
                 {knowledge.type === 'insight' && <div className="bg-white p-2 rounded flex items-center justify-center"><span className="hidden sm:block"><InsightIcon width={50} height={50} /></span><span className="sm:hidden"><InsightIcon width={30} height={30} /></span></div>}
                 {knowledge.type === 'manual' && <div className="bg-white p-2 rounded flex items-center justify-center"><span className="hidden sm:block"><ManualIcon width={50} height={50} /></span><span className="sm:hidden"><ManualIcon width={30} height={30} /></span></div>}
                 {knowledge.type === 'report' && <div className="bg-white p-2 rounded flex items-center justify-center"><span className="hidden sm:block"><ReportIcon width={50} height={50} /></span><span className="sm:hidden"><ReportIcon width={30} height={30} /></span></div>}
-                {knowledge.type === 'course' && <div className="bg-white p-2 rounded flex items-center justify-center"><span className="hidden sm:block"><KnowledgeIcon width={50} height={50} /></span><span className="sm:hidden"><KnowledgeIcon width={30} height={30} /></span></div>}
+                {knowledge.type === 'course' && <div className="bg-white p-2 rounded flex items-center justify-center"><span className="hidden sm:block"><CourseIcon width={50} height={50} /></span><span className="sm:hidden"><CourseIcon width={30} height={30} /></span></div>}
               </div>
               <div className="flex flex-col items-start">
                 <div className="flex flex-col items-start mb-6 sm:mb-10">
