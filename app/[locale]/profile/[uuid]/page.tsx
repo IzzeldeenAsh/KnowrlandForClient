@@ -21,6 +21,7 @@ import InstagramIcon from '@/public/file-icons/instagram';
 import WhatsappIcon from '@/public/file-icons/whatsapp';
 import { useTranslations } from 'next-intl';
 import styles from './profile.module.css';
+import Link from 'next/link';
 
 interface SocialLink {
   id: number;
@@ -60,6 +61,7 @@ interface Company {
   address: string;
   verified: boolean;
   social: SocialLink[];
+  uuid?: string;
 }
 
 interface ProfileData {
@@ -195,6 +197,7 @@ export default function ProfilePage() {
                 register_document: data.data.register_document,
                 logo: data.data.logo,
                 address: data.data.address,
+               
                 verified: data.data.verified,
                 social: data.data.social || []
               }
@@ -550,14 +553,14 @@ export default function ProfilePage() {
               <div className="flex flex-col md:flex-row gap-6">
                 {/* Profile Image */}
                 <div className="flex-shrink-0">
-                  <div className="w-32 h-32 rounded-xl overflow-hidden border-3 border-white dark:border-slate-800 shadow-md bg-white dark:bg-slate-700">
-                    {(isCompany || isCompanyInsighter) && profileData.company?.logo ? (
+                  <div className="w-32 h-32 rounded-xl  border-3 border-white dark:border-slate-800 shadow-md bg-white dark:bg-slate-700 relative">
+                    {(isCompany) && profileData.company?.logo ? (
                       <Image
                         src={profileData.company.logo}
                         alt={profileData.company?.legal_name || profileData.name}
                         width={400}
                         height={400}
-                        className="w-full h-full object-cover"
+                        className="w-full h-full rounded-xl object-cover"
                       />
                     ) : profileData.profile_photo_url ? (
                       <Image
@@ -565,7 +568,7 @@ export default function ProfilePage() {
                         alt={profileData.name}
                         width={400}
                         height={400}
-                        className="w-full h-full object-cover"
+                        className="w-full h-full rounded-xl object-cover"
                       />
                     ) : (
                       <div className="w-full h-full bg-gray-100 dark:bg-slate-700 flex items-center justify-center">
@@ -573,6 +576,19 @@ export default function ProfilePage() {
                           {profileData.first_name?.charAt(0) || ''}
                           {profileData.last_name?.charAt(0) || ''}
                         </span>
+                      </div>
+                    )}
+                    {isCompanyInsighter && profileData.company?.logo && (
+                      <div className="absolute -bottom-3 -right-3 w-14 h-14 rounded-lg overflow-hidden shadow-sm bg-white dark:bg-slate-700 z-10">
+                        <Link href={`${profileData.company?.uuid}`}>
+                        <Image
+                          src={profileData.company.logo}
+                          alt={profileData.company.legal_name}
+                          width={80}
+                          height={80}
+                          className="w-full h-full object-cover"
+                        />
+                        </Link>
                       </div>
                     )}
                   </div>
