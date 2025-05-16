@@ -32,7 +32,6 @@
 .tp-course-details2-widget-list-item span {
     font-size: 13px;
     font-weight: 500;
-    color: #4f5158;
 }
 
 .tp-course-details2-widget-list-item:last-child {
@@ -46,9 +45,7 @@
     align-items: center;
 }
 
-.tp-course-details2-widget-list-item span:first-child i {
-    color: #4f5158;
-}
+
 
 .tp-course-details2-widget-content {
     padding: 30px 10px;

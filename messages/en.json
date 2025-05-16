@@ -34,6 +34,7 @@
             "title":"Don't let your expertise fade to silence; let it bloom into sustainable revenue",
             "description":"Start earning by sharing your knowledge and experience on Knoldg. You Set the Value: Choose your price, and every time your work is downloaded, you're paid Directly."
         },
+        "showMore": "Show More",
         "insighter": {
             "title": "What is an ",
             "insighterText": "Insighter ?",
@@ -59,13 +60,48 @@
             "dataSets": "Data Sets & Templates",
             "supplyChain": "Supply Chain",
             "marketSize": "Market Size",
-            "customerBehavior": "Customer Behavior"
+            "customerBehavior": "Customer Behavior",
+            "internationalTrade": "International Trade",
+            "investmentOpportunities": "Investment Opportunities",
+            "investmentGrowthStrategies": "Investment & Growth Strategies",
+            "businessStrategiesPlans": "Business Strategies & Plans",
+            "currentStateAnalysis": "Current State Analysis",
+            "benchmarkingStudies": "Benchmarking Studies",
+            "statistics": "General & Sector-Specific Statistics",
+            "regulatoryPolicies": "Official Policies & Procedures",
+            "technicalStudies": "Specialized Technical Studies",
+            "supplierListsPriceQuotes": "Supplier Lists & Price Quotes",
+            "pricingStrategies": "Pricing Policies & Strategies",
+            "marketTrendsPriceForecasts": "Market Trends & Price Forecasts",
+            "periodicReportsMarketInsights": "Periodic Reports & Market Insights",
+            "competitorAnalysis": "Competitor Analysis",
+            "marketEntryStrategies": "Market Entry Strategies",
+            "exportOpportunities": "Export Opportunities & Potential Clients",
+            "feasibilityStudies": "Feasibility Studies",
+            "digitalTransformation": "Digital Transformation & Automation",
+            "complianceGovernance": "Compliance & Governance Policies",
+            "organizationalChangePlans": "Organizational Change Plans",
+            "projectIdeasSolutions": "Project Ideas & Practical Solutions",
+            "focusGroupWorkshopOutputs": "Focus Group & Workshop Outputs",
+            "supplyChainSources": "Supply Chain & Input Sources",
+            "salesDataConsumerBehavior": "Sales Data & Consumer Behavior",
+            "operationalWorkEnvironment": "Operational Conditions & Work Environment",
+            "qualityMetrics": "Quality Metrics & Statistics",
+            "operationalCaseStudies": "Operational Case Studies",
+            "rootCauseAnalysis": "Results & Root Cause Analysis",
+            "productionAssessment": "Production Line & Equipment Assessment",
+            "financialAnalysis": "Financial Data & Analysis",
+            "businessNews": "Business News & Updates",
+            "trainingContent": "Training & Educational Content",
+            "skillDevelopmentPlans": "Skill Development Plans",
+            "businessTemplates": "Business Tools & Templates (Excel, BI)",
+            "decisionMakingTools": "Data Analysis & Decision-Making Tools"
           }
         },
         "items": [
             {
                 "title": "A Sustainable Revenue Stream",
-                "description": "Start earning by sharing your insights and experience on Knoldiq. You Set the Value: Choose your price, and every time your work is downloaded, you’re paid directly.",
+                "description": "Start earning by sharing your insights and experience on Knoldiq. You Set the Value: Choose your price, and every time your work is downloaded, you're paid directly.",
                 "image": "/images/insighter-2.png",
                 "icon": "/images/insighter-2-icon.svg",
                 "position": "right"
@@ -79,7 +115,7 @@
             },
             {
               "title": "Don't let your expertise fade to silence; let it bloom into sustainable revenue",
-              "description": "Start earning by sharing your knowledge and experience on Knoldiq. You Set the Value: Choose your price, and every time your work is downloaded, you’re paid directly.",
+              "description": "Start earning by sharing your knowledge and experience on Knoldiq. You Set the Value: Choose your price, and every time your work is downloaded, you're paid directly.",
               "image": "/images/insighter-3.png",
               "icon": "/images/insighter-3-icon.svg",
               "position": "right"
@@ -559,7 +595,7 @@
         "lastUpdatedCookies": "Last Updated: March 26, 2025"
         },
         "contactUsPage": {
-                "contactUsTitle": "Message us now — We’d be happy to help!",
+                "contactUsTitle": "Message us now — We'd be happy to help!",
                 "contactUsFirstName": "First Name",
                 "contactUsFirstNameplaceholder": "E.g., Mark",
                 "contactUsLastName": "Last Name",
