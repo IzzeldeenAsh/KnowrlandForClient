@@ -41,7 +41,7 @@ export default function ReportIcon({ width = 50, height = 50 }: ReportIconProps)
           gradientUnits="userSpaceOnUse"
         >
           <stop stopColor="#0B5CD6" />
-          <stop offset="1" stopColor="#0181FC" />
+          <stop offset="1" stopColor="#000000" />
         </linearGradient>
       </defs>
     </svg>
