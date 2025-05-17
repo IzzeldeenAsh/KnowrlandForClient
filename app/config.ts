@@ -12,8 +12,8 @@ export const apiBaseUrl = isDevelopment
   : 'https://api.knoldg.com';
 
 export const appBaseUrl = isDevelopment 
-  ? 'https://app.knoldg.com' 
-  : 'https://app.knoldg.com';
+  ? 'http://localhost:4200' 
+  : 'http://localhost:4200';
 
 // Function to get full API URL with path
 export const getApiUrl = (path: string): string => {
