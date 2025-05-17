@@ -395,7 +395,7 @@ export default function InsighterFeatures() {
                       {t("insighter.joinUs")}
                     </span>
                   </div>
-                  <Link href="http://localhost:4200/auth/sign-up" className="btn text-slate-900 bg-gradient-to-r from-white/80 via-white to-white/80 hover:bg-white transition duration-150 ease-in-out group">
+                  <Link href="https://app.knoldg.com/auth/sign-up" className="btn text-slate-900 bg-gradient-to-r from-white/80 via-white to-white/80 hover:bg-white transition duration-150 ease-in-out group">
                     {t("insighter.cta")}
                     <span className="ml-2">
               
