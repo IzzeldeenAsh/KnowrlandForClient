@@ -172,7 +172,9 @@ export default function KnowledgePage({ params }: Props) {
   const translations = {
     insighter: isRTL ? 'إنسايتر' : 'Insighter',
     published: isRTL ? 'نُشر في' : 'Published',
+    publishedBy: isRTL ? 'نُشر بواسطة' : 'Published By',
     rating: isRTL ? 'التقييم' : 'Rating',
+    company: isRTL ? 'الشركة' : 'Company',
   };
 
   // No try/catch here - let any errors be caught by the not-found page
@@ -269,7 +271,7 @@ export default function KnowledgePage({ params }: Props) {
                     </Link>
                   </div>
                   <span className="flex flex-col">
-                    <span className="text-sm text-gray-500">Company</span>
+                    <span className="text-sm text-gray-500">{translations.company}</span>
                     <span className="text-sm font-bold text-gray-700">
                       <Link className="hover:text-blue-600" href={`/${locale}/profile/${knowledge.insighter.company?.uuid || knowledge.insighter.uuid}`}>
                         {knowledge.insighter.company?.legal_name || knowledge.insighter.name}
@@ -277,7 +279,7 @@ export default function KnowledgePage({ params }: Props) {
                     </span>
                   </span>
                   <div className="flex flex-col ps-4 sm:ps-8">
-                    <span className="text-gray-500 text-sm">Published By</span>
+                    <span className="text-gray-500 text-sm">{translations.publishedBy}</span>
                     <div className="flex items-center gap-2">
                       <div className="relative w-[18px] h-[18px] sm:w-[20px] sm:h-[20px]">
                         {knowledge.insighter.profile_photo_url ? (
