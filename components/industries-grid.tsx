@@ -39,9 +39,9 @@ export default function IndustriesGrid({ industries, locale }: IndustriesGridPro
         
         const cardContent = (
           <div 
-            className={`relative group bg-gradient-to-br from-white to-slate-50 min-h-[140px] rounded-sm p-6 shadow-md border border-slate-100 ${!isDisabled ? 'hover:shadow-lg hover:border-blue-100 hover:from-white hover:to-blue-50 transition-all duration-300 cursor-pointer' : 'opacity-50 cursor-not-allowed'}`}
+            className={`relative group bg-gradient-to-br from-white to-slate-50 rounded-sm p-6 shadow-md border border-slate-100 h-full flex flex-col ${!isDisabled ? 'hover:shadow-lg hover:border-blue-100 hover:from-white hover:to-blue-50 transition-all duration-300 cursor-pointer' : 'opacity-50 cursor-not-allowed'}`}
           >
-            <div className="space-y-2">
+            <div className="space-y-2 flex-grow">
               <h3 className={`text-base font-bold ${!isDisabled ? 'text-transparent bg-gradient-to-r from-blue-500 to-teal-400 bg-clip-text' : 'text-gray-900'}`}>
                 {industry.name}
                 {isDisabled && <span className="ml-2 text-xs text-gray-500"></span>}
@@ -91,9 +91,9 @@ export default function IndustriesGrid({ industries, locale }: IndustriesGridPro
         );
         
         return isDisabled ? (
-          <div key={industry.id}>{cardContent}</div>
+          <div key={industry.id} className="h-full">{cardContent}</div>
         ) : (
-          <Link key={industry.id} href={`/${currentLocale}/industry/${industry.id}/${industry.slug}`}>
+          <Link key={industry.id} href={`/${currentLocale}/industry/${industry.id}/${industry.slug}`} className="h-full block">
             {cardContent}
           </Link>
         );
