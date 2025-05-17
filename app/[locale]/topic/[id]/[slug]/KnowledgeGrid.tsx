@@ -177,19 +177,48 @@ export default function KnowledgeGrid({
                 <div className="flex justify-between items-center pb-4">
                   {showInsighter && (
                     <div className="flex items-center">
-                      <Avatar
-                        src={item.insighter.roles.includes("company") && item.insighter.company?.logo ? 
-                             item.insighter.company.logo : 
-                             item.insighter.profile_photo_url}
-                        radius="xl"
-                        alt={item.insighter.name}
-                        size="md"
-                        className={cardStyles.avatar}
-                      >
-                        {!(item.insighter.roles.includes("company") && item.insighter.company?.logo) && 
-                         !item.insighter.profile_photo_url &&
-                          getInitials(item.insighter.name)}
-                      </Avatar>
+                      <div className="relative">
+                        <Avatar
+                          src={(item.insighter.roles.includes("company") || item.insighter.roles.includes("company-insighter")) && item.insighter.company?.logo ? 
+                              item.insighter.company.logo : 
+                              item.insighter.profile_photo_url}
+                          radius="xl"
+                          alt={item.insighter.name}
+                          size="md"
+                          className={cardStyles.avatar}
+                        >
+                          {!((item.insighter.roles.includes("company") || item.insighter.roles.includes("company-insighter")) && item.insighter.company?.logo) && 
+                          !item.insighter.profile_photo_url &&
+                            getInitials(item.insighter.name)}
+                        </Avatar>
+                        
+                        {item.insighter.roles.includes("company-insighter") && item.insighter.profile_photo_url && (
+                          <Avatar
+                            src={item.insighter.profile_photo_url}
+                            radius="xl"
+                            size="xs"
+                            className="absolute bottom-0 right-0 translate-x-1/3 rounded-full translate-y-1/3 z-10"
+                            alt={item.insighter.name}
+                            style={{
+                              boxShadow: '0 0 0 2px white',
+                              position: 'absolute'
+                            }}
+                          />
+                        )}
+                         {item.insighter.roles.includes("company") && item.insighter.profile_photo_url && (
+                          <Avatar
+                            src={item.insighter.profile_photo_url}
+                            radius="xl"
+                            size="xs"
+                            className="absolute bottom-0 right-0 translate-x-1/3 rounded-full translate-y-1/3 z-10"
+                            alt={item.insighter.name}
+                            style={{
+                              boxShadow: '0 0 0 2px white',
+                              position: 'absolute'
+                            }}
+                          />
+                        )}
+                      </div>
 
                       <div className="ms-3">
                         <Text fw={600} size="sm" className="capitalize">
