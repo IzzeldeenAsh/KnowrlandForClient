@@ -555,6 +555,7 @@ export default function ProfilePage() {
                 <div className="flex-shrink-0">
                   <div className="w-32 h-32 rounded-xl  border-3 border-white dark:border-slate-800 shadow-md bg-white dark:bg-slate-700 relative">
                     {(isCompany) && profileData.company?.logo ? (
+                      <Link href={`${profileData.company?.uuid}`}>
                       <Image
                         src={profileData.company.logo}
                         alt={profileData.company?.legal_name || profileData.name}
@@ -562,6 +563,7 @@ export default function ProfilePage() {
                         height={400}
                         className="w-full h-full rounded-xl object-cover"
                       />
+                      </Link>
                     ) : profileData.profile_photo_url ? (
                       <Image
                         src={profileData.profile_photo_url}
@@ -591,6 +593,26 @@ export default function ProfilePage() {
                         </Link>
                       </div>
                     )}
+                      {isCompany && enterpriseType === 'insighter' && (
+                      <div className="absolute -bottom-3 -right-3 w-14 h-14 rounded-lg overflow-hidden shadow-md bg-white dark:bg-slate-700 z-10">
+                        {profileData.profile_photo_url ? (
+                          <Image
+                            src={profileData.profile_photo_url}
+                            alt={profileData.name}
+                            width={80}
+                            height={80}
+                            className="w-full h-full object-cover "
+                          />
+                        ) : (
+                          <div className="w-full h-full bg-gray-100 dark:bg-slate-700 flex items-center justify-center">
+                            <span className="text-sm font-bold text-gray-400 dark:text-slate-400">
+                              {profileData.first_name?.charAt(0) || ''}
+                              {profileData.last_name?.charAt(0) || ''}
+                            </span>
+                          </div>
+                        )}
+                      </div>
+                    )}
                   </div>
                 </div>
                 
@@ -599,28 +621,44 @@ export default function ProfilePage() {
                   <div className="flex flex-col md:flex-row h-full justify-between items-center">
                     <div>
                       {/* Name and Badges */}
-                      <div className="flex flex-wrap items-center gap-2 mb-1 capitalize">
-                        {enterpriseType === 'insighter' && (    <h1 className="text-2xl font-bold">{profileData.first_name.toLowerCase() || ''} {profileData.last_name.toLowerCase() || ''}</h1> )}
+                      <div className="flex flex-wrap items-start gap-2 mb-1 capitalize">
+                        {enterpriseType === 'insighter' && (    
+  <div>
+    <h1 className="text-2xl font-bold">
+      {profileData.first_name.toLowerCase() || ''} {profileData.last_name.toLowerCase() || ''} 
+    </h1>
+    {isCompany && <div className="text-blue-500 text-sm font-semibold">manager</div>}
+  </div>  
+)}
                         {enterpriseType !== 'insighter' && (    <h1 className="text-2xl font-bold">{profileData.company?.legal_name || ''}</h1> )}
                         
                      
 
-                        <IconRosetteDiscountCheckFilled className="w-5 h-5 text-blue-500" />
-                        {isCompany && (
+                        <IconRosetteDiscountCheckFilled className="w-5 h-5 mt-2 text-blue-500" />
+                        {isCompany && enterpriseType !== 'insighter' && (
                     
-                          <span className="bg-amber-100 font-bold text-yellow-500 text-xs px-2 py-0.5 rounded-full inline-flex items-center">
+                          <span className="bg-amber-100 mt-2 font-bold text-yellow-500 text-xs px-2 py-0.5 rounded-full inline-flex items-center">
                           {userProfileT('company')}
                         </span>
                         )}
+                         {isCompany && enterpriseType === 'insighter' && (
+                    <Link href={`${profileData.company?.uuid}`}>
+                    <span className="bg-amber-100 mt-2 font-bold text-yellow-500 text-xs px-2 py-0.5 rounded-full inline-flex items-center">
+                   {profileData.company?.legal_name} Company
+                  </span>
+                  </Link>
+                  )}
                         {isInsighter && (
                           <span className="bg-blue-100 text-blue-500 font-bold uppercase text-xs px-2 py-0.5 rounded-full inline-flex items-center">
                             {userProfileT('insighter')}
                           </span>
                         )}
                         {isCompanyInsighter && (
-                          <span className="bg-amber-100 font-bold text-yellow-500 uppercase text-xs px-2 py-0.5 rounded-full inline-flex items-center">
+                          <Link href={`${profileData.company?.uuid}`}>
+                          <span className="bg-amber-100 mt-2 font-bold text-yellow-500 uppercase text-xs px-2 py-0.5 rounded-full inline-flex items-center">
                             {profileData.company?.legal_name} Company
                           </span>
+                          </Link>
                         )}
                       </div>
                        
