@@ -163,7 +163,7 @@ export default function HomePage() {
       {/* Main content area */}
       <div className="flex flex-1 relative z-3">
         {/* Filters sidebar - full height with scroll on hover */}
-        <div className="w-80 shrink-0 border-r border-gray-200 bg-white sticky top-0 self-start h-screen">
+        {/* <div className="w-80 shrink-0 border-r border-gray-200 bg-white sticky top-0 self-start h-screen">
           <div className="p-4 h-[calc(100vh-150px)] overflow-y-auto custom-scrollbar">
             <Group justify="space-between" mb="md">
               <Text fw={500}>{t4("searchFilters")}</Text>
@@ -363,7 +363,7 @@ export default function HomePage() {
             </Stack>
           </div>
         </div>
-        
+         */}
         {/* Search results - with max width container */}
         <div className="flex-1 p-6">
           <div className="mx-auto max-w-6xl">

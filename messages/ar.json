@@ -598,5 +598,6 @@
         "industryKnowledge": "نوع المعرفة المتوفرة في {industry}",
         "subIndustry": "الصناعة الفرعية",
         "subIndustryKnowledge": "نوع المعرفة المتوفرة في {subIndustry}",
+        "topicKnowledge": "نوع المعرفة المتوفرة في {topic}",
         "topicLabel": "الموضوع"
 }
