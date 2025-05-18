@@ -50,6 +50,7 @@
         "insighter": {
             "title": "What is an ",
             "insighterText": "Insighter ?",
+            "insighterText2": "Insighter ?",
             "point1": "A subject matter expert, practitioner, consultant, strategist, technician, or field professional with hands-on experience,",
             "point2": "who shares valuable data, reports, insights, case studies, or practical tools on Knoldg platform to empower others and help businesses grow;",
             "point3": "A knowledge contributor who earns income each time their expertise is accessed.",
@@ -59,7 +60,7 @@
               "consultant": "Consultant",
               "technician": "Technician"
             },
-            "uploadTitle": "What Can You Upload as an",
+            "uploadTitle": "What data, reports and insights can you upload as",
             "cta": "Become an Insighter",
             "readMore": "Read more",
             "joinUs": "You can join now, it's easy,free, and worth it.",
