@@ -14,12 +14,20 @@ interface Topic {
   id: number
   name: string
   slug: string
+  weight: number
+  industry: {
+    id: number
+    name: string
+    slug: string
+    weight: number
+  }
 }
 
 interface IndustryChild {
   id: number
   name: string
   slug: string
+  weight: number
   topic: Topic[]
 }
 
@@ -27,6 +35,7 @@ interface IndustryDetails {
   id: number
   name: string
   slug: string
+  weight: number
   children: IndustryChild[]
 }
 
@@ -65,7 +74,8 @@ async function fetchIndustryData(id: string, slug: string, locale: string = 'en'
     throw new Error(`Failed to fetch industry details: ${response.status} ${response.statusText}`)
   }
 
-  const data = await response.json()
+  const data = await response.json();
+
   return data
 }
 
@@ -173,35 +183,44 @@ export default async function IndustryPage({ params }: Props) {
             </div>
             
             {/* Industry Children */}
-            <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-2 max-w-7xl mx-auto ">
-              {industry.children.map((child: IndustryChild) => (
-                 <Link key={child.id} href={`/${locale}/sub-industry/${child.id}/${child.slug}`} className="block">
-                <div
-                  className="relative min-h-[140px] bg-white rounded-sm p-6 shadow-sm hover:shadow-md transition-all duration-300"
-                  data-aos="fade-up"
-                >
-                    <div className="space-y-2">
-                 
-                      <div className="flex items-center gap-2">
-                        <IndustryIcon />
-                        <h3 className="text-sm font-semibold text-gray-900 hover:text-blue-600">
-                          {child.name}
-                        </h3>
-                      </div>
-                     
+            <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4 max-w-7xl mx-auto">
+              {industry.children.map((child: IndustryChild) => {
+                const isDisabled = child.weight === 0;
+                
+                const cardContent = (
+                  <div 
+                    className={`relative group bg-gradient-to-br from-white to-slate-50 rounded-sm p-6 shadow-md border border-slate-100 h-full flex flex-col ${!isDisabled ? 'hover:shadow-lg hover:border-blue-100 hover:from-white hover:to-blue-50 transition-all duration-300 cursor-pointer' : 'opacity-50 cursor-not-allowed'}`}
+                  >
+                    <div className="space-y-2 flex-grow">
+                      <h3 className={`text-base font-bold ${!isDisabled ? 'text-transparent bg-gradient-to-r from-blue-500 to-teal-400 bg-clip-text' : 'text-gray-900'}`}>
+                        {child.name}
+                        {isDisabled && <span className="ml-2 text-xs text-gray-500"></span>}
+                      </h3>
+                      
                       {child.topic.length > 0 ? (
                         <ul className="space-y-1">
-                          {child.topic.map((topic: Topic) => (
-                            <Link href={`/${locale}/topic/${topic.id}/${topic.slug}`} key={topic.id} className="block">
-                            <li
-                              key={topic.id}
-                              className="text-xs text-gray-600 hover:text-blue-600 transition-colors flex items-center"
-                            >
-                              <span className={isRTL ? "ml-2" : "mr-2"}>•</span>
-                              {topic.name}
-                            </li>
-                            </Link>
-                          ))}
+                          {child.topic.map((topic: Topic) => {
+                            const isTopicDisabled = topic.weight === 0;
+                            
+                            return (
+                              <li 
+                                key={topic.id} 
+                                className={`text-sm text-gray-700 ${!isTopicDisabled && !isDisabled ? 'hover:text-blue-600 transition-colors' : ''} flex items-center`}
+                              >
+                                {(!isDisabled && !isTopicDisabled) ? (
+                                  <Link href={`/${locale}/topic/${topic.id}/${topic.slug}`}>
+                                    <span className={isRTL ? "ml-2" : "mr-2"}>•</span>
+                                    {topic.name}
+                                  </Link>
+                                ) : (
+                                  <>
+                                    <span className={isRTL ? "ml-2" : "mr-2"}>•</span>
+                                    <span className={isTopicDisabled ? "opacity-50" : ""}>{topic.name}</span>
+                                  </>
+                                )}
+                              </li>
+                            );
+                          })}
                         </ul>
                       ) : (
                         <div className="text-xs text-gray-500 italic flex items-center">
@@ -210,10 +229,37 @@ export default async function IndustryPage({ params }: Props) {
                         </div>
                       )}
                     </div>
+                    <div className={`absolute top-6 ${isRTL ? 'left-6' : 'right-6'}`}>
+                      <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path 
+                          strokeLinecap="round" 
+                          strokeLinejoin="round" 
+                          strokeWidth="2" 
+                          d={isRTL ? "M15 5l-7 7 7 7" : "M9 5l7 7-7 7"} 
+                        />
+                      </svg>
+                    </div>
+                    {isDisabled && (
+                      <div
+                        className={`absolute z-10 px-3 py-2 text-sm font-medium text-white bg-gray-900 rounded shadow-md 
+                        bottom-1/2 mb-2 left-1/2 -translate-x-1/2 
+                        opacity-0 group-hover:opacity-100 
+                        pointer-events-none transition-opacity duration-300`}
+                      >
+                        {locale === 'ar' ? 'البيانات غير متوفرة' : 'Data not available'}
+                      </div>
+                    )}
+                  </div>
+                );
                 
-                </div>
-                </Link>
-              ))}
+                return isDisabled ? (
+                  <div key={child.id} className="h-full">{cardContent}</div>
+                ) : (
+                  <Link key={child.id} href={`/${locale}/sub-industry/${child.id}/${child.slug}`} className="h-full block">
+                    {cardContent}
+                  </Link>
+                );
+              })}
             </div>
           </div>
         </div>
