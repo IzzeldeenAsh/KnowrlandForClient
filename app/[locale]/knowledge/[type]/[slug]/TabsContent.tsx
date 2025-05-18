@@ -18,11 +18,17 @@ function TabContent({ activeTab, knowledge, onRefreshData }: { activeTab: string
     meetInsighter: isRTL ? 'قابل الخبير' : 'Meet the insighter'
   };
 
+  // Pass onRefreshData to Reviews tab as well
   switch (activeTab) {
     case "Overview":
       return <Overview knowledge={knowledge} />;
     case "Reviews":
-      return <Reviews knowledgeSlug={knowledge.slug} reviews={knowledge.review} is_review={knowledge.is_review ? true : false} />;
+      return <Reviews 
+        knowledgeSlug={knowledge.slug} 
+        reviews={knowledge.review} 
+        is_review={knowledge.is_review ? true : false} 
+        is_owner={knowledge.is_owner} 
+      />;
     case "Ask":
       return <AskInsighter knowledgeSlug={knowledge.slug} questions={knowledge.questions} is_owner={knowledge.is_owner} onRefreshData={onRefreshData} />;
     case "Meet":
@@ -45,19 +51,35 @@ export default function TabsContent({ knowledge }: { knowledge: KnowledgeDetails
   const router = useRouter();
   const searchParams = useSearchParams();
   
+  // Track knowledge data updates
+  const [knowledgeData, setKnowledgeData] = useState(knowledge);
+  
+  // Update knowledgeData when prop changes
+  useEffect(() => {
+    setKnowledgeData(knowledge);
+  }, [knowledge]);
+  
   // Check for tab query parameter on mount
   useEffect(() => {
     const tabParam = searchParams.get('tab');
     if (tabParam === 'ask') {
       setActiveTab("Ask");
+    } else if (tabParam === 'reviews') {
+      setActiveTab("Reviews");
     }
   }, [searchParams]);
 
-  // Function to refresh the knowledge data by reloading the page
+  // Enhanced function to refresh the knowledge data
   const refreshData = useCallback(() => {
     console.log('[TabsContent] Refreshing knowledge data...');
-    // Force a refresh of the current page
+    
+    // Force a hard refresh to ensure data is updated
     router.refresh();
+    
+    // After a short delay, reload the page to guarantee fresh data
+    setTimeout(() => {
+      window.location.href = window.location.href;
+    }, 1000);
   }, [router]);
   
   // Translations for tab labels
@@ -92,6 +114,8 @@ export default function TabsContent({ knowledge }: { knowledge: KnowledgeDetails
                 const url = new URL(window.location.href);
                 if (tabKey === 'Ask') {
                   url.searchParams.set('tab', 'ask');
+                } else if (tabKey === 'Reviews') {
+                  url.searchParams.set('tab', 'reviews');
                 } else {
                   // Remove tab parameter for other tabs
                   url.searchParams.delete('tab');
@@ -99,6 +123,11 @@ export default function TabsContent({ knowledge }: { knowledge: KnowledgeDetails
                 
                 // Update URL without refreshing the page
                 window.history.pushState({}, '', url);
+                
+                // If switching to Reviews tab, force a refresh to get the latest reviews
+                if (tabKey === 'Reviews') {
+                  router.refresh();
+                }
               }}
               className={`
                 whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm mx-4
@@ -113,7 +142,7 @@ export default function TabsContent({ knowledge }: { knowledge: KnowledgeDetails
         </nav>
       </div>
       <div className="mt-6">
-        <TabContent activeTab={activeTab} knowledge={knowledge} onRefreshData={refreshData} />
+        <TabContent activeTab={activeTab} knowledge={knowledgeData} onRefreshData={refreshData} />
       </div>
     </div>
   );
