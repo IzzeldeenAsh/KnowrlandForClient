@@ -106,6 +106,8 @@ async function fetchKnowledgeData(type: string, slug: string, locale: string = '
       {
         method: "GET",
         headers,
+        cache: "no-store", // Disable caching to always get fresh data
+        next: { revalidate: 0 }, // Force revalidation on each request
       }
     );
 
@@ -126,7 +128,6 @@ async function fetchKnowledgeData(type: string, slug: string, locale: string = '
     }
 
     const data = await response.json();
-    console.log(data);
     return data;
   } catch (error) {
     console.error("Error fetching knowledge data:", error);

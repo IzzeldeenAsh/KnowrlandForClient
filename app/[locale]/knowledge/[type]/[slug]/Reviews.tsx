@@ -24,6 +24,7 @@ interface ReviewsProps {
   knowledgeSlug: string;
   reviews: ReviewItem[];
   is_review: boolean;
+  is_owner?: boolean;
 }
 
 // Helper function to get initials from name
@@ -35,7 +36,7 @@ function getInitials(name: string) {
     .toUpperCase();
 }
 
-export default function Reviews({ knowledgeSlug, reviews, is_review }: ReviewsProps) {
+export default function Reviews({ knowledgeSlug, reviews, is_review, is_owner }: ReviewsProps) {
   // Get locale and determine RTL
   const params = useParams();
   const locale = params.locale as string;
@@ -73,6 +74,9 @@ export default function Reviews({ knowledgeSlug, reviews, is_review }: ReviewsPr
   // Use the hookError to display in our component
   const [displayError, setDisplayError] = useState<string | null>(null);
   
+  // Add state to store the temporary review before page refresh
+  const [localReviews, setLocalReviews] = useState<ReviewItem[]>([]);
+  
   // Update the displayError when hookError changes
   useEffect(() => {
     if (hookError) {
@@ -80,20 +84,65 @@ export default function Reviews({ knowledgeSlug, reviews, is_review }: ReviewsPr
     }
   }, [hookError]);
   
+  // Initialize localReviews with the props reviews
+  useEffect(() => {
+    setLocalReviews(reviews || []);
+  }, [reviews]);
+  
+  // Function to fetch updated reviews directly
+  const fetchUpdatedReviews = async () => {
+    try {
+      const headers: HeadersInit = {
+        "Content-Type": "application/json",
+        Accept: "application/json",
+        "Accept-Language": locale,
+      };
+      
+      if (token) {
+        headers.Authorization = `Bearer ${token}`;
+      }
+      
+      const response = await fetch(
+        `https://api.knoldg.com/api/platform/industries/knowledge/${knowledgeSlug}`,
+        {
+          method: "GET",
+          headers,
+          cache: "no-cache" // Ensure fresh data
+        }
+      );
+      
+      if (response.ok) {
+        const data = await response.json();
+        if (data.data && data.data.review) {
+          // Update local reviews with the fresh data
+          setLocalReviews(data.data.review);
+        }
+      }
+    } catch (error) {
+      console.error("Error fetching updated reviews:", error);
+    } finally {
+      setRefreshing(false);
+    }
+  };
+  
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setDisplayError(null); // Clear any previous errors
     
+    if (rate === 0) {
+      setDisplayError("Please select a rating before submitting");
+      return;
+    }
+    
     try {
       await postReview(rate, comment);
       
-      // If the submission was successful (no error thrown by the hook)
-      if (success) {
+      // Check success state after postReview completes
+      if (!hookError) {
         // Set refreshing to true before refreshing the page data
         setRefreshing(true);
-        router.refresh(); // This will trigger a re-fetch of the page data
         
-        // Create a mock review to show immediately
+        // Create a new review to show immediately
         const newReview: ReviewItem = {
           id: Date.now(), // Temporary ID
           rate,
@@ -102,14 +151,31 @@ export default function Reviews({ knowledgeSlug, reviews, is_review }: ReviewsPr
           created_date: new Date().toISOString(),
         };
         
-        // Set submit to true after a short delay to allow the refresh to complete
+        // Temporarily add the new review to our local reviews array
+        setLocalReviews(prevReviews => [newReview, ...prevReviews]);
+        
+        // Set submit to true to hide the form
+        setSubmit(true);
+        
+        // Reset form
+        setRate(0);
+        setComment("");
+        
+        // Multi-level refresh approach
+        // 1. Refresh Next.js router data
+        router.refresh();
+        
+        // 2. Directly fetch updated reviews after a short delay
         setTimeout(() => {
-          setSubmit(true);
-          setRefreshing(false);
-        }, 1500);
+          fetchUpdatedReviews();
+        }, 1000);
+        
+        // 3. Force a page reload as the last resort after giving API time to update
+        setTimeout(() => {
+          window.location.href = window.location.href;
+        }, 2500);
       }
     } catch (error) {
-      // The hook already sets its own error, so we don't need to do anything here
       console.error("Error submitting review:", error);
       setRefreshing(false);
     }
@@ -117,6 +183,9 @@ export default function Reviews({ knowledgeSlug, reviews, is_review }: ReviewsPr
 
   // Combined loading state - show loader if we're either submitting a review or refreshing the page
   const isLoading = loading || refreshing;
+
+  // Determine which reviews to display - prioritize fresh data
+  const displayReviews = localReviews && localReviews.length > 0 ? localReviews : reviews || [];
 
   return (
     <div dir={isRTL ? 'rtl' : 'ltr'}>
@@ -126,9 +195,9 @@ export default function Reviews({ knowledgeSlug, reviews, is_review }: ReviewsPr
               <Loader size="md" />
               <Text size="sm" mt={2} color="dimmed">{translations.loadingReviews}</Text>
             </div>
-          ) : reviews.length > 0 ? (
+          ) : displayReviews.length > 0 ? (
             <div className="space-y-4">
-              {reviews.map((review) => (
+              {displayReviews.map((review) => (
                 <div
                   key={review.id}
                   className="p-4 border rounded shadow-sm"
@@ -180,7 +249,23 @@ export default function Reviews({ knowledgeSlug, reviews, is_review }: ReviewsPr
             <p className={`text-gray-600 ${isRTL ? 'text-right' : 'text-start'}`}>{translations.noReviewsYet}</p>
           )}
         </div>
-      {token && !is_review && !submit && (
+        
+      {/* Success notification outside the form so it remains visible after submission */}
+      {success && !displayError && (
+        <Notification
+          icon={<IconCheck size={20} />}
+          color="teal"
+          title={translations.allGood}
+          onClose={() => {}}
+          mt="sm"
+          className="mb-4"
+        >
+          {translations.reviewSuccess}
+        </Notification>
+      )}
+      
+      {/* Only show review form if user is logged in, hasn't already reviewed, and is not the owner */}
+      {token && !is_review && !submit && !is_owner && (
         <Card padding="lg" radius="md" withBorder mt={'md'}>
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
@@ -195,7 +280,6 @@ export default function Reviews({ knowledgeSlug, reviews, is_review }: ReviewsPr
               />
             </div>
             <div>
-          
               <Textarea
                 placeholder={translations.writeReview}
                 value={comment}
@@ -215,17 +299,6 @@ export default function Reviews({ knowledgeSlug, reviews, is_review }: ReviewsPr
                 {displayError}
               </Notification>
             )}
-            {success && !displayError && (
-              <Notification
-                icon={<IconCheck size={20} />}
-                color="teal"
-                title={translations.allGood}
-                onClose={() => {}}
-                mt="sm"
-              >
-                {translations.reviewSuccess}
-              </Notification>
-            )}
             <Button
               type="submit"
               loading={loading}
@@ -237,6 +310,16 @@ export default function Reviews({ knowledgeSlug, reviews, is_review }: ReviewsPr
           </form>
         </Card>
       )}
+      
+      {/* Show message explaining why owners can't review their own content */}
+      {token && is_owner && (
+        <Card className="mt-4">
+          <Text color="dimmed" className={isRTL ? 'text-right' : 'text-start'}>
+            {isRTL ? 'لا يمكنك مراجعة المحتوى الخاص بك.' : 'You cannot review your own content.'}
+          </Text>
+        </Card>
+      )}
+      
       {!token && (
         <Card className="mt-4">
           <Text color="dimmed" className={isRTL ? 'text-right' : 'text-start'}>
