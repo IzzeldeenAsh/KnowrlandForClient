@@ -1,7 +1,7 @@
 'use client';
 
-import React, { useState } from "react";
-import { Rating, Textarea, Button, Notification, Card, Text, Avatar } from "@mantine/core";
+import React, { useState, useEffect } from "react";
+import { Rating, Textarea, Button, Notification, Card, Text, Avatar, Loader } from "@mantine/core";
 import { IconX, IconCheck } from "@tabler/icons-react";
 import { useReview } from "@/hooks/knowledgs/useReview";
 import { useRouter, useParams } from "next/navigation";
@@ -51,7 +51,9 @@ export default function Reviews({ knowledgeSlug, reviews, is_review }: ReviewsPr
     submitReview: isRTL ? 'إرسال المراجعة' : 'Submit Review',
     allGood: isRTL ? 'كل شيء جيد!' : 'All good!',
     reviewSuccess: isRTL ? 'تم إرسال المراجعة بنجاح!' : 'Review submitted successfully!',
-    signInRequired: isRTL ? 'يجب أن تكون مسجلاً للإضافة مراجعة.' : 'You must be signed in to leave a review.'
+    signInRequired: isRTL ? 'يجب أن تكون مسجلاً للإضافة مراجعة.' : 'You must be signed in to leave a review.',
+    errorSubmitting: isRTL ? 'حدث خطأ في إرسال المراجعة. يرجى المحاولة مرة أخرى.' : 'Error submitting review. Please try again.',
+    loadingReviews: isRTL ? 'جارِ تحميل المراجعات...' : 'Loading reviews...'
   };
 
   // Retrieve the token from localStorage
@@ -59,22 +61,72 @@ export default function Reviews({ knowledgeSlug, reviews, is_review }: ReviewsPr
 
   // Even if the user is not signed in, we want to show all reviews.
   // But only show the review form if token exists.
-  const { postReview, loading, error, success } = useReview(knowledgeSlug);
+  const { postReview, loading, error: hookError, success } = useReview(knowledgeSlug);
   const [rate, setRate] = useState(0);
   const [comment, setComment] = useState("");
   const router = useRouter();
   const [submit, setSubmit] = useState(false);
+  
+  // Add a state to track if we're refreshing data after submission
+  const [refreshing, setRefreshing] = useState(false);
+  
+  // Use the hookError to display in our component
+  const [displayError, setDisplayError] = useState<string | null>(null);
+  
+  // Update the displayError when hookError changes
+  useEffect(() => {
+    if (hookError) {
+      setDisplayError(hookError);
+    }
+  }, [hookError]);
+  
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    await postReview(rate, comment);
-    router.refresh(); // This will trigger a re-fetch of the page data
-    setSubmit(true);
+    setDisplayError(null); // Clear any previous errors
+    
+    try {
+      await postReview(rate, comment);
+      
+      // If the submission was successful (no error thrown by the hook)
+      if (success) {
+        // Set refreshing to true before refreshing the page data
+        setRefreshing(true);
+        router.refresh(); // This will trigger a re-fetch of the page data
+        
+        // Create a mock review to show immediately
+        const newReview: ReviewItem = {
+          id: Date.now(), // Temporary ID
+          rate,
+          comment,
+          user_name: "You", // This will be replaced when data refreshes
+          created_date: new Date().toISOString(),
+        };
+        
+        // Set submit to true after a short delay to allow the refresh to complete
+        setTimeout(() => {
+          setSubmit(true);
+          setRefreshing(false);
+        }, 1500);
+      }
+    } catch (error) {
+      // The hook already sets its own error, so we don't need to do anything here
+      console.error("Error submitting review:", error);
+      setRefreshing(false);
+    }
   };
+
+  // Combined loading state - show loader if we're either submitting a review or refreshing the page
+  const isLoading = loading || refreshing;
 
   return (
     <div dir={isRTL ? 'rtl' : 'ltr'}>
         <div>
-          {reviews.length > 0 ? (
+          {isLoading ? (
+            <div className="flex flex-col items-center justify-center py-8">
+              <Loader size="md" />
+              <Text size="sm" mt={2} color="dimmed">{translations.loadingReviews}</Text>
+            </div>
+          ) : reviews.length > 0 ? (
             <div className="space-y-4">
               {reviews.map((review) => (
                 <div
@@ -152,17 +204,18 @@ export default function Reviews({ knowledgeSlug, reviews, is_review }: ReviewsPr
                 minRows={3}
               />
             </div>
-            {error && (
+            {displayError && (
               <Notification
                 icon={<IconX size={20} />}
                 color="red"
-                onClose={() => {}}
+                onClose={() => setDisplayError(null)}
+                withCloseButton
                 mt="sm"
               >
-                {error}
+                {displayError}
               </Notification>
             )}
-            {success && (
+            {success && !displayError && (
               <Notification
                 icon={<IconCheck size={20} />}
                 color="teal"

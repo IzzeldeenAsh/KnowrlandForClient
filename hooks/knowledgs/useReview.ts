@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useLocale } from "next-intl";
+
 interface UseReviewReturn {
   postReview: (rate: number, comment: string) => Promise<void>;
   loading: boolean;
@@ -12,6 +13,7 @@ export function useReview(knowledgeSlug: string): UseReviewReturn {
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
   const locale = useLocale();
+  
   const postReview = async (rate: number, comment: string) => {
     setLoading(true);
     setError(null);
@@ -37,8 +39,18 @@ export function useReview(knowledgeSlug: string): UseReviewReturn {
 
       if (!response.ok) {
         const errorData = await response.json();
-        // errorData might be like:
-        // { "message": "Already reviewed", "errors": { "rate": ["Already reviewed"] } }
+        // Handle structured error responses
+        if (errorData && errorData.errors) {
+          // Get first error message from each field
+          const errorMessages = Object.values(errorData.errors)
+            .map((fieldErrors: any) => Array.isArray(fieldErrors) ? fieldErrors[0] : fieldErrors)
+            .filter(Boolean);
+          
+          if (errorMessages.length > 0) {
+            throw new Error(errorMessages[0] as string);
+          }
+        }
+        // Fall back to the main error message or a default
         throw new Error(errorData.message || "Failed to submit review");
       }
       setSuccess(true);
