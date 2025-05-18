@@ -607,7 +607,11 @@
             "contactUsMessageplaceholder": "اكتب رسالتك هنا...",
             "send": "إرسال الرسالة",
             "regionalOperations": "العمليات الإقليمية - الأردن",
-            "jordanPhone": "+962777771429"
+            "jordanPhone": "+962777771429",
+            "somethingWentWrong": "هناك خطأ ما",
+            "contactUsSuccessMessage": "تم إرسال رسالتك بنجاح",
+            "sending": "جارٍ إرسال الرسالة...",
+            "contactUsSuccessSubtext": "سيتم الرد عليك في أقرب وقت ممكن"
         },
         "dataNotAvailable": "البيانات غير متوفرة",
         "industryKnowledge": "نوع المعرفة المتوفرة في {industry}",
