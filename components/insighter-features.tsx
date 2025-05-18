@@ -207,7 +207,7 @@ export default function InsighterFeatures() {
                   >
                     {t("insighter.uploadTitle")}{" "}
                     <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-500 to-blue-200 font-semibold text-xl sm:text-3xl">
-                      {t("insighter.insighterText")}
+                      {t("insighter.insighterText2")}
                     </span>
                   </h5>
 
