@@ -94,15 +94,15 @@ export default function InsighterFeatures() {
                 <ul className="text-lg text-slate-300 space-y-4 pt-6 text-left ltr:ml-5 rtl:mr-5">
                   <li className="flex items-start gap-3">
                     <Image src="/images/triangle2.svg" alt="triangle" width={16} height={16} className={`${isRTL ? "rotate-180" : ""} mt-1`} />
-                    <span className="text-[18px] font-light">{t("insighter.point1")}</span>
+                    <span className="text-[18px] text-start font-light">{t("insighter.point1")}</span>
                   </li>
                   <li className="flex items-start gap-3">
                     <Image src="/images/triangle2.svg" alt="triangle" width={16} height={16} className={`${isRTL ? "rotate-180" : ""} mt-1`} />
-                    <span className="text-[18px] font-light">{t("insighter.point2")}</span>
+                    <span className="text-[18px] text-start font-light">{t("insighter.point2")}</span>
                   </li>
                   <li className="flex items-start gap-3">
                     <Image src="/images/triangle2.svg" alt="triangle" width={16} height={16} className={`${isRTL ? "rotate-180" : ""} mt-1`} />
-                    <span className="text-[18px] font-light">{t("insighter.point3")}</span>
+                    <span className="text-[18px] text-start font-light">{t("insighter.point3")}</span>
                   </li>
                 </ul>
               </div>
