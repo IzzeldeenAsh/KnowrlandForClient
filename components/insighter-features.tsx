@@ -8,7 +8,7 @@ import IllustrationTop from '@/public/images/pricing-illustration-top.svg'
 import Particles from '@/components/particles'
 import { useLocale } from 'next-intl';
 import { ParallaxProvider, Parallax } from 'react-scroll-parallax';
-import { ReactElement, JSXElementConstructor, ReactNode, ReactPortal, Key, useState } from "react";
+import {  useState } from "react";
 
 type InsighterItem = {
   title: string;
@@ -161,6 +161,42 @@ export default function InsighterFeatures() {
               </div>
             </div>
           </div>
+             {/* New CTA Section */}
+             <div className="relative " dir={isRTL ? "rtl" : "ltr"}>
+            <div className="max-w-6xl mx-auto px-4 sm:px-6">
+              <div className="relative px-8 py-12 md:py-20 border-t border-b [border-image:linear-gradient(to_right,transparent,theme(colors.slate.800),transparent)1]">
+                {/* Blurred shape */}
+                <div className="absolute top-0 -mt-24 left-1/2 -translate-x-1/2 ml-24 blur-2xl opacity-70 pointer-events-none -z-10" aria-hidden="true">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="434" height="427">
+                    <defs>
+                      <linearGradient id="bs4-a" x1="19.609%" x2="50%" y1="14.544%" y2="100%">
+                        <stop offset="0%" stopColor="#4B9EFF"></stop>
+                        <stop offset="100%" stopColor="#0066FF" stopOpacity="0"></stop>
+                      </linearGradient>
+                    </defs>
+                    <path fill="url(#bs4-a)" fillRule="evenodd" d="m0 0 461 369-284 58z" transform="matrix(1 0 0 -1 0 427)"></path>
+                  </svg>
+                </div>
+                {/* Particles animation */}
+                <div className="absolute left-1/2 -translate-x-1/2 top-0 -z-10 w-80 h-80 -mt-24">
+                  <Particles className="absolute inset-0 -z-10" quantity={6} staticity={30} />
+                </div>
+                {/* Content */}
+                <div   className="text-xl text-slate-300 mb-8 text-center"
+                data-aos="fade-down"
+                data-aos-delay="200">
+                  <h2 className="h2 bg-clip-text text-transparent bg-gradient-to-r from-slate-200/60 via-slate-200 to-slate-200/60 pb-4">{t("dataTypeSection.title")}</h2>
+                  <p className="text-lg text-slate-400 mb-6" dangerouslySetInnerHTML={{__html: t("dataTypeSection.description")}}></p>
+                  
+                
+                </div>
+              </div>
+            </div>
+          </div>
+
+      
+
+            
             {/* Section Second */}
            <div className="bg-[#151F34] py-20 w-screen relative left-1/2 right-1/2 -mx-[50vw]">
             <div className="max-w-6xl mx-auto px-4 sm:px-6" data-aos="fade-down">
@@ -361,9 +397,9 @@ export default function InsighterFeatures() {
           <div className="absolute bottom-0 translate-y-1/2 left-1/2 -translate-x-1/2 pointer-events-none -z-10 w-1/3 aspect-square" aria-hidden="true">
             <div className="absolute inset-0 translate-z-0 rounded-full bg-slate-800 group-hover:bg-blue-500 transition-colors duration-500 ease-in-out blur-[60px]" />
           </div>
-          <div className="flex flex-col p-6 h-[140px] items-center text-center justify-center">
+          <div className="flex flex-col pb-4 p-6 h-[140px] items-center text-center justify-center">
           {item.icon && (
-            <Image src={item.icon} alt={item.key} width={40} height={40} />
+            <Image className="mb-4" src={item.icon} alt={item.key} width={40} height={40} />
           )}
             <h3 className="font-bold text-lg bg-clip-text text-transparent bg-gradient-to-r from-slate-200/60 via-slate-200 to-slate-200/60 line-clamp-2">
               {t(`insighter.uploadTypes.${item.key}`)}
@@ -389,6 +425,55 @@ export default function InsighterFeatures() {
                   </div>
                 )}
 
+            
+            </div>
+          </div>
+    {/* Section5 - Revenue Stream */}
+    <div className="relative pt-12" dir={isRTL ? "rtl" : "ltr"}>
+            <div className="max-w-6xl mx-auto px-4 sm:px-6">
+              <div className="relative px-8 py-8 rounded-2xl overflow-hidden">
+                {/* Particles animation */}
+                <div className="absolute inset-0 -z-10">
+                  <Particles className="absolute inset-0" quantity={8} staticity={30} />
+                </div>
+                {/* Content */}
+                <div className="max-w-3xl mx-auto text-center" data-aos="fade-up">
+                  <h2 className="h2 bg-clip-text text-transparent bg-gradient-to-r from-slate-200/60 via-slate-200 to-slate-200/60 pb-4 leading-[1.2]">
+                    {t("section5.title")}
+                  </h2>
+                  <p className="text-lg text-slate-400 ">
+                    {t("section5.description")}
+                  </p>
+              
+                </div>
+              </div>
+            </div>
+          </div>
+          {/* Section6 - Client Demand */}
+          <div className="relative border-b  border-slate-800 py-12 bg-slate-900/30" dir={isRTL ? "rtl" : "ltr"}>
+            <div className="max-w-6xl mx-auto px-4 sm:px-6">
+              <div className="relative px-8 py-12 rounded-2xl overflow-hidden">
+                {/* Content */}
+                <div className="max-w-3xl mx-auto" data-aos="fade-up">
+                  <h2 className="h2 bg-clip-text text-transparent bg-gradient-to-r from-slate-200/60 via-slate-200 to-slate-200/60 pb-4 text-center">
+                    {t("section6.title")}
+                  </h2>
+                  
+                  {/* Split description into paragraphs */}
+                  {t("section6.description").split('\n\n').map((paragraph, index) => (
+                    <div key={index} className={index === 0 ? "text-lg text-slate-400 mb-8 text-center" : ""}>
+                      {index === 0 ? (
+                        <p className="mb-8">{paragraph}</p>
+                      ) : (
+                        <div className={`flex items-center justify-center my-4 mx-auto animate-[float_${3.5 + (index % 3) * 0.5}s_ease-in-out_${index * 0.2}s_infinite]`}>
+                          <div className={`flex items-center justify-center bg-blue-900/20 rounded-lg px-6 py-3 border border-blue-500/20 w-[450px] transition-all duration-300 hover:border-blue-400/50 hover:bg-blue-900/30`}>
+                            <span className="text-blue-300 font-medium text-center">{paragraph}</span>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  ))}
+                </div>
                 <div className="mt-12 text-center">
                   <div className="mb-4">
                     <span className="text-lg font-light text-slate-300">
@@ -402,8 +487,10 @@ export default function InsighterFeatures() {
                     </span>
                   </Link>
                 </div>
+              </div>
             </div>
           </div>
+       
 
         </div>
       </section>
