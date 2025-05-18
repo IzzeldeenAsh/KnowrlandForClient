@@ -627,7 +627,11 @@
                 "contactUsMessageplaceholder": "Type your message here...",
                 "send": "Send Message",
                 "regionalOperations": "Regional Operations - Jordan",
-                "jordanPhone": "+962777771429"
+                "jordanPhone": "+962777771429",
+                "somethingWentWrong": "Something went wrong",
+                "contactUsSuccessMessage": "Your message has been sent successfully",
+                "sending": "Sending message...",
+                "contactUsSuccessSubtext": "We will get back to you as soon as possible"
         },
     "dataNotAvailable": "No Knowledge Available",
     "industryKnowledge": "Explore knowledge in {industry}",
