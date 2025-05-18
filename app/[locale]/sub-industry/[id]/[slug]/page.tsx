@@ -23,6 +23,7 @@ interface Topic {
   id: number
   name: string
   slug: string
+  weight: number
   knowledge: Knowledge[]
 }
 
@@ -30,6 +31,7 @@ interface SubIndustryDetails {
   id: number
   name: string
   slug: string
+  weight: number
   topic: Topic[]
 }
 
@@ -68,7 +70,8 @@ async function fetchSubIndustryData(id: string, slug: string, locale: string = '
     throw new Error(`Failed to fetch sub-industry details: ${response.status} ${response.statusText}`)
   }
 
-  const data = await response.json()
+  const data = await response.json();
+  console.log(data);
   return data
 }
 
@@ -184,46 +187,75 @@ export default async function SubIndustryPage({ params }: Props) {
               </div>
 
               {/* Topics Grid */}
-              <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-2 max-w-7xl mx-auto">
-                {subIndustry.topic.map((topic: Topic) => (
-                  <div
-                    key={topic.id}
-                    className="relative min-h-[140px] bg-white rounded-sm p-6 shadow-sm hover:shadow-md transition-all duration-300"
-                    data-aos="fade-up"
-                  >
-                    <div className="space-y-2">
-                      <div className="flex items-center gap-2">
-                        <FolderIcon width={20} height={20} />
-                        <Link href={`/${locale}/topic/${topic.id}/${topic.slug}`}>
-                          <h3 className="text-sm font-semibold text-gray-900 hover:text-blue-600 transition-colors">
+              <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4 max-w-7xl mx-auto">
+                {subIndustry.topic.map((topic: Topic) => {
+                  const isDisabled = topic.weight === 0;
+                  
+                  const cardContent = (
+                    <div 
+                      className={`relative group bg-gradient-to-br from-white to-slate-50 rounded-sm p-6 shadow-md border border-slate-100 h-full flex flex-col ${!isDisabled ? 'hover:shadow-lg hover:border-blue-100 hover:from-white hover:to-blue-50 transition-all duration-300 cursor-pointer' : 'opacity-50 cursor-not-allowed'}`}
+                    >
+                      <div className="space-y-2 flex-grow">
+                        <div className="flex items-center gap-2">
+                          <FolderIcon width={20} height={20} className={`${!isDisabled ? 'text-blue-500' : 'text-gray-400'}`} />
+                          <h3 className={`text-base font-bold ${!isDisabled ? 'text-transparent bg-gradient-to-r from-blue-500 to-teal-400 bg-clip-text' : 'text-gray-900'}`}>
                             {topic.name}
+                            {isDisabled && <span className="ml-2 text-xs text-gray-500"></span>}
                           </h3>
-                        </Link>
+                        </div>
+                        
+                        {topic.knowledge.length > 0 ? (
+                          <ul className="space-y-1">
+                            {topic.knowledge.map((item: Knowledge, index: number) => (
+                              <li
+                                key={`${item.id}-${index}`}
+                                className="text-sm text-gray-700 hover:text-blue-600 transition-colors flex items-center"
+                              >
+                                <span className={isRTL ? "ml-2" : "mr-2"}>•</span>
+                                <Link href={`/${locale}/knowledge/${item.type}/${item.slug}`}>
+                                  {item.title}
+                                </Link>
+                              </li>
+                            ))}
+                          </ul>
+                        ) : (
+                          <div className="text-xs text-gray-500 italic flex items-center">
+                            <span className={isRTL ? "ml-2" : "mr-2"}>•</span>
+                            <p>{locale === 'ar' ? 'لا توجد عناصر معرفية متاحة' : 'No knowledge items available'}</p>
+                          </div>
+                        )}
                       </div>
-
-                      {topic.knowledge.length > 0 ? (
-                        <ul className="space-y-1">
-                          {topic.knowledge.map((item: Knowledge, index: number) => (
-                            <li
-                              key={`${item.id}-${index}`}
-                              className="text-xs text-gray-600 hover:text-blue-600 transition-colors flex items-center"
-                            >
-                              <span className={isRTL ? "ml-2" : "mr-2"}>•</span>
-                              <Link href={`/${locale}/knowledge/${item.type}/${item.slug}`}>
-                                {item.title}
-                              </Link>
-                            </li>
-                          ))}
-                        </ul>
-                      ) : (
-                        <div className="text-xs text-gray-500 italic flex items-center">
-                          <span className={isRTL ? "ml-2" : "mr-2"}>•</span>
-                          <p>{locale === 'ar' ? 'لا توجد عناصر معرفية متاحة' : 'No knowledge items available'}</p>
+                      <div className={`absolute top-6 ${isRTL ? 'left-6' : 'right-6'}`}>
+                        <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path 
+                            strokeLinecap="round" 
+                            strokeLinejoin="round" 
+                            strokeWidth="2" 
+                            d={isRTL ? "M15 5l-7 7 7 7" : "M9 5l7 7-7 7"} 
+                          />
+                        </svg>
+                      </div>
+                      {isDisabled && (
+                        <div
+                          className={`absolute z-10 px-3 py-2 text-sm font-medium text-white bg-gray-900 rounded shadow-md 
+                          bottom-1/2 mb-2 left-1/2 -translate-x-1/2 
+                          opacity-0 group-hover:opacity-100 
+                          pointer-events-none transition-opacity duration-300`}
+                        >
+                          {locale === 'ar' ? 'البيانات غير متوفرة' : 'Data not available'}
                         </div>
                       )}
                     </div>
-                  </div>
-                ))}
+                  );
+                  
+                  return isDisabled ? (
+                    <div key={topic.id} className="h-full">{cardContent}</div>
+                  ) : (
+                    <Link key={topic.id} href={`/${locale}/topic/${topic.id}/${topic.slug}`} className="h-full block">
+                      {cardContent}
+                    </Link>
+                  );
+                })}
               </div>
             </div>
           </div>
