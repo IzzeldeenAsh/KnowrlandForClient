@@ -34,6 +34,18 @@
             "title":"Don't let your expertise fade to silence; let it bloom into sustainable revenue",
             "description":"Start earning by sharing your knowledge and experience on Knoldg. You Set the Value: Choose your price, and every time your work is downloaded, you're paid Directly."
         },
+        "section5":{
+            "title":"Join our knowledge Ecosystem to Unlock a Recurring Revenue Stream",
+            "description":"Start earning by sharing your insights and experience on Knoldg. You Set the Value: Choose your price, and every time your work is downloaded, you're paid directly."
+        },
+        "section6":{
+            "title":"Knoldg ecosystem keeps you aligned with client demand",
+            "description":"Start creating what clients truly need in your field. Once you register as an Insighter, you'll receive notifications about client requests, enabling you to produce relevant data, reports, and insights from your area of expertise.\n\nOn-Demand Knowledge Production\n\nSmart Alerts for You & Your Clients\n\nWork Anytime, Anywhere"
+        },
+        "dataTypeSection":{
+            "title":"What data, insights, reports, or expertise have you locked away?",
+            "description":"Knoldg is your platform to showcase and monetize your intellectual assets. The platform organizes all your published material—including data and insights by category, making it easy for global audiences to find and purchase your work."
+        },
         "showMore": "Show More",
         "insighter": {
             "title": "What is an ",
@@ -121,7 +133,11 @@
               "position": "right"
             }
           ],
-          "ctaButton": "Get Started"
+          "ctaButton": "Get Started",
+        "knowledgeSection": {
+            "title": "What data, insights, reports, or expertise have you locked away?",
+            "description": "Knoldg is your platform to showcase and monetize your intellectual assets. The platform organizes all your published material—including data and insights by category, making it easy for global audiences to find and purchase your work."
+        }
     },
     "Header": {
         "navigation": {
@@ -282,7 +298,9 @@
         "title": "Turn Your Expertise into Profit—Share Your Knowledge with the World!",
         "description": "Start monetizing your knowledge and connect with prospective clients who need your expertise.",
         "button": "Get Started",
-        "contact": "For inquiries and collaborations, reach out to us at"
+        "contact": "For inquiries and collaborations, reach out to us at",
+        "topTag":"Do you have valuable intellectual property data, reports, insights,",
+        "topTag2":"ready to deliver measurable impact?"
     },
     "Footer": {
         "copyright": " Knoldg.com - All rights reserved",

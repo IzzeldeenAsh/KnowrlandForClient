@@ -167,7 +167,7 @@ export default async function IndustryPage({ params }: Props) {
           <div className="max-w-6xl mx-auto">
             <div className={`mb-8 ${isRTL ? 'text-right' : 'text-start'}`}>
               {/* <h2 className="text-2xl font-bold text-gray-900 mb-2">
-                {locale === 'ar' ? 'الصناعات الفرعية' : 'Sub Industries'}
+                {locale === 'ar' ? 'المجالات الفرعية' : 'Sub Industries'}
               </h2> */}
            
             </div>

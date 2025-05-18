@@ -10,12 +10,18 @@ export default function Cta() {
   return (
     <section>
       <div className="max-w-6xl mx-auto px-4 sm:px-6">
+        
         <div className="relative px-8 py-12 md:py-20 rounded-[3rem] overflow-hidden">
+        <div className="inline-flex md:px-20  me-auto  font-medium bg-clip-text text-transparent bg-gradient-to-r from-blue-500 to-blue-200 pb-3">
+                {t('topTag')} <br />
+                {t('topTag2')}
+                  </div>
           {/* Radial gradient */}
           <div className="absolute flex items-center justify-center top-0 -translate-y-1/2 left-1/2 -translate-x-1/2 pointer-events-none -z-10 w-1/3 aspect-square" aria-hidden="true">
             <div className="absolute inset-0 translate-z-0 bg-blue-500 rounded-full blur-[120px] opacity-70" />
             <div className="absolute w-1/4 h-1/4 translate-z-0 bg-blue-400 rounded-full blur-[40px]" />
           </div>
+          
           {/* Blurred shape */}
           <div className="absolute bottom-0 translate-y-1/2 left-0 blur-2xl opacity-50 pointer-events-none -z-10" aria-hidden="true">
             <svg xmlns="http://www.w3.org/2000/svg" width="434" height="427">
@@ -29,7 +35,9 @@ export default function Cta() {
             </svg>
           </div>
           {/* Content */}
+       
           <div className="max-w-3xl mx-auto text-center">
+    
             <div>
               {/*
                 Original inline text (4 words): "The security first platform"
