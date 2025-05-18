@@ -97,7 +97,7 @@ export default function KnowledgeGrid({
     manual: isRTL ? "دليل" : "Manuals",
     insight: isRTL ? "رؤى" : "Insights",
     data: isRTL ? "بيانات" : "Data",
-    article: isRTL ? "صناعات" : "Articles",
+    article: isRTL ? "مجالات" : "Articles",
     course: isRTL ? "دورة تدريبية" : "Course",
   };
   

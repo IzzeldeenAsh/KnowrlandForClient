@@ -63,7 +63,7 @@ export default function HomePage() {
   const feature = t4("Features4", { default: "الميزة ٤ (احتياطي)" });
 
   const tags = [
-    { id: 'industry', en: 'Industry', ar: 'الصناعات' },
+    { id: 'industry', en: 'Industry', ar: 'المجالات' },
     { id: 'report', en: 'Reports', ar: 'التقارير' },
     { id: 'data', en: 'Data', ar: 'البيانات' },
     { id: 'insight', en: 'Insights', ar: 'الرؤى' },

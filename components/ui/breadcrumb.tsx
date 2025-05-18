@@ -74,7 +74,7 @@ export default function Breadcrumb({ items }: BreadcrumbProps) {
         <ChevronRightIcon className="h-4 w-4 text-gray-400 flex-shrink-0" />
       )}
       <Link
-        href={(item.label === "Industries" || item.label === "الصناعات") ? `/${currentLocale}/all-industries` : `/${currentLocale}/${item.href}`}
+        href={(item.label === "Industries" || item.label === "المجالات") ? `/${currentLocale}/all-industries` : `/${currentLocale}/${item.href}`}
         className={`${isRTL ? 'mr-2' : 'ml-2'} text-sm whitespace-nowrap overflow-hidden overflow-ellipsis max-w-[150px] sm:max-w-none inline-block ${
           index === items.length - 1
             ? 'text-gray-900 font-medium'
