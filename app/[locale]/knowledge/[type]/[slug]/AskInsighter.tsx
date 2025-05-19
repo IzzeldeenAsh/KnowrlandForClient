@@ -6,7 +6,7 @@ import { useParams } from 'next/navigation';
 import Link from 'next/link';
 import { formatDistanceToNow } from 'date-fns';
 import { enUS, ar } from 'date-fns/locale';
-import { Notification, Avatar } from '@mantine/core';
+import { Notification, Avatar, Badge } from '@mantine/core';
 import { IconX } from '@tabler/icons-react';
 
 // Import CSS module for thread connectors
@@ -61,8 +61,8 @@ export default function AskInsighter({ knowledgeSlug, questions = [], is_owner =
   const translations = {
     discussion: isRTL ? '\u0627\u0644\u0623\u0633\u0626\u0644\u0629' : 'Questions',
     writeQuestion: isRTL ? '\u0627\u0643\u062a\u0628 \u0633\u0624\u0627\u0644\u0643 \u0644\u0644\u062e\u0628\u064a\u0631...' : 'Write your question to the insighter...',
-    writeReply: isRTL ? '\u0627\u0643\u062a\u0628 \u0631\u062f\u0643...' : 'Write your reply...',
-    writeAnswer: isRTL ? '\u0627\u0643\u062a\u0628 \u0625\u062c\u0627\u0628\u062a\u0643...' : 'Write your answer...',
+    writeReply: isRTL ? '\u0627\u0643\u062a\u0628 \u0631\u062f\u0643...' : 'Add your comment...',
+    writeAnswer: isRTL ? '\u0627\u0643\u062a\u0628 \u0625\u062c\u0627\u0628\u062a\u0643...' : 'Add your reply...',
     postQuestion: isRTL ? '\u0625\u0631\u0633\u0627\u0644 \u0627\u0644\u0633\u0624\u0627\u0644' : 'Send Question',
     postReply: isRTL ? '\u0625\u0631\u0633\u0627\u0644 \u0627\u0644\u0631\u062f' : 'Comment',
     postAnswer: isRTL ? '\u0625\u0631\u0633\u0627\u0644 \u0627\u0644\u0625\u062c\u0627\u0628\u0629' : 'Reply',
@@ -83,7 +83,9 @@ export default function AskInsighter({ knowledgeSlug, questions = [], is_owner =
     answerSubmitted: isRTL ? '\u062a\u0645 \u0625\u0631\u0633\u0627\u0644 \u0627\u0644\u0625\u062c\u0627\u0628\u0629 \u0628\u0646\u062c\u0627\u062d!' : 'Answer submitted successfully!',
     errorSubmitting: isRTL ? '\u062d\u062f\u062b \u062e\u0637\u0623 \u0641\u064a \u0625\u0631\u0633\u0627\u0644 \u0627\u0644\u0633\u0624\u0627\u0644. \u064a\u0631\u062c\u0649 \u0627\u0644\u0645\u062d\u0627\u0648\u0644\u0629 \u0645\u0631\u0629 \u0623\u062e\u0631\u0649.' : 'Error submitting. Please try again.',
     loginRequired: isRTL ? '\u064a\u062c\u0628 \u062a\u0633\u062c\u064a\u0644 \u0627\u0644\u062f\u062e\u0648\u0644 \u0644\u0644\u0645\u0634\u0627\u0631\u0643\u0629' : 'Login required to participate',
-    loginButton: isRTL ? '\u062a\u0633\u062c\u064a\u0644 \u0627\u0644\u062f\u062e\u0648\u0644' : 'Login'
+    loginButton: isRTL ? '\u062a\u0633\u062c\u064a\u0644 \u0627\u0644\u062f\u062e\u0648\u0644' : 'Login',
+    questions: isRTL ? '\u0623\u0633\u0626\u0644\u0629' : 'Questions',
+    question: isRTL ? '\u0633\u0624\u0627\u0644' : 'Question',
   };
 
   const handleQuestionSubmit = async (e: React.FormEvent) => {
@@ -396,7 +398,27 @@ export default function AskInsighter({ knowledgeSlug, questions = [], is_owner =
       const isLastItem = index === array.length - 1;
       
       return (
-      <div className={`${isReply ? '' : 'border shadow-sm p-5'} bg-white rounded mb-5 overflow-hidden`}>
+        <>  {/* Add question number badge for parent questions only */}
+        {!isReply && (
+          <div className="">
+            <div
+              className="bg-[#5AA9E6] text-white font-bold px-3 py-2 text-center max-w-[150px] shadow-md"
+              style={{ 
+                minWidth: '40px', 
+                borderTopLeftRadius: '5px',
+                borderTopRightRadius: '5px' 
+              }}
+            >
+              {translations.question} {questions.findIndex(q => q.id === question.id) + 1}
+            </div>
+          </div>
+        )}
+      <div 
+        id={!isReply ? `question-${question.id}` : undefined}
+        className={`${isReply ? '' : 'border shadow-sm p-5'} bg-white rounded mb-5 overflow-hidden relative`}
+      >
+        
+          
           <div className={styles.commentContainer} key={question.id} dir={isRTL ? 'rtl' : 'ltr'}>
        
           <article 
@@ -454,7 +476,7 @@ export default function AskInsighter({ knowledgeSlug, questions = [], is_owner =
         <div className="flex pb-4">
         <div aria-hidden="true" className={hasAnswer ? styles.commentsThreadLine : 'ps-10'} role="button"></div>
           {/* Question content */}
-          <p className="text-gray-800 mb-4 text-sm px-3">{question.question?.question}</p>
+          <p className="text-gray-800 mb-4 text-sm px-3 font-semibold">{question.question?.question}</p>
        
         </div>
           
@@ -527,7 +549,7 @@ export default function AskInsighter({ knowledgeSlug, questions = [], is_owner =
                 
              <div className="flex pb-4">
              <div aria-hidden="true" className={styles.emptyThread} role="button"/>
-             <p className="text-gray-800 dark:text-gray-300 text-sm ps-4 bg-[#e6f1ff] p-4 rounded-lg flex-1">{question.answer.answer}</p>
+             <p className="text-gray-800 dark:text-gray-300 text-sm ps-4 bg-[#eff6ff] p-4 rounded-lg flex-1">{question.answer.answer}</p>
              </div>
               </article>
           
@@ -540,15 +562,16 @@ export default function AskInsighter({ knowledgeSlug, questions = [], is_owner =
               <form onSubmit={(e) => {
                 handleReplySubmit(e, question.id, null);
               }}>
-                <div className="relative">
+                <div className="relative"             style={isReply?{width: '92%',marginInlineStart: 'auto'}:{width: '100%',marginInlineStart: '0'}}>
                   <label htmlFor={`replyText-${question.id}`} className="sr-only">
                     {translations.writeAnswer}
                   </label>
                   <textarea
                     id={`replyText-${question.id}`}
                     rows={2}
-                    className="px-3 py-2 pe-20 w-full text-sm text-gray-900 bg-white rounded-lg border border-gray-200 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white min-h-[100px]"
+                    className=" px-3 py-2 pe-20 w-full text-sm text-gray-900 bg-white rounded-lg border border-gray-200 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white min-h-[100px]"
                     placeholder={translations.writeAnswer}
+        
                     value={replyTexts[question.id] || ''}
                     onChange={(e) => setReplyTexts(prev => ({ ...prev, [question.id]: e.target.value }))}
                     disabled={isSubmitting}
@@ -673,6 +696,7 @@ export default function AskInsighter({ knowledgeSlug, questions = [], is_owner =
         {/* Only add the border divider if this is not the last item */}
         {!isLastItem && <div className="mt-3 border-t border-gray-200 dark:border-gray-700"></div>}
       </div>
+      </>
       );
     });
   };
