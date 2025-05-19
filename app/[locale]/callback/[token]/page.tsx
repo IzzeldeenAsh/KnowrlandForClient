@@ -157,13 +157,34 @@ export default function AuthCallback() {
         if (finalReturnUrl && finalReturnUrl !== '/' && !finalReturnUrl.includes('/login') && !finalReturnUrl.includes('/auth/')) {
           console.log('[token-callback] Redirecting to returnUrl:', finalReturnUrl);
           
-          // Handle both relative and absolute URLs
-          if (finalReturnUrl.startsWith('http')) {
-            // For absolute URLs (like coming from knoldg.com)
-            window.location.href = finalReturnUrl;
+          // Check if this is an Angular route that should go to the Angular app
+          if (finalReturnUrl.startsWith('/app/') || 
+              finalReturnUrl.startsWith('/profile/') ||
+              finalReturnUrl.startsWith('/insighter-dashboard/') ||
+              finalReturnUrl.startsWith('/knowledge-detail/') ||
+              finalReturnUrl.startsWith('/my-knowledge-base/') ||
+              finalReturnUrl.startsWith('/add-knowledge/') ||
+              finalReturnUrl.startsWith('/edit-knowledge/') ||
+              finalReturnUrl.startsWith('/review-insighter-knowledge/')) {
+            
+            // Ensure Angular routes go to the Angular app
+            console.log('[token-callback] Detected Angular route, redirecting to Angular app');
+            
+            // Make sure path has /app/ prefix if not already present
+            const angularPath = finalReturnUrl.startsWith('/app/') 
+              ? finalReturnUrl 
+              : `/app${finalReturnUrl}`;
+              
+            window.location.href = `https://app.knoldg.com${angularPath}?nextjs_token=${encodeURIComponent(token)}`;
           } else {
-            // For relative URLs within the app
-            window.location.href = finalReturnUrl;
+            // Handle both relative and absolute URLs for Next.js app
+            if (finalReturnUrl.startsWith('http')) {
+              // For absolute URLs
+              window.location.href = finalReturnUrl;
+            } else {
+              // For relative URLs within Next.js app
+              window.location.href = finalReturnUrl;
+            }
           }
         }
         // Only use role-based redirect if there's no valid returnUrl
