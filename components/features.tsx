@@ -24,9 +24,13 @@ export default function Features() {
   const locale = useLocale();
   const isRTL = locale === "ar";
   
+  // Add state for video hover
+  const [isVideoHovered, setIsVideoHovered] = useState(false);
+  const [isButtonsHovered, setIsButtonsHovered] = useState(false);
+
   // States to track which tab is being hovered for each section
   const [hoveredTab1, setHoveredTab1] = useState<number | null>(null);
-  // const [hoveredTab2, setHoveredTab2] = useState<number | null>(null);
+  const [hoveredTab2, setHoveredTab2] = useState<number | null>(null);
   const [hoveredTab3, setHoveredTab3] = useState<number | null>(null);
 
   return (
@@ -67,20 +71,20 @@ export default function Features() {
                     />
                     <Image
                       className={`w-full h-full rounded-[inherit] transition-all duration-700 ease-in-out absolute ${hoveredTab1 === 2 ? 'opacity-100' : 'opacity-0'}`}
-                      src={'https://res.cloudinary.com/dsiku9ipv/image/upload/v1746879543/Group_13440_soctoz.webp'}
+                      src={'/images/book-meeting.png'}
                       width={500}
                       height={500}
                       alt="Feature 2 - Image 2"
                       style={{ objectFit: 'contain' }}
                     />
-                    {/* <Image
+                    <Image
                       className={`w-full h-full rounded-[inherit] transition-all duration-700 ease-in-out absolute ${hoveredTab1 === 3 ? 'opacity-100' : 'opacity-0'}`}
-                      src={ChangelogImg04}
+                      src={'/images/rating.png'}
                       width={500}
                       height={500}
                       alt="Feature 2 - Image 3"
                       style={{ objectFit: 'contain' }}
-                    /> */}
+                    />
                   </div>
                 </figure>
               </div>
@@ -163,21 +167,24 @@ export default function Features() {
                 <div className="mt-8 max-w-md space-y-2">
                   <button
                     className={`flex items-center gap-2 text-start text-sm font-medium text-slate-50 rounded border bg-slate-800/25 w-full px-3 py-2 transition duration-150 ease-in-out hover:opacity-100 border-slate-700 opacity-70 min-h-[60px]`}
-                   
+                    onMouseEnter={() => setIsButtonsHovered(true)}
+                    onMouseLeave={() => setIsButtonsHovered(false)}
                   >
                     <MagnifyingGlassCircleIcon className="w-5 h-5 flex-shrink-0 text-blue-300" />
                     <span>{t("tabs.preciseResults.title")}</span>
                   </button>
                   <button
                     className={`flex items-center gap-2 text-start text-sm font-medium text-slate-50 rounded border bg-slate-800/25 w-full px-3 py-2 transition duration-150 ease-in-out hover:opacity-100 border-slate-700 opacity-70 min-h-[60px]`}
-                 
+                    onMouseEnter={() => setIsButtonsHovered(true)}
+                    onMouseLeave={() => setIsButtonsHovered(false)}
                   >
                     <GlobeAltIcon className="w-5 h-5 flex-shrink-0 text-blue-300" />
                     <span>{t("tabs.variableData.title")}</span>
                   </button>
                   <button
                     className={`flex items-center gap-2 text-start text-sm font-medium text-slate-50 rounded border bg-slate-800/25 w-full px-3 py-2 transition duration-150 ease-in-out hover:opacity-100 border-slate-700 opacity-70 min-h-[60px]`}
-                 
+                    onMouseEnter={() => setIsButtonsHovered(true)}
+                    onMouseLeave={() => setIsButtonsHovered(false)}
                   >
                     <RocketLaunchIcon className="w-5 h-5 flex-shrink-0 text-blue-300" />
                     <span>{t("tabs.fasterDecisions.title")}</span>
@@ -189,14 +196,34 @@ export default function Features() {
               <div className="w-full sm:w-4/5 md:w-1/2" data-aos="fade-up" data-aos-delay="100">
                 <figure className="rounded-3xl p-px mb-8">
                 <div className="relative flex items-center justify-center" style={{ width: '100%', height: '500px', overflow: 'hidden' }}>
-                    <Image
+                    {/* <Image
                       className={`w-full rounded-[inherit] transition-all duration-700 ease-in-out absolute inset-0`}
                       src={'https://res.cloudinary.com/dsiku9ipv/image/upload/v1746977594/tre_iskrzf.png'}
-                      width={500}
+                        width={500}
                       height={500}
                       alt="Feature 1 - Image 1"
-                      style={{ objectFit: 'cover' }}
-                    />
+                      style={{ objectFit: 'cover' }}  
+                    /> */}
+                             <figure className=" rounded-3xl p-px mb-8 overflow-hidden mt-10 max-w-[600px] h-[500px] w-[500px] mx-auto">
+                  <video 
+                    className={`w-full rounded-[inherit] transition-all duration-700 ease-in-out absolute inset-0`}
+                    onMouseEnter={() => setIsVideoHovered(true)}
+                    onMouseLeave={() => setIsVideoHovered(false)}
+                    loop 
+                    muted 
+                    playsInline
+                    src="/images/AI_Generate.mp4"
+                    ref={(videoElement) => {
+                      if (videoElement) {
+                        if (isVideoHovered || isButtonsHovered) {
+                          videoElement.play();
+                        } else {
+                          videoElement.pause();
+                        }
+                      }
+                    }}
+                  />
+                </figure>
                     {/* <Image
                       className={`w-full rounded-[inherit] transition-all duration-700 ease-in-out absolute inset-0 ${hoveredTab2 === 2 ? 'opacity-100' : 'opacity-0'}`}
                       src={ChangelogImg02}
@@ -273,18 +300,10 @@ export default function Features() {
               <div className="w-full sm:w-4/5 md:w-1/2 order-2" data-aos="fade-up" data-aos-delay="100">
                 <figure className="bg-gradient-to-b from-slate-300/20 to-transparent rounded-3xl p-px mb-8">
                 <div className="relative flex items-center justify-center" style={{ width: '100%', height: '500px', overflow: 'hidden' }}>
-                    {/* <Image
-                      className={`w-full rounded-[inherit] transition-all duration-700 ease-in-out absolute inset-0 ${hoveredTab3 === 1 || hoveredTab3 === null ? 'opacity-100' : 'opacity-0'}`}
-                      src={ChangelogImg04}
-                      width={500}
-                      height={500}
-                      alt="Feature 3 - Image 1"
-                      style={{ objectFit: 'cover' }}
-                    /> */}
-                         {/* Video */}
+            
                 <figure className=" rounded-3xl p-px mb-8 overflow-hidden mt-10 max-w-[600px] mx-auto">
                   <video 
-                    className={`w-full rounded-[inherit] transition-all duration-700 ease-in-out absolute inset-0 ${hoveredTab3 === 1 || hoveredTab3 === null ? 'opacity-100' : 'opacity-0'}`}
+                    className={`w-500px rounded-[inherit] transition-all duration-700 ease-in-out absolute inset-0`}
                     autoPlay 
                     loop 
                     muted 
@@ -292,23 +311,9 @@ export default function Features() {
                     src="/images/Pay-for-what-you-need.mp4"
                   />
                 </figure>
+       
 
-                    {/* <Image
-                      className={`w-full rounded-[inherit] transition-all duration-700 ease-in-out absolute inset-0 ${hoveredTab3 === 2 ? 'opacity-100' : 'opacity-0'}`}
-                      src={ChangelogImg03}
-                      width={500}
-                      height={500}
-                      alt="Feature 3 - Image 2"
-                      style={{ objectFit: 'cover' }}
-                    />
-                    <Image
-                      className={`w-full rounded-[inherit] transition-all duration-700 ease-in-out absolute inset-0 ${hoveredTab3 === 3 ? 'opacity-100' : 'opacity-0'}`}
-                      src={ChangelogImg02}
-                      width={500}
-                      height={500}
-                      alt="Feature 3 - Image 3"
-                      style={{ objectFit: 'cover' }}
-                    /> */}
+                  
                   </div>
                 </figure>
               </div>
