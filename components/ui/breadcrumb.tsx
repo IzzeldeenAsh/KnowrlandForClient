@@ -75,7 +75,7 @@ export default function Breadcrumb({ items }: BreadcrumbProps) {
       )}
       <Link
         href={(item.label === "Industries" || item.label === "المجالات") ? `/${currentLocale}/all-industries` : `/${currentLocale}/${item.href}`}
-        className={`${isRTL ? 'mr-2' : 'ml-2'} text-sm whitespace-nowrap overflow-hidden overflow-ellipsis max-w-[150px] sm:max-w-none inline-block ${
+        className={`${isRTL ? 'mr-2' : 'ml-2'} text-sm whitespace-nowrap truncate max-w-[150px] sm:max-w-none inline-block ${
           index === items.length - 1
             ? 'text-gray-900 font-medium'
             : 'text-gray-500 hover:text-gray-700'
@@ -89,8 +89,8 @@ export default function Breadcrumb({ items }: BreadcrumbProps) {
   );
   
   return (
-    <nav className="flex w-full overflow-hidden" aria-label="Breadcrumb">
-      <ol className={`flex items-center flex-wrap sm:flex-nowrap w-full overflow-x-auto scrollbar-hide ${isRTL ? 'space-x-reverse space-x-2' : 'space-x-2'}`}>
+    <nav className="flex w-full" aria-label="Breadcrumb">
+      <ol className={`flex items-center flex-wrap sm:flex-nowrap w-full ${isRTL ? 'space-x-reverse space-x-2' : 'space-x-2'}`}>
         <li>
           <Link
             href={`/${currentLocale}`}
