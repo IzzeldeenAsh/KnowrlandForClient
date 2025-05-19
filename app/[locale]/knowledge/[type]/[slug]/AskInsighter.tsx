@@ -64,7 +64,7 @@ export default function AskInsighter({ knowledgeSlug, questions = [], is_owner =
     writeReply: isRTL ? '\u0627\u0643\u062a\u0628 \u0631\u062f\u0643...' : 'Write your reply...',
     writeAnswer: isRTL ? '\u0627\u0643\u062a\u0628 \u0625\u062c\u0627\u0628\u062a\u0643...' : 'Write your answer...',
     postQuestion: isRTL ? '\u0625\u0631\u0633\u0627\u0644 \u0627\u0644\u0633\u0624\u0627\u0644' : 'Send Question',
-    postReply: isRTL ? '\u0625\u0631\u0633\u0627\u0644 \u0627\u0644\u0631\u062f' : 'Reply',
+    postReply: isRTL ? '\u0625\u0631\u0633\u0627\u0644 \u0627\u0644\u0631\u062f' : 'Comment',
     postAnswer: isRTL ? '\u0625\u0631\u0633\u0627\u0644 \u0627\u0644\u0625\u062c\u0627\u0628\u0629' : 'Reply',
     cancelReply: isRTL ? '\u0625\u0644\u063a\u0627\u0621' : 'Cancel',
     reply: isRTL ? '\u0631\u062f' : 'Comment',
@@ -463,7 +463,7 @@ export default function AskInsighter({ knowledgeSlug, questions = [], is_owner =
             <div className={`${styles.commentContainer} ${styles.answer} `} dir={isRTL ? 'rtl' : 'ltr'}>
             
               
-              <article className={`${styles.commentBox} dark:bg-gray-800`}>
+              <article className={`${styles.commentBox}  `}>
                 <footer className="flex justify-between items-center ">
                   <div className="flex items-center ">
                   <div aria-hidden="true" className={styles.curveElement} role="button"></div>
@@ -500,7 +500,7 @@ export default function AskInsighter({ knowledgeSlug, questions = [], is_owner =
                   }
                 </Avatar>
               )}
-                    <p className="inline-flex items-center mx-3 text-sm text-gray-900 dark:text-white font-semibold">
+                    <p className="inline-flex  items-center mx-3 text-sm text-gray-900 dark:text-white font-semibold">
                       {question.answer.user.uuid ? (
                         <Link 
                           href={
@@ -527,7 +527,7 @@ export default function AskInsighter({ knowledgeSlug, questions = [], is_owner =
                 
              <div className="flex pb-4">
              <div aria-hidden="true" className={styles.emptyThread} role="button"/>
-             <p className="text-gray-800 dark:text-gray-300 text-sm ps-4">{question.answer.answer}</p>
+             <p className="text-gray-800 dark:text-gray-300 text-sm ps-4 bg-[#e6f1ff] p-4 rounded-lg flex-1">{question.answer.answer}</p>
              </div>
               </article>
           
