@@ -349,7 +349,7 @@ const KnowledgeSideBox = ({
             economic_blocs && economic_blocs.length > 0 && (
               <div className="tp-course-details2-widget-list-item flex items-center justify-between">
                 <span className="flex items-center gap-2 font-medium ">
-                  <GlobeAsiaAustraliaIcon className="w-7 h-7 me-2" />
+                  <GlobeAsiaAustraliaIcon className="w-5 h-5 me-2" />
                   {translations.economicBloc}
                 </span>
                 <div className={`field-content-container ${expandedSections.economicBlocs ? 'expanded' : ''}`}>
