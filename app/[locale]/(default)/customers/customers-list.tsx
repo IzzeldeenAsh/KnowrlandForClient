@@ -1,3 +1,5 @@
+'use client'
+
 import Link from 'next/link'
 import Image from 'next/image'
 import CustomerBg01 from '@/public/images/customer-bg-01.png'
