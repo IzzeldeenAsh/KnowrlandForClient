@@ -633,7 +633,7 @@
                 "sending": "Sending message...",
                 "contactUsSuccessSubtext": "We will get back to you as soon as possible"
         },
-    "dataNotAvailable": "No Knowledge Available",
+    "dataNotAvailable": "No Knowledge Available Yet",
     "industryKnowledge": "Explore knowledge in {industry}",
     "subIndustry": "Sub Industry",
     "subIndustryKnowledge": "Explore knowledge in {subIndustry}",

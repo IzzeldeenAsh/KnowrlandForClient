@@ -9,12 +9,8 @@ import { UserProfile } from './header/components/UserProfile'
 import { useTranslations } from 'next-intl'
 import { usePathname } from 'next/navigation'
 import { useRouter } from '@/i18n/routing'
-import AppLoader from './AppLoader'
 import { useLoading } from '@/components/context/LoadingContext'
 import Particles from '@/components/particles'
-import Image from 'next/image'
-import Illustration from '@/public/images/glow-bottom-blue.svg'
-import NotificationBell from './header/components/NotificationBell'
 
 // Add CSS for text glow effect
 import './text-glow.css'
