@@ -246,7 +246,7 @@ export default async function IndustryPage({ params }: Props) {
                         opacity-0 group-hover:opacity-100 
                         pointer-events-none transition-opacity duration-300`}
                       >
-                        {locale === 'ar' ? 'البيانات غير متوفرة' : 'Data not available'}
+                        {locale === 'ar' ? 'البيانات غير متوفرة' : 'No Knowledge Available Yet'}
                       </div>
                     )}
                   </div>
