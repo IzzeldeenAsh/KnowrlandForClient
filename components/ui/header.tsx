@@ -14,6 +14,7 @@ import { useLoading } from '@/components/context/LoadingContext'
 import Particles from '@/components/particles'
 import Image from 'next/image'
 import Illustration from '@/public/images/glow-bottom-blue.svg'
+import NotificationBell from './header/components/NotificationBell'
 
 // Add CSS for text glow effect
 import './text-glow.css'
@@ -235,7 +236,7 @@ export default function Header() {
       {/* Illustration */}
    
       
-      <div className="mx-auto px-4 sm:px-6 max-w-full overflow-hidden relative z-30">
+      <div className="mx-auto px-4 sm:px-6 max-w-full relative z-10">
         <div className="flex items-center justify-between h-16 md:h-20">
 
           {/* Site branding */}
@@ -360,9 +361,15 @@ export default function Header() {
             {isLoading ? (
               <div className="w-10 h-10 bg-white animate-pulse rounded-full overflow-hidden border border-gray-200"></div>
             ) : user ? (
-              <li>
-                <UserProfile isHome={true} />
-              </li>
+              <>
+                {/* Notification Bell - add z-index */}
+                {/* <li className="mr-2 flex items-center relative z-20">
+                  <NotificationBell />
+                </li> */}
+                <li>
+                  <UserProfile isHome={true} />
+                </li>
+              </>
             ) : (
               <li>
                 <Link className="btn-sm text-slate-300 hover:text-white [background:linear-gradient(theme(colors.slate.900),_theme(colors.slate.900))_padding-box,_conic-gradient(theme(colors.slate.400),_theme(colors.slate.700)_25%,_theme(colors.slate.700)_75%,_theme(colors.slate.400)_100%)_border-box] before:bg-slate-800/30 hover:scale-105 active:scale-95 transition-all duration-150 ease-in-out group relative before:absolute before:inset-0 before:rounded-full before:pointer-events-none" 

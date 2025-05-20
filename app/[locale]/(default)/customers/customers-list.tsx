@@ -46,7 +46,6 @@ export default function CustomersList() {
 
       {items.map((item, index) => (
         <div key={index}>
-          <Link href={item.link}>
             <HighlighterItem02>
               <div className="relative h-full bg-slate-900 rounded-[inherit] z-20 overflow-hidden">
                 {/* Particles animation */}
@@ -61,7 +60,6 @@ export default function CustomersList() {
                 </div>
               </div>
             </HighlighterItem02>
-          </Link>
         </div>
       ))}
 
