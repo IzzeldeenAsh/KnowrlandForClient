@@ -618,5 +618,11 @@
         "subIndustry": "الصناعة الفرعية",
         "subIndustryKnowledge": "نوع المعرفة المتوفرة في {subIndustry}",
         "topicKnowledge": "نوع المعرفة المتوفرة في {topic}",
-        "topicLabel": "الموضوع"
-}
+        "topicLabel": "الموضوع",
+        "Notifications": {
+            "TITLE": "الإشعارات",
+            "NO_NEW": "لا توجد إشعارات جديدة",
+            "VIEW": "عرض"
+        }
+    }
+ 
