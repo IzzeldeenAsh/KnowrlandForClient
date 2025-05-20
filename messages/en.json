@@ -637,5 +637,10 @@
     "industryKnowledge": "Explore knowledge in {industry}",
     "subIndustry": "Sub Industry",
     "subIndustryKnowledge": "Explore knowledge in {subIndustry}",
-    "topicLabel": "Topic"
+    "topicLabel": "Topic",
+    "Notifications": {
+        "TITLE": "Notifications",
+        "NO_NEW": "No new notifications",
+        "VIEW": "View"
+    }
 }
