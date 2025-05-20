@@ -714,7 +714,7 @@ export default function ProfilePage() {
                         <p className="bg-clip-text text-transparent bg-gradient-to-r from-emerald-600 to-teal-500 font-bold text-4xl">{knowledgeData?.meta.total || 0}</p>
                       
                       </div>
-                      <div className="text-start bg-gradient-to-br from-white to-blue-50 dark:from-slate-700 dark:to-slate-600 p-3 rounded-lg hover:shadow-md transition-all duration-300 transform hover:-translate-y-1 border border-gray-100 dark:border-slate-600 group">
+                      {/* <div className="text-start bg-gradient-to-br from-white to-blue-50 dark:from-slate-700 dark:to-slate-600 p-3 rounded-lg hover:shadow-md transition-all duration-300 transform hover:-translate-y-1 border border-gray-100 dark:border-slate-600 group">
                         <div className="flex items-center mb-2">
                           <div className="p-1.5 bg-blue-100 dark:bg-blue-900/30 rounded-full me-2 group-hover:scale-110 transition-transform">
                             <IconSchool 
@@ -727,7 +727,7 @@ export default function ProfilePage() {
                         </div>
                         <p className="bg-clip-text text-transparent bg-gradient-to-r from-blue-500 to-teal-500 font-bold text-4xl">0</p>
                        
-                      </div>
+                      </div> */}
                
                  
                     </div>
