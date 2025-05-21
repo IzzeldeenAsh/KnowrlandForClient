@@ -21,7 +21,7 @@ const NotificationIcon = () => (
     strokeWidth="2" 
     strokeLinecap="round" 
     strokeLinejoin="round" 
-    className="w-6 h-6"
+    className="w-5 h-5"
   >
     <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
     <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
@@ -119,7 +119,7 @@ export default function NotificationBell() {
   return (
     <div className="relative notification-item">
       <button
-        className="flex items-center justify-center w-10 h-10 rounded-full bg-white hover:bg-gray-100 focus:outline-none transition-all duration-200 notification-toggle shadow-sm hover:shadow border border-gray-200"
+        className="flex items-center text-gray-600 justify-center w-10 h-10 rounded-full bg-white hover:bg-gray-100 focus:outline-none transition-all duration-200 notification-toggle shadow-sm hover:shadow border border-gray-200"
         onClick={toggleNotifications}
         aria-label="Notifications"
       >
