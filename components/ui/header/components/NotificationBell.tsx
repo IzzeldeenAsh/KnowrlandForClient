@@ -119,7 +119,7 @@ export default function NotificationBell() {
   return (
     <div className="relative notification-item">
       <button
-        className="flex items-center text-gray-600 justify-center w-10 h-10 rounded-full bg-white hover:bg-gray-100 focus:outline-none transition-all duration-200 notification-toggle shadow-sm hover:shadow border border-gray-200"
+        className="flex items-center text-gray-400 justify-center w-8 h-8 rounded-full hover:bg-gray-100 focus:outline-none transition-all duration-200 notification-toggle hover:shadow "
         onClick={toggleNotifications}
         aria-label="Notifications"
       >

@@ -146,7 +146,7 @@ export default function Features() {
         <div className="pt-16 pb-12 sm:pt-20 md:pt-28 lg:pt-32 sm:pb-16 md:pb-20">
           <div>
             {/* Section content */}
-            <div className="max-w-xl mx-auto md:max-w-none flex flex-col sm:flex-col md:flex-row space-y-8 space-y-reverse md:space-y-0 gap-8 items-start justify-between">
+            <div className="max-w-xl mx-auto md:max-w-none flex flex-col sm:flex-col md:flex-row space-y-8 space-y-reverse md:space-y-0 gap-8 items-center justify-between">
               {/* Content */}
               <div
                 className="flex-1 order-1 max-md:text-center sm:max-w-xl md:max-w-lg"
@@ -196,15 +196,15 @@ export default function Features() {
               <div className="w-full sm:w-4/5 md:w-1/2" data-aos="fade-up" data-aos-delay="100">
                 <figure className="rounded-3xl p-px mb-8">
                 <div className="relative flex items-center justify-center" style={{ width: '100%', height: '500px', overflow: 'hidden' }}>
-                    {/* <Image
-                      className={`w-full rounded-[inherit] transition-all duration-700 ease-in-out absolute inset-0`}
-                      src={'https://res.cloudinary.com/dsiku9ipv/image/upload/v1746977594/tre_iskrzf.png'}
+                    <Image
+                      className={`w-full rounded-[inherit] transition-all duration-700 ease-in-out absolute inset-0 my-auto`}
+                      src={locale === 'ar' ? 'https://res.cloudinary.com/dsiku9ipv/image/upload/v1747829666/search-by-ara_dkpcv6.png' : 'https://res.cloudinary.com/dsiku9ipv/image/upload/v1747832518/Group_13495_kf7osl.png'}
                         width={500}
                       height={500}
                       alt="Feature 1 - Image 1"
                       style={{ objectFit: 'cover' }}  
-                    /> */}
-                             <figure className=" rounded-3xl p-px mb-8 overflow-hidden mt-10 max-w-[600px] h-[500px] w-[500px] mx-auto">
+                    />
+                             {/* <figure className=" rounded-3xl p-px mb-8 overflow-hidden mt-10 max-w-[600px] h-[500px] w-[500px] mx-auto">
                   <video 
                     className={`w-full rounded-[inherit] transition-all duration-700 ease-in-out absolute inset-0`}
                     onMouseEnter={() => setIsVideoHovered(true)}
@@ -223,7 +223,7 @@ export default function Features() {
                       }
                     }}
                   />
-                </figure>
+                </figure> */}
                     {/* <Image
                       className={`w-full rounded-[inherit] transition-all duration-700 ease-in-out absolute inset-0 ${hoveredTab2 === 2 ? 'opacity-100' : 'opacity-0'}`}
                       src={ChangelogImg02}
