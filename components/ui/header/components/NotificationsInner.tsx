@@ -3,6 +3,7 @@ import { useEffect, useRef } from 'react'
 import Link from 'next/link'
 import { useTranslations } from 'next-intl'
 import { usePathname } from 'next/navigation'
+import { SvgIcon } from '../../SvgIcon'
 import Image from 'next/image'
 import { Notification } from '@/services/notifications.service'
 
@@ -65,97 +66,68 @@ const getTailwindColor = (color: string): string => {
 const getNotificationIconName = (subType: string): string => {
   switch (subType) {
     case 'activate_company':
-      return 'general/gen048';
+      return 'duotune/arrows/arr086.svg';
     case 'deactivate_company':
     case 'deactivate_company_with_delete':
     case 'deactivate_delete_company':
-      return 'general/gen050';
+      return 'duotune/general/gen047.svg';
     case 'activate_insighter':
-      return 'general/gen048';
+      return 'duotune/arrows/arr086.svg';
     case 'deactivate_insighter':
     case 'deactivate_insighter_with_delete':
     case 'deactivate_delete_insighter':
-      return 'general/gen050';
+      return 'duotune/general/gen047.svg';
     case 'accept_knowledge':
     case 'knowledge_accept':
-      return 'general/gen048';
+      return 'duotune/files/fil025.svg';
     case 'declined':
     case 'knowledge_declined':
-      return 'general/gen050';
+      return 'duotune/general/gen050.svg';
     case 'download':
-      return 'files/fil025';
+      return 'duotune/files/fil025.svg';
     case 'upload':
-      return 'files/fil022';
+      return 'duotune/files/fil022.svg';
     case 'comment':
-      return 'communication/com003';
+      return 'duotune/communication/com003.svg';
     case 'reply':
-      return 'communication/com012';
+      return 'duotune/communication/com012.svg';
     case 'like':
-      return 'general/gen030';
+      return 'duotune/general/gen030.svg';
     case 'save':
-      return 'general/gen019';
+      return 'duotune/general/gen019.svg';
     case 'share':
-      return 'general/gen016';
+      return 'duotune/general/gen016.svg';
     case 'view':
-      return 'general/gen007';
+      return 'duotune/general/gen007.svg';
     default:
-      return 'general/gen007';
+      return 'duotune/general/gen007.svg';
   }
 }
 
 // Helper function to determine icon based on notification sub_type
-const getNotificationIcon = (subType: string): React.ReactNode => {
-  // Map Angular SVG icons to our own SVG components
-  // We use a simplified set - you can expand this with more icons
-  const iconType = getNotificationIconName(subType);
+const getNotificationIcon = (subType: string, color?: string): React.ReactNode => {
+  // Get the SVG icon path from the duotune directory
+  const iconPath = getNotificationIconName(subType);
   
-  // Simple icons in SVG format based on notification type
-  const icons = {
-    // Success/Accept icons
-    'general/gen048': (
-      <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-        <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-      </svg>
-    ),
-    // Danger/Decline icons
-    'general/gen050': (
-      <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-        <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
-      </svg>
-    ),
-    // Download
-    'files/fil025': (
-      <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-        <path fillRule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clipRule="evenodd" />
-      </svg>
-    ),
-    // Upload
-    'files/fil022': (
-      <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-        <path fillRule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zM6.293 6.707a1 1 0 010-1.414l3-3a1 1 0 011.414 0l3 3a1 1 0 01-1.414 1.414L11 5.414V13a1 1 0 11-2 0V5.414L7.707 6.707a1 1 0 01-1.414 0z" clipRule="evenodd" />
-      </svg>
-    ),
-    // Comment
-    'communication/com003': (
-      <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-        <path fillRule="evenodd" d="M18 5v8a2 2 0 01-2 2h-5l-5 4v-4H4a2 2 0 01-2-2V5a2 2 0 012-2h12a2 2 0 012 2zM7 8H5v2h2V8zm2 0h2v2H9V8zm6 0h-2v2h2V8z" clipRule="evenodd" />
-      </svg>
-    ),
-    // Reply
-    'communication/com012': (
-      <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-        <path fillRule="evenodd" d="M7.707 3.293a1 1 0 010 1.414L5.414 7H11a7 7 0 017 7v2a1 1 0 11-2 0v-2a5 5 0 00-5-5H5.414l2.293 2.293a1 1 0 11-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clipRule="evenodd" />
-      </svg>
-    ),
-    // Default notification
-    'general/gen007': (
-      <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-        <path d="M10 2a6 6 0 00-6 6v3.586l-.707.707A1 1 0 004 14h12a1 1 0 00.707-1.707L16 11.586V8a6 6 0 00-6-6zM10 18a3 3 0 01-3-3h6a3 3 0 01-3 3z" />
-      </svg>
-    ),
+  // Get the Tailwind color from the notification color (if provided)
+  const tailwindColor = color ? getTailwindColor(color) : 'blue';
+  
+  // Create color-specific classes based on Tailwind colors
+  const colorClasses = {
+    'blue': 'text-blue-500',
+    'yellow': 'text-yellow-500',
+    'purple': 'text-purple-500',
+    'red': 'text-red-500',
+    'green': 'text-green-500'
   };
-
-  return icons[iconType as keyof typeof icons] || icons['general/gen007'];
+  
+  // Return a properly styled SVG Icon that can be colored like in Angular
+  return (
+    <SvgIcon 
+      src={`/${iconPath}`} 
+      className={`h-6 w-6 ${colorClasses[tailwindColor as keyof typeof colorClasses]}`}
+    />
+  );
 }
 
 // Helper function to determine display name based on notification sub_type
@@ -249,7 +221,7 @@ export default function NotificationsInner({
   return (
     <div 
       ref={componentRef}
-      className="w-80 sm:w-96 bg-white rounded-lg shadow-2xl overflow-hidden border border-gray-200 animate-fadeIn"
+      className="w-80 sm:w-96 bg-white rounded-lg shadow-2xl overflow-hidden  animate-fadeIn"
       style={{
         animation: 'fadeIn 0.2s ease-out',
         boxShadow: '0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)'
@@ -263,9 +235,10 @@ export default function NotificationsInner({
       `}</style>
 
       <div
-        className="bg-gradient-to-r from-blue-600 to-blue-800 px-5 py-4 text-white"
+        className="px-5 py-4 text-white"
+        style={{ backgroundImage: 'url(https://app.knoldg.com/assets/media/misc/menu-header-bg.jpg)', backgroundSize: 'cover', backgroundPosition: 'center' }}
       >
-        <h3 className="font-bold text-lg">
+        <h3 className="font-bold text-lg mt-4 mb-2">
           {t('TITLE')}
         </h3>
       </div>
@@ -292,25 +265,23 @@ export default function NotificationsInner({
           >
             <div className="flex items-start">
               <div className="flex-shrink-0 mr-3">
-                <div className={`w-10 h-10 rounded-full flex items-center justify-center bg-${getTailwindColor(getNotificationBg(notification.sub_type))}-100 text-${getTailwindColor(getNotificationBg(notification.sub_type))}-600`}>
-                  {getNotificationIcon(notification.sub_type)}
+                <div className={` h-12 w-12 rounded-md flex items-center justify-center bg-${getTailwindColor(getNotificationBg(notification.sub_type))}-100 text-${getTailwindColor(getNotificationBg(notification.sub_type))}-600`}>
+                {getNotificationIcon(notification.sub_type, getNotificationBg(notification.sub_type))}
                 </div>
               </div>
 
               <div className="flex-1 min-w-0">
-                <p className="font-medium text-gray-900">
+                <p className="font-semibold text-sm text-gray-900">
                   {getNotificationName(notification.sub_type)}
                 </p>
-                <p className="text-sm text-gray-500 truncate">
+                <p className="text-xs text-gray-400 ">
                   {notification.message}
                 </p>
-                <p className="text-xs text-gray-400 mt-1">
-                  {notification.read_at ? 'Read' : 'New'}
-                </p>
+             
               </div>
               
-              <div className="ml-3">
-                <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-${getTailwindColor(getNotificationBg(notification.sub_type))}-100 text-${getTailwindColor(getNotificationBg(notification.sub_type))}-800`}>
+              <div className="ml-3 mt-4">
+              <span className={`inline-flex items-center px-2 py-0.5 rounded-md text-xs font-semibold bg-[#EEF6FF] text-[#0978B9]`}>
                   {t('VIEW')}
                 </span>
               </div>
