@@ -14,6 +14,7 @@ import Particles from '@/components/particles'
 
 // Add CSS for text glow effect
 import './text-glow.css'
+import NotificationBell from './header/components/NotificationBell'
 
 interface User {
   name: string;
@@ -236,7 +237,7 @@ export default function Header() {
         <div className="flex items-center justify-between h-16 md:h-20">
 
           {/* Site branding */}
-          <div className="flex-shrink-0 w-[140px]">
+          <div className="flex-shrink-0 w-[40px] sm:w-[120px] md:w-[140px]">
             <Logo isHomePage={true} />
           </div>
 
@@ -340,7 +341,7 @@ export default function Header() {
           {/* Desktop sign in links */}
           <ul className="flex justify-end items-center flex-shrink-0">
             {/* Language Switch Button */}
-            <li className="mr-2 md:mr-4">
+            <li className="mx-2 ">
               <div className="flex items-center">
                 <button
                   onClick={() => switchLocale(pathname.split('/')[1] === 'en' ? 'ar' : 'en')}
@@ -354,18 +355,17 @@ export default function Header() {
               </div>
             </li>
             
+            {/* Always reserve space for notification bell */}
+            <li className="me-4 flex items-center relative z-20">
+              {user ? <NotificationBell /> : <div className="w-10 h-10 bg-white rounded-full border border-gray-200"></div>}
+            </li>
+            
             {isLoading ? (
               <div className="w-10 h-10 bg-white animate-pulse rounded-full overflow-hidden border border-gray-200"></div>
             ) : user ? (
-              <>
-                {/* Notification Bell - add z-index */}
-                {/* <li className="mr-2 flex items-center relative z-20">
-                  <NotificationBell />
-                </li> */}
-                <li>
-                  <UserProfile isHome={true} />
-                </li>
-              </>
+              <li>
+                <UserProfile isHome={true} />
+              </li>
             ) : (
               <li>
                 <Link className="btn-sm text-slate-300 hover:text-white [background:linear-gradient(theme(colors.slate.900),_theme(colors.slate.900))_padding-box,_conic-gradient(theme(colors.slate.400),_theme(colors.slate.700)_25%,_theme(colors.slate.700)_75%,_theme(colors.slate.400)_100%)_border-box] before:bg-slate-800/30 hover:scale-105 active:scale-95 transition-all duration-150 ease-in-out group relative before:absolute before:inset-0 before:rounded-full before:pointer-events-none" 
