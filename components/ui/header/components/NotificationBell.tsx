@@ -5,6 +5,7 @@ import NotificationsInner from './NotificationsInner'
 import { 
   getNotifications, 
   markNotificationAsRead, 
+  markAllNotificationsAsRead,
   startNotificationPolling, 
   subscribeToNotifications,
   Notification
@@ -27,61 +28,9 @@ const NotificationIcon = () => (
   </svg>
 )
 
-// Mock notifications for testing
-const mockNotifications: Notification[] = [
-  {
-    id: '1',
-    message: 'Your knowledge submission has been approved',
-    type: 'knowledge',
-    sub_type: 'accept_knowledge',
-    notifiable_group_id: '1',
-    notifiable_id: 1,
-    request_id: 1,
-    param: '123',
-    redirect_page: false,
-    read_at: undefined
-  },
-  {
-    id: '2',
-    message: 'New comment on your knowledge item',
-    type: 'comment',
-    sub_type: 'comment',
-    notifiable_group_id: '2',
-    notifiable_id: 2,
-    request_id: 2,
-    param: '456',
-    redirect_page: true,
-    read_at: undefined
-  },
-  {
-    id: '3',
-    message: 'Your company account has been activated',
-    type: 'company',
-    sub_type: 'activate_company',
-    notifiable_group_id: '3',
-    notifiable_id: 3,
-    request_id: 3,
-    param: '789',
-    redirect_page: false,
-    read_at: undefined
-  },
-  {
-    id: '4',
-    message: 'Your knowledge submission was declined',
-    type: 'knowledge',
-    sub_type: 'declined',
-    notifiable_group_id: '4',
-    notifiable_id: 4,
-    request_id: 4,
-    param: '101',
-    redirect_page: true,
-    read_at: undefined
-  }
-];
-
 export default function NotificationBell() {
   // Use mock data for testing or real notifications when they're available
-  const [notifications, setNotifications] = useState<Notification[]>(mockNotifications)
+  const [notifications, setNotifications] = useState<Notification[]>([])
   const [isOpen, setIsOpen] = useState(false)
   const pathname = usePathname()
   const locale = pathname.split('/')[1] || 'en'
@@ -118,7 +67,32 @@ export default function NotificationBell() {
   
   const toggleNotifications = (event: React.MouseEvent) => {
     event.stopPropagation()
+    
+    // Toggle notifications panel immediately
     setIsOpen(prev => !prev)
+    
+    // If we're opening notifications and there are unread notifications, mark all as read
+    if (notificationCount > 0) {
+      // Immediately mark all notifications as read in local state for UI feedback
+      setNotifications(prev => 
+        prev.map(notification => ({
+          ...notification, 
+          read_at: notification.read_at || new Date().toISOString()
+        }))
+      )
+      
+      // Call API to mark all notifications as read in the background
+      markAllNotificationsAsRead(locale)
+        .then(() => getNotifications(locale))
+        .then(updatedNotifications => {
+          if (updatedNotifications) {
+            setNotifications(updatedNotifications)
+          }
+        })
+        .catch(error => {
+          console.error('Error marking all notifications as read:', error)
+        })
+    }
   }
   
   const closeNotifications = () => {
@@ -150,13 +124,11 @@ export default function NotificationBell() {
         aria-label="Notifications"
       >
         <NotificationIcon />
-        {notificationCount > 0 && (
-          <span
-            className="absolute -top-1 -right-1 flex items-center justify-center w-5 h-5 text-xs font-bold text-white bg-red-600 rounded-full shadow-sm"
-          >
-            {notificationCount}
-          </span>
-        )}
+        <span
+          className={`absolute -top-1 -right-1 flex items-center justify-center w-5 h-5 text-xs font-bold text-white rounded-full shadow-sm ${notificationCount > 0 ? 'bg-red-600' : 'bg-transparent'}`}
+        >
+          {notificationCount > 0 ? notificationCount : ''}
+        </span>
       </button>
       
       {/* Notification dropdown - higher z-index and fixed position */}
