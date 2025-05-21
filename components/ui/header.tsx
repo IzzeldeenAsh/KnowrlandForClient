@@ -357,7 +357,7 @@ export default function Header() {
             
             {/* Always reserve space for notification bell */}
             <li className="me-4 flex items-center relative z-20">
-              {user ? <NotificationBell /> : <div className="w-10 h-10 bg-white rounded-full border border-gray-200"></div>}
+              {user ? <NotificationBell /> : ''}
             </li>
             
             {isLoading ? (
