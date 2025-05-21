@@ -101,7 +101,10 @@ export function UserProfile({ isHome }: { isHome: boolean }) {
     };
   }, [menuOpen]);
 
-  if (isLoading) {
+  // Only show loading state if we have a token (potential user)  
+  const hasToken = typeof localStorage !== 'undefined' && localStorage.getItem('token');
+
+  if (isLoading && hasToken) {
     return <div className="w-10 h-10 bg-white animate-pulse rounded-full overflow-hidden border border-gray-200"></div>;
   }
 

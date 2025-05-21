@@ -99,6 +99,10 @@ const getNotificationIconName = (subType: string): string => {
       return 'duotune/general/gen016.svg';
     case 'view':
       return 'duotune/general/gen007.svg';
+    case 'Question':
+      return 'duotune/communication/com007.svg';
+    case 'Answer Question':
+      return 'duotune/communication/com007.svg';
     default:
       return 'duotune/general/gen007.svg';
   }
@@ -265,7 +269,7 @@ export default function NotificationsInner({
           >
             <div className="flex items-start">
               <div className="flex-shrink-0 mr-3">
-                <div className={` h-12 w-12 rounded-md flex items-center justify-center bg-${getTailwindColor(getNotificationBg(notification.sub_type))}-100 text-${getTailwindColor(getNotificationBg(notification.sub_type))}-600`}>
+                <div className={` h-12 w-12 rounded-md flex items-center justify-center bg-${getTailwindColor(getNotificationBg(notification.sub_type))}-50 text-${getTailwindColor(getNotificationBg(notification.sub_type))}-600`}>
                 {getNotificationIcon(notification.sub_type, getNotificationBg(notification.sub_type))}
                 </div>
               </div>
