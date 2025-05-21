@@ -6,6 +6,7 @@ import HomeLogoImgEn from '@/public/images/Business-white.png'
 import HomeLogoImgAr from '@/public/images/KNOLDG- LOGO-29-29.png'
 import InnerLogoImgEn from '@/public/images/Business-colored.png'
 import InnerLogoImgAr from '@/public/images/KNOLDG-LOGO-12.png'
+import SmallLogo from '@/public/images/smallLogo.png'
 import { useEffect, useState } from 'react'
 import { usePathname } from 'next/navigation'
 
@@ -15,6 +16,7 @@ interface LogoProps {
 
 export default function Logo({ isHomePage = true }: LogoProps) {
   const [logoImg, setLogoImg] = useState(HomeLogoImgAr) // Default to Arabic home logo
+  const [smallLogoImg, setSmallLogoImg] = useState(SmallLogo) // Small logo for mobile
   const [locale, setLocale] = useState('ar') // Default to Arabic locale
   const pathname = usePathname()
 
@@ -40,7 +42,9 @@ export default function Logo({ isHomePage = true }: LogoProps) {
 
   return (
     <Link className="inline-flex" href={`/${locale}`} aria-label="Knoldg" onClick={handleLogoClick}>
-      <Image className="max-w-none" src={logoImg} width={120} height={60} priority alt="Knoldg" />
+      {/* Use small logo for mobile devices, regular logo for larger screens */}
+      <Image className="hidden md:block max-w-none" src={logoImg} width={120} height={60} priority alt="Knoldg" />
+      <Image className="block md:hidden max-w-none" src={smallLogoImg} width={40} height={40} priority alt="Knoldg" />
     </Link>
   )
 }
