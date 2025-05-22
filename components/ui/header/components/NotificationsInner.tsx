@@ -2,7 +2,7 @@
 import { useEffect, useRef } from 'react'
 import Link from 'next/link'
 import { useTranslations } from 'next-intl'
-import { usePathname } from 'next/navigation'
+import { usePathname, useParams } from 'next/navigation'
 import { SvgIcon } from '../../SvgIcon'
 import Image from 'next/image'
 import { Notification } from '@/services/notifications.service'
@@ -187,7 +187,9 @@ export default function NotificationsInner({
 }: NotificationsInnerProps) {
   const t = useTranslations('Notifications')
   const pathname = usePathname()
+  const params = useParams()
   const currentLanguage = pathname.split('/')[1] || 'en'
+  const isRTL = currentLanguage === 'ar' || currentLanguage === 'he'
   const componentRef = useRef<HTMLDivElement>(null)
   
   useEffect(() => {
@@ -225,10 +227,13 @@ export default function NotificationsInner({
   return (
     <div 
       ref={componentRef}
-      className="w-80 sm:w-96 bg-white rounded-lg shadow-2xl overflow-hidden  animate-fadeIn"
+      className="w-80 sm:w-96 bg-white rounded-lg shadow-2xl overflow-hidden animate-fadeIn"
       style={{
         animation: 'fadeIn 0.2s ease-out',
-        boxShadow: '0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)'
+        boxShadow: '0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)',
+        direction: isRTL ? 'rtl' : 'ltr',
+        right: isRTL ? '0' : 'auto',
+        left: isRTL ? 'auto' : '0'
       }}
     >
       <style jsx>{`
@@ -268,7 +273,7 @@ export default function NotificationsInner({
             className="p-4 border-b border-gray-100 hover:bg-blue-50 cursor-pointer transition-colors duration-200"
           >
             <div className="flex items-start">
-              <div className="flex-shrink-0 mr-3">
+              <div className={`flex-shrink-0 ${isRTL ? 'ml-3' : 'mr-3'}`}>
                 <div className={` h-12 w-12 rounded-md flex items-center justify-center bg-${getTailwindColor(getNotificationBg(notification.sub_type))}-50 text-${getTailwindColor(getNotificationBg(notification.sub_type))}-600`}>
                 {getNotificationIcon(notification.sub_type, getNotificationBg(notification.sub_type))}
                 </div>
@@ -284,7 +289,7 @@ export default function NotificationsInner({
              
               </div>
               
-              <div className="ml-3 mt-4">
+              <div className={`${isRTL ? 'mr-3' : 'ml-3'} mt-4`}>
               <span className={`inline-flex items-center px-2 py-0.5 rounded-md text-xs font-semibold bg-[#EEF6FF] text-[#0978B9]`}>
                   {t('VIEW')}
                 </span>
