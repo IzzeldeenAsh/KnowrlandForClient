@@ -10,7 +10,7 @@ import React, { useEffect, useState } from 'react';
 import Stripes from "@/public/images/stripes-dark.svg";
 import { Tabs } from '@mantine/core';
 import { useParams } from 'next/navigation';
-import { IconBrandFacebook, IconBrandX, IconBrandYoutube, IconBrandLinkedin, IconBrandInstagram, IconBrandFacebookFilled, IconBrandLinkedinFilled, IconBrandInstagramFilled, IconRosetteDiscountCheckFilled, IconFilter, IconFileReport, IconSchool } from '@tabler/icons-react';
+import {  IconBrandX, IconRosetteDiscountCheckFilled, IconFilter, IconFileReport, IconBrandHipchat } from '@tabler/icons-react';
 import { GlobeAsiaAustraliaIcon } from '@heroicons/react/24/outline';
 import KnowledgeGrid, { KnowledgeItem } from '@/app/[locale]/topic/[id]/[slug]/KnowledgeGrid';
 import NewCertificationIcon from '@/app/components/icons/NewCertificationIcon';
@@ -18,7 +18,6 @@ import FacebookIcon from '@/public/file-icons/facebook';
 import YoutubeIcon from '@/public/file-icons/youtube';
 import LinkedinIcon from '@/public/file-icons/linkedin';
 import InstagramIcon from '@/public/file-icons/instagram';
-import WhatsappIcon from '@/public/file-icons/whatsapp';
 import { useTranslations } from 'next-intl';
 import styles from './profile.module.css';
 import Link from 'next/link';
@@ -553,7 +552,7 @@ export default function ProfilePage() {
               <div className="flex flex-col md:flex-row gap-6">
                 {/* Profile Image */}
                 <div className="flex-shrink-0">
-                  <div className="w-32 h-32 rounded-xl  border-3 border-white dark:border-slate-800 shadow-md bg-white dark:bg-slate-700 relative">
+                  <div className="w-32 h-32 rounded-full  border border-blue-500 relative">
                     {(isCompany) && profileData.company?.logo ? (
                       <Link href={`${profileData.company?.uuid}`}>
                       <Image
@@ -561,7 +560,7 @@ export default function ProfilePage() {
                         alt={profileData.company?.legal_name || profileData.name}
                         width={400}
                         height={400}
-                        className="w-full h-full rounded-xl object-cover"
+                        className="w-full h-full rounded-full   object-cover"
                       />
                       </Link>
                     ) : profileData.profile_photo_url ? (
@@ -570,7 +569,7 @@ export default function ProfilePage() {
                         alt={profileData.name}
                         width={400}
                         height={400}
-                        className="w-full h-full rounded-xl object-cover"
+                        className="w-full h-full rounded-full object-cover"
                       />
                     ) : (
                       <div className="w-full h-full bg-gray-100 dark:bg-slate-700 flex items-center justify-center">
@@ -581,7 +580,7 @@ export default function ProfilePage() {
                       </div>
                     )}
                     {isCompanyInsighter && profileData.company?.logo && (
-                      <div className="absolute -bottom-3 -right-3 w-14 h-14 rounded-lg overflow-hidden shadow-sm bg-white dark:bg-slate-700 z-10">
+                      <div className="absolute -bottom-3 -right-3 w-14 h-14 rounded-full overflow-hidden shadow-sm bg-white dark:bg-slate-700 z-10 border-4 border-white bg-white">
                         <Link href={`${profileData.company?.uuid}`}>
                         <Image
                           src={profileData.company.logo}
@@ -594,14 +593,14 @@ export default function ProfilePage() {
                       </div>
                     )}
                       {isCompany && enterpriseType === 'insighter' && (
-                      <div className="absolute -bottom-3 -right-3 w-14 h-14 rounded-lg overflow-hidden shadow-md bg-white dark:bg-slate-700 z-10">
+                      <div className="absolute -bottom-3 -right-3 w-14 h-14 rounded-full border-4 border-white bg-white dark:bg-slate-700 z-10">
                         {profileData.profile_photo_url ? (
                           <Image
                             src={profileData.profile_photo_url}
                             alt={profileData.name}
                             width={80}
                             height={80}
-                            className="w-full h-full object-cover "
+                            className="w-full h-full object-cover border-3 border-white rounded-full"
                           />
                         ) : (
                           <div className="w-full h-full bg-gray-100 dark:bg-slate-700 flex items-center justify-center">
@@ -714,20 +713,22 @@ export default function ProfilePage() {
                         <p className="bg-clip-text text-transparent bg-gradient-to-r from-emerald-600 to-teal-500 font-bold text-4xl">{knowledgeData?.meta.total || 0}</p>
                       
                       </div>
-                      {/* <div className="text-start bg-gradient-to-br from-white to-blue-50 dark:from-slate-700 dark:to-slate-600 p-3 rounded-lg hover:shadow-md transition-all duration-300 transform hover:-translate-y-1 border border-gray-100 dark:border-slate-600 group">
-                        <div className="flex items-center mb-2">
-                          <div className="p-1.5 bg-blue-100 dark:bg-blue-900/30 rounded-full me-2 group-hover:scale-110 transition-transform">
-                            <IconSchool 
-                              size={18} 
-                              className="text-blue-500 dark:text-blue-400" 
-                              stroke={2} 
-                            />
-                          </div>
-                          <span className="text-xs font-medium text-transparent bg-clip-text bg-gradient-to-r from-blue-500 to-teal-500" dangerouslySetInnerHTML={{ __html: t('consultingSessions') }} />
+                 {
+                     enterpriseType === 'insighter' && (<div className="text-start bg-gradient-to-br from-white to-blue-50 dark:from-slate-700 dark:to-slate-600 p-3 rounded-lg hover:shadow-md transition-all duration-300 transform hover:-translate-y-1 border border-gray-100 dark:border-slate-600 group">
+                      <div className="flex items-center mb-2">
+                        <div className="p-1.5 bg-blue-100 dark:bg-blue-900/30 rounded-full me-2 group-hover:scale-110 transition-transform">
+                          <IconBrandHipchat 
+                            size={18} 
+                            className="text-blue-500 dark:text-blue-400" 
+                            stroke={2} 
+                          />
                         </div>
-                        <p className="bg-clip-text text-transparent bg-gradient-to-r from-blue-500 to-teal-500 font-bold text-4xl">0</p>
-                       
-                      </div> */}
+                        <span className="text-xs font-medium text-transparent bg-clip-text bg-gradient-to-r from-blue-500 to-teal-500" dangerouslySetInnerHTML={{ __html: t('consultingSessions') }} />
+                      </div>
+                      <p className="bg-clip-text text-transparent bg-gradient-to-r from-blue-500 to-teal-500 font-bold text-4xl">0</p>
+                     
+                    </div> )
+                 }
                
                  
                     </div>
