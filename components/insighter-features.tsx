@@ -325,143 +325,143 @@ export default function InsighterFeatures() {
                   },
                   {
                     key: "internationalTrade",
-                    icon: "",
+                    icon: "/images/International-Trade.svg",
                   },
                   {
                     key: "investmentOpportunities",
-                    icon: "",
+                    icon: "/images/Investment-Opportunities.svg",
                   },
                   {
                     key: "investmentGrowthStrategies",
-                    icon: "",
+                    icon: "/images/Investment-&-Growth-Strategies.svg",
                   },
                   {
                     key: "businessStrategiesPlans",
-                    icon: "",
+                    icon: "/images/Business-Strategies-&-Plans.svg",
                   },
                   {
                     key: "currentStateAnalysis",
-                    icon: "",
+                    icon: "/images/Current-State-Analysis.svg",
                   },
                   {
                     key: "benchmarkingStudies",
-                    icon: "",
+                    icon: "/images/Benchmarking-Studies.svg",
                   },
                   {
                     key: "statistics",
-                    icon: "",
+                    icon: "/images/General-&-Sector-Specific-Statistics.svg",
                   },
                   {
                     key: "regulatoryPolicies",
-                    icon: "",
+                    icon: "/images/Official-Policies-&-Procedures.svg",
                   },
                   {
                     key: "technicalStudies",
-                    icon: "",
+                    icon: "/images/Official-Policies-&-Procedures.svg",
                   },
                   {
                     key: "supplierListsPriceQuotes",
-                    icon: "",
+                    icon: "/images/Supplier-Lists-&-Price-Quotes.svg",
                   },
                   {
                     key: "pricingStrategies",
-                    icon: "",
+                    icon: "/images/Pricing-Policies-&-Strategies.svg",
                   },
                   {
                     key: "marketTrendsPriceForecasts",
-                    icon: "",
+                    icon: "/images/Market-Trends-&-Price-Forecasts.svg",
                   },
                   {
                     key: "periodicReportsMarketInsights",
-                    icon: "",
+                    icon: "/images/Periodic-Reports-&-Market-Insights.svg",
                   },
                   {
                     key: "competitorAnalysis",
-                    icon: "",
+                    icon: "/images/Competitor-Analysis.svg",
                   },
                   {
                     key: "marketEntryStrategies",
-                    icon: "",
+                    icon: "/images/Market-Entry-Strategies.svg",
                   },
                   {
                     key: "exportOpportunities",
-                    icon: "",
+                    icon: "/images/Export-Opportunities-&-Potential-Clients.svg",
                   },
                   {
                     key: "feasibilityStudies",
-                    icon: "",
+                    icon: "/images/Feasibility-Studies.svg",
                   },
                   {
                     key: "digitalTransformation",
-                    icon: "",
+                    icon: "/images/Digital-Transformation-&-Automation.svg",
                   },
                   {
                     key: "complianceGovernance",
-                    icon: "",
+                    icon: "/images/Compliance-&-Governance-Policies.svg",
                   },
                   {
                     key: "organizationalChangePlans",
-                    icon: "",
+                    icon: "/images/Organizational-Change-Plans.svg",
                   },
                   {
                     key: "projectIdeasSolutions",
-                    icon: "",
+                    icon: "/images/Project-Ideas-&-Practical-Solutions.svg",
                   },
                   {
                     key: "focusGroupWorkshopOutputs",
-                    icon: "",
+                    icon: "/images/Focus-Group-&-Workshop-Outputs.svg",
                   },
                   {
                     key: "supplyChainSources",
-                    icon: "",
+                    icon: "/images/Supply-Chain-&-Input-Sources.svg",
                   },
                   {
                     key: "salesDataConsumerBehavior",
-                    icon: "",
+                    icon: "/images/Sales-Data-&-Consumer-Behavior.svg",
                   },
                   {
                     key: "operationalWorkEnvironment",
-                    icon: "",
+                    icon: "/images/Operational-Conditions-&-Work-Environment.svg",
                   },
                   {
                     key: "qualityMetrics",
-                    icon: "",
+                    icon: "/images/Quality-Metrics-&-Statistics.svg",
                   },
                   {
                     key: "operationalCaseStudies",
-                    icon: "",
+                    icon: "/images/Operational-Case-Studies.svg",
                   },
                   {
                     key: "rootCauseAnalysis",
-                    icon: "",
+                    icon: "/images/Results-&-Root-Cause-Analysis.svg",
                   },
                   {
                     key: "productionAssessment",
-                    icon: "",
+                    icon: "/images/Production-Line-&-Equipment-Assessment.svg",
                   },
                   {
                     key: "financialAnalysis",
-                    icon: "",
+                    icon: "/images/Financial-Data-&-Analysis.svg",
                   },
                   {
                     key: "businessNews",
-                    icon: "",
+                    icon: "/images/Business-News-&-Updates.svg",
                   },
                   {
                     key: "trainingContent",
-                    icon: "",
+                    icon: "/images/Training-&-Educational-Content.svg",
                   },
                   {
                     key: "skillDevelopmentPlans",
-                    icon: "",
+                    icon: "/images/Skill-Development-Plans.svg",
                   },
                   {
                     key: "businessTemplates",
-                    icon: "",
+                    icon: "/images/Business-Tools-&-Templates-(Excel, BI).svg",
                   },
                   {
                     key: "decisionMakingTools",
-                    icon: "",
+                    icon: "/images/Data-Analysis-&-Decision-Making-Tools.svg",
                   },
                 ]
                   .slice(0, visibleItems)
@@ -483,7 +483,7 @@ export default function InsighterFeatures() {
                           >
                             <div className="absolute inset-0 translate-z-0 rounded-full bg-slate-800 group-hover:bg-blue-500 transition-colors duration-500 ease-in-out blur-[60px]" />
                           </div>
-                          <div className="flex flex-col pb-4 p-6 h-[140px] items-center text-center justify-center">
+                          <div className="flex flex-col pb-4 p-6 h-[170px] items-center text-center justify-center">
                             {item.icon && (
                               <Image
                                 className="mb-4"
@@ -669,7 +669,6 @@ export default function InsighterFeatures() {
                 className="relative inline-flex items-center px-8 py-3 text-black font-medium rounded-full bg-gradient-to-r from-gray-200 via-white to-gray-200 hover:brightness-110 transition duration-300 ease-in-out shadow-[0_0_20px_rgba(78,113,255,0.4)] hover:shadow-[0_0_25px_rgba(78,113,255,0.7)]"
               >
                 {t("insighter.cta")}
-                <span className="ml-2">→</span>
               </Link>
          
             </div>

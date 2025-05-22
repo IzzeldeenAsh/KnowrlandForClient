@@ -34,6 +34,7 @@ export default function NotificationBell() {
   const [isOpen, setIsOpen] = useState(false)
   const pathname = usePathname()
   const locale = pathname.split('/')[1] || 'en'
+  const isRTL = locale === 'ar' || locale === 'he'
   
   // Get count of unread notifications
   const notificationCount = notifications.filter(n => !n.read_at).length
@@ -125,7 +126,7 @@ export default function NotificationBell() {
       >
         <NotificationIcon />
         <span
-          className={`absolute -top-1 -right-1 flex items-center justify-center w-5 h-5 text-xs font-bold text-white rounded-full shadow-sm ${notificationCount > 0 ? 'bg-red-600' : 'bg-transparent'}`}
+          className={`absolute -top-1 ${isRTL ? '-left-1' : '-right-1'} flex items-center justify-center w-5 h-5 text-xs font-bold text-white rounded-full shadow-sm ${notificationCount > 0 ? 'bg-red-600' : 'bg-transparent'}`}
         >
           {notificationCount > 0 ? notificationCount : ''}
         </span>
@@ -134,7 +135,12 @@ export default function NotificationBell() {
       {/* Notification dropdown - higher z-index and fixed position */}
       {isOpen && (
         <div className="fixed inset-0 w-full h-full bg-transparent z-[100]" onClick={closeNotifications}>
-          <div className="absolute right-5 top-16 md:right-20 md:top-16" onClick={e => e.stopPropagation()}>
+          <div 
+            className={`absolute top-16 md:top-16 ${
+              isRTL ? 'left-5 md:left-20' : 'right-5 md:right-20'
+            }`} 
+            onClick={e => e.stopPropagation()}
+          >
             <NotificationsInner 
               parent="client"
               onNotificationClick={handleNotificationClick} 
