@@ -65,6 +65,8 @@ export default async function RootLayout({
         {/* Add keenicons CSS */}
         <link rel="stylesheet" href="/keenicons.css" />
         <link rel="stylesheet" href="/assets/plugins/keenicons/duotone/style.css" />
+        <link rel="stylesheet" href="/assets/plugins/keenicons/outline/style.css" />
+        <link rel="stylesheet" href="/assets/plugins/keenicons/solid/style.css" />
         
         {/* Add a client-side script to handle problematic routes */}
         <script
