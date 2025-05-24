@@ -128,6 +128,7 @@ async function fetchKnowledgeData(type: string, slug: string, locale: string = '
     }
 
     const data = await response.json();
+    console.log('KNOWLEDGE DATA', data);
     return data;
   } catch (error) {
     console.error("Error fetching knowledge data:", error);
