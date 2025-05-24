@@ -739,48 +739,50 @@ export default function AskInsighter({ knowledgeSlug, questions = [], is_owner =
             </a>
           </div>
         ) : (
-          /* Show question form if user is logged in */
-          <form className="mb-6" onSubmit={handleQuestionSubmit}>
-            <div className="py-2 px-4 mb-4 bg-white rounded-lg rounded-t-lg border border-gray-200 dark:bg-gray-800 dark:border-gray-700">
-              <label htmlFor="question" className="sr-only">
-                {translations.writeQuestion}
-              </label>
-              <div className="flex flex-col">
-                <textarea
-                  id="question"
-                  rows={3}
-                  className="px-0 w-full text-sm text-gray-900 border-0 focus:ring-0 focus:outline-none dark:text-white dark:placeholder-gray-400 dark:bg-gray-800"
-                  placeholder={translations.writeQuestion}
-                  value={questionText}
-                  onChange={(e) => setQuestionText(e.target.value)}
-                  required
-                  disabled={isSubmitting}
-                />
-                <div className="flex justify-end mt-2">
-                  <button
-                    type="submit"
-                    className="inline-flex items-center py-2 px-4 text-xs font-bold text-center text-white bg-gradient-to-r from-blue-500 to-teal-400 rounded-lg focus:ring-4 focus:ring-blue-200 dark:focus:ring-blue-900 hover:bg-blue-800 disabled:opacity-50 disabled:cursor-not-allowed"
+          /* Only show question form if user is logged in AND not the owner */
+          !is_owner && (
+            <form className="mb-6" onSubmit={handleQuestionSubmit}>
+              <div className="py-2 px-4 mb-4 bg-white rounded-lg rounded-t-lg border border-gray-200 dark:bg-gray-800 dark:border-gray-700">
+                <label htmlFor="question" className="sr-only">
+                  {translations.writeQuestion}
+                </label>
+                <div className="flex flex-col">
+                  <textarea
+                    id="question"
+                    rows={3}
+                    className="px-0 w-full text-sm text-gray-900 border-0 focus:ring-0 focus:outline-none dark:text-white dark:placeholder-gray-400 dark:bg-gray-800"
+                    placeholder={translations.writeQuestion}
+                    value={questionText}
+                    onChange={(e) => setQuestionText(e.target.value)}
+                    required
                     disabled={isSubmitting}
-                  >
-                    {isSubmitting ? translations.submittingQuestion : translations.postQuestion}
-                  </button>
+                  />
+                  <div className="flex justify-end mt-2">
+                    <button
+                      type="submit"
+                      className="inline-flex items-center py-2 px-4 text-xs font-bold text-center text-white bg-gradient-to-r from-blue-500 to-teal-400 rounded-lg focus:ring-4 focus:ring-blue-200 dark:focus:ring-blue-900 hover:bg-blue-800 disabled:opacity-50 disabled:cursor-not-allowed"
+                      disabled={isSubmitting}
+                    >
+                      {isSubmitting ? translations.submittingQuestion : translations.postQuestion}
+                    </button>
+                  </div>
                 </div>
               </div>
-            </div>
-            {submitError && (
-              <Notification
-                icon={<IconX size={20} />}
-                color="red"
-                onClose={() => setSubmitError('')}
-                mt="sm"
-                mb="md"
-                withCloseButton
-              >
-                {submitError}
-              </Notification>
-            )}
-   
-          </form>
+              {submitError && (
+                <Notification
+                  icon={<IconX size={20} />}
+                  color="red"
+                  onClose={() => setSubmitError('')}
+                  mt="sm"
+                  mb="md"
+                  withCloseButton
+                >
+                  {submitError}
+                </Notification>
+              )}
+     
+            </form>
+          )
         )}
         
         {/* Display all questions */}
