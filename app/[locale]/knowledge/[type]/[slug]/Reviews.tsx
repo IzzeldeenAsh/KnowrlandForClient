@@ -58,7 +58,8 @@ export default function Reviews({ knowledgeSlug, reviews, is_review, is_owner }:
     reviewSuccess: isRTL ? 'تم إرسال المراجعة بنجاح!' : 'Review submitted successfully!',
     signInRequired: isRTL ? 'يجب أن تكون مسجلاً للإضافة مراجعة.' : 'You must be signed in to leave a review.',
     errorSubmitting: isRTL ? 'حدث خطأ في إرسال المراجعة. يرجى المحاولة مرة أخرى.' : 'Error submitting review. Please try again.',
-    loadingReviews: isRTL ? 'جارِ تحميل المراجعات...' : 'Loading reviews...'
+    loadingReviews: isRTL ? 'جارِ تحميل المراجعات...' : 'Loading reviews...',
+    commentRequired: isRTL ? 'يرجى كتابة تعليق قبل الإرسال' : 'Please write a comment before submitting'
   };
 
   // Retrieve the token from localStorage
@@ -72,8 +73,8 @@ export default function Reviews({ knowledgeSlug, reviews, is_review, is_owner }:
   const router = useRouter();
   const [submit, setSubmit] = useState(false);
   
-  // Add a state to track if we're refreshing data after submission
-  const [refreshing, setRefreshing] = useState(false);
+  // Single unified loading state for submission and refreshing
+  const [submitting, setSubmitting] = useState(false);
   
   // We'll use toast directly instead of maintaining a separate displayError state
   
@@ -85,8 +86,8 @@ export default function Reviews({ knowledgeSlug, reviews, is_review, is_owner }:
   
   // Show toast notification when hookError changes - only show each unique error once
   useEffect(() => {
-    // Only show error toast if there's an error, we're not refreshing, and we haven't shown this error yet
-    if (hookError && !refreshing && !displayedErrors[hookError]) {
+    // Only show error toast if there's an error, we're not submitting, and we haven't shown this error yet
+    if (hookError && !submitting && !displayedErrors[hookError]) {
       // Show the error toast just once
       toast.error(hookError);
       
@@ -96,7 +97,7 @@ export default function Reviews({ knowledgeSlug, reviews, is_review, is_owner }:
         [hookError]: true
       }));
     }
-  }, [hookError, toast, refreshing, displayedErrors]);
+  }, [hookError, toast, submitting, displayedErrors]);
   
   // Initialize localReviews with the props reviews
   useEffect(() => {
@@ -134,8 +135,6 @@ export default function Reviews({ knowledgeSlug, reviews, is_review, is_owner }:
       }
     } catch (error) {
       console.error("Error fetching updated reviews:", error);
-    } finally {
-      setRefreshing(false);
     }
   };
   
@@ -143,12 +142,18 @@ export default function Reviews({ knowledgeSlug, reviews, is_review, is_owner }:
     e.preventDefault();
     
     // Prevent multiple submissions
-    if (loading || refreshing) {
+    if (loading || submitting) {
       return;
     }
     
     if (rate === 0) {
-      toast.error("Please select a rating before submitting");
+      toast.error(isRTL ? "يرجى اختيار تقييم قبل الإرسال" : "Please select a rating before submitting");
+      return;
+    }
+    
+    // Add validation for empty comment
+    if (!comment.trim()) {
+      toast.error(isRTL ? "يرجى كتابة تعليق قبل الإرسال" : "Please write a comment before submitting");
       return;
     }
     
@@ -159,97 +164,46 @@ export default function Reviews({ knowledgeSlug, reviews, is_review, is_owner }:
     setDisplayedErrors({});
     
     // Begin loading state
-    setRefreshing(true);
+    setSubmitting(true);
     
     try {
       // Send the review to the API
       await postReview(rate, safeComment);
       
-      // IMPORTANT: Wait for the next tick to check if the hook reported an error
-      // This ensures we have the latest hookError state
-      await new Promise(resolve => setTimeout(resolve, 0));
-      
-      // Only proceed if there's no error from the hook
-      if (!hookError && success) {
-        // Create a new review to show immediately
-        const newReview: ReviewItem = {
-          id: Date.now(), // Temporary ID
-          rate,
-          comment: safeComment,
-          user_name: "You", // This will be replaced when data refreshes
-          created_date: new Date().toISOString(),
-        };
-        
-        // Temporarily add the new review to our local reviews array
-        setLocalReviews(prevReviews => [newReview, ...prevReviews]);
-        
-        // Set submit to true to hide the form
-        setSubmit(true);
-        
-        // Show success toast - but only if we don't have an error
-        if (!hookError) {
-          toast.success(translations.reviewSuccess);
-        }
-        
-        // Reset form
-        setRate(0);
-        setComment("");
-        
-        // Multi-level refresh approach
-        // 1. Refresh Next.js router data
-        router.refresh();
-        
-        // 2. Directly fetch updated reviews after a short delay
-        setTimeout(() => {
-          fetchUpdatedReviews();
-        }, 1000);
-        
-        // 3. Force a page reload after a delay to ensure everything is updated
-        setTimeout(() => {
-          window.location.href = window.location.href;
-        }, 2500);
+      // Check for hook errors
+      if (hookError) {
+        toast.error(hookError);
+        return;
       }
+      
+      // Show success message and always refresh the page
+      // Don't check success state here since it might not be updated yet
+      toast.success(translations.reviewSuccess);
+        
+      // Always refresh the page after a successful API call
+      setTimeout(() => {
+        window.location.reload();
+      }, 500);
     } catch (error) {
       console.error("Error submitting review:", error);
       
       // Handle error that wasn't caught by the hook
       if (error instanceof Error) {
         const errorMessage = error.message;
-        
-        // Use our displayedErrors state to track this error
-        if (!displayedErrors[errorMessage]) {
-          toast.error(errorMessage);
-          setDisplayedErrors(prev => ({
-            ...prev,
-            [errorMessage]: true
-          }));
-        }
+        toast.error(errorMessage);
+      } else {
+        toast.error(translations.errorSubmitting);
       }
     } finally {
-      // Always end the refreshing state
-      setRefreshing(false);
+      // Always end the submitting state
+      setSubmitting(false);
     }
   };
   
-  // Handle server errors similar to Angular implementation
-  const handleServerErrors = (error: any) => {
-    // Check if error has a response with errors object
-    if (error.response && error.response.data && error.response.data.errors) {
-      // Just display the first error message to avoid multiple toasts
-      const errorData = error.response.data;
-      const firstErrorKey = Object.keys(errorData.errors)[0];
-      if (firstErrorKey && errorData.errors[firstErrorKey][0]) {
-        toast.error(errorData.errors[firstErrorKey][0]);
-        return;
-      }
-    }
-    
-    // Fallback to generic error handling
-    toast.error(translations.errorSubmitting);
-  }
 
-  // Combined loading state - show loader if we're either submitting a review or refreshing the page
-  const isLoading = loading || refreshing;
+
+  // Use a single loading state for the entire component
+  const isLoading = loading || submitting;
 
   // Determine which reviews to display - prioritize fresh data
   const displayReviews = localReviews && localReviews.length > 0 ? localReviews : reviews || [];
@@ -258,14 +212,7 @@ export default function Reviews({ knowledgeSlug, reviews, is_review, is_owner }:
     <div dir={isRTL ? 'rtl' : 'ltr'}>
      {token && !is_review && !is_owner && (
         <>
-          {refreshing ? (
-            <Card padding="lg" radius="md" withBorder mt={'md'} mb={'md'}>
-              <div className="flex flex-col items-center justify-center py-4">
-                <Loader size="sm" />
-                <Text size="sm" mt={2} color="dimmed">{isRTL ? 'جارِ معالجة المراجعة...' : 'Processing your review...'}</Text>
-              </div>
-            </Card>
-          ) : !submit && (
+          {!submit && (
             <Card padding="lg" radius="md" withBorder mt={'md'} mb={'md'}>
               <form onSubmit={handleSubmit} className="space-y-4">
                 <div>
@@ -291,7 +238,7 @@ export default function Reviews({ knowledgeSlug, reviews, is_review, is_owner }:
               
                 <Button
                   type="submit"
-                  loading={loading}
+                  loading={isLoading}
                   mt="md"
                   className="bg-gradient-to-r from-blue-500 to-teal-400 hover:shadow-md transition-all duration-200 hover:-translate-y-1"
                 >
@@ -303,7 +250,7 @@ export default function Reviews({ knowledgeSlug, reviews, is_review, is_owner }:
         </>
       )}
         <div>
-          {isLoading ? (
+          {isLoading && !displayReviews.length ? (
             <div className="flex flex-col items-center justify-center py-8">
               <Loader size="md" />
               <Text size="sm" mt={2} color="dimmed">{translations.loadingReviews}</Text>
