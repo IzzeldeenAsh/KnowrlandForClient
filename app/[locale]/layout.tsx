@@ -10,6 +10,9 @@ import {notFound} from 'next/navigation';
 import {Locale, routing} from '@/i18n/routing';
 import Header from '@/components/ui/header';
 import { LoadingProvider } from '@/components/context/LoadingContext';
+import { ToastProvider } from '@/components/toast/ToastContext';
+import '@/components/toast/toast.css';
+import '@/components/toast/keenicons.css';
 import ClientLogoutHandler from './ClientLogoutHandler';
 
 const inter = Inter({
@@ -59,6 +62,10 @@ export default async function RootLayout({
   return (
     <html lang={locale} dir={direction} className="scroll-smooth">
       <head>
+        {/* Add keenicons CSS */}
+        <link rel="stylesheet" href="/keenicons.css" />
+        <link rel="stylesheet" href="/assets/plugins/keenicons/duotone/style.css" />
+        
         {/* Add a client-side script to handle problematic routes */}
         <script
           dangerouslySetInnerHTML={{
@@ -106,13 +113,15 @@ export default async function RootLayout({
         <MantineProvider>
           <AOSProvider>
             <NextIntlClientProvider messages={messages}>
-              <LoadingProvider>
-                <ClientLogoutHandler />
-                <Header />
-                <div className="flex flex-col min-h-screen overflow-hidden supports-[overflow:clip]:overflow-clip">
-                  {children}
-                </div>
-              </LoadingProvider>
+              <ToastProvider>
+                <LoadingProvider>
+                  <ClientLogoutHandler />
+                  <Header />
+                  <div className="flex flex-col min-h-screen overflow-hidden supports-[overflow:clip]:overflow-clip">
+                    {children}
+                  </div>
+                </LoadingProvider>
+              </ToastProvider>
             </NextIntlClientProvider>
           </AOSProvider>
         </MantineProvider>

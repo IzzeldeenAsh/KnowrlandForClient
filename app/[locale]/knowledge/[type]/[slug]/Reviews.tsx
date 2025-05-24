@@ -1,11 +1,12 @@
 'use client';
 
 import React, { useState, useEffect } from "react";
-import { Rating, Textarea, Button, Notification, Card, Text, Avatar, Loader } from "@mantine/core";
+import { Rating, Textarea, Button, Card, Text, Avatar, Loader } from "@mantine/core";
 import { IconX, IconCheck } from "@tabler/icons-react";
 import { useReview } from "@/hooks/knowledgs/useReview";
 import { useRouter, useParams } from "next/navigation";
 import Link from "next/link";
+import { useToast } from "@/components/toast/ToastContext";
 
 interface ReviewItem {
   id: number;
@@ -42,6 +43,9 @@ export default function Reviews({ knowledgeSlug, reviews, is_review, is_owner }:
   const locale = params.locale as string;
   const isRTL = locale === 'ar';
   
+  // Initialize toast service
+  const toast = useToast();
+  
   // Translations
   const translations = {
     allReviews: isRTL ? 'جميع المراجعات' : 'All Reviews',
@@ -71,18 +75,17 @@ export default function Reviews({ knowledgeSlug, reviews, is_review, is_owner }:
   // Add a state to track if we're refreshing data after submission
   const [refreshing, setRefreshing] = useState(false);
   
-  // Use the hookError to display in our component
-  const [displayError, setDisplayError] = useState<string | null>(null);
+  // We'll use toast directly instead of maintaining a separate displayError state
   
   // Add state to store the temporary review before page refresh
   const [localReviews, setLocalReviews] = useState<ReviewItem[]>([]);
   
-  // Update the displayError when hookError changes
+  // Show toast notification when hookError changes
   useEffect(() => {
     if (hookError) {
-      setDisplayError(hookError);
+      toast.error(hookError);
     }
-  }, [hookError]);
+  }, [hookError, toast]);
   
   // Initialize localReviews with the props reviews
   useEffect(() => {
@@ -127,10 +130,9 @@ export default function Reviews({ knowledgeSlug, reviews, is_review, is_owner }:
   
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setDisplayError(null); // Clear any previous errors
     
     if (rate === 0) {
-      setDisplayError("Please select a rating before submitting");
+      toast.error("Please select a rating before submitting");
       return;
     }
     
@@ -157,6 +159,9 @@ export default function Reviews({ knowledgeSlug, reviews, is_review, is_owner }:
         // Set submit to true to hide the form
         setSubmit(true);
         
+        // Show success toast
+        toast.success(translations.reviewSuccess);
+        
         // Reset form
         setRate(0);
         setComment("");
@@ -178,8 +183,16 @@ export default function Reviews({ knowledgeSlug, reviews, is_review, is_owner }:
     } catch (error) {
       console.error("Error submitting review:", error);
       setRefreshing(false);
+      
+      // Handle server errors using the toast service
+      handleServerErrors(error);
     }
   };
+  
+  // Handle server errors similar to Angular implementation
+  const handleServerErrors = (error: any) => {
+    toast.handleServerErrors(error);
+  }
 
   // Combined loading state - show loader if we're either submitting a review or refreshing the page
   const isLoading = loading || refreshing;
@@ -189,6 +202,41 @@ export default function Reviews({ knowledgeSlug, reviews, is_review, is_owner }:
 
   return (
     <div dir={isRTL ? 'rtl' : 'ltr'}>
+     {token && !is_review && !submit && !is_owner && (
+        <Card padding="lg" radius="md" withBorder mt={'md'} mb={'md'}>
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <div>
+              <Text fw={500} fs="xs" mb={5} className={isRTL ? 'text-right' : 'text-start'}>
+                {translations.rateKnowledge}
+              </Text>
+              {/* @ts-ignore: The current Rating type doesn't include the `max` prop */}
+              <Rating
+                fractions={1}
+                value={rate}
+                onChange={(value) => setRate(value)}
+              />
+            </div>
+            <div>
+              <Textarea
+                placeholder={translations.writeReview}
+                value={comment}
+                onChange={(e) => setComment(e.currentTarget.value)}
+                autosize
+                minRows={3}
+              />
+            </div>
+          
+            <Button
+              type="submit"
+              loading={loading}
+              mt="md"
+              className="bg-gradient-to-r from-blue-500 to-teal-400 hover:shadow-md transition-all duration-200 hover:-translate-y-1"
+            >
+              {translations.submitReview}
+            </Button>
+          </form>
+        </Card>
+      )}
         <div>
           {isLoading ? (
             <div className="flex flex-col items-center justify-center py-8">
@@ -200,7 +248,7 @@ export default function Reviews({ knowledgeSlug, reviews, is_review, is_owner }:
               {displayReviews.map((review) => (
                 <div
                   key={review.id}
-                  className="p-4 border rounded shadow-sm"
+                  className="p-4 border rounded shadow-sm bg-white"
                 >
                   <div className="flex items-center text-xs justify-between">
                     <div className="flex items-center gap-2">
@@ -250,66 +298,8 @@ export default function Reviews({ knowledgeSlug, reviews, is_review, is_owner }:
           )}
         </div>
         
-      {/* Success notification outside the form so it remains visible after submission */}
-      {success && !displayError && (
-        <Notification
-          icon={<IconCheck size={20} />}
-          color="teal"
-          title={translations.allGood}
-          onClose={() => {}}
-          mt="sm"
-          className="mb-4"
-        >
-          {translations.reviewSuccess}
-        </Notification>
-      )}
-      
       {/* Only show review form if user is logged in, hasn't already reviewed, and is not the owner */}
-      {token && !is_review && !submit && !is_owner && (
-        <Card padding="lg" radius="md" withBorder mt={'md'}>
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <div>
-              <Text fw={500} fs="xs" mb={5} className={isRTL ? 'text-right' : 'text-start'}>
-                {translations.rateKnowledge}
-              </Text>
-              {/* @ts-ignore: The current Rating type doesn't include the `max` prop */}
-              <Rating
-                fractions={1}
-                value={rate}
-                onChange={(value) => setRate(value)}
-              />
-            </div>
-            <div>
-              <Textarea
-                placeholder={translations.writeReview}
-                value={comment}
-                onChange={(e) => setComment(e.currentTarget.value)}
-                autosize
-                minRows={3}
-              />
-            </div>
-            {displayError && (
-              <Notification
-                icon={<IconX size={20} />}
-                color="red"
-                onClose={() => setDisplayError(null)}
-                withCloseButton
-                mt="sm"
-              >
-                {displayError}
-              </Notification>
-            )}
-            <Button
-              type="submit"
-              loading={loading}
-              mt="md"
-              className="bg-gradient-to-r from-blue-500 to-teal-400 hover:shadow-md transition-all duration-200 hover:-translate-y-1"
-            >
-              {translations.submitReview}
-            </Button>
-          </form>
-        </Card>
-      )}
+    
       
       {/* Show message explaining why owners can't review their own content */}
       {token && is_owner && (
