@@ -54,6 +54,8 @@ export const ToastProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   }, []);
 
   const showToast = useCallback((message: string, type: ToastType, title?: string, delay: number = 5000) => {
+    // Generate a unique ID based on message content and type to prevent duplicates
+    const contentHash = `${type}-${message}`;
     const id = Date.now().toString();
     
     title = title || {
@@ -73,7 +75,21 @@ export const ToastProvider: React.FC<{ children: React.ReactNode }> = ({ childre
       }[type];
     }
     
-    setToasts((prevToasts) => [...prevToasts, { id, message, type, title, delay }]);
+    // Check if we already have a toast with the same message and type
+    setToasts((prevToasts) => {
+      // If we already have this exact toast message and type, don't add a duplicate
+      const duplicateToast = prevToasts.find(t => 
+        t.message === message && t.type === type
+      );
+      
+      if (duplicateToast) {
+        // Just return the existing toasts without adding a duplicate
+        return prevToasts;
+      }
+      
+      // Otherwise add the new toast
+      return [...prevToasts, { id, message, type, title, delay }];
+    });
   }, []);
   
   const success = useCallback((message: string = 'Success', title: string = 'Success', delay?: number) => {
@@ -94,32 +110,57 @@ export const ToastProvider: React.FC<{ children: React.ReactNode }> = ({ childre
 
   // Function to handle server errors similar to Angular service
   const handleServerErrors = useCallback((err: any) => {
+    // Consolidate all error messages into a single message
+    let errorMessage = '';
+    
     if (err.error && err.error.errors) {
+      // Handle Angular-style error responses
       const serverErrors = err.error.errors;
+      const allMessages: string[] = [];
+      
       for (const key in serverErrors) {
         if (serverErrors.hasOwnProperty(key)) {
           const messages = serverErrors[key];
-          error(messages.join(', '), '', 10000);
+          if (Array.isArray(messages)) {
+            allMessages.push(...messages);
+          } else if (typeof messages === 'string') {
+            allMessages.push(messages);
+          }
         }
       }
+      
+      errorMessage = allMessages.join('. ');
     } else if (err.response && err.response.data && err.response.data.errors) {
       // Handle axios/fetch style error responses
       const serverErrors = err.response.data.errors;
+      const allMessages: string[] = [];
+      
       for (const key in serverErrors) {
         if (serverErrors.hasOwnProperty(key)) {
           const messages = serverErrors[key];
-          error(Array.isArray(messages) ? messages.join(', ') : messages, '', 10000);
+          if (Array.isArray(messages)) {
+            allMessages.push(...messages);
+          } else if (typeof messages === 'string') {
+            allMessages.push(messages);
+          }
         }
       }
+      
+      errorMessage = allMessages.join('. ');
     } else if (err.response && err.response.data && err.response.data.message) {
       // Handle single error message
-      error(err.response.data.message, '', 10000);
+      errorMessage = err.response.data.message;
     } else if (err.message) {
       // Handle simple error object with message
-      error(err.message, '', 10000);
+      errorMessage = err.message;
     } else {
       // Default error message
-      error('An unexpected error occurred.', '', 10000);
+      errorMessage = 'An unexpected error occurred.';
+    }
+    
+    // Show a single toast with all error messages
+    if (errorMessage) {
+      error(errorMessage, '', 10000);
     }
   }, [error]);
 
