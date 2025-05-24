@@ -166,25 +166,25 @@ export default function Features() {
                 </p>
                 <div className="mt-8 max-w-md space-y-2">
                   <button
-                    className={`flex items-center gap-2 text-start text-sm font-medium text-slate-50 rounded border bg-slate-800/25 w-full px-3 py-2 transition duration-150 ease-in-out hover:opacity-100 border-slate-700 opacity-70 min-h-[60px]`}
-                    onMouseEnter={() => setIsButtonsHovered(true)}
-                    onMouseLeave={() => setIsButtonsHovered(false)}
+                    className={`flex items-center gap-2 text-start text-sm font-medium text-slate-50 rounded border bg-slate-800/25 w-full px-3 py-2 transition duration-150 ease-in-out hover:opacity-100 border-slate-700 ${hoveredTab2 === 1 ? 'opacity-100' : 'opacity-70'} min-h-[60px]`}
+                    onMouseEnter={() => setHoveredTab2(1)}
+                    onMouseLeave={() => setHoveredTab2(null)}
                   >
                     <MagnifyingGlassCircleIcon className="w-5 h-5 flex-shrink-0 text-blue-300" />
                     <span>{t("tabs.preciseResults.title")}</span>
                   </button>
                   <button
-                    className={`flex items-center gap-2 text-start text-sm font-medium text-slate-50 rounded border bg-slate-800/25 w-full px-3 py-2 transition duration-150 ease-in-out hover:opacity-100 border-slate-700 opacity-70 min-h-[60px]`}
-                    onMouseEnter={() => setIsButtonsHovered(true)}
-                    onMouseLeave={() => setIsButtonsHovered(false)}
+                    className={`flex items-center gap-2 text-start text-sm font-medium text-slate-50 rounded border bg-slate-800/25 w-full px-3 py-2 transition duration-150 ease-in-out hover:opacity-100 border-slate-700 ${hoveredTab2 === 2 ? 'opacity-100' : 'opacity-70'} min-h-[60px]`}
+                    onMouseEnter={() => setHoveredTab2(2)}
+                    onMouseLeave={() => setHoveredTab2(null)}
                   >
                     <GlobeAltIcon className="w-5 h-5 flex-shrink-0 text-blue-300" />
                     <span>{t("tabs.variableData.title")}</span>
                   </button>
                   <button
-                    className={`flex items-center gap-2 text-start text-sm font-medium text-slate-50 rounded border bg-slate-800/25 w-full px-3 py-2 transition duration-150 ease-in-out hover:opacity-100 border-slate-700 opacity-70 min-h-[60px]`}
-                    onMouseEnter={() => setIsButtonsHovered(true)}
-                    onMouseLeave={() => setIsButtonsHovered(false)}
+                    className={`flex items-center gap-2 text-start text-sm font-medium text-slate-50 rounded border bg-slate-800/25 w-full px-3 py-2 transition duration-150 ease-in-out hover:opacity-100 border-slate-700 ${hoveredTab2 === 3 ? 'opacity-100' : 'opacity-70'} min-h-[60px]`}
+                    onMouseEnter={() => setHoveredTab2(3)}
+                    onMouseLeave={() => setHoveredTab2(null)}
                   >
                     <RocketLaunchIcon className="w-5 h-5 flex-shrink-0 text-blue-300" />
                     <span>{t("tabs.fasterDecisions.title")}</span>
@@ -197,7 +197,7 @@ export default function Features() {
                 <figure className="rounded-3xl p-px mb-8">
                 <div className="relative flex items-center justify-center" style={{ width: '100%', height: '500px', overflow: 'hidden' }}>
                     <Image
-                      className={`w-full rounded-[inherit] transition-all duration-700 ease-in-out absolute inset-0 my-auto`}
+                      className={`w-full rounded-[inherit] transition-all duration-700 ease-in-out absolute inset-0 my-auto ${hoveredTab2 === 1 || hoveredTab2 === null ? 'opacity-100' : 'opacity-0'}`}
                       src={locale === 'ar' ? 'https://res.cloudinary.com/dsiku9ipv/image/upload/v1747829666/search-by-ara_dkpcv6.png' : 'https://res.cloudinary.com/dsiku9ipv/image/upload/v1747832518/Group_13495_kf7osl.png'}
                         width={500}
                       height={500}
@@ -224,9 +224,9 @@ export default function Features() {
                     }}
                   />
                 </figure> */}
-                    {/* <Image
+                    <Image
                       className={`w-full rounded-[inherit] transition-all duration-700 ease-in-out absolute inset-0 ${hoveredTab2 === 2 ? 'opacity-100' : 'opacity-0'}`}
-                      src={ChangelogImg02}
+                      src={'https://res.cloudinary.com/dsiku9ipv/image/upload/v1748025536/New_Project_11_xenv7c.png'}
                       width={500}
                       height={500}
                       alt="Feature 1 - Image 2"
@@ -234,18 +234,20 @@ export default function Features() {
                     />
                     <Image
                       className={`w-full rounded-[inherit] transition-all duration-700 ease-in-out absolute inset-0 ${hoveredTab2 === 3 ? 'opacity-100' : 'opacity-0'}`}
-                      src={ChangelogImg01}
+                      src={'https://res.cloudinary.com/dsiku9ipv/image/upload/v1748087334/Group_13447_3_zjyfju.png'}
                       width={500}
                       height={500}
                       alt="Feature 1 - Image 3"
                       style={{ objectFit: 'cover' }}
-                    /> */}
+                    />
                   </div>
                 </figure>
               </div>
             </div>
           </div>
         </div>
+
+
         {/* Third */}
         <div className="pt-16 pb-12 sm:pt-20 md:pt-24 lg:pt-28 sm:pb-16 md:pb-20">
           <div>
@@ -298,17 +300,16 @@ export default function Features() {
               </div>
                  {/* Image */}
               <div className="w-full sm:w-4/5 md:w-1/2 order-2" data-aos="fade-up" data-aos-delay="100">
-                <figure className="bg-gradient-to-b from-slate-300/20 to-transparent rounded-3xl p-px mb-8">
-                <div className="relative flex items-center justify-center" style={{ width: '100%', height: '500px', overflow: 'hidden' }}>
+                <figure className=" rounded-3xl p-px mb-8">
+                <div className="relative flex items-center justify-center" style={{ width: '100%', overflow: 'hidden' }}>
             
-                <figure className=" rounded-3xl p-px mb-8 overflow-hidden mt-10 max-w-[600px] mx-auto">
-                  <video 
-                    className={`w-500px rounded-[inherit] transition-all duration-700 ease-in-out absolute inset-0`}
-                    autoPlay 
-                    loop 
-                    muted 
-                    playsInline
-                    src="/images/Pay-for-what-you-need.mp4"
+                <figure className="rounded-3xl p-px mb-8 overflow-hidden mt-10 w-[800px]  mx-auto">
+                  <Image
+                    className="w-full rounded-[inherit]"
+                    src="https://res.cloudinary.com/dsiku9ipv/image/upload/v1748087733/Group_13523_1_nk8pqq.png"
+                    width={800}
+                    height={800}
+                    alt="Pay for what you need"
                   />
                 </figure>
        

@@ -1,0 +1,87 @@
+@font-face {
+  font-family: 'keenicons-duotone';
+  src:  url('/assets/plugins/keenicons/duotone/fonts/keenicons-duotone.eot?eut7fk');
+  src:  url('/assets/plugins/keenicons/duotone/fonts/keenicons-duotone.eot?eut7fk#iefix') format('embedded-opentype'),
+    url('/assets/plugins/keenicons/duotone/fonts/keenicons-duotone.ttf?eut7fk') format('truetype'),
+    url('/assets/plugins/keenicons/duotone/fonts/keenicons-duotone.woff?eut7fk') format('woff'),
+    url('/assets/plugins/keenicons/duotone/fonts/keenicons-duotone.svg?eut7fk#keenicons-duotone') format('svg');
+  font-weight: normal;
+  font-style: normal;
+  font-display: block;
+}
+
+.ki-duotone {
+  /* use !important to prevent issues with browser extensions that change fonts */
+  font-family: 'keenicons-duotone' !important;
+  /* Modern alternative to 'speak: never' */
+  -webkit-font-feature-settings: 'liga';
+  font-feature-settings: 'liga';
+  text-rendering: optimizeLegibility;
+  font-style: normal;
+  font-weight: normal;
+  font-variant: normal;
+  text-transform: none;
+  line-height: 1;
+  position: relative;
+  display: inline-flex; 
+  direction: ltr;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Icon definitions for the most commonly used icons */
+.ki-duotone.ki-check-circle .path1:before {
+  content: "\e932";
+  opacity: 0.3;
+}
+
+.ki-duotone.ki-check-circle .path2:before {
+  content: "\e933";
+  position: absolute;
+  left: 0;
+}
+
+.ki-duotone.ki-cross-circle .path1:before {
+  content: "\ea27";
+  opacity: 0.3;
+}
+
+.ki-duotone.ki-cross-circle .path2:before {
+  content: "\ea28";
+  position: absolute;
+  left: 0;
+}
+
+.ki-duotone.ki-information-5 .path1:before {
+  content: "\ebf5";
+  opacity: 0.3;
+}
+
+.ki-duotone.ki-information-5 .path2:before {
+  content: "\ebf6";
+  position: absolute;
+  left: 0;
+}
+
+.ki-duotone.ki-notification-status .path1:before {
+  content: "\ed80";
+  opacity: 0.3;
+}
+
+.ki-duotone.ki-notification-status .path2:before {
+  content: "\ed81";
+  position: absolute;
+  left: 0;
+}
+
+.ki-duotone.ki-notification-status .path3:before {
+  content: "\ed82";
+  position: absolute;
+  left: 0;
+}
+
+.ki-duotone.ki-notification-status .path4:before {
+  content: "\ed83";
+  position: absolute;
+  left: 0;
+}

@@ -1,0 +1,135 @@
+/* Toast container styles */
+.toast-container {
+  position: fixed;
+  top: 1.5rem;
+  right: 1.5rem;
+  z-index: 1060;
+  max-width: 380px;
+}
+
+/* Base toast styles */
+.toast {
+  width: 380px;
+  max-width: 100%;
+  color: #3F4254;
+  background-color: #fff;
+  background-clip: padding-box;
+  border: none;
+  box-shadow: 0 0.1rem 1rem rgba(0, 0, 0, 0.1);
+  border-radius: 0.475rem;
+  overflow: hidden;
+  margin-bottom: 1rem;
+  transition: transform 0.15s ease-in-out, opacity 0.15s ease-in-out;
+}
+
+.toast.fade {
+  transition: opacity 0.15s linear;
+}
+
+.toast.show {
+  display: block;
+  opacity: 1;
+}
+
+.toast:not(.show) {
+  display: none;
+}
+
+/* Toast header styles */
+.toast-header {
+  display: flex;
+  align-items: center;
+  padding:0.5rem 1rem;
+  color: #181C32;
+  background-color: #ffffff;
+  background-clip: padding-box;
+  border-bottom: 1px solid #EFF2F5;
+}
+
+.toast-header .btn-close {
+  margin-left: 0.5rem;
+  margin-right: -0.25rem;
+  padding: 0.25rem;
+  background: transparent;
+  border: 0;
+  cursor: pointer;
+  opacity: 0.4;
+  font-size: 0.7rem;
+  font-weight: 500;
+  line-height: 1;
+  color: #A1A5B7;
+}
+
+.toast-header .btn-close:hover {
+  opacity: 0.75;
+}
+
+.toast-header .btn-close:focus {
+  outline: none;
+}
+
+.toast-header .me-auto {
+  margin-right: auto !important;
+  font-weight: 600;
+  font-size: 0.8rem;
+}
+
+.toast-header .toast-time {
+  color: #A1A5B7;
+  font-size: 0.75rem;
+}
+
+.toast-body {
+  padding:0.5rem 1rem;
+  font-size: 0.75rem;
+  line-height: 1.5;
+  color: #7E8299;
+}
+
+/* Colors for different toast types */
+.text-success {
+  color: #50CD89 !important;
+}
+
+.text-danger {
+  color: #F1416C !important;
+}
+
+.text-warning {
+  color: #FFC700 !important;
+}
+
+.text-info {
+  color: #009EF7 !important;
+}
+
+/* Font size utilities */
+.fs-2 {
+  font-size: 0.8rem !important;
+}
+
+/* Margin utilities */
+.me-3 {
+  margin-right: 0.75rem !important;
+}
+
+/* RTL support */
+[dir="rtl"] .toast-container {
+  right: auto;
+  left: 1rem;
+}
+
+[dir="rtl"] .toast-header .me-auto {
+  margin-right: 0 !important;
+  margin-left: auto !important;
+}
+
+[dir="rtl"] .toast-header .me-3 {
+  margin-right: 0 !important;
+  margin-left: 1rem !important;
+}
+
+[dir="rtl"] .toast-header .btn-close {
+  margin-left: -0.25rem;
+  margin-right: 0.5rem;
+}
