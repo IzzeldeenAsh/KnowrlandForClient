@@ -167,21 +167,59 @@ export default function Reviews({ knowledgeSlug, reviews, is_review, is_owner }:
     setSubmitting(true);
     
     try {
-      // Send the review to the API
-      await postReview(rate, safeComment);
+      // Instead of relying on the hook's state which may not update immediately,
+      // let's directly check the response from the API
+      const token = localStorage.getItem("token");
       
-      // Important: Check for hook errors AFTER the postReview has completed
-      // The hook will have updated its error state by now if there was a problem
-      if (hookError) {
-        // If there's an error, show it and don't proceed to success flow
-        toast.error(hookError);
+      if (!token) {
+        toast.error(translations.signInRequired);
         setSubmitting(false);
         return;
       }
       
-      // Only show success message if there was no error
-      toast.success(translations.reviewSuccess);
+      // Make the API call directly
+      const response = await fetch(
+        `https://api.knoldg.com/api/account/review/knowledge/${knowledgeSlug}`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "Accept": "application/json",
+            "Accept-Language": locale,
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({ rate, comment: safeComment }),
+        }
+      );
+      
+      // Parse the response
+      const data = await response.json();
+      
+      // Check if the response was successful
+      if (!response.ok) {
+        // Handle error response
+        let errorMessage = data.message || translations.errorSubmitting;
         
+        // Check for structured errors
+        if (data.errors) {
+          // Get first error message from each field
+          const errorMessages = Object.values(data.errors)
+            .map((fieldErrors: any) => Array.isArray(fieldErrors) ? fieldErrors[0] : fieldErrors)
+            .filter(Boolean);
+          
+          if (errorMessages.length > 0) {
+            errorMessage = errorMessages[0] as string;
+          }
+        }
+        
+        toast.error(errorMessage);
+        setSubmitting(false);
+        return;
+      }
+      
+      // If we got here, the submission was successful
+      toast.success(translations.reviewSuccess);
+      
       // Refresh the page after a successful API call
       setTimeout(() => {
         window.location.reload();
@@ -189,10 +227,9 @@ export default function Reviews({ knowledgeSlug, reviews, is_review, is_owner }:
     } catch (error) {
       console.error("Error submitting review:", error);
       
-      // Handle error that wasn't caught by the hook
+      // Handle network errors or other exceptions
       if (error instanceof Error) {
-        const errorMessage = error.message;
-        toast.error(errorMessage);
+        toast.error(error.message);
       } else {
         toast.error(translations.errorSubmitting);
       }
