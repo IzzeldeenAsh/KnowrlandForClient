@@ -170,17 +170,19 @@ export default function Reviews({ knowledgeSlug, reviews, is_review, is_owner }:
       // Send the review to the API
       await postReview(rate, safeComment);
       
-      // Check for hook errors
+      // Important: Check for hook errors AFTER the postReview has completed
+      // The hook will have updated its error state by now if there was a problem
       if (hookError) {
+        // If there's an error, show it and don't proceed to success flow
         toast.error(hookError);
+        setSubmitting(false);
         return;
       }
       
-      // Show success message and always refresh the page
-      // Don't check success state here since it might not be updated yet
+      // Only show success message if there was no error
       toast.success(translations.reviewSuccess);
         
-      // Always refresh the page after a successful API call
+      // Refresh the page after a successful API call
       setTimeout(() => {
         window.location.reload();
       }, 500);
@@ -195,8 +197,10 @@ export default function Reviews({ knowledgeSlug, reviews, is_review, is_owner }:
         toast.error(translations.errorSubmitting);
       }
     } finally {
-      // Always end the submitting state
-      setSubmitting(false);
+      // Always end the submitting state if we didn't already return early
+      if (submitting) {
+        setSubmitting(false);
+      }
     }
   };
   
