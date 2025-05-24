@@ -80,12 +80,23 @@ export default function Reviews({ knowledgeSlug, reviews, is_review, is_owner }:
   // Add state to store the temporary review before page refresh
   const [localReviews, setLocalReviews] = useState<ReviewItem[]>([]);
   
-  // Show toast notification when hookError changes
+  // Add a state to track which error messages we've already shown
+  const [displayedErrors, setDisplayedErrors] = useState<{[key: string]: boolean}>({});
+  
+  // Show toast notification when hookError changes - only show each unique error once
   useEffect(() => {
-    if (hookError) {
+    // Only show error toast if there's an error, we're not refreshing, and we haven't shown this error yet
+    if (hookError && !refreshing && !displayedErrors[hookError]) {
+      // Show the error toast just once
       toast.error(hookError);
+      
+      // Mark this error as displayed so we don't show it again
+      setDisplayedErrors(prev => ({
+        ...prev,
+        [hookError]: true
+      }));
     }
-  }, [hookError, toast]);
+  }, [hookError, toast, refreshing, displayedErrors]);
   
   // Initialize localReviews with the props reviews
   useEffect(() => {
@@ -131,24 +142,40 @@ export default function Reviews({ knowledgeSlug, reviews, is_review, is_owner }:
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
+    // Prevent multiple submissions
+    if (loading || refreshing) {
+      return;
+    }
+    
     if (rate === 0) {
       toast.error("Please select a rating before submitting");
       return;
     }
     
+    // Ensure comment is a string (force empty string if undefined/null)
+    const safeComment = comment || "";
+    
+    // Reset any previous errors so we start fresh
+    setDisplayedErrors({});
+    
+    // Begin loading state
+    setRefreshing(true);
+    
     try {
-      await postReview(rate, comment);
+      // Send the review to the API
+      await postReview(rate, safeComment);
       
-      // Check success state after postReview completes
-      if (!hookError) {
-        // Set refreshing to true before refreshing the page data
-        setRefreshing(true);
-        
+      // IMPORTANT: Wait for the next tick to check if the hook reported an error
+      // This ensures we have the latest hookError state
+      await new Promise(resolve => setTimeout(resolve, 0));
+      
+      // Only proceed if there's no error from the hook
+      if (!hookError && success) {
         // Create a new review to show immediately
         const newReview: ReviewItem = {
           id: Date.now(), // Temporary ID
           rate,
-          comment,
+          comment: safeComment,
           user_name: "You", // This will be replaced when data refreshes
           created_date: new Date().toISOString(),
         };
@@ -159,8 +186,10 @@ export default function Reviews({ knowledgeSlug, reviews, is_review, is_owner }:
         // Set submit to true to hide the form
         setSubmit(true);
         
-        // Show success toast
-        toast.success(translations.reviewSuccess);
+        // Show success toast - but only if we don't have an error
+        if (!hookError) {
+          toast.success(translations.reviewSuccess);
+        }
         
         // Reset form
         setRate(0);
@@ -174,24 +203,44 @@ export default function Reviews({ knowledgeSlug, reviews, is_review, is_owner }:
         setTimeout(() => {
           fetchUpdatedReviews();
         }, 1000);
-        
-        // 3. Force a page reload as the last resort after giving API time to update
-        setTimeout(() => {
-          window.location.href = window.location.href;
-        }, 2500);
       }
     } catch (error) {
       console.error("Error submitting review:", error);
-      setRefreshing(false);
       
-      // Handle server errors using the toast service
-      handleServerErrors(error);
+      // Handle error that wasn't caught by the hook
+      if (error instanceof Error) {
+        const errorMessage = error.message;
+        
+        // Use our displayedErrors state to track this error
+        if (!displayedErrors[errorMessage]) {
+          toast.error(errorMessage);
+          setDisplayedErrors(prev => ({
+            ...prev,
+            [errorMessage]: true
+          }));
+        }
+      }
+    } finally {
+      // Always end the refreshing state
+      setRefreshing(false);
     }
   };
   
   // Handle server errors similar to Angular implementation
   const handleServerErrors = (error: any) => {
-    toast.handleServerErrors(error);
+    // Check if error has a response with errors object
+    if (error.response && error.response.data && error.response.data.errors) {
+      // Just display the first error message to avoid multiple toasts
+      const errorData = error.response.data;
+      const firstErrorKey = Object.keys(errorData.errors)[0];
+      if (firstErrorKey && errorData.errors[firstErrorKey][0]) {
+        toast.error(errorData.errors[firstErrorKey][0]);
+        return;
+      }
+    }
+    
+    // Fallback to generic error handling
+    toast.error(translations.errorSubmitting);
   }
 
   // Combined loading state - show loader if we're either submitting a review or refreshing the page
