@@ -203,6 +203,11 @@ export default function Reviews({ knowledgeSlug, reviews, is_review, is_owner }:
         setTimeout(() => {
           fetchUpdatedReviews();
         }, 1000);
+        
+        // 3. Force a page reload after a delay to ensure everything is updated
+        setTimeout(() => {
+          window.location.href = window.location.href;
+        }, 2500);
       }
     } catch (error) {
       console.error("Error submitting review:", error);
@@ -251,40 +256,51 @@ export default function Reviews({ knowledgeSlug, reviews, is_review, is_owner }:
 
   return (
     <div dir={isRTL ? 'rtl' : 'ltr'}>
-     {token && !is_review && !submit && !is_owner && (
-        <Card padding="lg" radius="md" withBorder mt={'md'} mb={'md'}>
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <div>
-              <Text fw={500} fs="xs" mb={5} className={isRTL ? 'text-right' : 'text-start'}>
-                {translations.rateKnowledge}
-              </Text>
-              {/* @ts-ignore: The current Rating type doesn't include the `max` prop */}
-              <Rating
-                fractions={1}
-                value={rate}
-                onChange={(value) => setRate(value)}
-              />
-            </div>
-            <div>
-              <Textarea
-                placeholder={translations.writeReview}
-                value={comment}
-                onChange={(e) => setComment(e.currentTarget.value)}
-                autosize
-                minRows={3}
-              />
-            </div>
-          
-            <Button
-              type="submit"
-              loading={loading}
-              mt="md"
-              className="bg-gradient-to-r from-blue-500 to-teal-400 hover:shadow-md transition-all duration-200 hover:-translate-y-1"
-            >
-              {translations.submitReview}
-            </Button>
-          </form>
-        </Card>
+     {token && !is_review && !is_owner && (
+        <>
+          {refreshing ? (
+            <Card padding="lg" radius="md" withBorder mt={'md'} mb={'md'}>
+              <div className="flex flex-col items-center justify-center py-4">
+                <Loader size="sm" />
+                <Text size="sm" mt={2} color="dimmed">{isRTL ? 'جارِ معالجة المراجعة...' : 'Processing your review...'}</Text>
+              </div>
+            </Card>
+          ) : !submit && (
+            <Card padding="lg" radius="md" withBorder mt={'md'} mb={'md'}>
+              <form onSubmit={handleSubmit} className="space-y-4">
+                <div>
+                  <Text fw={500} fs="xs" mb={5} className={isRTL ? 'text-right' : 'text-start'}>
+                    {translations.rateKnowledge}
+                  </Text>
+                  {/* @ts-ignore: The current Rating type doesn't include the `max` prop */}
+                  <Rating
+                    fractions={1}
+                    value={rate}
+                    onChange={(value) => setRate(value)}
+                  />
+                </div>
+                <div>
+                  <Textarea
+                    placeholder={translations.writeReview}
+                    value={comment}
+                    onChange={(e) => setComment(e.currentTarget.value)}
+                    autosize
+                    minRows={3}
+                  />
+                </div>
+              
+                <Button
+                  type="submit"
+                  loading={loading}
+                  mt="md"
+                  className="bg-gradient-to-r from-blue-500 to-teal-400 hover:shadow-md transition-all duration-200 hover:-translate-y-1"
+                >
+                  {translations.submitReview}
+                </Button>
+              </form>
+            </Card>
+          )}
+        </>
       )}
         <div>
           {isLoading ? (
