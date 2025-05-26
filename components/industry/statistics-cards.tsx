@@ -13,6 +13,7 @@ import ReportIcon from "@/components/icons/ReportIcon";
 import CourseIcon from "@/components/icons/CourseIcon";
 import IntlMessageFormat from 'intl-messageformat';
 import { useMessages } from '@/hooks/useMessages';
+import { useTranslations } from 'next-intl';
 
 interface StatisticsCardsProps {
   type: 'industry' | 'subIndustry' | 'topic';
@@ -25,6 +26,7 @@ export default function StatisticsCards({ type, id, entityName }: StatisticsCard
   const locale = params.locale as string || 'en';
   const isRTL = locale === 'ar';
   const { messages } = useMessages();
+  const t = useTranslations();
   
   const useStatisticHook = {
     industry: useIndustryStatistic,
@@ -40,27 +42,26 @@ export default function StatisticsCards({ type, id, entityName }: StatisticsCard
   }
 
   // Get the appropriate message key based on the type
-  const getMessageKey = () => {
-    if (!messages) return 'Explore knowledge';
-    
-    switch(type) {
-      case 'industry': return messages?.industryKnowledge || 'Explore knowledge in {industry}';
-      case 'subIndustry': return messages?.subIndustryKnowledge || 'Explore knowledge in {subIndustry}';
-      case 'topic': return messages?.topicKnowledge || 'Explore knowledge in {topic}';
-      default: return 'Explore knowledge';
-    }
-  };
+   const getMessageKey = () => {
+      switch (type) {
+        case 'industry': return 'industryKnowledge';
+        case 'subIndustry': return 'subIndustryKnowledge';
+        case 'topic': return 'topicKnowledge';
+        default: return '';
+      }
+    };
+  const key = getMessageKey();
 
   // Get the format parameter name based on the type
-  const getFormatParam = () => {
-    const paramMap = {
-      'industry': 'industry',
-      'subIndustry': 'subIndustry',
-      'topic': 'topic'
-    };
+  // const getFormatParam = () => {
+  //   const paramMap = {
+  //     'industry': 'industry',
+  //     'subIndustry': 'subIndustry',
+  //     'topic': 'topic'
+  //   };
     
-    return { [paramMap[type]]: entityName };
-  };
+  //   return { [paramMap[type]]: entityName };
+  // };
 
   // Translations for stat types - handle both singular and plural forms
   const getStatLabel = (statType: string) => {
@@ -69,15 +70,15 @@ export default function StatisticsCards({ type, id, entityName }: StatisticsCard
     const typeLower = statType.toLowerCase();
     
     const translations: Record<string, string> = {
-      'report': 'تقرير',
-      'reports': 'تقارير',
-      'insight': 'رؤية',
-      'insights': 'رؤى',
-      'data': 'بيانات',
-      'manual': 'دليل',
-      'manuals': 'أدلة',
-      'course': 'دورة',
-      'courses': 'دورات'
+      'report': 'التقارير',
+      'reports': 'التقارير',
+      'insight': 'الرؤى',
+      'insights': 'الرؤى',
+      'data': 'البيانات',
+      'manual': 'الأدلة',
+      'manuals': 'الأدلة',
+      'course': 'الدورات',
+      'courses': 'الدورات'
     };
     
     return translations[typeLower] || statType;
@@ -142,12 +143,13 @@ export default function StatisticsCards({ type, id, entityName }: StatisticsCard
       {entityName && (
         <span className="inline-block px-5 py-1 text-xs font-semibold text-blue-500 bg-blue-100 rounded-md mb-2 uppercase w-100">
           {
-            new IntlMessageFormat(
-              getMessageKey(),
-              locale
-            ).format(getFormatParam())
-          }
-        </span>
+          t.rich(getMessageKey(), {
+              industry: () => <span className="font-extrabold underline">{entityName}</span>,
+              subIndustry: () => <span className="font-extrabold underline">{entityName}</span>,
+              topic: () => <span className="font-extrabold underline">{entityName}</span>,
+            })
+        }
+    </span>
       )}
       
       <div className={`grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 ${styles.statsContainer}`} dir={isRTL ? 'rtl' : 'ltr'}>

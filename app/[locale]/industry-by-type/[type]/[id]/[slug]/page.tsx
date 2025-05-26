@@ -13,6 +13,7 @@ import IndustryIcon from "@/components/icons/industry-icon";
 import AOS from 'aos';
 import { useIndustryByType } from '@/hooks/industries/useIndustryByType';
 import Stripes from "@/public/images/stripes-dark.svg";
+import { useTranslations } from 'next-intl';
 interface Topic {
   id: number;
   name: string;
@@ -47,6 +48,7 @@ export default function IndustryByTypePage({ params }: Props) {
   const id = parseInt(resolvedParams.id, 10);
   const slug = resolvedParams.slug;
   const locale = resolvedParams.locale || 'en';
+  const t = useTranslations();
 
   useEffect(() => {
     AOS.init({
@@ -111,8 +113,8 @@ export default function IndustryByTypePage({ params }: Props) {
           />
           <div className={styles.headerContent}>
             <div data-aos="fade-down">
-              <span className={styles.typeLabel}>
-                {capitalizeFirstLetter(type)}
+             <span className={styles.typeLabel}>
+                {t(`typeLabel.${type}`)}
               </span>
               <h3 className={styles.headerTitle}>
                 {industry?.name || 'Loading...'}
