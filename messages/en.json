@@ -304,13 +304,13 @@
         "topTag2":"ready to deliver measurable impact?"
     },
     "Footer": {
-        "copyright": " Knoldg.com - All rights reserved",
+        "copyright": "© 2025 Knoldg.com. All Rights Reserved.",
         "knowledge": {
             "title": "Knowledge",
             "insights": "Insights",
             "reports": "Reports",
             "data": "Data",
-            "manual": "Manual",
+            "manual": "Manuals",
             "courses": "Courses"
         },
         "company": {
@@ -424,10 +424,10 @@
         "company": "Company",
         "client": "Client",
         "addKnowledge": "Add Knowledge +",
-        "knowledgeBase": "knowledge library",
+        "knowledgeBase": "My knowledge library",
         "myProfile": "My Profile",
         "dashboard": "Dashboard",
-        "myRequests": "My Requests",
+        "myRequests": "Requests",
         "accountSettings": "Account Settings",
         "becomeInsighter": "Become an Insighter",
         "becomeInsighterDescription": "Register as a knowledge provider and start uploading reports and data on the platform",
@@ -642,5 +642,12 @@
         "TITLE": "Notifications",
         "NO_NEW": "No new notifications",
         "VIEW": "View"
-    }
+    },
+     "typeLabel": {
+    "report": "Report",
+    "insight": "Insight",
+    "data": "Data",
+    "manual": "Manual",
+    "course": "Course"
+  }
 }

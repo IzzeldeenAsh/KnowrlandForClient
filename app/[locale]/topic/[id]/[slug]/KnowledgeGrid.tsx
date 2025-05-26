@@ -11,6 +11,7 @@ import cardStyles from "./knowledge-card.module.css";
 import { useParams } from "next/navigation";
 import Image from "next/image";
 import CourseIcon from "@/components/icons/CourseIcon";
+import { arSA, enUS } from 'date-fns/locale';
 
 interface KnowledgeGridProps {
   knowledge: KnowledgeItem[];
@@ -51,9 +52,11 @@ function getInitials(name: string) {
     .toUpperCase();
 }
 
-function formatPublishedDate(dateString: string) {
+function formatPublishedDate(dateString: string, locale: string = 'en') {
   // Ensure we're working with UTC time to avoid server/client mismatches
-  const date = new Date(dateString);
+   const date = new Date(dateString);
+
+  // إنشاء نسخة UTC من التاريخ الأصلي
   const utcDate = new Date(Date.UTC(
     date.getUTCFullYear(),
     date.getUTCMonth(),
@@ -61,8 +64,14 @@ function formatPublishedDate(dateString: string) {
     date.getUTCHours(),
     date.getUTCMinutes()
   ));
-  
-  return formatDistanceToNow(utcDate, { addSuffix: true });
+
+  // اختيار اللغة
+  const selectedLocale = locale === 'ar' ? arSA : enUS;
+
+  return formatDistanceToNow(utcDate, {
+    addSuffix: true,
+    locale: selectedLocale,
+  });
 }
 
 function truncateDescription(
@@ -222,29 +231,38 @@ export default function KnowledgeGrid({
 
                       <div className="ms-3">
                         <Text fw={600} size="sm" className="capitalize">
-                          { item.insighter.roles.includes("insighter") && item.insighter.name.toLowerCase()}
+                          {item.insighter.roles.includes("insighter") && item.insighter.name.toLowerCase()}
+
                           {item.insighter.roles.includes("company") && (
-                            item.insighter.company ? 
-                            `${item.insighter.company.legal_name} ${translations.company}` : 
-                            translations.company
+                            item.insighter.company
+                              ? isRTL
+                                ? `${translations.company} ${item.insighter.company.legal_name}`
+                                : `${item.insighter.company.legal_name} ${translations.company}`
+                              : translations.company
                           )}
-                           {item.insighter.roles.includes("company-insighter") && (
-                            item.insighter.company ? 
-                            `${item.insighter.company.legal_name} ${translations.company}` : 
-                            translations.company
+
+                          {item.insighter.roles.includes("company-insighter") && (
+                            item.insighter.company
+                              ? isRTL
+                                ? `${translations.company} ${item.insighter.company.legal_name}`
+                                : `${item.insighter.company.legal_name} ${translations.company}`
+                              : translations.company
                           )}
                         </Text>
+
                         <Text c="dimmed" size="xs" className="capitalize">
                           {item.insighter.roles.includes("insighter") && translations.insighter}
-                           {item.insighter.roles.includes("company") && (
-                            item.insighter.company ? 
-                            `${translations.by} ${item.insighter.name.toLowerCase()}` : 
-                            translations.company
+
+                          {item.insighter.roles.includes("company") && (
+                            item.insighter.company
+                              ? `${translations.by} ${item.insighter.name.toLowerCase()}`
+                              : translations.company
                           )}
-                           {item.insighter.roles.includes("company-insighter") && (
-                            item.insighter.company ? 
-                            `${translations.by} ${item.insighter.name.toLowerCase()}` : 
-                            translations.company
+
+                          {item.insighter.roles.includes("company-insighter") && (
+                            item.insighter.company
+                              ? `${translations.by} ${item.insighter.name.toLowerCase()}`
+                              : translations.company
                           )}
                         </Text>
                       </div>
@@ -275,8 +293,8 @@ export default function KnowledgeGrid({
                 
                 {/* Bottom row with published date and price badge */}
                 <div className="flex justify-between items-center  pt-2 mt-auto mt-6 border-t border-gray-100 w-full">
-                  <Text c="dimmed" size="xs">
-                    {translations.posted} {formatPublishedDate(item.published_at)}
+                 <Text c="dimmed" size="xs" dir={locale === 'ar' ? 'rtl' : 'ltr'}>
+                    {locale === 'ar' ? 'نشر' : 'Posted'} {formatPublishedDate(item.published_at, locale)}
                   </Text>
                   
                   <Badge
