@@ -82,7 +82,7 @@ export default function AskInsighter({ knowledgeSlug, questions = [], is_owner =
     replySubmitted: isRTL ? '\u062a\u0645 \u0625\u0631\u0633\u0627\u0644 \u0627\u0644\u0631\u062f \u0628\u0646\u062c\u0627\u062d!' : 'Reply submitted successfully!',
     answerSubmitted: isRTL ? '\u062a\u0645 \u0625\u0631\u0633\u0627\u0644 \u0627\u0644\u0625\u062c\u0627\u0628\u0629 \u0628\u0646\u062c\u0627\u062d!' : 'Answer submitted successfully!',
     errorSubmitting: isRTL ? '\u062d\u062f\u062b \u062e\u0637\u0623 \u0641\u064a \u0625\u0631\u0633\u0627\u0644 \u0627\u0644\u0633\u0624\u0627\u0644. \u064a\u0631\u062c\u0649 \u0627\u0644\u0645\u062d\u0627\u0648\u0644\u0629 \u0645\u0631\u0629 \u0623\u062e\u0631\u0649.' : 'Error submitting. Please try again.',
-    loginRequired: isRTL ? '\u064a\u062c\u0628 \u062a\u0633\u062c\u064a\u0644 \u0627\u0644\u062f\u062e\u0648\u0644 \u0644\u0644\u0645\u0634\u0627\u0631\u0643\u0629' : 'Login required to participate',
+    loginRequired: isRTL ? 'للتواصل مع الخبير يرجى تسجيل الدخول' : 'To ask with the Insighter, please log in.',
     loginButton: isRTL ? '\u062a\u0633\u062c\u064a\u0644 \u0627\u0644\u062f\u062e\u0648\u0644' : 'Login',
     questions: isRTL ? '\u0623\u0633\u0626\u0644\u0629' : 'Questions',
     question: isRTL ? '\u0633\u0624\u0627\u0644' : 'Question',

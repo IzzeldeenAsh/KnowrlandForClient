@@ -182,8 +182,22 @@ export default async function SubIndustryPage({ params }: Props) {
                   {locale === 'ar' ? 'المواضيع' : 'Topics'}
                 </h2> */}
                 <p className="text-gray-600">
-                  {locale === 'ar' ? `استكشف المواضيع والرؤى ضمن ${subIndustry.name}` : `Explore topics and insights within ${subIndustry.name}`}
-                </p>
+                    {locale === 'ar' ? (
+                      <>
+                        استكشف المواضيع والرؤى في{' '}
+                        <span className="bg-gradient-to-r from-blue-500 to-teal-400 text-transparent bg-clip-text font-extrabold">
+                          {subIndustry.name}
+                        </span>
+                      </>
+                    ) : (
+                      <>
+                        Explore topics and insights within{' '}
+                        <span className="bg-gradient-to-r from-blue-500 to-teal-400 text-transparent bg-clip-text font-extrabold">
+                          {subIndustry.name}
+                        </span>
+                      </>
+                    )}
+                  </p>
               </div>
 
               {/* Topics Grid */}

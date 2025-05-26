@@ -116,7 +116,8 @@ const KnowledgeSideBox = ({
     economicBloc: isRTL ? 'الكتلة الاقتصادية' : 'Economic Block',
     region: isRTL ? 'المنطقة' : 'Region',
     country: isRTL ? 'الدولة' : 'Country',
-    publishedAt: isRTL ? 'تاريخ النشر' : 'Published At',
+    targetMarket: isRTL ? 'السوق المستهدف': 'Target Market',
+    publishedAt: isRTL ? 'تاريخ النشر' : 'Published On',
     lastUpdate: isRTL ? 'آخر تحديث' : 'Last Update',
     oneTimePurchase: isRTL ? 'شراء لمرة واحدة' : 'One time purchase',
     buyNow: isRTL ? 'اشتري الآن' : 'Buy Now',
@@ -350,7 +351,7 @@ const KnowledgeSideBox = ({
               <div className="tp-course-details2-widget-list-item flex items-center justify-between">
                 <span className="flex items-center gap-2 font-medium ">
                   <GlobeAsiaAustraliaIcon className="w-5 h-5 me-2" />
-                  {translations.economicBloc}
+                  {translations.targetMarket}
                 </span>
                 <div className={`field-content-container ${expandedSections.economicBlocs ? 'expanded' : ''}`}>
                   <div className="flex flex-wrap gap-1 justify-end max-w-[100%]">
@@ -389,7 +390,7 @@ const KnowledgeSideBox = ({
               <div className="tp-course-details2-widget-list-item flex items-center justify-between">
                 <span className="flex items-center gap-2 font-medium ">
                   <GlobeAsiaAustraliaIcon className="w-5 h-5 me-2" />
-                  {translations.region}
+                  {translations.targetMarket}
                 </span>
                 <div className={`field-content-container ${expandedSections.regions ? 'expanded' : ''}`}>
                   <div className="flex flex-wrap justify-end gap-1 max-w-[100%]">
@@ -428,7 +429,7 @@ const KnowledgeSideBox = ({
               <div className="tp-course-details2-widget-list-item flex items-center justify-between">
                 <span className="flex items-center gap-2 font-medium ">
                   <GlobeAsiaAustraliaIcon className="w-5 h-5 me-2" />
-                  {translations.country}
+                  {translations.targetMarket}
                 </span>
                 <div className={`field-content-container ${expandedSections.countries ? 'expanded' : ''}`}>
                   <div className="flex flex-wrap justify-end gap-1 max-w-[100%]">
