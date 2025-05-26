@@ -85,7 +85,7 @@ export default function TabsContent({ knowledge }: { knowledge: KnowledgeDetails
   // Translations for tab labels
   const translations = {
     overview: isRTL ? 'نظرة عامة' : 'Overview',
-    reviews: isRTL ? 'المراجعات' : 'Reviews',
+    reviews: isRTL ? 'تقييمات وآراء' : 'Reviews',
     askInsighter: isRTL ? 'اسأل الخبير' : 'Ask Insighter'
   };
 

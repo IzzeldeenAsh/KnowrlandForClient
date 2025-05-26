@@ -404,10 +404,10 @@
         "company": "شركة",
         "client": "عميل",
         "addKnowledge": "إضافة معرفة +",
-        "knowledgeBase": "قاعدة المعرفة",
-        "myProfile": "ملفي الشخصي",
-        "dashboard": "لوحة التحكم",
-        "myRequests": "طلباتي",
+        "knowledgeBase": "مكتبة المعرفة",
+        "myProfile": "الملف الشخصي",
+        "dashboard": "لوحة المعلومات",
+        "myRequests": "الطلبات",
         "accountSettings": "إعدادات الحساب",
         "becomeInsighter": "سجل كإنسايتر",
         "becomeInsighterDescription": "سجل كمزود للمعرفة وابدأ برفع التقارير والبيانات على المنصة",
@@ -614,15 +614,23 @@
             "contactUsSuccessSubtext": "سيتم الرد عليك في أقرب وقت ممكن"
         },
         "dataNotAvailable": "البيانات غير متوفرة",
-        "industryKnowledge": "نوع المعرفة المتوفرة في {industry}",
         "subIndustry": "الصناعة الفرعية",
-        "subIndustryKnowledge": "نوع المعرفة المتوفرة في {subIndustry}",
-        "topicKnowledge": "نوع المعرفة المتوفرة في {topic}",
+        "industryKnowledge": "أنواع المعرفة المتوفرة في <industry></industry>",
+        "subIndustryKnowledge": "أنواع المعرفة المتوفرة في <subIndustry></subIndustry>",
+        "topicKnowledge": "أنواع المعرفة المتوفرة في <topic></topic>",
         "topicLabel": "الموضوع",
         "Notifications": {
             "TITLE": "الإشعارات",
             "NO_NEW": "لا توجد إشعارات جديدة",
             "VIEW": "عرض"
+        },
+        "typeLabel": {
+            "report": "التقرير",
+            "insight": "الرؤية",
+            "data": "البيانات",
+            "manual": "الدليل",
+            "course": "الدورة"
         }
+
     }
  

@@ -60,24 +60,13 @@ export default function Overview({ knowledge }: OverviewProps) {
   const locale = params.locale;
   const isRTL = locale === 'ar';
 
-  const typeTranslations: Record<
-  string, { en: string; ar: string; gender: 'masculine' | 'feminine' } > = {
-  course: { en: 'course', ar: 'دورة', gender: 'feminine' },
-  report: { en: 'report', ar: 'تقرير', gender: 'masculine' },
-  data: { en: 'data', ar: 'بيانات', gender: 'feminine' },
-  insight: { en: 'insight', ar: 'رؤية', gender: 'feminine' },
-  manual: { en: 'manual', ar: 'دليل', gender: 'masculine' },
-  industry: { en: 'industry', ar: 'صناعة', gender: 'feminine' },
-  };
-
-  const typeInfo = typeTranslations[knowledge.type];
-  const localizedType = typeInfo?.[isRTL ? 'ar' : 'en'] || knowledge.type;
-
   // Translations
   const translations = {
     chooseReportSections: isRTL ? 'اختر أقسام التقرير التي تناسب احتياجاتك وميزانيتك!' : 'Choose the report section that fits your needs and budget!',
-    thisIncludes: isRTL ? `${typeInfo?.gender === 'feminine' ? 'هذه' : 'هذا'} ${localizedType} يتضمن`:`This ${localizedType} includes`,   
-    documents: isRTL ? 'مستندات' : 'documents',
+     thisIncludes: isRTL
+    ? 'هذه المعرفة تتضمن'
+    : 'This knowledge includes',   
+    documents: isRTL ? 'المستندات' : 'documents',
     free: isRTL ? 'مجاني' : 'Free',
     download: isRTL ? 'تحميل' : 'Download',
     addToCart: isRTL ? 'إضافة إلى حقيبة المشتريات' : 'Add to Cart',
