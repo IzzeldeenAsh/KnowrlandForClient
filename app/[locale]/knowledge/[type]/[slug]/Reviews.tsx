@@ -309,6 +309,7 @@ export default function Reviews({ knowledgeSlug, reviews, is_review, is_owner }:
                         src={review.profile_photo_url}
                         size="sm"
                         radius="xl"
+                        style={{objectPosition: 'top'}}
                         alt={review.user_name}
                       >
                         {!review.profile_photo_url && getInitials(review.user_name)}

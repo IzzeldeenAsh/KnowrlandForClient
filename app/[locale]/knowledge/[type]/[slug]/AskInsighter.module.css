@@ -37,6 +37,9 @@
   font-weight: 500;
   color: #374151;
 }
+.commentAvatar img {
+  object-position: top;
+}
 
 .answer{
   /* background-color: #eff6ff !important;
