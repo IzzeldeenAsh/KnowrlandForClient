@@ -146,7 +146,7 @@ export default function ProfilePage() {
         // If entity=insighter is specified, try insighter API first
         if (entityType === 'insighter') {
           // Try insighter API first
-          let response = await fetch(`https://api.knoldg.com/api/platform/insighter/profile/${uuid}`, {
+          let response = await fetch(`https://api.foresighta.co/api/platform/insighter/profile/${uuid}`, {
             headers: {
               "Content-Type": "application/json",
               "Accept": "application/json",
@@ -159,7 +159,7 @@ export default function ProfilePage() {
             setProfileData(data.data);
           } else {
             // Fall back to company API if insighter fails
-            response = await fetch(`https://api.knoldg.com/api/platform/company/profile/${uuid}`, {
+            response = await fetch(`https://api.foresighta.co/api/platform/company/profile/${uuid}`, {
               headers: {
                 "Content-Type": "application/json",
                 "Accept": "application/json",
@@ -206,7 +206,7 @@ export default function ProfilePage() {
           }
         } else {
           // Default behavior: try company API first
-          let response = await fetch(`https://api.knoldg.com/api/platform/company/profile/${uuid}`, {
+          let response = await fetch(`https://api.foresighta.co/api/platform/company/profile/${uuid}`, {
             headers: {
               "Content-Type": "application/json",
               "Accept": "application/json",
@@ -249,7 +249,7 @@ export default function ProfilePage() {
             setProfileData(companyProfileData);
           } else {
             // Try insighter API if company API fails
-            response = await fetch(`https://api.knoldg.com/api/platform/insighter/profile/${uuid}`, {
+            response = await fetch(`https://api.foresighta.co/api/platform/insighter/profile/${uuid}`, {
               headers: {
                 "Content-Type": "application/json",
                 "Accept": "application/json",
@@ -289,8 +289,8 @@ export default function ProfilePage() {
         
         // Determine API endpoint based on entity parameter instead of roles
         let url = (entityType === 'insighter') 
-          ? `https://api.knoldg.com/api/platform/insighter/knowledge/${uuid}?page=${knowledgePage}&per_page=12`
-          : `https://api.knoldg.com/api/platform/company/knowledge/${uuid}?page=${knowledgePage}&per_page=12`;
+          ? `https://api.foresighta.co/api/platform/insighter/knowledge/${uuid}?page=${knowledgePage}&per_page=12`
+          : `https://api.foresighta.co/api/platform/company/knowledge/${uuid}?page=${knowledgePage}&per_page=12`;
         
         if (selectedType) {
           url += `&type=${selectedType}`;

@@ -99,7 +99,7 @@ export default function TabsContent({ knowledge }: { knowledge: KnowledgeDetails
   const tabs = [translations.overview, translations.reviews, translations.askInsighter];
 
   return (
-    <div className="mb-6" dir={isRTL ? 'rtl' : 'ltr'}>
+    <div className="mb-6" dir={isRTL ? 'rtl' : 'ltr' } style={knowledgeData.language === 'arabic' ? { direction: 'rtl', textAlign: 'right' } : {}}>
       <div className="border-b border-gray-200">
         <nav className="-mb-px flex  knowledge-tab-nav relative " aria-label="Tabs">
       

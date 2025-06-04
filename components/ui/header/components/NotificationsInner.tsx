@@ -217,7 +217,7 @@ export default function NotificationsInner({
     
     // Handle knowledge notifications with category
     if (notification.type === 'knowledge' && notification.category) {
-      const knowledgeUrl = `https://knoldg.com/${currentLanguage}/knowledge/${notification.category}/${notification.param || ''}?tab=ask`
+      const knowledgeUrl = `http://localhost:3000/${currentLanguage}/knowledge/${notification.category}/${notification.param || ''}?tab=ask`
       window.open(knowledgeUrl, '_blank')
     } else {
       onNotificationClick(notification.id)
@@ -245,7 +245,7 @@ export default function NotificationsInner({
 
       <div
         className="px-5 py-4 text-white"
-        style={{ backgroundImage: 'url(https://app.knoldg.com/assets/media/misc/menu-header-bg.jpg)', backgroundSize: 'cover', backgroundPosition: 'center' }}
+        style={{ backgroundImage: 'url(http://localhost:4200/assets/media/misc/menu-header-bg.jpg)', backgroundSize: 'cover', backgroundPosition: 'center' }}
       >
         <h3 className="font-bold text-lg mt-4 mb-2">
           {t('TITLE')}

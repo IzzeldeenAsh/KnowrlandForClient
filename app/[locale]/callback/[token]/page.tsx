@@ -83,7 +83,7 @@ export default function AuthCallback() {
         document.cookie = cookieSettings.join('; ');
         
         // Fetch profile
-        const response = await fetch('https://api.knoldg.com/api/account/profile', {
+        const response = await fetch('https://api.foresighta.co/api/account/profile', {
           headers: {
             'Authorization': `Bearer ${token}`,
             "Content-Type": "application/json",
@@ -175,7 +175,7 @@ export default function AuthCallback() {
               ? finalReturnUrl 
               : `/app${finalReturnUrl}`;
               
-            window.location.href = `https://app.knoldg.com${angularPath}?nextjs_token=${encodeURIComponent(token)}`;
+            window.location.href = `http://localhost:4200${angularPath}?nextjs_token=${encodeURIComponent(token)}`;
           } else {
             // Handle both relative and absolute URLs for Next.js app
             if (finalReturnUrl.startsWith('http')) {
@@ -195,7 +195,7 @@ export default function AuthCallback() {
           // Redirect to insighter dashboard with token
           console.log('[token-callback] Redirecting to Angular app with token parameter');
           // Pass token in both formats for compatibility
-          window.location.href = `https://app.knoldg.com/app/insighter-dashboard/my-dashboard?nextjs_token=${encodeURIComponent(token)}`;
+          window.location.href = `http://localhost:4200/app/insighter-dashboard/my-dashboard?nextjs_token=${encodeURIComponent(token)}`;
         } else {
           // Redirect to home page using current locale
           router.push(`/${locale}/home`);
@@ -203,7 +203,7 @@ export default function AuthCallback() {
       } catch (error) {
         console.error('Error fetching profile:', error);
         // Redirect to app login page
-        window.location.href = 'https://app.knoldg.com/auth/login';
+        window.location.href = 'http://localhost:4200/auth/login';
       }
     };
 
@@ -211,7 +211,7 @@ export default function AuthCallback() {
       fetchProfile();
     } else {
       console.error('No token found in URL parameters');
-      window.location.href = 'https://app.knoldg.com/auth/login';
+      window.location.href = 'http://localhost:4200/auth/login';
     }
   }, [token, router, locale]);
 
