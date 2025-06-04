@@ -104,3 +104,10 @@ html[dir="rtl"] .fas,
 html[dir="rtl"] .fas * {
   font-family: "Font Awesome 6 Free" !important;
 }
+
+.focus-outline-none{
+outline: none !important;
+} 
+.focus-outline-none:focus{
+outline: none !important;
+}

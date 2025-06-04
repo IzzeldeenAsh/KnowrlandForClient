@@ -1,5 +1,6 @@
 'use client'
-import { DocumentTextIcon, GlobeAltIcon, CalendarIcon, ClockIcon, BuildingLibraryIcon, TruckIcon, GlobeAsiaAustraliaIcon, ChevronDownIcon, ChevronUpIcon } from '@heroicons/react/24/outline';
+import { DocumentTextIcon, CalendarIcon, ClockIcon, ChevronDownIcon, ChevronUpIcon } from '@heroicons/react/24/outline';
+import { IconLanguage, IconCode, IconBuildingBank, IconMap, IconWorld } from '@tabler/icons-react';
 import { useParams } from 'next/navigation';
 import { useState, useEffect } from 'react';
 import FacebookIcon from '@/public/file-icons/facebook';
@@ -175,8 +176,10 @@ const KnowledgeSideBox = ({
 
         <div className="space-y-3">
           <div className="tp-course-details2-widget-list-item flex items-center justify-between">
-            <span>
-              <DocumentTextIcon className="w-5 h-5 me-2" />
+            <span className="flex items-center">
+              <div className="bg-blue-50 p-2 rounded-full mr-2">
+                <DocumentTextIcon className="w-4 h-4 text-blue-500" />
+              </div>
               {translations.documents}
             </span>
             <div className={`field-content-container ${expandedSections.documents ? 'expanded' : ''}`}>
@@ -229,8 +232,10 @@ const KnowledgeSideBox = ({
           </div>
 
           <div className="tp-course-details2-widget-list-item flex items-center justify-between">
-            <span>
-              <GlobeAltIcon className="w-5 h-5 me-2" />
+            <span className="flex items-center">
+              <div className="bg-blue-50 p-2 rounded-full mr-2">
+                <IconLanguage className="w-4 h-4 text-blue-500" />
+              </div>
               {translations.documentsLanguage}
             </span>
             <span className="field-content-container block mt-1 capitalize">{language}</span>
@@ -239,7 +244,9 @@ const KnowledgeSideBox = ({
           {isic_code && !Array.isArray(isic_code) && isic_code.key && (
             <div className="tp-course-details2-widget-list-item flex items-center justify-between">
               <span className="flex items-center gap-2 font-medium ">
-                <BuildingLibraryIcon className="w-5 h-5 me-2" />
+                <div className="bg-blue-50 p-2 rounded-full mr-2">
+                  <IconCode className="w-4 h-4 text-blue-500" />
+                </div>
                 {translations.isicCode}
               </span>
               <div className="field-content-container">
@@ -257,7 +264,9 @@ const KnowledgeSideBox = ({
           {isic_code && Array.isArray(isic_code) && isic_code.length > 0 && (
             <div className="tp-course-details2-widget-list-item flex items-center justify-between">
               <span className="flex items-center gap-2 font-medium ">
-                <BuildingLibraryIcon className="w-5 h-5 me-2" />
+                <div className="bg-blue-50 p-2 rounded-full mr-2">
+                  <IconCode className="w-4 h-4 text-blue-500" />
+                </div>
                 {translations.isicCode}
               </span>
               <div className={`field-content-container ${expandedSections.isicCode ? 'expanded' : ''}`}>
@@ -293,7 +302,9 @@ const KnowledgeSideBox = ({
           {hs_code && !Array.isArray(hs_code) && (
             <div className="tp-course-details2-widget-list-item flex items-center justify-between">
               <span className="flex items-center gap-2 font-medium ">
-                <TruckIcon className="w-5 h-5 me-2" />
+                <div className="bg-blue-50 p-2 rounded-full mr-2">
+                  <IconCode className="w-4 h-4 text-blue-500" />
+                </div>
                 {translations.hsCode}
               </span>
               <div className="field-content-container">
@@ -313,7 +324,9 @@ const KnowledgeSideBox = ({
           {hs_code && Array.isArray(hs_code) && hs_code.length > 0 && (
             <div className="tp-course-details2-widget-list-item flex items-center justify-between">
               <span className="flex items-center gap-2 font-medium ">
-                <TruckIcon className="w-5 h-5 me-2" />
+                <div className="bg-blue-50 p-2 rounded-full mr-2">
+                  <IconCode className="w-4 h-4 text-blue-500" />
+                </div>
                 {translations.hsCode}
               </span>
               <div className={`field-content-container ${expandedSections.hsCode ? 'expanded' : ''}`}>
@@ -350,7 +363,9 @@ const KnowledgeSideBox = ({
             economic_blocs && economic_blocs.length > 0 && (
               <div className="tp-course-details2-widget-list-item flex items-center justify-between">
                 <span className="flex items-center gap-2 font-medium ">
-                  <GlobeAsiaAustraliaIcon className="w-5 h-5 me-2" />
+                  <div className="bg-blue-50 p-2 rounded-full mr-2">
+                    <IconWorld className="w-4 h-4 text-blue-500" />
+                  </div>
                   {translations.targetMarket}
                 </span>
                 <div className={`field-content-container ${expandedSections.economicBlocs ? 'expanded' : ''}`}>
@@ -389,7 +404,9 @@ const KnowledgeSideBox = ({
             regions && regions.length > 0 && (
               <div className="tp-course-details2-widget-list-item flex items-center justify-between">
                 <span className="flex items-center gap-2 font-medium ">
-                  <GlobeAsiaAustraliaIcon className="w-5 h-5 me-2" />
+                  <div className="bg-blue-50 p-2 rounded-full mr-2">
+                    <IconWorld className="w-4 h-4 text-blue-500" />
+                  </div>
                   {translations.targetMarket}
                 </span>
                 <div className={`field-content-container ${expandedSections.regions ? 'expanded' : ''}`}>
@@ -428,7 +445,9 @@ const KnowledgeSideBox = ({
             countries && countries.length > 0 && (
               <div className="tp-course-details2-widget-list-item flex items-center justify-between">
                 <span className="flex items-center gap-2 font-medium ">
-                  <GlobeAsiaAustraliaIcon className="w-5 h-5 me-2" />
+                  <div className="bg-blue-50 p-2 rounded-full mr-2">
+                    <IconWorld className="w-4 h-4 text-blue-500" />
+                  </div>
                   {translations.targetMarket}
                 </span>
                 <div className={`field-content-container ${expandedSections.countries ? 'expanded' : ''}`}>
@@ -465,8 +484,10 @@ const KnowledgeSideBox = ({
           }
 
           <div className="tp-course-details2-widget-list-item flex items-center justify-between">
-            <span>
-              <CalendarIcon className="w-5 h-5 me-2" />
+            <span className="flex items-center">
+              <div className="bg-blue-50 p-2 rounded-full mr-2">
+                <CalendarIcon className="w-4 h-4 text-blue-500" />
+              </div>
               {translations.publishedAt}
             </span>
             <span className="field-content-container block mt-1">
@@ -477,8 +498,10 @@ const KnowledgeSideBox = ({
           {/* Only show Last Update if it has a value */}
           {false && (
             <div className="tp-course-details2-widget-list-item flex items-center justify-between">
-              <span>
-                <ClockIcon className="w-5 h-5 me-2" />
+              <span className="flex items-center">
+                <div className="bg-blue-50 p-2 rounded-full mr-2">
+                  <ClockIcon className="w-4 h-4 text-blue-500" />
+                </div>
                 {translations.lastUpdate}
               </span>
               <span className="field-content-container block mt-1">{translations.na}</span>
