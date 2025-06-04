@@ -107,7 +107,7 @@ export default function AskInsighter({ knowledgeSlug, questions = [], is_owner =
       }
       
       const response = await fetch(
-        `https://api.knoldg.com/api/account/ask/insighter/knowledge/${knowledgeSlug}`,
+        `https://api.foresighta.co/api/account/ask/insighter/knowledge/${knowledgeSlug}`,
         {
           method: 'POST',
           headers,
@@ -198,7 +198,7 @@ export default function AskInsighter({ knowledgeSlug, questions = [], is_owner =
         // For insighters, this will be the deepest question ID in the thread
         console.log(`[AskInsighter] Owner answering question ID: ${questionId}`);
         response = await fetch(
-          `https://api.knoldg.com/api/insighter/library/knowledge/answer/${questionId}`,
+          `https://api.foresighta.co/api/insighter/library/knowledge/answer/${questionId}`,
           {
             method: 'PUT',
             headers,
@@ -218,7 +218,7 @@ export default function AskInsighter({ knowledgeSlug, questions = [], is_owner =
         
         console.log(`[AskInsighter] Submitting reply to parent question ID: ${parentId}`);
         response = await fetch(
-          `https://api.knoldg.com/api/account/ask/insighter/knowledge/${knowledgeSlug}`,
+          `https://api.foresighta.co/api/account/ask/insighter/knowledge/${knowledgeSlug}`,
           {
             method: 'POST',
             headers,
@@ -703,7 +703,7 @@ export default function AskInsighter({ knowledgeSlug, questions = [], is_owner =
 
   // Redirect URL for login button with returnUrl parameter
   const getLoginUrl = () => {
-    return `https://app.knoldg.com/auth/login?returnUrl=${encodeURIComponent(typeof window !== 'undefined' ? window.location.href : '')}`;
+    return `http://localhost:4200/auth/login?returnUrl=${encodeURIComponent(typeof window !== 'undefined' ? window.location.href : '')}`;
   };
   
   // Determine if user is logged in

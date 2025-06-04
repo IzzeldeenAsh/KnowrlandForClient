@@ -102,7 +102,7 @@ async function fetchKnowledgeData(type: string, slug: string, locale: string = '
     }
     
     const response = await fetch(
-      `https://api.knoldg.com/api/platform/industries/knowledge/${slug}`,
+      `https://api.foresighta.co/api/platform/industries/knowledge/${slug}`,
       {
         method: "GET",
         headers,
@@ -189,7 +189,7 @@ export default function KnowledgePage({ params }: Props) {
   }));
 
   return (
-    <div className="min-h-screen bg-gray-50 relative" dir={isRTL ? 'rtl' : 'ltr'}>
+    <div className="min-h-screen bg-gray-50 relative" dir={isRTL ? 'rtl' : 'ltr'} style={knowledge.language === 'arabic' ? { direction: 'rtl', textAlign: 'right' } : {}}>
       {/* Background decoration */}
       <div className="pointer-events-none absolute z-10 left-[10%] top-0 hidden md:block" aria-hidden="true">
         <Image
@@ -220,7 +220,7 @@ export default function KnowledgePage({ params }: Props) {
           </div>
           
           {/* Header */}
-          <div className={`${isRTL ? 'text-right' : 'text-start'} mb-4 w-full`} data-aos="fade-down">
+          <div className={`${isRTL ? 'text-right' : 'text-start'} mb-4 w-full`}    data-aos="fade-down">
             <div className="flex-row gap-3 sm:gap-4 flex-wrap sm:flex-nowrap sm:flex max-w-80-per">
               <div className="mb-4 mt-1 hidden sm:block">
                 {knowledge.type === 'data' && <div className="bg-white p-2 sm:p-3 rounded flex items-center justify-center"><span className="hidden sm:block"><DataIcon width={40} height={40} /></span><span className="sm:hidden"><DataIcon width={30} height={30} /></span></div>}

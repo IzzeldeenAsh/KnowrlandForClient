@@ -118,7 +118,7 @@ export default function Reviews({ knowledgeSlug, reviews, is_review, is_owner }:
       }
       
       const response = await fetch(
-        `https://api.knoldg.com/api/platform/industries/knowledge/${knowledgeSlug}`,
+        `https://api.foresighta.co/api/platform/industries/knowledge/${knowledgeSlug}`,
         {
           method: "GET",
           headers,
@@ -179,7 +179,7 @@ export default function Reviews({ knowledgeSlug, reviews, is_review, is_owner }:
       
       // Make the API call directly
       const response = await fetch(
-        `https://api.knoldg.com/api/account/review/knowledge/${knowledgeSlug}`,
+        `https://api.foresighta.co/api/account/review/knowledge/${knowledgeSlug}`,
         {
           method: "POST",
           headers: {

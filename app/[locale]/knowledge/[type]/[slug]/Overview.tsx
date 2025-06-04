@@ -28,6 +28,7 @@ export interface KnowledgeDetails {
   description: string
   documents: Document[]
   type: string
+  language?: string
   // Add other fields if needed
 }
 
@@ -59,6 +60,7 @@ export default function Overview({ knowledge }: OverviewProps) {
   const params = useParams();
   const locale = params.locale;
   const isRTL = locale === 'ar';
+  const isArabicContent = knowledge.language === 'arabic';
 
   // Translations
   const translations = {
@@ -79,12 +81,13 @@ export default function Overview({ knowledge }: OverviewProps) {
   };
 
   return (
-    <div className={styles.container} dir={isRTL ? 'rtl' : 'ltr'}>
+    <div className={styles.container} dir={isRTL ? 'rtl' : 'ltr'}    style={isArabicContent ? { direction: 'rtl', textAlign: 'right' } : {}}>
       <div className={styles.py10}>
         {/* Description Section */}
         <div className="bg-transparent p-3 rounded mb-3">
           <p
-            className={`${styles.textLg} ${styles.textGray800}`}
+            className={`${styles.textLg} ${styles.textGray800} ${isArabicContent ? 'text-right' : ''}`}
+         
             dangerouslySetInnerHTML={{ __html: knowledge.description }}
           />
         </div>
