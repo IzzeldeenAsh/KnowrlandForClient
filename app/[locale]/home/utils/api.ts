@@ -81,6 +81,7 @@ export async function fetchStatisticsPerType(
   priceFilter: string | null = null,
   hsCodeFilter: number | null = null,
   accuracyFilter: 'any' | 'all' = 'any',
+  roleFilter: 'all' | 'company' | 'individual' = 'all',
   onError?: (errorMessage: any) => void
 ) {
   try {
@@ -129,6 +130,11 @@ export async function fetchStatisticsPerType(
     // Add price parameter
     if (priceFilter !== null) {
       url.searchParams.append('paid', priceFilter);
+    }
+    
+    // Add role parameter
+    if (roleFilter !== null && roleFilter !== 'all') {
+      url.searchParams.append('role', roleFilter);
     }
     
     const response = await fetch(url.toString(), {
@@ -181,7 +187,8 @@ export async function fetchSearchResults(
   industryFilter: number | null = null,
   priceFilter: string | null = null,
   hsCodeFilter: number | null = null,
-  accuracyFilter: 'any' | 'all' = 'any'
+  accuracyFilter: 'any' | 'all' = 'any',
+  roleFilter: 'all' | 'company' | 'individual' = 'all'
 ) {
   try {
     // Always use the search API endpoint
@@ -263,6 +270,11 @@ export async function fetchSearchResults(
     // Add price parameter for price filtering
     if (priceFilter !== null) {
       url.searchParams.append('paid', priceFilter);
+    }
+    
+    // Add role parameter for role filtering
+    if (roleFilter !== null && roleFilter !== 'all') {
+      url.searchParams.append('role', roleFilter);
     }
     
     // Keep the filters[country_id] for backward compatibility if needed
