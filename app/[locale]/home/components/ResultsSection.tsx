@@ -66,21 +66,60 @@ const ResultsSection: React.FC<ResultsSectionProps> = ({
 }) => {
   const t4 = useTranslations('Features4');
   const isRtl = locale === 'ar';
+  
+  // Loading state component with a nice spinner
+  const LoadingSpinner = () => (
+    <div className="flex flex-col items-center justify-center py-16">
+      <div className="relative">
+        <div className="w-16 h-16 border-4 border-blue-200 border-t-blue-600 rounded-full animate-spin"></div>
+      </div>
+      <p className="mt-4 text-gray-600 font-medium">
+        {locale === 'ar' ? 'جارٍ التحميل...' : 'Loading...'}
+      </p>
+    </div>
+  );
+  
+  // Empty state component 
+  const EmptyState = () => (
+    <div className="flex flex-col items-center justify-center py-16">
+      <div className="w-24 h-24 bg-gray-100 rounded-full flex items-center justify-center mb-4">
+        <svg className="w-12 h-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+        </svg>
+      </div>
+      <h3 className="text-lg font-medium text-gray-900 mb-2">
+        {locale === 'ar' ? 'لم يتم العثور على نتائج' : 'No results found'}
+      </h3>
+      <p className="text-gray-500 text-center max-w-md">
+        {locale === 'ar' ? 
+          'حاول تعديل البحث أو تغيير المرشحات للعثور على المزيد من النتائج.' : 
+          'Try adjusting your search or changing the filters to find more results.'
+        }
+      </p>
+    </div>
+  );
+  
   return (
     <div dir={isRtl ? 'rtl' : 'ltr'}>
       <Group justify="space-between" align="center" mb="md">
-      <p className="text-gray-700 font-semibold text-sm uppercase">
-         {/* {locale === 'ar' ? '\u0625\u062c\u0645\u0627\u0644\u064a \u0627\u0644\u0646\u062a\u0627\u0626\u062c:' : 'Total results:'}  <span className="font-light lowercase"> {totalItems} {locale === 'ar' ? 'نتيجة' : 'result'}</span> */}
+        <p className="text-gray-700 font-semibold text-sm uppercase">
+          {/* {!loading && totalItems > 0 && (
+            <>
+              {locale === 'ar' ? 'إجمالي النتائج:' : 'Total results:'} 
+              <span className="font-light lowercase ml-2">{totalItems} {locale === 'ar' ? 'نتيجة' : 'result'}</span>
+            </>
+          )} */}
         </p>
         <ViewModeToggle viewMode={viewMode} setViewMode={setViewMode} />
       </Group>
       <div className="border-b border-gray-300 mb-4"/>
-      <Suspense fallback={<LoadingState />}>
+      
+      <Suspense fallback={<LoadingSpinner />}>
         {loading ? (
-          <LoadingState />
+          <LoadingSpinner />
         ) : (
           <>
-            {/* Display search results whether we have a keyword or not, as backend returns all data for empty keywords */}
+            {/* Show results if we have them */}
             {searchResults.length > 0 ? (
               <SearchResultsGrid
                 key={`search-results-${searchType}-${Date.now()}`}
@@ -89,23 +128,31 @@ const ResultsSection: React.FC<ResultsSectionProps> = ({
                 locale={locale}
                 viewMode={viewMode}
               />
-            ) : viewMode === 'grid' ? (
-              <KnowledgeGrid 
-                knowledge={knowledgeItems} 
-                topicName="All Topics"
-                showHeader={false}
-                colNumbers={3}
-                locale={locale}
-              />
+            ) : knowledgeItems.length > 0 ? (
+              // Show knowledge items if we have them
+              viewMode === 'grid' ? (
+                <KnowledgeGrid 
+                  knowledge={knowledgeItems} 
+                  topicName="All Topics"
+                  showHeader={false}
+                  colNumbers={3}
+                  locale={locale}
+                />
+              ) : (
+                <KnowledgeList
+                  knowledge={knowledgeItems}
+                  topicName="All Topics"
+                  showHeader={false}
+                  locale={locale}
+                />
+              )
             ) : (
-              <KnowledgeList
-                knowledge={knowledgeItems}
-                topicName="All Topics"
-                showHeader={false}
-                locale={locale}
-              />
+              // Only show empty state when not loading and no results
+              <EmptyState />
             )}
-            {totalItems > 0 && (
+            
+            {/* Pagination - only show when we have results and not loading */}
+            {!loading && totalItems > 0 && (
               <div className="flex flex-col items-center mt-8">
                 <div className="text-sm text-gray-600 mb-2">
                   {locale === 'ar' ? 

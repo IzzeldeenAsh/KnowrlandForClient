@@ -41,10 +41,7 @@ export interface SearchResultItem {
     };
   }; // Only for knowledge items
   paid?: boolean; // Only for knowledge items
-  review_summary?: {
-    count: number;
-    average: number;
-  }; // Only for knowledge items
+  review: string;
 }
 
 interface SearchResultsGridProps {
@@ -226,11 +223,10 @@ export default function SearchResultsGrid({
                   </Text>
                 </div>
                 
-                {item.review_summary && item.review_summary.count >= 1 && item.review_summary.average > 0 && (
+                {item.review && parseInt(item.review) >= 1 && (
                   <div className="flex items-center mt-auto gap-1">
-                    <Rating value={item.review_summary.average} fractions={2} readOnly size="sm" />
-                    <Text size="xs" fw={500} className="mx-2 text-sky-500">{item.review_summary.average.toFixed(1)}</Text>
-                    <Text size="xs" c="dimmed" className="mx-2 text-gray-300">({item.review_summary.count})</Text>
+                    <Rating value={parseInt(item.review)} fractions={2} readOnly size="sm" />
+                    <Text size="xs" fw={500} className="mx-2 text-sky-500">{parseInt(item.review).toFixed(1)}</Text>
                   </div>
                 )}
               </div>
