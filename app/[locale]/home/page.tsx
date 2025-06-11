@@ -458,17 +458,35 @@ export default function HomePage() {
     const country = searchParams.get('country');
     const categoryType = searchParams.get('type');
     
+    // Read ALL filter parameters directly from URL to avoid state synchronization issues
+    const urlRegion = searchParams.get('region') ? parseInt(searchParams.get('region')!) : null;
+    const urlEconomicBloc = searchParams.get('economic_bloc') ? parseInt(searchParams.get('economic_bloc')!) : null;
+    const urlIndustry = searchParams.get('industry') ? parseInt(searchParams.get('industry')!) : null;
+    const urlIsicCode = searchParams.get('isic_code') ? parseInt(searchParams.get('isic_code')!) : null;
+    const urlHsCode = searchParams.get('hs_code') ? parseInt(searchParams.get('hs_code')!) : null;
+    const urlCountry = searchParams.get('country') ? parseInt(searchParams.get('country')!) : null;
+    const urlLanguage = (searchParams.get('language') as 'all' | 'arabic' | 'english') || 'all';
+    const urlPriceFilter = searchParams.get('paid') || null;
+    const urlAccuracy = (searchParams.get('accuracy') as 'any' | 'all') || 'all';
+    
+    console.log('INITIAL URL PARAMETERS:', {
+      query, type, accuracy, language, country, categoryType,
+      urlIndustry, urlRegion, urlEconomicBloc, urlIsicCode, urlHsCode
+    });
+    
     // Set loading to true immediately if we have any search parameters
-    const hasSearchParams = query || type || language || country || categoryType || accuracy;
+    const hasSearchParams = query || type || language || country || categoryType || accuracy || 
+                           urlIndustry || urlRegion || urlEconomicBloc || urlIsicCode || urlHsCode;
     if (hasSearchParams) {
       setLoading(true);
     }
     
     // Trigger search if we have query parameters OR other search parameters that should show results
-    const shouldTriggerSearch = query || type || accuracy || language || country || categoryType;
+    const shouldTriggerSearch = query || type || accuracy || language || country || categoryType ||
+                               urlIndustry || urlRegion || urlEconomicBloc || urlIsicCode || urlHsCode;
     
     if (shouldTriggerSearch) {
-      console.log('URL has search parameters, triggering search:', { query, type, accuracy, language, country, categoryType });
+      console.log('URL has search parameters, triggering search with direct URL values');
       
       const triggerSearch = async () => {
         try {
@@ -476,24 +494,25 @@ export default function HomePage() {
             toast.error(errorMessage, 'Validation Error');
           };
           
+          // Use URL parameters directly to avoid state synchronization issues
           const response = await fetchSearchResults(
             query?.trim() || '', // Use empty string if no query - backend should return all results
             type || 'knowledge',
             locale,
             currentPage,
             activeTab,
-            languageFilter,
-            countryFilter,
-            regionFilter,
-            economicBlocFilter,
-            isicCodeFilter,
-            selectedCategory !== 'all' ? selectedCategory : null, // Include the selected category
+            urlLanguage,
+            urlCountry,
+            urlRegion,
+            urlEconomicBloc,
+            urlIsicCode,
+            categoryType || 'all',
             30, // perPage
             handleError, // onError callback
-            industryFilter,
-            priceFilter,
-            hsCodeFilter,
-            accuracyFilter
+            urlIndustry, // Use URL value directly
+            urlPriceFilter,
+            urlHsCode,
+            urlAccuracy
           );
           
           setSearchResults(response.data || []);
@@ -507,8 +526,30 @@ export default function HomePage() {
           // Update the previous search query reference to avoid duplicate searches
           prevSearchQueryRef.current = query || '';
           
-          // Fetch statistics if search type is knowledge
-          await fetchStatisticsIfNeeded(query?.trim() || '', type || 'knowledge');
+          // Fetch statistics if search type is knowledge using URL parameters directly
+          if ((type || 'knowledge') === 'knowledge') {
+            try {
+              const statsResponse = await fetchStatisticsPerType(
+                query?.trim() || '',
+                locale,
+                urlLanguage,
+                urlCountry,
+                urlRegion,
+                urlEconomicBloc,
+                urlIsicCode,
+                urlIndustry, // Use URL value directly
+                urlPriceFilter,
+                urlHsCode,
+                urlAccuracy,
+                (errorMsg) => toast.error(errorMsg, 'Statistics Error')
+              );
+              setStatistics(statsResponse.data || []);
+            } catch (error) {
+              setStatistics([]);
+            }
+          } else {
+            setStatistics([]);
+          }
         } catch (error) {
           console.error('Initial search failed:', error);
           toast.error('Failed to fetch search results. Please try again later.', 'Error');
@@ -525,7 +566,7 @@ export default function HomePage() {
     
     // Set initialized after handling initial URL parameters
     setInitialized(true);
-  }, [searchParams, locale, currentPage, activeTab, languageFilter, countryFilter, initialized, industryFilter, isicCodeFilter]);
+  }, [searchParams, locale, currentPage, activeTab, initialized]);
   
   // Listen for changes in URL params after initial mount
   useEffect(() => {
@@ -534,74 +575,86 @@ export default function HomePage() {
       return;
     }
     
-    // For subsequent URL changes
-    const query = searchParams.get('keyword');
-    const type = searchParams.get('search_type') as 'knowledge' | 'insighter' || 'knowledge';
+    // For subsequent URL changes - use a batch update approach to avoid race conditions
+    const urlQuery = searchParams.get('keyword');
+    const urlType = searchParams.get('search_type') as 'knowledge' | 'insighter' || 'knowledge';
+    const urlLanguage = searchParams.get('language') as 'all' | 'arabic' | 'english';
+    const urlCountry = searchParams.get('country') ? parseInt(searchParams.get('country')!) : null;
+    const urlRegion = searchParams.get('region') ? parseInt(searchParams.get('region')!) : null;
+    const urlEconomicBloc = searchParams.get('economic_bloc') ? parseInt(searchParams.get('economic_bloc')!) : null;
+    const urlIndustry = searchParams.get('industry') ? parseInt(searchParams.get('industry')!) : null;
+    const urlIsicCode = searchParams.get('isic_code') ? parseInt(searchParams.get('isic_code')!) : null;
+    const urlHsCode = searchParams.get('hs_code') ? parseInt(searchParams.get('hs_code')!) : null;
+    const urlCategory = searchParams.get('type');
+    const urlAccuracy = searchParams.get('accuracy') as 'any' | 'all';
+    const urlPriceFilter = searchParams.get('paid');
     
-    // Handle search query and type updates
-    if (query) {
-      setSearchQuery(query);
-      // Reset the empty query flag to ensure search runs with the new query
-      emptyQueryCalledRef.current = false;
-    } else {
-      // If no keyword in URL, clear the search query
-      setSearchQuery('');
-    }
-    
-    if (type) {
-      setSearchType(type);
-    }
-    
-    // Handle filter parameter updates
-    const language = searchParams.get('language') as 'all' | 'arabic' | 'english';
-    if (language && language !== languageFilter) {
-      setLanguageFilter(language);
-    } else if (!language && languageFilter !== 'all') {
-      setLanguageFilter('all');
-    }
-    
-    // Handle numeric filters (country, region, etc.)
-    const updateNumericFilter = (
-      paramName: string, 
-      currentValue: number | null, 
-      setter: (value: number | null) => void
-    ) => {
-      const paramValue = searchParams.get(paramName);
-      if (paramValue) {
-        const numValue = parseInt(paramValue);
-        if (numValue !== currentValue) {
-          setter(numValue);
-        }
-      } else if (currentValue !== null) {
-        // If parameter is not in URL but we have a value, reset it
-        setter(null);
+    // Batch all state updates to avoid multiple re-renders and race conditions
+    const updateStates = () => {
+      // Handle search query and type updates
+      if (urlQuery !== searchQuery) {
+        setSearchQuery(urlQuery || '');
+        // Reset the empty query flag to ensure search runs with the new query
+        emptyQueryCalledRef.current = false;
+      }
+      
+      if (urlType && urlType !== searchType) {
+        setSearchType(urlType);
+      }
+      
+      // Handle language filter
+      if (urlLanguage && urlLanguage !== languageFilter) {
+        setLanguageFilter(urlLanguage);
+      } else if (!urlLanguage && languageFilter !== 'all') {
+        setLanguageFilter('all');
+      }
+      
+      // Handle numeric filters
+      if (urlCountry !== countryFilter) {
+        setCountryFilter(urlCountry);
+      }
+      
+      if (urlRegion !== regionFilter) {
+        setRegionFilter(urlRegion);
+      }
+      
+      if (urlEconomicBloc !== economicBlocFilter) {
+        setEconomicBlocFilter(urlEconomicBloc);
+      }
+      
+      if (urlIndustry !== industryFilter) {
+        setIndustryFilter(urlIndustry);
+      }
+      
+      if (urlIsicCode !== isicCodeFilter) {
+        setIsicCodeFilter(urlIsicCode);
+      }
+      
+      if (urlHsCode !== hsCodeFilter) {
+        setHsCodeFilter(urlHsCode);
+      }
+      
+      if (urlPriceFilter !== priceFilter) {
+        setPriceFilter(urlPriceFilter);
+      }
+      
+      // Handle category parameter
+      if (urlCategory && urlCategory !== selectedCategory) {
+        setSelectedCategory(urlCategory);
+      } else if (!urlCategory && selectedCategory !== 'all') {
+        setSelectedCategory('all');
+      }
+      
+      // Handle accuracy parameter
+      if (urlAccuracy && urlAccuracy !== accuracyFilter) {
+        setAccuracyFilter(urlAccuracy);
+      } else if (!urlAccuracy && accuracyFilter !== 'all') {
+        setAccuracyFilter('all');
       }
     };
     
-    updateNumericFilter('country', countryFilter, setCountryFilter);
-    updateNumericFilter('region', regionFilter, setRegionFilter);
-    updateNumericFilter('economic_bloc', economicBlocFilter, setEconomicBlocFilter);
-    updateNumericFilter('industry', industryFilter, setIndustryFilter);
-    updateNumericFilter('isic_code', isicCodeFilter, setIsicCodeFilter);
-    updateNumericFilter('hs_code', hsCodeFilter, setHsCodeFilter);
-    
-    // Handle category parameter
-    const category = searchParams.get('type');
-    if (category && category !== selectedCategory) {
-      setSelectedCategory(category);
-    } else if (!category && selectedCategory !== 'all') {
-      setSelectedCategory('all');
-    }
-    
-    // Handle accuracy parameter
-    const accuracy = searchParams.get('accuracy') as 'any' | 'all';
-    if (accuracy && accuracy !== accuracyFilter) {
-      setAccuracyFilter(accuracy);
-    } else if (!accuracy && accuracyFilter !== 'any') {
-      setAccuracyFilter('all');
-    }
-  }, [searchParams, initialized, languageFilter, countryFilter, regionFilter, 
-      economicBlocFilter, industryFilter, isicCodeFilter, hsCodeFilter, selectedCategory, accuracyFilter]);
+    updateStates();
+  }, [searchParams, initialized]);
   
   // Function to convert KnowledgeItem array to SearchResultItem array
   const mapToSearchResults = useCallback((items: KnowledgeItem[]) => {
