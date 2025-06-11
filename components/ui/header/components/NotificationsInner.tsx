@@ -29,6 +29,7 @@ const getNotificationBg = (subType: string): string => {
     case 'activate_insighter':
     case 'accept_knowledge':
     case 'knowledge_accept':
+    case 'approved':
     case 'download':
     case 'view':
       return 'info';
@@ -79,6 +80,7 @@ const getNotificationIconName = (subType: string): string => {
       return 'duotune/general/gen047.svg';
     case 'accept_knowledge':
     case 'knowledge_accept':
+    case 'approved':
       return 'duotune/files/fil025.svg';
     case 'declined':
     case 'knowledge_declined':
@@ -139,6 +141,7 @@ const getNotificationName = (subType: string): string => {
   const nameMap: Record<string, string> = {
     'accept_knowledge': 'Knowledge Accepted',
     'declined': 'Knowledge Declined',
+    'approved': 'Knowledge Approved',
     'download': 'Download',
     'upload': 'Upload',
     'comment': 'Comment',
@@ -206,6 +209,18 @@ export default function NotificationsInner({
   }, [onClickOutside])
 
   const handleNotificationClick = (notification: Notification) => {
+    // Handle accept_knowledge notifications - redirect to insighter dashboard
+    if (notification.sub_type === 'accept_knowledge') {
+      window.location.href = 'https://app.knoldg.com/app/insighter-dashboard/my-requests'
+      return
+    }
+    
+    // Handle knowledge approved notifications - redirect to knowledge details page
+    if (notification.type === 'knowledge' && notification.sub_type === 'approved') {
+      window.location.href = `https://app.knoldg.com/app/my-knowledge-base/view-my-knowledge/${notification.param}/details`
+      return
+    }
+    
     // Handle knowledge accept/decline notifications
     if (notification.type === 'knowledge' && (notification.sub_type === 'accept_knowledge' || notification.sub_type === 'declined')) {
       // For company-insighter role, we would handle this differently
@@ -217,7 +232,7 @@ export default function NotificationsInner({
     
     // Handle knowledge notifications with category
     if (notification.type === 'knowledge' && notification.category) {
-      const knowledgeUrl = `http://localhost:3000/${currentLanguage}/knowledge/${notification.category}/${notification.param || ''}?tab=ask`
+      const knowledgeUrl = `https://knoldg.com/${currentLanguage}/knowledge/${notification.category}/${notification.param || ''}?tab=ask`
       window.open(knowledgeUrl, '_blank')
     } else {
       onNotificationClick(notification.id)
@@ -245,7 +260,7 @@ export default function NotificationsInner({
 
       <div
         className="px-5 py-4 text-white"
-        style={{ backgroundImage: 'url(http://localhost:4200/assets/media/misc/menu-header-bg.jpg)', backgroundSize: 'cover', backgroundPosition: 'center' }}
+        style={{ backgroundImage: 'url(https://app.knoldg.com/assets/media/misc/menu-header-bg.jpg)', backgroundSize: 'cover', backgroundPosition: 'center' }}
       >
         <h3 className="font-bold text-lg mt-4 mb-2">
           {t('TITLE')}

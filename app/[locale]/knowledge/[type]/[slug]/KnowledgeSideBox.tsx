@@ -177,7 +177,7 @@ const KnowledgeSideBox = ({
         <div className="space-y-3">
           <div className="tp-course-details2-widget-list-item flex items-center justify-between">
             <span className="flex items-center">
-              <div className="bg-blue-50 p-2 rounded-full mr-2">
+              <div className="bg-blue-50 p-2 rounded-full me-2">
                 <DocumentTextIcon className="w-4 h-4 text-blue-500" />
               </div>
               {translations.documents}
@@ -233,7 +233,7 @@ const KnowledgeSideBox = ({
 
           <div className="tp-course-details2-widget-list-item flex items-center justify-between">
             <span className="flex items-center">
-              <div className="bg-blue-50 p-2 rounded-full mr-2">
+              <div className="bg-blue-50 p-2 rounded-full me-2">
                 <IconLanguage className="w-4 h-4 text-blue-500" />
               </div>
               {translations.documentsLanguage}
@@ -244,7 +244,7 @@ const KnowledgeSideBox = ({
           {isic_code && !Array.isArray(isic_code) && isic_code.key && (
             <div className="tp-course-details2-widget-list-item flex items-center justify-between">
               <span className="flex items-center gap-2 font-medium ">
-                <div className="bg-blue-50 p-2 rounded-full mr-2">
+                <div className="bg-blue-50 p-2 rounded-full me-2">
                   <IconCode className="w-4 h-4 text-blue-500" />
                 </div>
                 {translations.isicCode}
@@ -264,7 +264,7 @@ const KnowledgeSideBox = ({
           {isic_code && Array.isArray(isic_code) && isic_code.length > 0 && (
             <div className="tp-course-details2-widget-list-item flex items-center justify-between">
               <span className="flex items-center gap-2 font-medium ">
-                <div className="bg-blue-50 p-2 rounded-full mr-2">
+                <div className="bg-blue-50 p-2 rounded-full me-2">
                   <IconCode className="w-4 h-4 text-blue-500" />
                 </div>
                 {translations.isicCode}
@@ -302,7 +302,7 @@ const KnowledgeSideBox = ({
           {hs_code && !Array.isArray(hs_code) && (
             <div className="tp-course-details2-widget-list-item flex items-center justify-between">
               <span className="flex items-center gap-2 font-medium ">
-                <div className="bg-blue-50 p-2 rounded-full mr-2">
+                <div className="bg-blue-50 p-2 rounded-full me-2">
                   <IconCode className="w-4 h-4 text-blue-500" />
                 </div>
                 {translations.hsCode}
@@ -324,7 +324,7 @@ const KnowledgeSideBox = ({
           {hs_code && Array.isArray(hs_code) && hs_code.length > 0 && (
             <div className="tp-course-details2-widget-list-item flex items-center justify-between">
               <span className="flex items-center gap-2 font-medium ">
-                <div className="bg-blue-50 p-2 rounded-full mr-2">
+                <div className="bg-blue-50 p-2 rounded-full me-2">
                   <IconCode className="w-4 h-4 text-blue-500" />
                 </div>
                 {translations.hsCode}
@@ -363,7 +363,7 @@ const KnowledgeSideBox = ({
             economic_blocs && economic_blocs.length > 0 && (
               <div className="tp-course-details2-widget-list-item flex items-center justify-between">
                 <span className="flex items-center gap-2 font-medium ">
-                  <div className="bg-blue-50 p-2 rounded-full mr-2">
+                  <div className="bg-blue-50 p-2 rounded-full me-2">
                     <IconWorld className="w-4 h-4 text-blue-500" />
                   </div>
                   {translations.targetMarket}
@@ -404,7 +404,7 @@ const KnowledgeSideBox = ({
             regions && regions.length > 0 && (
               <div className="tp-course-details2-widget-list-item flex items-center justify-between">
                 <span className="flex items-center gap-2 font-medium ">
-                  <div className="bg-blue-50 p-2 rounded-full mr-2">
+                  <div className="bg-blue-50 p-2 rounded-full me-2">
                     <IconWorld className="w-4 h-4 text-blue-500" />
                   </div>
                   {translations.targetMarket}
@@ -445,7 +445,7 @@ const KnowledgeSideBox = ({
             countries && countries.length > 0 && (
               <div className="tp-course-details2-widget-list-item flex items-center justify-between">
                 <span className="flex items-center gap-2 font-medium ">
-                  <div className="bg-blue-50 p-2 rounded-full mr-2">
+                  <div className="bg-blue-50 p-2 rounded-full me-2">
                     <IconWorld className="w-4 h-4 text-blue-500" />
                   </div>
                   {translations.targetMarket}
@@ -485,7 +485,7 @@ const KnowledgeSideBox = ({
 
           <div className="tp-course-details2-widget-list-item flex items-center justify-between">
             <span className="flex items-center">
-              <div className="bg-blue-50 p-2 rounded-full mr-2">
+              <div className="bg-blue-50 p-2 rounded-full me-2">
                 <CalendarIcon className="w-4 h-4 text-blue-500" />
               </div>
               {translations.publishedAt}
@@ -499,7 +499,7 @@ const KnowledgeSideBox = ({
           {false && (
             <div className="tp-course-details2-widget-list-item flex items-center justify-between">
               <span className="flex items-center">
-                <div className="bg-blue-50 p-2 rounded-full mr-2">
+                <div className="bg-blue-50 p-2 rounded-full me-2">
                   <ClockIcon className="w-4 h-4 text-blue-500" />
                 </div>
                 {translations.lastUpdate}

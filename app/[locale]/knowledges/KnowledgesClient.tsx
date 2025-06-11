@@ -74,7 +74,7 @@ async function fetchKnowledgeItems({ taxonomy, id, type, page, locale }: FetchKn
   if (taxonomy && id) params.append(taxonomy, id);
   params.append('page', page.toString());
 
-  const response = await fetch(`https://api.foresighta.co/api/platform/industries/type/knowledge?${params.toString()}`, {
+  const response = await fetch(`https://api.knoldg.com/api/platform/industries/type/knowledge?${params.toString()}`, {
     headers: {
       "Content-Type": "application/json",
       "Accept": "application/json",
@@ -163,7 +163,7 @@ export default function KnowledgesClient() {
     if (selectedId && taxonomy === 'industry') {
       const fetchSubIndustries = async () => {
         try {
-          const response = await fetch(`https://api.foresighta.co/api/platform/industries/${selectedId}/subindustries`, {
+          const response = await fetch(`https://api.knoldg.com/api/platform/industries/${selectedId}/subindustries`, {
             method: 'POST',
             headers: {
               "Content-Type": "application/json",
@@ -190,7 +190,7 @@ export default function KnowledgesClient() {
   useEffect(() => {
     if (selectedId && taxonomy === 'sub_industry') {
       // Fetch topics for the selected sub-industry
-      fetch(`https://api.foresighta.co/api/subindustries/${selectedId}/topics`, {
+      fetch(`https://api.knoldg.com/api/subindustries/${selectedId}/topics`, {
         method: 'POST',
         headers: {
           "Content-Type": "application/json",

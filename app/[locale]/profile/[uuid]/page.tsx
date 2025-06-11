@@ -122,6 +122,7 @@ export default function ProfilePage() {
   const [knowledgePage, setKnowledgePage] = useState(1);
   const [loadingKnowledge, setLoadingKnowledge] = useState(false);
   const [selectedType, setSelectedType] = useState<string | null>(null);
+  const [initialTypeCounts, setInitialTypeCounts] = useState<Record<string, number>>({});
   const params = useParams();
   const searchParams = useSearchParams();
   const uuid = params.uuid as string;
@@ -146,7 +147,7 @@ export default function ProfilePage() {
         // If entity=insighter is specified, try insighter API first
         if (entityType === 'insighter') {
           // Try insighter API first
-          let response = await fetch(`https://api.foresighta.co/api/platform/insighter/profile/${uuid}`, {
+          let response = await fetch(`https://api.knoldg.com/api/platform/insighter/profile/${uuid}`, {
             headers: {
               "Content-Type": "application/json",
               "Accept": "application/json",
@@ -159,7 +160,7 @@ export default function ProfilePage() {
             setProfileData(data.data);
           } else {
             // Fall back to company API if insighter fails
-            response = await fetch(`https://api.foresighta.co/api/platform/company/profile/${uuid}`, {
+            response = await fetch(`https://api.knoldg.com/api/platform/company/profile/${uuid}`, {
               headers: {
                 "Content-Type": "application/json",
                 "Accept": "application/json",
@@ -206,7 +207,7 @@ export default function ProfilePage() {
           }
         } else {
           // Default behavior: try company API first
-          let response = await fetch(`https://api.foresighta.co/api/platform/company/profile/${uuid}`, {
+          let response = await fetch(`https://api.knoldg.com/api/platform/company/profile/${uuid}`, {
             headers: {
               "Content-Type": "application/json",
               "Accept": "application/json",
@@ -249,7 +250,7 @@ export default function ProfilePage() {
             setProfileData(companyProfileData);
           } else {
             // Try insighter API if company API fails
-            response = await fetch(`https://api.foresighta.co/api/platform/insighter/profile/${uuid}`, {
+            response = await fetch(`https://api.knoldg.com/api/platform/insighter/profile/${uuid}`, {
               headers: {
                 "Content-Type": "application/json",
                 "Accept": "application/json",
@@ -287,10 +288,10 @@ export default function ProfilePage() {
         const urlParams = new URLSearchParams(window.location.search);
         const entityType = urlParams.get('entity');
         
-        // Determine API endpoint based on entity parameter instead of roles
+        // Now fetch the filtered data
         let url = (entityType === 'insighter') 
-          ? `https://api.foresighta.co/api/platform/insighter/knowledge/${uuid}?page=${knowledgePage}&per_page=12`
-          : `https://api.foresighta.co/api/platform/company/knowledge/${uuid}?page=${knowledgePage}&per_page=12`;
+          ? `https://api.knoldg.com/api/platform/insighter/knowledge/${uuid}?page=${knowledgePage}&per_page=12`
+          : `https://api.knoldg.com/api/platform/company/knowledge/${uuid}?page=${knowledgePage}&per_page=12`;
         
         if (selectedType) {
           url += `&type=${selectedType}`;
@@ -310,6 +311,16 @@ export default function ProfilePage() {
         
         const data = await response.json();
         setKnowledgeData(data);
+        
+        // Store initial type counts only on first load without filter
+        if (!selectedType && Object.keys(initialTypeCounts).length === 0 && data.data) {
+          const counts: Record<string, number> = {};
+          data.data.forEach((item: KnowledgeApiItem) => {
+            counts[item.type] = (counts[item.type] || 0) + 1;
+          });
+          counts['all'] = data.meta.total;
+          setInitialTypeCounts(counts);
+        }
       } catch (error) {
         console.error('Error fetching knowledge data:', error);
       } finally {
@@ -572,7 +583,7 @@ export default function ProfilePage() {
                         className="w-full h-full rounded-full object-cover"
                       />
                     ) : (
-                      <div className="w-full h-full bg-gray-100 dark:bg-slate-700 flex items-center justify-center">
+                      <div className="w-full h-full bg-gray-100 dark:bg-slate-700 flex items-center justify-center rounded-full">
                         <span className="text-4xl font-bold text-gray-400 dark:text-slate-400">
                           {profileData.first_name?.charAt(0) || ''}
                           {profileData.last_name?.charAt(0) || ''}
@@ -592,7 +603,7 @@ export default function ProfilePage() {
                         </Link>
                       </div>
                     )}
-                      {isCompany && enterpriseType === 'insighter' && (
+                    {isCompany && enterpriseType === 'insighter' && (
                       <div className="absolute -bottom-3 -right-3 w-14 h-14 rounded-full border-4 border-white bg-white dark:bg-slate-700 z-10">
                         {profileData.profile_photo_url ? (
                           <Image
@@ -603,7 +614,7 @@ export default function ProfilePage() {
                             className="w-full h-full object-cover border-3 border-white rounded-full"
                           />
                         ) : (
-                          <div className="w-full h-full bg-gray-100 dark:bg-slate-700 flex items-center justify-center">
+                          <div className="w-full h-full bg-gray-100 dark:bg-slate-700 flex items-center justify-center rounded-full">
                             <span className="text-sm font-bold text-gray-400 dark:text-slate-400">
                               {profileData.first_name?.charAt(0) || ''}
                               {profileData.last_name?.charAt(0) || ''}
@@ -780,13 +791,15 @@ export default function ProfilePage() {
                     </div>
                     {knowledgeTypes.map((type) => {
                       const isActive = selectedType === type.id;
-                      const typeCount = knowledgeData?.data.filter(item => 
-                        type.id === null || item.type === type.id
-                      ).length || 0;
-                      
-                      // Skip rendering if count is 0 and it's not the "all" filter
-                      if (typeCount === 0 && type.id !== null) {
-                        return null;
+                      // Use initial counts if available, otherwise use current filtered data counts
+                      let typeCount = 0;
+                      if (type.id === null) {
+                        // For "All" filter, always show total
+                        typeCount = knowledgeData?.meta.total || 0;
+                      } else {
+                        // For specific types, use initial counts if available, otherwise current count
+                        typeCount = initialTypeCounts[type.id] || 
+                                   knowledgeData?.data.filter(item => item.type === type.id).length || 0;
                       }
                       
                       return (
@@ -802,7 +815,7 @@ export default function ProfilePage() {
                             <span className={`${isRTL ? 'me-2' : 'ml-2'} font-medium text-xs`}>
                               {filterT(type.label)}
                             </span>
-                            {type.id !== null && (
+                            {type.id !== null && typeCount > 0 && (
                               <span className={styles.countBadge}>{typeCount}</span>
                             )}
                           </span>
@@ -1121,7 +1134,7 @@ export default function ProfilePage() {
           <div className="text-center">
             <div className="bg-white dark:bg-slate-800 p-6 rounded-full mb-4 shadow-md inline-block">
               <svg xmlns="http://www.w3.org/2000/svg" className="h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4.354v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
               </svg>
             </div>
             <p className="text-xl text-gray-600 dark:text-gray-300">{t('profileNotFound')}</p>

@@ -4,12 +4,25 @@ import React, { Suspense } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import LoadingState from './LoadingState';
+import { IconRosetteDiscountCheckFilled } from '@tabler/icons-react';
+import { Rating } from '@mantine/core';
 
 // Import existing SearchResultItem type or define a compatible type
 export interface InsighterProfile {
   uuid: string;
   name: string;
   profile_photo_url: string | null;
+  roles: string[];
+  reviews_summary: {
+    count: number;
+    average: number;
+  };
+  company?: {
+    uuid: string;
+    legal_name: string;
+    logo: string;
+    verified: boolean;
+  };
 }
 
 interface InsightersResultsSectionProps {
@@ -57,33 +70,138 @@ const InsightersResultsSection: React.FC<InsightersResultsSectionProps> = ({
                   const uuid = insighter.uuid || insighter.id || '';
                   const name = insighter.name || '';
                   const photoUrl = insighter.profile_photo_url || insighter.photo || insighter.image || null;
+                  const roles = insighter.roles || [];
+                  const isInsighter = roles.includes('insighter');
+                  const isCompany = roles.includes('company');
+                  const isCompanyInsighter = roles.includes('company-insighter');
+                  const reviewsSummary = insighter.reviews_summary || { count: 0, average: 0 };
+                  const company = insighter.company;
                   
                   return (
                     <Link 
                       href={`/${locale}/profile/${uuid}?entity=insighter`} 
                       key={uuid}
-                      className="block bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-300 p-6"
+                      className="flex flex-col justify-between gap-4 bg-white rounded-lg border-1 border-gray-200 overflow-hidden  duration-300 p-6 hover:translate-y-[-5px] hover:shadow-md-blue-500"
                     >
-                      <div className="flex flex-col items-center">
-                        <div className="relative w-24 h-24 rounded-full overflow-hidden mb-4">
-                          {photoUrl ? (
+                      <div className="flex flex-col items-center space-y-4">
+                        {/* Avatar Section */}
+                        <div className="relative w-24 h-24 rounded-full border border-blue-500">
+                          {/* Avatar display logic based on role */}
+                          {isCompanyInsighter ? (
+                            // Company-insighter: Show initials with company logo overlay
+                            <>
+                              <div className="w-full h-full bg-blue-100 flex items-center justify-center rounded-full">
+                                <span className="text-2xl font-semibold text-blue-600 rounded-full">
+                                  {name.split(' ').map((word: string) => word.charAt(0)).join('').toUpperCase()}
+                                </span>
+                              </div>
+                              {company?.logo && (
+                                <div className="absolute -bottom-3 -right-3 w-14 h-14 rounded-full overflow-hidden border-4 border-white bg-white z-10">
+                                  <Image 
+                                    src={company.logo} 
+                                    alt={company.legal_name || 'Company'}
+                                    fill
+                                    className="object-cover rounded-full"
+                                  />
+                                </div>
+                              )}
+                            </>
+                          ) : isCompany && company?.logo ? (
+                            // Company: Show company logo with profile photo/initials overlay
+                            <>
+                              <Image 
+                                src={company.logo} 
+                                alt={company.legal_name || name}
+                                fill
+                                className="object-cover border-1 border-blue-500 rounded-full"
+                              />
+                              {photoUrl ? (
+                                <div className="absolute -bottom-3 -right-3 w-14 h-14 rounded-full border-4 border-white bg-white z-10">
+                                  <Image 
+                                    src={photoUrl} 
+                                    alt={name}
+                                    fill
+                                    className="object-cover rounded-full"
+                                  />
+                                </div>
+                              ) : (
+                                <div className="absolute -bottom-3 -right-3 w-14 h-14 rounded-full bg-blue-100 border-4 border-white z-10 flex items-center justify-center">
+                                  <span className="text-sm font-semibold text-blue-600 rounded-full">
+                                    {name.split(' ').map((word: string) => word.charAt(0)).join('').toUpperCase()}
+                                  </span>
+                                </div>
+                              )}
+                            </>
+                          ) : photoUrl ? (
+                            // Regular insighter: Show profile photo
                             <Image 
                               src={photoUrl} 
                               alt={name}
                               fill
-                              className="object-cover"
+                              className="object-cover border-1 border-blue-500 rounded-full"
                             />
                           ) : (
-                            <div className="w-full h-full bg-blue-100 flex items-center justify-center">
-                              <span className="text-2xl font-semibold text-blue-600">
+                            // Fallback: Show initials
+                            <div className="w-full h-full bg-blue-100 flex items-center justify-center rounded-full">
+                              <span className="text-2xl font-semibold text-blue-600 rounded-full">
                                 {name.charAt(0)}
                               </span>
                             </div>
                           )}
-                          <div className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 rounded-full border-2 border-white"></div>
+                          
+                          {/* Online indicator */}
                         </div>
-                      <div className='text-sm font-semibold'>{name}</div>
+
+                        {/* Name and Badge Section */}
+                        <div className='flex flex-col items-center gap-3'>
+                            {/* Role-based badges */}
+                            {isCompanyInsighter && company && (
+                            <span className="bg-yellow-100 text-yellow-600 font-bold uppercase text-[10px] px-3 py-1 rounded-full">
+                              {company.legal_name} Company
+                            </span>
+                          )}
+                          
+                          {isInsighter && !isCompanyInsighter && (
+                            <span className="bg-blue-100 text-blue-500 font-bold uppercase text-[10px] px-3 py-1 rounded-full">
+                              Insighter
+                            </span>
+                          )}
+                          
+                          {isCompany && !isCompanyInsighter && company && (
+                            <>
+                              <span className="bg-yellow-100 text-yellow-600 font-bold text-[10px] px-3 py-1 rounded-full uppercase">
+                                {company.legal_name} Company
+                              </span>
+                        
+                            </>
+                          )}
+                          <div className='flex items-center gap-2'>
+                            <div className='text-lg font-semibold text-center'>{name}</div>
+                            <IconRosetteDiscountCheckFilled className="w-5 h-5 text-blue-500" />
+                          </div>
+                          
+                        
+                        </div>
+                        
+                        {/* Rating Section */}
+                        {reviewsSummary && reviewsSummary.count >= 1 && reviewsSummary.average > 0 && (
+                          <div className="flex items-center gap-2">
+                            <Rating value={reviewsSummary.average} fractions={2} readOnly size="sm" />
+                            <span className="text-sm font-medium text-gray-700">({reviewsSummary.average.toFixed(1)})</span>
+                          </div>
+                        )}
+
+                       
                       </div>
+                       {/* Action Buttons */}
+                       <div className="flex flex-col gap-2 w-full">
+                          <button className="flex-1 bg-gradient-to-r from-blue-500 to-teal-400 text-xs text-white px-6 py-2 rounded-md font-medium hover:shadow-lg transition-all duration-300">
+                            {locale === 'ar' ? `مقابلة ${name}` : `Meet ${name}`}
+                          </button>
+                          <button className="flex-1 bg-white border border-gray-200 text-gray-700 px-6 py-2 text-xs rounded-md font-medium hover:bg-gray-50 transition-all duration-300">
+                            {locale === 'ar' ? 'تابع' : 'Keep up with'}
+                          </button>
+                        </div>
                     </Link>
                   );
                 })}

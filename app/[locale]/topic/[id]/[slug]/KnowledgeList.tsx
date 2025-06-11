@@ -11,6 +11,7 @@ import { useParams } from "next/navigation";
 import { arSA, enUS } from 'date-fns/locale';
 import CourseIcon from "@/components/icons/CourseIcon";
 import styles from "./knowledge-list.module.css";
+import Image from "next/image";
 
 interface KnowledgeListProps {
   knowledge: KnowledgeItem[];
@@ -321,7 +322,14 @@ export default function KnowledgeList({
         ))}
         {knowledge.length === 0 && (
           <div className="flex flex-col items-center justify-center py-12 px-4">
-            <div className="rounded-full bg-gray-50 p-4 mb-3"></div>
+          
+            <Image
+            src="/images/Search-Not-Found.svg"
+            alt="No results found"
+            width={300}
+            height={200}
+            className="mb-4"
+          />
             <p className="text-gray-500 text-sm">
               {translations.noItems}
             </p>

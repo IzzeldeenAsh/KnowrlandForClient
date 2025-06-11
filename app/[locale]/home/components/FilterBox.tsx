@@ -69,6 +69,7 @@ interface IndustryNode {
 
 interface FilterBoxProps {
   locale: string;
+  searchType?: 'knowledge' | 'insighter';
   languageFilter: 'all' | 'arabic' | 'english';
   setLanguageFilter: (filter: 'all' | 'arabic' | 'english') => void;
   countryFilter: number | null;
@@ -85,11 +86,14 @@ interface FilterBoxProps {
   setIndustryFilter?: (filter: number | null) => void;
   priceFilter?: string | null;
   setPriceFilter?: (filter: string | null) => void;
+  accuracyFilter?: 'any' | 'all';
+  setAccuracyFilter?: (filter: 'any' | 'all') => void;
   resetFilters?: () => void;
 }
 
 const FilterBox: React.FC<FilterBoxProps> = ({
   locale,
+  searchType = 'knowledge',
   languageFilter,
   setLanguageFilter,
   countryFilter,
@@ -106,6 +110,8 @@ const FilterBox: React.FC<FilterBoxProps> = ({
   setIndustryFilter = () => {},
   priceFilter = null,
   setPriceFilter = () => {},
+  accuracyFilter = 'all',
+  setAccuracyFilter = () => {},
   resetFilters = () => {}
 }) => {
   const [countries, setCountries] = useState<Country[]>([]);
@@ -155,6 +161,7 @@ const FilterBox: React.FC<FilterBoxProps> = ({
   // State for content types collapse
   const [priceCollapsed, setpriceCollapsed] = useState(false);
   const [languageCollapsed, setLanguageCollapsed] = useState(false);
+  const [accuracyCollapsed, setAccuracyCollapsed] = useState(false);
   const [industryCollapsed, setIndustryCollapsed] = useState(false);
   const [targetMarketCollapsed, setTargetMarketCollapsed] = useState(true);
   const [publicationDateCollapsed, setPublicationDateCollapsed] = useState(true);
@@ -170,7 +177,7 @@ const FilterBox: React.FC<FilterBoxProps> = ({
     const fetchCountries = async () => {
       setLoading(true);
       try {
-        const response = await fetch('https://api.foresighta.co/api/common/setting/country/list', {
+        const response = await fetch('https://api.knoldg.com/api/common/setting/country/list', {
           headers: {
             'Accept-Language': locale,
             'Accept': 'application/json'
@@ -191,7 +198,7 @@ const FilterBox: React.FC<FilterBoxProps> = ({
     const fetchRegions = async () => {
       setLoadingRegions(true);
       try {
-        const response = await fetch('https://api.foresighta.co/api/common/setting/region/list', {
+        const response = await fetch('https://api.knoldg.com/api/common/setting/region/list', {
           headers: {
             'Accept-Language': locale,
             'Accept': 'application/json'
@@ -217,7 +224,7 @@ const FilterBox: React.FC<FilterBoxProps> = ({
     const fetchEconomicBlocs = async () => {
       setLoadingEconomicBlocs(true);
       try {
-        const response = await fetch('https://api.foresighta.co/api/common/setting/economic-bloc/list', {
+        const response = await fetch('https://api.knoldg.com/api/common/setting/economic-bloc/list', {
           headers: {
             'Accept-Language': locale,
             'Accept': 'application/json'
@@ -243,7 +250,7 @@ const FilterBox: React.FC<FilterBoxProps> = ({
     const fetchIsicCodes = async () => {
       setLoadingIsicCodes(true);
       try {
-        const response = await fetch('https://api.foresighta.co/api/common/setting/isic-code/tree-list', {
+        const response = await fetch('https://api.knoldg.com/api/common/setting/isic-code/tree-list', {
           headers: {
             'Accept-Language': locale,
             'Accept': 'application/json'
@@ -264,7 +271,7 @@ const FilterBox: React.FC<FilterBoxProps> = ({
     const fetchHsCodes = async () => {
       setLoadingHsCodes(true);
       try {
-        const response = await fetch('https://api.foresighta.co/api/common/setting/hs-code/list', {
+        const response = await fetch('https://api.knoldg.com/api/common/setting/hs-code/list', {
           headers: {
             'Accept-Language': locale,
             'Accept': 'application/json'
@@ -285,7 +292,7 @@ const FilterBox: React.FC<FilterBoxProps> = ({
     const fetchIndustries = async () => {
       setLoadingIndustries(true);
       try {
-        const response = await fetch('https://api.foresighta.co/api/common/setting/industry/tree', {
+        const response = await fetch('https://api.knoldg.com/api/common/setting/industry/tree', {
           headers: {
             'Accept-Language': locale,
             'Accept': 'application/json'
@@ -684,67 +691,70 @@ const FilterBox: React.FC<FilterBoxProps> = ({
         </div>
 
         {/* Price Types Section */}
-        <div className="mb-4 border-b border-gray-200 pb-4">
-          <button
-            onClick={() => setpriceCollapsed(!priceCollapsed)}
-            className="w-full flex justify-between items-center py-2 text-left hover:bg-gray-50 rounded-md px-2"
-          >
-            <div className="flex items-center">
-            <div className="bg-blue-50 p-2 rounded-full mr-2">
-                    <IconCoin size={16} className="text-blue-500" />
-                  </div>
-              <h3 className="text-md font-semibold text-gray-700">
-                {locale === 'ar' ? 'السعر' : 'Price'}
-              </h3>
-            </div>
-            <svg 
-              className={`w-4 h-4 text-gray-500 transition-transform ${priceCollapsed ? 'rotate-0' : 'rotate-180'}`}
-              fill="none" 
-              stroke="currentColor" 
-              viewBox="0 0 24 24"
+        {searchType !== 'insighter' && (
+          <div className="mb-4 border-b border-gray-200 pb-4">
+            <button
+              onClick={() => setpriceCollapsed(!priceCollapsed)}
+              className="w-full flex justify-between items-center py-2 text-left hover:bg-gray-50 rounded-md px-2"
             >
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-            </svg>
-          </button>
-          
-          {!priceCollapsed && (
-            <div className="mt-3 space-y-4 px-2">
-              {/* Price Filter */}
-              <div>
-                <div className="flex gap-2">
-                  <button
-                    onClick={() => handlePriceFilterChange(null)}
-                    className={`px-4 py-2 rounded-full text-sm transition-colors ${priceFilter === null ? 'bg-[#299af8] text-white' : 'bg-gray-100 text-gray-800 hover:bg-gray-200'}`}
-                  >
-                    {locale === 'ar' ? '\u0627\u0644\u0643\u0644' : 'All'}
-                  </button>
-                  <button
-                    onClick={() => handlePriceFilterChange('false')}
-                    className={`px-4 py-2 rounded-full text-sm transition-colors ${priceFilter === 'false' ? 'bg-[#299af8] text-white' : 'bg-gray-100 text-gray-800 hover:bg-gray-200'}`}
-                  >
-                    {locale === 'ar' ? '\u0645\u062c\u0627\u0646\u064a' : 'Free'}
-                  </button>
-                  <button
-                    onClick={() => handlePriceFilterChange('true')}
-                    className={`px-4 py-2 rounded-full text-sm transition-colors ${priceFilter === 'true' ? 'bg-[#299af8] text-white' : 'bg-gray-100 text-gray-800 hover:bg-gray-200'}`}
-                  >
-                    {locale === 'ar' ? '\u0645\u062f\u0641\u0648\u0639' : 'Paid'}
-                  </button>
-                </div>
+              <div className="flex items-center">
+              <div className="bg-blue-50 p-2 rounded-full me-2">
+                      <IconCoin size={16} className="text-blue-500" />
+                    </div>
+                <h3 className="text-md font-semibold text-gray-700">
+                  {locale === 'ar' ? 'السعر' : 'Price'}
+                </h3>
               </div>
+              <svg 
+                className={`w-4 h-4 text-gray-500 transition-transform ${priceCollapsed ? 'rotate-0' : 'rotate-180'}`}
+                fill="none" 
+                stroke="currentColor" 
+                viewBox="0 0 24 24"
+              >
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+              </svg>
+            </button>
+            
+            {!priceCollapsed && (
+              <div className="mt-3 space-y-4 px-2">
+                {/* Price Filter */}
+                <div>
+                  <div className="flex gap-2">
+                    <button
+                      onClick={() => handlePriceFilterChange(null)}
+                      className={`px-4 py-2 rounded-full text-sm transition-colors ${priceFilter === null ? 'bg-[#299af8] text-white' : 'bg-gray-100 text-gray-800 hover:bg-gray-200'}`}
+                    >
+                      {locale === 'ar' ? '\u0627\u0644\u0643\u0644' : 'All'}
+                    </button>
+                    <button
+                      onClick={() => handlePriceFilterChange('false')}
+                      className={`px-4 py-2 rounded-full text-sm transition-colors ${priceFilter === 'false' ? 'bg-[#299af8] text-white' : 'bg-gray-100 text-gray-800 hover:bg-gray-200'}`}
+                    >
+                      {locale === 'ar' ? '\u0645\u062c\u0627\u0646\u064a' : 'Free'}
+                    </button>
+                    <button
+                      onClick={() => handlePriceFilterChange('true')}
+                      className={`px-4 py-2 rounded-full text-sm transition-colors ${priceFilter === 'true' ? 'bg-[#299af8] text-white' : 'bg-gray-100 text-gray-800 hover:bg-gray-200'}`}
+                    >
+                      {locale === 'ar' ? '\u0645\u062f\u0641\u0648\u0639' : 'Paid'}
+                    </button>
+                  </div>
+                </div>
 
-           
-            </div>
-          )}
-        </div>
-          {/* language Types Section */}
+             
+              </div>
+            )}
+          </div>
+        )}
+                  {/* language Types Section */}
+        {searchType !== 'insighter' && (
           <div className="mb-4 border-b border-gray-200 pb-4">
           <button
             onClick={() => setLanguageCollapsed(!languageCollapsed)}
             className="w-full flex justify-between items-center py-2 text-left hover:bg-gray-50 rounded-md px-2"
           >
             <div className="flex items-center">
-            <div className="bg-blue-50 p-2 rounded-full mr-2">
+            <div className="bg-blue-50 p-2 rounded-full me-2">
                     <IconLanguage size={16} className="text-blue-500" />
                   </div>
               <h3 className="text-md font-semibold text-gray-700">
@@ -792,6 +802,71 @@ const FilterBox: React.FC<FilterBoxProps> = ({
             </div>
           )}
         </div>
+        )}
+
+        {/* Accuracy Section */}
+        <div className="mb-4 border-b border-gray-200 pb-4">
+          <button
+            onClick={() => setAccuracyCollapsed(!accuracyCollapsed)}
+            className="w-full flex justify-between items-center py-2 text-left hover:bg-gray-50 rounded-md px-2"
+          >
+            <div className="flex items-center">
+              <div className="bg-blue-50 p-2 rounded-full me-2">
+                <IconWorldSearch size={16} className="text-blue-500" />
+              </div>
+              <h3 className="text-md font-semibold text-gray-700">
+                {locale === 'ar' ? 'الدقة' : 'Accuracy'}
+              </h3>
+            </div>
+            <svg 
+              className={`w-4 h-4 text-gray-500 transition-transform ${accuracyCollapsed ? 'rotate-0' : 'rotate-180'}`}
+              fill="none" 
+              stroke="currentColor" 
+              viewBox="0 0 24 24"
+            >
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+            </svg>
+          </button>
+          
+          {!accuracyCollapsed && (
+            <div className="mt-3 space-y-4 px-2">
+              {/* Accuracy Description */}
+              <p className="text-sm text-gray-600 mb-3">
+                {locale === 'ar' ? 'اضبط دقة البحث الخاص بك.' : 'Adjust the accuracy of your search.'}
+              </p>
+              
+              {/* Accuracy Filter */}
+              <div className="space-y-3">
+                <label className="flex items-center cursor-pointer">
+                  <input
+                    type="radio"
+                    name="accuracy"
+                    value="all"
+                    checked={accuracyFilter === 'all'}
+                    onChange={(e) => setAccuracyFilter(e.target.value as 'any' | 'all')}
+                    className="w-4 h-4 text-[#299af8] bg-gray-100 border-gray-300 focus:ring-[#299af8] focus:ring-2"
+                  />
+                  <span className="ms-2 text-sm text-gray-700">
+                    {locale === 'ar' ? 'تضمين جميع الكلمات' : 'Include all words'}
+                  </span>
+                </label>
+                <label className="flex items-center cursor-pointer">
+                  <input
+                    type="radio"
+                    name="accuracy"
+                    value="any"
+                    checked={accuracyFilter === 'any'}
+                    onChange={(e) => setAccuracyFilter(e.target.value as 'any' | 'all')}
+                    className="w-4 h-4 text-[#299af8] bg-gray-100 border-gray-300 focus:ring-[#299af8] focus:ring-2"
+                  />
+                  <span className="ms-2 text-sm text-gray-700">
+                    {locale === 'ar' ? 'تضمين أي كلمات' : 'Include any words'}
+                  </span>
+                </label>
+              </div>
+            </div>
+          )}
+        </div>
 
         {/* Industry Section */}
         <div className="mb-4 border-b border-gray-200 pb-4">
@@ -800,7 +875,7 @@ const FilterBox: React.FC<FilterBoxProps> = ({
             className="w-full flex justify-between items-center py-2 text-left hover:bg-gray-50 rounded-md px-2"
           >
             <div className="flex items-center">
-            <div className="bg-blue-50 p-2 rounded-full mr-2">
+            <div className="bg-blue-50 p-2 rounded-full me-2">
                     <IconBuildingFactory size={16} className="text-blue-500" />
                   </div>
               <h3 className="text-md font-semibold text-gray-700">
@@ -950,7 +1025,7 @@ const FilterBox: React.FC<FilterBoxProps> = ({
             className="w-full flex justify-between items-center py-2 text-left hover:bg-gray-50 rounded-md px-2"
           >
             <div className="flex items-center">
-            <div className="bg-blue-50 p-2 rounded-full mr-2">
+            <div className="bg-blue-50 p-2 rounded-full me-2">
                     <IconWorld size={16} className="text-blue-500" />
                   </div>
               <h3 className="text-md font-semibold text-gray-700">
@@ -969,37 +1044,39 @@ const FilterBox: React.FC<FilterBoxProps> = ({
           
           {!targetMarketCollapsed && (
             <div className="mt-3 space-y-4 px-2">
-              {/* Economic Blocs Filter */}
-              <div>
-                <div className="flex items-center mb-2">
-                 
-                  <h4 className="uppercase text-xs font-bold tracking-wider text-gray-600">
-                    {locale === 'ar' ? '\u0627\u0644\u0643\u062a\u0644 \u0627\u0644\u0627\u0642\u062a\u0635\u0627\u062f\u064a\u0629' : 'Economic Blocks'}
-                  </h4>
+              {/* Economic Blocs Filter - Hide for insighter */}
+              {searchType !== 'insighter' && (
+                <div>
+                  <div className="flex items-center mb-2">
+                   
+                    <h4 className="uppercase text-xs font-bold tracking-wider text-gray-600">
+                      {locale === 'ar' ? '\u0627\u0644\u0643\u062a\u0644 \u0627\u0644\u0627\u0642\u062a\u0635\u0627\u062f\u064a\u0629' : 'Economic Blocks'}
+                    </h4>
+                  </div>
+                  <div className="relative w-full">
+                    <Select
+                      placeholder={locale === 'ar' ? '\u0627\u062e\u062a\u0631 \u0643\u062a\u0644\u0629 \u0627\u0642\u062a\u0635\u0627\u062f\u064a\u0629' : 'Select an economic bloc'}
+                      data={economicBlocOptions}
+                      value={economicBlocFilter?.toString() || 'all'}
+                      onChange={(value) => {
+                        if (value === 'all') {
+                          setEconomicBlocFilter(null);
+                        } else {
+                          setEconomicBlocFilter(value ? parseInt(value) : null);
+                        }
+                      }}
+                      clearable
+                      searchable
+                      className="w-full"
+                      classNames={{
+                        root: 'w-full',
+                        input: 'border border-gray-300 py-2 px-3 rounded-md w-full text-sm',
+                        dropdown: 'bg-white shadow-lg border border-gray-200 rounded-md mt-1'
+                      }}
+                    />
+                  </div>
                 </div>
-                <div className="relative w-full">
-                  <Select
-                    placeholder={locale === 'ar' ? '\u0627\u062e\u062a\u0631 \u0643\u062a\u0644\u0629 \u0627\u0642\u062a\u0635\u0627\u062f\u064a\u0629' : 'Select an economic bloc'}
-                    data={economicBlocOptions}
-                    value={economicBlocFilter?.toString() || 'all'}
-                    onChange={(value) => {
-                      if (value === 'all') {
-                        setEconomicBlocFilter(null);
-                      } else {
-                        setEconomicBlocFilter(value ? parseInt(value) : null);
-                      }
-                    }}
-                    clearable
-                    searchable
-                    className="w-full"
-                    classNames={{
-                      root: 'w-full',
-                      input: 'border border-gray-300 py-2 px-3 rounded-md w-full text-sm',
-                      dropdown: 'bg-white shadow-lg border border-gray-200 rounded-md mt-1'
-                    }}
-                  />
-                </div>
-              </div>
+              )}
 
               {/* Regions Filter */}
               <div>
@@ -1087,7 +1164,7 @@ const FilterBox: React.FC<FilterBoxProps> = ({
             <div className="mt-3 space-y-4 px-2">
               <div>
                 <div className="flex items-center mb-2">
-                  <div className="bg-blue-50 p-2 rounded-full mr-2">
+                  <div className="bg-blue-50 p-2 rounded-full me-2">
                     <IconCode size={16} className="text-blue-500" />
                   </div>
                   <h4 className="uppercase text-xs font-bold tracking-wider text-gray-600">
@@ -1136,7 +1213,7 @@ const FilterBox: React.FC<FilterBoxProps> = ({
             <div className="mt-3 space-y-4 px-2">
               <div>
                 <div className="flex items-center mb-2">
-                  <div className="bg-blue-50 p-2 rounded-full mr-2">
+                  <div className="bg-blue-50 p-2 rounded-full me-2">
                     <IconCode size={16} className="text-blue-500" />
                   </div>
                   <h4 className="uppercase text-xs font-bold tracking-wider text-gray-600">
