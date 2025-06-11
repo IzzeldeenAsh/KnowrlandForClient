@@ -105,30 +105,29 @@ export default function HomePage() {
     searchQuery: string,
     searchType: 'knowledge' | 'insighter'
   ) => {
-    // if (searchType === 'knowledge') {
-    //   try {
-    //     const statsResponse = await fetchStatisticsPerType(
-    //       searchQuery,
-    //       locale,
-    //       languageFilter,
-    //       countryFilter,
-    //       regionFilter,
-    //       economicBlocFilter,
-    //       isicCodeFilter,
-    //       industryFilter,
-    //       priceFilter,
-    //       hsCodeFilter,
-    //       accuracyFilter,
-    //       (errorMsg) => toast.error(errorMsg, 'Statistics Error')
-    //     );
-    //     setStatistics(statsResponse.data || []);
-    //   } catch (error) {
-    //     console.error('Failed to fetch statistics:', error);
-    //     setStatistics([]);
-    //   }
-    // } else {
-    //   setStatistics([]);
-    // }
+    if (searchType === 'knowledge') {
+      try {
+        const statsResponse = await fetchStatisticsPerType(
+          searchQuery,
+          locale,
+          languageFilter,
+          countryFilter,
+          regionFilter,
+          economicBlocFilter,
+          isicCodeFilter,
+          industryFilter,
+          priceFilter,
+          hsCodeFilter,
+          accuracyFilter,
+          (errorMsg) => toast.error(errorMsg, 'Statistics Error')
+        );
+        setStatistics(statsResponse.data || []);
+      } catch (error) {
+        setStatistics([]);
+      }
+    } else {
+      setStatistics([]);
+    }
   }, [locale, languageFilter, countryFilter, regionFilter, economicBlocFilter, 
       isicCodeFilter, industryFilter, priceFilter, hsCodeFilter, accuracyFilter, toast]);
   
