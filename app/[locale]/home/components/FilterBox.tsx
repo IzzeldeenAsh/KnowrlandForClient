@@ -88,6 +88,8 @@ interface FilterBoxProps {
   setPriceFilter?: (filter: string | null) => void;
   accuracyFilter?: 'any' | 'all';
   setAccuracyFilter?: (filter: 'any' | 'all') => void;
+  roleFilter?: 'all' | 'company' | 'individual';
+  setRoleFilter?: (filter: 'all' | 'company' | 'individual') => void;
   resetFilters?: () => void;
 }
 
@@ -112,6 +114,8 @@ const FilterBox: React.FC<FilterBoxProps> = ({
   setPriceFilter = () => {},
   accuracyFilter = 'all',
   setAccuracyFilter = () => {},
+  roleFilter = 'all',
+  setRoleFilter = () => {},
   resetFilters = () => {}
 }) => {
   const [countries, setCountries] = useState<Country[]>([]);
@@ -166,6 +170,7 @@ const FilterBox: React.FC<FilterBoxProps> = ({
   const [targetMarketCollapsed, setTargetMarketCollapsed] = useState(true);
   const [publicationDateCollapsed, setPublicationDateCollapsed] = useState(true);
   const [archiveCollapsed, setArchiveCollapsed] = useState(true);
+  const [roleCollapsed, setRoleCollapsed] = useState(false);
 
   // State for publication date filter
   const [publicationDateFilter, setPublicationDateFilter] = useState<'all' | 'last_month' | 'last_3_months' | 'last_6_months' | 'last_year'>('all');
@@ -676,6 +681,14 @@ const FilterBox: React.FC<FilterBoxProps> = ({
     }
   };
 
+  // Handle role filter selection
+  const handleRoleFilterChange = (value: 'all' | 'company' | 'individual') => {
+    // Call the parent component's setRoleFilter function to trigger the search
+    if (setRoleFilter) {
+      setRoleFilter(value);
+    }
+  };
+
   return (
     <div className="bg-white border-t-4 rounded-md border-[#299af8] shadow-md" dir={locale === 'ar' ? 'rtl' : 'ltr'}>
       <div className="p-6">
@@ -1079,6 +1092,60 @@ const FilterBox: React.FC<FilterBoxProps> = ({
             </div>
           )}
         </div>
+          {/* Role Section - Only for insighter */}
+        {searchType === 'insighter' && (
+          <div className="mb-4 border-b border-gray-200 pb-4">
+            <button
+              onClick={() => setRoleCollapsed(!roleCollapsed)}
+              className="w-full flex justify-between items-center py-2 text-left hover:bg-gray-50 rounded-md px-2"
+            >
+              <div className="flex items-center">
+                <div className="bg-blue-50 p-2 rounded-full me-2">
+                  <IconBuildingBank size={16} className="text-blue-500" />
+                </div>
+                <h3 className="text-md font-semibold text-gray-700">
+                  {locale === 'ar' ? 'النوع' : 'Role'}
+                </h3>
+              </div>
+              <svg 
+                className={`w-4 h-4 text-gray-500 transition-transform ${roleCollapsed ? 'rotate-0' : 'rotate-180'}`}
+                fill="none" 
+                stroke="currentColor" 
+                viewBox="0 0 24 24"
+              >
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+              </svg>
+            </button>
+            
+            {!roleCollapsed && (
+              <div className="mt-3 space-y-4 px-2">
+                {/* Role Filter */}
+                <div>
+                  <div className="flex gap-2">
+                    <button
+                      onClick={() => handleRoleFilterChange('all')}
+                      className={`px-4 py-2 rounded-full text-sm transition-colors ${roleFilter === 'all' ? 'bg-[#299af8] text-white' : 'bg-gray-100 text-gray-800 hover:bg-gray-200'}`}
+                    >
+                      {locale === 'ar' ? 'الكل' : 'All'}
+                    </button>
+                    <button
+                      onClick={() => handleRoleFilterChange('company')}
+                      className={`px-4 py-2 rounded-full text-sm transition-colors ${roleFilter === 'company' ? 'bg-[#299af8] text-white' : 'bg-gray-100 text-gray-800 hover:bg-gray-200'}`}
+                    >
+                      {locale === 'ar' ? 'شركة' : 'Company'}
+                    </button>
+                    <button
+                      onClick={() => handleRoleFilterChange('individual')}
+                      className={`px-4 py-2 rounded-full text-sm transition-colors ${roleFilter === 'individual' ? 'bg-[#299af8] text-white' : 'bg-gray-100 text-gray-800 hover:bg-gray-200'}`}
+                    >
+                      {locale === 'ar' ? 'فرد' : 'Individual'}
+                    </button>
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+        )}
     {/* Accuracy Section */}
     <div >
           <button
@@ -1142,7 +1209,8 @@ const FilterBox: React.FC<FilterBoxProps> = ({
             </div>
           )}
         </div>
-    
+
+      
 
         {/* Publication Date Section */}
         {/* <div className="mb-4 border-b border-gray-200 pb-4">
@@ -1268,7 +1336,7 @@ const FilterBox: React.FC<FilterBoxProps> = ({
                     <input 
                       type="search" 
                       className="block w-full p-2 pl-10 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500" 
-                      placeholder={locale === 'ar' ? '\u0627\u0628\u062d\u062b \u0639\u0646 \u0627\u0644\u0635\u0646\u0627\u0639\u0629...' : 'Search for industry...'}
+                      placeholder={locale === 'ar' ? '\u0627\u0628\u062d\u062b \u0639\u0646 \u0631\u0645\u0632 ISIC...' : 'Search for industry...'}
                       value={industrySearchTerm}
                       onChange={(e) => setIndustrySearchTerm(e.target.value)}
                       dir={locale === 'ar' ? 'rtl' : 'ltr'}
@@ -1299,6 +1367,7 @@ const FilterBox: React.FC<FilterBoxProps> = ({
             )}
           </div>
         </Modal>
+        
         {/* Modal for ISIC Code selection */}
         <Modal 
           opened={isModalOpen} 
