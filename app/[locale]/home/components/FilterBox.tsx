@@ -670,7 +670,10 @@ const FilterBox: React.FC<FilterBoxProps> = ({
   
   // Handle price filter selection
   const handlePriceFilterChange = (value: string | null) => {
-    setPriceFilter(value);
+    // Call the parent component's setPriceFilter function to trigger the search
+    if (setPriceFilter) {
+      setPriceFilter(value);
+    }
   };
 
   return (
@@ -966,7 +969,8 @@ const FilterBox: React.FC<FilterBoxProps> = ({
                     <IconWorld size={16} className="text-blue-500" />
                   </div>
               <h3 className="text-md font-semibold text-gray-700">
-                {locale === 'ar' ? 'السوق المستهدف' : 'Target Market'}
+               
+                {locale === 'ar' ? (searchType === 'insighter' ? 'بلد الإنسايتر' : 'السوق المستهدف') : (searchType === 'insighter' ? 'Insighter Origin' : 'Target Market')}
               </h3>
             </div>
             <svg 
@@ -987,7 +991,7 @@ const FilterBox: React.FC<FilterBoxProps> = ({
                   <div className="flex items-center mb-2">
                    
                     <h4 className="uppercase text-xs font-bold tracking-wider text-gray-600">
-                      {locale === 'ar' ? '\u0627\u0644\u0643\u062a\u0644 \u0627\u0644\u0627\u0642\u062a\u0635\u0627\u062f\u064a\u0629' : 'Economic Blocks'}
+                      {locale === 'ar' ? '\u0627\u0644\u0643\u062a\u0644 \u0627\u0644\u0627\u0642\u062a\u0635\u0627\u062f\u064a\u0629' : 'By Economic Block'}
                     </h4>
                   </div>
                   <div className="relative w-full">
@@ -1020,7 +1024,7 @@ const FilterBox: React.FC<FilterBoxProps> = ({
                 <div className="flex items-center mb-2">
                 
                   <h4 className="uppercase text-xs font-bold tracking-wider text-gray-600">
-                    {locale === 'ar' ? '\u0627\u0644\u0645\u0646\u0627\u0637\u0642' : 'Regions'}
+                    {locale === 'ar' ? '\u0627\u0644\u0645\u0646\u0627\u0637\u0642' : 'By Region'}
                   </h4>
                 </div>
                 <div className="relative w-full">
@@ -1052,7 +1056,7 @@ const FilterBox: React.FC<FilterBoxProps> = ({
                 <div className="flex items-center mb-2">
                 
                   <h4 className="uppercase text-xs font-bold tracking-wider text-gray-600">
-                    {locale === 'ar' ? '\u0627\u0644\u0628\u0644\u062f\u0627\u0646' : 'Countries'}
+                    {locale === 'ar' ? '\u0627\u0644\u0628\u0644\u062f\u0627\u0646' : 'By Country'}
                   </h4>
                 </div>
                 <div className="relative w-full">
