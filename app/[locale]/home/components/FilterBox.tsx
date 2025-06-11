@@ -161,7 +161,7 @@ const FilterBox: React.FC<FilterBoxProps> = ({
   // State for content types collapse
   const [priceCollapsed, setpriceCollapsed] = useState(false);
   const [languageCollapsed, setLanguageCollapsed] = useState(false);
-  const [accuracyCollapsed, setAccuracyCollapsed] = useState(false);
+  const [accuracyCollapsed, setAccuracyCollapsed] = useState(true);
   const [industryCollapsed, setIndustryCollapsed] = useState(false);
   const [targetMarketCollapsed, setTargetMarketCollapsed] = useState(true);
   const [publicationDateCollapsed, setPublicationDateCollapsed] = useState(true);
@@ -804,69 +804,7 @@ const FilterBox: React.FC<FilterBoxProps> = ({
         </div>
         )}
 
-        {/* Accuracy Section */}
-        <div className="mb-4 border-b border-gray-200 pb-4">
-          <button
-            onClick={() => setAccuracyCollapsed(!accuracyCollapsed)}
-            className="w-full flex justify-between items-center py-2 text-left hover:bg-gray-50 rounded-md px-2"
-          >
-            <div className="flex items-center">
-              <div className="bg-blue-50 p-2 rounded-full me-2">
-                <IconWorldSearch size={16} className="text-blue-500" />
-              </div>
-              <h3 className="text-md font-semibold text-gray-700">
-                {locale === 'ar' ? 'الدقة' : 'Accuracy'}
-              </h3>
-            </div>
-            <svg 
-              className={`w-4 h-4 text-gray-500 transition-transform ${accuracyCollapsed ? 'rotate-0' : 'rotate-180'}`}
-              fill="none" 
-              stroke="currentColor" 
-              viewBox="0 0 24 24"
-            >
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-            </svg>
-          </button>
-          
-          {!accuracyCollapsed && (
-            <div className="mt-3 space-y-4 px-2">
-              {/* Accuracy Description */}
-              <p className="text-sm text-gray-600 mb-3">
-                {locale === 'ar' ? 'اضبط دقة البحث الخاص بك.' : 'Adjust the accuracy of your search.'}
-              </p>
-              
-              {/* Accuracy Filter */}
-              <div className="space-y-3">
-                <label className="flex items-center cursor-pointer">
-                  <input
-                    type="radio"
-                    name="accuracy"
-                    value="all"
-                    checked={accuracyFilter === 'all'}
-                    onChange={(e) => setAccuracyFilter(e.target.value as 'any' | 'all')}
-                    className="w-4 h-4 text-[#299af8] bg-gray-100 border-gray-300 focus:ring-[#299af8] focus:ring-2"
-                  />
-                  <span className="ms-2 text-sm text-gray-700">
-                    {locale === 'ar' ? 'تضمين جميع الكلمات' : 'Include all words'}
-                  </span>
-                </label>
-                <label className="flex items-center cursor-pointer">
-                  <input
-                    type="radio"
-                    name="accuracy"
-                    value="any"
-                    checked={accuracyFilter === 'any'}
-                    onChange={(e) => setAccuracyFilter(e.target.value as 'any' | 'all')}
-                    className="w-4 h-4 text-[#299af8] bg-gray-100 border-gray-300 focus:ring-[#299af8] focus:ring-2"
-                  />
-                  <span className="ms-2 text-sm text-gray-700">
-                    {locale === 'ar' ? 'تضمين أي كلمات' : 'Include any words'}
-                  </span>
-                </label>
-              </div>
-            </div>
-          )}
-        </div>
+    
 
         {/* Industry Section */}
         <div className="mb-4 border-b border-gray-200 pb-4">
@@ -1017,9 +955,8 @@ const FilterBox: React.FC<FilterBoxProps> = ({
             </div>
           )}
         </div>
-
-        {/* Target Market Section */}
-        <div >
+            {/* Target Market Section */}
+            <div  className="mb-4 border-b border-gray-200 pb-4">
           <button
             onClick={() => setTargetMarketCollapsed(!targetMarketCollapsed)}
             className="w-full flex justify-between items-center py-2 text-left hover:bg-gray-50 rounded-md px-2"
@@ -1138,6 +1075,70 @@ const FilterBox: React.FC<FilterBoxProps> = ({
             </div>
           )}
         </div>
+    {/* Accuracy Section */}
+    <div >
+          <button
+            onClick={() => setAccuracyCollapsed(!accuracyCollapsed)}
+            className="w-full flex justify-between items-center py-2 text-left hover:bg-gray-50 rounded-md px-2"
+          >
+            <div className="flex items-center">
+              <div className="bg-blue-50 p-2 rounded-full me-2">
+                <IconWorldSearch size={16} className="text-blue-500" />
+              </div>
+              <h3 className="text-md font-semibold text-gray-700">
+                {locale === 'ar' ? 'الدقة' : 'Accuracy'}
+              </h3>
+            </div>
+            <svg 
+              className={`w-4 h-4 text-gray-500 transition-transform ${accuracyCollapsed ? 'rotate-0' : 'rotate-180'}`}
+              fill="none" 
+              stroke="currentColor" 
+              viewBox="0 0 24 24"
+            >
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+            </svg>
+          </button>
+          
+          {!accuracyCollapsed && (
+            <div className="mt-3 space-y-4 px-2">
+              {/* Accuracy Description */}
+              <p className="text-sm text-gray-600 mb-3">
+                {locale === 'ar' ? 'اضبط دقة البحث الخاص بك.' : 'Adjust the accuracy of your search.'}
+              </p>
+              
+              {/* Accuracy Filter */}
+              <div className="space-y-3">
+                <label className="flex items-center cursor-pointer">
+                  <input
+                    type="radio"
+                    name="accuracy"
+                    value="all"
+                    checked={accuracyFilter === 'all'}
+                    onChange={(e) => setAccuracyFilter(e.target.value as 'any' | 'all')}
+                    className="w-4 h-4 text-[#299af8] bg-gray-100 border-gray-300 focus:ring-[#299af8] focus:ring-2"
+                  />
+                  <span className="ms-2 text-sm text-gray-700">
+                    {locale === 'ar' ? 'تضمين جميع الكلمات' : 'Include all words'}
+                  </span>
+                </label>
+                <label className="flex items-center cursor-pointer">
+                  <input
+                    type="radio"
+                    name="accuracy"
+                    value="any"
+                    checked={accuracyFilter === 'any'}
+                    onChange={(e) => setAccuracyFilter(e.target.value as 'any' | 'all')}
+                    className="w-4 h-4 text-[#299af8] bg-gray-100 border-gray-300 focus:ring-[#299af8] focus:ring-2"
+                  />
+                  <span className="ms-2 text-sm text-gray-700">
+                    {locale === 'ar' ? 'تضمين أي كلمات' : 'Include any words'}
+                  </span>
+                </label>
+              </div>
+            </div>
+          )}
+        </div>
+    
 
         {/* Publication Date Section */}
         {/* <div className="mb-4 border-b border-gray-200 pb-4">
