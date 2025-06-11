@@ -3,7 +3,7 @@
 import React from 'react';
 import Link from "next/link";
 import Image from "next/image";
-import { Card, Group, Text, Badge, Avatar } from "@mantine/core";
+import { Card, Group, Text, Badge, Avatar, Rating } from "@mantine/core";
 import { formatDistanceToNow } from "date-fns";
 import DataIcon from "@/components/icons/DataIcon";
 import InsightIcon from "@/components/icons/InsightIcon";
@@ -179,6 +179,12 @@ export default function SearchResultsList({
                   >
                     {item.title}
                   </Text>
+                  {item.review && parseInt(item.review) >= 1 && (
+                    <div className="flex items-center gap-1 mt-2">
+                      <Rating value={parseInt(item.review)} fractions={2} readOnly size="sm" />
+                      <Text size="xs" fw={500} className="mx-2 text-sky-500">{parseInt(item.review).toFixed(1)}</Text>
+                    </div>
+                  )}
                 </div>
                 
                 {item.searchable_type === "knowledge" && item.insighter && (
