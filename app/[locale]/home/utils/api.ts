@@ -260,7 +260,7 @@ export async function fetchSearchResults(
       url.searchParams.append('industry', industryFilter.toString());
     }
     
-    // Add paid parameter for price filtering
+    // Add price parameter for price filtering
     if (priceFilter !== null) {
       url.searchParams.append('paid', priceFilter);
     }
