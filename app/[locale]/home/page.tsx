@@ -49,6 +49,7 @@ export default function HomePage() {
   const initialAccuracy = (searchParams.get('accuracy') as 'any' | 'all') || 'all';
   // Get initial page from URL
   const initialPage = searchParams.get('page') ? parseInt(searchParams.get('page')!) : 1;
+  const initialRole = (searchParams.get('role') as 'all' | 'company' | 'individual') || 'all';
   
   const [searchQuery, setSearchQuery] = useState(initialQuery);
   const [searchType, setSearchType] = useState<'knowledge' | 'insighter'>(initialType);
@@ -83,6 +84,7 @@ export default function HomePage() {
   const [hsCodeFilter, setHsCodeFilter] = useState<number | null>(initialHsCode);
   const [priceFilter, setPriceFilter] = useState<string | null>(initialPriceFilter);
   const [accuracyFilter, setAccuracyFilter] = useState<'any' | 'all'>(initialAccuracy);
+  const [roleFilter, setRoleFilter] = useState<'all' | 'company' | 'individual'>(initialRole);
   
   // Add state for filter visibility
   const [filtersVisible, setFiltersVisible] = useState(true);
@@ -119,6 +121,7 @@ export default function HomePage() {
           priceFilter,
           hsCodeFilter,
           accuracyFilter,
+          roleFilter,
           (errorMsg) => toast.error(errorMsg, 'Statistics Error')
         );
         setStatistics(statsResponse.data || []);
@@ -129,7 +132,7 @@ export default function HomePage() {
       setStatistics([]);
     }
   }, [locale, languageFilter, countryFilter, regionFilter, economicBlocFilter, 
-      isicCodeFilter, industryFilter, priceFilter, hsCodeFilter, accuracyFilter, toast]);
+      isicCodeFilter, industryFilter, priceFilter, hsCodeFilter, accuracyFilter, roleFilter, toast]);
   
   // Helper function to get count for a specific category type from statistics
   const getCategoryCount = useCallback((categoryType: string) => {
@@ -156,6 +159,7 @@ export default function HomePage() {
     setPriceFilter(null);
     setSelectedCategory('all');
     setAccuracyFilter('all');
+    setRoleFilter('all');
     
     // Keep only search_type and keyword in URL
     const urlParams = new URLSearchParams();
@@ -182,6 +186,7 @@ export default function HomePage() {
     category?: string | null,
     paid?: string | null,
     accuracy?: 'any' | 'all',
+    role?: 'all' | 'company' | 'individual',
     page?: number
   }) => {
     // Build URL parameters
@@ -200,6 +205,7 @@ export default function HomePage() {
     const paid = params.paid !== undefined ? params.paid : priceFilter;
     const category = params.category !== undefined ? params.category : selectedCategory;
     const accuracy = params.accuracy !== undefined ? params.accuracy : accuracyFilter;
+    const role = params.role !== undefined ? params.role : roleFilter;
     const page = params.page !== undefined ? params.page : currentPage;
     
     // Add only non-default/non-empty parameters to the URL
@@ -218,12 +224,13 @@ export default function HomePage() {
     if (paid !== null) urlParams.set('paid', paid);
     if (category && category !== 'all') urlParams.set('type', category);
     if (accuracy && accuracy !== 'all') urlParams.set('accuracy', accuracy);
+    if (role && role !== 'all') urlParams.set('role', role);
     // Add page parameter if not page 1
     if (page && page > 1) urlParams.set('page', page.toString());
     
     // Update URL without refreshing the page
     router.push(`/${locale}/home?${urlParams.toString()}`, { scroll: false });
-  }, [locale, router, searchType, searchQuery, currentPage, languageFilter, countryFilter, regionFilter, economicBlocFilter, industryFilter, isicCodeFilter, hsCodeFilter, priceFilter, selectedCategory, accuracyFilter]);
+  }, [locale, router, searchType, searchQuery, currentPage, languageFilter, countryFilter, regionFilter, economicBlocFilter, industryFilter, isicCodeFilter, hsCodeFilter, priceFilter, selectedCategory, accuracyFilter, roleFilter]);
 
   // Handler for search type changes
   const handleSearchTypeChange = useCallback(async (type: 'knowledge' | 'insighter') => {
@@ -272,7 +279,8 @@ export default function HomePage() {
         industryFilter,
         priceFilter,
         hsCodeFilter,
-        accuracyFilter
+        accuracyFilter,
+        roleFilter
       );
       
       // Update results with the correct search type data
@@ -442,6 +450,22 @@ export default function HomePage() {
     
     // The main search effect will be triggered by the state change
   }, [updateUrlWithFilters]);
+
+  // Custom setter for role filter that triggers search
+  const handleRoleFilterChange = useCallback((value: 'all' | 'company' | 'individual') => {
+    // Set loading immediately to prevent flickering
+    setLoading(true);
+    
+    // Update the role filter state
+    setRoleFilter(value);
+    // Update URL with new filter
+    updateUrlWithFilters({ role: value });
+    
+    // Reset to page 1 when filter changes
+    setCurrentPage(1);
+    
+    // The main search effect will be triggered by the state change
+  }, [updateUrlWithFilters]);
   
   // Reference to track if empty query has been called
   const emptyQueryCalledRef = useRef<boolean>(false);
@@ -468,22 +492,23 @@ export default function HomePage() {
     const urlLanguage = (searchParams.get('language') as 'all' | 'arabic' | 'english') || 'all';
     const urlPriceFilter = searchParams.get('paid') || null;
     const urlAccuracy = (searchParams.get('accuracy') as 'any' | 'all') || 'all';
+    const urlRole = (searchParams.get('role') as 'all' | 'company' | 'individual') || 'all';
     
     console.log('INITIAL URL PARAMETERS:', {
       query, type, accuracy, language, country, categoryType,
-      urlIndustry, urlRegion, urlEconomicBloc, urlIsicCode, urlHsCode
+      urlIndustry, urlRegion, urlEconomicBloc, urlIsicCode, urlHsCode, urlRole
     });
     
     // Set loading to true immediately if we have any search parameters
     const hasSearchParams = query || type || language || country || categoryType || accuracy || 
-                           urlIndustry || urlRegion || urlEconomicBloc || urlIsicCode || urlHsCode;
+                           urlIndustry || urlRegion || urlEconomicBloc || urlIsicCode || urlHsCode || urlRole;
     if (hasSearchParams) {
       setLoading(true);
     }
     
     // Trigger search if we have query parameters OR other search parameters that should show results
     const shouldTriggerSearch = query || type || accuracy || language || country || categoryType ||
-                               urlIndustry || urlRegion || urlEconomicBloc || urlIsicCode || urlHsCode;
+                               urlIndustry || urlRegion || urlEconomicBloc || urlIsicCode || urlHsCode || urlRole;
     
     if (shouldTriggerSearch) {
       console.log('URL has search parameters, triggering search with direct URL values');
@@ -512,7 +537,8 @@ export default function HomePage() {
             urlIndustry, // Use URL value directly
             urlPriceFilter,
             urlHsCode,
-            urlAccuracy
+            urlAccuracy,
+            urlRole
           );
           
           setSearchResults(response.data || []);
@@ -541,6 +567,7 @@ export default function HomePage() {
                 urlPriceFilter,
                 urlHsCode,
                 urlAccuracy,
+                urlRole,
                 (errorMsg) => toast.error(errorMsg, 'Statistics Error')
               );
               setStatistics(statsResponse.data || []);
@@ -588,6 +615,7 @@ export default function HomePage() {
     const urlCategory = searchParams.get('type');
     const urlAccuracy = searchParams.get('accuracy') as 'any' | 'all';
     const urlPriceFilter = searchParams.get('paid');
+    const urlRole = searchParams.get('role') as 'all' | 'company' | 'individual' || 'all';
     
     // Batch all state updates to avoid multiple re-renders and race conditions
     const updateStates = () => {
@@ -650,6 +678,11 @@ export default function HomePage() {
         setAccuracyFilter(urlAccuracy);
       } else if (!urlAccuracy && accuracyFilter !== 'all') {
         setAccuracyFilter('all');
+      }
+      
+      // Handle role parameter
+      if (urlRole && urlRole !== roleFilter) {
+        setRoleFilter(urlRole);
       }
     };
     
@@ -729,7 +762,8 @@ export default function HomePage() {
         industryFilter,
         priceFilter,
         hsCodeFilter,
-        accuracyFilter
+        accuracyFilter,
+        roleFilter
       );
       
 
@@ -775,7 +809,8 @@ export default function HomePage() {
     isicCodeFilter,
     hsCodeFilter,
     priceFilter,
-    accuracyFilter
+    accuracyFilter,
+    roleFilter
   });
   
   // Track previous search query to avoid redundant API calls
@@ -929,13 +964,14 @@ export default function HomePage() {
       params.isicCodeFilter !== isicCodeFilter ||
       params.hsCodeFilter !== hsCodeFilter ||
       params.priceFilter !== priceFilter ||
-      params.accuracyFilter !== accuracyFilter;
+      params.accuracyFilter !== accuracyFilter ||
+      params.roleFilter !== roleFilter;
     
     // Log parameter changes for debugging (but don't include searchQuery)
     if (paramsChanged) {
       console.log('Search params changed (excluding query):', { 
         locale, languageFilter, countryFilter, regionFilter, economicBlocFilter,
-        activeTab, searchType, selectedCategory, industryFilter, isicCodeFilter, hsCodeFilter, priceFilter, accuracyFilter 
+        activeTab, searchType, selectedCategory, industryFilter, isicCodeFilter, hsCodeFilter, priceFilter, accuracyFilter, roleFilter 
       });
     }
     
@@ -955,7 +991,8 @@ export default function HomePage() {
       isicCodeFilter,
       hsCodeFilter,
       priceFilter,
-      accuracyFilter
+      accuracyFilter,
+      roleFilter
     };
     
     // If nothing changed, don't fetch
@@ -1034,7 +1071,8 @@ export default function HomePage() {
           industryFilter,
           priceFilter,
           hsCodeFilter,
-          accuracyFilter
+          accuracyFilter,
+          roleFilter
         );
         
         setSearchResults(response.data || []);
@@ -1066,7 +1104,7 @@ export default function HomePage() {
       }
     };
   // REMOVED searchQuery from dependencies - only trigger on filter changes, not query changes
-  }, [locale, languageFilter, countryFilter, regionFilter, economicBlocFilter, activeTab, searchType, initialized, toast, selectedCategory, industryFilter, isicCodeFilter, hsCodeFilter, priceFilter, accuracyFilter]);
+  }, [locale, languageFilter, countryFilter, regionFilter, economicBlocFilter, activeTab, searchType, initialized, toast, selectedCategory, industryFilter, isicCodeFilter, hsCodeFilter, priceFilter, accuracyFilter, roleFilter]);
 
   return (
    <main className='min-h-screen flex flex-col bg-gray-50'>
@@ -1310,6 +1348,8 @@ export default function HomePage() {
                       setPriceFilter={handlePriceFilterChange}
                       accuracyFilter={accuracyFilter}
                       setAccuracyFilter={handleAccuracyFilterChange}
+                      roleFilter={roleFilter}
+                      setRoleFilter={handleRoleFilterChange}
                       resetFilters={resetFilters}
                     />
                 </div>
