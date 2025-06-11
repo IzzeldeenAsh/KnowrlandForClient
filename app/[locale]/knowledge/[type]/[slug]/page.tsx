@@ -183,13 +183,13 @@ export default function KnowledgePage({ params }: Props) {
   // Use the use() hook instead of await since we're in a client component
   const { data: knowledge } = use(fetchKnowledgeData(type, slug, locale));
   const breadcrumbData = use(fetchBreadcrumb("knowledge", slug, locale));
-  const breadcrumbItems = breadcrumbData.map((item) => ({
-    label: item.label,
+  const breadcrumbItems = breadcrumbData.map((item, index) => ({
+    label: index === breadcrumbData.length - 1 ? "" : item.label,
     href: item.url,
   }));
 
   return (
-    <div className="min-h-screen bg-gray-50 relative" dir={isRTL ? 'rtl' : 'ltr'}>
+    <div className="min-h-screen bg-gray-50 relative" dir={isRTL ? 'rtl' : 'ltr'} style={knowledge.language === 'arabic' ? { direction: 'rtl', textAlign: 'right' } : {}}>
       {/* Background decoration */}
       <div className="pointer-events-none absolute z-10 left-[10%] top-0 hidden md:block" aria-hidden="true">
         <Image
@@ -220,7 +220,7 @@ export default function KnowledgePage({ params }: Props) {
           </div>
           
           {/* Header */}
-          <div className={`${isRTL ? 'text-right' : 'text-start'} mb-4 w-full`} data-aos="fade-down">
+          <div className={`${isRTL ? 'text-right' : 'text-start'} mb-4 w-full`}    data-aos="fade-down">
             <div className="flex-row gap-3 sm:gap-4 flex-wrap sm:flex-nowrap sm:flex max-w-80-per">
               <div className="mb-4 mt-1 hidden sm:block">
                 {knowledge.type === 'data' && <div className="bg-white p-2 sm:p-3 rounded flex items-center justify-center"><span className="hidden sm:block"><DataIcon width={40} height={40} /></span><span className="sm:hidden"><DataIcon width={30} height={30} /></span></div>}

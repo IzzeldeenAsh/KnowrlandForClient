@@ -7,7 +7,7 @@ import Image from 'next/image';
 import { notFound } from 'next/navigation';
 import { use, useEffect } from 'react';
 import styles from './topic-by-type.module.css';
-import AOS from 'aos';
+import { safeAOSInit } from '@/components/aos-provider';
 import { useTopicsByType } from '@/hooks/industries/useTopicsByType';
 import KnowledgeGrid from '../../../../topic/[id]/[slug]/KnowledgeGrid';
 
@@ -34,7 +34,7 @@ export default function TopicByTypePage({ params }: Props) {
   const locale = resolvedParams.locale || 'en';
 
   useEffect(() => {
-    AOS.init({
+    safeAOSInit({
       duration: 800,
       once: true,
     });
