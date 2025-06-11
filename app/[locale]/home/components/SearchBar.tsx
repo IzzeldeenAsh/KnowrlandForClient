@@ -37,6 +37,8 @@ const SearchBar: React.FC<SearchBarProps> = ({
   const searchInputRef = useRef<HTMLInputElement>(null);
   const [showTypeDropdown, setShowTypeDropdown] = React.useState(false);
   const typeDropdownRef = useRef<HTMLDivElement>(null);
+  // Add state to track if a search was just performed
+  const [hasJustSearched, setHasJustSearched] = React.useState(false);
   
   // Get suggestions functionality
   const {
@@ -88,6 +90,9 @@ const SearchBar: React.FC<SearchBarProps> = ({
       if (activeSuggestionIndex >= 0 && suggestions[activeSuggestionIndex]) {
         e.preventDefault();
         handleSuggestionSelect(suggestions[activeSuggestionIndex]);
+      } else {
+        // If no suggestion is selected, mark that a search will be performed
+        setHasJustSearched(true);
       }
     }
     // Escape key
@@ -100,6 +105,7 @@ const SearchBar: React.FC<SearchBarProps> = ({
   const handleSuggestionSelect = (suggestion: string) => {
     setShowSuggestions(false);
     resetSuggestions();
+    setHasJustSearched(true); // Mark that a search was performed
     
     // Use the onSearch prop if available, otherwise fall back to URL navigation
     if (onSearch) {
@@ -113,14 +119,15 @@ const SearchBar: React.FC<SearchBarProps> = ({
 
   // Only show suggestions when query has 2+ characters and we're not showing results
   const isShowingResults = searchParams.get('keyword') === searchQuery && searchQuery.trim().length > 0;
-  // Simplified condition: just check if we have suggestions and user is actively typing
-  const shouldShowSuggestions = searchQuery.trim().length >= 2 && showSuggestions && suggestions.length > 0;
+  // Modified condition: don't show suggestions if a search was just performed
+  const shouldShowSuggestions = searchQuery.trim().length >= 2 && showSuggestions && suggestions.length > 0 && !hasJustSearched;
   
   return (
     <form onSubmit={(e) => {
       // First close the suggestions
       setShowSuggestions(false);
       resetSuggestions();
+      setHasJustSearched(true); // Mark that a search was performed
       // Then submit the form
       onSubmit(e);
     }}>
@@ -238,10 +245,14 @@ const SearchBar: React.FC<SearchBarProps> = ({
               onChange={(e) => {
                 const newQuery = e.currentTarget.value;
                 setSearchQuery(newQuery);
+                // Reset the "just searched" state when user starts typing
+                if (hasJustSearched) {
+                  setHasJustSearched(false);
+                }
               }}
               onFocus={() => {
-                // Show suggestions on focus if we have enough characters and suggestions exist
-                if (searchQuery.trim().length >= 2 && suggestions.length > 0) {
+                // Only show suggestions on focus if we haven't just searched and have enough characters
+                if (searchQuery.trim().length >= 2 && suggestions.length > 0 && !hasJustSearched) {
                   setShowSuggestions(true);
                 }
               }}
@@ -267,6 +278,7 @@ const SearchBar: React.FC<SearchBarProps> = ({
                 // Close suggestions
                 setShowSuggestions(false);
                 resetSuggestions();
+                setHasJustSearched(true); // Mark that a search was performed
                 
                 // Always execute search, even with empty query
                 if (onSearch) {
