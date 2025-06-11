@@ -29,6 +29,7 @@ const getNotificationBg = (subType: string): string => {
     case 'activate_insighter':
     case 'accept_knowledge':
     case 'knowledge_accept':
+    case 'approved':
     case 'download':
     case 'view':
       return 'info';
@@ -79,6 +80,7 @@ const getNotificationIconName = (subType: string): string => {
       return 'duotune/general/gen047.svg';
     case 'accept_knowledge':
     case 'knowledge_accept':
+    case 'approved':
       return 'duotune/files/fil025.svg';
     case 'declined':
     case 'knowledge_declined':
@@ -139,6 +141,7 @@ const getNotificationName = (subType: string): string => {
   const nameMap: Record<string, string> = {
     'accept_knowledge': 'Knowledge Accepted',
     'declined': 'Knowledge Declined',
+    'approved': 'Knowledge Approved',
     'download': 'Download',
     'upload': 'Upload',
     'comment': 'Comment',
@@ -206,6 +209,18 @@ export default function NotificationsInner({
   }, [onClickOutside])
 
   const handleNotificationClick = (notification: Notification) => {
+    // Handle accept_knowledge notifications - redirect to insighter dashboard
+    if (notification.sub_type === 'accept_knowledge') {
+      window.location.href = 'https://app.knoldg.com/app/insighter-dashboard/my-requests'
+      return
+    }
+    
+    // Handle knowledge approved notifications - redirect to knowledge details page
+    if (notification.type === 'knowledge' && notification.sub_type === 'approved') {
+      window.location.href = `https://app.knoldg.com/app/my-knowledge-base/view-my-knowledge/${notification.param}/details`
+      return
+    }
+    
     // Handle knowledge accept/decline notifications
     if (notification.type === 'knowledge' && (notification.sub_type === 'accept_knowledge' || notification.sub_type === 'declined')) {
       // For company-insighter role, we would handle this differently
