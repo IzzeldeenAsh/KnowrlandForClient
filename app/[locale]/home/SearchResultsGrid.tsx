@@ -1,38 +1,35 @@
 "use client";
 
+import React from 'react';
 import { Text, Card, Badge, Group, Avatar, Rating } from "@mantine/core";
 import Link from "next/link";
+import Image from "next/image";
 import DataIcon from "@/components/icons/DataIcon";
 import InsightIcon from "@/components/icons/InsightIcon";
 import ManualIcon from "@/components/icons/ManualIcon";
 import ReportIcon from "@/components/icons/ReportIcon";
-import { formatDistanceToNow } from "date-fns";
-import cardStyles from "./knowledge-card.module.css";
-import { useParams } from "next/navigation";
-import Image from "next/image";
 import CourseIcon from "@/components/icons/CourseIcon";
+import FolderIcon from "@/components/icons/folder-icon";
+import { formatDistanceToNow } from "date-fns";
+import cardStyles from "../topic/[id]/[slug]/knowledge-card.module.css";
+import { useParams } from "next/navigation";
 import { arSA, enUS } from 'date-fns/locale';
+import dynamic from 'next/dynamic';
 
-interface KnowledgeGridProps {
-  knowledge: KnowledgeItem[];
-  topicName: string;
-  showHeader?: boolean;
-  colNumbers?: number;
-  locale?: string;
-  showInsighter?: boolean;
-}
-export interface KnowledgeItem {
-  slug: string;
-  type: string;
+// Dynamically import the SearchResultsList component
+const SearchResultsList = dynamic(() => import('./SearchResultsList'), { ssr: false });
+
+// Interface for search result items
+export interface SearchResultItem {
+  searchable_id: number;
+  searchable_type: string; // 'knowledge' or 'topic'
   title: string;
-  description: string;
-  total_price: string;
-  published_at: string;
-  review_summary?: {
-    count: number;
-    average: number;
-  };
-  insighter: {
+  description: string | null;
+  url: string;
+  type?: string;  // Only for knowledge items
+  published_at?: string | string[]; // Only for knowledge items
+  insighter?: {
+    uuid: string;
     name: string;
     profile_photo_url: string | null;
     roles: string[];
@@ -40,11 +37,24 @@ export interface KnowledgeItem {
       uuid: string;
       legal_name: string;
       logo: string;
+      verified?: boolean;
     };
-  };
+  }; // Only for knowledge items
+  paid?: boolean; // Only for knowledge items
+  review_summary?: {
+    count: number;
+    average: number;
+  }; // Only for knowledge items
 }
 
+interface SearchResultsGridProps {
+  results: SearchResultItem[];
+  colNumbers?: number;
+  locale?: string;
+  viewMode: 'grid' | 'list';
+}
 function getInitials(name: string) {
+  if (!name) return '';
   return name
     .split(" ")
     .map((word) => word[0])
@@ -52,11 +62,29 @@ function getInitials(name: string) {
     .toUpperCase();
 }
 
-function formatPublishedDate(dateString: string, locale: string = 'en') {
-  // Ensure we're working with UTC time to avoid server/client mismatches
-   const date = new Date(dateString);
+// Helper function to safely format date, handling both string and string[] types
+function safeFormatDate(dateInput: string | string[] | undefined): string {
+  if (!dateInput) return '';
+  
+  // Convert array to string if needed
+  const dateString = Array.isArray(dateInput) ? dateInput[0] || '' : dateInput;
+  if (!dateString) return '';
+  
+  try {
+    return formatPublishedDate(dateString, 'en');
+  } catch (error) {
+    console.error('Error formatting date:', error);
+    return '';
+  }
+}
 
-  // إنشاء نسخة UTC من التاريخ الأصلي
+function formatPublishedDate(dateString: string, locale: string = 'en') {
+  if (!dateString) return '';
+  
+  // Ensure we're working with UTC time to avoid server/client mismatches
+  const date = new Date(dateString);
+
+  // Create UTC version of the original date
   const utcDate = new Date(Date.UTC(
     date.getUTCFullYear(),
     date.getUTCMonth(),
@@ -65,7 +93,7 @@ function formatPublishedDate(dateString: string, locale: string = 'en') {
     date.getUTCMinutes()
   ));
 
-  // اختيار اللغة
+  // Select locale
   const selectedLocale = locale === 'ar' ? arSA : enUS;
 
   return formatDistanceToNow(utcDate, {
@@ -75,7 +103,7 @@ function formatPublishedDate(dateString: string, locale: string = 'en') {
 }
 
 function truncateDescription(
-  description: string,
+  description: string | null,
   wordLimit: number = 20
 ): string {
   if (!description) return "";
@@ -89,54 +117,81 @@ function truncateDescription(
   return words.slice(0, wordLimit).join(" ") + "...";
 }
 
-export default function KnowledgeGrid({
-  knowledge,
-  topicName,
-  showHeader = true,
+export default function SearchResultsGrid({
+  results,
   colNumbers = 3,
   locale,
-  showInsighter = true,
-}: KnowledgeGridProps) {
+  viewMode,
+}: SearchResultsGridProps) {
   const params = useParams();
   const currentLocale = locale || params.locale || "en";
   const isRTL = currentLocale === "ar";
+  
+  // Generate a unique prefix for this render to avoid key conflicts
+  const uniquePrefix = React.useMemo(() => Date.now().toString(), [results]);
 
   const typeTranslations: Record<string, string> = {
     report: isRTL ? "تقرير" : "Reports",
     manual: isRTL ? "دليل" : "Manuals",
     insight: isRTL ? "رؤى" : "Insights",
     data: isRTL ? "بيانات" : "Data",
-    article: isRTL ? "مجالات" : "Articles",
+    article: isRTL ? "مقالة" : "Articles",
     course: isRTL ? "دورة تدريبية" : "Course",
+    topic: isRTL ? "موضوع" : "Topic",
   };
   
   // Localized strings
   const translations = {
+    topic: isRTL ? "موضوع" : "Topic",
+    topicsRelated: isRTL ? "المواضيع المتعلقة بالبحث" : "Topics related to your search",
     knowledge: isRTL ? "المعرفة" : "Knowledge",
-    exploreInsights: isRTL ? `استكشف الرؤى ضمن ${topicName}` : `Explore insights within ${topicName}`,
-    noItems: isRTL ? "لا توجد عناصر معرفية متاحة بعد" : "No knowledge items available yet",
+    noItems: isRTL ? "لا توجد نتائج بحث متاحة" : "No search results available",
     posted: isRTL ? "نُشر" : "Posted",
     free: isRTL ? "مجاني" : "FREE",
     paid: isRTL ? "مدفوع" : "PAID",
     insighter: isRTL ? "إنسايتر" : "Insighter",
-    company: isRTL ? "شركة" : "Company" ,
-    by: isRTL ? "من قبل" : "By"
+    by: isRTL ? "من قبل" : "By",
+    company: isRTL ? "الشركة" : "Company"
   };
+
+  if (results.length === 0) {
+    return (
+      <div className="text-center py-12 flex flex-col items-center">
+        <Image
+          src="/images/Search-Not-Found.svg"
+          alt="No search results found"
+          width={350}
+          height={350}
+          className="mb-4"
+        />
+        <Text size="lg" fw={500} c="dimmed">
+          {translations.noItems}
+        </Text>
+      </div>
+    );
+  }
+
+  // Render list view
+  if (viewMode === 'list') {
+    return <SearchResultsList results={results} locale={currentLocale as string} />;
+  }
+
+  // Render grid view
+  // Split results by searchable_type
+  const knowledgeItems = results.filter(item => item.searchable_type === "knowledge");
+  const topicItems = results.filter(item => item.searchable_type === "topic");
 
   return (
     <div className="max-w-6xl mx-auto" dir={isRTL ? "rtl" : "ltr"}>
-      {/* {showHeader && (
-        <div className={`mb-8 ${isRTL ? 'text-right' : 'text-start'}`}>
-          <h2 className="text-2xl font-bold text-gray-900 mb-2">{translations.knowledge}</h2>
-        </div>
-      )} */}
-
-      <div
-        className={`grid sm:grid-cols-2 lg:grid-cols-${colNumbers} gap-4 max-w-7xl mx-auto`}
-      >
-        {knowledge.map((item: KnowledgeItem) => (
+      {/* Knowledge items section */}
+      {knowledgeItems.length > 0 && (
+        <div className="mb-6">
+          <div
+            className={`grid sm:grid-cols-2 lg:grid-cols-${colNumbers} gap-4 max-w-7xl mx-auto`}
+          >
+            {knowledgeItems.map((item) => (
           <Card
-            key={`${item.type}-${item.slug}`}
+            key={`${uniquePrefix}-knowledge-${item.searchable_id}`}
             withBorder
             padding="lg"
             radius="xs"
@@ -145,7 +200,7 @@ export default function KnowledgeGrid({
             component="div"
           >
             <Link
-              href={`/${currentLocale}/knowledge/${item.type}/${item.slug}`}
+              href={`/${currentLocale}/${item.url}`}
               className="block relative h-full flex flex-col"
             >
               <div className={cardStyles.darkSection}>
@@ -155,11 +210,10 @@ export default function KnowledgeGrid({
                     {item.type === "manual" && <ManualIcon width={20} height={20} />}
                     {item.type === "insight" && <InsightIcon width={20} height={20} />}
                     {item.type === "data" && <DataIcon width={20} height={20} />}
-                    {item.type === "article" && <CourseIcon width={20} height={20} />}
                     {item.type === "course" && <CourseIcon width={20} height={20} />}
 
                     <Badge w="fit-content" className="capitalize ml-2" variant="light">
-                      {typeTranslations[item.type.toLowerCase()] || item.type}
+                      {item.type && typeof item.type === 'string' ? (typeTranslations[item.type.toLowerCase()] || item.type) : ''}
                     </Badge>
                   </div>
                   
@@ -184,7 +238,7 @@ export default function KnowledgeGrid({
               <div className={cardStyles.whiteSection + " flex flex-col h-full "}>
                 {/* Top row with insighter info and action buttons */}
                 <div className="flex justify-between items-center pb-4">
-                  {showInsighter && (
+                  {item.insighter && (
                     <div className="flex items-center">
                       <div className="relative">
                         <Avatar
@@ -269,7 +323,7 @@ export default function KnowledgeGrid({
                     </div>
                   )}
                   
-                  <div className="flex gap-2">
+                  {/* <div className="flex gap-2">
                     <button 
                       className={cardStyles.actionButton}
                       onClick={(e) => e.stopPropagation()}
@@ -288,43 +342,95 @@ export default function KnowledgeGrid({
                         <path d="M12.7971 0.315674H5.74029C2.67502 0.315674 0.847656 2.14304 0.847656 5.20831V12.2567C0.847656 15.3304 2.67502 17.1578 5.74029 17.1578H12.7887C15.854 17.1578 17.6813 15.3304 17.6813 12.2651V5.20831C17.6898 2.14304 15.8624 0.315674 12.7971 0.315674ZM6.29608 7.87778C6.54029 7.63357 6.9445 7.63357 7.18871 7.87778L8.63713 9.3262V4.11357C8.63713 3.76831 8.92345 3.48199 9.26871 3.48199C9.61397 3.48199 9.90029 3.76831 9.90029 4.11357V9.3262L11.3487 7.87778C11.5929 7.63357 11.9971 7.63357 12.2413 7.87778C12.4856 8.12199 12.4856 8.5262 12.2413 8.77041L9.71502 11.2967C9.65608 11.3557 9.58871 11.3978 9.51292 11.4315C9.43713 11.4651 9.35292 11.482 9.26871 11.482C9.1845 11.482 9.10871 11.4651 9.0245 11.4315C8.94871 11.3978 8.88134 11.3557 8.82239 11.2967L6.29608 8.77041C6.05187 8.5262 6.05187 8.13041 6.29608 7.87778ZM14.5234 13.1325C12.8308 13.6967 11.054 13.983 9.26871 13.983C7.48345 13.983 5.7066 13.6967 4.01397 13.1325C3.68555 13.023 3.50871 12.6609 3.61818 12.3325C3.72766 12.0041 4.08134 11.8188 4.41818 11.9367C7.55081 12.9809 10.995 12.9809 14.1277 11.9367C14.4561 11.8273 14.8182 12.0041 14.9277 12.3325C15.0287 12.6694 14.8519 13.023 14.5234 13.1325Z" fill="#228BE6"/>
                       </svg>
                     </button>
-                  </div>
+                  </div> */}
                 </div>
                 
                 {/* Bottom row with published date and price badge */}
-                <div className="flex justify-between items-center  pt-2 mt-auto mt-6 border-t border-gray-100 w-full">
-                 <Text c="dimmed" size="xs" dir={locale === 'ar' ? 'rtl' : 'ltr'}>
-                    {locale === 'ar' ? 'نشر' : 'Posted'} {formatPublishedDate(item.published_at, locale)}
-                  </Text>
+                <div className="flex justify-between items-center pt-2 mt-auto mt-6 border-t border-gray-100 w-full">
+                  {item.published_at && (
+                    <Text c="dimmed" size="xs" dir={isRTL ? 'rtl' : 'ltr'}>
+                      {translations.posted} {safeFormatDate(item.published_at)}
+                    </Text>
+                  )}
                   
-                  <Badge
-                    color={item.total_price === "0" ? "green" : "yellow"}
-                    variant="light"
-                    className={cardStyles.priceBadge}
-                  >
-                    {item.total_price === "0" ? translations.free : translations.paid}
-                  </Badge>
+                  {item.paid !== undefined && (
+                    <Badge
+                      color={item.paid ? "yellow" : "green"}
+                      variant="light"
+                      className={cardStyles.priceBadge}
+                    >
+                      {item.paid ? translations.paid : translations.free}
+                    </Badge>
+                  )}
                 </div>
               </div>
             </Link>
           </Card>
         ))}
-        {knowledge.length === 0 && (
-          <div className="col-span-full flex flex-col items-center justify-center py-12 px-4">
-            <Image
-            src="/images/Search-Not-Found.svg"
-            alt="No results found"
-            width={300}
-            height={200}
-            className="mb-4"
-          />
-            <p className="text-gray-500 text-sm">
-              {translations.noItems}
-            
-            </p>
           </div>
-        )}
-      </div>
+        </div>
+      )}
+
+      {/* Topic items section - in a new row */}
+      {topicItems.length > 0 && (
+        <div className=" bg-white p-6 rounded-lg border border-gray-200">
+          {/* Fancy header section */}
+          <div className="relative mb-8">
+            {/* Content */}
+            <div className="relative">
+              <div className="flex items-center gap-4">
+                <div className="flex-shrink-0 p-3 bg-blue-50 rounded-xl shadow-lg transform hover:scale-105 transition-transform duration-200">
+                  <FolderIcon width={24} height={24} className="text-white" />
+                </div>
+                <div className="flex-1">
+                  <h2 className="text-2xl font-bold bg-gradient-to-r from-gray-800 to-gray-600 bg-clip-text text-transparent">
+                    {translations.topicsRelated}
+                  </h2>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <div
+            className={`grid sm:grid-cols-2 lg:grid-cols-${colNumbers} gap-4 max-w-7xl mx-auto`}
+          >
+            {topicItems.map((item) => (
+              <Card
+                key={`${uniquePrefix}-topic-${item.searchable_id}`}
+                withBorder
+                padding="lg"
+                radius="xs"
+                className={cardStyles.card}
+                data-aos="fade-up"
+                component="div"
+              >
+                <Link
+                  href={`/${currentLocale}/${item.url}`}
+                  className="block relative h-full flex flex-col"
+                >
+                  <div className={`${cardStyles.darkSection} ${item.searchable_type === "topic" ? "bg-topic" : ""}`} style={item.searchable_type === "topic" ? { backgroundImage: "url(/images/topics-bg.png)" } : {}}>
+                    <div>
+                      <div className="flex items-center mb-3">
+                        <Badge w="fit-content" className="capitalize" variant="light" color="yellow">
+                          {translations.topic}
+                        </Badge>
+                      </div>
+                      
+                      <Text
+                        fw={700}
+                        className={cardStyles.title}
+                        lineClamp={2}
+                      >
+                        {item.title}
+                      </Text>
+                    </div>
+                  </div>
+                </Link>
+              </Card>
+            ))}
+          </div>
+        </div>
+      )}
     </div>
   );
 }
