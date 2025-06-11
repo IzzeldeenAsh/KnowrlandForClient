@@ -186,9 +186,9 @@ export default function SearchResultsGrid({
           <div
             className={`grid sm:grid-cols-2 lg:grid-cols-${colNumbers} gap-4 max-w-7xl mx-auto`}
           >
-            {knowledgeItems.map((item) => (
+            {knowledgeItems.map((item, index) => (
           <Card
-            key={`${uniquePrefix}-knowledge-${item.searchable_id}`}
+            key={`${uniquePrefix}-knowledge-${item.searchable_id}-${index}`}
             withBorder
             padding="lg"
             radius="xs"
@@ -390,9 +390,9 @@ export default function SearchResultsGrid({
           <div
             className={`grid sm:grid-cols-2 lg:grid-cols-${colNumbers} gap-4 max-w-7xl mx-auto`}
           >
-            {topicItems.map((item) => (
+            {topicItems.map((item, index) => (
               <Card
-                key={`${uniquePrefix}-topic-${item.searchable_id}`}
+                key={`${uniquePrefix}-topic-${item.searchable_id}-${index}`}
                 withBorder
                 padding="lg"
                 radius="xs"
