@@ -765,6 +765,8 @@ export default function HomePage() {
     currentPage,
     languageFilter,
     countryFilter,
+    regionFilter,
+    economicBlocFilter,
     activeTab,
     searchQuery,
     searchType,
@@ -772,6 +774,7 @@ export default function HomePage() {
     industryFilter,
     isicCodeFilter,
     hsCodeFilter,
+    priceFilter,
     accuracyFilter
   });
   
@@ -917,19 +920,22 @@ export default function HomePage() {
       params.locale !== locale ||
       params.languageFilter !== languageFilter ||
       params.countryFilter !== countryFilter ||
+      params.regionFilter !== regionFilter ||
+      params.economicBlocFilter !== economicBlocFilter ||
       params.activeTab !== activeTab ||
       params.searchType !== searchType ||
       params.selectedCategory !== selectedCategory ||
       params.industryFilter !== industryFilter ||
       params.isicCodeFilter !== isicCodeFilter ||
       params.hsCodeFilter !== hsCodeFilter ||
+      params.priceFilter !== priceFilter ||
       params.accuracyFilter !== accuracyFilter;
     
     // Log parameter changes for debugging (but don't include searchQuery)
     if (paramsChanged) {
       console.log('Search params changed (excluding query):', { 
-        locale, languageFilter, countryFilter, 
-        activeTab, searchType, selectedCategory, industryFilter, isicCodeFilter, hsCodeFilter, accuracyFilter 
+        locale, languageFilter, countryFilter, regionFilter, economicBlocFilter,
+        activeTab, searchType, selectedCategory, industryFilter, isicCodeFilter, hsCodeFilter, priceFilter, accuracyFilter 
       });
     }
     
@@ -939,6 +945,8 @@ export default function HomePage() {
       currentPage,
       languageFilter,
       countryFilter,
+      regionFilter,
+      economicBlocFilter,
       activeTab,
       searchQuery: searchParamsRef.current.searchQuery, // Keep previous value
       searchType,
@@ -946,6 +954,7 @@ export default function HomePage() {
       industryFilter,
       isicCodeFilter,
       hsCodeFilter,
+      priceFilter,
       accuracyFilter
     };
     
@@ -1057,7 +1066,7 @@ export default function HomePage() {
       }
     };
   // REMOVED searchQuery from dependencies - only trigger on filter changes, not query changes
-  }, [locale, languageFilter, countryFilter, regionFilter, economicBlocFilter, activeTab, searchType, initialized, toast, selectedCategory, industryFilter, isicCodeFilter, hsCodeFilter, accuracyFilter]);
+  }, [locale, languageFilter, countryFilter, regionFilter, economicBlocFilter, activeTab, searchType, initialized, toast, selectedCategory, industryFilter, isicCodeFilter, hsCodeFilter, priceFilter, accuracyFilter]);
 
   return (
    <main className='min-h-screen flex flex-col bg-gray-50'>
@@ -1068,7 +1077,7 @@ export default function HomePage() {
      <section className="relative flex-1">
       <PageIllustration />
   {/* Hero Banner Section */}
-  <div className="relative overflow-hidden pt-16 pb-4">
+  <div className="relative overflow-hidden pt-16 pb-8">
        <div className="absolute inset-0 z-0">
          <svg className="absolute right-0 top-0 h-full w-1/2 translate-x-1/3 transform text-white opacity-10" fill="none" viewBox="0 0 400 400">
            <defs>
@@ -1084,12 +1093,12 @@ export default function HomePage() {
          <div className="text-center">
       
            
-       <div className="flex flex-col sm:flex-row align-center justify-center gap-2" style={{lineHeight: '1.3'}}>
-         <h1 className="text-3xl sm:text-4xl md:text-5xl font-extrabold tracking-tight text-gray-900 text-center sm:text-left" style={{lineHeight: '1.3'}}>
-           {locale === 'ar' ? 'اكتشف المعرفة' : 'Discover Knowledge at'}
+       <div className="flex flex-col sm:flex-col align-center justify-center gap-2" style={{lineHeight: '1.3'}}>
+         <h1 className="text-3xl sm:text-4xl md:text-5xl font-extrabold tracking-tight text-gray-900 text-center " style={{lineHeight: '1.3'}}>
+           {locale === 'ar' ? 'ابحث في التقارير والبيانات والرؤى' : 'Search data, reports, and insights'}
          </h1>
-         <h1 className="text-3xl sm:text-4xl md:text-5xl font-extrabold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-blue-500 to-teal-400 text-center sm:text-left" style={{lineHeight: '1.3'}}>
-           {locale === 'ar' ? 'بسرعة الضوء' : 'Light Speed'}
+         <h1 className="text-3xl sm:text-4xl md:text-5xl font-extrabold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-blue-500 to-teal-400 text-center " style={{lineHeight: '1.3'}}>
+           {locale === 'ar' ? 'ابدأ الآن' : 'Start exploring now'}
          </h1>
        </div>
             {/* <h1 className="text-4xl font-extrabold tracking-tight sm:text-5xl md:text-6xl">{locale === 'ar' ? 'اكتشف المعرفة بسرعة الضوء' : 'Discover Knowledge at Light Speed'}</h1>*/}
