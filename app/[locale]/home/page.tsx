@@ -301,6 +301,9 @@ export default function HomePage() {
 
   // Custom setter for language filter that triggers search
   const handleLanguageFilterChange = useCallback((value: 'all' | 'arabic' | 'english') => {
+    // Set loading immediately to prevent flickering
+    setLoading(true);
+    
     // Update the language filter state
     setLanguageFilter(value);
     // Update URL with new filter
@@ -309,57 +312,14 @@ export default function HomePage() {
     // Reset to page 1 when filter changes
     setCurrentPage(1);
     
-    // Trigger search if initialized
-    if (initialized) {
-      // Create a new search with the updated language filter
-      const fetchData = async () => {
-        setLoading(true);
-        try {
-          const handleError = (errorMessage: string) => {
-            toast.error(errorMessage, 'Validation Error');
-          };
-          
-          const response = await fetchSearchResults(
-            searchQuery.trim() || '', // Use empty string if no search query
-            searchType,
-            locale,
-            1, // Always use page 1 when filter changes
-            activeTab,
-            value, // Use the new language filter value
-            countryFilter,
-            regionFilter,
-            economicBlocFilter,
-            isicCodeFilter,
-            selectedCategory !== 'all' ? selectedCategory : null, // Maintain the selected category
-            30, // perPage
-            handleError, // onError callback
-            industryFilter,
-            priceFilter,
-            hsCodeFilter,
-            accuracyFilter
-          );
-          
-          setSearchResults(response.data || []);
-          setTotalPages(response.meta?.last_page || 1);
-          setTotalItems(response.meta?.total || 0);
-          
-          // Fetch statistics if search type is knowledge
-          await fetchStatisticsIfNeeded(searchQuery.trim() || '', searchType);
-        } catch (error) {
-          console.error('Language filter search failed:', error);
-          setSearchResults([]);
-          toast.error('Failed to fetch search results. Please try again later.', 'Error');
-        } finally {
-          setLoading(false);
-        }
-      };
-      
-      fetchData();
-    }
-  }, [initialized, locale, searchQuery, searchType, activeTab, countryFilter, regionFilter, economicBlocFilter, selectedCategory, toast, industryFilter, isicCodeFilter, accuracyFilter]);
+    // The main search effect will be triggered by the state change
+  }, [updateUrlWithFilters]);
   
   // Custom setter for country filter that triggers search
   const handleCountryFilterChange = useCallback((value: number | null) => {
+    // Set loading immediately to prevent flickering
+    setLoading(true);
+    
     // Update the country filter state
     setCountryFilter(value);
     // Update URL with new filter
@@ -368,57 +328,14 @@ export default function HomePage() {
     // Reset to page 1 when filter changes
     setCurrentPage(1);
     
-    // Trigger search if initialized
-    if (initialized) {
-      // Create a new search with the updated country filter
-      const fetchData = async () => {
-        setLoading(true);
-        try {
-          const handleError = (errorMessage: string) => {
-            toast.error(errorMessage, 'Validation Error');
-          };
-          
-          const response = await fetchSearchResults(
-            searchQuery.trim() || '', // Use empty string if no search query
-            searchType,
-            locale,
-            1, // Always use page 1 when filter changes
-            activeTab,
-            languageFilter,
-            value, // Use the new country filter value
-            regionFilter,
-            economicBlocFilter,
-            isicCodeFilter,
-            selectedCategory !== 'all' ? selectedCategory : null, // Maintain the selected category
-            30, // perPage
-            handleError, // onError callback
-            industryFilter,
-            priceFilter,
-            hsCodeFilter,
-            accuracyFilter
-          );
-          
-          setSearchResults(response.data || []);
-          setTotalPages(response.meta?.last_page || 1);
-          setTotalItems(response.meta?.total || 0);
-          
-          // Fetch statistics if search type is knowledge
-          await fetchStatisticsIfNeeded(searchQuery.trim() || '', searchType);
-        } catch (error) {
-          console.error('Country filter search failed:', error);
-          setSearchResults([]);
-          toast.error('Failed to fetch search results. Please try again later.', 'Error');
-        } finally {
-          setLoading(false);
-        }
-      };
-      
-      fetchData();
-    }
-  }, [initialized, locale, searchQuery, searchType, activeTab, languageFilter, regionFilter, economicBlocFilter, selectedCategory, toast, industryFilter, isicCodeFilter, accuracyFilter]);
+    // The main search effect will be triggered by the state change
+  }, [updateUrlWithFilters]);
   
   // Custom setter for region filter that triggers search
   const handleRegionFilterChange = useCallback((value: number | null) => {
+    // Set loading immediately to prevent flickering
+    setLoading(true);
+    
     // Update the region filter state
     setRegionFilter(value);
     // Update URL with new filter
@@ -427,57 +344,14 @@ export default function HomePage() {
     // Reset to page 1 when filter changes
     setCurrentPage(1);
     
-    // Trigger search if initialized
-    if (initialized) {
-      // Create a new search with the updated region filter
-      const fetchData = async () => {
-        setLoading(true);
-        try {
-          const handleError = (errorMessage: string) => {
-            toast.error(errorMessage, 'Validation Error');
-          };
-          
-          const response = await fetchSearchResults(
-            searchQuery.trim() || '', // Use empty string if no search query
-            searchType,
-            locale,
-            1, // Always use page 1 when filter changes
-            activeTab,
-            languageFilter,
-            countryFilter,
-            value, // Use the new region filter value
-            economicBlocFilter,
-            isicCodeFilter,
-            selectedCategory !== 'all' ? selectedCategory : null, // Maintain the selected category
-            30, // perPage
-            handleError, // onError callback
-            industryFilter,
-            priceFilter,
-            hsCodeFilter,
-            accuracyFilter
-          );
-          
-          setSearchResults(response.data || []);
-          setTotalPages(response.meta?.last_page || 1);
-          setTotalItems(response.meta?.total || 0);
-          
-          // Fetch statistics if search type is knowledge
-          await fetchStatisticsIfNeeded(searchQuery.trim() || '', searchType);
-        } catch (error) {
-          console.error('Region filter search failed:', error);
-          setSearchResults([]);
-          toast.error('Failed to fetch search results. Please try again later.', 'Error');
-        } finally {
-          setLoading(false);
-        }
-      };
-      
-      fetchData();
-    }
-  }, [initialized, locale, searchQuery, searchType, activeTab, languageFilter, countryFilter, economicBlocFilter, selectedCategory, toast, industryFilter, isicCodeFilter, accuracyFilter]);
+    // The main search effect will be triggered by the state change
+  }, [updateUrlWithFilters]);
   
   // Custom setter for economic bloc filter that triggers search
   const handleEconomicBlocFilterChange = useCallback((value: number | null) => {
+    // Set loading immediately to prevent flickering
+    setLoading(true);
+    
     // Update the economic bloc filter state
     setEconomicBlocFilter(value);
     // Update URL with new filter
@@ -486,57 +360,14 @@ export default function HomePage() {
     // Reset to page 1 when filter changes
     setCurrentPage(1);
     
-    // Trigger search if initialized
-    if (initialized) {
-      // Create a new search with the updated economic bloc filter
-      const fetchData = async () => {
-        setLoading(true);
-        try {
-          const handleError = (errorMessage: string) => {
-            toast.error(errorMessage, 'Validation Error');
-          };
-          
-          const response = await fetchSearchResults(
-            searchQuery.trim() || '', // Use empty string if no search query
-            searchType,
-            locale,
-            1, // Always use page 1 when filter changes
-            activeTab,
-            languageFilter,
-            countryFilter,
-            regionFilter,
-            value, // Use the new economic bloc filter value
-            isicCodeFilter,
-            selectedCategory !== 'all' ? selectedCategory : null, // Maintain the selected category
-            30, // perPage
-            handleError, // onError callback
-            industryFilter,
-            priceFilter,
-            hsCodeFilter,
-            accuracyFilter
-          );
-          
-          setSearchResults(response.data || []);
-          setTotalPages(response.meta?.last_page || 1);
-          setTotalItems(response.meta?.total || 0);
-          
-          // Fetch statistics if search type is knowledge
-          await fetchStatisticsIfNeeded(searchQuery.trim() || '', searchType);
-        } catch (error) {
-          console.error('Economic bloc filter search failed:', error);
-          setSearchResults([]);
-          toast.error('Failed to fetch search results. Please try again later.', 'Error');
-        } finally {
-          setLoading(false);
-        }
-      };
-      
-      fetchData();
-    }
-  }, [initialized, locale, searchQuery, searchType, activeTab, languageFilter, countryFilter, regionFilter, selectedCategory, toast, industryFilter, isicCodeFilter, accuracyFilter]);
+    // The main search effect will be triggered by the state change
+  }, [updateUrlWithFilters]);
   
   // Custom setter for price filter that triggers search
   const handlePriceFilterChange = useCallback((value: string | null) => {
+    // Set loading immediately to prevent flickering
+    setLoading(true);
+    
     // Update the price filter state
     setPriceFilter(value);
     // Update URL with new filter
@@ -545,57 +376,14 @@ export default function HomePage() {
     // Reset to page 1 when filter changes
     setCurrentPage(1);
     
-    // Only trigger search if initialized
-    if (initialized) {
-      // Create a new search with the updated price filter
-      const fetchData = async () => {
-        setLoading(true);
-        try {
-          const handleError = (errorMessage: string) => {
-            toast.error(errorMessage, 'Validation Error');
-          };
-          
-          const response = await fetchSearchResults(
-            searchQuery.trim() || '', // Use empty string if no search query
-            searchType,
-            locale,
-            1, // Always use page 1 when filter changes
-            activeTab,
-            languageFilter,
-            countryFilter,
-            regionFilter,
-            economicBlocFilter,
-            isicCodeFilter,
-            selectedCategory !== 'all' ? selectedCategory : null, // Maintain the selected category
-            30, // perPage
-            handleError, // onError callback
-            industryFilter,
-            value, // Use the new price filter value
-            hsCodeFilter,
-            accuracyFilter
-          );
-          
-          setSearchResults(response.data || []);
-          setTotalPages(response.meta?.last_page || 1);
-          setTotalItems(response.meta?.total || 0);
-          
-          // Fetch statistics if search type is knowledge
-          await fetchStatisticsIfNeeded(searchQuery.trim() || '', searchType);
-        } catch (error) {
-          console.error('Price filter search failed:', error);
-          setSearchResults([]);
-          toast.error('Failed to fetch search results. Please try again later.', 'Error');
-        } finally {
-          setLoading(false);
-        }
-      };
-      
-      fetchData();
-    }
-  }, [initialized, locale, searchQuery, searchType, activeTab, languageFilter, countryFilter, regionFilter, economicBlocFilter, selectedCategory, toast, industryFilter, isicCodeFilter, accuracyFilter]);
+    // The main search effect will be triggered by the state change
+  }, [updateUrlWithFilters]);
   
   // Custom setter for industry filter that triggers search
   const handleIndustryFilterChange = useCallback((value: number | null) => {
+    // Set loading immediately to prevent flickering
+    setLoading(true);
+    
     // Update the industry filter state
     setIndustryFilter(value);
     // Update URL with new filter
@@ -604,57 +392,14 @@ export default function HomePage() {
     // Reset to page 1 when filter changes
     setCurrentPage(1);
     
-    // Only trigger search if initialized
-    if (initialized) {
-      // Create a new search with the updated industry filter
-      const fetchData = async () => {
-        setLoading(true);
-        try {
-          const handleError = (errorMessage: string) => {
-            toast.error(errorMessage, 'Validation Error');
-          };
-          
-          const response = await fetchSearchResults(
-            searchQuery.trim() || '', // Use empty string if no search query
-            searchType,
-            locale,
-            1, // Always use page 1 when filter changes
-            activeTab,
-            languageFilter,
-            countryFilter,
-            regionFilter,
-            economicBlocFilter,
-            isicCodeFilter,
-            selectedCategory !== 'all' ? selectedCategory : null, // Maintain the selected category
-            30, // perPage
-            handleError, // onError callback
-            value, // Use the new industry filter value
-            priceFilter,
-            hsCodeFilter,
-            accuracyFilter
-          );
-          
-          setSearchResults(response.data || []);
-          setTotalPages(response.meta?.last_page || 1);
-          setTotalItems(response.meta?.total || 0);
-          
-          // Fetch statistics if search type is knowledge
-          await fetchStatisticsIfNeeded(searchQuery.trim() || '', searchType);
-        } catch (error) {
-          console.error('Industry filter search failed:', error);
-          setSearchResults([]);
-          toast.error('Failed to fetch search results. Please try again later.', 'Error');
-        } finally {
-          setLoading(false);
-        }
-      };
-      
-      fetchData();
-    }
-  }, [initialized, locale, searchQuery, searchType, activeTab, languageFilter, countryFilter, regionFilter, economicBlocFilter, selectedCategory, toast, isicCodeFilter, accuracyFilter]);
+    // The main search effect will be triggered by the state change
+  }, [updateUrlWithFilters]);
   
   // Custom setter for ISIC code filter that triggers search
   const handleIsicCodeFilterChange = useCallback((value: number | null) => {
+    // Set loading immediately to prevent flickering
+    setLoading(true);
+    
     // Update the ISIC code filter state
     setIsicCodeFilter(value);
     // Update URL with new filter
@@ -663,57 +408,14 @@ export default function HomePage() {
     // Reset to page 1 when filter changes
     setCurrentPage(1);
     
-    // Trigger search if initialized
-    if (initialized) {
-      // Create a new search with the updated ISIC code filter
-      const fetchData = async () => {
-        setLoading(true);
-        try {
-          const handleError = (errorMessage: string) => {
-            toast.error(errorMessage, 'Validation Error');
-          };
-          
-          const response = await fetchSearchResults(
-            searchQuery.trim() || '', // Use empty string if no search query
-            searchType,
-            locale,
-            1, // Always use page 1 when filter changes
-            activeTab,
-            languageFilter,
-            countryFilter,
-            regionFilter,
-            economicBlocFilter,
-            value, // Use the new ISIC code filter value
-            selectedCategory !== 'all' ? selectedCategory : null, // Maintain the selected category
-            30, // perPage
-            handleError, // onError callback
-            industryFilter,
-            priceFilter,
-            hsCodeFilter,
-            accuracyFilter
-          );
-          
-          setSearchResults(response.data || []);
-          setTotalPages(response.meta?.last_page || 1);
-          setTotalItems(response.meta?.total || 0);
-          
-          // Fetch statistics if search type is knowledge
-          await fetchStatisticsIfNeeded(searchQuery.trim() || '', searchType);
-        } catch (error) {
-          console.error('ISIC code filter search failed:', error);
-          setSearchResults([]);
-          toast.error('Failed to fetch search results. Please try again later.', 'Error');
-        } finally {
-          setLoading(false);
-        }
-      };
-      
-      fetchData();
-    }
-  }, [initialized, locale, searchQuery, searchType, activeTab, languageFilter, countryFilter, regionFilter, economicBlocFilter, selectedCategory, toast, industryFilter, priceFilter, hsCodeFilter, accuracyFilter]);
+    // The main search effect will be triggered by the state change
+  }, [updateUrlWithFilters]);
   
   // Custom setter for HS code filter that triggers search
   const handleHsCodeFilterChange = useCallback((value: number | null) => {
+    // Set loading immediately to prevent flickering
+    setLoading(true);
+    
     // Update the HS code filter state
     setHsCodeFilter(value);
     // Update URL with new filter
@@ -722,57 +424,14 @@ export default function HomePage() {
     // Reset to page 1 when filter changes
     setCurrentPage(1);
     
-    // Trigger search if initialized
-    if (initialized) {
-      // Create a new search with the updated HS code filter
-      const fetchData = async () => {
-        setLoading(true);
-        try {
-          const handleError = (errorMessage: string) => {
-            toast.error(errorMessage, 'Validation Error');
-          };
-          
-          const response = await fetchSearchResults(
-            searchQuery.trim() || '', // Use empty string if no search query
-            searchType,
-            locale,
-            1, // Always use page 1 when filter changes
-            activeTab,
-            languageFilter,
-            countryFilter,
-            regionFilter,
-            economicBlocFilter,
-            isicCodeFilter,
-            selectedCategory !== 'all' ? selectedCategory : null, // Maintain the selected category
-            30, // perPage
-            handleError, // onError callback
-            industryFilter,
-            priceFilter,
-            value, // Use the new HS code filter value
-            accuracyFilter
-          );
-          
-          setSearchResults(response.data || []);
-          setTotalPages(response.meta?.last_page || 1);
-          setTotalItems(response.meta?.total || 0);
-          
-          // Fetch statistics if search type is knowledge
-          await fetchStatisticsIfNeeded(searchQuery.trim() || '', searchType);
-        } catch (error) {
-          console.error('HS code filter search failed:', error);
-          setSearchResults([]);
-          toast.error('Failed to fetch search results. Please try again later.', 'Error');
-        } finally {
-          setLoading(false);
-        }
-      };
-      
-      fetchData();
-    }
-  }, [initialized, locale, searchQuery, searchType, activeTab, languageFilter, countryFilter, regionFilter, economicBlocFilter, selectedCategory, toast, industryFilter, priceFilter, isicCodeFilter, accuracyFilter]);
+    // The main search effect will be triggered by the state change
+  }, [updateUrlWithFilters]);
   
   // Custom setter for accuracy filter that triggers search
   const handleAccuracyFilterChange = useCallback((value: 'any' | 'all') => {
+    // Set loading immediately to prevent flickering
+    setLoading(true);
+    
     // Update the accuracy filter state
     setAccuracyFilter(value);
     // Update URL with new filter
@@ -781,54 +440,8 @@ export default function HomePage() {
     // Reset to page 1 when filter changes
     setCurrentPage(1);
     
-    // Trigger search if initialized
-    if (initialized) {
-      // Create a new search with the updated accuracy filter
-      const fetchData = async () => {
-        setLoading(true);
-        try {
-          const handleError = (errorMessage: string) => {
-            toast.error(errorMessage, 'Validation Error');
-          };
-          
-          const response = await fetchSearchResults(
-            searchQuery.trim() || '', // Use empty string if no search query
-            searchType,
-            locale,
-            1, // Always use page 1 when filter changes
-            activeTab,
-            languageFilter,
-            countryFilter,
-            regionFilter,
-            economicBlocFilter,
-            isicCodeFilter,
-            selectedCategory !== 'all' ? selectedCategory : null, // Maintain the selected category
-            30, // perPage
-            handleError, // onError callback
-            industryFilter,
-            priceFilter,
-            hsCodeFilter,
-            value // Use the new accuracy filter value
-          );
-          
-          setSearchResults(response.data || []);
-          setTotalPages(response.meta?.last_page || 1);
-          setTotalItems(response.meta?.total || 0);
-          
-          // Fetch statistics if search type is knowledge
-          await fetchStatisticsIfNeeded(searchQuery.trim() || '', searchType);
-        } catch (error) {
-          console.error('Accuracy filter search failed:', error);
-          setSearchResults([]);
-          toast.error('Failed to fetch search results. Please try again later.', 'Error');
-        } finally {
-          setLoading(false);
-        }
-      };
-      
-      fetchData();
-    }
-  }, [initialized, locale, searchQuery, searchType, activeTab, languageFilter, countryFilter, regionFilter, economicBlocFilter, selectedCategory, toast, industryFilter, priceFilter, isicCodeFilter, hsCodeFilter]);
+    // The main search effect will be triggered by the state change
+  }, [updateUrlWithFilters]);
   
   // Reference to track if empty query has been called
   const emptyQueryCalledRef = useRef<boolean>(false);
@@ -840,20 +453,31 @@ export default function HomePage() {
     
     const query = searchParams.get('keyword');
     const type = searchParams.get('search_type') as 'knowledge' | 'insighter';
+    const accuracy = searchParams.get('accuracy');
+    const language = searchParams.get('language');
+    const country = searchParams.get('country');
+    const categoryType = searchParams.get('type');
     
-    // If we have query parameters in the URL, immediately trigger a search
-    if (query) {
-      console.log('URL has query parameters, triggering search:', { query, type });
+    // Set loading to true immediately if we have any search parameters
+    const hasSearchParams = query || type || language || country || categoryType || accuracy;
+    if (hasSearchParams) {
+      setLoading(true);
+    }
+    
+    // Trigger search if we have query parameters OR other search parameters that should show results
+    const shouldTriggerSearch = query || type || accuracy || language || country || categoryType;
+    
+    if (shouldTriggerSearch) {
+      console.log('URL has search parameters, triggering search:', { query, type, accuracy, language, country, categoryType });
       
       const triggerSearch = async () => {
         try {
-          setLoading(true);
           const handleError = (errorMessage: string) => {
             toast.error(errorMessage, 'Validation Error');
           };
           
           const response = await fetchSearchResults(
-            query.trim(),
+            query?.trim() || '', // Use empty string if no query - backend should return all results
             type || 'knowledge',
             locale,
             currentPage,
@@ -877,14 +501,14 @@ export default function HomePage() {
           setTotalItems(response.meta?.total || 0);
           
           // Update the search query and type state to match URL parameters
-          setSearchQuery(query);
+          setSearchQuery(query || '');
           if (type) setSearchType(type);
           
           // Update the previous search query reference to avoid duplicate searches
-          prevSearchQueryRef.current = query;
+          prevSearchQueryRef.current = query || '';
           
           // Fetch statistics if search type is knowledge
-          await fetchStatisticsIfNeeded(query.trim(), type || 'knowledge');
+          await fetchStatisticsIfNeeded(query?.trim() || '', type || 'knowledge');
         } catch (error) {
           console.error('Initial search failed:', error);
           toast.error('Failed to fetch search results. Please try again later.', 'Error');
@@ -894,6 +518,9 @@ export default function HomePage() {
       };
       
       triggerSearch();
+    } else if (hasSearchParams) {
+      // If we have other search parameters but no query, still set loading off after a brief moment
+      setTimeout(() => setLoading(false), 100);
     }
     
     // Set initialized after handling initial URL parameters
@@ -1194,6 +821,9 @@ export default function HomePage() {
   // Track the last time an API call was made to prevent too many calls
   const lastApiCallTimeRef = useRef<number>(0);
   const MIN_API_CALL_INTERVAL = 500; // milliseconds
+  
+  // Add a debounce timer ref for search effect
+  const searchEffectTimerRef = useRef<NodeJS.Timeout | null>(null);
 
   // Fetch search results when other parameters change (BUT NOT searchQuery - only on explicit search actions)
   useEffect(() => {
@@ -1271,13 +901,35 @@ export default function HomePage() {
       return;
     }
     
-    // Only trigger search for filter changes, not for searchQuery changes
-    const fetchData = async () => {
-      setLoading(true);
+    // SET LOADING TO TRUE IMMEDIATELY when parameters change
+    setLoading(true);
+    
+    // Clear existing results immediately to prevent flickering
+    setSearchResults([]);
+    setKnowledgeItems([]);
+    
+    // Clear any existing timer
+    if (searchEffectTimerRef.current) {
+      clearTimeout(searchEffectTimerRef.current);
+    }
+    
+    // Debounce only the API call, not the loading state
+    searchEffectTimerRef.current = setTimeout(async () => {
+      // Check if enough time has passed since the last API call
+      const currentTime = Date.now();
+      const timeSinceLastCall = currentTime - lastApiCallTimeRef.current;
       
-      // Clear existing results at the start of any new search
-      setSearchResults([]);
-      setKnowledgeItems([]);
+      if (timeSinceLastCall < MIN_API_CALL_INTERVAL) {
+        console.log('Skipping API call - too soon since last call');
+        // Still turn off loading even if we skip the API call
+        setLoading(false);
+        return;
+      }
+      
+      // Update the last API call time
+      lastApiCallTimeRef.current = currentTime;
+      
+      // Loading is already true from above, no need to set it again
       
       try {        
         const handleError = (errorMessage: string) => {
@@ -1323,9 +975,6 @@ export default function HomePage() {
           accuracyFilter
         );
         
-
-        
-        // Handle search API response format
         setSearchResults(response.data || []);
         setTotalPages(response.meta?.last_page || 1);
         setTotalItems(response.meta?.total || 0);
@@ -1346,10 +995,14 @@ export default function HomePage() {
       } finally {
         setLoading(false);
       }
+    }, 150); // Reduced debounce delay to 150ms for faster response
+    
+    // Cleanup function to clear the timer
+    return () => {
+      if (searchEffectTimerRef.current) {
+        clearTimeout(searchEffectTimerRef.current);
+      }
     };
-
-    // Execute immediately for filter changes
-    fetchData();
   // REMOVED searchQuery from dependencies - only trigger on filter changes, not query changes
   }, [locale, languageFilter, countryFilter, regionFilter, economicBlocFilter, activeTab, searchType, initialized, toast, selectedCategory, industryFilter, isicCodeFilter, hsCodeFilter, accuracyFilter]);
 
@@ -1414,69 +1067,42 @@ export default function HomePage() {
                <div className="flex flex-wrap justify-center gap-6 md:gap-8">
                  {/* Using the top-level selectedCategory state */}
                  {(() => {
-                   const [isLoading, setIsLoading] = React.useState<boolean>(false);
-                   
                    // Function to handle category selection and trigger search API directly
                    const handleCategorySelect = async (category: string) => {
+                     // Set loading immediately to prevent flickering
+                     setLoading(true);
+                     
+                     // Clear existing results immediately
+                     setSearchResults([]);
+                     setKnowledgeItems([]);
+                     
                      // Update the top-level state
                      setSelectedCategory(category);
                      // Update URL with new category
                      updateUrlWithFilters({ category: category });
-                     setIsLoading(true);
                      
-                     try {
-                       // Use the current searchQuery state instead of reading from DOM
-                       const currentSearchQuery = searchQuery || '';
-                       
-                       // Call the search API with the selected category
-                       // Force 'knowledge' search type for category selection
-                       const results = await fetchSearchResults(
-                         currentSearchQuery, // keyword - use current state
-                         'knowledge', // Always use knowledge for category search
-                         locale, // locale
-                         1, // currentPage
-                         null, // activeTab - not needed since we're using categoryType
-                         languageFilter, // Use current language filter instead of hardcoding to 'all'
-                         countryFilter, // Use current country filter
-                         regionFilter, // Use current region filter
-                         economicBlocFilter, // Use current economic bloc filter
-                         isicCodeFilter, // Use the actual isicCodeFilter state
-                         category !== 'all' ? category : null, // categoryType parameter
-                         30, // perPage parameter
-                         (errorMsg) => toast.error(errorMsg, 'Error'), // Add error handling to display toast
-                         industryFilter, // Add industryFilter parameter
-                         priceFilter, // Add priceFilter parameter
-                         hsCodeFilter, // Add hsCodeFilter parameter
-                         accuracyFilter
-                       );
-                       
-                       console.log('Setting main searchResults from category select:', results.data);
-                       // Update the parent component's searchResults state
-                       setSearchResults(results.data || []);
-                       setTotalPages(results.meta?.last_page || 1);
-                       setTotalItems(results.meta?.total || 0);
-                       setCurrentPage(results.meta?.current_page || 1);
-                       
-                       // Fetch statistics for category selection
-                       await fetchStatisticsIfNeeded(currentSearchQuery, 'knowledge');
-                     } catch (error) {
-                       console.error('Error fetching search results:', error);
-                     } finally {
-                       setIsLoading(false);
-                     }
+                     // The main search effect will be triggered by the setSelectedCategory above
+                     // and will handle the API call and turn off loading
                    };
                    
                    // Call handleCategorySelect with 'all' on initial load to get results
                    React.useEffect(() => {
                      // Only call when searchResults is empty AND we're not in the middle of pagination
-                     // AND there's no current search query to prevent overriding existing search results
+                     // AND there's no current search query AND no URL search parameters to prevent overriding existing search results
+                     const hasUrlSearchParams = searchParams.get('keyword') || 
+                                               searchParams.get('search_type') || 
+                                               searchParams.get('accuracy') || 
+                                               searchParams.get('language') || 
+                                               searchParams.get('country') || 
+                                               searchParams.get('type');
+                     
                      if (searchResults.length === 0 && !loading && initialized && 
                          !isPageChangeInProgressRef.current && !skipNextSearchEffectRef.current &&
-                         !searchQuery.trim()) {
+                         !searchQuery.trim() && !hasUrlSearchParams) {
                        handleCategorySelect('all');
                      }
                    // eslint-disable-next-line react-hooks/exhaustive-deps
-                   }, [searchResults.length, loading, initialized]);
+                   }, [searchResults.length, loading, initialized, searchParams]);
                    
                    return (
                     searchType === 'knowledge' && (
