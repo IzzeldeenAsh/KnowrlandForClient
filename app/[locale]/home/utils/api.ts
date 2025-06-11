@@ -42,7 +42,7 @@ export async function fetchAutocomplete(
   if (!keyword.trim()) return [];
   
   try {
-    const response = await fetch(`https://api.foresighta.co/api/platform/search/autocomplete?keyword=${encodeURIComponent(keyword)}`, {
+    const response = await fetch(`https://api.knoldg.com/api/platform/search/autocomplete?keyword=${encodeURIComponent(keyword)}`, {
       headers: {
         'Accept-Language': locale,
         'Accept': 'application/json'
@@ -68,6 +68,101 @@ export async function fetchAutocomplete(
   }
 }
 
+// Function to fetch statistics per type
+export async function fetchStatisticsPerType(
+  searchQuery: string,
+  locale: string,
+  languageFilter: 'all' | 'arabic' | 'english',
+  countryFilter: number | null,
+  regionFilter: number | null = null,
+  economicBlocFilter: number | null = null,
+  isicCodeFilter: number | null = null,
+  industryFilter: number | null = null,
+  priceFilter: string | null = null,
+  hsCodeFilter: number | null = null,
+  accuracyFilter: 'any' | 'all' = 'any',
+  onError?: (errorMessage: any) => void
+) {
+  try {
+    const url = new URL('https://api.knoldg.com/api/platform/search/statistics-per-type');
+    
+    // Add base parameters
+    url.searchParams.append('accuracy', accuracyFilter);
+    url.searchParams.append('search_type', 'knowledge');
+    url.searchParams.append('keyword', searchQuery.trim());
+    
+    // Add language parameter
+    if (languageFilter && languageFilter !== 'all') {
+      url.searchParams.append('language', languageFilter);
+    }
+    
+    // Add country parameter
+    if (countryFilter !== null) {
+      url.searchParams.append('country', countryFilter.toString());
+    }
+    
+    // Add region parameter
+    if (regionFilter !== null) {
+      url.searchParams.append('region', regionFilter.toString());
+    }
+    
+    // Add economic bloc parameter
+    if (economicBlocFilter !== null) {
+      url.searchParams.append('economic_bloc', economicBlocFilter.toString());
+    }
+    
+    // Add ISIC code parameter
+    if (isicCodeFilter !== null) {
+      url.searchParams.append('isic_code', isicCodeFilter.toString());
+    }
+    
+    // Add HS code parameter
+    if (hsCodeFilter !== null) {
+      url.searchParams.append('hs_code', hsCodeFilter.toString());
+    }
+    
+    // Add industry parameter
+    if (industryFilter !== null) {
+      url.searchParams.append('industry', industryFilter.toString());
+    }
+    
+    // Add price parameter
+    if (priceFilter !== null) {
+      url.searchParams.append('paid', priceFilter);
+    }
+    
+    const response = await fetch(url.toString(), {
+      headers: {
+        "Content-Type": "application/json", 
+        "Accept": "application/json",
+        "Accept-Language": locale,
+      },
+      cache: 'no-store'
+    });
+    
+    // Handle 422 validation errors specifically
+    if (response.status === 422) {
+      const errorData: ErrorResponse = await response.json();
+      if (onError) {
+        onError(formatErrorMessage(errorData));
+      }
+      return { data: [] };
+    }
+    
+    if (!response.ok) {
+      throw new Error('Network response was not ok');
+    }
+    
+    return await response.json();
+  } catch (error) {
+    console.error('Statistics API request failed:', error);
+    if (onError) {
+      onError('Failed to fetch statistics. Please try again later.');
+    }
+    return { data: [] };
+  }
+}
+
 // Function to fetch search results
 export async function fetchSearchResults(
   searchQuery: string,
@@ -85,32 +180,23 @@ export async function fetchSearchResults(
   onError?: (errorMessage: any) => void,
   industryFilter: number | null = null,
   priceFilter: string | null = null,
-  hsCodeFilter: number | null = null
+  hsCodeFilter: number | null = null,
+  accuracyFilter: 'any' | 'all' = 'any'
 ) {
   try {
-    // Get URL parameters to ensure we're using values from the URL directly
-    const urlParams = new URLSearchParams(window.location.search);
-    const urlSearchType = urlParams.get('search_type') as 'knowledge' | 'insighter';
-    
-    // IMPORTANT: Do NOT read page from URL - use the parameter directly
-    // This ensures we use the exact page that was requested, not what might be in the URL
-    // due to potential race conditions with URL updates
-    
     // Always use the search API endpoint
-    const url = new URL('https://api.foresighta.co/api/platform/search');
-    // Use the correct API parameters for search
-    url.searchParams.append('accuracy', 'any');
+    const url = new URL('https://api.knoldg.com/api/platform/search');
+    // Use the accuracy parameter passed to the function
+    url.searchParams.append('accuracy', accuracyFilter);
     // Backend now returns all data when keyword is empty
     url.searchParams.append('keyword', searchQuery.trim());
     
-    // IMPORTANT: Always prioritize the search_type from the URL over the state variable
-    const finalSearchType = urlSearchType || searchType;
-    console.log('DEBUG: Using search type:', finalSearchType, 'URL contains search_type:', urlSearchType, 'State contains:', searchType);
-    url.searchParams.append('search_type', finalSearchType);
+    // IMPORTANT: Always use the search_type parameter passed to the function
+    // This ensures we use the exact search type that was requested
+    url.searchParams.append('search_type', searchType);
     
     // IMPORTANT: Always use the directly passed page parameter instead of reading from URL
     // This prevents issues with URL state being out of sync with the requested page
-    console.log('DEBUG: Using direct page parameter:', currentPage);
     url.searchParams.append('page', currentPage.toString());
     // Add per_page parameter for pagination control
     const perPageValue = perPage ? perPage.toString() : '30'; // Default to 30 if not provided

@@ -9,7 +9,7 @@ import { notFound, useParams } from 'next/navigation';
 import { use, useEffect } from 'react';
 import styles from './industries.module.css';
 import IndustryIcon from "@/components/icons/industry-icon";
-import AOS from 'aos';
+import { safeAOSInit } from '@/components/aos-provider';
 import Stripes from "@/public/images/stripes-dark.svg";
 
 interface Topic {
@@ -53,7 +53,7 @@ export default function IndustriesByTypePage({ params }: Props) {
   };
 
   useEffect(() => {
-    AOS.init({
+    safeAOSInit({
       duration: 800,
       once: true,
     });

@@ -10,19 +10,12 @@ const CategoryIcon: React.FC<CategoryIconProps> = ({ name }) => {
   switch (name) {
     case 'all':
       return (
-        <div className='bg-blue-50 p-2 rounded-md'>
-
-<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-<g clipPath="url(#clip0_517_133)">
-<path d="M12 0C5.36706 0 0 5.36795 0 12C0 18.633 5.36805 24 12 24C18.6329 24 24 18.632 24 12C24 5.36701 18.632 0 12 0ZM9.88235 15.5294H8.47059V13.4118H7.05882V15.5294H5.64706V10.5882C5.64706 9.42061 6.59708 8.47059 7.76471 8.47059C8.93242 8.47059 9.88235 9.42061 9.88235 10.5882V15.5294ZM14.8235 15.5294H11.2941V8.47059H12.7059V14.1176H14.8235V15.5294ZM19.7647 15.5294H16.2353V8.47059H17.6471V14.1176H19.7647V15.5294Z" fill="#32ACD9"/>
-<path d="M7.76472 9.88232C7.37554 9.88232 7.05884 10.199 7.05884 10.5882V12H8.4706V10.5882C8.4706 10.199 8.15394 9.88232 7.76472 9.88232Z" fill="#32ACD9"/>
-</g>
-<defs>
-<clipPath id="clip0_517_133">
-<rect width="24" height="24" fill="white"/>
-</clipPath>
-</defs>
+        <div className='bg-[#F1FAFE] p-2 rounded-md'>
+<svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+<path d="M14.19 0H5.81C2.17 0 0 2.17 0 5.81V14.18C0 17.83 2.17 20 5.81 20H14.18C17.82 20 19.99 17.83 19.99 14.19V5.81C20 2.17 17.83 0 14.19 0ZM15 15.25H5C4.59 15.25 4.25 14.91 4.25 14.5C4.25 14.09 4.59 13.75 5 13.75H15C15.41 13.75 15.75 14.09 15.75 14.5C15.75 14.91 15.41 15.25 15 15.25ZM15 10.75H5C4.59 10.75 4.25 10.41 4.25 10C4.25 9.59 4.59 9.25 5 9.25H15C15.41 9.25 15.75 9.59 15.75 10C15.75 10.41 15.41 10.75 15 10.75ZM15 6.25H5C4.59 6.25 4.25 5.91 4.25 5.5C4.25 5.09 4.59 4.75 5 4.75H15C15.41 4.75 15.75 5.09 15.75 5.5C15.75 5.91 15.41 6.25 15 6.25Z" fill="#3E97FE"/>
 </svg>
+
+
 
         </div>
       );
@@ -50,17 +43,12 @@ const CategoryIcon: React.FC<CategoryIconProps> = ({ name }) => {
       );
     case 'insight':
       return (
-        <div className='bg-emerald-50 p-2 rounded-md'>
-          <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <g clipPath="url(#clip0_516_193)">
-              <path d="M14.0774 0C17.6885 0 19.8411 2.15293 19.8312 5.76405V14.0774C19.8312 17.6884 17.6786 19.8414 14.0676 19.8414H5.76405C2.15299 19.8414 6.15571e-05 17.6886 0 14.0676V5.76405C0 2.15293 2.15293 0 5.76405 0H14.0774ZM5.68314 10.219C5.13109 10.2191 4.6824 10.6677 4.68239 11.2198V14.0323C4.68248 14.5842 5.13114 15.0325 5.68314 15.0326C6.24381 15.0326 6.69262 14.5843 6.69271 14.0323V11.2198C6.69267 10.6677 6.24386 10.219 5.68314 10.219ZM9.50476 5.80219C8.94405 5.80224 8.49567 6.25086 8.49562 6.80291V14.0323C8.49571 14.5842 8.94414 15.0325 9.50476 15.0326C10.0568 15.0326 10.5054 14.5843 10.5055 14.0323V6.80291C10.5055 6.25081 10.0569 5.80219 9.50476 5.80219ZM13.1757 4.2062C12.5981 4.2062 12.1359 4.72951 12.1359 5.37343V13.8053C12.136 14.4492 12.5981 14.9726 13.1757 14.9726C13.7443 14.9725 14.2061 14.4492 14.2062 13.8053V5.37343C14.2061 4.72954 13.7443 4.20625 13.1757 4.2062Z" fill="#5CC9CA"/>
-            </g>
-            <defs>
-              <clipPath id="clip0_516_193">
-                <rect width="20" height="20" fill="white"/>
-              </clipPath>
-            </defs>
-          </svg>
+        <div className='bg-red-50 p-2 rounded-md'>
+<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+<path d="M17.036 0C21.4101 0 24 2.58993 24 6.96403V17.036C24 21.4101 21.4101 24 17.036 24H6.96403C2.58993 24 0 21.3525 0 16.9784V6.96403C0 2.58993 2.58993 0 6.96403 0H17.036ZM6.84892 12.3741C6.15827 12.3741 5.64029 12.8921 5.64029 13.5827V16.9784C5.64029 17.6691 6.15827 18.187 6.84892 18.187C7.53957 18.187 8.05755 17.6691 8.05755 16.9784V13.5827C8.05755 12.8921 7.53957 12.3741 6.84892 12.3741ZM11.5108 7.02158C10.8201 7.02158 10.3022 7.53957 10.3022 8.23022V16.9784C10.3022 17.6691 10.8201 18.187 11.5108 18.187C12.2014 18.187 12.7194 17.6691 12.7194 16.9784V8.23022C12.7194 7.53957 12.2014 7.02158 11.5108 7.02158ZM15.9424 5.06475C15.2518 5.06475 14.6763 5.69784 14.6763 6.5036V16.6906C14.6763 17.4964 15.2518 18.1295 15.9424 18.1295C16.6331 18.1295 17.2086 17.4964 17.2086 16.6906V6.5036C17.2086 5.69784 16.6331 5.06475 15.9424 5.06475Z" fill="#8A1538"/>
+</svg>
+
+
         </div>
       );
     case 'manual':
@@ -103,13 +91,39 @@ interface CategoryIconBoxProps {
   className?: string;
   isSelected?: boolean;
   onClick?: React.MouseEventHandler<HTMLDivElement>;
+  count?: number;
 }
 
-export const CategoryIconBox: React.FC<CategoryIconBoxProps> = ({ name, label, locale, arLabel, className, isSelected = false, onClick }) => {
+export const CategoryIconBox: React.FC<CategoryIconBoxProps> = ({ name, label, locale, arLabel, className, isSelected = false, onClick, count }) => {
+  // Define badge colors based on category
+  const getBadgeColor = (categoryName: IconName) => {
+    switch (categoryName) {
+      case 'all':
+        return 'bg-blue-500'; // Blue for all
+      case 'data':
+        return 'bg-gray-800'; // Dark gray for data
+      case 'report':
+        return 'bg-blue-600'; // Blue for reports
+      case 'insight':
+        return 'bg-[#891638]'; // Custom red for insights
+      case 'manual':
+        return 'bg-yellow-500'; // Yellow/orange for manuals
+      case 'course':
+        return 'bg-green-600'; // Green for courses
+      default:
+        return 'bg-blue-500';
+    }
+  };
+
   return (
     <div className={`group flex flex-col items-center ${className || ''}`} onClick={onClick}>
-      <div className={`flex h-14 w-14 items-center justify-center rounded-lg border ${isSelected ? 'border-blue-500 bg-blue-50' : 'border-gray-200 bg-white'} p-2 shadow-sm transition-all hover:border-blue-200 hover:bg-blue-50 cursor-pointer`}>
+      <div className={`relative flex h-14 w-14 items-center justify-center rounded-lg border ${isSelected ? 'border-blue-500 bg-blue-50' : 'border-gray-200 bg-white'} p-2 shadow-sm transition-all hover:border-blue-200 hover:bg-blue-50 cursor-pointer`}>
         <CategoryIcon name={name} />
+        {count !== undefined && count > 0 && (
+          <div className={`absolute -top-2 -right-2 flex h-5 w-5 items-center justify-center rounded-full ${getBadgeColor(name)} text-xs font-bold text-white`}>
+            {count > 99 ? '99+' : count}
+          </div>
+        )}
       </div>
       <span className={`mt-2 text-xs font-medium ${isSelected ? 'text-blue-600' : 'text-gray-600'} group-hover:text-blue-600`}>
         {locale === 'ar' ? arLabel : label}

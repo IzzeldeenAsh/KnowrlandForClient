@@ -3,14 +3,11 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react'
 import { useParams, useSearchParams, useRouter } from 'next/navigation';
 import { useTranslations } from 'next-intl'
-import { Loader, ScrollArea } from '@mantine/core';
 import { useToast } from '@/components/toast/ToastContext';
 import Footer from '@/components/ui/footer'
 import PageIllustration from "@/components/page-illustration";
 import type { KnowledgeItem } from '../topic/[id]/[slug]/KnowledgeGrid';
 import type { SearchResultItem } from './SearchResultsGrid';
-import Image from 'next/image';
-import Link from 'next/link';
 
 // Import components
 import SearchBar from './components/SearchBar';
@@ -21,8 +18,18 @@ import FilterBox from './components/FilterBox';
 import { CategoryIconBox } from './components/CategoryIcons';
 
 // Import utils
-import { fetchSearchResults } from './utils/api';
+import { fetchSearchResults, fetchStatisticsPerType } from './utils/api';
 import { customScrollbarStyle } from './utils/styles';
+
+// Statistics types
+export interface StatisticsItem {
+  type: string | null;
+  count: number;
+}
+
+export interface StatisticsResponse {
+  data: StatisticsItem[];
+}
 
 export default function HomePage() {
   const searchParams = useSearchParams();
@@ -39,6 +46,7 @@ export default function HomePage() {
   const initialHsCode = searchParams.get('hs_code') ? parseInt(searchParams.get('hs_code')!) : null;
   const initialPriceFilter = searchParams.get('paid') || null;
   const initialCategory = searchParams.get('type') || 'all';
+  const initialAccuracy = (searchParams.get('accuracy') as 'any' | 'all') || 'all';
   // Get initial page from URL
   const initialPage = searchParams.get('page') ? parseInt(searchParams.get('page')!) : 1;
   
@@ -74,9 +82,13 @@ export default function HomePage() {
   const [isicCodeFilter, setIsicCodeFilter] = useState<number | null>(initialIsicCode);
   const [hsCodeFilter, setHsCodeFilter] = useState<number | null>(initialHsCode);
   const [priceFilter, setPriceFilter] = useState<string | null>(initialPriceFilter);
+  const [accuracyFilter, setAccuracyFilter] = useState<'any' | 'all'>(initialAccuracy);
   
   // Add state for filter visibility
   const [filtersVisible, setFiltersVisible] = useState(true);
+  
+  // Add state for statistics
+  const [statistics, setStatistics] = useState<StatisticsItem[]>([]);
   
   const params = useParams();
   const locale = params.locale as string || 'en';
@@ -87,6 +99,50 @@ export default function HomePage() {
   
   // Flag to track if component has initialized with URL params
   const [initialized, setInitialized] = useState(false);
+  
+  // Helper function to fetch statistics when search type is knowledge
+  const fetchStatisticsIfNeeded = useCallback(async (
+    searchQuery: string,
+    searchType: 'knowledge' | 'insighter'
+  ) => {
+    // if (searchType === 'knowledge') {
+    //   try {
+    //     const statsResponse = await fetchStatisticsPerType(
+    //       searchQuery,
+    //       locale,
+    //       languageFilter,
+    //       countryFilter,
+    //       regionFilter,
+    //       economicBlocFilter,
+    //       isicCodeFilter,
+    //       industryFilter,
+    //       priceFilter,
+    //       hsCodeFilter,
+    //       accuracyFilter,
+    //       (errorMsg) => toast.error(errorMsg, 'Statistics Error')
+    //     );
+    //     setStatistics(statsResponse.data || []);
+    //   } catch (error) {
+    //     console.error('Failed to fetch statistics:', error);
+    //     setStatistics([]);
+    //   }
+    // } else {
+    //   setStatistics([]);
+    // }
+  }, [locale, languageFilter, countryFilter, regionFilter, economicBlocFilter, 
+      isicCodeFilter, industryFilter, priceFilter, hsCodeFilter, accuracyFilter, toast]);
+  
+  // Helper function to get count for a specific category type from statistics
+  const getCategoryCount = useCallback((categoryType: string) => {
+    if (categoryType === 'all') {
+      // For 'all', sum up all counts
+      return statistics.reduce((total, stat) => total + stat.count, 0);
+    }
+    
+    // Find the specific category in statistics
+    const stat = statistics.find(s => s.type === categoryType);
+    return stat ? stat.count : 0;
+  }, [statistics]);
   
   // Function to reset all filters to default values
   const resetFilters = useCallback(() => {
@@ -100,6 +156,7 @@ export default function HomePage() {
     setHsCodeFilter(null);
     setPriceFilter(null);
     setSelectedCategory('all');
+    setAccuracyFilter('all');
     
     // Keep only search_type and keyword in URL
     const urlParams = new URLSearchParams();
@@ -125,6 +182,7 @@ export default function HomePage() {
     hs_code?: number | null,
     category?: string | null,
     paid?: string | null,
+    accuracy?: 'any' | 'all',
     page?: number
   }) => {
     // Build URL parameters
@@ -142,6 +200,7 @@ export default function HomePage() {
     const hsCode = params.hs_code !== undefined ? params.hs_code : hsCodeFilter;
     const paid = params.paid !== undefined ? params.paid : priceFilter;
     const category = params.category !== undefined ? params.category : selectedCategory;
+    const accuracy = params.accuracy !== undefined ? params.accuracy : accuracyFilter;
     const page = params.page !== undefined ? params.page : currentPage;
     
     // Add only non-default/non-empty parameters to the URL
@@ -159,21 +218,87 @@ export default function HomePage() {
     if (hsCode !== null) urlParams.set('hs_code', hsCode.toString());
     if (paid !== null) urlParams.set('paid', paid);
     if (category && category !== 'all') urlParams.set('type', category);
+    if (accuracy && accuracy !== 'all') urlParams.set('accuracy', accuracy);
     // Add page parameter if not page 1
     if (page && page > 1) urlParams.set('page', page.toString());
     
     // Update URL without refreshing the page
     router.push(`/${locale}/home?${urlParams.toString()}`, { scroll: false });
-  }, [locale, router, searchType, searchQuery, currentPage, languageFilter, countryFilter, regionFilter, economicBlocFilter, industryFilter, isicCodeFilter, hsCodeFilter, priceFilter, selectedCategory]);
+  }, [locale, router, searchType, searchQuery, currentPage, languageFilter, countryFilter, regionFilter, economicBlocFilter, industryFilter, isicCodeFilter, hsCodeFilter, priceFilter, selectedCategory, accuracyFilter]);
 
   // Handler for search type changes
-  const handleSearchTypeChange = useCallback((type: 'knowledge' | 'insighter') => {
+  const handleSearchTypeChange = useCallback(async (type: 'knowledge' | 'insighter') => {
+    // Set flag to prevent main search effect from interfering
+    isSearchTypeChangingRef.current = true;
+    
+    // Set loading immediately to show loading state during transition
+    setLoading(true);
+    
+    // Clear existing results immediately to prevent showing old data
+    setSearchResults([]);
+    setKnowledgeItems([]);
+    setStatistics([]);
+    
     // Update search type state
     setSearchType(type);
     
+    // Reset to page 1 when changing search type
+    setCurrentPage(1);
+    setTotalPages(1);
+    setTotalItems(0);
+    
     // Update URL with new search type
-    updateUrlWithFilters({ type: type });
-  }, [updateUrlWithFilters]);
+    updateUrlWithFilters({ type: type, page: 1 });
+    
+    // Perform the search immediately with the new search type
+    try {
+      const handleError = (errorMessage: string) => {
+        toast.error(errorMessage, 'Validation Error');
+      };
+      
+      const response = await fetchSearchResults(
+        searchQuery.trim(),
+        type, // Use the new search type directly
+        locale,
+        1, // Reset to page 1
+        activeTab,
+        languageFilter,
+        countryFilter,
+        regionFilter,
+        economicBlocFilter,
+        isicCodeFilter,
+        selectedCategory !== 'all' ? selectedCategory : null,
+        30, // perPage
+        handleError,
+        industryFilter,
+        priceFilter,
+        hsCodeFilter,
+        accuracyFilter
+      );
+      
+      // Update results with the correct search type data
+      setSearchResults(response.data || []);
+      setTotalPages(response.meta?.last_page || 1);
+      setTotalItems(response.meta?.total || 0);
+      
+      // Fetch statistics if search type is knowledge
+      if (type === 'knowledge') {
+        await fetchStatisticsIfNeeded(searchQuery.trim(), type);
+      } else {
+        setStatistics([]);
+      }
+    } catch (error) {
+      console.error('Search type change failed:', error);
+      setSearchResults([]);
+      toast.error('Failed to fetch search results. Please try again later.', 'Error');
+    } finally {
+      setLoading(false);
+      // Reset the flag after the search is complete
+      setTimeout(() => {
+        isSearchTypeChangingRef.current = false;
+      }, 500); // Wait a bit to ensure no race conditions
+    }
+  }, [updateUrlWithFilters, locale, activeTab, languageFilter, countryFilter, regionFilter, economicBlocFilter, isicCodeFilter, selectedCategory, industryFilter, priceFilter, hsCodeFilter, accuracyFilter, searchQuery, toast, fetchStatisticsIfNeeded]);
 
   // Custom setter for language filter that triggers search
   const handleLanguageFilterChange = useCallback((value: 'all' | 'arabic' | 'english') => {
@@ -211,12 +336,16 @@ export default function HomePage() {
             handleError, // onError callback
             industryFilter,
             priceFilter,
-            hsCodeFilter
+            hsCodeFilter,
+            accuracyFilter
           );
           
           setSearchResults(response.data || []);
           setTotalPages(response.meta?.last_page || 1);
           setTotalItems(response.meta?.total || 0);
+          
+          // Fetch statistics if search type is knowledge
+          await fetchStatisticsIfNeeded(searchQuery.trim() || '', searchType);
         } catch (error) {
           console.error('Language filter search failed:', error);
           setSearchResults([]);
@@ -228,7 +357,7 @@ export default function HomePage() {
       
       fetchData();
     }
-  }, [initialized, locale, searchQuery, searchType, activeTab, countryFilter, regionFilter, economicBlocFilter, selectedCategory, toast, industryFilter, isicCodeFilter]);
+  }, [initialized, locale, searchQuery, searchType, activeTab, countryFilter, regionFilter, economicBlocFilter, selectedCategory, toast, industryFilter, isicCodeFilter, accuracyFilter]);
   
   // Custom setter for country filter that triggers search
   const handleCountryFilterChange = useCallback((value: number | null) => {
@@ -266,12 +395,16 @@ export default function HomePage() {
             handleError, // onError callback
             industryFilter,
             priceFilter,
-            hsCodeFilter
+            hsCodeFilter,
+            accuracyFilter
           );
           
           setSearchResults(response.data || []);
           setTotalPages(response.meta?.last_page || 1);
           setTotalItems(response.meta?.total || 0);
+          
+          // Fetch statistics if search type is knowledge
+          await fetchStatisticsIfNeeded(searchQuery.trim() || '', searchType);
         } catch (error) {
           console.error('Country filter search failed:', error);
           setSearchResults([]);
@@ -283,7 +416,7 @@ export default function HomePage() {
       
       fetchData();
     }
-  }, [initialized, locale, searchQuery, searchType, activeTab, languageFilter, regionFilter, economicBlocFilter, selectedCategory, toast, industryFilter, isicCodeFilter]);
+  }, [initialized, locale, searchQuery, searchType, activeTab, languageFilter, regionFilter, economicBlocFilter, selectedCategory, toast, industryFilter, isicCodeFilter, accuracyFilter]);
   
   // Custom setter for region filter that triggers search
   const handleRegionFilterChange = useCallback((value: number | null) => {
@@ -321,12 +454,16 @@ export default function HomePage() {
             handleError, // onError callback
             industryFilter,
             priceFilter,
-            hsCodeFilter
+            hsCodeFilter,
+            accuracyFilter
           );
           
           setSearchResults(response.data || []);
           setTotalPages(response.meta?.last_page || 1);
           setTotalItems(response.meta?.total || 0);
+          
+          // Fetch statistics if search type is knowledge
+          await fetchStatisticsIfNeeded(searchQuery.trim() || '', searchType);
         } catch (error) {
           console.error('Region filter search failed:', error);
           setSearchResults([]);
@@ -338,7 +475,7 @@ export default function HomePage() {
       
       fetchData();
     }
-  }, [initialized, locale, searchQuery, searchType, activeTab, languageFilter, countryFilter, economicBlocFilter, selectedCategory, toast, industryFilter, isicCodeFilter]);
+  }, [initialized, locale, searchQuery, searchType, activeTab, languageFilter, countryFilter, economicBlocFilter, selectedCategory, toast, industryFilter, isicCodeFilter, accuracyFilter]);
   
   // Custom setter for economic bloc filter that triggers search
   const handleEconomicBlocFilterChange = useCallback((value: number | null) => {
@@ -376,12 +513,16 @@ export default function HomePage() {
             handleError, // onError callback
             industryFilter,
             priceFilter,
-            hsCodeFilter
+            hsCodeFilter,
+            accuracyFilter
           );
           
           setSearchResults(response.data || []);
           setTotalPages(response.meta?.last_page || 1);
           setTotalItems(response.meta?.total || 0);
+          
+          // Fetch statistics if search type is knowledge
+          await fetchStatisticsIfNeeded(searchQuery.trim() || '', searchType);
         } catch (error) {
           console.error('Economic bloc filter search failed:', error);
           setSearchResults([]);
@@ -393,7 +534,7 @@ export default function HomePage() {
       
       fetchData();
     }
-  }, [initialized, locale, searchQuery, searchType, activeTab, languageFilter, countryFilter, regionFilter, selectedCategory, toast, industryFilter, isicCodeFilter]);
+  }, [initialized, locale, searchQuery, searchType, activeTab, languageFilter, countryFilter, regionFilter, selectedCategory, toast, industryFilter, isicCodeFilter, accuracyFilter]);
   
   // Custom setter for price filter that triggers search
   const handlePriceFilterChange = useCallback((value: string | null) => {
@@ -431,12 +572,16 @@ export default function HomePage() {
             handleError, // onError callback
             industryFilter,
             value, // Use the new price filter value
-            hsCodeFilter
+            hsCodeFilter,
+            accuracyFilter
           );
           
           setSearchResults(response.data || []);
           setTotalPages(response.meta?.last_page || 1);
           setTotalItems(response.meta?.total || 0);
+          
+          // Fetch statistics if search type is knowledge
+          await fetchStatisticsIfNeeded(searchQuery.trim() || '', searchType);
         } catch (error) {
           console.error('Price filter search failed:', error);
           setSearchResults([]);
@@ -448,7 +593,7 @@ export default function HomePage() {
       
       fetchData();
     }
-  }, [initialized, locale, searchQuery, searchType, activeTab, languageFilter, countryFilter, regionFilter, economicBlocFilter, selectedCategory, toast, industryFilter, isicCodeFilter]);
+  }, [initialized, locale, searchQuery, searchType, activeTab, languageFilter, countryFilter, regionFilter, economicBlocFilter, selectedCategory, toast, industryFilter, isicCodeFilter, accuracyFilter]);
   
   // Custom setter for industry filter that triggers search
   const handleIndustryFilterChange = useCallback((value: number | null) => {
@@ -486,12 +631,16 @@ export default function HomePage() {
             handleError, // onError callback
             value, // Use the new industry filter value
             priceFilter,
-            hsCodeFilter
+            hsCodeFilter,
+            accuracyFilter
           );
           
           setSearchResults(response.data || []);
           setTotalPages(response.meta?.last_page || 1);
           setTotalItems(response.meta?.total || 0);
+          
+          // Fetch statistics if search type is knowledge
+          await fetchStatisticsIfNeeded(searchQuery.trim() || '', searchType);
         } catch (error) {
           console.error('Industry filter search failed:', error);
           setSearchResults([]);
@@ -503,7 +652,7 @@ export default function HomePage() {
       
       fetchData();
     }
-  }, [initialized, locale, searchQuery, searchType, activeTab, languageFilter, countryFilter, regionFilter, economicBlocFilter, selectedCategory, toast, isicCodeFilter]);
+  }, [initialized, locale, searchQuery, searchType, activeTab, languageFilter, countryFilter, regionFilter, economicBlocFilter, selectedCategory, toast, isicCodeFilter, accuracyFilter]);
   
   // Custom setter for ISIC code filter that triggers search
   const handleIsicCodeFilterChange = useCallback((value: number | null) => {
@@ -541,12 +690,16 @@ export default function HomePage() {
             handleError, // onError callback
             industryFilter,
             priceFilter,
-            hsCodeFilter
+            hsCodeFilter,
+            accuracyFilter
           );
           
           setSearchResults(response.data || []);
           setTotalPages(response.meta?.last_page || 1);
           setTotalItems(response.meta?.total || 0);
+          
+          // Fetch statistics if search type is knowledge
+          await fetchStatisticsIfNeeded(searchQuery.trim() || '', searchType);
         } catch (error) {
           console.error('ISIC code filter search failed:', error);
           setSearchResults([]);
@@ -558,7 +711,7 @@ export default function HomePage() {
       
       fetchData();
     }
-  }, [initialized, locale, searchQuery, searchType, activeTab, languageFilter, countryFilter, regionFilter, economicBlocFilter, selectedCategory, toast, industryFilter, priceFilter, hsCodeFilter]);
+  }, [initialized, locale, searchQuery, searchType, activeTab, languageFilter, countryFilter, regionFilter, economicBlocFilter, selectedCategory, toast, industryFilter, priceFilter, hsCodeFilter, accuracyFilter]);
   
   // Custom setter for HS code filter that triggers search
   const handleHsCodeFilterChange = useCallback((value: number | null) => {
@@ -596,12 +749,16 @@ export default function HomePage() {
             handleError, // onError callback
             industryFilter,
             priceFilter,
-            value // Use the new HS code filter value
+            value, // Use the new HS code filter value
+            accuracyFilter
           );
           
           setSearchResults(response.data || []);
           setTotalPages(response.meta?.last_page || 1);
           setTotalItems(response.meta?.total || 0);
+          
+          // Fetch statistics if search type is knowledge
+          await fetchStatisticsIfNeeded(searchQuery.trim() || '', searchType);
         } catch (error) {
           console.error('HS code filter search failed:', error);
           setSearchResults([]);
@@ -613,7 +770,66 @@ export default function HomePage() {
       
       fetchData();
     }
-  }, [initialized, locale, searchQuery, searchType, activeTab, languageFilter, countryFilter, regionFilter, economicBlocFilter, selectedCategory, toast, industryFilter, priceFilter, isicCodeFilter]);
+  }, [initialized, locale, searchQuery, searchType, activeTab, languageFilter, countryFilter, regionFilter, economicBlocFilter, selectedCategory, toast, industryFilter, priceFilter, isicCodeFilter, accuracyFilter]);
+  
+  // Custom setter for accuracy filter that triggers search
+  const handleAccuracyFilterChange = useCallback((value: 'any' | 'all') => {
+    // Update the accuracy filter state
+    setAccuracyFilter(value);
+    // Update URL with new filter
+    updateUrlWithFilters({ accuracy: value });
+    
+    // Reset to page 1 when filter changes
+    setCurrentPage(1);
+    
+    // Trigger search if initialized
+    if (initialized) {
+      // Create a new search with the updated accuracy filter
+      const fetchData = async () => {
+        setLoading(true);
+        try {
+          const handleError = (errorMessage: string) => {
+            toast.error(errorMessage, 'Validation Error');
+          };
+          
+          const response = await fetchSearchResults(
+            searchQuery.trim() || '', // Use empty string if no search query
+            searchType,
+            locale,
+            1, // Always use page 1 when filter changes
+            activeTab,
+            languageFilter,
+            countryFilter,
+            regionFilter,
+            economicBlocFilter,
+            isicCodeFilter,
+            selectedCategory !== 'all' ? selectedCategory : null, // Maintain the selected category
+            30, // perPage
+            handleError, // onError callback
+            industryFilter,
+            priceFilter,
+            hsCodeFilter,
+            value // Use the new accuracy filter value
+          );
+          
+          setSearchResults(response.data || []);
+          setTotalPages(response.meta?.last_page || 1);
+          setTotalItems(response.meta?.total || 0);
+          
+          // Fetch statistics if search type is knowledge
+          await fetchStatisticsIfNeeded(searchQuery.trim() || '', searchType);
+        } catch (error) {
+          console.error('Accuracy filter search failed:', error);
+          setSearchResults([]);
+          toast.error('Failed to fetch search results. Please try again later.', 'Error');
+        } finally {
+          setLoading(false);
+        }
+      };
+      
+      fetchData();
+    }
+  }, [initialized, locale, searchQuery, searchType, activeTab, languageFilter, countryFilter, regionFilter, economicBlocFilter, selectedCategory, toast, industryFilter, priceFilter, isicCodeFilter, hsCodeFilter]);
   
   // Reference to track if empty query has been called
   const emptyQueryCalledRef = useRef<boolean>(false);
@@ -653,7 +869,8 @@ export default function HomePage() {
             handleError, // onError callback
             industryFilter,
             priceFilter,
-            hsCodeFilter
+            hsCodeFilter,
+            accuracyFilter
           );
           
           setSearchResults(response.data || []);
@@ -666,6 +883,9 @@ export default function HomePage() {
           
           // Update the previous search query reference to avoid duplicate searches
           prevSearchQueryRef.current = query;
+          
+          // Fetch statistics if search type is knowledge
+          await fetchStatisticsIfNeeded(query.trim(), type || 'knowledge');
         } catch (error) {
           console.error('Initial search failed:', error);
           toast.error('Failed to fetch search results. Please try again later.', 'Error');
@@ -746,8 +966,16 @@ export default function HomePage() {
     } else if (!category && selectedCategory !== 'all') {
       setSelectedCategory('all');
     }
+    
+    // Handle accuracy parameter
+    const accuracy = searchParams.get('accuracy') as 'any' | 'all';
+    if (accuracy && accuracy !== accuracyFilter) {
+      setAccuracyFilter(accuracy);
+    } else if (!accuracy && accuracyFilter !== 'any') {
+      setAccuracyFilter('all');
+    }
   }, [searchParams, initialized, languageFilter, countryFilter, regionFilter, 
-      economicBlocFilter, industryFilter, isicCodeFilter, hsCodeFilter, selectedCategory]);
+      economicBlocFilter, industryFilter, isicCodeFilter, hsCodeFilter, selectedCategory, accuracyFilter]);
   
   // Function to convert KnowledgeItem array to SearchResultItem array
   const mapToSearchResults = useCallback((items: KnowledgeItem[]) => {
@@ -821,14 +1049,20 @@ export default function HomePage() {
         handleError,
         industryFilter,
         priceFilter,
-        hsCodeFilter
+        hsCodeFilter,
+        accuracyFilter
       );
+      
+
       
       // Handle search API response format
       setSearchResults(response.data || []);
       setTotalPages(response.meta?.last_page || 1);
       setTotalItems(response.meta?.total || 0);
       setCurrentPage(1); // Reset to page 1 for new searches
+      
+      // Fetch statistics if search type is knowledge
+      await fetchStatisticsIfNeeded(query, searchType);
     } catch (error) {
       console.error('Explicit search failed:', error);
       setKnowledgeItems([]);
@@ -837,7 +1071,7 @@ export default function HomePage() {
     } finally {
       setLoading(false);
     }
-  }, [searchQuery, searchType, locale, activeTab, languageFilter, countryFilter, regionFilter, economicBlocFilter, isicCodeFilter, selectedCategory, industryFilter, priceFilter, hsCodeFilter, updateUrlWithFilters, toast]);
+  }, [searchQuery, searchType, locale, activeTab, languageFilter, countryFilter, regionFilter, economicBlocFilter, isicCodeFilter, selectedCategory, industryFilter, priceFilter, hsCodeFilter, updateUrlWithFilters, toast, accuracyFilter]);
 
   // Handle search submission (Enter key or search button)
   const handleSubmit = (e: React.FormEvent) => {
@@ -858,7 +1092,8 @@ export default function HomePage() {
     selectedCategory,
     industryFilter,
     isicCodeFilter,
-    hsCodeFilter
+    hsCodeFilter,
+    accuracyFilter
   });
   
   // Track previous search query to avoid redundant API calls
@@ -872,6 +1107,9 @@ export default function HomePage() {
 
   // Track if we should skip the next search effect run (to prevent overriding pagination)
   const skipNextSearchEffectRef = useRef(false);
+  
+  // Flag to prevent main search effect from running during search type changes
+  const isSearchTypeChangingRef = useRef(false);
 
   // Direct page search function to be passed to ResultsSection
   const directSearchByPage = useCallback(async (page: number) => {
@@ -920,10 +1158,12 @@ export default function HomePage() {
         handleError, // onError callback
         industryFilter,
         priceFilter,
-        hsCodeFilter
+        hsCodeFilter,
+        accuracyFilter
       );
       
-      console.log('Got search results for page', page, '- count:', response.data?.length);
+
+      
       setSearchResults(response.data || []);
       setTotalPages(response.meta?.last_page || 1);
       setTotalItems(response.meta?.total || 0);
@@ -931,6 +1171,11 @@ export default function HomePage() {
       // Explicitly update the currentPage state to match the requested page
       // This ensures the UI reflects the correct page
       setCurrentPage(page);
+      
+      // Fetch statistics if search type is knowledge (only for page 1 to avoid duplicate calls)
+      if (page === 1) {
+        await fetchStatisticsIfNeeded(searchQuery.trim(), searchType);
+      }
     } catch (error) {
       console.error('Direct page search failed:', error);
       toast.error('Failed to fetch page results. Please try again.', 'Error');
@@ -945,7 +1190,7 @@ export default function HomePage() {
         skipNextSearchEffectRef.current = false;
       }, 1000); // Wait 1 second before allowing the main search effect to run again
     }
-  }, [initialized, searchQuery, searchType, locale, activeTab, languageFilter, countryFilter, regionFilter, economicBlocFilter, selectedCategory, toast, industryFilter, isicCodeFilter, priceFilter, hsCodeFilter]);
+  }, [initialized, searchQuery, searchType, locale, activeTab, languageFilter, countryFilter, regionFilter, economicBlocFilter, selectedCategory, toast, industryFilter, isicCodeFilter, priceFilter, hsCodeFilter, accuracyFilter]);
 
   // Track the last time an API call was made to prevent too many calls
   const lastApiCallTimeRef = useRef<number>(0);
@@ -955,6 +1200,12 @@ export default function HomePage() {
   useEffect(() => {
     // Skip if not initialized yet (initial search is handled by the mount effect)
     if (!initialized) {
+      return;
+    }
+    
+    // Skip if a search type change is in progress to prevent interference
+    if (isSearchTypeChangingRef.current) {
+      console.log('Skipping main search effect because a search type change is in progress');
       return;
     }
     
@@ -989,13 +1240,14 @@ export default function HomePage() {
       params.selectedCategory !== selectedCategory ||
       params.industryFilter !== industryFilter ||
       params.isicCodeFilter !== isicCodeFilter ||
-      params.hsCodeFilter !== hsCodeFilter;
+      params.hsCodeFilter !== hsCodeFilter ||
+      params.accuracyFilter !== accuracyFilter;
     
     // Log parameter changes for debugging (but don't include searchQuery)
     if (paramsChanged) {
       console.log('Search params changed (excluding query):', { 
         locale, languageFilter, countryFilter, 
-        activeTab, searchType, selectedCategory, industryFilter, isicCodeFilter, hsCodeFilter 
+        activeTab, searchType, selectedCategory, industryFilter, isicCodeFilter, hsCodeFilter, accuracyFilter 
       });
     }
     
@@ -1011,7 +1263,8 @@ export default function HomePage() {
       selectedCategory,
       industryFilter,
       isicCodeFilter,
-      hsCodeFilter
+      hsCodeFilter,
+      accuracyFilter
     };
     
     // If nothing changed, don't fetch
@@ -1022,6 +1275,10 @@ export default function HomePage() {
     // Only trigger search for filter changes, not for searchQuery changes
     const fetchData = async () => {
       setLoading(true);
+      
+      // Clear existing results at the start of any new search
+      setSearchResults([]);
+      setKnowledgeItems([]);
       
       try {        
         const handleError = (errorMessage: string) => {
@@ -1063,8 +1320,11 @@ export default function HomePage() {
           handleError, // onError callback
           industryFilter,
           priceFilter,
-          hsCodeFilter
+          hsCodeFilter,
+          accuracyFilter
         );
+        
+
         
         // Handle search API response format
         setSearchResults(response.data || []);
@@ -1074,6 +1334,9 @@ export default function HomePage() {
         // Reset pagination to page 1 when filter parameters have changed
         console.log('Resetting to page 1 because filter parameters changed');
         setCurrentPage(1);
+        
+        // Fetch statistics if search type is knowledge
+        await fetchStatisticsIfNeeded(keyword, search_type);
       } catch (error) {
         console.error('API request failed:', error);
         setKnowledgeItems([]);
@@ -1089,7 +1352,7 @@ export default function HomePage() {
     // Execute immediately for filter changes
     fetchData();
   // REMOVED searchQuery from dependencies - only trigger on filter changes, not query changes
-  }, [locale, languageFilter, countryFilter, regionFilter, economicBlocFilter, activeTab, searchType, initialized, toast, selectedCategory, industryFilter, isicCodeFilter, hsCodeFilter]);
+  }, [locale, languageFilter, countryFilter, regionFilter, economicBlocFilter, activeTab, searchType, initialized, toast, selectedCategory, industryFilter, isicCodeFilter, hsCodeFilter, accuracyFilter]);
 
   return (
    <main className='min-h-screen flex flex-col bg-gray-50'>
@@ -1184,7 +1447,8 @@ export default function HomePage() {
                          (errorMsg) => toast.error(errorMsg, 'Error'), // Add error handling to display toast
                          industryFilter, // Add industryFilter parameter
                          priceFilter, // Add priceFilter parameter
-                         hsCodeFilter // Add hsCodeFilter parameter
+                         hsCodeFilter, // Add hsCodeFilter parameter
+                         accuracyFilter
                        );
                        
                        console.log('Setting main searchResults from category select:', results.data);
@@ -1193,6 +1457,9 @@ export default function HomePage() {
                        setTotalPages(results.meta?.last_page || 1);
                        setTotalItems(results.meta?.total || 0);
                        setCurrentPage(results.meta?.current_page || 1);
+                       
+                       // Fetch statistics for category selection
+                       await fetchStatisticsIfNeeded(currentSearchQuery, 'knowledge');
                      } catch (error) {
                        console.error('Error fetching search results:', error);
                      } finally {
@@ -1224,6 +1491,7 @@ export default function HomePage() {
                         arLabel="الكل" 
                         isSelected={selectedCategory === 'all'} 
                         onClick={(e) => { e.preventDefault(); handleCategorySelect('all'); }} 
+                        count={getCategoryCount('all')}
                       />
                       <CategoryIconBox 
                         name="data" 
@@ -1232,6 +1500,7 @@ export default function HomePage() {
                         arLabel="البيانات" 
                         isSelected={selectedCategory === 'data'} 
                         onClick={(e) => { e.preventDefault(); handleCategorySelect('data'); }} 
+                        count={getCategoryCount('data')}
                       />
                       <CategoryIconBox 
                         name="report" 
@@ -1240,6 +1509,7 @@ export default function HomePage() {
                         arLabel="التقارير" 
                         isSelected={selectedCategory === 'report'} 
                         onClick={(e) => { e.preventDefault(); handleCategorySelect('report'); }} 
+                        count={getCategoryCount('report')}
                       />
                       <CategoryIconBox 
                         name="insight" 
@@ -1248,6 +1518,7 @@ export default function HomePage() {
                         arLabel="الرؤى" 
                         isSelected={selectedCategory === 'insight'} 
                         onClick={(e) => { e.preventDefault(); handleCategorySelect('insight'); }} 
+                        count={getCategoryCount('insight')}
                       />
                       <CategoryIconBox 
                         name="manual" 
@@ -1256,6 +1527,7 @@ export default function HomePage() {
                         arLabel="الأدلة" 
                         isSelected={selectedCategory === 'manual'} 
                         onClick={(e) => { e.preventDefault(); handleCategorySelect('manual'); }} 
+                        count={getCategoryCount('manual')}
                       />
                       <CategoryIconBox 
                         name="course" 
@@ -1264,6 +1536,7 @@ export default function HomePage() {
                         arLabel="الدورات" 
                         isSelected={selectedCategory === 'course'} 
                         onClick={(e) => { e.preventDefault(); handleCategorySelect('course'); }} 
+                        count={getCategoryCount('course')}
                       />
                     </>
                     )
@@ -1289,16 +1562,26 @@ export default function HomePage() {
               >
                 {filtersVisible ? (
                   <>
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                    </svg>
+                   <svg fill="none" height="24" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg"><g clip-rule="evenodd" fill-rule="evenodd"><path d="m11 20v-16h2v16z" fill="#90caea"/><g fill="#3747d6"><path d="m16.9142 12 2.7929-2.79289-1.4142-1.41422-3.5 3.50001c-.3905.3905-.3905 1.0237 0 1.4142l3.5 3.5 1.4142-1.4142z"/><path d="m7.0858 12-2.79289-2.79289 1.41421-1.41422 3.5 3.50001c.39053.3905.39053 1.0237 0 1.4142l-3.5 3.5-1.41421-1.4142z"/></g></g></svg>
                     {locale === 'ar' ? 'إخفاء المرشحات' : 'Hide Filters'}
                   </>
                 ) : (
                   <>
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.414A1 1 0 013 6.707V4z" />
-                    </svg>
+                    <svg width="25" height="25" viewBox="0 0 25 25" fill="none" xmlns="http://www.w3.org/2000/svg">
+<path d="M4.44336 5.9082H14.6973V7.37305H4.44336V5.9082Z" fill="#4DC4FF"/>
+<path d="M16.1621 5.9082H20.5566V7.37305H16.1621V5.9082Z" fill="#4DA6FF"/>
+<path d="M4.44336 11.7676H8.83789V13.2324H4.44336V11.7676Z" fill="#4DC4FF"/>
+<path d="M10.3027 11.7676H20.5566V13.2324H10.3027V11.7676Z" fill="#4DC4FF"/>
+<path d="M9.57031 14.6973C8.35869 14.6973 7.37305 13.7116 7.37305 12.5C7.37305 11.2884 8.35869 10.3027 9.57031 10.3027C10.7819 10.3027 11.7676 11.2884 11.7676 12.5C11.7676 13.7116 10.7819 14.6973 9.57031 14.6973Z" fill="#5A77B3"/>
+<path d="M4.44336 17.627H14.6973V19.0918H4.44336V17.627Z" fill="#4DC4FF"/>
+<path d="M16.1621 17.627H20.5566V19.0918H16.1621V17.627Z" fill="#4DA6FF"/>
+<path d="M12.5 17.627H14.6973V19.0918H12.5V17.627Z" fill="#4DA6FF"/>
+<path d="M12.5 11.7676H20.5566V13.2324H12.5V11.7676Z" fill="#4DA6FF"/>
+<path d="M12.5 5.9082H14.6973V7.37305H12.5V5.9082Z" fill="#4DA6FF"/>
+<path d="M15.4297 8.83789C14.2181 8.83789 13.2324 7.85225 13.2324 6.64062C13.2324 5.429 14.2181 4.44336 15.4297 4.44336C16.6413 4.44336 17.627 5.429 17.627 6.64062C17.627 7.85225 16.6413 8.83789 15.4297 8.83789Z" fill="#4D5B99"/>
+<path d="M15.4297 20.5566C14.2181 20.5566 13.2324 19.571 13.2324 18.3594C13.2324 17.1478 14.2181 16.1621 15.4297 16.1621C16.6413 16.1621 17.627 17.1478 17.627 18.3594C17.627 19.571 16.6413 20.5566 15.4297 20.5566Z" fill="#4D5B99"/>
+</svg>
+
                     {locale === 'ar' ? 'إظهار المرشحات' : 'Show Filters'}
                   </>
                 )}
@@ -1312,8 +1595,8 @@ export default function HomePage() {
               <div 
                 className={`lg:flex-shrink-0 transition-all duration-300 ease-in-out overflow-hidden ${
                   filtersVisible 
-                    ? 'lg:w-80 opacity-100 max-h-screen' 
-                    : 'lg:w-0 opacity-0 max-h-0 lg:max-h-screen'
+                    ? 'lg:w-80 opacity-100 ' 
+                    : 'lg:w-0 opacity-0 max-h-0'
                 }`}
               >
                 <div className={`sticky rounded-md top-2 transition-transform duration-300 ease-in-out ${
@@ -1321,6 +1604,7 @@ export default function HomePage() {
                 }`}>
                     <FilterBox
                       locale={locale}
+                      searchType={searchType}
                       languageFilter={languageFilter}
                       setLanguageFilter={handleLanguageFilterChange}
                       countryFilter={countryFilter}
@@ -1337,6 +1621,8 @@ export default function HomePage() {
                       setHsCodeFilter={handleHsCodeFilterChange}
                       priceFilter={priceFilter}
                       setPriceFilter={handlePriceFilterChange}
+                      accuracyFilter={accuracyFilter}
+                      setAccuracyFilter={handleAccuracyFilterChange}
                       resetFilters={resetFilters}
                     />
                 </div>
@@ -1355,6 +1641,7 @@ export default function HomePage() {
                 {/* Results section - conditionally show either ResultsSection or InsightersResultsSection based on searchType */}
                 {searchType === 'insighter' ? (
                   <InsightersResultsSection
+                    key={`insighter-section-${searchType}`}
                     searchQuery={searchQuery}
                     searchResults={searchResults}
                     loading={loading}
@@ -1381,6 +1668,7 @@ export default function HomePage() {
               onPageChange={directSearchByPage}
               router={router}
               updateUrlWithFilters={updateUrlWithFilters}
+              searchType={searchType}
             />
                 )}
               </div>

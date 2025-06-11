@@ -132,12 +132,12 @@ const SearchBar: React.FC<SearchBarProps> = ({
           {/* Dropdown section */}
           <div 
             onClick={() => setShowTypeDropdown(!showTypeDropdown)}
-            className="flex items-center justify-between cursor-pointer px-2 mb-2 sm:mb-0 sm:mr-3 w-full sm:w-auto sm:border-r sm:border-gray-200 sm:pr-3 relative"
+            className={`flex items-center justify-between cursor-pointer px-2 mb-2 sm:mb-0 sm:me-3 w-full sm:w-auto ${locale === 'ar' ? 'sm:border-l' : 'sm:border-r'} sm:border-gray-200 sm:pr-3 relative`}
             data-type-dropdown-toggle
           >
             <div className="flex items-center">
               {/* Display the icon based on selected option */}
-              <div className="flex items-center justify-center w-6 h-6 bg-blue-50 rounded-md mr-2">
+              <div className={`flex items-center justify-center w-6 h-6 bg-blue-50 rounded-md ${locale === 'ar' ? 'ml-2' : 'mr-2'}`}>
                 {searchType === 'knowledge' ? (
                  <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4 text-blue-600" width="24" height="24" viewBox="0 0 24 24" strokeWidth="2" stroke="currentColor" fill="none" strokeLinecap="round" strokeLinejoin="round">
                  <path stroke="none" d="M0 0h24v24H0z" fill="none" />
@@ -162,7 +162,7 @@ const SearchBar: React.FC<SearchBarProps> = ({
                   : (locale === 'ar' ? 'إنسايتر' : 'Insighter')}
               </span>
               <svg 
-                className="w-5 h-5 text-gray-500 ml-2" 
+                className={`w-5 h-5 text-gray-500 ${locale === 'ar' ? 'mr-2' : 'ml-2'}`} 
                 fill="none" 
                 stroke="currentColor" 
                 viewBox="0 0 24 24" 
@@ -172,7 +172,7 @@ const SearchBar: React.FC<SearchBarProps> = ({
                   strokeLinecap="round" 
                   strokeLinejoin="round" 
                   strokeWidth="2" 
-                  d={locale === 'ar' ? "M9 5l7 7-7 7" : "M19 9l-7 7-7-7"}
+                  d={locale === 'ar' ? "M15 19l-7-7 7-7" : "M19 9l-7 7-7-7"}
                 ></path>
               </svg>
             </div>
@@ -181,7 +181,7 @@ const SearchBar: React.FC<SearchBarProps> = ({
             {showTypeDropdown && (
               <div 
                 ref={typeDropdownRef}
-                className="absolute top-full left-0 mt-1 bg-white border border-gray-200 rounded-md shadow-lg z-30 w-40"
+                className={`absolute top-full mt-1 bg-white border border-gray-200 rounded-md shadow-lg z-30 w-40 ${locale === 'ar' ? 'right-0' : 'left-0'}`}
               >
                 <div 
                   className={`px-4 py-2 cursor-pointer hover:bg-blue-50 flex items-center ${searchType === 'knowledge' ? 'bg-blue-50' : ''}`}
@@ -190,7 +190,7 @@ const SearchBar: React.FC<SearchBarProps> = ({
                     setShowTypeDropdown(false);
                   }}
                 >
-                  <div className="flex items-center justify-center w-6 h-6 bg-blue-50 rounded-md mr-2">
+                  <div className={`flex items-center justify-center w-6 h-6 bg-blue-50 rounded-md ${locale === 'ar' ? 'ml-2' : 'mr-2'}`}>
                     <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4 text-blue-600" width="24" height="24" viewBox="0 0 24 24" strokeWidth="2" stroke="currentColor" fill="none" strokeLinecap="round" strokeLinejoin="round">
                       <path stroke="none" d="M0 0h24v24H0z" fill="none" />
                       <path d="M3 19a9 9 0 0 1 9 0a9 9 0 0 1 9 0" />
@@ -211,7 +211,7 @@ const SearchBar: React.FC<SearchBarProps> = ({
                     setShowTypeDropdown(false);
                   }}
                 >
-                  <div className="flex items-center justify-center w-6 h-6 bg-blue-50 rounded-md mr-2">
+                  <div className={`flex items-center justify-center w-6 h-6 bg-blue-50 rounded-md ${locale === 'ar' ? 'ml-2' : 'mr-2'}`}>
                     <svg width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
                       <path d="M6.87004 8.1525C6.79504 8.145 6.70504 8.145 6.62254 8.1525C4.83754 8.0925 3.42004 6.63 3.42004 4.83C3.42004 2.9925 4.90504 1.5 6.75004 1.5C8.58754 1.5 10.08 2.9925 10.08 4.83C10.0725 6.63 8.65504 8.0925 6.87004 8.1525Z" stroke="#2463EB" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
                       <path d="M12.3075 3C13.7625 3 14.9325 4.1775 14.9325 5.625C14.9325 7.0425 13.8075 8.1975 12.405 8.25C12.345 8.2425 12.2775 8.2425 12.21 8.25" stroke="#2463EB" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>

@@ -29,7 +29,7 @@ export async function getNotifications(locale: string = 'en'): Promise<Notificat
       return []
     }
     
-    const response = await fetch('https://api.foresighta.co/api/account/notification', {
+    const response = await fetch('https://api.knoldg.com/api/account/notification', {
       headers: {
         'Authorization': `Bearer ${token}`,
         'Content-Type': 'application/json',
@@ -65,7 +65,7 @@ export async function markNotificationAsRead(id: string, locale: string = 'en'):
       return false
     }
     
-    const response = await fetch(`https://api.foresighta.co/api/account/notification/read/${id}`, {
+    const response = await fetch(`https://api.knoldg.com/api/account/notification/read/${id}`, {
       method: 'PUT',
       headers: {
         'Authorization': `Bearer ${token}`,
@@ -96,7 +96,7 @@ export async function markAllNotificationsAsRead(locale: string = 'en'): Promise
       return false
     }
     
-    const response = await fetch('https://api.foresighta.co/api/account/notification/read', {
+    const response = await fetch('https://api.knoldg.com/api/account/notification/read', {
       method: 'PUT',
       headers: {
         'Authorization': `Bearer ${token}`,
