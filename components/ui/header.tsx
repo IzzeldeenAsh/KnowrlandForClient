@@ -210,13 +210,19 @@ export default function Header() {
     // Get the current path without locale prefix
     const currentPath = pathname.split('/').slice(2).join('/');
     
+    // Get current query parameters
+    const currentSearch = typeof window !== 'undefined' ? window.location.search : '';
+    
     // Navigate to the same route with the new locale
     // If we're on the home page (or empty path), just use '/'
     const newPath = currentPath ? `/${currentPath}` : '/';
     
+    // Preserve query parameters when switching locale
+    const fullUrl = `/${locale}${newPath}${currentSearch}`;
+    
     // Force a complete page reload to prevent client-side errors
     // This ensures all components are properly re-rendered with the new locale
-    window.location.href = `/${locale}${newPath}`;
+    window.location.href = fullUrl;
   };
 
   return (
