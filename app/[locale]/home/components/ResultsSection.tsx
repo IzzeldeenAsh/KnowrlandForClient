@@ -70,7 +70,7 @@ const ResultsSection: React.FC<ResultsSectionProps> = ({
     <div dir={isRtl ? 'rtl' : 'ltr'}>
       <Group justify="space-between" align="center" mb="md">
       <p className="text-gray-700 font-semibold text-sm uppercase">
-         {locale === 'ar' ? '\u0625\u062c\u0645\u0627\u0644\u064a \u0627\u0644\u0646\u062a\u0627\u0626\u062c:' : 'Total results:'}  <span className="font-light lowercase"> {totalItems} {locale === 'ar' ? 'نتيجة' : 'result'}</span>
+         {/* {locale === 'ar' ? '\u0625\u062c\u0645\u0627\u0644\u064a \u0627\u0644\u0646\u062a\u0627\u0626\u062c:' : 'Total results:'}  <span className="font-light lowercase"> {totalItems} {locale === 'ar' ? 'نتيجة' : 'result'}</span> */}
         </p>
         <ViewModeToggle viewMode={viewMode} setViewMode={setViewMode} />
       </Group>
