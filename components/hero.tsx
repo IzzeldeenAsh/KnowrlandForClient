@@ -30,7 +30,7 @@ async function fetchAutocomplete(keyword: string, locale: string): Promise<strin
   if (!keyword.trim()) return [];
   
   try {
-    const response = await fetch(`https://api.foresighta.co/api/platform/search/autocomplete?keyword=${encodeURIComponent(keyword)}`, {
+    const response = await fetch(`https://api.knoldg.com/api/platform/search/autocomplete?keyword=${encodeURIComponent(keyword)}`, {
       headers: {
         'Accept-Language': locale, // Set the locale in the header
         'Accept': 'application/json'
@@ -132,14 +132,14 @@ export default function Hero() {
   const handleSuggestionSelect = (suggestion: string) => {
     setSearchInput(suggestion);
     setShowSuggestions(false);
-    router.push(`/${currentLocale}/home?search_type=${searchType}&keyword=${encodeURIComponent(suggestion)}`);
+    router.push(`/${currentLocale}/home?search_type=${searchType}&keyword=${encodeURIComponent(suggestion)}&accuracy=any`);
   };
 
   // Handle search submission
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     // Navigate to home page even with empty input
-    router.push(`/${currentLocale}/home?search_type=${searchType}&keyword=${encodeURIComponent(searchInput.trim())}`);
+    router.push(`/${currentLocale}/home?search_type=${searchType}&keyword=${encodeURIComponent(searchInput.trim())}&accuracy=any`);
   };
 
   return (
@@ -177,7 +177,7 @@ export default function Hero() {
                       {/* Dropdown selector */}
                       <div 
                         onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-                        className="flex items-center justify-between px-5 py-4 border-r border-gray-300 cursor-pointer min-w-[170px]"
+                        className={`flex items-center justify-between px-5 py-4 border-r border-gray-300 cursor-pointer min-w-[170px] ${currentLocale === 'ar' ? 'border-l' : 'border-r'}`}
                       >
                         <div className="flex items-center">
                           {/* Display the icon based on selected option */}
@@ -268,7 +268,7 @@ export default function Hero() {
                     
                     {/* Dropdown menu */}
                     {isDropdownOpen && (
-                      <div className="absolute left-0 mt-1 w-[150px] bg-white border border-gray-200 rounded-md shadow-lg z-10">
+                      <div className={`absolute mt-1 w-[150px] bg-white border border-gray-200 rounded-md shadow-lg z-10 ${currentLocale === 'ar' ? 'right-0' : 'left-0'}`}>
                         <div 
                           className={`px-4 py-2 cursor-pointer hover:bg-blue-50 ${searchType === 'knowledge' ? 'bg-blue-50' : ''}`}
                           onClick={() => {
@@ -317,7 +317,7 @@ export default function Hero() {
                     {showSuggestions && (
                       <div 
                         ref={suggestionsRef}
-                        className="absolute left-0 right-0 mt-1 bg-white border border-gray-200 rounded-md shadow-lg z-20 max-h-60 overflow-y-auto"
+                        className={`absolute mt-1 bg-white border border-gray-200 rounded-md shadow-lg z-20 max-h-60 overflow-y-auto ${currentLocale === 'ar' ? 'right-0 left-0' : 'left-0 right-0'}`}
                       >
                         {suggestions.map((suggestion, index) => (
                           <div 

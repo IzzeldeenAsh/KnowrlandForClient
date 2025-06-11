@@ -1,5 +1,6 @@
 "use client";
 
+import React from 'react';
 import Link from "next/link";
 import Image from "next/image";
 import { Card, Group, Text, Badge, Avatar } from "@mantine/core";
@@ -30,24 +31,12 @@ function getInitials(name: string) {
     .toUpperCase();
 }
 
-// Helper function to safely get string from potentially string or array value
-function safeGetString(value: string | string[] | undefined): string {
-  if (!value) return '';
-  if (Array.isArray(value)) return value[0] || '';
-  return value;
-}
-
 // Helper function to safely format date, handling both string and string[] types
 function safeFormatDate(dateInput: string | string[] | undefined): string {
   if (!dateInput) return '';
   
   // Convert array to string if needed
-  let dateString = '';
-  if (Array.isArray(dateInput)) {
-    dateString = dateInput[0] || '';
-  } else {
-    dateString = dateInput;
-  }
+  const dateString = Array.isArray(dateInput) ? dateInput[0] || '' : dateInput;
   if (!dateString) return '';
   
   try {
@@ -90,6 +79,9 @@ export default function SearchResultsList({
   const params = useParams();
   const currentLocale = locale || params.locale || "en";
   const isRTL = currentLocale === "ar";
+  
+  // Generate a unique prefix for this render to avoid key conflicts
+  const uniquePrefix = React.useMemo(() => Date.now().toString(), [results]);
 
   const typeTranslations: Record<string, string> = {
     report: isRTL ? "تقرير" : "Reports",
@@ -110,7 +102,8 @@ export default function SearchResultsList({
     free: isRTL ? "مجاني" : "FREE",
     paid: isRTL ? "مدفوع" : "PAID",
     insighter: isRTL ? "إنسايتر" : "Insighter",
-    by: isRTL ? "من قبل" : "By"
+    by: isRTL ? "من قبل" : "By",
+    company: isRTL ? "الشركة" : "Company"
   };
 
   if (results.length === 0) {
@@ -138,17 +131,18 @@ export default function SearchResultsList({
     <div className="max-w-6xl mx-auto" dir={isRTL ? "rtl" : "ltr"}>
       {/* Knowledge items in list view */}
       {knowledgeItems.length > 0 && (
-        <div className="mb-6">
+        <div className="mb-6" >
           <div className="space-y-4 max-w-7xl mx-auto">
             {knowledgeItems.map((item) => (
               <Card
-                key={`${item.searchable_type}-${item.searchable_id}`}
+                key={`${uniquePrefix}-knowledge-${item.searchable_id}`}
                 withBorder={false}
                 padding={0}
                 radius="md"
                 className={listStyles.listCard}
                 data-aos="fade-up"
                 component="div"
+                style={{height:'100%'}}
               >
                 <Link
                   href={`/${currentLocale}/${item.url}`}
@@ -189,15 +183,98 @@ export default function SearchResultsList({
                 
                 {item.searchable_type === "knowledge" && item.insighter && (
                   <div className="flex items-center gap-1 z-10">
-                    <Text size="sm" className="text-gray-200">
-                      {translations.by} <span className="font-semibold text-white">{safeGetString(item.insighter)}</span>
-                    </Text>
+                    <div className="relative">
+                      <Avatar
+                        src={(item.insighter.roles.includes("company") || item.insighter.roles.includes("company-insighter")) && item.insighter.company?.logo ? 
+                            item.insighter.company.logo : 
+                            item.insighter.profile_photo_url}
+                        radius="xl"
+                        alt={item.insighter.name}
+                        size="sm"
+                        className="mr-2"
+                      >
+                        {/* Show initials when no image is available */}
+                        {(() => {
+                          // For company or company-insighter roles: show initials if no company logo
+                          if (item.insighter.roles.includes("company") || item.insighter.roles.includes("company-insighter")) {
+                            return !item.insighter.company?.logo ? getInitials(item.insighter.name) : null;
+                          }
+                          // For regular insighter: show initials if no profile photo
+                          return !item.insighter.profile_photo_url ? getInitials(item.insighter.name) : null;
+                        })()}
+                      </Avatar>
+                      
+                      {item.insighter.roles.includes("company-insighter") && item.insighter.profile_photo_url && (
+                        <Avatar
+                          src={item.insighter.profile_photo_url}
+                          radius="xl"
+                          size="xs"
+                          className="absolute bottom-0 right-[10px] translate-x-1/3 rounded-full translate-y-1/3 z-10"
+                          alt={item.insighter.name}
+                          style={{
+                            boxShadow: '0 0 0 1px white',
+                            position: 'absolute'
+                          }}
+                        />
+                      )}
+                      {item.insighter.roles.includes("company") && item.insighter.profile_photo_url && (
+                        <Avatar
+                          src={item.insighter.profile_photo_url}
+                          radius="xl"
+                          size="xs"
+                          className="absolute bottom-0 right-[10px] translate-x-1/3 rounded-full translate-y-1/3 z-10"
+                          alt={item.insighter.name}
+                          style={{
+                            boxShadow: '0 0 0 1px white',
+                            position: 'absolute'
+                          }}
+                        />
+                      )}
+                    </div>
+                    
+                    <div>
+                      <Text size="sm" fw={600} className="text-white capitalize">
+                        {item.insighter.roles.includes("insighter") && item.insighter.name.toLowerCase()}
+
+                        {item.insighter.roles.includes("company") && (
+                          item.insighter.company
+                            ? isRTL
+                              ? `${translations.company} ${item.insighter.company.legal_name}`
+                              : `${item.insighter.company.legal_name} ${translations.company}`
+                            : translations.company
+                        )}
+
+                        {item.insighter.roles.includes("company-insighter") && (
+                          item.insighter.company
+                            ? isRTL
+                              ? `${translations.company} ${item.insighter.company.legal_name}`
+                              : `${item.insighter.company.legal_name} ${translations.company}`
+                            : translations.company
+                        )}
+                      </Text>
+
+                      <Text c="dimmed" size="xs" className="text-gray-300 capitalize">
+                        {item.insighter.roles.includes("insighter") && translations.insighter}
+
+                        {item.insighter.roles.includes("company") && (
+                          item.insighter.company
+                            ? `${translations.by} ${item.insighter.name.toLowerCase()}`
+                            : translations.company
+                        )}
+
+                        {item.insighter.roles.includes("company-insighter") && (
+                          item.insighter.company
+                            ? `${translations.by} ${item.insighter.name.toLowerCase()}`
+                            : translations.company
+                        )}
+                      </Text>
+                    </div>
                   </div>
                 )}
               </div>
               
               {/* Only show contentColumn if there's content to display */}
-              {(item.description || (item.searchable_type === "knowledge" && (item.total_price || item.published_at))) && (
+              {(item.description || (item.searchable_type === "knowledge" && (item.paid !== undefined || item.published_at))) && (
                 <div className={listStyles.contentColumn}>
                   {item.description && (
                     <Text className={listStyles.description} lineClamp={3}>
@@ -208,13 +285,13 @@ export default function SearchResultsList({
                   {item.searchable_type === "knowledge" && (
                     <div className={listStyles.detailsSection}>
                       <div className="flex items-center gap-3">
-                        {item.total_price && (
+                        {item.paid !== undefined && (
                           <Badge
-                            color={parseInt(item.total_price) > 0 ? "yellow" : "green"}
+                            color={item.paid ? "yellow" : "green"}
                             variant="light"
                             className={listStyles.priceBadge}
                           >
-                            {parseInt(item.total_price) > 0 ? translations.paid : translations.free}
+                            {item.paid ? translations.paid : translations.free}
                           </Badge>
                         )}
                         
@@ -267,7 +344,7 @@ export default function SearchResultsList({
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4 max-w-7xl mx-auto">
             {topicItems.map((item) => (
               <Card
-                key={`${item.searchable_type}-${item.searchable_id}`}
+                key={`${uniquePrefix}-topic-${item.searchable_id}`}
                 withBorder
                 padding="lg"
                 radius="xs"

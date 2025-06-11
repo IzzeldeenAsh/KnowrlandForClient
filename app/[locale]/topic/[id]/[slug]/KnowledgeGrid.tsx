@@ -311,9 +311,16 @@ export default function KnowledgeGrid({
         ))}
         {knowledge.length === 0 && (
           <div className="col-span-full flex flex-col items-center justify-center py-12 px-4">
-            <div className="rounded-full bg-gray-50 p-4 mb-3"></div>
+            <Image
+            src="/images/Search-Not-Found.svg"
+            alt="No results found"
+            width={300}
+            height={200}
+            className="mb-4"
+          />
             <p className="text-gray-500 text-sm">
               {translations.noItems}
+            
             </p>
           </div>
         )}

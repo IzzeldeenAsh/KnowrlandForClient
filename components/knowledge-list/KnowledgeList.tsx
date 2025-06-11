@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { Card, Group, Text, Badge, Avatar } from "@mantine/core";
 import { formatDistanceToNow } from "date-fns";
 import { KnowledgeDetails } from "@/app/[locale]/knowledge/[type]/[slug]/types";
@@ -101,9 +102,18 @@ export default function KnowledgeList({ knowledge, locale }: KnowledgeListProps)
         </Card>
       ))}
       {knowledge.length === 0 && (
-        <Text ta="center" color="gray">
-          No knowledge items available yet.
-        </Text>
+        <div className="flex flex-col items-center justify-center py-8">
+          <Image
+            src="/images/Search-Not-Found.svg"
+            alt="No results found"
+            width={300}
+            height={200}
+            className="mb-4"
+          />
+          <Text ta="center" color="gray">
+            No knowledge items available yet.
+          </Text>
+        </div>
       )}
     </div>
   );

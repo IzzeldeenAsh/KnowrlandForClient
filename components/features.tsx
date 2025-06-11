@@ -198,7 +198,7 @@ export default function Features() {
                 <div className="relative flex items-center justify-center" style={{ width: '100%', height: '500px', overflow: 'hidden' }}>
                     <Image
                       className={`w-full rounded-[inherit] transition-all duration-700 ease-in-out absolute inset-0 my-auto ${hoveredTab2 === 1 || hoveredTab2 === null ? 'opacity-100' : 'opacity-0'}`}
-                      src={locale === 'ar' ? 'https://res.cloudinary.com/dsiku9ipv/image/upload/v1747829666/search-by-ara_dkpcv6.png' : 'https://res.cloudinary.com/dsiku9ipv/image/upload/v1747832518/Group_13495_kf7osl.png'}
+                      src={'https://res.cloudinary.com/dsiku9ipv/image/upload/v1747832518/Group_13495_kf7osl.png'}
                         width={500}
                       height={500}
                       alt="Feature 1 - Image 1"

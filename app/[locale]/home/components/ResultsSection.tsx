@@ -43,6 +43,8 @@ interface ResultsSectionProps {
   // Optional router for URL updates
   router?: any;
   updateUrlWithFilters?: (params: any) => void;
+  // Add search type to force re-render when it changes
+  searchType?: 'knowledge' | 'insighter';
 }
 
 const ResultsSection: React.FC<ResultsSectionProps> = ({
@@ -59,7 +61,8 @@ const ResultsSection: React.FC<ResultsSectionProps> = ({
   locale,
   onPageChange,
   router,
-  updateUrlWithFilters
+  updateUrlWithFilters,
+  searchType
 }) => {
   const t4 = useTranslations('Features4');
   const isRtl = locale === 'ar';
@@ -80,6 +83,7 @@ const ResultsSection: React.FC<ResultsSectionProps> = ({
             {/* Display search results whether we have a keyword or not, as backend returns all data for empty keywords */}
             {searchResults.length > 0 ? (
               <SearchResultsGrid
+                key={`search-results-${searchType}-${Date.now()}`}
                 results={searchResults}
                 colNumbers={3}
                 locale={locale}

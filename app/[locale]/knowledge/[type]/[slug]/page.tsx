@@ -102,7 +102,7 @@ async function fetchKnowledgeData(type: string, slug: string, locale: string = '
     }
     
     const response = await fetch(
-      `https://api.foresighta.co/api/platform/industries/knowledge/${slug}`,
+      `https://api.knoldg.com/api/platform/industries/knowledge/${slug}`,
       {
         method: "GET",
         headers,
@@ -183,8 +183,8 @@ export default function KnowledgePage({ params }: Props) {
   // Use the use() hook instead of await since we're in a client component
   const { data: knowledge } = use(fetchKnowledgeData(type, slug, locale));
   const breadcrumbData = use(fetchBreadcrumb("knowledge", slug, locale));
-  const breadcrumbItems = breadcrumbData.map((item) => ({
-    label: item.label,
+  const breadcrumbItems = breadcrumbData.map((item, index) => ({
+    label: index === breadcrumbData.length - 1 ? "" : item.label,
     href: item.url,
   }));
 

@@ -10,7 +10,7 @@ import { notFound } from 'next/navigation';
 import { use, useEffect } from 'react';
 import styles from './sub-industry-by-type.module.css';
 import IndustryIcon from "@/components/icons/industry-icon";
-import AOS from 'aos';
+import { safeAOSInit } from '@/components/aos-provider';
 import Stripes from "@/public/images/stripes-dark.svg";
 interface Topic {
   id: number;
@@ -50,7 +50,7 @@ export default function SubIndustryByTypePage({ params }: Props) {
   const locale = resolvedParams.locale || 'en';
 
   useEffect(() => {
-    AOS.init({
+    safeAOSInit({
       duration: 800,
       once: true,
     });

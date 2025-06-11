@@ -10,10 +10,11 @@ import { notFound } from 'next/navigation';
 import { use, useEffect } from 'react';
 import styles from './industry-by-type.module.css';
 import IndustryIcon from "@/components/icons/industry-icon";
-import AOS from 'aos';
+import { safeAOSInit } from '@/components/aos-provider';
 import { useIndustryByType } from '@/hooks/industries/useIndustryByType';
 import Stripes from "@/public/images/stripes-dark.svg";
 import { useTranslations } from 'next-intl';
+
 interface Topic {
   id: number;
   name: string;
@@ -51,7 +52,7 @@ export default function IndustryByTypePage({ params }: Props) {
   const t = useTranslations();
 
   useEffect(() => {
-    AOS.init({
+    safeAOSInit({
       duration: 800,
       once: true,
     });
