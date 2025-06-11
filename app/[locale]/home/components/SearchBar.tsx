@@ -40,6 +40,14 @@ const SearchBar: React.FC<SearchBarProps> = ({
   // Add state to track if a search was just performed
   const [hasJustSearched, setHasJustSearched] = React.useState(false);
   
+  // Check if component loaded with search parameters (from redirect)
+  useEffect(() => {
+    const keyword = searchParams.get('keyword');
+    if (keyword && keyword.trim().length > 0) {
+      setHasJustSearched(true);
+    }
+  }, [searchParams]);
+  
   // Get suggestions functionality
   const {
     suggestions,
