@@ -209,7 +209,7 @@ export default function SearchResultsGrid({
                     {item.type === "data" && <DataIcon width={20} height={20} />}
                     {item.type === "course" && <CourseIcon width={20} height={20} />}
 
-                    <Badge w="fit-content" className="capitalize ml-2" variant="light">
+                    <Badge c={'#67b5f6'} w="fit-content" className="capitalize ml-2 " variant="light">
                       {item.type && typeof item.type === 'string' ? (typeTranslations[item.type.toLowerCase()] || item.type) : ''}
                     </Badge>
                   </div>
