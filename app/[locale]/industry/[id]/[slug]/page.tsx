@@ -239,16 +239,7 @@ export default async function IndustryPage({ params }: Props) {
                         />
                       </svg>
                     </div>
-                    {isDisabled && (
-                      <div
-                        className={`absolute z-10 px-3 py-2 text-sm font-medium text-white bg-gray-900 rounded shadow-md 
-                        bottom-1/2 mb-2 left-1/2 -translate-x-1/2 
-                        opacity-0 group-hover:opacity-100 
-                        pointer-events-none transition-opacity duration-300`}
-                      >
-                        {locale === 'ar' ? 'البيانات غير متوفرة' : 'No Knowledge Available Yet'}
-                      </div>
-                    )}
+                    {isDisabled && (<div className={`absolute z-10 px-3 py-2 text-sm font-medium text-white bg-gray-900 rounded shadow-md bottom-1/2 mb-2 left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity duration-300`}>{locale === 'ar' ? 'البيانات غير متوفرة' : 'No Knowledge Available Yet'}</div>)}
                   </div>
                 );
                 
