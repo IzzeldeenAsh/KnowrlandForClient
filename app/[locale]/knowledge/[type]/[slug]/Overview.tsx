@@ -84,13 +84,10 @@ export default function Overview({ knowledge }: OverviewProps) {
     <div className={styles.container} dir={isRTL ? 'rtl' : 'ltr'}    style={isArabicContent ? { direction: 'rtl', textAlign: 'right' } : {}}>
       <div className={styles.py10}>
         {/* Description Section */}
-        <div className="bg-transparent p-3 rounded mb-3">
-          <p
-            className={`${styles.textLg} ${styles.textGray800} ${isArabicContent ? 'text-right' : ''}`}
-         
-            dangerouslySetInnerHTML={{ __html: knowledge.description }}
-          />
-        </div>
+        <div 
+          className={`${styles.description} bg-transparent p-3 rounded mb-3 ${isArabicContent ? 'text-right' : ''}`}
+          dangerouslySetInnerHTML={{ __html: knowledge.description }}
+        />
 
       
 
