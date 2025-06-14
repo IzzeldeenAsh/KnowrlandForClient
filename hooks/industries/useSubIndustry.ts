@@ -44,6 +44,7 @@ export function useSubIndustry({ type, id, slug, topTopic = 2 }: UseSubIndustryP
         }
 
         const result = await response.json();
+        console.log("Sub-Industry", result);
         setData(result);
       } catch (err) {
         setError(err instanceof Error ? err.message : 'An error occurred');
