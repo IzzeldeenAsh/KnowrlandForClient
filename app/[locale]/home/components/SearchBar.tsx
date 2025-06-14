@@ -2,7 +2,7 @@
 
 import React, { useRef, useEffect } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { IconSearch } from '@tabler/icons-react';
+import { IconSearch, IconX } from '@tabler/icons-react';
 import { useSuggestions, useClickAway } from '../utils/hooks';
 import styles from '../utils/custom-search-engine-styles.module.css';
 import { fetchSearchResults } from '../utils/api';
@@ -122,6 +122,18 @@ const SearchBar: React.FC<SearchBarProps> = ({
       // Fallback behavior
       setSearchQuery(suggestion);
       router.push(`/${locale}/home?search_type=${searchType}&keyword=${encodeURIComponent(suggestion)}`);
+    }
+  };
+
+  // Handle clearing the search input
+  const handleClearSearch = () => {
+    setSearchQuery('');
+    setShowSuggestions(false);
+    resetSuggestions();
+    setHasJustSearched(false);
+    // Focus back to the input after clearing
+    if (searchInputRef.current) {
+      searchInputRef.current.focus();
     }
   };
 
@@ -268,6 +280,18 @@ const SearchBar: React.FC<SearchBarProps> = ({
               autoComplete="off"
               dir={locale === 'ar' ? 'rtl' : 'ltr'}
             />
+            {/* Clear button - show when there's text in the input */}
+            {searchQuery.trim().length > 0 && (
+              <button
+                type="button"
+                className="mr-2 p-1 text-gray-400 hover:text-gray-600 flex items-center justify-center"
+                onClick={handleClearSearch}
+                aria-label="Clear search"
+              >
+                <IconX size={16} />
+              </button>
+            )}
+
             {isLoadingSuggestions && (
               <div className="flex items-center justify-center mr-2">
                 <svg className="animate-spin h-4 w-4 text-blue-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
