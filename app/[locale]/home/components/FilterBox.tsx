@@ -1,7 +1,7 @@
 'use client'
 
 import React, { useState, useEffect } from 'react';
-import { Select, Modal, Loader } from '@mantine/core';
+import { Select, Modal, Loader, Chip } from '@mantine/core';
 import { IconRefresh, IconCode, IconBuildingFactory, IconWorldSearch, IconBuildingBank, IconMap, IconWorld, IconLanguage, IconCoin } from '@tabler/icons-react';
 
 import { useTranslations } from 'next-intl';
@@ -515,7 +515,7 @@ const FilterBox: React.FC<FilterBoxProps> = ({
           return (
             <button
               key={node.key}
-              className={`py-2 px-3 rounded-md text-sm flex items-center w-full transition-colors ${isSelected ? 'bg-blue-100 text-blue-800 font-medium' : 'hover:bg-gray-100 border border-gray-200'}`}
+              className={`py-2 px-3 rounded-md text-sm flex items-center w-full transition-colors ${isSelected ? ' text-blue-800 font-medium' : 'hover:bg-gray-100 border border-gray-200'}`}
               onClick={() => handleSelectIsicCode(node)}
             >
               <span className={`font-mono text-xs bg-gray-100 px-1.5 py-0.5 rounded ${marginClass}`}>{node.code}</span>
@@ -538,7 +538,7 @@ const FilterBox: React.FC<FilterBoxProps> = ({
           return (
             <button
               key={code.id}
-              className={`py-2 px-3 rounded-md text-sm flex items-center w-full transition-colors ${isSelected ? 'bg-blue-100 text-blue-800 font-medium' : 'hover:bg-gray-100 border border-gray-200'}`}
+              className={`py-2 px-3 rounded-md text-sm flex items-center w-full transition-colors ${isSelected ? ' text-blue-800 font-medium' : 'hover:bg-gray-100 border border-gray-200'}`}
               onClick={() => handleSelectHsCode(code)}
             >
               <span className={`font-mono text-xs bg-gray-100 px-1.5 py-0.5 rounded ${marginClass}`}>{code.code}</span>
@@ -560,7 +560,7 @@ const FilterBox: React.FC<FilterBoxProps> = ({
           return (
             <button
               key={node.key}
-              className={`py-2 px-3 rounded-md text-sm flex items-center w-full transition-colors ${isSelected ? 'bg-blue-100 text-blue-800 font-medium' : 'hover:bg-gray-100 border border-gray-200'}`}
+              className={`py-2 px-3 rounded-md text-sm flex items-center w-full transition-colors ${isSelected ? ' text-blue-800 font-medium' : 'hover:bg-gray-100 border border-gray-200'}`}
               onClick={() => handleSelectIndustry(node)}
             >
               <span className="flex-1">{node.label}</span>
@@ -690,800 +690,405 @@ const FilterBox: React.FC<FilterBoxProps> = ({
   };
 
   return (
-    <div className="bg-white border-t-4 rounded-md border-[#299af8] shadow-md" dir={locale === 'ar' ? 'rtl' : 'ltr'}>
-      <div className="p-6">
-        {/* Filter Header */}
-        <div className="flex justify-between items-center mb-6">
-          <h2 className="text-xl font-semibold text-gray-800">
-            {locale === 'ar' ? '\u0641\u0644\u062a\u0631' : 'Filter'}
-          </h2>
-          <button
-            onClick={handleResetFilters}
-            className="text-sm text-[#299af8] flex items-center gap-1 hover:text-blue-800 transition-colors"
-          >
-            <span>{locale === 'ar' ? '\u0625\u0639\u0627\u062f\u0629 \u0636\u0628\u0637 \u0627\u0644\u0641\u0644\u0627\u062a\u0631' : 'Reset filters'}</span>
-            <IconRefresh size={14} />
-          </button>
+    <div className={`bg-gray-50 rounded-xl shadow border border-gray-200 w-full max-w-xs `} dir={locale === 'ar' ? 'rtl' : 'ltr'}>
+      {/* Top Bar */}
+      <div className="flex items-center justify-between px-4 pt-4 pb-2 border-b border-gray-200">
+        <h2 className="text-base font-semibold text-gray-800">{locale === 'ar' ? 'الفلاتر' : 'Filters'}</h2>
+        <div className="flex items-center gap-3 text-xs font-medium">
+          <button className="text-blue-500 hover:underline" onClick={handleResetFilters}>{locale === 'ar' ? 'مسح' : 'Clear'}</button>
         </div>
-
+      </div>
+      <div className="p-0 divide-y divide-gray-200">
         {/* Price Types Section */}
         {searchType !== 'insighter' && (
-          <div className="mb-4 border-b border-gray-200 pb-4">
+          <div>
             <button
               onClick={() => setpriceCollapsed(!priceCollapsed)}
-              className="w-full flex justify-between items-center py-2 text-left hover:bg-gray-50 rounded-md px-2"
+              className="w-full flex items-center justify-between px-4 py-3 text-left bg-gray-50 hover:bg-gray-100 focus:outline-none"
             >
-              <div className="flex items-center">
-              <div className="bg-blue-50 p-2 rounded-full me-2">
-                      <IconCoin size={16} className="text-blue-500" />
-                    </div>
-                <h3 className="text-md font-semibold text-gray-700">
-                  {locale === 'ar' ? 'السعر' : 'Price'}
-                </h3>
-              </div>
-              <svg 
-                className={`w-4 h-4 text-gray-500 transition-transform ${priceCollapsed ? 'rotate-0' : 'rotate-180'}`}
-                fill="none" 
-                stroke="currentColor" 
-                viewBox="0 0 24 24"
-              >
+              <span className="flex items-center gap-2 text-blue-500 font-semibold">
+                <IconCoin size={20} className="p-0.5  rounded-full" />
+                {locale === 'ar' ? 'السعر' : 'Price'}
+              </span>
+              <svg className={`w-4 h-4 text-gray-400 transition-transform ${priceCollapsed ? '' : 'rotate-180'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
               </svg>
             </button>
-            
             {!priceCollapsed && (
-              <div className="mt-3 space-y-4 px-2">
-                {/* Price Filter */}
-                <div>
-                  <div className="flex gap-2">
-                    <button
-                      onClick={() => handlePriceFilterChange(null)}
-                      className={`px-4 py-2 rounded-full text-sm transition-colors ${priceFilter === null ? 'bg-[#299af8] text-white' : 'bg-gray-100 text-gray-800 hover:bg-gray-200'}`}
-                    >
-                      {locale === 'ar' ? '\u0627\u0644\u0643\u0644' : 'All'}
-                    </button>
-                    <button
-                      onClick={() => handlePriceFilterChange('false')}
-                      className={`px-4 py-2 rounded-full text-sm transition-colors ${priceFilter === 'false' ? 'bg-[#299af8] text-white' : 'bg-gray-100 text-gray-800 hover:bg-gray-200'}`}
-                    >
-                      {locale === 'ar' ? '\u0645\u062c\u0627\u0646\u064a' : 'Free'}
-                    </button>
-                    <button
-                      onClick={() => handlePriceFilterChange('true')}
-                      className={`px-4 py-2 rounded-full text-sm transition-colors ${priceFilter === 'true' ? 'bg-[#299af8] text-white' : 'bg-gray-100 text-gray-800 hover:bg-gray-200'}`}
-                    >
-                      {locale === 'ar' ? '\u0645\u062f\u0641\u0648\u0639' : 'Paid'}
-                    </button>
-                  </div>
-                </div>
-
-             
+              <div className="px-4 py-3 bg-white flex gap-1.5 flex-wrap">
+                <Chip
+                  checked={priceFilter === null}
+                  onChange={() => handlePriceFilterChange(null)}
+                  variant="outline"
+                  size="sm"
+                >
+                  {locale === 'ar' ? 'الكل' : 'All'}
+                </Chip>
+                <Chip
+                  checked={priceFilter === 'false'}
+                  onChange={() => handlePriceFilterChange('false')}
+                  variant="outline"
+                  size="sm"
+                >
+                  {locale === 'ar' ? 'مجاني' : 'Free'}
+                </Chip>
+                <Chip
+                  checked={priceFilter === 'true'}
+                  onChange={() => handlePriceFilterChange('true')}
+                  variant="outline"
+                  size="sm"
+                >
+                  {locale === 'ar' ? 'مدفوع' : 'Paid'}
+                </Chip>
               </div>
             )}
           </div>
         )}
-                  {/* language Types Section */}
+        {/* Language Section */}
         {searchType !== 'insighter' && (
-          <div className="mb-4 border-b border-gray-200 pb-4">
-          <button
-            onClick={() => setLanguageCollapsed(!languageCollapsed)}
-            className="w-full flex justify-between items-center py-2 text-left hover:bg-gray-50 rounded-md px-2"
-          >
-            <div className="flex items-center">
-            <div className="bg-blue-50 p-2 rounded-full me-2">
-                    <IconLanguage size={16} className="text-blue-500" />
-                  </div>
-              <h3 className="text-md font-semibold text-gray-700">
-                {locale === 'ar' ? 'اللغة' : 'Language'}
-              </h3>
-            </div>
-            <svg 
-              className={`w-4 h-4 text-gray-500 transition-transform ${languageCollapsed ? 'rotate-0' : 'rotate-180'}`}
-              fill="none" 
-              stroke="currentColor" 
-              viewBox="0 0 24 24"
+          <div>
+            <button
+              onClick={() => setLanguageCollapsed(!languageCollapsed)}
+              className="w-full flex items-center justify-between px-4 py-3 text-left bg-gray-50 hover:bg-gray-100 focus:outline-none"
             >
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-            </svg>
-          </button>
-          
-          {!languageCollapsed && (
-            <div className="mt-3 space-y-4 px-2">
-           
-
-              {/* Language Filter */}
-              <div>
-               
-                <div className="flex gap-2">
-                  <button
-                    onClick={() => setLanguageFilter('all')}
-                    className={`px-4 py-2 rounded-full text-sm transition-colors ${languageFilter === 'all' ? 'bg-[#299af8] text-white' : 'bg-gray-100 text-gray-800 hover:bg-gray-200'}`}
-                  >
-                    {locale === 'ar' ? '\u0627\u0644\u0643\u0644' : 'All'}
-                  </button>
-                  <button
-                    onClick={() => setLanguageFilter('english')}
-                    className={`px-4 py-2 rounded-full text-sm transition-colors ${languageFilter === 'english' ? 'bg-[#299af8] text-white' : 'bg-gray-100 text-gray-800 hover:bg-gray-200'}`}
-                  >
-                    {locale === 'ar' ? '\u0627\u0644\u0625\u0646\u062c\u0644\u064a\u0632\u064a\u0629' : 'English'}
-                  </button>
-                  <button
-                    onClick={() => setLanguageFilter('arabic')}
-                    className={`px-4 py-2 rounded-full text-sm transition-colors ${languageFilter === 'arabic' ? 'bg-[#299af8] text-white' : 'bg-gray-100 text-gray-800 hover:bg-gray-200'}`}
-                  >
-                    {locale === 'ar' ? '\u0627\u0644\u0639\u0631\u0628\u064a\u0629' : 'Arabic'}
-                  </button>
-                </div>
+              <span className="flex items-center gap-2 text-blue-500 font-semibold">
+                <IconLanguage size={20} className="p-0.5  rounded-full" />
+                {locale === 'ar' ? 'اللغة' : 'Language'}
+              </span>
+              <svg className={`w-4 h-4 text-gray-400 transition-transform ${languageCollapsed ? '' : 'rotate-180'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+              </svg>
+            </button>
+            {!languageCollapsed && (
+              <div className="px-4 py-3 bg-white flex gap-2 flex-wrap">
+                <Chip
+                  checked={languageFilter === 'all'}
+                  onChange={() => setLanguageFilter('all')}
+                  variant="outline"
+                  size="sm"
+                >
+                  {locale === 'ar' ? 'الكل' : 'All'}
+                </Chip>
+                <Chip
+                  checked={languageFilter === 'english'}
+                  onChange={() => setLanguageFilter('english')}
+                  variant="outline"
+                  size="sm"
+                >
+                  {locale === 'ar' ? 'الإنجليزية' : 'English'}
+                </Chip>
+                <Chip
+                  checked={languageFilter === 'arabic'}
+                  onChange={() => setLanguageFilter('arabic')}
+                  variant="outline"
+                  size="sm"
+                >
+                  {locale === 'ar' ? 'العربية' : 'Arabic'}
+                </Chip>
               </div>
-            </div>
-          )}
-        </div>
+            )}
+          </div>
         )}
-
-    
-
         {/* Industry Section */}
-        <div className="mb-4 border-b border-gray-200 pb-4">
+        <div>
           <button
             onClick={() => setIndustryCollapsed(!industryCollapsed)}
-            className="w-full flex justify-between items-center py-2 text-left hover:bg-gray-50 rounded-md px-2"
+            className="w-full flex items-center justify-between px-4 py-3 text-left bg-gray-50 hover:bg-gray-100 focus:outline-none"
           >
-            <div className="flex items-center">
-            <div className="bg-blue-50 p-2 rounded-full me-2">
-                    <IconBuildingFactory size={16} className="text-blue-500" />
-                  </div>
-              <h3 className="text-md font-semibold text-gray-700">
-                {locale === 'ar' ? 'الصناعة' : 'Industry'}
-              </h3>
-            </div>
-            <svg 
-              className={`w-4 h-4 text-gray-500 transition-transform ${industryCollapsed ? 'rotate-0' : 'rotate-180'}`}
-              fill="none" 
-              stroke="currentColor" 
-              viewBox="0 0 24 24"
-            >
+            <span className="flex items-center gap-2 text-blue-500 font-semibold">
+              <IconBuildingFactory size={20} className="p-0.5  rounded-full" />
+              {locale === 'ar' ? 'الصناعة' : 'Industry'}
+            </span>
+            <svg className={`w-4 h-4 text-gray-400 transition-transform ${industryCollapsed ? '' : 'rotate-180'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
             </svg>
           </button>
-          
           {!industryCollapsed && (
-            <div className="mt-3 space-y-4 px-2">
+            <div className="px-4 py-3 bg-white space-y-2">
               {/* Industry Filter */}
-              <div>
-                <div className="flex items-center mb-2">
-                
-                  <h4 className="uppercase text-xs font-bold tracking-wider text-gray-600">
-                    {locale === 'ar' ? '\u0627\u0644\u0635\u0646\u0627\u0639\u0629' : 'Industry'}
-                  </h4>
-                </div>
-                <div className="relative w-full">
-                  <div
-                    onClick={() => setIsIndustryModalOpen(true)}
-                    className="border border-gray-300 py-2 px-3 rounded-md w-full text-sm cursor-pointer flex justify-between items-center"
-                  >
-                    {selectedIndustry ? (
-                      <div className="flex items-center flex-1 overflow-hidden">
-                        <span className="truncate">{selectedIndustry.label.length > 30 ? `${selectedIndustry.label.substring(0, 30)}...` : selectedIndustry.label}</span>
-                      </div>
-                    ) : (
-                      <span className="text-gray-500">
-                        {locale === 'ar' ? '\u0627\u062e\u062a\u0631 \u0627\u0644\u0635\u0646\u0627\u0639\u0629' : 'Select Industry'}
-                      </span>
-                    )}
-                    {selectedIndustry ? (
-                      <button 
-                        onClick={handleClearIndustry}
-                        className={`text-gray-600  ${locale === 'ar' ? 'mr-2' : 'ml-2'}  rounded-full hover:bg-red-50`}
-                        title={locale === 'ar' ? 'مسح الاختيار' : 'Clear selection'}
-                      >
-                        <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                        </svg>
-                      </button>
-                    ) : (
-                      <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
-                      </svg>
-                    )}
-                  </div>
+              <div className="flex flex-col gap-1">
+                <span className="text-xs font-semibold text-gray-700">{locale === 'ar' ? 'الصناعة' : 'Industry'}</span>
+                <div onClick={() => setIsIndustryModalOpen(true)} className="border border-gray-200 bg-white py-2 px-3 rounded text-sm cursor-pointer flex justify-between items-center hover:border-blue-400 transition-colors">
+                  {selectedIndustry ? (
+                    <span className="truncate text-gray-800 font-semibold">{selectedIndustry.label.length > 30 ? `${selectedIndustry.label.substring(0, 30)}...` : selectedIndustry.label}</span>
+                  ) : (
+                    <span className="text-gray-400 font-medium">{locale === 'ar' ? 'اختر الصناعة' : 'Select Industry'}</span>
+                  )}
+                  {selectedIndustry && (
+                    <button onClick={handleClearIndustry} className="ml-2 text-gray-400 hover:text-red-500">
+                      <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
+                    </button>
+                  )}
                 </div>
               </div>
-
               {/* ISIC Code Filter */}
-              <div>
-                <div className="flex items-center mb-2">
-             
-                  <h4 className="uppercase text-xs font-bold tracking-wider text-gray-600">
-                    {locale === 'ar' ? '\u0631\u0645\u0632 ISIC' : 'ISIC Code'}
-                  </h4>
-                </div>
-                <div className="relative w-full">
-                  <div
-                    onClick={() => setIsModalOpen(true)}
-                    className="border border-gray-300 py-2 px-3 rounded-md w-full text-sm cursor-pointer flex justify-between items-center"
-                  >
-                    {selectedIsicCode ? (
-                      <div className="flex items-center flex-1 overflow-hidden">
-                        <span className={`font-mono flex-shrink-0 ${locale === 'ar' ? 'ml-2' : 'mr-2'}`}>{selectedIsicCode.code}</span>
-                        <span className="truncate">{selectedIsicCode.label.length > 30 ? `${selectedIsicCode.label.substring(0, 30)}...` : selectedIsicCode.label}</span>
-                      </div>
-                    ) : (
-                      <span className="text-gray-500">
-                        {locale === 'ar' ? '\u0627\u062e\u062a\u0631 \u0631\u0645\u0632 ISIC' : 'Select ISIC Code'}
-                      </span>
-                    )}
-                    {selectedIsicCode ? (
-                      <button 
-                        onClick={handleClearIsicCode}
-                        className={`text-gray-600  ${locale === 'ar' ? 'mr-2' : 'ml-2'}  rounded-full hover:bg-red-50`}
-                        title={locale === 'ar' ? 'مسح الاختيار' : 'Clear selection'}
-                      >
-                        <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                        </svg>
-                      </button>
-                    ) : (
-                      <IconCode size={16} className="text-gray-500" />
-                    )}
-                  </div>
+              <div className="flex flex-col gap-1">
+                <span className="text-xs font-semibold text-gray-700">{locale === 'ar' ? 'رمز ISIC' : 'ISIC Code'}</span>
+                <div onClick={() => setIsModalOpen(true)} className="border border-gray-200 bg-white py-2 px-3 rounded text-sm cursor-pointer flex justify-between items-center hover:border-blue-400 transition-colors">
+                  {selectedIsicCode ? (
+                    <span className="truncate text-gray-800 font-semibold">{selectedIsicCode.code} - {selectedIsicCode.label.length > 30 ? `${selectedIsicCode.label.substring(0, 30)}...` : selectedIsicCode.label}</span>
+                  ) : (
+                    <span className="text-gray-400 font-medium">{locale === 'ar' ? 'اختر رمز ISIC' : 'Select ISIC Code'}</span>
+                  )}
+                  {selectedIsicCode && (
+                    <button onClick={handleClearIsicCode} className="ml-2 text-gray-400 hover:text-red-500">
+                      <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
+                    </button>
+                  )}
                 </div>
               </div>
-
               {/* HS Code Filter */}
-              <div>
-                <div className="flex items-center mb-2">
-               
-                  <h4 className="uppercase text-xs font-bold tracking-wider text-gray-600">
-                    {locale === 'ar' ? '\u0631\u0645\u0632 HS' : 'HS Code'}
-                  </h4>
-                </div>
-                <div className="relative w-full">
-                  <div
-                    onClick={() => setIsHsCodeModalOpen(true)}
-                    className="border border-gray-300 py-2 px-3 rounded-md w-full text-sm cursor-pointer flex justify-between items-center"
-                  >
-                    {selectedHsCode ? (
-                      <div className="flex items-center flex-1 overflow-hidden">
-                        <span className={`font-mono flex-shrink-0 ${locale === 'ar' ? 'ml-2' : 'mr-2'}`}>{selectedHsCode.code}</span>
-                        <span className="truncate">{selectedHsCode.label.length > 30 ? `${selectedHsCode.label.substring(0, 30)}...` : selectedHsCode.label}</span>
-                      </div>
-                    ) : (
-                      <span className="text-gray-500">
-                        {locale === 'ar' ? '\u0627\u062e\u062a\u0631 \u0631\u0645\u0632 HS' : 'Select HS Code'}
-                      </span>
-                    )}
-                    {selectedHsCode ? (
-                      <button 
-                        onClick={handleClearHsCode}
-                        className={`text-gray-600  ${locale === 'ar' ? 'mr-2' : 'ml-2'}  rounded-full hover:bg-red-50`}
-                        title={locale === 'ar' ? 'مسح الاختيار' : 'Clear selection'}
-                      >
-                        <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                        </svg>
-                      </button>
-                    ) : (
-                      <IconCode size={16} className="text-gray-500" />
-                    )}
-                  </div>
+              <div className="flex flex-col gap-1">
+                <span className="text-xs font-semibold text-gray-700">{locale === 'ar' ? 'رمز HS' : 'HS Code'}</span>
+                <div onClick={() => setIsHsCodeModalOpen(true)} className="border border-gray-200 bg-white py-2 px-3 rounded text-sm cursor-pointer flex justify-between items-center hover:border-blue-400 transition-colors">
+                  {selectedHsCode ? (
+                    <span className="truncate text-gray-800 font-semibold">{selectedHsCode.code} - {selectedHsCode.label.length > 30 ? `${selectedHsCode.label.substring(0, 30)}...` : selectedHsCode.label}</span>
+                  ) : (
+                    <span className="text-gray-400 font-medium">{locale === 'ar' ? 'اختر رمز HS' : 'Select HS Code'}</span>
+                  )}
+                  {selectedHsCode && (
+                    <button onClick={handleClearHsCode} className="ml-2 text-gray-400 hover:text-red-500">
+                      <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
+                    </button>
+                  )}
                 </div>
               </div>
             </div>
           )}
         </div>
-            {/* Target Market Section */}
-            <div  className="mb-4 border-b border-gray-200 pb-4">
+        {/* Target Market Section */}
+        <div>
           <button
             onClick={() => setTargetMarketCollapsed(!targetMarketCollapsed)}
-            className="w-full flex justify-between items-center py-2 text-left hover:bg-gray-50 rounded-md px-2"
+            className="w-full flex items-center justify-between px-4 py-3 text-left bg-gray-50 hover:bg-gray-100 focus:outline-none"
           >
-            <div className="flex items-center">
-            <div className="bg-blue-50 p-2 rounded-full me-2">
-                    <IconWorld size={16} className="text-blue-500" />
-                  </div>
-              <h3 className="text-md font-semibold text-gray-700">
-               
-                {locale === 'ar' ? (searchType === 'insighter' ? 'بلد الإنسايتر' : 'السوق المستهدف') : (searchType === 'insighter' ? 'Insighter Origin' : 'Target Market')}
-              </h3>
-            </div>
-            <svg 
-              className={`w-4 h-4 text-gray-500 transition-transform ${targetMarketCollapsed ? 'rotate-0' : 'rotate-180'}`}
-              fill="none" 
-              stroke="currentColor" 
-              viewBox="0 0 24 24"
-            >
+            <span className="flex items-center gap-2 text-blue-500 font-semibold">
+              <IconWorld size={20} className="p-0.5  rounded-full" />
+              {locale === 'ar' ? (searchType === 'insighter' ? 'بلد الإنسايتر' : 'السوق المستهدف') : (searchType === 'insighter' ? 'Insighter Origin' : 'Target Market')}
+            </span>
+            <svg className={`w-4 h-4 text-gray-400 transition-transform ${targetMarketCollapsed ? '' : 'rotate-180'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
             </svg>
           </button>
-          
           {!targetMarketCollapsed && (
-            <div className="mt-3 space-y-4 px-2">
-              {/* Economic Blocs Filter - Hide for insighter */}
+            <div className="px-4 py-3 bg-white space-y-2">
+              {/* Economic Bloc, Region, Country Selects */}
               {searchType !== 'insighter' && (
-                <div>
-                  <div className="flex items-center mb-2">
-                   
-                    <h4 className="uppercase text-xs font-bold tracking-wider text-gray-600">
-                      {locale === 'ar' ? '\u0627\u0644\u0643\u062a\u0644 \u0627\u0644\u0627\u0642\u062a\u0635\u0627\u062f\u064a\u0629' : 'By Economic Block'}
-                    </h4>
-                  </div>
-                  <div className="relative w-full">
-                    <Select
-                      placeholder={locale === 'ar' ? '\u0627\u062e\u062a\u0631 \u0643\u062a\u0644\u0629 \u0627\u0642\u062a\u0635\u0627\u062f\u064a\u0629' : 'Select an economic bloc'}
-                      data={economicBlocOptions}
-                      value={economicBlocFilter?.toString() || 'all'}
-                      onChange={(value) => {
-                        if (value === 'all') {
-                          setEconomicBlocFilter(null);
-                        } else {
-                          setEconomicBlocFilter(value ? parseInt(value) : null);
-                        }
-                      }}
-                      clearable
-                      searchable
-                      className="w-full"
-                      classNames={{
-                        root: 'w-full',
-                        input: 'border border-gray-300 py-2 px-3 rounded-md w-full text-sm',
-                        dropdown: 'bg-white shadow-lg border border-gray-200 rounded-md mt-1'
-                      }}
-                    />
-                  </div>
+                <div className="flex flex-col gap-1">
+                  <span className="text-xs font-semibold text-gray-700">{locale === 'ar' ? 'الكتل الاقتصادية' : 'By Economic Block'}</span>
+                  <Select
+                    placeholder={locale === 'ar' ? 'اختر كتلة اقتصادية' : 'Select an economic bloc'}
+                    data={economicBlocOptions}
+                    value={economicBlocFilter?.toString() || 'all'}
+                    onChange={(value) => {
+                      if (value === 'all') setEconomicBlocFilter(null);
+                      else setEconomicBlocFilter(value ? parseInt(value) : null);
+                    }}
+                    clearable
+                    searchable
+                    className="w-full"
+                    classNames={{
+                      root: 'w-full',
+                      input: 'border border-gray-200 bg-white py-2 px-3 rounded text-sm font-semibold hover:border-blue-400 transition-colors',
+                      dropdown: 'bg-white shadow-sm border border-gray-200 rounded-md mt-1'
+                    }}
+                  />
                 </div>
               )}
-
-              {/* Regions Filter */}
-              <div>
-                <div className="flex items-center mb-2">
-                
-                  <h4 className="uppercase text-xs font-bold tracking-wider text-gray-600">
-                    {locale === 'ar' ? '\u0627\u0644\u0645\u0646\u0627\u0637\u0642' : 'By Region'}
-                  </h4>
-                </div>
-                <div className="relative w-full">
-                  <Select
-                    placeholder={locale === 'ar' ? '\u0627\u062e\u062a\u0631 \u0645\u0646\u0637\u0642\u0629' : 'Select a region'}
-                    data={regionOptions}
-                    value={regionFilter?.toString() || 'all'}
-                    onChange={(value) => {
-                      if (value === 'all') {
-                        setRegionFilter(null);
-                      } else {
-                        setRegionFilter(value ? parseInt(value) : null);
-                      }
-                    }}
-                    clearable
-                    searchable
-                    className="w-full"
-                    classNames={{
-                      root: 'w-full',
-                      input: 'border border-gray-300 py-2 px-3 rounded-md w-full text-sm',
-                      dropdown: 'bg-white shadow-lg border border-gray-200 rounded-md mt-1'
-                    }}
-                  />
-                </div>
+              <div className="flex flex-col gap-1">
+                <span className="text-xs font-semibold text-gray-700">{locale === 'ar' ? 'المناطق' : 'By Region'}</span>
+                <Select
+                  placeholder={locale === 'ar' ? 'اختر منطقة' : 'Select a region'}
+                  data={regionOptions}
+                  value={regionFilter?.toString() || 'all'}
+                  onChange={(value) => {
+                    if (value === 'all') setRegionFilter(null);
+                    else setRegionFilter(value ? parseInt(value) : null);
+                  }}
+                  clearable
+                  searchable
+                  className="w-full"
+                  classNames={{
+                    root: 'w-full',
+                    input: 'border border-gray-200 bg-white py-2 px-3 rounded text-sm font-semibold hover:border-blue-400 transition-colors',
+                    dropdown: 'bg-white shadow-sm border border-gray-200 rounded-md mt-1'
+                  }}
+                />
               </div>
-
-              {/* Countries Filter */}
-              <div>
-                <div className="flex items-center mb-2">
-                
-                  <h4 className="uppercase text-xs font-bold tracking-wider text-gray-600">
-                    {locale === 'ar' ? '\u0627\u0644\u0628\u0644\u062f\u0627\u0646' : 'By Country'}
-                  </h4>
-                </div>
-                <div className="relative w-full">
-                  <Select
-                    placeholder={locale === 'ar' ? '\u0627\u062e\u062a\u0631 \u062f\u0648\u0644\u0629' : 'Select a country'}
-                    data={countryOptions}
-                    value={countryFilter?.toString() || ''}
-                    onChange={(value) => setCountryFilter(value ? parseInt(value) : null)}
-                    clearable
-                    searchable
-                    className="w-full"
-                    classNames={{
-                      root: 'w-full',
-                      input: 'border border-gray-300 py-2 px-3 rounded-md w-full text-sm',
-                      dropdown: 'bg-white shadow-lg border border-gray-200 rounded-md mt-1'
-                    }}
-                  />
-                </div>
+              <div className="flex flex-col gap-1">
+                <span className="text-xs font-semibold text-gray-700">{locale === 'ar' ? 'البلدان' : 'By Country'}</span>
+                <Select
+                  placeholder={locale === 'ar' ? 'اختر دولة' : 'Select a country'}
+                  data={countryOptions}
+                  value={countryFilter?.toString() || ''}
+                  onChange={(value) => setCountryFilter(value ? parseInt(value) : null)}
+                  clearable
+                  searchable
+                  className="w-full"
+                  classNames={{
+                    root: 'w-full',
+                    input: 'border border-gray-200 bg-white py-2 px-3 rounded text-sm font-semibold hover:border-blue-400 transition-colors',
+                    dropdown: 'bg-white shadow-sm border border-gray-200 rounded-md mt-1'
+                  }}
+                />
               </div>
             </div>
           )}
         </div>
-          {/* Role Section - Only for insighter */}
+        {/* Role Section - Only for insighter */}
         {searchType === 'insighter' && (
-          <div className="mb-4 border-b border-gray-200 pb-4">
+          <div>
             <button
               onClick={() => setRoleCollapsed(!roleCollapsed)}
-              className="w-full flex justify-between items-center py-2 text-left hover:bg-gray-50 rounded-md px-2"
+              className="w-full flex items-center justify-between px-4 py-3 text-left bg-gray-50 hover:bg-gray-100 focus:outline-none"
             >
-              <div className="flex items-center">
-                <div className="bg-blue-50 p-2 rounded-full me-2">
-                  <IconBuildingBank size={16} className="text-blue-500" />
-                </div>
-                <h3 className="text-md font-semibold text-gray-700">
-                  {locale === 'ar' ? 'النوع' : 'Role'}
-                </h3>
-              </div>
-              <svg 
-                className={`w-4 h-4 text-gray-500 transition-transform ${roleCollapsed ? 'rotate-0' : 'rotate-180'}`}
-                fill="none" 
-                stroke="currentColor" 
-                viewBox="0 0 24 24"
-              >
+              <span className="flex items-center gap-2 text-blue-500 font-semibold">
+                <IconBuildingBank size={20} className="p-0.5  rounded-full" />
+                {locale === 'ar' ? 'النوع' : 'Role'}
+              </span>
+              <svg className={`w-4 h-4 text-gray-400 transition-transform ${roleCollapsed ? '' : 'rotate-180'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
               </svg>
             </button>
-            
             {!roleCollapsed && (
-              <div className="mt-3 space-y-4 px-2">
-                {/* Role Filter */}
-                <div>
-                  <div className="flex gap-2">
-                    <button
-                      onClick={() => handleRoleFilterChange('all')}
-                      className={`px-4 py-2 rounded-full text-sm transition-colors ${roleFilter === 'all' ? 'bg-[#299af8] text-white' : 'bg-gray-100 text-gray-800 hover:bg-gray-200'}`}
-                    >
-                      {locale === 'ar' ? 'الكل' : 'All'}
-                    </button>
-                    <button
-                      onClick={() => handleRoleFilterChange('company')}
-                      className={`px-4 py-2 rounded-full text-sm transition-colors ${roleFilter === 'company' ? 'bg-[#299af8] text-white' : 'bg-gray-100 text-gray-800 hover:bg-gray-200'}`}
-                    >
-                      {locale === 'ar' ? 'شركة' : 'Company'}
-                    </button>
-                    <button
-                      onClick={() => handleRoleFilterChange('individual')}
-                      className={`px-4 py-2 rounded-full text-sm transition-colors ${roleFilter === 'individual' ? 'bg-[#299af8] text-white' : 'bg-gray-100 text-gray-800 hover:bg-gray-200'}`}
-                    >
-                      {locale === 'ar' ? 'فرد' : 'Individual'}
-                    </button>
-                  </div>
-                </div>
+              <div className="px-4 py-3 bg-white flex gap-2 flex-wrap">
+                <Chip
+                  checked={roleFilter === 'all'}
+                  onChange={() => handleRoleFilterChange('all')}
+                  variant="outline"
+                  size="sm"
+                >
+                  {locale === 'ar' ? 'الكل' : 'All'}
+                </Chip>
+                <Chip
+                  checked={roleFilter === 'company'}
+                  onChange={() => handleRoleFilterChange('company')}
+                  variant="outline"
+                  size="sm"
+                >
+                  {locale === 'ar' ? 'شركة' : 'Company'}
+                </Chip>
+                <Chip
+                  checked={roleFilter === 'individual'}
+                  onChange={() => handleRoleFilterChange('individual')}
+                  variant="outline"
+                  size="sm"
+                >
+                  {locale === 'ar' ? 'فرد' : 'Individual'}
+                </Chip>
               </div>
             )}
           </div>
         )}
-    {/* Accuracy Section */}
-    <div >
+        {/* Accuracy Section */}
+        <div>
           <button
             onClick={() => setAccuracyCollapsed(!accuracyCollapsed)}
-            className="w-full flex justify-between items-center py-2 text-left hover:bg-gray-50 rounded-md px-2"
+            className="w-full flex items-center justify-between px-4 py-3 text-left bg-gray-50 hover:bg-gray-100 focus:outline-none"
           >
-            <div className="flex items-center">
-              <div className="bg-blue-50 p-2 rounded-full me-2">
-                <IconWorldSearch size={16} className="text-blue-500" />
-              </div>
-              <h3 className="text-md font-semibold text-gray-700">
-                {locale === 'ar' ? 'الدقة' : 'Accuracy'}
-              </h3>
-            </div>
-            <svg 
-              className={`w-4 h-4 text-gray-500 transition-transform ${accuracyCollapsed ? 'rotate-0' : 'rotate-180'}`}
-              fill="none" 
-              stroke="currentColor" 
-              viewBox="0 0 24 24"
-            >
+            <span className="flex items-center gap-2 text-blue-500 font-semibold">
+              <IconWorldSearch size={20} className="p-0.5  rounded-full" />
+              {locale === 'ar' ? 'الدقة' : 'Accuracy'}
+            </span>
+            <svg className={`w-4 h-4 text-gray-400 transition-transform ${accuracyCollapsed ? '' : 'rotate-180'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
             </svg>
           </button>
-          
           {!accuracyCollapsed && (
-            <div className="mt-3 space-y-4 px-2">
-              {/* Accuracy Description */}
-              <p className="text-sm text-gray-600 mb-3">
-                {locale === 'ar' ? 'اضبط دقة البحث الخاص بك.' : 'Adjust the accuracy of your search.'}
-              </p>
-              
-              {/* Accuracy Filter */}
-              <div className="space-y-3">
-                <label className="flex items-center cursor-pointer">
-                  <input
-                    type="radio"
-                    name="accuracy"
-                    value="all"
-                    checked={accuracyFilter === 'all'}
-                    onChange={(e) => setAccuracyFilter(e.target.value as 'any' | 'all')}
-                    className="w-4 h-4 text-[#299af8] bg-gray-100 border-gray-300 focus:ring-[#299af8] focus:ring-2"
-                  />
-                  <span className="ms-2 text-sm text-gray-700">
-                    {locale === 'ar' ? 'تضمين جميع الكلمات' : 'Include all words'}
-                  </span>
+            <div className="px-4 py-3 bg-white space-y-2">
+              <p className="text-xs text-gray-500 mb-1">{locale === 'ar' ? 'اضبط دقة البحث الخاص بك.' : 'Adjust the accuracy of your search.'}</p>
+              <div className="flex flex-col gap-2">
+                <label className="flex items-center gap-2 text-xs text-gray-700 cursor-pointer">
+                  <input type="radio" name="accuracy" value="all" checked={accuracyFilter === 'all'} onChange={(e) => setAccuracyFilter(e.target.value as 'any' | 'all')} className="accent-blue-500" />
+                  {locale === 'ar' ? 'تضمين جميع الكلمات' : 'Include all words'}
                 </label>
-                <label className="flex items-center cursor-pointer">
-                  <input
-                    type="radio"
-                    name="accuracy"
-                    value="any"
-                    checked={accuracyFilter === 'any'}
-                    onChange={(e) => setAccuracyFilter(e.target.value as 'any' | 'all')}
-                    className="w-4 h-4 text-[#299af8] bg-gray-100 border-gray-300 focus:ring-[#299af8] focus:ring-2"
-                  />
-                  <span className="ms-2 text-sm text-gray-700">
-                    {locale === 'ar' ? 'تضمين أي كلمات' : 'Include any words'}
-                  </span>
+                <label className="flex items-center gap-2 text-xs text-gray-700 cursor-pointer">
+                  <input type="radio" name="accuracy" value="any" checked={accuracyFilter === 'any'} onChange={(e) => setAccuracyFilter(e.target.value as 'any' | 'all')} className="accent-blue-500" />
+                  {locale === 'ar' ? 'تضمين أي كلمات' : 'Include any words'}
                 </label>
               </div>
             </div>
           )}
         </div>
-
-      
-
-        {/* Publication Date Section */}
-        {/* <div className="mb-4 border-b border-gray-200 pb-4">
-          <button
-            onClick={() => setPublicationDateCollapsed(!publicationDateCollapsed)}
-            className="w-full flex justify-between items-center py-2 text-left hover:bg-gray-50 rounded-md px-2"
-          >
-            <div className="flex items-center">
-              <h3 className="text-sm font-semibold text-gray-700">
-                {locale === 'ar' ? 'تاريخ النشر' : 'Publication Date'}
-              </h3>
-            </div>
-            <svg 
-              className={`w-4 h-4 text-gray-500 transition-transform ${publicationDateCollapsed ? 'rotate-0' : 'rotate-180'}`}
-              fill="none" 
-              stroke="currentColor" 
-              viewBox="0 0 24 24"
-            >
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-            </svg>
-          </button>
-          
-          {!publicationDateCollapsed && (
-            <div className="mt-3 space-y-4 px-2">
-              <div>
-                <div className="flex items-center mb-2">
-                  <div className="bg-blue-50 p-2 rounded-full me-2">
-                    <IconCode size={16} className="text-blue-500" />
-                  </div>
-                  <h4 className="uppercase text-xs font-bold tracking-wider text-gray-600">
-                    {locale === 'ar' ? '\u0627\u0644\u062a\u0627\u0631\u064a\u062e' : 'Publication Date'}
-                  </h4>
-                </div>
-                <div className="relative w-full">
-                  <div
-                    className="border border-gray-300 py-2 px-3 rounded-md w-full text-sm cursor-pointer flex justify-between items-center"
-                  >
-                    <span className="text-gray-500">
-                      {locale === 'ar' ? '\u0627\u062e\u062a\u0631 \u0627\u0644\u062a\u0627\u0631\u064a\u062e' : 'Select publication date'}
-                    </span>
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
-                    </svg>
-                  </div>
-                </div>
-              </div>
-            </div>
-          )}
-        </div> */}
-
-        {/* Archive Section */}
-        {/* <div className="mb-4 border-b border-gray-200 pb-4">
-          <button
-            onClick={() => setArchiveCollapsed(!archiveCollapsed)}
-            className="w-full flex justify-between items-center py-2 text-left hover:bg-gray-50 rounded-md px-2"
-          >
-            <div className="flex items-center">
-              <h3 className="text-sm font-semibold text-gray-700">
-                {locale === 'ar' ? 'الأرشيف' : 'Archive'}
-              </h3>
-            </div>
-            <svg 
-              className={`w-4 h-4 text-gray-500 transition-transform ${archiveCollapsed ? 'rotate-0' : 'rotate-180'}`}
-              fill="none" 
-              stroke="currentColor" 
-              viewBox="0 0 24 24"
-            >
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-            </svg>
-          </button>
-          
-          {!archiveCollapsed && (
-            <div className="mt-3 space-y-4 px-2">
-              <div>
-                <div className="flex items-center mb-2">
-                  <div className="bg-blue-50 p-2 rounded-full me-2">
-                    <IconCode size={16} className="text-blue-500" />
-                  </div>
-                  <h4 className="uppercase text-xs font-bold tracking-wider text-gray-600">
-                    {locale === 'ar' ? '\u0627\u0644\u0623\u0631\u0634\u064a\u0641' : 'Archive'}
-                  </h4>
-                </div>
-                <div className="relative w-full">
-                  <div
-                    className="border border-gray-300 py-2 px-3 rounded-md w-full text-sm cursor-pointer flex justify-between items-center"
-                  >
-                    <span className="text-gray-500">
-                      {locale === 'ar' ? '\u0627\u062e\u062a\u0631 \u0627\u0644\u0623\u0631\u0634\u064a\u0641' : 'Select archive'}
-                    </span>
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
-                    </svg>
-                  </div>
-                </div>
-              </div>
-            </div>
-          )}
-        </div> */}
-
-        {/* Modal for Industry selection */}
-        <Modal 
-          opened={isIndustryModalOpen} 
-          onClose={() => setIsIndustryModalOpen(false)}
-          title={locale === 'ar' ? '\u0627\u062e\u062a\u0631 \u0627\u0644\u0635\u0646\u0627\u0639\u0629' : 'Select Industry'}
-          size="xl"
-          centered
-        >
-          <div className="max-h-[70vh] overflow-y-auto">
-            {loadingIndustries ? (
-              <div className="flex justify-center p-10">
-                <Loader size="md" />
-              </div>
-            ) : (
-              <div className="p-4">
-                {/* Search Input */}
-                <div className="mb-4">
-                  <div className="relative">
-                    <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
-                      <svg className="w-4 h-4 text-gray-500" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 20">
-                        <path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="m19 19-4-4m0-7A7 7 0 1 1 1 8a7 7 0 0 1 14 0Z" />
-                      </svg>
-                    </div>
-                    <input 
-                      type="search" 
-                      className="block w-full p-2 pl-10 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500" 
-                      placeholder={locale === 'ar' ? '\u0627\u0628\u062d\u062b \u0639\u0646 \u0631\u0645\u0632 ISIC...' : 'Search for industry...'}
-                      value={industrySearchTerm}
-                      onChange={(e) => setIndustrySearchTerm(e.target.value)}
-                      dir={locale === 'ar' ? 'rtl' : 'ltr'}
-                    />
-                    {industrySearchTerm && (
-                      <button 
-                        className="absolute inset-y-0 right-0 flex items-center pr-3"
-                        onClick={() => setIndustrySearchTerm('')}
-                      >
-                        <svg className="w-4 h-4 text-gray-500 hover:text-gray-700" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
-                          <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd"></path>
-                        </svg>
-                      </button>
-                    )}
-                  </div>
-                </div>
-                
-                <div className="bg-white border border-gray-200 rounded-lg shadow-sm p-4">
-                  {filteredIndustryLeafNodes.length > 0 ? (
-                    renderIndustryLeafNodes()
-                  ) : (
-                    <div className="text-center py-8">
-                      <p className="text-gray-500">{locale === 'ar' ? '\u0644\u0627 \u062a\u0648\u062c\u062f \u0646\u062a\u0627\u0626\u062c \u0645\u0637\u0627\u0628\u0642\u0629' : 'No matching results found'}</p>
-                    </div>
-                  )}
-                </div>
-              </div>
-            )}
-          </div>
-        </Modal>
-        
-        {/* Modal for ISIC Code selection */}
-        <Modal 
-          opened={isModalOpen} 
-          onClose={() => setIsModalOpen(false)}
-          title={locale === 'ar' ? '\u0627\u062e\u062a\u0631 \u0631\u0645\u0632 ISIC' : 'Select ISIC Code'}
-          size="xl"
-          centered
-        >
-          <div className="max-h-[70vh] overflow-y-auto">
-            {loadingIsicCodes ? (
-              <div className="flex justify-center p-10">
-                <Loader size="md" />
-              </div>
-            ) : (
-              <div className="p-4">
-                {/* Search Input */}
-                <div className="mb-4">
-                  <div className="relative">
-                    <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
-                      <svg className="w-4 h-4 text-gray-500" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 20">
-                        <path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="m19 19-4-4m0-7A7 7 0 1 1 1 8a7 7 0 0 1 14 0Z" />
-                      </svg>
-                    </div>
-                    <input 
-                      type="search" 
-                      className="block w-full p-2 pl-10 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500" 
-                      placeholder={locale === 'ar' ? '\u0627\u0628\u062d\u062b \u0639\u0646 \u0631\u0645\u0632 ISIC...' : 'Search for ISIC code...'}
-                      value={searchTerm}
-                      onChange={(e) => setSearchTerm(e.target.value)}
-                      dir={locale === 'ar' ? 'rtl' : 'ltr'}
-                    />
-                    {searchTerm && (
-                      <button 
-                        className="absolute inset-y-0 right-0 flex items-center pr-3"
-                        onClick={() => setSearchTerm('')}
-                      >
-                        <svg className="w-4 h-4 text-gray-500 hover:text-gray-700" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
-                          <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd"></path>
-                        </svg>
-                      </button>
-                    )}
-                  </div>
-                </div>
-                
-                <div className="bg-white border border-gray-200 rounded-lg shadow-sm p-4">
-                  {filteredLeafNodes.length > 0 ? (
-                    renderLeafNodes()
-                  ) : (
-                    <div className="text-center py-8">
-                      <p className="text-gray-500">{locale === 'ar' ? '\u0644\u0627 \u062a\u0648\u062c\u062f \u0646\u062a\u0627\u0626\u062c \u0645\u0637\u0627\u0628\u0642\u0629' : 'No matching results found'}</p>
-                    </div>
-                  )}
-                </div>
-              </div>
-            )}
-          </div>
-        </Modal>
-        
-        {/* Modal for HS Code selection */}
-        <Modal 
-          opened={isHsCodeModalOpen} 
-          onClose={() => setIsHsCodeModalOpen(false)}
-          title={locale === 'ar' ? '\u0627\u062e\u062a\u0631 \u0631\u0645\u0632 HS' : 'Select HS Code'}
-          size="xl"
-          centered
-        >
-          <div className="max-h-[70vh] overflow-y-auto">
-            {loadingHsCodes ? (
-              <div className="flex justify-center p-10">
-                <Loader size="md" />
-              </div>
-            ) : (
-              <div className="p-4">
-                {/* Search Input */}
-                <div className="mb-4">
-                  <div className="relative">
-                    <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
-                      <svg className="w-4 h-4 text-gray-500" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 20">
-                        <path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="m19 19-4-4m0-7A7 7 0 1 1 1 8a7 7 0 0 1 14 0Z" />
-                      </svg>
-                    </div>
-                    <input 
-                      type="search" 
-                      className="block w-full p-2 pl-10 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500" 
-                      placeholder={locale === 'ar' ? '\u0627\u0628\u062d\u062b \u0639\u0646 \u0631\u0645\u0632 HS...' : 'Search for HS code...'}
-                      value={hsCodeSearchTerm}
-                      onChange={(e) => setHsCodeSearchTerm(e.target.value)}
-                      dir={locale === 'ar' ? 'rtl' : 'ltr'}
-                    />
-                    {hsCodeSearchTerm && (
-                      <button 
-                        className="absolute inset-y-0 right-0 flex items-center pr-3"
-                        onClick={() => setHsCodeSearchTerm('')}
-                      >
-                        <svg className="w-4 h-4 text-gray-500 hover:text-gray-700" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
-                          <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd"></path>
-                        </svg>
-                      </button>
-                    )}
-                  </div>
-                </div>
-                
-                <div className="bg-white border border-gray-200 rounded-lg shadow-sm p-4">
-                  {filteredHsCodes.length > 0 ? (
-                    renderHsCodes()
-                  ) : (
-                    <div className="text-center py-8">
-                      <p className="text-gray-500">{locale === 'ar' ? '\u0644\u0627 \u062a\u0648\u062c\u062f \u0646\u062a\u0627\u0626\u062c \u0645\u0637\u0627\u0628\u0642\u0629' : 'No matching results found'}</p>
-                    </div>
-                  )}
-                </div>
-              </div>
-            )}
-          </div>
-        </Modal>
       </div>
+      
+      {/* ISIC Code Modal */}
+      <Modal
+        opened={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        title={locale === 'ar' ? 'اختر رمز ISIC' : 'Select ISIC Code'}
+        size="lg"
+        overlayProps={{ backgroundOpacity: 0.55, blur: 3 }}
+      >
+        <div className="space-y-4">
+          <input
+            type="text"
+            placeholder={locale === 'ar' ? 'ابحث عن رمز ISIC...' : 'Search ISIC codes...'}
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="w-full px-3 py-2 mt-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+          />
+          {loadingIsicCodes ? (
+            <div className="flex justify-center py-8">
+              <Loader size="md" />
+            </div>
+          ) : (
+            renderLeafNodes()
+          )}
+        </div>
+      </Modal>
+
+      {/* HS Code Modal */}
+      <Modal
+        opened={isHsCodeModalOpen}
+        onClose={() => setIsHsCodeModalOpen(false)}
+        title={locale === 'ar' ? 'اختر رمز HS' : 'Select HS Code'}
+        size="lg"
+        overlayProps={{ backgroundOpacity: 0.55, blur: 3 }}
+      >
+        <div className="space-y-4">
+          <input
+            type="text"
+            placeholder={locale === 'ar' ? 'ابحث عن رمز HS...' : 'Search HS codes...'}
+            value={hsCodeSearchTerm}
+            onChange={(e) => setHsCodeSearchTerm(e.target.value)}
+            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent mt-2"
+          />
+          {loadingHsCodes ? (
+            <div className="flex justify-center py-8">
+              <Loader size="md" />
+            </div>
+          ) : (
+            renderHsCodes()
+          )}
+        </div>
+      </Modal>
+
+      {/* Industry Modal */}
+      <Modal
+        opened={isIndustryModalOpen}
+        onClose={() => setIsIndustryModalOpen(false)}
+        title={locale === 'ar' ? 'اختر الصناعة' : 'Select Industry'}
+        size="lg"
+        overlayProps={{ backgroundOpacity: 0.55, blur: 3 }}
+      >
+        <div className="space-y-4">
+          <input
+            type="text"
+            placeholder={locale === 'ar' ? 'ابحث عن الصناعة...' : 'Search industries...'}
+            value={industrySearchTerm}
+            onChange={(e) => setIndustrySearchTerm(e.target.value)}
+            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent mt-2"
+          />
+          {loadingIndustries ? (
+            <div className="flex justify-center py-8">
+              <Loader size="md" />
+            </div>
+          ) : (
+            renderIndustryLeafNodes()
+          )}
+        </div>
+      </Modal>
     </div>
   );
 };
