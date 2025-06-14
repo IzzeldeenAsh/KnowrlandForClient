@@ -38,7 +38,7 @@ export const ToastProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     let container = document.querySelector('.toast-container');
     if (!container) {
       container = document.createElement('div');
-      container.className = 'position-fixed top-0 end-0 p-3 z-index-1000 toast-container';
+      container.className = 'position-fixed top-0 end-0 p-3 z-index-20 toast-container';
       document.body.appendChild(container);
     }
     
