@@ -90,13 +90,13 @@ const InsightersResultsSection: React.FC<InsightersResultsSectionProps> = ({
                           {isCompanyInsighter ? (
                             // Company-insighter: Show initials with company logo overlay
                             <>
-                              <div className="w-full h-full bg-blue-100 flex items-center justify-center rounded-full">
+                              <div className="w-full h-full bg-blue-100 flex items-center justify-center rounded-full pb-6">
                                 <span className="text-2xl font-semibold text-blue-600 rounded-full">
                                   {name.split(' ').map((word: string) => word.charAt(0)).join('').toUpperCase()}
                                 </span>
                               </div>
                               {company?.logo && (
-                                <div className="absolute -bottom-3 -right-3 w-14 h-14 rounded-full overflow-hidden border-4 border-white bg-white z-10">
+                                <div className="absolute -bottom-4 -right-7 w-14 h-14 rounded-full overflow-hidden border-4 border-white bg-white z-10">
                                   <Image 
                                     src={company.logo} 
                                     alt={company.legal_name || 'Company'}
@@ -116,7 +116,7 @@ const InsightersResultsSection: React.FC<InsightersResultsSectionProps> = ({
                                 className="object-cover border-1 border-blue-500 rounded-full"
                               />
                               {photoUrl ? (
-                                <div className="absolute -bottom-3 -right-3 w-14 h-14 rounded-full border-4 border-white bg-white z-10">
+                                <div className="absolute -bottom-4 -right-7 w-14 h-14 rounded-full border-4 border-white bg-white z-10">
                                   <Image 
                                     src={photoUrl} 
                                     alt={name}
@@ -125,7 +125,7 @@ const InsightersResultsSection: React.FC<InsightersResultsSectionProps> = ({
                                   />
                                 </div>
                               ) : (
-                                <div className="absolute -bottom-3 -right-3 w-14 h-14 rounded-full bg-blue-100 border-4 border-white z-10 flex items-center justify-center">
+                                <div className="absolute -bottom-4 -right-7 w-14 h-14 rounded-full bg-blue-100 border-4 border-white z-10 flex items-center justify-center">
                                   <span className="text-sm font-semibold text-blue-600 rounded-full">
                                     {name.split(' ').map((word: string) => word.charAt(0)).join('').toUpperCase()}
                                   </span>
