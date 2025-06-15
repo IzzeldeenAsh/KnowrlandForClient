@@ -60,15 +60,19 @@ export default function Features() {
               {/* Image */}
               <div className="w-full sm:w-4/5 md:w-1/2" data-aos="fade-up" data-aos-delay="100">
                 <figure className=" rounded-3xl p-px mb-8">
-                  <div className="relative flex items-center justify-center" style={{ width: '100%', height: '500px', overflow: 'hidden' }}>
-                    <Image
-                      className={`w-full h-full rounded-[inherit] transition-all duration-700 ease-in-out absolute ${hoveredTab1 === 1 || hoveredTab1 === null ? 'opacity-100' : 'opacity-0'}`}
-                      src={'https://res.cloudinary.com/dsiku9ipv/image/upload/v1747036866/New_Project_8_tqsmzg.png'}
-                      width={700}
-                      height={700}
-                      alt="Feature 2 - Image 1"
-                      style={{ objectFit: 'contain' }}
-                    />
+                  <div className="relative flex items-center justify-center " style={{ width: '100%', height: '500px', overflow: 'hidden' }}>
+                    <div className="relative w-full h-full">
+                      <div className="absolute inset-0 bg-gradient-to-br from-blue-500/10 rounded-lg to-transparent rounded-[inherit]" />
+                      <Image
+                        className={`w-full h-full rounded-[inherit] transition-all duration-700 ease-in-out absolute ${hoveredTab1 === 1 || hoveredTab1 === null ? 'opacity-100' : 'opacity-0'}`}
+                        src={'https://res.cloudinary.com/dsiku9ipv/image/upload/v1747036866/New_Project_8_tqsmzg.png'}
+                        width={700}
+                        height={700}
+                        alt="Feature 2 - Image 1"
+                        style={{ objectFit: 'contain' }}
+                      />
+                      <div className="absolute inset-0  rounded-[inherit]" />
+                    </div>
                     <Image
                       className={`w-full h-full rounded-[inherit] transition-all duration-700 ease-in-out absolute ${hoveredTab1 === 2 ? 'opacity-100' : 'opacity-0'}`}
                       src={'/images/book-meeting.png'}
@@ -299,11 +303,12 @@ export default function Features() {
                 </div>
               </div>
                  {/* Image */}
-              <div className="w-full sm:w-4/5 md:w-1/2 order-2" data-aos="fade-up" data-aos-delay="100">
+              <div className="w-full bg-gradient-to-br from-blue-500/10 rounded-lg to-transparent sm:w-4/5 md:w-1/2 order-2" data-aos="fade-up" data-aos-delay="100">
                 <figure className=" rounded-3xl p-px mb-8">
-                <div className="relative flex items-center justify-center" style={{ width: '100%', overflow: 'hidden' }}>
+                <div className="relative flex items-center justify-center h-100" style={{ width: '100%', overflow: 'hidden' }}>
             
-                <figure className="rounded-3xl p-px mb-8 overflow-hidden mt-10 w-[800px]  mx-auto">
+             
+                <figure className=" rounded-3xl p-px mb-8 overflow-hidden mt-10 w-[800px]  mx-auto">
                   <Image
                     className="w-full rounded-[inherit]"
                     src="https://res.cloudinary.com/dsiku9ipv/image/upload/v1748087733/Group_13523_1_nk8pqq.png"
@@ -311,7 +316,7 @@ export default function Features() {
                     height={800}
                     alt="Pay for what you need"
                   />
-                </figure>
+                </figure>  
        
 
                   
