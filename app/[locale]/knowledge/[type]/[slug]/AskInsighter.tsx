@@ -693,8 +693,6 @@ export default function AskInsighter({ knowledgeSlug, questions = [], is_owner =
           )}
           </article>
         </div>
-        {/* Only add the border divider if this is not the last item */}
-        {!isLastItem && <div className="mt-3 border-t border-gray-200 dark:border-gray-700"></div>}
       </div>
       </>
       );

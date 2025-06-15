@@ -515,7 +515,7 @@ const FilterBox: React.FC<FilterBoxProps> = ({
           return (
             <button
               key={node.key}
-              className={`py-2 px-3 rounded-md text-sm flex items-center w-full transition-colors ${isSelected ? ' text-blue-800 font-medium' : 'hover:bg-gray-100 border border-gray-200'}`}
+              className={`py-2 px-3 rounded-md text-sm flex text-start items-start w-full transition-colors ${isSelected ? ' text-blue-800 font-medium' : 'hover:bg-gray-100 border border-gray-200'}`}
               onClick={() => handleSelectIsicCode(node)}
             >
               <span className={`font-mono text-xs bg-gray-100 px-1.5 py-0.5 rounded ${marginClass}`}>{node.code}</span>
@@ -538,7 +538,7 @@ const FilterBox: React.FC<FilterBoxProps> = ({
           return (
             <button
               key={code.id}
-              className={`py-2 px-3 rounded-md text-sm flex items-center w-full transition-colors ${isSelected ? ' text-blue-800 font-medium' : 'hover:bg-gray-100 border border-gray-200'}`}
+              className={`py-2 px-3 rounded-md text-sm flex items-start text-start w-full transition-colors ${isSelected ? ' text-blue-800 font-medium' : 'hover:bg-gray-100 border border-gray-200'}`}
               onClick={() => handleSelectHsCode(code)}
             >
               <span className={`font-mono text-xs bg-gray-100 px-1.5 py-0.5 rounded ${marginClass}`}>{code.code}</span>
@@ -560,7 +560,7 @@ const FilterBox: React.FC<FilterBoxProps> = ({
           return (
             <button
               key={node.key}
-              className={`py-2 px-3 rounded-md text-sm flex items-center w-full transition-colors ${isSelected ? ' text-blue-800 font-medium' : 'hover:bg-gray-100 border border-gray-200'}`}
+              className={`py-2 px-3 rounded-md text-sm flex items-start text-start w-full transition-colors ${isSelected ? ' text-blue-800 font-medium' : 'hover:bg-gray-100 border border-gray-200'}`}
               onClick={() => handleSelectIndustry(node)}
             >
               <span className="flex-1">{node.label}</span>
@@ -951,7 +951,7 @@ const FilterBox: React.FC<FilterBoxProps> = ({
               </svg>
             </button>
             {!roleCollapsed && (
-              <div className="px-4 py-3 bg-white flex gap-2 flex-wrap">
+              <div className="px-2 py-3 bg-white flex gap-2 flex-wrap">
                 <Chip
                   checked={roleFilter === 'all'}
                   onChange={() => handleRoleFilterChange('all')}
