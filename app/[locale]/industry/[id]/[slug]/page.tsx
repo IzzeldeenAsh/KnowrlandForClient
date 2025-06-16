@@ -75,6 +75,7 @@ async function fetchIndustryData(id: string, slug: string, locale: string = 'en'
   }
 
   const data = await response.json();
+  console.log('API Response Industry:', data.data)
 
   return data
 }
