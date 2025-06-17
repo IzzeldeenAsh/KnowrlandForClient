@@ -62,6 +62,7 @@ async function getAllIndustries(locale: string) {
     }
 
     const data = await res.json()
+    console.log('API Response All Industries:', data.data)
     console.log('API Response All Industries:', data)
     return { data, error: null }
   } catch (error) {
@@ -87,6 +88,8 @@ export default async function AllIndustries({ params }: Props) {
       id: 1,
       name: "Technology",
       slug: "technology",
+      icon: "https://4sighta-common.s3.eu-north-1.amazonaws.com/industry/1/technology.svg",
+      weight: 1,
       children: [
         { id: 1, name: "Software Development", slug: "software-development" },
         { id: 2, name: "Cloud Computing", slug: "cloud-computing" },
@@ -97,6 +100,8 @@ export default async function AllIndustries({ params }: Props) {
       id: 2,
       name: "Healthcare",
       slug: "healthcare",
+      icon: "https://4sighta-common.s3.eu-north-1.amazonaws.com/industry/2/healthcare.svg",
+      weight: 2,
       children: [
         { id: 4, name: "Medical Devices", slug: "medical-devices" },
         { id: 5, name: "Pharmaceuticals", slug: "pharmaceuticals" },

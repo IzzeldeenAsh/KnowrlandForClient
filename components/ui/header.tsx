@@ -3,8 +3,8 @@ import Link from 'next/link'
 import Logo from './logo'
 import MobileMenu from './mobile-menu'
 import { useEffect, useState } from 'react'
-import {IconChevronDown, IconLanguage } from '@tabler/icons-react'
-import { HoverCard, Group, Text, Anchor, Divider, SimpleGrid, Button } from '@mantine/core'
+import {IconChevronDown, IconLanguage, IconSearch } from '@tabler/icons-react'
+import { HoverCard, Group, Text, Anchor, Divider, SimpleGrid, Button, TextInput } from '@mantine/core'
 import { UserProfile } from './header/components/UserProfile'
 import { useTranslations } from 'next-intl'
 import { usePathname } from 'next/navigation'
@@ -60,6 +60,7 @@ export default function Header() {
   const [industries, setIndustries] = useState<Industry[]>([]);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  const [searchQuery, setSearchQuery] = useState('');
   const { isLoading: isAppLoading, setIsLoading: setAppLoading } = useLoading();
   const pathname = usePathname();
   const router = useRouter();
@@ -67,6 +68,25 @@ export default function Header() {
   // Always use dark style with white text, as requested
   const textColorClass = 'text-slate-300 hover:text-white transition-all duration-300 ease-in-out px-3 py-2 rounded-md hover:bg-slate-700/50';
   const menuTextColorClass = 'text-gray-200 hover:text-gray-100 transition-all duration-300 ease-in-out px-3 py-2 rounded-md hover:bg-[#3B8AEF]/20';
+
+  // Handle search submission
+  const handleSearch = (query: string, searchType: 'knowledge' | 'insighter' = 'knowledge') => {
+    const searchParams = new URLSearchParams();
+    if (query.trim()) {
+      searchParams.set('keyword', query.trim());
+    }
+    searchParams.set('search_type', searchType);
+    
+    // Navigate to the search page with parameters - router already handles locale
+    router.push(`/home?${searchParams.toString()}`);
+    setSearchQuery('');
+  };
+
+  // Handle search input submission
+  const handleSearchSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    handleSearch(searchQuery);
+  };
 
   // Add active link styling function
   const isActiveLink = (path: string): string => {
@@ -249,7 +269,7 @@ export default function Header() {
 
           {/* Desktop navigation */}
           <nav className="hidden md:flex flex-1 overflow-hidden">
-            <ul className="flex justify-center items-center w-full">
+            <ul className="flex justify-start items-center w-full">
               <li>
                 <HoverCard  
                   position='bottom'
@@ -344,6 +364,80 @@ export default function Header() {
             </ul>
           </nav>
 
+          {/* Header Search Bar */}
+          <div className="hidden lg:flex items-center mx-4">
+            <form onSubmit={handleSearchSubmit} className="flex items-center">
+              <TextInput
+                placeholder={pathname.split('/')[1] === 'ar' ? 'البحث...' : 'Search...'}
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.currentTarget.value)}
+                onClick={() => {
+                  // Navigate to search page when clicked, even if empty
+                  if (!searchQuery.trim()) {
+                    handleSearch('');
+                  }
+                }}
+                onKeyDown={(e) => {
+                  if (e.key === 'Escape') {
+                    setSearchQuery('');
+                  }
+                }}
+                size="sm"
+                radius="md"
+                className="w-64"
+                // Position search icon based on locale - right for LTR, left for RTL
+                {...(pathname.split('/')[1] === 'ar' 
+                  ? { 
+                      leftSection: (
+                        <button
+                          type="submit"
+                          className="p-1 text-slate-300 hover:text-white transition-all duration-200 cursor-pointer"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleSearchSubmit(e as any);
+                          }}
+                        >
+                          <IconSearch size={16} />
+                        </button>
+                      )
+                    }
+                  : { 
+                      rightSection: (
+                        <button
+                          type="submit"
+                          className="p-1 text-slate-300 hover:text-white transition-all duration-200 cursor-pointer"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleSearchSubmit(e as any);
+                          }}
+                        >
+                          <IconSearch size={16} />
+                        </button>
+                      )
+                    }
+                )}
+                styles={{
+                  input: {
+                    backgroundColor: 'rgba(255, 255, 255, 0.1)',
+                    border: '1px solid rgba(255, 255, 255, 0.2)',
+                    color: 'white',
+                    direction: pathname.split('/')[1] === 'ar' ? 'rtl' : 'ltr',
+                    '&::placeholder': {
+                      color: 'rgba(255, 255, 255, 0.6)',
+                    },
+                    '&:focus': {
+                      borderColor: '#3B8AEF',
+                      backgroundColor: 'rgba(255, 255, 255, 0.15)',
+                    }
+                  },
+                  section: {
+                    color: 'rgba(255, 255, 255, 0.6)',
+                  }
+                }}
+              />
+            </form>
+          </div>
+
           {/* Desktop sign in links */}
           <ul className="flex justify-end items-center flex-shrink-0">
             {/* Language Switch Button */}
@@ -359,6 +453,18 @@ export default function Header() {
                   </span>
                 </button>
               </div>
+            </li>
+            
+            {/* Mobile search button - only show on smaller screens */}
+            <li className="lg:hidden mr-2">
+              <button
+                onClick={() => {
+                  router.push('/home');
+                }}
+                className="flex items-center p-2 text-slate-300 hover:text-white hover:bg-[#3B8AEF]/20 rounded-md transition-all duration-200"
+              >
+                <IconSearch size={18} />
+              </button>
             </li>
             
             {/* Always reserve space for notification bell */}
