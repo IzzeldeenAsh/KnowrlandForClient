@@ -8,6 +8,7 @@ interface Industry {
   id: number
   name: string
   slug: string
+  icon?: string
   weight?: number
   children: {
     id: number
@@ -43,10 +44,19 @@ export default function IndustriesGrid({ industries, locale }: IndustriesGridPro
             className={`relative group bg-gradient-to-br from-white to-slate-50 rounded-sm p-6 shadow-md border border-slate-100 h-full flex flex-col ${!isDisabled ? 'hover:shadow-lg hover:border-blue-100 hover:from-white hover:to-blue-50 transition-all duration-300 cursor-pointer' : 'opacity-50 cursor-not-allowed'}`}
           >
             <div className="space-y-2 flex-grow">
-              <h3 className={`text-base font-bold ${!isDisabled ? 'text-transparent bg-gradient-to-r from-blue-500 to-teal-400 bg-clip-text' : 'text-gray-900'}`}>
-                {industry.name}
-                {isDisabled && <span className="ml-2 text-xs text-gray-500"></span>}
-              </h3>
+              <div className="flex items-center gap-3">
+                {industry.icon && (
+                  <img 
+                    src={industry.icon} 
+                    alt={`${industry.name} icon`}
+                    className="w-8 h-8 object-contain flex-shrink-0"
+                  />
+                )}
+                <h3 className={`text-base font-bold ${!isDisabled ? 'text-transparent bg-gradient-to-r from-blue-500 to-teal-400 bg-clip-text' : 'text-gray-900'}`}>
+                  {industry.name}
+                  {isDisabled && <span className="ml-2 text-xs text-gray-500"></span>}
+                </h3>
+              </div>
               <ul className="space-y-1">
                 {industry.children.map((child) => (
                   <li 
@@ -105,10 +115,19 @@ export default function IndustriesGrid({ industries, locale }: IndustriesGridPro
             className={`relative group bg-gradient-to-br from-white to-slate-50 rounded-sm p-6 shadow-md border border-slate-100 h-full flex flex-col ${!isDisabled ? 'hover:shadow-lg hover:border-blue-100 hover:from-white hover:to-blue-50 transition-all duration-300 cursor-pointer' : 'opacity-50 cursor-not-allowed'}`}
           >
             <div className="space-y-2 flex-grow">
-              <h3 className={`text-base font-bold ${!isDisabled ? 'text-transparent bg-gradient-to-r from-blue-500 to-teal-400 bg-clip-text' : 'text-gray-900'}`}>
-                {industry.name}
-                {isDisabled && <span className="ml-2 text-xs text-gray-500"></span>}
-              </h3>
+              <div className="flex items-center gap-3">
+                {industry.icon && (
+                  <img 
+                    src={industry.icon} 
+                    alt={`${industry.name} icon`}
+                    className="w-8 h-8 object-contain flex-shrink-0"
+                  />
+                )}
+                <h3 className={`text-base font-bold ${!isDisabled ? 'text-transparent bg-gradient-to-r from-blue-500 to-teal-400 bg-clip-text' : 'text-gray-900'}`}>
+                  {industry.name}
+                  {isDisabled && <span className="ml-2 text-xs text-gray-500"></span>}
+                </h3>
+              </div>
               <ul className="space-y-1">
                 {industry.children.map((child) => (
                   <li 
