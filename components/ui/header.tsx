@@ -371,12 +371,6 @@ export default function Header() {
                 placeholder={pathname.split('/')[1] === 'ar' ? 'البحث...' : 'Search...'}
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.currentTarget.value)}
-                onClick={() => {
-                  // Navigate to search page when clicked, even if empty
-                  if (!searchQuery.trim()) {
-                    handleSearch('');
-                  }
-                }}
                 onKeyDown={(e) => {
                   if (e.key === 'Escape') {
                     setSearchQuery('');
