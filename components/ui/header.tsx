@@ -88,6 +88,23 @@ export default function Header() {
     handleSearch(searchQuery);
   };
 
+  // Check if current route should hide search bar
+  const shouldHideSearchBar = (): boolean => {
+    const pathSegments = pathname.split('/').filter(segment => segment !== '');
+    
+    // Hide on base URL (e.g., /en, /ar)
+    if (pathSegments.length === 1) {
+      return true;
+    }
+    
+    // Hide on home page (e.g., /en/home, /ar/home)
+    if (pathSegments.length === 2 && pathSegments[1] === 'home') {
+      return true;
+    }
+    
+    return false;
+  };
+
   // Add active link styling function
   const isActiveLink = (path: string): string => {
     // Split the pathname into segments
@@ -365,72 +382,74 @@ export default function Header() {
           </nav>
 
           {/* Header Search Bar */}
-          <div className="hidden lg:flex items-center mx-4">
-            <form onSubmit={handleSearchSubmit} className="flex items-center">
-              <TextInput
-                placeholder={pathname.split('/')[1] === 'ar' ? 'البحث...' : 'Search...'}
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.currentTarget.value)}
-                onKeyDown={(e) => {
-                  if (e.key === 'Escape') {
-                    setSearchQuery('');
-                  }
-                }}
-                size="sm"
-                radius="md"
-                className="w-64"
-                // Position search icon based on locale - right for LTR, left for RTL
-                {...(pathname.split('/')[1] === 'ar' 
-                  ? { 
-                      leftSection: (
-                        <button
-                          type="submit"
-                          className="p-1 text-slate-300 hover:text-white transition-all duration-200 cursor-pointer"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            handleSearchSubmit(e as any);
-                          }}
-                        >
-                          <IconSearch size={16} />
-                        </button>
-                      )
+          {!shouldHideSearchBar() && (
+            <div className="hidden lg:flex items-center mx-4">
+              <form onSubmit={handleSearchSubmit} className="flex items-center">
+                <TextInput
+                  placeholder={pathname.split('/')[1] === 'ar' ? 'البحث...' : 'Search...'}
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.currentTarget.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Escape') {
+                      setSearchQuery('');
                     }
-                  : { 
-                      rightSection: (
-                        <button
-                          type="submit"
-                          className="p-1 text-slate-300 hover:text-white transition-all duration-200 cursor-pointer"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            handleSearchSubmit(e as any);
-                          }}
-                        >
-                          <IconSearch size={16} />
-                        </button>
-                      )
-                    }
-                )}
-                styles={{
-                  input: {
-                    backgroundColor: 'rgba(255, 255, 255, 0.1)',
-                    border: '1px solid rgba(255, 255, 255, 0.2)',
-                    color: 'white',
-                    direction: pathname.split('/')[1] === 'ar' ? 'rtl' : 'ltr',
-                    '&::placeholder': {
-                      color: 'rgba(255, 255, 255, 0.6)',
+                  }}
+                  size="sm"
+                  radius="md"
+                  className="w-64"
+                  // Position search icon based on locale - right for LTR, left for RTL
+                  {...(pathname.split('/')[1] === 'ar' 
+                    ? { 
+                        leftSection: (
+                          <button
+                            type="submit"
+                            className="p-1 text-slate-300 hover:text-white transition-all duration-200 cursor-pointer"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleSearchSubmit(e as any);
+                            }}
+                          >
+                            <IconSearch size={16} />
+                          </button>
+                        )
+                      }
+                    : { 
+                        rightSection: (
+                          <button
+                            type="submit"
+                            className="p-1 text-slate-300 hover:text-white transition-all duration-200 cursor-pointer"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleSearchSubmit(e as any);
+                            }}
+                          >
+                            <IconSearch size={16} />
+                          </button>
+                        )
+                      }
+                  )}
+                  styles={{
+                    input: {
+                      backgroundColor: 'rgba(255, 255, 255, 0.1)',
+                      border: '1px solid rgba(255, 255, 255, 0.2)',
+                      color: 'white',
+                      direction: pathname.split('/')[1] === 'ar' ? 'rtl' : 'ltr',
+                      '&::placeholder': {
+                        color: 'rgba(255, 255, 255, 0.6)',
+                      },
+                      '&:focus': {
+                        borderColor: '#3B8AEF',
+                        backgroundColor: 'rgba(255, 255, 255, 0.15)',
+                      }
                     },
-                    '&:focus': {
-                      borderColor: '#3B8AEF',
-                      backgroundColor: 'rgba(255, 255, 255, 0.15)',
+                    section: {
+                      color: 'rgba(255, 255, 255, 0.6)',
                     }
-                  },
-                  section: {
-                    color: 'rgba(255, 255, 255, 0.6)',
-                  }
-                }}
-              />
-            </form>
-          </div>
+                  }}
+                />
+              </form>
+            </div>
+          )}
 
           {/* Desktop sign in links */}
           <ul className="flex justify-end items-center flex-shrink-0">
@@ -450,16 +469,18 @@ export default function Header() {
             </li>
             
             {/* Mobile search button - only show on smaller screens */}
-            <li className="lg:hidden mr-2">
-              <button
-                onClick={() => {
-                  router.push('/home');
-                }}
-                className="flex items-center p-2 text-slate-300 hover:text-white hover:bg-[#3B8AEF]/20 rounded-md transition-all duration-200"
-              >
-                <IconSearch size={18} />
-              </button>
-            </li>
+            {!shouldHideSearchBar() && (
+              <li className="lg:hidden mr-2">
+                <button
+                  onClick={() => {
+                    router.push('/home');
+                  }}
+                  className="flex items-center p-2 text-slate-300 hover:text-white hover:bg-[#3B8AEF]/20 rounded-md transition-all duration-200"
+                >
+                  <IconSearch size={18} />
+                </button>
+              </li>
+            )}
             
             {/* Always reserve space for notification bell */}
             <li className="me-4 flex items-center relative z-20">
