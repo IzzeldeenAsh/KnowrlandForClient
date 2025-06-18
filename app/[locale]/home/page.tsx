@@ -1276,7 +1276,7 @@ export default function HomePage() {
       {/* Main content area */}
       <div className="flex flex-col relative z-3 pt-2 pb-8">
         <div className="w-full">
-          <div className="mx-auto max-w-7xl px-4 sm:px-6">
+          <div className="mx-auto max-w-7xl 2xl:max-w-none 2xl:mx-8 px-4 sm:px-6">
             {/* Total results display moved to ResultsSection */}
             
             {/* Filter toggle button */}
