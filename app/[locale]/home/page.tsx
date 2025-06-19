@@ -147,7 +147,18 @@ export default function HomePage() {
   }, [statistics]);
   
   // Function to reset all filters to default values
-  const resetFilters = useCallback(() => {
+  const resetFilters = useCallback(async () => {
+    // Set flag to prevent other effects from interfering
+    isFilterResetInProgressRef.current = true;
+    
+    // Set loading immediately to show user that action is being performed
+    setLoading(true);
+    
+    // Clear existing results immediately to prevent showing stale data
+    setSearchResults([]);
+    setKnowledgeItems([]);
+    setStatistics([]);
+    
     // Reset all filter states
     setLanguageFilter('all');
     setCountryFilter(null);
@@ -160,6 +171,7 @@ export default function HomePage() {
     setSelectedCategory('all');
     setAccuracyFilter('all');
     setRoleFilter('all');
+    setCurrentPage(1);
     
     // Keep only search_type and keyword in URL
     const urlParams = new URLSearchParams();
@@ -168,7 +180,64 @@ export default function HomePage() {
     
     // Update URL with only search parameters
     router.push(`/${locale}/home?${urlParams.toString()}`, { scroll: false });
-  }, [searchQuery, searchType, locale, router]);
+    
+    // Explicitly trigger search with reset parameters
+    try {
+      const handleError = (errorMessage: string) => {
+        toast.error(errorMessage, 'Validation Error');
+      };
+      
+      console.log('Executing search after filter reset with params:', {
+        keyword: searchQuery.trim(),
+        searchType,
+        locale,
+        page: 1
+      });
+      
+      const response = await fetchSearchResults(
+        searchQuery.trim(),
+        searchType,
+        locale,
+        1, // Reset to page 1
+        activeTab,
+        'all', // Reset language filter
+        null, // Reset country filter
+        null, // Reset region filter
+        null, // Reset economic bloc filter
+        null, // Reset ISIC code filter
+        'all', // Reset category to 'all'
+        30, // perPage
+        handleError,
+        null, // Reset industry filter
+        null, // Reset price filter
+        null, // Reset HS code filter
+        'all', // Reset accuracy filter
+        'all' // Reset role filter
+      );
+      
+      setSearchResults(response.data || []);
+      setTotalPages(response.meta?.last_page || 1);
+      setTotalItems(response.meta?.total || 0);
+      
+      // Fetch statistics if search type is knowledge
+      if (searchType === 'knowledge') {
+        await fetchStatisticsIfNeeded(searchQuery.trim(), searchType);
+      } else {
+        setStatistics([]);
+      }
+    } catch (error) {
+      console.error('Search after filter reset failed:', error);
+      setSearchResults([]);
+      setKnowledgeItems([]);
+      toast.error('Failed to fetch search results. Please try again later.', 'Error');
+    } finally {
+      setLoading(false);
+      // Reset the flag after the operation completes
+      setTimeout(() => {
+        isFilterResetInProgressRef.current = false;
+      }, 500); // Wait a bit to ensure no race conditions
+    }
+  }, [searchQuery, searchType, locale, router, activeTab, toast, fetchStatisticsIfNeeded]);
   
 
   
@@ -827,6 +896,9 @@ export default function HomePage() {
   
   // Flag to prevent main search effect from running during search type changes
   const isSearchTypeChangingRef = useRef(false);
+  
+  // Flag to prevent main search effect from running during filter reset
+  const isFilterResetInProgressRef = useRef(false);
 
   // Direct page search function to be passed to ResultsSection
   const directSearchByPage = useCallback(async (page: number) => {
@@ -932,6 +1004,12 @@ export default function HomePage() {
     // Skip if a direct page change is in progress to prevent interference
     if (isPageChangeInProgressRef.current) {
       console.log('Skipping main search effect because a direct page change is in progress');
+      return;
+    }
+    
+    // Skip if a filter reset is in progress to prevent interference
+    if (isFilterResetInProgressRef.current) {
+      console.log('Skipping main search effect because a filter reset is in progress');
       return;
     }
     
@@ -1218,6 +1296,8 @@ export default function HomePage() {
                         onClick={(e) => { e.preventDefault(); handleCategorySelect('all'); }} 
                         count={getCategoryCount('all')}
                       />
+                      {/* Separator between "All" and specific categories */}
+                      <div className="hidden sm:block w-px h-16 bg-gray-300 mx-2"></div>
                       <CategoryIconBox 
                         name="data" 
                         label="Data" 
