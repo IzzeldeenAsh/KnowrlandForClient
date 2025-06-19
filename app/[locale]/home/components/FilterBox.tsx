@@ -90,7 +90,7 @@ interface FilterBoxProps {
   setAccuracyFilter?: (filter: 'any' | 'all') => void;
   roleFilter?: 'all' | 'company' | 'individual';
   setRoleFilter?: (filter: 'all' | 'company' | 'individual') => void;
-  resetFilters?: () => void;
+  resetFilters?: () => Promise<void>;
 }
 
 const FilterBox: React.FC<FilterBoxProps> = ({
@@ -116,7 +116,7 @@ const FilterBox: React.FC<FilterBoxProps> = ({
   setAccuracyFilter = () => {},
   roleFilter = 'all',
   setRoleFilter = () => {},
-  resetFilters = () => {}
+  resetFilters = async () => {}
 }) => {
   const [countries, setCountries] = useState<Country[]>([]);
   const [regions, setRegions] = useState<Region[]>([]);
@@ -322,6 +322,22 @@ const FilterBox: React.FC<FilterBoxProps> = ({
     fetchHsCodes();
     fetchIndustries();
   }, [locale]);
+
+  // Initialize selected ISIC code based on prop value
+  useEffect(() => {
+    if (isicCodeFilter && leafNodes.length > 0) {
+      const selectedCode = leafNodes.find(node => node.key === isicCodeFilter);
+      if (selectedCode) {
+        setSelectedIsicCode({
+          id: selectedCode.key,
+          code: selectedCode.code,
+          label: locale === 'ar' ? selectedCode.names.ar : selectedCode.names.en
+        });
+      }
+    } else if (!isicCodeFilter) {
+      setSelectedIsicCode(null);
+    }
+  }, [isicCodeFilter, leafNodes, locale]);
 
   // Initialize selected HS code based on prop value
   useEffect(() => {
@@ -662,15 +678,24 @@ const FilterBox: React.FC<FilterBoxProps> = ({
   };
 
   // Reset all filters to default values
-  const handleResetFilters = () => {
-    // Clear local component state
-    setSelectedIsicCode(null);
-    setSelectedHsCode(null);
-    setSelectedIndustry(null);
-    setIndustryFilter(null);
-    setPriceFilter(null);
-    // Call the parent resetFilters function to update URL and global state
-    resetFilters();
+  const handleResetFilters = async () => {
+    try {
+      console.log('Starting filter reset...');
+      
+      // Clear local component state
+      setSelectedIsicCode(null);
+      setSelectedHsCode(null);
+      setSelectedIndustry(null);
+      
+      // Call the parent resetFilters function to update URL and global state
+      // This is now async and will handle the search API call
+      await resetFilters();
+      
+      console.log('Filter reset completed successfully');
+    } catch (error) {
+      console.error('Error during filter reset:', error);
+      // You could add a toast notification here if needed
+    }
   };
   
   // Handle price filter selection
