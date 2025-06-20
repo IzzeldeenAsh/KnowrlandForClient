@@ -60,7 +60,7 @@ function getInitials(name: string) {
 }
 
 // Helper function to safely format date, handling both string and string[] types
-function safeFormatDate(dateInput: string | string[] | undefined): string {
+function safeFormatDate(dateInput: string | string[] | undefined, locale: string = 'en'): string {
   if (!dateInput) return '';
   
   // Convert array to string if needed
@@ -68,7 +68,7 @@ function safeFormatDate(dateInput: string | string[] | undefined): string {
   if (!dateString) return '';
   
   try {
-    return formatPublishedDate(dateString, 'en');
+    return formatPublishedDate(dateString, locale);
   } catch (error) {
     console.error('Error formatting date:', error);
     return '';
@@ -345,7 +345,7 @@ export default function SearchResultsGrid({
                 <div className="flex justify-between items-center pt-2 mt-auto mt-6 border-t border-gray-100 w-full">
                   {item.published_at && (
                     <Text c="dimmed" size="xs" dir={isRTL ? 'rtl' : 'ltr'}>
-                      {translations.posted} {safeFormatDate(item.published_at)}
+                      {translations.posted} {safeFormatDate(item.published_at, currentLocale as string)}
                     </Text>
                   )}
                   
