@@ -411,15 +411,21 @@ const KnowledgeSideBox = ({
                 </span>
                 <div className={`field-content-container ${expandedSections.regions ? 'expanded' : ''}`}>
                   <div className="flex flex-wrap justify-end gap-1 max-w-[100%]">
-                    {regions
-                      .slice(0, expandedSections.regions ? regions.length : MAX_VISIBLE_ITEMS)
-                      .map((region:any) => (
-                        <span key={region.id} className="badge bg-[#f1f1f4] text-[#4b5675] text-xs font-medium px-2.5 py-0.5 rounded">
-                          {region.name}
-                        </span>
-                      ))}
+                    {regions.length === 6 ? (
+                      <span className="badge bg-[#f1f1f4] text-[#4b5675] text-xs font-medium px-2.5 py-0.5 rounded">
+                        Worldwide
+                      </span>
+                    ) : (
+                      regions
+                        .slice(0, expandedSections.regions ? regions.length : MAX_VISIBLE_ITEMS)
+                        .map((region:any) => (
+                          <span key={region.id} className="badge bg-[#f1f1f4] text-[#4b5675] text-xs font-medium px-2.5 py-0.5 rounded">
+                            {region.name}
+                          </span>
+                        ))
+                    )}
                   </div>
-                  {regions.length > MAX_VISIBLE_ITEMS && (
+                  {regions.length > MAX_VISIBLE_ITEMS && regions.length !== 6 && (
                     <button 
                   style={{marginInlineStart:'auto'}}
 
