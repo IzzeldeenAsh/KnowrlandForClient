@@ -111,3 +111,7 @@ outline: none !important;
 .focus-outline-none:focus{
 outline: none !important;
 }
+
+.avatar-top-position img {
+  object-position: top !important;
+}
