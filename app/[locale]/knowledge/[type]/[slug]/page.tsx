@@ -290,7 +290,7 @@ export default function KnowledgePage({ params }: Props) {
                             alt={knowledge.insighter.name}
                             fill={true}
                             sizes="20px"
-                            className="rounded-full object-cover"
+                            className="rounded-full object-cover object-top"
                           />
                         ) : (
                           <div className="w-full h-full rounded-full bg-blue-500 flex items-center justify-center">
@@ -321,7 +321,7 @@ export default function KnowledgePage({ params }: Props) {
                           alt={knowledge.insighter.name}
                           fill={true}
                           sizes="(max-width: 640px) 40px, 50px"
-                          className="rounded-full object-cover"
+                          className="rounded-full object-cover object-top"
                         />
                       ) : (
                         <div className="w-full h-full rounded-full bg-blue-500 flex items-center justify-center">
