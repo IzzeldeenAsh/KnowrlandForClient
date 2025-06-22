@@ -580,7 +580,7 @@ export default function ProfilePage() {
                         alt={profileData.name}
                         width={400}
                         height={400}
-                        className="w-full h-full rounded-full object-cover"
+                        className="w-full h-full rounded-full object-cover object-top"
                       />
                     ) : (
                       <div className="w-full h-full bg-gray-100 dark:bg-slate-700 flex items-center justify-center rounded-full">
@@ -611,7 +611,7 @@ export default function ProfilePage() {
                             alt={profileData.name}
                             width={80}
                             height={80}
-                            className="w-full h-full object-cover border-3 border-white rounded-full"
+                            className="w-full h-full object-cover border-3 border-white rounded-full object-top"
                           />
                         ) : (
                           <div className="w-full h-full bg-gray-100 dark:bg-slate-700 flex items-center justify-center rounded-full">

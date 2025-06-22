@@ -194,7 +194,7 @@ export default function KnowledgeGrid({
                           radius="xl"
                           alt={item.insighter.name}
                           size="md"
-                          className={cardStyles.avatar}
+                          className={`${cardStyles.avatar} avatar-top-position`}
                         >
                           {!((item.insighter.roles.includes("company") || item.insighter.roles.includes("company-insighter")) && item.insighter.company?.logo) && 
                           !item.insighter.profile_photo_url &&
@@ -206,7 +206,7 @@ export default function KnowledgeGrid({
                             src={item.insighter.profile_photo_url}
                             radius="xl"
                             size="xs"
-                            className="absolute bottom-0 right-0 translate-x-1/3 rounded-full translate-y-1/3 z-10"
+                            className="absolute bottom-0 right-0 translate-x-1/3 rounded-full translate-y-1/3 z-10 avatar-top-position"
                             alt={item.insighter.name}
                             style={{
                               boxShadow: '0 0 0 2px white',
@@ -219,7 +219,7 @@ export default function KnowledgeGrid({
                             src={item.insighter.profile_photo_url}
                             radius="xl"
                             size="xs"
-                            className="absolute bottom-0 right-0 translate-x-1/3 rounded-full translate-y-1/3 z-10"
+                            className="absolute bottom-0 right-0 translate-x-1/3 rounded-full translate-y-1/3 z-10 avatar-top-position"
                             alt={item.insighter.name}
                             style={{
                               boxShadow: '0 0 0 2px white',
