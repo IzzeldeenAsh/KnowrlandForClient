@@ -197,7 +197,7 @@ export default function SearchResultsList({
                         radius="xl"
                         alt={item.insighter.name}
                         size="sm"
-                        className="mr-2"
+                        className="me-2 avatar-top-position"
                       >
                         {/* Show initials when no image is available */}
                         {(() => {
@@ -215,7 +215,7 @@ export default function SearchResultsList({
                           src={item.insighter.profile_photo_url}
                           radius="xl"
                           size="xs"
-                          className="absolute bottom-0 right-[10px] translate-x-1/3 rounded-full translate-y-1/3 z-10"
+                          className="absolute bottom-0 right-[10px] translate-x-1/3 rounded-full translate-y-1/3 z-10 avatar-top-position"
                           alt={item.insighter.name}
                           style={{
                             boxShadow: '0 0 0 1px white',
@@ -228,7 +228,7 @@ export default function SearchResultsList({
                           src={item.insighter.profile_photo_url}
                           radius="xl"
                           size="xs"
-                          className="absolute bottom-0 right-[10px] translate-x-1/3 rounded-full translate-y-1/3 z-10"
+                          className="absolute bottom-0 right-[10px] translate-x-1/3 rounded-full translate-y-1/3 z-10 avatar-top-position"
                           alt={item.insighter.name}
                           style={{
                             boxShadow: '0 0 0 1px white',
@@ -245,7 +245,7 @@ export default function SearchResultsList({
                         {item.insighter.roles.includes("company") && (
                           item.insighter.company
                             ? isRTL
-                              ? `${translations.company} ${item.insighter.company.legal_name}`
+                              ? ` ${item.insighter.company.legal_name}`
                               : `${item.insighter.company.legal_name} ${translations.company}`
                             : translations.company
                         )}
@@ -253,7 +253,7 @@ export default function SearchResultsList({
                         {item.insighter.roles.includes("company-insighter") && (
                           item.insighter.company
                             ? isRTL
-                              ? `${translations.company} ${item.insighter.company.legal_name}`
+                              ? ` ${item.insighter.company.legal_name}`
                               : `${item.insighter.company.legal_name} ${translations.company}`
                             : translations.company
                         )}
