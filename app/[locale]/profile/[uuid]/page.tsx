@@ -229,9 +229,9 @@ export default function ProfilePage() {
                 register_document: data.data.register_document,
                 logo: data.data.logo,
                 address: data.data.address,
-               
                 verified: data.data.verified,
-                social: data.data.social || []
+                social: data.data.social || [],
+                uuid: data.data.uuid
               }
             };
             
@@ -275,7 +275,8 @@ export default function ProfilePage() {
                 logo: data.data.logo,
                 address: data.data.address,
                 verified: data.data.verified,
-                social: data.data.social || []
+                social: data.data.social || [],
+                uuid: data.data.uuid
               }
             };
             
