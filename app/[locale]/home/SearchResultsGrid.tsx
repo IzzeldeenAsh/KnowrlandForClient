@@ -296,8 +296,8 @@ export default function SearchResultsGrid({
                           {item.insighter.roles.includes("company-insighter") && (
                             item.insighter.company
                               ? isRTL
-                                ? `${translations.company} ${item.insighter.company.legal_name}`
-                                : `${item.insighter.company.legal_name} ${translations.company}`
+                                ? ` ${item.insighter.company.legal_name}`
+                                : `${item.insighter.company.legal_name} `
                               : translations.company
                           )}
                         </Text>
