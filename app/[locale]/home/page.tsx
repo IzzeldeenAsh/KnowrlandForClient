@@ -1247,6 +1247,12 @@ export default function HomePage() {
                  {(() => {
                    // Function to handle category selection and trigger search API directly
                    const handleCategorySelect = async (category: string) => {
+                     // Check if the category is already selected to prevent unnecessary loading
+                     if (selectedCategory === category) {
+                       console.log('Category already selected, no action needed');
+                       return;
+                     }
+                     
                      // Set loading immediately to prevent flickering
                      setLoading(true);
                      
