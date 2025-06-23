@@ -6,11 +6,14 @@ import { useSearchParams } from 'next/navigation';
 import Footer from '@/components/ui/footer';
 import Image from 'next/image';
 import React, { useEffect, useState } from 'react';
+import axios from 'axios';
 
 import Stripes from "@/public/images/stripes-dark.svg";
-import { Tabs } from '@mantine/core';
-import { useParams } from 'next/navigation';
-import {  IconBrandX, IconRosetteDiscountCheckFilled, IconFilter, IconFileReport, IconBrandHipchat } from '@tabler/icons-react';
+import { Container, Modal, TextInput, Textarea, Button, Tabs } from '@mantine/core';
+import { useParams, useRouter } from 'next/navigation';
+import { IconBrandX, IconRosetteDiscountCheckFilled, IconFilter, IconFileReport, IconBrandHipchat, IconCalendarEvent, IconCalendarTime, IconClock, IconCalendarX, IconChevronLeft, IconChevronRight, IconLock } from '@tabler/icons-react';
+
+import Toast from '@/components/toast/Toast';
 import { GlobeAsiaAustraliaIcon } from '@heroicons/react/24/outline';
 import KnowledgeGrid, { KnowledgeItem } from '@/app/[locale]/topic/[id]/[slug]/KnowledgeGrid';
 import NewCertificationIcon from '@/app/components/icons/NewCertificationIcon';
@@ -115,6 +118,22 @@ interface KnowledgeResponse {
   };
 }
 
+interface MeetingTime {
+  start_time: string;
+  end_time: string;
+}
+
+interface MeetingAvailability {
+  date: string;
+  day: string;
+  active: boolean;
+  times: MeetingTime[];
+}
+
+interface MeetingAvailabilityResponse {
+  data: MeetingAvailability[];
+}
+
 export default function ProfilePage() {
   const [profileData, setProfileData] = useState<ProfileData | null>(null);
   const [loading, setLoading] = useState(true);
@@ -123,6 +142,8 @@ export default function ProfilePage() {
   const [loadingKnowledge, setLoadingKnowledge] = useState(false);
   const [selectedType, setSelectedType] = useState<string | null>(null);
   const [initialTypeCounts, setInitialTypeCounts] = useState<Record<string, number>>({});
+  const [errorToast, setErrorToast] = useState<{show: boolean, message: string}>({show: false, message: ''});
+  
   const params = useParams();
   const searchParams = useSearchParams();
   const uuid = params.uuid as string;
@@ -133,9 +154,20 @@ export default function ProfilePage() {
   const filterT = useTranslations('Filters');
   const [enterpriseType, setEnterpriseType] = useState<string | null>(null);
   
+  // Calendar booking states
+  const [loadingMeetings, setLoadingMeetings] = useState(false);
+  const [meetingAvailability, setMeetingAvailability] = useState<MeetingAvailability[]>([]);
+  const [selectedDate, setSelectedDate] = useState<string | null>(null);
+  const [selectedMeetingTime, setSelectedMeetingTime] = useState<MeetingTime | null>(null);
+  const [isBookingModalOpen, setIsBookingModalOpen] = useState(false);
+  const [meetingTitle, setMeetingTitle] = useState('');
+  const [meetingDescription, setMeetingDescription] = useState('');
+  const [isBookingLoading, setIsBookingLoading] = useState(false);
+  const [bookingError, setBookingError] = useState<string | null>(null);
+  const [currentMonth, setCurrentMonth] = useState<Date>(new Date());
+  
   // Get entity type from search params (safe for SSR)
   const entityParam = searchParams.get('entity');
-
 
   useEffect(() => {
     const fetchProfileData = async () => {
@@ -331,6 +363,117 @@ export default function ProfilePage() {
     fetchKnowledgeData();
   }, [uuid, locale, knowledgePage, selectedType, profileData]);
 
+  // State to track if user is authenticated
+  const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
+  const [authChecked, setAuthChecked] = useState<boolean>(false);
+
+  // Check if user is authenticated
+  useEffect(() => {
+    const checkAuth = () => {
+      // Check if token exists in localStorage
+      const token = localStorage.getItem('token');
+      setIsAuthenticated(!!token);
+      setAuthChecked(true);
+    };
+
+    // Safe check for browser environment
+    if (typeof window !== 'undefined') {
+      checkAuth();
+    } else {
+      setAuthChecked(true); // Mark as checked for SSR
+    }
+  }, []);
+
+  const [showToast, setShowToast] = useState(false);
+  const [toastProps, setToastProps] = useState<{
+    message: string;
+    title?: string;
+    type: 'success' | 'error' | 'warning' | 'info';
+  }>({ message: '', type: 'info' });
+
+  // Helper function to format error messages from API
+  const formatErrorMessage = (error: any): string => {
+    if (error?.response?.data?.errors) {
+      const errors = error.response.data.errors;
+      // Join all error messages into a single string
+      return Object.values(errors)
+        .flat()
+        .join(', ');
+    }
+    if (error?.response?.data?.message) {
+      return error.response.data.message;
+    }
+    return 'An error occurred. Please try again later.';
+  };
+
+  // Function to fetch meeting availability data
+  const fetchMeetingAvailability = async () => {
+    if (!uuid) return;
+    
+    // If user is not authenticated, don't make the API call
+    if (!isAuthenticated) {
+      setLoadingMeetings(false);
+      return;
+    }
+    
+    setLoadingMeetings(true);
+    try {
+      // Get auth token
+      const token = localStorage.getItem('token');
+      
+      // Calculate start and end date (3 months range starting from tomorrow)
+      const today = new Date();
+      
+      // Start date is tomorrow
+      const tomorrow = new Date(today);
+      tomorrow.setDate(today.getDate() + 1);
+      const startDate = tomorrow.toISOString().split('T')[0]; // YYYY-MM-DD format
+      
+      // End date is 3 months from tomorrow
+      const endDate = new Date(tomorrow);
+      endDate.setMonth(tomorrow.getMonth() + 3);
+      const endDateStr = endDate.toISOString().split('T')[0]; // YYYY-MM-DD format
+      
+      const response = await axios.post(
+        `https://api.knoldg.com/api/account/meeting/available/hours/${uuid}`,
+        {
+          start_date: startDate,
+          end_date: endDateStr
+        },
+        {
+          headers: {
+            "Content-Type": "application/json",
+            "Accept": "application/json",
+            "Accept-Language": locale,
+            "Authorization": `Bearer ${token}`
+          }
+        }
+      );
+      
+      if (response.data?.data) {
+        setMeetingAvailability(response.data.data);
+      }
+    } catch (error: any) {
+      console.error('Error fetching meeting availability:', error);
+      const errorMessage = formatErrorMessage(error);
+      setToastProps({
+        message: errorMessage,
+        type: 'error',
+        title: 'Error'
+      });
+      setShowToast(true);
+    } finally {
+      setLoadingMeetings(false);
+    }
+  };
+  
+  // Load meeting availability data when tab changes to "meet"
+  const handleTabChange = (value: string | null) => {
+    if (value === "meet" && (isInsighter || isCompanyInsighter)) {
+      fetchMeetingAvailability();
+    }
+  };
+
   const getSocialIcon = (type: string) => {
     switch (type) {
       case 'facebook':
@@ -356,6 +499,172 @@ export default function ProfilePage() {
   // Function to handle pagination
   const handlePageChange = (page: number) => {
     setKnowledgePage(page);
+  };
+  
+  // Calendar utility functions
+  const getDaysInMonth = (year: number, month: number) => {
+    return new Date(year, month + 1, 0).getDate();
+  };
+  
+  const getFirstDayOfMonth = (year: number, month: number) => {
+    return new Date(year, month, 1).getDay();
+  };
+  
+  const formatDateString = (year: number, month: number, day: number) => {
+    return `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+  };
+  
+  const getDayName = (locale: string, date: Date) => {
+    return date.toLocaleDateString(locale === 'ar' ? 'ar-SA' : 'en-US', { weekday: 'long' });
+  };
+  
+  const getMonthName = (locale: string, date: Date) => {
+    return date.toLocaleDateString(locale === 'ar' ? 'ar-SA' : 'en-US', { month: 'long' });
+  };
+  
+  const getShortWeekdayNames = (locale: string) => {
+    const names = [];
+    const date = new Date(2021, 0, 3); // Sunday
+    for (let i = 0; i < 7; i++) {
+      const dayName = date.toLocaleDateString(locale === 'ar' ? 'ar-SA' : 'en-US', { weekday: 'short' });
+      names.push(dayName);
+      date.setDate(date.getDate() + 1);
+    }
+    return names;
+  };
+  
+  const handlePreviousMonth = () => {
+    const newDate = new Date(currentMonth);
+    newDate.setMonth(currentMonth.getMonth() - 1);
+    setCurrentMonth(newDate);
+    setSelectedDate(null);
+    setSelectedMeetingTime(null);
+  };
+  
+  const handleNextMonth = () => {
+    const newDate = new Date(currentMonth);
+    newDate.setMonth(currentMonth.getMonth() + 1);
+    setCurrentMonth(newDate);
+    setSelectedDate(null);
+    setSelectedMeetingTime(null);
+  };
+  
+  // Check if a date is active (available for booking)
+  const isDateActive = (dateStr: string) => {
+    return meetingAvailability.some(day => day.date === dateStr && day.active);
+  };
+  
+  // Get meeting times for a specific date
+  const getMeetingTimesForDate = (dateStr: string) => {
+    const dayData = meetingAvailability.find(day => day.date === dateStr);
+    return dayData?.times || [];
+  };
+  
+  const handleDateClick = (dateStr: string) => {
+    if (isDateActive(dateStr)) {
+      setSelectedDate(dateStr);
+      setSelectedMeetingTime(null);
+    }
+  };
+  
+  const handleTimeClick = (time: MeetingTime) => {
+    setSelectedMeetingTime(time);
+  };
+  
+  // Handle booking action - opens the modal to enter title and description
+  const handleBookMeeting = () => {
+    if (!selectedMeetingTime) {
+      setToastProps({
+        message: 'Please select a time slot',
+        type: 'warning',
+        title: 'Selection Required'
+      });
+      setShowToast(true);
+      return;
+    }
+    
+    // Check if user is authenticated
+    if (!isAuthenticated) {
+      setToastProps({
+        message: t('loginToView'),
+        type: 'warning',
+        title: t('loginRequired')
+      });
+      setShowToast(true);
+      return;
+    }
+    
+    // Open the booking modal
+    setIsBookingModalOpen(true);
+    setBookingError(null);
+    
+    // Default title without relying on profileData
+    const defaultName = profileData?.name || 'consultant';
+    if (!meetingTitle) {
+      setMeetingTitle(`Meeting with ${defaultName}`);
+    }
+  };
+  
+  // Submit booking - handles the API call
+  const submitBookMeeting = async () => {
+    if (!selectedDate || !selectedMeetingTime) return;
+    
+    setIsBookingLoading(true);
+    setBookingError(null);
+    
+    try {
+      // Get auth token from localStorage
+      const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
+      
+      // Get profile name from URL if profileData is unavailable
+      const defaultName = uuid.toString().split('-')[0] || 'consultant';
+      
+      const response = await fetch(`https://api.knoldg.com/api/account/meeting/book/${uuid}`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+          'Accept-Language': locale,
+          ...(token && { 'Authorization': `Bearer ${token}` })
+        },
+        body: JSON.stringify({
+          meeting_date: selectedDate,
+          start_time: selectedMeetingTime.start_time.substring(0, 5),
+          end_time: selectedMeetingTime.end_time.substring(0, 5),
+          title: meetingTitle || `Meeting with ${defaultName}`,
+          description: meetingDescription || 'No description provided'
+        })
+      });
+      
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.message || 'Failed to book meeting');
+      }
+      
+      // Handle successful booking
+      setIsBookingModalOpen(false);
+      setMeetingTitle('');
+      setMeetingDescription('');
+      setSelectedMeetingTime(null);
+      setSelectedDate(null);
+      
+      // Show success notification or message
+      setToastProps({
+        message: `Successfully booked meeting on ${new Date(selectedDate).toLocaleDateString()} at ${selectedMeetingTime.start_time.substring(0, 5)} - ${selectedMeetingTime.end_time.substring(0, 5)}`,
+        type: 'success',
+        title: 'Booking Confirmed'
+      });
+      setShowToast(true);
+      
+      // Refresh availability if needed
+      fetchMeetingAvailability();
+      
+    } catch (error: any) {
+      console.error('Error booking meeting:', error);
+      setBookingError(error instanceof Error ? error.message : 'Failed to book meeting');
+    } finally {
+      setIsBookingLoading(false);
+    }
   };
 
   // Convert API knowledge items to the format expected by KnowledgeGrid
@@ -509,6 +818,17 @@ export default function ProfilePage() {
 
   return (
     <div className="flex flex-col min-h-screen bg-gradient-to-b from-gray-50 to-white dark:from-slate-950 dark:to-slate-900">
+      {/* Toast for displaying API errors */}
+      {showToast && (
+        <div className="fixed top-6 right-6 z-50">
+          <Toast 
+            message={toastProps.message} 
+            type={toastProps.type} 
+            title={toastProps.title} 
+            onClose={() => setShowToast(false)} 
+          />
+        </div>
+      )}
       {/* Decorative elements */}
       <div className="relative z-0 w-full overflow-hidden">
         <div
@@ -675,7 +995,7 @@ export default function ProfilePage() {
                       {/* Title/Role & Location */}
                       <div className="mb-3">
                           {/* 5-Star Rating */}
-                          <div className="flex items-center">
+                          {/* <div className="flex items-center">
                           {[1, 2, 3, 4, 5].map((star) => (
                             <svg 
                               key={star} 
@@ -684,11 +1004,11 @@ export default function ProfilePage() {
                               viewBox="0 0 20 20" 
                               fill="currentColor"
                             >
-                              <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118l-2.8-2.034c-.783-.57-.38-1.81.588-1.81h3.462a1 1 0 00.95-.69l1.07-3.292z" />
+                              <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 01-3.138-3.138 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00.806 1.946 3.42 3.42 0 013.138 3.138z" />
                             </svg>
                           ))}
                           <span className="ml-1 text-xs text-gray-600 dark:text-gray-400">(4.0)</span>
-                        </div>
+                        </div> */}
                        
                       </div>
                       
@@ -753,7 +1073,7 @@ export default function ProfilePage() {
 
           {/* Tabs with enhanced styling */}
           <div className="bg-white max-w-6xl mx-auto dark:bg-slate-800 rounded-xl shadow-lg overflow-hidden" data-aos="fade-up" data-aos-delay="100">
-            <Tabs defaultValue="knowledge" styles={{
+            <Tabs defaultValue="knowledge" onChange={handleTabChange} styles={{
               tab: {
                 '&[dataActive]': {
                   borderColor: '#3b82f6',
@@ -777,8 +1097,17 @@ export default function ProfilePage() {
                   value="about"
                   className="text-base font-medium px-8 py-4 transition"
                 >
-                 {enterpriseType === 'insighter' ? t('aboutMe') : t('aboutCompany')}
+                  {enterpriseType === 'insighter' ? t('aboutMe') : t('aboutCompany')}
                 </Tabs.Tab>
+                {(isInsighter || isCompanyInsighter) && !isCompany && (
+                  <></>
+                  // <Tabs.Tab
+                  //   value="meet"
+                  //   className="text-base font-medium px-8 py-4 transition"
+                  // >
+                  //   {t('meet')} {profileData?.first_name || ''}
+                  // </Tabs.Tab>
+                )}
               </Tabs.List>
 
               <Tabs.Panel value="knowledge" className="py-8 px-6 md:px-10">
@@ -897,6 +1226,7 @@ export default function ProfilePage() {
 
               <Tabs.Panel value="about" className="py-8 px-6 md:px-10">
                 <div className="prose max-w-none dark:prose-invert">
+
                    
                     {/* Company Information (if applicable) with better styling */}
                     {isCompany && profileData.company && (
@@ -1102,9 +1432,7 @@ export default function ProfilePage() {
                     <div className="bg-gray-50 dark:bg-slate-700/30 p-6 rounded-xl mb-10 mt-10" data-aos="fade-up">
                       <div className="grid grid-cols-1 gap-6">
                         <div className="bg-white dark:bg-slate-800 p-4 rounded-xl shadow-sm">
-                          <h3 className="text-xl font-semibold mb-4 text-gray-800 dark:text-white flex items-center">
-                            {t('socialMedia')}
-                          </h3>
+                          <h3 className="text-xl font-semibold mb-4">{t('socialMedia')}</h3>
                           <div className="flex flex-wrap gap-3">
                             {profileData.social.map((social) => (
                               <a
@@ -1126,7 +1454,246 @@ export default function ProfilePage() {
                  
                 </div>
               </Tabs.Panel>
+              
+              {/* Meet Tab Panel with Booking Calendar */}
+              <Tabs.Panel value="meet" className="py-8 px-6 md:px-10">
+                <div className="flex flex-col items-center max-w-3xl mx-auto">
+                  <h2 className="text-2xl font-semibold mb-6">
+                    {t('bookASession')} {t('with')} {profileData?.first_name || ''}
+                  </h2>
+                  
+                  {!authChecked ? (
+                    <div className="flex justify-center items-center py-12">
+                      <div className="animate-spin rounded-full h-10 w-10 border-t-2 border-b-2 border-blue-500"></div>
+                    </div>
+                  ) : !isAuthenticated ? (
+                    <div className="text-center py-16">
+                      <div className="flex justify-center mb-4">
+                        <IconLock size={48} className="text-gray-400" />
+                      </div>
+                      <h3 className="text-xl font-medium mb-2">{t('loginRequired')}</h3>
+                      <p className="text-gray-500 mb-4">{t('loginToView')}</p>
+                      <a 
+                        href={`https://app.knoldg.com/auth/login?returnUrl=${encodeURIComponent(`https://knoldg.com/${locale}/profile/${uuid}${typeof window !== 'undefined' ? window.location.search : ''}`)}`} 
+                        className="px-6 py-3 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition font-medium"
+                      >
+                        {t('login')}
+                      </a>
+                    </div>
+                  ) : loadingMeetings ? (
+                    <div className="flex justify-center items-center py-12">
+                      <div className="animate-spin rounded-full h-10 w-10 border-t-2 border-b-2 border-blue-500"></div>
+                    </div>
+                  ) : meetingAvailability.length === 0 ? (
+                    <div className="text-center py-16">
+                      <div className="flex justify-center mb-4">
+                        <IconCalendarX size={48} className="text-gray-400" />
+                      </div>
+                      <h3 className="text-xl font-medium mb-2">{t('noConsultingSessions')}</h3>
+                      <p className="text-gray-500">{t('checkBackLater')}</p>
+                    </div>
+                  ) : (
+                    <div className="w-full">
+                      {/* Two-column layout: Calendar + Time Selection */}
+                      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                        {/* Left Column: Calendar */}
+                        <div className="bg-white dark:bg-slate-800 rounded-lg shadow-md p-6">
+                          <h3 className="text-lg font-semibold mb-4">Select a Date</h3>
+                          
+                          {/* Month navigation */}
+                          <div className="flex justify-between items-center mb-4">
+                            <button 
+                              onClick={handlePreviousMonth}
+                              className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-slate-700 transition"
+                            >
+                              <IconChevronLeft size={18} />
+                            </button>
+                            <h3 className="text-lg font-semibold">
+                              {getMonthName(locale, currentMonth)} {currentMonth.getFullYear()}
+                            </h3>
+                            <button 
+                              onClick={handleNextMonth}
+                              className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-slate-700 transition"
+                            >
+                              <IconChevronRight size={18} />
+                            </button>
+                          </div>
+
+                          {/* Weekday headers */}
+                          <div className="grid grid-cols-7 gap-1 mb-2">
+                            {getShortWeekdayNames(locale).map((day, index) => (
+                              <div key={index} className="text-center text-sm font-medium text-gray-500 py-2">
+                                {day}
+                              </div>
+                            ))}
+                          </div>
+
+                          {/* Calendar days */}
+                          <div className="grid grid-cols-7 gap-1">
+                            {(() => {
+                              const year = currentMonth.getFullYear();
+                              const month = currentMonth.getMonth();
+                              const daysInMonth = getDaysInMonth(year, month);
+                              const firstDay = getFirstDayOfMonth(year, month);
+                              const days = [];
+
+                              // Empty cells for days before the first day of the month
+                              for (let i = 0; i < firstDay; i++) {
+                                days.push(<div key={`empty-${i}`} className="h-10"></div>);
+                              }
+
+                              // Days of the month
+                              for (let day = 1; day <= daysInMonth; day++) {
+                                const dateStr = formatDateString(year, month, day);
+                                const isActive = isDateActive(dateStr);
+                                const isSelected = dateStr === selectedDate;
+                                
+                                days.push(
+                                  <button
+                                    key={day}
+                                    onClick={() => isActive ? handleDateClick(dateStr) : null}
+                                    disabled={!isActive}
+                                    className={`
+                                      h-10 w-10 mx-auto rounded-full text-sm font-medium transition-colors
+                                      ${isActive
+                                        ? isSelected
+                                          ? 'bg-blue-500 text-white'
+                                          : 'bg-blue-50 text-blue-600 hover:bg-blue-100'
+                                        : 'text-gray-300 cursor-not-allowed'
+                                      }
+                                    `}
+                                  >
+                                    {day}
+                                  </button>
+                                );
+                              }
+                              return days;
+                            })()}
+                          </div>
+                        </div>
+
+                        {/* Right Column: Time Selection */}
+                        <div className="bg-white dark:bg-slate-800 rounded-lg shadow-md p-6">
+                          {selectedDate ? (
+                            <>
+                              <h3 className="text-lg font-semibold mb-4">
+                                {getDayName(locale, new Date(selectedDate))}, {new Date(selectedDate).toLocaleDateString(locale, { month: 'long', day: 'numeric' })}
+                              </h3>
+                              
+                              <div className="space-y-3 mb-6">
+                                {getMeetingTimesForDate(selectedDate).length > 0 ? (
+                                  getMeetingTimesForDate(selectedDate).map((time, index) => (
+                                    <button
+                                      key={index}
+                                      onClick={() => handleTimeClick(time)}
+                                      className={`
+                                        w-full p-3 rounded-lg border text-left transition-colors
+                                        ${selectedMeetingTime === time
+                                          ? 'border-blue-500 bg-blue-50 text-blue-700'
+                                          : 'border-gray-200 hover:border-blue-300 hover:bg-blue-50'
+                                        }
+                                      `}
+                                    >
+                                      {time.start_time.substring(0, 5)} - {time.end_time.substring(0, 5)}
+                                    </button>
+                                  ))
+                                ) : (
+                                  <p className="text-gray-500 text-center py-8">No times available for this date</p>
+                                )}
+                              </div>
+                              
+                              {/* Always visible Book button */}
+                              <button
+                                onClick={handleBookMeeting}
+                                disabled={!selectedMeetingTime}
+                                className={`
+                                  w-full py-3 px-6 rounded-lg font-medium transition-colors
+                                  ${selectedMeetingTime
+                                    ? 'bg-blue-500 text-white hover:bg-blue-600'
+                                    : 'bg-gray-200 text-gray-400 cursor-not-allowed'
+                                  }
+                                `}
+                              >
+                                {t('book')}
+                              </button>
+                            </>
+                          ) : (
+                            <div className="text-center py-12">
+                              <IconCalendarEvent size={48} className="text-gray-300 mx-auto mb-4" />
+                              <p className="text-gray-500">Please select a date to view available times</p>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </Tabs.Panel>
             </Tabs>
+            
+            {/* Meeting Booking Modal */}
+            <Modal
+              opened={isBookingModalOpen}
+              onClose={() => setIsBookingModalOpen(false)}
+              title={t('bookASession')}
+              size="md"
+              centered
+            >
+              <div className="p-2">
+                {selectedDate && selectedMeetingTime && (
+                  <div className="mb-4 p-3 bg-blue-50 dark:bg-slate-700 rounded-lg">
+                    <p className="text-sm text-gray-600 dark:text-gray-300">{t('bookingFor')}:</p>
+                    <p className="font-medium">
+                      {new Date(selectedDate).toLocaleDateString(undefined, { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
+                    </p>
+                    <p className="font-medium">
+                      {selectedMeetingTime.start_time.substring(0, 5)} - {selectedMeetingTime.end_time.substring(0, 5)}
+                    </p>
+                  </div>
+                )}
+                
+                {bookingError && (
+                  <div className="mb-4 p-3 bg-red-50 dark:bg-red-900/30 text-red-700 dark:text-red-300 rounded-lg">
+                    {bookingError}
+                  </div>
+                )}
+                
+                <form onSubmit={(e) => { e.preventDefault(); submitBookMeeting(); }}>
+                  <TextInput
+                    label={t('meetingTitle')}
+                    placeholder={t('enterMeetingTitle')}
+                    value={meetingTitle}
+                    onChange={(e) => setMeetingTitle(e.target.value)}
+                    className="mb-4"
+                    required
+                  />
+                  
+                  <Textarea
+                    label={t('meetingDescription')}
+                    placeholder={t('enterMeetingDescription')}
+                    value={meetingDescription}
+                    onChange={(e) => setMeetingDescription(e.target.value)}
+                    className="mb-4"
+                    minRows={3}
+                  />
+                  
+                  <div className="flex justify-end gap-3 mt-6">
+                    <Button 
+                      variant="subtle" 
+                      onClick={() => setIsBookingModalOpen(false)}
+                    >
+                      {t('cancel')}
+                    </Button>
+                    <Button 
+                      type="submit" 
+                      loading={isBookingLoading}
+                    >
+                      {t('confirmBooking')}
+                    </Button>
+                  </div>
+                </form>
+              </div>
+            </Modal>
           </div>
         </div>
       ) : (
