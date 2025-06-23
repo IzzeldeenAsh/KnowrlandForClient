@@ -246,7 +246,7 @@ export default function SearchResultsList({
                           item.insighter.company
                             ? isRTL
                               ? ` ${item.insighter.company.legal_name}`
-                              : `${item.insighter.company.legal_name} ${translations.company}`
+                              : `${item.insighter.company.legal_name}`
                             : translations.company
                         )}
 
@@ -254,7 +254,7 @@ export default function SearchResultsList({
                           item.insighter.company
                             ? isRTL
                               ? ` ${item.insighter.company.legal_name}`
-                              : `${item.insighter.company.legal_name} ${translations.company}`
+                              : `${item.insighter.company.legal_name}`
                             : translations.company
                         )}
                       </Text>
