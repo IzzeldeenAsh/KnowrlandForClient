@@ -473,14 +473,17 @@ export default function HomePage() {
   }, [updateUrlWithFilters]);
   
   // Custom setter for ISIC code filter that triggers search
-  const handleIsicCodeFilterChange = useCallback((value: number | null) => {
+  const handleIsicCodeFilterChange = useCallback((value: string | null) => {
     // Set loading immediately to prevent flickering
     setLoading(true);
     
+    // Convert string to number for internal state, or null if empty
+    const numericValue = value ? parseInt(value) : null;
+    
     // Update the ISIC code filter state
-    setIsicCodeFilter(value);
-    // Update URL with new filter
-    updateUrlWithFilters({ isic_code: value });
+    setIsicCodeFilter(numericValue);
+    // Update URL with new filter (use the numeric value)
+    updateUrlWithFilters({ isic_code: numericValue });
     
     // Reset to page 1 when filter changes
     setCurrentPage(1);
@@ -489,14 +492,17 @@ export default function HomePage() {
   }, [updateUrlWithFilters]);
   
   // Custom setter for HS code filter that triggers search
-  const handleHsCodeFilterChange = useCallback((value: number | null) => {
+  const handleHsCodeFilterChange = useCallback((value: string | null) => {
     // Set loading immediately to prevent flickering
     setLoading(true);
     
+    // Convert string to number for internal state, or null if empty
+    const numericValue = value ? parseInt(value) : null;
+    
     // Update the HS code filter state
-    setHsCodeFilter(value);
-    // Update URL with new filter
-    updateUrlWithFilters({ hs_code: value });
+    setHsCodeFilter(numericValue);
+    // Update URL with new filter (use the numeric value)
+    updateUrlWithFilters({ hs_code: numericValue });
     
     // Reset to page 1 when filter changes
     setCurrentPage(1);
@@ -1424,11 +1430,11 @@ export default function HomePage() {
                       setRegionFilter={handleRegionFilterChange}
                       economicBlocFilter={economicBlocFilter}
                       setEconomicBlocFilter={handleEconomicBlocFilterChange}
-                      isicCodeFilter={isicCodeFilter}
+                      isicCodeFilter={isicCodeFilter?.toString() || null}
                       setIsicCodeFilter={handleIsicCodeFilterChange}
                       industryFilter={industryFilter}
                       setIndustryFilter={handleIndustryFilterChange}
-                      hsCodeFilter={hsCodeFilter}
+                      hsCodeFilter={hsCodeFilter?.toString() || null}
                       setHsCodeFilter={handleHsCodeFilterChange}
                       priceFilter={priceFilter}
                       setPriceFilter={handlePriceFilterChange}
