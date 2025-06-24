@@ -78,10 +78,10 @@ interface FilterBoxProps {
   setRegionFilter?: (filter: number | null) => void;
   economicBlocFilter?: number | null;
   setEconomicBlocFilter?: (filter: number | null) => void;
-  isicCodeFilter?: number | null;
-  setIsicCodeFilter?: (filter: number | null) => void;
-  hsCodeFilter?: number | null;
-  setHsCodeFilter?: (filter: number | null) => void;
+  isicCodeFilter?: string | null;
+  setIsicCodeFilter?: (filter: string | null) => void;
+  hsCodeFilter?: string | null;
+  setHsCodeFilter?: (filter: string | null) => void;
   industryFilter?: number | null;
   setIndustryFilter?: (filter: number | null) => void;
   priceFilter?: string | null;
@@ -326,7 +326,7 @@ const FilterBox: React.FC<FilterBoxProps> = ({
   // Initialize selected ISIC code based on prop value
   useEffect(() => {
     if (isicCodeFilter && leafNodes.length > 0) {
-      const selectedCode = leafNodes.find(node => node.key === isicCodeFilter);
+      const selectedCode = leafNodes.find(node => node.code === isicCodeFilter);
       if (selectedCode) {
         setSelectedIsicCode({
           id: selectedCode.key,
@@ -342,7 +342,7 @@ const FilterBox: React.FC<FilterBoxProps> = ({
   // Initialize selected HS code based on prop value
   useEffect(() => {
     if (hsCodeFilter && hsCodes.length > 0) {
-      const selectedCode = hsCodes.find(code => code.id === hsCodeFilter);
+      const selectedCode = hsCodes.find(code => code.code === hsCodeFilter);
       if (selectedCode) {
         setSelectedHsCode({
           id: selectedCode.id,
@@ -595,7 +595,7 @@ const FilterBox: React.FC<FilterBoxProps> = ({
         code: node.code,
         label: locale === 'ar' ? node.names.ar : node.names.en
       });
-      setIsicCodeFilter?.(node.key);
+      setIsicCodeFilter?.(node.code);
       setIsModalOpen(false);
     }
   };
@@ -656,7 +656,7 @@ const FilterBox: React.FC<FilterBoxProps> = ({
     
     // Call the parent component's setHsCodeFilter function to trigger the search
     if (setHsCodeFilter) {
-      setHsCodeFilter(code.id);
+      setHsCodeFilter(code.code);
     }
     
     // Close the modal
