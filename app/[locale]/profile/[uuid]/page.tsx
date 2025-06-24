@@ -367,13 +367,41 @@ export default function ProfilePage() {
   // State to track if user is authenticated
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
   const [authChecked, setAuthChecked] = useState<boolean>(false);
+  // State to track if current profile is the user's own profile
+  const [isOwnProfile, setIsOwnProfile] = useState<boolean>(false);
 
-  // Check if user is authenticated
+  // Check if user is authenticated and fetch user profile if authenticated
   useEffect(() => {
-    const checkAuth = () => {
+    const checkAuth = async () => {
       // Check if token exists in localStorage
       const token = localStorage.getItem('token');
-      setIsAuthenticated(!!token);
+      const isAuth = !!token;
+      setIsAuthenticated(isAuth);
+      
+      // If authenticated, fetch current user profile to check if viewing own profile
+      if (isAuth && token) {
+        try {
+          const response = await fetch('https://api.knoldg.com/api/account/profile', {
+            headers: {
+              'Content-Type': 'application/json',
+              'Accept': 'application/json',
+              'Accept-Language': locale,
+              'Authorization': `Bearer ${token}`
+            }
+          });
+          
+          if (response.ok) {
+            const userData = await response.json();
+            // Compare UUIDs to determine if this is the user's own profile
+            if (userData?.data?.uuid === uuid) {
+              setIsOwnProfile(true);
+            }
+          }
+        } catch (error) {
+          console.error('Error fetching user profile:', error);
+        }
+      }
+      
       setAuthChecked(true);
     };
 
@@ -383,7 +411,7 @@ export default function ProfilePage() {
     } else {
       setAuthChecked(true); // Mark as checked for SSR
     }
-  }, []);
+  }, [uuid, locale]);
 
   const [showToast, setShowToast] = useState(false);
   const [toastProps, setToastProps] = useState<{
@@ -1100,7 +1128,8 @@ export default function ProfilePage() {
                 >
                   {enterpriseType === 'insighter' ? t('aboutMe') : t('aboutCompany')}
                 </Tabs.Tab>
-                {(isInsighter || isCompanyInsighter) && !isCompany && (
+                {/* Hide Meet tab if user is viewing their own profile */}
+                {(isInsighter || isCompanyInsighter) && !isCompany && !isOwnProfile && (
                   <></>
                   // <Tabs.Tab
                   //   value="meet"
