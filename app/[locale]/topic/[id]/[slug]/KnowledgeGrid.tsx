@@ -165,8 +165,9 @@ export default function KnowledgeGrid({
                   
                   <Text
                     fw={700}
-                    className={cardStyles.title}
+                    className={`${cardStyles.title} amiri-bold`}
                     lineClamp={2}
+
                   >
                     {item.title}
                   </Text>

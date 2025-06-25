@@ -4,6 +4,7 @@ import React, { Suspense } from 'react';
 import { Title, Group, Pagination } from '@mantine/core';
 import Image from 'next/image';
 import { useTranslations } from 'next-intl';
+import { useSearchParams } from 'next/navigation';
 import dynamic from 'next/dynamic';
 import ViewModeToggle from './ViewModeToggle';
 import LoadingState from './LoadingState';
@@ -41,9 +42,6 @@ interface ResultsSectionProps {
   locale: string;
   // Add a direct search callback function to trigger API calls
   onPageChange?: (page: number) => void;
-  // Optional router for URL updates
-  router?: any;
-  updateUrlWithFilters?: (params: any) => void;
   // Add search type to force re-render when it changes
   searchType?: 'knowledge' | 'insighter';
 }
@@ -61,12 +59,16 @@ const ResultsSection: React.FC<ResultsSectionProps> = ({
   setViewMode,
   locale,
   onPageChange,
-  router,
-  updateUrlWithFilters,
   searchType
 }) => {
   const t4 = useTranslations('Features4');
   const isRtl = locale === 'ar';
+  const searchParams = useSearchParams();
+  
+  // Get current page directly from URL - this is the source of truth!
+  const urlCurrentPage = searchParams.get('page') ? parseInt(searchParams.get('page')!) : 1;
+  
+  console.log('🟢 ResultsSection - URL page:', urlCurrentPage, 'Props page:', currentPage);
   
   // Loading state component with a nice spinner
   const LoadingSpinner = () => (
@@ -159,45 +161,23 @@ const ResultsSection: React.FC<ResultsSectionProps> = ({
               <div className="flex flex-col items-center mt-8">
                 <div className="text-sm text-gray-600 mb-2">
                   {locale === 'ar' ? 
-                    `عرض ${(currentPage - 1) * 30 + 1} - ${Math.min(currentPage * 30, totalItems)} من ${totalItems}` : 
-                    `Showing ${(currentPage - 1) * 30 + 1} - ${Math.min(currentPage * 30, totalItems)} of ${totalItems}`
+                    `عرض ${(urlCurrentPage - 1) * 30 + 1} - ${Math.min(urlCurrentPage * 30, totalItems)} من ${totalItems}` : 
+                    `Showing ${(urlCurrentPage - 1) * 30 + 1} - ${Math.min(urlCurrentPage * 30, totalItems)} of ${totalItems}`
                   }
                 </div>
                 <Pagination 
+                  key={`pagination-url-${urlCurrentPage}-${totalPages}-${Date.now()}`}
                   total={totalPages} 
-                  value={currentPage}
+                  value={urlCurrentPage}
                   onChange={(page) => {
-                    // First log the page change to help with debugging
-                    console.log('Pagination clicked, changing from page', currentPage, 'to', page);
+                    console.log('🟢 Pagination Component - URL page:', urlCurrentPage, 'Props page:', currentPage, 'Clicked page:', page);
                     
-                    // IMPORTANT: First update our local state
-                    // This ensures all components immediately reflect the new page
-                    setCurrentPage(page);
-                    
-                    // SECOND: Call the direct search function if provided
-                    // This ensures the API call uses the correct page number
+                    // Simply call the pagination handler - it will update URL which will update our display
                     if (onPageChange) {
-                      console.log('Calling direct search for page:', page);
+                      console.log('🟢 Calling onPageChange for page:', page);
                       onPageChange(page);
                     } else {
-                      console.warn('No onPageChange handler provided!');
-                    }
-                    
-                    // THIRD: Update URL with the page parameter
-                    // We do this last to prevent race conditions
-                    if (updateUrlWithFilters) {
-                      console.log('Updating URL with page:', page);
-                      updateUrlWithFilters({ page });
-                    } else if (router) {
-                      // Fallback if updateUrlWithFilters not provided but router is
-                      const urlParams = new URLSearchParams(window.location.search);
-                      // Remove page parameter if page 1 for cleaner URLs
-                      if (page === 1) {
-                        urlParams.delete('page');
-                      } else {
-                        urlParams.set('page', page.toString());
-                      }
-                      router.push(`/${locale}/home?${urlParams.toString()}`, { scroll: false });
+                      console.warn('🟢 No onPageChange handler provided!');
                     }
                     
                     // Scroll back to top of results for better UX
