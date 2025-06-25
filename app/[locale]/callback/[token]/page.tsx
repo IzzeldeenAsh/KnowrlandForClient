@@ -27,7 +27,16 @@ export default function AuthCallback() {
   // Get token from either path parameter or query parameter
   const pathToken = params.token as string;
   const queryToken = searchParams.get('token');
-  const token = pathToken || queryToken;
+  let token = pathToken || queryToken;
+  
+  // Additional safety check: if no token found, check if query string is a raw token
+  if (!token && typeof window !== 'undefined') {
+    const queryString = window.location.search.substring(1);
+    if (queryString && queryString.startsWith('eyJ') && queryString.includes('.')) {
+      token = queryString;
+      console.log('[token-callback] Detected raw token in query string as fallback');
+    }
+  }
   const locale = (params.locale as string) || 'en';
 
   useEffect(() => {

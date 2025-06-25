@@ -24,7 +24,20 @@ export default function QueryParamAuthCallback() {
   const router = useRouter();
   const params = useParams();
   const searchParams = useSearchParams();
-  const token = searchParams.get('token');
+  
+  // First try to get token from query parameter
+  let token = searchParams.get('token');
+  
+  // If no token parameter, check if the entire query string is a token (JWT format)
+  if (!token) {
+    const queryString = window.location.search.substring(1); // Remove the '?'
+    // Check if the query string looks like a JWT token (starts with eyJ)
+    if (queryString && queryString.startsWith('eyJ') && queryString.includes('.')) {
+      token = queryString;
+      console.log('[callback] Detected raw token in query string:', token.substring(0, 20) + '...');
+    }
+  }
+  
   const returnUrl = searchParams.get('returnUrl');
   const locale = params.locale as string || 'en';
 
@@ -35,9 +48,50 @@ export default function QueryParamAuthCallback() {
           throw new Error('No token provided');
         }
 
-        // Store token in localStorage only
-        console.log('[callback] Storing token in localStorage');
+        // Store token in localStorage and cookies
+        console.log('[callback] Storing token in localStorage and cookies');
+        
+        // Clear any existing tokens to avoid conflicts
+        localStorage.removeItem('token');
+        localStorage.removeItem('foresighta-creds');
+        
+        // Store token in Next.js format
         localStorage.setItem('token', token);
+        
+        // Also store in Angular app format for compatibility
+        const angularAuthData = {
+          authToken: token,
+          refreshToken: ''
+        };
+        localStorage.setItem('foresighta-creds', JSON.stringify(angularAuthData));
+        
+        // Set the token in a cookie to make it accessible for SSR functions
+        const isLocalhost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+        
+        // Create cookie settings array based on environment
+        let cookieSettings;
+        
+        if (isLocalhost) {
+          // For localhost: Use Lax SameSite without Secure flag
+          cookieSettings = [
+            `token=${token}`,
+            `Path=/`,                 // send on all paths
+            `Max-Age=${60 * 60 * 24}`, // expires in 24 hours
+            `SameSite=Lax`            // default value, works on same site
+          ];
+        } else {
+          // For production: Use None SameSite with Secure flag and domain
+          cookieSettings = [
+            `token=${token}`,
+            `Path=/`,
+            `Max-Age=${60 * 60 * 24}`,
+            `SameSite=None`,          // works across domains
+            `Domain=.knoldg.com`,     // leading dot = include subdomains
+            `Secure`                  // HTTPS only
+          ];
+        }
+        
+        document.cookie = cookieSettings.join('; ');
         
         // Fetch profile
         const response = await fetch(getApiUrl('/api/account/profile'), {
@@ -103,6 +157,7 @@ export default function QueryParamAuthCallback() {
     if (token) {
       fetchProfile();
     } else {
+      console.error('No token found in URL parameters or query string');
       // Redirect to login if no token
       router.push(`/${locale}/login`);
     }
