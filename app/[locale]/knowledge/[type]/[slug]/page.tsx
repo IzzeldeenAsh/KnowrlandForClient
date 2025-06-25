@@ -87,7 +87,7 @@ async function fetchKnowledgeData(type: string, slug: string, locale: string = '
   try {
     // Get auth token from cookies for server-side requests
     const cookieStore = await cookies();
-    const token = cookieStore.get('token')?.value;
+    const token = cookieStore.get('knoldg_session')?.value;
     
     // Prepare headers with auth token if available
     const headers: HeadersInit = {
@@ -128,7 +128,6 @@ async function fetchKnowledgeData(type: string, slug: string, locale: string = '
     }
 
     const data = await response.json();
-    console.log('KNOWLEDGE DATA', data);
     return data;
   } catch (error) {
     console.error("Error fetching knowledge data:", error);
