@@ -404,6 +404,8 @@
     "UserProfile": {
         "login": "تسجيل الدخول",
         "insighter": "إنسايتر",
+        "ReceivedMeetings": "الاجتماعات المستلمة",
+        "SentMeetings": "الاجتماعات المرسلة",
         "companyInsighter": "إنسايتر-شركة",
         "company": "شركة",
         "client": "عميل",

@@ -103,7 +103,13 @@ export function UserProfile({ isHome }: { isHome: boolean }) {
 
   // Only show loading state if we have a token (potential user)  
   const hasToken = typeof localStorage !== 'undefined' && localStorage.getItem('token');
-
+  const isClient$ = () => {
+    return roles.includes("client") && 
+      !roles.includes("insighter") && 
+      !roles.includes("company") && 
+      !roles.includes("company-insighter");
+  };
+  
   if (isLoading && hasToken) {
     return <div className="w-10 h-10 bg-white animate-pulse rounded-full overflow-hidden border border-gray-200"></div>;
   }
@@ -264,47 +270,57 @@ export function UserProfile({ isHome }: { isHome: boolean }) {
             >
               {t("myProfile")}
             </Link>
-            {(roles.includes("insighter") ||
-              roles.includes("company") ||
-              roles.includes("company-insighter")) && (
+            {/* Show dashboard for all users */}
+            <Link
+              href="https://app.knoldg.com/app/insighter-dashboard/my-dashboard"
+              className="block px-4 py-2.5 font-semibold text-slate-900 hover:bg-indigo-50 hover:text-sky-700"
+              onClick={() => setMenuOpen(false)}
+              style={{fontSize: '13px'}}
+            >
+              {t("dashboard")}
+            </Link>
+            
+            {/* Hide requests, received meetings and account settings for client-only role */}
+            {!isClient$() && (
               <>
                 <Link
-                  href="https://app.knoldg.com/app/insighter-dashboard/my-dashboard"
-                  className="block px-4 py-2.5  font-semibold text-slate-900 hover:bg-indigo-50 hover:text-sky-700"
-                  onClick={() => setMenuOpen(false)}
-                  style={{fontSize: '13px'}}
-                >
-                  {t("dashboard")}
-                </Link>
-                <Link
                   href="https://app.knoldg.com/app/insighter-dashboard/my-requests"
-                  className="block px-4 py-2.5  font-semibold text-slate-900 hover:bg-indigo-50 hover:text-sky-700"
+                  className="block px-4 py-2.5 font-semibold text-slate-900 hover:bg-indigo-50 hover:text-sky-700"
                   onClick={() => setMenuOpen(false)}
                   style={{fontSize: '13px'}}
                 >
                   {t("myRequests")}
                 </Link>
-                {roles.includes('company') && 
                 <Link
-                  href="https://app.knoldg.com/app/insighter-dashboard/my-company-settings"
-                  className="block px-4 py-2.5  font-semibold text-slate-900 hover:bg-indigo-50 hover:text-sky-700"
+                  href="https://app.knoldg.com/app/insighter-dashboard/my-meetings/received"
+                  className="block px-4 py-2.5 font-semibold text-slate-900 hover:bg-indigo-50 hover:text-sky-700"
                   onClick={() => setMenuOpen(false)}
                   style={{fontSize: '13px'}}
                 >
-                  {t("myCompany")}
+                  {t("ReceivedMeetings")}
                 </Link>
-              }
                 <Link
                   href="https://app.knoldg.com/app/insighter-dashboard/account-settings/general-settings"
-                  className="block px-4 py-2.5  font-semibold text-slate-900 hover:bg-indigo-50 hover:text-sky-700"
+                  className="block px-4 py-2.5 font-semibold text-slate-900 hover:bg-indigo-50 hover:text-sky-700"
                   onClick={() => setMenuOpen(false)}
                   style={{fontSize: '13px'}}
                 >
                   {t("accountSettings")}
                 </Link>
-                
               </>
             )}
+            
+            {/* Show company settings only for company role */}
+            {roles.includes('company') && 
+              <Link
+                href="https://app.knoldg.com/app/insighter-dashboard/my-company-settings"
+                className="block px-4 py-2.5 font-semibold text-slate-900 hover:bg-indigo-50 hover:text-sky-700"
+                onClick={() => setMenuOpen(false)}
+                style={{fontSize: '13px'}}
+              >
+                {t("myCompany")}
+              </Link>
+            }
 
             {roles.includes("client") &&
               !roles.includes("insighter") &&
@@ -328,7 +344,14 @@ export function UserProfile({ isHome }: { isHome: boolean }) {
                </>
               )}
             
-
+            <Link
+                  href="https://app.knoldg.com/app/insighter-dashboard/my-meetings/sent"
+                  className="block px-4 py-2.5  font-semibold text-slate-900 hover:bg-indigo-50 hover:text-sky-700"
+                  onClick={() => setMenuOpen(false)}
+                  style={{fontSize: '13px'}}
+                >
+                  {t("SentMeetings")}
+                </Link>
             <div className="border-t border-slate-100">
               <button
                 onClick={() => {
