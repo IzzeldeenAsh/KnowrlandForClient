@@ -428,6 +428,8 @@
         "companyInsighter": "Company-Insighter",
         "company": "Company",
         "client": "Client",
+        "ReceivedMeetings": "Received Meetings",
+        "SentMeetings": "Sent Meetings",
         "addKnowledge": "Add Knowledge +",
         "knowledgeBase": "My knowledge library",
         "myProfile": "My Profile",
