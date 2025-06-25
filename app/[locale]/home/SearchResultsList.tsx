@@ -175,7 +175,7 @@ export default function SearchResultsList({
                 <div className={listStyles.titleSection}>
                   <Text
                     component="h3"
-                    className={listStyles.title}
+                    className={`${listStyles.title} amiri-bold`}
                   >
                     {item.title}
                   </Text>

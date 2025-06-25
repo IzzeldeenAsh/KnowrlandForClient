@@ -1,6 +1,6 @@
 @import 'tailwindcss/base';
 @import 'tailwindcss/components';
-
+@import url('https://fonts.googleapis.com/css2?family=Amiri:ital,wght@0,400;0,700;1,400;1,700&display=swap');
 /* Additional styles */
 @import 'additional-styles/utility-patterns.css';
 @import 'additional-styles/theme.css';
@@ -114,4 +114,35 @@ outline: none !important;
 
 .avatar-top-position img {
   object-position: top !important;
+}
+
+/* El Messiri font for knowledge titles */
+.el-messiri-knowledge-title {
+  font-family: "El Messiri", sans-serif !important;
+  font-optical-sizing: auto;
+  font-weight: 700;
+  font-style: normal;
+}
+.amiri-regular {
+  font-family: "Amiri", serif !important;
+  font-weight: 400;
+  font-style: normal;
+}
+
+.amiri-bold {
+  font-family: "Amiri", serif !important;
+  font-weight: 700;
+  font-style: normal;
+}
+
+.amiri-regular-italic {
+  font-family: "Amiri", serif !important;
+  font-weight: 400;
+  font-style: italic;
+}
+
+.amiri-bold-italic {
+  font-family: "Amiri", serif !important;
+  font-weight: 700;
+  font-style: italic;
 }
