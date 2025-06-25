@@ -3,6 +3,7 @@
         "title": "Home Page",
         "description": "Home Page Description"
     },
+ 
     "Hero": {
         "tagline": "Beyond Research Boundaries",
         "title": "Unlock Business Success with Shared Expert Knowldge",
@@ -442,10 +443,15 @@
         "profileNotFound": "Profile not found",
         "bio": "Personal Bio",
         "industries": "Industries",
+        "minimum3Characters": "Minimum 3 characters",
+        "optional": "Optional",
         "certifications": "Certifications",
         "bookASession": "Book a Session",
+        "meetingDate": "Meeting Date",
         "meetingTitle": "Meeting Title",
         "enterMeetingTitle": "Enter a title for your meeting",
+        "titleTooLong": "Meeting title must be less than 50 characters",
+        "descriptionTooLong": "Meeting description must be less than 100 characters",
         "meetingDescription": "Meeting Description",
         "enterMeetingDescription": "Enter details about what you'd like to discuss",
         "bookingFor": "Booking for",
