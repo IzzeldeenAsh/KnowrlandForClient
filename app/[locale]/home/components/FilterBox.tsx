@@ -273,27 +273,6 @@ const FilterBox: React.FC<FilterBoxProps> = ({
       }
     };
 
-    const fetchHsCodes = async () => {
-      setLoadingHsCodes(true);
-      try {
-        const response = await fetch('https://api.knoldg.com/api/common/setting/hs-code/list', {
-          headers: {
-            'Accept-Language': locale,
-            'Accept': 'application/json'
-          }
-        });
-        
-        if (!response.ok) throw new Error('Failed to fetch HS codes');
-        
-        const data = await response.json();
-        setHsCodes(data.data || []);
-      } catch (error) {
-        console.error('Error fetching HS codes:', error);
-      } finally {
-        setLoadingHsCodes(false);
-      }
-    };
-
     const fetchIndustries = async () => {
       setLoadingIndustries(true);
       try {
@@ -319,9 +298,42 @@ const FilterBox: React.FC<FilterBoxProps> = ({
     fetchRegions();
     fetchEconomicBlocs();
     fetchIsicCodes();
-    fetchHsCodes();
     fetchIndustries();
   }, [locale]);
+
+  // Fetch HS codes when ISIC code is selected
+  useEffect(() => {
+    const fetchHsCodes = async (isicCodeId: number) => {
+      setLoadingHsCodes(true);
+      try {
+        const response = await fetch(`https://api.knoldg.com/api/common/setting/hs-code/isic-code/${isicCodeId}`, {
+          headers: {
+            'Accept-Language': locale,
+            'Accept': 'application/json'
+          }
+        });
+        
+        if (!response.ok) throw new Error('Failed to fetch HS codes');
+        
+        const data = await response.json();
+        setHsCodes(data.data || []);
+      } catch (error) {
+        console.error('Error fetching HS codes:', error);
+        setHsCodes([]);
+      } finally {
+        setLoadingHsCodes(false);
+      }
+    };
+
+    if (selectedIsicCode?.id) {
+      fetchHsCodes(selectedIsicCode.id);
+    } else {
+      // Clear HS codes when no ISIC code is selected
+      setHsCodes([]);
+      setSelectedHsCode(null);
+      setHsCodeFilter?.(null);
+    }
+  }, [selectedIsicCode?.id, locale, setHsCodeFilter]);
 
   // Initialize selected ISIC code based on prop value
   useEffect(() => {
@@ -545,6 +557,21 @@ const FilterBox: React.FC<FilterBoxProps> = ({
   
   // Render the list of HS codes
   const renderHsCodes = () => {
+    if (filteredHsCodes.length === 0) {
+      return (
+        <div className="flex flex-col items-center justify-center py-8 text-center">
+          <div className="text-gray-400 mb-2">
+            <svg className="w-12 h-12 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+            </svg>
+          </div>
+          <p className="text-gray-500 text-sm">
+            {locale === 'ar' ? 'لا توجد رموز HS متاحة لرمز ISIC المحدد' : 'No HS codes available for the selected ISIC code'}
+          </p>
+        </div>
+      );
+    }
+
     return (
       <div className="grid grid-cols-1 gap-2 max-h-[60vh] overflow-y-auto pr-2">
         {filteredHsCodes.map((code) => {
@@ -590,6 +617,10 @@ const FilterBox: React.FC<FilterBoxProps> = ({
   // Handle ISIC code selection
   const handleSelectIsicCode = (node: ISICCode) => {
     if (isLeafNode(node)) {
+      // Clear HS code selection when ISIC code changes
+      setSelectedHsCode(null);
+      setHsCodeFilter?.(null);
+      
       setSelectedIsicCode({
         id: node.key,
         code: node.code,
@@ -623,12 +654,16 @@ const FilterBox: React.FC<FilterBoxProps> = ({
     // Prevent the click from bubbling up to the parent div that opens the modal
     e.stopPropagation();
     
-    // Clear the selected ISIC code
+    // Clear the selected ISIC code and HS code
     setSelectedIsicCode(null);
+    setSelectedHsCode(null);
     
-    // Call the parent component's setIsicCodeFilter function to trigger a search without the ISIC code filter
+    // Call the parent component's filter functions to trigger a search without the filters
     if (setIsicCodeFilter) {
       setIsicCodeFilter(null);
+    }
+    if (setHsCodeFilter) {
+      setHsCodeFilter(null);
     }
   };
   
@@ -865,13 +900,25 @@ const FilterBox: React.FC<FilterBoxProps> = ({
               {/* HS Code Filter */}
               <div className="flex flex-col gap-1">
                 <span className="text-xs font-semibold text-gray-700">{locale === 'ar' ? 'رمز HS' : 'HS Code'}</span>
-                <div onClick={() => setIsHsCodeModalOpen(true)} className="border border-gray-200 bg-white py-2 px-3 rounded text-sm cursor-pointer flex justify-between items-center hover:border-blue-400 transition-colors">
+                <div 
+                  onClick={selectedIsicCode ? () => setIsHsCodeModalOpen(true) : undefined} 
+                  className={`border border-gray-200 py-2 px-3 rounded text-sm flex justify-between items-center transition-colors ${
+                    selectedIsicCode 
+                      ? 'bg-white cursor-pointer hover:border-blue-400' 
+                      : 'bg-gray-100 cursor-not-allowed opacity-60'
+                  }`}
+                >
                   {selectedHsCode ? (
                     <span className="truncate text-gray-800 font-semibold">{selectedHsCode.code} - {selectedHsCode.label.length > 30 ? `${selectedHsCode.label.substring(0, 30)}...` : selectedHsCode.label}</span>
                   ) : (
-                    <span className="text-gray-400 font-medium">{locale === 'ar' ? 'اختر رمز HS' : 'Select HS Code'}</span>
+                    <span className="text-gray-400 font-medium">
+                      {selectedIsicCode 
+                        ? (locale === 'ar' ? 'اختر رمز HS' : 'Select HS Code')
+                        : (locale === 'ar' ? 'اختر رمز ISIC أولاً' : 'Select ISIC Code first')
+                      }
+                    </span>
                   )}
-                  {selectedHsCode && (
+                  {selectedHsCode && selectedIsicCode && (
                     <button onClick={handleClearHsCode} className="ml-2 text-gray-400 hover:text-red-500">
                       <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
                     </button>
