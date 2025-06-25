@@ -165,6 +165,10 @@ export default function ProfilePage() {
   const [isBookingLoading, setIsBookingLoading] = useState(false);
   const [bookingError, setBookingError] = useState<string | null>(null);
   const [currentMonth, setCurrentMonth] = useState<Date>(new Date());
+  const [validationErrors, setValidationErrors] = useState<{
+    title?: string;
+    description?: string;
+  }>({});
   
   // Get entity type from search params (safe for SSR)
   const entityParam = searchParams.get('entity');
@@ -626,6 +630,7 @@ export default function ProfilePage() {
     // Open the booking modal
     setIsBookingModalOpen(true);
     setBookingError(null);
+    setValidationErrors({});
     
     // Default title without relying on profileData
     const defaultName = profileData?.name || 'consultant';
@@ -634,9 +639,70 @@ export default function ProfilePage() {
     }
   };
   
+  // Validation function for title and description
+  const validateBookingForm = (): boolean => {
+    const errors: { title?: string; description?: string } = {};
+    
+    // Title validation
+    if (!meetingTitle.trim()) {
+      errors.title = t('titleRequired');
+    } else if (meetingTitle.trim().length < 3) {
+      errors.title = t('titleTooShort');
+    } else if (meetingTitle.trim().length > 100) {
+      errors.title = t('titleTooLong');
+    }
+    
+    // Description validation
+    if (meetingDescription.trim().length > 100) {
+      errors.description = t('descriptionTooLong');
+    }
+    
+    setValidationErrors(errors);
+    return Object.keys(errors).length === 0;
+  };
+
+  // Handle title change with validation
+  const handleTitleChange = (value: string) => {
+    setMeetingTitle(value);
+    
+    // Real-time validation for title
+    const titleErrors: { title?: string } = {};
+    if (value.trim() && value.trim().length < 3) {
+      titleErrors.title = t('titleTooShort');
+    } else if (value.trim().length > 50) {
+      titleErrors.title = t('titleTooLong');
+    }
+    
+    setValidationErrors(prev => ({
+      ...prev,
+      title: titleErrors.title
+    }));
+  };
+
+  // Handle description change with validation
+  const handleDescriptionChange = (value: string) => {
+    setMeetingDescription(value);
+    
+    // Real-time validation for description
+    const descErrors: { description?: string } = {};
+    if (value.trim().length > 500) {
+      descErrors.description = t('descriptionTooLong');
+    }
+    
+    setValidationErrors(prev => ({
+      ...prev,
+      description: descErrors.description
+    }));
+  };
+
   // Submit booking - handles the API call
   const submitBookMeeting = async () => {
     if (!selectedDate || !selectedMeetingTime) return;
+    
+    // Validate form before submission
+    if (!validateBookingForm()) {
+      return;
+    }
     
     setIsBookingLoading(true);
     setBookingError(null);
@@ -1130,13 +1196,12 @@ export default function ProfilePage() {
                 </Tabs.Tab>
                 {/* Hide Meet tab if user is viewing their own profile */}
                 {(isInsighter || isCompanyInsighter) && !isCompany && !isOwnProfile && (
-                  <></>
-                  // <Tabs.Tab
-                  //   value="meet"
-                  //   className="text-base font-medium px-8 py-4 transition"
-                  // >
-                  //   {t('meet')} {profileData?.first_name || ''}
-                  // </Tabs.Tab>
+                  <Tabs.Tab
+                    value="meet"
+                    className="text-base font-medium px-8 py-4 transition"
+                  >
+                    {t('meet')} {profileData?.first_name || ''}
+                  </Tabs.Tab>
                 )}
               </Tabs.List>
 
@@ -1689,23 +1754,43 @@ export default function ProfilePage() {
                 )}
                 
                 <form onSubmit={(e) => { e.preventDefault(); submitBookMeeting(); }}>
-                  <TextInput
-                    label={t('meetingTitle')}
-                    placeholder={t('enterMeetingTitle')}
-                    value={meetingTitle}
-                    onChange={(e) => setMeetingTitle(e.target.value)}
-                    className="mb-4"
-                    required
-                  />
+                  <div className="mb-4">
+                    <TextInput
+                      label={t('meetingTitle')}
+                      placeholder={t('enterMeetingTitle')}
+                      value={meetingTitle}
+                      onChange={(e) => handleTitleChange(e.target.value)}
+                      required
+                      error={validationErrors.title}
+                    />
+                    <div className="flex justify-between mt-1">
+                      <span className="text-xs text-gray-500">
+                        {t('minimum3Characters')}
+                      </span>
+                      <span className={`text-xs ${meetingTitle.length > 50 ? 'text-red-500' : 'text-gray-500'}`}>
+                        {meetingTitle.length}/50
+                      </span>
+                    </div>
+                  </div>
                   
-                  <Textarea
-                    label={t('meetingDescription')}
-                    placeholder={t('enterMeetingDescription')}
-                    value={meetingDescription}
-                    onChange={(e) => setMeetingDescription(e.target.value)}
-                    className="mb-4"
-                    minRows={3}
-                  />
+                  <div className="mb-4">
+                    <Textarea
+                      label={t('meetingDescription')}
+                      placeholder={t('enterMeetingDescription')}
+                      value={meetingDescription}
+                      onChange={(e) => handleDescriptionChange(e.target.value)}
+                      minRows={3}
+                      error={validationErrors.description}
+                    />
+                    <div className="flex justify-between mt-1">
+                      <span className="text-xs text-gray-500">
+                        {t('optional')}
+                      </span>
+                      <span className={`text-xs ${meetingDescription.length > 100 ? 'text-red-500' : 'text-gray-500'}`}>
+                        {meetingDescription.length}/100
+                      </span>
+                    </div>
+                  </div>
                   
                   <div className="flex justify-end gap-3 mt-6">
                     <Button 
@@ -1717,6 +1802,7 @@ export default function ProfilePage() {
                     <Button 
                       type="submit" 
                       loading={isBookingLoading}
+                      disabled={Object.keys(validationErrors).some(key => validationErrors[key as keyof typeof validationErrors])}
                     >
                       {t('confirmBooking')}
                     </Button>
