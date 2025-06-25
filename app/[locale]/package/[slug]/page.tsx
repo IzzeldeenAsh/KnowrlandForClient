@@ -41,7 +41,7 @@ interface Props {
 
 async function fetchPackageData(slug: string, locale: string = 'en') {
   const cookieStore = await cookies();
-  const tokenCookie = cookieStore.get("token");
+  const tokenCookie = cookieStore.get("knoldg_session");
   const token = tokenCookie?.value;
   
   const response = await fetch(
