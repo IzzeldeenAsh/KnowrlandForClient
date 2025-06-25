@@ -87,7 +87,7 @@ async function fetchKnowledgeData(type: string, slug: string, locale: string = '
   try {
     // Get auth token from cookies for server-side requests
     const cookieStore = await cookies();
-    const token = cookieStore.get('knoldg_session')?.value;
+    const token = cookieStore.get('token')?.value;
     
     // Prepare headers with auth token if available
     const headers: HeadersInit = {
