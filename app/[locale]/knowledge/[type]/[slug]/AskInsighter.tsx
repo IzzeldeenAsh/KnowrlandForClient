@@ -399,8 +399,6 @@ export default function AskInsighter({ knowledgeSlug, questions = [], is_owner =
       
       return (
         <>  {/* Add question number badge for parent questions only */}
-        <div>{is_owner ? 'is_owner' : 'not_owner'}</div>
-        <div>{is_owner ? 'true' : 'false'}</div>
         {!isReply && (
           <div className="">
             <div
