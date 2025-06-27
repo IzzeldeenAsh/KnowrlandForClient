@@ -391,9 +391,6 @@ export default function HomePage() {
 
   // Custom setter for language filter that triggers search
   const handleLanguageFilterChange = useCallback((value: 'all' | 'arabic' | 'english') => {
-    // Set loading immediately to prevent flickering
-    setLoading(true);
-    
     // Update the language filter state
     setLanguageFilter(value);
     // Update URL with new filter
@@ -407,9 +404,6 @@ export default function HomePage() {
   
   // Custom setter for country filter that triggers search
   const handleCountryFilterChange = useCallback((value: number | null) => {
-    // Set loading immediately to prevent flickering
-    setLoading(true);
-    
     // Update the country filter state
     setCountryFilter(value);
     // Update URL with new filter
@@ -423,9 +417,6 @@ export default function HomePage() {
   
   // Custom setter for region filter that triggers search
   const handleRegionFilterChange = useCallback((value: number | null) => {
-    // Set loading immediately to prevent flickering
-    setLoading(true);
-    
     // Update the region filter state
     setRegionFilter(value);
     // Update URL with new filter
@@ -439,9 +430,6 @@ export default function HomePage() {
   
   // Custom setter for economic bloc filter that triggers search
   const handleEconomicBlocFilterChange = useCallback((value: number | null) => {
-    // Set loading immediately to prevent flickering
-    setLoading(true);
-    
     // Update the economic bloc filter state
     setEconomicBlocFilter(value);
     // Update URL with new filter
@@ -455,9 +443,6 @@ export default function HomePage() {
   
   // Custom setter for price filter that triggers search
   const handlePriceFilterChange = useCallback((value: string | null) => {
-    // Set loading immediately to prevent flickering
-    setLoading(true);
-    
     // Update the price filter state
     setPriceFilter(value);
     // Update URL with new filter
@@ -471,9 +456,6 @@ export default function HomePage() {
   
   // Custom setter for industry filter that triggers search
   const handleIndustryFilterChange = useCallback((value: number | null) => {
-    // Set loading immediately to prevent flickering
-    setLoading(true);
-    
     // Update the industry filter state
     setIndustryFilter(value);
     // Update URL with new filter
@@ -487,9 +469,6 @@ export default function HomePage() {
   
   // Custom setter for ISIC code filter that triggers search
   const handleIsicCodeFilterChange = useCallback((value: string | null) => {
-    // Set loading immediately to prevent flickering
-    setLoading(true);
-    
     // Convert string to number for internal state, or null if empty
     const numericValue = value ? parseInt(value) : null;
     
@@ -506,9 +485,6 @@ export default function HomePage() {
   
   // Custom setter for HS code filter that triggers search
   const handleHsCodeFilterChange = useCallback((value: string | null) => {
-    // Set loading immediately to prevent flickering
-    setLoading(true);
-    
     // Convert string to number for internal state, or null if empty
     const numericValue = value ? parseInt(value) : null;
     
@@ -525,9 +501,6 @@ export default function HomePage() {
   
   // Custom setter for accuracy filter that triggers search
   const handleAccuracyFilterChange = useCallback((value: 'any' | 'all') => {
-    // Set loading immediately to prevent flickering
-    setLoading(true);
-    
     // Update the accuracy filter state
     setAccuracyFilter(value);
     // Update URL with new filter
@@ -541,9 +514,6 @@ export default function HomePage() {
 
   // Custom setter for role filter that triggers search
   const handleRoleFilterChange = useCallback((value: 'all' | 'company' | 'individual') => {
-    // Set loading immediately to prevent flickering
-    setLoading(true);
-    
     // Update the role filter state
     setRoleFilter(value);
     // Update URL with new filter
@@ -862,7 +832,7 @@ export default function HomePage() {
   // Ref to track URL update timeout
   const urlUpdateTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
-  // Handle immediate query change for URL updates
+  // Handle immediate query change for URL updates - REMOVED LOADING STATE
   const handleQueryChange = useCallback((query: string) => {
     // Clear previous timeout if user is still typing
     if (urlUpdateTimeoutRef.current) {
@@ -1276,7 +1246,7 @@ export default function HomePage() {
       }
     };
   // REMOVED searchQuery from dependencies - only trigger on filter changes, not query changes
-  }, [locale, languageFilter, countryFilter, regionFilter, economicBlocFilter, activeTab, searchType, initialized, toast, selectedCategory, industryFilter, isicCodeFilter, hsCodeFilter, priceFilter, accuracyFilter, roleFilter]);
+  }, [locale, languageFilter, countryFilter, regionFilter, economicBlocFilter, activeTab, searchType, initialized, toast, selectedCategory, industryFilter, isicCodeFilter, hsCodeFilter, priceFilter, accuracyFilter, roleFilter, fetchStatisticsIfNeeded]);
 
   return (
    <main className='min-h-screen flex flex-col bg-gray-50'>
@@ -1328,6 +1298,7 @@ export default function HomePage() {
                placeholder={locale === 'ar' ? 'البحث عن معرفة أو شخص...' : 'Search for knowledge or person...'}
                onSubmit={handleSubmit}
                onSearch={executeSearch}
+               onQueryChange={handleQueryChange}
              />
            </div>
             
@@ -1347,20 +1318,16 @@ export default function HomePage() {
                        return;
                      }
                      
-                     // Set loading immediately to prevent flickering
-                     setLoading(true);
-                     
-                     // Clear existing results immediately
-                     setSearchResults([]);
-                     setKnowledgeItems([]);
-                     
                      // Update the top-level state
                      setSelectedCategory(category);
                      // Update URL with new category
                      updateUrlWithFilters({ category: category });
                      
+                     // Reset to page 1 when category changes
+                     setCurrentPage(1);
+                     
                      // The main search effect will be triggered by the setSelectedCategory above
-                     // and will handle the API call and turn off loading
+                     // and will handle the API call and loading state
                    };
                    
                    // Call handleCategorySelect with 'all' on initial load to get results
@@ -1374,13 +1341,15 @@ export default function HomePage() {
                                                searchParams.get('country') || 
                                                searchParams.get('type');
                      
+                     // Only trigger if no results, not loading, initialized, no search query, and no URL params
                      if (searchResults.length === 0 && !loading && initialized && 
                          !isPageChangeInProgressRef.current && !skipNextSearchEffectRef.current &&
-                         !searchQuery.trim() && !hasUrlSearchParams) {
+                         !searchQuery.trim() && !hasUrlSearchParams && searchType === 'knowledge') {
+                       console.log('Auto-triggering "all" category search on initial load');
                        handleCategorySelect('all');
                      }
                    // eslint-disable-next-line react-hooks/exhaustive-deps
-                   }, [searchResults.length, loading, initialized, searchParams]);
+                   }, [searchResults.length, loading, initialized, searchParams, searchType]);
                    
                    return (
                     searchType === 'knowledge' && (
@@ -1548,7 +1517,7 @@ export default function HomePage() {
                 {/* Results section - conditionally show either ResultsSection or InsightersResultsSection based on searchType */}
                 {searchType === 'insighter' ? (
                   <InsightersResultsSection
-                    key={`insighter-section-${currentPage}-${totalPages}-${Date.now()}`}
+                    key={`insighter-section-${searchType}-${totalItems}`}
                     searchQuery={searchQuery}
                     searchResults={searchResults}
                     loading={loading}
@@ -1561,7 +1530,7 @@ export default function HomePage() {
                   />
                 ) : (
                   <ResultsSection
-              key={`results-section-${currentPage}-${totalPages}-${Date.now()}`}
+              key={`results-section-${searchType}-${totalItems}`}
               searchQuery={searchQuery}
               searchResults={searchResults}
               knowledgeItems={knowledgeItems}
