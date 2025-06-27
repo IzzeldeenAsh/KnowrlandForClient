@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useRef, useEffect } from 'react';
+import React, { useRef, useEffect, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { IconSearch, IconX } from '@tabler/icons-react';
 import { useSuggestions, useClickAway } from '../utils/hooks';
@@ -35,18 +35,12 @@ const SearchBar: React.FC<SearchBarProps> = ({
   const router = useRouter();
   const searchParams = useSearchParams();
   const searchInputRef = useRef<HTMLInputElement>(null);
-  const [showTypeDropdown, setShowTypeDropdown] = React.useState(false);
+  const [showTypeDropdown, setShowTypeDropdown] = useState(false);
   const typeDropdownRef = useRef<HTMLDivElement>(null);
-  // Add state to track if a search was just performed
-  const [hasJustSearched, setHasJustSearched] = React.useState(false);
   
-  // Check if component loaded with search parameters (from redirect)
-  useEffect(() => {
-    const keyword = searchParams.get('keyword');
-    if (keyword && keyword.trim().length > 0) {
-      setHasJustSearched(true);
-    }
-  }, [searchParams]);
+  // Simplified suggestion state management
+  const [inputFocused, setInputFocused] = useState(false);
+  const [suggestionSelected, setSuggestionSelected] = useState(false);
   
   // Get suggestions functionality
   const {
@@ -62,6 +56,7 @@ const SearchBar: React.FC<SearchBarProps> = ({
   // Handle clicking outside the suggestions dropdown
   const suggestionsRef = useClickAway(() => {
     setShowSuggestions(false);
+    setInputFocused(false);
   });
   
   // Handle clicking outside the type dropdown
@@ -99,21 +94,24 @@ const SearchBar: React.FC<SearchBarProps> = ({
         e.preventDefault();
         handleSuggestionSelect(suggestions[activeSuggestionIndex]);
       } else {
-        // If no suggestion is selected, mark that a search will be performed
-        setHasJustSearched(true);
+        // Execute search when Enter is pressed without suggestion selection
+        setSuggestionSelected(true);
+        setShowSuggestions(false);
       }
     }
     // Escape key
     else if (e.key === 'Escape') {
       setShowSuggestions(false);
+      setInputFocused(false);
     }
   };
 
   // Handle suggestion selection
   const handleSuggestionSelect = (suggestion: string) => {
+    setSuggestionSelected(true);
     setShowSuggestions(false);
     resetSuggestions();
-    setHasJustSearched(true); // Mark that a search was performed
+    setInputFocused(false);
     
     // Use the onSearch prop if available, otherwise fall back to URL navigation
     if (onSearch) {
@@ -130,24 +128,59 @@ const SearchBar: React.FC<SearchBarProps> = ({
     setSearchQuery('');
     setShowSuggestions(false);
     resetSuggestions();
-    setHasJustSearched(false);
+    setSuggestionSelected(false);
+    setInputFocused(false);
     // Focus back to the input after clearing
     if (searchInputRef.current) {
       searchInputRef.current.focus();
+      setInputFocused(true);
     }
   };
 
-  // Only show suggestions when query has 2+ characters and we're not showing results
-  const isShowingResults = searchParams.get('keyword') === searchQuery && searchQuery.trim().length > 0;
-  // Modified condition: don't show suggestions if a search was just performed
-  const shouldShowSuggestions = searchQuery.trim().length >= 2 && showSuggestions && suggestions.length > 0 && !hasJustSearched;
+  // Handle input focus
+  const handleInputFocus = () => {
+    setInputFocused(true);
+    setSuggestionSelected(false);
+    // Show suggestions if we have them and conditions are met
+    if (searchQuery.trim().length >= 2 && suggestions.length > 0) {
+      setShowSuggestions(true);
+    }
+  };
+
+  // Handle input change
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const newQuery = e.target.value;
+    setSearchQuery(newQuery);
+    setSuggestionSelected(false);
+    
+    // Call onQueryChange for URL updates (debounced in parent)
+    if (onQueryChange) {
+      onQueryChange(newQuery);
+    }
+    
+    // Show suggestions if conditions are met and input is focused
+    if (newQuery.trim().length >= 2 && inputFocused) {
+      setShowSuggestions(true);
+    } else {
+      setShowSuggestions(false);
+    }
+  };
+
+  // Simplified suggestion visibility logic
+  const shouldShowSuggestions = 
+    inputFocused && 
+    !suggestionSelected && 
+    searchQuery.trim().length >= 2 && 
+    showSuggestions && 
+    suggestions.length > 0;
   
   return (
     <form onSubmit={(e) => {
       // First close the suggestions
       setShowSuggestions(false);
       resetSuggestions();
-      setHasJustSearched(true); // Mark that a search was performed
+      setSuggestionSelected(true);
+      setInputFocused(false);
       // Then submit the form
       onSubmit(e);
     }}>
@@ -262,19 +295,15 @@ const SearchBar: React.FC<SearchBarProps> = ({
               className="flex-1 outline-none bg-transparent border-none focus-outline-none focus:border-none focus:ring-0 w-full"
               placeholder={placeholder}
               value={searchQuery}
-              onChange={(e) => {
-                const newQuery = e.currentTarget.value;
-                setSearchQuery(newQuery);
-                // Reset the "just searched" state when user starts typing
-                if (hasJustSearched) {
-                  setHasJustSearched(false);
-                }
-              }}
-              onFocus={() => {
-                // Only show suggestions on focus if we haven't just searched and have enough characters
-                if (searchQuery.trim().length >= 2 && suggestions.length > 0 && !hasJustSearched) {
-                  setShowSuggestions(true);
-                }
+              onChange={handleInputChange}
+              onFocus={handleInputFocus}
+              onBlur={() => {
+                // Delay hiding suggestions to allow for clicks
+                setTimeout(() => {
+                  if (!suggestionSelected) {
+                    setInputFocused(false);
+                  }
+                }, 150);
               }}
               onKeyDown={handleKeyDown}
               autoComplete="off"
@@ -310,7 +339,8 @@ const SearchBar: React.FC<SearchBarProps> = ({
                 // Close suggestions
                 setShowSuggestions(false);
                 resetSuggestions();
-                setHasJustSearched(true); // Mark that a search was performed
+                setSuggestionSelected(true);
+                setInputFocused(false);
                 
                 // Always execute search, even with empty query
                 if (onSearch) {

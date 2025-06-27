@@ -74,7 +74,7 @@ export default function AskInsighter({ knowledgeSlug, questions = [], is_owner =
     report: isRTL ? '\u0625\u0628\u0644\u0627\u063a' : 'Report',
     author: isRTL ? '\u0627\u0644\u0645\u0624\u0644\u0641' : 'Author',
     commentSettings: isRTL ? '\u0625\u0639\u062f\u0627\u062f\u0627\u062a \u0627\u0644\u062a\u0639\u0644\u064a\u0642' : 'Comment settings',
-    noQuestionsYet: isRTL ? '\u0644\u0627 \u062a\u0648\u062c\u062f \u0623\u0633\u0626\u0644\u0629 \u0628\u0639\u062f. \u0643\u0646 \u0623\u0648\u0644 \u0645\u0646 \u064a\u0633\u0623\u0644!' : 'No questions yet. Be the first to ask!',
+    noQuestionsYet: isRTL ? '\u0644\u0627 \u062a\u0648\u062c\u062f \u0623\u0633\u0626\u0644\u0629 \u0628\u0639\u062f' : 'No questions yet',
     submittingQuestion: isRTL ? '\u062c\u0627\u0631\u064a \u0625\u0631\u0633\u0627\u0644 \u0627\u0644\u0633\u0624\u0627\u0644...' : 'Submitting question...',
     submittingReply: isRTL ? '\u062c\u0627\u0631\u064a \u0625\u0631\u0633\u0627\u0644 \u0627\u0644\u0631\u062f...' : 'Submitting reply...',
     submittingAnswer: isRTL ? '\u062c\u0627\u0631\u064a \u0625\u0631\u0633\u0627\u0644 \u0627\u0644\u0625\u062c\u0627\u0628\u0629...' : 'Submitting answer...',
