@@ -127,7 +127,7 @@ const ResultsSection: React.FC<ResultsSectionProps> = ({
             {/* Show results if we have them */}
             {searchResults.length > 0 ? (
               <SearchResultsGrid
-                key={`search-results-${searchType}-${Date.now()}`}
+                key={`search-results-${searchType}-${totalItems}-${currentPage}`}
                 results={searchResults}
                 colNumbers={3}
                 locale={locale}
@@ -166,7 +166,7 @@ const ResultsSection: React.FC<ResultsSectionProps> = ({
                   }
                 </div>
                 <Pagination 
-                  key={`pagination-url-${urlCurrentPage}-${totalPages}-${Date.now()}`}
+                  key={`pagination-${totalPages}-${totalItems}`}
                   total={totalPages} 
                   value={urlCurrentPage}
                   onChange={(page) => {
