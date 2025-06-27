@@ -1,7 +1,7 @@
 'use client'
 
 import React, { useState, useEffect } from 'react';
-import { Select, Modal, Loader, Chip } from '@mantine/core';
+import { Select, Modal, Loader, Chip, Combobox, Input, InputBase, useCombobox } from '@mantine/core';
 import { IconRefresh, IconCode, IconBuildingFactory, IconWorldSearch, IconBuildingBank, IconMap, IconWorld, IconLanguage, IconCoin } from '@tabler/icons-react';
 
 import { useTranslations } from 'next-intl';
@@ -177,6 +177,45 @@ const FilterBox: React.FC<FilterBoxProps> = ({
   
   // State for archive filter  
   const [archiveFilter, setArchiveFilter] = useState<'all' | 'with_archive' | 'without_archive'>('without_archive');
+
+  // State for combobox search functionality
+  const [economicBlocSearch, setEconomicBlocSearch] = useState('');
+  const [regionSearch, setRegionSearch] = useState('');
+  const [countrySearch, setCountrySearch] = useState('');
+
+  // Combobox stores
+  const economicBlocCombobox = useCombobox({
+    onDropdownClose: () => {
+      economicBlocCombobox.resetSelectedOption();
+      economicBlocCombobox.focusTarget();
+      setEconomicBlocSearch('');
+    },
+    onDropdownOpen: () => {
+      economicBlocCombobox.focusSearchInput();
+    },
+  });
+
+  const regionCombobox = useCombobox({
+    onDropdownClose: () => {
+      regionCombobox.resetSelectedOption();
+      regionCombobox.focusTarget();
+      setRegionSearch('');
+    },
+    onDropdownOpen: () => {
+      regionCombobox.focusSearchInput();
+    },
+  });
+
+  const countryCombobox = useCombobox({
+    onDropdownClose: () => {
+      countryCombobox.resetSelectedOption();
+      countryCombobox.focusTarget();
+      setCountrySearch('');
+    },
+    onDropdownOpen: () => {
+      countryCombobox.focusSearchInput();
+    },
+  });
 
   useEffect(() => {
     const fetchCountries = async () => {
@@ -403,22 +442,48 @@ const FilterBox: React.FC<FilterBoxProps> = ({
     label: `${getCountryFlagEmoji(country.iso2)} ${locale === 'ar' && country.names?.ar ? country.names.ar : country.name}`
   }));
   // Convert regions to Mantine Select data format
-  const regionOptions = [
-    { value: 'all', label: locale === 'ar' ? '\u0627\u0644\u0643\u0644' : 'All' },
-    ...regions.map((region: Region) => ({
-      value: region.id.toString(),
-      label: region.name
-    }))
-  ];
+  const regionOptions = regions.map((region: Region) => ({
+    value: region.id.toString(),
+    label: region.name
+  }));
   
   // Convert economic blocs to Mantine Select data format
-  const economicBlocOptions = [
-    { value: 'all', label: locale === 'ar' ? '\u0627\u0644\u0643\u0644' : 'All' },
-    ...economicBlocs.map((bloc: EconomicBloc) => ({
-      value: bloc.id.toString(),
-      label: bloc.name
-    }))
-  ];
+  const economicBlocOptions = economicBlocs.map((bloc: EconomicBloc) => ({
+    value: bloc.id.toString(),
+    label: bloc.name
+  }));
+
+  // Helper functions to get display text for selected values
+  const getSelectedEconomicBlocLabel = () => {
+    if (!economicBlocFilter) return null;
+    const selected = economicBlocs.find(bloc => bloc.id === economicBlocFilter);
+    return selected ? selected.name : null;
+  };
+
+  const getSelectedRegionLabel = () => {
+    if (!regionFilter) return null;
+    const selected = regions.find(region => region.id === regionFilter);
+    return selected ? selected.name : null;
+  };
+
+  const getSelectedCountryLabel = () => {
+    if (!countryFilter) return null;
+    const selected = countries.find(country => country.id === countryFilter);
+    return selected ? `${getCountryFlagEmoji(selected.iso2)} ${locale === 'ar' && selected.names?.ar ? selected.names.ar : selected.name}` : null;
+  };
+
+  // Filter options based on search
+  const filteredEconomicBlocOptions = economicBlocOptions.filter(option =>
+    option.label.toLowerCase().includes(economicBlocSearch.toLowerCase().trim())
+  );
+
+  const filteredRegionOptions = regionOptions.filter(option =>
+    option.label.toLowerCase().includes(regionSearch.toLowerCase().trim())
+  );
+
+  const filteredCountryOptions = countryOptions.filter(option =>
+    option.label.toLowerCase().includes(countrySearch.toLowerCase().trim())
+  );
 
   // Define language options for dropdown
   const languageOptions = [
@@ -948,61 +1013,145 @@ const FilterBox: React.FC<FilterBoxProps> = ({
               {searchType !== 'insighter' && (
                 <div className="flex flex-col gap-1">
                   <span className="text-xs font-semibold text-gray-700">{locale === 'ar' ? 'الكتل الاقتصادية' : 'By Economic Block'}</span>
-                  <Select
-                    placeholder={locale === 'ar' ? 'اختر كتلة اقتصادية' : 'Select an economic bloc'}
-                    data={economicBlocOptions}
-                    value={economicBlocFilter?.toString() || 'all'}
-                    onChange={(value) => {
-                      if (value === 'all') setEconomicBlocFilter(null);
-                      else setEconomicBlocFilter(value ? parseInt(value) : null);
+                  <Combobox
+                    store={economicBlocCombobox}
+                    withinPortal={false}
+                    onOptionSubmit={(val) => {
+                      console.log('🟦 Economic Bloc changed:', val, 'Clearing region and country filters');
+                      if (setEconomicBlocFilter) setEconomicBlocFilter(parseInt(val));
+                      // Clear other target market filters when economic bloc is selected
+                      if (setRegionFilter) setRegionFilter(null);
+                      if (setCountryFilter) setCountryFilter(null);
+                      economicBlocCombobox.closeDropdown();
                     }}
-                    clearable
-                    searchable
-                    className="w-full"
-                    classNames={{
-                      root: 'w-full',
-                      input: 'border border-gray-200 bg-white py-2 px-3 rounded text-sm font-semibold hover:border-blue-400 transition-colors',
-                      dropdown: 'bg-white shadow-sm border border-gray-200 rounded-md mt-1'
-                    }}
-                  />
+                  >
+                    <Combobox.Target>
+                      <InputBase
+                        component="button"
+                        type="button"
+                        pointer
+                        rightSection={<Combobox.Chevron />}
+                        onClick={() => economicBlocCombobox.toggleDropdown()}
+                        rightSectionPointerEvents="none"
+                        className="text-sm font-semibold hover:border-blue-400 transition-colors"
+                      >
+                        {getSelectedEconomicBlocLabel() || <Input.Placeholder>{locale === 'ar' ? 'اختر كتلة اقتصادية' : 'Select an economic bloc'}</Input.Placeholder>}
+                      </InputBase>
+                    </Combobox.Target>
+                    <Combobox.Dropdown>
+                      <Combobox.Search
+                        value={economicBlocSearch}
+                        onChange={(event) => setEconomicBlocSearch(event.currentTarget.value)}
+                        placeholder={locale === 'ar' ? 'البحث في الكتل الاقتصادية' : 'Search economic blocs'}
+                      />
+                      <Combobox.Options>
+                        {filteredEconomicBlocOptions.length > 0 ? (
+                          filteredEconomicBlocOptions.map((option) => (
+                            <Combobox.Option value={option.value} key={option.value}>
+                              {option.label}
+                            </Combobox.Option>
+                          ))
+                        ) : (
+                          <Combobox.Empty>{locale === 'ar' ? 'لا توجد نتائج' : 'Nothing found'}</Combobox.Empty>
+                        )}
+                      </Combobox.Options>
+                    </Combobox.Dropdown>
+                  </Combobox>
                 </div>
               )}
               <div className="flex flex-col gap-1">
                 <span className="text-xs font-semibold text-gray-700">{locale === 'ar' ? 'المناطق' : 'By Region'}</span>
-                <Select
-                  placeholder={locale === 'ar' ? 'اختر منطقة' : 'Select a region'}
-                  data={regionOptions}
-                  value={regionFilter?.toString() || 'all'}
-                  onChange={(value) => {
-                    if (value === 'all') setRegionFilter(null);
-                    else setRegionFilter(value ? parseInt(value) : null);
+                <Combobox
+                  store={regionCombobox}
+                  withinPortal={false}
+                  onOptionSubmit={(val) => {
+                    console.log('🟩 Region changed:', val, 'Clearing economic bloc and country filters');
+                    if (setRegionFilter) setRegionFilter(parseInt(val));
+                    // Clear other target market filters when region is selected
+                    if (setEconomicBlocFilter) setEconomicBlocFilter(null);
+                    if (setCountryFilter) setCountryFilter(null);
+                    regionCombobox.closeDropdown();
                   }}
-                  clearable
-                  searchable
-                  className="w-full"
-                  classNames={{
-                    root: 'w-full',
-                    input: 'border border-gray-200 bg-white py-2 px-3 rounded text-sm font-semibold hover:border-blue-400 transition-colors',
-                    dropdown: 'bg-white shadow-sm border border-gray-200 rounded-md mt-1'
-                  }}
-                />
+                >
+                  <Combobox.Target>
+                    <InputBase
+                      component="button"
+                      type="button"
+                      pointer
+                      rightSection={<Combobox.Chevron />}
+                      onClick={() => regionCombobox.toggleDropdown()}
+                      rightSectionPointerEvents="none"
+                      className=" text-sm font-semibold hover:border-blue-400 transition-colors"
+                    >
+                      {getSelectedRegionLabel() || <Input.Placeholder>{locale === 'ar' ? 'اختر منطقة' : 'Select a region'}</Input.Placeholder>}
+                    </InputBase>
+                  </Combobox.Target>
+                  <Combobox.Dropdown>
+                    <Combobox.Search
+                      value={regionSearch}
+                      onChange={(event) => setRegionSearch(event.currentTarget.value)}
+                      placeholder={locale === 'ar' ? 'البحث في المناطق' : 'Search regions'}
+                    />
+                    <Combobox.Options>
+                      {filteredRegionOptions.length > 0 ? (
+                        filteredRegionOptions.map((option) => (
+                          <Combobox.Option value={option.value} key={option.value}>
+                            {option.label}
+                          </Combobox.Option>
+                        ))
+                      ) : (
+                        <Combobox.Empty>{locale === 'ar' ? 'لا توجد نتائج' : 'Nothing found'}</Combobox.Empty>
+                      )}
+                    </Combobox.Options>
+                  </Combobox.Dropdown>
+                </Combobox>
               </div>
               <div className="flex flex-col gap-1">
                 <span className="text-xs font-semibold text-gray-700">{locale === 'ar' ? 'البلدان' : 'By Country'}</span>
-                <Select
-                  placeholder={locale === 'ar' ? 'اختر دولة' : 'Select a country'}
-                  data={countryOptions}
-                  value={countryFilter?.toString() || ''}
-                  onChange={(value) => setCountryFilter(value ? parseInt(value) : null)}
-                  clearable
-                  searchable
-                  className="w-full"
-                  classNames={{
-                    root: 'w-full',
-                    input: 'border border-gray-200 bg-white py-2 px-3 rounded text-sm font-semibold hover:border-blue-400 transition-colors',
-                    dropdown: 'bg-white shadow-sm border border-gray-200 rounded-md mt-1'
+                <Combobox
+                  store={countryCombobox}
+                  withinPortal={false}
+                  onOptionSubmit={(val) => {
+                    console.log('🟨 Country changed:', val, 'Clearing economic bloc and region filters');
+                    if (setCountryFilter) setCountryFilter(parseInt(val));
+                    // Clear other target market filters when country is selected
+                    if (setEconomicBlocFilter) setEconomicBlocFilter(null);
+                    if (setRegionFilter) setRegionFilter(null);
+                    countryCombobox.closeDropdown();
                   }}
-                />
+                >
+                  <Combobox.Target>
+                    <InputBase
+                      component="button"
+                      type="button"
+                      pointer
+                      rightSection={<Combobox.Chevron />}
+                      onClick={() => countryCombobox.toggleDropdown()}
+                      rightSectionPointerEvents="none"
+                      className=" text-sm font-semibold hover:border-blue-400 transition-colors"
+                    >
+                      {getSelectedCountryLabel() || <Input.Placeholder>{locale === 'ar' ? 'اختر دولة' : 'Select a country'}</Input.Placeholder>}
+                    </InputBase>
+                  </Combobox.Target>
+                  <Combobox.Dropdown>
+                    <Combobox.Search
+                      value={countrySearch}
+                      onChange={(event) => setCountrySearch(event.currentTarget.value)}
+                      placeholder={locale === 'ar' ? 'البحث في البلدان' : 'Search countries'}
+                    />
+                    <Combobox.Options>
+                      {filteredCountryOptions.length > 0 ? (
+                        filteredCountryOptions.map((option) => (
+                          <Combobox.Option value={option.value} key={option.value}>
+                            {option.label}
+                          </Combobox.Option>
+                        ))
+                      ) : (
+                        <Combobox.Empty>{locale === 'ar' ? 'لا توجد نتائج' : 'Nothing found'}</Combobox.Empty>
+                      )}
+                    </Combobox.Options>
+                  </Combobox.Dropdown>
+                </Combobox>
               </div>
             </div>
           )}
