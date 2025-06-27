@@ -126,6 +126,7 @@ const KnowledgeSideBox = ({
     na: isRTL ? 'غير متوفر' : 'N/A',
     free: isRTL ? 'مجاني' : 'Free',
     share: isRTL ? 'مشاركة' : 'Share',
+    worldWide: isRTL ? 'كافة أنحاء العالم': 'Worldwide',
     showMore: isRTL ? 'عرض المزيد' : 'Show more',
     showLess: isRTL ? 'عرض أقل' : 'Show less',
     more: isRTL ? 'المزيد' : 'more',
@@ -413,7 +414,7 @@ const KnowledgeSideBox = ({
                   <div className="flex flex-wrap justify-end gap-1 max-w-[100%]">
                     {regions.length === 6 ? (
                       <span className="badge bg-[#f1f1f4] text-[#4b5675] text-xs font-medium px-2.5 py-0.5 rounded">
-                        Worldwide
+                     {translations.worldWide}
                       </span>
                     ) : (
                       regions
