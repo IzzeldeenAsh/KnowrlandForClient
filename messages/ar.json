@@ -641,8 +641,8 @@
         },
         "dataNotAvailable": "البيانات غير متوفرة",
         "subIndustry": "الصناعة الفرعية",
-        "industryKnowledge": "أنواع المعرفة المتوفرة في <industry></industry>",
-        "subIndustryKnowledge": "أنواع المعرفة المتوفرة في <subIndustry></subIndustry>",
+        "industryKnowledge":"استكشف المعارف حسب النوع",
+        "subIndustryKnowledge": "استكشف المعارف حسب النوع",
         "topicKnowledge": "أنواع المعرفة المتوفرة في <topic></topic>",
         "topicLabel": "الموضوع",
         "Notifications": {
