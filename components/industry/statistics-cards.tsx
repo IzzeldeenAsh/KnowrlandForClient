@@ -46,7 +46,7 @@ export default function StatisticsCards({ type, id, entityName }: StatisticsCard
       switch (type) {
         case 'industry': return 'industryKnowledge';
         case 'subIndustry': return 'subIndustryKnowledge';
-        case 'topic': return 'topicKnowledge';
+        case 'topic': return 'topic Knowledge';
         default: return '';
       }
     };
