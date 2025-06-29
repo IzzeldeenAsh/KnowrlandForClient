@@ -157,9 +157,7 @@ export default async function SubIndustryPage({ params }: Props) {
                 {/* Left Side: Title */}
                 <div className="min-h-[100px] flex flex-col md:flex-row items-start justify-between w-50">
                   <div className={`${isRTL ? 'text-right' : 'text-start'} mb-4`} data-aos="fade-down">
-                    <span className="inline-block px-5 py-1 text-xs font-semibold text-blue-500 bg-blue-100 rounded-md mb-2 uppercase">
-                      {messages?.Header?.navigation?.subIndustry || (locale === 'ar' ? 'الصناعة الفرعية' : 'Sub Industry')}
-                    </span>
+               
                     <h3 className="text-md bg-gradient-to-r from-blue-500 to-teal-400 md:text-5xl font-extrabold text-transparent bg-clip-text mb-4">
                       {subIndustry.name}
                     </h3>

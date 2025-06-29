@@ -1,6 +1,6 @@
 'use client'
 import { DocumentTextIcon, CalendarIcon, ClockIcon, ChevronDownIcon, ChevronUpIcon } from '@heroicons/react/24/outline';
-import { IconLanguage, IconCode, IconBuildingBank, IconMap, IconWorld } from '@tabler/icons-react';
+import { IconLanguage, IconCode, IconBuildingBank, IconMap, IconWorld, IconCrane } from '@tabler/icons-react';
 import { useParams } from 'next/navigation';
 import { useState, useEffect } from 'react';
 import FacebookIcon from '@/public/file-icons/facebook';
@@ -304,7 +304,7 @@ const KnowledgeSideBox = ({
             <div className="tp-course-details2-widget-list-item flex items-center justify-between">
               <span className="flex items-center gap-2 font-medium ">
                 <div className="bg-blue-50 p-2 rounded-full me-2">
-                  <IconCode className="w-4 h-4 text-blue-500" />
+                  <IconCrane className="w-4 h-4 text-blue-500" />
                 </div>
                 {translations.hsCode}
               </span>
@@ -326,7 +326,7 @@ const KnowledgeSideBox = ({
             <div className="tp-course-details2-widget-list-item flex items-center justify-between">
               <span className="flex items-center gap-2 font-medium ">
                 <div className="bg-blue-50 p-2 rounded-full me-2">
-                  <IconCode className="w-4 h-4 text-blue-500" />
+                  <IconCrane className="w-4 h-4 text-blue-500" />
                 </div>
                 {translations.hsCode}
               </span>
