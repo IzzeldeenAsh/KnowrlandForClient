@@ -502,7 +502,7 @@ export default function ProfilePage() {
   
   // Load meeting availability data when tab changes to "meet"
   const handleTabChange = (value: string | null) => {
-    if (value === "meet" && (isInsighter || isCompanyInsighter)) {
+    if (value === "meet" && (entityParam === 'insighter')) {
       fetchMeetingAvailability();
     }
   };
