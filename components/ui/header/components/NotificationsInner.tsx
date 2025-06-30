@@ -159,6 +159,11 @@ const getNotificationName = (subType: string): string => {
     'knowledge_accept': 'Knowledge Accepted',
     'knowledge_declined': 'Knowledge Declined',
     'activate_company': 'Active Company',
+    'client_meeting_new':'New Meeting Request',
+'insighter_meeting_client_new':'New Meeting Request',
+'insighter_meeting_approved':'Meeting Approved',
+'client_meeting_insighter_approved':'Meeting Approved',
+
   }
   return nameMap[subType] || subType
 }
