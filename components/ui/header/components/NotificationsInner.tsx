@@ -105,6 +105,12 @@ const getNotificationIconName = (subType: string): string => {
       return 'duotune/communication/com007.svg';
     case 'Answer Question':
       return 'duotune/communication/com007.svg';
+    case 'client_meeting_insighter_approved':
+    case 'client_meeting_new':
+      return 'duotune/general/gen014'; 
+    case 'insighter_meeting_client_new':
+    case 'insighter_meeting_approved':
+      return 'duotune/general/gen014';
     default:
       return 'duotune/general/gen007.svg';
   }
@@ -214,7 +220,14 @@ export default function NotificationsInner({
       window.location.href = 'https://app.knoldg.com/app/insighter-dashboard/my-requests'
       return
     }
-    
+    if(notification.sub_type.startsWith('client_')) {
+      window.location.href = 'https://app.knoldg.com/app/insighter-dashboard/my-meetings/sent'
+      return
+    }
+    if(notification.sub_type.startsWith('insighter_')) {
+      window.location.href = 'https://app.knoldg.com/app/insighter-dashboard/my-meetings/received'
+      return
+    }
     // Handle knowledge approved notifications - redirect to knowledge details page
     if (notification.type === 'knowledge' && notification.sub_type === 'approved') {
       window.location.href = `https://app.knoldg.com/app/my-knowledge-base/view-my-knowledge/${notification.param}/details`
