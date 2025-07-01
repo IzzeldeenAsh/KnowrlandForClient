@@ -106,11 +106,15 @@ const getNotificationIconName = (subType: string): string => {
     case 'Answer Question':
       return 'duotune/communication/com007.svg';
     case 'client_meeting_insighter_approved':
+      return 'duotune/general/gen014.svg';
     case 'client_meeting_new':
-      return 'duotune/general/gen014'; 
+      return 'duotune/general/gen014.svg'; 
     case 'insighter_meeting_client_new':
+      return 'duotune/general/gen014.svg';
     case 'insighter_meeting_approved':
-      return 'duotune/general/gen014';
+      return 'duotune/general/gen014.svg';
+      case "client_meeting_insighter_postponed":
+        return 'duotune/general/gen014.svg';
     default:
       return 'duotune/general/gen007.svg';
   }
@@ -163,7 +167,7 @@ const getNotificationName = (subType: string): string => {
 'insighter_meeting_client_new':'New Meeting Request',
 'insighter_meeting_approved':'Meeting Approved',
 'client_meeting_insighter_approved':'Meeting Approved',
-
+'client_meeting_insighter_postponed':'Meeting Postponed',
   }
   return nameMap[subType] || subType
 }
@@ -238,7 +242,10 @@ export default function NotificationsInner({
       window.location.href = `https://app.knoldg.com/app/my-knowledge-base/view-my-knowledge/${notification.param}/details`
       return
     }
-    
+    if(notification.sub_type.startsWith('client_meeting_insighter_postponed')){
+      window.location.href = 'https://app.knoldg.com/app/insighter-dashboard/my-meetings/sent'
+      return
+    }
     // Handle knowledge accept/decline notifications
     if (notification.type === 'knowledge' && (notification.sub_type === 'accept_knowledge' || notification.sub_type === 'declined')) {
       // For company-insighter role, we would handle this differently
