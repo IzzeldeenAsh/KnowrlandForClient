@@ -118,6 +118,9 @@ const FilterBox: React.FC<FilterBoxProps> = ({
   setRoleFilter = () => {},
   resetFilters = async () => {}
 }) => {
+  console.log(`🔧 FilterBox rendered with searchType: ${searchType}`);
+  console.log(`🔧 Price/Language sections visible: ${searchType !== 'insighter'}`);
+  console.log(`🔧 Role section visible: ${searchType === 'insighter'}`);
   const [countries, setCountries] = useState<Country[]>([]);
   const [regions, setRegions] = useState<Region[]>([]);
   const [economicBlocs, setEconomicBlocs] = useState<EconomicBloc[]>([]);
@@ -162,11 +165,11 @@ const FilterBox: React.FC<FilterBoxProps> = ({
   const [industryLeafNodes, setIndustryLeafNodes] = useState<IndustryNode[]>([]);
   const [filteredIndustryLeafNodes, setFilteredIndustryLeafNodes] = useState<IndustryNode[]>([]);
 
-  // State for content types collapse
+  // State for content types collapse - adjust based on search type
   const [priceCollapsed, setpriceCollapsed] = useState(false);
   const [languageCollapsed, setLanguageCollapsed] = useState(false);
-  const [accuracyCollapsed, setAccuracyCollapsed] = useState(true);
-  const [industryCollapsed, setIndustryCollapsed] = useState(false);
+  const [accuracyCollapsed, setAccuracyCollapsed] = useState(searchType === 'knowledge'); // Collapsed for knowledge, visible for insighter
+  const [industryCollapsed, setIndustryCollapsed] = useState(searchType === 'insighter'); // Collapsed for insighter, visible for knowledge
   const [targetMarketCollapsed, setTargetMarketCollapsed] = useState(true);
   const [publicationDateCollapsed, setPublicationDateCollapsed] = useState(true);
   const [archiveCollapsed, setArchiveCollapsed] = useState(true);
@@ -216,6 +219,13 @@ const FilterBox: React.FC<FilterBoxProps> = ({
       countryCombobox.focusSearchInput();
     },
   });
+
+  // Update collapsed states when search type changes
+  useEffect(() => {
+    console.log(`🔧 FilterBox searchType changed to: ${searchType}, updating collapsed states`);
+    setAccuracyCollapsed(searchType === 'knowledge'); // Visible for insighter, collapsed for knowledge
+    setIndustryCollapsed(searchType === 'insighter'); // Visible for knowledge, collapsed for insighter
+  }, [searchType]);
 
   useEffect(() => {
     const fetchCountries = async () => {
@@ -826,7 +836,7 @@ const FilterBox: React.FC<FilterBoxProps> = ({
       <div className="p-0 divide-y divide-gray-200">
         {/* Price Types Section */}
         {searchType !== 'insighter' && (
-          <div>
+          <div data-debug={`Price section visible for ${searchType}`}>
             <button
               onClick={() => setpriceCollapsed(!priceCollapsed)}
               className="w-full flex items-center justify-between px-4 py-3 text-left bg-gray-50 hover:bg-gray-100 focus:outline-none"
@@ -871,7 +881,7 @@ const FilterBox: React.FC<FilterBoxProps> = ({
         )}
         {/* Language Section */}
         {searchType !== 'insighter' && (
-          <div>
+          <div data-debug={`Language section visible for ${searchType}`}>
             <button
               onClick={() => setLanguageCollapsed(!languageCollapsed)}
               className="w-full flex items-center justify-between px-4 py-3 text-left bg-gray-50 hover:bg-gray-100 focus:outline-none"
@@ -1158,7 +1168,7 @@ const FilterBox: React.FC<FilterBoxProps> = ({
         </div>
         {/* Role Section - Only for insighter */}
         {searchType === 'insighter' && (
-          <div>
+          <div data-debug={`Role section visible for ${searchType}`}>
             <button
               onClick={() => setRoleCollapsed(!roleCollapsed)}
               className="w-full flex items-center justify-between px-4 py-3 text-left bg-gray-50 hover:bg-gray-100 focus:outline-none"
