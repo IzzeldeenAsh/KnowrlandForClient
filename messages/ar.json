@@ -409,6 +409,7 @@
         "companyInsighter": "إنسايتر-شركة",
         "company": "شركة",
         "client": "عميل",
+        "myConsultingSchedule": "جدول المواعيد الخاصة بي",
         "addKnowledge": "إضافة معرفة +",
         "knowledgeBase": "مكتبة المعرفة",
         "myProfile": "الملف الشخصي",
@@ -657,6 +658,7 @@
             "manual": "الدليل",
             "course": "الدورة"
         }
+  
 
     }
  
