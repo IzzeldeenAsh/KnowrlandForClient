@@ -115,6 +115,10 @@ const getNotificationIconName = (subType: string): string => {
       return 'duotune/general/gen014.svg';
       case "client_meeting_insighter_postponed":
         return 'duotune/general/gen014.svg';
+    case 'insighter_meeting_client_reschedule':
+      return 'duotune/general/gen014.svg';
+    case 'client_meeting_reschedule':
+      return 'duotune/general/gen014.svg';
     default:
       return 'duotune/general/gen007.svg';
   }
@@ -168,6 +172,9 @@ const getNotificationName = (subType: string): string => {
 'insighter_meeting_approved':'Meeting Approved',
 'client_meeting_insighter_approved':'Meeting Approved',
 'client_meeting_insighter_postponed':'Meeting Postponed',
+'client_meeting_reschedule':'Meeting Rescheduled',
+'insighter_meeting_client_reschedule':'Meeting Rescheduled',
+'deactivate_delete_company':'Company Deactivation',
   }
   return nameMap[subType] || subType
 }
@@ -244,6 +251,14 @@ export default function NotificationsInner({
     }
     if(notification.sub_type.startsWith('client_meeting_insighter_postponed')){
       window.location.href = 'https://app.knoldg.com/app/insighter-dashboard/my-meetings/sent'
+      return
+    }
+    if(notification.sub_type.startsWith('client_meeting_reschedule')){
+      window.location.href = 'https://app.knoldg.com/app/insighter-dashboard/my-meetings/sent'
+      return
+    }
+    if(notification.sub_type.startsWith('insighter_meeting_client_reschedule')){
+      window.location.href = 'https://app.knoldg.com/app/insighter-dashboard/my-meetings/received'
       return
     }
     // Handle knowledge accept/decline notifications
