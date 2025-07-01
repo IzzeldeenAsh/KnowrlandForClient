@@ -316,6 +316,8 @@ export default function HomePage() {
 
   // Handler for search type changes
   const handleSearchTypeChange = useCallback(async (type: 'knowledge' | 'insighter') => {
+    console.log(`🔄 Search type change from ${searchType} to ${type}`);
+    
     // Set flag to prevent main search effect from interfering
     isSearchTypeChangingRef.current = true;
     
@@ -327,22 +329,56 @@ export default function HomePage() {
     setKnowledgeItems([]);
     setStatistics([]);
     
-    // Update search type state
-    setSearchType(type);
+    // Batch all state updates together using React's automatic batching
+    // This ensures they all take effect in the same render cycle
+    React.startTransition(() => {
+      // Update search type state FIRST
+      setSearchType(type);
+      
+      // Reset to page 1 when changing search type
+      setCurrentPage(1);
+      setTotalPages(1);
+      setTotalItems(0);
+      
+      // Reset type-specific filters when switching search types
+      if (type === 'knowledge') {
+        // When switching to knowledge, reset insighter-specific filters
+        setAccuracyFilter('all');
+        setRoleFilter('all');
+        // Reset category to 'all' for knowledge
+        setSelectedCategory('all');
+        console.log('🔄 Reset insighter filters for knowledge search');
+      } else if (type === 'insighter') {
+        // When switching to insighter, reset knowledge-specific filters
+        setIndustryFilter(null);
+        setIsicCodeFilter(null);
+        setHsCodeFilter(null);
+        setPriceFilter(null);
+        setSelectedCategory('all');
+        console.log('🔄 Reset knowledge filters for insighter search');
+      }
+    });
     
-    // Reset to page 1 when changing search type
-    setCurrentPage(1);
-    setTotalPages(1);
-    setTotalItems(0);
+    // Build URL parameters for the new search type with reset filters
+    const urlParams = new URLSearchParams();
+    if (searchQuery && searchQuery.trim() !== '') urlParams.set('keyword', searchQuery);
+    urlParams.set('search_type', type);
+    // Keep only common filters that apply to both types
+    if (languageFilter && languageFilter !== 'all') urlParams.set('language', languageFilter);
+    if (countryFilter !== null) urlParams.set('country', countryFilter.toString());
+    if (regionFilter !== null) urlParams.set('region', regionFilter.toString());
+    if (economicBlocFilter !== null) urlParams.set('economic_bloc', economicBlocFilter.toString());
     
-    // Update URL with new search type
-    updateUrlWithFilters({ type: type, page: 1 });
+    // Update URL with clean parameters for the new search type
+    router.push(`/${locale}/home?${urlParams.toString()}`, { scroll: false });
     
-    // Perform the search immediately with the new search type
+    // Perform the search immediately with the new search type and explicitly reset filters
     try {
       const handleError = (errorMessage: string) => {
         toast.error(errorMessage, 'Validation Error');
       };
+      
+      console.log(`🔍 Making API call for ${type} search type`);
       
       const response = await fetchSearchResults(
         searchQuery.trim(),
@@ -354,16 +390,18 @@ export default function HomePage() {
         countryFilter,
         regionFilter,
         economicBlocFilter,
-        isicCodeFilter,
-        selectedCategory !== 'all' ? selectedCategory : null,
+        null, // Always reset ISIC code when switching types
+        'all', // Always reset category to 'all'
         30, // perPage
         handleError,
-        industryFilter,
-        priceFilter,
-        hsCodeFilter,
-        accuracyFilter,
-        roleFilter
+        null, // Always reset industry when switching types
+        null, // Always reset price when switching types
+        null, // Always reset HS code when switching types
+        'all', // Always reset accuracy to 'all' when switching types
+        'all' // Always reset role to 'all' when switching types
       );
+      
+      console.log(`✅ API response for ${type}:`, response.data?.length, 'items');
       
       // Update results with the correct search type data
       setSearchResults(response.data || []);
@@ -372,9 +410,11 @@ export default function HomePage() {
       
       // Fetch statistics if search type is knowledge
       if (type === 'knowledge') {
+        console.log('📊 Fetching statistics for knowledge search');
         await fetchStatisticsIfNeeded(searchQuery.trim(), type);
       } else {
         setStatistics([]);
+        console.log('📊 Cleared statistics for insighter search');
       }
     } catch (error) {
       console.error('Search type change failed:', error);
@@ -385,9 +425,10 @@ export default function HomePage() {
       // Reset the flag after the search is complete
       setTimeout(() => {
         isSearchTypeChangingRef.current = false;
+        console.log('🏁 Search type change completed');
       }, 500); // Wait a bit to ensure no race conditions
     }
-  }, [updateUrlWithFilters, locale, activeTab, languageFilter, countryFilter, regionFilter, economicBlocFilter, isicCodeFilter, selectedCategory, industryFilter, priceFilter, hsCodeFilter, accuracyFilter, searchQuery, toast, fetchStatisticsIfNeeded]);
+  }, [searchQuery, locale, router, activeTab, languageFilter, countryFilter, regionFilter, economicBlocFilter, toast, fetchStatisticsIfNeeded]);
 
   // Custom setter for language filter that triggers search
   const handleLanguageFilterChange = useCallback((value: 'all' | 'arabic' | 'english') => {
@@ -1477,6 +1518,7 @@ export default function HomePage() {
                   filtersVisible ? 'transform translate-x-0' : 'transform -translate-x-full lg:translate-x-0'
                 }`}>
                     <FilterBox
+                      key={`filter-box-${searchType}`} // Force re-render when search type changes
                       locale={locale}
                       searchType={searchType}
                       languageFilter={languageFilter}
@@ -1515,37 +1557,40 @@ export default function HomePage() {
                 </div>
                 
                 {/* Results section - conditionally show either ResultsSection or InsightersResultsSection based on searchType */}
-                {searchType === 'insighter' ? (
-                  <InsightersResultsSection
-                    key={`insighter-section-${searchType}-${totalItems}`}
-                    searchQuery={searchQuery}
-                    searchResults={searchResults}
-                    loading={loading}
-                    currentPage={currentPage}
-                    totalItems={totalItems}
-                    setCurrentPage={setCurrentPage}
-                    totalPages={totalPages}
-                    locale={locale}
-                    onPageChange={handlePageChange}
-                  />
-                ) : (
-                  <ResultsSection
-              key={`results-section-${searchType}-${totalItems}`}
-              searchQuery={searchQuery}
-              searchResults={searchResults}
-              knowledgeItems={knowledgeItems}
-              loading={loading}
-              currentPage={currentPage}
-              setCurrentPage={setCurrentPage}
-              totalPages={totalPages}
-              totalItems={totalItems}
-              viewMode={viewMode}
-              setViewMode={setViewMode}
-              locale={locale}
-              onPageChange={handlePageChange}
-              searchType={searchType}
-            />
-                )}
+                {(() => {
+                  console.log(`🎯 Rendering results section for searchType: ${searchType}, results count: ${searchResults.length}`);
+                  return searchType === 'insighter' ? (
+                    <InsightersResultsSection
+                      key={`insighter-section-${searchType}-${totalItems}`}
+                      searchQuery={searchQuery}
+                      searchResults={searchResults}
+                      loading={loading}
+                      currentPage={currentPage}
+                      totalItems={totalItems}
+                      setCurrentPage={setCurrentPage}
+                      totalPages={totalPages}
+                      locale={locale}
+                      onPageChange={handlePageChange}
+                    />
+                  ) : (
+                    <ResultsSection
+                key={`results-section-${searchType}-${totalItems}`}
+                searchQuery={searchQuery}
+                searchResults={searchResults}
+                knowledgeItems={knowledgeItems}
+                loading={loading}
+                currentPage={currentPage}
+                setCurrentPage={setCurrentPage}
+                totalPages={totalPages}
+                totalItems={totalItems}
+                viewMode={viewMode}
+                setViewMode={setViewMode}
+                locale={locale}
+                onPageChange={handlePageChange}
+                searchType={searchType}
+              />
+                  );
+                })()}
               </div>
             </div>
           </div>
