@@ -348,7 +348,13 @@ export default function Reviews({ knowledgeSlug, reviews, is_review, is_owner }:
               ))}
             </div>
           ) : (
-            <p className={`text-gray-600 ${isRTL ? 'text-right' : 'text-start'}`}>{translations.noReviewsYet}</p>
+            <div className="p-4">
+            <Card className="mt-4 ">
+          <Text color="dimmed" className={isRTL ? 'text-right' : 'text-start'}>
+            {isRTL ? 'لايوجد مراجعات حتى الآن' : 'No Reviews Yet'}
+          </Text>
+        </Card>
+       </div>           
           )}
         </div>
         
@@ -356,13 +362,7 @@ export default function Reviews({ knowledgeSlug, reviews, is_review, is_owner }:
     
       
       {/* Show message explaining why owners can't review their own content */}
-      {token && is_owner && (
-        <Card className="mt-4">
-          <Text color="dimmed" className={isRTL ? 'text-right' : 'text-start'}>
-            {isRTL ? 'لا يمكنك مراجعة المحتوى الخاص بك.' : 'You cannot review your own content.'}
-          </Text>
-        </Card>
-      )}
+  
       
       {!token && (
         <Card className="mt-4">

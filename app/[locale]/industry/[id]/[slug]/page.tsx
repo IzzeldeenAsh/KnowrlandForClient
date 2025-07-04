@@ -180,7 +180,9 @@ export default async function IndustryPage({ params }: Props) {
               </h2> */}
            
             </div>
-            
+            <h2 className="text-xl font-bold text-transparent bg-gradient-to-r from-blue-500 to-teal-400 bg-clip-text mb-8">
+              {locale === 'ar' ? 'الصناعات الفرعية' : 'Sub Industries'}
+            </h2>
             {/* Industry Children */}
             <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4 max-w-7xl mx-auto">
               {industry.children.map((child: IndustryChild) => {
@@ -228,7 +230,7 @@ export default async function IndustryPage({ params }: Props) {
                         </div>
                       )}
                     </div>
-                    <div className={`absolute top-6 ${isRTL ? 'left-6' : 'right-6'}`}>
+                    <div className={`absolute top-6  ${isRTL ? 'left-6' : 'right-6'}`}>
                       <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path 
                           strokeLinecap="round" 
@@ -237,8 +239,7 @@ export default async function IndustryPage({ params }: Props) {
                           d={isRTL ? "M15 5l-7 7 7 7" : "M9 5l7 7-7 7"} 
                         />
                       </svg>
-                    </div>
-                    {isDisabled && (<div className={`absolute z-10 px-3 py-2 text-sm font-medium text-white bg-gray-900 rounded shadow-md bottom-1/2 mb-2 left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity duration-300`}>{locale === 'ar' ? 'البيانات غير متوفرة' : 'No Knowledge Available Yet'}</div>)}
+                    </div>{isDisabled && (<div className={` absolute z-10 px-3 py-2 text-sm font-medium text-white bg-gray-900 rounded shadow-md bottom-1/2 mb-2 left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity duration-300`}><div className='min-w-[240px]'>{locale === 'ar' ? 'البيانات غير متوفرة' : 'No Knowledge Available Yet'}</div></div>)}
                   </div>
                 );
                 

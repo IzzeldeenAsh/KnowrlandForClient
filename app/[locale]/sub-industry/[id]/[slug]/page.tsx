@@ -179,23 +179,9 @@ export default async function SubIndustryPage({ params }: Props) {
                 {/* <h2 className="text-2xl font-bold text-gray-900 mb-2">
                   {locale === 'ar' ? 'المواضيع' : 'Topics'}
                 </h2> */}
-                <p className="text-gray-600">
-                    {locale === 'ar' ? (
-                      <>
-                        استكشف المواضيع والرؤى في{' '}
-                        <span className="bg-gradient-to-r from-blue-500 to-teal-400 text-transparent bg-clip-text font-extrabold">
-                          {subIndustry.name}
-                        </span>
-                      </>
-                    ) : (
-                      <>
-                        Explore topics and insights within{' '}
-                        <span className="bg-gradient-to-r from-blue-500 to-teal-400 text-transparent bg-clip-text font-extrabold">
-                          {subIndustry.name}
-                        </span>
-                      </>
-                    )}
-                  </p>
+                 <h2 className="text-xl font-bold text-transparent bg-gradient-to-r from-blue-500 to-teal-400 bg-clip-text mb-8">
+              {locale === 'ar' ? 'المواضيع' : 'Topics'}
+            </h2>
               </div>
 
               {/* Topics Grid */}
@@ -248,9 +234,7 @@ export default async function SubIndustryPage({ params }: Props) {
                         </svg>
                       </div>
                       {isDisabled && (
-                        <div
-                        className={`absolute z-10 px-3 py-2 text-sm font-medium text-white bg-gray-900 rounded shadow-md bottom-1/2 mb-2 left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity duration-300`}
-                        >
+                        <div className="min-w-[250px] absolute z-10 px-3 py-2 text-sm font-medium text-white bg-gray-900 rounded shadow-md bottom-1/2 mb-2 left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity duration-300">
                           {locale === 'ar' ? 'البيانات غير متوفرة' : 'No Knowledge Available Yet'}
                         </div>
                       )}
