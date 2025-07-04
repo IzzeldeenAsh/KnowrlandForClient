@@ -1070,7 +1070,7 @@ const FilterBox: React.FC<FilterBoxProps> = ({
                 </div>
               )}
               <div className="flex flex-col gap-1">
-                <span className="text-xs font-semibold text-gray-700">{locale === 'ar' ? 'المناطق' : 'By Region'}</span>
+                <span className="text-xs font-semibold text-gray-700">{locale === 'ar' ? 'المناطق أو ' : 'Or By Region'}</span>
                 <Combobox
                   store={regionCombobox}
                   withinPortal={false}
@@ -1117,7 +1117,7 @@ const FilterBox: React.FC<FilterBoxProps> = ({
                 </Combobox>
               </div>
               <div className="flex flex-col gap-1">
-                <span className="text-xs font-semibold text-gray-700">{locale === 'ar' ? 'البلدان' : 'By Country'}</span>
+                <span className="text-xs font-semibold text-gray-700">{locale === 'ar' ? 'البلدان أو ' : 'Or By Country'}</span>
                 <Combobox
                   store={countryCombobox}
                   withinPortal={false}
