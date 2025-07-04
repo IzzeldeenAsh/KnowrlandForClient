@@ -222,25 +222,27 @@ export default function KnowledgePage({ params }: Props) {
           <div className={`${isRTL ? 'text-right' : 'text-start'} mb-4 w-full`}    data-aos="fade-down">
             <div className="flex-row gap-3 sm:gap-4 flex-wrap sm:flex-nowrap sm:flex max-w-80-per">
               <div className="mb-4 mt-1 hidden sm:block">
+                
                 {knowledge.type === 'data' && <div className="bg-white p-2 sm:p-3 rounded flex items-center justify-center"><span className="hidden sm:block"><DataIcon width={40} height={40} /></span><span className="sm:hidden"><DataIcon width={30} height={30} /></span></div>}
                 {knowledge.type === 'insight' && <div className="bg-white p-2 rounded flex items-center justify-center"><span className="hidden sm:block"><InsightIcon width={50} height={50} /></span><span className="sm:hidden"><InsightIcon width={30} height={30} /></span></div>}
                 {knowledge.type === 'manual' && <div className="bg-white p-2 rounded flex items-center justify-center"><span className="hidden sm:block"><ManualIcon width={50} height={50} /></span><span className="sm:hidden"><ManualIcon width={30} height={30} /></span></div>}
                 {knowledge.type === 'report' && <div className="bg-white p-2 rounded flex items-center justify-center"><span className="hidden sm:block"><ReportIcon width={50} height={50} /></span><span className="sm:hidden"><ReportIcon width={30} height={30} /></span></div>}
                 {knowledge.type === 'course' && <div className="bg-white p-2 rounded flex items-center justify-center"><span className="hidden sm:block"><CourseIcon width={50} height={50} /></span><span className="sm:hidden"><CourseIcon width={30} height={30} /></span></div>}
+                <div className="text-xs font-bold text-center bg-blue-100 uppercase mt-2 text-blue-500 rounded-md">
+                    {messages && knowledge.type === 'data' ? messages?.Header?.navigation?.data || knowledge.type : 
+                     knowledge.type === 'insight' ? messages?.Header?.navigation?.insight || knowledge.type : 
+                     knowledge.type === 'manual' ? messages?.Header?.navigation?.manual || knowledge.type : 
+                     knowledge.type === 'report' ? messages?.Header?.navigation?.report || knowledge.type : 
+                     knowledge.type === 'course' ? messages?.Header?.navigation?.course || knowledge.type : 
+                     knowledge.type}
+                  </div>
               </div>
               <div className="flex flex-col items-start">
                 <div className="flex flex-col items-start mb-6 sm:mb-10">
                   <h3 className="text-md sm:text-2xl md:text-4xl bg-gradient-to-r from-blue-500 to-teal-400 font-extrabold text-transparent bg-clip-text ">
                     {knowledge.title}
                   </h3>
-                  <div className="text-sm font-bold text-gray-700 capitalize">
-                    {messages && knowledge.type === 'data' ? messages?.Header?.navigation?.data || knowledge.type : 
-                     knowledge.type === 'insight' ? messages?.Header?.navigation?.insights || knowledge.type : 
-                     knowledge.type === 'manual' ? messages?.Header?.navigation?.manuals || knowledge.type : 
-                     knowledge.type === 'report' ? messages?.Header?.navigation?.reports || knowledge.type : 
-                     knowledge.type === 'course' ? messages?.Header?.navigation?.courses || knowledge.type : 
-                     knowledge.type}
-                  </div>
+                  
                 </div>
               </div>
             </div>
