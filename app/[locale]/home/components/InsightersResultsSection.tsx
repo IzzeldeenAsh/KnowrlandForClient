@@ -81,7 +81,12 @@ const InsightersResultsSection: React.FC<InsightersResultsSectionProps> = ({
                     <Link 
                       href={`/${locale}/profile/${uuid}?entity=insighter`} 
                       key={uuid}
-                      className="flex flex-col justify-between gap-4 bg-white rounded-lg border-1 border-gray-200 overflow-hidden  duration-300 p-6 hover:translate-y-[-5px] hover:shadow-md-blue-500"
+                      className="flex flex-col justify-between gap-4 bg-white rounded-lg border-1 border-gray-200 overflow-hidden duration-300 p-6 hover:translate-y-[-5px] hover:shadow-md-blue-500"
+                      style={{
+                        backgroundImage: "url('https://res.cloudinary.com/dsiku9ipv/image/upload/v1746774672/Artboard_2_qzimiu.png')",
+                        backgroundSize: 'cover',
+                        backgroundPosition: 'center'
+                      }}
                     >
                       <div className="flex flex-col items-center space-y-4">
                         {/* Avatar Section */}
@@ -90,7 +95,7 @@ const InsightersResultsSection: React.FC<InsightersResultsSectionProps> = ({
                           {isCompanyInsighter ? (
                             // Company-insighter: Show initials with company logo overlay
                             <>
-                              <div className="w-full h-full bg-blue-100 flex items-center justify-center rounded-full pb-6">
+                              <div className="w-full h-full bg-blue-100 flex items-center justify-center rounded-full">
                                 <span className="text-2xl font-semibold text-blue-600 rounded-full">
                                   {name.split(' ').map((word: string) => word.charAt(0)).join('').toUpperCase()}
                                 </span>
@@ -101,7 +106,7 @@ const InsightersResultsSection: React.FC<InsightersResultsSectionProps> = ({
                                     src={company.logo} 
                                     alt={company.legal_name || 'Company'}
                                     fill
-                                    className="object-cover rounded-full"
+                                    className="object-cover rounded-full object-top"
                                   />
                                 </div>
                               )}
@@ -121,7 +126,7 @@ const InsightersResultsSection: React.FC<InsightersResultsSectionProps> = ({
                                     src={photoUrl} 
                                     alt={name}
                                     fill
-                                    className="object-cover rounded-full"
+                                    className="object-cover rounded-full object-top"
                                   />
                                 </div>
                               ) : (
@@ -138,7 +143,7 @@ const InsightersResultsSection: React.FC<InsightersResultsSectionProps> = ({
                               src={photoUrl} 
                               alt={name}
                               fill
-                              className="object-cover border-1 border-blue-500 rounded-full"
+                              className="object-cover border-1 border-blue-500 rounded-full object-top"
                             />
                           ) : (
                             // Fallback: Show initials
@@ -157,7 +162,7 @@ const InsightersResultsSection: React.FC<InsightersResultsSectionProps> = ({
                             {/* Role-based badges */}
                             {isCompanyInsighter && company && (
                             <span className="bg-yellow-100 text-yellow-600 font-bold uppercase text-[10px] px-3 py-1 rounded-full">
-                              {company.legal_name} Company
+                              {company.legal_name} 
                             </span>
                           )}
                           
@@ -170,7 +175,7 @@ const InsightersResultsSection: React.FC<InsightersResultsSectionProps> = ({
                           {isCompany && !isCompanyInsighter && company && (
                             <>
                               <span className="bg-yellow-100 text-yellow-600 font-bold text-[10px] px-3 py-1 rounded-full uppercase">
-                                {company.legal_name} Company
+                                {company.legal_name} 
                               </span>
                         
                             </>

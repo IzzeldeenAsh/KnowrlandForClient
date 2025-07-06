@@ -279,33 +279,33 @@ export function UserProfile({ isHome }: { isHome: boolean }) {
             >
               {t("dashboard")}
             </Link>
-            <Link
+            {/* <Link
             href="https://app.knoldg.com/app/insighter-dashboard/my-consulting-schedule"
             className="block px-4 py-2.5 font-semibold text-slate-900 hover:bg-indigo-50 hover:text-sky-700"
             onClick={() => setMenuOpen(false)}
             style={{fontSize: '13px'}}
             >
               {t("myConsultingSchedule")}
-            </Link>
+            </Link> */}
             {/* Hide requests, received meetings and account settings for client-only role */}
             {!isClient$() && (
               <>
-                <Link
+                {/* <Link
                   href="https://app.knoldg.com/app/insighter-dashboard/my-requests"
                   className="block px-4 py-2.5 font-semibold text-slate-900 hover:bg-indigo-50 hover:text-sky-700"
                   onClick={() => setMenuOpen(false)}
                   style={{fontSize: '13px'}}
                 >
                   {t("myRequests")}
-                </Link>
-                <Link
+                </Link> */}
+                {/* <Link
                   href="https://app.knoldg.com/app/insighter-dashboard/my-meetings/received"
                   className="block px-4 py-2.5 font-semibold text-slate-900 hover:bg-indigo-50 hover:text-sky-700"
                   onClick={() => setMenuOpen(false)}
                   style={{fontSize: '13px'}}
                 >
                   {t("ReceivedMeetings")}
-                </Link>
+                </Link> */}
                 <Link
                   href="https://app.knoldg.com/app/insighter-dashboard/account-settings/general-settings"
                   className="block px-4 py-2.5 font-semibold text-slate-900 hover:bg-indigo-50 hover:text-sky-700"
@@ -318,7 +318,7 @@ export function UserProfile({ isHome }: { isHome: boolean }) {
             )}
             
             {/* Show company settings only for company role */}
-            {roles.includes('company') && 
+            {/* {roles.includes('company') && 
               <Link
                 href="https://app.knoldg.com/app/insighter-dashboard/my-company-settings"
                 className="block px-4 py-2.5 font-semibold text-slate-900 hover:bg-indigo-50 hover:text-sky-700"
@@ -327,7 +327,7 @@ export function UserProfile({ isHome }: { isHome: boolean }) {
               >
                 {t("myCompany")}
               </Link>
-            }
+            } */}
 
             {roles.includes("client") &&
               !roles.includes("insighter") &&
@@ -351,14 +351,16 @@ export function UserProfile({ isHome }: { isHome: boolean }) {
                </>
               )}
             
-            <Link
-                  href="https://app.knoldg.com/app/insighter-dashboard/my-meetings/sent"
-                  className="block px-4 py-2.5  font-semibold text-slate-900 hover:bg-indigo-50 hover:text-sky-700"
-                  onClick={() => setMenuOpen(false)}
-                  style={{fontSize: '13px'}}
-                >
-                  {t("SentMeetings")}
-                </Link>
+          {isClient$() && (
+              <Link
+              href="https://app.knoldg.com/app/insighter-dashboard/my-meetings/sent"
+              className="block px-4 py-2.5  font-semibold text-slate-900 hover:bg-indigo-50 hover:text-sky-700"
+              onClick={() => setMenuOpen(false)}
+              style={{fontSize: '13px'}}
+            >
+              {t("SentMeetings")}
+            </Link>
+          )}
             <div className="border-t border-slate-100">
               <button
                 onClick={() => {

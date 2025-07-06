@@ -446,6 +446,8 @@
         "profileNotFound": "Profile not found",
         "bio": "Personal Bio",
         "industries": "Industries",
+        "country": "Country",
+        "location": "Location",
         "minimum3Characters": "Minimum 3 characters",
         "optional": "Optional",
         "certifications": "Certifications",
