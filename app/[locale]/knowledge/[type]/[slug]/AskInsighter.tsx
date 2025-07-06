@@ -6,7 +6,7 @@ import { useParams } from 'next/navigation';
 import Link from 'next/link';
 import { formatDistanceToNow } from 'date-fns';
 import { enUS, ar } from 'date-fns/locale';
-import { Notification, Avatar, Badge } from '@mantine/core';
+import { Notification, Avatar, Badge,Text, Card } from '@mantine/core';
 import { IconX } from '@tabler/icons-react';
 
 // Import CSS module for thread connectors
@@ -364,9 +364,11 @@ export default function AskInsighter({ knowledgeSlug, questions = [], is_owner =
   const renderQuestions = (questionsToRender: Question[], isReply = false) => {
     if (questionsToRender.length === 0 && !isReply) {
       return (
-        <div className="p-6 text-center">
-          <p className="text-gray-500 dark:text-gray-400">{translations.noQuestionsYet}</p>
-        </div>
+        <Card >
+          <Text color="dimmed" className="text-start">
+          {translations.noQuestionsYet}
+          </Text>
+        </Card>
       );
     }
     

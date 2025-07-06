@@ -66,27 +66,36 @@ export default function Breadcrumb({ items }: BreadcrumbProps) {
   };
   
   // Function to render a single breadcrumb item
-  const renderBreadcrumbItem = (item: BreadcrumbItem, index: number) => (
-    <li key={item.href} className="flex items-center">
-      {isRTL ? (
-        <ChevronLeftIcon className="h-4 w-4 text-gray-400 flex-shrink-0" />
-      ) : (
-        <ChevronRightIcon className="h-4 w-4 text-gray-400 flex-shrink-0" />
-      )}
-      <Link
-        href={(item.label === "Industries" || item.label === "المجالات") ? `/${currentLocale}/all-industries` : `/${currentLocale}/${item.href}`}
-        className={`${isRTL ? 'mr-2' : 'ml-2'} text-sm whitespace-nowrap truncate max-w-[150px] sm:max-w-none inline-block ${
-          index === items.length - 1
-            ? 'text-gray-900 font-medium'
-            : 'text-gray-500 hover:text-gray-700'
-        }`}
-        aria-current={index === items.length - 1 ? 'page' : undefined}
-        title={item.label} // Add title for hover tooltip on truncated text
-      >
-        {item.label}
-      </Link>
-    </li>
-  );
+  const renderBreadcrumbItem = (item: BreadcrumbItem, index: number) => {
+    const isLastItem = index === items.length - 1;
+    
+    return (
+      <li key={item.href} className="flex items-center">
+        {isRTL ? (
+          <ChevronLeftIcon className="h-4 w-4 text-gray-400 flex-shrink-0" />
+        ) : (
+          <ChevronRightIcon className="h-4 w-4 text-gray-400 flex-shrink-0" />
+        )}
+        {isLastItem ? (
+          <span
+            className={`${isRTL ? 'mr-2' : 'ml-2'} text-sm whitespace-nowrap truncate max-w-[150px] sm:max-w-none inline-block text-gray-900 font-medium`}
+            aria-current="page"
+            title={item.label} // Add title for hover tooltip on truncated text
+          >
+            {item.label}
+          </span>
+        ) : (
+          <Link
+            href={(item.label === "Industries" || item.label === "المجالات") ? `/${currentLocale}/all-industries` : `/${currentLocale}/${item.href}`}
+            className={`${isRTL ? 'mr-2' : 'ml-2'} text-sm whitespace-nowrap truncate max-w-[150px] sm:max-w-none inline-block text-gray-500 hover:text-gray-700`}
+            title={item.label} // Add title for hover tooltip on truncated text
+          >
+            {item.label}
+          </Link>
+        )}
+      </li>
+    );
+  };
   
   return (
     <nav className="flex w-full" aria-label="Breadcrumb">
