@@ -135,6 +135,17 @@ export default function Hero() {
     router.push(`/${currentLocale}/home?search_type=${searchType}&keyword=${encodeURIComponent(suggestion)}&accuracy=any`);
   };
 
+  // Handle clear search input
+  const handleClearSearch = () => {
+    setSearchInput('');
+    setSuggestions([]);
+    setShowSuggestions(false);
+    setActiveSuggestionIndex(-1);
+    if (searchInputRef.current) {
+      searchInputRef.current.focus();
+    }
+  };
+
   // Handle search submission
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -244,6 +255,30 @@ export default function Hero() {
                         </div>
                       )}
                       
+                      {/* Clear button */}
+                      {searchInput && !isLoading && (
+                        <button
+                          type="button"
+                          onClick={handleClearSearch}
+                          className="flex items-center justify-center px-2 hover:bg-gray-100 transition duration-300"
+                        >
+                          <svg
+                            className="w-5 h-5 text-gray-400 hover:text-gray-600"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                            xmlns="http://www.w3.org/2000/svg"
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth={2}
+                              d="M6 18L18 6M6 6l12 12"
+                            />
+                          </svg>
+                        </button>
+                      )}
+                      
                       {/* Search button */}
                       <button
                         type="submit"
@@ -268,16 +303,16 @@ export default function Hero() {
                     
                     {/* Dropdown menu */}
                     {isDropdownOpen && (
-                      <div className={`absolute mt-1 w-[150px] bg-white border border-gray-200 rounded-md shadow-lg z-10 ${currentLocale === 'ar' ? 'right-0' : 'left-0'}`}>
+                      <div className={`absolute mt-1 w-[160px] bg-white border border-gray-200 rounded-md shadow-lg z-10 ${currentLocale === 'ar' ? 'right-0' : 'left-0'}`}>
                         <div 
-                          className={`px-4 py-2 cursor-pointer hover:bg-blue-50 ${searchType === 'knowledge' ? 'bg-blue-50' : ''}`}
+                          className={`px-4 py-3 cursor-pointer hover:bg-blue-50 ${searchType === 'knowledge' ? 'bg-blue-50' : ''}`}
                           onClick={() => {
                             setSearchType('knowledge');
                             setIsDropdownOpen(false);
                           }}
                         >
                           <div className="flex items-center">
-                            <div className="flex items-center justify-center w-7 h-7 bg-blue-50 rounded-md mr-2">
+                            <div className="flex items-center justify-center w-6 h-6 bg-blue-50 rounded-md mr-3">
                               <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4 text-blue-600" width="24" height="24" viewBox="0 0 24 24" strokeWidth="2" stroke="currentColor" fill="none" strokeLinecap="round" strokeLinejoin="round">
                                 <path stroke="none" d="M0 0h24v24H0z" fill="none" />
                                 <path d="M3 19a9 9 0 0 1 9 0a9 9 0 0 1 9 0" />
@@ -287,18 +322,18 @@ export default function Hero() {
                                 <path d="M21 6l0 13" />
                               </svg>
                             </div>
-                            <span className="text-gray-900 font-medium md:text-lg text-base">{currentLocale === 'ar' ? 'معرفة' : 'Knowledge'}</span>
+                            <span className="text-gray-900 font-medium md:text-md text-sm">{currentLocale === 'ar' ? 'معرفة' : 'Knowledge'}</span>
                           </div>
                         </div>
                         <div 
-                          className={`px-4 py-2 cursor-pointer hover:bg-blue-50 ${searchType === 'insighter' ? 'bg-blue-50' : ''}`}
+                          className={`px-4 py-3 cursor-pointer hover:bg-blue-50 ${searchType === 'insighter' ? 'bg-blue-50' : ''}`}
                           onClick={() => {
                             setSearchType('insighter');
                             setIsDropdownOpen(false);
                           }}
                         >
                           <div className="flex items-center">
-                            <div className="flex items-center justify-center w-6 h-6 rounded-md mr-2">
+                            <div className="flex items-center justify-center w-6 h-6 bg-blue-50 rounded-md mr-3">
                               <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4 text-blue-600" width="24" height="24" viewBox="0 0 24 24" strokeWidth="2" stroke="currentColor" fill="none" strokeLinecap="round" strokeLinejoin="round">
                                 <path stroke="none" d="M0 0h24v24H0z" fill="none" />
                                 <path d="M9 7m-4 0a4 4 0 1 0 8 0a4 4 0 1 0 -8 0" />
@@ -307,7 +342,7 @@ export default function Hero() {
                                 <path d="M21 21v-2a4 4 0 0 0 -3 -3.85" />
                               </svg>
                             </div>
-                            <span className="text-gray-900 font-medium md:text-lg text-base">{currentLocale === 'ar' ? 'إنسايتر' : 'Insighter'}</span>
+                            <span className="text-gray-900 font-medium md:text-md text-sm">{currentLocale === 'ar' ? 'إنسايتر' : 'Insighter'}</span>
                           </div>
                         </div>
                       </div>
