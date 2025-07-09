@@ -40,6 +40,50 @@ export default function AuthCallback() {
   const locale = (params.locale as string) || 'en';
 
   useEffect(() => {
+    // Helper function to set user's timezone in the API
+    const setUserTimezone = async (authToken: string) => {
+      try {
+        const userTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+        console.log('%c[TIMEZONE API REQUEST]', 'background: #6b8aff; color: white; font-size: 14px; padding: 5px;', 
+          'Setting timezone:', userTimezone);
+          
+        const timezoneResponse = await fetch('https://api.knoldg.com/api/account/timezone/set', {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${authToken}`,
+            'Content-Type': 'application/json',
+            'Accept': 'application/json',
+            'Accept-Language': locale,
+          },
+          body: JSON.stringify({
+            timezone: userTimezone
+          })
+        });
+        
+        // Log the complete response for debugging
+        const responseStatus = timezoneResponse.status;
+        let responseData = null;
+        try {
+          responseData = await timezoneResponse.clone().json();
+        } catch (e) {
+          responseData = 'Could not parse response as JSON';
+        }
+        
+        if (!timezoneResponse.ok) {
+          console.error('%c[TIMEZONE API ERROR]', 'background: #ff6b6b; color: white; font-size: 14px; padding: 5px;', 
+            'Failed with status:', responseStatus, 
+            'Response:', responseData);
+        } else {
+          console.log('%c[TIMEZONE API SUCCESS]', 'background: #6bff8a; color: black; font-size: 14px; padding: 5px;', 
+            'Status:', responseStatus,
+            'Response:', responseData);
+        }
+      } catch (timezoneError) {
+        console.error('%c[TIMEZONE API EXCEPTION]', 'background: #ff6b6b; color: white; font-size: 14px; padding: 5px;', timezoneError);
+        // Continue with the flow even if timezone setting fails
+      }
+    };
+    
     const fetchProfile = async () => {
       try {
         if (!token) {
@@ -91,6 +135,10 @@ export default function AuthCallback() {
         
         document.cookie = cookieSettings.join('; ');
         
+        // Set user's timezone as soon as we have a token
+        // This happens independent of profile fetch success
+        await setUserTimezone(token);
+        
         // Fetch profile
         const response = await fetch('https://api.knoldg.com/api/account/profile', {
           headers: {
@@ -118,46 +166,6 @@ export default function AuthCallback() {
           first_name: data.data.first_name,
           last_name: data.data.last_name,
         }));
-        
-        // Set user's timezone in the API
-        try {
-          const userTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
-          const timezoneResponse = await fetch('https://api.knoldg.com/api/account/timezone/set', {
-            method: 'POST',
-            headers: {
-              'Authorization': `Bearer ${token}`,
-              'Content-Type': 'application/json',
-              'Accept': 'application/json',
-              'Accept-Language' :locale,
-            },
-            body: JSON.stringify({
-              timezone: userTimezone
-            })
-          });
-          
-          // Log the complete response for debugging
-          const responseStatus = timezoneResponse.status;
-          let responseData = null;
-          try {
-            responseData = await timezoneResponse.clone().json();
-          } catch (e) {
-            responseData = 'Could not parse response as JSON';
-          }
-          
-          if (!timezoneResponse.ok) {
-            console.error('%c[TIMEZONE API ERROR]', 'background: #ff6b6b; color: white; font-size: 14px; padding: 5px;', 
-              'Failed with status:', responseStatus, 
-              'Response:', responseData);
-          } else {
-            console.log('%c[TIMEZONE API SUCCESS]', 'background: #6bff8a; color: black; font-size: 14px; padding: 5px;', 
-              'Status:', responseStatus,
-              'Response:', responseData);
-          }
-        } catch (timezoneError) {
-          console.error('%c[TIMEZONE API EXCEPTION]', 'background: #ff6b6b; color: white; font-size: 14px; padding: 5px;', timezoneError);
-          
-          // Continue with the login flow even if timezone setting fails
-        }
         
         // Check for returnUrl parameter first
         const returnUrl = searchParams.get('returnUrl');
@@ -258,6 +266,22 @@ export default function AuthCallback() {
     };
 
     if (token) {
+      // Always attempt to set timezone if we have a token, regardless of profile fetch outcome
+      const userTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+      const setTimezoneDirectly = async () => {
+        try {
+          await setUserTimezone(token);
+          console.log('[token-callback] Set timezone call completed');
+        } catch (e) {
+          console.error('[token-callback] Failed to set timezone directly:', e);
+          // Continue with auth flow even if timezone setting fails
+        }
+      };
+      
+      // Start timezone API call immediately
+      setTimezoneDirectly();
+      
+      // Continue with normal profile fetch
       fetchProfile();
     } else {
       console.error('No token found in URL parameters');
