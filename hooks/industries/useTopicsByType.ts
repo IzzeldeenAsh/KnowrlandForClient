@@ -96,7 +96,7 @@ export function useTopicsByType({ type, id, slug, topKnowledge = 10 }: UseTopics
             headers: {
               "Content-Type": "application/json",
               "Accept": "application/json",
-              "Accept-Language": locale,
+              "Accept-Language": locale,"X-Timezone": Intl.DateTimeFormat().resolvedOptions().timeZone,
             },
             body: JSON.stringify({
               top_knowledge: topKnowledge,

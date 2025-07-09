@@ -6,11 +6,14 @@ import { useParams } from 'next/navigation';
 import Link from 'next/link';
 import { formatDistanceToNow } from 'date-fns';
 import { enUS, ar } from 'date-fns/locale';
-import { Notification, Avatar, Badge,Text, Card } from '@mantine/core';
-import { IconX } from '@tabler/icons-react';
+import { Avatar, Badge, Text, Card, Button } from '@mantine/core';
+import { IconX, IconTrash } from '@tabler/icons-react';
 
 // Import CSS module for thread connectors
 import styles from './AskInsighter.module.css';
+
+// Import toast context
+import { useToast } from '@/components/toast/ToastContext';
 
 import { Question, KnowledgeDetails } from './types';
 
@@ -34,6 +37,8 @@ interface AskInsighterProps {
 }
 
 export default function AskInsighter({ knowledgeSlug, questions = [], is_owner = false, onRefreshData }: AskInsighterProps) {
+  // Get toast context with notification methods
+  const { error, success } = useToast();
   const [questionText, setQuestionText] = useState('');
   const [replyTexts, setReplyTexts] = useState<Record<number, string>>({});
   const [replyingTo, setReplyingTo] = useState<number | null>(null); // Keeping this for tracking which question is being replied to, even though forms will always be visible
@@ -86,6 +91,10 @@ export default function AskInsighter({ knowledgeSlug, questions = [], is_owner =
     loginButton: isRTL ? '\u062a\u0633\u062c\u064a\u0644 \u0627\u0644\u062f\u062e\u0648\u0644' : 'Login',
     questions: isRTL ? '\u0623\u0633\u0626\u0644\u0629' : 'Questions',
     question: isRTL ? '\u0633\u0624\u0627\u0644' : 'Question',
+    deleteQuestion: isRTL ? '\u062d\u0630\u0641 \u0627\u0644\u0633\u0624\u0627\u0644' : 'Delete Question',
+    deletingQuestion: isRTL ? '\u062c\u0627\u0631\u064a \u062d\u0630\u0641 \u0627\u0644\u0633\u0624\u0627\u0644...' : 'Deleting question...',
+    questionDeleted: isRTL ? '\u062a\u0645 \u062d\u0630\u0641 \u0627\u0644\u0633\u0624\u0627\u0644 \u0628\u0646\u062c\u0627\u062d!' : 'Question deleted successfully!',
+    deleteError: isRTL ? '\u062d\u062f\u062b \u062e\u0637\u0623 \u0641\u064a \u062d\u0630\u0641 \u0627\u0644\u0633\u0624\u0627\u0644. \u064a\u0631\u062c\u0649 \u0627\u0644\u0645\u062d\u0627\u0648\u0644\u0629 \u0645\u0631\u0629 \u0623\u062e\u0631\u0649.' : 'Error deleting question. Please try again.',
   };
 
   const handleQuestionSubmit = async (e: React.FormEvent) => {
@@ -99,6 +108,7 @@ export default function AskInsighter({ knowledgeSlug, questions = [], is_owner =
         'Content-Type': 'application/json',
         'Accept': 'application/json',
         'Accept-Language': locale,
+        "X-Timezone": Intl.DateTimeFormat().resolvedOptions().timeZone,
       };
       
       // Add authorization header if token exists
@@ -133,12 +143,18 @@ export default function AskInsighter({ knowledgeSlug, questions = [], is_owner =
             .filter(Boolean);
           
           if (errorMessages.length > 0) {
-            setSubmitError(errorMessages[0] as string);
+            const errorMsg = errorMessages[0] as string;
+            setSubmitError(errorMsg);
+            error(errorMsg); // Show toast notification
           } else {
-            setSubmitError(errorData.message || translations.errorSubmitting);
+            const errorMsg = errorData.message || translations.errorSubmitting;
+            setSubmitError(errorMsg);
+            error(errorMsg); // Show toast notification
           }
         } else {
-          setSubmitError(errorData?.message || translations.errorSubmitting);
+          const errorMsg = errorData?.message || translations.errorSubmitting;
+          setSubmitError(errorMsg);
+          error(errorMsg); // Show toast notification
         }
         
         throw new Error(`Failed to submit question: ${response.status} ${response.statusText}`);
@@ -148,6 +164,7 @@ export default function AskInsighter({ knowledgeSlug, questions = [], is_owner =
       console.log('Question submitted successfully:', data);
       setQuestionText('');
       setSubmitSuccess(true);
+      success(translations.questionSubmitted);
       
       // Refresh knowledge data to show the new question
       if (onRefreshData) {
@@ -178,6 +195,7 @@ export default function AskInsighter({ knowledgeSlug, questions = [], is_owner =
         'Content-Type': 'application/json',
         'Accept': 'application/json',
         'Accept-Language': locale,
+        "X-Timezone": Intl.DateTimeFormat().resolvedOptions().timeZone,
       };
       
       // Add authorization header if token exists
@@ -189,7 +207,9 @@ export default function AskInsighter({ knowledgeSlug, questions = [], is_owner =
       const replyText = replyTexts[questionId] || '';
       
       if (!replyText.trim()) {
-        setSubmitError('Reply cannot be empty');
+        const errorMessage = 'Reply cannot be empty';
+        setSubmitError(errorMessage);
+        error(errorMessage);
         return;
       }
       
@@ -212,7 +232,9 @@ export default function AskInsighter({ knowledgeSlug, questions = [], is_owner =
         // parentId should always be the top-level parent question ID
         if (!parentId) {
           console.error('[AskInsighter] Error: Missing parent_id for nested question');
-          setSubmitError('Missing parent question reference');
+          const errorMessage = 'Missing parent question reference';
+          setSubmitError(errorMessage);
+          error(errorMessage);
           return;
         }
         
@@ -246,12 +268,18 @@ export default function AskInsighter({ knowledgeSlug, questions = [], is_owner =
             .filter(Boolean);
           
           if (errorMessages.length > 0) {
-            setSubmitError(errorMessages[0] as string);
+            const errorMsg = errorMessages[0] as string;
+            setSubmitError(errorMsg);
+            error(errorMsg); // Show toast notification
           } else {
-            setSubmitError(errorData.message || translations.errorSubmitting);
+            const errorMsg = errorData.message || translations.errorSubmitting;
+            setSubmitError(errorMsg);
+            error(errorMsg); // Show toast notification
           }
         } else {
-          setSubmitError(errorData?.message || translations.errorSubmitting);
+          const errorMsg = errorData?.message || translations.errorSubmitting;
+          setSubmitError(errorMsg);
+          error(errorMsg); // Show toast notification
         }
         
         throw new Error(`Failed to submit reply: ${response.status} ${response.statusText}`);
@@ -268,6 +296,9 @@ export default function AskInsighter({ knowledgeSlug, questions = [], is_owner =
       });
       
       setSubmitSuccess(true);
+      
+      // Show success toast notification
+      success(is_owner ? translations.answerSubmitted : translations.replySubmitted);
       
       // Refresh knowledge data to show the new reply
       if (onRefreshData) {
@@ -359,6 +390,53 @@ export default function AskInsighter({ knowledgeSlug, questions = [], is_owner =
     }
     
     return false;
+  };
+  
+  // Function to delete a question
+  const deleteQuestion = async (questionId: number) => {
+    if (!authToken) {
+      setSubmitError(translations.loginRequired);
+      return;
+    }
+    
+    setIsSubmitting(true);
+    
+    try {
+      const response = await fetch(
+        `https://api.knoldg.com/api/account/knowledge/question/${questionId}`,
+        {
+          method: 'DELETE',
+          headers: {
+            "Content-Type": "application/json",
+            "Accept": "application/json",
+            "Accept-Language": locale,
+            "X-Timezone": Intl.DateTimeFormat().resolvedOptions().timeZone,
+            Authorization: `Bearer ${authToken}`,
+          },
+        }
+      );
+      
+      if (response.ok) {
+        // Show success message
+        setSubmitSuccess(true);
+        success(translations.questionDeleted);
+        
+        // Refresh the page after successful deletion
+        setTimeout(() => {
+          window.location.reload();
+        }, 500);
+      } else {
+        const errorData = await response.json().catch(() => null);
+        const errorMessage = errorData?.message || translations.deleteError;
+        setSubmitError(errorMessage);
+        error(errorMessage);
+      }
+    } catch (error) {
+      console.error("Error deleting question:", error);
+      setSubmitError(translations.deleteError);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
   
   const renderQuestions = (questionsToRender: Question[], isReply = false) => {
@@ -478,7 +556,24 @@ export default function AskInsighter({ knowledgeSlug, questions = [], is_owner =
         <div className="flex pb-4">
         <div aria-hidden="true" className={hasAnswer ? styles.commentsThreadLine : 'ps-10'} role="button"></div>
           {/* Question content */}
-          <p className="text-gray-800 mb-4 text-sm px-3 font-semibold">{question.question?.question}</p>
+          <div className="flex justify-between items-start px-3 w-full">
+                  <p className="text-gray-800 mb-4 text-sm font-semibold">{question.question?.question}</p>
+                  {question.is_owner && (
+                    <Button
+                      size="xs"
+                      color="red"
+                      variant="subtle"
+                      onClick={() => deleteQuestion(question.id)}
+                      disabled={isSubmitting}
+                      className="hover:bg-red-50 ml-2"
+                    >
+                      <div className="flex items-center">
+                        <IconTrash size={16} className={`${isRTL ? 'ml-1' : 'mr-1'}`} />
+                        {translations.deleteQuestion}
+                      </div>
+                    </Button>
+                  )}
+                </div>
        
         </div>
           
@@ -590,18 +685,7 @@ export default function AskInsighter({ knowledgeSlug, questions = [], is_owner =
                     </button>
                   </div>
                 </div>
-                {question.id === replyingTo && submitError && (
-                  <Notification
-                    icon={<IconX size={20} />}
-                    color="red"
-                    onClose={() => setSubmitError('')}
-                    mt="sm"
-                    mb="md"
-                    withCloseButton
-                  >
-                    {submitError}
-                  </Notification>
-                )}
+                {/* Error handling now done via toast system */}
               </form>
             </div>
           )}
@@ -655,18 +739,7 @@ export default function AskInsighter({ knowledgeSlug, questions = [], is_owner =
                         </button>
                       </div>
                     </div>
-                    {question.id === replyingTo && submitError && (
-                      <Notification
-                        icon={<IconX size={20} />}
-                        color="red"
-                        onClose={() => setSubmitError('')}
-                        mt="sm"
-                        mb="md"
-                        withCloseButton
-                      >
-                        {submitError}
-                      </Notification>
-                    )}
+                    {/* Error handling now done via toast system */}
                   </form>
                 </div>
               )}
@@ -768,18 +841,7 @@ export default function AskInsighter({ knowledgeSlug, questions = [], is_owner =
                   </div>
                 </div>
               </div>
-              {submitError && (
-                <Notification
-                  icon={<IconX size={20} />}
-                  color="red"
-                  onClose={() => setSubmitError('')}
-                  mt="sm"
-                  mb="md"
-                  withCloseButton
-                >
-                  {submitError}
-                </Notification>
-              )}
+              {/* Error handling now done via toast system */}
      
             </form>
           )

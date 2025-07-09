@@ -71,29 +71,6 @@ export default function NotificationBell() {
     
     // Toggle notifications panel immediately
     setIsOpen(prev => !prev)
-    
-    // If we're opening notifications and there are unread notifications, mark all as read
-    if (notificationCount > 0) {
-      // Immediately mark all notifications as read in local state for UI feedback
-      setNotifications(prev => 
-        prev.map(notification => ({
-          ...notification, 
-          read_at: notification.read_at || new Date().toISOString()
-        }))
-      )
-      
-      // Call API to mark all notifications as read in the background
-      markAllNotificationsAsRead(locale)
-        .then(() => getNotifications(locale))
-        .then(updatedNotifications => {
-          if (updatedNotifications) {
-            setNotifications(updatedNotifications)
-          }
-        })
-        .catch(error => {
-          console.error('Error marking all notifications as read:', error)
-        })
-    }
   }
   
   const closeNotifications = () => {

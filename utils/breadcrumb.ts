@@ -14,6 +14,7 @@ export async function fetchBreadcrumb(
       'Content-Type': 'application/json',
       'Accept': 'application/json',
       'Accept-Language': locale,
+      "X-Timezone": Intl.DateTimeFormat().resolvedOptions().timeZone,
     },
     body: JSON.stringify({
       type,
