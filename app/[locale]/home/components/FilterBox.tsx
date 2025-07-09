@@ -234,7 +234,8 @@ const FilterBox: React.FC<FilterBoxProps> = ({
         const response = await fetch('https://api.knoldg.com/api/common/setting/country/list', {
           headers: {
             'Accept-Language': locale,
-            'Accept': 'application/json'
+            'Accept': 'application/json',
+            "X-Timezone": Intl.DateTimeFormat().resolvedOptions().timeZone,
           }
         });
         
@@ -255,7 +256,8 @@ const FilterBox: React.FC<FilterBoxProps> = ({
         const response = await fetch('https://api.knoldg.com/api/common/setting/region/list', {
           headers: {
             'Accept-Language': locale,
-            'Accept': 'application/json'
+            'Accept': 'application/json',
+            "X-Timezone": Intl.DateTimeFormat().resolvedOptions().timeZone,
           }
         });
         
@@ -281,7 +283,8 @@ const FilterBox: React.FC<FilterBoxProps> = ({
         const response = await fetch('https://api.knoldg.com/api/common/setting/economic-bloc/list', {
           headers: {
             'Accept-Language': locale,
-            'Accept': 'application/json'
+            'Accept': 'application/json',
+            "X-Timezone": Intl.DateTimeFormat().resolvedOptions().timeZone,
           }
         });
         
@@ -307,7 +310,8 @@ const FilterBox: React.FC<FilterBoxProps> = ({
         const response = await fetch('https://api.knoldg.com/api/common/setting/isic-code/tree-list', {
           headers: {
             'Accept-Language': locale,
-            'Accept': 'application/json'
+            'Accept': 'application/json',
+            "X-Timezone": Intl.DateTimeFormat().resolvedOptions().timeZone,
           }
         });
         
@@ -328,7 +332,8 @@ const FilterBox: React.FC<FilterBoxProps> = ({
         const response = await fetch('https://api.knoldg.com/api/common/setting/industry/tree', {
           headers: {
             'Accept-Language': locale,
-            'Accept': 'application/json'
+            'Accept': 'application/json',
+            "X-Timezone": Intl.DateTimeFormat().resolvedOptions().timeZone,
           }
         });
         
@@ -358,7 +363,8 @@ const FilterBox: React.FC<FilterBoxProps> = ({
         const response = await fetch(`https://api.knoldg.com/api/common/setting/hs-code/isic-code/${isicCodeId}`, {
           headers: {
             'Accept-Language': locale,
-            'Accept': 'application/json'
+            'Accept': 'application/json',
+            "X-Timezone": Intl.DateTimeFormat().resolvedOptions().timeZone,
           }
         });
         

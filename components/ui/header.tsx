@@ -37,7 +37,7 @@ async function getIndustries(locale: string = 'en') {
     headers: {
       "Content-Type": "application/json",
       Accept: "application/json",
-      "Accept-Language": locale,
+      "Accept-Language": locale,"X-Timezone": Intl.DateTimeFormat().resolvedOptions().timeZone,
     },
     body: JSON.stringify({
       top_industry: 6,
@@ -161,6 +161,7 @@ export default function Header() {
             "Content-Type": "application/json",
             "Accept": "application/json",
             "Accept-Language": pathname.split('/')[1] || 'en',
+            "X-Timezone": Intl.DateTimeFormat().resolvedOptions().timeZone,
           }
         });
 

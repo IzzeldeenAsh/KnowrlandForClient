@@ -56,7 +56,7 @@ async function fetchTopicData(id: string, slug: string, locale: string = 'en') {
       headers: {
         "Content-Type": "application/json",
         "Accept": "application/json",
-        "Accept-Language": locale,
+        "Accept-Language": locale,"X-Timezone": Intl.DateTimeFormat().resolvedOptions().timeZone,
       },
     }
   )
