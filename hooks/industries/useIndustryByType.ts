@@ -51,7 +51,7 @@ export function useIndustryByType({ type, id, slug, topTopic = 2 }: UseIndustryB
             headers: {
               "Content-Type": "application/json",
               "Accept": "application/json",
-              "Accept-Language": locale,
+              "Accept-Language": locale,"X-Timezone": Intl.DateTimeFormat().resolvedOptions().timeZone,
             },
             body: JSON.stringify({
               top_topic: topTopic,

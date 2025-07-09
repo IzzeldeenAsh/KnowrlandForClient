@@ -42,7 +42,7 @@ export function useUserProfile() {
               'Authorization': `Bearer ${token}`,
               "Content-Type": "application/json",
               "Accept": "application/json",
-              "Accept-Language": locale,
+              "Accept-Language": locale,"X-Timezone": Intl.DateTimeFormat().resolvedOptions().timeZone,
             },
           }
         );
