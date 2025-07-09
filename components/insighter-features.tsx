@@ -357,7 +357,7 @@ export default function InsighterFeatures() {
                   },
                   {
                     key: "technicalStudies",
-                    icon: "/images/Official-Policies-&-Procedures.svg",
+                    icon: "/images/Specialized-Technical-Studies.svg",
                   },
                   {
                     key: "supplierListsPriceQuotes",
