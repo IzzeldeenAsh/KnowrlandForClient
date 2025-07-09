@@ -98,6 +98,7 @@ export default function AuthCallback() {
             "Content-Type": "application/json",
             "Accept": "application/json",
             "Accept-Language": locale,
+            "X-Timezone": Intl.DateTimeFormat().resolvedOptions().timeZone,
           }
         });
 
@@ -117,6 +118,46 @@ export default function AuthCallback() {
           first_name: data.data.first_name,
           last_name: data.data.last_name,
         }));
+        
+        // Set user's timezone in the API
+        try {
+          const userTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+          const timezoneResponse = await fetch('https://api.knoldg.com/api/account/timezone/set', {
+            method: 'POST',
+            headers: {
+              'Authorization': `Bearer ${token}`,
+              'Content-Type': 'application/json',
+              'Accept': 'application/json',
+              'Accept-Language' :locale,
+            },
+            body: JSON.stringify({
+              timezone: userTimezone
+            })
+          });
+          
+          // Log the complete response for debugging
+          const responseStatus = timezoneResponse.status;
+          let responseData = null;
+          try {
+            responseData = await timezoneResponse.clone().json();
+          } catch (e) {
+            responseData = 'Could not parse response as JSON';
+          }
+          
+          if (!timezoneResponse.ok) {
+            console.error('%c[TIMEZONE API ERROR]', 'background: #ff6b6b; color: white; font-size: 14px; padding: 5px;', 
+              'Failed with status:', responseStatus, 
+              'Response:', responseData);
+          } else {
+            console.log('%c[TIMEZONE API SUCCESS]', 'background: #6bff8a; color: black; font-size: 14px; padding: 5px;', 
+              'Status:', responseStatus,
+              'Response:', responseData);
+          }
+        } catch (timezoneError) {
+          console.error('%c[TIMEZONE API EXCEPTION]', 'background: #ff6b6b; color: white; font-size: 14px; padding: 5px;', timezoneError);
+          
+          // Continue with the login flow even if timezone setting fails
+        }
         
         // Check for returnUrl parameter first
         const returnUrl = searchParams.get('returnUrl');

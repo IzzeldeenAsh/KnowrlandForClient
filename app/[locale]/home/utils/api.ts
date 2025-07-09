@@ -45,7 +45,8 @@ export async function fetchAutocomplete(
     const response = await fetch(`https://api.knoldg.com/api/platform/search/autocomplete?keyword=${encodeURIComponent(keyword)}`, {
       headers: {
         'Accept-Language': locale,
-        'Accept': 'application/json'
+        'Accept': 'application/json',
+        "X-Timezone": Intl.DateTimeFormat().resolvedOptions().timeZone,
       }
     });
     
@@ -141,7 +142,7 @@ export async function fetchStatisticsPerType(
       headers: {
         "Content-Type": "application/json", 
         "Accept": "application/json",
-        "Accept-Language": locale,
+        "Accept-Language": locale,"X-Timezone": Intl.DateTimeFormat().resolvedOptions().timeZone,
       },
       cache: 'no-store'
     });
@@ -286,7 +287,7 @@ export async function fetchSearchResults(
       headers: {
         "Content-Type": "application/json", 
         "Accept": "application/json",
-        "Accept-Language": locale,
+        "Accept-Language": locale,"X-Timezone": Intl.DateTimeFormat().resolvedOptions().timeZone,
       },
       cache: 'no-store'
     });

@@ -94,6 +94,7 @@ async function fetchKnowledgeData(type: string, slug: string, locale: string = '
       "Content-Type": "application/json",
       Accept: "application/json",
       "Accept-Language": locale,
+      "X-Timezone": Intl.DateTimeFormat().resolvedOptions().timeZone,
     };
     
     // Add Authorization header if token exists
@@ -126,8 +127,9 @@ async function fetchKnowledgeData(type: string, slug: string, locale: string = '
         `Failed to fetch knowledge details: ${response.status} ${response.statusText}`
       );
     }
-
+  
     const data = await response.json();
+    console.log('Knowledge Data' , data)  
     return data;
   } catch (error) {
     console.error("Error fetching knowledge data:", error);

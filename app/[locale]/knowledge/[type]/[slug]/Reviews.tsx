@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import { Rating, Textarea, Button, Card, Text, Avatar, Loader } from "@mantine/core";
-import { IconX, IconCheck } from "@tabler/icons-react";
+import { IconX, IconCheck, IconTrash } from "@tabler/icons-react";
 import { useReview } from "@/hooks/knowledgs/useReview";
 import { useRouter, useParams } from "next/navigation";
 import Link from "next/link";
@@ -19,6 +19,7 @@ interface ReviewItem {
   uuid?: string;
   roles?: string[];
   created_date: string;
+  is_owner?: boolean;
 }
 
 interface ReviewsProps {
@@ -59,7 +60,11 @@ export default function Reviews({ knowledgeSlug, reviews, is_review, is_owner }:
     signInRequired: isRTL ? 'يجب أن تكون مسجلاً للإضافة مراجعة.' : 'You must be signed in to leave a review.',
     errorSubmitting: isRTL ? 'حدث خطأ في إرسال المراجعة. يرجى المحاولة مرة أخرى.' : 'Error submitting review. Please try again.',
     loadingReviews: isRTL ? 'جارِ تحميل المراجعات...' : 'Loading reviews...',
-    commentRequired: isRTL ? 'يرجى كتابة تعليق قبل الإرسال' : 'Please write a comment before submitting'
+    commentRequired: isRTL ? 'يرجى كتابة تعليق قبل الإرسال' : 'Please write a comment before submitting',
+    deleteReview: isRTL ? 'حذف المراجعة' : 'Delete Review',
+    deleteSuccess: isRTL ? 'تم حذف المراجعة بنجاح!' : 'Review deleted successfully!',
+    deleteError: isRTL ? 'حدث خطأ في حذف المراجعة. يرجى المحاولة مرة أخرى.' : 'Error deleting review. Please try again.',
+    confirmDelete: isRTL ? 'هل أنت متأكد أنك تريد حذف هذه المراجعة؟' : 'Are you sure you want to delete this review?'
   };
 
   // Retrieve the token from localStorage
@@ -110,7 +115,7 @@ export default function Reviews({ knowledgeSlug, reviews, is_review, is_owner }:
       const headers: HeadersInit = {
         "Content-Type": "application/json",
         Accept: "application/json",
-        "Accept-Language": locale,
+        "Accept-Language": locale,"X-Timezone": Intl.DateTimeFormat().resolvedOptions().timeZone,
       };
       
       if (token) {
@@ -185,7 +190,7 @@ export default function Reviews({ knowledgeSlug, reviews, is_review, is_owner }:
           headers: {
             "Content-Type": "application/json",
             "Accept": "application/json",
-            "Accept-Language": locale,
+            "Accept-Language": locale,"X-Timezone": Intl.DateTimeFormat().resolvedOptions().timeZone,
             Authorization: `Bearer ${token}`,
           },
           body: JSON.stringify({ rate, comment: safeComment }),
@@ -242,6 +247,48 @@ export default function Reviews({ knowledgeSlug, reviews, is_review, is_owner }:
   };
   
 
+
+  // Function to delete a review
+  const deleteReview = async (reviewId: number) => {
+    if (!token) {
+      toast.error(translations.signInRequired);
+      return;
+    }
+    setSubmitting(true);
+
+    try {
+      const response = await fetch(
+        `https://api.knoldg.com/api/account/review/knowledge/${reviewId}`,
+        {
+          method: 'DELETE',
+          headers: {
+            "Content-Type": "application/json",
+            "Accept": "application/json",
+            "Accept-Language": locale,
+            "X-Timezone": Intl.DateTimeFormat().resolvedOptions().timeZone,
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      if (response.ok) {
+        toast.success(translations.deleteSuccess);
+        
+        // Refresh the page after a successful deletion
+        setTimeout(() => {
+          window.location.reload();
+        }, 500);
+      } else {
+        const data = await response.json();
+        toast.error(data.message || translations.deleteError);
+      }
+    } catch (error) {
+      console.error("Error deleting review:", error);
+      toast.error(translations.deleteError);
+    } finally {
+      setSubmitting(false);
+    }
+  };
 
   // Use a single loading state for the entire component
   const isLoading = loading || submitting;
@@ -343,6 +390,23 @@ export default function Reviews({ knowledgeSlug, reviews, is_review, is_owner }:
                     <p className={`mt-2 text-gray-700 text-sm ${isRTL ? 'text-right' : 'text-start'}`}>
                       {review.comment}
                     </p>
+                    {review.is_owner && (
+                      <div className={`mt-3 flex ${isRTL ? 'justify-start' : 'justify-end'}`}>
+                        <Button
+                          size="xs"
+                          color="red"
+                          variant="subtle"
+                          onClick={() => deleteReview(review.id)}
+                          loading={isLoading}
+                          className="hover:bg-red-50"
+                        >
+                          <div className="flex items-center">
+                            <IconTrash size={16} className={`${isRTL ? 'ml-1' : 'mr-1'}`} />
+                            {translations.deleteReview}
+                          </div>
+                        </Button>
+                      </div>
+                    )}
                   </div>
                 </div>
               ))}

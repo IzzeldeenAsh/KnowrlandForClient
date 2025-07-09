@@ -33,7 +33,7 @@ async function getAllIndustries(locale: string) {
       headers: {
         "Content-Type": "application/json", 
         "Accept": "application/json",
-        "Accept-Language": locale,
+        "Accept-Language": locale
       },
       body: JSON.stringify({
         top_sub_industry: 3,
@@ -46,6 +46,7 @@ async function getAllIndustries(locale: string) {
         "Content-Type": "application/json",
         "Accept": "application/json",
         "Accept-Language": locale,
+        "X-Timezone": Intl.DateTimeFormat().resolvedOptions().timeZone,
       },
       body: JSON.stringify({
         top_sub_industry: 3,
