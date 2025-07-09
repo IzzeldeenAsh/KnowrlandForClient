@@ -20,6 +20,7 @@ export interface Question {
     answer_date: string | null;
     user: User;
   };
+  is_owner?: boolean;
   knowledge: {
     id: number;
     type: string;

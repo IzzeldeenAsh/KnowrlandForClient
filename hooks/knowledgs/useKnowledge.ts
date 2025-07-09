@@ -57,7 +57,7 @@ export function useKnowledge({ taxonomy, id, knowledgeType, page }: UseKnowledge
       headers: {
         "Content-Type": "application/json",
         "Accept": "application/json",
-        "Accept-Language": locale, // Use dynamic locale instead of hardcoded 'en'
+        "Accept-Language": locale,"X-Timezone": Intl.DateTimeFormat().resolvedOptions().timeZone, // Use dynamic locale instead of hardcoded 'en'
       },
     })
       .then((res) => {

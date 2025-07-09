@@ -30,7 +30,7 @@ export function useReview(knowledgeSlug: string): UseReviewReturn {
           headers: {
             "Content-Type": "application/json",
             "Accept": "application/json",
-            "Accept-Language": locale,
+            "Accept-Language": locale,"X-Timezone": Intl.DateTimeFormat().resolvedOptions().timeZone,
             Authorization: `Bearer ${token}`,
           },
           body: JSON.stringify({ rate, comment }),

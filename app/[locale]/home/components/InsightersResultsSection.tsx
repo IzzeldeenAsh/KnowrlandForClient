@@ -200,9 +200,15 @@ const InsightersResultsSection: React.FC<InsightersResultsSectionProps> = ({
                       </div>
                        {/* Action Buttons */}
                        <div className="flex flex-col gap-2 w-full">
-                          <button className="flex-1 bg-gradient-to-r from-blue-500 to-teal-400 text-xs text-white px-6 py-2 rounded-md font-medium hover:shadow-lg transition-all duration-300">
-                            {locale === 'ar' ? `مقابلة ${name}` : `Meet ${name}`}
-                          </button>
+                          <Link 
+                            href={`/${locale}/profile/${uuid}?entity=insighter&tab=meet`}
+                            onClick={(e) => e.stopPropagation()}
+                            className="flex-1"
+                          >
+                            <button className="w-full bg-gradient-to-r from-blue-500 to-teal-400 text-xs text-white px-6 py-2 rounded-md font-medium hover:shadow-lg transition-all duration-300">
+                              {locale === 'ar' ? `مقابلة ${name}` : `Meet ${name}`}
+                            </button>
+                          </Link>
                           <button className="flex-1 bg-white border border-gray-200 text-gray-700 px-6 py-2 text-xs rounded-md font-medium hover:bg-gray-50 transition-all duration-300">
                             {locale === 'ar' ? 'تابع' : 'Keep up with'}
                           </button>

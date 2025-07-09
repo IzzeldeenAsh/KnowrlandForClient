@@ -121,6 +121,7 @@ interface KnowledgeResponse {
 interface MeetingTime {
   start_time: string;
   end_time: string;
+  rate: string;
 }
 
 interface MeetingAvailability {
@@ -390,7 +391,8 @@ export default function ProfilePage() {
               'Content-Type': 'application/json',
               'Accept': 'application/json',
               'Accept-Language': locale,
-              'Authorization': `Bearer ${token}`
+              'Authorization': `Bearer ${token}`,
+              "X-Timezone": Intl.DateTimeFormat().resolvedOptions().timeZone,
             }
           });
           
@@ -477,7 +479,7 @@ export default function ProfilePage() {
           headers: {
             "Content-Type": "application/json",
             "Accept": "application/json",
-            "Accept-Language": locale,
+            "Accept-Language": locale,"X-Timezone": Intl.DateTimeFormat().resolvedOptions().timeZone,
             "Authorization": `Bearer ${token}`
           }
         }
@@ -1046,7 +1048,7 @@ export default function ProfilePage() {
                   <div className="flex flex-col md:flex-row h-full justify-between items-center">
                     <div>
                       {/* Name and Badges */}
-                      <div className="flex flex-wrap items-start gap-2 mb-1 capitalize">
+                      <div className="flex flex-wrap items-center gap-2 mb-1 capitalize">
                         {enterpriseType === 'insighter' && (    
   <div>
     <h1 className="text-2xl font-bold">
@@ -1059,7 +1061,7 @@ export default function ProfilePage() {
                         
                      
 
-                        <IconRosetteDiscountCheckFilled className="w-5 h-5 mt-2 text-blue-500" />
+                        <IconRosetteDiscountCheckFilled className="w-5 h-5 text-blue-500" />
                         {isCompany && enterpriseType !== 'insighter' && (
                     
                           <span className="bg-amber-100 mt-2 font-bold text-yellow-500 text-xs px-2 py-0.5 rounded-full inline-flex items-center">
@@ -1109,13 +1111,7 @@ export default function ProfilePage() {
                       
                       {/* Action Buttons */}
                       <div className="flex flex-wrap gap-3 mb-4">
-                       {
-                        enterpriseType === 'insighter' && (
-                          <button className="px-3 py-1.5 text-xs bg-gradient-to-r from-blue-500 to-teal-400 text-white rounded-md font-medium shadow-sm hover:shadow-md transition transform hover:translate-y-[-1px]">
-                            {t('meet')} {profileData.first_name || ''} {profileData.last_name || ''}
-                          </button>
-                        )
-                       }
+                      
                         <button className="px-3 py-1.5 text-xs bg-white dark:bg-slate-700 text-gray-800 dark:text-white rounded-md font-medium border border-gray-200 dark:border-slate-600 hover:border-gray-300 dark:hover:border-slate-500 shadow-sm hover:shadow-md transition transform hover:translate-y-[-1px]">
                           {t('follow')}
                         </button>
@@ -1168,7 +1164,8 @@ export default function ProfilePage() {
 
           {/* Tabs with enhanced styling */}
           <div className="bg-white max-w-6xl mx-auto dark:bg-slate-800 rounded-xl shadow-lg overflow-hidden" data-aos="fade-up" data-aos-delay="100">
-            <Tabs defaultValue="knowledge" onChange={handleTabChange} styles={{
+            {/* Get the tab parameter from the search params, default to 'knowledge' if not provided */}
+            <Tabs defaultValue={searchParams.get('tab') || "knowledge"} onChange={handleTabChange} styles={{
               tab: {
                 '&[dataActive]': {
                   borderColor: '#3b82f6',
@@ -1677,21 +1674,34 @@ export default function ProfilePage() {
                               
                               <div className="space-y-3 mb-6">
                                 {getMeetingTimesForDate(selectedDate).length > 0 ? (
-                                  getMeetingTimesForDate(selectedDate).map((time, index) => (
-                                    <button
-                                      key={index}
-                                      onClick={() => handleTimeClick(time)}
-                                      className={`
-                                        w-full p-3 rounded-lg border text-left transition-colors
-                                        ${selectedMeetingTime === time
-                                          ? 'border-blue-500 bg-blue-50 text-blue-700'
-                                          : 'border-gray-200 hover:border-blue-300 hover:bg-blue-50'
-                                        }
-                                      `}
-                                    >
-                                      {time.start_time.substring(0, 5)} - {time.end_time.substring(0, 5)}
-                                    </button>
-                                  ))
+                                  getMeetingTimesForDate(selectedDate).map((time, index) => {
+                                    const isSelected = selectedMeetingTime === time;
+                                    const rate = parseFloat(time.rate);
+                                    const isFree = rate === 0;
+                                    
+                                    return (
+                                      <button
+                                        key={index}
+                                        onClick={() => handleTimeClick(time)}
+                                        className={`
+                                          w-full p-3 rounded-lg border text-left transition-colors
+                                          ${isSelected
+                                            ? 'border-blue-500 bg-blue-50 text-blue-700'
+                                            : 'border-gray-200 hover:border-blue-300 hover:bg-blue-50'
+                                          }
+                                        `}
+                                      >
+                                        <div className="flex justify-between items-center">
+                                          <span className="font-medium">
+                                            {time.start_time.substring(0, 5)} - {time.end_time.substring(0, 5)}
+                                          </span>
+                                          <span className={`text-sm font-bold ${isFree ? 'text-green-600' : 'text-gray-600'}`}>
+                                            {isFree ? 'Free' : `$${rate}`}
+                                          </span>
+                                        </div>
+                                      </button>
+                                    );
+                                  })
                                 ) : (
                                   <p className="text-gray-500 text-center py-8">No times available for this date</p>
                                 )}
@@ -1744,6 +1754,14 @@ export default function ProfilePage() {
                     <p className="font-medium">
                       {selectedMeetingTime.start_time.substring(0, 5)} - {selectedMeetingTime.end_time.substring(0, 5)}
                     </p>
+                    <div className="mt-2 p-2 bg-white dark:bg-slate-600 rounded border">
+                      <div className="flex justify-between items-center">
+                        <span className="text-sm text-gray-600 dark:text-gray-300">Session Rate:</span>
+                        <span className={`font-bold ${parseFloat(selectedMeetingTime.rate) === 0 ? 'text-green-600' : 'text-blue-600'}`}>
+                          {parseFloat(selectedMeetingTime.rate) === 0 ? 'Free' : `$${selectedMeetingTime.rate}`}
+                        </span>
+                      </div>
+                    </div>
                   </div>
                 )}
                 

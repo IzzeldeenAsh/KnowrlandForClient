@@ -34,7 +34,9 @@ export async function getNotifications(locale: string = 'en'): Promise<Notificat
         'Authorization': `Bearer ${token}`,
         'Content-Type': 'application/json',
         'Accept': 'application/json',
-        'Accept-Language': locale
+        'Accept-Language': locale,
+        "X-Timezone": Intl.DateTimeFormat().resolvedOptions().timeZone,
+
       }
     })
     
@@ -71,7 +73,9 @@ export async function markNotificationAsRead(id: string, locale: string = 'en'):
         'Authorization': `Bearer ${token}`,
         'Content-Type': 'application/json',
         'Accept': 'application/json',
-        'Accept-Language': locale
+        'Accept-Language': locale,
+        "X-Timezone": Intl.DateTimeFormat().resolvedOptions().timeZone,
+
       }
     })
     
@@ -102,7 +106,9 @@ export async function markAllNotificationsAsRead(locale: string = 'en'): Promise
         'Authorization': `Bearer ${token}`,
         'Content-Type': 'application/json',
         'Accept': 'application/json',
-        'Accept-Language': locale
+        'Accept-Language': locale,
+        "X-Timezone": Intl.DateTimeFormat().resolvedOptions().timeZone,
+        
       }
     })
     

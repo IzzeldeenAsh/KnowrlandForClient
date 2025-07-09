@@ -10,7 +10,7 @@ import { Notification } from '@/services/notifications.service'
 interface NotificationsInnerProps {
   notifications: Notification[]
   parent: string
-  onNotificationClick: (id: string) => void
+  onNotificationClick: (id: string) => Promise<void>
   onClickOutside: () => void
 }
 
@@ -117,7 +117,11 @@ const getNotificationIconName = (subType: string): string => {
         return 'duotune/general/gen014.svg';
     case 'insighter_meeting_client_reschedule':
       return 'duotune/general/gen014.svg';
+      case "insighter_meeting_reminder":
+        return 'duotune/general/gen014.svg';
     case 'client_meeting_reschedule':
+      return 'duotune/general/gen014.svg';
+    case 'client_meeting_reminder':
       return 'duotune/general/gen014.svg';
     default:
       return 'duotune/general/gen007.svg';
@@ -174,6 +178,8 @@ const getNotificationName = (subType: string): string => {
 'client_meeting_insighter_postponed':'Meeting Postponed',
 'client_meeting_reschedule':'Meeting Rescheduled',
 'insighter_meeting_client_reschedule':'Meeting Rescheduled',
+'client_meeting_reminder':'Meeting Reminder',
+'insighter_meeting_reminder':'Meeting Reminder',
 'deactivate_delete_company':'Company Deactivation',
   }
   return nameMap[subType] || subType
@@ -230,7 +236,10 @@ export default function NotificationsInner({
     }
   }, [onClickOutside])
 
-  const handleNotificationClick = (notification: Notification) => {
+  const handleNotificationClick = async (notification: Notification) => {
+    // Always mark the notification as read first and wait for it to complete
+    await onNotificationClick(notification.id)
+    
     // Handle accept_knowledge notifications - redirect to insighter dashboard
     if (notification.sub_type === 'accept_knowledge') {
       window.location.href = 'https://app.knoldg.com/app/insighter-dashboard/my-requests'
@@ -261,12 +270,18 @@ export default function NotificationsInner({
       window.location.href = 'https://app.knoldg.com/app/insighter-dashboard/my-meetings/received'
       return
     }
+    if(notification.sub_type.startsWith('insighter_meeting_reminder')){
+      window.location.href = 'https://app.knoldg.com/app/insighter-dashboard/my-meetings/received'
+      return
+    }
+    if(notification.sub_type.startsWith('client_meeting_reminder')){
+      window.location.href = 'https://app.knoldg.com/app/insighter-dashboard/my-meetings/sent'
+      return
+    }
     // Handle knowledge accept/decline notifications
     if (notification.type === 'knowledge' && (notification.sub_type === 'accept_knowledge' || notification.sub_type === 'declined')) {
       // For company-insighter role, we would handle this differently
       // This would require checking user roles from context/state
-      
-      onNotificationClick(notification.id)
       return
     }
     
@@ -274,8 +289,6 @@ export default function NotificationsInner({
     if (notification.type === 'knowledge' && notification.category) {
       const knowledgeUrl = `https://knoldg.com/${currentLanguage}/knowledge/${notification.category}/${notification.param || ''}?tab=ask`
       window.open(knowledgeUrl, '_blank')
-    } else {
-      onNotificationClick(notification.id)
     }
   }
 
@@ -335,13 +348,12 @@ export default function NotificationsInner({
               </div>
 
               <div className="flex-1 min-w-0">
-                <p className="font-semibold text-sm text-gray-900">
+                <p className={`text-sm text-gray-900 ${!notification.read_at ? 'font-bold' : 'font-light'}`}>
                   {getNotificationName(notification.sub_type)}
                 </p>
-                <p className="text-xs text-gray-400 ">
+                <p className={`text-xs text-gray-400 ${!notification.read_at ? 'font-semibold' : 'font-normal'}`}>
                   {notification.message}
                 </p>
-             
               </div>
               
               <div className={`${isRTL ? 'mr-3' : 'ml-3'} mt-4`}>

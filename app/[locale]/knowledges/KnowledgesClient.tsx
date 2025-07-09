@@ -78,7 +78,7 @@ async function fetchKnowledgeItems({ taxonomy, id, type, page, locale }: FetchKn
     headers: {
       "Content-Type": "application/json",
       "Accept": "application/json",
-      "Accept-Language": locale,
+      "Accept-Language": locale,"X-Timezone": Intl.DateTimeFormat().resolvedOptions().timeZone,
     },
   });
 
@@ -168,7 +168,7 @@ export default function KnowledgesClient() {
             headers: {
               "Content-Type": "application/json",
               "Accept": "application/json",
-              "Accept-Language": locale,
+              "Accept-Language": locale,"X-Timezone": Intl.DateTimeFormat().resolvedOptions().timeZone,
             },
           });
           if (!response.ok) {
@@ -195,7 +195,7 @@ export default function KnowledgesClient() {
         headers: {
           "Content-Type": "application/json",
           "Accept": "application/json",
-          "Accept-Language": locale,
+          "Accept-Language": locale,"X-Timezone": Intl.DateTimeFormat().resolvedOptions().timeZone,
         },
       })
         .then((res) => res.json())
