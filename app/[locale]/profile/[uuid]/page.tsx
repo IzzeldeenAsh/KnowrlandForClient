@@ -508,6 +508,14 @@ export default function ProfilePage() {
       fetchMeetingAvailability();
     }
   };
+  
+  // Check URL parameters on initial load to fetch meeting data if needed
+  useEffect(() => {
+    const tabParam = searchParams.get('tab');
+    if (tabParam === "meet" && entityParam === 'insighter' && isAuthenticated && authChecked) {
+      fetchMeetingAvailability();
+    }
+  }, [entityParam, isAuthenticated, authChecked]); // Run once authentication status is confirmed
 
   const getSocialIcon = (type: string) => {
     switch (type) {
