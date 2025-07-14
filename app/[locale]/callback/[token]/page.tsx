@@ -37,112 +37,224 @@ export default function AuthCallback() {
       console.log('[token-callback] Detected raw token in query string as fallback');
     }
   }
+  
   const locale = (params.locale as string) || 'en';
 
   useEffect(() => {
-    // Helper function to set user's timezone in the API
-    const setUserTimezone = async (authToken: string) => {
-      try {
-        const userTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
-        console.log('%c[TIMEZONE API REQUEST]', 'background: #6b8aff; color: white; font-size: 14px; padding: 5px;', 
-          'Setting timezone:', userTimezone);
-          
-        const timezoneResponse = await fetch('https://api.knoldg.com/api/account/timezone/set', {
-          method: 'POST',
-          headers: {
-            'Authorization': `Bearer ${authToken}`,
-            'Content-Type': 'application/json',
-            'Accept': 'application/json',
-            'Accept-Language': locale,
-          },
-          body: JSON.stringify({
-            timezone: userTimezone
-          })
-        });
-        
-        // Log the complete response for debugging
-        const responseStatus = timezoneResponse.status;
-        let responseData = null;
-        try {
-          responseData = await timezoneResponse.clone().json();
-        } catch (e) {
-          responseData = 'Could not parse response as JSON';
-        }
-        
-        if (!timezoneResponse.ok) {
-          console.error('%c[TIMEZONE API ERROR]', 'background: #ff6b6b; color: white; font-size: 14px; padding: 5px;', 
-            'Failed with status:', responseStatus, 
-            'Response:', responseData);
-        } else {
-          console.log('%c[TIMEZONE API SUCCESS]', 'background: #6bff8a; color: black; font-size: 14px; padding: 5px;', 
-            'Status:', responseStatus,
-            'Response:', responseData);
-        }
-      } catch (timezoneError) {
-        console.error('%c[TIMEZONE API EXCEPTION]', 'background: #ff6b6b; color: white; font-size: 14px; padding: 5px;', timezoneError);
-        // Continue with the flow even if timezone setting fails
-      }
-    };
-    
     const fetchProfile = async () => {
       try {
         if (!token) {
           throw new Error('No token provided');
         }
 
-        console.log('[token-callback] Storing token in localStorage and cookies');
+        console.log('[token-callback] Processing authentication token:', token.substring(0, 20) + '...');
         
-        // Clear any existing tokens to avoid conflicts
-        // This ensures we're starting with a clean state
-        localStorage.removeItem('token');
-        localStorage.removeItem('foresighta-creds');
-        
-        // Store token in Next.js format
-        localStorage.setItem('token', token);
-        
-        // Also store in Angular app format
-        const angularAuthData = {
-          authToken: token,
-          refreshToken: ''
-        };
-        localStorage.setItem('foresighta-creds', JSON.stringify(angularAuthData));
-        
-        // Set the token in a cookie to make it accessible for SSR functions
-        const isLocalhost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
-        
-        // Create cookie settings array based on environment
-        let cookieSettings;
-        
-        if (isLocalhost) {
-          // For localhost: Use Lax SameSite without Secure flag
-          cookieSettings = [
-            `token=${token}`,
-            `Path=/`,                 // send on all paths
-            `Max-Age=${60 * 60 * 24}`, // expires in 24 hours
-            `SameSite=Lax`            // default value, works on same site
-          ];
-        } else {
-          // For production: Use None SameSite with Secure flag and domain
-          cookieSettings = [
-            `token=${token}`,
-            `Path=/`,
-            `Max-Age=${60 * 60 * 24}`,
-            `SameSite=None`,          // works across domains
-            `Domain=.knoldg.com`,     // leading dot = include subdomains
-            `Secure`                  // HTTPS only
-          ];
+        // Store token in cookie (primary storage) with better error handling
+        try {
+          setTokenCookie(token);
+          console.log('[token-callback] Token stored in cookie successfully');
+        } catch (cookieError) {
+          console.error('[token-callback] Failed to set token cookie:', cookieError);
+          // Continue anyway, as we can still use localStorage
         }
         
-        document.cookie = cookieSettings.join('; ');
+        // Store token in localStorage for backward compatibility
+        localStorage.setItem('token', token);
+        console.log('[token-callback] Token stored in localStorage');
         
-        // Set user's timezone as soon as we have a token
-        // This happens independent of profile fetch success
-        await setUserTimezone(token);
+        // Set user's timezone (don't let this block the main flow)
+        setUserTimezone(token).catch(error => {
+          console.error('[token-callback] Failed to set timezone, continuing anyway:', error);
+        });
         
-        // Fetch profile
+        // Fetch profile with retry logic
+        console.log('[token-callback] Fetching user profile...');
+        const response = await fetchProfileWithRetry(token);
+        
+        console.log('[token-callback] Profile fetched successfully:', response.data.email, 'Roles:', response.data.roles);
+        
+        // Store user data in localStorage
+        console.log('[token-callback] Storing user data in localStorage');
+        const userData = {
+          id: response.data.id,
+          name: response.data.name,
+          email: response.data.email,
+          profile_photo_url: response.data.profile_photo_url,
+          first_name: response.data.first_name,
+          last_name: response.data.last_name,
+        };
+        
+        localStorage.setItem('user', JSON.stringify(userData));
+        
+        // Verify authentication was successful
+        const storedToken = getTokenFromCookie() || localStorage.getItem('token');
+        const storedUser = localStorage.getItem('user');
+        
+        if (!storedToken || !storedUser) {
+          throw new Error('Failed to verify stored authentication data');
+        }
+        
+        console.log('[token-callback] Authentication verification successful');
+        
+        // Add small delay to ensure all storage operations complete
+        setTimeout(() => {
+          handleRedirect(response.data);
+        }, 200);
+        
+      } catch (error) {
+        console.error('[token-callback] Error in authentication flow:', error);
+        
+        // Clear any partially set auth data
+        clearAuthData();
+        
+        // Show error for a moment before redirecting to login
+        setTimeout(() => {
+          console.log('[token-callback] Redirecting to login due to error');
+          window.location.href = 'https://app.knoldg.com/auth/login';
+        }, 2000);
+      }
+    };
+
+    if (token) {
+      fetchProfile();
+    } else {
+      console.error('No token found in URL parameters');
+      window.location.href = 'https://app.knoldg.com/auth/login';
+    }
+  }, [token, locale]);
+
+  // Helper function to set token in cookie with improved localhost settings
+  const setTokenCookie = (token: string) => {
+    const isLocalhost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+    
+    let cookieSettings;
+    if (isLocalhost) {
+      // For localhost development - use permissive settings
+      cookieSettings = [
+        `token=${token}`,
+        `Path=/`,
+        `Max-Age=${60 * 60 * 24 * 7}`, // 7 days
+        `SameSite=Lax` // More permissive for localhost
+      ];
+    } else {
+      cookieSettings = [
+        `token=${token}`,
+        `Path=/`,
+        `Max-Age=${60 * 60 * 24 * 7}`, // 7 days
+        `SameSite=None`,
+        `Domain=.knoldg.com`,
+        `Secure`
+      ];
+    }
+    
+    const cookieString = cookieSettings.join('; ');
+    console.log('[token-callback] Setting cookie:', cookieString);
+    document.cookie = cookieString;
+    
+    // Verify the cookie was set
+    setTimeout(() => {
+      const verification = getTokenFromCookie();
+      console.log('[token-callback] Cookie set verification:', verification ? 'Success' : 'Failed');
+    }, 100);
+  };
+
+  // Helper function to get token from cookie
+  const getTokenFromCookie = (): string | null => {
+    if (typeof document === 'undefined') return null;
+    
+    const cookies = document.cookie.split(';');
+    for (let cookie of cookies) {
+      const [name, value] = cookie.trim().split('=');
+      if (name === 'token') {
+        return value;
+      }
+    }
+    return null;
+  };
+
+  // Helper function to get cookie value
+  const getCookie = (name: string): string | null => {
+    if (typeof document === 'undefined') return null;
+    
+    const cookies = document.cookie.split(';');
+    for (let i = 0; i < cookies.length; i++) {
+      const cookie = cookies[i].trim();
+      if (cookie.startsWith(name + '=')) {
+        return decodeURIComponent(cookie.substring(name.length + 1));
+      }
+    }
+    return null;
+  };
+
+  // Helper function to clear auth data
+  const clearAuthData = () => {
+    localStorage.removeItem('token');
+    localStorage.removeItem('user');
+    localStorage.removeItem('foresighta-creds');
+    
+    // Clear token cookie
+    const isLocalhost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+    let cookieSettings;
+    
+    if (isLocalhost) {
+      cookieSettings = [
+        'token=',
+        'Path=/',
+        'Max-Age=-1'
+      ];
+    } else {
+      cookieSettings = [
+        'token=',
+        'Path=/',
+        'Max-Age=-1',
+        'SameSite=None',
+        'Domain=.knoldg.com',
+        'Secure'
+      ];
+    }
+    
+    document.cookie = cookieSettings.join('; ');
+  };
+
+  // Helper function to set user's timezone
+  const setUserTimezone = async (authToken: string) => {
+    try {
+      const userTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+      console.log('[TIMEZONE] Setting timezone:', userTimezone);
+      
+      const timezoneResponse = await fetch('https://api.knoldg.com/api/account/timezone/set', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${authToken}`,
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+          'Accept-Language': locale,
+        },
+        body: JSON.stringify({
+          timezone: userTimezone
+        })
+      });
+      
+      if (!timezoneResponse.ok) {
+        console.error('[TIMEZONE] Failed to set timezone:', timezoneResponse.status);
+      } else {
+        console.log('[TIMEZONE] Successfully set timezone');
+      }
+    } catch (timezoneError) {
+      console.error('[TIMEZONE] Error setting timezone:', timezoneError);
+      // Continue with the flow even if timezone setting fails
+    }
+  };
+
+  // Helper function to fetch profile with retry logic
+  const fetchProfileWithRetry = async (authToken: string, maxRetries = 3): Promise<any> => {
+    for (let attempt = 1; attempt <= maxRetries; attempt++) {
+      try {
+        console.log(`[token-callback] Profile fetch attempt ${attempt}/${maxRetries}`);
+        
         const response = await fetch('https://api.knoldg.com/api/account/profile', {
           headers: {
-            'Authorization': `Bearer ${token}`,
+            'Authorization': `Bearer ${authToken}`,
             "Content-Type": "application/json",
             "Accept": "application/json",
             "Accept-Language": locale,
@@ -150,144 +262,134 @@ export default function AuthCallback() {
           }
         });
 
+        console.log(`[token-callback] Profile fetch response (attempt ${attempt}):`, {
+          status: response.status,
+          ok: response.ok,
+          statusText: response.statusText
+        });
+
         if (!response.ok) {
-          throw new Error('Failed to fetch profile');
+          // For auth errors, don't retry
+          if (response.status === 401 || response.status === 403) {
+            throw new Error(`Authentication failed: ${response.status} ${response.statusText}`);
+          }
+          
+          // For other errors, retry if not the last attempt
+          if (attempt < maxRetries) {
+            const delay = Math.pow(2, attempt - 1) * 1000; // Exponential backoff
+            console.log(`[token-callback] Request failed, retrying in ${delay}ms...`);
+            await new Promise(resolve => setTimeout(resolve, delay));
+            continue;
+          }
+          
+          throw new Error(`Failed to fetch profile: ${response.status} ${response.statusText}`);
         }
 
-        const data: ProfileResponse = await response.json();
-        
-        // Store user data in localStorage only
-        console.log('[token-callback] Storing user data in localStorage');
-        localStorage.setItem('user', JSON.stringify({
-          id: data.data.id,
-          name: data.data.name,
-          email: data.data.email,
-          profile_photo_url: data.data.profile_photo_url,
-          first_name: data.data.first_name,
-          last_name: data.data.last_name,
-        }));
-        
-        // Check for returnUrl parameter first
-        const returnUrl = searchParams.get('returnUrl');
-        
-        // Function to get cookie value
-        const getCookie = (name: string): string | null => {
-          if (typeof document === 'undefined') return null;
-          
-          const cookies = document.cookie.split(';');
-          for (let i = 0; i < cookies.length; i++) {
-            const cookie = cookies[i].trim();
-            if (cookie.startsWith(name + '=')) {
-              return decodeURIComponent(cookie.substring(name.length + 1));
-            }
-          }
-          return null;
-        };
-        
-        // Check for stored returnUrl in cookie as fallback (for social auth)
-        const storedReturnUrl = getCookie('auth_return_url');
-        const finalReturnUrl = returnUrl || storedReturnUrl;
-        
-        // Clean up the stored return URL cookie
-        if (storedReturnUrl) {
-          const isLocalhost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
-          let cookieSettings;
-          
-          if (isLocalhost) {
-            cookieSettings = [
-              'auth_return_url=',
-              'Path=/',
-              'Max-Age=-1'  // expire immediately
-            ];
-          } else {
-            cookieSettings = [
-              'auth_return_url=',
-              'Path=/',
-              'Max-Age=-1',
-              'SameSite=None',
-              'Domain=.knoldg.com',
-              'Secure'
-            ];
-          }
-          document.cookie = cookieSettings.join('; ');
-        }
-        
-        if (finalReturnUrl && finalReturnUrl !== '/' && !finalReturnUrl.includes('/login') && !finalReturnUrl.includes('/auth/')) {
-          console.log('[token-callback] Redirecting to returnUrl:', finalReturnUrl);
-          
-          // Check if this is an Angular route that should go to the Angular app
-          if (finalReturnUrl.startsWith('/app/') || 
-              finalReturnUrl.startsWith('/profile/') ||
-              finalReturnUrl.startsWith('/insighter-dashboard/') ||
-              finalReturnUrl.startsWith('/knowledge-detail/') ||
-              finalReturnUrl.startsWith('/my-knowledge-base/') ||
-              finalReturnUrl.startsWith('/add-knowledge/') ||
-              finalReturnUrl.startsWith('/edit-knowledge/') ||
-              finalReturnUrl.startsWith('/review-insighter-knowledge/')) {
-            
-            // Ensure Angular routes go to the Angular app
-            console.log('[token-callback] Detected Angular route, redirecting to Angular app');
-            
-            // Make sure path has /app/ prefix if not already present
-            const angularPath = finalReturnUrl.startsWith('/app/') 
-              ? finalReturnUrl 
-              : `/app${finalReturnUrl}`;
-              
-            window.location.href = `https://app.knoldg.com${angularPath}?nextjs_token=${encodeURIComponent(token)}`;
-          } else {
-            // Handle both relative and absolute URLs for Next.js app
-            if (finalReturnUrl.startsWith('http')) {
-              // For absolute URLs
-              window.location.href = finalReturnUrl;
-            } else {
-              // For relative URLs within Next.js app
-              window.location.href = finalReturnUrl;
-            }
-          }
-        }
-        // Only use role-based redirect if there's no valid returnUrl
-        else if (data.data.roles && 
-            (data.data.roles.includes('insighter') || 
-             data.data.roles.includes('company') || 
-             data.data.roles.includes('company-insighter'))) {
-          // Redirect to insighter dashboard with token
-          console.log('[token-callback] Redirecting to Angular app with token parameter');
-          // Pass token in both formats for compatibility
-          window.location.href = `https://app.knoldg.com/app/insighter-dashboard/my-dashboard?nextjs_token=${encodeURIComponent(token)}`;
-        } else {
-          // Redirect to home page using current locale
-          router.push(`/${locale}/home`);
-        }
+        return await response.json();
       } catch (error) {
-        console.error('Error fetching profile:', error);
-        // Redirect to app login page
-        window.location.href = 'https://app.knoldg.com/auth/login';
-      }
-    };
-
-    if (token) {
-      // Always attempt to set timezone if we have a token, regardless of profile fetch outcome
-      const userTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
-      const setTimezoneDirectly = async () => {
-        try {
-          await setUserTimezone(token);
-          console.log('[token-callback] Set timezone call completed');
-        } catch (e) {
-          console.error('[token-callback] Failed to set timezone directly:', e);
-          // Continue with auth flow even if timezone setting fails
+        console.error(`[token-callback] Attempt ${attempt} failed:`, error);
+        
+        // If it's an auth error or the last attempt, re-throw
+        if ((error instanceof Error && error.message.includes('Authentication failed')) || attempt === maxRetries) {
+          throw error;
         }
-      };
-      
-      // Start timezone API call immediately
-      setTimezoneDirectly();
-      
-      // Continue with normal profile fetch
-      fetchProfile();
-    } else {
-      console.error('No token found in URL parameters');
-      window.location.href = 'https://app.knoldg.com/auth/login';
+        
+        // Otherwise, continue to next attempt
+        const delay = Math.pow(2, attempt - 1) * 1000;
+        await new Promise(resolve => setTimeout(resolve, delay));
+      }
     }
-  }, [token, router, locale]);
+    
+    throw new Error('Failed to fetch profile after all retry attempts');
+  };
+
+  // Helper function to handle redirects
+  const handleRedirect = (userData: any) => {
+    // Check for returnUrl parameter first
+    const returnUrl = searchParams.get('returnUrl');
+    
+    // Check for stored returnUrl in cookie as fallback (for social auth)
+    const storedReturnUrl = getCookie('auth_return_url');
+    const finalReturnUrl = returnUrl || storedReturnUrl;
+    
+    // Clean up the stored return URL cookie
+    if (storedReturnUrl) {
+      clearReturnUrlCookie();
+    }
+    
+    if (finalReturnUrl && finalReturnUrl !== '/' && !finalReturnUrl.includes('/login') && !finalReturnUrl.includes('/auth/')) {
+      console.log('[token-callback] Redirecting to returnUrl:', finalReturnUrl);
+      
+      // Check if this is an Angular route that should go to the Angular app
+      if (isAngularRoute(finalReturnUrl)) {
+        console.log('[token-callback] Detected Angular route, redirecting to Angular app');
+        const angularPath = finalReturnUrl.startsWith('/app/') ? finalReturnUrl : `/app${finalReturnUrl}`;
+        window.location.href = `https://app.knoldg.com${angularPath}`;
+      } else {
+        // Handle Next.js routes
+        console.log('[token-callback] Detected Next.js route, redirecting within app');
+        if (finalReturnUrl.startsWith('http')) {
+          console.log('[token-callback] External URL redirect:', finalReturnUrl);
+          window.location.href = finalReturnUrl;
+        } else {
+          console.log('[token-callback] Internal route redirect:', finalReturnUrl);
+          // Use router.push for internal Next.js routes to maintain auth state
+          router.push(finalReturnUrl);
+        }
+      }
+    } else if (userData.roles && 
+        (userData.roles.includes('insighter') || 
+         userData.roles.includes('company') || 
+         userData.roles.includes('company-insighter'))) {
+      // Redirect to insighter dashboard
+      console.log('[token-callback] Redirecting to Angular insighter dashboard');
+      window.location.href = `https://app.knoldg.com/app/insighter-dashboard/my-dashboard`;
+    } else {
+      // Redirect to home page using current locale
+      router.push(`/${locale}/home`);
+    }
+  };
+
+  // Helper function to check if route is Angular route
+  const isAngularRoute = (url: string): boolean => {
+    const angularRoutes = [
+      '/app/',
+      '/profile/',
+      '/insighter-dashboard/',
+      '/knowledge-detail/',
+      '/my-knowledge-base/',
+      '/add-knowledge/',
+      '/edit-knowledge/',
+      '/review-insighter-knowledge/'
+    ];
+    
+    return angularRoutes.some(route => url.startsWith(route));
+  };
+
+  // Helper function to clear return URL cookie
+  const clearReturnUrlCookie = () => {
+    const isLocalhost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+    
+    let cookieSettings;
+    if (isLocalhost) {
+      cookieSettings = [
+        'auth_return_url=',
+        'Path=/',
+        'Max-Age=-1'
+      ];
+    } else {
+      cookieSettings = [
+        'auth_return_url=',
+        'Path=/',
+        'Max-Age=-1',
+        'SameSite=None',
+        'Domain=.knoldg.com',
+        'Secure'
+      ];
+    }
+    
+    document.cookie = cookieSettings.join('; ');
+  };
 
   return (
     <div className="min-h-screen flex items-center justify-center">
