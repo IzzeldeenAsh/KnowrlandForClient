@@ -7,14 +7,16 @@ import {IconChevronDown, IconLanguage, IconSearch } from '@tabler/icons-react'
 import { HoverCard, Group, Text, Anchor, Divider, SimpleGrid, Button, TextInput } from '@mantine/core'
 import { UserProfile } from './header/components/UserProfile'
 import { useTranslations } from 'next-intl'
-import { usePathname } from 'next/navigation'
-import { useRouter } from '@/i18n/routing'
+import { usePathname, useRouter } from 'next/navigation'
+import { useRouter as useI18nRouter } from '@/i18n/routing'
 import { useLoading } from '@/components/context/LoadingContext'
 import Particles from '@/components/particles'
 
 // Add CSS for text glow effect
 import './text-glow.css'
 import NotificationBell from './header/components/NotificationBell'
+import { useUserProfile } from '@/app/lib/useUserProfile';
+
 
 interface User {
   name: string;
@@ -64,6 +66,7 @@ export default function Header() {
   const { isLoading: isAppLoading, setIsLoading: setAppLoading } = useLoading();
   const pathname = usePathname();
   const router = useRouter();
+  const locale = useTranslations('Header');
   
   // Always use dark style with white text, as requested
   const textColorClass = 'text-slate-300 hover:text-white transition-all duration-300 ease-in-out px-3 py-2 rounded-md hover:bg-slate-700/50';
@@ -215,20 +218,7 @@ export default function Header() {
     return `${firstName[0]}${lastName[0]}`.toUpperCase();
   };
 
-  const handleSignOut = () => {
-    // Clear localStorage in current app
-    localStorage.removeItem('token');
-    localStorage.removeItem('user');
-    
-    // Get the current locale for the redirect
-    const locale = pathname.split('/')[1] || 'en';
-    
-    // Create a logout timestamp to prevent caching issues
-    const timestamp = new Date().getTime();
-    
-    // Perform a coordinated logout by redirecting to the Angular app's logout endpoint
-    window.location.href = `https://app.knoldg.com/auth/logout?redirect_uri=${encodeURIComponent(`https://knoldg.com/${locale}?t=${timestamp}`)}`;    
-  };
+  const { handleSignOut } = useUserProfile();
 
   // Function to switch locale
   const switchLocale = (locale: string) => {

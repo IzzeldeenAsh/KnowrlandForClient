@@ -1155,7 +1155,7 @@ const FilterBox: React.FC<FilterBoxProps> = ({
                       onChange={(event) => setCountrySearch(event.currentTarget.value)}
                       placeholder={locale === 'ar' ? 'البحث في البلدان' : 'Search countries'}
                     />
-                    <Combobox.Options>
+                    <Combobox.Options className="max-h-60 overflow-y-auto">
                       {filteredCountryOptions.length > 0 ? (
                         filteredCountryOptions.map((option) => (
                           <Combobox.Option value={option.value} key={option.value}>
