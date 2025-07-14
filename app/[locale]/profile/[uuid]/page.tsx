@@ -142,7 +142,6 @@ export default function ProfilePage() {
   const [knowledgePage, setKnowledgePage] = useState(1);
   const [loadingKnowledge, setLoadingKnowledge] = useState(false);
   const [selectedType, setSelectedType] = useState<string | null>(null);
-  const [initialTypeCounts, setInitialTypeCounts] = useState<Record<string, number>>({});
   const [errorToast, setErrorToast] = useState<{show: boolean, message: string}>({show: false, message: ''});
   
   const params = useParams();
@@ -349,16 +348,6 @@ export default function ProfilePage() {
         
         const data = await response.json();
         setKnowledgeData(data);
-        
-        // Store initial type counts only on first load without filter
-        if (!selectedType && Object.keys(initialTypeCounts).length === 0 && data.data) {
-          const counts: Record<string, number> = {};
-          data.data.forEach((item: KnowledgeApiItem) => {
-            counts[item.type] = (counts[item.type] || 0) + 1;
-          });
-          counts['all'] = data.meta.total;
-          setInitialTypeCounts(counts);
-        }
       } catch (error) {
         console.error('Error fetching knowledge data:', error);
       } finally {
@@ -464,11 +453,10 @@ export default function ProfilePage() {
       tomorrow.setDate(today.getDate() + 1);
       const startDate = tomorrow.toISOString().split('T')[0]; // YYYY-MM-DD format
       
-      // End date is 3 months from tomorrow
+      // End date is 1 year from tomorrow
       const endDate = new Date(tomorrow);
-      endDate.setMonth(tomorrow.getMonth() + 3);
+      endDate.setFullYear(tomorrow.getFullYear() + 1);
       const endDateStr = endDate.toISOString().split('T')[0]; // YYYY-MM-DD format
-      
       const response = await axios.post(
         `https://api.knoldg.com/api/account/meeting/available/hours/${uuid}`,
         {
@@ -644,9 +632,7 @@ export default function ProfilePage() {
     
     // Default title without relying on profileData
     const defaultName = profileData?.name || 'consultant';
-    if (!meetingTitle) {
-      setMeetingTitle(`Meeting with ${defaultName}`);
-    }
+    
   };
   
   // Validation function for title and description
@@ -1220,16 +1206,6 @@ export default function ProfilePage() {
                     </div>
                     {knowledgeTypes.map((type) => {
                       const isActive = selectedType === type.id;
-                      // Use initial counts if available, otherwise use current filtered data counts
-                      let typeCount = 0;
-                      if (type.id === null) {
-                        // For "All" filter, always show total
-                        typeCount = knowledgeData?.meta.total || 0;
-                      } else {
-                        // For specific types, use initial counts if available, otherwise current count
-                        typeCount = initialTypeCounts[type.id] || 
-                                   knowledgeData?.data.filter(item => item.type === type.id).length || 0;
-                      }
                       
                       return (
                         <button
@@ -1244,9 +1220,6 @@ export default function ProfilePage() {
                             <span className={`${isRTL ? 'me-2' : 'ml-2'} font-medium text-xs`}>
                               {filterT(type.label)}
                             </span>
-                            {type.id !== null && typeCount > 0 && (
-                              <span className={styles.countBadge}>{typeCount}</span>
-                            )}
                           </span>
                         </button>
                       );
