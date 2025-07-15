@@ -299,85 +299,8 @@ export default function KnowledgesClient() {
       
    <Title order={1} mb="xl"></Title>
    
-   {/* Filters Section */}
-   {/* <Box mb="xl" >
-     <Grid >
-       <Grid.Col span={{ base: 12, md: 4 }}>
-         <Select
-           label={translations.filterBy}
-           placeholder={translations.selectCategory}
-           data={[
-             { value: 'industry', label: translations.industry },
-             { value: 'sub_industry', label: translations.subIndustry },
-             { value: 'topic', label: translations.topic }
-           ]}
-           value={taxonomy}
-           onChange={(value) => handleTaxonomyChange(value || 'industry')}
-           mb="md"
-         />
-       </Grid.Col>
-       
-       <Grid.Col span={{ base: 12, md: 4 }}>
-         {taxonomy === 'industry' && (
-           <Select
-             label={translations.industry}
-             placeholder={translations.selectIndustry}
-             data={industries.map(i => ({ value: i.id.toString(), label: i.name }))}
-             value={selectedId}
-             onChange={handleIdChange}
-             mb="md"
-             searchable
-           />
-         )}
-         
-         {taxonomy === 'sub_industry' && (
-           <Select
-             label={translations.subIndustry}
-             placeholder={translations.selectSubIndustry}
-             data={subIndustries.map(i => ({ value: i.id.toString(), label: i.name }))}
-             value={selectedId}
-             onChange={handleIdChange}
-             mb="md"
-             searchable
-           />
-         )}
-         
-         {taxonomy === 'topic' && (
-           <Select
-             label={translations.topic}
-             placeholder={translations.selectTopic}
-             data={topics.map(i => ({ value: i.id.toString(), label: i.name }))}
-             value={selectedId}
-             onChange={handleIdChange}
-             mb="md"
-             searchable
-           />
-         )}
-       </Grid.Col>
-       
-       <Grid.Col span={{ base: 12, md: 4 }}>
-         <Select
-           label={translations.knowledgeType}
-           placeholder={translations.selectType}
-           data={knowledgeTypes}
-           value={selectedType}
-           onChange={(value) => handleTypeChange(value || 'data')}
-           mb="md"
-         />
-       </Grid.Col>
-     </Grid>
-   </Box> */}
-   
-   {/* Results Controls */}
-   <Flex justify="space-between" align="center" mb="md" style={{paddingInlineStart: '3rem'}}>
-     <Text>
-       {pagination && pagination.total > 0 
-         ? `${translations.showing} ${pagination.from}-${pagination.to} ${translations.of} ${pagination.total} ${translations.items}` 
-         : translations.noItems}
-     </Text>
-     
   
-   </Flex>
+ 
    
    {/* Results Display */}
    {knowledgeItems.length > 0 ? (
@@ -419,6 +342,14 @@ export default function KnowledgesClient() {
        </Button>
      </Flex>
    )}
+     {/* Results Controls */}
+     <Text className='text-center w-100 d-block ' pt={20} >
+       {pagination && pagination.total > 0 
+         ? `${translations.showing} ${pagination.from}-${pagination.to} ${translations.of} ${pagination.total} ${translations.items}` 
+         : translations.noItems}
+     </Text>
+     
+  
  </div></>
 
   );
