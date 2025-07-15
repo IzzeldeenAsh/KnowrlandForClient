@@ -62,7 +62,9 @@ export default function NotificationBell() {
     // Clean up on component unmount
     return () => {
       unsubscribe()
-      clearInterval(intervalId)
+      if (intervalId) {
+        clearInterval(intervalId)
+      }
     }
   }, [locale])
   
