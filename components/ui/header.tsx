@@ -16,15 +16,7 @@ import Particles from '@/components/particles'
 import './text-glow.css'
 import NotificationBell from './header/components/NotificationBell'
 import { useUserProfile } from '@/app/lib/useUserProfile';
-
-
-interface User {
-  name: string;
-  profile_photo_url: string | null;
-  first_name: string;
-  last_name: string;
-  email: string;
-}
+import { startNotificationPolling, stopNotificationPolling } from '@/services/notifications.service';
 
 interface Industry {
   id: number;
@@ -33,40 +25,94 @@ interface Industry {
   children?: Industry[];
 }
 
-async function getIndustries(locale: string = 'en') {
-  const res = await fetch("https://api.knoldg.com/api/platform/industries/menu", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      Accept: "application/json",
-      "Accept-Language": locale,"X-Timezone": Intl.DateTimeFormat().resolvedOptions().timeZone,
-    },
-    body: JSON.stringify({
-      top_industry: 6,
-      top_sub_industry: 6,
-    }),
-  });
+// Global cache for industries to prevent duplicate API calls
+let industriesCache: {
+  data: Industry[];
+  lastFetchTime: number;
+  isLoading: boolean;
+  pendingPromise: Promise<Industry[]> | null;
+} = {
+  data: [],
+  lastFetchTime: 0,
+  isLoading: false,
+  pendingPromise: null
+};
 
-  if (!res.ok) {
-    return [];
+const INDUSTRIES_CACHE_DURATION = 300000; // 5 minutes cache for industries
+
+async function getIndustries(locale: string = 'en', forceRefresh: boolean = false): Promise<Industry[]> {
+  const now = Date.now();
+  
+  // Return cached data if still valid and not forced refresh
+  if (!forceRefresh && industriesCache.data.length > 0 && (now - industriesCache.lastFetchTime) < INDUSTRIES_CACHE_DURATION) {
+    return industriesCache.data;
   }
 
-  const json = await res.json();
-  return json.data as Industry[];
+  // If already fetching, return the pending promise
+  if (industriesCache.isLoading && industriesCache.pendingPromise) {
+    return industriesCache.pendingPromise;
+  }
+
+  // Start new fetch
+  industriesCache.isLoading = true;
+  industriesCache.pendingPromise = fetchIndustriesFromAPI(locale);
+
+  try {
+    const industries = await industriesCache.pendingPromise;
+    return industries;
+  } finally {
+    industriesCache.pendingPromise = null;
+  }
+}
+
+async function fetchIndustriesFromAPI(locale: string): Promise<Industry[]> {
+  try {
+    const res = await fetch("https://api.knoldg.com/api/platform/industries/menu", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Accept: "application/json",
+        "Accept-Language": locale,
+        "X-Timezone": Intl.DateTimeFormat().resolvedOptions().timeZone,
+      },
+      body: JSON.stringify({
+        top_industry: 6,
+        top_sub_industry: 6,
+      }),
+    });
+
+    if (!res.ok) {
+      return industriesCache.data; // Return cached data on error
+    }
+
+    const json = await res.json();
+    const industries = json.data as Industry[];
+    
+    // Update cache
+    industriesCache.data = industries;
+    industriesCache.lastFetchTime = Date.now();
+    
+    return industries;
+  } catch (error) {
+    console.error('Error fetching industries:', error);
+    return industriesCache.data; // Return cached data on error
+  } finally {
+    industriesCache.isLoading = false;
+  }
 }
 
 export default function Header() {
   const t = useTranslations('Header');
-  const [user, setUser] = useState<User | null>(null);
-  const [roles, setRoles] = useState<string[]>([]);
-  const [industries, setIndustries] = useState<Industry[]>([]);
+  const [industries, setIndustries] = useState<Industry[]>(industriesCache.data);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [isLoading, setIsLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
   const { isLoading: isAppLoading, setIsLoading: setAppLoading } = useLoading();
   const pathname = usePathname();
   const router = useRouter();
   const locale = useTranslations('Header');
+  
+  // Use the centralized user profile hook
+  const { user, roles, isLoading, handleSignOut } = useUserProfile();
   
   // Always use dark style with white text, as requested
   const textColorClass = 'text-slate-300 hover:text-white transition-all duration-300 ease-in-out px-3 py-2 rounded-md hover:bg-slate-700/50';
@@ -147,78 +193,31 @@ export default function Header() {
       switchLocale(preferredLanguage);
     }
 
-    const fetchProfile = async () => {
-      // Try to get token from localStorage
-      const token = localStorage.getItem('token');
-      
-      setIsLoading(true);
-      if (!token) {
-        setIsLoading(false);
-        return;
-      }
-
-      try {
-        const response = await fetch('https://api.knoldg.com/api/account/profile', {
-          headers: {
-            'Authorization': `Bearer ${token}`,
-            "Content-Type": "application/json",
-            "Accept": "application/json",
-            "Accept-Language": pathname.split('/')[1] || 'en',
-            "X-Timezone": Intl.DateTimeFormat().resolvedOptions().timeZone,
-          }
-        });
-
-        if (response.status === 401) {
-          // Handle unauthorized - token expired or invalid
-          console.log('Session expired or unauthorized access');
-          handleSignOut();
-          return;
-        }
-
-        if (!response.ok) {
-          throw new Error('Failed to fetch profile');
-        }
-
-        const data = await response.json();
-        setRoles(data.data.roles);
-        const userData = {
-          id: data.data.id,
-          name: data.data.name,
-          email: data.data.email,
-          profile_photo_url: data.data.profile_photo_url,
-          first_name: data.data.first_name,
-          last_name: data.data.last_name,
-        };
-        
-        localStorage.setItem('user', JSON.stringify(userData));
-        setUser(userData);
-      } catch (error) {
-        console.error('Error fetching profile:', error);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    const fetchIndustries = async () => {
+    // Fetch industries data with caching
+    const loadIndustries = async () => {
       const data = await getIndustries(pathname.split('/')[1] || 'en');
       setIndustries(data);
     };
 
-    // Try to get user data from localStorage
-    const userData = localStorage.getItem('user');
-    if (userData) {
-      setUser(JSON.parse(userData));
+    loadIndustries();
+  }, [pathname]);
+
+  // Start notification polling when user is logged in
+  useEffect(() => {
+    if (user) {
+      const currentLocale = pathname.split('/')[1] || 'en';
+      startNotificationPolling(currentLocale);
+      
+      // Cleanup on unmount or when user logs out
+      return () => {
+        stopNotificationPolling();
+      };
     }
-    
-    fetchProfile();
-    fetchIndustries();
-  }, [pathname, router]);
+  }, [user, pathname]);
 
   const getInitials = (firstName: string, lastName: string) => {
     return `${firstName[0]}${lastName[0]}`.toUpperCase();
   };
-
-  const { handleSignOut } = useUserProfile();
 
   // Function to switch locale
   const switchLocale = (locale: string) => {

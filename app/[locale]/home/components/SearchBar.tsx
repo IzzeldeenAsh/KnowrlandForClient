@@ -41,6 +41,7 @@ const SearchBar: React.FC<SearchBarProps> = ({
   // Simplified suggestion state management
   const [inputFocused, setInputFocused] = useState(false);
   const [suggestionSelected, setSuggestionSelected] = useState(false);
+  const [mouseInSuggestions, setMouseInSuggestions] = useState(false);
   
   // Get suggestions functionality
   const {
@@ -50,13 +51,16 @@ const SearchBar: React.FC<SearchBarProps> = ({
     isLoadingSuggestions,
     activeSuggestionIndex,
     setActiveSuggestionIndex,
-    resetSuggestions
+    resetSuggestions,
+    hideSuggestions,
+    allowSuggestions
   } = useSuggestions(searchQuery, locale);
   
   // Handle clicking outside the suggestions dropdown
   const suggestionsRef = useClickAway(() => {
-    setShowSuggestions(false);
+    hideSuggestions();
     setInputFocused(false);
+    setMouseInSuggestions(false);
   });
   
   // Handle clicking outside the type dropdown
@@ -73,6 +77,14 @@ const SearchBar: React.FC<SearchBarProps> = ({
       document.removeEventListener('mousedown', handleClickOutside);
     };
   }, []);
+
+  // Ensure suggestions show when they become available and input is focused
+  useEffect(() => {
+    if (inputFocused && suggestions.length > 0 && !suggestionSelected) {
+      console.log('Triggering allowSuggestions from useEffect');
+      allowSuggestions();
+    }
+  }, [suggestions, inputFocused, suggestionSelected, allowSuggestions]);
   
   // Handle keyboard navigation for suggestions
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
@@ -96,12 +108,12 @@ const SearchBar: React.FC<SearchBarProps> = ({
       } else {
         // Execute search when Enter is pressed without suggestion selection
         setSuggestionSelected(true);
-        setShowSuggestions(false);
+        hideSuggestions();
       }
     }
     // Escape key
     else if (e.key === 'Escape') {
-      setShowSuggestions(false);
+      hideSuggestions();
       setInputFocused(false);
     }
   };
@@ -109,8 +121,7 @@ const SearchBar: React.FC<SearchBarProps> = ({
   // Handle suggestion selection
   const handleSuggestionSelect = (suggestion: string) => {
     setSuggestionSelected(true);
-    setShowSuggestions(false);
-    resetSuggestions();
+    hideSuggestions();
     setInputFocused(false);
     
     // Use the onSearch prop if available, otherwise fall back to URL navigation
@@ -126,7 +137,6 @@ const SearchBar: React.FC<SearchBarProps> = ({
   // Handle clearing the search input
   const handleClearSearch = () => {
     setSearchQuery('');
-    setShowSuggestions(false);
     resetSuggestions();
     setSuggestionSelected(false);
     setInputFocused(false);
@@ -141,10 +151,8 @@ const SearchBar: React.FC<SearchBarProps> = ({
   const handleInputFocus = () => {
     setInputFocused(true);
     setSuggestionSelected(false);
-    // Show suggestions if we have them and conditions are met
-    if (searchQuery.trim().length >= 2 && suggestions.length > 0) {
-      setShowSuggestions(true);
-    }
+    // Allow suggestions to show when focused
+    allowSuggestions();
   };
 
   // Handle input change
@@ -158,27 +166,32 @@ const SearchBar: React.FC<SearchBarProps> = ({
       onQueryChange(newQuery);
     }
     
-    // Show suggestions if conditions are met and input is focused
-    if (newQuery.trim().length >= 2 && inputFocused) {
-      setShowSuggestions(true);
-    } else {
-      setShowSuggestions(false);
-    }
+    // Always allow suggestions to show when typing
+    allowSuggestions();
   };
 
-  // Simplified suggestion visibility logic
+  // Simplified suggestion visibility logic - show suggestions if we have them and input is focused
   const shouldShowSuggestions = 
-    inputFocused && 
-    !suggestionSelected && 
-    searchQuery.trim().length >= 2 && 
     showSuggestions && 
-    suggestions.length > 0;
+    suggestions.length > 0 &&
+    inputFocused &&
+    !suggestionSelected;
+  
+  // Debug log for suggestion visibility
+  useEffect(() => {
+    console.log('Suggestion visibility state:', {
+      showSuggestions,
+      suggestionsCount: suggestions.length,
+      inputFocused,
+      suggestionSelected,
+      shouldShowSuggestions
+    });
+  }, [showSuggestions, suggestions.length, inputFocused, suggestionSelected, shouldShowSuggestions]);
   
   return (
     <form onSubmit={(e) => {
       // First close the suggestions
-      setShowSuggestions(false);
-      resetSuggestions();
+      hideSuggestions();
       setSuggestionSelected(true);
       setInputFocused(false);
       // Then submit the form
@@ -300,10 +313,11 @@ const SearchBar: React.FC<SearchBarProps> = ({
               onBlur={() => {
                 // Delay hiding suggestions to allow for clicks
                 setTimeout(() => {
-                  if (!suggestionSelected) {
+                  if (!suggestionSelected && !mouseInSuggestions) {
                     setInputFocused(false);
+                    hideSuggestions();
                   }
-                }, 150);
+                }, 100);
               }}
               onKeyDown={handleKeyDown}
               autoComplete="off"
@@ -337,8 +351,7 @@ const SearchBar: React.FC<SearchBarProps> = ({
               onClick={async (e) => {
                 e.preventDefault();
                 // Close suggestions
-                setShowSuggestions(false);
-                resetSuggestions();
+                hideSuggestions();
                 setSuggestionSelected(true);
                 setInputFocused(false);
                 
@@ -361,7 +374,9 @@ const SearchBar: React.FC<SearchBarProps> = ({
         {shouldShowSuggestions && (
           <div 
             ref={suggestionsRef}
-            className="absolute left-0 right-0 top-full mt-1 bg-white border border-gray-200 rounded-md shadow-lg z-20 max-h-60 overflow-y-auto custom-scrollbar"
+            className="absolute left-0 right-0 top-full mt-1 bg-white border border-gray-200 rounded-md shadow-lg z-20 max-h-40 overflow-y-auto custom-scrollbar"
+            onMouseEnter={() => setMouseInSuggestions(true)}
+            onMouseLeave={() => setMouseInSuggestions(false)}
           >
             {suggestions.map((suggestion, index) => (
               <div 
