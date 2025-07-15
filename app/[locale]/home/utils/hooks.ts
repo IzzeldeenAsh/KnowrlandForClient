@@ -25,9 +25,10 @@ export function useSuggestions(searchQuery: string, locale: string) {
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [isLoadingSuggestions, setIsLoadingSuggestions] = useState(false);
   const [activeSuggestionIndex, setActiveSuggestionIndex] = useState(-1);
+  const [forceHidden, setForceHidden] = useState(false);
   
   const toast = useToast();
-  const debouncedSearchTerm = useDebounce(searchQuery, 300);
+  const debouncedSearchTerm = useDebounce(searchQuery, 200);
   
   useEffect(() => {
     const getSuggestions = async () => {
@@ -43,12 +44,18 @@ export function useSuggestions(searchQuery: string, locale: string) {
         // Use try/catch to handle potential network issues
         try {
           const suggestionResults = await fetchAutocomplete(debouncedSearchTerm, locale, handleError);
+          console.log('Autocomplete results for:', debouncedSearchTerm, 'Results:', suggestionResults);
           setSuggestions(suggestionResults);
-          // Always try to show suggestions if we have results
+          
+          // Always show suggestions if we have results, regardless of forceHidden state
+          // The forceHidden state should only prevent showing until next input change
           if (suggestionResults.length > 0) {
             setShowSuggestions(true);
+            setForceHidden(false); // Reset force hidden when we have new results
+            console.log('Showing suggestions:', suggestionResults.length, 'items');
           } else {
             setShowSuggestions(false);
+            console.log('No suggestions to show');
           }
         } catch (error) {
           console.error('Error fetching suggestions:', error);
@@ -70,6 +77,20 @@ export function useSuggestions(searchQuery: string, locale: string) {
   const resetSuggestions = () => {
     setShowSuggestions(false);
     setActiveSuggestionIndex(-1);
+    setForceHidden(false);
+  };
+  
+  const hideSuggestions = () => {
+    setShowSuggestions(false);
+    setForceHidden(true);
+  };
+  
+  const allowSuggestions = () => {
+    setForceHidden(false);
+    // If we have suggestions and search term is long enough, show them immediately
+    if (suggestions.length > 0 && searchQuery.trim().length >= 2) {
+      setShowSuggestions(true);
+    }
   };
   
   return {
@@ -79,7 +100,9 @@ export function useSuggestions(searchQuery: string, locale: string) {
     isLoadingSuggestions,
     activeSuggestionIndex,
     setActiveSuggestionIndex,
-    resetSuggestions
+    resetSuggestions,
+    hideSuggestions,
+    allowSuggestions
   };
 }
 
