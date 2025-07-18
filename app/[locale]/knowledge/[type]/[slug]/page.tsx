@@ -100,6 +100,12 @@ async function fetchKnowledgeData(type: string, slug: string, locale: string = '
     // Add Authorization header if token exists
     if (token) {
       headers.Authorization = `Bearer ${token}`;
+    }else if(localStorage.getItem('token')){
+      headers.Authorization = `Bearer ${localStorage.getItem('token')}`;
+    }else{
+      localStorage.removeItem('token');
+      localStorage.removeItem('foresighta-creds');
+      window.location.href = 'https://app.knoldg.com/';
     }
     
     const response = await fetch(
@@ -392,7 +398,7 @@ export default function KnowledgePage({ params }: Props) {
       <div className="container mx-auto px-3 sm:px-4 pb-12 sm:pb-16 md:pb-20">
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-8">
           <div className="lg:col-span-2">
-            <TabsContent knowledge={knowledge} />
+            <TabsContent knowledge={knowledge} knowledgeSlug={slug} />
           </div>
           <div className="lg:col-span-1">
             <KnowledgeSideBox
@@ -406,6 +412,7 @@ export default function KnowledgePage({ params }: Props) {
               regions={knowledge.regions}
               countries={knowledge.countries}
               locale={locale}
+              knowledgeSlug={slug}
             />
           </div>
         </div>
