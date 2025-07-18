@@ -19,6 +19,7 @@ import Stripes from "@/public/images/stripes-dark.svg";
 import { getMessages } from '@/utils/get-messages';
 import Link from 'next/link';
 import { Rating, Text } from "@mantine/core";
+import AuthHandler from './AuthHandler';
 
 interface KnowledgeDetails {
   type: string;
@@ -100,12 +101,6 @@ async function fetchKnowledgeData(type: string, slug: string, locale: string = '
     // Add Authorization header if token exists
     if (token) {
       headers.Authorization = `Bearer ${token}`;
-    }else if(localStorage.getItem('token')){
-      headers.Authorization = `Bearer ${localStorage.getItem('token')}`;
-    }else{
-      localStorage.removeItem('token');
-      localStorage.removeItem('foresighta-creds');
-      window.location.href = 'https://app.knoldg.com/';
     }
     
     const response = await fetch(
@@ -197,6 +192,9 @@ export default function KnowledgePage({ params }: Props) {
 
   return (
     <div className="min-h-screen bg-gray-50 relative" dir={isRTL ? 'rtl' : 'ltr'} style={knowledge.language === 'arabic' ? { direction: 'rtl', textAlign: 'right' } : {}}>
+      {/* Add client-side auth handler */}
+      <AuthHandler />
+      
       {/* Background decoration */}
       <div className="pointer-events-none absolute z-10 left-[10%] top-0 hidden md:block" aria-hidden="true">
         <Image
