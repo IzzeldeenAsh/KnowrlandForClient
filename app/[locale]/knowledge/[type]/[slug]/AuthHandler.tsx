@@ -51,7 +51,16 @@ export default function AuthHandler() {
         
         // Clean up any remaining auth data
         localStorage.removeItem('token');
+        localStorage.removeItem('user');
         localStorage.removeItem('foresighta-creds');
+        
+        // Clear auth cookies with proper domain settings
+        const isLocalhost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+        if (isLocalhost) {
+          document.cookie = 'token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
+        } else {
+          document.cookie = 'token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/; Domain=.knoldg.com; Secure; SameSite=None;';
+        }
         
         // Handle signout
         handleSignOut();
