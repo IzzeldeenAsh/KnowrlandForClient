@@ -2,18 +2,19 @@
 
 import { useEffect } from 'react';
 import { useUserProfile } from '@/app/lib/useUserProfile';
+import { usePathname } from 'next/navigation';
 
 export default function AuthHandler() {
   const { handleSignOut } = useUserProfile();
+  const pathname = usePathname();
 
   useEffect(() => {
     // Helper function to get token from cookie
     const getTokenFromCookie = (): string | null => {
       if (typeof document === 'undefined') return null;
       
-      // Try to get token from .knoldg.com domain cookies first
-      const allCookies = document.cookie.split(';');
-      for (let cookie of allCookies) {
+      const cookies = document.cookie.split(';');
+      for (let cookie of cookies) {
         const [name, value] = cookie.trim().split('=');
         if (name === 'token') {
           return decodeURIComponent(value);
@@ -35,31 +36,6 @@ export default function AuthHandler() {
       } catch (e) {
         console.error('[AuthHandler] Error cleaning localStorage:', e);
       }
-      
-      // Clean cookies - handle all possible domain scenarios
-      try {
-        const isLocalhost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
-        if (isLocalhost) {
-          document.cookie = 'token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
-        } else {
-          // Clear cookie from all possible domain variations
-          const domains = [
-            '.knoldg.com',           // Main domain with dot
-            'knoldg.com',            // Main domain without dot
-            window.location.hostname  // Current subdomain
-          ];
-          
-          domains.forEach(domain => {
-            // Clear with domain
-            document.cookie = `token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/; domain=${domain}; Secure; SameSite=None;`;
-            // Clear without domain (fallback)
-            document.cookie = 'token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/; Secure; SameSite=None;';
-          });
-        }
-        console.log('[AuthHandler] Cookies cleaned');
-      } catch (e) {
-        console.error('[AuthHandler] Error cleaning cookies:', e);
-      }
     };
 
     // Check auth state and handle cleanup
@@ -75,16 +51,17 @@ export default function AuthHandler() {
         domain: window.location.hostname
       });
 
-      // Clean up in any of these cases:
-      // 1. No cookie token but has localStorage data
-      // 2. Cookie token doesn't match localStorage token
-      // 3. Has localStorage token but no cookie token
-      if (!cookieToken || 
-          (localStorageToken && cookieToken !== localStorageToken) || 
-          (!cookieToken && (localStorageToken || userData))) {
-        console.log('[AuthHandler] Auth mismatch detected - cleaning up');
+      // If we have localStorage data but no cookie token, we need to clean up and redirect
+      if (!cookieToken && (localStorageToken || userData)) {
+        console.log('[AuthHandler] Auth mismatch detected - cleaning up and redirecting to logout');
         cleanupAuthData();
-        handleSignOut();
+        
+        // Get the current locale for the redirect
+        const locale = pathname.split('/')[1] || 'en';
+        const timestamp = new Date().getTime();
+        
+        // Redirect to Angular app's logout endpoint
+        window.location.href = `https://app.knoldg.com/auth/logout?redirect_uri=${encodeURIComponent(`https://knoldg.com/${locale}?t=${timestamp}`)}`;
       }
     };
 
@@ -98,7 +75,7 @@ export default function AuthHandler() {
 
     // Cleanup interval on unmount
     return () => clearInterval(interval);
-  }, [handleSignOut]);
+  }, [handleSignOut, pathname]);
 
   // This component doesn't render anything
   return null;
