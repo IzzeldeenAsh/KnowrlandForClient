@@ -14,10 +14,8 @@ import styles from './AskInsighter.module.css';
 
 // Import toast context
 import { useToast } from '@/components/toast/ToastContext';
-import { getAccessToken } from '../../../../lib/auth/auth';
 
 import { Question, KnowledgeDetails } from './types';
-import router from 'next/router';
 
 // Update User interface to include roles
 interface User {
@@ -56,10 +54,10 @@ export default function AskInsighter({ knowledgeSlug, questions = [], is_owner =
   const locale = params.locale as string;
   const isRTL = locale === 'ar';
   
-  // Get the authentication token from cookies (or localStorage as fallback)
+  // Get the authentication token from localStorage
   useEffect(() => {
     if (typeof window !== 'undefined') {
-      const token = getAccessToken();
+      const token = localStorage.getItem('token');
       setAuthToken(token);
     }
   }, []);
@@ -116,12 +114,6 @@ export default function AskInsighter({ knowledgeSlug, questions = [], is_owner =
       // Add authorization header if token exists
       if (authToken) {
         headers['Authorization'] = `Bearer ${authToken}`;
-      }else if(localStorage.getItem('token')){
-        headers['Authorization'] = `Bearer ${localStorage.getItem('token')}`;
-      }else{
-        localStorage.removeItem('token');
-        localStorage.removeItem('foresighta-creds');
-        router.push('https://app.knoldg.com/')
       }
       
       const response = await fetch(

@@ -2,7 +2,6 @@
 
 import { useEffect } from 'react';
 import { useRouter, useParams, useSearchParams } from 'next/navigation';
-import { getAccessToken, setAccessToken, removeAccessToken } from '../../lib/auth/auth';
 
 interface ProfileResponse {
   data: {
@@ -40,11 +39,25 @@ export default function QueryParamAuthCallback() {
   const returnUrl = searchParams.get('returnUrl');
   const locale = params.locale as string || 'en';
 
-  // If still no token, try to get it from existing auth storage
+  // Helper function to get token from cookie
+  const getTokenFromCookie = (): string | null => {
+    if (typeof document === 'undefined') return null;
+    
+    const cookies = document.cookie.split(';');
+    for (let cookie of cookies) {
+      const [name, value] = cookie.trim().split('=');
+      if (name === 'token') {
+        return value;
+      }
+    }
+    return null;
+  };
+
+  // If still no token, try to get it from cookie
   if (!token) {
-    token = getAccessToken();
+    token = getTokenFromCookie();
     if (token) {
-      console.log('[callback] Found token in auth storage:', token.substring(0, 20) + '...');
+      console.log('[callback] Found token in cookie:', token.substring(0, 20) + '...');
     }
   }
 
@@ -58,14 +71,18 @@ export default function QueryParamAuthCallback() {
         console.log('[callback] Processing authentication with token:', token.substring(0, 20) + '...');
         console.log('[callback] Return URL:', returnUrl);
         
-        // Store token using centralized auth utility
+        // Store token in cookie (primary storage) with error handling
         try {
-          setAccessToken(token);
-          console.log('[callback] Token stored using auth utility successfully');
-        } catch (storageError) {
-          console.error('[callback] Failed to store token:', storageError);
-          throw storageError;
+          setTokenCookie(token);
+          console.log('[callback] Token stored in cookie successfully');
+        } catch (cookieError) {
+          console.error('[callback] Failed to set token cookie:', cookieError);
+          // Continue anyway, as we can still use localStorage
         }
+        
+        // Store token in localStorage for backward compatibility
+        localStorage.setItem('token', token);
+        console.log('[callback] Token stored in localStorage');
         
         // Set user's timezone (don't let this block the main flow)
         setUserTimezone(token).catch(error => {
@@ -92,7 +109,7 @@ export default function QueryParamAuthCallback() {
         localStorage.setItem('user', JSON.stringify(userData));
         
         // Verify authentication was successful
-        const storedToken = getAccessToken();
+        const storedToken = getTokenFromCookie() || localStorage.getItem('token');
         const storedUser = localStorage.getItem('user');
         
         if (!storedToken || !storedUser) {
@@ -123,11 +140,46 @@ export default function QueryParamAuthCallback() {
     if (token) {
       fetchProfile();
     } else {
-      console.error('[callback] No token found in URL parameters or auth storage');
+      console.error('[callback] No token found in URL parameters or cookies');
       // Redirect to login if no token
       window.location.href = 'https://app.knoldg.com/auth/login';
     }
   }, [token, locale, returnUrl]);
+
+  // Helper function to set token in cookie with improved localhost settings
+  const setTokenCookie = (token: string) => {
+    const isLocalhost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+    
+    let cookieSettings;
+    if (isLocalhost) {
+      // For localhost development - use permissive settings
+      cookieSettings = [
+        `token=${token}`,
+        `Path=/`,
+        `Max-Age=${60 * 60 * 24 * 7}`, // 7 days
+        `SameSite=Lax` // More permissive for localhost
+      ];
+    } else {
+      cookieSettings = [
+        `token=${token}`,
+        `Path=/`,
+        `Max-Age=${60 * 60 * 24 * 7}`, // 7 days
+        `SameSite=None`,
+        `Domain=.knoldg.com`,
+        `Secure`
+      ];
+    }
+    
+    const cookieString = cookieSettings.join('; ');
+    console.log('[callback] Setting cookie:', cookieString);
+    document.cookie = cookieString;
+    
+    // Verify the cookie was set
+    setTimeout(() => {
+      const verification = getTokenFromCookie();
+      console.log('[callback] Cookie set verification:', verification ? 'Success' : 'Failed');
+    }, 100);
+  };
 
   // Helper function to get cookie value
   const getCookie = (name: string): string | null => {
@@ -145,26 +197,33 @@ export default function QueryParamAuthCallback() {
 
   // Helper function to clear auth data
   const clearAuthData = () => {
-    console.log('[callback] Clearing auth data using centralized utility');
-    
-    // Use centralized auth utility to clear tokens
-    removeAccessToken();
-    
-    // Clear any additional legacy auth data
+    console.log('[callback] Clearing auth data');
+    localStorage.removeItem('token');
+    localStorage.removeItem('user');
     localStorage.removeItem('foresighta-creds');
     
-    // Clear any additional auth cookies that might exist
+    // Clear token cookie
     const isLocalhost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+    let cookieSettings;
     
-    const removeCookie = (name: string) => {
-      if (isLocalhost) {
-        document.cookie = `${name}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;`;
-      } else {
-        document.cookie = `${name}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/; SameSite=None; Domain=.knoldg.com; Secure;`;
-      }
-    };
+    if (isLocalhost) {
+      cookieSettings = [
+        'token=',
+        'Path=/',
+        'Max-Age=-1'
+      ];
+    } else {
+      cookieSettings = [
+        'token=',
+        'Path=/',
+        'Max-Age=-1',
+        'SameSite=None',
+        'Domain=.knoldg.com',
+        'Secure'
+      ];
+    }
     
-    removeCookie('auth_return_url');
+    document.cookie = cookieSettings.join('; ');
   };
 
   // Helper function to set user's timezone
