@@ -7,7 +7,7 @@ import Reviews from "./Reviews";
 import AskInsighter from "./AskInsighter";
 import { useParams, useRouter, useSearchParams } from "next/navigation";
 
-function TabContent({ activeTab, knowledge, onRefreshData }: { activeTab: string; knowledge: KnowledgeDetails; onRefreshData?: () => void }) {
+function TabContent({ activeTab, knowledge, knowledgeSlug, onRefreshData }: { activeTab: string; knowledge: KnowledgeDetails; knowledgeSlug: string; onRefreshData?: () => void }) {
   const params = useParams();
   const locale = params.locale as string;
   const isRTL = locale === 'ar';
@@ -21,7 +21,7 @@ function TabContent({ activeTab, knowledge, onRefreshData }: { activeTab: string
   // Pass onRefreshData to Reviews tab as well
   switch (activeTab) {
     case "Overview":
-      return <Overview knowledge={knowledge} />;
+      return <Overview knowledge={knowledge} knowledgeSlug={knowledgeSlug} />;
     case "Reviews":
       return <Reviews 
         knowledgeSlug={knowledge.slug} 
@@ -43,7 +43,7 @@ function TabContent({ activeTab, knowledge, onRefreshData }: { activeTab: string
   }
 }
 
-export default function TabsContent({ knowledge }: { knowledge: KnowledgeDetails }) {
+export default function TabsContent({ knowledge, knowledgeSlug }: { knowledge: KnowledgeDetails; knowledgeSlug: string }) {
   const [activeTab, setActiveTab] = useState("Overview");
   const params = useParams();
   const locale = params.locale as string;
@@ -142,7 +142,7 @@ export default function TabsContent({ knowledge }: { knowledge: KnowledgeDetails
         </nav>
       </div>
       <div className="mt-6">
-        <TabContent activeTab={activeTab} knowledge={knowledgeData} onRefreshData={refreshData} />
+        <TabContent activeTab={activeTab} knowledge={knowledgeData} knowledgeSlug={knowledgeSlug} onRefreshData={refreshData} />
       </div>
     </div>
   );
