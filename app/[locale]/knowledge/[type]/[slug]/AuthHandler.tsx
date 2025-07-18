@@ -11,11 +11,12 @@ export default function AuthHandler() {
     const getTokenFromCookie = (): string | null => {
       if (typeof document === 'undefined') return null;
       
-      const cookies = document.cookie.split(';');
-      for (let cookie of cookies) {
+      // Try to get token from .knoldg.com domain cookies first
+      const allCookies = document.cookie.split(';');
+      for (let cookie of allCookies) {
         const [name, value] = cookie.trim().split('=');
         if (name === 'token') {
-           return decodeURIComponent(value);
+          return decodeURIComponent(value);
         }
       }
       return null;
@@ -35,13 +36,25 @@ export default function AuthHandler() {
         console.error('[AuthHandler] Error cleaning localStorage:', e);
       }
       
-      // Clean cookies
+      // Clean cookies - handle all possible domain scenarios
       try {
         const isLocalhost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
         if (isLocalhost) {
           document.cookie = 'token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
         } else {
-          document.cookie = 'token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/; Domain=.knoldg.com; Secure; SameSite=None;';
+          // Clear cookie from all possible domain variations
+          const domains = [
+            '.knoldg.com',           // Main domain with dot
+            'knoldg.com',            // Main domain without dot
+            window.location.hostname  // Current subdomain
+          ];
+          
+          domains.forEach(domain => {
+            // Clear with domain
+            document.cookie = `token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/; domain=${domain}; Secure; SameSite=None;`;
+            // Clear without domain (fallback)
+            document.cookie = 'token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/; Secure; SameSite=None;';
+          });
         }
         console.log('[AuthHandler] Cookies cleaned');
       } catch (e) {
@@ -58,7 +71,8 @@ export default function AuthHandler() {
       console.log('[AuthHandler] Auth check:', {
         hasCookieToken: !!cookieToken,
         hasLocalStorageToken: !!localStorageToken,
-        hasUserData: !!userData
+        hasUserData: !!userData,
+        domain: window.location.hostname
       });
 
       // Clean up in any of these cases:
