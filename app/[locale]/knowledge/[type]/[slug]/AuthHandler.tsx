@@ -15,66 +15,75 @@ export default function AuthHandler() {
       for (let cookie of cookies) {
         const [name, value] = cookie.trim().split('=');
         if (name === 'token') {
-          return value;
+           return decodeURIComponent(value);
         }
       }
       return null;
     };
 
-    // Helper function to get token from any available source
-    const getAuthToken = (): string | null => {
-      // First try cookie (primary storage)
-      const cookieToken = getTokenFromCookie();
-      if (cookieToken) {
-        return cookieToken;
-      }
-
-      // Fallback to localStorage for backward compatibility
-      const localStorageToken = localStorage.getItem("token");
-      if (localStorageToken) {
-        return localStorageToken;
-      }
-
-      return null;
-    };
-
-    // Check if there's no token and handle signout
-    const checkAuth = () => {
-      const token = getAuthToken();
-      const userData = localStorage.getItem('user');
+    // Function to clean up all auth data
+    const cleanupAuthData = () => {
+      console.log('[AuthHandler] Cleaning up auth data');
       
-      // Only trigger signout if:
-      // 1. There's no token (they lost their session)
-      // 2. AND there's user data (indicating they were previously logged in)
-      if (!token && userData) {
-        console.log('[AuthHandler] User was previously logged in but token is missing - signing out');
-        
-        // Clean up any remaining auth data
+      // Clean localStorage
+      try {
         localStorage.removeItem('token');
         localStorage.removeItem('user');
         localStorage.removeItem('foresighta-creds');
-        
-        // Clear auth cookies with proper domain settings
+        console.log('[AuthHandler] LocalStorage cleaned');
+      } catch (e) {
+        console.error('[AuthHandler] Error cleaning localStorage:', e);
+      }
+      
+      // Clean cookies
+      try {
         const isLocalhost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
         if (isLocalhost) {
           document.cookie = 'token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
         } else {
           document.cookie = 'token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/; Domain=.knoldg.com; Secure; SameSite=None;';
         }
-        
-        // Handle signout
-        handleSignOut();
-      } else if (!token && !userData) {
-        console.log('[AuthHandler] No token and no user data - user was never logged in, no action needed');
-      } else if (token && userData) {
-        console.log('[AuthHandler] Token and user data present - user is authenticated');
+        console.log('[AuthHandler] Cookies cleaned');
+      } catch (e) {
+        console.error('[AuthHandler] Error cleaning cookies:', e);
       }
     };
 
-    // Only run this check on the client side
+    // Check auth state and handle cleanup
+    const checkAuth = () => {
+      const cookieToken = getTokenFromCookie();
+      const localStorageToken = localStorage.getItem('token');
+      const userData = localStorage.getItem('user');
+
+      console.log('[AuthHandler] Auth check:', {
+        hasCookieToken: !!cookieToken,
+        hasLocalStorageToken: !!localStorageToken,
+        hasUserData: !!userData
+      });
+
+      // Clean up in any of these cases:
+      // 1. No cookie token but has localStorage data
+      // 2. Cookie token doesn't match localStorage token
+      // 3. Has localStorage token but no cookie token
+      if (!cookieToken || 
+          (localStorageToken && cookieToken !== localStorageToken) || 
+          (!cookieToken && (localStorageToken || userData))) {
+        console.log('[AuthHandler] Auth mismatch detected - cleaning up');
+        cleanupAuthData();
+        handleSignOut();
+      }
+    };
+
+    // Run initial check
     if (typeof window !== 'undefined') {
       checkAuth();
     }
+
+    // Set up interval to periodically check auth state
+    const interval = setInterval(checkAuth, 5000);
+
+    // Cleanup interval on unmount
+    return () => clearInterval(interval);
   }, [handleSignOut]);
 
   // This component doesn't render anything
