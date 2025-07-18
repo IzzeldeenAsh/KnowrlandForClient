@@ -87,8 +87,8 @@ export default function Overview({ knowledge, knowledgeSlug }: OverviewProps) {
   };
 
   const handleBuyClick = (documentId: number) => {
-    setSelectedDocumentId(documentId);
-    setBuyModalOpened(true);
+    // setSelectedDocumentId(documentId);
+    // setBuyModalOpened(true);
   };
 
   return (
