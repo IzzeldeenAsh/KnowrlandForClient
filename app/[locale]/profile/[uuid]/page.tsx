@@ -23,7 +23,6 @@ import LinkedinIcon from '@/public/file-icons/linkedin';
 import InstagramIcon from '@/public/file-icons/instagram';
 import { useTranslations } from 'next-intl';
 import styles from './profile.module.css';
-import { getAccessToken } from '../../../lib/auth/auth';
 import Link from 'next/link';
 
 interface SocialLink {
@@ -368,8 +367,8 @@ export default function ProfilePage() {
   // Check if user is authenticated and fetch user profile if authenticated
   useEffect(() => {
     const checkAuth = async () => {
-      // Check if token exists in cookies (or localStorage as fallback)
-      const token = getAccessToken();
+      // Check if token exists in localStorage
+      const token = localStorage.getItem('token');
       const isAuth = !!token;
       setIsAuthenticated(isAuth);
       
@@ -444,7 +443,7 @@ export default function ProfilePage() {
     setLoadingMeetings(true);
     try {
       // Get auth token
-      const token = getAccessToken();
+      const token = localStorage.getItem('token');
       
       // Calculate start and end date (3 months range starting from tomorrow)
       const today = new Date();
@@ -705,8 +704,8 @@ export default function ProfilePage() {
     setBookingError(null);
     
     try {
-      // Get auth token from cookies (or localStorage as fallback)
-      const token = typeof window !== 'undefined' ? getAccessToken() : null;
+      // Get auth token from localStorage
+      const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
       
       // Get profile name from URL if profileData is unavailable
       const defaultName = uuid.toString().split('-')[0] || 'consultant';

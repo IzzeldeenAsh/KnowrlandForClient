@@ -1,6 +1,5 @@
 import { useState } from "react";
 import { useLocale } from "next-intl";
-import { getAccessToken } from "../../app/lib/auth/auth";
 
 interface UseReviewReturn {
   postReview: (rate: number, comment: string) => Promise<void>;
@@ -20,7 +19,7 @@ export function useReview(knowledgeSlug: string): UseReviewReturn {
     setError(null);
     setSuccess(false);
     try {
-      const token = getAccessToken();
+      const token = localStorage.getItem("token");
       if (!token) {
         throw new Error("You must be signed in to submit a review.");
       }
