@@ -6,9 +6,21 @@ import { useState, useEffect } from 'react';
 import FacebookIcon from '@/public/file-icons/facebook';
 import LinkedinIcon from '@/public/file-icons/linkedin';
 import WhatsappIcon from '@/public/file-icons/whatsapp';
+import BuyModal from './BuyModal';
 
 interface Document {
+  id: number;
+  file_name: string;
+  file_size: number;
+  price: string;
+  description: string | null;
   file_extension: string;
+  table_of_content: Array<{
+    chapter?: {
+      title: string;
+    };
+    title?: string;
+  }>;
 }
 
 interface EconomicBloc {
@@ -30,6 +42,7 @@ interface KnowledgeSideBoxProps {
   regions?: any;
   countries?: any;
   locale?: string;
+  knowledgeSlug?: string;
 }
 
 const KnowledgeSideBox = ({
@@ -42,7 +55,8 @@ const KnowledgeSideBox = ({
   economic_blocs,
   regions,
   countries,
-  locale
+  locale,
+  knowledgeSlug
 }: KnowledgeSideBoxProps) => {
   const params = useParams();
   const currentLocale = locale || params.locale as string || 'en';
@@ -64,6 +78,10 @@ const KnowledgeSideBox = ({
     isicCode: false,
     hsCode: false,
   });
+
+  // Buy Modal state
+  const [buyModalOpened, setBuyModalOpened] = useState(false);
+  const [selectedDocumentIds, setSelectedDocumentIds] = useState<number[]>([]);
   
   // Function to toggle section expansion
   const toggleSection = (section: 'economicBlocs' | 'regions' | 'countries' | 'documents' | 'isicCode' | 'hsCode') => {
@@ -71,6 +89,14 @@ const KnowledgeSideBox = ({
       ...expandedSections,
       [section]: !expandedSections[section],
     });
+  };
+
+  // Handle buy/download click
+  const handleBuyClick = () => {
+    // Pre-select all documents when opening the modal
+    // const allDocumentIds = documents.map(doc => doc.id);
+    // setSelectedDocumentIds(allDocumentIds);
+    // setBuyModalOpened(true);
   };
   
   // Maximum number of items to show initially
@@ -160,12 +186,18 @@ const KnowledgeSideBox = ({
 
         <div className="space-y-3 mb-4">
           {isFree ? (
-            <button className="w-full font-semibold bg-gradient-to-r from-blue-500 to-teal-400 text-white py-2 px-4 rounded-lg hover:from-blue-700 hover:to-blue-900 transition-colors">
+            <button 
+              onClick={handleBuyClick}
+              className="w-full font-semibold bg-gradient-to-r from-blue-500 to-teal-400 text-white py-2 px-4 rounded-lg hover:from-blue-700 hover:to-blue-900 transition-colors"
+            >
               {translations.download}
             </button>
           ) : (
             <>
-              <button className="w-full font-semibold bg-gradient-to-r from-blue-500 to-teal-400 text-white py-2 px-4 rounded-lg hover:from-blue-700 hover:to-blue-900 transition-colors">
+              <button 
+                onClick={handleBuyClick}
+                className="w-full font-semibold bg-gradient-to-r from-blue-500 to-teal-400 text-white py-2 px-4 rounded-lg hover:from-blue-700 hover:to-blue-900 transition-colors"
+              >
                 {translations.buyNow}
               </button>
               <button className="w-full font-semibold  bg-gray-100 text-gray-600 py-2 px-4 rounded-lg hover:bg-blue-50 transition-colors">
@@ -716,6 +748,17 @@ const KnowledgeSideBox = ({
         }
       `}</style>
     </div>
+
+    {/* Buy Modal */}
+    {knowledgeSlug && (
+      <BuyModal
+        opened={buyModalOpened}
+        onClose={() => setBuyModalOpened(false)}
+        documents={documents}
+        preSelectedDocumentIds={selectedDocumentIds}
+        knowledgeSlug={knowledgeSlug}
+      />
+    )}
   </div>
   );
 };

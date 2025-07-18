@@ -2,6 +2,7 @@
 
 import { useEffect } from 'react';
 import { useRouter, useParams, useSearchParams } from 'next/navigation';
+import { removeAccessToken } from '../../lib/auth/auth';
 
 export default function SignoutPage() {
   const router = useRouter();
@@ -11,26 +12,29 @@ export default function SignoutPage() {
   const redirectUri = searchParams.get('redirect_uri');
 
   useEffect(() => {
-    // Helper function to remove cookies properly
-    const removeCookie = (name: string) => {
-      // Remove from current domain
-      document.cookie = `${name}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;`;
-      
-      // Remove from root domain and ensure Secure/SameSite settings match creation
-      document.cookie = `${name}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/; Domain=.knoldg.com; Secure; SameSite=None;`;
-    };
+    // Use the centralized auth utility to remove tokens from both cookies and localStorage
+    removeAccessToken();
     
-    // Clear ALL possible localStorage keys from both apps
-    localStorage.removeItem('token'); // Next.js format
-    localStorage.removeItem('user'); // Next.js user data
+    // Clear any additional auth data that might exist from legacy systems
     localStorage.removeItem('foresighta-creds'); // Angular format
     localStorage.removeItem('currentUser'); // Possible Angular user data
     localStorage.removeItem('authToken'); // Possible direct token storage
     
-    // Clear any auth cookies
-    removeCookie('token');
+    // Helper function to remove any additional cookies that might exist
+    const removeCookie = (name: string) => {
+      const isLocalhost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+      
+      if (isLocalhost) {
+        document.cookie = `${name}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;`;
+      } else {
+        document.cookie = `${name}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/; Domain=.knoldg.com; Secure; SameSite=None;`;
+      }
+    };
+    
+    // Clear any additional auth cookies that might exist
     removeCookie('auth_token');
     removeCookie('auth_user');
+    removeCookie('auth_return_url');
     
     // Check if we also need to notify the Angular app about logout
     const shouldNotifyAngularApp = !redirectUri?.includes('app.knoldg.com');
