@@ -4,7 +4,7 @@ import { useEffect } from 'react';
 import { useUserProfile } from '@/app/lib/useUserProfile';
 import { usePathname } from 'next/navigation';
 
-export default function AuthHandler() {
+export default function GlobalAuthHandler() {
   const { handleSignOut } = useUserProfile();
   const pathname = usePathname();
 
@@ -25,16 +25,16 @@ export default function AuthHandler() {
 
     // Function to clean up all auth data
     const cleanupAuthData = () => {
-      console.log('[AuthHandler] Cleaning up auth data');
+      console.log('[GlobalAuthHandler] Cleaning up auth data');
       
       // Clean localStorage
       try {
         localStorage.removeItem('token');
         localStorage.removeItem('user');
         localStorage.removeItem('foresighta-creds');
-        console.log('[AuthHandler] LocalStorage cleaned');
+        console.log('[GlobalAuthHandler] LocalStorage cleaned');
       } catch (e) {
-        console.error('[AuthHandler] Error cleaning localStorage:', e);
+        console.error('[GlobalAuthHandler] Error cleaning localStorage:', e);
       }
     };
 
@@ -44,16 +44,28 @@ export default function AuthHandler() {
       const localStorageToken = localStorage.getItem('token');
       const userData = localStorage.getItem('user');
 
-      console.log('[AuthHandler] Auth check:', {
+      // Skip auth check for public routes
+      const isPublicRoute = pathname.includes('/home') || 
+                          pathname === '/' || 
+                          pathname.includes('/callback') ||
+                          pathname.includes('/signout');
+
+      if (isPublicRoute) {
+        console.log('[GlobalAuthHandler] Public route detected, skipping auth check');
+        return;
+      }
+
+      console.log('[GlobalAuthHandler] Auth check:', {
         hasCookieToken: !!cookieToken,
         hasLocalStorageToken: !!localStorageToken,
         hasUserData: !!userData,
-        domain: window.location.hostname
+        domain: window.location.hostname,
+        pathname
       });
 
       // If we have localStorage data but no cookie token, we need to clean up and redirect
       if (!cookieToken && (localStorageToken || userData)) {
-        console.log('[AuthHandler] Auth mismatch detected - cleaning up and redirecting to logout');
+        console.log('[GlobalAuthHandler] Auth mismatch detected - cleaning up and redirecting to logout');
         cleanupAuthData();
         
         // Get the current locale for the redirect
