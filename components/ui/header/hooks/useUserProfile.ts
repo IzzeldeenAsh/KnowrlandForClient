@@ -226,20 +226,6 @@ export function useUserProfile() {
   };
 
   useEffect(() => {
-    // Check for cached user data first for immediate UI update
-    const userData = localStorage.getItem("user");
-    if (userData && !userProfileCache.user) {
-      console.log("[useUserProfile] Found cached user data in localStorage");
-      try {
-        const cachedUser = JSON.parse(userData);
-        userProfileCache.user = cachedUser;
-        setUser(cachedUser);
-      } catch (error) {
-        console.error("[useUserProfile] Error parsing cached user data:", error);
-        localStorage.removeItem("user");
-      }
-    }
-
     // Set loading state
     setIsLoading(userProfileCache.isLoading);
 
@@ -247,7 +233,8 @@ export function useUserProfile() {
     const loadProfile = async () => {
       setIsLoading(true);
       try {
-        const { user: fetchedUser, roles: fetchedRoles } = await fetchProfile();
+        // Force a profile refresh to ensure we have the latest auth state
+        const { user: fetchedUser, roles: fetchedRoles } = await fetchProfile(true);
         setUser(fetchedUser);
         setRoles(fetchedRoles);
       } finally {
