@@ -1,12 +1,13 @@
 'use client';
 
-import React, { useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
 import Image from 'next/image'
 import styles from './knowledge.module.css'
 import { SparklesIcon } from '@heroicons/react/20/solid'
 import { IconFiles } from '@tabler/icons-react'
 import { Group, Text, Badge } from '@mantine/core'
 import { useParams } from 'next/navigation'
+import BuyModal from './BuyModal'
 
 // Define interfaces for minimal typing, you can expand these as needed
 interface Document {
@@ -29,11 +30,13 @@ export interface KnowledgeDetails {
   documents: Document[]
   type: string
   language?: string
+  slug?: string
   // Add other fields if needed
 }
 
 interface OverviewProps {
   knowledge: KnowledgeDetails
+  knowledgeSlug: string
 }
 
 const getFileIconByExtension = (extension: string) => {
@@ -56,11 +59,14 @@ const getFileIconByExtension = (extension: string) => {
   return iconMap[extension.toLowerCase()] || iconMap.default
 }
 
-export default function Overview({ knowledge }: OverviewProps) {
+export default function Overview({ knowledge, knowledgeSlug }: OverviewProps) {
   const params = useParams();
   const locale = params.locale;
   const isRTL = locale === 'ar';
   const isArabicContent = knowledge.language === 'arabic';
+
+  const [buyModalOpened, setBuyModalOpened] = useState(false);
+  const [selectedDocumentId, setSelectedDocumentId] = useState<number | undefined>(undefined);
 
   // Translations
   const translations = {
@@ -71,13 +77,18 @@ export default function Overview({ knowledge }: OverviewProps) {
     documents: isRTL ? 'المستندات' : 'documents',
     free: isRTL ? 'مجاني' : 'Free',
     download: isRTL ? 'تحميل' : 'Download',
-    addToCart: isRTL ? 'إضافة إلى حقيبة المشتريات' : 'Add to Cart',
+    buyNow: isRTL ? 'شراء الآن' : 'Buy Now',
     evaluateWithAI: isRTL ? 'تقييم باستخدام الذكاء الاصطناعي' : 'Evaluate with AI',
     description: isRTL ? 'الوصف' : 'Description',
     tableOfContents: isRTL ? 'جدول المحتويات' : 'Table of Contents',
     chapter: isRTL ? 'الفصل' : 'Chapter',
     title: isRTL ? 'العنوان' : 'Title',
     noDocumentsAvailable: isRTL ? 'لا توجد مستندات متاحة.' : 'No documents available.'
+  };
+
+  const handleBuyClick = (documentId: number) => {
+    // setSelectedDocumentId(documentId);
+    // setBuyModalOpened(true);
   };
 
   return (
@@ -195,14 +206,26 @@ export default function Overview({ knowledge }: OverviewProps) {
                   <div className="max-w-xs mx-auto sm:max-w-none sm:inline-flex sm:justify-start space-y-2 sm:space-y-0 sm:space-x-2 mt-4">
                     <div>
                     { doc.price === "0" && (
-  <a  className="btn-sm text-white bg-[#1C7CBB] text-sm hover:bg-opacity-90 transition duration-150 ease-in-out group text-sm px-3 py-1 cursor-pointer">
+ <button
+ onClick={(e) => {
+   e.stopPropagation();
+   handleBuyClick(doc.id);
+ }}
+ className="btn-sm mx-4 text-white bg-[#1C7CBB] text-sm hover:bg-opacity-90 transition duration-150 ease-in-out group text-sm px-3 py-1 cursor-pointer"
+>
   {translations.download} <span className="tracking-normal text-white group-hover:translate-x-0.5 transition-transform duration-150 ease-in-out ml-1">-&gt;</span>
-</a>
+</button>
 )}
 {doc.price !== "0" && (
-    <a  className="btn-sm mx-4 text-white bg-[#1C7CBB] text-sm hover:bg-opacity-90 transition duration-150 ease-in-out group text-sm px-3 py-1 cursor-pointer">
-    {translations.addToCart} <span className="tracking-normal text-white group-hover:translate-x-0.5 transition-transform duration-150 ease-in-out ml-1">-&gt;</span>
-  </a>
+    <button
+      onClick={(e) => {
+        e.stopPropagation();
+        handleBuyClick(doc.id);
+      }}
+      className="btn-sm mx-4 text-white bg-[#1C7CBB] text-sm hover:bg-opacity-90 transition duration-150 ease-in-out group text-sm px-3 py-1 cursor-pointer"
+    >
+      {translations.buyNow} <span className="tracking-normal text-white group-hover:translate-x-0.5 transition-transform duration-150 ease-in-out ml-1">-&gt;</span>
+    </button>
 )}
                     </div>
                     <div>
@@ -222,6 +245,15 @@ export default function Overview({ knowledge }: OverviewProps) {
           )}
         </div>
       </div>
+
+      {/* Buy Modal */}
+      <BuyModal
+        opened={buyModalOpened}
+        onClose={() => setBuyModalOpened(false)}
+        documents={knowledge.documents}
+        preSelectedDocumentId={selectedDocumentId}
+        knowledgeSlug={knowledgeSlug}
+      />
     </div>
   )
 }

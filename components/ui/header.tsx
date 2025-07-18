@@ -127,7 +127,7 @@ export default function Header() {
     searchParams.set('search_type', searchType);
     
     // Navigate to the search page with parameters - router already handles locale
-    router.push(`/home?${searchParams.toString()}`);
+    router.push(`/${pathname.split('/')[1]}/home?${searchParams.toString()}`);
     setSearchQuery('');
   };
 
