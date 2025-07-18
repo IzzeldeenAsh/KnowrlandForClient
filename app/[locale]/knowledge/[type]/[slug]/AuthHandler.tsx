@@ -41,14 +41,24 @@ export default function AuthHandler() {
     // Check if there's no token and handle signout
     const checkAuth = () => {
       const token = getAuthToken();
+      const userData = localStorage.getItem('user');
       
-      if (!token) {
+      // Only trigger signout if:
+      // 1. There's no token (they lost their session)
+      // 2. AND there's user data (indicating they were previously logged in)
+      if (!token && userData) {
+        console.log('[AuthHandler] User was previously logged in but token is missing - signing out');
+        
         // Clean up any remaining auth data
         localStorage.removeItem('token');
         localStorage.removeItem('foresighta-creds');
         
         // Handle signout
         handleSignOut();
+      } else if (!token && !userData) {
+        console.log('[AuthHandler] No token and no user data - user was never logged in, no action needed');
+      } else if (token && userData) {
+        console.log('[AuthHandler] Token and user data present - user is authenticated');
       }
     };
 
