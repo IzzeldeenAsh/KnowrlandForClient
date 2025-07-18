@@ -94,9 +94,9 @@ const KnowledgeSideBox = ({
   // Handle buy/download click
   const handleBuyClick = () => {
     // Pre-select all documents when opening the modal
-    // const allDocumentIds = documents.map(doc => doc.id);
-    // setSelectedDocumentIds(allDocumentIds);
-    // setBuyModalOpened(true);
+    const allDocumentIds = documents.map(doc => doc.id);
+    setSelectedDocumentIds(allDocumentIds);
+    setBuyModalOpened(true);
   };
   
   // Maximum number of items to show initially
