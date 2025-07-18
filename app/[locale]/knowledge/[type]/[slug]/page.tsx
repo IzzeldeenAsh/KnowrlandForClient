@@ -102,6 +102,7 @@ async function fetchKnowledgeData(type: string, slug: string, locale: string = '
     if (token) {
       headers.Authorization = `Bearer ${token}`;
     }
+    // Note: localStorage cleanup is handled by AuthHandler component
     
     const response = await fetch(
       `https://api.knoldg.com/api/platform/industries/knowledge/${slug}`,
