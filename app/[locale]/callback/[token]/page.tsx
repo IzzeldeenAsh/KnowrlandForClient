@@ -1,8 +1,7 @@
 'use client';
 
 import { useEffect } from 'react';
-import { useRouter, useParams } from 'next/navigation';
-import { getAccessToken, setAccessToken, removeAccessToken } from '../../../lib/auth/auth';
+import { useRouter, useParams, useSearchParams } from 'next/navigation';
 
 interface ProfileResponse {
   data: {
@@ -20,12 +19,26 @@ interface ProfileResponse {
   };
 }
 
-export default function TokenCallback() {
+export default function AuthCallback() {
   const router = useRouter();
   const params = useParams();
+  const searchParams = useSearchParams();
   
-  const token = params.token as string;
-  const locale = params.locale as string || 'en';
+  // Get token from either path parameter or query parameter
+  const pathToken = params.token as string;
+  const queryToken = searchParams.get('token');
+  let token = pathToken || queryToken;
+  
+  // Additional safety check: if no token found, check if query string is a raw token
+  if (!token && typeof window !== 'undefined') {
+    const queryString = window.location.search.substring(1);
+    if (queryString && queryString.startsWith('eyJ') && queryString.includes('.')) {
+      token = queryString;
+      console.log('[token-callback] Detected raw token in query string as fallback');
+    }
+  }
+  
+  const locale = (params.locale as string) || 'en';
 
   useEffect(() => {
     const fetchProfile = async () => {
@@ -34,16 +47,20 @@ export default function TokenCallback() {
           throw new Error('No token provided');
         }
 
-        console.log('[token-callback] Processing authentication with token:', token.substring(0, 20) + '...');
+        console.log('[token-callback] Processing authentication token:', token.substring(0, 20) + '...');
         
-        // Store token using centralized auth utility
+        // Store token in cookie (primary storage) with better error handling
         try {
-          setAccessToken(token);
-          console.log('[token-callback] Token stored using auth utility successfully');
-        } catch (storageError) {
-          console.error('[token-callback] Failed to store token:', storageError);
-          throw storageError;
+          setTokenCookie(token);
+          console.log('[token-callback] Token stored in cookie successfully');
+        } catch (cookieError) {
+          console.error('[token-callback] Failed to set token cookie:', cookieError);
+          // Continue anyway, as we can still use localStorage
         }
+        
+        // Store token in localStorage for backward compatibility
+        localStorage.setItem('token', token);
+        console.log('[token-callback] Token stored in localStorage');
         
         // Set user's timezone (don't let this block the main flow)
         setUserTimezone(token).catch(error => {
@@ -70,7 +87,7 @@ export default function TokenCallback() {
         localStorage.setItem('user', JSON.stringify(userData));
         
         // Verify authentication was successful
-        const storedToken = getAccessToken();
+        const storedToken = getTokenFromCookie() || localStorage.getItem('token');
         const storedUser = localStorage.getItem('user');
         
         if (!storedToken || !storedUser) {
@@ -101,34 +118,102 @@ export default function TokenCallback() {
     if (token) {
       fetchProfile();
     } else {
-      console.error('[token-callback] No token found in URL parameters');
-      // Redirect to login if no token
+      console.error('No token found in URL parameters');
       window.location.href = 'https://app.knoldg.com/auth/login';
     }
   }, [token, locale]);
 
-  // Helper function to clear auth data
-  const clearAuthData = () => {
-    console.log('[token-callback] Clearing auth data using centralized utility');
-    
-    // Use centralized auth utility to clear tokens
-    removeAccessToken();
-    
-    // Clear any additional legacy auth data
-    localStorage.removeItem('foresighta-creds');
-    
-    // Clear any additional auth cookies that might exist
+  // Helper function to set token in cookie with improved localhost settings
+  const setTokenCookie = (token: string) => {
     const isLocalhost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
     
-    const removeCookie = (name: string) => {
-      if (isLocalhost) {
-        document.cookie = `${name}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;`;
-      } else {
-        document.cookie = `${name}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/; SameSite=None; Domain=.knoldg.com; Secure;`;
-      }
-    };
+    let cookieSettings;
+    if (isLocalhost) {
+      // For localhost development - use permissive settings
+      cookieSettings = [
+        `token=${token}`,
+        `Path=/`,
+        `Max-Age=${60 * 60 * 24 * 7}`, // 7 days
+        `SameSite=Lax` // More permissive for localhost
+      ];
+    } else {
+      cookieSettings = [
+        `token=${token}`,
+        `Path=/`,
+        `Max-Age=${60 * 60 * 24 * 7}`, // 7 days
+        `SameSite=None`,
+        `Domain=.knoldg.com`,
+        `Secure`
+      ];
+    }
     
-    removeCookie('auth_return_url');
+    const cookieString = cookieSettings.join('; ');
+    console.log('[token-callback] Setting cookie:', cookieString);
+    document.cookie = cookieString;
+    
+    // Verify the cookie was set
+    setTimeout(() => {
+      const verification = getTokenFromCookie();
+      console.log('[token-callback] Cookie set verification:', verification ? 'Success' : 'Failed');
+    }, 100);
+  };
+
+  // Helper function to get token from cookie
+  const getTokenFromCookie = (): string | null => {
+    if (typeof document === 'undefined') return null;
+    
+    const cookies = document.cookie.split(';');
+    for (let cookie of cookies) {
+      const [name, value] = cookie.trim().split('=');
+      if (name === 'token') {
+        return value;
+      }
+    }
+    return null;
+  };
+
+  // Helper function to get cookie value
+  const getCookie = (name: string): string | null => {
+    if (typeof document === 'undefined') return null;
+    
+    const cookies = document.cookie.split(';');
+    for (let i = 0; i < cookies.length; i++) {
+      const cookie = cookies[i].trim();
+      if (cookie.startsWith(name + '=')) {
+        return decodeURIComponent(cookie.substring(name.length + 1));
+      }
+    }
+    return null;
+  };
+
+  // Helper function to clear auth data
+  const clearAuthData = () => {
+    localStorage.removeItem('token');
+    localStorage.removeItem('user');
+    localStorage.removeItem('foresighta-creds');
+    
+    // Clear token cookie
+    const isLocalhost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+    let cookieSettings;
+    
+    if (isLocalhost) {
+      cookieSettings = [
+        'token=',
+        'Path=/',
+        'Max-Age=-1'
+      ];
+    } else {
+      cookieSettings = [
+        'token=',
+        'Path=/',
+        'Max-Age=-1',
+        'SameSite=None',
+        'Domain=.knoldg.com',
+        'Secure'
+      ];
+    }
+    
+    document.cookie = cookieSettings.join('; ');
   };
 
   // Helper function to set user's timezone
@@ -158,25 +243,6 @@ export default function TokenCallback() {
     } catch (timezoneError) {
       console.error('[TIMEZONE] Error setting timezone:', timezoneError);
       // Continue with the flow even if timezone setting fails
-    }
-  };
-
-  // Helper function to handle redirects
-  const handleRedirect = (userData: any) => {
-    console.log('[token-callback] Handling redirect for user:', userData.email);
-    console.log('[token-callback] User roles:', userData.roles);
-    
-    if (userData.roles && 
-        (userData.roles.includes('insighter') || 
-         userData.roles.includes('company') || 
-         userData.roles.includes('company-insighter'))) {
-      // Redirect to insighter dashboard
-      console.log('[token-callback] Redirecting to Angular insighter dashboard');
-      window.location.href = `https://app.knoldg.com/app/insighter-dashboard/my-dashboard`;
-    } else {
-      // Redirect to home page using current locale
-      console.log('[token-callback] Redirecting to home page:', `/${locale}/home`);
-      router.push(`/${locale}/home`);
     }
   };
 
@@ -235,6 +301,94 @@ export default function TokenCallback() {
     }
     
     throw new Error('Failed to fetch profile after all retry attempts');
+  };
+
+  // Helper function to handle redirects
+  const handleRedirect = (userData: any) => {
+    // Check for returnUrl parameter first
+    const returnUrl = searchParams.get('returnUrl');
+    
+    // Check for stored returnUrl in cookie as fallback (for social auth)
+    const storedReturnUrl = getCookie('auth_return_url');
+    const finalReturnUrl = returnUrl || storedReturnUrl;
+    
+    // Clean up the stored return URL cookie
+    if (storedReturnUrl) {
+      clearReturnUrlCookie();
+    }
+    
+    if (finalReturnUrl && finalReturnUrl !== '/' && !finalReturnUrl.includes('/login') && !finalReturnUrl.includes('/auth/')) {
+      console.log('[token-callback] Redirecting to returnUrl:', finalReturnUrl);
+      
+      // Check if this is an Angular route that should go to the Angular app
+      if (isAngularRoute(finalReturnUrl)) {
+        console.log('[token-callback] Detected Angular route, redirecting to Angular app');
+        const angularPath = finalReturnUrl.startsWith('/app/') ? finalReturnUrl : `/app${finalReturnUrl}`;
+        window.location.href = `https://app.knoldg.com${angularPath}`;
+      } else {
+        // Handle Next.js routes
+        console.log('[token-callback] Detected Next.js route, redirecting within app');
+        if (finalReturnUrl.startsWith('http')) {
+          console.log('[token-callback] External URL redirect:', finalReturnUrl);
+          window.location.href = finalReturnUrl;
+        } else {
+          console.log('[token-callback] Internal route redirect:', finalReturnUrl);
+          // Use router.push for internal Next.js routes to maintain auth state
+          router.push(finalReturnUrl);
+        }
+      }
+    } else if (userData.roles && 
+        (userData.roles.includes('insighter') || 
+         userData.roles.includes('company') || 
+         userData.roles.includes('company-insighter'))) {
+      // Redirect to insighter dashboard
+      console.log('[token-callback] Redirecting to Angular insighter dashboard');
+      window.location.href = `https://app.knoldg.com/app/insighter-dashboard/my-dashboard`;
+    } else {
+      // Redirect to home page using current locale
+      router.push(`/${locale}/home`);
+    }
+  };
+
+  // Helper function to check if route is Angular route
+  const isAngularRoute = (url: string): boolean => {
+    const angularRoutes = [
+      '/app/',
+      '/profile/',
+      '/insighter-dashboard/',
+      '/knowledge-detail/',
+      '/my-knowledge-base/',
+      '/add-knowledge/',
+      '/edit-knowledge/',
+      '/review-insighter-knowledge/'
+    ];
+    
+    return angularRoutes.some(route => url.startsWith(route));
+  };
+
+  // Helper function to clear return URL cookie
+  const clearReturnUrlCookie = () => {
+    const isLocalhost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+    
+    let cookieSettings;
+    if (isLocalhost) {
+      cookieSettings = [
+        'auth_return_url=',
+        'Path=/',
+        'Max-Age=-1'
+      ];
+    } else {
+      cookieSettings = [
+        'auth_return_url=',
+        'Path=/',
+        'Max-Age=-1',
+        'SameSite=None',
+        'Domain=.knoldg.com',
+        'Secure'
+      ];
+    }
+    
+    document.cookie = cookieSettings.join('; ');
   };
 
   return (
