@@ -546,18 +546,18 @@ export default function ProfilePage() {
   };
   
   const getDayName = (locale: string, date: Date) => {
-    return date.toLocaleDateString(locale === 'ar' ? 'ar-SA' : 'en-US', { weekday: 'long' });
+    return date.toLocaleDateString('en-US', { weekday: 'long' });
   };
   
   const getMonthName = (locale: string, date: Date) => {
-    return date.toLocaleDateString(locale === 'ar' ? 'ar-SA' : 'en-US', { month: 'long' });
+    return date.toLocaleDateString('en-US', { month: 'long' });
   };
   
   const getShortWeekdayNames = (locale: string) => {
     const names = [];
     const date = new Date(2021, 0, 3); // Sunday
     for (let i = 0; i < 7; i++) {
-      const dayName = date.toLocaleDateString(locale === 'ar' ? 'ar-SA' : 'en-US', { weekday: 'short' });
+      const dayName = date.toLocaleDateString('en-US', { weekday: 'short' });
       names.push(dayName);
       date.setDate(date.getDate() + 1);
     }
@@ -1650,7 +1650,7 @@ export default function ProfilePage() {
                           {selectedDate ? (
                             <>
                               <h3 className="text-lg font-semibold mb-4">
-                                {getDayName(locale, new Date(selectedDate))}, {new Date(selectedDate).toLocaleDateString(locale, { month: 'long', day: 'numeric' })}
+                                {getDayName(locale, new Date(selectedDate))}, {new Date(selectedDate).toLocaleDateString('en-US', { month: 'long', day: 'numeric' })}
                               </h3>
                               
                               <div className="space-y-3 mb-6">
