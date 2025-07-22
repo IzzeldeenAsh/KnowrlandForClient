@@ -132,8 +132,8 @@ export default function BuyModal({ opened, onClose, documents, preSelectedDocume
       toast.success(data.message || translations.success, translations.success);
 
       onClose();
-      // Optionally refresh the page or update the UI
-      window.location.reload();
+      // Redirect to my-downloads page after successful purchase
+      window.location.href = 'https://app.knoldg.com/app/insighter-dashboard/my-downloads';
       
     } catch (error) {
       console.error('Purchase error:', error);

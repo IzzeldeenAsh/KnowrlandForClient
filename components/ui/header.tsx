@@ -106,7 +106,7 @@ export default function Header() {
   const [industries, setIndustries] = useState<Industry[]>(industriesCache.data);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
-  const { isLoading: isAppLoading, setIsLoading: setAppLoading } = useLoading();
+const { isLoading: isAppLoading, setIsLoading: setAppLoading } = useLoading();
   const pathname = usePathname();
   const router = useRouter();
   const locale = useTranslations('Header');
