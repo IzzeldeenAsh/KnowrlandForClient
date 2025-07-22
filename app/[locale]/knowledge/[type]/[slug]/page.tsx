@@ -44,6 +44,7 @@ interface KnowledgeDetails {
   published_at: string;
   review: any[];
   is_review: boolean;
+  is_purchased: boolean;
   insighter: {
     name: string;
     profile_photo_url: string;
@@ -62,6 +63,7 @@ interface KnowledgeDetails {
     file_extension: string;
     price: string;
     description: string | null;
+    is_purchased?: boolean;
     table_of_content: {
       chapter: {
         title: string;
@@ -408,6 +410,7 @@ export default function KnowledgePage({ params }: Props) {
               countries={knowledge.countries}
               locale={locale}
               knowledgeSlug={slug}
+              is_purchased={knowledge.is_purchased}
             />
           </div>
         </div>

@@ -134,7 +134,7 @@ export function UserProfile({ isHome }: { isHome: boolean }) {
           className="flex items-center cursor-pointer"
           onClick={() => setMenuOpen(!menuOpen)}
         >
-          {roles.includes('company') && user.company?.logo ? (
+          {/* {roles.includes('company') && user.company?.logo ? (
             <div className="w-8 h-8 md:w-10 md:h-10 rounded-full overflow-hidden">
               <Image
                 src={user.company.logo}
@@ -146,6 +146,23 @@ export function UserProfile({ isHome }: { isHome: boolean }) {
               />
             </div>
           ) : user.profile_photo_url ? (
+            <div className="w-8 h-8 md:w-10 md:h-10 rounded-full overflow-hidden">
+              <Image
+                src={user.profile_photo_url}
+                alt={user.name}
+                width={100}
+                height={100}
+                quality={100}
+                className="w-full h-full object-cover object-top"
+              />
+            </div>
+          ) : (
+            <div className="w-8 h-8 md:w-10 md:h-10 rounded-full bg-white flex items-center justify-center text-blue-600 text-sm font-medium border border-gray-200">
+              {getInitials(user.first_name, user.last_name)}
+            </div>
+          )} */}
+
+{  user.profile_photo_url ? (
             <div className="w-8 h-8 md:w-10 md:h-10 rounded-full overflow-hidden">
               <Image
                 src={user.profile_photo_url}
@@ -178,7 +195,7 @@ export function UserProfile({ isHome }: { isHome: boolean }) {
         >
           <div className="px-4 py-3 border-b border-gray-100">
             <div className="flex items-center gap-3">
-              {(roles.includes('company') || roles.includes('company-insighter')) && user.company?.logo ? (
+              {/* {(roles.includes('company') || roles.includes('company-insighter')) && user.company?.logo ? (
                 <div className="w-10 h-10 rounded-lg overflow-hidden flex-shrink-0">
                   <Image
                     src={user.company.logo}
@@ -204,7 +221,25 @@ export function UserProfile({ isHome }: { isHome: boolean }) {
                 <div className="w-10 h-10 rounded-full bg-white flex items-center justify-center text-blue-600 text-sm font-medium flex-shrink-0 border border-gray-200">
                   {getInitials(user.first_name, user.last_name)}
                 </div>
-              )}
+              )} */}
+              {
+                 user.profile_photo_url ? (
+                  <div className="w-10 h-10 rounded-lg overflow-hidden flex-shrink-0">
+                    <Image
+                      src={user.profile_photo_url}
+                      alt={user.name}
+                      width={100}
+                      height={100}
+                      quality={100}
+                      className="w-full h-full object-cover object-top"
+                    />
+                  </div>
+                ) : (
+                  <div className="w-10 h-10 rounded-full bg-white flex items-center justify-center text-blue-600 text-sm font-medium flex-shrink-0 border border-gray-200">
+                    {getInitials(user.first_name, user.last_name)}
+                  </div>
+                )
+              }
               <div className="min-w-0 flex-1">
                 <div className="flex flex-wrap gap-1 items-center">
                   <p className="text-sm font-bold text-gray-900 truncate">
