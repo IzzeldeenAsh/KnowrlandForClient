@@ -1186,7 +1186,7 @@ export default function ProfilePage() {
                   {enterpriseType === 'insighter' ? t('aboutMe') : t('aboutCompany')}
                 </Tabs.Tab>
                 {/* Hide Meet tab if user is viewing their own profile */}
-                {(isInsighter || isCompanyInsighter || isCompany) && !isOwnProfile && (
+                {(isInsighter || isCompanyInsighter || isCompany) && !isOwnProfile && enterpriseType === 'insighter' && (
                   <Tabs.Tab
                     value="meet"
                     className="text-base font-medium px-8 py-4 transition"
