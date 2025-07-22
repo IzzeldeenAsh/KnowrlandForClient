@@ -4,7 +4,7 @@ import React, { useEffect, useState } from 'react'
 import Image from 'next/image'
 import styles from './knowledge.module.css'
 import { SparklesIcon } from '@heroicons/react/20/solid'
-import { IconFiles } from '@tabler/icons-react'
+import { IconCloudUpload, IconFiles } from '@tabler/icons-react'
 import { Group, Text, Badge } from '@mantine/core'
 import { useParams } from 'next/navigation'
 import BuyModal from './BuyModal'
@@ -17,6 +17,7 @@ interface Document {
   price: string
   description: string | null
   file_extension: string
+  is_purchased?: boolean
   table_of_content: Array<{
     chapter?: {
       title: string
@@ -83,7 +84,8 @@ export default function Overview({ knowledge, knowledgeSlug }: OverviewProps) {
     tableOfContents: isRTL ? 'جدول المحتويات' : 'Table of Contents',
     chapter: isRTL ? 'الفصل' : 'Chapter',
     title: isRTL ? 'العنوان' : 'Title',
-    noDocumentsAvailable: isRTL ? 'لا توجد مستندات متاحة.' : 'No documents available.'
+    noDocumentsAvailable: isRTL ? 'لا توجد مستندات متاحة.' : 'No documents available.',
+    alreadyPurchased: isRTL ? 'تم الشراء بالفعل' : 'Already Purchased'
   };
 
   const handleBuyClick = (documentId: number) => {
@@ -205,28 +207,37 @@ export default function Overview({ knowledge, knowledgeSlug }: OverviewProps) {
                   )}
                   <div className="max-w-xs mx-auto sm:max-w-none sm:inline-flex sm:justify-start space-y-2 sm:space-y-0 sm:space-x-2 mt-4">
                     <div>
-                    { doc.price === "0" && (
- <button
- onClick={(e) => {
-   e.stopPropagation();
-   handleBuyClick(doc.id);
- }}
- className="btn-sm mx-4 text-white bg-[#1C7CBB] text-sm hover:bg-opacity-90 transition duration-150 ease-in-out group text-sm px-3 py-1 cursor-pointer"
->
-  {translations.download} <span className="tracking-normal text-white group-hover:translate-x-0.5 transition-transform duration-150 ease-in-out ml-1">-&gt;</span>
-</button>
-)}
-{doc.price !== "0" && (
-    <button
-      onClick={(e) => {
-        e.stopPropagation();
-        handleBuyClick(doc.id);
-      }}
-      className="btn-sm mx-4 text-white bg-[#1C7CBB] text-sm hover:bg-opacity-90 transition duration-150 ease-in-out group text-sm px-3 py-1 cursor-pointer"
-    >
-      {translations.buyNow} <span className="tracking-normal text-white group-hover:translate-x-0.5 transition-transform duration-150 ease-in-out ml-1">-&gt;</span>
-    </button>
-)}
+                    {doc.is_purchased ? (
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          window.location.href = 'https://app.knoldg.com/app/insighter-dashboard/my-downloads';
+                        }}
+                        className="btn-sm mx-4 text-white bg-green-600 text-sm hover:bg-green-700 transition duration-150 ease-in-out group text-sm px-3 py-1 cursor-pointer"
+                      >
+                        {translations.alreadyPurchased} <span className="tracking-normal text-white group-hover:translate-x-0.5 transition-transform duration-150 ease-in-out ml-1">-&gt;</span>
+                      </button>
+                    ) : doc.price === "0" ? (
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleBuyClick(doc.id);
+                        }}
+                        className="btn-sm mx-4 text-white bg-[#1C7CBB] text-sm hover:bg-opacity-90 transition duration-150 ease-in-out group text-sm px-3 py-1 cursor-pointer"
+                      >
+                        {translations.download}  <IconCloudUpload size={16} className="ms-1" />
+                      </button>
+                    ) : (
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleBuyClick(doc.id);
+                        }}
+                        className="btn-sm mx-4 text-white bg-[#1C7CBB] text-sm hover:bg-opacity-90 transition duration-150 ease-in-out group text-sm px-3 py-1 cursor-pointer"
+                      >
+                        {translations.buyNow} <IconCloudUpload size={16} className="ms-1" />
+                      </button>
+                    )}
                     </div>
                     <div>
                       <a className="btn-sm text-slate-600 hover:text-slate-900 bg-slate-200 hover:bg-slate-300 transition duration-150 ease-in-out text-sm px-3 py-1 flex items-center border border-slate-300 cursor-pointer">

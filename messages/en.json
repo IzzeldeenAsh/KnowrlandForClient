@@ -445,6 +445,8 @@
     "ProfilePage": {
         "profileNotFound": "Profile not found",
         "bio": "Personal Bio",
+        "titleTooShort": "Title must be at least 3 characters",
+        "descriptionTooShort": "Description must be at least 3 characters",
         "industries": "Industries",
         "country": "Country",
         "location": "Location",

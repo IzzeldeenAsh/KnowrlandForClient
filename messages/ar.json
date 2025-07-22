@@ -435,6 +435,8 @@
         "cancel": "إلغاء",
         "confirmBooking": "تأكيد الحجز",
         "profileNotFound": "الملف الشخصي غير موجود",
+        "titleTooShort": "عنوان الاجتماع يجب أن يكون أطول من 3 أحرف",
+        "descriptionTooShort": "وصف الاجتماع يجب أن يكون أطول من 3 أحرف",
         "bio": "السيرة الذاتية",
         "industries": "المجالات",
         "certifications": "الشهادات",
