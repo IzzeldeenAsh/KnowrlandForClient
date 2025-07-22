@@ -15,6 +15,7 @@ interface Document {
   price: string;
   description: string | null;
   file_extension: string;
+  is_purchased?: boolean;
   table_of_content: Array<{
     chapter?: {
       title: string;
@@ -43,6 +44,7 @@ interface KnowledgeSideBoxProps {
   countries?: any;
   locale?: string;
   knowledgeSlug?: string;
+  is_purchased?: boolean;
 }
 
 const KnowledgeSideBox = ({
@@ -56,7 +58,8 @@ const KnowledgeSideBox = ({
   regions,
   countries,
   locale,
-  knowledgeSlug
+  knowledgeSlug,
+  is_purchased
 }: KnowledgeSideBoxProps) => {
   const params = useParams();
   const currentLocale = locale || params.locale as string || 'en';
@@ -156,7 +159,8 @@ const KnowledgeSideBox = ({
     showMore: isRTL ? 'عرض المزيد' : 'Show more',
     showLess: isRTL ? 'عرض أقل' : 'Show less',
     more: isRTL ? 'المزيد' : 'more',
-    download: isRTL ? 'تحميل' : 'Download'
+    download: isRTL ? 'تحميل' : 'Download',
+    alreadyPurchased: isRTL ? 'تم الشراء بالفعل' : 'Already Purchased'
   };
 
   const documentCounts = documents.reduce((acc: { [key: string]: number }, doc) => {
@@ -185,7 +189,14 @@ const KnowledgeSideBox = ({
         </div>
 
         <div className="space-y-3 mb-4">
-          {isFree ? (
+          {is_purchased ? (
+            <button 
+              onClick={() => window.location.href = 'https://app.knoldg.com/app/insighter-dashboard/my-downloads'}
+              className="w-full font-semibold bg-green-600 text-white py-2 px-4 rounded-lg hover:bg-green-700 transition-colors"
+            >
+              {translations.alreadyPurchased}
+            </button>
+          ) : isFree ? (
             <button 
               onClick={handleBuyClick}
               className="w-full font-semibold bg-gradient-to-r from-blue-500 to-teal-400 text-white py-2 px-4 rounded-lg hover:from-blue-700 hover:to-blue-900 transition-colors"
