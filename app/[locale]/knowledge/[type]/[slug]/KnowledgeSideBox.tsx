@@ -44,7 +44,7 @@ interface KnowledgeSideBoxProps {
   countries?: any;
   locale?: string;
   knowledgeSlug?: string;
-  is_purchased?: boolean;
+  purchased_status?: 'non-purchased' | 'purchased' | 'partial-purchased';
 }
 
 const KnowledgeSideBox = ({
@@ -59,7 +59,7 @@ const KnowledgeSideBox = ({
   countries,
   locale,
   knowledgeSlug,
-  is_purchased
+  purchased_status
 }: KnowledgeSideBoxProps) => {
   const params = useParams();
   const currentLocale = locale || params.locale as string || 'en';
@@ -160,7 +160,8 @@ const KnowledgeSideBox = ({
     showLess: isRTL ? 'عرض أقل' : 'Show less',
     more: isRTL ? 'المزيد' : 'more',
     download: isRTL ? 'تحميل' : 'Download',
-    alreadyPurchased: isRTL ? 'تم الشراء بالفعل' : 'Already Purchased'
+    alreadyPurchased: isRTL ? 'تم الشراء ' : 'Purchased',
+    partiallyPurchased: isRTL ? 'تم الشراء جزئياً' : 'Partially Purchased'
   };
 
   const documentCounts = documents.reduce((acc: { [key: string]: number }, doc) => {
@@ -189,12 +190,19 @@ const KnowledgeSideBox = ({
         </div>
 
         <div className="space-y-3 mb-4">
-          {is_purchased ? (
+          {purchased_status === 'purchased' ? (
             <button 
               onClick={() => window.location.href = 'https://app.knoldg.com/app/insighter-dashboard/my-downloads'}
               className="w-full font-semibold bg-green-600 text-white py-2 px-4 rounded-lg hover:bg-green-700 transition-colors"
             >
               {translations.alreadyPurchased}
+            </button>
+          ) : purchased_status === 'partial-purchased' ? (
+            <button 
+              onClick={handleBuyClick}
+              className="w-full font-semibold bg-cyan-500 text-white py-2 px-4 rounded-lg hover:bg-cyan-600 transition-colors"
+            >
+              {translations.partiallyPurchased}
             </button>
           ) : isFree ? (
             <button 
