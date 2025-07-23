@@ -44,7 +44,7 @@ interface KnowledgeDetails {
   published_at: string;
   review: any[];
   is_review: boolean;
-  is_purchased: boolean;
+  purchased_status: 'non-purchased' | 'purchased' | 'partial-purchased';
   insighter: {
     name: string;
     profile_photo_url: string;
@@ -410,7 +410,7 @@ export default function KnowledgePage({ params }: Props) {
               countries={knowledge.countries}
               locale={locale}
               knowledgeSlug={slug}
-              is_purchased={knowledge.is_purchased}
+              purchased_status={knowledge.purchased_status}
             />
           </div>
         </div>

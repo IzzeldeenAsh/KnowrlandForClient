@@ -13,6 +13,7 @@ interface Document {
   price: string;
   description: string | null;
   file_extension: string;
+  is_purchased?: boolean;
   table_of_content: Array<{
     chapter?: {
       title: string;
@@ -68,16 +69,25 @@ export default function BuyModal({ opened, onClose, documents, preSelectedDocume
     success: isRTL ? 'تم الشراء بنجاح!' : 'Purchase successful!',
     error: isRTL ? 'فشل في الشراء' : 'Purchase failed',
     selectAtLeastOne: isRTL ? 'يرجى اختيار مستند واحد على الأقل' : 'Please select at least one document',
+    alreadyPurchased: isRTL ? 'تم الشراء ' : 'Purchased',
   };
 
-  // Initialize selected documents with pre-selected ones
+  // Initialize selected documents with pre-selected ones (excluding already purchased)
   useEffect(() => {
     if (preSelectedDocumentIds && preSelectedDocumentIds.length > 0) {
-      setSelectedDocuments(preSelectedDocumentIds);
+      // Filter out already purchased documents from pre-selection
+      const unpurchasedIds = preSelectedDocumentIds.filter(id => {
+        const doc = documents.find(d => d.id === id);
+        return doc && !doc.is_purchased;
+      });
+      setSelectedDocuments(unpurchasedIds);
     } else if (preSelectedDocumentId) {
-      setSelectedDocuments([preSelectedDocumentId]);
+      const doc = documents.find(d => d.id === preSelectedDocumentId);
+      if (doc && !doc.is_purchased) {
+        setSelectedDocuments([preSelectedDocumentId]);
+      }
     }
-  }, [preSelectedDocumentId, preSelectedDocumentIds]);
+  }, [preSelectedDocumentId, preSelectedDocumentIds, documents]);
 
   // Calculate total price
   const totalPrice = selectedDocuments.reduce((sum, docId) => {
@@ -163,54 +173,67 @@ export default function BuyModal({ opened, onClose, documents, preSelectedDocume
         </Text>
 
         <div className="space-y-3 mb-6">
-          {documents.map((doc) => (
-            <div
-              key={doc.id}
-              className={`p-4 border rounded-lg transition-colors ${
-                selectedDocuments.includes(doc.id) 
-                  ? 'border-blue-500 bg-blue-50' 
-                  : 'border-gray-200 hover:border-gray-300'
-              }`}
-            >
-              <Group gap="md" wrap="nowrap">
-                <Checkbox
-                  checked={selectedDocuments.includes(doc.id)}
-                  onChange={() => handleDocumentToggle(doc.id)}
-                  size="md"
-                />
-                
-                <div className="flex-shrink-0">
-                  <Image
-                    src={getFileIconByExtension(doc.file_extension)}
-                    alt={`${doc.file_extension.toUpperCase()} file`}
-                    width={32}
-                    height={32}
+          {documents.map((doc) => {
+            const isPurchased = doc.is_purchased;
+            const isSelected = selectedDocuments.includes(doc.id);
+            
+            return (
+              <div
+                key={doc.id}
+                className={`p-4 border rounded-lg transition-colors ${
+                  isPurchased 
+                    ? 'border-gray-200 bg-gray-50 opacity-60' 
+                    : isSelected 
+                      ? 'border-blue-500 bg-blue-50' 
+                      : 'border-gray-200 hover:border-gray-300'
+                }`}
+              >
+                <Group gap="md" wrap="nowrap">
+                  <Checkbox
+                    checked={isSelected}
+                    onChange={() => handleDocumentToggle(doc.id)}
+                    disabled={isPurchased}
+                    size="md"
                   />
-                </div>
+                  
+                  <div className="flex-shrink-0">
+                    <Image
+                      src={getFileIconByExtension(doc.file_extension)}
+                      alt={`${doc.file_extension.toUpperCase()} file`}
+                      width={32}
+                      height={32}
+                      className={isPurchased ? 'opacity-50' : ''}
+                    />
+                  </div>
 
-                <div className="flex-1 min-w-0">
-                  <Text size="sm" fw={500} truncate>
-                    {doc.file_name}
-                  </Text>
-                  <Text size="xs" c="dimmed">
-                    {(doc.file_size / 1024).toFixed(2)} KB
-                  </Text>
-                </div>
+                  <div className="flex-1 min-w-0">
+                    <Text size="sm" fw={500} truncate c={isPurchased ? 'dimmed' : undefined}>
+                      {doc.file_name}
+                    </Text>
+                    <Text size="xs" c="dimmed">
+                      {(doc.file_size / 1024).toFixed(2)} KB
+                    </Text>
+                  </div>
 
-                <div className="flex-shrink-0">
-                  {parseFloat(doc.price) === 0 ? (
-                    <Badge color="green" variant="light">
-                      {translations.free}
-                    </Badge>
-                  ) : (
-                    <Badge color="blue" variant="light">
-                      ${parseFloat(doc.price).toFixed(2)}
-                    </Badge>
-                  )}
-                </div>
-              </Group>
-            </div>
-          ))}
+                  <div className="flex-shrink-0">
+                    {isPurchased ? (
+                      <Badge color="gray" variant="light">
+                        {translations.alreadyPurchased}
+                      </Badge>
+                    ) : parseFloat(doc.price) === 0 ? (
+                      <Badge color="green" variant="light">
+                        {translations.free}
+                      </Badge>
+                    ) : (
+                      <Badge color="blue" variant="light">
+                        ${parseFloat(doc.price).toFixed(2)}
+                      </Badge>
+                    )}
+                  </div>
+                </Group>
+              </div>
+            );
+          })}
         </div>
 
         <Divider my="md" />
