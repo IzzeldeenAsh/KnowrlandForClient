@@ -85,7 +85,7 @@ export default function Overview({ knowledge, knowledgeSlug }: OverviewProps) {
     chapter: isRTL ? 'الفصل' : 'Chapter',
     title: isRTL ? 'العنوان' : 'Title',
     noDocumentsAvailable: isRTL ? 'لا توجد مستندات متاحة.' : 'No documents available.',
-    alreadyPurchased: isRTL ? 'تم الشراء بالفعل' : 'Already Purchased'
+    alreadyPurchased: isRTL ? 'تم الشراء ' : 'Purchased'
   };
 
   const handleBuyClick = (documentId: number) => {
