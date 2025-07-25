@@ -404,6 +404,7 @@
     "UserProfile": {
         "login": "تسجيل الدخول",
         "insighter": "إنسايتر",
+        "manager": "مدير",
         "ReceivedMeetings": "الاجتماعات المستلمة",
         "SentMeetings": "الاجتماعات المرسلة",
         "companyInsighter": "إنسايتر-شركة",
@@ -422,8 +423,10 @@
         "signOut": "تسجيل الخروج"
     },
     "ProfilePage": {
+        "manager": "مدير",
         "bookASession": "حجز جلسة",
         "meetingTitle": "عنوان الاجتماع",
+        "compmay": "شركة",
         "enterMeetingTitle": "أدخل عنوانًا للاجتماع",
         "meetingDescription": "وصف الاجتماع",
         "enterMeetingDescription": "أدخل تفاصيل حول ما ترغب في مناقشته",
