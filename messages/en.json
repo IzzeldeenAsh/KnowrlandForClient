@@ -425,6 +425,7 @@
     "UserProfile": {
         "login": "Login",
         "insighter": "Insighter",
+        "manager": "Manager",
          "myConsultingSchedule": "My Consulting Schedule",
         "companyInsighter": "Company-Insighter",
         "company": "Company",
@@ -449,6 +450,8 @@
         "descriptionTooShort": "Description must be at least 3 characters",
         "industries": "Industries",
         "country": "Country",
+        "manager": "Manager",
+        "compmay": "Company",
         "location": "Location",
         "minimum3Characters": "Minimum 3 characters",
         "optional": "Optional",

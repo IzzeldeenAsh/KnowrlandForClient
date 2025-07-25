@@ -153,7 +153,11 @@ export default function Overview({ knowledge, knowledgeSlug }: OverviewProps) {
                     <h5 className="text-sm text-gray-900 font-semibold">
                       {doc.file_name}
                     </h5>
-                    <small className="text-xs text-gray-400 ">{(doc.file_size / 1024).toFixed(2)} KB</small>
+                    <small className="text-xs text-gray-400 ">
+                      {doc.file_size < 1024 * 1000
+                        ? `${(doc.file_size / 1024).toFixed(2)} KB`
+                        : `${(doc.file_size / (1024 * 1024)).toFixed(2)} MB`}
+                    </small>
                   </div>
                   <div className={styles.priceTag}>
   {parseFloat(doc.price) === 0 ? (
@@ -211,7 +215,7 @@ export default function Overview({ knowledge, knowledgeSlug }: OverviewProps) {
                       <button
                         onClick={(e) => {
                           e.stopPropagation();
-                          window.location.href = 'https://app.knoldg.com/app/insighter-dashboard/my-downloads';
+                          window.location.href = 'https://app.foresighta.co/app/insighter-dashboard/my-downloads';
                         }}
                         className="btn-sm mx-4 text-white bg-green-600 text-sm hover:bg-green-700 transition duration-150 ease-in-out group text-sm px-3 py-1 cursor-pointer"
                       >
