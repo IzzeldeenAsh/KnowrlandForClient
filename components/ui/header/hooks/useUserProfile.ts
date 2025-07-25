@@ -78,7 +78,7 @@ export function useUserProfile() {
         console.log(`[useUserProfile] Attempt ${attempt}/${maxRetries} to fetch profile`);
         
         const response = await fetch(
-          "https://api.knoldg.comm/api/account/profile",
+          "https://api.foresighta.co/api/account/profile",
           {
             headers: {
               'Authorization': `Bearer ${token}`,
@@ -283,7 +283,7 @@ export function useUserProfile() {
         if (isLocalhost) {
           document.cookie = `${name}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;`;
         } else {
-          document.cookie = `${name}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/; Domain=.knoldg.com; Secure; SameSite=None;`;
+          document.cookie = `${name}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/; Domain=.foresighta.co; Secure; SameSite=None;`;
         }
       };
       
@@ -302,7 +302,7 @@ export function useUserProfile() {
     const timestamp = new Date().getTime();
     
     // Perform a coordinated logout by redirecting to the Angular app's logout endpoint
-    window.location.href = `https://app.knoldg.com/auth/logout?redirect_uri=${encodeURIComponent(`https://knoldg.com/${locale}?t=${timestamp}`)}`;    
+    window.location.href = `https://app.foresighta.co/auth/logout?redirect_uri=${encodeURIComponent(`https://foresighta.co/${locale}?t=${timestamp}`)}`;    
   };
 
   return { user, roles, isLoading, handleSignOut };
