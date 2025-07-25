@@ -165,7 +165,7 @@ export default function QueryParamAuthCallback() {
         `Path=/`,
         `Max-Age=${60 * 60 * 24 * 7}`, // 7 days
         `SameSite=None`,
-        `Domain=.knoldg.com`,
+        `Domain=.foresighta.com`,
         `Secure`
       ];
     }
@@ -218,7 +218,7 @@ export default function QueryParamAuthCallback() {
         'Path=/',
         'Max-Age=-1',
         'SameSite=None',
-        'Domain=.knoldg.com',
+        'Domain=.foresighta.com',
         'Secure'
       ];
     }
@@ -343,7 +343,7 @@ export default function QueryParamAuthCallback() {
         'Path=/',
         'Max-Age=-1',
         'SameSite=None',
-        'Domain=.knoldg.com',
+        'Domain=.foresighta.com',
         'Secure'
       ];
     }

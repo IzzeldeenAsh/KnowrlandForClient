@@ -227,7 +227,7 @@ const { isLoading: isAppLoading, setIsLoading: setAppLoading } = useLoading();
     // Set the language preference in a cookie - expires in 1 year
     document.cookie = [
       `preferred_language=${locale}`,
-      `Domain=.knoldg.com`,           // leading dot = include subdomains
+      `Domain=.foresighta.com`,           // leading dot = include subdomains
       `Path=/`,                       // send on all paths
       `Max-Age=${60 * 60 * 24 * 365}`,// one year
       `SameSite=Lax`,                 // prevent CSRF, still send on top-level nav
