@@ -24,7 +24,7 @@ export default function TestimonialsCarousel() {
   const locale = useLocale()
   useEffect(() => {
     /* تمرير الموديولات عبر الخاصيّة modules */
-    new Swiper('.knoldg-carousel', {
+    new Swiper('.foresighta-carousel', {
       modules: [Navigation, Autoplay],
 
       breakpoints: {
