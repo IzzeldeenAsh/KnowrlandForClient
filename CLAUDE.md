@@ -134,7 +134,7 @@ app/[locale]/                    # Internationalized routes
 
 **Cookie Management:**
 - Development: SameSite=Lax for localhost
-- Production: SameSite=None, Secure, Domain=.foresighta.com
+- Production: SameSite=None, Secure, Domain=.foresighta.co
 
 **Common API Endpoints:**
 - Knowledge operations: `/api/platform/knowledge/*`

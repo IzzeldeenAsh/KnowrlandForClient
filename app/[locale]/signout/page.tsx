@@ -17,7 +17,7 @@ export default function SignoutPage() {
       document.cookie = `${name}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;`;
       
       // Remove from root domain and ensure Secure/SameSite settings match creation
-      document.cookie = `${name}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/; Domain=.foresighta.com; Secure; SameSite=None;`;
+      document.cookie = `${name}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/; Domain=.foresighta.co; Secure; SameSite=None;`;
     };
     
     // Clear ALL possible localStorage keys from both apps
