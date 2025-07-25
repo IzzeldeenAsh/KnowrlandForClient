@@ -63,7 +63,7 @@ async function fetchIndustryByTypeFromAPI(
   locale: string
 ): Promise<IndustryByTypeResponse> {
   const response = await fetch(
-    `https://api.foresighta.co/api/platform/industries/type/${type}/${id}/${slug}`,
+    `https://api.knoldg.comm/api/platform/industries/type/${type}/${id}/${slug}`,
     {
       method: 'POST',
       headers: {

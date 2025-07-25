@@ -45,7 +45,7 @@ export default function ContactContent() {
     setSuccess(false);
     
     try {
-      const response = await fetch('https://api.foresighta.co/api/common/content/contact-us', {
+      const response = await fetch('https://api.knoldg.comm/api/common/content/contact-us', {
         method: 'POST',
         headers: {
           "Content-Type": "application/json",

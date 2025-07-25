@@ -39,7 +39,7 @@ export default function IntegrationsCarousel() {
   const [swiperInitialized, setSwiperInitialized] = useState<boolean>(false)
 
   useEffect(() => {
-    const carousel = new Swiper('.foresighta-carousel', {
+    const carousel = new Swiper('.knoldg-carousel', {
       breakpoints: {
         320: {
           slidesPerView: 1
