@@ -9,7 +9,7 @@ export function useAllIndustries() {
   useEffect(() => {
     const fetchIndustries = async () => {
       try {
-        const res = await fetch('https://api.knoldg.comm/api/platform/industries', {
+        const res = await fetch('https://api.foresighta.co/api/platform/industries', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
