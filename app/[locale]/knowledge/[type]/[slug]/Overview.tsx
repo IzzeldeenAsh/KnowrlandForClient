@@ -215,7 +215,7 @@ export default function Overview({ knowledge, knowledgeSlug }: OverviewProps) {
                       <button
                         onClick={(e) => {
                           e.stopPropagation();
-                          window.location.href = 'https://app.knoldg.com/app/insighter-dashboard/my-downloads';
+                          window.location.href = 'https://app.foresighta.co/app/insighter-dashboard/my-downloads';
                         }}
                         className="btn-sm mx-4 text-white bg-green-600 text-sm hover:bg-green-700 transition duration-150 ease-in-out group text-sm px-3 py-1 cursor-pointer"
                       >
