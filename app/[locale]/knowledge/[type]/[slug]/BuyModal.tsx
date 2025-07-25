@@ -119,7 +119,7 @@ export default function BuyModal({ opened, onClose, documents, preSelectedDocume
         .find(row => row.startsWith('token='))
         ?.split('=')[1];
 
-      const response = await fetch(`https://api.knoldg.com/api/platform/industries/knowledge/buy/${knowledgeSlug}`, {
+      const response = await fetch(`https://api.foresighta.co/api/platform/industries/knowledge/buy/${knowledgeSlug}`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -143,7 +143,7 @@ export default function BuyModal({ opened, onClose, documents, preSelectedDocume
 
       onClose();
       // Redirect to my-downloads page after successful purchase
-      window.location.href = 'https://app.knoldg.com/app/insighter-dashboard/my-downloads';
+      window.location.href = 'https://app.foresighta.co/app/insighter-dashboard/my-downloads';
       
     } catch (error) {
       console.error('Purchase error:', error);
