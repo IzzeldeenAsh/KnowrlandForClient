@@ -108,7 +108,7 @@ async function fetchTopicsByTypeFromAPI(
   locale: string
 ): Promise<TopicsByTypeResponse> {
   const response = await fetch(
-    `https://api.knoldg.comm/api/platform/industries/type/topics/${type}/${id}/${slug}`,
+    `https://api.foresighta.co/api/platform/industries/type/topics/${type}/${id}/${slug}`,
     {
       method: 'POST',
       headers: {
