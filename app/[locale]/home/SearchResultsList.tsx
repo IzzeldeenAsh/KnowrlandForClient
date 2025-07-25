@@ -1,9 +1,11 @@
 "use client";
 
-import React from 'react';
+import React, { useState } from 'react';
 import Link from "next/link";
 import Image from "next/image";
 import { Card, Group, Text, Badge, Avatar, Rating } from "@mantine/core";
+import { BookmarkIcon } from '@heroicons/react/24/outline';
+import { BookmarkIcon as BookmarkSolidIcon } from '@heroicons/react/24/solid';
 import { formatDistanceToNow } from "date-fns";
 import DataIcon from "@/components/icons/DataIcon";
 import InsightIcon from "@/components/icons/InsightIcon";
@@ -15,6 +17,7 @@ import { useParams } from "next/navigation";
 import { SearchResultItem } from './SearchResultsGrid';
 import listStyles from "../topic/[id]/[slug]/knowledge-list.module.css";
 import cardStyles from "../topic/[id]/[slug]/knowledge-card.module.css";
+import axios from 'axios';
 
 interface SearchResultsListProps {
   results: SearchResultItem[];
@@ -80,8 +83,59 @@ export default function SearchResultsList({
   const currentLocale = locale || params.locale || "en";
   const isRTL = currentLocale === "ar";
   
+  // State for tracking read later status for each item
+  const [readLaterStates, setReadLaterStates] = useState<{[key: number]: boolean}>({});
+  const [loadingStates, setLoadingStates] = useState<{[key: number]: boolean}>({});
+  
   // Generate a unique prefix for this render to avoid key conflicts
   const uniquePrefix = React.useMemo(() => Date.now().toString(), [results]);
+
+  // Handle read later toggle
+  const handleReadLaterToggle = async (item: SearchResultItem, e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+
+    if (item.searchable_type !== 'knowledge') return;
+
+    const itemId = item.searchable_id;
+    const currentState = readLaterStates[itemId] ?? item.is_read_later ?? false;
+
+    setLoadingStates(prev => ({ ...prev, [itemId]: true }));
+
+    try {
+      const token = localStorage.getItem('token');
+      if (!token) {
+        console.error('No auth token found');
+        return;
+      }
+
+      const method = currentState ? 'DELETE' : 'POST';
+      const url = `https://api.foresighta.co/api/account/favorite/knowledge/${item.url.split('/').pop()}`;
+
+      const axiosConfig = {
+        method,
+        url,
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+          'Accept': 'application/json',
+          'Accept-language': currentLocale
+        }
+      };
+
+      const response = await axios(axiosConfig);
+
+      if (response.status === 200) {
+        setReadLaterStates(prev => ({ ...prev, [itemId]: !currentState }));
+      } else {
+        console.error('Failed to toggle read later status');
+      }
+    } catch (error) {
+      console.error('Error toggling read later:', error);
+    } finally {
+      setLoadingStates(prev => ({ ...prev, [itemId]: false }));
+    }
+  };
 
   const typeTranslations: Record<string, string> = {
     report: isRTL ? "تقرير" : "Reports",
@@ -310,13 +364,24 @@ export default function SearchResultsList({
                       
                       <div className="flex gap-2">
                         <button 
-                          className={listStyles.actionButton}
-                          onClick={(e) => e.stopPropagation()}
-                          aria-label="Bookmark"
+                          className={`${listStyles.actionButton} ${
+                            (readLaterStates[item.searchable_id] ?? item.is_read_later) 
+                              ? 'bg-yellow-100 text-yellow-600' 
+                              : 'bg-gray-100 text-gray-600'
+                          } ${loadingStates[item.searchable_id] ? 'opacity-50 cursor-not-allowed' : ''}`}
+                          onClick={(e) => handleReadLaterToggle(item, e)}
+                          disabled={loadingStates[item.searchable_id]}
+                          aria-label="Read Later"
                         >
-                          <svg width="21" height="21" viewBox="0 0 21 21" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <path d="M14.2161 1.89478H6.09818C4.3045 1.89478 2.84766 3.36004 2.84766 5.1453V17.0106C2.84766 18.5264 3.93397 19.1664 5.2645 18.4337L9.37397 16.1516C9.81187 15.9074 10.5192 15.9074 10.9487 16.1516L15.0582 18.4337C16.3887 19.1748 17.475 18.5348 17.475 17.0106V5.1453C17.4666 3.36004 16.0098 1.89478 14.2161 1.89478ZM12.2624 9.81056H10.7887V11.3348C10.7887 11.68 10.5024 11.9664 10.1571 11.9664C9.81187 11.9664 9.52555 11.68 9.52555 11.3348V9.81056H8.05187C7.7066 9.81056 7.42029 9.52425 7.42029 9.17899C7.42029 8.83372 7.7066 8.54741 8.05187 8.54741H9.52555V7.12425C9.52555 6.77899 9.81187 6.49267 10.1571 6.49267C10.5024 6.49267 10.7887 6.77899 10.7887 7.12425V8.54741H12.2624C12.6077 8.54741 12.894 8.83372 12.894 9.17899C12.894 9.52425 12.6077 9.81056 12.2624 9.81056Z" fill="#228BE6"/>
-                          </svg>
+                          {loadingStates[item.searchable_id] ? (
+                            <div className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin" />
+                          ) : (
+                            (readLaterStates[item.searchable_id] ?? item.is_read_later) ? (
+                              <BookmarkSolidIcon className="w-4 h-4" />
+                            ) : (
+                              <BookmarkIcon className="w-4 h-4" />
+                            )
+                          )}
                         </button>
                         <button 
                           className={listStyles.actionButton}

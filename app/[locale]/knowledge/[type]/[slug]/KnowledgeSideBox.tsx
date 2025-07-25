@@ -1,5 +1,6 @@
 'use client'
-import { DocumentTextIcon, CalendarIcon, ClockIcon, ChevronDownIcon, ChevronUpIcon } from '@heroicons/react/24/outline';
+import { DocumentTextIcon, CalendarIcon, ClockIcon, ChevronDownIcon, ChevronUpIcon, BookmarkIcon } from '@heroicons/react/24/outline';
+import { BookmarkIcon as BookmarkSolidIcon } from '@heroicons/react/24/solid';
 import { IconLanguage, IconCode, IconBuildingBank, IconMap, IconWorld, IconCrane } from '@tabler/icons-react';
 import { useParams } from 'next/navigation';
 import { useState, useEffect } from 'react';
@@ -45,6 +46,7 @@ interface KnowledgeSideBoxProps {
   locale?: string;
   knowledgeSlug?: string;
   purchased_status?: 'non-purchased' | 'purchased' | 'partial-purchased';
+  is_read_later?: boolean;
 }
 
 const KnowledgeSideBox = ({
@@ -59,7 +61,8 @@ const KnowledgeSideBox = ({
   countries,
   locale,
   knowledgeSlug,
-  purchased_status
+  purchased_status,
+  is_read_later
 }: KnowledgeSideBoxProps) => {
   const params = useParams();
   const currentLocale = locale || params.locale as string || 'en';
@@ -86,6 +89,10 @@ const KnowledgeSideBox = ({
   const [buyModalOpened, setBuyModalOpened] = useState(false);
   const [selectedDocumentIds, setSelectedDocumentIds] = useState<number[]>([]);
   
+  // Read Later state
+  const [isReadLater, setIsReadLater] = useState(is_read_later || false);
+  const [isReadLaterLoading, setIsReadLaterLoading] = useState(false);
+  
   // Function to toggle section expansion
   const toggleSection = (section: 'economicBlocs' | 'regions' | 'countries' | 'documents' | 'isicCode' | 'hsCode') => {
     setExpandedSections({
@@ -100,6 +107,45 @@ const KnowledgeSideBox = ({
     const allDocumentIds = documents.map(doc => doc.id);
     setSelectedDocumentIds(allDocumentIds);
     setBuyModalOpened(true);
+  };
+  
+  // Handle read later toggle
+  const handleReadLaterToggle = async () => {
+    if (!knowledgeSlug) return;
+    
+    setIsReadLaterLoading(true);
+    try {
+      const token = localStorage.getItem('token');
+      if (!token) {
+        console.error('No auth token found');
+        return;
+      }
+
+      const method = isReadLater ? 'DELETE' : 'POST';
+      const url =  `https://api.foresighta.co/api/account/favorite/knowledge/${knowledgeSlug}`
+
+      
+      const response = await fetch(url, {
+        method,
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+          'Accept': 'application/json',
+          'Accept-language': currentLocale
+        },
+        ...({  })
+      });
+
+      if (response.ok) {
+        setIsReadLater(!isReadLater);
+      } else {
+        console.error('Failed to toggle read later status');
+      }
+    } catch (error) {
+      console.error('Error toggling read later:', error);
+    } finally {
+      setIsReadLaterLoading(false);
+    }
   };
   
   // Maximum number of items to show initially
@@ -152,6 +198,8 @@ const KnowledgeSideBox = ({
     oneTimePurchase: isRTL ? 'شراء لمرة واحدة' : 'One time purchase',
     buyNow: isRTL ? 'اشتري الآن' : 'Buy Now',
     addToCart: isRTL ?  'إضافة إلى حقيبة المشتريات' : 'Add to Cart',
+    readLater: isRTL ? 'قراءة لاحقا' : 'Read Later',
+    removeReadLater: isRTL ? 'إزالة من قراءة لاحقا' : 'Remove Read Later',
     na: isRTL ? 'غير متوفر' : 'N/A',
     free: isRTL ? 'مجاني' : 'Free',
     share: isRTL ? 'مشاركة' : 'Share',
@@ -192,7 +240,7 @@ const KnowledgeSideBox = ({
         <div className="space-y-3 mb-4">
           {purchased_status === 'purchased' ? (
             <button 
-              onClick={() => window.location.href = 'https://app.knoldg.com/app/insighter-dashboard/my-downloads'}
+              onClick={() => window.location.href = 'https://app.foresighta.co/app/insighter-dashboard/my-downloads'}
               className="w-full font-semibold bg-green-600 text-white py-2 px-4 rounded-lg hover:bg-green-700 transition-colors"
             >
               {translations.alreadyPurchased}
@@ -200,7 +248,7 @@ const KnowledgeSideBox = ({
           ) : purchased_status === 'partial-purchased' ? (
             <button 
               onClick={handleBuyClick}
-              className="w-full font-semibold bg-cyan-500 text-white py-2 px-4 rounded-lg hover:bg-cyan-600 transition-colors"
+              className="w-full font-semibold bg-orange-500 text-white py-2 px-4 rounded-lg hover:bg-orange-600 transition-colors"
             >
               {translations.partiallyPurchased}
             </button>
@@ -219,11 +267,29 @@ const KnowledgeSideBox = ({
               >
                 {translations.buyNow}
               </button>
-              <button className="w-full font-semibold  bg-gray-100 text-gray-600 py-2 px-4 rounded-lg hover:bg-blue-50 transition-colors">
-                {translations.addToCart}
-              </button>
+     
             </>
           )}
+                   <button 
+                onClick={handleReadLaterToggle}
+                disabled={isReadLaterLoading}
+                className={`w-full font-semibold py-2 px-4 rounded-lg transition-colors flex items-center justify-center gap-2 ${
+                  isReadLater 
+                    ? 'bg-yellow-100 text-yellow-700 hover:bg-yellow-200' 
+                    : 'bg-gray-100 text-gray-600 hover:bg-blue-50'
+                } ${isReadLaterLoading ? 'opacity-50 cursor-not-allowed' : ''}`}
+              >
+                {isReadLaterLoading ? (
+                  <div className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin" />
+                ) : (
+                  isReadLater ? (
+                    <BookmarkSolidIcon className="w-4 h-4" />
+                  ) : (
+                    <BookmarkIcon className="w-4 h-4" />
+                  )
+                )}
+                {isReadLater ? translations.removeReadLater : translations.readLater}
+              </button>
         </div>
 
         <div className="space-y-3">
