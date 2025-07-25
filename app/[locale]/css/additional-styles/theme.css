@@ -12,11 +12,11 @@
     @apply opacity-50 cursor-default pointer-events-none;
 }
 
-.Knoldg-carousel .swiper-slide {
+.foresighta-carousel .swiper-slide {
     @apply opacity-80;
 }
 
-.Knoldg-carousel .swiper-slide.swiper-slide-active {
+.foresighta-carousel .swiper-slide.swiper-slide-active {
     @apply opacity-100;
 }
 
