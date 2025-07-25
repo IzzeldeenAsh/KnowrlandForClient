@@ -44,6 +44,7 @@ interface KnowledgeDetails {
   published_at: string;
   review: any[];
   is_review: boolean;
+  is_read_later?: boolean;
   purchased_status: 'non-purchased' | 'purchased' | 'partial-purchased';
   insighter: {
     name: string;
@@ -106,7 +107,7 @@ async function fetchKnowledgeData(type: string, slug: string, locale: string = '
     // Note: localStorage cleanup is handled by AuthHandler component
     
     const response = await fetch(
-      `https://api.knoldg.com/api/platform/industries/knowledge/${slug}`,
+      `https://api.foresighta.co/api/platform/industries/knowledge/${slug}`,
       {
         method: "GET",
         headers,
@@ -411,6 +412,7 @@ export default function KnowledgePage({ params }: Props) {
               locale={locale}
               knowledgeSlug={slug}
               purchased_status={knowledge.purchased_status}
+              is_read_later={knowledge.is_read_later}
             />
           </div>
         </div>

@@ -118,7 +118,7 @@ export function UserProfile({ isHome }: { isHome: boolean }) {
     return (
       <>
         <Link
-          href="https://app.knoldg.com/auth/login"
+          href="https://app.foresighta.co/auth/login"
           className="btn-sm bg-gray-800 text-gray-200 shadow hover:bg-gray-900"
         >
           {t("login")}
@@ -249,15 +249,27 @@ export function UserProfile({ isHome }: { isHome: boolean }) {
                 </div>
                <div className="flex flex-wrap gap-1">
                {roles.includes("insighter") && (
-                    <span className="bg-[#F0F8FF] text-[#0978B9] text-xs font-bold px-1.5 rounded-sm dark:bg-blue-900 dark:text-blue-300 whitespace-nowrap">
+                    <span className="bg-[#DFFEE9] text-[#1BC653] text-xs font-bold px-1.5 rounded-sm dark:bg-blue-900 dark:text-blue-300 whitespace-nowrap">
                       {t("insighter")}
                     </span>
                   )}
-                  {(roles.includes("company") ||
+                  {(
                     roles.includes("company-insighter")) && (
-                    <span className="bg-[#FFF8DD] text-[#F6C001]  text-xs font-semibold px-1.5 rounded-sm dark:bg-yellow-900 dark:text-yellow-300 whitespace-nowrap">
+                    <span className="bg-[#EFF8FF] text-[#0978B9]  text-xs font-semibold px-1.5 rounded-sm dark:bg-yellow-900 dark:text-yellow-300 whitespace-nowrap">
                      {user.company?.legal_name + " " + t("insighter")}
                     </span>
+                  )}
+                   {(roles.includes("company") &&
+                    !roles.includes("company-insighter")) && (
+                   <div className="flex gap-1 pt-1">
+                    
+                    <span className="bg-[#EFF8FF] text-[#0978B9]  text-xs font-semibold px-1.5 rounded-sm dark:bg-yellow-900 dark:text-yellow-300 whitespace-nowrap">
+                     {user.company?.legal_name}
+                    </span>
+                    <span className="bg-[#EFF8FF] text-[#0978B9]  text-xs font-semibold px-1.5 rounded-sm dark:bg-yellow-900 dark:text-yellow-300 whitespace-nowrap">
+                     {t("manager")}
+                      </span>
+                   </div>
                   )}
                   {roles.includes("client") &&
                     !roles.some((role) =>
@@ -280,7 +292,7 @@ export function UserProfile({ isHome }: { isHome: boolean }) {
               roles.includes("company-insighter")) && (
             <>
               <Link
-                href="https://app.knoldg.com/app/add-knowledge/stepper"
+                href="https://app.foresighta.co/app/add-knowledge/stepper"
                 className="block px-4 py-2.5 text-sm font-medium text-sky-600 hover:bg-indigo-50 hover:text-sky-700"
                 onClick={() => setMenuOpen(false)}
                 style={{fontSize: '13px'}}
@@ -288,7 +300,7 @@ export function UserProfile({ isHome }: { isHome: boolean }) {
                 {t("addKnowledge")}
               </Link>
                <Link
-               href="https://app.knoldg.com/app/insighter-dashboard/my-knowledge/general"
+               href="https://app.foresighta.co/app/insighter-dashboard/my-knowledge/general"
                className="block px-4 py-2.5  font-semibold text-slate-900 hover:bg-indigo-50 hover:text-sky-700"
                onClick={() => setMenuOpen(false)}
                style={{fontSize: '13px'}}
@@ -298,7 +310,7 @@ export function UserProfile({ isHome }: { isHome: boolean }) {
              </>
             )}
             <Link
-              href="https://app.knoldg.com/app/profile/overview"
+              href="https://app.foresighta.co/app/profile/overview"
               className="block px-4 py-3  font-semibold text-slate-900 hover:bg-indigo-50 hover:text-sky-700"
               style={{fontSize: '13px'}}
               onClick={() => setMenuOpen(false)}
@@ -307,7 +319,7 @@ export function UserProfile({ isHome }: { isHome: boolean }) {
             </Link>
             {/* Show dashboard for all users */}
             <Link
-              href="https://app.knoldg.com/app/insighter-dashboard/my-dashboard"
+              href="https://app.foresighta.co/app/insighter-dashboard/my-dashboard"
               className="block px-4 py-2.5 font-semibold text-slate-900 hover:bg-indigo-50 hover:text-sky-700"
               onClick={() => setMenuOpen(false)}
               style={{fontSize: '13px'}}
@@ -315,7 +327,7 @@ export function UserProfile({ isHome }: { isHome: boolean }) {
               {t("dashboard")}
             </Link>
             {/* <Link
-            href="https://app.knoldg.com/app/insighter-dashboard/my-consulting-schedule"
+            href="https://app.foresighta.co/app/insighter-dashboard/my-consulting-schedule"
             className="block px-4 py-2.5 font-semibold text-slate-900 hover:bg-indigo-50 hover:text-sky-700"
             onClick={() => setMenuOpen(false)}
             style={{fontSize: '13px'}}
@@ -326,7 +338,7 @@ export function UserProfile({ isHome }: { isHome: boolean }) {
             {!isClient$() && (
               <>
                 {/* <Link
-                  href="https://app.knoldg.com/app/insighter-dashboard/my-requests"
+                  href="https://app.foresighta.co/app/insighter-dashboard/my-requests"
                   className="block px-4 py-2.5 font-semibold text-slate-900 hover:bg-indigo-50 hover:text-sky-700"
                   onClick={() => setMenuOpen(false)}
                   style={{fontSize: '13px'}}
@@ -334,7 +346,7 @@ export function UserProfile({ isHome }: { isHome: boolean }) {
                   {t("myRequests")}
                 </Link> */}
                 {/* <Link
-                  href="https://app.knoldg.com/app/insighter-dashboard/my-meetings/received"
+                  href="https://app.foresighta.co/app/insighter-dashboard/my-meetings/received"
                   className="block px-4 py-2.5 font-semibold text-slate-900 hover:bg-indigo-50 hover:text-sky-700"
                   onClick={() => setMenuOpen(false)}
                   style={{fontSize: '13px'}}
@@ -342,7 +354,7 @@ export function UserProfile({ isHome }: { isHome: boolean }) {
                   {t("ReceivedMeetings")}
                 </Link> */}
                 <Link
-                  href="https://app.knoldg.com/app/insighter-dashboard/account-settings/general-settings"
+                  href="https://app.foresighta.co/app/insighter-dashboard/account-settings/general-settings"
                   className="block px-4 py-2.5 font-semibold text-slate-900 hover:bg-indigo-50 hover:text-sky-700"
                   onClick={() => setMenuOpen(false)}
                   style={{fontSize: '13px'}}
@@ -355,7 +367,7 @@ export function UserProfile({ isHome }: { isHome: boolean }) {
             {/* Show company settings only for company role */}
             {/* {roles.includes('company') && 
               <Link
-                href="https://app.knoldg.com/app/insighter-dashboard/my-company-settings"
+                href="https://app.foresighta.co/app/insighter-dashboard/my-company-settings"
                 className="block px-4 py-2.5 font-semibold text-slate-900 hover:bg-indigo-50 hover:text-sky-700"
                 onClick={() => setMenuOpen(false)}
                 style={{fontSize: '13px'}}
@@ -370,7 +382,7 @@ export function UserProfile({ isHome }: { isHome: boolean }) {
               !roles.includes("company-insighter") && (
                 <>
                 <Link
-                  href="https://app.knoldg.com/app/insighter-register/vertical"
+                  href="https://app.foresighta.co/app/insighter-register/vertical"
                   className="block px-4 py-2.5  font-semibold bg-clip-text text-transparent bg-gradient-to-r from-blue-500 to-teal-400"
                   onClick={() => setMenuOpen(false)}
                   style={{fontSize: '13px'}}
@@ -388,7 +400,7 @@ export function UserProfile({ isHome }: { isHome: boolean }) {
             
           {isClient$() && (
               <Link
-              href="https://app.knoldg.com/app/insighter-dashboard/my-meetings/sent"
+              href="https://app.foresighta.co/app/insighter-dashboard/my-meetings/sent"
               className="block px-4 py-2.5  font-semibold text-slate-900 hover:bg-indigo-50 hover:text-sky-700"
               onClick={() => setMenuOpen(false)}
               style={{fontSize: '13px'}}
