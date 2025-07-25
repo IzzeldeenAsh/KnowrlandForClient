@@ -40,7 +40,7 @@ export default function SignoutPage() {
       // Create an iframe to silently trigger logout on Angular app
       const angularLogoutFrame = document.createElement('iframe');
       angularLogoutFrame.style.display = 'none';
-      angularLogoutFrame.src = `https://app.knoldg.com/auth/logout?redirect_uri=${encodeURIComponent(window.location.href)}`;
+      angularLogoutFrame.src = `https://app.foresighta.co/auth/logout?redirect_uri=${encodeURIComponent(window.location.href)}`;
       document.body.appendChild(angularLogoutFrame);
       
       // Remove iframe after 2 seconds to ensure logout completes
