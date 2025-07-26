@@ -1,5 +1,5 @@
 // API-related utility functions for the home page
-
+import { cookies } from "next/headers";
 // Error response interface for the API
 export interface ErrorResponse {
   message: string;
@@ -39,14 +39,25 @@ export async function fetchAutocomplete(
   locale: string, 
   onError?: (error: string) => void
 ): Promise<string[]> {
+  const cookieStore = await cookies();
+  const token = cookieStore.get('token')?.value;
+  const headers: HeadersInit = {
+    "Content-Type": "application/json", 
+    "Accept": "application/json",
+    "Accept-Language": locale,
+    "X-Timezone": Intl.DateTimeFormat().resolvedOptions().timeZone,
+  };
+  if (token) {
+    headers.Authorization = `Bearer ${token}`;
+  } 
+
   if (!keyword.trim()) return [];
   
   try {
     const response = await fetch(`https://api.knoldg.com/api/platform/search/autocomplete?keyword=${encodeURIComponent(keyword)}`, {
       headers: {
-        'Accept-Language': locale,
-        'Accept': 'application/json',
-        "X-Timezone": Intl.DateTimeFormat().resolvedOptions().timeZone,
+       
+        ...headers,
       }
     });
     
