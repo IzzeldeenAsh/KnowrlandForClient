@@ -8,7 +8,7 @@ export async function fetchBreadcrumb(
   identifier: number | string,
   locale: string = 'en'
 ): Promise<BreadcrumbItem[]> {
-  const response = await fetch('https://api.knoldg.co/api/common/setting/breadcrumb', {
+  const response = await fetch('https://api.knoldg.com/api/common/setting/breadcrumb', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
