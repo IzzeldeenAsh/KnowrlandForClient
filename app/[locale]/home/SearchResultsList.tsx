@@ -19,6 +19,37 @@ import listStyles from "../topic/[id]/[slug]/knowledge-list.module.css";
 import cardStyles from "../topic/[id]/[slug]/knowledge-card.module.css";
 import axios from 'axios';
 
+// Helper function to get token from cookie
+function getTokenFromCookie(): string | null {
+  if (typeof document === 'undefined') return null;
+  
+  const cookies = document.cookie.split(';');
+  for (let cookie of cookies) {
+    const [name, value] = cookie.trim().split('=');
+    if (name === 'token') {
+      return decodeURIComponent(value);
+    }
+  }
+  return null;
+}
+
+// Helper function to get token from any available source (cookie first, then localStorage as fallback)
+function getAuthToken(): string | null {
+  // First try cookie (primary storage)
+  const cookieToken = getTokenFromCookie();
+  if (cookieToken) {
+    return cookieToken;
+  }
+
+  // Fallback to localStorage for backward compatibility
+  const localStorageToken = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
+  if (localStorageToken) {
+    return localStorageToken;
+  }
+
+  return null;
+}
+
 interface SearchResultsListProps {
   results: SearchResultItem[];
   locale?: string;
@@ -87,6 +118,13 @@ export default function SearchResultsList({
   const [readLaterStates, setReadLaterStates] = useState<{[key: number]: boolean}>({});
   const [loadingStates, setLoadingStates] = useState<{[key: number]: boolean}>({});
   
+  // Check if user is logged in
+  const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
+  
+  React.useEffect(() => {
+    setIsLoggedIn(!!getAuthToken());
+  }, []);
+  
   // Generate a unique prefix for this render to avoid key conflicts
   const uniquePrefix = React.useMemo(() => Date.now().toString(), [results]);
 
@@ -110,7 +148,11 @@ export default function SearchResultsList({
       }
 
       const method = currentState ? 'DELETE' : 'POST';
-      const url = `https://api.knoldg.com/api/account/favorite/knowledge/${item.url.split('/').pop()}`;
+      const slug = item.url.split('/').pop();
+      const url = `https://api.knoldg.com/api/account/favorite/knowledge/${slug}`;
+
+      console.log(`[Read Later] ${method} request to:`, url);
+      console.log(`[Read Later] Current state:`, currentState, 'Item ID:', itemId, 'Slug:', slug);
 
       const axiosConfig = {
         method,
@@ -125,13 +167,26 @@ export default function SearchResultsList({
 
       const response = await axios(axiosConfig);
 
-      if (response.status === 200) {
+      console.log(`[Read Later] Response status:`, response.status, 'Data:', response.data);
+
+      // Check for successful responses (200, 201, 204)
+      if (response.status >= 200 && response.status < 300) {
         setReadLaterStates(prev => ({ ...prev, [itemId]: !currentState }));
+        console.log(`[Read Later] Success! New state:`, !currentState);
       } else {
-        console.error('Failed to toggle read later status');
+        console.error('Failed to toggle read later status. Status:', response.status, 'Response:', response.data);
       }
     } catch (error) {
       console.error('Error toggling read later:', error);
+      if (axios.isAxiosError(error)) {
+        console.error('Axios error details:', {
+          status: error.response?.status,
+          statusText: error.response?.statusText,
+          data: error.response?.data,
+          url: error.config?.url,
+          method: error.config?.method
+        });
+      }
     } finally {
       setLoadingStates(prev => ({ ...prev, [itemId]: false }));
     }
@@ -201,6 +256,14 @@ export default function SearchResultsList({
                 <Link
                   href={`/${currentLocale}/${item.url}`}
                   className="block relative w-full h-full flex flex-row"
+                  onClick={(e) => {
+                    // Check if the URL is valid before navigation
+                    if (!item.url || item.url.trim() === '') {
+                      e.preventDefault();
+                      console.error('Invalid URL for item:', item);
+                      return;
+                    }
+                  }}
                 >
               <div className={`${listStyles.typeColumn} ${item.searchable_type === "topic" ? "bg-topic" : ""}`} style={item.searchable_type === "topic" ? { backgroundImage: "url(/images/topics-bg.png)" } : {}}>
                 <div className="flex items-center gap-2 z-10">
@@ -363,35 +426,40 @@ export default function SearchResultsList({
                       </div>
                       
                       <div className="flex gap-2">
-                        <button 
-                          className={`${listStyles.actionButton} ${
-                            (readLaterStates[item.searchable_id] ?? item.is_read_later) 
-                              ? 'bg-yellow-100 text-yellow-600' 
-                              : 'bg-gray-100 text-gray-600'
-                          } ${loadingStates[item.searchable_id] ? 'opacity-50 cursor-not-allowed' : ''}`}
-                          onClick={(e) => handleReadLaterToggle(item, e)}
-                          disabled={loadingStates[item.searchable_id]}
-                          aria-label="Read Later"
-                        >
-                          {loadingStates[item.searchable_id] ? (
-                            <div className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin" />
-                          ) : (
-                            (readLaterStates[item.searchable_id] ?? item.is_read_later) ? (
-                              <BookmarkSolidIcon className="w-4 h-4" />
+                        {isLoggedIn && (
+                          <div className="relative">
+                            {loadingStates[item.searchable_id] ? (
+                              <div className="w-4 h-4 border-2 border-gray-400 border-t-transparent rounded-full animate-spin" />
                             ) : (
-                              <BookmarkIcon className="w-4 h-4" />
-                            )
-                          )}
-                        </button>
-                        <button 
-                          className={listStyles.actionButton}
-                          onClick={(e) => e.stopPropagation()}
-                          aria-label="Download"
-                        >
-                          <svg width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <path d="M12.7971 0.315674H5.74029C2.67502 0.315674 0.847656 2.14304 0.847656 5.20831V12.2567C0.847656 15.3304 2.67502 17.1578 5.74029 17.1578H12.7887C15.854 17.1578 17.6813 15.3304 17.6813 12.2651V5.20831C17.6898 2.14304 15.8624 0.315674 12.7971 0.315674ZM6.29608 7.87778C6.54029 7.63357 6.9445 7.63357 7.18871 7.87778L8.63713 9.3262V4.11357C8.63713 3.76831 8.92345 3.48199 9.26871 3.48199C9.61397 3.48199 9.90029 3.76831 9.90029 4.11357V9.3262L11.3487 7.87778C11.5929 7.63357 11.9971 7.63357 12.2413 7.87778C12.4856 8.12199 12.4856 8.5262 12.2413 8.77041L9.71502 11.2967C9.65608 11.3557 9.58871 11.3978 9.51292 11.4315C9.43713 11.4651 9.35292 11.482 9.26871 11.482C9.1845 11.482 9.10871 11.4651 9.0245 11.4315C8.94871 11.3978 8.88134 11.3557 8.82239 11.2967L6.29608 8.77041C6.05187 8.5262 6.05187 8.13041 6.29608 7.87778ZM14.5234 13.1325C12.8308 13.6967 11.054 13.983 9.26871 13.983C7.48345 13.983 5.7066 13.6967 4.01397 13.1325C3.68555 13.023 3.50871 12.6609 3.61818 12.3325C3.72766 12.0041 4.08134 11.8188 4.41818 11.9367C7.55081 12.9809 10.995 12.9809 14.1277 11.9367C14.4561 11.8273 14.8182 12.0041 14.9277 12.3325C15.0287 12.6694 14.8519 13.023 14.5234 13.1325Z" fill="#228BE6"/>
-                          </svg>
-                        </button>
+                              (item.searchable_id in readLaterStates ? readLaterStates[item.searchable_id] : item.is_read_later) ? (
+                                <BookmarkSolidIcon 
+                                  className="w-4 h-4 text-yellow-600 cursor-pointer hover:text-yellow-700 transition-colors"
+                                  onClick={(e) => {
+                                    e.preventDefault();
+                                    e.stopPropagation();
+                                    if (!loadingStates[item.searchable_id]) {
+                                      handleReadLaterToggle(item, e);
+                                    }
+                                  }}
+                                  aria-label="Remove from Read Later"
+                                />
+                              ) : (
+                                <BookmarkIcon 
+                                  className="w-4 h-4 text-gray-600 cursor-pointer hover:text-gray-700 transition-colors"
+                                  onClick={(e) => {
+                                    e.preventDefault();
+                                    e.stopPropagation();
+                                    if (!loadingStates[item.searchable_id]) {
+                                      handleReadLaterToggle(item, e);
+                                    }
+                                  }}
+                                  aria-label="Add to Read Later"
+                                />
+                              )
+                            )}
+                          </div>
+                        )}
+                   
                       </div>
                     </div>
                   )}

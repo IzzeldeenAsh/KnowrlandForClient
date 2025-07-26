@@ -66,14 +66,11 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background-color: rgba(34, 139, 230, 0.1);
   border-radius: 6px;
   transition: background-color 0.2s ease;
 }
 
-.actionButton:hover {
-  background-color: rgba(34, 139, 230, 0.2);
-}
+
 
 .avatar {
   border: 1px solid #228BE6;
