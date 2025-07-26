@@ -1,9 +1,39 @@
 // API-related utility functions for the home page
-import { cookies } from "next/headers";
 // Error response interface for the API
 export interface ErrorResponse {
   message: string;
   errors?: Record<string, string[]>;
+}
+
+// Helper function to get token from cookie
+function getTokenFromCookie(): string | null {
+  if (typeof document === 'undefined') return null;
+  
+  const cookies = document.cookie.split(';');
+  for (let cookie of cookies) {
+    const [name, value] = cookie.trim().split('=');
+    if (name === 'token') {
+      return decodeURIComponent(value);
+    }
+  }
+  return null;
+}
+
+// Helper function to get token from any available source (cookie first, then localStorage as fallback)
+function getAuthToken(): string | null {
+  // First try cookie (primary storage)
+  const cookieToken = getTokenFromCookie();
+  if (cookieToken) {
+    return cookieToken;
+  }
+
+  // Fallback to localStorage for backward compatibility
+  const localStorageToken = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
+  if (localStorageToken) {
+    return localStorageToken;
+  }
+
+  return null;
 }
 
 // Function to format error messages from 422 responses
@@ -39,8 +69,8 @@ export async function fetchAutocomplete(
   locale: string, 
   onError?: (error: string) => void
 ): Promise<string[]> {
-  const cookieStore = await cookies();
-  const token = cookieStore.get('token')?.value;
+  // Get token from cookies (primary) or localStorage (fallback)
+  const token = getAuthToken();
   const headers: HeadersInit = {
     "Content-Type": "application/json", 
     "Accept": "application/json",
@@ -146,12 +176,20 @@ export async function fetchStatisticsPerType(
       url.searchParams.append('role', roleFilter);
     }
     
+    // Get token from cookies (primary) or localStorage (fallback)
+    const token = getAuthToken();
+    const headers: HeadersInit = {
+      "Content-Type": "application/json", 
+      "Accept": "application/json",
+      "Accept-Language": locale,
+      "X-Timezone": Intl.DateTimeFormat().resolvedOptions().timeZone,
+    };
+    if (token) {
+      headers.Authorization = `Bearer ${token}`;
+    }
+    
     const response = await fetch(url.toString(), {
-      headers: {
-        "Content-Type": "application/json", 
-        "Accept": "application/json",
-        "Accept-Language": locale,"X-Timezone": Intl.DateTimeFormat().resolvedOptions().timeZone,
-      },
+      headers,
       cache: 'no-store'
     });
     
@@ -291,12 +329,20 @@ export async function fetchSearchResults(
     //   url.searchParams.append('filters[country_id]', countryFilter.toString());
     // }
     
+    // Get token from cookies (primary) or localStorage (fallback)
+    const token = getAuthToken();
+    const headers: HeadersInit = {
+      "Content-Type": "application/json", 
+      "Accept": "application/json",
+      "Accept-Language": locale,
+      "X-Timezone": Intl.DateTimeFormat().resolvedOptions().timeZone,
+    };
+    if (token) {
+      headers.Authorization = `Bearer ${token}`;
+    }
+    
     const response = await fetch(url.toString(), {
-      headers: {
-        "Content-Type": "application/json", 
-        "Accept": "application/json",
-        "Accept-Language": locale,"X-Timezone": Intl.DateTimeFormat().resolvedOptions().timeZone,
-      },
+      headers,
       cache: 'no-store'
     });
     
