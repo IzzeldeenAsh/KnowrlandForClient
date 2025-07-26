@@ -19,6 +19,37 @@ import { arSA, enUS } from 'date-fns/locale';
 import dynamic from 'next/dynamic';
 import axios from 'axios';
 
+// Helper function to get token from cookie
+function getTokenFromCookie(): string | null {
+  if (typeof document === 'undefined') return null;
+  
+  const cookies = document.cookie.split(';');
+  for (let cookie of cookies) {
+    const [name, value] = cookie.trim().split('=');
+    if (name === 'token') {
+      return decodeURIComponent(value);
+    }
+  }
+  return null;
+}
+
+// Helper function to get token from any available source (cookie first, then localStorage as fallback)
+function getAuthToken(): string | null {
+  // First try cookie (primary storage)
+  const cookieToken = getTokenFromCookie();
+  if (cookieToken) {
+    return cookieToken;
+  }
+
+  // Fallback to localStorage for backward compatibility
+  const localStorageToken = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
+  if (localStorageToken) {
+    return localStorageToken;
+  }
+
+  return null;
+}
+
 // Dynamically import the SearchResultsList component
 const SearchResultsList = dynamic(() => import('./SearchResultsList'), { ssr: false });
 
@@ -132,6 +163,13 @@ export default function SearchResultsGrid({
   const [readLaterStates, setReadLaterStates] = useState<{[key: number]: boolean}>({});
   const [loadingStates, setLoadingStates] = useState<{[key: number]: boolean}>({});
   
+  // Check if user is logged in
+  const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
+  
+  React.useEffect(() => {
+    setIsLoggedIn(!!getAuthToken());
+  }, []);
+  
   // Generate a unique prefix for this render to avoid key conflicts
   const uniquePrefix = React.useMemo(() => Date.now().toString(), [results]);
 
@@ -155,7 +193,11 @@ export default function SearchResultsGrid({
       }
 
       const method = currentState ? 'DELETE' : 'POST';
-      const url = `https://api.knoldg.com/api/account/favorite/knowledge/${item.url.split('/').pop()}`;
+      const slug = item.url.split('/').pop();
+      const url = `https://api.knoldg.com/api/account/favorite/knowledge/${slug}`;
+
+      console.log(`[Read Later] ${method} request to:`, url);
+      console.log(`[Read Later] Current state:`, currentState, 'Item ID:', itemId, 'Slug:', slug);
 
       const response = await axios({
         method,
@@ -168,13 +210,26 @@ export default function SearchResultsGrid({
         }
       });
 
-      if (response.status === 200) {
+      console.log(`[Read Later] Response status:`, response.status, 'Data:', response.data);
+
+      // Check for successful responses (200, 201, 204)
+      if (response.status >= 200 && response.status < 300) {
         setReadLaterStates(prev => ({ ...prev, [itemId]: !currentState }));
+        console.log(`[Read Later] Success! New state:`, !currentState);
       } else {
-        console.error('Failed to toggle read later status');
+        console.error('Failed to toggle read later status. Status:', response.status, 'Response:', response.data);
       }
     } catch (error) {
       console.error('Error toggling read later:', error);
+      if (axios.isAxiosError(error)) {
+        console.error('Axios error details:', {
+          status: error.response?.status,
+          statusText: error.response?.statusText,
+          data: error.response?.data,
+          url: error.config?.url,
+          method: error.config?.method
+        });
+      }
     } finally {
       setLoadingStates(prev => ({ ...prev, [itemId]: false }));
     }
@@ -252,6 +307,14 @@ export default function SearchResultsGrid({
             <Link
               href={`/${currentLocale}/${item.url}`}
               className="block relative h-full flex flex-col"
+              onClick={(e) => {
+                // Check if the URL is valid before navigation
+                if (!item.url || item.url.trim() === '') {
+                  e.preventDefault();
+                  console.error('Invalid URL for item:', item);
+                  return;
+                }
+              }}
             >
               <div className={cardStyles.darkSection}>
                 <div>
@@ -375,27 +438,38 @@ export default function SearchResultsGrid({
                   )}
                   
                   <div className="flex gap-2">
-                    {item.searchable_type === 'knowledge' && (
-                      <button 
-                        className={`${cardStyles.actionButton} ${
-                          (readLaterStates[item.searchable_id] ?? item.is_read_later) 
-                            ? 'bg-yellow-100 text-yellow-600' 
-                            : 'bg-gray-100 text-gray-600'
-                        } ${loadingStates[item.searchable_id] ? 'opacity-50 cursor-not-allowed' : ''}`}
-                        onClick={(e) => handleReadLaterToggle(item, e)}
-                        disabled={loadingStates[item.searchable_id]}
-                        aria-label="Read Later"
-                      >
+                    {item.searchable_type === 'knowledge' && isLoggedIn && (
+                      <div className="relative">
                         {loadingStates[item.searchable_id] ? (
-                          <div className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin" />
+                          <div className="w-4 h-4 border-2 border-gray-400 border-t-transparent rounded-full animate-spin" />
                         ) : (
-                          (readLaterStates[item.searchable_id] ?? item.is_read_later) ? (
-                            <BookmarkSolidIcon className="w-4 h-4" />
+                          (item.searchable_id in readLaterStates ? readLaterStates[item.searchable_id] : item.is_read_later) ? (
+                            <BookmarkSolidIcon 
+                              className="w-4 h-4 text-yellow-600 cursor-pointer hover:text-yellow-700 transition-colors"
+                              onClick={(e) => {
+                                e.preventDefault();
+                                e.stopPropagation();
+                                if (!loadingStates[item.searchable_id]) {
+                                  handleReadLaterToggle(item, e);
+                                }
+                              }}
+                              aria-label="Remove from Read Later"
+                            />
                           ) : (
-                            <BookmarkIcon className="w-4 h-4" />
+                            <BookmarkIcon 
+                              className="w-4 h-4 text-gray-600 cursor-pointer hover:text-gray-700 transition-colors"
+                              onClick={(e) => {
+                                e.preventDefault();
+                                e.stopPropagation();
+                                if (!loadingStates[item.searchable_id]) {
+                                  handleReadLaterToggle(item, e);
+                                }
+                              }}
+                              aria-label="Add to Read Later"
+                            />
                           )
                         )}
-                      </button>
+                      </div>
                     )}
                     {/* <button 
                       className={cardStyles.actionButton}
