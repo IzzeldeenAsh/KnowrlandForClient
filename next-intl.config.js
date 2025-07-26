@@ -2,7 +2,7 @@ const { getRequestConfig } = require('next-intl/server');
 
 
 module.exports = {
-  defaultLocale: 'ar',
+  defaultLocale: 'en',
   locales: ['en', 'ar'],
 };
 
