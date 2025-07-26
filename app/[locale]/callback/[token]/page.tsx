@@ -222,7 +222,7 @@ export default function AuthCallback() {
       const userTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
       console.log('[TIMEZONE] Setting timezone:', userTimezone);
       
-      const timezoneResponse = await fetch('https://api.knoldg.co/api/account/timezone/set', {
+      const timezoneResponse = await fetch('https://api.knoldg.com/api/account/timezone/set', {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${authToken}`,
@@ -252,7 +252,7 @@ export default function AuthCallback() {
       try {
         console.log(`[token-callback] Profile fetch attempt ${attempt}/${maxRetries}`);
         
-        const response = await fetch('https://api.knoldg.co/api/account/profile', {
+        const response = await fetch('https://api.knoldg.com/api/account/profile', {
           headers: {
             'Authorization': `Bearer ${authToken}`,
             "Content-Type": "application/json",
