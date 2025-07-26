@@ -110,7 +110,7 @@ export default function SearchResultsList({
       }
 
       const method = currentState ? 'DELETE' : 'POST';
-      const url = `https://api.foresighta.co/api/account/favorite/knowledge/${item.url.split('/').pop()}`;
+      const url = `https://api.knoldg.co/api/account/favorite/knowledge/${item.url.split('/').pop()}`;
 
       const axiosConfig = {
         method,
