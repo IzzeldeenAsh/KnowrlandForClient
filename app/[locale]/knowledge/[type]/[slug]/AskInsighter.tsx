@@ -117,7 +117,7 @@ export default function AskInsighter({ knowledgeSlug, questions = [], is_owner =
       }
       
       const response = await fetch(
-        `https://api.knoldg.co/api/account/ask/insighter/knowledge/${knowledgeSlug}`,
+        `https://api.knoldg.com/api/account/ask/insighter/knowledge/${knowledgeSlug}`,
         {
           method: 'POST',
           headers,
@@ -218,7 +218,7 @@ export default function AskInsighter({ knowledgeSlug, questions = [], is_owner =
         // For insighters, this will be the deepest question ID in the thread
         console.log(`[AskInsighter] Owner answering question ID: ${questionId}`);
         response = await fetch(
-          `https://api.knoldg.co/api/insighter/library/knowledge/answer/${questionId}`,
+          `https://api.knoldg.com/api/insighter/library/knowledge/answer/${questionId}`,
           {
             method: 'PUT',
             headers,
@@ -240,7 +240,7 @@ export default function AskInsighter({ knowledgeSlug, questions = [], is_owner =
         
         console.log(`[AskInsighter] Submitting reply to parent question ID: ${parentId}`);
         response = await fetch(
-          `https://api.knoldg.co/api/account/ask/insighter/knowledge/${knowledgeSlug}`,
+          `https://api.knoldg.com/api/account/ask/insighter/knowledge/${knowledgeSlug}`,
           {
             method: 'POST',
             headers,
@@ -403,7 +403,7 @@ export default function AskInsighter({ knowledgeSlug, questions = [], is_owner =
     
     try {
       const response = await fetch(
-        `https://api.knoldg.co/api/account/knowledge/question/${questionId}`,
+        `https://api.knoldg.com/api/account/knowledge/question/${questionId}`,
         {
           method: 'DELETE',
           headers: {

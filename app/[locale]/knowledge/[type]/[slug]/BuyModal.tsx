@@ -119,7 +119,7 @@ export default function BuyModal({ opened, onClose, documents, preSelectedDocume
         .find(row => row.startsWith('token='))
         ?.split('=')[1];
 
-      const response = await fetch(`https://api.knoldg.co/api/platform/industries/knowledge/buy/${knowledgeSlug}`, {
+      const response = await fetch(`https://api.knoldg.com/api/platform/industries/knowledge/buy/${knowledgeSlug}`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

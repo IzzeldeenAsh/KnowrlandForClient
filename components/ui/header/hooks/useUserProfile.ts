@@ -78,7 +78,7 @@ export function useUserProfile() {
         console.log(`[useUserProfile] Attempt ${attempt}/${maxRetries} to fetch profile`);
         
         const response = await fetch(
-          "https://api.knoldg.co/api/account/profile",
+          "https://api.knoldg.com/api/account/profile",
           {
             headers: {
               'Authorization': `Bearer ${token}`,
