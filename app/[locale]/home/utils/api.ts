@@ -55,10 +55,7 @@ export async function fetchAutocomplete(
   
   try {
     const response = await fetch(`https://api.knoldg.com/api/platform/search/autocomplete?keyword=${encodeURIComponent(keyword)}`, {
-      headers: {
-       
-        ...headers,
-      }
+     headers
     });
     
     // Handle 422 validation errors specifically
