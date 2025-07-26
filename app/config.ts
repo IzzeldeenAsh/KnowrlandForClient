@@ -8,8 +8,8 @@ const isDevelopment = FORCE_DEVELOPMENT || process.env.NODE_ENV === 'development
 
 // API and App URLs based on environment
 export const apiBaseUrl = isDevelopment 
-  ? 'https://api.knoldg.co' 
-  : 'https://api.knoldg.co';
+  ? 'https://api.knoldg.com' 
+  : 'https://api.knoldg.com';
 
 export const appBaseUrl = isDevelopment 
   ? 'https://app.knoldg.com' 

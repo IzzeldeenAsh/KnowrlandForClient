@@ -122,7 +122,7 @@ const KnowledgeSideBox = ({
       }
 
       const method = isReadLater ? 'DELETE' : 'POST';
-      const url =  `https://api.knoldg.co/api/account/favorite/knowledge/${knowledgeSlug}`
+      const url =  `https://api.knoldg.com/api/account/favorite/knowledge/${knowledgeSlug}`
 
       
       const response = await fetch(url, {
