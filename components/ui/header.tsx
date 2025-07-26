@@ -176,23 +176,6 @@ const { isLoading: isAppLoading, setIsLoading: setAppLoading } = useLoading();
   };
 
   useEffect(() => {
-    // Get preferred language from cookie
-    const getCookie = (name: string) => {
-      const value = `; ${document.cookie}`;
-      const parts = value.split(`; ${name}=`);
-      if (parts.length === 2) return parts.pop()?.split(';').shift();
-      return null;
-    };
-
-    // Check if user has a preferred language cookie that's different from current
-    const preferredLanguage = getCookie('preferred_language');
-    const currentLanguage = pathname.split('/')[1];
-    
-    if (preferredLanguage && preferredLanguage !== currentLanguage) {
-      // Automatically switch to preferred language
-      switchLocale(preferredLanguage);
-    }
-
     // Fetch industries data with caching
     const loadIndustries = async () => {
       const data = await getIndustries(pathname.split('/')[1] || 'en');
@@ -224,12 +207,16 @@ const { isLoading: isAppLoading, setIsLoading: setAppLoading } = useLoading();
     // Set loading state before switching locale
     setAppLoading(true);
     
-    // Set the language preference in a cookie - expires in 1 year
+    // Enhanced cookie setting for better browser compatibility (especially Safari/Firefox)
     const isProduction = typeof window !== 'undefined' && window.location.hostname.includes('knoldg.com');
+    const expirationDate = new Date();
+    expirationDate.setFullYear(expirationDate.getFullYear() + 1); // 1 year from now
+    
     const cookieParts = [
       `preferred_language=${locale}`,
       `Path=/`,                       // send on all paths
-      `Max-Age=${60 * 60 * 24 * 365}`,// one year
+      `Expires=${expirationDate.toUTCString()}`, // Use Expires for better Safari/Firefox compatibility
+      `Max-Age=${60 * 60 * 24 * 365}`,// one year (keeping both for compatibility)
       `SameSite=Lax`                  // prevent CSRF, still send on top-level nav
     ];
     
@@ -238,7 +225,21 @@ const { isLoading: isAppLoading, setIsLoading: setAppLoading } = useLoading();
       cookieParts.push(`Secure`);                // HTTPS only in production
     }
     
+    // Set cookie with improved browser compatibility
     document.cookie = cookieParts.join('; ');
+    
+    // Also try to set cookie without domain for local fallback (helps with Safari)
+    if (isProduction) {
+      const fallbackCookie = [
+        `preferred_language=${locale}`,
+        `Path=/`,
+        `Expires=${expirationDate.toUTCString()}`,
+        `Max-Age=${60 * 60 * 24 * 365}`,
+        `SameSite=Lax`,
+        `Secure`
+      ].join('; ');
+      document.cookie = fallbackCookie;
+    }
     
     // Get the current path without locale prefix
     const currentPath = pathname.split('/').slice(2).join('/');
