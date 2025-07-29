@@ -253,7 +253,7 @@ export async function fetchSearchResults(
     // This prevents issues with URL state being out of sync with the requested page
     url.searchParams.append('page', currentPage.toString());
     // Add per_page parameter for pagination control
-    const perPageValue = perPage ? perPage.toString() : '30'; // Default to 30 if not provided
+    const perPageValue = perPage ? perPage.toString() : '27'; // Default to 30 if not provided
     url.searchParams.append('per_page', perPageValue);
     
     // Log pagination parameters for debugging with a clear identifier
