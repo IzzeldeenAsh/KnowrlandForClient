@@ -19,6 +19,7 @@ import Stripes from "@/public/images/stripes-dark.svg";
 import { getMessages } from '@/utils/get-messages';
 import Link from 'next/link';
 import { Rating, Text } from "@mantine/core";
+import LanguageMismatchNotifier from './LanguageMismatchNotifier';
 
 interface KnowledgeDetails {
   type: string;
@@ -195,6 +196,12 @@ export default function KnowledgePage({ params }: Props) {
 
   return (
     <div className="min-h-screen bg-gray-50 relative" dir={isRTL ? 'rtl' : 'ltr'} style={knowledge.language === 'arabic' ? { direction: 'rtl', textAlign: 'right' } : {}}>
+      {/* Language mismatch notifier */}
+      <LanguageMismatchNotifier 
+        knowledgeLanguage={knowledge.language} 
+        currentLocale={locale} 
+      />
+      
       {/* Background decoration */}
       <div className="pointer-events-none absolute z-10 left-[10%] top-0 hidden md:block" aria-hidden="true">
         <Image
