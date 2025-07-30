@@ -1,7 +1,8 @@
 'use client';
 
 import React, { useState, useEffect } from "react";
-import { Rating, Textarea, Button, Card, Text, Avatar, Loader } from "@mantine/core";
+import { Rating, Textarea, Button, Card, Text, Loader } from "@mantine/core";
+import Image from "next/image";
 import { IconX, IconCheck, IconTrash } from "@tabler/icons-react";
 import { useReview } from "@/hooks/knowledgs/useReview";
 import { useRouter, useParams } from "next/navigation";
@@ -352,15 +353,20 @@ export default function Reviews({ knowledgeSlug, reviews, is_review, is_owner }:
                 >
                   <div className="flex items-center text-xs justify-between">
                     <div className="flex items-center gap-2">
-                      <Avatar
-                        src={review.profile_photo_url}
-                        size="sm"
-                        radius="xl"
-                        style={{objectPosition: 'top'}}
-                        alt={review.user_name}
-                      >
-                        {!review.profile_photo_url && getInitials(review.user_name)}
-                      </Avatar>
+                      {review.profile_photo_url ? (
+                        <div className="relative w-8 h-8 rounded-full overflow-hidden">
+                          <Image
+                            src={review.profile_photo_url}
+                            alt={review.user_name}
+                            fill
+                            className="object-cover object-top"
+                          />
+                        </div>
+                      ) : (
+                        <div className="flex items-center justify-center w-8 h-8 rounded-full bg-blue-500 text-white text-xs">
+                          {getInitials(review.user_name)}
+                        </div>
+                      )}
                       {review.uuid ? (
                         <Link href={`/${locale}/profile/${review.uuid}?entity=insighter`} className="font-semibold capitalize hover:text-blue-600">
                           {review.user_name.toLowerCase()}
