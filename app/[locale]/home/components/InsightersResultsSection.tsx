@@ -93,13 +93,24 @@ const InsightersResultsSection: React.FC<InsightersResultsSectionProps> = ({
                         <div className="relative w-24 h-24 rounded-full border border-blue-500">
                           {/* Avatar display logic based on role */}
                           {isCompanyInsighter ? (
-                            // Company-insighter: Show initials with company logo overlay
+                            // Company-insighter: Show profile photo or initials with company logo overlay
                             <>
-                              <div className="w-full h-full bg-blue-100 flex items-center justify-center rounded-full">
-                                <span className="text-2xl font-semibold text-blue-600 rounded-full">
-                                  {name.split(' ').map((word: string) => word.charAt(0)).join('').toUpperCase()}
-                                </span>
-                              </div>
+                              {photoUrl ? (
+                                // Show profile photo if available
+                                <Image 
+                                  src={photoUrl} 
+                                  alt={name}
+                                  fill
+                                  className="object-cover border-1 border-blue-500 rounded-full object-top"
+                                />
+                              ) : (
+                                // Fallback to initials
+                                <div className="w-full h-full bg-blue-100 flex items-center justify-center rounded-full">
+                                  <span className="text-2xl font-semibold text-blue-600 rounded-full">
+                                    {name.split(' ').map((word: string) => word.charAt(0)).join('').toUpperCase()}
+                                  </span>
+                                </div>
+                              )}
                               {company?.logo && (
                                 <div className="absolute -bottom-4 -right-7 w-14 h-14 rounded-full overflow-hidden border-4 border-white bg-white z-10">
                                   <Image 
