@@ -318,14 +318,18 @@ export function UserProfile({ isHome }: { isHome: boolean }) {
               {t("myProfile")}
             </Link>
             {/* Show dashboard for all users */}
-            <Link
-              href="https://app.knoldg.com/app/insighter-dashboard/my-dashboard"
-              className="block px-4 py-2.5 font-semibold text-slate-900 hover:bg-indigo-50 hover:text-sky-700"
-              onClick={() => setMenuOpen(false)}
-              style={{fontSize: '13px'}}
-            >
-              {t("dashboard")}
-            </Link>
+            {
+              !isClient$() && (
+                <Link
+                href="https://app.knoldg.com/app/insighter-dashboard/my-dashboard"
+                className="block px-4 py-2.5 font-semibold text-slate-900 hover:bg-indigo-50 hover:text-sky-700"
+                onClick={() => setMenuOpen(false)}
+                style={{fontSize: '13px'}}
+              >
+                {t("dashboard")}
+              </Link>
+              )
+            }
             {/* <Link
             href="https://app.knoldg.com/app/insighter-dashboard/my-consulting-schedule"
             className="block px-4 py-2.5 font-semibold text-slate-900 hover:bg-indigo-50 hover:text-sky-700"
@@ -406,6 +410,28 @@ export function UserProfile({ isHome }: { isHome: boolean }) {
               style={{fontSize: '13px'}}
             >
               {t("SentMeetings")}
+            </Link>
+          )}
+                    
+          {isClient$() && (
+              <Link
+              href="https://app.knoldg.com/app/insighter-dashboard/read-later"
+              className="block px-4 py-2.5  font-semibold text-slate-900 hover:bg-indigo-50 hover:text-sky-700"
+              onClick={() => setMenuOpen(false)}
+              style={{fontSize: '13px'}}
+            >
+              {t("myReadLater")}
+            </Link>
+          )}
+                             
+                             {isClient$() && (
+              <Link
+              href="https://app.knoldg.com/app/insighter-dashboard/my-downloads"
+              className="block px-4 py-2.5  font-semibold text-slate-900 hover:bg-indigo-50 hover:text-sky-700"
+              onClick={() => setMenuOpen(false)}
+              style={{fontSize: '13px'}}
+            >
+              {t("myDownloads")}
             </Link>
           )}
             <div className="border-t border-slate-100">
