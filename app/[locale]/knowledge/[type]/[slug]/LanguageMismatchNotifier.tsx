@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from 'react';
-import { IconInfoCircle } from '@tabler/icons-react';
+import { IconInfoCircle, IconLanguage } from '@tabler/icons-react';
 
 interface LanguageMismatchNotifierProps {
   knowledgeLanguage: string;
@@ -15,7 +15,8 @@ export default function LanguageMismatchNotifier({
   const isRTL = currentLocale === 'ar';
   const hasShownWarning = useRef(false);
   const [showWarning, setShowWarning] = useState(false);
-  const [warningMessage, setWarningMessage] = useState('');
+  const [animationState, setAnimationState] = useState('hidden'); // 'hidden', 'entering', 'visible', 'exiting'
+  const [targetLanguage, setTargetLanguage] = useState('');
 
   useEffect(() => {
     if (knowledgeLanguage && !hasShownWarning.current) {
@@ -33,71 +34,107 @@ export default function LanguageMismatchNotifier({
       const mappedKnowledgeLanguage = languageMap[normalizedKnowledgeLanguage] || normalizedKnowledgeLanguage;
       
       if (mappedKnowledgeLanguage !== normalizedCurrentLocale) {
-        const targetLanguage = mappedKnowledgeLanguage === 'ar' ? 'Arabic' : 'English';
-        const message = isRTL 
-          ? `للحصول على قراءة أفضل، يُفضل التبديل إلى اللغة ${mappedKnowledgeLanguage === 'ar' ? 'العربية' : 'الإنجليزية'}`
-          : `For better readability, it's recommended to switch to ${targetLanguage}`;
+        const language = mappedKnowledgeLanguage === 'ar' ? 'Arabic' : 'English';
+        setTargetLanguage(language);
         
-        setWarningMessage(message);
-        setShowWarning(true);
+        // Show with animation sequence
+        setAnimationState('entering');
         hasShownWarning.current = true;
+        setShowWarning(true);
+        
+        // After entering animation completes
+        setTimeout(() => setAnimationState('visible'), 500);
 
-        // Auto-hide after 5 seconds
+        // Auto-hide after 8 seconds
         setTimeout(() => {
-          setShowWarning(false);
-        }, 5000);
+          setAnimationState('exiting');
+          setTimeout(() => setShowWarning(false), 500);
+        }, 8000);
       }
     }
-  }, [knowledgeLanguage, currentLocale, isRTL]);
+  }, [knowledgeLanguage, currentLocale]);
 
   const handleClose = () => {
-    setShowWarning(false);
+    setAnimationState('exiting');
+    setTimeout(() => setShowWarning(false), 500);
   };
 
   if (!showWarning) return null;
+  
+  // Animation and positioning styles
+  const getAnimationStyles = () => {
+    switch (animationState) {
+      case 'hidden':
+        return { opacity: 0, transform: 'translateY(20px) scale(0.95)' };
+      case 'entering':
+        return { opacity: 1, transform: 'translateY(0) scale(1)' };
+      case 'visible':
+        return { opacity: 1, transform: 'translateY(0) scale(1)' };
+      case 'exiting':
+        return { opacity: 0, transform: 'translateY(20px) scale(0.95)' };
+      default:
+        return {};
+    }
+  };
 
   return (
     <div 
-      className={`fixed bottom-4 ${isRTL ? 'right-4' : 'left-4'} z-50 max-w-sm w-full`}
+      className="fixed bottom-8 left-8 z-50 rounded-sm"
       style={{
-        opacity: showWarning ? 1 : 0,
-        transition: 'opacity 0.15s ease-in-out'
+        ...getAnimationStyles(),
+        transition: 'all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275)' // Bouncy animation
       }}
     >
       <div 
-        className="toast fade show"
+        className="bg-white dark:bg-gray-800 shadow-lg overflow-hidden"
+        style={{ 
+          maxWidth: '500px', 
+          width: '500px',
+          borderRadius: '4px',
+          border: '2px solid rgb(254, 185, 119)' // Bright orange border
+        }}
         role="alert" 
         aria-live="assertive" 
         aria-atomic="true"
       >
-        <div className="toast-header">
-          <div 
-            className="me-2 rounded-full p-1"
-            style={{ 
-              color: '#009EF7',
-              backgroundColor: '#F1FAFF',
-              display: 'inline-flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              width: '22px',
-              height: '22px'
-            }}
-          >
-            <IconInfoCircle size={10} style={{ fontWeight: 'bold' }} />
+        <div className="py-3 px-5">
+          {/* Top row with icon and close button */}
+          <div className="flex items-center justify-between mb-3">
+          
+            <button 
+              type="button" 
+              className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 transition-colors"
+              onClick={handleClose} 
+              aria-label="Close"
+            >
+              <span className="text-xl font-normal">&times;</span>
+            </button>
+            <div className="flex items-center">
+              <div 
+                className="rounded-full p-2 mr-3"
+                style={{ 
+                  color: '#009EF7',
+                  backgroundColor: '#F1FAFF',
+                }}
+              >
+                <IconLanguage size={24} stroke={2} />
+              </div>
+            </div>
           </div>
-          <strong className="me-auto text-xs">Information</strong>
-          <small className="toast-time">Just now</small>
-          <button 
-            type="button" 
-            className="btn-close" 
-            onClick={handleClose} 
-            aria-label="Close"
-            style={{ fontSize: '0.8rem', fontWeight: 'normal', opacity: 0.5 }}
-          >
-            ×
-          </button>
+          
+          {/* Content area with both messages */}
+          <div className="text-left">
+            {/* English message */}
+            <div className="text-gray-700 dark:text-gray-300 text-lg font-medium mb-2">
+              For better readability, it's recommended to switch to {targetLanguage}
+            </div>
+            
+            {/* Arabic message (with explicit left alignment) */}
+            <div className="text-gray-700 dark:text-gray-300 text-lg font-medium text-left">
+              للحصول على قراءة أفضل، يُفضل التبديل إلى اللغة {targetLanguage === 'Arabic' ? 'العربية' : 'الإنجليزية'}
+            </div>
+          </div>
         </div>
-        <div className="toast-body">{warningMessage}</div>
       </div>
     </div>
   );
