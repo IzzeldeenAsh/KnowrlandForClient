@@ -251,7 +251,7 @@ export default function SearchResultsList({
                 className={listStyles.listCard}
                 data-aos="fade-up"
                 component="div"
-                style={{height:'100%'}}
+                style={{height:'240px'}} // Fixed height for consistency
               >
                 <Link
                   href={`/${currentLocale}/${item.url}`}
@@ -265,7 +265,12 @@ export default function SearchResultsList({
                     }
                   }}
                 >
-              <div className={`${listStyles.typeColumn} ${item.searchable_type === "topic" ? "bg-topic" : ""}`} style={item.searchable_type === "topic" ? { backgroundImage: "url(/images/topics-bg.png)" } : {}}>
+              <div className={`${listStyles.typeColumn} ${item.searchable_type === "topic" ? "bg-topic" : ""}`} style={{
+                ...(item.searchable_type === "topic" ? { backgroundImage: "url(/images/topics-bg.png)" } : {}),
+                display: 'flex',
+                flexDirection: 'column',
+                justifyContent: 'space-between'
+              }}>
                 <div className="flex items-center gap-2 z-10">
                   <div className={listStyles.iconWrapper}>
                     {item.searchable_type === "knowledge" && item.type && (
@@ -398,7 +403,7 @@ export default function SearchResultsList({
               
               {/* Only show contentColumn if there's content to display */}
               {(item.description || (item.searchable_type === "knowledge" && (item.paid !== undefined || item.published_at))) && (
-                <div className={listStyles.contentColumn}>
+                <div className={listStyles.contentColumn} style={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-between', height: '100%' }}>
                   {item.description && (
                     <Text className={listStyles.description} lineClamp={3}>
                       {truncateDescription(item.description, 50)}
@@ -490,12 +495,13 @@ export default function SearchResultsList({
                 className={cardStyles.card}
                 data-aos="fade-up"
                 component="div"
+                style={{height:'240px'}} // Added fixed height to match knowledge items
               >
                 <Link
                   href={`/${currentLocale}/${item.url}`}
                   className="block relative h-full flex flex-col"
                 >
-                  <div className={`${cardStyles.darkSection} bg-topic`} style={{ backgroundImage: "url(/images/topics-bg.png)" }}>
+                  <div className={`${cardStyles.darkSection} bg-topic`} style={{ backgroundImage: "url(/images/topics-bg.png)", height: '100%' }}>
                     <div>
                       <div className="flex items-center mb-3">
                         <Badge color="yellow" w="fit-content" className="capitalize" variant="light">

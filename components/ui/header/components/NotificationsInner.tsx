@@ -245,6 +245,10 @@ export default function NotificationsInner({
       window.location.href = 'https://app.knoldg.com/app/insighter-dashboard/my-requests'
       return
     }
+    if (notification.sub_type === 'declined' && notification.type === 'knowledge') {
+      window.location.href = `https://app.knoldg.com/app/my-knowledge-base/view-my-knowledge/${notification.param}/details`
+      return
+    }
     if(notification.sub_type.startsWith('client_')) {
       window.location.href = 'https://app.knoldg.com/app/insighter-dashboard/my-meetings/sent'
       return
