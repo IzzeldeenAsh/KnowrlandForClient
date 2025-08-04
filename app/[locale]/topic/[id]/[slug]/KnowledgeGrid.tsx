@@ -1,17 +1,52 @@
 "use client";
 
+import React, { useState } from 'react';
 import { Text, Card, Badge, Group, Avatar, Rating } from "@mantine/core";
 import Link from "next/link";
+import Image from "next/image";
+import { BookmarkIcon } from '@heroicons/react/24/outline';
+import { BookmarkIcon as BookmarkSolidIcon } from '@heroicons/react/24/solid';
 import DataIcon from "@/components/icons/DataIcon";
 import InsightIcon from "@/components/icons/InsightIcon";
 import ManualIcon from "@/components/icons/ManualIcon";
 import ReportIcon from "@/components/icons/ReportIcon";
+import CourseIcon from "@/components/icons/CourseIcon";
 import { formatDistanceToNow } from "date-fns";
 import cardStyles from "./knowledge-card.module.css";
 import { useParams } from "next/navigation";
-import Image from "next/image";
-import CourseIcon from "@/components/icons/CourseIcon";
 import { arSA, enUS } from 'date-fns/locale';
+import axios from 'axios';
+
+// Helper function to get token from cookie
+function getTokenFromCookie(): string | null {
+  if (typeof document === 'undefined') return null;
+  
+  const cookies = document.cookie.split(';');
+  for (let cookie of cookies) {
+    const [name, value] = cookie.trim().split('=');
+    if (name === 'token') {
+      return decodeURIComponent(value);
+    }
+  }
+  return null;
+}
+
+// Helper function to get token from any available source (cookie first, then localStorage as fallback)
+function getAuthToken(): string | null {
+  // First try cookie (primary storage)
+  const cookieToken = getTokenFromCookie();
+  if (cookieToken) {
+    return cookieToken;
+  }
+
+  // Fallback to localStorage for backward compatibility
+  const localStorageToken = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
+  if (localStorageToken) {
+    return localStorageToken;
+  }
+
+  return null;
+}
 
 interface KnowledgeGridProps {
   knowledge: KnowledgeItem[];
@@ -42,9 +77,11 @@ export interface KnowledgeItem {
       logo: string;
     };
   };
+  is_read_later?: boolean;
 }
 
 function getInitials(name: string) {
+  if (!name) return '';
   return name
     .split(" ")
     .map((word) => word[0])
@@ -100,6 +137,76 @@ export default function KnowledgeGrid({
   const params = useParams();
   const currentLocale = locale || params.locale || "en";
   const isRTL = currentLocale === "ar";
+  
+  // State for tracking read later status for each item
+  const [readLaterStates, setReadLaterStates] = useState<{[key: string]: boolean}>({});
+  const [loadingStates, setLoadingStates] = useState<{[key: string]: boolean}>({});
+  
+  // Check if user is logged in
+  const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
+  
+  React.useEffect(() => {
+    setIsLoggedIn(!!getAuthToken());
+  }, []);
+
+  // Handle read later toggle
+  const handleReadLaterToggle = async (item: KnowledgeItem, e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    
+    const itemKey = item.slug;
+    const currentState = readLaterStates[itemKey] ?? item.is_read_later ?? false;
+    
+    setLoadingStates(prev => ({ ...prev, [itemKey]: true }));
+    
+    try {
+      const token = getAuthToken();
+      if (!token) {
+        console.error('No auth token found');
+        return;
+      }
+
+      const method = currentState ? 'DELETE' : 'POST';
+      const url = `https://api.knoldg.com/api/account/favorite/knowledge/${item.slug}`;
+
+      console.log(`[Read Later] ${method} request to:`, url);
+      console.log(`[Read Later] Current state:`, currentState, 'Item slug:', item.slug);
+
+      const response = await axios({
+        method,
+        url,
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+          'Accept': 'application/json',
+          'Accept-language': currentLocale
+        }
+      });
+
+      console.log(`[Read Later] Response status:`, response.status, 'Data:', response.data);
+
+      // Check for successful responses (200, 201, 204)
+      if (response.status >= 200 && response.status < 300) {
+        setReadLaterStates(prev => ({ ...prev, [itemKey]: !currentState }));
+        console.log(`[Read Later] Success! New state:`, !currentState);
+      } else {
+        console.error('Failed to toggle read later status. Status:', response.status, 'Response:', response.data);
+      }
+    } catch (error) {
+      console.error('Error toggling read later:', error);
+      if (axios.isAxiosError(error)) {
+        console.error('Axios error details:', {
+          status: error.response?.status,
+          statusText: error.response?.statusText,
+          data: error.response?.data,
+          url: error.config?.url,
+          method: error.config?.method
+        });
+      }
+    } finally {
+      setLoadingStates(prev => ({ ...prev, [itemKey]: false }));
+    }
+  };
 
   const typeTranslations: Record<string, string> = {
     report: isRTL ? "تقرير" : "Reports",
@@ -188,19 +295,21 @@ export default function KnowledgeGrid({
                   {showInsighter && (
                     <div className="flex items-center">
                       <div className="relative">
-                        <Avatar
-                          src={(item.insighter.roles.includes("company") || item.insighter.roles.includes("company-insighter")) && item.insighter.company?.logo ? 
-                              item.insighter.company.logo : 
-                              item.insighter.profile_photo_url}
-                          radius="xl"
-                          alt={item.insighter.name}
-                          size="md"
-                          className={`${cardStyles.avatar} avatar-top-position`}
-                        >
-                          {!((item.insighter.roles.includes("company") || item.insighter.roles.includes("company-insighter")) && item.insighter.company?.logo) && 
-                          !item.insighter.profile_photo_url &&
-                            getInitials(item.insighter.name)}
-                        </Avatar>
+                        <div className="object-cover object-top">
+                          <Avatar
+                            src={(item.insighter.roles.includes("company") || item.insighter.roles.includes("company-insighter")) && item.insighter.company?.logo ? 
+                                item.insighter.company.logo : 
+                                item.insighter.profile_photo_url}
+                            radius="xl"
+                            alt={item.insighter.name}
+                            size="md"
+                            className={`${cardStyles.avatar} avatar-top-position`}
+                          >
+                            {!((item.insighter.roles.includes("company") || item.insighter.roles.includes("company-insighter")) && item.insighter.company?.logo) && 
+                            !item.insighter.profile_photo_url &&
+                              getInitials(item.insighter.name)}
+                          </Avatar>
+                        </div>
                         
                         {item.insighter.roles.includes("company-insighter") && item.insighter.profile_photo_url && (
                           <Avatar
@@ -211,7 +320,7 @@ export default function KnowledgeGrid({
                             alt={item.insighter.name}
                             style={{
                               boxShadow: '0 0 0 2px white',
-                              position: 'absolute'
+                              position: 'absolute',
                             }}
                           />
                         )}
@@ -224,7 +333,7 @@ export default function KnowledgeGrid({
                             alt={item.insighter.name}
                             style={{
                               boxShadow: '0 0 0 2px white',
-                              position: 'absolute'
+                              position: 'absolute',
                             }}
                           />
                         )}
@@ -237,16 +346,16 @@ export default function KnowledgeGrid({
                           {item.insighter.roles.includes("company") && (
                             item.insighter.company
                               ? isRTL
-                                ? `${translations.company} ${item.insighter.company.legal_name}`
-                                : `${item.insighter.company.legal_name} ${translations.company}`
+                                ? ` ${item.insighter.company.legal_name}`
+                                : `${item.insighter.company.legal_name} `
                               : translations.company
                           )}
 
                           {item.insighter.roles.includes("company-insighter") && (
                             item.insighter.company
                               ? isRTL
-                                ? `${translations.company} ${item.insighter.company.legal_name}`
-                                : `${item.insighter.company.legal_name} ${translations.company}`
+                                ? ` ${item.insighter.company.legal_name}`
+                                : `${item.insighter.company.legal_name} `
                               : translations.company
                           )}
                         </Text>
@@ -271,31 +380,46 @@ export default function KnowledgeGrid({
                   )}
                   
                   <div className="flex gap-2">
-                    <button 
-                      className={cardStyles.actionButton}
-                      onClick={(e) => e.stopPropagation()}
-                      aria-label="Bookmark"
-                    >
-                      <svg width="21" height="21" viewBox="0 0 21 21" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M14.2161 1.89478H6.09818C4.3045 1.89478 2.84766 3.36004 2.84766 5.1453V17.0106C2.84766 18.5264 3.93397 19.1664 5.2645 18.4337L9.37397 16.1516C9.81187 15.9074 10.5192 15.9074 10.9487 16.1516L15.0582 18.4337C16.3887 19.1748 17.475 18.5348 17.475 17.0106V5.1453C17.4666 3.36004 16.0098 1.89478 14.2161 1.89478ZM12.2624 9.81056H10.7887V11.3348C10.7887 11.68 10.5024 11.9664 10.1571 11.9664C9.81187 11.9664 9.52555 11.68 9.52555 11.3348V9.81056H8.05187C7.7066 9.81056 7.42029 9.52425 7.42029 9.17899C7.42029 8.83372 7.7066 8.54741 8.05187 8.54741H9.52555V7.12425C9.52555 6.77899 9.81187 6.49267 10.1571 6.49267C10.5024 6.49267 10.7887 6.77899 10.7887 7.12425V8.54741H12.2624C12.6077 8.54741 12.894 8.83372 12.894 9.17899C12.894 9.52425 12.6077 9.81056 12.2624 9.81056Z" fill="#228BE6"/>
-                      </svg>
-                    </button>
-                    <button 
-                      className={cardStyles.actionButton}
-                      onClick={(e) => e.stopPropagation()}
-                      aria-label="Download"
-                    >
-                      <svg width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M12.7971 0.315674H5.74029C2.67502 0.315674 0.847656 2.14304 0.847656 5.20831V12.2567C0.847656 15.3304 2.67502 17.1578 5.74029 17.1578H12.7887C15.854 17.1578 17.6813 15.3304 17.6813 12.2651V5.20831C17.6898 2.14304 15.8624 0.315674 12.7971 0.315674ZM6.29608 7.87778C6.54029 7.63357 6.9445 7.63357 7.18871 7.87778L8.63713 9.3262V4.11357C8.63713 3.76831 8.92345 3.48199 9.26871 3.48199C9.61397 3.48199 9.90029 3.76831 9.90029 4.11357V9.3262L11.3487 7.87778C11.5929 7.63357 11.9971 7.63357 12.2413 7.87778C12.4856 8.12199 12.4856 8.5262 12.2413 8.77041L9.71502 11.2967C9.65608 11.3557 9.58871 11.3978 9.51292 11.4315C9.43713 11.4651 9.35292 11.482 9.26871 11.482C9.1845 11.482 9.10871 11.4651 9.0245 11.4315C8.94871 11.3978 8.88134 11.3557 8.82239 11.2967L6.29608 8.77041C6.05187 8.5262 6.05187 8.13041 6.29608 7.87778ZM14.5234 13.1325C12.8308 13.6967 11.054 13.983 9.26871 13.983C7.48345 13.983 5.7066 13.6967 4.01397 13.1325C3.68555 13.023 3.50871 12.6609 3.61818 12.3325C3.72766 12.0041 4.08134 11.8188 4.41818 11.9367C7.55081 12.9809 10.995 12.9809 14.1277 11.9367C14.4561 11.8273 14.8182 12.0041 14.9277 12.3325C15.0287 12.6694 14.8519 13.023 14.5234 13.1325Z" fill="#228BE6"/>
-                      </svg>
-                    </button>
+                    {isLoggedIn && (
+                      <div className="relative">
+                        {loadingStates[item.slug] ? (
+                          <div className="w-4 h-4 border-2 border-gray-400 border-t-transparent rounded-full animate-spin" />
+                        ) : (
+                          (item.slug in readLaterStates ? readLaterStates[item.slug] : item.is_read_later) ? (
+                            <BookmarkSolidIcon 
+                              className="w-4 h-4 text-yellow-600 cursor-pointer hover:text-yellow-700 transition-colors"
+                              onClick={(e) => {
+                                e.preventDefault();
+                                e.stopPropagation();
+                                if (!loadingStates[item.slug]) {
+                                  handleReadLaterToggle(item, e);
+                                }
+                              }}
+                              aria-label="Remove from Read Later"
+                            />
+                          ) : (
+                            <BookmarkIcon 
+                              className="w-4 h-4 text-gray-600 cursor-pointer hover:text-gray-700 transition-colors"
+                              onClick={(e) => {
+                                e.preventDefault();
+                                e.stopPropagation();
+                                if (!loadingStates[item.slug]) {
+                                  handleReadLaterToggle(item, e);
+                                }
+                              }}
+                              aria-label="Add to Read Later"
+                            />
+                          )
+                        )}
+                      </div>
+                    )}
                   </div>
                 </div>
                 
                 {/* Bottom row with published date and price badge */}
-                <div className="flex justify-between items-center  pt-2 mt-auto mt-6 border-t border-gray-100 w-full">
-                 <Text c="dimmed" size="xs" dir={locale === 'ar' ? 'rtl' : 'ltr'}>
-                    {locale === 'ar' ? 'نشر' : 'Posted'} {formatPublishedDate(item.published_at, locale)}
+                <div className="flex justify-between items-center pt-2 mt-auto mt-6 border-t border-gray-100 w-full">
+                  <Text c="dimmed" size="xs" dir={isRTL ? 'rtl' : 'ltr'}>
+                    {translations.posted} {formatPublishedDate(item.published_at, currentLocale as string)}
                   </Text>
                   
                   <Badge
