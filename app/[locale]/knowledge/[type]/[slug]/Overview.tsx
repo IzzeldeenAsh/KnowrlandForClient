@@ -8,6 +8,7 @@ import { IconCloudUpload, IconFiles } from '@tabler/icons-react'
 import { Group, Text, Badge } from '@mantine/core'
 import { useParams } from 'next/navigation'
 import BuyModal from './BuyModal'
+import AuthModal from './AuthModal'
 
 // Define interfaces for minimal typing, you can expand these as needed
 interface Document {
@@ -68,6 +69,7 @@ export default function Overview({ knowledge, knowledgeSlug }: OverviewProps) {
 
   const [buyModalOpened, setBuyModalOpened] = useState(false);
   const [selectedDocumentId, setSelectedDocumentId] = useState<number | undefined>(undefined);
+  const [authModalOpened, setAuthModalOpened] = useState(false);
 
   // Translations
   const translations = {
@@ -88,7 +90,18 @@ export default function Overview({ knowledge, knowledgeSlug }: OverviewProps) {
     alreadyPurchased: isRTL ? 'تم الشراء ' : 'Purchased'
   };
 
+  // Check if user is logged in
+  const isUserLoggedIn = () => {
+    const token = localStorage.getItem('token');
+    return !!token;
+  };
+
   const handleBuyClick = (documentId: number) => {
+    if (!isUserLoggedIn()) {
+      setAuthModalOpened(true);
+      return;
+    }
+    
     setSelectedDocumentId(documentId);
     setBuyModalOpened(true);
   };
@@ -268,6 +281,13 @@ export default function Overview({ knowledge, knowledgeSlug }: OverviewProps) {
         documents={knowledge.documents}
         preSelectedDocumentId={selectedDocumentId}
         knowledgeSlug={knowledgeSlug}
+      />
+
+      {/* Auth Modal */}
+      <AuthModal
+        opened={authModalOpened}
+        onClose={() => setAuthModalOpened(false)}
+        locale={locale as string}
       />
     </div>
   )
