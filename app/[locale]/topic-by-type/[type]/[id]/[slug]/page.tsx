@@ -87,7 +87,7 @@ export default function TopicByTypePage({ params }: Props) {
           </div>
         </div>
 
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           {isLoading ? (
             <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
               {Array(6).fill(0).map((_, index) => (
@@ -95,6 +95,8 @@ export default function TopicByTypePage({ params }: Props) {
               ))}
             </div>
           ) : (
+            <>
+            <Text ps={4} pb={10} size='md' fw={600}>{locale ==='ar' ? '  المعرفة:' : 'Knowledge:'}</Text>
             <KnowledgeGrid 
               knowledge={knowledge || []}
               topicName={subIndustry?.name || ''}
@@ -102,6 +104,7 @@ export default function TopicByTypePage({ params }: Props) {
               showHeader={true}
               colNumbers={3}
             />
+            </>
           )}
         </div>
       </div>
