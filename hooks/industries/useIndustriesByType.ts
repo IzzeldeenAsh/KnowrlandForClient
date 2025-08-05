@@ -39,6 +39,7 @@ export function useIndustriesByType({ type, topSubIndustry = 2 }: UseIndustriesB
         }
 
         const json = await res.json();
+        
         setIndustries(json.data);
       } catch (error) {
         console.error('Error fetching industries by type:', error);

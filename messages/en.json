@@ -164,6 +164,9 @@
         "language": {
             "switchToArabic": "العربية",
             "switchToEnglish": "English"
+        },
+        "beta": {
+            "notice": "🚀 Platform in Beta - Some features may not be complete. Stay tuned for updates!"
         }
     },
     "Features": {
