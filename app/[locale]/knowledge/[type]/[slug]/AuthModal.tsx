@@ -25,15 +25,12 @@ const AuthModal: React.FC<AuthModalProps> = ({ opened, onClose, locale }) => {
   };
 
   const handleSignUp = () => {
-    // Use environment variables or domain-relative URLs instead of hardcoded localhost
-    const baseUrl = process.env.NEXT_PUBLIC_AUTH_URL || window.location.origin;
-    window.location.href = `${baseUrl}/auth/sign-up`;
+    window.location.href = 'https://app.knoldg.com/auth/sign-up';
   };
 
   const handleLogIn = () => {
-    // Use environment variables or domain-relative URLs instead of hardcoded localhost
-    const baseUrl = process.env.NEXT_PUBLIC_AUTH_URL || window.location.origin;
-    window.location.href = `${baseUrl}/auth/login`;
+    const currentUrl = window.location.href;
+    window.location.href = `https://app.knoldg.com/auth/login?returnUrl=${encodeURIComponent(currentUrl)}`;
   };
 
   return (
@@ -54,8 +51,8 @@ const AuthModal: React.FC<AuthModalProps> = ({ opened, onClose, locale }) => {
           <Image 
             src="/images/joinUs.svg" 
             alt="Join Us" 
-            width={280} 
-            height={210} 
+            width={340} 
+            height={240} 
             style={{ margin: '0 auto' }}
             priority
           />
