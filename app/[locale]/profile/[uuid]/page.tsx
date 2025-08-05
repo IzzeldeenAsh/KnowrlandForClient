@@ -199,6 +199,8 @@ export default function ProfilePage() {
     title?: string;
     description?: string;
   }>({});
+  const [showDuplicateWarning, setShowDuplicateWarning] = useState(false);
+  const [isDuplicateCheckLoading, setIsDuplicateCheckLoading] = useState(false);
 
   // Get entity type from search params (safe for SSR)
   const entityParam = searchParams.get("entity");
@@ -747,8 +749,48 @@ export default function ProfilePage() {
     }));
   };
 
+  // Check for duplicate meeting times
+  const checkDuplicateMeetingTime = async (
+    meetingDate: string,
+    startTime: string,
+    endTime: string
+  ): Promise<boolean> => {
+    try {
+      const token =
+        typeof window !== "undefined" ? localStorage.getItem("token") : null;
+
+      const response = await fetch(
+        "https://api.knoldg.com/api/account/meeting/client/check-duplicate-time",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Accept: "application/json",
+            "Accept-Language": locale,
+            ...(token && { Authorization: `Bearer ${token}` }),
+          },
+          body: JSON.stringify({
+            meeting_date: meetingDate,
+            start_time: startTime,
+            end_time: endTime,
+          }),
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error("Failed to check duplicate meeting time");
+      }
+
+      const data = await response.json();
+      return data.data.exists;
+    } catch (error) {
+      console.error("Error checking duplicate meeting time:", error);
+      return false; // If check fails, allow booking to proceed
+    }
+  };
+
   // Submit booking - handles the API call
-  const submitBookMeeting = async () => {
+  const submitBookMeeting = async (skipDuplicateCheck = false) => {
     if (!selectedDate || !selectedMeetingTime) return;
 
     // Validate form before submission
@@ -760,6 +802,23 @@ export default function ProfilePage() {
     setBookingError(null);
 
     try {
+      // Check for duplicate meeting time first (unless skipped)
+      if (!skipDuplicateCheck) {
+        setIsDuplicateCheckLoading(true);
+        const isDuplicate = await checkDuplicateMeetingTime(
+          selectedDate,
+          selectedMeetingTime.start_time.substring(0, 5),
+          selectedMeetingTime.end_time.substring(0, 5)
+        );
+        setIsDuplicateCheckLoading(false);
+
+        if (isDuplicate) {
+          setShowDuplicateWarning(true);
+          setIsBookingLoading(false);
+          return;
+        }
+      }
+
       // Get auth token from localStorage
       const token =
         typeof window !== "undefined" ? localStorage.getItem("token") : null;
@@ -2269,6 +2328,44 @@ export default function ProfilePage() {
                     </Button>
                   </div>
                 </form>
+              </div>
+            </Modal>
+
+            {/* Duplicate Meeting Warning Modal */}
+            <Modal
+              opened={showDuplicateWarning}
+              onClose={() => setShowDuplicateWarning(false)}
+              title={t("duplicateMeetingWarning")}
+              size="md"
+              centered
+            >
+              <div className="p-2">
+                <p className="text-gray-700 mb-6">
+                  {t("duplicateMeetingMessage", {
+                    date: selectedDate ? new Date(selectedDate).toLocaleDateString() : "",
+                    startTime: selectedMeetingTime?.start_time.substring(0, 5) || "",
+                    endTime: selectedMeetingTime?.end_time.substring(0, 5) || ""
+                  })}
+                </p>
+                
+                <div className="flex justify-end gap-3">
+                  <Button
+                    variant="subtle"
+                    onClick={() => setShowDuplicateWarning(false)}
+                  >
+                    {t("cancel")}
+                  </Button>
+                  <Button
+                    color="orange"
+                    onClick={() => {
+                      setShowDuplicateWarning(false);
+                      submitBookMeeting(true); // Skip duplicate check
+                    }}
+                    loading={isBookingLoading}
+                  >
+                    {t("continueBooking")}
+                  </Button>
+                </div>
               </div>
             </Modal>
           </div>
