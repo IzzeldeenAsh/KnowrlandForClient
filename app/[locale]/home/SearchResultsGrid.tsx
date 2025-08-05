@@ -18,6 +18,7 @@ import { useParams } from "next/navigation";
 import { arSA, enUS } from 'date-fns/locale';
 import dynamic from 'next/dynamic';
 import axios from 'axios';
+import AuthModal from '../knowledge/[type]/[slug]/AuthModal';
 
 // Helper function to get token from cookie
 function getTokenFromCookie(): string | null {
@@ -159,6 +160,9 @@ export default function SearchResultsGrid({
   const currentLocale = locale || params.locale || "en";
   const isRTL = currentLocale === "ar";
   
+  // Auth Modal state
+  const [authModalOpened, setAuthModalOpened] = useState(false);
+  
   // State for tracking read later status for each item
   const [readLaterStates, setReadLaterStates] = useState<{[key: number]: boolean}>({});
   const [loadingStates, setLoadingStates] = useState<{[key: number]: boolean}>({});
@@ -175,6 +179,10 @@ export default function SearchResultsGrid({
 
   // Handle read later toggle
   const handleReadLaterToggle = async (item: SearchResultItem, e: React.MouseEvent) => {
+    if(!isLoggedIn){
+      setAuthModalOpened(true);
+      return;
+    }
     e.preventDefault();
     e.stopPropagation();
     
@@ -316,6 +324,7 @@ export default function SearchResultsGrid({
                 }
               }}
             >
+                 
               <div className={cardStyles.darkSection}>
                 <div>
                   <div className="flex items-center mb-3">
@@ -346,7 +355,7 @@ export default function SearchResultsGrid({
                   </div>
                 )}
               </div>
-              
+              </Link>
               <div className={cardStyles.whiteSection + " flex flex-col h-full "}>
                 {/* Top row with insighter info and action buttons */}
                 <div className="flex justify-between items-center pb-4">
@@ -354,22 +363,29 @@ export default function SearchResultsGrid({
                     <div className="flex items-center">
                       <div className="relative">
                    <div className="object-cover object-top">
-                   <Avatar
-                          src={(item.insighter.roles.includes("company") || item.insighter.roles.includes("company-insighter")) && item.insighter.company?.logo ? 
-                              item.insighter.company.logo : 
-                              item.insighter.profile_photo_url}
-                          radius="xl"
-                          alt={item.insighter.name}
-                          size="md"
-                          className={`${cardStyles.avatar} avatar-top-position`}
-                        >
-                          {!((item.insighter.roles.includes("company") || item.insighter.roles.includes("company-insighter")) && item.insighter.company?.logo) && 
-                          !item.insighter.profile_photo_url &&
-                            getInitials(item.insighter.name)}
-                        </Avatar>
+                   <Link 
+                     href={item.insighter.roles.includes("company") || item.insighter.roles.includes("company-insighter") ? 
+                       `/${currentLocale}/profile/${item.insighter.company?.uuid}` : 
+                       `/${currentLocale}/profile/${item.insighter.uuid}?entity=insighter`}
+                   >
+                     <Avatar
+                       src={(item.insighter.roles.includes("company") || item.insighter.roles.includes("company-insighter")) && item.insighter.company?.logo ? 
+                         item.insighter.company.logo : 
+                         item.insighter.profile_photo_url}
+                       radius="xl"
+                       alt={item.insighter.name}
+                       size="md"
+                       className={`${cardStyles.avatar} avatar-top-position`}
+                     >
+                       {!((item.insighter.roles.includes("company") || item.insighter.roles.includes("company-insighter")) && item.insighter.company?.logo) && 
+                       !item.insighter.profile_photo_url &&
+                         getInitials(item.insighter.name)}
+                     </Avatar>
+                   </Link>
                    </div>
                         
                         {item.insighter.roles.includes("company-insighter") && item.insighter.profile_photo_url && (
+                          <Link href={`/${currentLocale}/profile/${item.insighter.uuid}?entity=insighter`}>
                           <Avatar
                             src={item.insighter.profile_photo_url}
                             radius="xl"
@@ -381,8 +397,10 @@ export default function SearchResultsGrid({
                               position: 'absolute',
                             }}
                           />
+                          </Link>
                         )}
                          {item.insighter.roles.includes("company") && item.insighter.profile_photo_url && (
+                          <Link href={`/${currentLocale}/profile/${item.insighter.uuid}?entity=insighter`}>
                           <Avatar
                             src={item.insighter.profile_photo_url}
                             radius="xl"
@@ -394,13 +412,17 @@ export default function SearchResultsGrid({
                               position: 'absolute',
                             }}
                           />
+                          </Link>
                         )}
                       </div>
 
                       <div className="ms-3">
                         <Text fw={600} size="sm" className="capitalize">
+                          <Link href={`/${currentLocale}/profile/${item.insighter.uuid}?entity=insighter`}>
                           {item.insighter.roles.includes("insighter") && item.insighter.name.toLowerCase()}
+                          </Link>
 
+                        <Link href={`/${currentLocale}/profile/${item.insighter.company?.uuid}`}>
                           {item.insighter.roles.includes("company") && (
                             item.insighter.company
                               ? isRTL
@@ -408,7 +430,9 @@ export default function SearchResultsGrid({
                                 : `${item.insighter.company.legal_name} `
                               : translations.company
                           )}
+                          </Link>
 
+                          <Link href={`/${currentLocale}/profile/${item.insighter.company?.uuid}`}>
                           {item.insighter.roles.includes("company-insighter") && (
                             item.insighter.company
                               ? isRTL
@@ -416,36 +440,48 @@ export default function SearchResultsGrid({
                                 : `${item.insighter.company.legal_name} `
                               : translations.company
                           )}
-                        </Text>
+                        </Link>
+                          </Text>
 
                         <Text c="dimmed" size="xs" className="capitalize">
+                          <Link href={`/${currentLocale}/profile/${item.insighter.uuid}?entity=insighter`}>
                           {item.insighter.roles.includes("insighter") && translations.insighter}
+                          </Link>
 
+                         
                           {item.insighter.roles.includes("company") && (
                             item.insighter.company
-                              ? `${translations.by} ${item.insighter.name.toLowerCase()}`
-                              : translations.company
+                              ? (<Link href={`/${currentLocale}/profile/${item.insighter?.uuid}?entity=insighter`}>
+                                {translations.by} {item.insighter.name.toLowerCase()}
+                                </Link>)
+                              : <Link href={`/${currentLocale}/profile/${item.insighter?.uuid}?entity=insighter`}>
+                            Company
+                              </Link>
                           )}
 
+                          <Link href={`/${currentLocale}/profile/${item.insighter.company?.uuid}`}>
                           {item.insighter.roles.includes("company-insighter") && (
                             item.insighter.company
-                              ? `${translations.by} ${item.insighter.name.toLowerCase()}`
+                              ? (<Link href={`/${currentLocale}/profile/${item.insighter?.uuid}?entity=insighter`}>
+                                {translations.by} {item.insighter.name.toLowerCase()}
+                                </Link>)
                               : translations.company
                           )}
+                          </Link>
                         </Text>
                       </div>
                     </div>
                   )}
                   
                   <div className="flex gap-2">
-                    {item.searchable_type === 'knowledge' && isLoggedIn && (
+                    {item.searchable_type === 'knowledge'  && (
                       <div className="relative">
                         {loadingStates[item.searchable_id] ? (
-                          <div className="w-4 h-4 border-2 border-gray-400 border-t-transparent rounded-full animate-spin" />
+                          <div className="w-5 h-5 border-2 border-gray-400 border-t-transparent rounded-full animate-spin" />
                         ) : (
                           (item.searchable_id in readLaterStates ? readLaterStates[item.searchable_id] : item.is_read_later) ? (
                             <BookmarkSolidIcon 
-                              className="w-4 h-4 text-yellow-600 cursor-pointer hover:text-yellow-700 transition-colors"
+                              className="w-5 h-5 text-[#861536] cursor-pointer hover:text-[#861536] transition-colors"
                               onClick={(e) => {
                                 e.preventDefault();
                                 e.stopPropagation();
@@ -457,7 +493,7 @@ export default function SearchResultsGrid({
                             />
                           ) : (
                             <BookmarkIcon 
-                              className="w-4 h-4 text-gray-600 cursor-pointer hover:text-gray-700 transition-colors"
+                              className="w-5 h-5 text-gray-600 cursor-pointer hover:text-gray-700 transition-colors"
                               onClick={(e) => {
                                 e.preventDefault();
                                 e.stopPropagation();
@@ -502,7 +538,7 @@ export default function SearchResultsGrid({
                   )}
                 </div>
               </div>
-            </Link>
+         
           </Card>
         ))}
           </div>
@@ -569,6 +605,12 @@ export default function SearchResultsGrid({
           </div>
         </div>
       )}
+          {/* Auth Modal */}
+    <AuthModal
+      opened={authModalOpened}
+      onClose={() => setAuthModalOpened(false)}
+      locale={currentLocale}
+    />
     </div>
   );
 }
