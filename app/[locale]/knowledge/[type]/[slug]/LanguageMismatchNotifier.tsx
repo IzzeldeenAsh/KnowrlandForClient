@@ -110,7 +110,7 @@ export default function LanguageMismatchNotifier({
         
         <div className="relative py-4 px-6">
           {/* Top row with icon and close button */}
-          <div className="flex items-center justify-between mb-4">
+          <div className="flex items-center justify-between mb-4" style={{direction:'ltr'}}>
             <div className="flex items-center">
               <div 
                 className="rounded-full p-3 mr-4 backdrop-blur-sm"

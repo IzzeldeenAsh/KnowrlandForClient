@@ -42,13 +42,13 @@ export default function AuthBanner({ onSignUp, onLogin }: AuthBannerProps) {
           <div className="text-lg font-bold mb-1">
             {isRTL ? 
               'اكتشف المعرفة المهنية' :
-              'Unlock professional knowledge'
+              'Unlock business knowledge'
             }
           </div>
           <div className="text-sm opacity-90">
             {isRTL ? 
               'انضم إلى خبراء KNOLDG واحصل على رؤى حصرية وتقارير متخصصة.' :
-              'Join KNOLDG experts and access exclusive insights and industry reports.'
+              'Join KNOLDG experts, and access exclusive insights.'
             }
           </div>
         </div>
