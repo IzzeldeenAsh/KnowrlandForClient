@@ -4,7 +4,7 @@ import React, { useState } from 'react';
 import { Text, Card, Badge, Group, Avatar, Rating } from "@mantine/core";
 import Link from "next/link";
 import Image from "next/image";
-import { BookmarkIcon } from '@heroicons/react/24/outline';
+import { BookmarkIcon, ArrowDownTrayIcon } from '@heroicons/react/24/outline';
 import { BookmarkIcon as BookmarkSolidIcon } from '@heroicons/react/24/solid';
 import DataIcon from "@/components/icons/DataIcon";
 import InsightIcon from "@/components/icons/InsightIcon";
@@ -78,6 +78,7 @@ export interface SearchResultItem {
   paid?: boolean; // Only for knowledge items
   review: string;
   is_read_later?: boolean; // Only for knowledge items
+  total_downloads?: number; // Only for knowledge items
 }
 
 interface SearchResultsGridProps {
@@ -264,7 +265,11 @@ export default function SearchResultsGrid({
     paid: isRTL ? "مدفوع" : "PAID",
     insighter: isRTL ? "إنسايتر" : "Insighter",
     by: isRTL ? "من قبل" : "By",
-    company: isRTL ? "الشركة" : "Company"
+    company: isRTL ? "الشركة" : "Company",
+    downloads: isRTL ? "تحميل" : "Downloads",
+    downloaded: isRTL ? "تم التحميل" : "Downloaded",
+    time: isRTL ? "مرة" : "time",
+    times: isRTL ? "مرات" : "times"
   };
 
   if (results.length === 0) {
@@ -325,7 +330,7 @@ export default function SearchResultsGrid({
               }}
             >
                  
-              <div className={cardStyles.darkSection}>
+              <div className={`${cardStyles.darkSection} relative`}>
                 <div>
                   <div className="flex items-center mb-3">
                     {item.type === "report" && <ReportIcon width={20} height={20} />}
@@ -352,6 +357,17 @@ export default function SearchResultsGrid({
                   <div className="flex items-center mt-auto gap-1">
                     <Rating value={parseInt(item.review)} fractions={2} readOnly size="sm" />
                     <Text size="xs" fw={500} className="mx-2 text-sky-500">{parseInt(item.review).toFixed(1)}</Text>
+                  </div>
+                )}
+                
+                {item.total_downloads !== undefined && item.total_downloads > 0 && (
+                  <div className="absolute bottom-4 left-4 flex items-center gap-2">
+                    <div className="flex items-center justify-center w-6 h-6 bg-white bg-opacity-20 rounded-full">
+                      <ArrowDownTrayIcon className="w-3 h-3 text-white" />
+                    </div>
+                    <Text size="xs" className="text-white font-medium">
+                      {translations.downloaded} {item.total_downloads.toLocaleString()} {item.total_downloads === 1 ? translations.time : translations.times}
+                    </Text>
                   </div>
                 )}
               </div>
