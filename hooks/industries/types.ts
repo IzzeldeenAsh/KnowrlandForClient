@@ -4,6 +4,7 @@ export interface Industry {
   slug: string;
   children?: Industry[];
   topic?: Topic[];
+  icon?: string;
 }
 
 export interface Topic {
