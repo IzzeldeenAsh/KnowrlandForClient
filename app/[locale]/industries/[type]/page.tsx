@@ -18,12 +18,6 @@ interface Topic {
   slug: string;
 }
 
-interface IndustryChild {
-  id: number;
-  name: string;
-  slug: string;
-  topic: Topic[];
-}
 
 const validTypes: IndustryType[] = ['report', 'insight', 'data', 'manual', 'course'];
 
@@ -79,7 +73,10 @@ export default function IndustriesByTypePage({ params }: Props) {
       </div>
     );
   }
-
+  const getIndustryIcon = (industry: Industry) => {
+    if (!industry.icon) return <IndustryIcon width={20} height={20} />;
+    return <Image src={industry.icon} alt={industry.name} width={35} height={35} />;
+  }
   return (
     <div className="flex flex-col min-h-screen bg-white dark:bg-slate-900">
       <div className="relative z-10 max-w-6xl relative mx-auto  w-full ">
@@ -133,28 +130,33 @@ export default function IndustriesByTypePage({ params }: Props) {
                 ))}
               </div>
             ) : (
+           <>
+        
               <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-2 max-w-7xl mx-auto">
                 {industries.map((industry: Industry) => (
                   <div
                     key={industry.id}
-                    className="relative bg-white rounded-sm p-6 shadow-sm hover:shadow-md transition-all duration-300"
+                    className="relative bg-white border border-gray-200 rounded-sm p-6 shadow-sm hover:shadow-md transition-all duration-300"
                     data-aos="fade-up"
                   >
                     <div className="space-y-2">
                       <Link href={`/${locale}/industry-by-type/${type}/${industry.id}/${industry.slug}`} className="block">
                         <div className="flex items-center gap-2">
-                          <IndustryIcon />
+                          {getIndustryIcon(industry)}
                           <h3 className="text-sm font-semibold text-gray-900 hover:text-blue-600">
                             {industry.name}
                           </h3>
                         </div>
                       </Link>
+                      <Text size="xs" color="gray" fw={500}>
+                        {locale === 'ar' ? ":الصناعات الفرعية" : "Sub-industries:"}
+                        </Text>
                       {industry.children && industry.children.length > 0 ? (
                         <ul className="space-y-1">
                           {industry.children.map((child: Industry) => (
                             <Link href={`/${locale}/sub-industry-by-type/${type}/${child.id}/${child.slug}`} key={child.id} className="block">
                               <li
-                                className="text-xs text-gray-600 hover:text-blue-600 transition-colors flex items-center"
+                                className="text-xs text-blue-800 hover:text-blue-600 transition-colors flex items-center"
                               >
                                 <span className="mr-2">•</span>
                                 {child.name}
@@ -172,6 +174,7 @@ export default function IndustriesByTypePage({ params }: Props) {
                   </div>
                 ))}
               </div>
+           </>
             )}
           </div>
         </div>
