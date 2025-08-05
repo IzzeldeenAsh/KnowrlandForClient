@@ -18,6 +18,7 @@ import { SearchResultItem } from './SearchResultsGrid';
 import listStyles from "../topic/[id]/[slug]/knowledge-list.module.css";
 import cardStyles from "../topic/[id]/[slug]/knowledge-card.module.css";
 import axios from 'axios';
+import AuthModal from '../knowledge/[type]/[slug]/AuthModal';
 
 // Helper function to get token from cookie
 function getTokenFromCookie(): string | null {
@@ -113,7 +114,7 @@ export default function SearchResultsList({
   const params = useParams();
   const currentLocale = locale || params.locale || "en";
   const isRTL = currentLocale === "ar";
-  
+      const [authModalOpened, setAuthModalOpened] = useState(false);
   // State for tracking read later status for each item
   const [readLaterStates, setReadLaterStates] = useState<{[key: number]: boolean}>({});
   const [loadingStates, setLoadingStates] = useState<{[key: number]: boolean}>({});
@@ -130,6 +131,10 @@ export default function SearchResultsList({
 
   // Handle read later toggle
   const handleReadLaterToggle = async (item: SearchResultItem, e: React.MouseEvent) => {
+    if(!isLoggedIn){
+      setAuthModalOpened(true);
+      return;
+    }
     e.preventDefault();
     e.stopPropagation();
 
@@ -253,25 +258,17 @@ export default function SearchResultsList({
                 component="div"
                 style={{height:'240px'}} // Fixed height for consistency
               >
-                <Link
-                  href={`/${currentLocale}/${item.url}`}
-                  className="block relative w-full h-full flex flex-row"
-                  onClick={(e) => {
-                    // Check if the URL is valid before navigation
-                    if (!item.url || item.url.trim() === '') {
-                      e.preventDefault();
-                      console.error('Invalid URL for item:', item);
-                      return;
-                    }
-                  }}
-                >
+                <div  className="block relative w-full h-full flex flex-row">
+             
               <div className={`${listStyles.typeColumn} ${item.searchable_type === "topic" ? "bg-topic" : ""}`} style={{
                 ...(item.searchable_type === "topic" ? { backgroundImage: "url(/images/topics-bg.png)" } : {}),
                 display: 'flex',
                 flexDirection: 'column',
                 justifyContent: 'space-between'
               }}>
+                 <Link href={`/${currentLocale}/${item.url}`}>
                 <div className="flex items-center gap-2 z-10">
+                 
                   <div className={listStyles.iconWrapper}>
                     {item.searchable_type === "knowledge" && item.type && (
                       <>
@@ -292,6 +289,7 @@ export default function SearchResultsList({
                       ? (typeof item.type === 'string' ? typeTranslations[item.type.toLowerCase()] || item.type : typeTranslations['insight'])
                       : item.searchable_type === "topic" ? translations.topic : translations.knowledge}
                   </Badge>
+                 
                 </div>
                 
                 <div className={listStyles.titleSection}>
@@ -308,106 +306,131 @@ export default function SearchResultsList({
                     </div>
                   )}
                 </div>
-                
+                </Link>
                 {item.searchable_type === "knowledge" && item.insighter && (
                   <div className="flex items-center gap-1 z-10">
                     <div className="relative">
-                      <Avatar
-                        src={(item.insighter.roles.includes("company") || item.insighter.roles.includes("company-insighter")) && item.insighter.company?.logo ? 
-                            item.insighter.company.logo : 
-                            item.insighter.profile_photo_url}
-                        radius="xl"
-                        alt={item.insighter.name}
-                        size="sm"
-                        className="me-2 avatar-top-position"
-                      >
-                        {/* Show initials when no image is available */}
-                        {(() => {
-                          // For company or company-insighter roles: show initials if no company logo
-                          if (item.insighter.roles.includes("company") || item.insighter.roles.includes("company-insighter")) {
-                            return !item.insighter.company?.logo ? getInitials(item.insighter.name) : null;
-                          }
-                          // For regular insighter: show initials if no profile photo
-                          return !item.insighter.profile_photo_url ? getInitials(item.insighter.name) : null;
-                        })()}
-                      </Avatar>
-                      
-                      {item.insighter.roles.includes("company-insighter") && item.insighter.profile_photo_url && (
-                        <Avatar
-                          src={item.insighter.profile_photo_url}
-                          radius="xl"
-                          size="xs"
-                          className="absolute bottom-0 right-[10px] translate-x-1/3 rounded-full translate-y-1/3 z-10 avatar-top-position"
-                          alt={item.insighter.name}
-                          style={{
-                            boxShadow: '0 0 0 1px white',
-                            position: 'absolute'
-                          }}
-                        />
-                      )}
-                      {item.insighter.roles.includes("company") && item.insighter.profile_photo_url && (
-                        <Avatar
-                          src={item.insighter.profile_photo_url}
-                          radius="xl"
-                          size="xs"
-                          className="absolute bottom-0 right-[10px] translate-x-1/3 rounded-full translate-y-1/3 z-10 avatar-top-position"
-                          alt={item.insighter.name}
-                          style={{
-                            boxShadow: '0 0 0 1px white',
-                            position: 'absolute'
-                          }}
-                        />
-                      )}
-                    </div>
+                   <div className="object-cover object-top">
+                   <Link 
+                     href={item.insighter.roles.includes("company") || item.insighter.roles.includes("company-insighter") ? 
+                       `/${currentLocale}/profile/${item.insighter.company?.uuid}` : 
+                       `/${currentLocale}/profile/${item.insighter.uuid}?entity=insighter`}
+                   >
+                     <Avatar
+                       src={(item.insighter.roles.includes("company") || item.insighter.roles.includes("company-insighter")) && item.insighter.company?.logo ? 
+                         item.insighter.company.logo : 
+                         item.insighter.profile_photo_url}
+                       radius="xl"
+                       alt={item.insighter.name}
+                       size="md"
+                       className={`${cardStyles.avatar} avatar-top-position`}
+                     >
+                       {!((item.insighter.roles.includes("company") || item.insighter.roles.includes("company-insighter")) && item.insighter.company?.logo) && 
+                       !item.insighter.profile_photo_url &&
+                         getInitials(item.insighter.name)}
+                     </Avatar>
+                   </Link>
+                   </div>
+                        
+                        {item.insighter.roles.includes("company-insighter") && item.insighter.profile_photo_url && (
+                          <Link href={`/${currentLocale}/profile/${item.insighter.uuid}?entity=insighter`}>
+                          <Avatar
+                            src={item.insighter.profile_photo_url}
+                            radius="xl"
+                            size="xs"
+                            className="absolute bottom-0 right-0 translate-x-1/3 rounded-full translate-y-1/3 z-10 avatar-top-position"
+                            alt={item.insighter.name}
+                            style={{
+                              boxShadow: '0 0 0 2px white',
+                              position: 'absolute',
+                            }}
+                          />
+                          </Link>
+                        )}
+                         {item.insighter.roles.includes("company") && item.insighter.profile_photo_url && (
+                          <Link href={`/${currentLocale}/profile/${item.insighter.uuid}?entity=insighter`}>
+                          <Avatar
+                            src={item.insighter.profile_photo_url}
+                            radius="xl"
+                            size="xs"
+                            className="absolute bottom-0 right-0 translate-x-1/3 rounded-full translate-y-1/3 z-10 avatar-top-position"
+                            alt={item.insighter.name}
+                            style={{
+                              boxShadow: '0 0 0 2px white',
+                              position: 'absolute',
+                            }}
+                          />
+                          </Link>
+                        )}
+                      </div>
                     
                     <div>
-                      <Text size="sm" fw={600} className="text-white capitalize">
-                        {item.insighter.roles.includes("insighter") && item.insighter.name.toLowerCase()}
+                    <Text fw={600} size="sm" className="capitalize" c="white" ps={4}>
+                          <Link href={`/${currentLocale}/profile/${item.insighter.uuid}?entity=insighter`}>
+                          {item.insighter.roles.includes("insighter") && item.insighter.name.toLowerCase()}
+                          </Link>
 
-                        {item.insighter.roles.includes("company") && (
-                          item.insighter.company
-                            ? isRTL
-                              ? ` ${item.insighter.company.legal_name}`
-                              : `${item.insighter.company.legal_name}`
-                            : translations.company
-                        )}
+                        <Link href={`/${currentLocale}/profile/${item.insighter.company?.uuid}`}>
+                          {item.insighter.roles.includes("company") && (
+                            item.insighter.company
+                              ? isRTL
+                                ? ` ${item.insighter.company.legal_name}`
+                                : `${item.insighter.company.legal_name} `
+                              : translations.company
+                          )}
+                          </Link>
 
-                        {item.insighter.roles.includes("company-insighter") && (
-                          item.insighter.company
-                            ? isRTL
-                              ? ` ${item.insighter.company.legal_name}`
-                              : `${item.insighter.company.legal_name}`
-                            : translations.company
-                        )}
-                      </Text>
+                          <Link href={`/${currentLocale}/profile/${item.insighter.company?.uuid}`}>
+                          {item.insighter.roles.includes("company-insighter") && (
+                            item.insighter.company
+                              ? isRTL
+                                ? ` ${item.insighter.company.legal_name}`
+                                : `${item.insighter.company.legal_name} `
+                              : translations.company
+                          )}
+                        </Link>
+                          </Text>
 
-                      <Text c="dimmed" size="xs" className="text-gray-300 capitalize">
-                        {item.insighter.roles.includes("insighter") && translations.insighter}
+                        <Text c="dimmed" size="xs" className="capitalize" ps={4}>
+                          <Link href={`/${currentLocale}/profile/${item.insighter.uuid}?entity=insighter`}>
+                          {item.insighter.roles.includes("insighter") && translations.insighter}
+                          </Link>
 
-                        {item.insighter.roles.includes("company") && (
-                          item.insighter.company
-                            ? `${translations.by} ${item.insighter.name.toLowerCase()}`
-                            : translations.company
-                        )}
+                         
+                          {item.insighter.roles.includes("company") && (
+                            item.insighter.company
+                              ? (<Link href={`/${currentLocale}/profile/${item.insighter?.uuid}?entity=insighter`}>
+                                {translations.by} {item.insighter.name.toLowerCase()}
+                                </Link>)
+                              : <Link href={`/${currentLocale}/profile/${item.insighter?.uuid}?entity=insighter`}>
+                            Company
+                              </Link>
+                          )}
 
-                        {item.insighter.roles.includes("company-insighter") && (
-                          item.insighter.company
-                            ? `${translations.by} ${item.insighter.name.toLowerCase()}`
-                            : translations.company
-                        )}
-                      </Text>
+                          <Link href={`/${currentLocale}/profile/${item.insighter.company?.uuid}`}>
+                          {item.insighter.roles.includes("company-insighter") && (
+                            item.insighter.company
+                              ? (<Link href={`/${currentLocale}/profile/${item.insighter?.uuid}?entity=insighter`}>
+                                {translations.by} {item.insighter.name.toLowerCase()}
+                                </Link>)
+                              : translations.company
+                          )}
+                          </Link>
+                        </Text>
                     </div>
                   </div>
                 )}
               </div>
-              
+            
               {/* Only show contentColumn if there's content to display */}
               {(item.description || (item.searchable_type === "knowledge" && (item.paid !== undefined || item.published_at))) && (
                 <div className={listStyles.contentColumn} style={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-between', height: '100%' }}>
                   {item.description && (
+                      <Link href={`/${currentLocale}/${item.url}`}>
                     <Text className={listStyles.description} lineClamp={3}>
                       {truncateDescription(item.description, 50)}
                     </Text>
+                    </Link>
                   )}
                   
                   {item.searchable_type === "knowledge" && (
@@ -431,14 +454,14 @@ export default function SearchResultsList({
                       </div>
                       
                       <div className="flex gap-2">
-                        {isLoggedIn && (
+                       
                           <div className="relative">
                             {loadingStates[item.searchable_id] ? (
-                              <div className="w-4 h-4 border-2 border-gray-400 border-t-transparent rounded-full animate-spin" />
+                              <div className="w-5 h-5 border-2 border-gray-400 border-t-transparent rounded-full animate-spin" />
                             ) : (
                               (item.searchable_id in readLaterStates ? readLaterStates[item.searchable_id] : item.is_read_later) ? (
                                 <BookmarkSolidIcon 
-                                  className="w-4 h-4 text-yellow-600 cursor-pointer hover:text-yellow-700 transition-colors"
+                                  className="w-5 h-5 text-[#861536] cursor-pointer hover:text-[#861536] transition-colors"
                                   onClick={(e) => {
                                     e.preventDefault();
                                     e.stopPropagation();
@@ -450,7 +473,7 @@ export default function SearchResultsList({
                                 />
                               ) : (
                                 <BookmarkIcon 
-                                  className="w-4 h-4 text-gray-600 cursor-pointer hover:text-gray-700 transition-colors"
+                                  className="w-5 h-5 text-gray-600 cursor-pointer hover:text-gray-700 transition-colors"
                                   onClick={(e) => {
                                     e.preventDefault();
                                     e.stopPropagation();
@@ -463,14 +486,14 @@ export default function SearchResultsList({
                               )
                             )}
                           </div>
-                        )}
                    
                       </div>
                     </div>
                   )}
                 </div>
               )}
-            </Link>
+       
+            </div>
           </Card>
             ))}
           </div>
@@ -497,10 +520,7 @@ export default function SearchResultsList({
                 component="div"
                 style={{height:'240px'}} // Added fixed height to match knowledge items
               >
-                <Link
-                  href={`/${currentLocale}/${item.url}`}
-                  className="block relative h-full flex flex-col"
-                >
+              
                   <div className={`${cardStyles.darkSection} bg-topic`} style={{ backgroundImage: "url(/images/topics-bg.png)", height: '100%' }}>
                     <div>
                       <div className="flex items-center mb-3">
@@ -517,12 +537,17 @@ export default function SearchResultsList({
                       </Text>
                     </div>
                   </div>
-                </Link>
+
               </Card>
             ))}
           </div>
         </div>
       )}
+      <AuthModal
+        opened={authModalOpened}
+        onClose={() => setAuthModalOpened(false)}
+        locale={currentLocale}
+      />
     </div>
   );
 }

@@ -8,6 +8,7 @@ import FacebookIcon from '@/public/file-icons/facebook';
 import LinkedinIcon from '@/public/file-icons/linkedin';
 import WhatsappIcon from '@/public/file-icons/whatsapp';
 import BuyModal from './BuyModal';
+import AuthModal from './AuthModal';
 
 interface Document {
   id: number;
@@ -89,6 +90,9 @@ const KnowledgeSideBox = ({
   const [buyModalOpened, setBuyModalOpened] = useState(false);
   const [selectedDocumentIds, setSelectedDocumentIds] = useState<number[]>([]);
   
+  // Auth Modal state
+  const [authModalOpened, setAuthModalOpened] = useState(false);
+  
   // Read Later state
   const [isReadLater, setIsReadLater] = useState(is_read_later || false);
   const [isReadLaterLoading, setIsReadLaterLoading] = useState(false);
@@ -101,8 +105,19 @@ const KnowledgeSideBox = ({
     });
   };
 
+  // Check if user is logged in
+  const isUserLoggedIn = () => {
+    const token = localStorage.getItem('token');
+    return !!token;
+  };
+
   // Handle buy/download click
   const handleBuyClick = () => {
+    if (!isUserLoggedIn()) {
+      setAuthModalOpened(true);
+      return;
+    }
+    
     // Pre-select all documents when opening the modal
     const allDocumentIds = documents.map(doc => doc.id);
     setSelectedDocumentIds(allDocumentIds);
@@ -112,6 +127,11 @@ const KnowledgeSideBox = ({
   // Handle read later toggle
   const handleReadLaterToggle = async () => {
     if (!knowledgeSlug) return;
+    
+    if (!isUserLoggedIn()) {
+      setAuthModalOpened(true);
+      return;
+    }
     
     setIsReadLaterLoading(true);
     try {
@@ -844,6 +864,13 @@ const KnowledgeSideBox = ({
         knowledgeSlug={knowledgeSlug}
       />
     )}
+
+    {/* Auth Modal */}
+    <AuthModal
+      opened={authModalOpened}
+      onClose={() => setAuthModalOpened(false)}
+      locale={currentLocale}
+    />
   </div>
   );
 };
