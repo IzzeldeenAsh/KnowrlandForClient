@@ -260,14 +260,20 @@ const { isLoading: isAppLoading, setIsLoading: setAppLoading } = useLoading();
   };
 
   return (
-    <header className="relative w-full z-30 bg-[#0F1629]">
-      {/* Particles animation - reduced effects */}
-      <div style={{opacity: 0.2}}>
-      <Particles 
-        className="absolute inset-0 -z-1" 
-      
-      />
+    <>
+      {/* Beta Warning Bar */}
+      <div className="w-full bg-gradient-to-r from-blue-500 to-cyan-500 text-white py-2 px-4 text-center text-md font-medium relative z-40">
+        <span>{t('beta.notice')}</span>
       </div>
+      
+      <header className="relative w-full z-30 bg-[#0F1629]">
+        {/* Particles animation - reduced effects */}
+        <div style={{opacity: 0.2}}>
+        <Particles 
+          className="absolute inset-0 -z-1" 
+        
+        />
+        </div>
      
 
       {/* Illustration */}
@@ -507,5 +513,6 @@ const { isLoading: isAppLoading, setIsLoading: setAppLoading } = useLoading();
         </div>
       </div>
     </header>
+    </>
   )
 }

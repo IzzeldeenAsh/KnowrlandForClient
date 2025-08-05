@@ -14,6 +14,7 @@ import { ToastProvider } from '@/components/toast/ToastContext';
 import '@/components/toast/toast.css';
 import '@/components/toast/keenicons.css';
 import ClientLogoutHandler from './ClientLogoutHandler';
+import ConditionalAuthBanner from '@/components/ui/conditional-auth-banner';
 
 const inter = Inter({
   subsets: ['latin'],
@@ -122,6 +123,7 @@ export default async function RootLayout({
                   <div className="flex flex-col min-h-screen overflow-hidden supports-[overflow:clip]:overflow-clip">
                     {children}
                   </div>
+                  <ConditionalAuthBanner />
                 </LoadingProvider>
               </ToastProvider>
             </NextIntlClientProvider>

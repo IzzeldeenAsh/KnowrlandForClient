@@ -132,11 +132,12 @@ export default function SubIndustryByTypePage({ params }: Props) {
             </div>
           ) : (
             <div>
+              <Text ps={4} pb={8} size='md' fw={600}>{locale ==='ar' ? '  المواضيع:' : 'Topics:'}</Text>
               <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
                 {subIndustry?.topic?.map((topic: any) => (
                   <div
                     key={topic.id}
-                    className="bg-white rounded-lg p-6 shadow-sm hover:shadow-md transition-all duration-300"
+                   className="relative bg-white border border-gray-200 rounded-sm p-6 shadow-sm hover:shadow-md transition-all duration-300"
                     data-aos="fade-up"
                   >
                     <div className="space-y-3">
