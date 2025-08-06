@@ -379,28 +379,6 @@ export function UserProfile({ isHome }: { isHome: boolean }) {
                 {t("myCompany")}
               </Link>
             } */}
-
-            {roles.includes("client") &&
-              !roles.includes("insighter") &&
-              !roles.includes("company") &&
-              !roles.includes("company-insighter") && (
-                <>
-                <Link
-                  href="https://app.knoldg.com/app/insighter-register/vertical"
-                  className="block px-4 py-2.5  font-semibold bg-clip-text text-transparent bg-gradient-to-r from-blue-500 to-teal-400"
-                  onClick={() => setMenuOpen(false)}
-                  style={{fontSize: '13px'}}
-                >
-                  {t("becomeInsighter")}
-                </Link>
-                <p
-                  className="block px-4 pt-1 text-gray-500 pb-2"
-                  style={{ fontSize: '12px', lineHeight: '1.4' }}
-                >
-                  {t("becomeInsighterDescription")}
-                </p>
-               </>
-              )}
             
           {isClient$() && (
               <Link
@@ -434,6 +412,27 @@ export function UserProfile({ isHome }: { isHome: boolean }) {
               {t("myDownloads")}
             </Link>
           )}
+            {roles.includes("client") &&
+              !roles.includes("insighter") &&
+              !roles.includes("company") &&
+              !roles.includes("company-insighter") && (
+                <>
+                <Link
+                  href="https://app.knoldg.com/app/insighter-register/vertical"
+                  className="block px-4 py-2.5  font-semibold bg-clip-text text-transparent bg-gradient-to-r from-blue-500 to-teal-400"
+                  onClick={() => setMenuOpen(false)}
+                  style={{fontSize: '13px'}}
+                >
+                  {t("becomeInsighter")}
+                </Link>
+                <p
+                  className="block px-4 pt-1 text-gray-500 pb-2"
+                  style={{ fontSize: '12px', lineHeight: '1.4' }}
+                >
+                  {t("becomeInsighterDescription")}
+                </p>
+               </>
+              )}
             <div className="border-t border-slate-100">
               <button
                 onClick={() => {
