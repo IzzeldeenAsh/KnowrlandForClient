@@ -1941,7 +1941,7 @@ export default function ProfilePage() {
                         {/* Left Column: Calendar */}
                         <div className="bg-white dark:bg-slate-800 rounded-lg shadow-md p-6">
                           <h3 className="text-lg font-semibold mb-4">
-                            Select a Date
+                            {t("selectDate")} 
                           </h3>
 
                           {/* Month navigation */}
@@ -2037,11 +2037,15 @@ export default function ProfilePage() {
                           {selectedDate ? (
                             <>
                               <h3 className="text-lg font-semibold mb-4">
-                                {getDayName(locale, new Date(selectedDate))},{" "}
-                                {new Date(selectedDate).toLocaleDateString(
-                                  "en-US",
-                                  { month: "long", day: "numeric" }
-                                )}
+                                {locale.startsWith('ar')
+                                  ? `الجلسات المتاحة في ${getDayName('en-US', new Date(selectedDate))}, ${new Date(selectedDate).toLocaleDateString('en-US', {
+                                      month: 'long',
+                                      day: 'numeric'
+                                    })}`
+                                  : `Available sessions on ${getDayName('en-US', new Date(selectedDate))}, ${new Date(selectedDate).toLocaleDateString('en-US', {
+                                      month: 'long',
+                                      day: 'numeric'
+                                    })}`}
                               </h3>
 
                               <div className="space-y-3 mb-6">
@@ -2069,8 +2073,17 @@ export default function ProfilePage() {
                                         >
                                           <div className="flex justify-between items-center">
                                             <span className="font-medium">
-                                              {time.start_time.substring(0, 5)}{" "}
-                                              - {time.end_time.substring(0, 5)}
+                                              {new Date(`1970-01-01T${time.start_time}`).toLocaleTimeString(locale, {
+                                                hour: 'numeric',
+                                                minute: '2-digit',
+                                                hour12: true
+                                              })}{" "}
+                                              -{" "}
+                                              {new Date(`1970-01-01T${time.end_time}`).toLocaleTimeString(locale, {
+                                                hour: 'numeric',
+                                                minute: '2-digit',
+                                                hour12: true
+                                              })}
                                             </span>
                                             <span
                                               className={`text-sm font-bold ${
@@ -2157,7 +2170,7 @@ export default function ProfilePage() {
                     <div className="mt-2 p-2 bg-white dark:bg-slate-600 rounded border">
                       <div className="flex justify-between items-center">
                         <span className="text-sm text-gray-600 dark:text-gray-300">
-                          Session Rate:
+                          {t("sessionRate")}
                         </span>
                         <span
                           className={`font-bold ${
