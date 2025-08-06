@@ -221,7 +221,7 @@ const InsightersResultsSection: React.FC<InsightersResultsSectionProps> = ({
                             </button>
                           </Link>
                           <button className="flex-1 bg-white border border-gray-200 text-gray-700 px-6 py-2 text-xs rounded-md font-medium hover:bg-gray-50 transition-all duration-300">
-                            {locale === 'ar' ? 'تابع' : 'Keep up with'}
+                            {locale === 'ar' ? 'تابع' : 'Follow'}
                           </button>
                         </div>
                     </Link>
