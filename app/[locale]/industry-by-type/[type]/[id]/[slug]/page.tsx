@@ -134,7 +134,9 @@ export default function IndustryByTypePage({ params }: Props) {
             </div>
           ) : (
             <div>
-                 <Text size="md" ps={4} pb={10}  fw={600}>{locale === 'ar' ? " :الصناعات الفرعية" : "Sub-industries:"}</Text>
+            <h2 className="text-xl font-bold text-transparent bg-gradient-to-r from-blue-500 to-teal-400 bg-clip-text mb-8">
+              {locale === 'ar' ? 'الصناعات الفرعية' : 'Sub-industries:'}
+            </h2>
               <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
                 {industry?.children?.map((subIndustry: SubIndustry) => (
                   <div
@@ -153,7 +155,9 @@ export default function IndustryByTypePage({ params }: Props) {
                       </Link>
                       {subIndustry.topic && subIndustry.topic.length > 0 ? (
                         <div>
-                          <h3 className="text-sm font-bold mb-2">{locale === 'ar' ? 'المواضيع' : 'Topics'}</h3>
+                          <Text size="xs" color="gray" fw={500} pb={5}>
+                          {locale === 'ar' ? 'المواضيع:' : 'Topics:'}
+                        </Text>
                           <ul className="space-y-2">
                             {subIndustry.topic.map((topic: Topic) => (
                               <Link href={`/${locale}/topic-by-type/${type}/${topic.id}/${topic.slug}`} key={topic.id} className="block">
