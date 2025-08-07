@@ -2,13 +2,12 @@ import Footer from '@/components/ui/footer'
 import Breadcrumb from '@/components/ui/breadcrumb'
 import Image from 'next/image'
 import { Metadata } from 'next'
-import Link from 'next/link'
 import { fetchBreadcrumb } from '@/utils/breadcrumb'
 import KnowledgeGrid from './KnowledgeGrid'
 import StatisticsCards from '@/components/industry/statistics-cards'
 import Stripes from "@/public/images/stripes-dark.svg";
-import IntlMessageFormat from 'intl-messageformat';
 import { getMessages } from '@/utils/get-messages'
+import { IntlMessageFormat } from 'intl-messageformat';
 
 interface Knowledge {
   id: number
@@ -56,7 +55,8 @@ async function fetchTopicData(id: string, slug: string, locale: string = 'en') {
       headers: {
         "Content-Type": "application/json",
         "Accept": "application/json",
-        "Accept-Language": locale,"X-Timezone": Intl.DateTimeFormat().resolvedOptions().timeZone,
+        "Accept-Language": locale,
+        "X-Timezone": Intl.DateTimeFormat().resolvedOptions().timeZone,
       },
     }
   )
@@ -102,15 +102,23 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
 export default async function TopicPage({ params }: Props) {
   const { id, slug, locale = 'en' } = await params
+  const isRTL = locale === 'ar';
+  
+  // Get translations
+  const messages = await getMessages(locale);
 
   try {
     const { data: topic } = await fetchTopicData(id, slug, locale)
-    const breadcrumbItems = await fetchBreadcrumb('topic', parseInt(id))
-    const messages = await getMessages(locale);
+    const breadcrumbData = await fetchBreadcrumb('topic', parseInt(id), locale)
+    const breadcrumbItems = breadcrumbData.map(item => ({
+      label: item.label,
+      href: item.url
+    }))
     const showStatistics = !!topic?.knowledge?.length;
 
     return (
       <>
+      
         <div className="relative z-10 max-w-6xl relative mx-auto  w-full ">
       <div
         className="pointer-events-none absolute z-10 -translate-x-1/2 transform hidden md:block"
@@ -129,38 +137,57 @@ export default async function TopicPage({ params }: Props) {
       </div>
       </div>
     
-        <div className="relative z-10 max-w-6xl relative mx-auto mt-5 w-full">
-          {/* Breadcrumb */}
-          <div className="mb-8">
-            <Breadcrumb
-              items={breadcrumbItems.map(item => ({
-                label: item.label,
-                href: item.url,
-              }))}
+        <div className="min-h-screen bg-gray-50" dir={isRTL ? 'rtl' : 'ltr'}>
+            <div className="section-header px-4 sm:px-6 lg:px-8 py-8 relative overflow-hidden rounded-lg">
+            <Image
+              alt="Section background"
+              src="https://res.cloudinary.com/dsiku9ipv/image/upload/v1737266454/breadcrumb-bg-2_anwto8.png"
+              fill
+              className="object-cover z-0"
+              priority
             />
-          </div>
 
-          <div className="flex flex-row w-full justify-between">
-            {/* Header */}
-            <div className="min-h-[100px] flex flex-col md:flex-row items-start justify-between w-50">
-              <div className={`${locale == 'ar' ? 'text-right' : 'text-start'} mb-4`} data-aos="fade-down">
-                <h3 className="text-md bg-gradient-to-r from-blue-500 to-teal-400 md:text-5xl font-extrabold text-transparent bg-clip-text mb-4">
-                  {topic.name}
-                </h3>
+            <div className="relative z-10 max-w-6xl mx-auto mt-5 w-full">
+              {/* Breadcrumb */}
+                 <div className="mb-8">
+                    <Breadcrumb items={breadcrumbItems} />
+                  </div>
+
+              {/* Header Wrapper Split */}
+              <div className="flex flex-row w-full justify-between">
+                
+                {/* Left Side: Title */}
+                <div className="min-h-[100px] flex flex-col md:flex-row items-start justify-between w-50">
+                  <div className={`${isRTL ? 'text-right' : 'text-start'} mb-4`} data-aos="fade-down">
+               
+                    <h3 className="text-md bg-gradient-to-r from-blue-500 to-teal-400 md:text-5xl font-extrabold text-transparent bg-clip-text mb-4">
+                      {topic.name}
+                    </h3>
+                  </div>
+                </div>
+
+                {/* Right Side: Stats */}
+                {showStatistics && (
+                  <div className="flex flex-col items-start justify-between w-50 gap-2">
+                    <StatisticsCards type="topic" id={parseInt(id)} entityName={topic.name} />
+                  </div>
+                )}
               </div>
             </div>
+          </div>
 
-            {showStatistics && (
-                <div className="flex flex-col items-start justify-between w-50 gap-2">
-                  <StatisticsCards type="topic" id={parseInt(id)} entityName={topic.name} />
-                </div>
-              )}
+
+          <div className="max-w-container relative mx-auto mt-10 w-full px-4 sm:px-6 lg:px-8 pb-12">
+            <div className="max-w-6xl mx-auto">
+              <div className={`mb-8 ${isRTL ? 'text-right' : 'text-start'}`}>
+                 <h2 className="text-xl font-bold text-transparent bg-gradient-to-r from-blue-500 to-teal-400 bg-clip-text mb-8">
+              {locale === 'ar' ? 'المعرفة' : 'Knowledge'}
+            </h2>
+              </div>
+              <KnowledgeGrid knowledge={topic.knowledge} topicName={topic.name} showHeader={false} />
+            </div>
           </div>
         </div>
-
-      <div className="max-w-container relative mx-auto mt-10 w-full px-4 sm:px-6 lg:px-8 pb-12">
-        <KnowledgeGrid knowledge={topic.knowledge} topicName={topic.name} />
-      </div>
         <Footer />
       </>
     )
