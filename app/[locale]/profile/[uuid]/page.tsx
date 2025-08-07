@@ -2095,7 +2095,7 @@ export default function ProfilePage() {
                         <div className="bg-white dark:bg-slate-800 rounded-lg shadow-md p-6">
                           {selectedDate ? (
                             <>
-                              <h3 className="text-lg font-semibold mb-4">
+                              <h3 className="text-lg font-semibold mb-2">
                                 {locale.startsWith('ar')
                                   ? `الجلسات المتاحة في ${getDayName('en-US', new Date(selectedDate))}, ${new Date(selectedDate).toLocaleDateString('en-US', {
                                       month: 'long',
@@ -2106,6 +2106,9 @@ export default function ProfilePage() {
                                       day: 'numeric'
                                     })}`}
                               </h3>
+                              <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">
+                                {locale.startsWith('ar') ? 'جميع الأوقات بتوقيت 24 ساعة' : 'All times shown in 24-hour format'}
+                              </p>
 
                               <div className="space-y-3 mb-6">
                                 {getMeetingTimesForDate(selectedDate).length >
@@ -2133,15 +2136,15 @@ export default function ProfilePage() {
                                           <div className="flex justify-between items-center">
                                             <span className="font-medium">
                                               {new Date(`1970-01-01T${time.start_time}`).toLocaleTimeString(locale, {
-                                                hour: 'numeric',
+                                                hour: '2-digit',
                                                 minute: '2-digit',
-                                                hour12: true
+                                                hour12: false
                                               })}{" "}
                                               -{" "}
                                               {new Date(`1970-01-01T${time.end_time}`).toLocaleTimeString(locale, {
-                                                hour: 'numeric',
+                                                hour: '2-digit',
                                                 minute: '2-digit',
-                                                hour12: true
+                                                hour12: false
                                               })}
                                             </span>
                                             <span
