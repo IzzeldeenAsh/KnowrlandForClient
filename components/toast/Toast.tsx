@@ -95,13 +95,15 @@ const Toast: React.FC<ToastProps> = ({
       aria-atomic="true"
       style={{
         opacity: show ? 1 : 0,
-        transition: 'opacity 0.15s ease-in-out'
+        transition: 'opacity 0.15s ease-in-out',
+        minWidth: '350px',
+        maxWidth: '500px'
       }}
     >
-      <div className="toast-header">
+      <div className="toast-header" style={{ padding: '16px' }}>
         {/* Icon based on toast type with light background */}
         <div 
-          className="me-2 rounded-full p-1"
+          className="me-3"
           style={{ 
             color: getIconStyles().color,
             backgroundColor: getIconStyles().bgColor,
@@ -109,27 +111,57 @@ const Toast: React.FC<ToastProps> = ({
             alignItems: 'center',
             justifyContent: 'center',
             width: '22px',
-            height: '22px'
+            height: '22px',
+            borderRadius: '50%',
+            padding: '4px'
           }}
         >
           {getIconStyles().icon}
         </div>
-        {/* Title with smaller font size */}
-        <strong className="me-auto text-xs">{getDefaultTitle()}</strong>
-        {/* Timestamp */}
-        <small className="toast-time">{getTimeText()}</small>
-        {/* Close button with X character */}
+        {/* Title with fs-4 equivalent font size */}
+        <strong 
+          className="me-auto" 
+          style={{ 
+            fontSize: '1.1rem', // fs-4 equivalent
+            fontWeight: '600'
+          }}
+        >
+          {getDefaultTitle()}
+        </strong>
+        {/* Timestamp with fs-6 equivalent */}
+        <small 
+          className="toast-time" 
+          style={{ 
+            fontSize: '0.875rem' // fs-6 equivalent
+          }}
+        >
+          {getTimeText()}
+        </small>
+        {/* Close button with fs-5 equivalent */}
         <button 
           type="button" 
           className="btn-close" 
           onClick={handleClose} 
           aria-label="Close"
-          style={{ fontSize: '0.8rem', fontWeight: 'normal', opacity: 0.5 }}
+          style={{ 
+            fontSize: '1rem', // fs-5 equivalent
+            fontWeight: 'normal', 
+            opacity: 0.5,
+            marginLeft: '8px'
+          }}
         >
           ×
         </button>
       </div>
-      <div className="toast-body">{message}</div>
+      <div 
+        className="toast-body" 
+        style={{ 
+          fontSize: '1rem', // fs-5 equivalent
+          padding: '16px'
+        }}
+      >
+        {message}
+      </div>
     </div>
   );
 };
