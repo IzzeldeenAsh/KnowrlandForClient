@@ -11,7 +11,7 @@ import StatisticsCards from '@/components/industry/statistics-cards'
 import Stripes from "@/public/images/stripes-dark.svg";
 import { getMessages } from '@/utils/get-messages'
 import { IntlMessageFormat } from 'intl-messageformat';
-
+import {  Text } from '@mantine/core';
 interface Knowledge {
   id: number
   type: string
@@ -203,6 +203,10 @@ export default async function SubIndustryPage({ params }: Props) {
                         </div>
                         
                         {topic.knowledge.length > 0 ? (
+                      <>
+                          <Text size="xs" color="gray" fw={500} pb={5}>
+                          {locale === 'ar' ? 'المعرفة:' : 'Knowledge:'}
+                        </Text>
                           <ul className="space-y-1">
                             {topic.knowledge.map((item: Knowledge, index: number) => (
                               <li
@@ -215,7 +219,7 @@ export default async function SubIndustryPage({ params }: Props) {
                                 </Link>
                               </li>
                             ))}
-                          </ul>
+                          </ul></>
                         ) : (
                           <div className="text-xs text-gray-500 italic flex items-center">
                             <span className={isRTL ? "ml-2" : "mr-2"}>•</span>
