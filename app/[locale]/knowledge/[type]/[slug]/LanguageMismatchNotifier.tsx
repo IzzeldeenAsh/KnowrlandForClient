@@ -140,12 +140,12 @@ export default function LanguageMismatchNotifier({
           <div className="text-left space-y-3">
             {/* English message */}
             <div className="text-white/90 text-base font-medium leading-relaxed">
-              For better readability, it's recommended to switch to {targetLanguage}
+              For better experience, it's recommended to switch to {targetLanguage}
             </div>
             
             {/* Arabic message (with explicit left alignment) */}
-            <div className="text-white/90 text-base font-medium text-left leading-relaxed">
-              للحصول على قراءة أفضل، يُفضل التبديل إلى اللغة {targetLanguage === 'Arabic' ? 'العربية' : 'الإنجليزية'}
+            <div className="text-white/90 text-base font-medium text-right leading-relaxed">
+              للحصول على تجربة أفضل، يُفضل التبديل إلى اللغة {targetLanguage === 'Arabic' ? 'العربية' : 'الإنجليزية'}
             </div>
           </div>
         </div>

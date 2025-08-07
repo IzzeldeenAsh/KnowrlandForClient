@@ -132,7 +132,9 @@ export default function SubIndustryByTypePage({ params }: Props) {
             </div>
           ) : (
             <div>
-              <Text ps={4} pb={8} size='md' fw={600}>{locale ==='ar' ? '  المواضيع:' : 'Topics:'}</Text>
+            <h2 className="text-xl font-bold text-transparent bg-gradient-to-r from-blue-500 to-teal-400 bg-clip-text mb-8">
+              {locale === 'ar' ? 'المواضيع:' : 'Topics:'}
+            </h2>
               <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
                 {subIndustry?.topic?.map((topic: any) => (
                   <div
@@ -151,6 +153,9 @@ export default function SubIndustryByTypePage({ params }: Props) {
                       </Link>
                       {topic?.knowledge && topic.knowledge.length > 0 ? (
                         <div>
+                          <Text size="xs" color="gray" fw={500} pb={5}>
+                          {locale === 'ar' ? 'المعرفة:' : 'Knowledge:'}
+                        </Text>
                           <ul className="space-y-2">
                             {topic.knowledge.map((item: any) => (
                               <li key={item.id} className="text-xs text-gray-600 hover:text-blue-600 transition-colors flex items-center">
