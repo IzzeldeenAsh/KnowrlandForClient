@@ -41,19 +41,44 @@ const Toast: React.FC<ToastProps> = ({
     };
   }, [delay, onClose]);
 
-  // Get icon, color, and background color based on type
-  const getIconStyles = () => {
+  // Get icon, color, background color and border color based on type
+  const getStyles = () => {
     switch(type) {
       case 'success':
-        return { icon: <IconCheck size={10} style={{ fontWeight: 'bold' }} />, color: '#50CD89', bgColor: '#E8FFF3', };
+        return { 
+          icon: <IconCheck size={10} style={{ fontWeight: 'bold' }} />, 
+          color: '#50CD89', 
+          bgColor: '#E9F6EE',
+          borderColor: '#BBF7D0'
+        };
       case 'error':
-        return { icon: <IconX size={10} style={{ fontWeight: 'bold' }} />, color: '#F1416C', bgColor: '#FFF5F8', };
+        return { 
+          icon: <IconX size={10} style={{ fontWeight: 'bold' }} />, 
+          color: '#F1416C', 
+          bgColor: '#FFF2F3',
+          borderColor: '#FECACA'
+        };
       case 'warning':
-        return { icon: <IconAlertCircle size={10} style={{ fontWeight: 'bold' }} />, color: '#FFC700', bgColor: '#FFF8DD', };
+        return { 
+          icon: <IconAlertCircle size={10} style={{ fontWeight: 'bold' }} />, 
+          color: '#FFC700', 
+          bgColor: '#FFFCEA',
+          borderColor: '#FEF08A'
+        };
       case 'info':
-        return { icon: <IconInfoCircle size={10} style={{ fontWeight: 'bold' }} />, color: '#009EF7', bgColor: '#F1FAFF', };
+        return { 
+          icon: <IconInfoCircle size={10} style={{ fontWeight: 'bold' }} />, 
+          color: '#009EF7', 
+          bgColor: '#F0F7FF',
+          borderColor: '#BFDBFE'
+        };
       default:
-        return { icon: <IconInfoCircle size={10} style={{ fontWeight: 'bold' }} />, color: '#009EF7', bgColor: '#F1FAFF', };
+        return { 
+          icon: <IconInfoCircle size={10} style={{ fontWeight: 'bold' }} />, 
+          color: '#009EF7', 
+          bgColor: '#F0F7FF',
+          borderColor: '#BFDBFE'
+        };
     }
   };
 
@@ -97,16 +122,24 @@ const Toast: React.FC<ToastProps> = ({
         opacity: show ? 1 : 0,
         transition: 'opacity 0.15s ease-in-out',
         minWidth: '350px',
-        maxWidth: '500px'
+        maxWidth: '500px',
+        backgroundColor: getStyles().bgColor,
+        borderColor: getStyles().borderColor,
+        borderWidth: '2px',
+        borderStyle: 'solid'
       }}
     >
-      <div className="toast-header" style={{ padding: '16px' }}>
+      <div className="toast-header" style={{ 
+        padding: '16px', 
+        backgroundColor: getStyles().bgColor,
+        borderBottom: 'none'
+      }}>
         {/* Icon based on toast type with light background */}
         <div 
           className="me-3"
           style={{ 
-            color: getIconStyles().color,
-            backgroundColor: getIconStyles().bgColor,
+            color: getStyles().color,
+            backgroundColor: getStyles().bgColor,
             display: 'inline-flex',
             alignItems: 'center',
             justifyContent: 'center',
@@ -116,7 +149,7 @@ const Toast: React.FC<ToastProps> = ({
             padding: '4px'
           }}
         >
-          {getIconStyles().icon}
+          {getStyles().icon}
         </div>
         {/* Title with fs-4 equivalent font size */}
         <strong 
