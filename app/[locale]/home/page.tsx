@@ -572,9 +572,9 @@ export default function HomePage() {
   // Effect to directly trigger search when URL has query parameters
   useEffect(() => {
     // Only run this effect once on initial mount
+
     if (initialized) return;
-    
-    const query = searchParams.get('keyword');
+      const query = searchParams.get('keyword');
     const type = searchParams.get('search_type') as 'knowledge' | 'insighter';
     const accuracy = searchParams.get('accuracy');
     const language = searchParams.get('language');

@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useRouter, useSearchParams, useParams } from 'next/navigation';
 import Link from 'next/link';
+import Image from 'next/image';
 import {
   Container,
   Text,
@@ -22,7 +23,7 @@ import KnowledgeGrid from '@/app/[locale]/topic/[id]/[slug]/KnowledgeGrid';
 import KnowledgeList from '@/components/knowledge-list/KnowledgeList';
 import PageIllustration from '@/components/page-illustration';
 import { ListBulletIcon, Squares2X2Icon } from '@heroicons/react/24/outline';
-
+import Stripes from "@/public/images/stripes-dark.svg";
 interface FetchKnowledgeProps {
   taxonomy?: string;
   id?: string;
@@ -122,7 +123,8 @@ export default function KnowledgesClient() {
     manual: isRTL ? 'أدلة' : 'Manual',
     course: isRTL ? 'دورات' : 'Course',
     report: isRTL ? 'تقارير' : 'Report',
-    filteredResults: isRTL ? 'نتائج المرشحات' : 'Filtered Results'
+    filteredResults: isRTL ? 'نتائج المرشحات' : 'Filtered Results',
+    knowledge: isRTL ? 'معرفة' : 'Knowledge'
   };
 
   // Get filter values from URL query parameters
@@ -157,6 +159,12 @@ export default function KnowledgesClient() {
     { value: 'course', label: translations.course },
     { value: 'report', label: translations.report },
   ];
+
+  // Get the current knowledge type label for header
+  const getCurrentTypeLabel = () => {
+    const typeObj = knowledgeTypes.find(type => type.value === selectedType);
+    return typeObj ? typeObj.label : translations.data;
+  };
 
   // Fetch sub-industries when industry changes
   useEffect(() => {
@@ -294,6 +302,41 @@ export default function KnowledgesClient() {
   return (
     <>
        <PageIllustration />
+       <div className="relative z-10 max-w-6xl relative mx-auto  w-full ">
+      <div
+        className="pointer-events-none absolute z-10 -translate-x-1/2 transform hidden md:block"
+        style={{ left: '28%' }}
+        aria-hidden="true"
+      >
+        <Image
+          className="max-w-none opacity-50"
+          src={Stripes}
+          width={768}
+          height={768}
+          style={{ width: 'auto', height: 'auto' }}
+          alt="Stripes"
+          priority
+        />
+      </div>
+      </div>
+       {/* Header Section */}
+       <div className="section-header px-4 sm:px-6 lg:px-8 py-8 relative overflow-hidden rounded-lg">
+          <Image
+                   alt="Section background"
+                   src="https://res.cloudinary.com/dsiku9ipv/image/upload/v1737266454/breadcrumb-bg-2_anwto8.png"
+                   fill
+                   className="object-cover z-0"
+                   priority
+                 />
+         <div className="relative z-10 max-w-6xl relative mx-auto mt-5 w-full">
+           <div className="text-start" data-aos="fade-down">
+             <h3 className="text-md bg-gradient-to-r from-blue-500 to-teal-400 md:text-3xl font-extrabold text-transparent bg-clip-text mb-4">
+               {getCurrentTypeLabel()} {translations.knowledge}
+             </h3>
+           </div>
+         </div>
+       </div>
+
        <div className='container mx-auto px-3 sm:px-4 pb-12 sm:pb-16 md:pb-20'  style={{position: 'relative', zIndex: 1}} >
    
       
