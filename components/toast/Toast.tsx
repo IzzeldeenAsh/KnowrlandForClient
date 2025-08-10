@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect, useRef } from 'react';
-import { IconCheck, IconX, IconInfoCircle, IconAlertCircle } from '@tabler/icons-react';
+import { IconCheck, IconX, IconInfoCircle, IconAlertTriangle } from '@tabler/icons-react';
 
 interface ToastProps {
   message: string;
@@ -41,43 +41,48 @@ const Toast: React.FC<ToastProps> = ({
     };
   }, [delay, onClose]);
 
-  // Get icon, color, background color and border color based on type
+  // Get icon and colors based on type - matching PrimeNG design
   const getStyles = () => {
     switch(type) {
       case 'success':
         return { 
-          icon: <IconCheck size={10} style={{ fontWeight: 'bold' }} />, 
-          color: '#50CD89', 
-          bgColor: '#E9F6EE',
-          borderColor: '#BBF7D0'
+          icon: <IconCheck size={20} />, 
+          iconColor: '#22c55e',
+          borderColor: '#22c55e',
+          backgroundColor: '#dcfce7',
+          textColor: '#15803d'
         };
       case 'error':
         return { 
-          icon: <IconX size={10} style={{ fontWeight: 'bold' }} />, 
-          color: '#F1416C', 
-          bgColor: '#FFF2F3',
-          borderColor: '#FECACA'
+          icon: <IconX size={20} />, 
+          iconColor: '#ef4444',
+          borderColor: '#ef4444',
+          backgroundColor: '#fee2e2',
+          textColor: '#dc2626'
         };
       case 'warning':
         return { 
-          icon: <IconAlertCircle size={10} style={{ fontWeight: 'bold' }} />, 
-          color: '#FFC700', 
-          bgColor: '#FFFCEA',
-          borderColor: '#FEF08A'
+          icon: <IconAlertTriangle size={20} />, 
+          iconColor: '#f59e0b',
+          borderColor: '#f59e0b',
+          backgroundColor: '#fef3c7',
+          textColor: '#d97706'
         };
       case 'info':
         return { 
-          icon: <IconInfoCircle size={10} style={{ fontWeight: 'bold' }} />, 
-          color: '#009EF7', 
-          bgColor: '#F0F7FF',
-          borderColor: '#BFDBFE'
+          icon: <IconInfoCircle size={20} />, 
+          iconColor: '#3b82f6',
+          borderColor: '#3b82f6',
+          backgroundColor: '#dbeafe',
+          textColor: '#2563eb'
         };
       default:
         return { 
-          icon: <IconInfoCircle size={10} style={{ fontWeight: 'bold' }} />, 
-          color: '#009EF7', 
-          bgColor: '#F0F7FF',
-          borderColor: '#BFDBFE'
+          icon: <IconInfoCircle size={20} />, 
+          iconColor: '#3b82f6',
+          borderColor: '#3b82f6',
+          backgroundColor: '#dbeafe',
+          textColor: '#2563eb'
         };
     }
   };
@@ -88,15 +93,31 @@ const Toast: React.FC<ToastProps> = ({
     
     switch(type) {
       case 'success':
-        return 'Success';
+        return 'test';
       case 'error':
-        return 'Error';
+        return 'test';
       case 'warning':
-        return 'Warning';
+        return 'test';
       case 'info':
-        return 'Information';
+        return 'test';
       default:
-        return 'Notification';
+        return 'test';
+    }
+  };
+
+  // Get message based on type
+  const getTypeMessage = () => {
+    switch(type) {
+      case 'success':
+        return 'success';
+      case 'error':
+        return 'danger';
+      case 'warning':
+        return 'warning';
+      case 'info':
+        return 'info';
+      default:
+        return message;
     }
   };
 
@@ -107,94 +128,91 @@ const Toast: React.FC<ToastProps> = ({
     }
   };
 
-  // Get timestamp text for the toast notification
-  const getTimeText = () => {
-    return 'Just now'; // In a real implementation, you'd calculate this
-  };
+  const styles = getStyles();
 
   return (
     <div 
-      className={`toast fade ${show ? 'show' : ''}`} 
       role="alert" 
       aria-live="assertive" 
       aria-atomic="true"
       style={{
         opacity: show ? 1 : 0,
-        transition: 'opacity 0.15s ease-in-out',
-        minWidth: '350px',
-        maxWidth: '500px',
-        backgroundColor: getStyles().bgColor,
-        borderColor: getStyles().borderColor,
-        borderWidth: '2px',
-        borderStyle: 'solid'
+        transform: show ? 'translateY(0)' : 'translateY(-10px)',
+        transition: 'all 0.3s ease-in-out',
+        minWidth: '300px',
+        maxWidth: '400px',
+        backgroundColor: styles.backgroundColor,
+        border: 'none',
+        borderRadius: '6px',
+        borderLeft: `4px solid ${styles.borderColor}`,
+        boxShadow: '0 4px 12px rgba(0, 0, 0, 0.15)',
+        display: 'flex',
+        alignItems: 'flex-start',
+        padding: '16px',
+        gap: '12px',
+        fontFamily: 'system-ui, -apple-system, sans-serif'
       }}
     >
-      <div className="toast-header" style={{ 
-        padding: '16px', 
-        backgroundColor: getStyles().bgColor,
-        borderBottom: 'none'
+      {/* Icon */}
+      <div style={{ 
+        color: styles.iconColor,
+        flexShrink: 0,
+        marginTop: '2px'
       }}>
-        {/* Icon based on toast type with light background */}
-        <div 
-          className="me-3"
-          style={{ 
-            color: getStyles().color,
-            backgroundColor: getStyles().bgColor,
-            display: 'inline-flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            width: '22px',
-            height: '22px',
-            borderRadius: '50%',
-            padding: '4px'
-          }}
-        >
-          {getStyles().icon}
-        </div>
-        {/* Title with fs-4 equivalent font size */}
-        <strong 
-          className="me-auto" 
-          style={{ 
-            fontSize: '1.1rem', // fs-4 equivalent
-            fontWeight: '600'
-          }}
-        >
+        {styles.icon}
+      </div>
+
+      {/* Content */}
+      <div style={{ flex: 1, minWidth: 0 }}>
+        {/* Title */}
+        <div style={{ 
+          fontSize: '14px',
+          fontWeight: '600',
+          color: styles.textColor,
+          marginBottom: '4px',
+          lineHeight: '1.2'
+        }}>
           {getDefaultTitle()}
-        </strong>
-        {/* Timestamp with fs-6 equivalent */}
-        <small 
-          className="toast-time" 
-          style={{ 
-            fontSize: '0.875rem' // fs-6 equivalent
-          }}
-        >
-          {getTimeText()}
-        </small>
-        {/* Close button with fs-5 equivalent */}
-        <button 
-          type="button" 
-          className="btn-close" 
-          onClick={handleClose} 
-          aria-label="Close"
-          style={{ 
-            fontSize: '1rem', // fs-5 equivalent
-            fontWeight: 'normal', 
-            opacity: 0.5,
-            marginLeft: '8px'
-          }}
-        >
-          ×
-        </button>
+        </div>
+        
+        {/* Message */}
+        <div style={{ 
+          fontSize: '14px',
+          color: styles.textColor,
+          lineHeight: '1.3',
+          opacity: 0.9
+        }}>
+          {message || getTypeMessage()}
+        </div>
       </div>
-      <div 
-        className="toast-body" 
+
+      {/* Close button */}
+      <button 
+        type="button" 
+        onClick={handleClose} 
+        aria-label="Close"
         style={{ 
-          fontSize: '1rem', // fs-5 equivalent
-          padding: '16px'
+          background: 'none',
+          border: 'none',
+          color: styles.textColor,
+          cursor: 'pointer',
+          fontSize: '18px',
+          lineHeight: '1',
+          opacity: 0.6,
+          padding: '0',
+          flexShrink: 0,
+          marginTop: '2px',
+          width: '20px',
+          height: '20px',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center'
         }}
+        onMouseEnter={(e) => e.currentTarget.style.opacity = '1'}
+        onMouseLeave={(e) => e.currentTarget.style.opacity = '0.6'}
       >
-        {message}
-      </div>
+        ×
+      </button>
     </div>
   );
 };
