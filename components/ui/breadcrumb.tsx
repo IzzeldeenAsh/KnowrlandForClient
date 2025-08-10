@@ -12,9 +12,10 @@ interface BreadcrumbItem {
 
 interface BreadcrumbProps {
   items: BreadcrumbItem[];
+  makeLastItemClickable?: boolean;
 }
 
-export default function Breadcrumb({ items }: BreadcrumbProps) {
+export default function Breadcrumb({ items, makeLastItemClickable = false }: BreadcrumbProps) {
   const pathname = usePathname();
   const currentLocale = pathname.split('/')[1];
   const isRTL = currentLocale === 'ar';
@@ -76,7 +77,7 @@ export default function Breadcrumb({ items }: BreadcrumbProps) {
         ) : (
           <ChevronRightIcon className="h-4 w-4 text-gray-400 flex-shrink-0" />
         )}
-        {isLastItem ? (
+        {isLastItem && !makeLastItemClickable ? (
           <span
             className={`${isRTL ? 'mr-2' : 'ml-2'} text-sm whitespace-nowrap truncate max-w-[150px] sm:max-w-none inline-block text-gray-900 font-medium`}
             aria-current="page"
@@ -87,7 +88,7 @@ export default function Breadcrumb({ items }: BreadcrumbProps) {
         ) : (
           <Link
             href={(item.label === "Industries" || item.label === "المجالات") ? `/${currentLocale}/all-industries` : `/${currentLocale}/${item.href}`}
-            className={`${isRTL ? 'mr-2' : 'ml-2'} text-sm whitespace-nowrap truncate max-w-[150px] sm:max-w-none inline-block text-gray-500 hover:text-gray-700`}
+            className={`${isRTL ? 'mr-2' : 'ml-2'} text-sm whitespace-nowrap truncate max-w-[150px] sm:max-w-none inline-block ${isLastItem && makeLastItemClickable ? 'text-gray-900 font-medium' : 'text-gray-500 hover:text-gray-700'}`}
             title={item.label} // Add title for hover tooltip on truncated text
           >
             {item.label}
