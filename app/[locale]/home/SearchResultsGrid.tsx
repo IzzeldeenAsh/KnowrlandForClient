@@ -582,7 +582,7 @@ export default function SearchResultsGrid({
           </div>
           
           <div
-            className={`grid sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 gap-4 max-w-7xl 2xl:max-w-none 2xl:mx-8 mx-auto`}
+            className={`grid sm:grid-cols-2 lg:grid-cols-3 3xl:grid-cols-4 gap-4 max-w-7xl 2xl:max-w-none 2xl:mx-8 mx-auto`}
           >
             {topicItems.map((item, index) => (
               <Card
