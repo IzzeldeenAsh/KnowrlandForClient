@@ -156,7 +156,7 @@ export default function StatisticsCards({ type, id, entityName }: StatisticsCard
         {statistics.map((stat) => (
           <Link 
             key={stat.type} 
-            href={`/${locale}/knowledges?taxonomy=${type =='subIndustry' ? 'sub_industry' : type}&id=${id}&type=${stat.type}`}
+            href={`/${locale}/knowledges?taxonomy=${type =='subIndustry' ? 'sub_industry' : type}&id=${id}&type=${stat.type}&entityName=${entityName}`}
           >
             <div key={stat.type} className={styles.statsCard}>
               <div className="flex items-center gap-2 mb-1">

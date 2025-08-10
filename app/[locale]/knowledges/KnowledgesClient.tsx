@@ -22,6 +22,8 @@ import { useAllIndustries } from '@/hooks/industries/useAllIndustries';
 import KnowledgeGrid from '@/app/[locale]/topic/[id]/[slug]/KnowledgeGrid';
 import KnowledgeList from '@/components/knowledge-list/KnowledgeList';
 import PageIllustration from '@/components/page-illustration';
+import Breadcrumb from '@/components/ui/breadcrumb';
+import { fetchBreadcrumb } from '@/utils/breadcrumb';
 import { ListBulletIcon, Squares2X2Icon } from '@heroicons/react/24/outline';
 import Stripes from "@/public/images/stripes-dark.svg";
 interface FetchKnowledgeProps {
@@ -132,17 +134,20 @@ export default function KnowledgesClient() {
   const idParam = searchParams.get('id') || '';
   const typeParam = searchParams.get('type') || 'data';
   const pageParam = parseInt(searchParams.get('page') || '1', 10);
+  const entityNameParam = searchParams.get('entityName') || '';
 
   // State for filters
   const [taxonomy, setTaxonomy] = useState<string>(taxonomyParam);
   const [selectedId, setSelectedId] = useState<string>(idParam);
   const [selectedType, setSelectedType] = useState<string>(typeParam);
   const [page, setPage] = useState<number>(pageParam);
+  const [entityName, setEntityName] = useState<string>(entityNameParam);
   const [view, setView] = useState<'grid' | 'list'>('grid');
   
   // State for data
   const [knowledgeItems, setKnowledgeItems] = useState<KnowledgeItem[]>([]);
   const [pagination, setPagination] = useState<PaginationMeta | null>(null);
+  const [breadcrumbItems, setBreadcrumbItems] = useState<{label: string, href: string}[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -216,6 +221,54 @@ export default function KnowledgesClient() {
     }
   }, [selectedId, taxonomy, locale]);
 
+  // Fetch breadcrumb data when taxonomy/id changes
+  useEffect(() => {
+    if (selectedId && taxonomy) {
+      const breadcrumbType = taxonomy === 'sub_industry' ? 'sub-industry' : taxonomy;
+      fetchBreadcrumb(breadcrumbType as 'industry' | 'sub-industry' | 'topic', parseInt(selectedId), locale)
+        .then((breadcrumbData) => {
+          const items = breadcrumbData.map((item, index) => {
+            // If this is the last item, modify the href to point to the original entity page
+            if (index === breadcrumbData.length - 1) {
+              let entityUrl = '';
+              switch (taxonomy) {
+                case 'industry':
+                  // For industry, we need the slug from the entity name
+                  const industrySlug = entityName ? entityName.toLowerCase().replace(/\s+/g, '-').replace(/[&]/g, '').replace(/--+/g, '-') : 'slug';
+                  entityUrl = `industry/${selectedId}/${industrySlug}`;
+                  break;
+                case 'sub_industry':
+                  // For sub-industry, we need the slug from the URL or entity name
+                  const slug = entityName ? entityName.toLowerCase().replace(/\s+/g, '-').replace(/[&]/g, '').replace(/--+/g, '-') : 'slug';
+                  entityUrl = `sub-industry/${selectedId}/${slug}`;
+                  break;
+                case 'topic':
+                  // For topic, we need the slug from the entity name
+                  const topicSlug = entityName ? entityName.toLowerCase().replace(/\s+/g, '-').replace(/[&]/g, '').replace(/--+/g, '-') : 'slug';
+                  entityUrl = `topic/${selectedId}/${topicSlug}`;
+                  break;
+              }
+              return {
+                label: item.label,
+                href: entityUrl
+              };
+            }
+            return {
+              label: item.label,
+              href: item.url
+            };
+          });
+          setBreadcrumbItems(items);
+        })
+        .catch((error) => {
+          console.error('Error fetching breadcrumb:', error);
+          setBreadcrumbItems([]);
+        });
+    } else {
+      setBreadcrumbItems([]);
+    }
+  }, [taxonomy, selectedId, entityName, locale]);
+
   // Fetch knowledge items when filters change
   useEffect(() => {
     if (selectedId) {
@@ -249,10 +302,11 @@ export default function KnowledgesClient() {
     if (taxonomy) params.set('taxonomy', taxonomy);
     if (selectedId) params.set('id', selectedId);
     if (selectedType) params.set('type', selectedType);
+    if (entityName) params.set('entityName', entityName);
     if (page > 1) params.set('page', page.toString());
 
     router.push(`/${locale}/knowledges?${params.toString()}`);
-  }, [taxonomy, selectedId, selectedType, page, locale, router]);
+  }, [taxonomy, selectedId, selectedType, entityName, page, locale, router]);
 
   // Handle filter changes
   const handleTaxonomyChange = (value: string) => {
@@ -329,9 +383,17 @@ export default function KnowledgesClient() {
                    priority
                  />
          <div className="relative z-10 max-w-6xl relative mx-auto mt-5 w-full">
+           {/* Breadcrumb */}
+           {breadcrumbItems.length > 0 && (
+             <div className="mb-8">
+               <Breadcrumb items={breadcrumbItems} makeLastItemClickable={true} />
+             </div>
+           )}
+           
            <div className="text-start" data-aos="fade-down">
              <h3 className="text-md bg-gradient-to-r from-blue-500 to-teal-400 md:text-3xl font-extrabold text-transparent bg-clip-text mb-4">
                {getCurrentTypeLabel()} {translations.knowledge}
+               {entityName && ` in ${entityName}`}
              </h3>
            </div>
          </div>
