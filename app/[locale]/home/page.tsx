@@ -1324,9 +1324,9 @@ export default function HomePage() {
        </div>
             {/* <h1 className="text-4xl font-extrabold tracking-tight sm:text-5xl md:text-6xl">{locale === 'ar' ? 'اكتشف المعرفة بسرعة الضوء' : 'Discover Knowledge at Light Speed'}</h1>*/}
            
-           <p className="mx-auto mt-4 max-w-2xl text-base text-gray-600 sm:text-lg md:mt-5 md:max-w-4xl md:text-lg">
+           {/* <p className="mx-auto mt-4 max-w-2xl text-base text-gray-600 sm:text-lg md:mt-5 md:max-w-4xl md:text-lg">
              {locale === 'ar' ? 'الوصول للمعلومات المميزة والمقالات والتحليلات. ابحث واكتشف وتعلم.' : 'Access premium information, data, and insights. Search, discover, and learn.'}
-           </p> 
+           </p>  */}
            
            {/* Search Bar Prominent Placement */}
            <div className="mx-auto mt-8 max-w-3xl shadow-md">
