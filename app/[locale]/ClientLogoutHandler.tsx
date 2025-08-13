@@ -69,13 +69,6 @@ export default function ClientLogoutHandler() {
       const localStorageToken = localStorage.getItem('token');
       const userData = localStorage.getItem('user');
 
-      console.log('[ClientLogoutHandler] Auth check:', {
-        hasCookieToken: !!cookieToken,
-        hasLocalStorageToken: !!localStorageToken,
-        hasUserData: !!userData,
-        domain: window.location.hostname,
-        pathname
-      });
 
       // If we have localStorage data but no cookie token, we need to clean up and redirect
       if (!cookieToken && (localStorageToken || userData)) {
