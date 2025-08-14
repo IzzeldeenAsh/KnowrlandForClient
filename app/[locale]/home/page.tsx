@@ -91,8 +91,26 @@ export default function HomePage() {
   const [accuracyFilter, setAccuracyFilter] = useState<'any' | 'all'>(initialAccuracy);
   const [roleFilter, setRoleFilter] = useState<'all' | 'company' | 'individual'>(initialRole);
   
-  // Add state for filter visibility
+  // Add state for filter visibility and drawer
   const [filtersVisible, setFiltersVisible] = useState(true);
+  const [isFilterDrawerOpen, setIsFilterDrawerOpen] = useState(false);
+  const [isTabletOrMobile, setIsTabletOrMobile] = useState(false);
+
+  // Handle responsive behavior
+  useEffect(() => {
+    const handleResize = () => {
+      setIsTabletOrMobile(window.innerWidth <= 1024);
+    };
+    
+    // Initial check
+    handleResize();
+    
+    // Add event listener
+    window.addEventListener('resize', handleResize);
+    
+    // Cleanup
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
   
   // Add state for statistics
   const [statistics, setStatistics] = useState<StatisticsItem[]>([]);
@@ -1472,10 +1490,17 @@ export default function HomePage() {
             {/* Filter toggle button */}
             <div className="mb-4 flex justify-start">
               <button
-                onClick={() => setFiltersVisible(!filtersVisible)}
+                onClick={() => {
+                  // On tablet/mobile, open drawer instead of toggling sidebar
+                  if (isTabletOrMobile) {
+                    setIsFilterDrawerOpen(true);
+                  } else {
+                    setFiltersVisible(!filtersVisible);
+                  }
+                }}
                 className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 hover:text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 shadow-sm"
               >
-                {filtersVisible ? (
+                {filtersVisible && !isTabletOrMobile ? (
                   <>
                    <svg fill="none" height="24" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg"><g clipRule="evenodd" fill-rule="evenodd"><path d="m11 20v-16h2v16z" fill="#90caea"/><g fill="#3747d6"><path d="m16.9142 12 2.7929-2.79289-1.4142-1.41422-3.5 3.50001c-.3905.3905-.3905 1.0237 0 1.4142l3.5 3.5 1.4142-1.4142z"/><path d="m7.0858 12-2.79289-2.79289 1.41421-1.41422 3.5 3.50001c.39053.3905.39053 1.0237 0 1.4142l-3.5 3.5-1.41421-1.4142z"/></g></g></svg>
                     {locale === 'ar' ? 'إخفاء المرشحات' : 'Hide Filters'}
@@ -1542,6 +1567,8 @@ export default function HomePage() {
                       roleFilter={roleFilter}
                       setRoleFilter={handleRoleFilterChange}
                       resetFilters={resetFilters}
+                      isDrawerOpen={isFilterDrawerOpen}
+                      setIsDrawerOpen={setIsFilterDrawerOpen}
                     />
                 </div>
               </div>

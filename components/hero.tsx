@@ -184,15 +184,15 @@ export default function Hero() {
                 <form onSubmit={handleSubmit} className="flex flex-col items-center gap-3">
                   <div className="relative w-full">
                     {/* Integrated search bar with dropdown */}
-                    <div className="flex w-full bg-white border border-gray-300 rounded-md shadow-lg overflow-hidden" style={{ minHeight: '60px' }}>
+                    <div className="flex flex-wrap sm:flex-nowrap items-center w-full bg-white border border-gray-300 rounded-md shadow-lg overflow-hidden p-2" style={{ minHeight: '60px' }}>
                       {/* Dropdown selector */}
                       <div 
                         onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-                        className={`flex items-center justify-between px-5 py-4 border-r border-gray-300 cursor-pointer min-w-[170px] ${currentLocale === 'ar' ? 'border-l' : 'border-r'}`}
+                        className={`flex items-center justify-between cursor-pointer px-2 mb-2 sm:mb-0 sm:me-3 w-full sm:w-auto ${currentLocale === 'ar' ? 'sm:border-l' : 'sm:border-r'} sm:border-gray-200 sm:pr-3 relative`}
                       >
                         <div className="flex items-center">
                           {/* Display the icon based on selected option */}
-                          <div className="flex items-center justify-center w-6 h-6 bg-blue-50 rounded-md mr-2">
+                          <div className={`flex items-center justify-center w-6 h-6 bg-blue-50 rounded-md ${currentLocale === 'ar' ? 'ml-2' : 'mr-2'}`}>
                             {searchType === 'knowledge' ? (
                               <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4 text-blue-600" width="24" height="24" viewBox="0 0 24 24" strokeWidth="2" stroke="currentColor" fill="none" strokeLinecap="round" strokeLinejoin="round">
                                 <path stroke="none" d="M0 0h24v24H0z" fill="none" />
@@ -219,86 +219,93 @@ export default function Hero() {
                           </span>
                         </div>
                         <svg 
-                          xmlns="http://www.w3.org/2000/svg" 
-                          className="w-5 h-5 text-gray-500 ml-2"
-                          viewBox="0 0 20 20" 
-                          fill="currentColor"
+                          className={`w-5 h-5 text-gray-500 ${currentLocale === 'ar' ? 'mr-2' : 'ml-2'}`} 
+                          fill="none" 
+                          stroke="currentColor" 
+                          viewBox="0 0 24 24" 
+                          xmlns="http://www.w3.org/2000/svg"
                         >
                           <path 
-                            fillRule="evenodd" 
-                            d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" 
-                            clipRule="evenodd" 
-                          />
+                            strokeLinecap="round" 
+                            strokeLinejoin="round" 
+                            strokeWidth="2" 
+                            d={currentLocale === 'ar' ? "M15 19l-7-7 7-7" : "M19 9l-7 7-7-7"}
+                          ></path>
                         </svg>
                       </div>
                       
                       {/* Search input field */}
-                      <input
-                        ref={searchInputRef}
-                        type="text"
-                        value={searchInput}
-                        onChange={(e) => setSearchInput(e.target.value)}
-                        onFocus={() => searchInput && suggestions.length > 0 && setShowSuggestions(true)}
-                        onKeyDown={handleKeyDown}
-                        placeholder={window.innerWidth < 768 ? t('searchPlaceholderMobile') : t('searchPlaceholder')}
-                        className="flex-1 px-6 py-4 md:text-lg text-base bg-transparent placeholder-gray-500 text-gray-800 focus:outline-none focus:ring-0 border-0"
-                        autoComplete="off"
-                      />
+                      <div className="flex flex-1 items-center w-full sm:w-auto">
+                        <input
+                          ref={searchInputRef}
+                          type="text"
+                          value={searchInput}
+                          onChange={(e) => setSearchInput(e.target.value)}
+                          onFocus={() => searchInput && suggestions.length > 0 && setShowSuggestions(true)}
+                          onKeyDown={handleKeyDown}
+                          placeholder={window.innerWidth < 768 ? t('searchPlaceholderMobile') : t('searchPlaceholder')}
+                          className="flex-1 outline-none bg-transparent border-none focus-outline-none focus:border-none focus:ring-0 md:text-lg text-base placeholder-gray-500 text-gray-800 w-full"
+                          autoComplete="off"
+                          dir={currentLocale === 'ar' ? 'rtl' : 'ltr'}
+                        />
                       
-                      {/* Loading indicator */}
-                      {isLoading && (
-                        <div className="flex items-center mr-2">
-                          <svg className="animate-spin h-5 w-5 text-blue-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                          </svg>
-                        </div>
-                      )}
-                      
-                      {/* Clear button */}
-                      {searchInput && !isLoading && (
+                        {/* Clear button - show when there's text in the input */}
+                        {searchInput.trim().length > 0 && (
+                          <button
+                            type="button"
+                            className="mr-2 p-1 text-gray-400 hover:text-gray-600 flex items-center justify-center"
+                            onClick={handleClearSearch}
+                            aria-label="Clear search"
+                          >
+                            <svg
+                              className="w-4 h-4"
+                              fill="none"
+                              stroke="currentColor"
+                              viewBox="0 0 24 24"
+                              xmlns="http://www.w3.org/2000/svg"
+                            >
+                              <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                strokeWidth={2}
+                                d="M6 18L18 6M6 6l12 12"
+                              />
+                            </svg>
+                          </button>
+                        )}
+
+                        {/* Loading indicator */}
+                        {isLoading && (
+                          <div className="flex items-center justify-center mr-2">
+                            <svg className="animate-spin h-4 w-4 text-blue-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                              <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                            </svg>
+                          </div>
+                        )}
+                        
+                        {/* Search button */}
                         <button
-                          type="button"
-                          onClick={handleClearSearch}
-                          className="flex items-center justify-center px-2 hover:bg-gray-100 transition duration-300"
+                          type="submit"
+                          className="ml-2 bg-blue-600 text-white p-2 rounded-md flex items-center justify-center hover:bg-blue-700 transition duration-300"
+                          aria-label="Search"
                         >
                           <svg
-                            className="w-5 h-5 text-gray-400 hover:text-gray-600"
-                            fill="none"
+                            className="w-5 h-5"
+                            fill="none" 
                             stroke="currentColor"
                             viewBox="0 0 24 24"
                             xmlns="http://www.w3.org/2000/svg"
                           >
                             <path
                               strokeLinecap="round"
-                              strokeLinejoin="round"
+                              strokeLinejoin="round" 
                               strokeWidth={2}
-                              d="M6 18L18 6M6 6l12 12"
+                              d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
                             />
                           </svg>
                         </button>
-                      )}
-                      
-                      {/* Search button */}
-                      <button
-                        type="submit"
-                        className="flex items-center justify-center px-6 hover:bg-gray-100 transition duration-300"
-                      >
-                        <svg
-                          className="w-7 h-7 text-blue-600"
-                          fill="none" 
-                          stroke="currentColor"
-                          viewBox="0 0 24 24"
-                          xmlns="http://www.w3.org/2000/svg"
-                        >
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round" 
-                            strokeWidth={2}
-                            d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-                          />
-                        </svg>
-                      </button>
+                      </div>
                     </div>
                     
                     {/* Dropdown menu */}
@@ -312,7 +319,7 @@ export default function Hero() {
                           }}
                         >
                           <div className="flex items-center">
-                            <div className="flex items-center justify-center w-6 h-6 bg-blue-50 rounded-md mr-3">
+                            <div className={`flex items-center justify-center w-6 h-6 bg-blue-50 rounded-md ${currentLocale === 'ar' ? 'ml-2' : 'mr-3'}`}>
                               <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4 text-blue-600" width="24" height="24" viewBox="0 0 24 24" strokeWidth="2" stroke="currentColor" fill="none" strokeLinecap="round" strokeLinejoin="round">
                                 <path stroke="none" d="M0 0h24v24H0z" fill="none" />
                                 <path d="M3 19a9 9 0 0 1 9 0a9 9 0 0 1 9 0" />
@@ -333,7 +340,7 @@ export default function Hero() {
                           }}
                         >
                           <div className="flex items-center">
-                            <div className="flex items-center justify-center w-6 h-6 bg-blue-50 rounded-md mr-3">
+                            <div className={`flex items-center justify-center w-6 h-6 bg-blue-50 rounded-md ${currentLocale === 'ar' ? 'ml-2' : 'mr-3'}`}>
                               <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4 text-blue-600" width="24" height="24" viewBox="0 0 24 24" strokeWidth="2" stroke="currentColor" fill="none" strokeLinecap="round" strokeLinejoin="round">
                                 <path stroke="none" d="M0 0h24v24H0z" fill="none" />
                                 <path d="M9 7m-4 0a4 4 0 1 0 8 0a4 4 0 1 0 -8 0" />
@@ -352,7 +359,7 @@ export default function Hero() {
                     {showSuggestions && (
                       <div 
                         ref={suggestionsRef}
-                        className={`absolute mt-1 bg-white border border-gray-200 rounded-md shadow-lg z-20 max-h-60 overflow-y-auto ${currentLocale === 'ar' ? 'right-0 left-0' : 'left-0 right-0'}`}
+                        className="absolute left-0 right-0 top-full mt-1 bg-white border border-gray-200 rounded-md shadow-lg z-20 max-h-60 overflow-y-auto"
                       >
                         {suggestions.map((suggestion, index) => (
                           <div 
@@ -360,9 +367,10 @@ export default function Hero() {
                             className={`px-4 py-2 cursor-pointer hover:bg-blue-50 ${activeSuggestionIndex === index ? 'bg-blue-50' : ''}`}
                             onClick={() => handleSuggestionSelect(suggestion)}
                             onMouseEnter={() => setActiveSuggestionIndex(index)}
+                            dir={currentLocale === 'ar' ? 'rtl' : 'ltr'}
                           >
                             <div className="flex items-center">
-                              <svg className="w-5 h-5 text-gray-400 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                              <svg className={`w-5 h-5 text-gray-400 ${currentLocale === 'ar' ? 'ml-2' : 'mr-2'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                               </svg>
                               <span className="text-gray-800">
