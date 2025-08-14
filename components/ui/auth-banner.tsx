@@ -37,9 +37,9 @@ export default function AuthBanner({ onSignUp, onLogin }: AuthBannerProps) {
       className="fixed bottom-0 left-0 right-0 z-50 bg-gradient-to-r from-blue-500 to-cyan-500 px-4 py-4"
       dir={isRTL ? 'rtl' : 'ltr'}
     >
-      <div className={`max-w-7xl mx-auto flex items-center justify-between ${isRTL ? 'flex-row-reverse' : 'flex-row'}`}>
+      <div className={`max-w-7xl mx-auto flex flex-col sm:flex-row  items-center gap-4 justify-between ${isRTL ? 'flex-row-reverse' : 'flex-row'}`}>
         <div className="text-white">
-          <div className="text-lg font-bold mb-1">
+          <div className=" text-md sm:text-lg font-bold mb-1">
             {isRTL ? 
               'اكتشف المعرفة المهنية' :
               'Unlock business knowledge'
