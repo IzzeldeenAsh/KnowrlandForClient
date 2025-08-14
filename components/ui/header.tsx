@@ -262,7 +262,7 @@ const { isLoading: isAppLoading, setIsLoading: setAppLoading } = useLoading();
   return (
     <>
       {/* Beta Warning Bar */}
-      <div className="w-full bg-gradient-to-r from-blue-500 to-cyan-500 text-white py-2 px-4 text-center text-md font-medium relative z-40">
+      <div className="w-full bg-gradient-to-r from-blue-500 to-cyan-500 text-white py-2 px-4 text-center text-xs md:text-md font-medium relative z-40">
         <span>{t('beta.notice')}</span>
       </div>
       
@@ -476,7 +476,7 @@ const { isLoading: isAppLoading, setIsLoading: setAppLoading } = useLoading();
               <li className="lg:hidden mr-2">
                 <button
                   onClick={() => {
-                    router.push('/home');
+                    router.push(`/${pathname.split('/')[1]}/home`);
                   }}
                   className="flex items-center p-2 text-slate-300 hover:text-white hover:bg-[#3B8AEF]/20 rounded-md transition-all duration-200"
                 >
