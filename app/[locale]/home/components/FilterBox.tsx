@@ -1,7 +1,8 @@
 'use client'
 
 import React, { useState, useEffect } from 'react';
-import { Select, Modal, Loader, Chip, Combobox, Input, InputBase, useCombobox } from '@mantine/core';
+import { Select, Modal, Loader, Chip, Combobox, Input, InputBase, useCombobox, Drawer } from '@mantine/core';
+import { useMediaQuery } from '@mantine/hooks';
 import { IconRefresh, IconCode, IconBuildingFactory, IconWorldSearch, IconBuildingBank, IconMap, IconWorld, IconLanguage, IconCoin } from '@tabler/icons-react';
 
 import { useTranslations } from 'next-intl';
@@ -91,6 +92,10 @@ interface FilterBoxProps {
   roleFilter?: 'all' | 'company' | 'individual';
   setRoleFilter?: (filter: 'all' | 'company' | 'individual') => void;
   resetFilters?: () => Promise<void>;
+  // Drawer props for responsive behavior
+  isDrawerOpen?: boolean;
+  setIsDrawerOpen?: (open: boolean) => void;
+  forceDrawerMode?: boolean;
 }
 
 const FilterBox: React.FC<FilterBoxProps> = ({
@@ -116,11 +121,20 @@ const FilterBox: React.FC<FilterBoxProps> = ({
   setAccuracyFilter = () => {},
   roleFilter = 'all',
   setRoleFilter = () => {},
-  resetFilters = async () => {}
+  resetFilters = async () => {},
+  // Drawer props
+  isDrawerOpen = false,
+  setIsDrawerOpen = () => {},
+  forceDrawerMode = false
 }) => {
   console.log(`🔧 FilterBox rendered with searchType: ${searchType}`);
   console.log(`🔧 Price/Language sections visible: ${searchType !== 'insighter'}`);
   console.log(`🔧 Role section visible: ${searchType === 'insighter'}`);
+  
+  // Responsive breakpoint detection - tablet and mobile use drawer
+  const isTabletOrMobile = useMediaQuery('(max-width: 1024px)');
+  const shouldUseDrawer = forceDrawerMode || isTabletOrMobile;
+  
   const [countries, setCountries] = useState<Country[]>([]);
   const [regions, setRegions] = useState<Region[]>([]);
   const [economicBlocs, setEconomicBlocs] = useState<EconomicBloc[]>([]);
@@ -165,15 +179,15 @@ const FilterBox: React.FC<FilterBoxProps> = ({
   const [industryLeafNodes, setIndustryLeafNodes] = useState<IndustryNode[]>([]);
   const [filteredIndustryLeafNodes, setFilteredIndustryLeafNodes] = useState<IndustryNode[]>([]);
 
-  // State for content types collapse - adjust based on search type
-  const [priceCollapsed, setpriceCollapsed] = useState(false);
-  const [languageCollapsed, setLanguageCollapsed] = useState(false);
-  const [accuracyCollapsed, setAccuracyCollapsed] = useState(searchType === 'knowledge'); // Collapsed for knowledge, visible for insighter
-  const [industryCollapsed, setIndustryCollapsed] = useState(searchType === 'insighter'); // Collapsed for insighter, visible for knowledge
+  // State for content types collapse - adjust based on search type and screen size
+  const [priceCollapsed, setpriceCollapsed] = useState(shouldUseDrawer);
+  const [languageCollapsed, setLanguageCollapsed] = useState(shouldUseDrawer);
+  const [accuracyCollapsed, setAccuracyCollapsed] = useState(searchType === 'knowledge' || shouldUseDrawer); // Collapsed for knowledge or small screens, visible for insighter on large screens
+  const [industryCollapsed, setIndustryCollapsed] = useState(searchType === 'insighter' || shouldUseDrawer); // Collapsed for insighter or small screens, visible for knowledge on large screens
   const [targetMarketCollapsed, setTargetMarketCollapsed] = useState(true);
   const [publicationDateCollapsed, setPublicationDateCollapsed] = useState(true);
   const [archiveCollapsed, setArchiveCollapsed] = useState(true);
-  const [roleCollapsed, setRoleCollapsed] = useState(false);
+  const [roleCollapsed, setRoleCollapsed] = useState(shouldUseDrawer);
 
   // State for publication date filter
   const [publicationDateFilter, setPublicationDateFilter] = useState<'all' | 'last_month' | 'last_3_months' | 'last_6_months' | 'last_year'>('all');
@@ -220,12 +234,15 @@ const FilterBox: React.FC<FilterBoxProps> = ({
     },
   });
 
-  // Update collapsed states when search type changes
+  // Update collapsed states when search type or screen size changes
   useEffect(() => {
-    console.log(`🔧 FilterBox searchType changed to: ${searchType}, updating collapsed states`);
-    setAccuracyCollapsed(searchType === 'knowledge'); // Visible for insighter, collapsed for knowledge
-    setIndustryCollapsed(searchType === 'insighter'); // Visible for knowledge, collapsed for insighter
-  }, [searchType]);
+    console.log(`🔧 FilterBox searchType changed to: ${searchType}, screen size drawer: ${shouldUseDrawer}, updating collapsed states`);
+    setAccuracyCollapsed(searchType === 'knowledge' || shouldUseDrawer); // Visible for insighter on large screens only
+    setIndustryCollapsed(searchType === 'insighter' || shouldUseDrawer); // Visible for knowledge on large screens only
+    setpriceCollapsed(shouldUseDrawer); // Closed on small screens by default
+    setLanguageCollapsed(shouldUseDrawer); // Closed on small screens by default  
+    setRoleCollapsed(shouldUseDrawer); // Closed on small screens by default
+  }, [searchType, shouldUseDrawer]);
 
   useEffect(() => {
     const fetchCountries = async () => {
@@ -830,8 +847,9 @@ const FilterBox: React.FC<FilterBoxProps> = ({
     }
   };
 
-  return (
-    <div className={`bg-gray-50 rounded-xl shadow border border-gray-200 w-full max-w-xs `} dir={locale === 'ar' ? 'rtl' : 'ltr'}>
+  // Extract the filter content into a reusable component
+  const FilterContent = () => (
+    <div className={`${shouldUseDrawer ? '' : 'bg-gray-50 rounded-xl shadow border border-gray-200 w-full max-w-xs'}`} dir={locale === 'ar' ? 'rtl' : 'ltr'}>
       {/* Top Bar */}
       <div className="flex items-center justify-between px-4 pt-4 pb-2 border-b border-gray-200">
         <h2 className="text-base font-semibold text-gray-800">{locale === 'ar' ? 'الفلاتر' : 'Filters'}</h2>
@@ -1328,6 +1346,28 @@ const FilterBox: React.FC<FilterBoxProps> = ({
       </Modal>
     </div>
   );
+
+  // Conditional rendering based on screen size
+  if (shouldUseDrawer) {
+    return (
+      <Drawer
+        opened={isDrawerOpen}
+        onClose={() => setIsDrawerOpen(false)}
+        title={locale === 'ar' ? 'الفلاتر' : 'Filters'}
+        padding="md"
+        size="sm"
+        position={locale === 'ar' ? 'right' : 'left'}
+        overlayProps={{ backgroundOpacity: 0.5, blur: 4 }}
+      >
+        <div className="h-full overflow-y-auto">
+          <FilterContent />
+        </div>
+      </Drawer>
+    );
+  }
+
+  // Default sidebar rendering for desktop
+  return <FilterContent />;
 };
 
 export default FilterBox;
