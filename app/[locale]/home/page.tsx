@@ -1354,7 +1354,7 @@ export default function HomePage() {
                searchType={searchType}
                setSearchType={handleSearchTypeChange}
                locale={locale}
-               placeholder={locale === 'ar' ? 'البحث عن معرفة أو شخص...' : 'Search for knowledge or person...'}
+               placeholder={locale === 'ar' ? 'إبحث عن معرفة أو خبير...' : 'Search for Knowledge or Expert...'}
                onSubmit={handleSubmit}
                onSearch={executeSearch}
                onQueryChange={handleQueryChange}
