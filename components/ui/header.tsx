@@ -262,7 +262,7 @@ const { isLoading: isAppLoading, setIsLoading: setAppLoading } = useLoading();
   return (
     <>
       {/* Beta Warning Bar */}
-      <div className="w-full bg-gradient-to-r from-blue-500 to-cyan-500 text-white py-2 px-4 text-center text-xs md:text-md font-medium relative z-40">
+      <div className="w-full bg-gradient-to-r from-blue-500 to-cyan-500 text-white py-2 px-4 text-center text-xs md:text-lg font-medium relative z-40">
         <span>{t('beta.notice')}</span>
       </div>
       
