@@ -14,7 +14,7 @@
 }
 
 .iconData {
-  color: #3b82f6; /* blue-500 */
+  color: #000000; /* blue-500 */
 }
 
 .iconInsight {
@@ -36,6 +36,15 @@
 /* Active icon colors (white for all when active) */
 .iconActive {
   color: white !important;
+}
+
+/* Special handling for report and manual icons when active */
+.iconReport.iconActive path[fill="white"] {
+  fill: #3699FF !important;
+}
+
+.iconManual.iconActive path[fill="white"] {
+  fill: #FF9F43 !important;
 }
 
 /* Type counter badge */
@@ -87,11 +96,11 @@
 }
 
 .filterDataActive {
-  background-color: #3b82f6 !important; /* blue-500 */
+  background-color: black !important;
 }
 
 .filterInsightActive {
-  background-color: #0181FC !important; /* custom insight blue */
+  background-color: #891638 !important;
 }
 
 .filterReportActive {
