@@ -1175,7 +1175,7 @@ export default function ProfilePage() {
             {/* Profile Container */}
             <div className="max-w-6xl z-20 mx-auto px-4 sm:px-6 relative -mt-16">
               {/* Profile Layout - Image, Info, Stats */}
-              <div className="flex flex-col md:flex-row gap-6">
+              <div className="flex flex-col md:flex-row gap-6  items-center md:items-start">
                 {/* Profile Image */}
                 <div className="flex-shrink-0">
                   <div className="w-32 h-32 rounded-full  border border-blue-500 relative">
@@ -1289,7 +1289,7 @@ export default function ProfilePage() {
                           </Link>
                         )}
                       </div>
-                      {isCompany && <div className="text-blue-500 text-sm font-semibold">{t("manager")}</div>}
+                      {(isCompany && entityParam) && <div className="text-blue-500 text-sm font-semibold">{t("manager")}</div>}
 
                       {/* Title/Role & Location */}
                       <div className="mb-3">
@@ -1311,7 +1311,7 @@ export default function ProfilePage() {
                       </div>
 
                       {/* Action Buttons */}
-                      <div className="flex flex-wrap gap-3 mb-4">
+                      <div className="flex flex-wrap gap-3 mb-4 justify-center md:justify-start">
                         <button className="px-3 py-1.5 text-xs bg-white dark:bg-slate-700 text-gray-800 dark:text-white rounded-md font-medium border border-gray-200 dark:border-slate-600 hover:border-gray-300 dark:hover:border-slate-500 shadow-sm hover:shadow-md transition transform hover:translate-y-[-1px]">
                           {t("follow")}
                         </button>
@@ -1406,12 +1406,14 @@ export default function ProfilePage() {
                 >
                   {
                     isCompanyInsighter
-                      ? t("aboutCompany")
-                      : isCompany
-                        ? t("aboutManager")
-                        : enterpriseType === "insighter"
-                          ? t("aboutMe")
-                          : null
+                      ? t("aboutMe")
+                      : isCompany && !enterpriseType
+                        ? t("aboutCompany")
+                        : isCompany && enterpriseType
+                          ? t("aboutManager")
+                          : enterpriseType === "insighter"
+                            ? t("aboutMe")
+                            : null
                   }
                 </Tabs.Tab>
                 {/* Hide Meet tab if user is viewing their own profile */}
