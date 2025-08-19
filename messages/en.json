@@ -8,7 +8,7 @@
         "tagline": "Beyond Research Boundaries",
         "title": "Unlock Business Success with Shared Expert Knowldge",
         "description":"Explore a hub of data, insights, and business intelligence tailored for your business growth.",
-        "searchPlaceholder":"Search data, reports, insights, HS Code, ISIC Code... ",
+        "searchPlaceholder":"Find knowledge or an Insight Expert (Insighter)...",
         "searchPlaceholderMobile":"Search in data, reports, insights...",
         "direction": "ltr"
     },
@@ -254,10 +254,10 @@
                 "title":"Purchase part of a report, section or file"
             },
             "payAsYouGo": {
-                "title": "No monthly fees- Pay as You Go"
+                "title": "No monthly fees- One time purchase"
             },
             "purchaseSpecific": {
-                "title": "Pay for Only for the Targeted Insight or Data"
+                "title": "Pay for only for the targeted insight or data"
             }
         }
     },
