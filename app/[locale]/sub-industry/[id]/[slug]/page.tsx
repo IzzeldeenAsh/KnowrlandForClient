@@ -211,7 +211,7 @@ export default async function SubIndustryPage({ params }: Props) {
                             {topic.knowledge.map((item: Knowledge, index: number) => (
                               <li
                                 key={`${item.id}-${index}`}
-                                className="text-sm text-gray-700 hover:text-blue-600 transition-colors flex items-center"
+                                className="text-sm text-blue-800 hover:text-blue-600 transition-colors flex items-center"
                               >
                                 <span className={isRTL ? "ml-2" : "mr-2"}>•</span>
                                 <Link href={`/${locale}/knowledge/${item.type}/${item.slug}`}>
