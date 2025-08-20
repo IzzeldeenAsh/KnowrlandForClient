@@ -277,7 +277,7 @@ export function UserProfile({ isHome }: { isHome: boolean }) {
                         role
                       )
                     ) && (
-                      <span className="bg-[#F1F2F4] text-[#7B6E6A] text-xs font-medium px-1.5 rounded-sm whitespace-nowrap">
+                      <span className="bg-[#dafdff] text-[#06a2b2] text-xs font-bold px-1.5 rounded-md whitespace-nowrap">
                         {t("client")}
                       </span>
                     )}
