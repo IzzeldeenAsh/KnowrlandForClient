@@ -132,7 +132,7 @@ export default function IndustriesGrid({ industries, locale }: IndustriesGridPro
                 {industry.children.map((child) => (
                   <li 
                     key={child.id} 
-                    className={`text-sm text-gray-700 ${!isDisabled ? 'hover:text-blue-600 transition-colors' : ''} flex items-center`}
+                    className={`text-sm text-blue-800 hover:text-blue-600 ${!isDisabled ? 'hover:text-blue-600 transition-colors' : ''} flex items-center`}
                   >
                     <span className={isRTL ? "ml-2" : "mr-2"}>•</span>
                     {child.name}

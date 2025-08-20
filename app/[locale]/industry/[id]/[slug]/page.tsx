@@ -206,11 +206,11 @@ export default async function IndustryPage({ params }: Props) {
                             return (
                               <li 
                                 key={topic.id} 
-                                className={`text-sm text-gray-700 ${!isTopicDisabled && !isDisabled ? 'hover:text-blue-600 transition-colors' : ''} flex items-center`}
+                                className={`text-sm text-blue-800 hover:text-blue-600 ${!isTopicDisabled && !isDisabled ? 'hover:text-blue-600 transition-colors' : ''} flex items-center`}
                               >
                                 {(!isDisabled && !isTopicDisabled) ? (
                                   <Link href={`/${locale}/topic/${topic.id}/${topic.slug}`}>
-                                    <span className={isRTL ? "ml-2" : "mr-2"}>•</span>
+                                    <span className={isRTL ? "ml-2 text-blue-800 hover:text-blue-600" : "mr-2 text-blue-800 hover:text-blue-600"}>•</span>
                                     {topic.name}
                                   </Link>
                                 ) : (
