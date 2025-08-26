@@ -254,7 +254,6 @@ export default function SearchResultsList({
                 padding={0}
                 radius="md"
                 className={listStyles.listCard}
-                data-aos="fade-up"
                 component="div"
                 style={{height:'240px'}} // Fixed height for consistency
               >
@@ -516,7 +515,6 @@ export default function SearchResultsList({
                 padding="lg"
                 radius="xs"
                 className={cardStyles.card}
-                data-aos="fade-up"
                 component="div"
                 style={{height:'240px'}} // Added fixed height to match knowledge items
               >
