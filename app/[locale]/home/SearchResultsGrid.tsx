@@ -314,7 +314,6 @@ export default function SearchResultsGrid({
             padding="lg"
             radius="xs"
             className={cardStyles.card}
-            data-aos="fade-up"
             component="div"
           >
             <Link
@@ -591,7 +590,6 @@ export default function SearchResultsGrid({
                 padding="lg"
                 radius="xs"
                 className={cardStyles.card}
-                data-aos="fade-up"
                 component="div"
               >
                 <Link
