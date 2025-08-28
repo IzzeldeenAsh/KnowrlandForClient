@@ -359,18 +359,9 @@ export function UserProfile({ isHome }: { isHome: boolean }) {
                   onClick={() => setMenuOpen(false)}
                   style={{fontSize: '13px'}}
                 >
-                  {t("accountSettings")}
+                  {t("settings")}
                 </Link>
-                {(roles.includes("insighter") || roles.includes("company")) && (
-                  <Link
-                    href="https://app.knoldg.com/app/insighter-dashboard/account-settings/payment-settings"
-                    className="block px-4 py-2.5 font-semibold text-slate-900 hover:bg-indigo-50 hover:text-sky-700"
-                    onClick={() => setMenuOpen(false)}
-                    style={{fontSize: '13px'}}
-                  >
-                    {isRtl ? "إعدادات الدفع" : "Payment Settings"}
-                  </Link>
-                )}
+              
               </>
             )}
             
