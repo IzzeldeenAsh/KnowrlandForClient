@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { Modal, Button, Checkbox, Group, Text, Badge, Divider } from '@mantine/core';
 import Image from 'next/image';
-import { useParams } from 'next/navigation';
+import { useParams, useRouter } from 'next/navigation';
 import { useToast } from '@/components/toast/ToastContext';
 
 interface Document {
@@ -29,6 +29,7 @@ interface BuyModalProps {
   preSelectedDocumentId?: number;
   preSelectedDocumentIds?: number[];
   knowledgeSlug: string;
+  knowledgeUUID: number;
 }
 
 const getFileIconByExtension = (extension: string) => {
@@ -49,10 +50,11 @@ const getFileIconByExtension = (extension: string) => {
   return iconMap[extension.toLowerCase()] || iconMap.default;
 };
 
-export default function BuyModal({ opened, onClose, documents, preSelectedDocumentId, preSelectedDocumentIds, knowledgeSlug }: BuyModalProps) {
+export default function BuyModal({ opened, onClose, documents, preSelectedDocumentId, preSelectedDocumentIds, knowledgeSlug , knowledgeUUID }: BuyModalProps) {
   const params = useParams();
   const locale = params.locale as string;
   const isRTL = locale === 'ar';
+  const router = useRouter();
   
   const [selectedDocuments, setSelectedDocuments] = useState<number[]>([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -105,52 +107,21 @@ export default function BuyModal({ opened, onClose, documents, preSelectedDocume
   };
 
   // Handle purchase
-  const handlePurchase = async () => {
+  const handlePurchase = () => {
     if (selectedDocuments.length === 0) {
       toast.error(translations.selectAtLeastOne, translations.error);
       return;
     }
 
-    setIsLoading(true);
-    try {
-      // Get auth token from cookies
-      const token = document.cookie
-        .split('; ')
-        .find(row => row.startsWith('token='))
-        ?.split('=')[1];
+    // Create query parameters for checkout page
+    const queryParams = new URLSearchParams({
+      slug: knowledgeSlug,
+      documents: selectedDocuments.join(','),
+      knowledgeUUID: knowledgeUUID.toString()
+    });
 
-      const response = await fetch(`https://api.knoldg.com/api/platform/industries/knowledge/buy/${knowledgeSlug}`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Accept': 'application/json',
-          'Accept-Language': locale,
-          "X-Timezone": Intl.DateTimeFormat().resolvedOptions().timeZone,
-          ...(token && { 'Authorization': `Bearer ${token}` }),
-        },
-        body: JSON.stringify({
-          knowledge_document_ids: selectedDocuments,
-        }),
-      });
-
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-
-      const data = await response.json();
-      
-      toast.success(data.message || translations.success, translations.success);
-
-      onClose();
-      // Redirect to my-downloads page after successful purchase
-      window.location.href = 'https://app.knoldg.com/app/insighter-dashboard/my-downloads';
-      
-    } catch (error) {
-      console.error('Purchase error:', error);
-      toast.error(error instanceof Error ? error.message : translations.error, translations.error);
-    } finally {
-      setIsLoading(false);
-    }
+    // Navigate to checkout page
+    router.push(`/${locale}/checkout?${queryParams.toString()}`);
   };
 
   return (
@@ -251,13 +222,11 @@ export default function BuyModal({ opened, onClose, documents, preSelectedDocume
           <Button
             variant="outline"
             onClick={onClose}
-            disabled={isLoading}
           >
             {translations.cancel}
           </Button>
           <Button
             onClick={handlePurchase}
-            loading={isLoading}
             disabled={selectedDocuments.length === 0}
           >
             {translations.buy}
