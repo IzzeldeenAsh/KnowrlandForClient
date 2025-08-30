@@ -1,0 +1,140 @@
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2rem;
+}
+
+.checkoutGrid {
+  display: grid;
+  grid-template-columns: 1.5fr 1fr;
+  gap: 2rem;
+  align-items: start;
+}
+
+.singleColumn {
+  display: block;
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.leftColumn {
+  width: 100%;
+}
+
+.rightColumn {
+  width: 100%;
+}
+
+.confirmButtonContainer {
+  margin-top: 1.5rem;
+}
+
+.documentCard {
+  padding: 1rem;
+  border: 1px solid #bfdbfe;
+  border-radius: 0.5rem;
+  margin-bottom: 0.75rem;
+}
+
+.documentCard:hover {
+  border-color: #d1d5db;
+}
+
+.documentCardSelected {
+  border-color: #3b82f6;
+  background-color: #f8fafc;
+}
+
+.paymentMethodCard {
+  cursor: pointer;
+  border: 1px solid #bfdbfe;
+  border-radius: 0.5rem;
+  padding: 1rem;
+  margin-bottom: 0.75rem;
+  display: flex;
+  align-items: flex-start;
+  min-height: 70px;
+ background-color: #F7FAFC;
+}
+
+.paymentMethodCard:hover:not(.disabled) {
+  border-color: #d1d5db;
+}
+
+.paymentMethodCard.selected {
+  border-color: #3b82f6;
+  background-color: #f8fafc;
+}
+
+.paymentMethodCard.disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  background-color: #f9fafb;
+}
+
+.methodCheckbox {
+  flex-shrink: 0;
+}
+
+.confirmButton {
+  background-color: #3b82f6;
+  border: none;
+  color: white;
+  font-weight: 600;
+  padding: 0.75rem 2rem;
+  border-radius: 0.375rem;
+  font-size: 1rem;
+}
+
+.confirmButton:hover:not(:disabled) {
+  background-color: #2563eb;
+}
+
+.confirmButton:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.priceCard {
+  border: 1px solid #bfdbfe;
+  border-radius: 0.5rem;
+  padding: 1rem;
+}
+
+.sectionTitle {
+  font-size: 1.125rem;
+  font-weight: 600;
+  margin-bottom: 1rem;
+  color: #111827;
+}
+
+.divider {
+  border-top: 1px solid #bfdbfe;
+  margin: 1rem 0;
+}
+
+@media (max-width: 1024px) {
+  .checkoutGrid {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+  }
+}
+.freeDownloadButton {
+  max-width: 200px;
+  margin: 0 auto;
+}
+
+
+@media (max-width: 640px) {
+  .container {
+    padding: 1rem;
+  }
+  
+  .documentCard {
+    padding: 0.75rem;
+  }
+  
+  .confirmButton {
+    width: 100%;
+  }
+}
