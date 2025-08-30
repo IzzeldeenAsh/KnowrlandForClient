@@ -32,6 +32,7 @@ interface EconomicBloc {
 }
 
 interface KnowledgeSideBoxProps {
+  knowledgeUUID: number;
   total_price: string;
   documents: Document[];
   language: string;
@@ -63,7 +64,8 @@ const KnowledgeSideBox = ({
   locale,
   knowledgeSlug,
   purchased_status,
-  is_read_later
+  is_read_later,
+  knowledgeUUID
 }: KnowledgeSideBoxProps) => {
   const params = useParams();
   const currentLocale = locale || params.locale as string || 'en';
@@ -862,6 +864,7 @@ const KnowledgeSideBox = ({
         documents={documents}
         preSelectedDocumentIds={selectedDocumentIds}
         knowledgeSlug={knowledgeSlug}
+        knowledgeUUID={knowledgeUUID}
       />
     )}
 

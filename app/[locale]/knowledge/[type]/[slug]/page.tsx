@@ -22,6 +22,7 @@ import { Rating, Text } from "@mantine/core";
 import LanguageMismatchNotifier from './LanguageMismatchNotifier';
 
 interface KnowledgeDetails {
+  id: number;
   type: string;
   title: string;
   slug: string;
@@ -41,6 +42,7 @@ interface KnowledgeDetails {
   }>;
   regions: any[];
   economic_blocs: any[];
+
   status: string;
   published_at: string;
   review: any[];
@@ -420,6 +422,7 @@ export default function KnowledgePage({ params }: Props) {
               knowledgeSlug={slug}
               purchased_status={knowledge.purchased_status}
               is_read_later={knowledge.is_read_later}
+              knowledgeUUID={knowledge.id}
             />
           </div>
         </div>
