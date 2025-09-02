@@ -161,10 +161,10 @@ function Card({ img, alt, title, desc, learnMore }: CardProps) {
           <div className="text-slate-400 mb-3">{desc}</div>
         </div>
         <div className="text-right">
-          <a className="text-sm font-medium text-slate-300 hover:text-white inline-flex items-center transition duration-150 ease-in-out group" href="#0">
+          <span className="text-sm font-medium text-slate-300 hover:text-white inline-flex items-center transition duration-150 ease-in-out group">
             {learnMore}
             <span className="tracking-normal text-blue-500 group-hover:translate-x-0.5 transition-transform duration-150 ease-in-out mx-1">-&gt;</span>
-          </a>
+          </span>
         </div>
       </div>
     </div>
