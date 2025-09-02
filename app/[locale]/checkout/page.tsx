@@ -14,6 +14,7 @@ import {
   Image as MantineImage,
   Container,
 } from "@mantine/core";
+import { IconCheck } from "@tabler/icons-react";
 import Image from "next/image";
 import { useToast } from "@/components/toast/ToastContext";
 import PageIllustration from "@/components/page-illustration";
@@ -78,7 +79,6 @@ export default function CheckoutPage() {
       .get("documents")
       ?.split(",")
       .map((id) => parseInt(id)) || [];
-  const knowledgeUUID = searchParams.get("knowledgeUUID") || "";
   const [knowledge, setKnowledge] = useState<Knowledge | null>(null);
   const [selectedDocuments, setSelectedDocuments] =
     useState<number[]>(documentIds);
@@ -86,6 +86,7 @@ export default function CheckoutPage() {
   const [walletBalance, setWalletBalance] = useState<number>(0);
   const [isLoading, setIsLoading] = useState(true);
   const [isCheckingOut, setIsCheckingOut] = useState(false);
+  const [showSuccessUI, setShowSuccessUI] = useState(false);
 
   // Translations
   const translations = {
@@ -95,7 +96,7 @@ export default function CheckoutPage() {
     paymentMethod: isRTL ? "طريقة الدفع" : "Payment Method",
     knoldgWallet: isRTL ? "محفظة نولدج" : "Knoldg Wallet",
     stripeProvider: isRTL ? "مزود سترايب" : "Stripe Provider",
-    confirmOrder: isRTL ? "تأكيد الطلب" : "Confirm Order",
+    confirmOrder: isRTL ? "تأكيد الطلب" : "Checkout",
     download: isRTL ? "تحميل" : "Download",
     free: isRTL ? "مجاني" : "Free",
     insufficientBalance: isRTL ? "الرصيد غير كافي" : "Insufficient balance",
@@ -108,6 +109,11 @@ export default function CheckoutPage() {
     orderError: isRTL ? "فشل في إتمام الطلب" : "Failed to complete order",
     loading: isRTL ? "جاري التحميل..." : "Loading...",
     remove: isRTL ? "إزالة" : "Remove",
+    paymentSuccess: isRTL ? "تم الدفع بنجاح!" : "Payment Successful!",
+    orderCompleted: isRTL
+      ? "تم إكمال طلبك بنجاح. يمكنك الآن تنزيل المستندات المشتراة."
+      : "Your order has been completed successfully. You can now download your purchased documents.",
+    goToDownloads: isRTL ? "الذهاب إلى التنزيلات" : "Go to Downloads",
   };
 
   // Get auth token from cookies
@@ -205,6 +211,16 @@ export default function CheckoutPage() {
   const totalPrice = calculateTotalPrice();
   const isFree = totalPrice === 0;
 
+  // Format currency with proper formatting
+  const formatCurrency = (amount: number) => {
+    return new Intl.NumberFormat(locale === 'ar' ? 'ar-SA' : 'en-US', {
+      style: 'currency',
+      currency: 'USD',
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    }).format(amount);
+  };
+
   // Handle document selection toggle
   const handleDocumentToggle = (documentId: number) => {
     setSelectedDocuments((prev) =>
@@ -233,7 +249,7 @@ export default function CheckoutPage() {
         payment_method: isFree ? "free" : paymentMethod,
         sub_orders: [
           {
-            knowledge_id: knowledgeUUID, // Using knowledge ID
+            knowledge_slug: slug, // Using knowledge ID
             knowledge_document_ids: selectedDocuments,
           },
         ],
@@ -255,6 +271,7 @@ export default function CheckoutPage() {
       );
 
       const data = await response.json();
+      console.log('Checkout response:', data); // Debug log
 
       if (!response.ok) {
         throw new Error(
@@ -262,15 +279,37 @@ export default function CheckoutPage() {
         );
       }
 
+      // Handle Stripe payment
+      if (paymentMethod === "provider") {
+        console.log('Payment method is provider, checking for client_secret...'); // Debug log
+        
+        // Check different possible response structures
+        const responseData = data.data || data;
+        const { client_secret, order_uuid } = responseData;
+        
+        console.log('Client secret:', client_secret, 'Order UUID:', order_uuid); // Debug log
+        
+        if (client_secret && order_uuid) {
+          // Redirect to Stripe payment page with necessary data
+          const paymentParams = new URLSearchParams({
+            client_secret,
+            order_uuid,
+            amount: totalPrice.toFixed(2),
+            title: knowledge?.title || 'Knowledge Purchase',
+          });
+          
+          const stripeUrl = `/${locale}/payment/stripe?${paymentParams.toString()}`;
+          console.log('Redirecting to:', stripeUrl); // Debug log
+          
+          router.push(stripeUrl);
+          return;
+        } else {
+          console.log('Missing client_secret or order_uuid in response'); // Debug log
+        }
+      }
 
-
-      toast.success(
-        data.message || translations.orderSuccess,
-        translations.orderSuccess
-      );
-
-      // Redirect to downloads page
-        window.location.href="https://app.knoldg.com/app/insighter-dashboard/my-downloads"
+      // For free or wallet payments, show success UI
+      setShowSuccessUI(true);
     } catch (error) {
       console.error("Checkout error:", error);
       toast.error(
@@ -302,6 +341,36 @@ export default function CheckoutPage() {
   const documentsToShow = knowledge.documents.filter((doc) =>
     documentIds.includes(doc.id)
   );
+
+  // Success UI - similar to Stripe payment success
+  if (showSuccessUI) {
+    return (
+      <>
+        <PageIllustration middle={false} />
+        
+        <div className="min-h-screen relative z-1" dir={isRTL ? "rtl" : "ltr"}>
+          <Container size="sm" className="py-12">
+            <div className="max-w-md mx-auto text-center">
+              <div className="mb-6">
+                <div className="mx-auto w-16 h-16 bg-green-100 rounded-full flex items-center justify-center">
+                  <IconCheck size={32} className="text-green-600" />
+                </div>
+              </div>
+              <h2 className="text-2xl font-bold mb-2">{translations.paymentSuccess}</h2>
+              <p className="text-gray-600 mb-6">{translations.orderCompleted}</p>
+              <Button
+                size="lg"
+                className="bg-gradient-to-r from-blue-500 to-teal-400"
+                onClick={() => window.location.href = "https://app.knoldg.com/app/insighter-dashboard/my-downloads"}
+              >
+                {translations.goToDownloads}
+              </Button>
+            </div>
+          </Container>
+        </div>
+      </>
+    );
+  }
 
   return (
     <>
@@ -381,7 +450,7 @@ export default function CheckoutPage() {
                       >
                         {parseFloat(doc.price) === 0
                           ? translations.free
-                          : `$${parseFloat(doc.price).toFixed(2)}`}
+                          : formatCurrency(parseFloat(doc.price))}
                       </Badge>
                     </Group>
                   </div>
@@ -395,7 +464,7 @@ export default function CheckoutPage() {
                   <Group justify="space-between">
                     <Text size="lg" fw={600}>{translations.totalPrice}</Text>
                     <Badge size="lg" color="blue" variant="filled">
-                      {isFree ? translations.free : `$${totalPrice.toFixed(2)}`}
+                      {isFree ? translations.free : formatCurrency(totalPrice)}
                     </Badge>
                   </Group>
                 </div>
@@ -452,10 +521,13 @@ export default function CheckoutPage() {
                           </div>
                           <div style={{ flex: 1 }}>
                             <Text fw={500}>{translations.knoldgWallet}</Text>
+                            <Text size="sm" fw={600} c={walletBalance < totalPrice ? "red" : "green"} mt={2}>
+                              {isRTL ? "الرصيد المتاح: " : "Available Balance: "}
+                              {formatCurrency(walletBalance)}
+                            </Text>
                             {walletBalance < totalPrice && (
-                              <Text size="xs" c="red" mt={2}>
-                                {translations.insufficientBalance} ($
-                                {walletBalance.toFixed(2)})
+                              <Text size="xs" c="red">
+                                {translations.insufficientBalance}
                               </Text>
                             )}
                           </div>
@@ -487,7 +559,7 @@ export default function CheckoutPage() {
                             }}
                           >
                             <MantineImage
-                              src="https://www.citypng.com/public/uploads/preview/hd-stripe-official-logo-png-701751694777755j0aa3puxte.png"
+                              src="https://res.cloudinary.com/dsiku9ipv/image/upload/v1754902439/New_Project_12_jmtvd6.png"
                               alt="Stripe"
                               width={50}
                               height={25}

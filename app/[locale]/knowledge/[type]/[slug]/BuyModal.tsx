@@ -29,7 +29,6 @@ interface BuyModalProps {
   preSelectedDocumentId?: number;
   preSelectedDocumentIds?: number[];
   knowledgeSlug: string;
-  knowledgeUUID: number;
 }
 
 const getFileIconByExtension = (extension: string) => {
@@ -50,7 +49,7 @@ const getFileIconByExtension = (extension: string) => {
   return iconMap[extension.toLowerCase()] || iconMap.default;
 };
 
-export default function BuyModal({ opened, onClose, documents, preSelectedDocumentId, preSelectedDocumentIds, knowledgeSlug , knowledgeUUID }: BuyModalProps) {
+export default function BuyModal({ opened, onClose, documents, preSelectedDocumentId, preSelectedDocumentIds, knowledgeSlug  }: BuyModalProps) {
   const params = useParams();
   const locale = params.locale as string;
   const isRTL = locale === 'ar';
@@ -117,7 +116,6 @@ export default function BuyModal({ opened, onClose, documents, preSelectedDocume
     const queryParams = new URLSearchParams({
       slug: knowledgeSlug,
       documents: selectedDocuments.join(','),
-      knowledgeUUID: knowledgeUUID.toString()
     });
 
     // Navigate to checkout page
