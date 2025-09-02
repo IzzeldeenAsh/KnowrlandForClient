@@ -281,6 +281,7 @@ export default function Overview({ knowledge, knowledgeSlug }: OverviewProps) {
         documents={knowledge.documents}
         preSelectedDocumentId={selectedDocumentId}
         knowledgeSlug={knowledgeSlug}
+        
       />
 
       {/* Auth Modal */}
