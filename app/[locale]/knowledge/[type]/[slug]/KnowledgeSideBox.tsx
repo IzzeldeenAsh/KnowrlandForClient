@@ -864,7 +864,6 @@ const KnowledgeSideBox = ({
         documents={documents}
         preSelectedDocumentIds={selectedDocumentIds}
         knowledgeSlug={knowledgeSlug}
-        knowledgeUUID={knowledgeUUID}
       />
     )}
 
