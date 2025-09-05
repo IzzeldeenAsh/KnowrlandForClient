@@ -15,6 +15,9 @@ import '@/components/toast/toast.css';
 import '@/components/toast/keenicons.css';
 import ClientLogoutHandler from './ClientLogoutHandler';
 import ConditionalAuthBanner from '@/components/ui/conditional-auth-banner';
+import { GlobalProfileProvider } from '@/components/auth/GlobalProfileProvider';
+import GlobalAuthHandler from '@/components/auth/GlobalAuthHandler';
+import RoleGuard from '@/components/auth/RoleGuard';
 
 const inter = Inter({
   subsets: ['latin'],
@@ -118,12 +121,17 @@ export default async function RootLayout({
             <NextIntlClientProvider messages={messages}>
               <ToastProvider>
                 <LoadingProvider>
-                  <ClientLogoutHandler />
-                  <Header />
-                  <div className="flex flex-col min-h-screen overflow-hidden supports-[overflow:clip]:overflow-clip">
-                    {children}
-                  </div>
-                  <ConditionalAuthBanner />
+                  <GlobalProfileProvider>
+                    <RoleGuard>
+                      <GlobalAuthHandler />
+                      <ClientLogoutHandler />
+                      <Header />
+                      <div className="flex flex-col min-h-screen overflow-hidden supports-[overflow:clip]:overflow-clip">
+                        {children}
+                      </div>
+                      <ConditionalAuthBanner />
+                    </RoleGuard>
+                  </GlobalProfileProvider>
                 </LoadingProvider>
               </ToastProvider>
             </NextIntlClientProvider>

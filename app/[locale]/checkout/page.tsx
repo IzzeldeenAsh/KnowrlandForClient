@@ -13,6 +13,7 @@ import {
   Stack,
   Image as MantineImage,
   Container,
+  Progress,
 } from "@mantine/core";
 import { IconCheck } from "@tabler/icons-react";
 import Image from "next/image";
@@ -87,6 +88,9 @@ export default function CheckoutPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [isCheckingOut, setIsCheckingOut] = useState(false);
   const [showSuccessUI, setShowSuccessUI] = useState(false);
+  const [downloadProgress, setDownloadProgress] = useState(0);
+  const [showDocumentsAdded, setShowDocumentsAdded] = useState(false);
+  const [knowledgeDownloadIds, setKnowledgeDownloadIds] = useState<string[]>([]);
 
   // Translations
   const translations = {
@@ -114,6 +118,11 @@ export default function CheckoutPage() {
       ? "تم إكمال طلبك بنجاح. يمكنك الآن تنزيل المستندات المشتراة."
       : "Your order has been completed successfully. You can now download your purchased documents.",
     goToDownloads: isRTL ? "الذهاب إلى التنزيلات" : "Go to Downloads",
+    congratulations: isRTL ? "تهانينا!" : "Congratulations!",
+    paymentComplete: isRTL ? "تمت معالجة دفعتك بنجاح" : "Your payment has been processed successfully",
+    accessGranted: isRTL ? "يمكنك الآن الوصول إلى جميع المستندات المشتراة" : "You now have access to all your purchased documents",
+    preparingDownloads: isRTL ? "جاري تجهيز التنزيلات..." : "Preparing your downloads...",
+    documentsAdded: isRTL ? "تمت إضافة المستندات إلى التنزيلات الخاصة بك" : "Documents added to your Downloads",
   };
 
   // Get auth token from cookies
@@ -135,7 +144,7 @@ export default function CheckoutPage() {
         const token = getAuthToken();
 
         const response = await fetch(
-          `https://api.knoldg.com/api/platform/industries/knowledge/${slug}`,
+          `https://api.foresighta.co/api/platform/industries/knowledge/${slug}`,
           {
             headers: {
               "Content-Type": "application/json",
@@ -174,7 +183,7 @@ export default function CheckoutPage() {
         const token = getAuthToken();
 
         const response = await fetch(
-          "https://api.knoldg.com/api/account/wallet/balance",
+          "https://api.foresighta.co/api/account/wallet/balance",
           {
             headers: {
               "Content-Type": "application/json",
@@ -230,6 +239,32 @@ export default function CheckoutPage() {
     );
   };
 
+  // Handle download progress animation when payment succeeds
+  useEffect(() => {
+    if (showSuccessUI) {
+      // Animate progress bar over 2.5 seconds
+      const duration = 2500;
+      const interval = 50;
+      const increment = 100 / (duration / interval);
+      
+      const timer = setInterval(() => {
+        setDownloadProgress((prev) => {
+          const next = prev + increment;
+          if (next >= 100) {
+            clearInterval(timer);
+            setTimeout(() => {
+              setShowDocumentsAdded(true);
+            }, 300);
+            return 100;
+          }
+          return next;
+        });
+      }, interval);
+
+      return () => clearInterval(timer);
+    }
+  }, [showSuccessUI]);
+
   // Handle checkout
   const handleCheckout = async () => {
     if (!isFree && !paymentMethod) {
@@ -256,7 +291,7 @@ export default function CheckoutPage() {
       };
 
       const response = await fetch(
-        "https://api.knoldg.com/api/account/order/knowledge/checkout",
+        "https://api.foresighta.co/api/account/order/knowledge/checkout",
         {
           method: "POST",
           headers: {
@@ -277,6 +312,12 @@ export default function CheckoutPage() {
         throw new Error(
           data.message || `HTTP error! status: ${response.status}`
         );
+      }
+
+      // Extract knowledge_download_ids if available
+      const responseData = data.data || data;
+      if (responseData.knowledge_download_ids) {
+        setKnowledgeDownloadIds(responseData.knowledge_download_ids);
       }
 
       // Handle Stripe payment
@@ -350,18 +391,78 @@ export default function CheckoutPage() {
         
         <div className="min-h-screen relative z-1" dir={isRTL ? "rtl" : "ltr"}>
           <Container size="sm" className="py-12">
-            <div className="max-w-md mx-auto text-center">
-              <div className="mb-6">
-                <div className="mx-auto w-16 h-16 bg-green-100 rounded-full flex items-center justify-center">
-                  <IconCheck size={32} className="text-green-600" />
+            <div className={`max-w-md mx-auto text-center ${styles.successContainer}`}>
+              {/* Animated Checkmark */}
+              <div className="mb-8">
+                <div className={`mx-auto w-24 h-24 relative ${styles.checkmarkCircle}`}>
+                  <div className="absolute inset-0 bg-gradient-to-br from-green-400 to-emerald-500 rounded-full opacity-20"></div>
+                  <div className="absolute inset-0 bg-gradient-to-br from-green-500 to-emerald-600 rounded-full flex items-center justify-center">
+                    <svg className="w-12 h-12" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <path 
+                        className={styles.checkmarkPath}
+                        d="M5 13l4 4L19 7" 
+                        stroke="white" 
+                        strokeWidth="3" 
+                        strokeLinecap="round" 
+                        strokeLinejoin="round"
+                      />
+                    </svg>
+                  </div>
                 </div>
               </div>
-              <h2 className="text-2xl font-bold mb-2">{translations.paymentSuccess}</h2>
-              <p className="text-gray-600 mb-6">{translations.orderCompleted}</p>
+
+              {/* Success Messages */}
+              <h1 className={`text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-green-500 to-emerald-600 mb-2 ${styles.successTitle}`}>
+                {translations.congratulations}
+              </h1>
+              <h2 className={`text-xl font-semibold text-gray-800 mb-3 ${styles.successSubtitle}`}>
+                {translations.paymentComplete}
+              </h2>
+              <p className={`text-gray-600 mb-8 ${styles.successDescription}`}>
+                {translations.accessGranted}
+              </p>
+              
+              {/* Progress section */}
+              <div className={`mb-8 ${styles.progressSection}`}>
+                {!showDocumentsAdded ? (
+                  <div className="space-y-4">
+                    <Text size="sm" c="dimmed" fw={500}>{translations.preparingDownloads}</Text>
+                    <Progress 
+                      value={downloadProgress} 
+                      size="xl" 
+                      radius="xl"
+                      color="teal"
+                      striped
+                      animated={downloadProgress < 100}
+                    />
+                  </div>
+                ) : (
+                  <div className={styles.documentsAddedText}>
+                    <div className="flex items-center justify-center gap-2 mb-2">
+                      <IconCheck size={20} className="text-emerald-600" />
+                      <Text size="md" fw={600} className="text-gray-700">
+                        {translations.documentsAdded}
+                      </Text>
+                    </div>
+                  </div>
+                )}
+              </div>
+              
               <Button
-                size="lg"
-                className="bg-gradient-to-r from-blue-500 to-teal-400"
-                onClick={() => window.location.href = "https://app.knoldg.com/app/insighter-dashboard/my-downloads"}
+                size="md"
+                className={`bg-gradient-to-r from-blue-500 to-teal-400 hover:from-blue-600 hover:to-teal-500 transition-all ${styles.downloadButton}`}
+                onClick={() => {
+                  // Use UUIDs if available, otherwise fall back to title search
+                  if (knowledgeDownloadIds.length > 0) {
+                    const uuidsParam = `?uuids=${knowledgeDownloadIds.join(',')}`;
+                    window.location.href = `http://localhost:4200/app/insighter-dashboard/my-downloads${uuidsParam}`;
+                  } else {
+                    // Fallback to title search if no UUIDs available
+                    const searchTitle = knowledge?.title || "";
+                    const searchParam = searchTitle ? `?search=${encodeURIComponent(searchTitle)}` : "";
+                    window.location.href = `http://localhost:4200/app/insighter-dashboard/my-downloads${searchParam}`;
+                  }
+                }}
               >
                 {translations.goToDownloads}
               </Button>
@@ -512,7 +613,7 @@ export default function CheckoutPage() {
                             }}
                           >
                             <MantineImage
-                              src="https://app.knoldg.com/assets/media/logos/custom-2.svg"
+                              src="http://localhost:4200/assets/media/logos/custom-2.svg"
                               alt="Knoldg Wallet"
                               width={32}
                               height={32}

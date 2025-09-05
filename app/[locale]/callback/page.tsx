@@ -2,6 +2,7 @@
 
 import { useEffect } from 'react';
 import { useRouter, useParams, useSearchParams } from 'next/navigation';
+import { useGlobalProfile } from '@/components/auth/GlobalProfileProvider';
 
 interface ProfileResponse {
   data: {
@@ -23,6 +24,7 @@ export default function QueryParamAuthCallback() {
   const router = useRouter();
   const params = useParams();
   const searchParams = useSearchParams();
+  const { refreshProfile } = useGlobalProfile();
   
   // Get token from query parameters or cookies
   let token = searchParams.get('token');
@@ -118,6 +120,9 @@ export default function QueryParamAuthCallback() {
         
         console.log('[callback] Authentication verification successful');
         
+        // Refresh the global profile state
+        await refreshProfile();
+        
         // Add small delay to ensure all storage operations complete
         setTimeout(() => {
           handleRedirect(response.data);
@@ -132,7 +137,7 @@ export default function QueryParamAuthCallback() {
         // Show error for a moment before redirecting to login
         setTimeout(() => {
           console.log('[callback] Redirecting to login due to error');
-          window.location.href = 'https://app.knoldg.com/auth/login';
+          window.location.href = 'http://localhost:4200/auth/login';
         }, 2000);
       }
     };
@@ -142,7 +147,7 @@ export default function QueryParamAuthCallback() {
     } else {
       console.error('[callback] No token found in URL parameters or cookies');
       // Redirect to login if no token
-      window.location.href = 'https://app.knoldg.com/auth/login';
+      window.location.href = 'http://localhost:4200/auth/login';
     }
   }, [token, locale, returnUrl]);
 
@@ -232,7 +237,7 @@ export default function QueryParamAuthCallback() {
       const userTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
       console.log('[TIMEZONE] Setting timezone:', userTimezone);
       
-      const timezoneResponse = await fetch('https://api.knoldg.com/api/account/timezone/set', {
+      const timezoneResponse = await fetch('https://api.foresighta.co/api/account/timezone/set', {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${authToken}`,
@@ -262,6 +267,13 @@ export default function QueryParamAuthCallback() {
     console.log('[callback] User roles:', userData.roles);
     console.log('[callback] Return URL from params:', returnUrl);
     
+    // Check if user has admin role
+    if (userData.roles && userData.roles.includes('admin')) {
+      console.log('[callback] Admin user detected, redirecting to admin dashboard');
+      window.location.href = 'http://localhost:4200/admin-dashboard/admin/dashboard/main-dashboard/requests';
+      return;
+    }
+    
     // Check for stored returnUrl in cookie as fallback (for social auth)
     const storedReturnUrl = getCookie('auth_return_url');
     console.log('[callback] Stored return URL from cookie:', storedReturnUrl);
@@ -281,7 +293,7 @@ export default function QueryParamAuthCallback() {
       if (isAngularRoute(finalReturnUrl)) {
         console.log('[callback] Detected Angular route, redirecting to Angular app');
         const angularPath = finalReturnUrl.startsWith('/app/') ? finalReturnUrl : `/app${finalReturnUrl}`;
-        const redirectUrl = `https://app.knoldg.com${angularPath}`;
+        const redirectUrl = `http://localhost:4200${angularPath}`;
         console.log('[callback] Final Angular redirect URL:', redirectUrl);
         window.location.href = redirectUrl;
       } else {
@@ -302,7 +314,7 @@ export default function QueryParamAuthCallback() {
          userData.roles.includes('company-insighter'))) {
       // Redirect to insighter dashboard
       console.log('[callback] Redirecting to Angular insighter dashboard');
-      window.location.href = `https://app.knoldg.com/app/insighter-dashboard/my-dashboard`;
+      window.location.href = `http://localhost:4200/app/insighter-dashboard/my-dashboard`;
     } else {
       // Redirect to home page using current locale
       console.log('[callback] Redirecting to home page:', `/${locale}/home`);
@@ -357,7 +369,7 @@ export default function QueryParamAuthCallback() {
       try {
         console.log(`[callback] Profile fetch attempt ${attempt}/${maxRetries}`);
         
-        const response = await fetch('https://api.knoldg.com/api/account/profile', {
+        const response = await fetch('https://api.foresighta.co/api/account/profile', {
           headers: {
             'Authorization': `Bearer ${authToken}`,
             "Content-Type": "application/json",
