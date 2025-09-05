@@ -2,6 +2,7 @@
 import { useState, useEffect } from 'react';
 import { IndustryType } from './types';
 import { useLocale } from 'next-intl';
+import { getApiUrl } from '@/app/config';
 
 interface Topic {
   id: number;
@@ -62,8 +63,9 @@ async function fetchIndustryByTypeFromAPI(
   topTopic: number, 
   locale: string
 ): Promise<IndustryByTypeResponse> {
-  const response = await fetch(
-    `https://api.knoldg.com/api/platform/industries/type/${type}/${id}/${slug}`,
+  const apiUrl = getApiUrl(`/api/platform/industries/type/${type}/${id}/${slug}`)
+  
+  const response = await fetch(apiUrl,
     {
       method: 'POST',
       headers: {

@@ -203,7 +203,7 @@ export default function SearchResultsGrid({
 
       const method = currentState ? 'DELETE' : 'POST';
       const slug = item.url.split('/').pop();
-      const url = `https://api.knoldg.com/api/account/favorite/knowledge/${slug}`;
+      const url = `https://api.foresighta.co/api/account/favorite/knowledge/${slug}`;
 
       console.log(`[Read Later] ${method} request to:`, url);
       console.log(`[Read Later] Current state:`, currentState, 'Item ID:', itemId, 'Slug:', slug);

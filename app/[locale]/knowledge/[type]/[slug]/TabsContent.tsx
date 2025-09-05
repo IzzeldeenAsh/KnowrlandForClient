@@ -101,7 +101,7 @@ export default function TabsContent({ knowledge, knowledgeSlug }: { knowledge: K
   return (
     <div className="mb-6" dir={isRTL ? 'rtl' : 'ltr' } style={knowledgeData.language === 'arabic' ? { direction: 'rtl', textAlign: 'right' } : {}}>
       <div className="border-b border-gray-200">
-        <nav className="-mb-px flex  knowledge-tab-nav relative " aria-label="Tabs">
+        <nav className="-mb-px flex  knowledge-tab-nav relative" aria-label={isRTL ? 'تبويبات المحتوى' : 'Content tabs'} role="tablist">
       
           {tabs.map((tab) => (
             <button
@@ -130,18 +130,23 @@ export default function TabsContent({ knowledge, knowledgeSlug }: { knowledge: K
                 }
               }}
               className={`
-                whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm mx-4
+                whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm mx-4 transition-all duration-200
                 ${tabMapping[tab] === activeTab
-                  ? "border-blue-500 text-blue-600"
-                  : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"}
+                  ? "border-blue-500 text-blue-600 bg-blue-50"
+                  : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 hover:bg-gray-50"}
               `}
+              role="tab"
+              aria-selected={tabMapping[tab] === activeTab}
+              aria-controls={`tabpanel-${tabMapping[tab]}`}
+              id={`tab-${tabMapping[tab]}`}
+              tabIndex={tabMapping[tab] === activeTab ? 0 : -1}
             >
               {tab}
             </button>
           ))}
         </nav>
       </div>
-      <div className="mt-6">
+      <div className="mt-6" role="tabpanel" id={`tabpanel-${activeTab}`} aria-labelledby={`tab-${activeTab}`}>
         <TabContent activeTab={activeTab} knowledge={knowledgeData} knowledgeSlug={knowledgeSlug} onRefreshData={refreshData} />
       </div>
     </div>

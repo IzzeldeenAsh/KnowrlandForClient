@@ -1,4 +1,5 @@
 'use client'
+import React from 'react';
 import { DocumentTextIcon, CalendarIcon, ClockIcon, ChevronDownIcon, ChevronUpIcon, BookmarkIcon } from '@heroicons/react/24/outline';
 import { BookmarkIcon as BookmarkSolidIcon } from '@heroicons/react/24/solid';
 import { IconLanguage, IconCode, IconBuildingBank, IconMap, IconWorld, IconCrane } from '@tabler/icons-react';
@@ -262,7 +263,7 @@ const KnowledgeSideBox = ({
         <div className="space-y-3 mb-4">
           {purchased_status === 'purchased' ? (
             <button 
-              onClick={() => window.location.href = 'https://app.knoldg.com/app/insighter-dashboard/my-downloads'}
+              onClick={() => window.location.href = (process.env.NEXT_PUBLIC_DASHBOARD_URL || 'https://app.knoldg.com') + '/app/insighter-dashboard/my-downloads'}
               className="w-full font-semibold bg-green-600 text-white py-2 px-4 rounded-lg hover:bg-green-700 transition-colors"
             >
               {translations.alreadyPurchased}
