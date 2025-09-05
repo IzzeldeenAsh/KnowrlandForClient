@@ -644,3 +644,114 @@
   font-weight: 400;
   font-size: 0.8125rem;
 }
+
+/* Enhanced container with smooth transitions */
+.container {
+  transition: all 0.3s ease;
+}
+
+/* Modern card hover effects */
+.cardHover {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  will-change: transform;
+}
+
+.cardHover:hover {
+  transform: translateY(-4px) scale(1.02);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+}
+
+/* Improved loading states */
+.loadingShimmer {
+  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+/* Enhanced button styles */
+.modernButton {
+  position: relative;
+  overflow: hidden;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.modernButton::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
+  transition: left 0.6s;
+}
+
+.modernButton:hover::before {
+  left: 100%;
+}
+
+/* Accessibility improvements */
+.focusVisible:focus {
+  outline: 2px solid #3b82f6;
+  outline-offset: 2px;
+}
+
+.srOnly {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* Smooth scroll behavior */
+.smoothScroll {
+  scroll-behavior: smooth;
+}
+
+/* Enhanced animations for mobile */
+@media (prefers-reduced-motion: no-preference) {
+  .fadeInUp {
+    animation: fadeInUp 0.6s ease-out;
+  }
+  
+  .staggerChild:nth-child(1) { animation-delay: 0.1s; }
+  .staggerChild:nth-child(2) { animation-delay: 0.2s; }
+  .staggerChild:nth-child(3) { animation-delay: 0.3s; }
+  .staggerChild:nth-child(4) { animation-delay: 0.4s; }
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Respect reduced motion preferences */
+@media (prefers-reduced-motion: reduce) {
+  .container *, 
+  .container *::before, 
+  .container *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}

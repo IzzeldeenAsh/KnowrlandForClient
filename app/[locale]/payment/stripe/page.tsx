@@ -5,10 +5,11 @@ import { useSearchParams, useParams, useRouter } from "next/navigation";
 import { loadStripe } from "@stripe/stripe-js";
 import Image from "next/image";
 
-import { Container, Text, Button, Paper, Group, Stack, Badge } from "@mantine/core";
-import { IconCreditCard, IconCheck } from "@tabler/icons-react";
+import { Container, Text, Button, Paper, Group, Stack, Badge, Progress } from "@mantine/core";
+import { IconCreditCard, IconCheck, IconLock } from "@tabler/icons-react";
 import PageIllustration from "@/components/page-illustration";
 import { Elements, PaymentElement, useElements, useStripe } from "@stripe/react-stripe-js";
+import styles from "./payment.module.css";
 
 // Initialize Stripe
 const stripePromise = loadStripe("pk_test_51RpQiFL3mrWP7a0P1OYWGeFJWtgMwcWJtiEDLvn29CpYn5x8Ou77YViA1yoimlixKU5aUAeOeN5VTfoC4sMpvFVF00qq9a6BNm");
@@ -54,6 +55,7 @@ interface OrderDetails {
   currency: string;
   date: string;
   suborders: Suborder[];
+  knowledge_download_ids?: string[];
 }
 
 interface PaymentFormProps {
@@ -71,6 +73,8 @@ function PaymentForm({ orderUuid, amount, title, locale, isRTL, orderDetails }: 
   const [isProcessing, setIsProcessing] = useState(false);
   const [paymentStatus, setPaymentStatus] = useState<"idle" | "processing" | "polling" | "success" | "error">("idle");
   const [errorMessage, setErrorMessage] = useState("");
+  const [downloadProgress, setDownloadProgress] = useState(0);
+  const [showDocumentsAdded, setShowDocumentsAdded] = useState(false);
 
   // Get auth token from cookies
   const getAuthToken = () => {
@@ -93,18 +97,31 @@ function PaymentForm({ orderUuid, amount, title, locale, isRTL, orderDetails }: 
     goToDownloads: isRTL ? "الذهاب إلى التنزيلات" : "Go to Downloads",
     paymentFailed: isRTL ? "فشل الدفع" : "Payment Failed",
     tryAgain: isRTL ? "حاول مرة أخرى" : "Try Again",
+    preparingDownloads: isRTL ? "جاري تجهيز التنزيلات..." : "Preparing your downloads...",
+    documentsAdded: isRTL ? "تمت إضافة المستندات إلى التنزيلات الخاصة بك" : "Documents added to your Downloads",
+    congratulations: isRTL ? "تهانينا!" : "Congratulations!",
+    paymentComplete: isRTL ? "تمت معالجة دفعتك بنجاح" : "Your payment has been processed successfully",
+    accessGranted: isRTL ? "يمكنك الآن الوصول إلى جميع المستندات المشتراة" : "You now have access to all your purchased documents",
+    securityNote: isRTL ? "معلومات بطاقتك آمنة ولن يتم حفظها" : "Your card information is secure and will not be saved",
   };
 
   // Poll order status
   const pollOrderStatus = useCallback(async () => {
     const token = getAuthToken();
     let attempts = 0;
-    const maxAttempts = 100; // 30 attempts * 2 seconds = 60 seconds max
+    const maxAttempts = 18; // ~2 minutes with progressive delays
+    
+    // Progressive delay calculation
+    const getPollingDelay = (attempt: number): number => {
+      if (attempt < 5) return 4000;    // 4 seconds for first 5 attempts
+      if (attempt < 10) return 6000;   // 6 seconds for next 5 attempts
+      return 10000;                     // 10 seconds for remaining attempts
+    };
 
     const checkStatus = async (): Promise<boolean> => {
       try {
         const response = await fetch(
-          `https://api.knoldg.com/api/account/order/knowledge/${orderUuid}`,
+          `https://api.foresighta.co/api/account/order/knowledge/${orderUuid}`,
           {
             headers: {
               "Content-Type": "application/json",
@@ -144,8 +161,8 @@ function PaymentForm({ orderUuid, amount, title, locale, isRTL, orderDetails }: 
       }
 
       attempts++;
-      // Wait 2 seconds before next check
-      await new Promise(resolve => setTimeout(resolve, 2000));
+      // Wait with progressive delay before next check
+      await new Promise(resolve => setTimeout(resolve, getPollingDelay(attempts)));
     }
 
     setPaymentStatus("error");
@@ -195,21 +212,107 @@ function PaymentForm({ orderUuid, amount, title, locale, isRTL, orderDetails }: 
     setErrorMessage("");
   };
 
+  // Handle download progress animation when payment succeeds
+  useEffect(() => {
+    if (paymentStatus === "success") {
+      // Animate progress bar over 2.5 seconds
+      const duration = 2500;
+      const interval = 50;
+      const increment = 100 / (duration / interval);
+      
+      const timer = setInterval(() => {
+        setDownloadProgress((prev) => {
+          const next = prev + increment;
+          if (next >= 100) {
+            clearInterval(timer);
+            setTimeout(() => {
+              setShowDocumentsAdded(true);
+            }, 300);
+            return 100;
+          }
+          return next;
+        });
+      }, interval);
+
+      return () => clearInterval(timer);
+    }
+  }, [paymentStatus]);
+
   // Success UI
   if (paymentStatus === "success") {
     return (
-      <div className="max-w-md mx-auto text-center">
-        <div className="mb-6">
-          <div className="mx-auto w-16 h-16 bg-green-100 rounded-full flex items-center justify-center">
-            <IconCheck size={32} className="text-green-600" />
+      <div className={`max-w-md mx-auto text-center ${styles.successContainer}`}>
+        {/* Animated Checkmark */}
+        <div className="mb-8">
+          <div className={`mx-auto w-24 h-24 relative ${styles.checkmarkCircle}`}>
+            <div className="absolute inset-0 bg-gradient-to-br from-green-400 to-emerald-500 rounded-full opacity-20"></div>
+            <div className="absolute inset-0 bg-gradient-to-br from-green-500 to-emerald-600 rounded-full flex items-center justify-center">
+              <svg className="w-12 h-12" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path 
+                  className={styles.checkmarkPath}
+                  d="M5 13l4 4L19 7" 
+                  stroke="white" 
+                  strokeWidth="3" 
+                  strokeLinecap="round" 
+                  strokeLinejoin="round"
+                />
+              </svg>
+            </div>
           </div>
         </div>
-        <h2 className="text-2xl font-bold mb-2">{translations.paymentSuccess}</h2>
-        {/* <p className="text-gray-600 mb-6">{translations.redirecting}</p> */}
+
+        {/* Success Messages */}
+        <h1 className={`text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-green-500 to-emerald-600 mb-2 ${styles.successTitle}`}>
+          {translations.congratulations}
+        </h1>
+        <h2 className={`text-xl font-semibold text-gray-800 mb-3 ${styles.successSubtitle}`}>
+          {translations.paymentComplete}
+        </h2>
+        <p className={`text-gray-600 mb-8 ${styles.successDescription}`}>
+          {translations.accessGranted}
+        </p>
+        
+        {/* Progress section */}
+        <div className={`mb-8 ${styles.progressSection}`}>
+          {!showDocumentsAdded ? (
+            <div className="space-y-4">
+              <Text size="sm" c="dimmed" fw={500}>{translations.preparingDownloads}</Text>
+              <Progress 
+                value={downloadProgress} 
+                size="xl" 
+                radius="xl"
+                color="teal"
+                striped
+                animated={downloadProgress < 100}
+              />
+            </div>
+          ) : (
+            <div className={styles.documentsAddedText}>
+              <div className="flex items-center justify-center gap-2 mb-2">
+                <IconCheck size={20} className="text-emerald-600" />
+                <Text size="md" fw={600} className="text-gray-700">
+                  {translations.documentsAdded}
+                </Text>
+              </div>
+            </div>
+          )}
+        </div>
+        
         <Button
-          size="lg"
-          className="bg-gradient-to-r from-blue-500 to-teal-400"
-          onClick={() => window.location.href = "https://app.knoldg.com/app/insighter-dashboard/my-downloads"}
+          size="md"
+          className={`bg-gradient-to-r from-blue-500 to-teal-400 hover:from-blue-600 hover:to-teal-500 transition-all ${styles.downloadButton}`}
+          onClick={() => {
+            // Use knowledge_download_ids if available, otherwise fall back to title search
+            if (orderDetails?.knowledge_download_ids && orderDetails.knowledge_download_ids.length > 0) {
+              const uuidsParam = `?uuids=${orderDetails.knowledge_download_ids.join(',')}`;
+              window.location.href = `http://localhost:4200/app/insighter-dashboard/my-downloads${uuidsParam}`;
+            } else {
+              // Fallback to title search if no UUIDs available
+              const searchTitle = orderDetails?.suborders?.[0]?.knowledge?.[0]?.title || "";
+              const searchParam = searchTitle ? `?search=${encodeURIComponent(searchTitle)}` : "";
+              window.location.href = `http://localhost:4200/app/insighter-dashboard/my-downloads${searchParam}`;
+            }
+          }}
         >
           {translations.goToDownloads}
         </Button>
@@ -235,9 +338,22 @@ function PaymentForm({ orderUuid, amount, title, locale, isRTL, orderDetails }: 
   }
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-6">
-      {/* Two column layout for larger screens */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+    <div className="space-y-6">
+      {/* Payment Header - Only show for normal payment state */}
+      <div className="text-center mb-8">
+        <h1 className="text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-500 to-teal-400 mb-2">
+          {isRTL ? "إتمام الدفع" : "Complete Your Payment"}
+        </h1>
+        <p className="text-gray-600">
+          {isRTL 
+            ? "أدخل معلومات الدفع الخاصة بك لإكمال الطلب" 
+            : "Enter your payment details to complete the order"}
+        </p>
+      </div>
+
+      <form onSubmit={handleSubmit} className="space-y-6">
+        {/* Two column layout for larger screens */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Order Summary - Left Column */}
         <Paper  p="lg" radius="md" className="border border-gray-200 h-fit">
           <Text size="lg" fw={600} mb="md">
@@ -289,10 +405,17 @@ function PaymentForm({ orderUuid, amount, title, locale, isRTL, orderDetails }: 
             <PaymentElement 
               options={{
                 layout: "tabs",
-                paymentMethodOrder: ["card"],
               }}
             />
           </Paper>
+
+          {/* Security Note */}
+          <div className="flex items-center justify-center gap-2 text-sm text-gray-500">
+            <IconLock size={16} />
+            <Text size="sm" c="dimmed">
+              {translations.securityNote}
+            </Text>
+          </div>
 
           {/* Submit Button */}
           <Button
@@ -312,7 +435,8 @@ function PaymentForm({ orderUuid, amount, title, locale, isRTL, orderDetails }: 
           </Button>
         </div>
       </div>
-    </form>
+      </form>
+    </div>
   );
 }
 
@@ -347,7 +471,7 @@ export default function StripePaymentPage() {
       try {
         const token = getAuthToken();
         const response = await fetch(
-          `https://api.knoldg.com/api/account/order/knowledge/${orderUuid}`,
+          `https://api.foresighta.co/api/account/order/knowledge/${orderUuid}`,
           {
             headers: {
               "Content-Type": "application/json",
@@ -405,17 +529,6 @@ export default function StripePaymentPage() {
       <div className="min-h-screen relative z-1" dir={isRTL ? "rtl" : "ltr"}>
         <Container size="lg" className="py-12">
           <div className="max-w-5xl mx-auto">
-            <div className="text-center mb-8">
-              <h1 className="text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-500 to-teal-400 mb-2">
-                {isRTL ? "إتمام الدفع" : "Complete Your Payment"}
-              </h1>
-              <p className="text-gray-600">
-                {isRTL 
-                  ? "أدخل معلومات الدفع الخاصة بك لإكمال الطلب" 
-                  : "Enter your payment details to complete the order"}
-              </p>
-            </div>
-
             <Elements stripe={stripePromise} options={options}>
               <PaymentForm 
                 orderUuid={orderUuid}

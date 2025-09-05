@@ -219,7 +219,7 @@ export default function ProfilePage() {
         if (entityType === "insighter") {
           // Try insighter API first
           let response = await fetch(
-            `https://api.knoldg.com/api/platform/insighter/profile/${uuid}`,
+            `https://api.foresighta.co/api/platform/insighter/profile/${uuid}`,
             {
               headers: {
                 "Content-Type": "application/json",
@@ -235,7 +235,7 @@ export default function ProfilePage() {
           } else {
             // Fall back to company API if insighter fails
             response = await fetch(
-              `https://api.knoldg.com/api/platform/company/profile/${uuid}`,
+              `https://api.foresighta.co/api/platform/company/profile/${uuid}`,
               {
                 headers: {
                   "Content-Type": "application/json",
@@ -285,7 +285,7 @@ export default function ProfilePage() {
         } else {
           // Default behavior: try company API first
           let response = await fetch(
-            `https://api.knoldg.com/api/platform/company/profile/${uuid}`,
+            `https://api.foresighta.co/api/platform/company/profile/${uuid}`,
             {
               headers: {
                 "Content-Type": "application/json",
@@ -332,7 +332,7 @@ export default function ProfilePage() {
           } else {
             // Try insighter API if company API fails
             response = await fetch(
-              `https://api.knoldg.com/api/platform/insighter/profile/${uuid}`,
+              `https://api.foresighta.co/api/platform/insighter/profile/${uuid}`,
               {
                 headers: {
                   "Content-Type": "application/json",
@@ -375,8 +375,8 @@ export default function ProfilePage() {
         // Now fetch the filtered data
         let url =
           entityType === "insighter"
-            ? `https://api.knoldg.com/api/platform/insighter/knowledge/${uuid}?page=${knowledgePage}&per_page=12`
-            : `https://api.knoldg.com/api/platform/company/knowledge/${uuid}?page=${knowledgePage}&per_page=12`;
+            ? `https://api.foresighta.co/api/platform/insighter/knowledge/${uuid}?page=${knowledgePage}&per_page=12`
+            : `https://api.foresighta.co/api/platform/company/knowledge/${uuid}?page=${knowledgePage}&per_page=12`;
 
         if (selectedType) {
           url += `&type=${selectedType}`;
@@ -424,7 +424,7 @@ export default function ProfilePage() {
       if (isAuth && token) {
         try {
           const response = await fetch(
-            "https://api.knoldg.com/api/account/profile",
+            "https://api.foresighta.co/api/account/profile",
             {
               headers: {
                 "Content-Type": "application/json",
@@ -507,7 +507,7 @@ export default function ProfilePage() {
       endDate.setFullYear(tomorrow.getFullYear() + 1);
       const endDateStr = endDate.toISOString().split("T")[0]; // YYYY-MM-DD format
       const response = await axios.post(
-        `https://api.knoldg.com/api/account/meeting/available/hours/${uuid}`,
+        `https://api.foresighta.co/api/account/meeting/available/hours/${uuid}`,
         {
           start_date: startDate,
           end_date: endDateStr,
@@ -760,7 +760,7 @@ export default function ProfilePage() {
         typeof window !== "undefined" ? localStorage.getItem("token") : null;
 
       const response = await fetch(
-        "https://api.knoldg.com/api/account/meeting/client/check-duplicate-time",
+        "https://api.foresighta.co/api/account/meeting/client/check-duplicate-time",
         {
           method: "POST",
           headers: {
@@ -827,7 +827,7 @@ export default function ProfilePage() {
       const defaultName = uuid.toString().split("-")[0] || "consultant";
 
       const response = await fetch(
-        `https://api.knoldg.com/api/account/meeting/book/${uuid}`,
+        `https://api.foresighta.co/api/account/meeting/book/${uuid}`,
         {
           method: "POST",
           headers: {
@@ -1975,8 +1975,8 @@ export default function ProfilePage() {
                       </h3>
                       <p className="text-gray-500 mb-4">{t("loginToView")}</p>
                       <a
-                        href={`https://app.knoldg.com/auth/login?returnUrl=${encodeURIComponent(
-                          `https://knoldg.com/${locale}/profile/${uuid}${
+                        href={`http://localhost:4200/auth/login?returnUrl=${encodeURIComponent(
+                          `http://localhost:3000/${locale}/profile/${uuid}${
                             typeof window !== "undefined"
                               ? window.location.search
                               : ""
