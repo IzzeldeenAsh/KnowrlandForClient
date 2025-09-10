@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { memo } from 'react';
 
 type IconName = 'all' | 'data' | 'report' | 'insight' | 'manual' | 'course';
 
@@ -94,7 +94,7 @@ interface CategoryIconBoxProps {
   count?: number;
 }
 
-export const CategoryIconBox: React.FC<CategoryIconBoxProps> = ({ name, label, locale, arLabel, className, isSelected = false, onClick, count }) => {
+export const CategoryIconBox = memo<CategoryIconBoxProps>(({ name, label, locale, arLabel, className, isSelected = false, onClick, count }) => {
   // Define badge colors based on category
   const getBadgeColor = (categoryName: IconName) => {
     switch (categoryName) {
@@ -130,4 +130,4 @@ export const CategoryIconBox: React.FC<CategoryIconBoxProps> = ({ name, label, l
       </span>
     </div>
   );
-};
+});

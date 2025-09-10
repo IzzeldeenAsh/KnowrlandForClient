@@ -1364,7 +1364,7 @@ export default function HomePage() {
                       {/* Category Icons */}
            {/* Only show categories when searchType is 'knowledge' */}
         
-             <div className="mt-10">
+             <div className="mt-4">
         {searchType === 'knowledge' && (       <p className="text-sm font-medium text-gray-500 mb-4">{locale === 'ar' ? 'استكشف بحسب الفئة' : 'Explore by category'}</p>)}
                <div className="flex flex-wrap justify-center gap-6 md:gap-8">
                  {/* Using the top-level selectedCategory state */}
@@ -1488,7 +1488,7 @@ export default function HomePage() {
             {/* Total results display moved to ResultsSection */}
             
             {/* Filter toggle button */}
-            <div className="mb-4 flex justify-start">
+            <div className="mb-1 flex justify-start">
               <button
                 onClick={() => {
                   // On tablet/mobile, open drawer instead of toggling sidebar
