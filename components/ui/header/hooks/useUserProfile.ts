@@ -4,6 +4,7 @@ import { useGlobalProfile } from '@/components/auth/GlobalProfileProvider';
 
 export interface User {
   id: number;
+  uuid?: string;
   name: string;
   profile_photo_url: string | null;
   first_name: string;
@@ -12,6 +13,7 @@ export interface User {
   company?: {
     logo: string;
     legal_name?: string;
+    uuid?: string;
   };
 }
 

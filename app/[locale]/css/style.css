@@ -146,3 +146,11 @@ outline: none !important;
   font-weight: 700;
   font-style: italic;
 }
+.p-datatable.p-datatable-gridlines .p-datatable-tbody > tr > td,
+.p-datatable.p-datatable-gridlines .p-datatable-thead > tr > th {
+  border: 1px solid #e5e7eb !important; /* نفس لون الخطوط بالصورة */
+}
+
+.p-datatable .p-datatable-tbody > tr {
+  border-bottom: 1px solid #e5e7eb !important;
+}

@@ -65,9 +65,10 @@ interface PaymentFormProps {
   locale: string;
   isRTL: boolean;
   orderDetails: OrderDetails | null;
+  setOrderDetails: (details: OrderDetails) => void;
 }
 
-function PaymentForm({ orderUuid, amount, title, locale, isRTL, orderDetails }: PaymentFormProps) {
+function PaymentForm({ orderUuid, amount, title, locale, isRTL, orderDetails, setOrderDetails }: PaymentFormProps) {
   const stripe = useStripe();
   const elements = useElements();
   const [isProcessing, setIsProcessing] = useState(false);
@@ -75,6 +76,7 @@ function PaymentForm({ orderUuid, amount, title, locale, isRTL, orderDetails }: 
   const [errorMessage, setErrorMessage] = useState("");
   const [downloadProgress, setDownloadProgress] = useState(0);
   const [showDocumentsAdded, setShowDocumentsAdded] = useState(false);
+  const [isFetchingDownloadIds, setIsFetchingDownloadIds] = useState(false);
 
   // Get auth token from cookies
   const getAuthToken = () => {
@@ -84,6 +86,39 @@ function PaymentForm({ orderUuid, amount, title, locale, isRTL, orderDetails }: 
       ?.split("=")[1];
     return token;
   };
+
+  // Fetch updated order details to get knowledge_download_ids
+  const fetchUpdatedOrderDetails = useCallback(async (uuid: string, setOrderDetails: (details: OrderDetails) => void) => {
+    try {
+      setIsFetchingDownloadIds(true);
+      const token = getAuthToken();
+      const response = await fetch(
+        `https://api.foresighta.co/api/account/order/knowledge/${uuid}`,
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Accept: "application/json",
+            "Accept-Language": locale,
+            "X-Timezone": Intl.DateTimeFormat().resolvedOptions().timeZone,
+            ...(token && { Authorization: `Bearer ${token}` }),
+          },
+        }
+      );
+
+      if (response.ok) {
+        const data = await response.json();
+        console.log('Updated order details fetched:', data.data); // Debug log
+        const updatedOrderData = data.data;
+        setOrderDetails(updatedOrderData);
+        return updatedOrderData;
+      }
+    } catch (error) {
+      console.error("Error fetching updated order details:", error);
+    } finally {
+      setIsFetchingDownloadIds(false);
+    }
+    return null;
+  }, [locale]);
 
   // Translations
   const translations = {
@@ -225,8 +260,11 @@ function PaymentForm({ orderUuid, amount, title, locale, isRTL, orderDetails }: 
           const next = prev + increment;
           if (next >= 100) {
             clearInterval(timer);
-            setTimeout(() => {
+            setTimeout(async () => {
               setShowDocumentsAdded(true);
+              // Recall the API to get updated knowledge_download_ids after documents are processed
+              console.log('Documents processed, fetching updated order details...'); // Debug log
+              await fetchUpdatedOrderDetails(orderUuid, setOrderDetails);
             }, 300);
             return 100;
           }
@@ -236,7 +274,7 @@ function PaymentForm({ orderUuid, amount, title, locale, isRTL, orderDetails }: 
 
       return () => clearInterval(timer);
     }
-  }, [paymentStatus]);
+  }, [paymentStatus, orderUuid, fetchUpdatedOrderDetails, setOrderDetails]);
 
   // Success UI
   if (paymentStatus === "success") {
@@ -301,20 +339,28 @@ function PaymentForm({ orderUuid, amount, title, locale, isRTL, orderDetails }: 
         <Button
           size="md"
           className={`bg-gradient-to-r from-blue-500 to-teal-400 hover:from-blue-600 hover:to-teal-500 transition-all ${styles.downloadButton}`}
+          loading={isFetchingDownloadIds}
+          disabled={isFetchingDownloadIds}
           onClick={() => {
+            console.log('Download button clicked. Order details:', orderDetails); // Debug log
             // Use knowledge_download_ids if available, otherwise fall back to title search
             if (orderDetails?.knowledge_download_ids && orderDetails.knowledge_download_ids.length > 0) {
               const uuidsParam = `?uuids=${orderDetails.knowledge_download_ids.join(',')}`;
+              console.log('Redirecting with UUIDs:', uuidsParam); // Debug log
               window.location.href = `http://localhost:4200/app/insighter-dashboard/my-downloads${uuidsParam}`;
             } else {
+              console.log('No UUIDs available, falling back to search'); // Debug log
               // Fallback to title search if no UUIDs available
               const searchTitle = orderDetails?.suborders?.[0]?.knowledge?.[0]?.title || "";
               const searchParam = searchTitle ? `?search=${encodeURIComponent(searchTitle)}` : "";
+              console.log('Redirecting with search:', searchParam); // Debug log
               window.location.href = `http://localhost:4200/app/insighter-dashboard/my-downloads${searchParam}`;
             }
           }}
         >
-          {translations.goToDownloads}
+          {isFetchingDownloadIds 
+            ? (isRTL ? "جاري التحديث..." : "Updating...")
+            : translations.goToDownloads}
         </Button>
       </div>
     );
@@ -537,6 +583,7 @@ export default function StripePaymentPage() {
                 locale={locale}
                 isRTL={isRTL}
                 orderDetails={orderDetails}
+                setOrderDetails={setOrderDetails}
               />
             </Elements>
           </div>

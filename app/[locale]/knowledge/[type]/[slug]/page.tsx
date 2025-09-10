@@ -435,6 +435,7 @@ export default function KnowledgePage({ params }: Props) {
               purchased_status={knowledge.purchased_status}
               is_read_later={knowledge.is_read_later}
               knowledgeUUID={knowledge.id}
+              insighterUUID={knowledge.insighter.uuid}
             />
           </div>
         </div>
