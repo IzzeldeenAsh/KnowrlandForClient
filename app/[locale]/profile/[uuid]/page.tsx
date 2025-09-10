@@ -16,6 +16,8 @@ import {
   Textarea,
   Button,
   Tabs,
+  Checkbox,
+  Image as MantineImage,
 } from "@mantine/core";
 import { useParams, useRouter } from "next/navigation";
 import {
@@ -46,6 +48,75 @@ import InstagramIcon from "@/public/file-icons/instagram";
 import { useTranslations } from "next-intl";
 import styles from "./profile.module.css";
 import Link from "next/link";
+import { loadStripe } from "@stripe/stripe-js";
+import { Elements, PaymentElement, useElements, useStripe } from "@stripe/react-stripe-js";
+
+// Initialize Stripe
+const stripePromise = loadStripe("pk_test_51RpQiFL3mrWP7a0P1OYWGeFJWtgMwcWJtiEDLvn29CpYn5x8Ou77YViA1yoimlixKU5aUAeOeN5VTfoC4sMpvFVF00qq9a6BNm");
+
+// Stripe Payment Form Component
+interface StripePaymentFormProps {
+  clientSecret: string;
+  onSuccess: () => void;
+  onError: (error: string) => void;
+  isProcessing: boolean;
+  setIsProcessing: (processing: boolean) => void;
+  locale: string;
+}
+
+function StripePaymentForm({ 
+  clientSecret, 
+  onSuccess, 
+  onError, 
+  isProcessing, 
+  setIsProcessing,
+  locale 
+}: StripePaymentFormProps) {
+  const stripe = useStripe();
+  const elements = useElements();
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    if (!stripe || !elements) {
+      return;
+    }
+
+    setIsProcessing(true);
+
+    const { error } = await stripe.confirmPayment({
+      elements,
+      confirmParams: {
+        return_url: window.location.href,
+      },
+      redirect: "if_required",
+    });
+
+    if (error) {
+      onError(error.message || "Payment failed");
+      setIsProcessing(false);
+    } else {
+      onSuccess();
+    }
+  };
+
+  return (
+    <form onSubmit={handleSubmit}>
+      <PaymentElement />
+      <Button
+        type="submit"
+        loading={isProcessing}
+        disabled={!stripe || !elements || isProcessing}
+        className="w-full mt-4"
+        size="md"
+      >
+        {isProcessing 
+          ? (locale === "ar" ? "جاري المعالجة..." : "Processing...")
+          : (locale === "ar" ? "ادفع الآن" : "Pay Now")}
+      </Button>
+    </form>
+  );
+}
 
 interface SocialLink {
   id: number;
@@ -201,6 +272,16 @@ export default function ProfilePage() {
   }>({});
   const [showDuplicateWarning, setShowDuplicateWarning] = useState(false);
   const [isDuplicateCheckLoading, setIsDuplicateCheckLoading] = useState(false);
+  
+  // Payment related states
+  const [paymentMethod, setPaymentMethod] = useState<"manual" | "provider" | null>(null);
+  const [walletBalance, setWalletBalance] = useState(0);
+  const [showSuccessUI, setShowSuccessUI] = useState(false);
+  const [clientSecret, setClientSecret] = useState<string | null>(null);
+  const [orderUuid, setOrderUuid] = useState<string | null>(null);
+  const [showStripeElements, setShowStripeElements] = useState(false);
+  const [isPollingStatus, setIsPollingStatus] = useState(false);
+  const [isStripeProcessing, setIsStripeProcessing] = useState(false);
 
   // Get entity type from search params (safe for SSR)
   const entityParam = searchParams.get("entity");
@@ -560,6 +641,38 @@ export default function ProfilePage() {
     }
   }, [entityParam, isAuthenticated, authChecked]); // Run once authentication status is confirmed
 
+  // Fetch wallet balance when booking modal opens
+  useEffect(() => {
+    if (isBookingModalOpen && isAuthenticated) {
+      fetchWalletBalance();
+    }
+  }, [isBookingModalOpen, isAuthenticated]);
+
+  // Fetch wallet balance
+  const fetchWalletBalance = async () => {
+    try {
+      const token = typeof window !== "undefined" ? localStorage.getItem("token") : null;
+      if (!token) return;
+      
+      const response = await fetch("https://api.foresighta.co/api/account/wallet/balance", {
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+          "Accept-Language": locale,
+          "X-Timezone": Intl.DateTimeFormat().resolvedOptions().timeZone,
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        setWalletBalance(data.data?.balance || 0);
+      }
+    } catch (error) {
+      console.error("Error fetching wallet balance:", error);
+    }
+  };
+
   const getSocialIcon = (type: string) => {
     switch (type) {
       case "facebook":
@@ -789,6 +902,51 @@ export default function ProfilePage() {
     }
   };
 
+  const pollOrderStatus = async (orderUuid: string): Promise<boolean> => {
+    const token = typeof window !== "undefined" ? localStorage.getItem("token") : null;
+    if (!token) return false;
+
+    const getPollingDelay = (attempt: number): number => {
+      const delays = [1000, 2000, 3000, 5000, 8000, 10000];
+      return delays[Math.min(attempt, delays.length - 1)];
+    };
+
+    const checkStatus = async (): Promise<boolean> => {
+      try {
+        const response = await fetch(
+          `https://api.foresighta.co/api/account/order/meeting/${orderUuid}`,
+          {
+            headers: {
+              "Content-Type": "application/json",
+              Accept: "application/json",
+              "Accept-Language": locale,
+              "X-Timezone": Intl.DateTimeFormat().resolvedOptions().timeZone,
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+
+        if (!response.ok) throw new Error("Failed to check payment status");
+        
+        const data = await response.json();
+        return data.data?.status === "paid" || data.data?.payment_status === "completed";
+      } catch (error) {
+        console.error("Error checking payment status:", error);
+        return false;
+      }
+    };
+
+    for (let attempt = 0; attempt < 10; attempt++) {
+      const isPaid = await checkStatus();
+      if (isPaid) return true;
+      
+      const delay = getPollingDelay(attempt);
+      await new Promise(resolve => setTimeout(resolve, delay));
+    }
+    
+    return false;
+  };
+
   // Submit booking - handles the API call
   const submitBookMeeting = async (skipDuplicateCheck = false) => {
     if (!selectedDate || !selectedMeetingTime) return;
@@ -826,8 +984,19 @@ export default function ProfilePage() {
       // Get profile name from URL if profileData is unavailable
       const defaultName = uuid.toString().split("-")[0] || "consultant";
 
+      // Check if meeting requires payment
+      const meetingPrice = parseFloat(selectedMeetingTime.rate);
+      const isFree = meetingPrice === 0;
+
+      // For paid meetings, check payment method selection
+      if (!isFree && !paymentMethod) {
+        setBookingError("Please select a payment method");
+        setIsBookingLoading(false);
+        return;
+      }
+
       const response = await fetch(
-        `https://api.foresighta.co/api/account/meeting/book/${uuid}`,
+        `https://api.foresighta.co/api/account/order/meeting/checkout/${uuid}`,
         {
           method: "POST",
           headers: {
@@ -842,6 +1011,7 @@ export default function ProfilePage() {
             end_time: selectedMeetingTime.end_time.substring(0, 5),
             title: meetingTitle || `Meeting with ${defaultName}`,
             description: meetingDescription || "No description provided",
+            payment_method: isFree ? "free" : paymentMethod,
           }),
         }
       );
@@ -851,28 +1021,43 @@ export default function ProfilePage() {
         throw new Error(errorData.message || "Failed to book meeting");
       }
 
-      // Handle successful booking
-      setIsBookingModalOpen(false);
-      setMeetingTitle("");
-      setMeetingDescription("");
-      setSelectedMeetingTime(null);
-      setSelectedDate(null);
+      const data = await response.json();
 
-      // Show success notification or message
-      setToastProps({
-        message: `Successfully booked meeting on ${new Date(
-          selectedDate
-        ).toLocaleDateString()} at ${selectedMeetingTime.start_time.substring(
-          0,
-          5
-        )} - ${selectedMeetingTime.end_time.substring(0, 5)}`,
-        type: "success",
-        title: "Booking Confirmed",
-      });
-      setShowToast(true);
+      // Handle different payment scenarios
+      if (isFree || paymentMethod === "manual") {
+        // Free session or wallet payment - booking is complete
+        setIsBookingModalOpen(false);
+        setMeetingTitle("");
+        setMeetingDescription("");
+        setSelectedMeetingTime(null);
+        setSelectedDate(null);
+        setPaymentMethod(null);
 
-      // Refresh availability if needed
-      fetchMeetingAvailability();
+        // Show enhanced success UI
+        setShowSuccessUI(true);
+
+        // Refresh availability and wallet balance
+        fetchMeetingAvailability();
+        fetchWalletBalance();
+      } else if (paymentMethod === "provider") {
+        // Stripe payment required
+        console.log('Stripe payment data:', data); // Debug log
+        
+        // Check both possible response structures
+        const responseData = data.data || data;
+        const { client_secret, order_uuid } = responseData;
+        
+        console.log('Extracted values:', { client_secret, order_uuid }); // Debug log
+        
+        if (client_secret && order_uuid) {
+          setClientSecret(client_secret);
+          setOrderUuid(order_uuid);
+          setShowStripeElements(true);
+        } else {
+          console.error('Missing payment data in response:', responseData);
+          throw new Error("Payment setup failed - missing payment information");
+        }
+      }
     } catch (error: any) {
       console.error("Error booking meeting:", error);
       setBookingError(
@@ -2216,7 +2401,7 @@ export default function ProfilePage() {
               opened={isBookingModalOpen}
               onClose={() => setIsBookingModalOpen(false)}
               title={t("bookASession")}
-              size="md"
+              size="lg"
               centered
             >
               <div className="p-2">
@@ -2320,6 +2505,127 @@ export default function ProfilePage() {
                     </div>
                   </div>
 
+                  {/* Payment Section */}
+                  {selectedMeetingTime && parseFloat(selectedMeetingTime.rate) > 0 && (
+                    <div className="mb-6">
+                      <h4 className="font-medium mb-4 text-gray-800 dark:text-gray-200 required">{t("paymentOptions")}</h4>
+                      
+                    
+                      {/* Payment methods in one row */}
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        {/* Knoldg Wallet Option */}
+                        <div 
+                          className={`border rounded-lg p-4 cursor-pointer transition-all ${
+                            paymentMethod === "manual" 
+                              ? "border-blue-500 bg-blue-50 dark:bg-blue-900/20" 
+                              : "border-gray-200 dark:border-slate-600 hover:border-gray-300 dark:hover:border-slate-500"
+                          } ${
+                            walletBalance < parseFloat(selectedMeetingTime.rate)
+                              ? "opacity-50 cursor-not-allowed"
+                              : ""
+                          }`}
+                          onClick={() => {
+                            if (walletBalance >= parseFloat(selectedMeetingTime.rate)) {
+                              setPaymentMethod("manual")
+                            }
+                          }}
+                        >
+                          <div className="flex flex-col items-center text-center space-y-3">
+                            <input
+                              type="radio"
+                              name="paymentMethod"
+                              value="manual"
+                              checked={paymentMethod === "manual"}
+                              disabled={walletBalance < parseFloat(selectedMeetingTime.rate)}
+                              onChange={() => {
+                                if (walletBalance >= parseFloat(selectedMeetingTime.rate)) {
+                                  setPaymentMethod("manual")
+                                }
+                              }}
+                              className="w-4 h-4"
+                            />
+                            <div className="w-10 h-10 flex items-center justify-center">
+                              <MantineImage
+                                src="http://localhost:4200/assets/media/logos/custom-2.svg"
+                                alt="Knoldg Wallet"
+                                width={32}
+                                height={32}
+                                fit="contain"
+                              />
+                            </div>
+                            <div>
+                              <div className="font-medium text-sm text-gray-800 dark:text-gray-200">
+                                {locale.startsWith('ar') ? 'محفظة نولدج' : 'Knoldg Wallet'}
+                              </div>
+                              <div className="text-xs text-gray-600 dark:text-gray-400 mt-1">
+                                {locale.startsWith('ar') 
+                                  ? `الرصيد: $${walletBalance}`
+                                  : `Balance: $${walletBalance}`}
+                              </div>
+                              {walletBalance >= parseFloat(selectedMeetingTime.rate) ? (
+                                <div className="text-xs text-green-600 dark:text-green-400 font-medium">
+                                  {locale.startsWith('ar') ? 'رصيد كافي' : 'Sufficient balance'}
+                                </div>
+                              ) : (
+                                <div className="text-xs text-red-500 font-medium">
+                                  {locale.startsWith('ar') ? 'رصيد غير كافي' : 'Insufficient balance'}
+                                </div>
+                              )}
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* Stripe Provider Option */}
+                        <div 
+                          className={`border rounded-lg p-4 cursor-pointer transition-all ${
+                            paymentMethod === "provider" 
+                              ? "border-blue-500 bg-blue-50 dark:bg-blue-900/20" 
+                              : "border-gray-200 dark:border-slate-600 hover:border-gray-300 dark:hover:border-slate-500"
+                          }`}
+                          onClick={() => setPaymentMethod("provider")}
+                        >
+                          <div className="flex flex-col items-center text-center space-y-3">
+                            <input
+                              type="radio"
+                              name="paymentMethod"
+                              value="provider"
+                              checked={paymentMethod === "provider"}
+                              onChange={() => setPaymentMethod("provider")}
+                              className="w-4 h-4"
+                            />
+                            <div className="w-10 h-10 flex items-center justify-center">
+                              <MantineImage
+                                src="https://res.cloudinary.com/dsiku9ipv/image/upload/v1754902439/New_Project_12_jmtvd6.png"
+                                alt="Stripe"
+                                width={50}
+                                height={25}
+                                fit="contain"
+                              />
+                            </div>
+                            <div>
+                              <div className="font-medium text-sm text-gray-800 dark:text-gray-200">
+                                {locale.startsWith('ar') ? 'مزود سترايب' : 'Stripe Provider'}
+                              </div>
+                              <div className="text-xs text-gray-600 dark:text-gray-400 mt-1">
+                                {locale.startsWith('ar') 
+                                  ? 'دفع بالبطاقة الائتمانية'
+                                  : 'Credit/Debit Card'}
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
+                  {selectedMeetingTime && parseFloat(selectedMeetingTime.rate) === 0 && (
+                    <div className="mb-4 p-3 bg-green-50 dark:bg-green-900/20 rounded">
+                      <p className="text-sm text-green-700 dark:text-green-300">
+                        {t("freeSession")}
+                      </p>
+                    </div>
+                  )}
+
                   <div className="flex justify-end gap-3 mt-6">
                     <Button
                       variant="subtle"
@@ -2378,6 +2684,124 @@ export default function ProfilePage() {
                   </Button>
                 </div>
               </div>
+            </Modal>
+
+            {/* Success Modal */}
+            <Modal
+              opened={showSuccessUI}
+              onClose={() => {
+                setShowSuccessUI(false);
+                setShowStripeElements(false);
+                setClientSecret(null);
+                setOrderUuid(null);
+              }}
+              size="md"
+              centered
+              withCloseButton={false}
+            >
+              <div className="text-center py-8">
+                {/* Animated Checkmark */}
+                <div className="mb-8">
+                  <div className="mx-auto w-24 h-24 relative">
+                    <div className="absolute inset-0 bg-gradient-to-br from-green-400 to-emerald-500 rounded-full opacity-20"></div>
+                    <div className="absolute inset-0 bg-gradient-to-br from-green-500 to-emerald-600 rounded-full flex items-center justify-center">
+                      <svg className="w-12 h-12" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={3}
+                          d="M5 13l4 4L19 7"
+                          stroke="white"
+                        />
+                      </svg>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Success Messages */}
+                <h1 className="text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-green-500 to-emerald-600 mb-2">
+                  {locale.startsWith('ar') ? 'تهانينا!' : 'Congratulations!'}
+                </h1>
+                <h2 className="text-xl font-semibold text-gray-800 dark:text-gray-200 mb-3">
+                  {locale.startsWith('ar') ? 'تم حجز الاجتماع بنجاح!' : 'Meeting Booked Successfully!'}
+                </h2>
+                <p className="text-gray-600 dark:text-gray-400 mb-8">
+                  {locale.startsWith('ar') 
+                    ? 'تم تأكيد حجز اجتماعك بنجاح'
+                    : 'Your meeting has been successfully confirmed'}
+                </p>
+                
+                
+                <Button
+                  size="md"
+                  className="bg-gradient-to-r from-blue-500 to-teal-400 hover:from-blue-600 hover:to-teal-500 transition-all"
+                  onClick={() => {
+                    // Redirect to meetings dashboard
+                    window.location.href = "http://localhost:4200/app/insighter-dashboard/my-meetings/sent";
+                  }}
+                >
+                  {locale.startsWith('ar') ? 'اذهب إلى الاجتماعات' : 'Go to Meetings'}
+                </Button>
+              </div>
+            </Modal>
+
+            {/* Stripe Payment Modal */}
+            <Modal
+              opened={showStripeElements && !!clientSecret}
+              onClose={() => {
+                if (!isStripeProcessing && !isPollingStatus) {
+                  setShowStripeElements(false);
+                  setClientSecret(null);
+                  setOrderUuid(null);
+                }
+              }}
+              title={locale.startsWith('ar') ? 'إتمام الدفع' : 'Complete Payment'}
+              size="md"
+              centered
+            >
+              {clientSecret && (
+                <Elements
+                  stripe={stripePromise}
+                  options={{
+                    clientSecret,
+                  }}
+                >
+                  <StripePaymentForm
+                    clientSecret={clientSecret}
+                    onSuccess={async () => {
+                      if (orderUuid) {
+                        const success = await pollOrderStatus(orderUuid);
+                        if (success) {
+                          setShowStripeElements(false);
+                          setShowSuccessUI(true);
+                          setIsBookingModalOpen(false);
+                          setSelectedMeetingTime(null);
+                          setSelectedDate(null);
+                        } else {
+                          setBookingError(t("paymentVerificationFailed"));
+                          setShowStripeElements(false);
+                        }
+                      }
+                    }}
+                    onError={(error: string) => {
+                      setBookingError(error);
+                      setShowStripeElements(false);
+                    }}
+                    isProcessing={isStripeProcessing || isPollingStatus}
+                    setIsProcessing={setIsStripeProcessing}
+                    locale={locale}
+                  />
+                  
+                  {isPollingStatus && (
+                    <div className="mt-4 text-center">
+                      <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500 mx-auto mb-2"></div>
+                      <p className="text-sm text-gray-600">
+                        {t("verifyingPayment")}
+                      </p>
+                    </div>
+                  )}
+                </Elements>
+              )}
             </Modal>
           </div>
         </div>

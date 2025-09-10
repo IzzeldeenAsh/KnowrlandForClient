@@ -205,9 +205,6 @@ export default function SearchResultsGrid({
       const slug = item.url.split('/').pop();
       const url = `https://api.foresighta.co/api/account/favorite/knowledge/${slug}`;
 
-      console.log(`[Read Later] ${method} request to:`, url);
-      console.log(`[Read Later] Current state:`, currentState, 'Item ID:', itemId, 'Slug:', slug);
-
       const response = await axios({
         method,
         url,
@@ -219,12 +216,9 @@ export default function SearchResultsGrid({
         }
       });
 
-      console.log(`[Read Later] Response status:`, response.status, 'Data:', response.data);
-
       // Check for successful responses (200, 201, 204)
       if (response.status >= 200 && response.status < 300) {
         setReadLaterStates(prev => ({ ...prev, [itemId]: !currentState }));
-        console.log(`[Read Later] Success! New state:`, !currentState);
       } else {
         console.error('Failed to toggle read later status. Status:', response.status, 'Response:', response.data);
       }

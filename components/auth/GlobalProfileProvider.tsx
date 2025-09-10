@@ -104,6 +104,7 @@ export function GlobalProfileProvider({ children }: { children: React.ReactNode 
         
         const userData: User = {
           id: data.data.id,
+          uuid: data.data.uuid,
           name: data.data.name,
           email: data.data.email,
           profile_photo_url: data.data.profile_photo_url,
