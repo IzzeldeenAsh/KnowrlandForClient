@@ -13,11 +13,18 @@ import {
   Stack,
   Image as MantineImage,
   Container,
+  Progress,
 } from "@mantine/core";
 import { IconCheck } from "@tabler/icons-react";
 import Image from "next/image";
 import { useToast } from "@/components/toast/ToastContext";
 import PageIllustration from "@/components/page-illustration";
+import { 
+  VisaIcon, 
+  MasterCardIcon, 
+  GooglePayIcon, 
+  ApplePayIcon 
+} from "@/components/payment-icons";
 import styles from "./checkout.module.css";
 
 interface Document {
@@ -87,6 +94,11 @@ export default function CheckoutPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [isCheckingOut, setIsCheckingOut] = useState(false);
   const [showSuccessUI, setShowSuccessUI] = useState(false);
+  const [downloadProgress, setDownloadProgress] = useState(0);
+  const [showDocumentsAdded, setShowDocumentsAdded] = useState(false);
+  const [knowledgeDownloadIds, setKnowledgeDownloadIds] = useState<string[]>([]);
+  const [orderUuid, setOrderUuid] = useState<string>("");
+  const [isFetchingDownloadIds, setIsFetchingDownloadIds] = useState(false);
 
   // Translations
   const translations = {
@@ -114,6 +126,11 @@ export default function CheckoutPage() {
       ? "تم إكمال طلبك بنجاح. يمكنك الآن تنزيل المستندات المشتراة."
       : "Your order has been completed successfully. You can now download your purchased documents.",
     goToDownloads: isRTL ? "الذهاب إلى التنزيلات" : "Go to Downloads",
+    congratulations: isRTL ? "تهانينا!" : "Congratulations!",
+    paymentComplete: isRTL ? "تمت معالجة دفعتك بنجاح" : "Your payment has been processed successfully",
+    accessGranted: isRTL ? "يمكنك الآن الوصول إلى جميع المستندات المشتراة" : "You now have access to all your purchased documents",
+    preparingDownloads: isRTL ? "جاري تجهيز التنزيلات..." : "Preparing your downloads...",
+    documentsAdded: isRTL ? "تمت إضافة المستندات إلى التنزيلات الخاصة بك" : "Documents added to your Downloads",
   };
 
   // Get auth token from cookies
@@ -221,6 +238,44 @@ export default function CheckoutPage() {
     }).format(amount);
   };
 
+  // Fetch updated order details to get knowledge_download_ids
+  const fetchUpdatedOrderDetails = async (uuid: string) => {
+    try {
+      setIsFetchingDownloadIds(true);
+      const token = getAuthToken();
+      const response = await fetch(
+        `https://api.knoldg.com/api/account/order/knowledge/${uuid}`,
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Accept: "application/json",
+            "Accept-Language": locale,
+            "X-Timezone": Intl.DateTimeFormat().resolvedOptions().timeZone,
+            ...(token && { Authorization: `Bearer ${token}` }),
+          },
+        }
+      );
+
+      if (response.ok) {
+        const data = await response.json();
+        console.log('Updated order details fetched:', data.data); // Debug log
+        const updatedOrderData = data.data;
+        
+        // Extract knowledge_download_ids if available
+        if (updatedOrderData.knowledge_download_ids) {
+          setKnowledgeDownloadIds(updatedOrderData.knowledge_download_ids);
+        }
+        
+        return updatedOrderData;
+      }
+    } catch (error) {
+      console.error("Error fetching updated order details:", error);
+    } finally {
+      setIsFetchingDownloadIds(false);
+    }
+    return null;
+  };
+
   // Handle document selection toggle
   const handleDocumentToggle = (documentId: number) => {
     setSelectedDocuments((prev) =>
@@ -229,6 +284,37 @@ export default function CheckoutPage() {
         : [...prev, documentId]
     );
   };
+
+  // Handle download progress animation when payment succeeds
+  useEffect(() => {
+    if (showSuccessUI) {
+      // Animate progress bar over 2.5 seconds
+      const duration = 2500;
+      const interval = 50;
+      const increment = 100 / (duration / interval);
+      
+      const timer = setInterval(() => {
+        setDownloadProgress((prev) => {
+          const next = prev + increment;
+          if (next >= 100) {
+            clearInterval(timer);
+            setTimeout(async () => {
+              setShowDocumentsAdded(true);
+              // Recall the API to get updated knowledge_download_ids after documents are processed
+              if (orderUuid) {
+                console.log('Documents processed, fetching updated order details...'); // Debug log
+                await fetchUpdatedOrderDetails(orderUuid);
+              }
+            }, 300);
+            return 100;
+          }
+          return next;
+        });
+      }, interval);
+
+      return () => clearInterval(timer);
+    }
+  }, [showSuccessUI, orderUuid]);
 
   // Handle checkout
   const handleCheckout = async () => {
@@ -277,6 +363,19 @@ export default function CheckoutPage() {
         throw new Error(
           data.message || `HTTP error! status: ${response.status}`
         );
+      }
+
+      // Extract order data
+      const responseData = data.data || data;
+      
+      // Store the order UUID for later use
+      if (responseData.uuid) {
+        setOrderUuid(responseData.uuid);
+      }
+      
+      // Extract knowledge_download_ids if available
+      if (responseData.knowledge_download_ids) {
+        setKnowledgeDownloadIds(responseData.knowledge_download_ids);
       }
 
       // Handle Stripe payment
@@ -350,20 +449,88 @@ export default function CheckoutPage() {
         
         <div className="min-h-screen relative z-1" dir={isRTL ? "rtl" : "ltr"}>
           <Container size="sm" className="py-12">
-            <div className="max-w-md mx-auto text-center">
-              <div className="mb-6">
-                <div className="mx-auto w-16 h-16 bg-green-100 rounded-full flex items-center justify-center">
-                  <IconCheck size={32} className="text-green-600" />
+            <div className={`max-w-md mx-auto text-center ${styles.successContainer}`}>
+              {/* Animated Checkmark */}
+              <div className="mb-8">
+                <div className={`mx-auto w-24 h-24 relative ${styles.checkmarkCircle}`}>
+                  <div className="absolute inset-0 bg-gradient-to-br from-green-400 to-emerald-500 rounded-full opacity-20"></div>
+                  <div className="absolute inset-0 bg-gradient-to-br from-green-500 to-emerald-600 rounded-full flex items-center justify-center">
+                    <svg className="w-12 h-12" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <path 
+                        className={styles.checkmarkPath}
+                        d="M5 13l4 4L19 7" 
+                        stroke="white" 
+                        strokeWidth="3" 
+                        strokeLinecap="round" 
+                        strokeLinejoin="round"
+                      />
+                    </svg>
+                  </div>
                 </div>
               </div>
-              <h2 className="text-2xl font-bold mb-2">{translations.paymentSuccess}</h2>
-              <p className="text-gray-600 mb-6">{translations.orderCompleted}</p>
+
+              {/* Success Messages */}
+              <h1 className={`text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-green-500 to-emerald-600 mb-2 ${styles.successTitle}`}>
+                {translations.congratulations}
+              </h1>
+              <h2 className={`text-xl font-semibold text-gray-800 mb-3 ${styles.successSubtitle}`}>
+                {translations.paymentComplete}
+              </h2>
+              <p className={`text-gray-600 mb-8 ${styles.successDescription}`}>
+                {translations.accessGranted}
+              </p>
+              
+              {/* Progress section */}
+              <div className={`mb-8 ${styles.progressSection}`}>
+                {!showDocumentsAdded ? (
+                  <div className="space-y-4">
+                    <Text size="sm" c="dimmed" fw={500}>{translations.preparingDownloads}</Text>
+                    <Progress 
+                      value={downloadProgress} 
+                      size="xl" 
+                      radius="xl"
+                      color="teal"
+                      striped
+                      animated={downloadProgress < 100}
+                    />
+                  </div>
+                ) : (
+                  <div className={styles.documentsAddedText}>
+                    <div className="flex items-center justify-center gap-2 mb-2">
+                      <IconCheck size={20} className="text-emerald-600" />
+                      <Text size="md" fw={600} className="text-gray-700">
+                        {translations.documentsAdded}
+                      </Text>
+                    </div>
+                  </div>
+                )}
+              </div>
+              
               <Button
-                size="lg"
-                className="bg-gradient-to-r from-blue-500 to-teal-400"
-                onClick={() => window.location.href = "https://app.knoldg.com/app/insighter-dashboard/my-downloads"}
+                size="md"
+                className={`bg-gradient-to-r from-blue-500 to-teal-400 hover:from-blue-600 hover:to-teal-500 transition-all ${styles.downloadButton}`}
+                loading={isFetchingDownloadIds}
+                disabled={isFetchingDownloadIds}
+                onClick={() => {
+                  console.log('Download button clicked. Knowledge download IDs:', knowledgeDownloadIds); // Debug log
+                  // Use UUIDs if available, otherwise fall back to title search
+                  if (knowledgeDownloadIds && knowledgeDownloadIds.length > 0) {
+                    const uuidsParam = `?uuids=${knowledgeDownloadIds.join(',')}`;
+                    console.log('Redirecting with UUIDs:', uuidsParam); // Debug log
+                    window.location.href = `https://app.knoldg.com/app/insighter-dashboard/my-downloads${uuidsParam}`;
+                  } else {
+                    console.log('No UUIDs available, falling back to search'); // Debug log
+                    // Fallback to title search if no UUIDs available
+                    const searchTitle = knowledge?.title || "";
+                    const searchParam = searchTitle ? `?search=${encodeURIComponent(searchTitle)}` : "";
+                    console.log('Redirecting with search:', searchParam); // Debug log
+                    window.location.href = `https://app.knoldg.com/app/insighter-dashboard/my-downloads${searchParam}`;
+                  }
+                }}
               >
-                {translations.goToDownloads}
+                {isFetchingDownloadIds 
+                  ? (isRTL ? "جاري التحديث..." : "Updating...")
+                  : translations.goToDownloads}
               </Button>
             </div>
           </Container>
@@ -551,30 +718,17 @@ export default function CheckoutPage() {
                           </div>
                           <div
                             style={{
-                              width: 40,
-                              height: 40,
-                              display: "flex",
-                              alignItems: "center",
-                              justifyContent: "center",
-                            }}
-                          >
-                            <MantineImage
-                              src="https://res.cloudinary.com/dsiku9ipv/image/upload/v1754902439/New_Project_12_jmtvd6.png"
-                              alt="Stripe"
-                              width={50}
-                              height={25}
-                              fit="contain"
-                            />
-                          </div>
-                          <div
-                            style={{
                               flex: 1,
                               minHeight: "48px",
                               display: "flex",
                               alignItems: "center",
+                              gap: "20px",
                             }}
                           >
-                            <Text fw={500}>{translations.stripeProvider}</Text>
+                            <VisaIcon />
+                            <MasterCardIcon />
+                            <GooglePayIcon />
+                            <ApplePayIcon />
                           </div>
                         </Group>
                       </div>

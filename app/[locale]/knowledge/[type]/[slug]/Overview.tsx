@@ -9,6 +9,7 @@ import { Group, Text, Badge } from '@mantine/core'
 import { useParams } from 'next/navigation'
 import BuyModal from './BuyModal'
 import AuthModal from './AuthModal'
+import { useGlobalProfile } from '@/components/auth/GlobalProfileProvider'
 
 // Define interfaces for minimal typing, you can expand these as needed
 interface Document {
@@ -33,6 +34,9 @@ export interface KnowledgeDetails {
   type: string
   language?: string
   slug?: string
+  insighter?: {
+    uuid?: string
+  }
   // Add other fields if needed
 }
 
@@ -66,10 +70,14 @@ export default function Overview({ knowledge, knowledgeSlug }: OverviewProps) {
   const locale = params.locale;
   const isRTL = locale === 'ar';
   const isArabicContent = knowledge.language === 'arabic';
+  const { user } = useGlobalProfile();
 
   const [buyModalOpened, setBuyModalOpened] = useState(false);
   const [selectedDocumentId, setSelectedDocumentId] = useState<number | undefined>(undefined);
   const [authModalOpened, setAuthModalOpened] = useState(false);
+
+  // Check if the current user is the owner of this knowledge
+  const isOwner = user && knowledge.insighter?.uuid && user.uuid === knowledge.insighter.uuid;
 
   // Translations
   const translations = {
@@ -142,9 +150,9 @@ export default function Overview({ knowledge, knowledgeSlug }: OverviewProps) {
                 return priceA - priceB;
               })
               .map((doc) => (
-              <div key={doc.id} id={`doc-card-${doc.id}`} className={`${styles.documentCard} ${styles.expandable}`}>
+              <div key={doc.id} id={`doc-card-${doc.id}`} className={`${styles.documentCard} ${styles.expandable} ${styles.cardHover}`}>
                 <div 
-                  className={styles.documentHeader}
+                  className={`${styles.documentHeader} ${styles.focusVisible}`}
                   onClick={() => {
                     const element = document.getElementById(`doc-content-${doc.id}`);
                     const card = document.getElementById(`doc-card-${doc.id}`);
@@ -153,6 +161,22 @@ export default function Overview({ knowledge, knowledgeSlug }: OverviewProps) {
                       card.classList.toggle(styles.active);
                     }
                   }}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                      e.preventDefault();
+                      const element = document.getElementById(`doc-content-${doc.id}`);
+                      const card = document.getElementById(`doc-card-${doc.id}`);
+                      if (element && card) {
+                        element.classList.toggle(styles.expanded);
+                        card.classList.toggle(styles.active);
+                      }
+                    }
+                  }}
+                  tabIndex={0}
+                  role="button"
+                  aria-expanded="false"
+                  aria-controls={`doc-content-${doc.id}`}
+                  aria-describedby={`doc-price-${doc.id}`}
                 >
                   <div className={styles.fileIcon}>
                     <Image
@@ -174,9 +198,9 @@ export default function Overview({ knowledge, knowledgeSlug }: OverviewProps) {
                   </div>
                   <div className={styles.priceTag}>
   {parseFloat(doc.price) === 0 ? (
-    <span className={`${styles.badge} ${styles.badgeFree}`}>{translations.free}</span>
+    <span id={`doc-price-${doc.id}`} className={`${styles.badge} ${styles.badgeFree}`} role="text" aria-label={`${translations.free} document`}>{translations.free}</span>
   ) : (
-    <span className={styles.badge}>${parseFloat(doc.price).toFixed(2)}</span>
+    <span id={`doc-price-${doc.id}`} className={styles.badge} role="text" aria-label={`Price: $${parseFloat(doc.price).toFixed(2)}`}>${parseFloat(doc.price).toFixed(2)}</span>
   )}
 </div>
                   <div className={styles.expandIcon}>
@@ -189,9 +213,11 @@ export default function Overview({ knowledge, knowledgeSlug }: OverviewProps) {
                       strokeWidth="2" 
                       strokeLinecap="round" 
                       strokeLinejoin="round"
+                      aria-hidden="true"
                     >
                       <polyline points="6 9 12 15 18 9"></polyline>
                     </svg>
+                    <span className={styles.srOnly}>{isRTL ? 'توسيع أو طي تفاصيل المستند' : 'Expand or collapse document details'}</span>
                   </div>
                 </div>
                 <div id={`doc-content-${doc.id}`} className={styles.documentContent}>
@@ -223,46 +249,56 @@ export default function Overview({ knowledge, knowledgeSlug }: OverviewProps) {
                     </div>
                   )}
                   <div className="max-w-xs mx-auto sm:max-w-none sm:inline-flex sm:justify-start space-y-2 sm:space-y-0 sm:space-x-2 mt-4">
-                    <div>
-                    {doc.is_purchased ? (
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          window.location.href = 'https://app.knoldg.com/app/insighter-dashboard/my-downloads';
-                        }}
-                        className="btn-sm mx-4 text-white bg-green-600 text-sm hover:bg-green-700 transition duration-150 ease-in-out group text-sm px-3 py-1 cursor-pointer"
-                      >
-                        {translations.alreadyPurchased} <span className="tracking-normal text-white group-hover:translate-x-0.5 transition-transform duration-150 ease-in-out ml-1">-&gt;</span>
-                      </button>
-                    ) : doc.price === "0" ? (
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleBuyClick(doc.id);
-                        }}
-                        className="btn-sm mx-4 text-white bg-[#1C7CBB] text-sm hover:bg-opacity-90 transition duration-150 ease-in-out group text-sm px-3 py-1 cursor-pointer"
-                      >
-                        {translations.download}  <IconCloudUpload size={16} className="ms-1" />
-                      </button>
-                    ) : (
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleBuyClick(doc.id);
-                        }}
-                        className="btn-sm mx-4 text-white bg-[#1C7CBB] text-sm hover:bg-opacity-90 transition duration-150 ease-in-out group text-sm px-3 py-1 cursor-pointer"
-                      >
-                        {translations.buyNow} <IconCloudUpload size={16} className="ms-1" />
-                      </button>
+                    {!isOwner && (
+                      <div>
+                      {doc.is_purchased ? (
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            window.location.href = process.env.NEXT_PUBLIC_DASHBOARD_URL + '/app/insighter-dashboard/my-downloads' || 'https://app.knoldg.com/app/insighter-dashboard/my-downloads';
+                          }}
+                          className={`btn-sm mx-4 text-white bg-green-600 text-sm hover:bg-green-700 transition duration-150 ease-in-out group text-sm px-3 py-1 cursor-pointer ${styles.modernButton} ${styles.focusVisible}`}
+                          aria-label={`${translations.alreadyPurchased} - ${doc.file_name}`}
+                        >
+                          {translations.alreadyPurchased} <span className="tracking-normal text-white group-hover:translate-x-0.5 transition-transform duration-150 ease-in-out ml-1" aria-hidden="true">-&gt;</span>
+                        </button>
+                      ) : doc.price === "0" ? (
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleBuyClick(doc.id);
+                          }}
+                          className={`btn-sm mx-4 text-white bg-[#1C7CBB] text-sm hover:bg-opacity-90 transition duration-150 ease-in-out group text-sm px-3 py-1 cursor-pointer ${styles.modernButton} ${styles.focusVisible}`}
+                          aria-label={`${translations.download} ${doc.file_name} - ${translations.free}`}
+                        >
+                          {translations.download}  <IconCloudUpload size={16} className="ms-1" aria-hidden="true" />
+                        </button>
+                      ) : (
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleBuyClick(doc.id);
+                          }}
+                          className={`btn-sm mx-4 text-white bg-[#1C7CBB] text-sm hover:bg-opacity-90 transition duration-150 ease-in-out group text-sm px-3 py-1 cursor-pointer ${styles.modernButton} ${styles.focusVisible}`}
+                          aria-label={`${translations.buyNow} ${doc.file_name} - $${parseFloat(doc.price).toFixed(2)}`}
+                        >
+                          {translations.buyNow} <IconCloudUpload size={16} className="ms-1" aria-hidden="true" />
+                        </button>
+                      )}
+                      </div>
                     )}
-                    </div>
                     <div>
-                      <a className="btn-sm text-slate-600 hover:text-slate-900 bg-slate-200 hover:bg-slate-300 transition duration-150 ease-in-out text-sm px-3 py-1 flex items-center border border-slate-300 cursor-pointer">
-                        <svg className="shrink-0 fill-slate-600 mr-2" xmlns="http://www.w3.org/2000/svg" width="12" height="12">
+                      <button 
+                        className={`btn-sm text-slate-600 hover:text-slate-900 bg-slate-200 hover:bg-slate-300 transition duration-150 ease-in-out text-sm px-3 py-1 flex items-center border border-slate-300 cursor-pointer ${styles.modernButton} ${styles.focusVisible}`}
+                        disabled
+                        aria-label={`${translations.evaluateWithAI} - ${doc.file_name} (${isRTL ? 'قريباً' : 'Coming soon'})`}
+                        title={isRTL ? 'هذه الميزة قريباً' : 'This feature is coming soon'}
+                      >
+                        <svg className="shrink-0 fill-slate-600 mr-2" xmlns="http://www.w3.org/2000/svg" width="12" height="12" aria-hidden="true">
                           <path d="m1.999 0 1 2-1 2 2-1 2 1-1-2 1-2-2 1zM11.999 0l1 2-1 2 2-1 2 1-1-2 1-2-2 1zM11.999 10l1 2-1 2 2-1 2 1-1-2 1-2-2 1zM6.292 7.586l2.646-2.647L11.06 7.06 8.413 9.707zM0 13.878l5.586-5.586 2.122 2.121L2.12 16z" />
                         </svg>
                         <span>{translations.evaluateWithAI}</span>
-                      </a>
+                      </button>
                     </div>
                   </div>
                 </div>
