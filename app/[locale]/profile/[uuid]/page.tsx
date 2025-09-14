@@ -50,6 +50,7 @@ import styles from "./profile.module.css";
 import Link from "next/link";
 import { loadStripe } from "@stripe/stripe-js";
 import { Elements, PaymentElement, useElements, useStripe } from "@stripe/react-stripe-js";
+import { VisaIcon, MasterCardIcon, GooglePayIcon, ApplePayIcon } from "@/components/payment-icons";
 
 // Initialize Stripe
 const stripePromise = loadStripe("pk_test_51RpQiFL3mrWP7a0P1OYWGeFJWtgMwcWJtiEDLvn29CpYn5x8Ou77YViA1yoimlixKU5aUAeOeN5VTfoC4sMpvFVF00qq9a6BNm");
@@ -300,7 +301,7 @@ export default function ProfilePage() {
         if (entityType === "insighter") {
           // Try insighter API first
           let response = await fetch(
-            `https://api.foresighta.co/api/platform/insighter/profile/${uuid}`,
+            `https://api.knoldg.com/api/platform/insighter/profile/${uuid}`,
             {
               headers: {
                 "Content-Type": "application/json",
@@ -316,7 +317,7 @@ export default function ProfilePage() {
           } else {
             // Fall back to company API if insighter fails
             response = await fetch(
-              `https://api.foresighta.co/api/platform/company/profile/${uuid}`,
+              `https://api.knoldg.com/api/platform/company/profile/${uuid}`,
               {
                 headers: {
                   "Content-Type": "application/json",
@@ -366,7 +367,7 @@ export default function ProfilePage() {
         } else {
           // Default behavior: try company API first
           let response = await fetch(
-            `https://api.foresighta.co/api/platform/company/profile/${uuid}`,
+            `https://api.knoldg.com/api/platform/company/profile/${uuid}`,
             {
               headers: {
                 "Content-Type": "application/json",
@@ -413,7 +414,7 @@ export default function ProfilePage() {
           } else {
             // Try insighter API if company API fails
             response = await fetch(
-              `https://api.foresighta.co/api/platform/insighter/profile/${uuid}`,
+              `https://api.knoldg.com/api/platform/insighter/profile/${uuid}`,
               {
                 headers: {
                   "Content-Type": "application/json",
@@ -456,8 +457,8 @@ export default function ProfilePage() {
         // Now fetch the filtered data
         let url =
           entityType === "insighter"
-            ? `https://api.foresighta.co/api/platform/insighter/knowledge/${uuid}?page=${knowledgePage}&per_page=12`
-            : `https://api.foresighta.co/api/platform/company/knowledge/${uuid}?page=${knowledgePage}&per_page=12`;
+            ? `https://api.knoldg.com/api/platform/insighter/knowledge/${uuid}?page=${knowledgePage}&per_page=12`
+            : `https://api.knoldg.com/api/platform/company/knowledge/${uuid}?page=${knowledgePage}&per_page=12`;
 
         if (selectedType) {
           url += `&type=${selectedType}`;
@@ -505,7 +506,7 @@ export default function ProfilePage() {
       if (isAuth && token) {
         try {
           const response = await fetch(
-            "https://api.foresighta.co/api/account/profile",
+            "https://api.knoldg.com/api/account/profile",
             {
               headers: {
                 "Content-Type": "application/json",
@@ -588,7 +589,7 @@ export default function ProfilePage() {
       endDate.setFullYear(tomorrow.getFullYear() + 1);
       const endDateStr = endDate.toISOString().split("T")[0]; // YYYY-MM-DD format
       const response = await axios.post(
-        `https://api.foresighta.co/api/account/meeting/available/hours/${uuid}`,
+        `https://api.knoldg.com/api/account/meeting/available/hours/${uuid}`,
         {
           start_date: startDate,
           end_date: endDateStr,
@@ -654,7 +655,7 @@ export default function ProfilePage() {
       const token = typeof window !== "undefined" ? localStorage.getItem("token") : null;
       if (!token) return;
       
-      const response = await fetch("https://api.foresighta.co/api/account/wallet/balance", {
+      const response = await fetch("https://api.knoldg.com/api/account/wallet/balance", {
         headers: {
           "Content-Type": "application/json",
           Accept: "application/json",
@@ -873,7 +874,7 @@ export default function ProfilePage() {
         typeof window !== "undefined" ? localStorage.getItem("token") : null;
 
       const response = await fetch(
-        "https://api.foresighta.co/api/account/meeting/client/check-duplicate-time",
+        "https://api.knoldg.com/api/account/meeting/client/check-duplicate-time",
         {
           method: "POST",
           headers: {
@@ -914,7 +915,7 @@ export default function ProfilePage() {
     const checkStatus = async (): Promise<boolean> => {
       try {
         const response = await fetch(
-          `https://api.foresighta.co/api/account/order/meeting/${orderUuid}`,
+          `https://api.knoldg.com/api/account/order/meeting/${orderUuid}`,
           {
             headers: {
               "Content-Type": "application/json",
@@ -996,7 +997,7 @@ export default function ProfilePage() {
       }
 
       const response = await fetch(
-        `https://api.foresighta.co/api/account/order/meeting/checkout/${uuid}`,
+        `https://api.knoldg.com/api/account/order/meeting/checkout/${uuid}`,
         {
           method: "POST",
           headers: {
@@ -2160,8 +2161,8 @@ export default function ProfilePage() {
                       </h3>
                       <p className="text-gray-500 mb-4">{t("loginToView")}</p>
                       <a
-                        href={`http://localhost:4200/auth/login?returnUrl=${encodeURIComponent(
-                          `http://localhost:3000/${locale}/profile/${uuid}${
+                        href={`https://app.knoldg.com/auth/login?returnUrl=${encodeURIComponent(
+                          `https://knoldg.com/${locale}/profile/${uuid}${
                             typeof window !== "undefined"
                               ? window.location.search
                               : ""
@@ -2512,10 +2513,10 @@ export default function ProfilePage() {
                       
                     
                       {/* Payment methods in one row */}
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div className="flex flex-col gap-3">
                         {/* Knoldg Wallet Option */}
                         <div 
-                          className={`border rounded-lg p-4 cursor-pointer transition-all ${
+                          className={`border rounded-lg p-4 cursor-pointer transition-all min-h-[72px] ${
                             paymentMethod === "manual" 
                               ? "border-blue-500 bg-blue-50 dark:bg-blue-900/20" 
                               : "border-gray-200 dark:border-slate-600 hover:border-gray-300 dark:hover:border-slate-500"
@@ -2530,7 +2531,7 @@ export default function ProfilePage() {
                             }
                           }}
                         >
-                          <div className="flex flex-col items-center text-center space-y-3">
+                          <div className="flex items-center justify-center  gap-4 h-full">
                             <input
                               type="radio"
                               name="paymentMethod"
@@ -2542,74 +2543,74 @@ export default function ProfilePage() {
                                   setPaymentMethod("manual")
                                 }
                               }}
-                              className="w-4 h-4"
+                              className="w-4 h-4 flex-shrink-0"
                             />
-                            <div className="w-10 h-10 flex items-center justify-center">
-                              <MantineImage
-                                src="http://localhost:4200/assets/media/logos/custom-2.svg"
-                                alt="Knoldg Wallet"
-                                width={32}
-                                height={32}
-                                fit="contain"
-                              />
-                            </div>
-                            <div>
-                              <div className="font-medium text-sm text-gray-800 dark:text-gray-200">
-                                {locale.startsWith('ar') ? 'محفظة نولدج' : 'Knoldg Wallet'}
-                              </div>
-                              <div className="text-xs text-gray-600 dark:text-gray-400 mt-1">
-                                {locale.startsWith('ar') 
-                                  ? `الرصيد: $${walletBalance}`
-                                  : `Balance: $${walletBalance}`}
-                              </div>
-                              {walletBalance >= parseFloat(selectedMeetingTime.rate) ? (
-                                <div className="text-xs text-green-600 dark:text-green-400 font-medium">
-                                  {locale.startsWith('ar') ? 'رصيد كافي' : 'Sufficient balance'}
+                            <div className="flex-1">
+                              <div className="flex items-center justify-between">
+                                
+                                <div className="font-medium text-sm text-gray-800 dark:text-gray-200">
+                                  {locale.startsWith('ar') ? 'محفظة نولدج' : 'Knoldg Wallet'}
                                 </div>
-                              ) : (
-                                <div className="text-xs text-red-500 font-medium">
-                                  {locale.startsWith('ar') ? 'رصيد غير كافي' : 'Insufficient balance'}
+                                <div className="flex items-center gap-3">
+                                <div className="w-8 h-8 flex items-center justify-center flex-shrink-0">
+                                    <MantineImage
+                                      src="https://app.knoldg.com/assets/media/logos/custom-2.svg"
+                                      alt="Knoldg Wallet"
+                                      width={24}
+                                      height={24}
+                                      fit="contain"
+                                    />
+                                  </div>
+                                  <div className="text-right">
+                                    <div className="text-sm font-semibold text-gray-700 dark:text-gray-300">
+                                      ${walletBalance.toFixed(2)}
+                                    </div>
+                                    {walletBalance >= parseFloat(selectedMeetingTime.rate) ? (
+                                      <div className="text-xs text-green-600 dark:text-green-400 font-medium">
+                                        {locale.startsWith('ar') ? 'رصيد كافي' : 'Sufficient'}
+                                      </div>
+                                    ) : (
+                                      <div className="text-xs text-red-500 font-medium">
+                                        {locale.startsWith('ar') ? 'رصيد غير كافي' : 'Insufficient'}
+                                      </div>
+                                    )}
+                                  </div>
+                               
                                 </div>
-                              )}
+                              </div>
                             </div>
                           </div>
                         </div>
 
                         {/* Stripe Provider Option */}
                         <div 
-                          className={`border rounded-lg p-4 cursor-pointer transition-all ${
+                          className={`border rounded-lg p-4 cursor-pointer transition-all min-h-[72px] ${
                             paymentMethod === "provider" 
                               ? "border-blue-500 bg-blue-50 dark:bg-blue-900/20" 
                               : "border-gray-200 dark:border-slate-600 hover:border-gray-300 dark:hover:border-slate-500"
                           }`}
                           onClick={() => setPaymentMethod("provider")}
                         >
-                          <div className="flex flex-col items-center text-center space-y-3">
+                          <div className="flex items-center pt-2 justify-center gap-4 h-full">
                             <input
                               type="radio"
                               name="paymentMethod"
                               value="provider"
                               checked={paymentMethod === "provider"}
                               onChange={() => setPaymentMethod("provider")}
-                              className="w-4 h-4"
+                              className="w-4 h-4 flex-shrink-0"
                             />
-                            <div className="w-10 h-10 flex items-center justify-center">
-                              <MantineImage
-                                src="https://res.cloudinary.com/dsiku9ipv/image/upload/v1754902439/New_Project_12_jmtvd6.png"
-                                alt="Stripe"
-                                width={50}
-                                height={25}
-                                fit="contain"
-                              />
-                            </div>
-                            <div>
-                              <div className="font-medium text-sm text-gray-800 dark:text-gray-200">
-                                {locale.startsWith('ar') ? 'مزود سترايب' : 'Stripe Provider'}
-                              </div>
-                              <div className="text-xs text-gray-600 dark:text-gray-400 mt-1">
-                                {locale.startsWith('ar') 
-                                  ? 'دفع بالبطاقة الائتمانية'
-                                  : 'Credit/Debit Card'}
+                            <div className="flex-1">
+                              <div className="flex items-center justify-between">
+                                <div className="font-medium text-sm text-gray-800 dark:text-gray-200">
+                                  {locale.startsWith('ar') ? 'بطاقة الائتمان' : 'Credit Card'}
+                                </div>
+                                <div className="flex items-center gap-2">
+                                  <VisaIcon />
+                                  <MasterCardIcon />
+                                  <GooglePayIcon />
+                                  <ApplePayIcon />
+                                </div>
                               </div>
                             </div>
                           </div>
@@ -2726,9 +2727,9 @@ export default function ProfilePage() {
                   {locale.startsWith('ar') ? 'تم حجز الاجتماع بنجاح!' : 'Meeting Booked Successfully!'}
                 </h2>
                 <p className="text-gray-600 dark:text-gray-400 mb-8">
-                  {locale.startsWith('ar') 
-                    ? 'تم تأكيد حجز اجتماعك بنجاح'
-                    : 'Your meeting has been successfully confirmed'}
+                  {locale.startsWith('ar')
+                    ? 'تم حجز الاجتماع بنجاح وانتظر الموافقة عليه من الإنسايتر.'
+                    : 'Your meeting has been successfully booked and is waiting for Insighter\'s approval.'}
                 </p>
                 
                 
@@ -2737,7 +2738,7 @@ export default function ProfilePage() {
                   className="bg-gradient-to-r from-blue-500 to-teal-400 hover:from-blue-600 hover:to-teal-500 transition-all"
                   onClick={() => {
                     // Redirect to meetings dashboard
-                    window.location.href = "http://localhost:4200/app/insighter-dashboard/my-meetings/sent";
+                    window.location.href = "https://app.knoldg.com/app/insighter-dashboard/my-meetings/sent";
                   }}
                 >
                   {locale.startsWith('ar') ? 'اذهب إلى الاجتماعات' : 'Go to Meetings'}

@@ -19,6 +19,12 @@ import { IconCheck } from "@tabler/icons-react";
 import Image from "next/image";
 import { useToast } from "@/components/toast/ToastContext";
 import PageIllustration from "@/components/page-illustration";
+import { 
+  VisaIcon, 
+  MasterCardIcon, 
+  GooglePayIcon, 
+  ApplePayIcon 
+} from "@/components/payment-icons";
 import styles from "./checkout.module.css";
 
 interface Document {
@@ -91,6 +97,8 @@ export default function CheckoutPage() {
   const [downloadProgress, setDownloadProgress] = useState(0);
   const [showDocumentsAdded, setShowDocumentsAdded] = useState(false);
   const [knowledgeDownloadIds, setKnowledgeDownloadIds] = useState<string[]>([]);
+  const [orderUuid, setOrderUuid] = useState<string>("");
+  const [isFetchingDownloadIds, setIsFetchingDownloadIds] = useState(false);
 
   // Translations
   const translations = {
@@ -144,7 +152,7 @@ export default function CheckoutPage() {
         const token = getAuthToken();
 
         const response = await fetch(
-          `https://api.foresighta.co/api/platform/industries/knowledge/${slug}`,
+          `https://api.knoldg.com/api/platform/industries/knowledge/${slug}`,
           {
             headers: {
               "Content-Type": "application/json",
@@ -183,7 +191,7 @@ export default function CheckoutPage() {
         const token = getAuthToken();
 
         const response = await fetch(
-          "https://api.foresighta.co/api/account/wallet/balance",
+          "https://api.knoldg.com/api/account/wallet/balance",
           {
             headers: {
               "Content-Type": "application/json",
@@ -230,6 +238,44 @@ export default function CheckoutPage() {
     }).format(amount);
   };
 
+  // Fetch updated order details to get knowledge_download_ids
+  const fetchUpdatedOrderDetails = async (uuid: string) => {
+    try {
+      setIsFetchingDownloadIds(true);
+      const token = getAuthToken();
+      const response = await fetch(
+        `https://api.knoldg.com/api/account/order/knowledge/${uuid}`,
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Accept: "application/json",
+            "Accept-Language": locale,
+            "X-Timezone": Intl.DateTimeFormat().resolvedOptions().timeZone,
+            ...(token && { Authorization: `Bearer ${token}` }),
+          },
+        }
+      );
+
+      if (response.ok) {
+        const data = await response.json();
+        console.log('Updated order details fetched:', data.data); // Debug log
+        const updatedOrderData = data.data;
+        
+        // Extract knowledge_download_ids if available
+        if (updatedOrderData.knowledge_download_ids) {
+          setKnowledgeDownloadIds(updatedOrderData.knowledge_download_ids);
+        }
+        
+        return updatedOrderData;
+      }
+    } catch (error) {
+      console.error("Error fetching updated order details:", error);
+    } finally {
+      setIsFetchingDownloadIds(false);
+    }
+    return null;
+  };
+
   // Handle document selection toggle
   const handleDocumentToggle = (documentId: number) => {
     setSelectedDocuments((prev) =>
@@ -252,8 +298,13 @@ export default function CheckoutPage() {
           const next = prev + increment;
           if (next >= 100) {
             clearInterval(timer);
-            setTimeout(() => {
+            setTimeout(async () => {
               setShowDocumentsAdded(true);
+              // Recall the API to get updated knowledge_download_ids after documents are processed
+              if (orderUuid) {
+                console.log('Documents processed, fetching updated order details...'); // Debug log
+                await fetchUpdatedOrderDetails(orderUuid);
+              }
             }, 300);
             return 100;
           }
@@ -263,7 +314,7 @@ export default function CheckoutPage() {
 
       return () => clearInterval(timer);
     }
-  }, [showSuccessUI]);
+  }, [showSuccessUI, orderUuid]);
 
   // Handle checkout
   const handleCheckout = async () => {
@@ -291,7 +342,7 @@ export default function CheckoutPage() {
       };
 
       const response = await fetch(
-        "https://api.foresighta.co/api/account/order/knowledge/checkout",
+        "https://api.knoldg.com/api/account/order/knowledge/checkout",
         {
           method: "POST",
           headers: {
@@ -314,8 +365,15 @@ export default function CheckoutPage() {
         );
       }
 
-      // Extract knowledge_download_ids if available
+      // Extract order data
       const responseData = data.data || data;
+      
+      // Store the order UUID for later use
+      if (responseData.uuid) {
+        setOrderUuid(responseData.uuid);
+      }
+      
+      // Extract knowledge_download_ids if available
       if (responseData.knowledge_download_ids) {
         setKnowledgeDownloadIds(responseData.knowledge_download_ids);
       }
@@ -451,20 +509,28 @@ export default function CheckoutPage() {
               <Button
                 size="md"
                 className={`bg-gradient-to-r from-blue-500 to-teal-400 hover:from-blue-600 hover:to-teal-500 transition-all ${styles.downloadButton}`}
+                loading={isFetchingDownloadIds}
+                disabled={isFetchingDownloadIds}
                 onClick={() => {
+                  console.log('Download button clicked. Knowledge download IDs:', knowledgeDownloadIds); // Debug log
                   // Use UUIDs if available, otherwise fall back to title search
-                  if (knowledgeDownloadIds.length > 0) {
+                  if (knowledgeDownloadIds && knowledgeDownloadIds.length > 0) {
                     const uuidsParam = `?uuids=${knowledgeDownloadIds.join(',')}`;
-                    window.location.href = `http://localhost:4200/app/insighter-dashboard/my-downloads${uuidsParam}`;
+                    console.log('Redirecting with UUIDs:', uuidsParam); // Debug log
+                    window.location.href = `https://app.knoldg.com/app/insighter-dashboard/my-downloads${uuidsParam}`;
                   } else {
+                    console.log('No UUIDs available, falling back to search'); // Debug log
                     // Fallback to title search if no UUIDs available
                     const searchTitle = knowledge?.title || "";
                     const searchParam = searchTitle ? `?search=${encodeURIComponent(searchTitle)}` : "";
-                    window.location.href = `http://localhost:4200/app/insighter-dashboard/my-downloads${searchParam}`;
+                    console.log('Redirecting with search:', searchParam); // Debug log
+                    window.location.href = `https://app.knoldg.com/app/insighter-dashboard/my-downloads${searchParam}`;
                   }
                 }}
               >
-                {translations.goToDownloads}
+                {isFetchingDownloadIds 
+                  ? (isRTL ? "جاري التحديث..." : "Updating...")
+                  : translations.goToDownloads}
               </Button>
             </div>
           </Container>
@@ -613,7 +679,7 @@ export default function CheckoutPage() {
                             }}
                           >
                             <MantineImage
-                              src="http://localhost:4200/assets/media/logos/custom-2.svg"
+                              src="https://app.knoldg.com/assets/media/logos/custom-2.svg"
                               alt="Knoldg Wallet"
                               width={32}
                               height={32}
@@ -652,30 +718,17 @@ export default function CheckoutPage() {
                           </div>
                           <div
                             style={{
-                              width: 40,
-                              height: 40,
-                              display: "flex",
-                              alignItems: "center",
-                              justifyContent: "center",
-                            }}
-                          >
-                            <MantineImage
-                              src="https://res.cloudinary.com/dsiku9ipv/image/upload/v1754902439/New_Project_12_jmtvd6.png"
-                              alt="Stripe"
-                              width={50}
-                              height={25}
-                              fit="contain"
-                            />
-                          </div>
-                          <div
-                            style={{
                               flex: 1,
                               minHeight: "48px",
                               display: "flex",
                               alignItems: "center",
+                              gap: "20px",
                             }}
                           >
-                            <Text fw={500}>{translations.stripeProvider}</Text>
+                            <VisaIcon />
+                            <MasterCardIcon />
+                            <GooglePayIcon />
+                            <ApplePayIcon />
                           </div>
                         </Group>
                       </div>
