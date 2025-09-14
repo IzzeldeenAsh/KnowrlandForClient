@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useRef, useEffect, useState } from 'react';
+import React, { useRef, useEffect, useState, memo } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { IconSearch, IconX } from '@tabler/icons-react';
 import { useSuggestions, useClickAway } from '../utils/hooks';
@@ -81,8 +81,7 @@ const SearchBar: React.FC<SearchBarProps> = ({
   // Ensure suggestions show when they become available and input is focused
   useEffect(() => {
     if (inputFocused && suggestions.length > 0 && !suggestionSelected) {
-      console.log('Triggering allowSuggestions from useEffect');
-      allowSuggestions();
+        allowSuggestions();
     }
   }, [suggestions, inputFocused, suggestionSelected, allowSuggestions]);
   
@@ -431,4 +430,12 @@ const SearchBar: React.FC<SearchBarProps> = ({
   );
 };
 
-export default SearchBar;
+export default memo(SearchBar, (prevProps, nextProps) => {
+  // Custom comparison function to optimize re-renders
+  return (
+    prevProps.searchQuery === nextProps.searchQuery &&
+    prevProps.searchType === nextProps.searchType &&
+    prevProps.locale === nextProps.locale &&
+    prevProps.placeholder === nextProps.placeholder
+  );
+});

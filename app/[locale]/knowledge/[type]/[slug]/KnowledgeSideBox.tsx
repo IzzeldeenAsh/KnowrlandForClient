@@ -1,4 +1,5 @@
 'use client'
+import React from 'react';
 import { DocumentTextIcon, CalendarIcon, ClockIcon, ChevronDownIcon, ChevronUpIcon, BookmarkIcon } from '@heroicons/react/24/outline';
 import { BookmarkIcon as BookmarkSolidIcon } from '@heroicons/react/24/solid';
 import { IconLanguage, IconCode, IconBuildingBank, IconMap, IconWorld, IconCrane } from '@tabler/icons-react';
@@ -9,6 +10,7 @@ import LinkedinIcon from '@/public/file-icons/linkedin';
 import WhatsappIcon from '@/public/file-icons/whatsapp';
 import BuyModal from './BuyModal';
 import AuthModal from './AuthModal';
+import { useGlobalProfile } from '@/components/auth/GlobalProfileProvider';
 
 interface Document {
   id: number;
@@ -33,6 +35,7 @@ interface EconomicBloc {
 
 interface KnowledgeSideBoxProps {
   knowledgeUUID: number;
+  insighterUUID?: string;
   total_price: string;
   documents: Document[];
   language: string;
@@ -65,11 +68,16 @@ const KnowledgeSideBox = ({
   knowledgeSlug,
   purchased_status,
   is_read_later,
-  knowledgeUUID
+  knowledgeUUID,
+  insighterUUID
 }: KnowledgeSideBoxProps) => {
   const params = useParams();
   const currentLocale = locale || params.locale as string || 'en';
   const isRTL = currentLocale === 'ar';
+  const { user } = useGlobalProfile();
+  
+  // Check if the current user is the owner of this knowledge
+  const isOwner = user && insighterUUID && user.uuid === insighterUUID;
   
   // State to track which sections are expanded
   const [expandedSections, setExpandedSections] = useState<{
@@ -260,39 +268,41 @@ const KnowledgeSideBox = ({
         </div>
 
         <div className="space-y-3 mb-4">
-          {purchased_status === 'purchased' ? (
-            <button 
-              onClick={() => window.location.href = 'https://app.knoldg.com/app/insighter-dashboard/my-downloads'}
-              className="w-full font-semibold bg-green-600 text-white py-2 px-4 rounded-lg hover:bg-green-700 transition-colors"
-            >
-              {translations.alreadyPurchased}
-            </button>
-          ) : purchased_status === 'partial-purchased' ? (
-            <button 
-              onClick={handleBuyClick}
-              className="w-full font-semibold bg-orange-500 text-white py-2 px-4 rounded-lg hover:bg-orange-600 transition-colors"
-            >
-              {translations.partiallyPurchased}
-            </button>
-          ) : isFree ? (
-            <button 
-              onClick={handleBuyClick}
-              className="w-full font-semibold bg-gradient-to-r from-blue-500 to-teal-400 text-white py-2 px-4 rounded-lg hover:from-blue-700 hover:to-blue-900 transition-colors"
-            >
-              {translations.download}
-            </button>
-          ) : (
+          {!isOwner && (
             <>
+              {purchased_status === 'purchased' ? (
+                <button 
+                  onClick={() => window.location.href = (process.env.NEXT_PUBLIC_DASHBOARD_URL || 'https://app.knoldg.com') + '/app/insighter-dashboard/my-downloads'}
+                  className="w-full font-semibold bg-green-600 text-white py-2 px-4 rounded-lg hover:bg-green-700 transition-colors"
+                >
+                  {translations.alreadyPurchased}
+                </button>
+              ) : purchased_status === 'partial-purchased' ? (
+                <button 
+                  onClick={handleBuyClick}
+                  className="w-full font-semibold bg-orange-500 text-white py-2 px-4 rounded-lg hover:bg-orange-600 transition-colors"
+                >
+                  {translations.partiallyPurchased}
+                </button>
+              ) : isFree ? (
+                <button 
+                  onClick={handleBuyClick}
+                  className="w-full font-semibold bg-gradient-to-r from-blue-500 to-teal-400 text-white py-2 px-4 rounded-lg hover:from-blue-700 hover:to-blue-900 transition-colors"
+                >
+                  {translations.download}
+                </button>
+              ) : (
+                <>
+                  <button 
+                    onClick={handleBuyClick}
+                    className="w-full font-semibold bg-gradient-to-r from-blue-500 to-teal-400 text-white py-2 px-4 rounded-lg hover:from-blue-700 hover:to-blue-900 transition-colors"
+                  >
+                    {translations.buyNow}
+                  </button>
+         
+                </>
+              )}
               <button 
-                onClick={handleBuyClick}
-                className="w-full font-semibold bg-gradient-to-r from-blue-500 to-teal-400 text-white py-2 px-4 rounded-lg hover:from-blue-700 hover:to-blue-900 transition-colors"
-              >
-                {translations.buyNow}
-              </button>
-     
-            </>
-          )}
-                   <button 
                 onClick={handleReadLaterToggle}
                 disabled={isReadLaterLoading}
                 className={`w-full font-semibold py-2 px-4 rounded-lg transition-colors flex items-center justify-center gap-2 ${
@@ -312,6 +322,8 @@ const KnowledgeSideBox = ({
                 )}
                 {isReadLater ? translations.removeReadLater : translations.readLater}
               </button>
+            </>
+          )}
         </div>
 
         <div className="space-y-3">

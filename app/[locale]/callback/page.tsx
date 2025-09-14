@@ -2,6 +2,7 @@
 
 import { useEffect } from 'react';
 import { useRouter, useParams, useSearchParams } from 'next/navigation';
+import { useGlobalProfile } from '@/components/auth/GlobalProfileProvider';
 
 interface ProfileResponse {
   data: {
@@ -23,6 +24,7 @@ export default function QueryParamAuthCallback() {
   const router = useRouter();
   const params = useParams();
   const searchParams = useSearchParams();
+  const { refreshProfile } = useGlobalProfile();
   
   // Get token from query parameters or cookies
   let token = searchParams.get('token');
@@ -117,6 +119,9 @@ export default function QueryParamAuthCallback() {
         }
         
         console.log('[callback] Authentication verification successful');
+        
+        // Refresh the global profile state
+        await refreshProfile();
         
         // Add small delay to ensure all storage operations complete
         setTimeout(() => {
@@ -261,6 +266,13 @@ export default function QueryParamAuthCallback() {
     console.log('[callback] Handling redirect for user:', userData.email);
     console.log('[callback] User roles:', userData.roles);
     console.log('[callback] Return URL from params:', returnUrl);
+    
+    // Check if user has admin role
+    if (userData.roles && userData.roles.includes('admin')) {
+      console.log('[callback] Admin user detected, redirecting to admin dashboard');
+      window.location.href = 'https://app.knoldg.com/admin-dashboard/admin/dashboard/main-dashboard/requests';
+      return;
+    }
     
     // Check for stored returnUrl in cookie as fallback (for social auth)
     const storedReturnUrl = getCookie('auth_return_url');

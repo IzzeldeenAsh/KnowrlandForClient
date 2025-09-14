@@ -1,6 +1,6 @@
 'use client';
 
-import { useUserProfile } from '@/app/lib/useUserProfile';
+import { useUserProfile } from '@/components/ui/header/hooks/useUserProfile';
 import AuthBanner from './auth-banner';
 
 export default function ConditionalAuthBanner() {

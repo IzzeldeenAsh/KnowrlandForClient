@@ -17,37 +17,9 @@ import { useParams } from "next/navigation";
 import { arSA, enUS } from 'date-fns/locale';
 import axios from 'axios';
 import AuthModal from '../../../knowledge/[type]/[slug]/AuthModal';
+import { useAuth, getAuthToken } from '@/hooks/useAuth';
+import { getApiUrl } from '@/app/config';
 
-// Helper function to get token from cookie
-function getTokenFromCookie(): string | null {
-  if (typeof document === 'undefined') return null;
-  
-  const cookies = document.cookie.split(';');
-  for (let cookie of cookies) {
-    const [name, value] = cookie.trim().split('=');
-    if (name === 'token') {
-      return decodeURIComponent(value);
-    }
-  }
-  return null;
-}
-
-// Helper function to get token from any available source (cookie first, then localStorage as fallback)
-function getAuthToken(): string | null {
-  // First try cookie (primary storage)
-  const cookieToken = getTokenFromCookie();
-  if (cookieToken) {
-    return cookieToken;
-  }
-
-  // Fallback to localStorage for backward compatibility
-  const localStorageToken = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
-  if (localStorageToken) {
-    return localStorageToken;
-  }
-
-  return null;
-}
 
 interface KnowledgeGridProps {
   knowledge: KnowledgeItem[];
@@ -146,12 +118,8 @@ export default function KnowledgeGrid({
   const [readLaterStates, setReadLaterStates] = useState<{[key: string]: boolean}>({});
   const [loadingStates, setLoadingStates] = useState<{[key: string]: boolean}>({});
   
-  // Check if user is logged in
-  const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
-  
-  React.useEffect(() => {
-    setIsLoggedIn(!!getAuthToken());
-  }, []);
+  // Use auth hook
+  const { isLoggedIn } = useAuth();
 
   // Handle read later toggle
   const handleReadLaterToggle = async (item: KnowledgeItem, e: React.MouseEvent) => {
@@ -175,10 +143,7 @@ export default function KnowledgeGrid({
       }
 
       const method = currentState ? 'DELETE' : 'POST';
-      const url = `https://api.knoldg.com/api/account/favorite/knowledge/${item.slug}`;
-
-      console.log(`[Read Later] ${method} request to:`, url);
-      console.log(`[Read Later] Current state:`, currentState, 'Item slug:', item.slug);
+      const url = getApiUrl(`/api/account/favorite/knowledge/${item.slug}`);
 
       const response = await axios({
         method,
@@ -191,26 +156,12 @@ export default function KnowledgeGrid({
         }
       });
 
-      console.log(`[Read Later] Response status:`, response.status, 'Data:', response.data);
-
       // Check for successful responses (200, 201, 204)
       if (response.status >= 200 && response.status < 300) {
         setReadLaterStates(prev => ({ ...prev, [itemKey]: !currentState }));
-        console.log(`[Read Later] Success! New state:`, !currentState);
-      } else {
-        console.error('Failed to toggle read later status. Status:', response.status, 'Response:', response.data);
       }
     } catch (error) {
-      console.error('Error toggling read later:', error);
-      if (axios.isAxiosError(error)) {
-        console.error('Axios error details:', {
-          status: error.response?.status,
-          statusText: error.response?.statusText,
-          data: error.response?.data,
-          url: error.config?.url,
-          method: error.config?.method
-        });
-      }
+      // Silently handle error in production
     } finally {
       setLoadingStates(prev => ({ ...prev, [itemKey]: false }));
     }

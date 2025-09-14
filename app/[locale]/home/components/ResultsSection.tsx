@@ -68,8 +68,6 @@ const ResultsSection: React.FC<ResultsSectionProps> = ({
   // Get current page directly from URL - this is the source of truth!
   const urlCurrentPage = searchParams.get('page') ? parseInt(searchParams.get('page')!) : 1;
   
-  console.log('🟢 ResultsSection - URL page:', urlCurrentPage, 'Props page:', currentPage);
-  
   // Loading state component with a nice spinner
   const LoadingSpinner = () => (
     <div className="flex flex-col items-center justify-center py-16">
@@ -170,14 +168,9 @@ const ResultsSection: React.FC<ResultsSectionProps> = ({
                   total={totalPages} 
                   value={urlCurrentPage}
                   onChange={(page) => {
-                    console.log('🟢 Pagination Component - URL page:', urlCurrentPage, 'Props page:', currentPage, 'Clicked page:', page);
-                    
                     // Simply call the pagination handler - it will update URL which will update our display
                     if (onPageChange) {
-                      console.log('🟢 Calling onPageChange for page:', page);
                       onPageChange(page);
-                    } else {
-                      console.warn('🟢 No onPageChange handler provided!');
                     }
                     
                     // Scroll back to top of results for better UX

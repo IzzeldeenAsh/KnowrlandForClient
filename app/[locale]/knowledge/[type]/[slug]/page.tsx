@@ -2,6 +2,7 @@ import Footer from '@/components/ui/footer'
 import Breadcrumb from "@/components/ui/breadcrumb";
 import Image from "next/image";
 import { Metadata } from "next";
+import { generateKnowledgeMetadata, generateStructuredData } from '@/utils/seo';
 import { use } from "react";
 import { notFound } from "next/navigation";
 import { cookies } from "next/headers";
@@ -146,26 +147,20 @@ async function fetchKnowledgeData(type: string, slug: string, locale: string = '
 
 // Generate metadata for SEO
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  // We need to await the promise in async context
   const resolvedParams = await params;
   const { type, slug, locale } = resolvedParams;
 
   try {
     const { data } = await fetchKnowledgeData(type, slug, locale);
-
-    return {
-      title: `${data.title} | KNOLDG Knowledge`,
-      description: `Detailed knowledge and insights about ${data.title}`,
-      openGraph: {
-        title: `${data.title} | KNOLDG Knowledge`,
-        description: `Detailed knowledge and insights about ${data.title}`,
-      },
-    };
+    return generateKnowledgeMetadata(data, locale, type, slug);
   } catch (error) {
-    // Let the not-found page handle this
+    const isRTL = locale === 'ar';
     return {
-      title: "Knowledge Not Found | KNOLDG",
-      description: "The requested knowledge resource could not be found",
+      title: isRTL ? "المعرفة غير موجودة | KNOLDG" : "Knowledge Not Found | KNOLDG",
+      description: isRTL 
+        ? "لم يتم العثور على المورد المعرفي المطلوب. تحقق من الرابط أو ابحث عن محتوى آخر على منصة KNOLDG."
+        : "The requested knowledge resource could not be found. Please check the URL or search for other content on KNOLDG platform.",
+      robots: { index: false, follow: false },
     };
   }
 }
@@ -196,7 +191,24 @@ export default function KnowledgePage({ params }: Props) {
     href: item.url,
   }));
 
+  // Generate structured data
+  const structuredData = generateStructuredData(knowledge, locale, type, slug);
+
   return (
+    <>
+      {/* Structured Data */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify([
+            structuredData.article,
+            structuredData.product,
+            structuredData.organization,
+            structuredData.breadcrumb
+          ].filter(Boolean))
+        }}
+      />
+      
     <div className="min-h-screen bg-gray-50 relative" dir={isRTL ? 'rtl' : 'ltr'} style={knowledge.language === 'arabic' ? { direction: 'rtl', textAlign: 'right' } : {}}>
       {/* Language mismatch notifier */}
       <LanguageMismatchNotifier 
@@ -423,6 +435,7 @@ export default function KnowledgePage({ params }: Props) {
               purchased_status={knowledge.purchased_status}
               is_read_later={knowledge.is_read_later}
               knowledgeUUID={knowledge.id}
+              insighterUUID={knowledge.insighter.uuid}
             />
           </div>
         </div>
@@ -430,5 +443,6 @@ export default function KnowledgePage({ params }: Props) {
 
       <Footer />
     </div>
+    </>
   );
 }

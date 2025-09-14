@@ -1,36 +1,51 @@
 'use client';
 import { useState, useEffect } from 'react';
 import { Industry } from './types';
+import { getApiUrl } from '@/app/config';
 
-export function useAllIndustries() {
+interface UseAllIndustriesOptions {
+  locale?: string;
+  topSubIndustry?: number;
+}
+
+export function useAllIndustries(options: UseAllIndustriesOptions = {}) {
+  const { locale = 'en', topSubIndustry = 10 } = options;
   const [industries, setIndustries] = useState<Industry[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchIndustries = async () => {
       try {
-        const res = await fetch('https://api.knoldg.com/api/platform/industries', {
+        setIsLoading(true);
+        setError(null);
+        
+        const apiUrl = getApiUrl('/api/platform/industries');
+        const res = await fetch(apiUrl, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
             Accept: 'application/json',
-            'Accept-Language': 'en',
+            'Accept-Language': locale,
+            'X-Timezone': Intl.DateTimeFormat().resolvedOptions().timeZone,
           },
           body: JSON.stringify({
-            top_sub_industry: 10
+            top_sub_industry: topSubIndustry
           }),
           cache: 'force-cache',
           next: { revalidate: 3600 },
         });
 
         if (!res.ok) {
-          throw new Error('Failed to fetch industries');
+          throw new Error(`Failed to fetch industries: ${res.status}`);
         }
 
         const json = await res.json();
-        setIndustries(json.data);
+        setIndustries(json.data || []);
       } catch (error) {
-        console.error('Error fetching industries:', error);
+        const errorMessage = error instanceof Error ? error.message : 'Failed to fetch industries';
+        console.error('Error fetching industries:', errorMessage);
+        setError(errorMessage);
         setIndustries([]);
       } finally {
         setIsLoading(false);
@@ -38,7 +53,7 @@ export function useAllIndustries() {
     };
 
     fetchIndustries();
-  }, []);
+  }, [locale, topSubIndustry]);
 
-  return { industries, isLoading };
+  return { industries, isLoading, error };
 }
