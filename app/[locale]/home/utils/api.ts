@@ -101,8 +101,10 @@ export async function fetchAutocomplete(
     
     const data = await response.json();
     return data.data.searchKeywords || [];
-  } catch (error) {
-    console.error('Error fetching autocomplete suggestions:', error);
+  } catch (error: any) {
+    if (error.name !== 'AbortError') {
+      console.error('Error fetching autocomplete suggestions:', error);
+    }
     return [];
   }
 }
@@ -256,12 +258,8 @@ export async function fetchSearchResults(
     const perPageValue = perPage ? perPage.toString() : '27'; // Default to 30 if not provided
     url.searchParams.append('per_page', perPageValue);
     
-    // Log pagination parameters for debugging with a clear identifier
+    // Track request type for debugging (removed in production)
     const isPaginationRequest = currentPage > 1;
-    console.log(`${isPaginationRequest ? 'PAGINATION REQUEST' : 'SEARCH REQUEST'}: page=${currentPage}, per_page=${perPageValue}`);
-    
-    // Add detailed logging of the exact URL that will be used
-    console.log('FULL API URL BEING REQUESTED:', url.toString());
 
     
     // Add type parameter for category filtering (data, reports, insights, manuals, courses)

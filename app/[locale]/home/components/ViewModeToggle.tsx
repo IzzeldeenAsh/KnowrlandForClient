@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect } from 'react';
+import { useEffect, memo } from 'react';
 
 interface ViewModeToggleProps {
   viewMode: 'grid' | 'list';
@@ -47,4 +47,4 @@ const ViewModeToggle: React.FC<ViewModeToggleProps> = ({ viewMode, setViewMode }
   );
 };
 
-export default ViewModeToggle;
+export default memo(ViewModeToggle);

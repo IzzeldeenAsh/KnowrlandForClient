@@ -1,0 +1,84 @@
+@keyframes checkmark {
+  0% {
+    stroke-dashoffset: 100;
+    opacity: 0;
+  }
+  20% {
+    opacity: 1;
+  }
+  100% {
+    stroke-dashoffset: 0;
+  }
+}
+
+@keyframes circleExpand {
+  0% {
+    transform: scale(0);
+    opacity: 0;
+  }
+  50% {
+    transform: scale(1.1);
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+@keyframes fadeInUp {
+  0% {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes pulse {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.05);
+  }
+}
+
+.successContainer {
+  animation: fadeInUp 0.6s ease-out;
+}
+
+.checkmarkCircle {
+  animation: circleExpand 0.6s ease-out;
+}
+
+.checkmarkPath {
+  stroke-dasharray: 100;
+  stroke-dashoffset: 100;
+  animation: checkmark 0.8s ease-out 0.4s forwards;
+}
+
+.successTitle {
+  animation: fadeInUp 0.6s ease-out 0.6s both;
+}
+
+.successSubtitle {
+  animation: fadeInUp 0.6s ease-out 0.8s both;
+}
+
+.successDescription {
+  animation: fadeInUp 0.6s ease-out 1s both;
+}
+
+.progressSection {
+  animation: fadeInUp 0.6s ease-out 1.2s both;
+}
+
+.documentsAddedText {
+  animation: fadeInUp 0.4s ease-out;
+}
+
+.downloadButton {
+  animation: fadeInUp 0.6s ease-out 1.4s both;
+}

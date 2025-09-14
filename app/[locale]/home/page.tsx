@@ -1364,7 +1364,7 @@ export default function HomePage() {
                       {/* Category Icons */}
            {/* Only show categories when searchType is 'knowledge' */}
         
-             <div className="mt-10">
+             <div className="mt-4">
         {searchType === 'knowledge' && (       <p className="text-sm font-medium text-gray-500 mb-4">{locale === 'ar' ? 'استكشف بحسب الفئة' : 'Explore by category'}</p>)}
                <div className="flex flex-wrap justify-center gap-6 md:gap-8">
                  {/* Using the top-level selectedCategory state */}
@@ -1488,7 +1488,7 @@ export default function HomePage() {
             {/* Total results display moved to ResultsSection */}
             
             {/* Filter toggle button */}
-            <div className="mb-4 flex justify-start">
+            <div className="mb-1 flex justify-start">
               <button
                 onClick={() => {
                   // On tablet/mobile, open drawer instead of toggling sidebar
@@ -1502,7 +1502,7 @@ export default function HomePage() {
               >
                 {filtersVisible && !isTabletOrMobile ? (
                   <>
-                   <svg fill="none" height="24" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg"><g clipRule="evenodd" fill-rule="evenodd"><path d="m11 20v-16h2v16z" fill="#90caea"/><g fill="#3747d6"><path d="m16.9142 12 2.7929-2.79289-1.4142-1.41422-3.5 3.50001c-.3905.3905-.3905 1.0237 0 1.4142l3.5 3.5 1.4142-1.4142z"/><path d="m7.0858 12-2.79289-2.79289 1.41421-1.41422 3.5 3.50001c.39053.3905.39053 1.0237 0 1.4142l-3.5 3.5-1.41421-1.4142z"/></g></g></svg>
+                   <svg fill="none" height="24" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg"><g clipRule="evenodd" fillRule="evenodd"><path d="m11 20v-16h2v16z" fill="#90caea"/><g fill="#3747d6"><path d="m16.9142 12 2.7929-2.79289-1.4142-1.41422-3.5 3.50001c-.3905.3905-.3905 1.0237 0 1.4142l3.5 3.5 1.4142-1.4142z"/><path d="m7.0858 12-2.79289-2.79289 1.41421-1.41422 3.5 3.50001c.39053.3905.39053 1.0237 0 1.4142l-3.5 3.5-1.41421-1.4142z"/></g></g></svg>
                     {locale === 'ar' ? 'إخفاء المرشحات' : 'Hide Filters'}
                   </>
                 ) : (
