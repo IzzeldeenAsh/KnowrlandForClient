@@ -48,7 +48,7 @@ export function generateKnowledgeMetadata(
   slug: string
 ): Metadata {
   const isRTL = locale === 'ar';
-  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://knoldg.com';
+  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000';
   const currentUrl = `${baseUrl}/${locale}/knowledge/${type}/${slug}`;
   
   // Calculate average rating
@@ -198,7 +198,7 @@ export function generateKnowledgeMetadata(
 }
 
 export function generateStructuredData(knowledge: KnowledgeMetadata, locale: string, type: string, slug: string) {
-  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://knoldg.com';
+  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000';
   const currentUrl = `${baseUrl}/${locale}/knowledge/${type}/${slug}`;
   
   const avgRating = knowledge.review && knowledge.review.length > 0

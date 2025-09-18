@@ -93,7 +93,7 @@ function PaymentForm({ orderUuid, amount, title, locale, isRTL, orderDetails, se
       setIsFetchingDownloadIds(true);
       const token = getAuthToken();
       const response = await fetch(
-        `https://api.knoldg.com/api/account/order/knowledge/${uuid}`,
+        `https://api.foresighta.co/api/account/order/knowledge/${uuid}`,
         {
           headers: {
             "Content-Type": "application/json",
@@ -156,7 +156,7 @@ function PaymentForm({ orderUuid, amount, title, locale, isRTL, orderDetails, se
     const checkStatus = async (): Promise<boolean> => {
       try {
         const response = await fetch(
-          `https://api.knoldg.com/api/account/order/knowledge/${orderUuid}`,
+          `https://api.foresighta.co/api/account/order/knowledge/${orderUuid}`,
           {
             headers: {
               "Content-Type": "application/json",
@@ -347,14 +347,14 @@ function PaymentForm({ orderUuid, amount, title, locale, isRTL, orderDetails, se
             if (orderDetails?.knowledge_download_ids && orderDetails.knowledge_download_ids.length > 0) {
               const uuidsParam = `?uuids=${orderDetails.knowledge_download_ids.join(',')}`;
               console.log('Redirecting with UUIDs:', uuidsParam); // Debug log
-              window.location.href = `https://app.knoldg.com/app/insighter-dashboard/my-downloads${uuidsParam}`;
+              window.location.href = `http://localhost:4200/app/insighter-dashboard/my-downloads${uuidsParam}`;
             } else {
               console.log('No UUIDs available, falling back to search'); // Debug log
               // Fallback to title search if no UUIDs available
               const searchTitle = orderDetails?.suborders?.[0]?.knowledge?.[0]?.title || "";
               const searchParam = searchTitle ? `?search=${encodeURIComponent(searchTitle)}` : "";
               console.log('Redirecting with search:', searchParam); // Debug log
-              window.location.href = `https://app.knoldg.com/app/insighter-dashboard/my-downloads${searchParam}`;
+              window.location.href = `http://localhost:4200/app/insighter-dashboard/my-downloads${searchParam}`;
             }
           }}
         >
@@ -517,7 +517,7 @@ export default function StripePaymentPage() {
       try {
         const token = getAuthToken();
         const response = await fetch(
-          `https://api.knoldg.com/api/account/order/knowledge/${orderUuid}`,
+          `https://api.foresighta.co/api/account/order/knowledge/${orderUuid}`,
           {
             headers: {
               "Content-Type": "application/json",

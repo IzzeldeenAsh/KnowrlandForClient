@@ -152,7 +152,7 @@ export default function CheckoutPage() {
         const token = getAuthToken();
 
         const response = await fetch(
-          `https://api.knoldg.com/api/platform/industries/knowledge/${slug}`,
+          `https://api.foresighta.co/api/platform/industries/knowledge/${slug}`,
           {
             headers: {
               "Content-Type": "application/json",
@@ -191,7 +191,7 @@ export default function CheckoutPage() {
         const token = getAuthToken();
 
         const response = await fetch(
-          "https://api.knoldg.com/api/account/wallet/balance",
+          "https://api.foresighta.co/api/account/wallet/balance",
           {
             headers: {
               "Content-Type": "application/json",
@@ -244,7 +244,7 @@ export default function CheckoutPage() {
       setIsFetchingDownloadIds(true);
       const token = getAuthToken();
       const response = await fetch(
-        `https://api.knoldg.com/api/account/order/knowledge/${uuid}`,
+        `https://api.foresighta.co/api/account/order/knowledge/${uuid}`,
         {
           headers: {
             "Content-Type": "application/json",
@@ -342,7 +342,7 @@ export default function CheckoutPage() {
       };
 
       const response = await fetch(
-        "https://api.knoldg.com/api/account/order/knowledge/checkout",
+        "https://api.foresighta.co/api/account/order/knowledge/checkout",
         {
           method: "POST",
           headers: {
@@ -517,14 +517,14 @@ export default function CheckoutPage() {
                   if (knowledgeDownloadIds && knowledgeDownloadIds.length > 0) {
                     const uuidsParam = `?uuids=${knowledgeDownloadIds.join(',')}`;
                     console.log('Redirecting with UUIDs:', uuidsParam); // Debug log
-                    window.location.href = `https://app.knoldg.com/app/insighter-dashboard/my-downloads${uuidsParam}`;
+                    window.location.href = `http://localhost:4200/app/insighter-dashboard/my-downloads${uuidsParam}`;
                   } else {
                     console.log('No UUIDs available, falling back to search'); // Debug log
                     // Fallback to title search if no UUIDs available
                     const searchTitle = knowledge?.title || "";
                     const searchParam = searchTitle ? `?search=${encodeURIComponent(searchTitle)}` : "";
                     console.log('Redirecting with search:', searchParam); // Debug log
-                    window.location.href = `https://app.knoldg.com/app/insighter-dashboard/my-downloads${searchParam}`;
+                    window.location.href = `http://localhost:4200/app/insighter-dashboard/my-downloads${searchParam}`;
                   }
                 }}
               >
@@ -541,7 +541,7 @@ export default function CheckoutPage() {
 
   return (
     <>
-      <PageIllustration middle={false} />
+   <PageIllustration middle={false} />
 
       <div className="min-h-screen relative z-1" dir={isRTL ? "rtl" : "ltr"}>
         {/* Simple header */}
@@ -570,12 +570,10 @@ export default function CheckoutPage() {
           <div className={isFree ? styles.singleColumn : styles.checkoutGrid}>
             {/* Selected Documents Section */}
                   <div>
-                  <div className="border border-blue-200 rounded-lg p-4 mb-6">
+                  <div className="border border-[#E2E8F0] rounded-lg p-4 mb-6" style={{ background: 'rgba(255, 255, 255, 0.7)', backdropFilter: 'blur(10px)', WebkitBackdropFilter: 'blur(10px)' }}>
               <Text size="lg" fw={600} mb="xs">
                 {knowledge.title}
               </Text>
-              <div className={styles.divider} />
-
               <Stack gap="md">
                 {documentsToShow.map((doc) => (
                   <div
@@ -641,7 +639,7 @@ export default function CheckoutPage() {
               <>
                 <div className={styles.rightColumn}>
                   {/* Payment Methods */}
-                  <div className="border border-blue-200 rounded-lg p-4">
+                  <div className="border border-[#e2e8f0] rounded-lg p-4" style={{ background: 'rgba(255, 255, 255, 0.7)', backdropFilter: 'blur(10px)', WebkitBackdropFilter: 'blur(10px)' }}>
                     <Text className={styles.sectionTitle}>
                       {translations.paymentMethod}
                     </Text>
@@ -679,7 +677,7 @@ export default function CheckoutPage() {
                             }}
                           >
                             <MantineImage
-                              src="https://app.knoldg.com/assets/media/logos/custom-2.svg"
+                              src="http://localhost:4200/assets/media/logos/custom-2.svg"
                               alt="Knoldg Wallet"
                               width={32}
                               height={32}
@@ -716,19 +714,19 @@ export default function CheckoutPage() {
                               size="md"
                             />
                           </div>
-                          <div
-                            style={{
-                              flex: 1,
-                              minHeight: "48px",
-                              display: "flex",
-                              alignItems: "center",
-                              gap: "20px",
-                            }}
-                          >
-                            <VisaIcon />
-                            <MasterCardIcon />
-                            <GooglePayIcon />
-                            <ApplePayIcon />
+                          <div className={styles.paymentIconsContainer}>
+                            <div className={styles.paymentIcon}>
+                              <VisaIcon />
+                            </div>
+                            <div className={styles.paymentIcon}>
+                              <MasterCardIcon />
+                            </div>
+                            <div className={styles.paymentIcon}>
+                              <GooglePayIcon />
+                            </div>
+                            <div className={styles.paymentIcon}>
+                              <ApplePayIcon />
+                            </div>
                           </div>
                         </Group>
                       </div>

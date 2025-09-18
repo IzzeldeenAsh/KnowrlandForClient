@@ -25,12 +25,12 @@ const AuthModal: React.FC<AuthModalProps> = ({ opened, onClose, locale }) => {
   };
 
   const handleSignUp = () => {
-    window.location.href = 'https://app.knoldg.com/auth/sign-up';
+    window.location.href = 'http://localhost:4200/auth/sign-up';
   };
 
   const handleLogIn = () => {
     const currentUrl = window.location.href;
-    window.location.href = `https://app.knoldg.com/auth/login?returnUrl=${encodeURIComponent(currentUrl)}`;
+    window.location.href = `http://localhost:4200/auth/login?returnUrl=${encodeURIComponent(currentUrl)}`;
   };
 
   return (
