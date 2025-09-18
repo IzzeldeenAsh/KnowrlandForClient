@@ -127,7 +127,21 @@ const KnowledgeSideBox = ({
       setAuthModalOpened(true);
       return;
     }
-    
+
+    // Check if all documents are free or if total price is 0
+    const areAllDocumentsFree = documents.every(doc => parseFloat(doc.price) === 0);
+
+    if (isFree || areAllDocumentsFree) {
+      // Skip modal and go directly to checkout for free documents
+      const allDocumentIds = documents.map(doc => doc.id);
+      const queryParams = new URLSearchParams({
+        slug: knowledgeSlug || '',
+        documents: allDocumentIds.join(','),
+      });
+      window.location.href = `/${currentLocale}/checkout?${queryParams.toString()}`;
+      return;
+    }
+
     // Pre-select all documents when opening the modal
     const allDocumentIds = documents.map(doc => doc.id);
     setSelectedDocumentIds(allDocumentIds);
@@ -888,5 +902,5 @@ const KnowledgeSideBox = ({
   </div>
   );
 };
-
+ 
 export default KnowledgeSideBox;

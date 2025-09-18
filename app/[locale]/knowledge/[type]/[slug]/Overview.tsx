@@ -10,6 +10,7 @@ import { useParams } from 'next/navigation'
 import BuyModal from './BuyModal'
 import AuthModal from './AuthModal'
 import { useGlobalProfile } from '@/components/auth/GlobalProfileProvider'
+import { useRouter } from 'next/navigation'
 
 // Define interfaces for minimal typing, you can expand these as needed
 interface Document {
@@ -71,6 +72,7 @@ export default function Overview({ knowledge, knowledgeSlug }: OverviewProps) {
   const isRTL = locale === 'ar';
   const isArabicContent = knowledge.language === 'arabic';
   const { user } = useGlobalProfile();
+  const router = useRouter();
 
   const [buyModalOpened, setBuyModalOpened] = useState(false);
   const [selectedDocumentId, setSelectedDocumentId] = useState<number | undefined>(undefined);
@@ -109,7 +111,21 @@ export default function Overview({ knowledge, knowledgeSlug }: OverviewProps) {
       setAuthModalOpened(true);
       return;
     }
-    
+
+    // Find the specific document
+    const selectedDoc = knowledge.documents.find(doc => doc.id === documentId);
+
+    // Check if this document is free
+    if (selectedDoc && parseFloat(selectedDoc.price) === 0) {
+      // Skip modal and go directly to checkout for free document
+      const queryParams = new URLSearchParams({
+        slug: knowledgeSlug,
+        documents: documentId.toString(),
+      });
+      router.push(`/${locale}/checkout?${queryParams.toString()}`);
+      return;
+    }
+
     setSelectedDocumentId(documentId);
     setBuyModalOpened(true);
   };
