@@ -33,7 +33,7 @@ export default function SignoutPage() {
     removeCookie('auth_user');
     
     // Check if we also need to notify the Angular app about logout
-    const shouldNotifyAngularApp = !redirectUri?.includes('app.foresighta.co');
+    const shouldNotifyAngularApp = !redirectUri?.includes('app.knoldg.com');
     
     // If logout originated from Next.js, notify Angular app to ensure it also logs out
     if (shouldNotifyAngularApp) {
