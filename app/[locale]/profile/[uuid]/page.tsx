@@ -58,7 +58,7 @@ import { Elements, PaymentElement, useElements, useStripe } from "@stripe/react-
 import { VisaIcon, MasterCardIcon, GooglePayIcon, ApplePayIcon } from "@/components/payment-icons";
 
 // Initialize Stripe
-const stripePromise = loadStripe("YOUR_STRIPE_SECRET_KEY_HERE");
+const stripePromise = loadStripe("process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY\!");
 
 // Stripe Payment Form Component
 interface StripePaymentFormProps {
