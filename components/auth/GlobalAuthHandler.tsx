@@ -66,7 +66,7 @@ export default function GlobalAuthHandler() {
         const timestamp = new Date().getTime();
         
         // Redirect to Angular app's logout endpoint
-        window.location.href = `https://app.knoldg.com/auth/logout?redirect_uri=${encodeURIComponent(`https://knoldg.com/${locale}?t=${timestamp}`)}`;
+        window.location.href = `https://app.knoldg.com/auth/logout?redirect_uri=${encodeURIComponent(`http://localhost:3000/${locale}?t=${timestamp}`)}`;
       }
     };
 

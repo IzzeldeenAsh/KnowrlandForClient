@@ -111,6 +111,8 @@ export function GlobalProfileProvider({ children }: { children: React.ReactNode 
           first_name: data.data.first_name,
           last_name: data.data.last_name,
           company: data.data.company,
+          country: data.data.country,
+          country_id: data.data.country_id,
         };
 
         console.log("[GlobalProfileProvider] Successfully retrieved profile", { 

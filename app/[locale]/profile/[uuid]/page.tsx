@@ -18,6 +18,9 @@ import {
   Tabs,
   Checkbox,
   Image as MantineImage,
+  Select,
+  Group,
+  Text,
 } from "@mantine/core";
 import { useParams, useRouter } from "next/navigation";
 import {
@@ -48,12 +51,15 @@ import InstagramIcon from "@/public/file-icons/instagram";
 import { useTranslations } from "next-intl";
 import styles from "./profile.module.css";
 import Link from "next/link";
+import { useCountries, Country } from "@/app/lib/useCountries";
+import { useToast } from "@/components/toast/ToastContext";
 import { loadStripe } from "@stripe/stripe-js";
 import { Elements, PaymentElement, useElements, useStripe } from "@stripe/react-stripe-js";
 import { VisaIcon, MasterCardIcon, GooglePayIcon, ApplePayIcon } from "@/components/payment-icons";
+import { getStripePublishableKey } from "@/app/config";
 
 // Initialize Stripe
-const stripePromise = loadStripe("pk_test_51RpQiFL3mrWP7a0P1OYWGeFJWtgMwcWJtiEDLvn29CpYn5x8Ou77YViA1yoimlixKU5aUAeOeN5VTfoC4sMpvFVF00qq9a6BNm");
+const stripePromise = loadStripe(getStripePublishableKey());
 
 // Stripe Payment Form Component
 interface StripePaymentFormProps {
@@ -103,7 +109,17 @@ function StripePaymentForm({
 
   return (
     <form onSubmit={handleSubmit}>
-      <PaymentElement />
+      <PaymentElement
+        options={{
+          fields: {
+            billingDetails: {
+              address: {
+                country: "auto",
+              },
+            },
+          },
+        }}
+      />
       <Button
         type="submit"
         loading={isProcessing}
@@ -271,6 +287,15 @@ export default function ProfilePage() {
     title?: string;
     description?: string;
   }>({});
+
+  // Country selection states
+  const [selectedCountry, setSelectedCountry] = useState<string>("");
+  const [isEditingCountry, setIsEditingCountry] = useState(false);
+  const [isUpdatingCountry, setIsUpdatingCountry] = useState(false);
+
+  // Hooks
+  const { countries, isLoading: countriesLoading, getLocalizedCountryName } = useCountries();
+  const toast = useToast();
   const [showDuplicateWarning, setShowDuplicateWarning] = useState(false);
   const [isDuplicateCheckLoading, setIsDuplicateCheckLoading] = useState(false);
   
@@ -560,6 +585,74 @@ export default function ProfilePage() {
     }
     return "An error occurred. Please try again later.";
   };
+
+  // Function to update user country
+  const updateUserCountry = async (countryId: string) => {
+    setIsUpdatingCountry(true);
+    try {
+      const token = localStorage.getItem("token") ||
+        document.cookie
+          .split("; ")
+          .find((row) => row.startsWith("token="))
+          ?.split("=")[1];
+
+      const response = await fetch(
+        "https://api.knoldg.com/api/account/profile/country",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Accept: "application/json",
+            "Accept-Language": locale,
+            "X-Timezone": Intl.DateTimeFormat().resolvedOptions().timeZone,
+            ...(token && { Authorization: `Bearer ${token}` }),
+          },
+          body: JSON.stringify({
+            country_id: countryId,
+          }),
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const data = await response.json();
+
+      // Update the profile data with new country
+      const selectedCountryData = countries.find(c => c.id.toString() === countryId);
+      if (selectedCountryData && profileData) {
+        setProfileData({
+          ...profileData,
+          country_id: selectedCountryData.id,
+          country: getLocalizedCountryName(selectedCountryData),
+        });
+      }
+
+      toast.success(
+        isRTL ? "تم تحديث الدولة بنجاح" : "Country updated successfully",
+        isRTL ? "نجح" : "Success"
+      );
+      setIsEditingCountry(false);
+      return true;
+    } catch (error) {
+      console.error("Error updating country:", error);
+      toast.error(
+        error instanceof Error ? error.message : (isRTL ? "فشل في تحديث الدولة" : "Failed to update country"),
+        isRTL ? "خطأ" : "Error"
+      );
+      return false;
+    } finally {
+      setIsUpdatingCountry(false);
+    }
+  };
+
+  // Prepare country options for select
+  const countryOptions = countries.map((country) => ({
+    value: country.id.toString(),
+    label: getLocalizedCountryName(country),
+    flag: country.flag,
+  }));
 
   // Function to fetch meeting availability data
   const fetchMeetingAvailability = async () => {
@@ -1850,22 +1943,94 @@ export default function ProfilePage() {
                               </div>
                             )}
                           {/* Country */}
-                          {profileData.country && (
+                          {(profileData.country || isOwnProfile) && (
                             <div className="bg-white dark:bg-slate-800 p-4 rounded-xl shadow-sm">
-                              <div className="flex items-center">
-                                <GlobeAsiaAustraliaIcon
-                                  className={`w-5 h-5 text-gray-500 dark:text-gray-400 ${
-                                    isRTL ? "ml-2" : "mr-2"
-                                  }`}
-                                />
-                                <div>
-                                  <p className="text-sm text-gray-500 dark:text-gray-400">
-                                    {t("country")}
-                                  </p>
-                                  <p className="font-medium">
-                                    {profileData.country}
-                                  </p>
+                              <div className="flex items-center justify-between">
+                                <div className="flex items-center">
+                                  <GlobeAsiaAustraliaIcon
+                                    className={`w-5 h-5 text-gray-500 dark:text-gray-400 ${
+                                      isRTL ? "ml-2" : "mr-2"
+                                    }`}
+                                  />
+                                  <div>
+                                    <p className="text-sm text-gray-500 dark:text-gray-400">
+                                      {t("country")}
+                                    </p>
+                                    {isEditingCountry && isOwnProfile ? (
+                                      <div className="mt-2">
+                                        <Select
+                                          placeholder={isRTL ? "اختر الدولة" : "Select Country"}
+                                          value={selectedCountry}
+                                          onChange={(value) => setSelectedCountry(value || "")}
+                                          data={countryOptions}
+                                          searchable
+                                          disabled={countriesLoading || isUpdatingCountry}
+                                          dir={isRTL ? "rtl" : "ltr"}
+                                          size="sm"
+                                          renderOption={({ option }) => {
+                                            const countryOption = option as typeof option & { flag: string };
+                                            return (
+                                              <Group gap="sm">
+                                                <Image
+                                                  src={`/images/flags/${countryOption.flag}.svg`}
+                                                  alt={`${countryOption.label} flag`}
+                                                  width={20}
+                                                  height={15}
+                                                  style={{ objectFit: "cover" }}
+                                                />
+                                                <Text size="sm">{countryOption.label}</Text>
+                                              </Group>
+                                            );
+                                          }}
+                                        />
+                                        <Group gap="sm" mt="sm">
+                                          <Button
+                                            size="xs"
+                                            onClick={() => {
+                                              if (selectedCountry) {
+                                                updateUserCountry(selectedCountry);
+                                              }
+                                            }}
+                                            loading={isUpdatingCountry}
+                                            disabled={!selectedCountry}
+                                          >
+                                            {isRTL ? "حفظ" : "Save"}
+                                          </Button>
+                                          <Button
+                                            size="xs"
+                                            variant="outline"
+                                            onClick={() => {
+                                              setIsEditingCountry(false);
+                                              setSelectedCountry("");
+                                            }}
+                                            disabled={isUpdatingCountry}
+                                          >
+                                            {isRTL ? "إلغاء" : "Cancel"}
+                                          </Button>
+                                        </Group>
+                                      </div>
+                                    ) : (
+                                      <p className="font-medium">
+                                        {profileData.country || (isRTL ? "لم يتم تحديد الدولة" : "Country not set")}
+                                      </p>
+                                    )}
+                                  </div>
                                 </div>
+                                {isOwnProfile && !isEditingCountry && (
+                                  <Button
+                                    size="xs"
+                                    variant="light"
+                                    onClick={() => {
+                                      setIsEditingCountry(true);
+                                      // Set current country if exists
+                                      if (profileData.country_id) {
+                                        setSelectedCountry(profileData.country_id.toString());
+                                      }
+                                    }}
+                                  >
+                                    {isRTL ? "تعديل" : "Edit"}
+                                  </Button>
+                                )}
                               </div>
                             </div>
                           )}
@@ -2162,7 +2327,7 @@ export default function ProfilePage() {
                       <p className="text-gray-500 mb-4">{t("loginToView")}</p>
                       <a
                         href={`https://app.knoldg.com/auth/login?returnUrl=${encodeURIComponent(
-                          `https://knoldg.com/${locale}/profile/${uuid}${
+                          `http://localhost:3000/${locale}/profile/${uuid}${
                             typeof window !== "undefined"
                               ? window.location.search
                               : ""
