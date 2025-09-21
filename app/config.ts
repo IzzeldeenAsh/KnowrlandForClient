@@ -24,12 +24,3 @@ export const getApiUrl = (path: string): string => {
 export const getAppUrl = (path: string): string => {
   return `${appBaseUrl}${path}`;
 };
-
-// Stripe configuration
-export const getStripePublishableKey = (): string => {
-  if (isDevelopment) {
-    return process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY || 'pk_test_REPLACE_WITH_YOUR_PUBLISHABLE_KEY';
-  } else {
-    return process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY || 'pk_live_REPLACE_WITH_YOUR_LIVE_PUBLISHABLE_KEY';
-  }
-}; 

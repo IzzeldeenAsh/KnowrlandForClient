@@ -9,11 +9,10 @@ import { Container, Text, Button, Paper, Group, Stack, Badge, Progress } from "@
 import { IconCreditCard, IconCheck, IconLock } from "@tabler/icons-react";
 import PageIllustration from "@/components/page-illustration";
 import { Elements, PaymentElement, useElements, useStripe } from "@stripe/react-stripe-js";
-import { getStripePublishableKey } from "@/app/config";
 import styles from "./payment.module.css";
 
 // Initialize Stripe
-const stripePromise = loadStripe(getStripePublishableKey());
+const stripePromise = loadStripe("YOUR_STRIPE_SECRET_KEY_HERE");
 
 // File icon mapping function
 const getFileIconByExtension = (extension: string) => {

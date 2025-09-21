@@ -56,10 +56,9 @@ import { useToast } from "@/components/toast/ToastContext";
 import { loadStripe } from "@stripe/stripe-js";
 import { Elements, PaymentElement, useElements, useStripe } from "@stripe/react-stripe-js";
 import { VisaIcon, MasterCardIcon, GooglePayIcon, ApplePayIcon } from "@/components/payment-icons";
-import { getStripePublishableKey } from "@/app/config";
 
 // Initialize Stripe
-const stripePromise = loadStripe(getStripePublishableKey());
+const stripePromise = loadStripe("YOUR_STRIPE_SECRET_KEY_HERE");
 
 // Stripe Payment Form Component
 interface StripePaymentFormProps {
