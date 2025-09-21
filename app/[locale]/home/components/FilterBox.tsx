@@ -248,7 +248,7 @@ const FilterBox: React.FC<FilterBoxProps> = ({
     const fetchCountries = async () => {
       setLoading(true);
       try {
-        const response = await fetch('https://api.foresighta.co/api/common/setting/country/list', {
+        const response = await fetch('https://api.knoldg.com/api/common/setting/country/list', {
           headers: {
             'Accept-Language': locale,
             'Accept': 'application/json',
@@ -270,7 +270,7 @@ const FilterBox: React.FC<FilterBoxProps> = ({
     const fetchRegions = async () => {
       setLoadingRegions(true);
       try {
-        const response = await fetch('https://api.foresighta.co/api/common/setting/region/list', {
+        const response = await fetch('https://api.knoldg.com/api/common/setting/region/list', {
           headers: {
             'Accept-Language': locale,
             'Accept': 'application/json',
@@ -297,7 +297,7 @@ const FilterBox: React.FC<FilterBoxProps> = ({
     const fetchEconomicBlocs = async () => {
       setLoadingEconomicBlocs(true);
       try {
-        const response = await fetch('https://api.foresighta.co/api/common/setting/economic-bloc/list', {
+        const response = await fetch('https://api.knoldg.com/api/common/setting/economic-bloc/list', {
           headers: {
             'Accept-Language': locale,
             'Accept': 'application/json',
@@ -324,7 +324,7 @@ const FilterBox: React.FC<FilterBoxProps> = ({
     const fetchIsicCodes = async () => {
       setLoadingIsicCodes(true);
       try {
-        const response = await fetch('https://api.foresighta.co/api/common/setting/isic-code/tree-list', {
+        const response = await fetch('https://api.knoldg.com/api/common/setting/isic-code/tree-list', {
           headers: {
             'Accept-Language': locale,
             'Accept': 'application/json',
@@ -346,7 +346,7 @@ const FilterBox: React.FC<FilterBoxProps> = ({
     const fetchIndustries = async () => {
       setLoadingIndustries(true);
       try {
-        const response = await fetch('https://api.foresighta.co/api/common/setting/industry/tree', {
+        const response = await fetch('https://api.knoldg.com/api/common/setting/industry/tree', {
           headers: {
             'Accept-Language': locale,
             'Accept': 'application/json',
@@ -377,7 +377,7 @@ const FilterBox: React.FC<FilterBoxProps> = ({
     const fetchHsCodes = async (isicCodeId: number) => {
       setLoadingHsCodes(true);
       try {
-        const response = await fetch(`https://api.foresighta.co/api/common/setting/hs-code/isic-code/${isicCodeId}`, {
+        const response = await fetch(`https://api.knoldg.com/api/common/setting/hs-code/isic-code/${isicCodeId}`, {
           headers: {
             'Accept-Language': locale,
             'Accept': 'application/json',

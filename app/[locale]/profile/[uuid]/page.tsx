@@ -301,7 +301,7 @@ export default function ProfilePage() {
         if (entityType === "insighter") {
           // Try insighter API first
           let response = await fetch(
-            `https://api.foresighta.co/api/platform/insighter/profile/${uuid}`,
+            `https://api.knoldg.com/api/platform/insighter/profile/${uuid}`,
             {
               headers: {
                 "Content-Type": "application/json",
@@ -317,7 +317,7 @@ export default function ProfilePage() {
           } else {
             // Fall back to company API if insighter fails
             response = await fetch(
-              `https://api.foresighta.co/api/platform/company/profile/${uuid}`,
+              `https://api.knoldg.com/api/platform/company/profile/${uuid}`,
               {
                 headers: {
                   "Content-Type": "application/json",
@@ -367,7 +367,7 @@ export default function ProfilePage() {
         } else {
           // Default behavior: try company API first
           let response = await fetch(
-            `https://api.foresighta.co/api/platform/company/profile/${uuid}`,
+            `https://api.knoldg.com/api/platform/company/profile/${uuid}`,
             {
               headers: {
                 "Content-Type": "application/json",
@@ -414,7 +414,7 @@ export default function ProfilePage() {
           } else {
             // Try insighter API if company API fails
             response = await fetch(
-              `https://api.foresighta.co/api/platform/insighter/profile/${uuid}`,
+              `https://api.knoldg.com/api/platform/insighter/profile/${uuid}`,
               {
                 headers: {
                   "Content-Type": "application/json",
@@ -457,8 +457,8 @@ export default function ProfilePage() {
         // Now fetch the filtered data
         let url =
           entityType === "insighter"
-            ? `https://api.foresighta.co/api/platform/insighter/knowledge/${uuid}?page=${knowledgePage}&per_page=12`
-            : `https://api.foresighta.co/api/platform/company/knowledge/${uuid}?page=${knowledgePage}&per_page=12`;
+            ? `https://api.knoldg.com/api/platform/insighter/knowledge/${uuid}?page=${knowledgePage}&per_page=12`
+            : `https://api.knoldg.com/api/platform/company/knowledge/${uuid}?page=${knowledgePage}&per_page=12`;
 
         if (selectedType) {
           url += `&type=${selectedType}`;
@@ -506,7 +506,7 @@ export default function ProfilePage() {
       if (isAuth && token) {
         try {
           const response = await fetch(
-            "https://api.foresighta.co/api/account/profile",
+            "https://api.knoldg.com/api/account/profile",
             {
               headers: {
                 "Content-Type": "application/json",
@@ -589,7 +589,7 @@ export default function ProfilePage() {
       endDate.setFullYear(tomorrow.getFullYear() + 1);
       const endDateStr = endDate.toISOString().split("T")[0]; // YYYY-MM-DD format
       const response = await axios.post(
-        `https://api.foresighta.co/api/account/meeting/available/hours/${uuid}`,
+        `https://api.knoldg.com/api/account/meeting/available/hours/${uuid}`,
         {
           start_date: startDate,
           end_date: endDateStr,
@@ -655,7 +655,7 @@ export default function ProfilePage() {
       const token = typeof window !== "undefined" ? localStorage.getItem("token") : null;
       if (!token) return;
       
-      const response = await fetch("https://api.foresighta.co/api/account/wallet/balance", {
+      const response = await fetch("https://api.knoldg.com/api/account/wallet/balance", {
         headers: {
           "Content-Type": "application/json",
           Accept: "application/json",
@@ -874,7 +874,7 @@ export default function ProfilePage() {
         typeof window !== "undefined" ? localStorage.getItem("token") : null;
 
       const response = await fetch(
-        "https://api.foresighta.co/api/account/meeting/client/check-duplicate-time",
+        "https://api.knoldg.com/api/account/meeting/client/check-duplicate-time",
         {
           method: "POST",
           headers: {
@@ -915,7 +915,7 @@ export default function ProfilePage() {
     const checkStatus = async (): Promise<boolean> => {
       try {
         const response = await fetch(
-          `https://api.foresighta.co/api/account/order/meeting/${orderUuid}`,
+          `https://api.knoldg.com/api/account/order/meeting/${orderUuid}`,
           {
             headers: {
               "Content-Type": "application/json",
@@ -997,7 +997,7 @@ export default function ProfilePage() {
       }
 
       const response = await fetch(
-        `https://api.foresighta.co/api/account/order/meeting/checkout/${uuid}`,
+        `https://api.knoldg.com/api/account/order/meeting/checkout/${uuid}`,
         {
           method: "POST",
           headers: {
@@ -2161,8 +2161,8 @@ export default function ProfilePage() {
                       </h3>
                       <p className="text-gray-500 mb-4">{t("loginToView")}</p>
                       <a
-                        href={`http://localhost:4200/auth/login?returnUrl=${encodeURIComponent(
-                          `http://localhost:3000/${locale}/profile/${uuid}${
+                        href={`https://app.knoldg.com/auth/login?returnUrl=${encodeURIComponent(
+                          `https://knoldg.com/${locale}/profile/${uuid}${
                             typeof window !== "undefined"
                               ? window.location.search
                               : ""
@@ -2554,7 +2554,7 @@ export default function ProfilePage() {
                                 <div className="flex items-center gap-3">
                                 <div className="w-8 h-8 flex items-center justify-center flex-shrink-0">
                                     <MantineImage
-                                      src="http://localhost:4200/assets/media/logos/custom-2.svg"
+                                      src="https://app.knoldg.com/assets/media/logos/custom-2.svg"
                                       alt="Knoldg Wallet"
                                       width={24}
                                       height={24}
@@ -2746,7 +2746,7 @@ export default function ProfilePage() {
                   className="bg-gradient-to-r from-blue-500 to-teal-400 hover:from-blue-600 hover:to-teal-500 transition-all"
                   onClick={() => {
                     // Redirect to meetings dashboard
-                    window.location.href = "http://localhost:4200/app/insighter-dashboard/my-meetings/sent";
+                    window.location.href = "https://app.knoldg.com/app/insighter-dashboard/my-meetings/sent";
                   }}
                 >
                   {locale.startsWith('ar') ? 'اذهب إلى الاجتماعات' : 'Go to Meetings'}

@@ -152,7 +152,7 @@ export default function CheckoutPage() {
         const token = getAuthToken();
 
         const response = await fetch(
-          `https://api.foresighta.co/api/platform/industries/knowledge/${slug}`,
+          `https://api.knoldg.com/api/platform/industries/knowledge/${slug}`,
           {
             headers: {
               "Content-Type": "application/json",
@@ -191,7 +191,7 @@ export default function CheckoutPage() {
         const token = getAuthToken();
 
         const response = await fetch(
-          "https://api.foresighta.co/api/account/wallet/balance",
+          "https://api.knoldg.com/api/account/wallet/balance",
           {
             headers: {
               "Content-Type": "application/json",
@@ -244,7 +244,7 @@ export default function CheckoutPage() {
       setIsFetchingDownloadIds(true);
       const token = getAuthToken();
       const response = await fetch(
-        `https://api.foresighta.co/api/account/order/knowledge/${uuid}`,
+        `https://api.knoldg.com/api/account/order/knowledge/${uuid}`,
         {
           headers: {
             "Content-Type": "application/json",
@@ -342,7 +342,7 @@ export default function CheckoutPage() {
       };
 
       const response = await fetch(
-        "https://api.foresighta.co/api/account/order/knowledge/checkout",
+        "https://api.knoldg.com/api/account/order/knowledge/checkout",
         {
           method: "POST",
           headers: {
@@ -517,14 +517,14 @@ export default function CheckoutPage() {
                   if (knowledgeDownloadIds && knowledgeDownloadIds.length > 0) {
                     const uuidsParam = `?uuids=${knowledgeDownloadIds.join(',')}`;
                     console.log('Redirecting with UUIDs:', uuidsParam); // Debug log
-                    window.location.href = `http://localhost:4200/app/insighter-dashboard/my-downloads${uuidsParam}`;
+                    window.location.href = `https://app.knoldg.com/app/insighter-dashboard/my-downloads${uuidsParam}`;
                   } else {
                     console.log('No UUIDs available, falling back to search'); // Debug log
                     // Fallback to title search if no UUIDs available
                     const searchTitle = knowledge?.title || "";
                     const searchParam = searchTitle ? `?search=${encodeURIComponent(searchTitle)}` : "";
                     console.log('Redirecting with search:', searchParam); // Debug log
-                    window.location.href = `http://localhost:4200/app/insighter-dashboard/my-downloads${searchParam}`;
+                    window.location.href = `https://app.knoldg.com/app/insighter-dashboard/my-downloads${searchParam}`;
                   }
                 }}
               >
@@ -677,7 +677,7 @@ export default function CheckoutPage() {
                             }}
                           >
                             <MantineImage
-                              src="http://localhost:4200/assets/media/logos/custom-2.svg"
+                              src="https://app.knoldg.com/assets/media/logos/custom-2.svg"
                               alt="Knoldg Wallet"
                               width={32}
                               height={32}
