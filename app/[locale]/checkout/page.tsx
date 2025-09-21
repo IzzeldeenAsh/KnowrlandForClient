@@ -14,17 +14,20 @@ import {
   Image as MantineImage,
   Container,
   Progress,
+  Select,
 } from "@mantine/core";
 import { IconCheck } from "@tabler/icons-react";
 import Image from "next/image";
 import { useToast } from "@/components/toast/ToastContext";
 import PageIllustration from "@/components/page-illustration";
-import { 
-  VisaIcon, 
-  MasterCardIcon, 
-  GooglePayIcon, 
-  ApplePayIcon 
+import {
+  VisaIcon,
+  MasterCardIcon,
+  GooglePayIcon,
+  ApplePayIcon
 } from "@/components/payment-icons";
+import { useCountries, Country } from "@/app/lib/useCountries";
+import { useUserProfile } from "@/components/ui/header/hooks/useUserProfile";
 import styles from "./checkout.module.css";
 
 interface Document {
@@ -80,6 +83,10 @@ export default function CheckoutPage() {
   const router = useRouter();
   const toast = useToast();
 
+  // Hooks
+  const { user } = useUserProfile();
+  const { countries, isLoading: countriesLoading, getLocalizedCountryName } = useCountries();
+
   const slug = searchParams.get("slug") || "";
   const documentIds =
     searchParams
@@ -99,6 +106,8 @@ export default function CheckoutPage() {
   const [knowledgeDownloadIds, setKnowledgeDownloadIds] = useState<string[]>([]);
   const [orderUuid, setOrderUuid] = useState<string>("");
   const [isFetchingDownloadIds, setIsFetchingDownloadIds] = useState(false);
+  const [selectedCountry, setSelectedCountry] = useState<string>("");
+  const [isUpdatingProfile, setIsUpdatingProfile] = useState(false);
 
   // Translations
   const translations = {
@@ -131,6 +140,10 @@ export default function CheckoutPage() {
     accessGranted: isRTL ? "يمكنك الآن الوصول إلى جميع المستندات المشتراة" : "You now have access to all your purchased documents",
     preparingDownloads: isRTL ? "جاري تجهيز التنزيلات..." : "Preparing your downloads...",
     documentsAdded: isRTL ? "تمت إضافة المستندات إلى التنزيلات الخاصة بك" : "Documents added to your Downloads",
+    selectCountry: isRTL ? "اختر الدولة" : "Select Country",
+    countryRequired: isRTL ? "الدولة مطلوبة لاستخدام المحفظة" : "Country is required to use wallet",
+    pleaseSelectCountry: isRTL ? "يرجى اختيار الدولة" : "Please select a country",
+    updatingProfile: isRTL ? "جاري التحديث..." : "Updating...",
   };
 
   // Get auth token from cookies
@@ -141,6 +154,61 @@ export default function CheckoutPage() {
       ?.split("=")[1];
     return token;
   };
+
+  // Update user country
+  const updateUserCountry = async (countryId: string) => {
+    setIsUpdatingProfile(true);
+    try {
+      const token = getAuthToken();
+      const response = await fetch(
+        "https://api.knoldg.com/api/account/profile/country",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Accept: "application/json",
+            "Accept-Language": locale,
+            "X-Timezone": Intl.DateTimeFormat().resolvedOptions().timeZone,
+            ...(token && { Authorization: `Bearer ${token}` }),
+          },
+          body: JSON.stringify({
+            country_id: countryId,
+          }),
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const data = await response.json();
+      toast.success(
+        isRTL ? "تم تحديث الدولة بنجاح" : "Country updated successfully",
+        isRTL ? "نجح" : "Success"
+      );
+      return true;
+    } catch (error) {
+      console.error("Error updating country:", error);
+      toast.error(
+        error instanceof Error ? error.message : translations.orderError,
+        translations.orderError
+      );
+      return false;
+    } finally {
+      setIsUpdatingProfile(false);
+    }
+  };
+
+  // Check if user has country
+  const userHasCountry = user && (user.country || user.country_id);
+  const showCountrySelection = paymentMethod === "manual" && !userHasCountry;
+
+  // Prepare country options for select
+  const countryOptions = countries.map((country) => ({
+    value: country.id.toString(),
+    label: getLocalizedCountryName(country),
+    flag: country.flag,
+  }));
 
   // Fetch knowledge data
   useEffect(() => {
@@ -325,6 +393,20 @@ export default function CheckoutPage() {
 
     if (selectedDocuments.length === 0) {
       return;
+    }
+
+    // Check if wallet is selected and user needs to provide country
+    if (paymentMethod === "manual" && !userHasCountry) {
+      if (!selectedCountry) {
+        toast.error(translations.pleaseSelectCountry, translations.orderError);
+        return;
+      }
+
+      // Update user country before proceeding
+      const updateSuccess = await updateUserCountry(selectedCountry);
+      if (!updateSuccess) {
+        return;
+      }
     }
 
     setIsCheckingOut(true);
@@ -646,57 +728,92 @@ export default function CheckoutPage() {
 
                     <Stack gap="md">
                       {/* Wallet Method */}
-                      <div
-                        className={`${styles.paymentMethodCard} ${
-                          paymentMethod === "manual" ? styles.selected : ""
-                        } ${walletBalance < totalPrice ? styles.disabled : ""}`}
-                        onClick={() =>
-                          walletBalance >= totalPrice &&
-                          setPaymentMethod("manual")
-                        }
-                      >
-                        <Group gap="lg" align="center">
-                          <div className={styles.methodCheckbox}>
-                            <Checkbox
-                              checked={paymentMethod === "manual"}
-                              onChange={() =>
-                                walletBalance >= totalPrice &&
-                                setPaymentMethod("manual")
-                              }
-                              disabled={walletBalance < totalPrice}
-                              size="md"
-                            />
-                          </div>
-                          <div
-                            style={{
-                              width: 40,
-                              height: 40,
-                              display: "flex",
-                              alignItems: "center",
-                              justifyContent: "center",
-                            }}
-                          >
-                            <MantineImage
-                              src="https://app.knoldg.com/assets/media/logos/custom-2.svg"
-                              alt="Knoldg Wallet"
-                              width={32}
-                              height={32}
-                              fit="contain"
-                            />
-                          </div>
-                          <div style={{ flex: 1 }}>
-                            <Text fw={500}>{translations.knoldgWallet}</Text>
-                            <Text size="sm" fw={600} c={walletBalance < totalPrice ? "red" : "green"} mt={2}>
-                              {isRTL ? "الرصيد المتاح: " : "Available Balance: "}
-                              {formatCurrency(walletBalance)}
-                            </Text>
-                            {walletBalance < totalPrice && (
-                              <Text size="xs" c="red">
-                                {translations.insufficientBalance}
+                      <div>
+                        <div
+                          className={`${styles.paymentMethodCard} ${
+                            paymentMethod === "manual" ? styles.selected : ""
+                          } ${walletBalance < totalPrice ? styles.disabled : ""}`}
+                          onClick={() =>
+                            walletBalance >= totalPrice &&
+                            setPaymentMethod("manual")
+                          }
+                        >
+                          <Group gap="lg" align="center">
+                            <div className={styles.methodCheckbox}>
+                              <Checkbox
+                                checked={paymentMethod === "manual"}
+                                onChange={() =>
+                                  walletBalance >= totalPrice &&
+                                  setPaymentMethod("manual")
+                                }
+                                disabled={walletBalance < totalPrice}
+                                size="md"
+                              />
+                            </div>
+                            <div
+                              style={{
+                                width: 40,
+                                height: 40,
+                                display: "flex",
+                                alignItems: "center",
+                                justifyContent: "center",
+                              }}
+                            >
+                              <MantineImage
+                                src="https://app.knoldg.com/assets/media/logos/custom-2.svg"
+                                alt="Knoldg Wallet"
+                                width={32}
+                                height={32}
+                                fit="contain"
+                              />
+                            </div>
+                            <div style={{ flex: 1 }}>
+                              <Text fw={500}>{translations.knoldgWallet}</Text>
+                              <Text size="sm" fw={600} c={walletBalance < totalPrice ? "red" : "green"} mt={2}>
+                                {isRTL ? "الرصيد المتاح: " : "Available Balance: "}
+                                {formatCurrency(walletBalance)}
                               </Text>
-                            )}
+                              {walletBalance < totalPrice && (
+                                <Text size="xs" c="red">
+                                  {translations.insufficientBalance}
+                                </Text>
+                              )}
+                            </div>
+                          </Group>
+                        </div>
+
+                        {/* Country Selection for Wallet */}
+                        {showCountrySelection && (
+                          <div className="mt-4 p-4 border border-orange-200 rounded-lg bg-orange-50">
+                            <Text size="sm" fw={500} mb="sm" c="orange.7">
+                              {translations.countryRequired}
+                            </Text>
+                            <Select
+                              placeholder={translations.selectCountry}
+                              value={selectedCountry}
+                              onChange={(value) => setSelectedCountry(value || "")}
+                              data={countryOptions}
+                              searchable
+                              disabled={countriesLoading || isUpdatingProfile}
+                              dir={isRTL ? "rtl" : "ltr"}
+                              renderOption={({ option }) => {
+                                const countryOption = option as typeof option & { flag: string };
+                                return (
+                                  <Group gap="sm">
+                                    <Image
+                                      src={`/images/flags/${countryOption.flag}.svg`}
+                                      alt={`${countryOption.label} flag`}
+                                      width={20}
+                                      height={15}
+                                      style={{ objectFit: "cover" }}
+                                    />
+                                    <Text size="sm">{countryOption.label}</Text>
+                                  </Group>
+                                );
+                              }}
+                            />
                           </div>
-                        </Group>
+                        )}
                       </div>
 
                       {/* Stripe Method */}
@@ -738,15 +855,18 @@ export default function CheckoutPage() {
                     <Button
                       size="lg"
                       onClick={handleCheckout}
-                      loading={isCheckingOut}
+                      loading={isCheckingOut || isUpdatingProfile}
                       disabled={
                         selectedDocuments.length === 0 ||
-                        (!isFree && !paymentMethod)
+                        (!isFree && !paymentMethod) ||
+                        (showCountrySelection && !selectedCountry)
                       }
                       className={styles.confirmButton}
                       fullWidth
                     >
-                      {isFree
+                      {isUpdatingProfile
+                        ? translations.updatingProfile
+                        : isFree
                         ? translations.download
                         : translations.confirmOrder}
                     </Button>
@@ -761,12 +881,15 @@ export default function CheckoutPage() {
                 <Button
                   size="lg"
                   onClick={handleCheckout}
-                  loading={isCheckingOut}
-                  disabled={selectedDocuments.length === 0}
+                  loading={isCheckingOut || isUpdatingProfile}
+                  disabled={
+                    selectedDocuments.length === 0 ||
+                    (showCountrySelection && !selectedCountry)
+                  }
                   className={styles.confirmButton}
                   fullWidth
                 >
-                  {translations.download}
+                  {isUpdatingProfile ? translations.updatingProfile : translations.download}
                 </Button>
               </div>
             )}

@@ -31,7 +31,7 @@ export default function Cta02() {
               <path fill="url(#bs4-a)" fillRule="evenodd" d="m0 0 461 369-284 58z" transform="matrix(1 0 0 -1 0 427)"></path>
             </svg>
           </div>
-          {/* Content */}
+          {/* Contet */}
           <div className={`max-w-3xl mx-auto text-center ${isRTL ? 'rtl' : 'ltr'}`}>
             <h2 className="h2 bg-clip-text text-transparent bg-gradient-to-r from-slate-200/60 via-slate-200 to-slate-200/60 pb-4">{t('title')}</h2>
             <p className="text-lg text-slate-400 mb-6">{t('description')}</p>

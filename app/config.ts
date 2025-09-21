@@ -23,4 +23,13 @@ export const getApiUrl = (path: string): string => {
 // Function to get full App URL with path
 export const getAppUrl = (path: string): string => {
   return `${appBaseUrl}${path}`;
+};
+
+// Stripe configuration
+export const getStripePublishableKey = (): string => {
+  if (isDevelopment) {
+    return 'pk_test_51RpQiFL3mrWP7a0P1OYWGeFJWtgMwcWJtiEDLvn29CpYn5x8Ou77YViA1yoimlixKU5aUAeOeN5VTfoC4sMpvFVF00qq9a6BNm';
+  } else {
+    return process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY || 'pk_test_51RpQiFL3mrWP7a0P1OYWGeFJWtgMwcWJtiEDLvn29CpYn5x8Ou77YViA1yoimlixKU5aUAeOeN5VTfoC4sMpvFVF00qq9a6BNm';
+  }
 }; 
