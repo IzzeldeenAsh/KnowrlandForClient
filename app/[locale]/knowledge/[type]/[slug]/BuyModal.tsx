@@ -75,20 +75,42 @@ export default function BuyModal({ opened, onClose, documents, preSelectedDocume
 
   // Initialize selected documents with pre-selected ones (excluding already purchased)
   useEffect(() => {
-    if (preSelectedDocumentIds && preSelectedDocumentIds.length > 0) {
-      // Filter out already purchased documents from pre-selection
-      const unpurchasedIds = preSelectedDocumentIds.filter(id => {
-        const doc = documents.find(d => d.id === id);
-        return doc && !doc.is_purchased;
-      });
-      setSelectedDocuments(unpurchasedIds);
-    } else if (preSelectedDocumentId) {
-      const doc = documents.find(d => d.id === preSelectedDocumentId);
-      if (doc && !doc.is_purchased) {
-        setSelectedDocuments([preSelectedDocumentId]);
+    // Check if all pre-selected documents are free
+    const checkAndRedirect = () => {
+      let documentsToCheck: Document[] = [];
+      let idsToCheck: number[] = [];
+
+      if (preSelectedDocumentIds && preSelectedDocumentIds.length > 0) {
+        idsToCheck = preSelectedDocumentIds;
+        documentsToCheck = documents.filter(d => preSelectedDocumentIds.includes(d.id));
+      } else if (preSelectedDocumentId) {
+        idsToCheck = [preSelectedDocumentId];
+        documentsToCheck = documents.filter(d => d.id === preSelectedDocumentId);
       }
-    }
-  }, [preSelectedDocumentId, preSelectedDocumentIds, documents]);
+
+      // Filter out already purchased documents
+      const unpurchasedDocs = documentsToCheck.filter(doc => !doc.is_purchased);
+      const unpurchasedIds = unpurchasedDocs.map(doc => doc.id);
+
+      // Check if all unpurchased documents are free
+      const areAllFree = unpurchasedDocs.every(doc => parseFloat(doc.price) === 0);
+
+      if (opened && areAllFree && unpurchasedDocs.length > 0) {
+        // Close modal and redirect to checkout for free documents
+        onClose();
+        const queryParams = new URLSearchParams({
+          slug: knowledgeSlug,
+          documents: unpurchasedIds.join(','),
+        });
+        router.push(`/${locale}/checkout?${queryParams.toString()}`);
+      } else {
+        // Set selected documents normally
+        setSelectedDocuments(unpurchasedIds);
+      }
+    };
+
+    checkAndRedirect();
+  }, [preSelectedDocumentId, preSelectedDocumentIds, documents, opened, knowledgeSlug, locale, router, onClose]);
 
   // Calculate total price
   const totalPrice = selectedDocuments.reduce((sum, docId) => {
