@@ -68,11 +68,11 @@
 
 ```bash
 # Base URLs (Required)
-NEXT_PUBLIC_BASE_URL=http://localhost:3000
-NEXT_PUBLIC_DASHBOARD_URL=http://localhost:4200
+NEXT_PUBLIC_BASE_URL=https://knoldg.com
+NEXT_PUBLIC_DASHBOARD_URL=https://app.knoldg.com
 
 # API Configuration
-NEXT_PUBLIC_API_URL=https://api.foresighta.co
+NEXT_PUBLIC_API_URL=https://api.knoldg.com
 
 # Social Media
 NEXT_PUBLIC_TWITTER_HANDLE=@KNOLDG

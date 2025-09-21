@@ -81,7 +81,7 @@ export function useCountries() {
         }
 
         const response = await fetch(
-          "https://api.foresighta.co/api/common/setting/country/list",
+          "https://api.knoldg.com/api/common/setting/country/list",
           { headers }
         );
 
