@@ -2605,11 +2605,19 @@ export default function ProfilePage() {
                                 <div className="font-medium text-sm text-gray-800 dark:text-gray-200">
                                   {locale.startsWith('ar') ? 'بطاقة الائتمان' : 'Credit Card'}
                                 </div>
-                                <div className="flex items-center gap-2">
-                                  <VisaIcon />
-                                  <MasterCardIcon />
-                                  <GooglePayIcon />
-                                  <ApplePayIcon />
+                                <div className="flex items-center gap-1 sm:gap-3">
+                                  <div className="w-12 h-7 sm:w-16 sm:h-9 bg-gray-50/60 backdrop-blur-[8px] border border-gray-200/40 rounded-md flex items-center justify-center transition-all duration-200 hover:bg-gray-100/80 hover:border-gray-300/60 p-1 sm:p-2">
+                                    <VisaIcon />
+                                  </div>
+                                  <div className="w-12 h-7 sm:w-16 sm:h-9 bg-gray-50/60 backdrop-blur-[8px] border border-gray-200/40 rounded-md flex items-center justify-center transition-all duration-200 hover:bg-gray-100/80 hover:border-gray-300/60 p-1 sm:p-2">
+                                    <MasterCardIcon />
+                                  </div>
+                                  <div className="w-12 h-7 sm:w-16 sm:h-9 bg-gray-50/60 backdrop-blur-[8px] border border-gray-200/40 rounded-md flex items-center justify-center transition-all duration-200 hover:bg-gray-100/80 hover:border-gray-300/60 p-1 sm:p-2">
+                                    <GooglePayIcon />
+                                  </div>
+                                  <div className="w-12 h-7 sm:w-16 sm:h-9 bg-gray-50/60 backdrop-blur-[8px] border border-gray-200/40 rounded-md flex items-center justify-center transition-all duration-200 hover:bg-gray-100/80 hover:border-gray-300/60 p-1 sm:p-2">
+                                    <ApplePayIcon />
+                                  </div>
                                 </div>
                               </div>
                             </div>

@@ -541,7 +541,7 @@ export default function CheckoutPage() {
 
   return (
     <>
-      <PageIllustration middle={false} />
+   <PageIllustration middle={false} />
 
       <div className="min-h-screen relative z-1" dir={isRTL ? "rtl" : "ltr"}>
         {/* Simple header */}
@@ -570,12 +570,10 @@ export default function CheckoutPage() {
           <div className={isFree ? styles.singleColumn : styles.checkoutGrid}>
             {/* Selected Documents Section */}
                   <div>
-                  <div className="border border-blue-200 rounded-lg p-4 mb-6">
+                  <div className="border border-[#E2E8F0] rounded-lg p-4 mb-6" style={{ background: 'rgba(255, 255, 255, 0.7)', backdropFilter: 'blur(10px)', WebkitBackdropFilter: 'blur(10px)' }}>
               <Text size="lg" fw={600} mb="xs">
                 {knowledge.title}
               </Text>
-              <div className={styles.divider} />
-
               <Stack gap="md">
                 {documentsToShow.map((doc) => (
                   <div
@@ -641,7 +639,7 @@ export default function CheckoutPage() {
               <>
                 <div className={styles.rightColumn}>
                   {/* Payment Methods */}
-                  <div className="border border-blue-200 rounded-lg p-4">
+                  <div className="border border-[#e2e8f0] rounded-lg p-4" style={{ background: 'rgba(255, 255, 255, 0.7)', backdropFilter: 'blur(10px)', WebkitBackdropFilter: 'blur(10px)' }}>
                     <Text className={styles.sectionTitle}>
                       {translations.paymentMethod}
                     </Text>
@@ -716,19 +714,19 @@ export default function CheckoutPage() {
                               size="md"
                             />
                           </div>
-                          <div
-                            style={{
-                              flex: 1,
-                              minHeight: "48px",
-                              display: "flex",
-                              alignItems: "center",
-                              gap: "20px",
-                            }}
-                          >
-                            <VisaIcon />
-                            <MasterCardIcon />
-                            <GooglePayIcon />
-                            <ApplePayIcon />
+                          <div className={styles.paymentIconsContainer}>
+                            <div className={styles.paymentIcon}>
+                              <VisaIcon />
+                            </div>
+                            <div className={styles.paymentIcon}>
+                              <MasterCardIcon />
+                            </div>
+                            <div className={styles.paymentIcon}>
+                              <GooglePayIcon />
+                            </div>
+                            <div className={styles.paymentIcon}>
+                              <ApplePayIcon />
+                            </div>
                           </div>
                         </Group>
                       </div>
