@@ -28,8 +28,8 @@ export const getAppUrl = (path: string): string => {
 // Stripe configuration
 export const getStripePublishableKey = (): string => {
   if (isDevelopment) {
-    return 'YOUR_STRIPE_SECRET_KEY_HERE';
+    return process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY || 'pk_test_REPLACE_WITH_YOUR_PUBLISHABLE_KEY';
   } else {
-    return process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY || 'YOUR_STRIPE_SECRET_KEY_HERE';
+    return process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY || 'pk_live_REPLACE_WITH_YOUR_LIVE_PUBLISHABLE_KEY';
   }
 }; 
