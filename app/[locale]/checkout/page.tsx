@@ -14,7 +14,6 @@ import {
   Image as MantineImage,
   Container,
   Progress,
-  Select,
 } from "@mantine/core";
 import { IconCheck } from "@tabler/icons-react";
 import Image from "next/image";
@@ -26,7 +25,6 @@ import {
   GooglePayIcon,
   ApplePayIcon
 } from "@/components/payment-icons";
-import { useCountries, Country } from "@/app/lib/useCountries";
 import { useUserProfile } from "@/components/ui/header/hooks/useUserProfile";
 import styles from "./checkout.module.css";
 
@@ -85,7 +83,6 @@ export default function CheckoutPage() {
 
   // Hooks
   const { user } = useUserProfile();
-  const { countries, isLoading: countriesLoading, getLocalizedCountryName } = useCountries();
 
   const slug = searchParams.get("slug") || "";
   const documentIds =
@@ -106,8 +103,6 @@ export default function CheckoutPage() {
   const [knowledgeDownloadIds, setKnowledgeDownloadIds] = useState<string[]>([]);
   const [orderUuid, setOrderUuid] = useState<string>("");
   const [isFetchingDownloadIds, setIsFetchingDownloadIds] = useState(false);
-  const [selectedCountry, setSelectedCountry] = useState<string>("");
-  const [isUpdatingProfile, setIsUpdatingProfile] = useState(false);
 
   // Translations
   const translations = {
@@ -140,10 +135,6 @@ export default function CheckoutPage() {
     accessGranted: isRTL ? "يمكنك الآن الوصول إلى جميع المستندات المشتراة" : "You now have access to all your purchased documents",
     preparingDownloads: isRTL ? "جاري تجهيز التنزيلات..." : "Preparing your downloads...",
     documentsAdded: isRTL ? "تمت إضافة المستندات إلى التنزيلات الخاصة بك" : "Documents added to your Downloads",
-    selectCountry: isRTL ? "اختر الدولة" : "Select Country",
-    countryRequired: isRTL ? "الدولة مطلوبة لاستخدام المحفظة" : "Country is required to use wallet",
-    pleaseSelectCountry: isRTL ? "يرجى اختيار الدولة" : "Please select a country",
-    updatingProfile: isRTL ? "جاري التحديث..." : "Updating...",
   };
 
   // Get auth token from cookies
@@ -154,61 +145,6 @@ export default function CheckoutPage() {
       ?.split("=")[1];
     return token;
   };
-
-  // Update user country
-  const updateUserCountry = async (countryId: string) => {
-    setIsUpdatingProfile(true);
-    try {
-      const token = getAuthToken();
-      const response = await fetch(
-        "https://api.knoldg.com/api/account/profile/country",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Accept: "application/json",
-            "Accept-Language": locale,
-            "X-Timezone": Intl.DateTimeFormat().resolvedOptions().timeZone,
-            ...(token && { Authorization: `Bearer ${token}` }),
-          },
-          body: JSON.stringify({
-            country_id: countryId,
-          }),
-        }
-      );
-
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-
-      const data = await response.json();
-      toast.success(
-        isRTL ? "تم تحديث الدولة بنجاح" : "Country updated successfully",
-        isRTL ? "نجح" : "Success"
-      );
-      return true;
-    } catch (error) {
-      console.error("Error updating country:", error);
-      toast.error(
-        error instanceof Error ? error.message : translations.orderError,
-        translations.orderError
-      );
-      return false;
-    } finally {
-      setIsUpdatingProfile(false);
-    }
-  };
-
-  // Check if user has country
-  const userHasCountry = user && (user.country || user.country_id);
-  const showCountrySelection = paymentMethod === "manual" && !userHasCountry;
-
-  // Prepare country options for select
-  const countryOptions = countries.map((country) => ({
-    value: country.id.toString(),
-    label: getLocalizedCountryName(country),
-    flag: country.flag,
-  }));
 
   // Fetch knowledge data
   useEffect(() => {
@@ -236,7 +172,13 @@ export default function CheckoutPage() {
           throw new Error(`HTTP error! status: ${response.status}`);
         }
 
-        const data = await response.json();
+        // Parse JSON response safely
+        const text = await response.text();
+        if (!text.trim()) {
+          throw new Error("Empty response from server");
+        }
+
+        const data = JSON.parse(text);
         setKnowledge(data.data);
       } catch (error) {
         console.error("Error fetching knowledge:", error);
@@ -272,8 +214,15 @@ export default function CheckoutPage() {
         );
 
         if (response.ok) {
-          const data = await response.json();
-          setWalletBalance(data.data.balance);
+          try {
+            const text = await response.text();
+            if (text.trim()) {
+              const data = JSON.parse(text);
+              setWalletBalance(data.data.balance);
+            }
+          } catch (parseError) {
+            console.warn("Wallet balance response is not valid JSON");
+          }
         }
       } catch (error) {
         console.error("Error fetching wallet balance:", error);
@@ -325,16 +274,23 @@ export default function CheckoutPage() {
       );
 
       if (response.ok) {
-        const data = await response.json();
-        console.log('Updated order details fetched:', data.data); // Debug log
-        const updatedOrderData = data.data;
-        
-        // Extract knowledge_download_ids if available
-        if (updatedOrderData.knowledge_download_ids) {
-          setKnowledgeDownloadIds(updatedOrderData.knowledge_download_ids);
+        try {
+          const text = await response.text();
+          if (text.trim()) {
+            const data = JSON.parse(text);
+            console.log('Updated order details fetched:', data.data); // Debug log
+            const updatedOrderData = data.data;
+
+            // Extract knowledge_download_ids if available
+            if (updatedOrderData.knowledge_download_ids) {
+              setKnowledgeDownloadIds(updatedOrderData.knowledge_download_ids);
+            }
+
+            return updatedOrderData;
+          }
+        } catch (parseError) {
+          console.warn("Order details response is not valid JSON");
         }
-        
-        return updatedOrderData;
       }
     } catch (error) {
       console.error("Error fetching updated order details:", error);
@@ -395,20 +351,6 @@ export default function CheckoutPage() {
       return;
     }
 
-    // Check if wallet is selected and user needs to provide country
-    if (paymentMethod === "manual" && !userHasCountry) {
-      if (!selectedCountry) {
-        toast.error(translations.pleaseSelectCountry, translations.orderError);
-        return;
-      }
-
-      // Update user country before proceeding
-      const updateSuccess = await updateUserCountry(selectedCountry);
-      if (!updateSuccess) {
-        return;
-      }
-    }
-
     setIsCheckingOut(true);
     try {
       const token = getAuthToken();
@@ -438,13 +380,36 @@ export default function CheckoutPage() {
         }
       );
 
-      const data = await response.json();
-      console.log('Checkout response:', data); // Debug log
-
       if (!response.ok) {
-        throw new Error(
-          data.message || `HTTP error! status: ${response.status}`
-        );
+        // Try to parse error response if it contains JSON
+        let errorMessage = `HTTP error! status: ${response.status}`;
+        try {
+          const text = await response.text();
+          if (text.trim()) {
+            const errorData = JSON.parse(text);
+            errorMessage = errorData.message || errorMessage;
+          }
+        } catch {
+          // If JSON parsing fails, use the default error message
+        }
+        throw new Error(errorMessage);
+      }
+
+      // Parse JSON response safely for successful responses
+      let data = null;
+      try {
+        const text = await response.text();
+        if (text.trim()) {
+          data = JSON.parse(text);
+          console.log('Checkout response:', data); // Debug log
+        }
+      } catch (parseError) {
+        console.warn("Checkout response is not valid JSON, but request was successful");
+        throw new Error("Invalid response format from server");
+      }
+
+      if (!data) {
+        throw new Error("Empty response from server");
       }
 
       // Extract order data
@@ -782,38 +747,6 @@ export default function CheckoutPage() {
                           </Group>
                         </div>
 
-                        {/* Country Selection for Wallet */}
-                        {showCountrySelection && (
-                          <div className="mt-4 p-4 border border-orange-200 rounded-lg bg-orange-50">
-                            <Text size="sm" fw={500} mb="sm" c="orange.7">
-                              {translations.countryRequired}
-                            </Text>
-                            <Select
-                              placeholder={translations.selectCountry}
-                              value={selectedCountry}
-                              onChange={(value) => setSelectedCountry(value || "")}
-                              data={countryOptions}
-                              searchable
-                              disabled={countriesLoading || isUpdatingProfile}
-                              dir={isRTL ? "rtl" : "ltr"}
-                              renderOption={({ option }) => {
-                                const countryOption = option as typeof option & { flag: string };
-                                return (
-                                  <Group gap="sm">
-                                    <Image
-                                      src={`/images/flags/${countryOption.flag}.svg`}
-                                      alt={`${countryOption.label} flag`}
-                                      width={20}
-                                      height={15}
-                                      style={{ objectFit: "cover" }}
-                                    />
-                                    <Text size="sm">{countryOption.label}</Text>
-                                  </Group>
-                                );
-                              }}
-                            />
-                          </div>
-                        )}
                       </div>
 
                       {/* Stripe Method */}
@@ -855,18 +788,15 @@ export default function CheckoutPage() {
                     <Button
                       size="lg"
                       onClick={handleCheckout}
-                      loading={isCheckingOut || isUpdatingProfile}
+                      loading={isCheckingOut}
                       disabled={
                         selectedDocuments.length === 0 ||
-                        (!isFree && !paymentMethod) ||
-                        (showCountrySelection && !selectedCountry)
+                        (!isFree && !paymentMethod)
                       }
                       className={styles.confirmButton}
                       fullWidth
                     >
-                      {isUpdatingProfile
-                        ? translations.updatingProfile
-                        : isFree
+                      {isFree
                         ? translations.download
                         : translations.confirmOrder}
                     </Button>
@@ -881,15 +811,12 @@ export default function CheckoutPage() {
                 <Button
                   size="lg"
                   onClick={handleCheckout}
-                  loading={isCheckingOut || isUpdatingProfile}
-                  disabled={
-                    selectedDocuments.length === 0 ||
-                    (showCountrySelection && !selectedCountry)
-                  }
+                  loading={isCheckingOut}
+                  disabled={selectedDocuments.length === 0}
                   className={styles.confirmButton}
                   fullWidth
                 >
-                  {isUpdatingProfile ? translations.updatingProfile : translations.download}
+                  {translations.download}
                 </Button>
               </div>
             )}

@@ -18,7 +18,6 @@ import {
   Tabs,
   Checkbox,
   Image as MantineImage,
-  Select,
   Group,
   Text,
 } from "@mantine/core";
@@ -39,7 +38,6 @@ import {
 } from "@tabler/icons-react";
 
 import Toast from "@/components/toast/Toast";
-import { GlobeAsiaAustraliaIcon } from "@heroicons/react/24/outline";
 import KnowledgeGrid, {
   KnowledgeItem,
 } from "@/app/[locale]/topic/[id]/[slug]/KnowledgeGrid";
@@ -51,7 +49,8 @@ import InstagramIcon from "@/public/file-icons/instagram";
 import { useTranslations } from "next-intl";
 import styles from "./profile.module.css";
 import Link from "next/link";
-import { useCountries, Country } from "@/app/lib/useCountries";
+import { useUserProfile } from "@/components/ui/header/hooks/useUserProfile";
+import { useGlobalProfile } from "@/components/auth/GlobalProfileProvider";
 import { useToast } from "@/components/toast/ToastContext";
 import { loadStripe } from "@stripe/stripe-js";
 import { Elements, PaymentElement, useElements, useStripe } from "@stripe/react-stripe-js";
@@ -184,8 +183,6 @@ interface ProfileData {
   email: string;
   roles: string[];
   profile_photo_url: string | null;
-  country_id: number | null;
-  country: string | null;
   bio: string | null;
   certifications: Certification[];
   industries: Industry[];
@@ -288,13 +285,9 @@ export default function ProfilePage() {
     description?: string;
   }>({});
 
-  // Country selection states
-  const [selectedCountry, setSelectedCountry] = useState<string>("");
-  const [isEditingCountry, setIsEditingCountry] = useState(false);
-  const [isUpdatingCountry, setIsUpdatingCountry] = useState(false);
-
   // Hooks
-  const { countries, isLoading: countriesLoading, getLocalizedCountryName } = useCountries();
+  const { user } = useUserProfile();
+  const { refreshProfile } = useGlobalProfile();
   const toast = useToast();
   const [showDuplicateWarning, setShowDuplicateWarning] = useState(false);
   const [isDuplicateCheckLoading, setIsDuplicateCheckLoading] = useState(false);
@@ -367,8 +360,6 @@ export default function ProfilePage() {
               email: "",
               roles: ["company"],
               profile_photo_url: data.data.logo,
-              country_id: null,
-              country: null,
               bio: data.data.about_us,
               certifications: data.data.certifications || [],
               industries: data.data.industries || [],
@@ -415,8 +406,6 @@ export default function ProfilePage() {
               email: "",
               roles: ["company"],
               profile_photo_url: data.data.logo,
-              country_id: null,
-              country: null,
               bio: data.data.about_us,
               certifications: data.data.certifications || [],
               industries: data.data.industries || [],
@@ -586,73 +575,15 @@ export default function ProfilePage() {
     return "An error occurred. Please try again later.";
   };
 
-  // Function to update user country
-  const updateUserCountry = async (countryId: string) => {
-    setIsUpdatingCountry(true);
-    try {
-      const token = localStorage.getItem("token") ||
-        document.cookie
-          .split("; ")
-          .find((row) => row.startsWith("token="))
-          ?.split("=")[1];
-
-      const response = await fetch(
-        "https://api.knoldg.com/api/account/profile/country",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Accept: "application/json",
-            "Accept-Language": locale,
-            "X-Timezone": Intl.DateTimeFormat().resolvedOptions().timeZone,
-            ...(token && { Authorization: `Bearer ${token}` }),
-          },
-          body: JSON.stringify({
-            country_id: countryId,
-          }),
-        }
-      );
-
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-
-      const data = await response.json();
-
-      // Update the profile data with new country
-      const selectedCountryData = countries.find(c => c.id.toString() === countryId);
-      if (selectedCountryData && profileData) {
-        setProfileData({
-          ...profileData,
-          country_id: selectedCountryData.id,
-          country: getLocalizedCountryName(selectedCountryData),
-        });
-      }
-
-      toast.success(
-        isRTL ? "تم تحديث الدولة بنجاح" : "Country updated successfully",
-        isRTL ? "نجح" : "Success"
-      );
-      setIsEditingCountry(false);
-      return true;
-    } catch (error) {
-      console.error("Error updating country:", error);
-      toast.error(
-        error instanceof Error ? error.message : (isRTL ? "فشل في تحديث الدولة" : "Failed to update country"),
-        isRTL ? "خطأ" : "Error"
-      );
-      return false;
-    } finally {
-      setIsUpdatingCountry(false);
-    }
+  // Get auth token from cookies
+  const getAuthToken = () => {
+    const token = document.cookie
+      .split("; ")
+      .find((row) => row.startsWith("token="))
+      ?.split("=")[1];
+    return token;
   };
 
-  // Prepare country options for select
-  const countryOptions = countries.map((country) => ({
-    value: country.id.toString(),
-    label: getLocalizedCountryName(country),
-    flag: country.flag,
-  }));
 
   // Function to fetch meeting availability data
   const fetchMeetingAvailability = async () => {
@@ -1043,6 +974,10 @@ export default function ProfilePage() {
 
   // Submit booking - handles the API call
   const submitBookMeeting = async (skipDuplicateCheck = false) => {
+    console.log("=== Starting submitBookMeeting ===");
+    console.log("Current user data:", user);
+    console.log("Current paymentMethod:", paymentMethod);
+
     if (!selectedDate || !selectedMeetingTime) return;
 
     // Validate form before submission
@@ -1088,6 +1023,7 @@ export default function ProfilePage() {
         setIsBookingLoading(false);
         return;
       }
+
 
       const response = await fetch(
         `https://api.knoldg.com/api/account/order/meeting/checkout/${uuid}`,
@@ -1942,98 +1878,6 @@ export default function ProfilePage() {
                                 </div>
                               </div>
                             )}
-                          {/* Country */}
-                          {(profileData.country || isOwnProfile) && (
-                            <div className="bg-white dark:bg-slate-800 p-4 rounded-xl shadow-sm">
-                              <div className="flex items-center justify-between">
-                                <div className="flex items-center">
-                                  <GlobeAsiaAustraliaIcon
-                                    className={`w-5 h-5 text-gray-500 dark:text-gray-400 ${
-                                      isRTL ? "ml-2" : "mr-2"
-                                    }`}
-                                  />
-                                  <div>
-                                    <p className="text-sm text-gray-500 dark:text-gray-400">
-                                      {t("country")}
-                                    </p>
-                                    {isEditingCountry && isOwnProfile ? (
-                                      <div className="mt-2">
-                                        <Select
-                                          placeholder={isRTL ? "اختر الدولة" : "Select Country"}
-                                          value={selectedCountry}
-                                          onChange={(value) => setSelectedCountry(value || "")}
-                                          data={countryOptions}
-                                          searchable
-                                          disabled={countriesLoading || isUpdatingCountry}
-                                          dir={isRTL ? "rtl" : "ltr"}
-                                          size="sm"
-                                          renderOption={({ option }) => {
-                                            const countryOption = option as typeof option & { flag: string };
-                                            return (
-                                              <Group gap="sm">
-                                                <Image
-                                                  src={`/images/flags/${countryOption.flag}.svg`}
-                                                  alt={`${countryOption.label} flag`}
-                                                  width={20}
-                                                  height={15}
-                                                  style={{ objectFit: "cover" }}
-                                                />
-                                                <Text size="sm">{countryOption.label}</Text>
-                                              </Group>
-                                            );
-                                          }}
-                                        />
-                                        <Group gap="sm" mt="sm">
-                                          <Button
-                                            size="xs"
-                                            onClick={() => {
-                                              if (selectedCountry) {
-                                                updateUserCountry(selectedCountry);
-                                              }
-                                            }}
-                                            loading={isUpdatingCountry}
-                                            disabled={!selectedCountry}
-                                          >
-                                            {isRTL ? "حفظ" : "Save"}
-                                          </Button>
-                                          <Button
-                                            size="xs"
-                                            variant="outline"
-                                            onClick={() => {
-                                              setIsEditingCountry(false);
-                                              setSelectedCountry("");
-                                            }}
-                                            disabled={isUpdatingCountry}
-                                          >
-                                            {isRTL ? "إلغاء" : "Cancel"}
-                                          </Button>
-                                        </Group>
-                                      </div>
-                                    ) : (
-                                      <p className="font-medium">
-                                        {profileData.country || (isRTL ? "لم يتم تحديد الدولة" : "Country not set")}
-                                      </p>
-                                    )}
-                                  </div>
-                                </div>
-                                {isOwnProfile && !isEditingCountry && (
-                                  <Button
-                                    size="xs"
-                                    variant="light"
-                                    onClick={() => {
-                                      setIsEditingCountry(true);
-                                      // Set current country if exists
-                                      if (profileData.country_id) {
-                                        setSelectedCountry(profileData.country_id.toString());
-                                      }
-                                    }}
-                                  >
-                                    {isRTL ? "تعديل" : "Edit"}
-                                  </Button>
-                                )}
-                              </div>
-                            </div>
-                          )}
 
                           {/* Company Address */}
                           {isCompany && profileData.company?.address && (
@@ -2565,7 +2409,9 @@ export default function ProfilePage() {
             {/* Meeting Booking Modal */}
             <Modal
               opened={isBookingModalOpen}
-              onClose={() => setIsBookingModalOpen(false)}
+              onClose={() => {
+                setIsBookingModalOpen(false);
+              }}
               title={t("bookASession")}
               size="lg"
               centered
@@ -2747,6 +2593,7 @@ export default function ProfilePage() {
                           </div>
                         </div>
 
+
                         {/* Stripe Provider Option */}
                         <div 
                           className={`border rounded-lg p-4 cursor-pointer transition-all min-h-[72px] ${
@@ -2803,17 +2650,21 @@ export default function ProfilePage() {
                   <div className="flex justify-end gap-3 mt-6">
                     <Button
                       variant="subtle"
-                      onClick={() => setIsBookingModalOpen(false)}
+                      onClick={() => {
+                        setIsBookingModalOpen(false);
+                      }}
                     >
                       {t("cancel")}
                     </Button>
                     <Button
                       type="submit"
                       loading={isBookingLoading}
-                      disabled={Object.keys(validationErrors).some(
-                        (key) =>
-                          validationErrors[key as keyof typeof validationErrors]
-                      )}
+                      disabled={
+                        Object.keys(validationErrors).some(
+                          (key) =>
+                            validationErrors[key as keyof typeof validationErrors]
+                        )
+                      }
                     >
                       {t("confirmBooking")}
                     </Button>
