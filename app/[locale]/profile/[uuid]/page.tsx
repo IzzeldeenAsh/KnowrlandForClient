@@ -58,7 +58,7 @@ import { VisaIcon, MasterCardIcon, GooglePayIcon, ApplePayIcon } from "@/compone
 import { getStripePublishableKey } from "@/app/config";
 
 // Initialize Stripe
-const stripePromise = loadStripe(getStripePublishableKey());
+const stripePromise = loadStripe("pk_test_51RvbpiRSMujJZykzGpYlMXB5BXcWcTKrBLcWVtvj3oM2vS9S0z1Ur8YVWPDVSoRTwIoYEDMkvnblr7VbQMCiwwx700TNlixQE6");
 
 // Stripe Payment Form Component
 interface StripePaymentFormProps {

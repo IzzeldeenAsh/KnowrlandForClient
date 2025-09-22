@@ -13,7 +13,7 @@ import { getStripePublishableKey } from "@/app/config";
 import styles from "./payment.module.css";
 
 // Initialize Stripe
-const stripePromise = loadStripe(getStripePublishableKey());
+const stripePromise = loadStripe("pk_test_51RvbpiRSMujJZykzGpYlMXB5BXcWcTKrBLcWVtvj3oM2vS9S0z1Ur8YVWPDVSoRTwIoYEDMkvnblr7VbQMCiwwx700TNlixQE6");
 
 // File icon mapping function
 const getFileIconByExtension = (extension: string) => {
