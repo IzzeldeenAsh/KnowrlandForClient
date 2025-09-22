@@ -2327,7 +2327,7 @@ export default function ProfilePage() {
                       <p className="text-gray-500 mb-4">{t("loginToView")}</p>
                       <a
                         href={`https://app.knoldg.com/auth/login?returnUrl=${encodeURIComponent(
-                          `http://localhost:3000/${locale}/profile/${uuid}${
+                          `https://knoldg.com/${locale}/profile/${uuid}${
                             typeof window !== "undefined"
                               ? window.location.search
                               : ""

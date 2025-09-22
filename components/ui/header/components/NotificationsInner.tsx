@@ -291,7 +291,7 @@ export default function NotificationsInner({
     
     // Handle knowledge notifications with category
     if (notification.type === 'knowledge' && notification.category) {
-      const knowledgeUrl = `http://localhost:3000/${currentLanguage}/knowledge/${notification.category}/${notification.param || ''}?tab=ask`
+      const knowledgeUrl = `https://knoldg.com/${currentLanguage}/knowledge/${notification.category}/${notification.param || ''}?tab=ask`
       window.open(knowledgeUrl, '_blank')
     }
   }
