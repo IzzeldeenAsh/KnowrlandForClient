@@ -13,7 +13,7 @@ import { getStripePublishableKey } from "@/app/config";
 import styles from "./payment.module.css";
 
 // Initialize Stripe
-const stripePromise = loadStripe("pk_test_51RvbpiRSMujJZykzGpYlMXB5BXcWcTKrBLcWVtvj3oM2vS9S0z1Ur8YVWPDVSoRTwIoYEDMkvnblr7VbQMCiwwx700TNlixQE6");
+const stripePromise = loadStripe("pk_test_51RpQiFL3mrWP7a0P1OYWGeFJWtgMwcWJtiEDLvn29CpYn5x8Ou77YViA1yoimlixKU5aUAeOeN5VTfoC4sMpvFVF00qq9a6BNm");
 
 // File icon mapping function
 const getFileIconByExtension = (extension: string) => {
