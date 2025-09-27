@@ -103,7 +103,7 @@ export default function KnowledgesClient() {
   const translations = {
     loading: isRTL ? 'جاري تحميل عناصر المعرفة...' : 'Loading knowledge items...',
     noItemsFound: isRTL ? 'لم يتم العثور على عناصر للمرشحات المحددة.' : 'No knowledge items found for the selected filters.',
-    resetFilters: isRTL ? 'إعادة ضبط المرشحات' : 'Reset Filters',
+    resetFilters: isRTL ? 'إعادة ضبط الفلاتر' : 'Reset Filters',
     showing: isRTL ? 'عرض' : 'Showing',
     of: isRTL ? 'من' : 'of',
     items: isRTL ? 'عنصر' : 'items',
@@ -125,7 +125,7 @@ export default function KnowledgesClient() {
     manual: isRTL ? 'أدلة' : 'Manual',
     course: isRTL ? 'دورات' : 'Course',
     report: isRTL ? 'تقارير' : 'Report',
-    filteredResults: isRTL ? 'نتائج المرشحات' : 'Filtered Results',
+    filteredResults: isRTL ? 'نتائج الفلاتر' : 'Filtered Results',
     knowledge: isRTL ? 'معرفة' : 'Knowledge'
   };
 

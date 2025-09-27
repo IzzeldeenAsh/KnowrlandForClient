@@ -1503,7 +1503,7 @@ export default function HomePage() {
                 {filtersVisible && !isTabletOrMobile ? (
                   <>
                    <svg fill="none" height="24" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg"><g clipRule="evenodd" fillRule="evenodd"><path d="m11 20v-16h2v16z" fill="#90caea"/><g fill="#3747d6"><path d="m16.9142 12 2.7929-2.79289-1.4142-1.41422-3.5 3.50001c-.3905.3905-.3905 1.0237 0 1.4142l3.5 3.5 1.4142-1.4142z"/><path d="m7.0858 12-2.79289-2.79289 1.41421-1.41422 3.5 3.50001c.39053.3905.39053 1.0237 0 1.4142l-3.5 3.5-1.41421-1.4142z"/></g></g></svg>
-                    {locale === 'ar' ? 'إخفاء المرشحات' : 'Hide Filters'}
+                    {locale === 'ar' ? 'إخفاء الفلاتر' : 'Hide Filters'}
                   </>
                 ) : (
                   <>
@@ -1522,7 +1522,7 @@ export default function HomePage() {
 <path d="M15.4297 20.5566C14.2181 20.5566 13.2324 19.571 13.2324 18.3594C13.2324 17.1478 14.2181 16.1621 15.4297 16.1621C16.6413 16.1621 17.627 17.1478 17.627 18.3594C17.627 19.571 16.6413 20.5566 15.4297 20.5566Z" fill="#4D5B99"/>
 </svg>
 
-                    {locale === 'ar' ? 'إظهار المرشحات' : 'Show Filters'}
+                    {locale === 'ar' ? 'إظهار الفلاتر' : 'Show Filters'}
                   </>
                 )}
               </button>

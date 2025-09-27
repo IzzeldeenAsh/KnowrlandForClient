@@ -46,6 +46,31 @@ async function fetchAutocomplete(keyword: string, locale: string): Promise<strin
   }
 }
 
+// *** NEW COMPONENT FOR BOLD PLACEHOLDER ***
+function Placeholder() {
+  const t = useTranslations('Hero');
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    const checkSize = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+    checkSize();
+    window.addEventListener('resize', checkSize);
+    return () => window.removeEventListener('resize', checkSize);
+  }, []);
+
+  const placeholderText = isMobile ? t.raw('searchPlaceholderMobile') : t.raw('searchPlaceholder');
+
+  return (
+    <div
+      className="absolute inset-y-0 flex items-center pointer-events-none text-gray-500 md:text-lg text-base"
+      dangerouslySetInnerHTML={{ __html: placeholderText }}
+    />
+  );
+}
+
+
 export default function Hero() {
   const t = useTranslations('Hero');
   const router = useRouter();
@@ -235,7 +260,11 @@ export default function Hero() {
                       </div>
                       
                       {/* Search input field */}
-                      <div className="flex flex-1 items-center w-full sm:w-auto">
+                      {/* *** MODIFIED SECTION: Added relative positioning and custom placeholder *** */}
+                      <div className="relative flex flex-1 items-center w-full sm:w-auto">
+                        {/* Render custom placeholder only when input is empty */}
+                        {!searchInput && <Placeholder />}
+
                         <input
                           ref={searchInputRef}
                           type="text"
@@ -243,11 +272,11 @@ export default function Hero() {
                           onChange={(e) => setSearchInput(e.target.value)}
                           onFocus={() => searchInput && suggestions.length > 0 && setShowSuggestions(true)}
                           onKeyDown={handleKeyDown}
-                          placeholder={window.innerWidth < 768 ? t('searchPlaceholderMobile') : t('searchPlaceholder')}
-                          className="flex-1 outline-none bg-transparent border-none focus-outline-none focus:border-none focus:ring-0 md:text-lg text-base placeholder-gray-500 text-gray-800 w-full"
+                          //                            placeholder={window.innerWidth < 768 ? t('searchPlaceholderMobile') : t('searchPlaceholder')} // The native placeholder is removed.
+                          className="flex-1 outline-none bg-transparent border-none focus-outline-none focus:border-none focus:ring-0 md:text-lg text-base placeholder-transparent text-gray-800 w-full"
                           autoComplete="off"
                           dir={currentLocale === 'ar' ? 'rtl' : 'ltr'}
-                        />
+                        />  
                       
                         {/* Clear button - show when there's text in the input */}
                         {searchInput.trim().length > 0 && (
