@@ -19,6 +19,7 @@ import { IconCheck } from "@tabler/icons-react";
 import Image from "next/image";
 import { useToast } from "@/components/toast/ToastContext";
 import PageIllustration from "@/components/page-illustration";
+import CountryGuard from "@/components/auth/CountryGuard";
 import {
   VisaIcon,
   MasterCardIcon,
@@ -281,7 +282,7 @@ export default function CheckoutPage() {
             console.log('Updated order details fetched:', data.data); // Debug log
             const updatedOrderData = data.data;
 
-            // Extract knowledge_download_ids if available
+            // Extract knowledge_download_ids if available (now directly in updatedOrderData)
             if (updatedOrderData.knowledge_download_ids) {
               setKnowledgeDownloadIds(updatedOrderData.knowledge_download_ids);
             }
@@ -357,12 +358,10 @@ export default function CheckoutPage() {
 
       const body = {
         payment_method: isFree ? "free" : paymentMethod,
-        sub_orders: [
-          {
-            knowledge_slug: slug, // Using knowledge ID
-            knowledge_document_ids: selectedDocuments,
-          },
-        ],
+        sub_order: {
+          knowledge_slug: slug,
+          knowledge_document_ids: selectedDocuments,
+        },
       };
 
       const response = await fetch(
@@ -414,13 +413,13 @@ export default function CheckoutPage() {
 
       // Extract order data
       const responseData = data.data || data;
-      
+
       // Store the order UUID for later use
       if (responseData.uuid) {
         setOrderUuid(responseData.uuid);
       }
-      
-      // Extract knowledge_download_ids if available
+
+      // Extract knowledge_download_ids if available (now directly in responseData)
       if (responseData.knowledge_download_ids) {
         setKnowledgeDownloadIds(responseData.knowledge_download_ids);
       }
@@ -484,9 +483,17 @@ export default function CheckoutPage() {
   }
 
   // Filter documents to show only the ones that were initially selected
-  const documentsToShow = knowledge.documents.filter((doc) =>
-    documentIds.includes(doc.id)
-  );
+  // If no specific documents were provided in URL, show all documents
+  const documentsToShow = documentIds.length > 0
+    ? knowledge.documents.filter((doc) => documentIds.includes(doc.id))
+    : knowledge.documents;
+
+  // Debug logging
+  console.log('Knowledge object:', knowledge);
+  console.log('DocumentIds from URL:', documentIds);
+  console.log('Documents to show:', documentsToShow);
+  console.log('Knowledge documents:', knowledge.documents);
+  console.log('SearchParams:', Object.fromEntries(searchParams.entries()));
 
   // Success UI - similar to Stripe payment success
   if (showSuccessUI) {
@@ -587,10 +594,11 @@ export default function CheckoutPage() {
   }
 
   return (
-    <>
-   <PageIllustration middle={false} />
+    <CountryGuard>
+      <>
+     <PageIllustration middle={false} />
 
-      <div className="min-h-screen relative z-1" dir={isRTL ? "rtl" : "ltr"}>
+        <div className="min-h-screen relative z-1" dir={isRTL ? "rtl" : "ltr"}>
         {/* Simple header */}
         <div className="px-4 sm:px-6 lg:px-8 pt-10 ">
           <div className="max-w-8xl mx-auto">
@@ -622,7 +630,12 @@ export default function CheckoutPage() {
                 {knowledge.title}
               </Text>
               <Stack gap="md">
-                {documentsToShow.map((doc) => (
+                {documentsToShow.length === 0 ? (
+                  <Text size="sm" c="dimmed" ta="center">
+                    {isRTL ? "لا توجد مستندات متاحة" : "No documents available"}
+                  </Text>
+                ) : (
+                  documentsToShow.map((doc) => (
                   <div
                     key={doc.id}
                     className={`${styles.documentCard} ${
@@ -666,7 +679,8 @@ export default function CheckoutPage() {
                       </Badge>
                     </Group>
                   </div>
-                ))}
+                  ))
+                )}
               </Stack>
 
               
@@ -822,7 +836,8 @@ export default function CheckoutPage() {
             )}
           </div>
         </div>
-      </div>
-    </>
+        </div>
+      </>
+    </CountryGuard>
   );
 }
