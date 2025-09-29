@@ -711,6 +711,19 @@
     "data": "Data",
     "manual": "Manual",
     "course": "Course"
+  },
+  "countryUpdate": {
+    "title": "Update Country",
+    "country": "Country",
+    "selectCountry": "Select Country",
+    "countryRequired": "Country is required",
+    "updateCountry": "Update Country",
+    "updating": "Updating...",
+    "countryUpdateRequired": "Country Update Required",
+    "pleaseSelectCountry": "Please select your country to continue",
+    "thisInfoRequired": "This information is required to access the dashboard",
+    "loadingCountries": "Loading countries...",
+    "failedToLoadCountries": "Failed to load countries"
   }
- 
+
 }

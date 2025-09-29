@@ -691,8 +691,20 @@
             "data": "البيانات",
             "manual": "الدليل",
             "course": "الدورة"
+        },
+        "countryUpdate": {
+            "title": "تحديث البلد",
+            "country": "الدولة",
+            "selectCountry": "اختر البلد",
+            "countryRequired": "البلد مطلوب",
+            "updateCountry": "تحديث البلد",
+            "updating": "جاري التحديث...",
+            "countryUpdateRequired": "مطلوب تحديث البلد",
+            "pleaseSelectCountry": "يرجى اختيار بلدك للمتابعة",
+            "thisInfoRequired": "هذه المعلومة مطلوبة للوصول إلى لوحة المعلومات",
+            "loadingCountries": "جاري تحميل البلدان...",
+            "failedToLoadCountries": "فشل في تحميل البلدان"
         }
-  
 
     }
  
