@@ -8,8 +8,7 @@
         "tagline": "Beyond Research Boundaries",
         "title": "Unlock Business Success with Shared Expert Knowldge",
         "description":"Explore a hub of data, insights, and business intelligence tailored for your business growth.",
-        "searchPlaceholder":"Find knowledge or an Insight Expert (Insighter)...",
-        "searchPlaceholderMobile":"Search in data, reports, insights...",
+        "searchPlaceholder": "Search in&nbsp;<strong>Knowledge</strong>&nbsp;or&nbsp;<strong>Insighter</strong>&nbsp;(Insight Expert)...",        "searchPlaceholderMobile":"Search in data, reports, insights...",
         "direction": "ltr"
     },
     "HeroInsighter":{

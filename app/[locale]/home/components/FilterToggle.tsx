@@ -18,8 +18,8 @@ const FilterToggle = memo<FilterToggleProps>(({
 }) => {
   // Memoized translations
   const translations = useMemo(() => ({
-    showFilters: locale === 'ar' ? 'إظهار المرشحات' : 'Show Filters',
-    hideFilters: locale === 'ar' ? 'إخفاء المرشحات' : 'Hide Filters',
+    showFilters: locale === 'ar' ? 'إظهار الفلاتر' : 'Show Filters',
+    hideFilters: locale === 'ar' ? 'إخفاء الفلاتر' : 'Hide Filters',
   }), [locale]);
 
   return (

@@ -298,9 +298,9 @@ export default function HomePageOptimized() {
     searchTitle: locale === 'ar' ? 'ابحث في التقارير والبيانات والرؤى' : 'Search data, reports, and insights',
     searchSubtitle: locale === 'ar' ? 'ابدأ الآن' : 'Start exploring now',
     exploreByCategory: locale === 'ar' ? 'استكشف بحسب الفئة' : 'Explore by category',
-    filters: locale === 'ar' ? 'المرشحات' : 'Filters',
-    showFilters: locale === 'ar' ? 'إظهار المرشحات' : 'Show Filters',
-    hideFilters: locale === 'ar' ? 'إخفاء المرشحات' : 'Hide Filters',
+    filters: locale === 'ar' ? 'الفلاتر' : 'Filters',
+    showFilters: locale === 'ar' ? 'إظهار الفلاتر' : 'Show Filters',
+    hideFilters: locale === 'ar' ? 'إخفاء الفلاتر' : 'Hide Filters',
   }), [locale]);
 
   return (

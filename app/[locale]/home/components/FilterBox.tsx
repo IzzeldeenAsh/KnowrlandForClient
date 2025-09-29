@@ -956,7 +956,7 @@ const FilterBox: React.FC<FilterBoxProps> = ({
           >
             <span className="flex items-center gap-2 text-blue-500 font-semibold">
               <IconBuildingFactory size={20} className="p-0.5  rounded-full" />
-              {locale === 'ar' ? 'الصناعة' : 'Industry'}
+              {locale === 'ar' ? 'المجال' : 'Industry'}
             </span>
             <svg className={`w-4 h-4 text-gray-400 transition-transform ${industryCollapsed ? '' : 'rotate-180'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
@@ -966,12 +966,12 @@ const FilterBox: React.FC<FilterBoxProps> = ({
             <div className="px-4 py-3 bg-white space-y-2">
               {/* Industry Filter */}
               <div className="flex flex-col gap-1">
-                <span className="text-xs font-semibold text-gray-700">{locale === 'ar' ? 'الصناعة' : 'Industry'}</span>
+                <span className="text-xs font-semibold text-gray-700">{locale === 'ar' ? 'المجال' : 'Industry'}</span>
                 <div onClick={() => setIsIndustryModalOpen(true)} className="border border-gray-200 bg-white py-2 px-3 rounded text-sm cursor-pointer flex justify-between items-center hover:border-blue-400 transition-colors">
                   {selectedIndustry ? (
                     <span className="truncate text-gray-800 font-semibold">{selectedIndustry.label.length > 30 ? `${selectedIndustry.label.substring(0, 30)}...` : selectedIndustry.label}</span>
                   ) : (
-                    <span className="text-gray-400 font-medium">{locale === 'ar' ? 'اختر الصناعة' : 'Select Industry'}</span>
+                    <span className="text-gray-400 font-medium">{locale === 'ar' ? 'اختر المجال' : 'Select Industry'}</span>
                   )}
                   {selectedIndustry && (
                     <button onClick={handleClearIndustry} className="ml-2 text-gray-400 hover:text-red-500">
@@ -1046,7 +1046,7 @@ const FilterBox: React.FC<FilterBoxProps> = ({
               {/* Economic Bloc, Region, Country Selects */}
               {searchType !== 'insighter' && (
                 <div className="flex flex-col gap-1">
-                  <span className="text-xs font-semibold text-gray-700">{locale === 'ar' ? 'الكتل الاقتصادية' : 'By Economic Block'}</span>
+                  <span className="text-xs font-semibold text-gray-700">{locale === 'ar' ? 'الكتلة الاقتصادية' : 'By Economic Block'}</span>
                   <Combobox
                     store={economicBlocCombobox}
                     withinPortal={false}
@@ -1094,7 +1094,7 @@ const FilterBox: React.FC<FilterBoxProps> = ({
                 </div>
               )}
               <div className="flex flex-col gap-1">
-                <span className="text-xs font-semibold text-gray-700">{locale === 'ar' ? 'المناطق أو ' : 'Or By Region'}</span>
+                <span className="text-xs font-semibold text-gray-700">{locale === 'ar' ? 'المنطقة' : 'Or By Region'}</span>
                 <Combobox
                   store={regionCombobox}
                   withinPortal={false}
@@ -1141,7 +1141,7 @@ const FilterBox: React.FC<FilterBoxProps> = ({
                 </Combobox>
               </div>
               <div className="flex flex-col gap-1">
-                <span className="text-xs font-semibold text-gray-700">{locale === 'ar' ? 'البلدان أو ' : 'Or By Country'}</span>
+                <span className="text-xs font-semibold text-gray-700">{locale === 'ar' ? 'الدولة' : 'Or By Country'}</span>
                 <Combobox
                   store={countryCombobox}
                   withinPortal={false}
@@ -1259,7 +1259,7 @@ const FilterBox: React.FC<FilterBoxProps> = ({
                 </label>
                 <label className="flex items-center gap-2 text-xs text-gray-700 cursor-pointer">
                   <input type="radio" name="accuracy" value="any" checked={accuracyFilter === 'any'} onChange={(e) => setAccuracyFilter(e.target.value as 'any' | 'all')} className="accent-blue-500" />
-                  {locale === 'ar' ? 'تضمين أي كلمات' : 'Include any words'}
+                  {locale === 'ar' ? 'تضمين أي من كلمات' : 'Include any words'}
                 </label>
               </div>
             </div>
@@ -1323,14 +1323,14 @@ const FilterBox: React.FC<FilterBoxProps> = ({
       <Modal
         opened={isIndustryModalOpen}
         onClose={() => setIsIndustryModalOpen(false)}
-        title={locale === 'ar' ? 'اختر الصناعة' : 'Select Industry'}
+        title={locale === 'ar' ? 'اختر المجال' : 'Select Industry'}
         size="lg"
         overlayProps={{ backgroundOpacity: 0.55, blur: 3 }}
       >
         <div className="space-y-4">
           <input
             type="text"
-            placeholder={locale === 'ar' ? 'ابحث عن الصناعة...' : 'Search industries...'}
+            placeholder={locale === 'ar' ? 'ابحث عن المجال...' : 'Search industries...'}
             value={industrySearchTerm}
             onChange={(e) => setIndustrySearchTerm(e.target.value)}
             className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent mt-2"

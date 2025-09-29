@@ -30,9 +30,9 @@ const FiltersSection = memo<FiltersSectionProps>(({
 }) => {
   // Memoized translations
   const translations = useMemo(() => ({
-    filters: locale === 'ar' ? 'المرشحات' : 'Filters',
-    showFilters: locale === 'ar' ? 'إظهار المرشحات' : 'Show Filters',
-    hideFilters: locale === 'ar' ? 'إخفاء المرشحات' : 'Hide Filters',
+    filters: locale === 'ar' ? 'الفلاتر' : 'Filters',
+    showFilters: locale === 'ar' ? 'إظهار الفلاتر' : 'Show Filters',
+    hideFilters: locale === 'ar' ? 'إخفاء الفلاتر' : 'Hide Filters',
   }), [locale]);
 
   return (

@@ -95,7 +95,7 @@ const ResultsSection: React.FC<ResultsSectionProps> = ({
       </h3>
       <p className="text-gray-500 text-center max-w-md">
         {locale === 'ar' ? 
-          'حاول تعديل البحث أو تغيير المرشحات للعثور على المزيد من النتائج.' : 
+          'حاول تعديل البحث أو تغيير الفلاتر للعثور على المزيد من النتائج.' : 
           'Try adjusting your search or changing the filters to find more results.'
         }
       </p>
