@@ -33,6 +33,7 @@ import InstagramIcon from "@/public/file-icons/instagram";
 import { useTranslations } from "next-intl";
 import styles from "./profile.module.css";
 import Link from "next/link";
+import CountryGuard from "@/components/auth/CountryGuard";
 import { useUserProfile } from "@/components/ui/header/hooks/useUserProfile";
 import { useGlobalProfile } from "@/components/auth/GlobalProfileProvider";
 import { useToast } from "@/components/toast/ToastContext";
@@ -868,7 +869,8 @@ export default function ProfilePage() {
   };
 
   return (
-    <div className="flex flex-col min-h-screen bg-gradient-to-b from-gray-50 to-white dark:from-slate-950 dark:to-slate-900">
+    <CountryGuard>
+      <div className="flex flex-col min-h-screen bg-gradient-to-b from-gray-50 to-white dark:from-slate-950 dark:to-slate-900">
       {/* Toast for displaying API errors */}
       {showToast && (
         <div className="fixed top-6 right-6 z-50">
@@ -1269,8 +1271,9 @@ export default function ProfilePage() {
         </div>
       )}
 
-      <div className="flex-grow"></div>
-      <Footer />
-    </div>
+        <div className="flex-grow"></div>
+        <Footer />
+      </div>
+    </CountryGuard>
   );
 }

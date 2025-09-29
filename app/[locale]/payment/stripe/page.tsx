@@ -55,7 +55,7 @@ interface OrderDetails {
   amount: number;
   currency: string;
   date: string;
-  suborders: Suborder[];
+  suborder: Suborder;
   knowledge_download_ids?: string[];
 }
 
@@ -352,7 +352,7 @@ function PaymentForm({ orderUuid, amount, title, locale, isRTL, orderDetails, se
             } else {
               console.log('No UUIDs available, falling back to search'); // Debug log
               // Fallback to title search if no UUIDs available
-              const searchTitle = orderDetails?.suborders?.[0]?.knowledge?.[0]?.title || "";
+              const searchTitle = orderDetails?.suborder?.knowledge?.[0]?.title || "";
               const searchParam = searchTitle ? `?search=${encodeURIComponent(searchTitle)}` : "";
               console.log('Redirecting with search:', searchParam); // Debug log
               window.location.href = `https://app.knoldg.com/app/insighter-dashboard/my-downloads${searchParam}`;
@@ -412,27 +412,25 @@ function PaymentForm({ orderUuid, amount, title, locale, isRTL, orderDetails, se
             </Group>
             
             {/* Display ordered files */}
-            {orderDetails && orderDetails.suborders && orderDetails.suborders.length > 0 && (
+            {orderDetails && orderDetails.suborder && orderDetails.suborder.knowledge_documents && (
               <div className="mt-2">
                 <div className="flex flex-col  flex-wrap gap-3">
-                  {orderDetails.suborders.map((suborder, subIndex) => 
-                    suborder.knowledge_documents.flat().map((doc, docIndex) => (
-                      <div key={`${subIndex}-${docIndex}`} className="flex items-center gap-2 bg-gray-50 rounded-md px-3 py-2">
-                        <Image
-                          src={getFileIconByExtension(doc.file_extension)}
-                          alt={`${doc.file_extension.toUpperCase()} file`}
-                          width={20}
-                          height={20}
-                        />
-                        <Text size="xs" c="dimmed" style={{ maxWidth: '150px' }} truncate>
-                          {doc.file_name}
-                        </Text>
-                        <Badge size="xs" color="blue" variant="light" className="bg-blue-100">
-                          ${doc.price}
-                        </Badge>
-                      </div>
-                    ))  
-                  )}
+                  {orderDetails.suborder.knowledge_documents.flat().map((doc, docIndex) => (
+                    <div key={docIndex} className="flex items-center gap-2 bg-gray-50 rounded-md px-3 py-2">
+                      <Image
+                        src={getFileIconByExtension(doc.file_extension)}
+                        alt={`${doc.file_extension.toUpperCase()} file`}
+                        width={20}
+                        height={20}
+                      />
+                      <Text size="xs" c="dimmed" style={{ maxWidth: '150px' }} truncate>
+                        {doc.file_name}
+                      </Text>
+                      <Badge size="xs" color="blue" variant="light" className="bg-blue-100">
+                        ${doc.price}
+                      </Badge>
+                    </div>
+                  ))}
                 </div>
               </div>
             )}

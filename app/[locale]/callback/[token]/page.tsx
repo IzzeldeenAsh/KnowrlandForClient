@@ -316,22 +316,55 @@ export default function AuthCallback() {
       window.location.href = 'https://app.knoldg.com/admin-dashboard/admin/dashboard/main-dashboard/requests';
       return;
     }
-    
+
+    // Check if user needs to update country
+    if (!userData.country_id) {
+      console.log('[token-callback] User missing country, redirecting to country update');
+
+      // Store the intended destination for after country update
+      const returnUrl = searchParams.get('returnUrl');
+      const storedReturnUrl = getCookie('auth_return_url');
+      const finalReturnUrl = returnUrl || storedReturnUrl;
+
+      if (finalReturnUrl && finalReturnUrl !== '/' && !finalReturnUrl.includes('/login') && !finalReturnUrl.includes('/auth/')) {
+        // Store the return URL for after country update
+        storeCountryUpdateReturnUrl(finalReturnUrl);
+      } else if (userData.roles &&
+          (userData.roles.includes('insighter') ||
+           userData.roles.includes('company') ||
+           userData.roles.includes('company-insighter'))) {
+        // Store Angular dashboard as return URL
+        storeCountryUpdateReturnUrl('/app/insighter-dashboard/my-dashboard');
+      } else {
+        // Store home page as return URL
+        storeCountryUpdateReturnUrl(`/${locale}/home`);
+      }
+
+      // Clean up auth return URL cookie
+      if (getCookie('auth_return_url')) {
+        clearReturnUrlCookie();
+      }
+
+      // Redirect to country update page
+      window.location.href = `/${locale}/update-country`;
+      return;
+    }
+
     // Check for returnUrl parameter first
     const returnUrl = searchParams.get('returnUrl');
-    
+
     // Check for stored returnUrl in cookie as fallback (for social auth)
     const storedReturnUrl = getCookie('auth_return_url');
     const finalReturnUrl = returnUrl || storedReturnUrl;
-    
+
     // Clean up the stored return URL cookie
     if (storedReturnUrl) {
       clearReturnUrlCookie();
     }
-    
+
     if (finalReturnUrl && finalReturnUrl !== '/' && !finalReturnUrl.includes('/login') && !finalReturnUrl.includes('/auth/')) {
       console.log('[token-callback] Redirecting to returnUrl:', finalReturnUrl);
-      
+
       // Check if this is an Angular route that should go to the Angular app
       if (isAngularRoute(finalReturnUrl)) {
         console.log('[token-callback] Detected Angular route, redirecting to Angular app');
@@ -349,9 +382,9 @@ export default function AuthCallback() {
           router.push(finalReturnUrl);
         }
       }
-    } else if (userData.roles && 
-        (userData.roles.includes('insighter') || 
-         userData.roles.includes('company') || 
+    } else if (userData.roles &&
+        (userData.roles.includes('insighter') ||
+         userData.roles.includes('company') ||
          userData.roles.includes('company-insighter'))) {
       // Redirect to insighter dashboard
       console.log('[token-callback] Redirecting to Angular insighter dashboard');
@@ -381,7 +414,7 @@ export default function AuthCallback() {
   // Helper function to clear return URL cookie
   const clearReturnUrlCookie = () => {
     const isLocalhost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
-    
+
     let cookieSettings;
     if (isLocalhost) {
       cookieSettings = [
@@ -399,7 +432,36 @@ export default function AuthCallback() {
         'Secure'
       ];
     }
-    
+
+    document.cookie = cookieSettings.join('; ');
+  };
+
+  // Helper function to store country update return URL
+  const storeCountryUpdateReturnUrl = (url: string) => {
+    localStorage.setItem('countryUpdateReturnUrl', url);
+
+    // Also store in cookie for cross-domain compatibility
+    const isLocalhost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+
+    let cookieSettings;
+    if (isLocalhost) {
+      cookieSettings = [
+        `countryUpdateReturnUrl=${encodeURIComponent(url)}`,
+        `Path=/`,
+        `Max-Age=${60 * 60}`, // 1 hour
+        `SameSite=Lax`
+      ];
+    } else {
+      cookieSettings = [
+        `countryUpdateReturnUrl=${encodeURIComponent(url)}`,
+        `Path=/`,
+        `Max-Age=${60 * 60}`, // 1 hour
+        `SameSite=None`,
+        `Domain=.knoldg.com`,
+        `Secure`
+      ];
+    }
+
     document.cookie = cookieSettings.join('; ');
   };
 
