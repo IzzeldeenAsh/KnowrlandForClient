@@ -101,7 +101,7 @@ export default function CheckoutPage() {
   const [showSuccessUI, setShowSuccessUI] = useState(false);
   const [downloadProgress, setDownloadProgress] = useState(0);
   const [showDocumentsAdded, setShowDocumentsAdded] = useState(false);
-  const [knowledgeDownloadIds, setKnowledgeDownloadIds] = useState<string[]>([]);
+  const [knowledgeDownloadId, setKnowledgeDownloadId] = useState<string>('');
   const [orderUuid, setOrderUuid] = useState<string>("");
   const [isFetchingDownloadIds, setIsFetchingDownloadIds] = useState(false);
 
@@ -256,7 +256,7 @@ export default function CheckoutPage() {
     }).format(amount);
   };
 
-  // Fetch updated order details to get knowledge_download_ids
+  // Fetch updated order details to get knowledge_download_id
   const fetchUpdatedOrderDetails = async (uuid: string) => {
     try {
       setIsFetchingDownloadIds(true);
@@ -282,9 +282,9 @@ export default function CheckoutPage() {
             console.log('Updated order details fetched:', data.data); // Debug log
             const updatedOrderData = data.data;
 
-            // Extract knowledge_download_ids if available (now directly in updatedOrderData)
-            if (updatedOrderData.knowledge_download_ids) {
-              setKnowledgeDownloadIds(updatedOrderData.knowledge_download_ids);
+            // Extract knowledge_download_id if available (now directly in updatedOrderData)
+            if (updatedOrderData.knowledge_download_id) {
+              setKnowledgeDownloadId(updatedOrderData.knowledge_download_id);
             }
 
             return updatedOrderData;
@@ -325,7 +325,7 @@ export default function CheckoutPage() {
             clearInterval(timer);
             setTimeout(async () => {
               setShowDocumentsAdded(true);
-              // Recall the API to get updated knowledge_download_ids after documents are processed
+              // Recall the API to get updated knowledge_download_id after documents are processed
               if (orderUuid) {
                 console.log('Documents processed, fetching updated order details...'); // Debug log
                 await fetchUpdatedOrderDetails(orderUuid);
@@ -419,9 +419,9 @@ export default function CheckoutPage() {
         setOrderUuid(responseData.uuid);
       }
 
-      // Extract knowledge_download_ids if available (now directly in responseData)
-      if (responseData.knowledge_download_ids) {
-        setKnowledgeDownloadIds(responseData.knowledge_download_ids);
+      // Extract knowledge_download_id if available (now directly in responseData)
+      if (responseData.knowledge_download_id) {
+        setKnowledgeDownloadId(responseData.knowledge_download_id);
       }
 
       // Handle Stripe payment
@@ -566,15 +566,15 @@ export default function CheckoutPage() {
                 loading={isFetchingDownloadIds}
                 disabled={isFetchingDownloadIds}
                 onClick={() => {
-                  console.log('Download button clicked. Knowledge download IDs:', knowledgeDownloadIds); // Debug log
-                  // Use UUIDs if available, otherwise fall back to title search
-                  if (knowledgeDownloadIds && knowledgeDownloadIds.length > 0) {
-                    const uuidsParam = `?uuids=${knowledgeDownloadIds.join(',')}`;
-                    console.log('Redirecting with UUIDs:', uuidsParam); // Debug log
+                  console.log('Download button clicked. Knowledge download ID:', knowledgeDownloadId); // Debug log
+                  // Use UUID if available, otherwise fall back to title search
+                  if (knowledgeDownloadId) {
+                    const uuidsParam = `?uuids=${knowledgeDownloadId}`;
+                    console.log('Redirecting with UUID:', uuidsParam); // Debug log
                     window.location.href = `https://app.knoldg.com/app/insighter-dashboard/my-downloads${uuidsParam}`;
                   } else {
-                    console.log('No UUIDs available, falling back to search'); // Debug log
-                    // Fallback to title search if no UUIDs available
+                    console.log('No UUID available, falling back to search'); // Debug log
+                    // Fallback to title search if no UUID available
                     const searchTitle = knowledge?.title || "";
                     const searchParam = searchTitle ? `?search=${encodeURIComponent(searchTitle)}` : "";
                     console.log('Redirecting with search:', searchParam); // Debug log

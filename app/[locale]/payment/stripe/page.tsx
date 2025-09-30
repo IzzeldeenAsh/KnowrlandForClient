@@ -56,7 +56,7 @@ interface OrderDetails {
   currency: string;
   date: string;
   suborder: Suborder;
-  knowledge_download_ids?: string[];
+  knowledge_download_id?: string;
 }
 
 interface PaymentFormProps {
@@ -88,7 +88,7 @@ function PaymentForm({ orderUuid, amount, title, locale, isRTL, orderDetails, se
     return token;
   };
 
-  // Fetch updated order details to get knowledge_download_ids
+  // Fetch updated order details to get knowledge_download_id
   const fetchUpdatedOrderDetails = useCallback(async (uuid: string, setOrderDetails: (details: OrderDetails) => void) => {
     try {
       setIsFetchingDownloadIds(true);
@@ -263,7 +263,7 @@ function PaymentForm({ orderUuid, amount, title, locale, isRTL, orderDetails, se
             clearInterval(timer);
             setTimeout(async () => {
               setShowDocumentsAdded(true);
-              // Recall the API to get updated knowledge_download_ids after documents are processed
+              // Recall the API to get updated knowledge_download_id after documents are processed
               console.log('Documents processed, fetching updated order details...'); // Debug log
               await fetchUpdatedOrderDetails(orderUuid, setOrderDetails);
             }, 300);
@@ -344,14 +344,14 @@ function PaymentForm({ orderUuid, amount, title, locale, isRTL, orderDetails, se
           disabled={isFetchingDownloadIds}
           onClick={() => {
             console.log('Download button clicked. Order details:', orderDetails); // Debug log
-            // Use knowledge_download_ids if available, otherwise fall back to title search
-            if (orderDetails?.knowledge_download_ids && orderDetails.knowledge_download_ids.length > 0) {
-              const uuidsParam = `?uuids=${orderDetails.knowledge_download_ids.join(',')}`;
-              console.log('Redirecting with UUIDs:', uuidsParam); // Debug log
+            // Use knowledge_download_id if available, otherwise fall back to title search
+            if (orderDetails?.knowledge_download_id) {
+              const uuidsParam = `?uuids=${orderDetails.knowledge_download_id}`;
+              console.log('Redirecting with UUID:', uuidsParam); // Debug log
               window.location.href = `https://app.knoldg.com/app/insighter-dashboard/my-downloads${uuidsParam}`;
             } else {
-              console.log('No UUIDs available, falling back to search'); // Debug log
-              // Fallback to title search if no UUIDs available
+              console.log('No UUID available, falling back to search'); // Debug log
+              // Fallback to title search if no UUID available
               const searchTitle = orderDetails?.suborder?.knowledge?.[0]?.title || "";
               const searchParam = searchTitle ? `?search=${encodeURIComponent(searchTitle)}` : "";
               console.log('Redirecting with search:', searchParam); // Debug log
