@@ -15,7 +15,7 @@ const TransactionDetailsExample: React.FC<{ locale?: string }> = ({ locale }) =>
     "date": "2025-09-14 17:44:07",
     "type": "book_meeting",
     "order": {
-      "sub_orders": [
+      "orderables": [
         {
           "meeting_booking": {
             "date": "2025-09-20",

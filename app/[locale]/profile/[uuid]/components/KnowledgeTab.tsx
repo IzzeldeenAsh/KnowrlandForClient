@@ -56,7 +56,7 @@ export default function KnowledgeTab({
   formatKnowledgeItems,
 }: KnowledgeTabProps) {
   const t = useTranslations("ProfilePage");
-  const filterT = useTranslations("Filter");
+  const filterT = useTranslations("Filters");
 
   return (
     <div className="py-8 px-6 md:px-10">

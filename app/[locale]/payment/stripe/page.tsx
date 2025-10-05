@@ -13,7 +13,7 @@ import { getStripePublishableKey } from "@/app/config";
 import styles from "./payment.module.css";
 
 // Initialize Stripe
-const stripePromise = loadStripe("pk_test_51RvbpiRSMujJZykzGpYlMXB5BXcWcTKrBLcWVtvj3oM2vS9S0z1Ur8YVWPDVSoRTwIoYEDMkvnblr7VbQMCiwwx700TNlixQE6");
+const stripePromise = loadStripe("pk_test_51RpQiFL3mrWP7a0P1OYWGeFJWtgMwcWJtiEDLvn29CpYn5x8Ou77YViA1yoimlixKU5aUAeOeN5VTfoC4sMpvFVF00qq9a6BNm");
 
 // File icon mapping function
 const getFileIconByExtension = (extension: string) => {
@@ -55,7 +55,7 @@ interface OrderDetails {
   amount: number;
   currency: string;
   date: string;
-  suborder: Suborder;
+  orderable: Suborder;
   knowledge_download_id?: string;
 }
 
@@ -352,7 +352,7 @@ function PaymentForm({ orderUuid, amount, title, locale, isRTL, orderDetails, se
             } else {
               console.log('No UUID available, falling back to search'); // Debug log
               // Fallback to title search if no UUID available
-              const searchTitle = orderDetails?.suborder?.knowledge?.[0]?.title || "";
+              const searchTitle = orderDetails?.orderable?.knowledge?.[0]?.title || "";
               const searchParam = searchTitle ? `?search=${encodeURIComponent(searchTitle)}` : "";
               console.log('Redirecting with search:', searchParam); // Debug log
               window.location.href = `https://app.knoldg.com/app/insighter-dashboard/my-downloads${searchParam}`;
@@ -412,10 +412,10 @@ function PaymentForm({ orderUuid, amount, title, locale, isRTL, orderDetails, se
             </Group>
             
             {/* Display ordered files */}
-            {orderDetails && orderDetails.suborder && orderDetails.suborder.knowledge_documents && (
+            {orderDetails && orderDetails.orderable && orderDetails.orderable.knowledge_documents && (
               <div className="mt-2">
                 <div className="flex flex-col  flex-wrap gap-3">
-                  {orderDetails.suborder.knowledge_documents.flat().map((doc, docIndex) => (
+                  {orderDetails.orderable.knowledge_documents.flat().map((doc, docIndex) => (
                     <div key={docIndex} className="flex items-center gap-2 bg-gray-50 rounded-md px-3 py-2">
                       <Image
                         src={getFileIconByExtension(doc.file_extension)}
