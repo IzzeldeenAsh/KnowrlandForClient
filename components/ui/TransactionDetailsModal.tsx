@@ -23,7 +23,7 @@ interface Transaction {
   date: string;
   type: string;
   order?: {
-    sub_orders?: SubOrder[];
+    orderables?: SubOrder[];
   };
 }
 
@@ -110,7 +110,7 @@ const TransactionDetailsModal: React.FC<TransactionDetailsModalProps> = ({
     return type === 'withdraw' ? translations.withdraw : translations.deposit;
   };
 
-  const meetingBooking = transaction.order?.sub_orders?.[0]?.meeting_booking;
+  const meetingBooking = transaction.order?.orderables?.[0]?.meeting_booking;
 
   return (
     <Modal
@@ -218,7 +218,7 @@ const TransactionDetailsModal: React.FC<TransactionDetailsModalProps> = ({
           </>
         )}
 
-        {!meetingBooking && transaction.order?.sub_orders && (
+        {!meetingBooking && transaction.order?.orderables && (
           <Text size="sm" c="dimmed" ta="center" py="md">
             {translations.noDetails}
           </Text>

@@ -358,7 +358,7 @@ export default function CheckoutPage() {
 
       const body = {
         payment_method: isFree ? "free" : paymentMethod,
-        sub_order: {
+        order_data: {
           knowledge_slug: slug,
           knowledge_document_ids: selectedDocuments,
         },
