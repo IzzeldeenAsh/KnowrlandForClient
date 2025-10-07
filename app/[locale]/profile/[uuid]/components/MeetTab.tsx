@@ -7,13 +7,13 @@ import {
   IconChevronLeft,
   IconChevronRight,
   IconCalendarEvent,
+  IconWallet,
 } from "@tabler/icons-react";
 import {
   Modal,
   TextInput,
   Textarea,
   Button,
-  Image as MantineImage,
 } from "@mantine/core";
 import { useTranslations } from "next-intl";
 import { Elements, useStripe, useElements, PaymentElement } from "@stripe/react-stripe-js";
@@ -892,12 +892,9 @@ export default function MeetTab({
                             </div>
                             <div className="flex items-center gap-3">
                             <div className="w-8 h-8 flex items-center justify-center flex-shrink-0">
-                                <MantineImage
-                                  src="https://app.knoldg.com/assets/media/logos/custom-2.svg"
-                                  alt="Knoldg Wallet"
-                                  width={24}
-                                  height={24}
-                                  fit="contain"
+                                <IconWallet
+                                  size={24}
+                                  color="#1BC653"
                                 />
                               </div>
                               <div className="text-right">
