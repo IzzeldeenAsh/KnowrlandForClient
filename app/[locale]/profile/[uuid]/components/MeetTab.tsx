@@ -19,6 +19,7 @@ import { useTranslations } from "next-intl";
 import { Elements, useStripe, useElements, PaymentElement } from "@stripe/react-stripe-js";
 import { loadStripe } from "@stripe/stripe-js";
 import { VisaIcon, MasterCardIcon, GooglePayIcon, ApplePayIcon } from "@/components/payment-icons";
+import { useUserProfile } from "@/app/lib/useUserProfile";
 
 // Initialize Stripe
 const stripePromise = loadStripe("pk_test_51RvbpiRSMujJZykzGpYlMXB5BXcWcTKrBLcWVtvj3oM2vS9S0z1Ur8YVWPDVSoRTwIoYEDMkvnblr7VbQMCiwwx700TNlixQE6");
@@ -151,6 +152,13 @@ export default function MeetTab({
   getDayName,
 }: MeetTabProps) {
   const t = useTranslations("ProfilePage");
+  const { roles } = useUserProfile();
+
+  // Check if user is client-only (has "client" role but not insighter, company, or company-insighter)
+  const isClientOnlyUser = roles?.includes("client") &&
+    !roles?.includes("insighter") &&
+    !roles?.includes("company") &&
+    !roles?.includes("company-insighter");
 
   // Modal and booking states
   const [isBookingModalOpen, setIsBookingModalOpen] = useState(false);
@@ -860,12 +868,12 @@ export default function MeetTab({
                           ? "border-blue-500 bg-blue-50 dark:bg-blue-900/20"
                           : "border-gray-200 dark:border-slate-600 hover:border-gray-300 dark:hover:border-slate-500"
                       } ${
-                        walletBalance < parseFloat(selectedMeetingTime.rate)
+                        isClientOnlyUser || walletBalance < parseFloat(selectedMeetingTime.rate)
                           ? "opacity-50 cursor-not-allowed"
                           : ""
                       }`}
                       onClick={() => {
-                        if (walletBalance >= parseFloat(selectedMeetingTime.rate)) {
+                        if (!isClientOnlyUser && walletBalance >= parseFloat(selectedMeetingTime.rate)) {
                           setPaymentMethod("manual")
                         }
                       }}
@@ -876,9 +884,9 @@ export default function MeetTab({
                           name="paymentMethod"
                           value="manual"
                           checked={paymentMethod === "manual"}
-                          disabled={walletBalance < parseFloat(selectedMeetingTime.rate)}
+                          disabled={isClientOnlyUser || walletBalance < parseFloat(selectedMeetingTime.rate)}
                           onChange={() => {
-                            if (walletBalance >= parseFloat(selectedMeetingTime.rate)) {
+                            if (!isClientOnlyUser && walletBalance >= parseFloat(selectedMeetingTime.rate)) {
                               setPaymentMethod("manual")
                             }
                           }}
@@ -901,7 +909,11 @@ export default function MeetTab({
                                 <div className="text-sm font-semibold text-gray-700 dark:text-gray-300">
                                   ${walletBalance.toFixed(2)}
                                 </div>
-                                {walletBalance >= parseFloat(selectedMeetingTime.rate) ? (
+                                {isClientOnlyUser ? (
+                                  <div className="text-xs text-blue-500 font-medium">
+                                    {locale.startsWith('ar') ? 'قريباً' : 'Coming Soon'}
+                                  </div>
+                                ) : walletBalance >= parseFloat(selectedMeetingTime.rate) ? (
                                   <div className="text-xs text-green-600 dark:text-green-400 font-medium">
                                     {locale.startsWith('ar') ? 'رصيد كافي' : 'Sufficient'}
                                   </div>
