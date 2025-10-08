@@ -1,6 +1,7 @@
 'use client';
 import { useState, useEffect } from 'react';
 import { useLocale } from 'next-intl';
+import { getApiUrl } from '@/app/config';
 
 export interface Country {
   id: number;
@@ -81,7 +82,7 @@ export function useCountries() {
         }
 
         const response = await fetch(
-          "https://api.knoldg.com/api/common/setting/country/list",
+          getApiUrl("/api/common/setting/country/list"),
           { headers }
         );
 
@@ -93,13 +94,18 @@ export function useCountries() {
         });
 
         if (!response.ok) {
+          // Handle specific status codes
+          if (response.status === 0) {
+            throw new Error('Network error or CORS issue. Please check your internet connection.');
+          }
+
           if (attempt < maxRetries) {
             const delay = Math.pow(2, attempt - 1) * 1000;
             console.log(`[useCountries] Request failed, retrying in ${delay}ms...`);
             await new Promise(resolve => setTimeout(resolve, delay));
             continue;
           }
-          
+
           throw new Error(`Failed to fetch countries: ${response.status} ${response.statusText}`);
         }
 
@@ -115,11 +121,17 @@ export function useCountries() {
         return data.data;
       } catch (error) {
         console.error(`[useCountries] Attempt ${attempt} failed:`, error);
-        
-        if (attempt === maxRetries) {
+
+        // Handle network errors and CORS issues specifically
+        if (error instanceof TypeError && error.message.includes('Failed to fetch')) {
+          console.error('[useCountries] Network error or CORS issue detected');
+          if (attempt === maxRetries) {
+            throw new Error('Network error: Unable to fetch countries. This may be due to CORS policy or network connectivity issues.');
+          }
+        } else if (attempt === maxRetries) {
           throw error;
         }
-        
+
         const delay = Math.pow(2, attempt - 1) * 1000;
         await new Promise(resolve => setTimeout(resolve, delay));
       }
@@ -159,9 +171,25 @@ export function useCountries() {
 
   useEffect(() => {
     const loadCountries = async () => {
+      // Skip loading if we're on sign-out related pages
+      if (typeof window !== 'undefined') {
+        const pathname = window.location.pathname;
+        if (pathname.includes('/signout') || pathname.includes('/callback')) {
+          console.log('[useCountries] Skipping countries fetch on sign-out/callback page');
+          return;
+        }
+      }
+
+      // Check if we have a valid token before starting
+      const token = getAuthToken();
+      if (!token) {
+        console.log('[useCountries] No token available, skipping countries fetch');
+        return;
+      }
+
       setIsLoading(true);
       setError(null);
-      
+
       try {
         const fetchedCountries = await fetchCountries();
         setCountries(fetchedCountries);

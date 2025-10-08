@@ -11,7 +11,6 @@ import {
   Badge,
   Divider,
   Stack,
-  Image as MantineImage,
   Container,
   Progress,
 } from "@mantine/core";
@@ -313,11 +312,11 @@ export default function CheckoutPage() {
   // Handle download progress animation when payment succeeds
   useEffect(() => {
     if (showSuccessUI) {
-      // Animate progress bar over 2.5 seconds
-      const duration = 2500;
+      // Animate progress bar over 5 seconds
+      const duration = 5000;
       const interval = 50;
       const increment = 100 / (duration / interval);
-      
+
       const timer = setInterval(() => {
         setDownloadProgress((prev) => {
           const next = prev + increment;
@@ -559,33 +558,35 @@ export default function CheckoutPage() {
                   </div>
                 )}
               </div>
-              
-              <Button
-                size="md"
-                className={`bg-gradient-to-r from-blue-500 to-teal-400 hover:from-blue-600 hover:to-teal-500 transition-all ${styles.downloadButton}`}
-                loading={isFetchingDownloadIds}
-                disabled={isFetchingDownloadIds}
-                onClick={() => {
-                  console.log('Download button clicked. Knowledge download ID:', knowledgeDownloadId); // Debug log
-                  // Use UUID if available, otherwise fall back to title search
-                  if (knowledgeDownloadId) {
-                    const uuidsParam = `?uuids=${knowledgeDownloadId}`;
-                    console.log('Redirecting with UUID:', uuidsParam); // Debug log
-                    window.location.href = `https://app.knoldg.com/app/insighter-dashboard/my-downloads${uuidsParam}`;
-                  } else {
-                    console.log('No UUID available, falling back to search'); // Debug log
-                    // Fallback to title search if no UUID available
-                    const searchTitle = knowledge?.title || "";
-                    const searchParam = searchTitle ? `?search=${encodeURIComponent(searchTitle)}` : "";
-                    console.log('Redirecting with search:', searchParam); // Debug log
-                    window.location.href = `https://app.knoldg.com/app/insighter-dashboard/my-downloads${searchParam}`;
-                  }
-                }}
-              >
-                {isFetchingDownloadIds 
-                  ? (isRTL ? "جاري التحديث..." : "Updating...")
-                  : translations.goToDownloads}
-              </Button>
+
+              {showDocumentsAdded && (
+                <Button
+                  size="md"
+                  className={`bg-gradient-to-r from-blue-500 to-teal-400 hover:from-blue-600 hover:to-teal-500 transition-all ${styles.downloadButton}`}
+                  loading={isFetchingDownloadIds}
+                  disabled={isFetchingDownloadIds}
+                  onClick={() => {
+                    console.log('Download button clicked. Knowledge download ID:', knowledgeDownloadId); // Debug log
+                    // Use UUID if available, otherwise fall back to title search
+                    if (knowledgeDownloadId) {
+                      const uuidsParam = `?uuids=${knowledgeDownloadId}`;
+                      console.log('Redirecting with UUID:', uuidsParam); // Debug log
+                      window.location.href = `https://app.knoldg.com/app/insighter-dashboard/my-downloads${uuidsParam}`;
+                    } else {
+                      console.log('No UUID available, falling back to search'); // Debug log
+                      // Fallback to title search if no UUID available
+                      const searchTitle = knowledge?.title || "";
+                      const searchParam = searchTitle ? `?search=${encodeURIComponent(searchTitle)}` : "";
+                      console.log('Redirecting with search:', searchParam); // Debug log
+                      window.location.href = `https://app.knoldg.com/app/insighter-dashboard/my-downloads${searchParam}`;
+                    }
+                  }}
+                >
+                  {isFetchingDownloadIds
+                    ? (isRTL ? "جاري التحديث..." : "Updating...")
+                    : translations.goToDownloads}
+                </Button>
+              )}
             </div>
           </Container>
         </div>
@@ -738,12 +739,11 @@ export default function CheckoutPage() {
                                 justifyContent: "center",
                               }}
                             >
-                              <MantineImage
-                                src="https://app.knoldg.com/assets/media/logos/custom-2.svg"
+                              <Image
+                                src="/images/wallet-icon.svg"
                                 alt="Knoldg Wallet"
                                 width={32}
                                 height={32}
-                                fit="contain"
                               />
                             </div>
                             <div style={{ flex: 1 }}>

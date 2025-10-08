@@ -721,7 +721,7 @@
     "updating": "Updating...",
     "countryUpdateRequired": "Country Update Required",
     "pleaseSelectCountry": "Please select your country to continue",
-    "thisInfoRequired": "This information is required to access the dashboard",
+    "thisInfoRequired": "This information is required ",
     "loadingCountries": "Loading countries...",
     "failedToLoadCountries": "Failed to load countries"
   }
