@@ -1244,7 +1244,7 @@ const FilterBox: React.FC<FilterBoxProps> = ({
           >
             <span className="flex items-center gap-2 text-blue-500 font-semibold">
               <IconWorldSearch size={20} className="p-0.5  rounded-full" />
-              {locale === 'ar' ? 'الدقة' : 'Accuracy'}
+              {locale === 'ar' ? 'دقة البحث' : 'Accuracy'}
             </span>
             <svg className={`w-4 h-4 text-gray-400 transition-transform ${accuracyCollapsed ? '' : 'rotate-180'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />

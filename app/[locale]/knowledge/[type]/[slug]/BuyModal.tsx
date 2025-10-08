@@ -63,7 +63,7 @@ export default function BuyModal({ opened, onClose, documents, preSelectedDocume
   const translations = {
     buyDocuments: isRTL ? 'شراء المستندات' : 'Buy Documents',
     selectDocuments: isRTL ? 'اختر المستندات التي تريد شراءها' : 'Select the documents you want to buy',
-    totalPrice: isRTL ? 'السعر الإجمالي' : 'Total Price',
+    totalPrice: isRTL ? 'القيمة الإجمالية' : 'Total Price',
     buy: isRTL ? 'شراء' : 'Buy',
     cancel: isRTL ? 'إلغاء' : 'Cancel',
     free: isRTL ? 'مجاني' : 'Free',
