@@ -70,7 +70,9 @@ export default function UpdateCountryPage() {
       throw new Error(errorData?.message || `Failed to update country: ${response.status}`);
     }
 
-    return response.json();
+    // Handle empty response body
+    const text = await response.text();
+    return text ? JSON.parse(text) : {};
   };
 
   // Handle form submission
