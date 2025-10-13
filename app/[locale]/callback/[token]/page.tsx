@@ -326,18 +326,22 @@ export default function AuthCallback() {
       const storedReturnUrl = getCookie('auth_return_url');
       const finalReturnUrl = returnUrl || storedReturnUrl;
 
+      let redirectUrl: string;
       if (finalReturnUrl && finalReturnUrl !== '/' && !finalReturnUrl.includes('/login') && !finalReturnUrl.includes('/auth/')) {
         // Store the return URL for after country update
+        redirectUrl = finalReturnUrl;
         storeCountryUpdateReturnUrl(finalReturnUrl);
       } else if (userData.roles &&
           (userData.roles.includes('insighter') ||
            userData.roles.includes('company') ||
            userData.roles.includes('company-insighter'))) {
         // Store Angular dashboard as return URL
-        storeCountryUpdateReturnUrl('/app/insighter-dashboard/my-dashboard');
+        redirectUrl = '/app/insighter-dashboard/my-dashboard';
+        storeCountryUpdateReturnUrl(redirectUrl);
       } else {
         // Store home page as return URL
-        storeCountryUpdateReturnUrl(`/${locale}/home`);
+        redirectUrl = `/${locale}/home`;
+        storeCountryUpdateReturnUrl(redirectUrl);
       }
 
       // Clean up auth return URL cookie
@@ -345,8 +349,8 @@ export default function AuthCallback() {
         clearReturnUrlCookie();
       }
 
-      // Redirect to country update page
-      window.location.href = `/${locale}/update-country`;
+      // Redirect to country update page with redirect parameter
+      window.location.href = `/${locale}/update-country?redirect=${encodeURIComponent(redirectUrl)}`;
       return;
     }
 

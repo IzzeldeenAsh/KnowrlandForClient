@@ -133,9 +133,13 @@ export function shouldRequireCountry(pathname: string): boolean {
  * Redirect to country update page
  */
 export function redirectToCountryUpdate(locale: string, currentUrl?: string) {
+  let redirectUrl = `/${locale}/update-country`;
+
   if (currentUrl && shouldRequireCountry(currentUrl)) {
     storeReturnUrl(currentUrl);
+    // Also add as URL parameter for immediate access
+    redirectUrl += `?redirect=${encodeURIComponent(currentUrl)}`;
   }
 
-  window.location.href = `/${locale}/update-country`;
+  window.location.href = redirectUrl;
 }

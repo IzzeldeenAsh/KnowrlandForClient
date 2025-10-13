@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useRouter, useParams } from 'next/navigation';
+import { useRouter, useParams, useSearchParams } from 'next/navigation';
 import { useTranslations } from 'next-intl';
 import { useCountries, Country } from '@/app/lib/useCountries';
 import { useGlobalProfile } from '@/components/auth/GlobalProfileProvider';
@@ -13,6 +13,7 @@ export default function UpdateCountryPage() {
 
   const router = useRouter();
   const params = useParams();
+  const searchParams = useSearchParams();
   const t = useTranslations('countryUpdate');
   const locale = params.locale as string;
 
@@ -107,21 +108,29 @@ export default function UpdateCountryPage() {
 
   // Handle redirect after country update
   const handleRedirect = () => {
-    // Check if there's a return URL in localStorage or cookies
-    const returnUrl = localStorage.getItem('countryUpdateReturnUrl') || getCookie('countryUpdateReturnUrl');
+    // Check for redirect URL in search params first, then localStorage, then cookies
+    const redirectUrl = searchParams.get('redirect') ||
+                       localStorage.getItem('countryUpdateReturnUrl') ||
+                       getCookie('countryUpdateReturnUrl');
 
-    if (returnUrl) {
+    if (redirectUrl) {
+      // Clean up stored redirect URLs
       localStorage.removeItem('countryUpdateReturnUrl');
       clearCookie('countryUpdateReturnUrl');
 
-      console.log('[UpdateCountry] Redirecting to return URL:', returnUrl);
+      console.log('[UpdateCountry] Redirecting to return URL:', redirectUrl);
 
       // Check if it's an Angular route
-      if (isAngularRoute(returnUrl)) {
-        const angularPath = returnUrl.startsWith('/app/') ? returnUrl : `/app${returnUrl}`;
+      if (isAngularRoute(redirectUrl)) {
+        const angularPath = redirectUrl.startsWith('/app/') ? redirectUrl : `/app${redirectUrl}`;
         window.location.href = `https://app.knoldg.com${angularPath}`;
       } else {
-        router.push(returnUrl);
+        // Handle relative URLs by ensuring they start with the locale
+        let finalUrl = redirectUrl;
+        if (redirectUrl.startsWith('/') && !redirectUrl.startsWith(`/${locale}`)) {
+          finalUrl = `/${locale}${redirectUrl}`;
+        }
+        router.push(finalUrl);
       }
     } else {
       // Default redirect based on user roles

@@ -23,7 +23,7 @@ export default function Footer({ border = false }: { border?: boolean }) {
             <Image src={Logo} alt="Logo" width={120} height={60} priority  />
           </Link>
             <div className="text-sm text-gray-600">
-              &copy; foresighta.co - All rights reserved.
+              &copy; knoldg.com - All rights reserved.
             </div>
             {/* Social links */}
             <div className="mt-4 pt-20">

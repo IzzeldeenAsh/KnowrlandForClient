@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect } from 'react';
-import { usePathname } from 'next/navigation';
+import { usePathname, useSearchParams } from 'next/navigation';
 import { useGlobalProfile } from '@/components/auth/GlobalProfileProvider';
 import { needsCountryUpdate, shouldRequireCountry, redirectToCountryUpdate } from './countryUtils';
 
@@ -16,6 +16,7 @@ interface UseCountryCheckOptions {
 export function useCountryCheck({ locale, enabled = true }: UseCountryCheckOptions) {
   const { user, isLoading } = useGlobalProfile();
   const pathname = usePathname();
+  const searchParams = useSearchParams();
 
   useEffect(() => {
     // Skip if disabled or still loading
@@ -37,9 +38,15 @@ export function useCountryCheck({ locale, enabled = true }: UseCountryCheckOptio
     // Check if user needs country update
     if (needsCountryUpdate(user)) {
       console.log('[useCountryCheck] User needs country update, redirecting');
-      redirectToCountryUpdate(locale, pathname);
+
+      // Build full URL with search parameters
+      const fullUrl = searchParams.toString()
+        ? `${pathname}?${searchParams.toString()}`
+        : pathname;
+
+      redirectToCountryUpdate(locale, fullUrl);
     }
-  }, [user, isLoading, pathname, locale, enabled]);
+  }, [user, isLoading, pathname, searchParams, locale, enabled]);
 
   return {
     needsUpdate: needsCountryUpdate(user),
