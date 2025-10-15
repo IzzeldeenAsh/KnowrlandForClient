@@ -74,6 +74,7 @@ function PaymentForm({ orderUuid, amount, title, locale, isRTL, orderDetails, se
   const [isProcessing, setIsProcessing] = useState(false);
   const [paymentStatus, setPaymentStatus] = useState<"idle" | "processing" | "polling" | "success" | "error">("idle");
   const [errorMessage, setErrorMessage] = useState("");
+  const [showInlineError, setShowInlineError] = useState(false);
   const [downloadProgress, setDownloadProgress] = useState(0);
   const [showDocumentsAdded, setShowDocumentsAdded] = useState(false);
   const [isFetchingDownloadIds, setIsFetchingDownloadIds] = useState(false);
@@ -215,6 +216,7 @@ function PaymentForm({ orderUuid, amount, title, locale, isRTL, orderDetails, se
     setIsProcessing(true);
     setPaymentStatus("processing");
     setErrorMessage("");
+    setShowInlineError(false);
 
     try {
       // Confirm the payment
@@ -227,8 +229,19 @@ function PaymentForm({ orderUuid, amount, title, locale, isRTL, orderDetails, se
       });
 
       if (result.error) {
-        setErrorMessage(result.error.message || "Payment failed");
-        setPaymentStatus("error");
+        // For validation errors (like missing card info), show inline error
+        // For other errors, show full error UI
+        if (result.error.type === 'validation_error' ||
+            result.error.type === 'card_error' ||
+            result.error.message?.includes('incomplete') ||
+            result.error.message?.includes('card number')) {
+          setErrorMessage(result.error.message || "Payment failed");
+          setShowInlineError(true);
+          setPaymentStatus("idle"); // Keep form visible
+        } else {
+          setErrorMessage(result.error.message || "Payment failed");
+          setPaymentStatus("error"); // Show full error UI
+        }
       } else {
         // Payment succeeded, start polling for order status
         await pollOrderStatus();
@@ -245,6 +258,7 @@ function PaymentForm({ orderUuid, amount, title, locale, isRTL, orderDetails, se
   const handleRetry = () => {
     setPaymentStatus("idle");
     setErrorMessage("");
+    setShowInlineError(false);
   };
 
   // Handle download progress animation when payment succeeds
@@ -454,7 +468,7 @@ function PaymentForm({ orderUuid, amount, title, locale, isRTL, orderDetails, se
     fields: {
       billingDetails: {
         address: {
-          country: "auto",     // أو "never" أو "optional" أو "required"
+          country: "auto",
         },
       },
     },
@@ -469,6 +483,15 @@ function PaymentForm({ orderUuid, amount, title, locale, isRTL, orderDetails, se
               {translations.securityNote}
             </Text>
           </div>
+
+          {/* Inline Error Message */}
+          {showInlineError && errorMessage && (
+            <div className="bg-red-50 border border-red-200 rounded-md p-3 mb-2">
+              <Text size="sm" c="red" className="text-center">
+                {errorMessage}
+              </Text>
+            </div>
+          )}
 
           {/* Submit Button */}
           <Button
