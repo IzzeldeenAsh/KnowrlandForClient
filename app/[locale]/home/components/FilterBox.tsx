@@ -1047,7 +1047,7 @@ const FilterBox: React.FC<FilterBoxProps> = ({
               {/* Economic Bloc, Region, Country Selects */}
               {searchType !== 'insighter' && (
                 <div className="flex flex-col gap-1">
-                  <span className="text-xs font-semibold text-gray-700">{locale === 'ar' ? 'الكتلة الاقتصادية' : 'By Economic Block'}</span>
+                  <span className="text-xs font-semibold text-gray-700">{locale === 'ar' ? 'المنطقة الاقتصادية' : 'By Economic Block'}</span>
                   <Combobox
                     store={economicBlocCombobox}
                     withinPortal={false}
@@ -1070,7 +1070,7 @@ const FilterBox: React.FC<FilterBoxProps> = ({
                         rightSectionPointerEvents="none"
                         className="text-sm font-semibold hover:border-blue-400 transition-colors"
                       >
-                        {getSelectedEconomicBlocLabel() || <Input.Placeholder>{locale === 'ar' ? 'اختر كتلة اقتصادية' : 'Select an economic bloc'}</Input.Placeholder>}
+                        {getSelectedEconomicBlocLabel() || <Input.Placeholder>{locale === 'ar' ? 'اختر المنطقة الاقتصادية' : 'Select an economic bloc'}</Input.Placeholder>}
                       </InputBase>
                     </Combobox.Target>
                     <Combobox.Dropdown>
@@ -1095,7 +1095,7 @@ const FilterBox: React.FC<FilterBoxProps> = ({
                 </div>
               )}
               <div className="flex flex-col gap-1">
-                <span className="text-xs font-semibold text-gray-700">{locale === 'ar' ? 'المنطقة' : 'Or By Region'}</span>
+                <span className="text-xs font-semibold text-gray-700">{locale === 'ar' ? 'اختر المنطقة الجغرافية' : 'Or By Region'}</span>
                 <Combobox
                   store={regionCombobox}
                   withinPortal={false}
