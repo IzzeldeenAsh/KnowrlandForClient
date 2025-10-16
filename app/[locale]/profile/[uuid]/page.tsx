@@ -1069,11 +1069,11 @@ export default function ProfilePage() {
                       </div>
 
                       {/* Action Buttons */}
-                      <div className="flex flex-wrap gap-3 mb-4 justify-center md:justify-start">
+                      {/* <div className="flex flex-wrap gap-3 mb-4 justify-center md:justify-start">
                         <button className="px-3 py-1.5 text-xs bg-white dark:bg-slate-700 text-gray-800 dark:text-white rounded-md font-medium border border-gray-200 dark:border-slate-600 hover:border-gray-300 dark:hover:border-slate-500 shadow-sm hover:shadow-md transition transform hover:translate-y-[-1px]">
                           {t("follow")}
                         </button>
-                      </div>
+                      </div> */}
                     </div>
 
                     {/* Stats Section */}
