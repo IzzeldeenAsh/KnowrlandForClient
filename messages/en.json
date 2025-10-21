@@ -6,8 +6,8 @@
  
     "Hero": {
         "tagline": "Beyond Research Boundaries",
-        "title": "Unlock Business Success with Shared Expert Knowldge",
-        "description":"Explore a hub of data, insights, and business intelligence tailored for your business growth.",
+        "title": "Unlock verified expert knowledge, trusted data, and Insights that lead your business to excellence.",
+        "description":"Bringing together specialized experts, valuable data, reports, and more — everything you need for your business success.",
         "searchPlaceholder": "Search in&nbsp;<strong>Knowledge</strong>&nbsp;or&nbsp;<strong>Insighter</strong>&nbsp;(Insight Expert)...",        "searchPlaceholderMobile":"Search in data, reports, insights...",
         "direction": "ltr"
     },
@@ -296,18 +296,18 @@
             "description": "Get notified instantly when new reports, insights, and valuable resources are published on topics that matters to you."
         },
         "connectWithExpert": {
-            "title": "Connect With an Expert",
-            "description": "The platform engages you directly with SMEs for additional details, inquiries, and tailored guidance."
+            "title": "Book Meetings with Subject Matter Experts",
+            "description": "Arrange a one-on-one session with SMEs to address your unique challenges and questions."
         },
         "discover": "Discover"
     },
     "Cta": {
         "tagline": "",
-        "title": "Turn Your Expertise into Profit—Share Your Knowledge with the World!",
-        "description": "Start monetizing your knowledge and connect with prospective clients who need your expertise.",
+        "title": "Are you an expert with valuable data, reports, or insights ready to make a measurable business impact?",
+        "description": "Join Knoldg Marketplace and become an Insighter. Turn your expertise into income and connect with clients who need your expertise.",
         "button": "Get Started",
         "contact": "For inquiries and collaborations, reach out to us at",
-        "topTag":"Do you have valuable intellectual property data, reports, insights,",
+        "topTag":"Turn Your Expertise into Profit",
         "topTag2":"ready to deliver measurable impact?"
     },
     "Footer": {
