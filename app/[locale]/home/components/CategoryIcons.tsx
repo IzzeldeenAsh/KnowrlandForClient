@@ -119,7 +119,7 @@ export const CategoryIconBox = memo<CategoryIconBoxProps>(({ name, label, locale
     <div className={`group flex flex-col items-center ${className || ''}`} onClick={onClick}>
       <div className={`relative flex h-14 w-14 items-center justify-center rounded-lg border ${isSelected ? 'border-blue-500 bg-blue-50' : 'border-gray-200 bg-white'} p-2 shadow-sm transition-all hover:border-blue-200 hover:bg-blue-50 cursor-pointer`}>
         <CategoryIcon name={name} />
-        {count !== undefined && count > 0 && (
+        {count !== undefined && count > 0 && name !=='all'  &&(
           <div className={`absolute -top-2 -right-2 flex h-5 w-10 items-center justify-center rounded-full ${getBadgeColor(name)} text-xs font-bold text-white`}>
             {count > 999 ? '999+' : count}
           </div>
