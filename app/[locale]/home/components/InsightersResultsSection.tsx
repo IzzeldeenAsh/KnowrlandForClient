@@ -211,16 +211,25 @@ const InsightersResultsSection: React.FC<InsightersResultsSectionProps> = ({
                       </div>
                        {/* Action Buttons */}
                        <div className="flex flex-col gap-2 w-full">
-                          <Link 
+                          <Link
                             href={`/${locale}/profile/${uuid}?entity=insighter&tab=meet`}
                             onClick={(e) => e.stopPropagation()}
                             className="flex-1"
                           >
                             <button className="w-full bg-gradient-to-r from-blue-500 to-teal-400 text-xs text-white px-6 py-2 rounded-md font-medium hover:shadow-lg transition-all duration-300">
-                              {locale === 'ar' ? `مقابلة ${name}` : `Meet ${name}`}
+                              {locale === 'ar' ? ` حجز مقابلة ` : `Meet `}
                             </button>
                           </Link>
-                         
+                          <Link
+                            href={`/${locale}/profile/${uuid}?entity=insighter`}
+                            onClick={(e) => e.stopPropagation()}
+                            className="flex-1"
+                          >
+                            <button className="w-full bg-white text-xs text-gray-900 border border-gray-300 px-6 py-2 rounded-md font-medium hover:bg-blue-50 transition-all duration-300">
+                              {locale === 'ar' ? 'عرض المعرفة المنشورة' : 'View Published Knowledge'}
+                            </button>
+                          </Link>
+
                         </div>
                     </Link>
                   );
@@ -236,12 +245,12 @@ const InsightersResultsSection: React.FC<InsightersResultsSectionProps> = ({
             
             {totalItems > 0 && (
               <div className="flex flex-col items-center mt-8">
-                <div className="text-sm text-gray-600 mb-2">
+                {/* <div className="text-sm text-gray-600 mb-2">
                   {locale === 'ar' ? 
                     `عرض ${(currentPage - 1) * 10 + 1} - ${Math.min(currentPage * 10, totalItems)} من ${totalItems}` : 
                     `Showing ${(currentPage - 1) * 10 + 1} - ${Math.min(currentPage * 10, totalItems)} of ${totalItems}`
                   }
-                </div>
+                </div> */}
                 <div className="flex items-center justify-center space-x-2">
                   <button 
                     onClick={() => {

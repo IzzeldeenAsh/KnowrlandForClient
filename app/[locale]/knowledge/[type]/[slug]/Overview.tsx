@@ -304,7 +304,7 @@ export default function Overview({ knowledge, knowledgeSlug }: OverviewProps) {
                       </div>
                     )}
                     <div>
-                      <button 
+                      {/* <button 
                         className={`btn-sm text-slate-600 hover:text-slate-900 bg-slate-200 hover:bg-slate-300 transition duration-150 ease-in-out text-sm px-3 py-1 flex items-center border border-slate-300 cursor-pointer ${styles.modernButton} ${styles.focusVisible}`}
                         disabled
                         aria-label={`${translations.evaluateWithAI} - ${doc.file_name} (${isRTL ? 'قريباً' : 'Coming soon'})`}
@@ -314,7 +314,7 @@ export default function Overview({ knowledge, knowledgeSlug }: OverviewProps) {
                           <path d="m1.999 0 1 2-1 2 2-1 2 1-1-2 1-2-2 1zM11.999 0l1 2-1 2 2-1 2 1-1-2 1-2-2 1zM11.999 10l1 2-1 2 2-1 2 1-1-2 1-2-2 1zM6.292 7.586l2.646-2.647L11.06 7.06 8.413 9.707zM0 13.878l5.586-5.586 2.122 2.121L2.12 16z" />
                         </svg>
                         <span>{translations.evaluateWithAI}</span>
-                      </button>
+                      </button> */}
                     </div>
                   </div>
                 </div>

@@ -157,12 +157,12 @@ const ResultsSection: React.FC<ResultsSectionProps> = ({
             {/* Pagination - only show when we have results and not loading */}
             {!loading && totalItems > 0 && (
               <div className="flex flex-col items-center mt-8">
-                <div className="text-sm text-gray-600 mb-2">
+                {/* <div className="text-sm text-gray-600 mb-2">
                   {locale === 'ar' ? 
                     `عرض ${(urlCurrentPage - 1) * 30 + 1} - ${Math.min(urlCurrentPage * 30, totalItems)} من ${totalItems}` : 
                     `Showing ${(urlCurrentPage - 1) * 30 + 1} - ${Math.min(urlCurrentPage * 30, totalItems)} of ${totalItems}`
                   }
-                </div>
+                </div> */}
                 <Pagination 
                   key={`pagination-${totalPages}-${totalItems}`}
                   total={totalPages} 
