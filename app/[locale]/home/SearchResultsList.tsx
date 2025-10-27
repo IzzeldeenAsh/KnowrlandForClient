@@ -154,7 +154,7 @@ export default function SearchResultsList({
 
       const method = currentState ? 'DELETE' : 'POST';
       const slug = item.url.split('/').pop();
-      const url = `https://api.knoldg.com/api/account/favorite/knowledge/${slug}`;
+      const url = `https://api.foresighta.co/api/account/favorite/knowledge/${slug}`;
 
       console.log(`[Read Later] ${method} request to:`, url);
       console.log(`[Read Later] Current state:`, currentState, 'Item ID:', itemId, 'Slug:', slug);
@@ -214,7 +214,6 @@ export default function SearchResultsList({
     noItems: isRTL ? "لا توجد نتائج بحث متاحة" : "No search results available",
     posted: isRTL ? "نُشر" : "Posted",
     free: isRTL ? "مجاني" : "FREE",
-    paid: isRTL ? "مدفوع" : "PAID",
     insighter: isRTL ? "إنسايتر" : "Insighter",
     by: isRTL ? "من قبل" : "By",
     company: isRTL ? "الشركة" : "Company"
@@ -422,7 +421,7 @@ export default function SearchResultsList({
               </div>
             
               {/* Only show contentColumn if there's content to display */}
-              {(item.description || (item.searchable_type === "knowledge" && (item.paid !== undefined || item.published_at))) && (
+              {(item.description || (item.searchable_type === "knowledge" && (item.price !== undefined || item.published_at))) && (
                 <div className={listStyles.contentColumn} style={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-between', height: '100%' }}>
                   {item.description && (
                       <Link href={`/${currentLocale}/${item.url}`}>
@@ -435,13 +434,13 @@ export default function SearchResultsList({
                   {item.searchable_type === "knowledge" && (
                     <div className={listStyles.detailsSection}>
                       <div className="flex items-center gap-3">
-                        {item.paid !== undefined && (
+                        {item.price !== undefined && (
                           <Badge
-                            color={item.paid ? "yellow" : "green"}
+                            color={item.price === "0" ? "green" : "yellow"}
                             variant="light"
                             className={listStyles.priceBadge}
                           >
-                            {item.paid ? translations.paid : translations.free}
+                            {item.price === "0" ? translations.free : `$${item.price}`}
                           </Badge>
                         )}
                         

@@ -104,38 +104,6 @@ export default function CheckoutPage() {
   const [orderUuid, setOrderUuid] = useState<string>("");
   const [isFetchingDownloadIds, setIsFetchingDownloadIds] = useState(false);
 
-  // Translations
-  const translations = {
-    checkout: isRTL ? "الدفع" : "Checkout",
-    selectDocuments: isRTL ? "المستندات المحددة" : "Selected Documents",
-    totalPrice: isRTL ? "السعر الإجمالي" : "Total Price",
-    paymentMethod: isRTL ? "طريقة الدفع" : "Payment Method",
-    knoldgWallet: isRTL ? "محفظة نولدج" : "Knoldg Wallet",
-    stripeProvider: isRTL ? "مزود سترايب" : "Stripe Provider",
-    confirmOrder: isRTL ? "تأكيد الطلب" : "Checkout",
-    download: isRTL ? "تحميل" : "Download",
-    free: isRTL ? "مجاني" : "Free",
-    insufficientBalance: isRTL ? "الرصيد غير كافي" : "Insufficient balance",
-    pleaseSelectPayment: isRTL
-      ? "يرجى اختيار طريقة الدفع"
-      : "Please select a payment method",
-    orderSuccess: isRTL
-      ? "تم إتمام الطلب بنجاح"
-      : "Order completed successfully",
-    orderError: isRTL ? "فشل في إتمام الطلب" : "Failed to complete order",
-    loading: isRTL ? "جاري التحميل..." : "Loading...",
-    remove: isRTL ? "إزالة" : "Remove",
-    paymentSuccess: isRTL ? "تم الدفع بنجاح!" : "Payment Successful!",
-    orderCompleted: isRTL
-      ? "تم إكمال طلبك بنجاح. يمكنك الآن تنزيل المستندات المشتراة."
-      : "Your order has been completed successfully. You can now download your purchased documents.",
-    goToDownloads: isRTL ? "الذهاب إلى التنزيلات" : "Go to Downloads",
-    congratulations: isRTL ? "تهانينا!" : "Congratulations!",
-    paymentComplete: isRTL ? "تمت معالجة دفعتك بنجاح" : "Your payment has been processed successfully",
-    accessGranted: isRTL ? "يمكنك الآن الوصول إلى جميع المستندات المشتراة" : "You now have access to all your purchased documents",
-    preparingDownloads: isRTL ? "جاري تجهيز التنزيلات..." : "Preparing your downloads...",
-    documentsAdded: isRTL ? "تمت إضافة المستندات إلى التنزيلات الخاصة بك" : "Documents added to your Downloads",
-  };
 
   // Get auth token from cookies
   const getAuthToken = () => {
@@ -156,7 +124,7 @@ export default function CheckoutPage() {
         const token = getAuthToken();
 
         const response = await fetch(
-          `https://api.knoldg.com/api/platform/industries/knowledge/${slug}`,
+          `https://api.foresighta.co/api/platform/industries/knowledge/${slug}`,
           {
             headers: {
               "Content-Type": "application/json",
@@ -201,7 +169,7 @@ export default function CheckoutPage() {
         const token = getAuthToken();
 
         const response = await fetch(
-          "https://api.knoldg.com/api/account/wallet/balance",
+          "https://api.foresighta.co/api/account/wallet/balance",
           {
             headers: {
               "Content-Type": "application/json",
@@ -245,6 +213,39 @@ export default function CheckoutPage() {
   const totalPrice = calculateTotalPrice();
   const isFree = totalPrice === 0;
 
+  // Translations
+  const translations = {
+    checkout: isRTL ? "الدفع" : "Checkout",
+    selectDocuments: isRTL ? "المستندات المحددة" : "Selected Documents",
+    totalPrice: isRTL ? "السعر الإجمالي" : "Total Price",
+    paymentMethod: isRTL ? "طريقة الدفع" : "Payment Method",
+    knoldgWallet: isRTL ? "محفظة نولدج" : "Knoldg Wallet",
+    stripeProvider: isRTL ? "مزود سترايب" : "Stripe Provider",
+    confirmOrder: isRTL ? "تأكيد الطلب" : "Checkout",
+    download: isRTL ? "تحميل" : "Download",
+    free: isRTL ? "مجاني" : "Free",
+    insufficientBalance: isRTL ? "الرصيد غير كافي" : "Insufficient balance",
+    pleaseSelectPayment: isRTL
+      ? "يرجى اختيار طريقة الدفع"
+      : "Please select a payment method",
+    orderSuccess: isRTL
+      ? "تم إتمام الطلب بنجاح"
+      : "Order completed successfully",
+    orderError: isRTL ? "فشل في إتمام الطلب" : "Failed to complete order",
+    loading: isRTL ? "جاري التحميل..." : "Loading...",
+    remove: isRTL ? "إزالة" : "Remove",
+    paymentSuccess: isRTL ? "تم الدفع بنجاح!" : "Payment Successful!",
+    orderCompleted: isRTL
+      ? "تم إكمال طلبك بنجاح. يمكنك الآن تنزيل المستندات المشتراة."
+      : "Your order has been completed successfully. You can now download your purchased documents.",
+    goToDownloads: isRTL ? "الذهاب إلى التنزيلات" : "Go to Downloads",
+    congratulations: isRTL ? "تهانينا!" : "Congratulations!",
+    paymentComplete: isRTL ? (isFree ? "تم إكمال الطلب بنجاح" : "تمت معالجة دفعتك بنجاح") : (isFree ? "Your order has been completed successfully" : "Your payment has been processed successfully"),
+    accessGranted: isRTL ? (isFree ? "يمكنك الآن الوصول إلى جميع المستندات" : "يمكنك الآن الوصول إلى جميع المستندات المشتراة") : (isFree ? "You now have access to all your documents" : "You now have access to all your purchased documents"),
+    preparingDownloads: isRTL ? "جاري تجهيز التنزيلات..." : "Preparing your downloads...",
+    documentsAdded: isRTL ? "تمت إضافة المستندات إلى التنزيلات الخاصة بك" : "Documents added to your Downloads",
+  };
+
   // Format currency with proper formatting
   const formatCurrency = (amount: number) => {
     return new Intl.NumberFormat(locale === 'ar' ? 'ar-SA' : 'en-US', {
@@ -261,7 +262,7 @@ export default function CheckoutPage() {
       setIsFetchingDownloadIds(true);
       const token = getAuthToken();
       const response = await fetch(
-        `https://api.knoldg.com/api/account/order/knowledge/${uuid}`,
+        `https://api.foresighta.co/api/account/order/knowledge/${uuid}`,
         {
           headers: {
             "Content-Type": "application/json",
@@ -364,7 +365,7 @@ export default function CheckoutPage() {
       };
 
       const response = await fetch(
-        "https://api.knoldg.com/api/account/order/knowledge/checkout",
+        "https://api.foresighta.co/api/account/order/knowledge/checkout",
         {
           method: "POST",
           headers: {
@@ -571,14 +572,14 @@ export default function CheckoutPage() {
                     if (knowledgeDownloadId) {
                       const uuidsParam = `?uuids=${knowledgeDownloadId}`;
                       console.log('Redirecting with UUID:', uuidsParam); // Debug log
-                      window.location.href = `https://app.knoldg.com/app/insighter-dashboard/my-downloads${uuidsParam}`;
+                      window.location.href = `http://localhost:4200/app/insighter-dashboard/my-downloads${uuidsParam}`;
                     } else {
                       console.log('No UUID available, falling back to search'); // Debug log
                       // Fallback to title search if no UUID available
                       const searchTitle = knowledge?.title || "";
                       const searchParam = searchTitle ? `?search=${encodeURIComponent(searchTitle)}` : "";
                       console.log('Redirecting with search:', searchParam); // Debug log
-                      window.location.href = `https://app.knoldg.com/app/insighter-dashboard/my-downloads${searchParam}`;
+                      window.location.href = `http://localhost:4200/app/insighter-dashboard/my-downloads${searchParam}`;
                     }
                   }}
                 >

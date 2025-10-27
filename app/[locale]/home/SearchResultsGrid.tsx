@@ -76,6 +76,7 @@ export interface SearchResultItem {
     };
   }; // Only for knowledge items
   paid?: boolean; // Only for knowledge items
+  price?: string; // Only for knowledge items - price as string from API
   review: string;
   is_read_later?: boolean; // Only for knowledge items
   total_downloads?: number; // Only for knowledge items
@@ -203,7 +204,7 @@ export default function SearchResultsGrid({
 
       const method = currentState ? 'DELETE' : 'POST';
       const slug = item.url.split('/').pop();
-      const url = `https://api.knoldg.com/api/account/favorite/knowledge/${slug}`;
+      const url = `https://api.foresighta.co/api/account/favorite/knowledge/${slug}`;
 
       const response = await axios({
         method,
@@ -256,7 +257,6 @@ export default function SearchResultsGrid({
     noItems: isRTL ? "لا توجد نتائج بحث متاحة" : "No search results available",
     posted: isRTL ? "نُشر" : "Posted",
     free: isRTL ? "مجاني" : "FREE",
-    paid: isRTL ? "مدفوع" : "PAID",
     insighter: isRTL ? "إنسايتر" : "Insighter",
     by: isRTL ? "من قبل" : "By",
     company: isRTL ? "الشركة" : "Company",
@@ -536,13 +536,13 @@ export default function SearchResultsGrid({
                     </Text>
                   )}
                   
-                  {item.paid !== undefined && (
+                  {item.price !== undefined && (
                     <Badge
-                      color={item.paid ? "yellow" : "green"}
+                      color={item.price === "0" ? "green" : "yellow"}
                       variant="light"
                       className={cardStyles.priceBadge}
                     >
-                      {item.paid ? translations.paid : translations.free}
+                      {item.price === "0" ? translations.free : `$${item.price}`}
                     </Badge>
                   )}
                 </div>
