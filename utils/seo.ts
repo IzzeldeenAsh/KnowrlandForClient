@@ -49,6 +49,16 @@ export function generateKnowledgeMetadata(
 ): Metadata {
   const isRTL = locale === 'ar';
   const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://knoldg.com';
+  const defaultSocialImage = 'https://res.cloudinary.com/dsiku9ipv/image/upload/v1761457481/socil-media-share-bg_cgurrb.webp';
+  let metadataBase: URL | undefined;
+
+  try {
+    metadataBase = new URL(baseUrl);
+  } catch (error) {
+    console.error('Invalid NEXT_PUBLIC_BASE_URL provided, falling back to default.', error);
+    metadataBase = new URL('https://knoldg.com');
+  }
+
   const currentUrl = `${baseUrl}/${locale}/knowledge/${type}/${slug}`;
   
   // Calculate average rating
@@ -110,7 +120,32 @@ export function generateKnowledgeMetadata(
   const alternateLanguages: Record<string, string> = {};
   alternateLanguages[locale === 'ar' ? 'en' : 'ar'] = `${baseUrl}/${locale === 'ar' ? 'en' : 'ar'}/knowledge/${type}/${slug}`;
 
+  const openGraphImages = [
+    {
+      url: defaultSocialImage,
+      width: 1200,
+      height: 630,
+      alt: `${knowledge.title} | KNOLDG`,
+      type: 'image/webp',
+    },
+    ...[
+      knowledge.insighter.company?.logo || knowledge.insighter.profile_photo_url,
+    ]
+      .filter(Boolean)
+      .map((imageUrl) => ({
+        url: imageUrl as string,
+        width: 600,
+        height: 600,
+        alt: authorName,
+      })),
+  ];
+
+  const twitterImages = [
+    defaultSocialImage,
+  ];
+
   const metadata: Metadata = {
+    metadataBase,
     title,
     description: description.length > 160 ? description.substring(0, 157) + '...' : description,
     keywords: keywords.join(', '),
@@ -149,22 +184,7 @@ export function generateKnowledgeMetadata(
       tags: keywords,
       
       // Images
-      images: [
-        {
-          url: knowledge.insighter.company?.logo || knowledge.insighter.profile_photo_url || `${baseUrl}/og-default.jpg`,
-          width: 1200,
-          height: 630,
-          alt: title,
-          type: 'image/jpeg',
-        },
-        {
-          url: `${baseUrl}/og-square.jpg`,
-          width: 400,
-          height: 400,
-          alt: title,
-          type: 'image/jpeg',
-        }
-      ],
+      images: openGraphImages,
     },
 
     // Twitter Card
@@ -174,7 +194,7 @@ export function generateKnowledgeMetadata(
       creator: `@${authorName.replace(/\s+/g, '')}`,
       title,
       description,
-      images: [knowledge.insighter.company?.logo || knowledge.insighter.profile_photo_url || `${baseUrl}/twitter-card.jpg`],
+      images: twitterImages,
     },
 
     // Additional meta tags
@@ -188,6 +208,7 @@ export function generateKnowledgeMetadata(
       'product:condition': 'new',
       'og:price:amount': knowledge.total_price,
       'og:price:currency': 'USD',
+      'og:image': defaultSocialImage,
       'rating:average': avgRating.toString(),
       'rating:count': knowledge.review.length.toString(),
       'rating:scale': '5',
@@ -207,6 +228,7 @@ export function generateStructuredData(knowledge: KnowledgeMetadata, locale: str
 
   const authorName = knowledge.insighter.company?.legal_name || knowledge.insighter.name;
   const isFree = knowledge.total_price === '0' || parseFloat(String(knowledge.total_price)) === 0;
+  const defaultSocialImage = 'https://res.cloudinary.com/dsiku9ipv/image/upload/v1761457481/socil-media-share-bg_cgurrb.webp';
 
   // Article Schema
   const articleSchema = {
@@ -234,7 +256,7 @@ export function generateStructuredData(knowledge: KnowledgeMetadata, locale: str
     "datePublished": knowledge.published_at,
     "dateModified": knowledge.published_at,
     "url": currentUrl,
-    "image": knowledge.insighter.company?.logo || knowledge.insighter.profile_photo_url || `${baseUrl}/default-article.jpg`,
+    "image": defaultSocialImage,
     "inLanguage": locale === 'ar' ? 'ar-SA' : 'en-US',
     "keywords": [knowledge.type, ...knowledge.countries.map(c => c.name)].join(', ')
   };
@@ -245,7 +267,7 @@ export function generateStructuredData(knowledge: KnowledgeMetadata, locale: str
     "@type": "Product",
     "name": knowledge.title,
     "description": knowledge.description,
-    "image": knowledge.insighter.company?.logo || knowledge.insighter.profile_photo_url,
+    "image": knowledge.insighter.company?.logo || knowledge.insighter.profile_photo_url || defaultSocialImage,
     "brand": {
       "@type": knowledge.insighter.company ? "Organization" : "Person",
       "name": authorName
