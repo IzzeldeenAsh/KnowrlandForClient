@@ -20,6 +20,8 @@ export interface FilterState {
   isicCode: string | null;
   hsCode: string | null;
   price: string | null;
+  priceRangeStart: number | null;
+  priceRangeEnd: number | null;
   accuracy: 'any' | 'all';
   role: 'all' | 'company' | 'individual';
   category: string;
@@ -61,6 +63,8 @@ export type FilterAction =
   | { type: 'SET_ISIC_CODE'; payload: string | null }
   | { type: 'SET_HS_CODE'; payload: string | null }
   | { type: 'SET_PRICE'; payload: string | null }
+  | { type: 'SET_PRICE_RANGE_START'; payload: number | null }
+  | { type: 'SET_PRICE_RANGE_END'; payload: number | null }
   | { type: 'SET_ACCURACY'; payload: 'any' | 'all' }
   | { type: 'SET_ROLE'; payload: 'all' | 'company' | 'individual' }
   | { type: 'SET_CATEGORY'; payload: string }

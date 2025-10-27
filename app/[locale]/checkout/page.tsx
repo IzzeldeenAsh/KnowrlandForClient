@@ -104,38 +104,6 @@ export default function CheckoutPage() {
   const [orderUuid, setOrderUuid] = useState<string>("");
   const [isFetchingDownloadIds, setIsFetchingDownloadIds] = useState(false);
 
-  // Translations
-  const translations = {
-    checkout: isRTL ? "الدفع" : "Checkout",
-    selectDocuments: isRTL ? "المستندات المحددة" : "Selected Documents",
-    totalPrice: isRTL ? "السعر الإجمالي" : "Total Price",
-    paymentMethod: isRTL ? "طريقة الدفع" : "Payment Method",
-    knoldgWallet: isRTL ? "محفظة نولدج" : "Knoldg Wallet",
-    stripeProvider: isRTL ? "مزود سترايب" : "Stripe Provider",
-    confirmOrder: isRTL ? "تأكيد الطلب" : "Checkout",
-    download: isRTL ? "تحميل" : "Download",
-    free: isRTL ? "مجاني" : "Free",
-    insufficientBalance: isRTL ? "الرصيد غير كافي" : "Insufficient balance",
-    pleaseSelectPayment: isRTL
-      ? "يرجى اختيار طريقة الدفع"
-      : "Please select a payment method",
-    orderSuccess: isRTL
-      ? "تم إتمام الطلب بنجاح"
-      : "Order completed successfully",
-    orderError: isRTL ? "فشل في إتمام الطلب" : "Failed to complete order",
-    loading: isRTL ? "جاري التحميل..." : "Loading...",
-    remove: isRTL ? "إزالة" : "Remove",
-    paymentSuccess: isRTL ? "تم الدفع بنجاح!" : "Payment Successful!",
-    orderCompleted: isRTL
-      ? "تم إكمال طلبك بنجاح. يمكنك الآن تنزيل المستندات المشتراة."
-      : "Your order has been completed successfully. You can now download your purchased documents.",
-    goToDownloads: isRTL ? "الذهاب إلى التنزيلات" : "Go to Downloads",
-    congratulations: isRTL ? "تهانينا!" : "Congratulations!",
-    paymentComplete: isRTL ? "تمت معالجة دفعتك بنجاح" : "Your payment has been processed successfully",
-    accessGranted: isRTL ? "يمكنك الآن الوصول إلى جميع المستندات المشتراة" : "You now have access to all your purchased documents",
-    preparingDownloads: isRTL ? "جاري تجهيز التنزيلات..." : "Preparing your downloads...",
-    documentsAdded: isRTL ? "تمت إضافة المستندات إلى التنزيلات الخاصة بك" : "Documents added to your Downloads",
-  };
 
   // Get auth token from cookies
   const getAuthToken = () => {
@@ -244,6 +212,39 @@ export default function CheckoutPage() {
 
   const totalPrice = calculateTotalPrice();
   const isFree = totalPrice === 0;
+
+  // Translations
+  const translations = {
+    checkout: isRTL ? "الدفع" : "Checkout",
+    selectDocuments: isRTL ? "المستندات المحددة" : "Selected Documents",
+    totalPrice: isRTL ? "السعر الإجمالي" : "Total Price",
+    paymentMethod: isRTL ? "طريقة الدفع" : "Payment Method",
+    knoldgWallet: isRTL ? "محفظة نولدج" : "Knoldg Wallet",
+    stripeProvider: isRTL ? "مزود سترايب" : "Stripe Provider",
+    confirmOrder: isRTL ? "تأكيد الطلب" : "Checkout",
+    download: isRTL ? "تحميل" : "Download",
+    free: isRTL ? "مجاني" : "Free",
+    insufficientBalance: isRTL ? "الرصيد غير كافي" : "Insufficient balance",
+    pleaseSelectPayment: isRTL
+      ? "يرجى اختيار طريقة الدفع"
+      : "Please select a payment method",
+    orderSuccess: isRTL
+      ? "تم إتمام الطلب بنجاح"
+      : "Order completed successfully",
+    orderError: isRTL ? "فشل في إتمام الطلب" : "Failed to complete order",
+    loading: isRTL ? "جاري التحميل..." : "Loading...",
+    remove: isRTL ? "إزالة" : "Remove",
+    paymentSuccess: isRTL ? "تم الدفع بنجاح!" : "Payment Successful!",
+    orderCompleted: isRTL
+      ? "تم إكمال طلبك بنجاح. يمكنك الآن تنزيل المستندات المشتراة."
+      : "Your order has been completed successfully. You can now download your purchased documents.",
+    goToDownloads: isRTL ? "الذهاب إلى التنزيلات" : "Go to Downloads",
+    congratulations: isRTL ? "تهانينا!" : "Congratulations!",
+    paymentComplete: isRTL ? (isFree ? "تم إكمال الطلب بنجاح" : "تمت معالجة دفعتك بنجاح") : (isFree ? "Your order has been completed successfully" : "Your payment has been processed successfully"),
+    accessGranted: isRTL ? (isFree ? "يمكنك الآن الوصول إلى جميع المستندات" : "يمكنك الآن الوصول إلى جميع المستندات المشتراة") : (isFree ? "You now have access to all your documents" : "You now have access to all your purchased documents"),
+    preparingDownloads: isRTL ? "جاري تجهيز التنزيلات..." : "Preparing your downloads...",
+    documentsAdded: isRTL ? "تمت إضافة المستندات إلى التنزيلات الخاصة بك" : "Documents added to your Downloads",
+  };
 
   // Format currency with proper formatting
   const formatCurrency = (amount: number) => {

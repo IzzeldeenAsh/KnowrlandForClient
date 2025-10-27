@@ -4,7 +4,7 @@ import { DocumentTextIcon, CalendarIcon, ClockIcon, ChevronDownIcon, ChevronUpIc
 import { BookmarkIcon as BookmarkSolidIcon } from '@heroicons/react/24/solid';
 import { IconLanguage, IconCode, IconBuildingBank, IconMap, IconWorld, IconCrane } from '@tabler/icons-react';
 import { useParams } from 'next/navigation';
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import FacebookIcon from '@/public/file-icons/facebook';
 import LinkedinIcon from '@/public/file-icons/linkedin';
 import WhatsappIcon from '@/public/file-icons/whatsapp';
@@ -12,7 +12,7 @@ import BuyModal from './BuyModal';
 import AuthModal from './AuthModal';
 import { useGlobalProfile } from '@/components/auth/GlobalProfileProvider';
 
-interface Document {
+interface KnowledgeDocument {
   id: number;
   file_name: string;
   file_size: number;
@@ -37,7 +37,7 @@ interface KnowledgeSideBoxProps {
   knowledgeUUID: number;
   insighterUUID?: string;
   total_price: string;
-  documents: Document[];
+  documents: KnowledgeDocument[];
   language: string;
   isic_code?: {
     name: string;
@@ -102,10 +102,14 @@ const KnowledgeSideBox = ({
   
   // Auth Modal state
   const [authModalOpened, setAuthModalOpened] = useState(false);
-  
+
   // Read Later state
   const [isReadLater, setIsReadLater] = useState(is_read_later || false);
   const [isReadLaterLoading, setIsReadLaterLoading] = useState(false);
+
+  // Social Share Modal state
+  const [shareModalOpened, setShareModalOpened] = useState(false);
+  const [customShareMessage, setCustomShareMessage] = useState('');
   
   // Function to toggle section expansion
   const toggleSection = (section: 'economicBlocs' | 'regions' | 'countries' | 'documents' | 'isicCode' | 'hsCode') => {
@@ -197,19 +201,42 @@ const KnowledgeSideBox = ({
   
   // Share functionality
   const handleShare = () => {
-    // Get current URL
-    const url = window.location.href;
-    const title = document.title;
-    const text = 'Check out this knowledge resource: ';
-    
-    // Try using Web Share API if available
-    if (navigator.share) {
-      navigator.share({
-        title: title,
-        text: text,
-        url: url,
-      })
-      .catch((error) => console.error('Error sharing:', error));
+    setCustomShareMessage(getDefaultShareMessage());
+    setShareModalOpened(true);
+  };
+
+  const getDefaultShareMessage = () => {
+    if (isRTL) {
+      return `اعتقدت أنك قد تستمتع بهذا على Knoldg.com: المعرفة - ${document.title || 'تحقق من هذه المعرفة'}`;
+    }
+    return `Thought you might enjoy this on Knoldg.com: Knowledge - ${document.title || 'Check out this knowledge'}`;
+  };
+
+  const shareToSocial = (platform: string) => {
+    const url = encodeURIComponent(window.location.href);
+    const message = encodeURIComponent(customShareMessage || getDefaultShareMessage());
+    const title = encodeURIComponent(document.title);
+
+    let shareUrl = '';
+
+    switch(platform) {
+      case 'facebook':
+        shareUrl = `https://www.facebook.com/sharer/sharer.php?u=${url}&quote=${message}`;
+        break;
+      case 'twitter':
+        shareUrl = `https://twitter.com/intent/tweet?text=${message}&url=${url}`;
+        break;
+      case 'linkedin':
+        shareUrl = `https://www.linkedin.com/sharing/share-offsite/?url=${url}&title=${title}&summary=${message}`;
+        break;
+      case 'whatsapp':
+        shareUrl = `https://api.whatsapp.com/send?text=${message}%20${url}`;
+        break;
+    }
+
+    if (shareUrl) {
+      window.open(shareUrl, '_blank', 'width=600,height=400');
+      setShareModalOpened(false);
     }
   };
   
@@ -253,7 +280,14 @@ const KnowledgeSideBox = ({
     more: isRTL ? 'المزيد' : 'more',
     download: isRTL ? 'تحميل' : 'Download',
     alreadyPurchased: isRTL ? 'تم الشراء ' : 'Purchased',
-    partiallyPurchased: isRTL ? 'تم الشراء جزئياً' : 'Partially Purchased'
+    partiallyPurchased: isRTL ? 'تم الشراء جزئياً' : 'Partially Purchased',
+    shareKnowledge: isRTL ? 'مشاركة المعرفة' : 'Share Knowledge',
+    customShareMessage: isRTL ? 'رسالة مخصصة' : 'Custom Share Message',
+    shareMessageHint: isRTL ? 'اكتب رسالتك المخصصة لمشاركة هذه المعرفة' : 'Write your custom message to share this knowledge',
+    characterCount: isRTL ? 'عدد الأحرف' : 'Character Count',
+    close: isRTL ? 'إغلاق' : 'Close',
+    copyLink: isRTL ? 'نسخ الرابط' : 'Copy Link',
+    linkCopied: isRTL ? 'تم نسخ الرابط' : 'Link Copied'
   };
 
   const documentCounts = documents.reduce((acc: { [key: string]: number }, doc) => {
@@ -341,7 +375,7 @@ const KnowledgeSideBox = ({
         </div>
 
         <div className="space-y-3">
-          <div className="tp-course-details2-widget-list-item flex items-center justify-between">
+          <div className="tp-course-details2-widget-list-item flex items-start justify-between">
             <span className="flex items-center">
               <div className="bg-blue-50 p-2 rounded-full me-2">
                 <DocumentTextIcon className="w-4 h-4 text-blue-500" />
@@ -349,7 +383,7 @@ const KnowledgeSideBox = ({
               {translations.documents}
             </span>
             <div className={`field-content-container ${expandedSections.documents ? 'expanded' : ''}`}>
-              <div className="flex flex-wrap gap-2 mt-2">
+              <div className="flex flex-wrap gap-2">
                 {Object.entries(documentCounts).map(([ext, count]) => {
                   let badgeStyle = "";
                   
@@ -404,10 +438,10 @@ const KnowledgeSideBox = ({
               </div>
               {translations.documentsLanguage}
             </span>
-            <span className="field-content-container block mt-1 capitalize">
+            <span className="field-content-container flex items-center justify-end capitalize">
               {language ? (
-                currentLocale === 'ar' ? 
-                  (language.toLowerCase() === 'english' ? 'الإنجليزية' : 'العربية') : 
+                currentLocale === 'ar' ?
+                  (language.toLowerCase() === 'english' ? 'الإنجليزية' : 'العربية') :
                   language
               ) : translations.na}
             </span>
@@ -442,7 +476,7 @@ const KnowledgeSideBox = ({
                 {translations.isicCode}
               </span>
               <div className={`field-content-container ${expandedSections.isicCode ? 'expanded' : ''}`}>
-                <div className="flex flex-wrap gap-1 justify-end max-w-[100%]">
+                <div className="flex flex-wrap gap-1 justify-end">
                   {isic_code
                     .slice(0, expandedSections.isicCode ? isic_code.length : MAX_VISIBLE_ITEMS)
                     .map((code, index) => (
@@ -534,7 +568,7 @@ const KnowledgeSideBox = ({
                 {translations.hsCode}
               </span>
               <div className={`field-content-container ${expandedSections.hsCode ? 'expanded' : ''}`}>
-                <div className="flex flex-wrap gap-1 justify-end max-w-[100%]">
+                <div className="flex flex-wrap gap-1 justify-end">
                   {hs_code
                     .slice(0, expandedSections.hsCode ? hs_code.length : MAX_VISIBLE_ITEMS)
                     .map((code, index) => (
@@ -573,7 +607,7 @@ const KnowledgeSideBox = ({
                   {translations.targetMarket}
                 </span>
                 <div className={`field-content-container ${expandedSections.economicBlocs ? 'expanded' : ''}`}>
-                  <div className="flex flex-wrap gap-1 justify-end max-w-[100%]">
+                  <div className="flex flex-wrap gap-1 justify-end">
                     {economic_blocs
                       .slice(0, expandedSections.economicBlocs ? economic_blocs.length : MAX_VISIBLE_ITEMS)
                       .map((economicBloc) => (
@@ -614,7 +648,7 @@ const KnowledgeSideBox = ({
                   {translations.targetMarket}
                 </span>
                 <div className={`field-content-container ${expandedSections.regions ? 'expanded' : ''}`}>
-                  <div className="flex flex-wrap justify-end gap-1 max-w-[100%]">
+                  <div className="flex flex-wrap justify-end gap-1">
                     {regions.length === 6 ? (
                       <span className="badge bg-[#f1f1f4] text-[#4b5675] text-xs font-medium px-2.5 py-0.5 rounded">
                      {translations.worldWide}
@@ -661,7 +695,7 @@ const KnowledgeSideBox = ({
                   {translations.targetMarket}
                 </span>
                 <div className={`field-content-container ${expandedSections.countries ? 'expanded' : ''}`}>
-                  <div className="flex flex-wrap justify-end gap-1 max-w-[100%]">
+                  <div className="flex flex-wrap justify-end gap-1">
                     {countries
                       .slice(0, expandedSections.countries ? countries.length : MAX_VISIBLE_ITEMS)
                       .map((country:any) => (
@@ -700,7 +734,7 @@ const KnowledgeSideBox = ({
               </div>
               {translations.publishedAt}
             </span>
-            <span className="field-content-container block mt-1">
+            <span className="field-content-container flex items-center justify-end">
               {published_at ? new Date(published_at).toLocaleDateString(isRTL ? 'en-US' : undefined) : translations.na}
             </span>
           </div>
@@ -724,181 +758,165 @@ const KnowledgeSideBox = ({
       
     
     </div>
-            {/* Share Button with Animation */}
+            {/* Simple Share Button */}
             <div className="mt-5 flex justify-center">
-      <button 
-        className="share-button border-2 border-gradient-to-r from-blue-500 to-teal-400 max-w-[200px] relative w-full py-3 px-6 font-medium text-sm text-sky-500 outline-none overflow-hidden cursor-pointer rounded-[24px]"
+      <button
+        className="w-full max-w-[200px] py-3 px-6 font-semibold text-white bg-gradient-to-r from-blue-500 to-teal-400 rounded-lg hover:from-blue-600 hover:to-teal-500 transition-all duration-200 transform hover:-translate-y-0.5 hover:shadow-lg flex items-center justify-center gap-2"
         onClick={handleShare}
       >
-        <span className="btn-text inline-flex align-middle transition-all duration-300 px-4 ease-out-cubic text-sky-600">{translations.share}</span>
-        <span className="btn-icon inline-flex align-middle ml-2 transition-all duration-300 ease-out-cubic">
-          <svg
-            className="w-4 h-4"
-            viewBox="0 0 1024 1024"
-            version="1.1"
-            xmlns="http://www.w3.org/2000/svg"
-          >
-            <path
-              d="M767.99994 585.142857q75.995429 0 129.462857 53.394286t53.394286 129.462857-53.394286 129.462857-129.462857 53.394286-129.462857-53.394286-53.394286-129.462857q0-6.875429 1.170286-19.456l-205.677714-102.838857q-52.589714 49.152-124.562286 49.152-75.995429 0-129.462857-53.394286t-53.394286-129.462857 53.394286-129.462857 129.462857-53.394286q71.972571 0 124.562286 49.152l205.677714-102.838857q-1.170286-12.580571-1.170286-19.456 0-75.995429 53.394286-129.462857t129.462857-53.394286 129.462857 53.394286 53.394286 129.462857-53.394286 129.462857-129.462857 53.394286q-71.972571 0-124.562286-49.152l-205.677714 102.838857q1.170286 12.580571 1.170286 19.456t-1.170286 19.456l205.677714 102.838857q52.589714-49.152 124.562286-49.152z"
-              fill="#147aba"
-            ></path>
-          </svg>
-        </span>
-        <ul className="social-icons  absolute top-1/2 left-0 right-0 flex m-0 p-0 list-none transform -translate-y-1/2">
-          {/* Facebook */}
-          <li className="flex-1">
-            <a href={typeof window !== 'undefined' ? getShareLinks().facebook : '#'} 
-               target="_blank" 
-               rel="noopener noreferrer"
-               onClick={(e) => {
-                 e.stopPropagation();
-                 window.open(getShareLinks().facebook, 'facebook-share', 'width=580,height=296');
-                 return false;
-               }}
-               className="social-icon inline-flex align-middle transform translate-y-[55px] transition-all duration-300 ease-out-cubic hover:opacity-50">
-              <FacebookIcon />
-            </a>
-          </li>
-          {/* WhatsApp */}
-          <li className="flex-1">
-            <a href={typeof window !== 'undefined' ? getShareLinks().whatsapp : '#'} 
-               target="_blank" 
-               rel="noopener noreferrer"
-               onClick={(e) => e.stopPropagation()}
-               className="social-icon inline-flex align-middle transform translate-y-[55px] transition-all duration-300 ease-out-cubic hover:opacity-50">
-              <WhatsappIcon />
-            </a>
-          </li>
-          {/* X (Twitter) */}
-          <li className="flex-1">
-            <a href={typeof window !== 'undefined' ? getShareLinks().twitter : '#'} 
-               target="_blank" 
-               rel="noopener noreferrer"
-               onClick={(e) => {
-                 e.stopPropagation();
-                 window.open(getShareLinks().twitter, 'twitter-share', 'width=580,height=296');
-                 return false;
-               }}
-               className="social-icon inline-flex align-middle transform translate-y-[55px] transition-all duration-300 ease-out-cubic hover:opacity-50">
-              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="22" height="22" fill="black">
-                <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
-              </svg>
-            </a>
-          </li>
-          {/* LinkedIn */}
-          <li className="flex-1">
-            <a href={typeof window !== 'undefined' ? getShareLinks().linkedin : '#'} 
-               target="_blank" 
-               rel="noopener noreferrer"
-               onClick={(e) => {
-                 e.stopPropagation();
-                 window.open(getShareLinks().linkedin, 'linkedin-share', 'width=580,height=296');
-                 return false;
-               }}
-               className="social-icon inline-flex align-middle transform translate-y-[55px] transition-all duration-300 ease-out-cubic hover:opacity-50">
-              <LinkedinIcon />
-            </a>
-          </li>
-        </ul>
+        <span>{translations.share}</span>
+        <svg
+          className="w-4 h-4"
+          viewBox="0 0 1024 1024"
+          version="1.1"
+          xmlns="http://www.w3.org/2000/svg"
+          fill="currentColor"
+        >
+          <path
+            d="M767.99994 585.142857q75.995429 0 129.462857 53.394286t53.394286 129.462857-53.394286 129.462857-129.462857 53.394286-129.462857-53.394286-53.394286-129.462857q0-6.875429 1.170286-19.456l-205.677714-102.838857q-52.589714 49.152-124.562286 49.152-75.995429 0-129.462857-53.394286t-53.394286-129.462857 53.394286-129.462857 129.462857-53.394286q71.972571 0 124.562286 49.152l205.677714-102.838857q-1.170286-12.580571-1.170286-19.456 0-75.995429 53.394286-129.462857t129.462857-53.394286 129.462857 53.394286 53.394286 129.462857-53.394286 129.462857-129.462857 53.394286q-71.972571 0-124.562286-49.152l-205.677714 102.838857q1.170286 12.580571 1.170286 19.456t-1.170286 19.456l205.677714 102.838857q52.589714-49.152 124.562286-49.152z"
+          />
+        </svg>
       </button>
-        {/* CSS for Share Button Animation */}
+            </div>
+
+            {/* Share Modal */}
+            {shareModalOpened && (
+              <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4" onClick={() => setShareModalOpened(false)}>
+                <div className="bg-white rounded-lg p-6 max-w-md w-full" onClick={(e) => e.stopPropagation()} dir={isRTL ? 'rtl' : 'ltr'}>
+                  {/* Modal Header */}
+                  <div className="flex justify-between items-center mb-4 pb-4 border-b">
+                    <h2 className="text-xl font-bold">{translations.shareKnowledge}</h2>
+                    <button
+                      onClick={() => setShareModalOpened(false)}
+                      className="text-gray-500 hover:text-gray-700 text-2xl leading-none"
+                    >
+                      ×
+                    </button>
+                  </div>
+
+                  {/* Custom Message Input */}
+                  <div className="mb-4">
+                    <label className="block text-sm font-semibold mb-2">{translations.customShareMessage}</label>
+                    <textarea
+                      className="w-full p-3 border border-gray-300 rounded-lg resize-none"
+                      rows={3}
+                      value={customShareMessage}
+                      onChange={(e) => setCustomShareMessage(e.target.value)}
+                      placeholder={getDefaultShareMessage()}
+                    />
+                    <div className="text-xs text-gray-500 mt-2">
+                      {translations.shareMessageHint}
+                    </div>
+                  </div>
+
+                  {/* Character Count */}
+                  <div className="mb-6">
+                    <small className="text-gray-500">{translations.characterCount}: {customShareMessage.length}</small>
+                  </div>
+
+                  {/* Social Media Buttons */}
+                  <div className="flex justify-center gap-3 mb-6">
+                    {/* Facebook */}
+                    <button
+                      className="w-12 h-12 bg-blue-600 hover:bg-blue-700 text-white rounded-full flex items-center justify-center transition-colors"
+                      onClick={() => shareToSocial('facebook')}
+                      title="Share on Facebook"
+                    >
+                      <FacebookIcon />
+                    </button>
+
+                    {/* Twitter */}
+                    <button
+                      className="w-12 h-12 bg-black hover:bg-gray-800 text-white rounded-full flex items-center justify-center transition-colors"
+                      onClick={() => shareToSocial('twitter')}
+                      title="Share on Twitter"
+                    >
+                      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20" fill="currentColor">
+                        <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
+                      </svg>
+                    </button>
+
+                    {/* LinkedIn */}
+                    <button
+                      className="w-12 h-12 bg-blue-700 hover:bg-blue-800 text-white rounded-full flex items-center justify-center transition-colors"
+                      onClick={() => shareToSocial('linkedin')}
+                      title="Share on LinkedIn"
+                    >
+                      <LinkedinIcon />
+                    </button>
+
+                    {/* WhatsApp */}
+                    <button
+                      className="w-12 h-12 bg-green-500 hover:bg-green-600 text-white rounded-full flex items-center justify-center transition-colors"
+                      onClick={() => shareToSocial('whatsapp')}
+                      title="Share on WhatsApp"
+                    >
+                      <WhatsappIcon />
+                    </button>
+                  </div>
+
+                  {/* Copy Link Button */}
+                  <button
+                    className="w-full py-2 px-4 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg transition-colors"
+                    onClick={() => {
+                      navigator.clipboard.writeText(window.location.href);
+                    }}
+                  >
+                    {translations.copyLink}
+                  </button>
+                </div>
+              </div>
+            )}
+        {/* Field content styles */}
         <style jsx>{`
-        .share-button {
-          position: relative;
-          font-family: Roboto, sans-serif;
-          transition: 0.3s cubic-bezier(0.215, 0.61, 0.355, 1);
-          border: 1px solid #147aba;
-        }
-        
-        .share-button::before {
-          position: absolute;
-          content: "";
-          top: 0;
-          left: 0;
-          z-index: -1;
-          width: 100%;
-          height: 100%;
-      
-          background: #ffffff;
-          border-radius: 24px;
-          transition: 0.3s cubic-bezier(0.215, 0.61, 0.355, 1);
-        }
-        
-        .share-button .btn-text {
-          transition-delay: 0.05s;
-        }
-        
-        .share-button .btn-icon {
-          transition-delay: 0.1s;
-        }
-        
-        .share-button:hover::before {
-          transform: scale(1.1);
-        }
-        
-        .share-button:hover .btn-text,
-        .share-button:hover .btn-icon {
-          transform: translateY(-55px);
-        }
-        
-        .share-button:hover .social-icons li:nth-child(1) a {
-          transform: translateY(0);
-          transition-delay: 0.15s;
-        }
-        
-        .share-button:hover .social-icons li:nth-child(2) a {
-          transform: translateY(0);
-          transition-delay: 0.2s;
-        }
-        
-        .share-button:hover .social-icons li:nth-child(3) a {
-          transform: translateY(0);
-          transition-delay: 0.25s;
-        }
-        
-        .share-button:hover .social-icons li:nth-child(4) a {
-          transform: translateY(0);
-          transition-delay: 0.3s;
-        }
+          .field-content-container {
+            min-height: 40px;
+            overflow: hidden;
+            transition: max-height 0.3s ease;
+            width: 60%;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+          }
 
-        /* Field content styles */
-        .field-content-container {
-          max-height: 40px;
-          overflow: hidden;
-          transition: max-height 0.3s ease;
-          width: 60%;
-          position: relative;
-        }
-        
-        .field-content-container.expanded {
-          max-height: 200px; /* Adjust this value as needed */
-        }
-        
-        .tp-course-details2-widget-list-item {
-          min-height: 60px;
-          padding: 8px 0;
-          border-bottom: 1px solid #f3f4f6;
-        }
-      `}</style>
-    </div>
+          .field-content-container.expanded {
+            max-height: none;
+          }
 
-    {/* Buy Modal */}
-    {knowledgeSlug && (
-      <BuyModal
-        opened={buyModalOpened}
-        onClose={() => setBuyModalOpened(false)}
-        documents={documents}
-        preSelectedDocumentIds={selectedDocumentIds}
-        knowledgeSlug={knowledgeSlug}
+          .field-content-container:not(.expanded) {
+            max-height: 80px;
+          }
+
+          .tp-course-details2-widget-list-item {
+            min-height: 50px;
+            padding: 12px 0;
+            border-bottom: 1px solid #f3f4f6;
+            align-items: flex-start;
+          }
+
+          .tp-course-details2-widget-list-item:last-child {
+            border-bottom: none;
+          }
+        `}</style>
+
+      {/* Buy Modal */}
+      {knowledgeSlug && (
+        <BuyModal
+          opened={buyModalOpened}
+          onClose={() => setBuyModalOpened(false)}
+          documents={documents}
+          preSelectedDocumentIds={selectedDocumentIds}
+          knowledgeSlug={knowledgeSlug}
+        />
+      )}
+
+      {/* Auth Modal */}
+      <AuthModal
+        opened={authModalOpened}
+        onClose={() => setAuthModalOpened(false)}
+        locale={currentLocale}
       />
-    )}
-
-    {/* Auth Modal */}
-    <AuthModal
-      opened={authModalOpened}
-      onClose={() => setAuthModalOpened(false)}
-      locale={currentLocale}
-    />
   </div>
   );
 };

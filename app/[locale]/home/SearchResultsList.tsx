@@ -213,8 +213,7 @@ export default function SearchResultsList({
     knowledge: isRTL ? "المعرفة" : "Knowledge",
     noItems: isRTL ? "لا توجد نتائج بحث متاحة" : "No search results available",
     posted: isRTL ? "نُشر" : "Posted",
-    free: isRTL ? "مجاني" : "FREE",
-    paid: isRTL ? "مدفوع" : "PAID",
+    free: isRTL ? "مجاني" : "Free",
     insighter: isRTL ? "إنسايتر" : "Insighter",
     by: isRTL ? "من قبل" : "By",
     company: isRTL ? "الشركة" : "Company"
@@ -247,15 +246,28 @@ export default function SearchResultsList({
       {knowledgeItems.length > 0 && (
         <div className="mb-6" >
           <div className="space-y-4 max-w-7xl mx-auto">
-            {knowledgeItems.map((item) => (
-              <Card
-                key={`${uniquePrefix}-knowledge-${item.searchable_id}`}
-                withBorder={false}
-                padding={0}
-                radius="md"
-                className={listStyles.listCard}
-                component="div"
-                style={{height:'240px'}} // Fixed height for consistency
+            {knowledgeItems.map((item) => {
+              const normalizedPrice = String(item.price ?? "").trim();
+              const hasPrice = normalizedPrice !== "";
+              const numericPrice = Number(normalizedPrice);
+              const isNumericPrice = normalizedPrice !== "" && !Number.isNaN(numericPrice);
+              const isFreePrice = isNumericPrice && numericPrice === 0;
+              const formattedPrice = isNumericPrice
+                ? `$${numericPrice.toLocaleString(
+                    currentLocale === "ar" ? "ar-SA" : "en-US",
+                    { maximumFractionDigits: 2 }
+                  )}`
+                : normalizedPrice;
+
+              return (
+                <Card
+                  key={`${uniquePrefix}-knowledge-${item.searchable_id}`}
+                  withBorder={false}
+                  padding={0}
+                  radius="md"
+                  className={listStyles.listCard}
+                  component="div"
+                  style={{height:'240px'}} // Fixed height for consistency
               >
                 <div  className="block relative w-full h-full flex flex-row">
              
@@ -422,7 +434,7 @@ export default function SearchResultsList({
               </div>
             
               {/* Only show contentColumn if there's content to display */}
-              {(item.description || (item.searchable_type === "knowledge" && (item.paid !== undefined || item.published_at))) && (
+              {(item.description || (item.searchable_type === "knowledge" && (hasPrice || item.published_at))) && (
                 <div className={listStyles.contentColumn} style={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-between', height: '100%' }}>
                   {item.description && (
                       <Link href={`/${currentLocale}/${item.url}`}>
@@ -435,13 +447,13 @@ export default function SearchResultsList({
                   {item.searchable_type === "knowledge" && (
                     <div className={listStyles.detailsSection}>
                       <div className="flex items-center gap-3">
-                        {item.paid !== undefined && (
+                        {hasPrice && (
                           <Badge
-                            color={item.paid ? "yellow" : "green"}
+                            color={isFreePrice ? "green" : "yellow"}
                             variant="light"
                             className={listStyles.priceBadge}
                           >
-                            {item.paid ? translations.paid : translations.free}
+                            {isFreePrice ? translations.free : formattedPrice}
                           </Badge>
                         )}
                         
@@ -494,7 +506,8 @@ export default function SearchResultsList({
        
             </div>
           </Card>
-            ))}
+              );
+            })}
           </div>
         </div>
       )}

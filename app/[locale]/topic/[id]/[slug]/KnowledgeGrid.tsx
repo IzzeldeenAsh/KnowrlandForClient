@@ -182,7 +182,7 @@ export default function KnowledgeGrid({
     exploreInsights: isRTL ? `استكشف الرؤى ضمن ${topicName}` : `Explore insights within ${topicName}`,
     noItems: isRTL ? "لا توجد عناصر معرفية متاحة بعد" : "No knowledge items available yet",
     posted: isRTL ? "نُشر" : "Posted",
-    free: isRTL ? "مجاني" : "FREE",
+    free: isRTL ? "مجاني" : "Free",
     paid: isRTL ? "مدفوع" : "PAID",
     insighter: isRTL ? "إنسايتر" : "Insighter",
     company: isRTL ? "شركة" : "Company" ,
@@ -200,199 +200,219 @@ export default function KnowledgeGrid({
       <div
         className={`grid sm:grid-cols-2 lg:grid-cols-${colNumbers} gap-4 max-w-7xl mx-auto`}
       >
-        {knowledge.map((item: KnowledgeItem) => (
-          <Card
-            key={`${item.type}-${item.slug}`}
-            withBorder
-            padding="lg"
-            radius="xs"
-            className={cardStyles.card}
-            data-aos="fade-up"
-            component="div"
-          >
-            <Link
-              href={`/${currentLocale}/knowledge/${item.type}/${item.slug}`}
-              className="block relative h-full flex flex-col"
-            >
-              <div className={cardStyles.darkSection}>
-                <div>
-                  <div className="flex items-center mb-3">
-                    {item.type === "report" && <ReportIcon width={20} height={20} />}
-                    {item.type === "manual" && <ManualIcon width={20} height={20} />}
-                    {item.type === "insight" && <InsightIcon width={20} height={20} />}
-                    {item.type === "data" && <DataIcon width={20} height={20} />}
-                    {item.type === "article" && <CourseIcon width={20} height={20} />}
-                    {item.type === "course" && <CourseIcon width={20} height={20} />}
+        {knowledge.map((item: KnowledgeItem) => {
+          const priceString = item.total_price?.toString().trim() ?? "";
+          const numericPrice = Number(priceString);
+          const isNumericPrice = priceString !== "" && !Number.isNaN(numericPrice);
+          const isFree = isNumericPrice ? numericPrice === 0 : priceString === "0";
+          const formattedPrice = isNumericPrice
+            ? `$${numericPrice.toLocaleString(
+                currentLocale === "ar" ? "ar-SA" : "en-US",
+                { maximumFractionDigits: 2 }
+              )}`
+            : priceString || translations.paid;
 
-                    <Badge w="fit-content" className="capitalize ml-2" variant="light">
-                      {typeTranslations[item.type.toLowerCase()] || item.type}
-                    </Badge>
+          return (
+            <Card
+              key={`${item.type}-${item.slug}`}
+              withBorder
+              padding="lg"
+              radius="xs"
+              className={cardStyles.card}
+              data-aos="fade-up"
+              component="div"
+            >
+              <Link
+                href={`/${currentLocale}/knowledge/${item.type}/${item.slug}`}
+                className="block relative h-full flex flex-col"
+              >
+                <div className={cardStyles.darkSection}>
+                  <div>
+                    <div className="flex items-center mb-3">
+                      {item.type === "report" && <ReportIcon width={20} height={20} />}
+                      {item.type === "manual" && <ManualIcon width={20} height={20} />}
+                      {item.type === "insight" && <InsightIcon width={20} height={20} />}
+                      {item.type === "data" && <DataIcon width={20} height={20} />}
+                      {item.type === "article" && <CourseIcon width={20} height={20} />}
+                      {item.type === "course" && <CourseIcon width={20} height={20} />}
+
+                      <Badge w="fit-content" className="capitalize ml-2" variant="light">
+                        {typeTranslations[item.type.toLowerCase()] || item.type}
+                      </Badge>
+                    </div>
+                    
+                    <Text
+                      fw={700}
+                      className={`${cardStyles.title} amiri-bold`}
+                      lineClamp={2}
+                    >
+                      {item.title}
+                    </Text>
                   </div>
                   
-                  <Text
-                    fw={700}
-                    className={`${cardStyles.title} amiri-bold`}
-                    lineClamp={2}
+                  {item.review_summary && item.review_summary.count >= 1 && item.review_summary.average > 0 && (
+                    <div className="flex items-center mt-auto gap-1">
+                      <Rating value={item.review_summary.average} fractions={2} readOnly size="sm" />
+                      <Text size="xs" fw={500} className="mx-2 text-sky-500">{item.review_summary.average.toFixed(1)}</Text>
+                      <Text size="xs" c="dimmed" className="mx-2 text-gray-300">({item.review_summary.count})</Text>
+                    </div>
+                  )}
+                </div>
+              </Link>
+              <div className={cardStyles.whiteSection + " flex flex-col h-full "}>
+                {/* Top row with insighter info and action buttons */}
+                <div className="flex justify-between items-center pb-4">
+                  <Link
+                    href={`/${currentLocale}/knowledge/${item.type}/${item.slug}`}
+                    className="block relative h-full flex flex-col"
                   >
-                    {item.title}
-                  </Text>
-                </div>
-                
-                {item.review_summary && item.review_summary.count >= 1 && item.review_summary.average > 0 && (
-                  <div className="flex items-center mt-auto gap-1">
-                    <Rating value={item.review_summary.average} fractions={2} readOnly size="sm" />
-                    <Text size="xs" fw={500} className="mx-2 text-sky-500">{item.review_summary.average.toFixed(1)}</Text>
-                    <Text size="xs" c="dimmed" className="mx-2 text-gray-300">({item.review_summary.count})</Text>
-                  </div>
-                )}
-              </div>
-            </Link>
-            <div className={cardStyles.whiteSection + " flex flex-col h-full "}>
-              {/* Top row with insighter info and action buttons */}
-              <div className="flex justify-between items-center pb-4">
-              <Link
-              href={`/${currentLocale}/knowledge/${item.type}/${item.slug}`}
-              className="block relative h-full flex flex-col"
-            >
-                {showInsighter && (
-                  <div className="flex items-center">
-                    <div className="relative">
-                      <div className="object-cover object-top">
-                        <Avatar
-                          src={(item.insighter.roles.includes("company") || item.insighter.roles.includes("company-insighter")) && item.insighter.company?.logo ? 
-                              item.insighter.company.logo : 
-                              item.insighter.profile_photo_url}
-                          radius="xl"
-                          alt={item.insighter.name}
-                          size="md"
-                          className={`${cardStyles.avatar} avatar-top-position`}
-                        >
-                          {!((item.insighter.roles.includes("company") || item.insighter.roles.includes("company-insighter")) && item.insighter.company?.logo) && 
-                          !item.insighter.profile_photo_url &&
-                            getInitials(item.insighter.name)}
-                        </Avatar>
+                    {showInsighter && (
+                      <div className="flex items-center">
+                        <div className="relative">
+                          <div className="object-cover object-top">
+                            <Avatar
+                              src={(item.insighter.roles.includes("company") || item.insighter.roles.includes("company-insighter")) && item.insighter.company?.logo
+                                ? item.insighter.company.logo
+                                : item.insighter.profile_photo_url}
+                              radius="xl"
+                              alt={item.insighter.name}
+                              size="md"
+                              className={`${cardStyles.avatar} avatar-top-position`}
+                            >
+                              {!((item.insighter.roles.includes("company") || item.insighter.roles.includes("company-insighter")) && item.insighter.company?.logo) &&
+                                !item.insighter.profile_photo_url &&
+                                getInitials(item.insighter.name)}
+                            </Avatar>
+                          </div>
+
+                          {item.insighter.roles.includes("company-insighter") && item.insighter.profile_photo_url && (
+                            <Avatar
+                              src={item.insighter.profile_photo_url}
+                              radius="xl"
+                              size="xs"
+                              className="absolute bottom-0 right-0 translate-x-1/3 rounded-full translate-y-1/3 z-10 avatar-top-position"
+                              alt={item.insighter.name}
+                              style={{
+                                boxShadow: "0 0 0 2px white",
+                                position: "absolute",
+                              }}
+                            />
+                          )}
+
+                          {item.insighter.roles.includes("company") && item.insighter.profile_photo_url && (
+                            <Avatar
+                              src={item.insighter.profile_photo_url}
+                              radius="xl"
+                              size="xs"
+                              className="absolute bottom-0 right-0 translate-x-1/3 rounded-full translate-y-1/3 z-10 avatar-top-position"
+                              alt={item.insighter.name}
+                              style={{
+                                boxShadow: "0 0 0 2px white",
+                                position: "absolute",
+                              }}
+                            />
+                          )}
+                        </div>
+
+                        <div className="ms-3">
+                          <Text fw={600} size="sm" className="capitalize">
+                            {item.insighter.roles.includes("insighter") && item.insighter.name.toLowerCase()}
+
+                            {item.insighter.roles.includes("company") && (
+                              item.insighter.company
+                                ? isRTL
+                                  ? ` ${item.insighter.company.legal_name}`
+                                  : `${item.insighter.company.legal_name} `
+                                : translations.company
+                            )}
+
+                            {item.insighter.roles.includes("company-insighter") && (
+                              item.insighter.company
+                                ? isRTL
+                                  ? ` ${item.insighter.company.legal_name}`
+                                  : `${item.insighter.company.legal_name} `
+                                : translations.company
+                            )}
+                          </Text>
+
+                          <Text c="dimmed" size="xs" className="capitalize">
+                            {item.insighter.roles.includes("insighter") && translations.insighter}
+
+                            {item.insighter.roles.includes("company") && (
+                              item.insighter.company
+                                ? `${translations.by} ${item.insighter.name.toLowerCase()}`
+                                : translations.company
+                            )}
+
+                            {item.insighter.roles.includes("company-insighter") && (
+                              item.insighter.company
+                                ? `${translations.by} ${item.insighter.name.toLowerCase()}`
+                                : translations.company
+                            )}
+                          </Text>
+                        </div>
                       </div>
-                      
-                      {item.insighter.roles.includes("company-insighter") && item.insighter.profile_photo_url && (
-                        <Avatar
-                          src={item.insighter.profile_photo_url}
-                          radius="xl"
-                          size="xs"
-                          className="absolute bottom-0 right-0 translate-x-1/3 rounded-full translate-y-1/3 z-10 avatar-top-position"
-                          alt={item.insighter.name}
-                          style={{
-                            boxShadow: '0 0 0 2px white',
-                            position: 'absolute',
-                          }}
-                        />
-                      )}
-                       {item.insighter.roles.includes("company") && item.insighter.profile_photo_url && (
-                        <Avatar
-                          src={item.insighter.profile_photo_url}
-                          radius="xl"
-                          size="xs"
-                          className="absolute bottom-0 right-0 translate-x-1/3 rounded-full translate-y-1/3 z-10 avatar-top-position"
-                          alt={item.insighter.name}
-                          style={{
-                            boxShadow: '0 0 0 2px white',
-                            position: 'absolute',
-                          }}
-                        />
-                      )}
-                    </div>
-
-                    <div className="ms-3">
-                      <Text fw={600} size="sm" className="capitalize">
-                        {item.insighter.roles.includes("insighter") && item.insighter.name.toLowerCase()}
-
-                        {item.insighter.roles.includes("company") && (
-                          item.insighter.company
-                            ? isRTL
-                              ? ` ${item.insighter.company.legal_name}`
-                              : `${item.insighter.company.legal_name} `
-                            : translations.company
-                        )}
-
-                        {item.insighter.roles.includes("company-insighter") && (
-                          item.insighter.company
-                            ? isRTL
-                              ? ` ${item.insighter.company.legal_name}`
-                              : `${item.insighter.company.legal_name} `
-                            : translations.company
-                        )}
-                      </Text>
-
-                      <Text c="dimmed" size="xs" className="capitalize">
-                        {item.insighter.roles.includes("insighter") && translations.insighter}
-
-                        {item.insighter.roles.includes("company") && (
-                          item.insighter.company
-                            ? `${translations.by} ${item.insighter.name.toLowerCase()}`
-                            : translations.company
-                        )}
-
-                        {item.insighter.roles.includes("company-insighter") && (
-                          item.insighter.company
-                            ? `${translations.by} ${item.insighter.name.toLowerCase()}`
-                            : translations.company
-                        )}
-                      </Text>
-                    </div>
-                  </div>
-                )}
-                </Link>
-                <div className="flex gap-2">
-                  <div className="relative">
-                    {loadingStates[item.slug] ? (
-                      <div className="w-5 h-5 border-2 border-gray-400 border-t-transparent rounded-full animate-spin" />
-                    ) : (
-                      (item.slug in readLaterStates ? readLaterStates[item.slug] : item.is_read_later) ? (
-                        <BookmarkSolidIcon 
-                          className="w-5 h-5 text-[#861536] cursor-pointer hover:text-[#861536] transition-colors"
-                          onClick={(e) => {
-                            e.preventDefault();
-                            e.stopPropagation();
-                            if (!loadingStates[item.slug]) {
-                              handleReadLaterToggle(item, e);
-                            }
-                          }}
-                          aria-label="Remove from Read Later"
-                        />
-                      ) : (
-                        <BookmarkIcon 
-                          className="w-5 h-5 text-gray-600 cursor-pointer hover:text-gray-700 transition-colors"
-                          onClick={(e) => {
-                            e.preventDefault();
-                            e.stopPropagation();
-                            if (!loadingStates[item.slug]) {
-                              handleReadLaterToggle(item, e);
-                            }
-                          }}
-                          aria-label="Add to Read Later"
-                        />
-                      )
                     )}
+                  </Link>
+                  <div className="flex gap-2">
+                    <div className="relative">
+                      {loadingStates[item.slug] ? (
+                        <div className="w-5 h-5 border-2 border-gray-400 border-t-transparent rounded-full animate-spin" />
+                      ) : (
+                        (item.slug in readLaterStates ? readLaterStates[item.slug] : item.is_read_later) ? (
+                          <BookmarkSolidIcon
+                            className="w-5 h-5 text-[#861536] cursor-pointer hover:text-[#861536] transition-colors"
+                            onClick={(e) => {
+                              e.preventDefault();
+                              e.stopPropagation();
+                              if (!loadingStates[item.slug]) {
+                                handleReadLaterToggle(item, e);
+                              }
+                            }}
+                            aria-label="Remove from Read Later"
+                          />
+                        ) : (
+                          <BookmarkIcon
+                            className="w-5 h-5 text-gray-600 cursor-pointer hover:text-gray-700 transition-colors"
+                            onClick={(e) => {
+                              e.preventDefault();
+                              e.stopPropagation();
+                              if (!loadingStates[item.slug]) {
+                                handleReadLaterToggle(item, e);
+                              }
+                            }}
+                            aria-label="Add to Read Later"
+                          />
+                        )
+                      )}
+                    </div>
                   </div>
                 </div>
+
+                {/* Bottom row with published date and price info */}
+                <div className="flex justify-between items-center pt-2 mt-auto mt-6 border-t border-gray-100 w-full">
+                  <Text c="dimmed" size="xs" dir={isRTL ? "rtl" : "ltr"}>
+                    {translations.posted} {formatPublishedDate(item.published_at, currentLocale as string)}
+                  </Text>
+
+                  {isFree ? (
+                    <Badge
+                      color="green"
+                      variant="light"
+                      className={cardStyles.priceBadge}
+                    >
+                      {translations.free}
+                    </Badge>
+                  ) : (
+                    <Text fw={700} size="sm" className={cardStyles.priceBadge}>
+                      {formattedPrice}
+                    </Text>
+                  )}
+                </div>
               </div>
-              
-              {/* Bottom row with published date and price badge */}
-              <div className="flex justify-between items-center pt-2 mt-auto mt-6 border-t border-gray-100 w-full">
-                <Text c="dimmed" size="xs" dir={isRTL ? 'rtl' : 'ltr'}>
-                  {translations.posted} {formatPublishedDate(item.published_at, currentLocale as string)}
-                </Text>
-                
-                <Badge
-                  color={item.total_price === "0" ? "green" : "yellow"}
-                  variant="light"
-                  className={cardStyles.priceBadge}
-                >
-                  {item.total_price === "0" ? translations.free : translations.paid}
-                </Badge>
-              </div>
-            </div>
-          </Card>
-        ))}
+            </Card>
+          );
+        })}
         {knowledge.length === 0 && (
           <div className="col-span-full flex flex-col items-center justify-center py-12 px-4">
             <Image
