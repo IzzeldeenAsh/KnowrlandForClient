@@ -414,8 +414,6 @@ export default function HomePage() {
         handleError,
         null, // Always reset industry when switching types
         null, // Always reset price when switching types
-        0, // Always reset price range start when switching types
-        null, // Always reset price range end when switching types
         null, // Always reset HS code when switching types
         'all', // Always reset accuracy to 'all' when switching types
         'all' // Always reset role to 'all' when switching types
