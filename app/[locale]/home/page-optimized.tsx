@@ -64,20 +64,6 @@ export default function HomePageOptimized() {
       isicCode: searchParams.get('isic_code') || null,
       hsCode: searchParams.get('hs_code') || null,
       price: searchParams.get('paid') || null,
-      priceRangeStart: (() => {
-        const value = searchParams.get('range_start');
-        if (!value) return 0;
-        const parsed = parseInt(value, 10);
-        if (Number.isNaN(parsed)) return 0;
-        return Math.max(0, parsed);
-      })(),
-      priceRangeEnd: (() => {
-        const value = searchParams.get('range_end');
-        if (!value) return 1000;
-        const parsed = parseInt(value, 10);
-        if (Number.isNaN(parsed)) return 1000;
-        return Math.max(0, parsed);
-      })(),
       accuracy: (searchParams.get('accuracy') as any) || 'all',
       role: (searchParams.get('role') as any) || 'all',
       category: searchParams.get('type') || 'all',
@@ -132,16 +118,9 @@ export default function HomePageOptimized() {
     if (filterState.region) params.set('region', filterState.region.toString());
     if (filterState.economicBloc) params.set('economic_bloc', filterState.economicBloc.toString());
     if (filterState.industry) params.set('industry', filterState.industry.toString());
-    if (filterState.isicCode) params.set('isic_code', filterState.isicCode);
-    if (filterState.hsCode) params.set('hs_code', filterState.hsCode);
-    if (filterState.price) params.set('paid', filterState.price);
-    if ((filterState.priceRangeStart !== null && filterState.priceRangeStart !== 0) || filterState.priceRangeEnd !== null) {
-      const startValue = filterState.priceRangeStart ?? 0;
-      params.set('range_start', startValue.toString());
-      if (filterState.priceRangeEnd !== null) {
-        params.set('range_end', filterState.priceRangeEnd.toString());
-      }
-    }
+   if (filterState.isicCode) params.set('isic_code', filterState.isicCode);
+   if (filterState.hsCode) params.set('hs_code', filterState.hsCode);
+   if (filterState.price) params.set('paid', filterState.price);
     if (filterState.accuracy !== 'all') params.set('accuracy', filterState.accuracy);
     if (filterState.role !== 'all') params.set('role', filterState.role);
     if (filterState.category !== 'all') params.set('type', filterState.category);
@@ -180,8 +159,6 @@ export default function HomePageOptimized() {
         handleError,
         filterState.industry,
         filterState.price,
-        filterState.priceRangeStart,
-        filterState.priceRangeEnd,
         filterState.hsCode ? parseInt(filterState.hsCode) : null,
         filterState.accuracy,
         filterState.role
@@ -199,8 +176,6 @@ export default function HomePageOptimized() {
           filterState.isicCode ? parseInt(filterState.isicCode) : null,
           filterState.industry,
           filterState.price,
-          filterState.priceRangeStart,
-          filterState.priceRangeEnd,
           filterState.hsCode ? parseInt(filterState.hsCode) : null,
           filterState.accuracy,
           filterState.role,
@@ -525,10 +500,6 @@ export default function HomePageOptimized() {
                       setHsCodeFilter={createFilterHandler('SET_HS_CODE')}
                       priceFilter={filterState.price}
                       setPriceFilter={createFilterHandler('SET_PRICE')}
-                      priceRangeStart={filterState.priceRangeStart}
-                      setPriceRangeStart={createFilterHandler('SET_PRICE_RANGE_START')}
-                      priceRangeEnd={filterState.priceRangeEnd}
-                      setPriceRangeEnd={createFilterHandler('SET_PRICE_RANGE_END')}
                       accuracyFilter={filterState.accuracy}
                       setAccuracyFilter={createFilterHandler('SET_ACCURACY')}
                       roleFilter={filterState.role}
