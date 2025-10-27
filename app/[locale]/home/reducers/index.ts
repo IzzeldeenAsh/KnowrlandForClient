@@ -21,8 +21,6 @@ export const filterInitialState: FilterState = {
   isicCode: null,
   hsCode: null,
   price: null,
-  priceRangeStart: 0,
-  priceRangeEnd: 1000,
   accuracy: 'all',
   role: 'all',
   category: 'all',
@@ -124,12 +122,6 @@ export function filterReducer(state: FilterState, action: FilterAction): FilterS
     
     case 'SET_PRICE':
       return { ...state, price: action.payload };
-    
-    case 'SET_PRICE_RANGE_START':
-      return { ...state, priceRangeStart: action.payload };
-    
-    case 'SET_PRICE_RANGE_END':
-      return { ...state, priceRangeEnd: action.payload };
     
     case 'SET_ACCURACY':
       return { ...state, accuracy: action.payload };
