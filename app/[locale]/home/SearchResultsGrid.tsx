@@ -204,7 +204,7 @@ export default function SearchResultsGrid({
 
       const method = currentState ? 'DELETE' : 'POST';
       const slug = item.url.split('/').pop();
-      const url = `https://api.foresighta.co/api/account/favorite/knowledge/${slug}`;
+      const url = `https://api.knoldg.com/api/account/favorite/knowledge/${slug}`;
 
       const response = await axios({
         method,
@@ -256,7 +256,7 @@ export default function SearchResultsGrid({
     knowledge: isRTL ? "المعرفة" : "Knowledge",
     noItems: isRTL ? "لا توجد نتائج بحث متاحة" : "No search results available",
     posted: isRTL ? "نُشر" : "Posted",
-    free: isRTL ? "مجاني" : "FREE",
+    free: isRTL ? "مجاني" : "Free",
     insighter: isRTL ? "إنسايتر" : "Insighter",
     by: isRTL ? "من قبل" : "By",
     company: isRTL ? "الشركة" : "Company",
@@ -301,27 +301,40 @@ export default function SearchResultsGrid({
           <div
             className={`grid sm:grid-cols-2 lg:grid-cols-3 3xl:grid-cols-4 gap-4 max-w-7xl 2xl:max-w-none 2xl:mx-8 mx-auto`}
           >
-            {knowledgeItems.map((item, index) => (
-          <Card
-            key={`${uniquePrefix}-knowledge-${item.searchable_id}-${index}`}
-            withBorder
-            padding="lg"
-            radius="xs"
-            className={cardStyles.card}
-            component="div"
-          >
-            <Link
-              href={`/${currentLocale}/${item.url}`}
-              className="block relative h-full flex flex-col"
-              onClick={(e) => {
-                // Check if the URL is valid before navigation
-                if (!item.url || item.url.trim() === '') {
-                  e.preventDefault();
-                  console.error('Invalid URL for item:', item);
-                  return;
-                }
-              }}
-            >
+            {knowledgeItems.map((item, index) => {
+              const normalizedPrice = String(item.price ?? "").trim();
+              const hasPrice = normalizedPrice !== "";
+              const numericPrice = Number(normalizedPrice);
+              const isNumericPrice = normalizedPrice !== "" && !Number.isNaN(numericPrice);
+              const isFreePrice = isNumericPrice && numericPrice === 0;
+              const formattedPrice = isNumericPrice
+                ? `$${numericPrice.toLocaleString(
+                    currentLocale === "ar" ? "ar-SA" : "en-US",
+                    { maximumFractionDigits: 2 }
+                  )}`
+                : normalizedPrice;
+
+              return (
+                <Card
+                  key={`${uniquePrefix}-knowledge-${item.searchable_id}-${index}`}
+                  withBorder
+                  padding="lg"
+                  radius="xs"
+                  className={cardStyles.card}
+                  component="div"
+                >
+                  <Link
+                    href={`/${currentLocale}/${item.url}`}
+                    className="block relative h-full flex flex-col"
+                    onClick={(e) => {
+                      // Check if the URL is valid before navigation
+                      if (!item.url || item.url.trim() === '') {
+                        e.preventDefault();
+                        console.error('Invalid URL for item:', item);
+                        return;
+                      }
+                    }}
+                  >
                  
               <div className={`${cardStyles.darkSection} relative`}>
                 <div>
@@ -536,20 +549,21 @@ export default function SearchResultsGrid({
                     </Text>
                   )}
                   
-                  {item.price !== undefined && (
+                  {hasPrice && (
                     <Badge
-                      color={item.price === "0" ? "green" : "yellow"}
+                      color={isFreePrice ? "green" : "yellow"}
                       variant="light"
                       className={cardStyles.priceBadge}
                     >
-                      {item.price === "0" ? translations.free : `$${item.price}`}
+                      {isFreePrice ? translations.free : formattedPrice}
                     </Badge>
                   )}
                 </div>
               </div>
          
-          </Card>
-        ))}
+                </Card>
+              );
+            })}
           </div>
         </div>
       )}

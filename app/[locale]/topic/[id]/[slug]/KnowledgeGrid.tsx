@@ -182,7 +182,7 @@ export default function KnowledgeGrid({
     exploreInsights: isRTL ? `استكشف الرؤى ضمن ${topicName}` : `Explore insights within ${topicName}`,
     noItems: isRTL ? "لا توجد عناصر معرفية متاحة بعد" : "No knowledge items available yet",
     posted: isRTL ? "نُشر" : "Posted",
-    free: isRTL ? "مجاني" : "FREE",
+    free: isRTL ? "مجاني" : "Free",
     paid: isRTL ? "مدفوع" : "PAID",
     insighter: isRTL ? "إنسايتر" : "Insighter",
     company: isRTL ? "شركة" : "Company" ,

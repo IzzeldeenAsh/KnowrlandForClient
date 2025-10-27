@@ -1,12 +1,13 @@
 'use client'
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Select, Modal, Loader, Chip, Combobox, Input, InputBase, useCombobox, Drawer } from '@mantine/core';
 import { useMediaQuery } from '@mantine/hooks';
 import { IconRefresh, IconCode, IconBuildingFactory, IconWorldSearch, IconBuildingBank, IconMap, IconWorld, IconLanguage, IconCoin } from '@tabler/icons-react';
 
 import { useTranslations } from 'next-intl';
 import { getApiUrl } from '@/app/config';
+import { useSearchParams } from 'next/navigation';
 
 interface Region {
   id: number;
@@ -88,6 +89,10 @@ interface FilterBoxProps {
   setIndustryFilter?: (filter: number | null) => void;
   priceFilter?: string | null;
   setPriceFilter?: (filter: string | null) => void;
+  priceRangeStart?: number | null;
+  setPriceRangeStart?: (value: number | null) => void;
+  priceRangeEnd?: number | null;
+  setPriceRangeEnd?: (value: number | null) => void;
   accuracyFilter?: 'any' | 'all';
   setAccuracyFilter?: (filter: 'any' | 'all') => void;
   roleFilter?: 'all' | 'company' | 'individual';
@@ -98,6 +103,9 @@ interface FilterBoxProps {
   setIsDrawerOpen?: (open: boolean) => void;
   forceDrawerMode?: boolean;
 }
+
+const noop = () => {};
+const PRICE_RANGE_DEBOUNCE_MS = 1000;
 
 const FilterBox: React.FC<FilterBoxProps> = ({
   locale,
@@ -111,17 +119,21 @@ const FilterBox: React.FC<FilterBoxProps> = ({
   economicBlocFilter = null,
   setEconomicBlocFilter = () => {},
   isicCodeFilter = null,
-  setIsicCodeFilter = () => {},
+  setIsicCodeFilter = noop,
   hsCodeFilter = null,
-  setHsCodeFilter = () => {},
+  setHsCodeFilter = noop,
   industryFilter = null,
-  setIndustryFilter = () => {},
+  setIndustryFilter = noop,
   priceFilter = null,
-  setPriceFilter = () => {},
+  setPriceFilter = noop,
+  priceRangeStart = 0,
+  setPriceRangeStart = noop,
+  priceRangeEnd = null,
+  setPriceRangeEnd = noop,
   accuracyFilter = 'all',
-  setAccuracyFilter = () => {},
+  setAccuracyFilter = noop,
   roleFilter = 'all',
-  setRoleFilter = () => {},
+  setRoleFilter = noop,
   resetFilters = async () => {},
   // Drawer props
   isDrawerOpen = false,
@@ -200,6 +212,107 @@ const FilterBox: React.FC<FilterBoxProps> = ({
   const [economicBlocSearch, setEconomicBlocSearch] = useState('');
   const [regionSearch, setRegionSearch] = useState('');
   const [countrySearch, setCountrySearch] = useState('');
+  const minPriceInputRef = useRef<HTMLInputElement>(null);
+  const maxPriceInputRef = useRef<HTMLInputElement>(null);
+  const priceRangeStartSetterRef = useRef(setPriceRangeStart);
+  const priceRangeEndSetterRef = useRef(setPriceRangeEnd);
+  const shouldApplyDefaultPriceRangeEndRef = useRef(priceRangeEnd === null);
+  const debounceTimeoutStartRef = useRef<NodeJS.Timeout | null>(null);
+  const debounceTimeoutEndRef = useRef<NodeJS.Timeout | null>(null);
+  const lastUserInputStartRef = useRef<number>(0);
+  const lastUserInputEndRef = useRef<number>(0);
+  const searchParams = useSearchParams();
+
+  useEffect(() => {
+    priceRangeStartSetterRef.current = setPriceRangeStart;
+  }, [setPriceRangeStart]);
+
+  useEffect(() => {
+    priceRangeEndSetterRef.current = setPriceRangeEnd;
+  }, [setPriceRangeEnd]);
+
+  // Initialize input values from URL params on mount
+  useEffect(() => {
+    const urlRangeStart = searchParams.get('range_start');
+    const urlRangeEnd = searchParams.get('range_end');
+
+    if (minPriceInputRef.current) {
+      minPriceInputRef.current.value = urlRangeStart || (priceRangeStart ?? 0).toString();
+    }
+    if (maxPriceInputRef.current) {
+      if (urlRangeEnd) {
+        maxPriceInputRef.current.value = urlRangeEnd;
+      } else if (priceRangeEnd !== null && priceRangeEnd !== undefined) {
+        maxPriceInputRef.current.value = priceRangeEnd.toString();
+      } else {
+        maxPriceInputRef.current.value = '1000000';
+      }
+    }
+  }, []); // Only run on mount
+
+  // Handle price filter changes
+  useEffect(() => {
+    if (priceFilter === 'false') {
+      if (minPriceInputRef.current) {
+        minPriceInputRef.current.value = '0';
+      }
+      if (maxPriceInputRef.current) {
+        maxPriceInputRef.current.value = '';
+      }
+      priceRangeStartSetterRef.current(0);
+      priceRangeEndSetterRef.current(null);
+      shouldApplyDefaultPriceRangeEndRef.current = true;
+    } else if (priceRangeEnd === null && shouldApplyDefaultPriceRangeEndRef.current) {
+      if (maxPriceInputRef.current) {
+        maxPriceInputRef.current.value = '1000000';
+      }
+      priceRangeEndSetterRef.current(1000000);
+      shouldApplyDefaultPriceRangeEndRef.current = false;
+    }
+  }, [priceFilter, priceRangeEnd]);
+
+  // Sync input values with URL parameters (but not during user input)
+  useEffect(() => {
+    const now = Date.now();
+    const timeSinceLastInputStart = now - lastUserInputStartRef.current;
+    const timeSinceLastInputEnd = now - lastUserInputEndRef.current;
+
+    // Get values from URL params
+    const urlRangeStart = searchParams.get('range_start');
+    const urlRangeEnd = searchParams.get('range_end');
+
+    // Sync min price input if user hasn't typed recently
+    if (minPriceInputRef.current && timeSinceLastInputStart > 2000) {
+      const expectedValue = urlRangeStart || '0';
+      const currentValue = minPriceInputRef.current.value;
+
+      if (currentValue !== expectedValue) {
+        minPriceInputRef.current.value = expectedValue;
+      }
+    }
+
+    // Sync max price input if user hasn't typed recently
+    if (maxPriceInputRef.current && timeSinceLastInputEnd > 2000) {
+      const expectedValue = urlRangeEnd || '';
+      const currentValue = maxPriceInputRef.current.value;
+
+      if (currentValue !== expectedValue) {
+        maxPriceInputRef.current.value = expectedValue;
+      }
+    }
+  }, [searchParams]);
+
+  // Cleanup timeouts on unmount
+  useEffect(() => {
+    return () => {
+      if (debounceTimeoutStartRef.current) {
+        clearTimeout(debounceTimeoutStartRef.current);
+      }
+      if (debounceTimeoutEndRef.current) {
+        clearTimeout(debounceTimeoutEndRef.current);
+      }
+    };
+  }, []);
 
   // Combobox stores
   const economicBlocCombobox = useCombobox({
@@ -820,6 +933,15 @@ const FilterBox: React.FC<FilterBoxProps> = ({
       setSelectedIsicCode(null);
       setSelectedHsCode(null);
       setSelectedIndustry(null);
+      shouldApplyDefaultPriceRangeEndRef.current = true;
+
+      // Reset input values directly
+      if (minPriceInputRef.current) {
+        minPriceInputRef.current.value = '0';
+      }
+      if (maxPriceInputRef.current) {
+        maxPriceInputRef.current.value = '1000000';
+      }
       
       // Call the parent resetFilters function to update URL and global state
       // This is now async and will handle the search API call
@@ -838,6 +960,81 @@ const FilterBox: React.FC<FilterBoxProps> = ({
     if (setPriceFilter) {
       setPriceFilter(value);
     }
+
+    if (value === 'false') {
+      if (minPriceInputRef.current) {
+        minPriceInputRef.current.value = '0';
+      }
+      if (maxPriceInputRef.current) {
+        maxPriceInputRef.current.value = '';
+      }
+      setPriceRangeStart(0);
+      setPriceRangeEnd(null);
+      shouldApplyDefaultPriceRangeEndRef.current = true;
+    } else if (value !== 'false' && priceRangeEnd === null) {
+      shouldApplyDefaultPriceRangeEndRef.current = true;
+      if (maxPriceInputRef.current) {
+        maxPriceInputRef.current.value = '1000000';
+      }
+    }
+  };
+
+  // Handle price range minimum change with debouncing
+  const handlePriceRangeStartChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const value = event.currentTarget.value;
+
+    // Track when user last typed
+    lastUserInputStartRef.current = Date.now();
+
+    // Clear existing timeout
+    if (debounceTimeoutStartRef.current) {
+      clearTimeout(debounceTimeoutStartRef.current);
+    }
+
+    // Set new timeout
+    debounceTimeoutStartRef.current = setTimeout(() => {
+      if (priceFilter === 'false') return;
+
+      const rawValue = value.trim();
+      const parsed = rawValue === '' ? 0 : parseInt(rawValue, 10);
+      const sanitized = Number.isNaN(parsed) ? 0 : Math.max(0, parsed);
+
+      priceRangeStartSetterRef.current(sanitized);
+    }, PRICE_RANGE_DEBOUNCE_MS);
+  };
+
+  // Handle price range maximum change with debouncing
+  const handlePriceRangeEndChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const value = event.currentTarget.value;
+    shouldApplyDefaultPriceRangeEndRef.current = false;
+
+    // Track when user last typed
+    lastUserInputEndRef.current = Date.now();
+
+    // Clear existing timeout
+    if (debounceTimeoutEndRef.current) {
+      clearTimeout(debounceTimeoutEndRef.current);
+    }
+
+    // Set new timeout
+    debounceTimeoutEndRef.current = setTimeout(() => {
+      if (priceFilter === 'false') return;
+
+      const rawValue = value.trim();
+      if (rawValue === '') {
+        priceRangeEndSetterRef.current(null);
+        return;
+      }
+
+      const parsed = parseInt(rawValue, 10);
+      if (Number.isNaN(parsed)) {
+        priceRangeEndSetterRef.current(null);
+        return;
+      }
+
+      const sanitized = Math.max(0, parsed);
+      priceRangeEndSetterRef.current(sanitized);
+    }, PRICE_RANGE_DEBOUNCE_MS);
   };
 
   // Handle role filter selection
@@ -875,31 +1072,63 @@ const FilterBox: React.FC<FilterBoxProps> = ({
               </svg>
             </button>
             {!priceCollapsed && (
-              <div className="px-4 py-3 bg-white flex gap-1.5 flex-wrap">
-                <Chip
-                  checked={priceFilter === null}
-                  onChange={() => handlePriceFilterChange(null)}
-                  variant="outline"
-                  size="sm"
-                >
-                  {locale === 'ar' ? 'الكل' : 'All'}
-                </Chip>
-                <Chip
-                  checked={priceFilter === 'false'}
-                  onChange={() => handlePriceFilterChange('false')}
-                  variant="outline"
-                  size="sm"
-                >
-                  {locale === 'ar' ? 'مجاني' : 'Free'}
-                </Chip>
-                <Chip
-                  checked={priceFilter === 'true'}
-                  onChange={() => handlePriceFilterChange('true')}
-                  variant="outline"
-                  size="sm"
+              <div className="px-4 py-3 bg-white space-y-3">
+                <div className="flex gap-1.5 flex-wrap">
+                  <Chip
+                    checked={priceFilter === null}
+                    onChange={() => handlePriceFilterChange(null)}
+                    variant="outline"
+                    size="sm"
+                  >
+                    {locale === 'ar' ? 'الكل' : 'All'}
+                  </Chip>
+                  <Chip
+                    checked={priceFilter === 'false'}
+                    onChange={() => handlePriceFilterChange('false')}
+                    variant="outline"
+                    size="sm"
+                  >
+                    {locale === 'ar' ? 'مجاني' : 'Free'}
+                  </Chip>
+                  <Chip
+                    checked={priceFilter === 'true'}
+                    onChange={() => handlePriceFilterChange('true')}
+                    variant="outline"
+                    size="sm"
                 >
                   {locale === 'ar' ? 'مدفوع' : 'Paid'}
                 </Chip>
+              </div>
+                {priceFilter !== 'false' && (
+                  <div className="grid grid-cols-2 gap-2">
+                    <div className="flex flex-col gap-1">
+                      <span className="text-xs text-gray-500">
+                        {locale === 'ar' ? 'السعر الأدنى' : 'Min price'}
+                      </span>
+                      <Input
+                        type="number"
+                        min={0}
+                        ref={minPriceInputRef}
+                        onChange={handlePriceRangeStartChange}
+                        placeholder="0"
+                        size="xs"
+                      />
+                    </div>
+                    <div className="flex flex-col gap-1">
+                      <span className="text-xs text-gray-500">
+                        {locale === 'ar' ? 'السعر الأقصى' : 'Max price'}
+                      </span>
+                      <Input
+                        type="number"
+                        min={0}
+                        ref={maxPriceInputRef}
+                        onChange={handlePriceRangeEndChange}
+                        placeholder="1000000"
+                        size="xs"
+                      />
+                    </div>
+                  </div>
+                )}
               </div>
             )}
           </div>

@@ -84,7 +84,7 @@ export async function fetchAutocomplete(
   if (!keyword.trim()) return [];
   
   try {
-    const response = await fetch(`https://api.foresighta.co/api/platform/search/autocomplete?keyword=${encodeURIComponent(keyword)}`, {
+    const response = await fetch(`https://api.knoldg.com/api/platform/search/autocomplete?keyword=${encodeURIComponent(keyword)}`, {
      headers
     });
     
@@ -120,13 +120,15 @@ export async function fetchStatisticsPerType(
   isicCodeFilter: number | null = null,
   industryFilter: number | null = null,
   priceFilter: string | null = null,
+  priceRangeStart: number | null = null,
+  priceRangeEnd: number | null = null,
   hsCodeFilter: number | null = null,
   accuracyFilter: 'any' | 'all' = 'any',
   roleFilter: 'all' | 'company' | 'individual' = 'all',
   onError?: (errorMessage: any) => void
 ) {
   try {
-    const url = new URL('https://api.foresighta.co/api/platform/search/statistics-per-type');
+    const url = new URL('https://api.knoldg.com/api/platform/search/statistics-per-type');
     
     // Add base parameters
     url.searchParams.append('accuracy', accuracyFilter);
@@ -171,6 +173,14 @@ export async function fetchStatisticsPerType(
     // Add price parameter
     if (priceFilter !== null) {
       url.searchParams.append('paid', priceFilter);
+    }
+    
+    if ((priceRangeStart !== null && priceRangeStart !== 0) || priceRangeEnd !== null) {
+      const startValue = priceRangeStart ?? 0;
+      url.searchParams.append('range_start', startValue.toString());
+      if (priceRangeEnd !== null) {
+        url.searchParams.append('range_end', priceRangeEnd.toString());
+      }
     }
     
     // Add role parameter
@@ -235,13 +245,15 @@ export async function fetchSearchResults(
   onError?: (errorMessage: any) => void,
   industryFilter: number | null = null,
   priceFilter: string | null = null,
+  priceRangeStart: number | null = null,
+  priceRangeEnd: number | null = null,
   hsCodeFilter: number | null = null,
   accuracyFilter: 'any' | 'all' = 'any',
   roleFilter: 'all' | 'company' | 'individual' = 'all'
 ) {
   try {
     // Always use the search API endpoint
-    const url = new URL('https://api.foresighta.co/api/platform/search');
+    const url = new URL('https://api.knoldg.com/api/platform/search');
     // Use the accuracy parameter passed to the function
     url.searchParams.append('accuracy', accuracyFilter);
     // Backend now returns all data when keyword is empty
@@ -315,6 +327,14 @@ export async function fetchSearchResults(
     // Add price parameter for price filtering
     if (priceFilter !== null) {
       url.searchParams.append('paid', priceFilter);
+    }
+    
+    if ((priceRangeStart !== null && priceRangeStart !== 0) || priceRangeEnd !== null) {
+      const startValue = priceRangeStart ?? 0;
+      url.searchParams.append('range_start', startValue.toString());
+      if (priceRangeEnd !== null) {
+        url.searchParams.append('range_end', priceRangeEnd.toString());
+      }
     }
     
     // Add role parameter for role filtering

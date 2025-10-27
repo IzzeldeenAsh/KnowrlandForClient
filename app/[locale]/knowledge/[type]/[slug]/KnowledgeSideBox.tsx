@@ -170,7 +170,7 @@ const KnowledgeSideBox = ({
       }
 
       const method = isReadLater ? 'DELETE' : 'POST';
-      const url =  `https://api.foresighta.co/api/account/favorite/knowledge/${knowledgeSlug}`
+      const url =  `https://api.knoldg.com/api/account/favorite/knowledge/${knowledgeSlug}`
 
       
       const response = await fetch(url, {
@@ -320,7 +320,7 @@ const KnowledgeSideBox = ({
             <>
               {purchased_status === 'purchased' ? (
                 <button 
-                  onClick={() => window.location.href = (process.env.NEXT_PUBLIC_DASHBOARD_URL || 'http://localhost:4200') + '/app/insighter-dashboard/my-downloads'}
+                  onClick={() => window.location.href = (process.env.NEXT_PUBLIC_DASHBOARD_URL || 'https://app.knoldg.com') + '/app/insighter-dashboard/my-downloads'}
                   className="w-full font-semibold bg-green-600 text-white py-2 px-4 rounded-lg hover:bg-green-700 transition-colors"
                 >
                   {translations.alreadyPurchased}

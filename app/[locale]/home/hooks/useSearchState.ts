@@ -49,6 +49,20 @@ export function useSearchState({ locale, onError }: UseSearchStateOptions) {
       isicCode: urlParams.get('isic_code') || null,
       hsCode: urlParams.get('hs_code') || null,
       price: urlParams.get('paid') || null,
+      priceRangeStart: (() => {
+        const value = urlParams.get('range_start');
+        if (!value) return 0;
+        const parsed = parseInt(value, 10);
+        if (Number.isNaN(parsed)) return 0;
+        return Math.max(0, parsed);
+      })(),
+      priceRangeEnd: (() => {
+        const value = urlParams.get('range_end');
+        if (!value) return 1000;
+        const parsed = parseInt(value, 10);
+        if (Number.isNaN(parsed)) return 1000;
+        return Math.max(0, parsed);
+      })(),
       accuracy: (urlParams.get('accuracy') as any) || 'all',
       role: (urlParams.get('role') as any) || 'all',
       category: urlParams.get('type') || 'all',
@@ -76,9 +90,16 @@ export function useSearchState({ locale, onError }: UseSearchStateOptions) {
     if (filterState.region) params.set('region', filterState.region.toString());
     if (filterState.economicBloc) params.set('economic_bloc', filterState.economicBloc.toString());
     if (filterState.industry) params.set('industry', filterState.industry.toString());
-    if (filterState.isicCode) params.set('isic_code', filterState.isicCode);
-    if (filterState.hsCode) params.set('hs_code', filterState.hsCode);
-    if (filterState.price) params.set('paid', filterState.price);
+   if (filterState.isicCode) params.set('isic_code', filterState.isicCode);
+   if (filterState.hsCode) params.set('hs_code', filterState.hsCode);
+   if (filterState.price) params.set('paid', filterState.price);
+    if ((filterState.priceRangeStart !== null && filterState.priceRangeStart !== 0) || filterState.priceRangeEnd !== null) {
+      const startValue = filterState.priceRangeStart ?? 0;
+      params.set('range_start', startValue.toString());
+      if (filterState.priceRangeEnd !== null) {
+        params.set('range_end', filterState.priceRangeEnd.toString());
+      }
+    }
     if (filterState.accuracy !== 'all') params.set('accuracy', filterState.accuracy);
     if (filterState.role !== 'all') params.set('role', filterState.role);
     if (filterState.category !== 'all') params.set('type', filterState.category);
@@ -110,13 +131,15 @@ export function useSearchState({ locale, onError }: UseSearchStateOptions) {
           filterState.isicCode ? parseInt(filterState.isicCode) : null,
           filterState.category !== 'all' ? filterState.category : null,
           30,
-          onError,
-          filterState.industry,
-          filterState.price,
-          filterState.hsCode ? parseInt(filterState.hsCode) : null,
-          filterState.accuracy,
-          filterState.role
-        );
+        onError,
+        filterState.industry,
+        filterState.price,
+        filterState.priceRangeStart,
+        filterState.priceRangeEnd,
+        filterState.hsCode ? parseInt(filterState.hsCode) : null,
+        filterState.accuracy,
+        filterState.role
+      );
 
         // Fetch statistics for knowledge search
         if (searchState.type === 'knowledge') {
@@ -127,14 +150,16 @@ export function useSearchState({ locale, onError }: UseSearchStateOptions) {
             filterState.country,
             filterState.region,
             filterState.economicBloc,
-            filterState.isicCode ? parseInt(filterState.isicCode) : null,
-            filterState.industry,
-            filterState.price,
-            filterState.hsCode ? parseInt(filterState.hsCode) : null,
-            filterState.accuracy,
-            filterState.role,
-            onError
-          );
+          filterState.isicCode ? parseInt(filterState.isicCode) : null,
+          filterState.industry,
+          filterState.price,
+          filterState.priceRangeStart,
+          filterState.priceRangeEnd,
+          filterState.hsCode ? parseInt(filterState.hsCode) : null,
+          filterState.accuracy,
+          filterState.role,
+          onError
+        );
           searchDispatch({ type: 'SET_STATISTICS', payload: statsResponse.data || [] });
         }
 
