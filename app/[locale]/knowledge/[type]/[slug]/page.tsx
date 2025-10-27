@@ -155,12 +155,54 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     return generateKnowledgeMetadata(data, locale, type, slug);
   } catch (error) {
     const isRTL = locale === 'ar';
+    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://knoldg.com';
+    const defaultSocialImage = 'https://res.cloudinary.com/dsiku9ipv/image/upload/v1761457481/socil-media-share-bg_cgurrb.webp';
+    const pageUrl = `${baseUrl}/${locale}/knowledge/${type}/${slug}`;
+
+    let metadataBase: URL | undefined;
+    try {
+      metadataBase = new URL(baseUrl);
+    } catch {
+      metadataBase = new URL('https://knoldg.com');
+    }
+
+    const title = isRTL ? "المعرفة غير موجودة | KNOLDG" : "Knowledge Not Found | KNOLDG";
+    const description = isRTL 
+      ? "لم يتم العثور على المورد المعرفي المطلوب. تحقق من الرابط أو ابحث عن محتوى آخر على منصة KNOLDG."
+      : "The requested knowledge resource could not be found. Please check the URL or search for other content on KNOLDG platform.";
+
     return {
-      title: isRTL ? "المعرفة غير موجودة | KNOLDG" : "Knowledge Not Found | KNOLDG",
-      description: isRTL 
-        ? "لم يتم العثور على المورد المعرفي المطلوب. تحقق من الرابط أو ابحث عن محتوى آخر على منصة KNOLDG."
-        : "The requested knowledge resource could not be found. Please check the URL or search for other content on KNOLDG platform.",
+      metadataBase,
+      title,
+      description,
       robots: { index: false, follow: false },
+      alternates: {
+        canonical: pageUrl,
+      },
+      openGraph: {
+        type: 'website',
+        url: pageUrl,
+        siteName: 'KNOLDG',
+        title,
+        description,
+        locale: isRTL ? 'ar_SA' : 'en_US',
+        images: [
+          {
+            url: defaultSocialImage,
+            width: 1200,
+            height: 630,
+            alt: title,
+            type: 'image/webp',
+          },
+        ],
+      },
+      twitter: {
+        card: 'summary_large_image',
+        site: '@KNOLDG',
+        title,
+        description,
+        images: [defaultSocialImage],
+      },
     };
   }
 }
