@@ -1057,7 +1057,9 @@ export default function HomePage() {
     hsCodeFilter,
     priceFilter,
     accuracyFilter,
-    roleFilter
+    roleFilter,
+    rangeStartFilter,
+    rangeEndFilter
   });
   
   // Track previous search query to avoid redundant API calls
