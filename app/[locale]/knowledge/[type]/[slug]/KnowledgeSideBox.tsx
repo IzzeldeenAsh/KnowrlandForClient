@@ -301,7 +301,7 @@ const KnowledgeSideBox = ({
 
   return (
     <div className='tp-course-details2-widget'>
-    <div className="tp-course-details2-widget-child rounded-lg p-4 sticky max-w-[400px]" dir={isRTL ? 'rtl' : 'ltr'}>
+    <div className="tp-course-details2-widget-child rounded-lg p-4 sticky " dir={isRTL ? 'rtl' : 'ltr'}>
       
       <div className="p-4">
         <div className="text-center mb-4">
