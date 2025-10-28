@@ -289,7 +289,7 @@ export default function KnowledgePage({ params }: Props) {
           
           {/* Header */}
           <div className={`${isRTL ? 'text-right' : 'text-start'} mb-4 w-full`}    data-aos="fade-down">
-            <div className="flex-row gap-3 sm:gap-4 flex-wrap sm:flex-nowrap sm:flex max-w-80-per px-4" style={knowledge.language =='arabic' ? {direction: 'rtl', textAlign: 'right'} : {}}>
+            <div className="flex-row gap-3 sm:gap-4 flex-wrap sm:flex-nowrap sm:flex max-w-80-per px-4" >
               <div className="mb-4 mt-1 hidden sm:block">
                 
                 {knowledge.type === 'data' && <div className="bg-white p-2 sm:p-3 rounded flex items-center justify-center"><span className="hidden sm:block"><DataIcon width={40} height={40} /></span><span className="sm:hidden"><DataIcon width={30} height={30} /></span></div>}

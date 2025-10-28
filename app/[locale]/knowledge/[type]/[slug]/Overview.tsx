@@ -131,11 +131,12 @@ export default function Overview({ knowledge, knowledgeSlug }: OverviewProps) {
   };
 
   return (
-    <div className={styles.container} dir={isRTL ? 'rtl' : 'ltr'}>
+    <div className={styles.container}>
       <div className={styles.py10}>
         {/* Description Section */}
         <div 
-          className={`${styles.description} bg-transparent p-3 rounded mb-3 ${isArabicContent ? 'text-right' : ''}`}
+          className={`${styles.description} bg-transparent p-3 rounded mb-3`}
+           dir={isArabicContent? 'rtl' : 'ltr'}
           dangerouslySetInnerHTML={{ __html: knowledge.description }}
         />
 
