@@ -251,7 +251,7 @@ export default function KnowledgePage({ params }: Props) {
         }}
       />
       
-    <div className="min-h-screen bg-gray-50 relative" dir={isRTL ? 'rtl' : 'ltr'} style={knowledge.language === 'arabic' ? { direction: 'rtl', textAlign: 'right' } : {}}>
+    <div className="min-h-screen bg-gray-50 relative" dir={isRTL ? 'rtl' : 'ltr' }>
       {/* Language mismatch notifier */}
       <LanguageMismatchNotifier 
         knowledgeLanguage={knowledge.language} 
@@ -289,7 +289,7 @@ export default function KnowledgePage({ params }: Props) {
           
           {/* Header */}
           <div className={`${isRTL ? 'text-right' : 'text-start'} mb-4 w-full`}    data-aos="fade-down">
-            <div className="flex-row gap-3 sm:gap-4 flex-wrap sm:flex-nowrap sm:flex max-w-80-per">
+            <div className="flex-row gap-3 sm:gap-4 flex-wrap sm:flex-nowrap sm:flex max-w-80-per px-4" style={knowledge.language =='arabic' ? {direction: 'rtl', textAlign: 'right'} : {}}>
               <div className="mb-4 mt-1 hidden sm:block">
                 
                 {knowledge.type === 'data' && <div className="bg-white p-2 sm:p-3 rounded flex items-center justify-center"><span className="hidden sm:block"><DataIcon width={40} height={40} /></span><span className="sm:hidden"><DataIcon width={30} height={30} /></span></div>}
@@ -308,7 +308,7 @@ export default function KnowledgePage({ params }: Props) {
               </div>
               <div className="flex flex-col items-start">
                 <div className="flex flex-col items-start mb-6 sm:mb-10">
-                  <h3 className="text-3xl  md:text-4xl bg-gradient-to-r from-blue-500 to-teal-400 font-extrabold text-transparent bg-clip-text ">
+                  <h3 className="text-3xl  md:text-4xl bg-gradient-to-r from-blue-500 to-teal-400 pt-4 font-extrabold text-transparent bg-clip-text " >
                     {knowledge.title}
                   </h3>
                   

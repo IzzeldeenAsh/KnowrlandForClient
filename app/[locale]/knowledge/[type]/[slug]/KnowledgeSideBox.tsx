@@ -438,7 +438,7 @@ const KnowledgeSideBox = ({
               </div>
               {translations.documentsLanguage}
             </span>
-            <span className="field-content-container flex items-center justify-end capitalize">
+            <span className="field-content-container flex items-center justify-center capitalize">
               {language ? (
                 currentLocale === 'ar' ?
                   (language.toLowerCase() === 'english' ? 'الإنجليزية' : 'العربية') :

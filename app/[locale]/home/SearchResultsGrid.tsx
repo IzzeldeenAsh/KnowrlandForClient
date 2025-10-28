@@ -11,7 +11,6 @@ import InsightIcon from "@/components/icons/InsightIcon";
 import ManualIcon from "@/components/icons/ManualIcon";
 import ReportIcon from "@/components/icons/ReportIcon";
 import CourseIcon from "@/components/icons/CourseIcon";
-import FolderIcon from "@/components/icons/folder-icon";
 import { formatDistanceToNow } from "date-fns";
 import cardStyles from "../topic/[id]/[slug]/knowledge-card.module.css";
 import { useParams } from "next/navigation";
@@ -353,6 +352,7 @@ export default function SearchResultsGrid({
                   <Text
                     fw={700}
                     className={`${cardStyles.title} amiri-bold`}
+                    pt={4}
                     lineClamp={2}
                   >
                     {item.title}
@@ -568,62 +568,27 @@ export default function SearchResultsGrid({
         </div>
       )}
 
-      {/* Topic items section - in a new row */}
+      {/* Topic items section - Simple chips layout */}
       {topicItems.length > 0 && (
-        <div className=" bg-white p-6 rounded-lg border border-gray-200">
-          {/* Fancy header section */}
-          <div className="relative mb-8">
-            {/* Content */}
-            <div className="relative">
-              <div className="flex items-center gap-4">
-                <div className="flex-shrink-0 p-3 bg-blue-50 rounded-xl shadow-lg transform hover:scale-105 transition-transform duration-200">
-                  <FolderIcon width={24} height={24} className="text-white" />
-                </div>
-                <div className="flex-1">
-                  <h2 className="text-2xl font-bold bg-gradient-to-r from-gray-800 to-gray-600 bg-clip-text text-transparent">
-                    {translations.topicsRelated}
-                  </h2>
-                </div>
-              </div>
-            </div>
-          </div>
-          
-          <div
-            className={`grid sm:grid-cols-2 lg:grid-cols-3 3xl:grid-cols-4 gap-4 max-w-7xl 2xl:max-w-none 2xl:mx-8 mx-auto`}
-          >
-            {topicItems.map((item, index) => (
-              <Card
-                key={`${uniquePrefix}-topic-${item.searchable_id}-${index}`}
-                withBorder
-                padding="lg"
-                radius="xs"
-                className={cardStyles.card}
-                component="div"
-              >
+        <div className="bg-white p-6 rounded-lg border border-gray-200">
+          {/* Header section */}
+          <div className="mb-6">
+            <h2 className="text-md font-semibold text-gray-800 mb-4">
+              {translations.topicsRelated}
+            </h2>
+
+            {/* Topic chips */}
+            <div className="flex flex-wrap gap-3">
+              {topicItems.map((item, index) => (
                 <Link
+                  key={`${uniquePrefix}-topic-${item.searchable_id}-${index}`}
                   href={`/${currentLocale}/${item.url}`}
-                  className="block relative h-full flex flex-col"
+                  className="inline-block px-4 py-2 bg-gray-100 hover:bg-gray-200 rounded-full text-gray-700 text-xs font-medium transition-colors duration-200"
                 >
-                  <div className={`${cardStyles.darkSection} ${item.searchable_type === "topic" ? "bg-topic" : ""}`} style={item.searchable_type === "topic" ? { backgroundImage: "url(/images/topics-bg.png)" } : {}}>
-                    <div>
-                      <div className="flex items-center mb-3">
-                        <Badge w="fit-content" className="capitalize" variant="light" color="yellow">
-                          {translations.topic}
-                        </Badge>
-                      </div>
-                      
-                      <Text
-                        fw={700}
-                        className={cardStyles.title}
-                        lineClamp={2}
-                      >
-                        {item.title}
-                      </Text>
-                    </div>
-                  </div>
+                  {item.title}
                 </Link>
-              </Card>
-            ))}
+              ))}
+            </div>
           </div>
         </div>
       )}
@@ -636,3 +601,4 @@ export default function SearchResultsGrid({
     </div>
   );
 }
+
