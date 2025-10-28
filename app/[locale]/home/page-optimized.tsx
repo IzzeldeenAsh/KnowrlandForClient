@@ -179,6 +179,8 @@ export default function HomePageOptimized() {
           filterState.hsCode ? parseInt(filterState.hsCode) : null,
           filterState.accuracy,
           filterState.role,
+          null, // rangeStartFilter
+          null, // rangeEndFilter
           handleError
         );
           searchDispatch({ type: 'SET_STATISTICS', payload: statsResponse.data || [] });
