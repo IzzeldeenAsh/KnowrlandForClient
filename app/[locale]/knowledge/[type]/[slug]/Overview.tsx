@@ -131,7 +131,7 @@ export default function Overview({ knowledge, knowledgeSlug }: OverviewProps) {
   };
 
   return (
-    <div className={styles.container} dir={isRTL ? 'rtl' : 'ltr'}    style={isArabicContent ? { direction: 'rtl', textAlign: 'right' } : {}}>
+    <div className={styles.container} dir={isRTL ? 'rtl' : 'ltr'}>
       <div className={styles.py10}>
         {/* Description Section */}
         <div 

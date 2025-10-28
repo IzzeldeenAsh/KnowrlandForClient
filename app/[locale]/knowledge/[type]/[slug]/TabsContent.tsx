@@ -99,7 +99,7 @@ export default function TabsContent({ knowledge, knowledgeSlug }: { knowledge: K
   const tabs = [translations.overview, translations.reviews, translations.askInsighter];
 
   return (
-    <div className="mb-6" dir={isRTL ? 'rtl' : 'ltr' } style={knowledgeData.language === 'arabic' ? { direction: 'rtl', textAlign: 'right' } : {}}>
+    <div className="mb-6" dir={isRTL ? 'rtl' : 'ltr' }>
       <div className="border-b border-gray-200">
         <nav className="-mb-px flex  knowledge-tab-nav relative" aria-label={isRTL ? 'تبويبات المحتوى' : 'Content tabs'} role="tablist">
       

@@ -1,9 +1,9 @@
 'use client'
 
-import React, { useState, useEffect, useCallback, useRef } from 'react';
+import React, { useState, useEffect, useCallback, useRef, useMemo } from 'react';
 import { Select, Modal, Loader, Chip, Combobox, Input, InputBase, useCombobox, Drawer } from '@mantine/core';
 import { useMediaQuery } from '@mantine/hooks';
-import { IconRefresh, IconCode, IconBuildingFactory, IconWorldSearch, IconBuildingBank, IconMap, IconWorld, IconLanguage, IconCoin } from '@tabler/icons-react';
+import { IconRefresh, IconCode, IconBuildingFactory, IconWorldSearch, IconBuildingBank, IconMap, IconWorld, IconLanguage, IconCoin, IconSearch, IconX } from '@tabler/icons-react';
 
 import { useTranslations } from 'next-intl';
 import { getApiUrl } from '@/app/config';
@@ -89,6 +89,10 @@ interface FilterBoxProps {
   setIndustryFilter?: (filter: number | null) => void;
   priceFilter?: string | null;
   setPriceFilter?: (filter: string | null) => void;
+  rangeStartFilter?: string | null;
+  setRangeStartFilter?: (filter: string | null) => void;
+  rangeEndFilter?: string | null;
+  setRangeEndFilter?: (filter: string | null) => void;
   accuracyFilter?: 'any' | 'all';
   setAccuracyFilter?: (filter: 'any' | 'all') => void;
   roleFilter?: 'all' | 'company' | 'individual';
@@ -102,7 +106,7 @@ interface FilterBoxProps {
 
 const noop = () => {};
 
-const FilterBox: React.FC<FilterBoxProps> = ({
+const FilterBox: React.FC<FilterBoxProps> = React.memo(({
   locale,
   searchType = 'knowledge',
   languageFilter,
@@ -121,6 +125,10 @@ const FilterBox: React.FC<FilterBoxProps> = ({
   setIndustryFilter = noop,
   priceFilter = null,
   setPriceFilter = noop,
+  rangeStartFilter = null,
+  setRangeStartFilter = noop,
+  rangeEndFilter = null,
+  setRangeEndFilter = noop,
   accuracyFilter = 'all',
   setAccuracyFilter = noop,
   roleFilter = 'all',
@@ -131,9 +139,7 @@ const FilterBox: React.FC<FilterBoxProps> = ({
   setIsDrawerOpen = () => {},
   forceDrawerMode = false
 }) => {
-  console.log(`🔧 FilterBox rendered with searchType: ${searchType}`);
-  console.log(`🔧 Price/Language sections visible: ${searchType !== 'insighter'}`);
-  console.log(`🔧 Role section visible: ${searchType === 'insighter'}`);
+  // Debug logs removed to prevent console spam during typing
 
   // Responsive breakpoint detection - tablet and mobile use drawer
   const isTabletOrMobile = useMediaQuery('(max-width: 1024px)');
@@ -197,6 +203,17 @@ const FilterBox: React.FC<FilterBoxProps> = ({
   const [targetMarketCollapsed, setTargetMarketCollapsed] = useState(true);
   const [roleCollapsed, setRoleCollapsed] = useState(shouldUseDrawer);
 
+  // Range price filter states - using refs to prevent re-renders
+  const tempRangeStartRef = useRef('');
+  const tempRangeEndRef = useRef('');
+  const [rangeError, setRangeError] = useState('');
+
+  // Refs to maintain focus during re-renders and store values
+  const rangeStartInputRef = useRef<HTMLInputElement>(null);
+  const rangeEndInputRef = useRef<HTMLInputElement>(null);
+
+  // Note: Range inputs use refs instead of state to prevent re-renders
+
 
   // Combobox Search States
   const [economicBlocSearch, setEconomicBlocSearch] = useState('');
@@ -247,7 +264,7 @@ const FilterBox: React.FC<FilterBoxProps> = ({
 
   // Update collapsed states when search type or screen size changes
   useEffect(() => {
-    console.log(`🔧 FilterBox searchType changed to: ${searchType}, screen size drawer: ${shouldUseDrawer}, updating collapsed states`);
+    // Update collapsed states when searchType or screen size changes
     setAccuracyCollapsed(searchType === 'knowledge' || shouldUseDrawer);
     setIndustryCollapsed(searchType === 'insighter' || shouldUseDrawer);
     setPriceCollapsed(shouldUseDrawer);
@@ -806,6 +823,11 @@ const FilterBox: React.FC<FilterBoxProps> = ({
     if (setPriceFilter) {
       setPriceFilter(value);
     }
+
+    // Reset range filters when Free is selected
+    if (value === 'false') { // 'false' means Free
+      handleRangePriceClear();
+    }
   };
 
   const handleRoleFilterChange = (value: 'all' | 'company' | 'individual') => {
@@ -813,6 +835,95 @@ const FilterBox: React.FC<FilterBoxProps> = ({
       setRoleFilter(value);
     }
   };
+
+  // Range price filter handlers - memoized to prevent re-renders
+  const handleRangePriceSearch = useCallback(() => {
+    // Clear previous errors
+    setRangeError('');
+
+    // Validate inputs
+    const startValue = tempRangeStartRef.current.trim();
+    const endValue = tempRangeEndRef.current.trim();
+
+    // If both are empty, do nothing
+    if (!startValue && !endValue) {
+      setRangeError(locale === 'ar' ? 'يرجى إدخال قيمة واحدة على الأقل' : 'Please enter at least one value');
+      return;
+    }
+
+    // Parse values
+    const start = startValue ? parseFloat(startValue) : null;
+    const end = endValue ? parseFloat(endValue) : null;
+
+    // Validate numbers
+    if ((startValue && (isNaN(start!) || start! < 0)) ||
+        (endValue && (isNaN(end!) || end! < 0))) {
+      setRangeError(locale === 'ar' ? 'يرجى إدخال أرقام صحيحة وموجبة' : 'Please enter valid positive numbers');
+      return;
+    }
+
+    // Validate that max > min if both are provided
+    if (start !== null && end !== null && start >= end) {
+      setRangeError(locale === 'ar' ? 'يجب أن يكون الحد الأقصى أكبر من الحد الأدنى' : 'Maximum must be greater than minimum');
+      return;
+    }
+
+    // Apply filters
+    if (setRangeStartFilter) {
+      setRangeStartFilter(start !== null ? start.toString() : null);
+    }
+    if (setRangeEndFilter) {
+      setRangeEndFilter(end !== null ? end.toString() : null);
+    }
+  }, [locale, setRangeStartFilter, setRangeEndFilter]);
+
+  const handleRangePriceClear = useCallback(() => {
+    // Clear ref values
+    tempRangeStartRef.current = '';
+    tempRangeEndRef.current = '';
+
+    // Clear input fields
+    if (rangeStartInputRef.current) {
+      rangeStartInputRef.current.value = '';
+    }
+    if (rangeEndInputRef.current) {
+      rangeEndInputRef.current.value = '';
+    }
+
+    // Clear error state
+    setRangeError('');
+
+    // Clear applied filters
+    if (setRangeStartFilter) {
+      setRangeStartFilter(null);
+    }
+    if (setRangeEndFilter) {
+      setRangeEndFilter(null);
+    }
+  }, [setRangeStartFilter, setRangeEndFilter]);
+
+  // Memoized input change handlers using refs to prevent re-renders
+  const handleRangeStartChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    tempRangeStartRef.current = e.target.value;
+    if (rangeStartInputRef.current) {
+      rangeStartInputRef.current.value = e.target.value;
+    }
+  }, []);
+
+  const handleRangeEndChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    tempRangeEndRef.current = e.target.value;
+    if (rangeEndInputRef.current) {
+      rangeEndInputRef.current.value = e.target.value;
+    }
+  }, []);
+
+  // Memoized applied range display to prevent unnecessary re-renders
+  const appliedRangeDisplay = useMemo(() => {
+    if (rangeStartFilter || rangeEndFilter) {
+      return `${locale === 'ar' ? 'النطاق المطبق:' : 'Applied range:'} ${rangeStartFilter || '0'} - ${rangeEndFilter || '∞'}`;
+    }
+    return null;
+  }, [rangeStartFilter, rangeEndFilter, locale]);
 
   // Enhanced LoadingOverlay component
   const LoadingOverlay = ({ children, isLoading, message }: {
@@ -875,34 +986,102 @@ const FilterBox: React.FC<FilterBoxProps> = ({
             {!priceCollapsed && (
               <div className="px-4 py-3 bg-white">
                 <LoadingOverlay isLoading={isDisabled} message={locale === 'ar' ? 'جاري التحديث...' : 'Updating...'}>
-                  <div className="flex gap-1.5 flex-wrap">
-                    <Chip
-                      checked={priceFilter === null}
-                      onChange={() => !isDisabled && handlePriceFilterChange(null)}
-                      variant="outline"
-                      size="sm"
-                      disabled={isDisabled}
-                    >
-                      {locale === 'ar' ? 'الكل' : 'All'}
-                    </Chip>
-                    <Chip
-                      checked={priceFilter === 'false'}
-                      onChange={() => !isDisabled && handlePriceFilterChange('false')}
-                      variant="outline"
-                      size="sm"
-                      disabled={isDisabled}
-                    >
-                      {locale === 'ar' ? 'مجاني' : 'Free'}
-                    </Chip>
-                    <Chip
-                      checked={priceFilter === 'true'}
-                      onChange={() => !isDisabled && handlePriceFilterChange('true')}
-                      variant="outline"
-                      size="sm"
-                      disabled={isDisabled}
-                    >
-                      {locale === 'ar' ? 'مدفوع' : 'Paid'}
-                    </Chip>
+                  <div className="space-y-3">
+                    {/* Original Price Filter Chips */}
+                    <div className="flex gap-1.5 flex-wrap">
+                      <Chip
+                        checked={priceFilter === null}
+                        onChange={() => !isDisabled && handlePriceFilterChange(null)}
+                        variant="outline"
+                        size="sm"
+                        disabled={isDisabled}
+                      >
+                        {locale === 'ar' ? 'الكل' : 'All'}
+                      </Chip>
+                      <Chip
+                        checked={priceFilter === 'false'}
+                        onChange={() => !isDisabled && handlePriceFilterChange('false')}
+                        variant="outline"
+                        size="sm"
+                        disabled={isDisabled}
+                      >
+                        {locale === 'ar' ? 'مجاني' : 'Free'}
+                      </Chip>
+                      <Chip
+                        checked={priceFilter === 'true'}
+                        onChange={() => !isDisabled && handlePriceFilterChange('true')}
+                        variant="outline"
+                        size="sm"
+                        disabled={isDisabled}
+                      >
+                        {locale === 'ar' ? 'مدفوع' : 'Paid'}
+                      </Chip>
+                    </div>
+
+                    {/* Range Price Filter - Hidden when Free is selected */}
+                    {priceFilter !== 'false' && (
+                      <div className="border-t pt-3">
+                      <span className="text-xs font-semibold text-gray-700 mb-2 block">
+                        {locale === 'ar' ? 'أو حسب النطاق السعري' : 'Or by price range'}
+                      </span>
+                      <div className="flex items-center gap-2 mb-2">
+                        <input
+                          ref={rangeStartInputRef}
+                          type="number"
+                          placeholder={locale === 'ar' ? 'الحد الأدنى' : 'Min price'}
+                          defaultValue=""
+                          onChange={handleRangeStartChange}
+                          className={`w-[100px] px-2 py-1 text-xs border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-transparent ${
+                            isDisabled ? 'opacity-50 cursor-not-allowed' : ''
+                          }`}
+                          disabled={isDisabled}
+                          min="0"
+                          step="0.01"
+                        />
+                        <input
+                          ref={rangeEndInputRef}
+                          type="number"
+                          placeholder={locale === 'ar' ? 'الحد الأقصى' : 'Max price'}
+                          defaultValue=""
+                          onChange={handleRangeEndChange}
+                          className={`w-[100px] px-2 py-1 text-xs border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-transparent ${
+                            isDisabled ? 'opacity-50 cursor-not-allowed' : ''
+                          }`}
+                          disabled={isDisabled}
+                          min="0"
+                          step="0.01"
+                        />
+                        <button
+                          onClick={handleRangePriceSearch}
+                          disabled={isDisabled}
+                          className={`p-1 text-blue-500 hover:text-blue-700 hover:bg-blue-50 rounded transition-colors ${
+                            isDisabled ? 'opacity-50 cursor-not-allowed' : ''
+                          }`}
+                          title={locale === 'ar' ? 'بحث' : 'Search'}
+                        >
+                          <IconSearch size={16} />
+                        </button>
+                        <button
+                          onClick={handleRangePriceClear}
+                          disabled={isDisabled}
+                          className={`p-1 text-gray-500 hover:text-red-500 hover:bg-red-50 rounded transition-colors ${
+                            isDisabled ? 'opacity-50 cursor-not-allowed' : ''
+                          }`}
+                          title={locale === 'ar' ? 'مسح' : 'Clear'}
+                        >
+                          <IconX size={16} />
+                        </button>
+                      </div>
+                      {rangeError && (
+                        <p className="text-xs text-red-500 mt-1">{rangeError}</p>
+                      )}
+                      {appliedRangeDisplay && (
+                        <p className="text-xs text-gray-600 mt-1">
+                          {appliedRangeDisplay}
+                        </p>
+                      )}
+                      </div>
+                    )}
                   </div>
                 </LoadingOverlay>
               </div>
@@ -1467,6 +1646,26 @@ const FilterBox: React.FC<FilterBoxProps> = ({
   }
 
   return <FilterContent />;
-};
+}, (prevProps, nextProps) => {
+  // Custom comparison function to prevent unnecessary re-renders
+  // Only re-render if props that actually affect the component have changed
+  const propsToCompare: (keyof FilterBoxProps)[] = [
+    'locale', 'searchType', 'languageFilter', 'countryFilter', 'regionFilter',
+    'economicBlocFilter', 'isicCodeFilter', 'hsCodeFilter', 'industryFilter',
+    'priceFilter', 'rangeStartFilter', 'rangeEndFilter', 'accuracyFilter',
+    'roleFilter', 'isDrawerOpen', 'forceDrawerMode'
+  ];
+
+  // Compare only the important props, ignore function references unless they're actually different
+  for (const prop of propsToCompare) {
+    if (prevProps[prop] !== nextProps[prop]) {
+      return false; // Props changed, should re-render
+    }
+  }
+
+  return true; // Props are the same, don't re-render
+});
+
+FilterBox.displayName = 'FilterBox';
 
 export default FilterBox;

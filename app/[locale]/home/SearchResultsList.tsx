@@ -512,44 +512,23 @@ export default function SearchResultsList({
         </div>
       )}
 
-      {/* Topic items in grid view */}
+      {/* Topic items - Simple chips layout */}
       {topicItems.length > 0 && (
-        <div className="mt-8">
-          {isRTL ? (
-            <h2 className="text-xl font-bold mb-3">{translations.topic}</h2>
-          ) : (
-            <h2 className="text-xl font-bold mb-3">{translations.topic}</h2>
-          )}
-          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4 max-w-7xl mx-auto">
-            {topicItems.map((item) => (
-              <Card
-                key={`${uniquePrefix}-topic-${item.searchable_id}`}
-                withBorder
-                padding="lg"
-                radius="xs"
-                className={cardStyles.card}
-                component="div"
-                style={{height:'240px'}} // Added fixed height to match knowledge items
-              >
-              
-                  <div className={`${cardStyles.darkSection} bg-topic`} style={{ backgroundImage: "url(/images/topics-bg.png)", height: '100%' }}>
-                    <div>
-                      <div className="flex items-center mb-3">
-                        <Badge color="yellow" w="fit-content" className="capitalize" variant="light">
-                          {translations.topic}
-                        </Badge>
-                      </div>
-                      <Text
-                        fw={700}
-                        className={cardStyles.title}
-                        lineClamp={2}
-                      >
-                        {item.title}
-                      </Text>
-                    </div>
-                  </div>
+        <div className="bg-white p-6 rounded-lg border border-gray-200 mt-8">
+          <h2 className="text-md font-semibold text-gray-800 mb-4">
+            {isRTL ? "المواضيع المتعلقة بالبحث" : "Topics matching Your Search"}
+          </h2>
 
-              </Card>
+          {/* Topic chips */}
+          <div className="flex flex-wrap gap-3">
+            {topicItems.map((item) => (
+              <Link
+                key={`${uniquePrefix}-topic-${item.searchable_id}`}
+                href={`/${currentLocale}/${item.url}`}
+                className="inline-block px-4 py-2 bg-gray-100 hover:bg-gray-200 rounded-full text-gray-700 text-xs font-medium transition-colors duration-200"
+              >
+                {item.title}
+              </Link>
             ))}
           </div>
         </div>
@@ -575,3 +554,4 @@ function truncateDescription(description: string | null, wordLimit: number = 30)
 
   return words.slice(0, wordLimit).join(" ") + "...";
 }
+
