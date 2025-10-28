@@ -456,30 +456,30 @@ export default function KnowledgePage({ params }: Props) {
       </div>
       
       {/* Main Content */}
-      <div className="container mx-auto px-3 sm:px-4 pb-12 sm:pb-16 md:pb-20">
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-8">
-          <div className="lg:col-span-2">
-            <TabsContent knowledge={knowledge} knowledgeSlug={slug} />
-          </div>
+        <div className="container mx-auto px-3 sm:px-4 pb-12 sm:pb-16 md:pb-20">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-8">
+            <div className="lg:col-span-2">
+              <TabsContent knowledge={knowledge} knowledgeSlug={slug} />
+            </div>
           <div className="lg:col-span-1">
-            <KnowledgeSideBox
-              total_price={knowledge.total_price}
-              documents={knowledge.documents}
-              language={knowledge.language}
-              isic_code={knowledge.isic_code ? knowledge.isic_code : null}
-              hs_code={knowledge.hs_code ? knowledge.hs_code : null}
-              published_at={knowledge.published_at}
-              economic_blocs={knowledge.economic_blocs}
-              regions={knowledge.regions}
-              countries={knowledge.countries}
-              locale={locale}
-              knowledgeSlug={slug}
-              purchased_status={knowledge.purchased_status}
-              is_read_later={knowledge.is_read_later}
-              knowledgeUUID={knowledge.id}
-              insighterUUID={knowledge.insighter.uuid}
-            />
-          </div>
+              <KnowledgeSideBox
+                total_price={knowledge.total_price}
+                documents={knowledge.documents}
+                language={knowledge.language}
+                isic_code={knowledge.isic_code ? knowledge.isic_code : null}
+                hs_code={knowledge.hs_code ? knowledge.hs_code : null}
+                published_at={knowledge.published_at}
+                economic_blocs={knowledge.economic_blocs}
+                regions={knowledge.regions}
+                countries={knowledge.countries}
+                locale={locale}
+                knowledgeSlug={slug}
+                purchased_status={knowledge.purchased_status}
+                is_read_later={knowledge.is_read_later}
+                knowledgeUUID={knowledge.id}
+                insighterUUID={knowledge.insighter.uuid}
+              />
+            </div>
         </div>
       </div>
 
