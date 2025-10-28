@@ -133,6 +133,8 @@ export function useSearchState({ locale, onError }: UseSearchStateOptions) {
             filterState.hsCode ? parseInt(filterState.hsCode) : null,
             filterState.accuracy,
             filterState.role,
+            null, // rangeStartFilter
+            null, // rangeEndFilter
             onError
           );
           searchDispatch({ type: 'SET_STATISTICS', payload: statsResponse.data || [] });
