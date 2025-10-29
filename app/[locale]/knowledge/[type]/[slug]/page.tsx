@@ -156,7 +156,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   } catch (error) {
     const isRTL = locale === 'ar';
     const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://knoldg.com';
-    const defaultSocialImage = 'https://res.cloudinary.com/dsiku9ipv/image/upload/v1761457481/socil-media-share-bg_cgurrb.webp';
+    const defaultSocialImage = 'https://res.cloudinary.com/dsiku9ipv/image/upload/v1761651021/drilldown_l7cdf2.jpg';
     const pageUrl = `${baseUrl}/${locale}/knowledge/${type}/${slug}`;
 
     let metadataBase: URL | undefined;
@@ -192,7 +192,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
             width: 1200,
             height: 630,
             alt: title,
-            type: 'image/webp',
+            type: 'image/jpeg',
           },
         ],
       },
