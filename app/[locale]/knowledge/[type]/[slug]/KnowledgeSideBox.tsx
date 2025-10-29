@@ -1,10 +1,9 @@
 'use client'
-import React from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { DocumentTextIcon, CalendarIcon, ClockIcon, ChevronDownIcon, ChevronUpIcon, BookmarkIcon } from '@heroicons/react/24/outline';
 import { BookmarkIcon as BookmarkSolidIcon } from '@heroicons/react/24/solid';
 import { IconLanguage, IconCode, IconBuildingBank, IconMap, IconWorld, IconCrane } from '@tabler/icons-react';
 import { useParams } from 'next/navigation';
-import { useState } from 'react';
 import FacebookIcon from '@/public/file-icons/facebook';
 import LinkedinIcon from '@/public/file-icons/linkedin';
 import WhatsappIcon from '@/public/file-icons/whatsapp';
@@ -110,6 +109,13 @@ const KnowledgeSideBox = ({
   // Social Share Modal state
   const [shareModalOpened, setShareModalOpened] = useState(false);
   const [customShareMessage, setCustomShareMessage] = useState('');
+  const shareTextareaRef = useRef<HTMLTextAreaElement | null>(null);
+
+  useEffect(() => {
+    if (shareModalOpened) {
+      shareTextareaRef.current?.focus();
+    }
+  }, [shareModalOpened]);
   
   // Function to toggle section expansion
   const toggleSection = (section: 'economicBlocs' | 'regions' | 'countries' | 'documents' | 'isicCode' | 'hsCode') => {
@@ -201,20 +207,14 @@ const KnowledgeSideBox = ({
   
   // Share functionality
   const handleShare = () => {
-    setCustomShareMessage(getDefaultShareMessage());
     setShareModalOpened(true);
   };
 
-  const getDefaultShareMessage = () => {
-    if (isRTL) {
-      return `اعتقدت أنك قد تستمتع بهذا على Knoldg.com: المعرفة - ${document.title || 'تحقق من هذه المعرفة'}`;
-    }
-    return `Thought you might enjoy this on Knoldg.com: Knowledge - ${document.title || 'Check out this knowledge'}`;
-  };
+
 
   const shareToSocial = (platform: string) => {
     const url = encodeURIComponent(window.location.href);
-    const message = encodeURIComponent(customShareMessage || getDefaultShareMessage());
+    const message = encodeURIComponent(customShareMessage );
     const title = encodeURIComponent(document.title);
 
     let shareUrl = '';
@@ -282,7 +282,7 @@ const KnowledgeSideBox = ({
     alreadyPurchased: isRTL ? 'تم الشراء ' : 'Purchased',
     partiallyPurchased: isRTL ? 'تم الشراء جزئياً' : 'Partially Purchased',
     shareKnowledge: isRTL ? 'مشاركة المعرفة' : 'Share Knowledge',
-    customShareMessage: isRTL ? 'رسالة مخصصة' : 'Custom Share Message',
+    customShareMessage: isRTL ? 'رسالة المشاركة' : 'Share Message',
     shareMessageHint: isRTL ? 'اكتب رسالتك المخصصة لمشاركة هذه المعرفة' : 'Write your custom message to share this knowledge',
     characterCount: isRTL ? 'عدد الأحرف' : 'Character Count',
     close: isRTL ? 'إغلاق' : 'Close',
@@ -802,11 +802,9 @@ const KnowledgeSideBox = ({
                       rows={3}
                       value={customShareMessage}
                       onChange={(e) => setCustomShareMessage(e.target.value)}
-                      placeholder={getDefaultShareMessage()}
+                      placeholder={translations.shareMessageHint}
+                      ref={shareTextareaRef}
                     />
-                    <div className="text-xs text-gray-500 mt-2">
-                      {translations.shareMessageHint}
-                    </div>
                   </div>
 
                   {/* Character Count */}
@@ -818,7 +816,7 @@ const KnowledgeSideBox = ({
                   <div className="flex justify-center gap-3 mb-6">
                     {/* Facebook */}
                     <button
-                      className="w-12 h-12 bg-blue-600 hover:bg-blue-700 text-white rounded-full flex items-center justify-center transition-colors"
+                      className="w-12 h-12 bg-[#2196F3] hover:bg-blue-700 text-white rounded-full flex items-center justify-center transition-colors"
                       onClick={() => shareToSocial('facebook')}
                       title="Share on Facebook"
                     >
@@ -838,7 +836,7 @@ const KnowledgeSideBox = ({
 
                     {/* LinkedIn */}
                     <button
-                      className="w-12 h-12 bg-blue-700 hover:bg-blue-800 text-white rounded-full flex items-center justify-center transition-colors"
+                      className="w-12 h-12 bg-[#0077b5] hover:bg-blue-800 text-white rounded-full flex items-center justify-center transition-colors"
                       onClick={() => shareToSocial('linkedin')}
                       title="Share on LinkedIn"
                     >
