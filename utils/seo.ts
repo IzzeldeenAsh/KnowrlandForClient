@@ -49,7 +49,7 @@ export function generateKnowledgeMetadata(
 ): Metadata {
   const isRTL = locale === 'ar';
   const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://knoldg.com';
-  const defaultSocialImage = 'https://res.cloudinary.com/dsiku9ipv/image/upload/v1761457481/socil-media-share-bg_cgurrb.webp';
+  const defaultSocialImage = 'https://res.cloudinary.com/dsiku9ipv/image/upload/v1761651021/drilldown_l7cdf2.jpg';
   let metadataBase: URL | undefined;
 
   try {
@@ -66,11 +66,8 @@ export function generateKnowledgeMetadata(
     ? knowledge.review.reduce((sum, review) => sum + Math.min(5, review.rate), 0) / knowledge.review.length
     : 0;
 
-  // Determine pricing info
+  // Determine if content is free (needed for structured data)
   const isFree = knowledge.total_price === '0' || parseFloat(String(knowledge.total_price)) === 0;
-  const priceText = isFree 
-    ? (isRTL ? 'مجاني' : 'Free')
-    : `$${knowledge.total_price}`;
 
   // Generate rich title
   const typeTranslation = isRTL ? {
@@ -81,9 +78,9 @@ export function generateKnowledgeMetadata(
     'course': 'دورة'
   }[knowledge.type] || knowledge.type : knowledge.type.charAt(0).toUpperCase() + knowledge.type.slice(1);
 
-  const title = isRTL 
-    ? `${knowledge.title} | ${typeTranslation} ${priceText} | KNOLDG`
-    : `${knowledge.title} | ${typeTranslation} ${priceText} | KNOLDG`;
+  const title = isRTL
+    ? `${knowledge.title} | ${typeTranslation} | KNOLDG`
+    : `${knowledge.title} | ${typeTranslation} | KNOLDG`;
 
   // Generate rich description
   const authorName = knowledge.insighter.company?.legal_name || knowledge.insighter.name;
@@ -98,8 +95,8 @@ export function generateKnowledgeMetadata(
     : '';
 
   const description = isRTL
-    ? `اكتشف ${knowledge.title} - ${typeTranslation} ${priceText} من ${authorName}. باللغة ${languageText}. ${knowledge.documents.length} مستند متاح. ${ratingText}. احصل على رؤى قيمة ومعرفة متخصصة على منصة KNOLDG.`
-    : `Discover ${knowledge.title} - ${typeTranslation} ${priceText} by ${authorName}. Available in ${languageText}. ${knowledge.documents.length} documents included. ${ratingText}. Get valuable insights and expert knowledge on KNOLDG platform.`;
+    ? `اكتشف ${knowledge.title} - ${typeTranslation} من ${authorName}. باللغة ${languageText}. ${knowledge.documents.length} مستند متاح. ${ratingText}. احصل على رؤى قيمة ومعرفة متخصصة على منصة KNOLDG.`
+    : `Discover ${knowledge.title} - ${typeTranslation} by ${authorName}. Available in ${languageText}. ${knowledge.documents.length} documents included. ${ratingText}. Get valuable insights and expert knowledge on KNOLDG platform.`;
 
   // Generate keywords
   const keywords = [
@@ -111,7 +108,6 @@ export function generateKnowledgeMetadata(
     'insights',
     'expertise',
     'business intelligence',
-    isFree ? 'free' : 'premium',
     ...knowledge.countries.map(country => country.name),
     ...knowledge.documents.map(doc => doc.file_extension)
   ].filter(Boolean).slice(0, 15);
@@ -126,7 +122,7 @@ export function generateKnowledgeMetadata(
       width: 1200,
       height: 630,
       alt: `${knowledge.title} | KNOLDG`,
-      type: 'image/webp',
+      type: 'image/jpeg',
     },
     ...[
       knowledge.insighter.company?.logo || knowledge.insighter.profile_photo_url,
@@ -228,7 +224,7 @@ export function generateStructuredData(knowledge: KnowledgeMetadata, locale: str
 
   const authorName = knowledge.insighter.company?.legal_name || knowledge.insighter.name;
   const isFree = knowledge.total_price === '0' || parseFloat(String(knowledge.total_price)) === 0;
-  const defaultSocialImage = 'https://res.cloudinary.com/dsiku9ipv/image/upload/v1761457481/socil-media-share-bg_cgurrb.webp';
+  const defaultSocialImage = 'https://res.cloudinary.com/dsiku9ipv/image/upload/v1761651021/drilldown_l7cdf2.jpg';
 
   // Article Schema
   const articleSchema = {
