@@ -181,6 +181,8 @@ export default function HomePageOptimized() {
           filterState.role,
           null, // rangeStartFilter
           null, // rangeEndFilter
+          null, // coverStartFilter
+          null, // coverEndFilter
           handleError
         );
           searchDispatch({ type: 'SET_STATISTICS', payload: statsResponse.data || [] });
