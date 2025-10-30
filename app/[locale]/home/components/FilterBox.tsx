@@ -211,7 +211,7 @@ const FilterBox: React.FC<FilterBoxProps> = React.memo(({
   const [accuracyCollapsed, setAccuracyCollapsed] = useState(searchType === 'knowledge' || shouldUseDrawer);
   const [industryCollapsed, setIndustryCollapsed] = useState(searchType === 'insighter' || shouldUseDrawer);
   const [targetMarketCollapsed, setTargetMarketCollapsed] = useState(true);
-  const [yearOfStudyCollapsed, setYearOfStudyCollapsed] = useState(true);
+  const [yearOfStudyCollapsed, setYearOfStudyCollapsed] = useState(false);
   const [roleCollapsed, setRoleCollapsed] = useState(shouldUseDrawer);
 
   // Range price filter states - using refs to prevent re-renders
