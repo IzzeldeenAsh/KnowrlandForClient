@@ -24,6 +24,7 @@ export const filterInitialState: FilterState = {
   accuracy: 'all',
   role: 'all',
   category: 'all',
+  yearOfStudy: null,
 };
 
 export const uiInitialState: UIState = {
@@ -131,7 +132,10 @@ export function filterReducer(state: FilterState, action: FilterAction): FilterS
     
     case 'SET_CATEGORY':
       return { ...state, category: action.payload };
-    
+
+    case 'SET_YEAR_OF_STUDY':
+      return { ...state, yearOfStudy: action.payload };
+
     case 'RESET_FILTERS':
       return filterInitialState;
     

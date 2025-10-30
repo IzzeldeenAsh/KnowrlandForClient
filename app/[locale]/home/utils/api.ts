@@ -84,7 +84,7 @@ export async function fetchAutocomplete(
   if (!keyword.trim()) return [];
   
   try {
-    const response = await fetch(`https://api.foresighta.co/api/platform/search/autocomplete?keyword=${encodeURIComponent(keyword)}`, {
+    const response = await fetch(`https://api.knoldg.com/api/platform/search/autocomplete?keyword=${encodeURIComponent(keyword)}`, {
      headers
     });
     
@@ -125,10 +125,12 @@ export async function fetchStatisticsPerType(
   roleFilter: 'all' | 'company' | 'individual' = 'all',
   rangeStartFilter: string | null = null,
   rangeEndFilter: string | null = null,
+  coverStartFilter: string | null = null,
+  coverEndFilter: string | null = null,
   onError?: (errorMessage: any) => void
 ) {
   try {
-    const url = new URL('https://api.foresighta.co/api/platform/search/statistics-per-type');
+    const url = new URL('https://api.knoldg.com/api/platform/search/statistics-per-type');
     
     // Add base parameters
     url.searchParams.append('accuracy', accuracyFilter);
@@ -188,7 +190,16 @@ export async function fetchStatisticsPerType(
     if (rangeEndFilter !== null) {
       url.searchParams.append('range_end', rangeEndFilter);
     }
-    
+
+    // Add cover start/end parameters for year of study
+    if (coverStartFilter !== null) {
+      url.searchParams.append('cover_start', coverStartFilter);
+    }
+
+    if (coverEndFilter !== null) {
+      url.searchParams.append('cover_end', coverEndFilter);
+    }
+
     // Get token from cookies (primary) or localStorage (fallback)
     const token = getAuthToken();
     const headers: HeadersInit = {
@@ -250,11 +261,13 @@ export async function fetchSearchResults(
   accuracyFilter: 'any' | 'all' = 'any',
   roleFilter: 'all' | 'company' | 'individual' = 'all',
   rangeStartFilter: string | null = null,
-  rangeEndFilter: string | null = null
+  rangeEndFilter: string | null = null,
+  coverStartFilter: string | null = null,
+  coverEndFilter: string | null = null
 ) {
   try {
     // Always use the search API endpoint
-    const url = new URL('https://api.foresighta.co/api/platform/search');
+    const url = new URL('https://api.knoldg.com/api/platform/search');
     // Use the accuracy parameter passed to the function
     url.searchParams.append('accuracy', accuracyFilter);
     // Backend now returns all data when keyword is empty
@@ -343,7 +356,16 @@ export async function fetchSearchResults(
     if (rangeEndFilter !== null) {
       url.searchParams.append('range_end', rangeEndFilter);
     }
-    
+
+    // Add cover start/end parameters for year of study
+    if (coverStartFilter !== null) {
+      url.searchParams.append('cover_start', coverStartFilter);
+    }
+
+    if (coverEndFilter !== null) {
+      url.searchParams.append('cover_end', coverEndFilter);
+    }
+
     // Keep the filters[country_id] for backward compatibility if needed
     // if (countryFilter !== null) {
     //   url.searchParams.append('filters[country_id]', countryFilter.toString());

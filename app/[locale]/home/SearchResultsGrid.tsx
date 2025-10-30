@@ -262,7 +262,7 @@ export default function SearchResultsGrid({
 
       const method = currentState ? 'DELETE' : 'POST';
       const slug = item.url.split('/').pop();
-      const url = `https://api.foresighta.co/api/account/favorite/knowledge/${slug}`;
+      const url = `https://api.knoldg.com/api/account/favorite/knowledge/${slug}`;
 
       const response = await axios({
         method,
@@ -422,7 +422,7 @@ export default function SearchResultsGrid({
                   <div >
                     <div
                       
-                      className="text-md font-bold leading-none bg-clip-text text-transparent bg-gradient-to-r from-sky-600 via-cyan-300 to-blue-100  drop-shadow-lg"
+                      className="text-xl font-bold leading-none bg-clip-text text-transparent bg-gradient-to-r from-sky-300 via-cyan-800 to-blue-800  drop-shadow-lg"
                     >
                       {coverageText}
                     </div>

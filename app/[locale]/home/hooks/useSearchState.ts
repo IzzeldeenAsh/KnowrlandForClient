@@ -39,6 +39,19 @@ export function useSearchState({ locale, onError }: UseSearchStateOptions) {
 
   const getInitialFilterState = (): FilterState => {
     const urlParams = new URLSearchParams(searchParams.toString());
+
+    // Parse year of study from cover_start and cover_end
+    const coverStart = urlParams.get('cover_start');
+    const coverEnd = urlParams.get('cover_end');
+    let yearOfStudy = null;
+
+    if (coverStart || coverEnd) {
+      yearOfStudy = {
+        startYear: coverStart ? parseInt(coverStart) : null,
+        endYear: coverEnd ? parseInt(coverEnd) : null,
+      };
+    }
+
     return {
       ...filterInitialState,
       language: (urlParams.get('language') as any) || 'all',
@@ -52,6 +65,7 @@ export function useSearchState({ locale, onError }: UseSearchStateOptions) {
       accuracy: (urlParams.get('accuracy') as any) || 'all',
       role: (urlParams.get('role') as any) || 'all',
       category: urlParams.get('type') || 'all',
+      yearOfStudy: yearOfStudy,
     };
   };
 
@@ -82,6 +96,16 @@ export function useSearchState({ locale, onError }: UseSearchStateOptions) {
     if (filterState.accuracy !== 'all') params.set('accuracy', filterState.accuracy);
     if (filterState.role !== 'all') params.set('role', filterState.role);
     if (filterState.category !== 'all') params.set('type', filterState.category);
+
+    // Year of Study params
+    if (filterState.yearOfStudy) {
+      if (filterState.yearOfStudy.startYear !== null) {
+        params.set('cover_start', filterState.yearOfStudy.startYear.toString());
+      }
+      if (filterState.yearOfStudy.endYear !== null) {
+        params.set('cover_end', filterState.yearOfStudy.endYear.toString());
+      }
+    }
     
     router.push(`/${locale}/home?${params.toString()}`, { scroll: false });
   }, [searchState, filterState, locale, router]);
@@ -115,7 +139,11 @@ export function useSearchState({ locale, onError }: UseSearchStateOptions) {
           filterState.price,
           filterState.hsCode ? parseInt(filterState.hsCode) : null,
           filterState.accuracy,
-          filterState.role
+          filterState.role,
+          null, // rangeStartFilter
+          null, // rangeEndFilter
+          filterState.yearOfStudy?.startYear?.toString() || null,
+          filterState.yearOfStudy?.endYear?.toString() || null
         );
 
         // Fetch statistics for knowledge search
@@ -135,6 +163,8 @@ export function useSearchState({ locale, onError }: UseSearchStateOptions) {
             filterState.role,
             null, // rangeStartFilter
             null, // rangeEndFilter
+            filterState.yearOfStudy?.startYear?.toString() || null,
+            filterState.yearOfStudy?.endYear?.toString() || null,
             onError
           );
           searchDispatch({ type: 'SET_STATISTICS', payload: statsResponse.data || [] });

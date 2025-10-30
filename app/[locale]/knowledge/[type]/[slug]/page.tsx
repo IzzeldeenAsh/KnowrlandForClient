@@ -50,6 +50,8 @@ interface KnowledgeDetails {
   is_review: boolean;
   is_read_later?: boolean;
   purchased_status: 'non-purchased' | 'purchased' | 'partial-purchased';
+  cover_start?: number;
+  cover_end?: number;
   insighter: {
     name: string;
     profile_photo_url: string;
@@ -111,7 +113,7 @@ async function fetchKnowledgeData(type: string, slug: string, locale: string = '
     // Note: localStorage cleanup is handled by AuthHandler component
     
     const response = await fetch(
-      `https://api.foresighta.co/api/platform/industries/knowledge/${slug}`,
+      `https://api.knoldg.com/api/platform/industries/knowledge/${slug}`,
       {
         method: "GET",
         headers,
@@ -155,7 +157,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     return generateKnowledgeMetadata(data, locale, type, slug);
   } catch (error) {
     const isRTL = locale === 'ar';
-    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000';
+    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://knoldg.com';
     const defaultSocialImage = 'https://res.cloudinary.com/dsiku9ipv/image/upload/v1761746492/drilldown_1_cjpvli.jpg';
     const pageUrl = `${baseUrl}/${locale}/knowledge/${type}/${slug}`;
 
@@ -163,7 +165,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     try {
       metadataBase = new URL(baseUrl);
     } catch {
-      metadataBase = new URL('http://localhost:3000');
+      metadataBase = new URL('https://knoldg.com');
     }
 
     const title = isRTL ? "المعرفة غير موجودة | KNOLDG" : "Knowledge Not Found | KNOLDG";
@@ -478,6 +480,8 @@ export default function KnowledgePage({ params }: Props) {
                 is_read_later={knowledge.is_read_later}
                 knowledgeUUID={knowledge.id}
                 insighterUUID={knowledge.insighter.uuid}
+                cover_start={knowledge.cover_start}
+                cover_end={knowledge.cover_end}
               />
             </div>
         </div>

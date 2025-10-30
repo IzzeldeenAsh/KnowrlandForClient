@@ -3,7 +3,8 @@
 import React, { useState, useEffect, useCallback, useRef, useMemo } from 'react';
 import { Select, Modal, Loader, Chip, Combobox, Input, InputBase, useCombobox, Drawer } from '@mantine/core';
 import { useMediaQuery } from '@mantine/hooks';
-import { IconRefresh, IconCode, IconBuildingFactory, IconWorldSearch, IconBuildingBank, IconMap, IconWorld, IconLanguage, IconCoin, IconSearch, IconX } from '@tabler/icons-react';
+import { IconRefresh, IconCode, IconBuildingFactory, IconWorldSearch, IconBuildingBank, IconMap, IconWorld, IconLanguage, IconCoin, IconSearch, IconX, IconCalendarEvent } from '@tabler/icons-react';
+import CustomYearPicker from './CustomYearPicker';
 
 import { useTranslations } from 'next-intl';
 import { getApiUrl } from '@/app/config';
@@ -70,6 +71,11 @@ interface IndustryNode {
   children: IndustryNode[];
 }
 
+interface YearRange {
+  startYear: number | null;
+  endYear: number | null;
+}
+
 interface FilterBoxProps {
   locale: string;
   searchType?: 'knowledge' | 'insighter';
@@ -97,6 +103,8 @@ interface FilterBoxProps {
   setAccuracyFilter?: (filter: 'any' | 'all') => void;
   roleFilter?: 'all' | 'company' | 'individual';
   setRoleFilter?: (filter: 'all' | 'company' | 'individual') => void;
+  yearOfStudyFilter?: YearRange | null;
+  setYearOfStudyFilter?: (filter: YearRange | null) => void;
   resetFilters?: () => Promise<void>;
   // Drawer props for responsive behavior
   isDrawerOpen?: boolean;
@@ -133,6 +141,8 @@ const FilterBox: React.FC<FilterBoxProps> = React.memo(({
   setAccuracyFilter = noop,
   roleFilter = 'all',
   setRoleFilter = noop,
+  yearOfStudyFilter = null,
+  setYearOfStudyFilter = noop,
   resetFilters = async () => {},
   // Drawer props
   isDrawerOpen = false,
@@ -201,6 +211,7 @@ const FilterBox: React.FC<FilterBoxProps> = React.memo(({
   const [accuracyCollapsed, setAccuracyCollapsed] = useState(searchType === 'knowledge' || shouldUseDrawer);
   const [industryCollapsed, setIndustryCollapsed] = useState(searchType === 'insighter' || shouldUseDrawer);
   const [targetMarketCollapsed, setTargetMarketCollapsed] = useState(true);
+  const [yearOfStudyCollapsed, setYearOfStudyCollapsed] = useState(true);
   const [roleCollapsed, setRoleCollapsed] = useState(shouldUseDrawer);
 
   // Range price filter states - using refs to prevent re-renders
@@ -1144,6 +1155,57 @@ const FilterBox: React.FC<FilterBoxProps> = React.memo(({
             )}
           </div>
         )}
+  {/* Year of Study Section */}
+  <div>
+          <button
+            onClick={() => !isDisabled && setYearOfStudyCollapsed(!yearOfStudyCollapsed)}
+            disabled={isDisabled}
+            className={`w-full flex items-center justify-between px-4 py-3 text-left bg-gray-50 hover:bg-gray-100 focus:outline-none transition-colors ${
+              isDisabled ? 'opacity-50 cursor-not-allowed' : ''
+            }`}
+          >
+            <span className="flex items-center gap-2 text-blue-500 font-semibold">
+              <IconCalendarEvent size={20} className="p-0.5 rounded-full" />
+              {locale === 'ar' ? 'سنة الدراسة' : 'Year of Study'}
+            </span>
+            <svg className={`w-4 h-4 text-gray-400 transition-transform ${yearOfStudyCollapsed ? '' : 'rotate-180'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+            </svg>
+          </button>
+          {!yearOfStudyCollapsed && (
+            <div className="px-4 py-3 bg-white">
+              <LoadingOverlay isLoading={isDisabled}>
+                <div className="flex flex-col gap-1">
+                  <span className="text-xs font-semibold text-gray-700 mb-2">
+                    {locale === 'ar' ? 'اختر سنة الدراسة' : 'Select Year of Study'}
+                  </span>
+                  <CustomYearPicker
+                    placeholder={locale === 'ar' ? 'اختر السنة' : 'Select year'}
+                    yearRangeStart={1900}
+                    yearRangeEnd={2030}
+                    allowRange={true}
+                    locale={locale}
+                    value={yearOfStudyFilter}
+                    onChange={(value) => {
+                      if (setYearOfStudyFilter) {
+                        setYearOfStudyFilter(value);
+                      }
+                    }}
+                    disabled={isDisabled}
+                  />
+                  {yearOfStudyFilter && (
+                    <div className="mt-2 text-xs text-gray-600">
+                      {yearOfStudyFilter.startYear === yearOfStudyFilter.endYear
+                        ? `${locale === 'ar' ? 'السنة المحددة:' : 'Selected year:'} ${yearOfStudyFilter.startYear}`
+                        : `${locale === 'ar' ? 'النطاق المحدد:' : 'Selected range:'} ${yearOfStudyFilter.startYear} - ${yearOfStudyFilter.endYear}`
+                      }
+                    </div>
+                  )}
+                </div>
+              </LoadingOverlay>
+            </div>
+          )}
+        </div>
 
         {/* Industry Section */}
         <div>
@@ -1444,6 +1506,7 @@ const FilterBox: React.FC<FilterBoxProps> = React.memo(({
           )}
         </div>
 
+      
         {/* Role Section - Only for insighter */}
         {searchType === 'insighter' && (
           <div data-debug={`Role section visible for ${searchType}`}>
@@ -1653,7 +1716,7 @@ const FilterBox: React.FC<FilterBoxProps> = React.memo(({
     'locale', 'searchType', 'languageFilter', 'countryFilter', 'regionFilter',
     'economicBlocFilter', 'isicCodeFilter', 'hsCodeFilter', 'industryFilter',
     'priceFilter', 'rangeStartFilter', 'rangeEndFilter', 'accuracyFilter',
-    'roleFilter', 'isDrawerOpen', 'forceDrawerMode'
+    'roleFilter', 'isDrawerOpen', 'forceDrawerMode', 'yearOfStudyFilter'
   ];
 
   // Compare only the important props, ignore function references unless they're actually different
