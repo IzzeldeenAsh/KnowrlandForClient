@@ -329,7 +329,7 @@ export default function KnowledgePage({ params }: Props) {
                           alt={knowledge.insighter.company.legal_name || 'Company'}
                           fill={true}
                           sizes="(max-width: 640px) 40px, 50px"
-                          className="rounded-full object-contain"
+                          className="rounded-full object-cover object-top"
                         />
                       ) : (
                         <div className="w-full h-full rounded-full bg-blue-500 flex items-center justify-center">
