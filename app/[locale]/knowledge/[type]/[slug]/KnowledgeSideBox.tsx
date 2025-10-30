@@ -51,6 +51,8 @@ interface KnowledgeSideBoxProps {
   knowledgeSlug?: string;
   purchased_status?: 'non-purchased' | 'purchased' | 'partial-purchased';
   is_read_later?: boolean;
+  cover_start?: number;
+  cover_end?: number;
 }
 
 const KnowledgeSideBox = ({
@@ -68,7 +70,9 @@ const KnowledgeSideBox = ({
   purchased_status,
   is_read_later,
   knowledgeUUID,
-  insighterUUID
+  insighterUUID,
+  cover_start,
+  cover_end
 }: KnowledgeSideBoxProps) => {
   const params = useParams();
   const currentLocale = locale || params.locale as string || 'en';
@@ -266,6 +270,7 @@ const KnowledgeSideBox = ({
     targetMarket: isRTL ? 'السوق المستهدف': 'Target Market',
     publishedAt: isRTL ? 'تاريخ النشر' : 'Published On',
     lastUpdate: isRTL ? 'آخر تحديث' : 'Last Update',
+    yearsItCovers: isRTL ? 'السنوات التي يغطيها' : 'Years it covers',
     oneTimePurchase: isRTL ? 'شراء لمرة واحدة' : 'One time purchase',
     buyNow: isRTL ? 'اشتري الآن' : 'Buy Now',
     addToCart: isRTL ?  'إضافة إلى حقيبة المشتريات' : 'Add to Cart',
@@ -455,13 +460,14 @@ const KnowledgeSideBox = ({
                 </div>
                 {translations.isicCode}
               </span>
-              <div className="field-content-container">
+              <div className="field-content-container overflow-visible relative">
                 <div className="group relative inline-block">
-                  <span className="inline-flex items-center rounded-md bg-blue-50 px-2 py-1 text-xs font-medium text-blue-700 ring-1 ring-inset ring-blue-700/10 mt-1">
+                  <span className="inline-flex items-center rounded-md bg-blue-50 px-2 py-1 text-xs font-medium text-blue-700 ring-1 ring-inset ring-blue-700/10 mt-1 cursor-help">
                     {isic_code.key}
                   </span>
-                  <span className="absolute bottom-full left-1/2 mb-2 hidden -translate-x-1/2 transform rounded bg-white p-2 text-xs shadow-lg border border-gray-200 group-hover:block min-w-[200px] max-w-[300px] z-10 text-center">
+                  <span className="absolute bottom-full left-1/2 mb-2 hidden -translate-x-1/2 transform rounded bg-black text-white p-3 text-xs shadow-xl group-hover:block min-w-[200px] max-w-[300px] z-[9999] text-center whitespace-normal break-words">
                     {isic_code.name}
+                    <span className="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-black"></span>
                   </span>
                 </div>
               </div>
@@ -529,14 +535,15 @@ const KnowledgeSideBox = ({
                 </div>
                 {translations.hsCode}
               </span>
-              <div className="field-content-container">
+              <div className="field-content-container overflow-visible relative">
                 <div className="group relative inline-block">
-                  <span className="inline-flex items-center rounded-md bg-blue-50 px-2 py-1 text-xs font-medium text-blue-700 ring-1 ring-inset ring-blue-700/10 mt-1">
+                  <span className="inline-flex items-center rounded-md bg-blue-50 px-2 py-1 text-xs font-medium text-blue-700 ring-1 ring-inset ring-blue-700/10 mt-1 cursor-help">
                     {typeof hs_code === 'object' ? (hs_code.key || JSON.stringify(hs_code)) : hs_code}
                   </span>
                   {typeof hs_code === 'object' && hs_code.name && (
-                    <span className="absolute bottom-full left-1/2 mb-2 hidden -translate-x-1/2 transform rounded bg-white p-2 text-xs shadow-lg border border-gray-200 group-hover:block min-w-[200px] max-w-[300px] z-10 text-center">
+                    <span className="absolute bottom-full left-1/2 mb-2 hidden -translate-x-1/2 transform rounded bg-black text-white p-3 text-xs shadow-xl group-hover:block min-w-[200px] max-w-[300px] z-[9999] text-center whitespace-normal break-words">
                       {hs_code.name}
+                      <span className="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-black"></span>
                     </span>
                   )}
                 </div>
@@ -727,6 +734,22 @@ const KnowledgeSideBox = ({
             )
           }
 
+          {cover_start && cover_end && cover_start !== cover_end && (
+            <div className="tp-course-details2-widget-list-item flex items-center justify-between">
+              <span className="flex items-center">
+                <div className="bg-blue-50 p-2 rounded-full me-2">
+                  <CalendarIcon className="w-4 h-4 text-blue-500" />
+                </div>
+                {translations.yearsItCovers}
+              </span>
+              <span className="field-content-container">
+                <span className="flex items-center justify-end">
+                  {`${cover_start} - ${cover_end}`}
+                </span>
+              </span>
+            </div>
+          )}
+
           <div className="tp-course-details2-widget-list-item flex items-center justify-between">
             <span className="flex items-center">
               <div className="bg-blue-50 p-2 rounded-full me-2">
@@ -878,6 +901,10 @@ const KnowledgeSideBox = ({
             align-items: flex-end;
           }
 
+          .field-content-container.overflow-visible {
+            overflow: visible;
+          }
+
           .field-content-container.expanded {
             max-height: none;
           }
@@ -886,11 +913,17 @@ const KnowledgeSideBox = ({
             max-height: 80px;
           }
 
+          .field-content-container:not(.expanded).overflow-visible {
+            overflow: visible;
+          }
+
           .tp-course-details2-widget-list-item {
             min-height: 50px;
             padding: 12px 0;
             border-bottom: 1px solid #f3f4f6;
-            align-items: flex-start;
+            align-items: center;
+            position: relative;
+            overflow: visible;
           }
 
           .tp-course-details2-widget-list-item:last-child {

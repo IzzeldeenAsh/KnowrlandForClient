@@ -31,6 +31,11 @@ export interface StatisticsResponse {
   data: StatisticsItem[];
 }
 
+interface YearRange {
+  startYear: number | null;
+  endYear: number | null;
+}
+
 export default function HomePage() {
   const searchParams = useSearchParams();
   const router = useRouter();
@@ -52,6 +57,14 @@ export default function HomePage() {
   // Get initial page from URL
   const initialPage = searchParams.get('page') ? parseInt(searchParams.get('page')!) : 1;
   const initialRole = (searchParams.get('role') as 'all' | 'company' | 'individual') || 'all';
+
+  // Parse year of study from URL params
+  const initialCoverStart = searchParams.get('cover_start');
+  const initialCoverEnd = searchParams.get('cover_end');
+  const initialYearOfStudy = (initialCoverStart || initialCoverEnd) ? {
+    startYear: initialCoverStart ? parseInt(initialCoverStart) : null,
+    endYear: initialCoverEnd ? parseInt(initialCoverEnd) : null,
+  } : null;
   
   const [searchQuery, setSearchQuery] = useState(initialQuery);
   const [searchType, setSearchType] = useState<'knowledge' | 'insighter'>(initialType);
@@ -94,6 +107,7 @@ export default function HomePage() {
   const [rangeEndFilter, setRangeEndFilter] = useState<string | null>(initialRangeEnd);
   const [accuracyFilter, setAccuracyFilter] = useState<'any' | 'all'>(initialAccuracy);
   const [roleFilter, setRoleFilter] = useState<'all' | 'company' | 'individual'>(initialRole);
+  const [yearOfStudyFilter, setYearOfStudyFilter] = useState<YearRange | null>(initialYearOfStudy);
   
   // Add state for filter visibility and drawer
   const [filtersVisible, setFiltersVisible] = useState(true);
@@ -151,6 +165,8 @@ export default function HomePage() {
           roleFilter,
           rangeStartFilter,
           rangeEndFilter,
+          yearOfStudyFilter?.startYear?.toString() || null,
+          yearOfStudyFilter?.endYear?.toString() || null,
           (errorMsg) => toast.error(errorMsg, 'Statistics Error')
         );
         setStatistics(statsResponse.data || []);
@@ -161,7 +177,7 @@ export default function HomePage() {
       setStatistics([]);
     }
   }, [locale, languageFilter, countryFilter, regionFilter, economicBlocFilter,
-      isicCodeFilter, industryFilter, priceFilter, hsCodeFilter, accuracyFilter, roleFilter, rangeStartFilter, rangeEndFilter, toast]);
+      isicCodeFilter, industryFilter, priceFilter, hsCodeFilter, accuracyFilter, roleFilter, rangeStartFilter, rangeEndFilter, yearOfStudyFilter, toast]);
   
   // Helper function to get count for a specific category type from statistics
   const getCategoryCount = useCallback((categoryType: string) => {
@@ -199,6 +215,7 @@ export default function HomePage() {
     setPriceFilter(null);
     setRangeStartFilter(null);
     setRangeEndFilter(null);
+    setYearOfStudyFilter(null);
     setSelectedCategory('all');
     setAccuracyFilter('all');
     setRoleFilter('all');
@@ -289,6 +306,8 @@ export default function HomePage() {
     paid?: string | null,
     range_start?: string | null,
     range_end?: string | null,
+    cover_start?: string | null,
+    cover_end?: string | null,
     accuracy?: 'any' | 'all',
     role?: 'all' | 'company' | 'individual',
     page?: number
@@ -314,6 +333,8 @@ export default function HomePage() {
     const paid = params.paid !== undefined ? params.paid : priceFilter;
     const rangeStart = params.range_start !== undefined ? params.range_start : rangeStartFilter;
     const rangeEnd = params.range_end !== undefined ? params.range_end : rangeEndFilter;
+    const coverStart = params.cover_start !== undefined ? params.cover_start : (yearOfStudyFilter?.startYear?.toString() || null);
+    const coverEnd = params.cover_end !== undefined ? params.cover_end : (yearOfStudyFilter?.endYear?.toString() || null);
     const category = params.category !== undefined ? params.category : selectedCategory;
     const accuracy = params.accuracy !== undefined ? params.accuracy : accuracyFilter;
     const role = params.role !== undefined ? params.role : roleFilter;
@@ -335,6 +356,8 @@ export default function HomePage() {
     if (paid !== null) urlParams.set('paid', paid);
     if (rangeStart !== null) urlParams.set('range_start', rangeStart);
     if (rangeEnd !== null) urlParams.set('range_end', rangeEnd);
+    if (coverStart !== null) urlParams.set('cover_start', coverStart);
+    if (coverEnd !== null) urlParams.set('cover_end', coverEnd);
     if (category && category !== 'all') urlParams.set('type', category);
     if (accuracy && accuracy !== 'all') urlParams.set('accuracy', accuracy);
     if (role && role !== 'all') urlParams.set('role', role);
@@ -346,7 +369,7 @@ export default function HomePage() {
     
     // Update URL without refreshing the page
     router.push(`/${locale}/home?${urlParams.toString()}`, { scroll: false });
-  }, [locale, router, searchType, searchQuery, currentPage, languageFilter, countryFilter, regionFilter, economicBlocFilter, industryFilter, isicCodeFilter, hsCodeFilter, priceFilter, selectedCategory, accuracyFilter, roleFilter, rangeStartFilter, rangeEndFilter]);
+  }, [locale, router, searchType, searchQuery, currentPage, languageFilter, countryFilter, regionFilter, economicBlocFilter, industryFilter, isicCodeFilter, hsCodeFilter, priceFilter, selectedCategory, accuracyFilter, roleFilter, rangeStartFilter, rangeEndFilter, yearOfStudyFilter]);
 
   // Handler for search type changes
   const handleSearchTypeChange = useCallback(async (type: 'knowledge' | 'insighter') => {
@@ -621,13 +644,43 @@ export default function HomePage() {
     setRoleFilter(value);
     // Update URL with new filter
     updateUrlWithFilters({ role: value });
-    
+
     // Reset to page 1 when filter changes
     setCurrentPage(1);
-    
+
     // The main search effect will be triggered by the state change
   }, [updateUrlWithFilters]);
-  
+
+  const handleYearOfStudyFilterChange = useCallback((value: YearRange | null) => {
+    console.log('🗓️ Year of Study filter changed:', value);
+
+    // Update the year of study filter state
+    setYearOfStudyFilter(value);
+
+    // Update URL with new filter - convert to cover_start and cover_end
+    const urlParams: any = {};
+    if (value) {
+      if (value.startYear !== null) {
+        urlParams.cover_start = value.startYear.toString();
+      }
+      if (value.endYear !== null) {
+        urlParams.cover_end = value.endYear.toString();
+      }
+    } else {
+      // Clear the URL params when filter is null
+      urlParams.cover_start = null;
+      urlParams.cover_end = null;
+    }
+
+    console.log('🗓️ Updating URL with params:', urlParams);
+    updateUrlWithFilters(urlParams);
+
+    // Reset to page 1 when filter changes
+    setCurrentPage(1);
+
+    // The main search effect will be triggered by the state change
+  }, [updateUrlWithFilters]);
+
   // Reference to track if empty query has been called
   const emptyQueryCalledRef = useRef<boolean>(false);
 
@@ -842,6 +895,8 @@ export default function HomePage() {
     const urlPriceFilter = searchParams.get('paid');
     const urlRangeStart = searchParams.get('range_start');
     const urlRangeEnd = searchParams.get('range_end');
+    const urlCoverStart = searchParams.get('cover_start');
+    const urlCoverEnd = searchParams.get('cover_end');
     const urlRole = searchParams.get('role') as 'all' | 'company' | 'individual' || 'all';
     const urlPage = searchParams.get('page') ? parseInt(searchParams.get('page')!) : 1;
     
@@ -900,6 +955,16 @@ export default function HomePage() {
 
       if (urlRangeEnd !== rangeEndFilter) {
         setRangeEndFilter(urlRangeEnd);
+      }
+
+      // Handle year of study parameter (cover_start and cover_end)
+      const urlYearOfStudy = (urlCoverStart || urlCoverEnd) ? {
+        startYear: urlCoverStart ? parseInt(urlCoverStart) : null,
+        endYear: urlCoverEnd ? parseInt(urlCoverEnd) : null,
+      } : null;
+
+      if (JSON.stringify(urlYearOfStudy) !== JSON.stringify(yearOfStudyFilter)) {
+        setYearOfStudyFilter(urlYearOfStudy);
       }
 
       // Handle category parameter
@@ -1010,7 +1075,9 @@ export default function HomePage() {
         accuracyFilter,
         roleFilter,
         rangeStartFilter,
-        rangeEndFilter
+        rangeEndFilter,
+        yearOfStudyFilter?.startYear?.toString() || null,
+        yearOfStudyFilter?.endYear?.toString() || null
       );
 
 
@@ -1031,7 +1098,7 @@ export default function HomePage() {
     } finally {
       setLoading(false);
     }
-  }, [searchQuery, searchType, locale, activeTab, languageFilter, countryFilter, regionFilter, economicBlocFilter, isicCodeFilter, selectedCategory, industryFilter, priceFilter, hsCodeFilter, updateUrlWithFilters, toast, accuracyFilter, roleFilter, rangeStartFilter, rangeEndFilter]);
+  }, [searchQuery, searchType, locale, activeTab, languageFilter, countryFilter, regionFilter, economicBlocFilter, isicCodeFilter, selectedCategory, industryFilter, priceFilter, hsCodeFilter, updateUrlWithFilters, toast, accuracyFilter, roleFilter, rangeStartFilter, rangeEndFilter, yearOfStudyFilter]);
 
   // Handle search submission (Enter key or search button)
   const handleSubmit = (e: React.FormEvent) => {
@@ -1059,7 +1126,8 @@ export default function HomePage() {
     accuracyFilter,
     roleFilter,
     rangeStartFilter,
-    rangeEndFilter
+    rangeEndFilter,
+    yearOfStudyFilter
   });
   
   // Track previous search query to avoid redundant API calls
@@ -1141,7 +1209,9 @@ export default function HomePage() {
         accuracyFilter,
         roleFilter,
         rangeStartFilter,
-        rangeEndFilter
+        rangeEndFilter,
+        yearOfStudyFilter?.startYear?.toString() || null,
+        yearOfStudyFilter?.endYear?.toString() || null
       );
 
       console.log('📄 API Response for page', newPage, ':', response.meta);
@@ -1166,7 +1236,7 @@ export default function HomePage() {
         console.log('📄 Pagination flags reset');
       }, 2000); // Increased to 2 seconds to ensure no interference
     }
-  }, [searchQuery, searchType, locale, activeTab, languageFilter, countryFilter, regionFilter, economicBlocFilter, isicCodeFilter, selectedCategory, industryFilter, priceFilter, hsCodeFilter, accuracyFilter, roleFilter, rangeStartFilter, rangeEndFilter, toast]);
+  }, [searchQuery, searchType, locale, activeTab, languageFilter, countryFilter, regionFilter, economicBlocFilter, isicCodeFilter, selectedCategory, industryFilter, priceFilter, hsCodeFilter, accuracyFilter, roleFilter, rangeStartFilter, rangeEndFilter, yearOfStudyFilter, toast]);
 
   // Track the last time an API call was made to prevent too many calls
   const lastApiCallTimeRef = useRef<number>(0);
@@ -1177,8 +1247,11 @@ export default function HomePage() {
 
   // Fetch search results when other parameters change (BUT NOT searchQuery - only on explicit search actions)
   useEffect(() => {
+    console.log('🔍 Main search effect triggered with yearOfStudyFilter:', yearOfStudyFilter);
+
     // Skip if not initialized yet (initial search is handled by the mount effect)
     if (!initialized) {
+      console.log('🔴 Skipping search effect - not initialized');
       return;
     }
     
@@ -1187,24 +1260,26 @@ export default function HomePage() {
       console.log('🔴 Skipping main search effect because a search type change is in progress');
       return;
     }
-    
+
     // Skip if a direct page change is in progress to prevent interference
     if (isPageChangeInProgressRef.current) {
       console.log('🔴 Skipping main search effect because a direct page change is in progress');
       return;
     }
-    
+
     // Skip if a filter reset is in progress to prevent interference
     if (isFilterResetInProgressRef.current) {
       console.log('🔴 Skipping main search effect because a filter reset is in progress');
       return;
     }
-    
+
     // Skip this effect run if we just completed a pagination request
     if (skipNextSearchEffectRef.current) {
       console.log('🔴 Skipping main search effect due to recent pagination');
       return; // Don't reset the flag here - let pagination handle it
     }
+
+    console.log('✅ All checks passed, proceeding with search...');
     
     // If this effect runs due to a change in search parameters (not pagination),
     // we should reset the lastDirectPageRef to ensure proper page handling
@@ -1215,7 +1290,7 @@ export default function HomePage() {
     
     // Update the reference values (EXCLUDING searchQuery - we don't want to auto-search on typing)
     const params = searchParamsRef.current;
-    const paramsChanged = 
+    const paramsChanged =
       params.locale !== locale ||
       params.languageFilter !== languageFilter ||
       params.countryFilter !== countryFilter ||
@@ -1231,13 +1306,14 @@ export default function HomePage() {
       params.accuracyFilter !== accuracyFilter ||
       params.roleFilter !== roleFilter ||
       params.rangeStartFilter !== rangeStartFilter ||
-      params.rangeEndFilter !== rangeEndFilter;
+      params.rangeEndFilter !== rangeEndFilter ||
+      JSON.stringify(params.yearOfStudyFilter) !== JSON.stringify(yearOfStudyFilter);
     
     // Log parameter changes for debugging (but don't include searchQuery)
     if (paramsChanged) {
-      console.log('Search params changed (excluding query):', { 
+      console.log('Search params changed (excluding query):', {
         locale, languageFilter, countryFilter, regionFilter, economicBlocFilter,
-        activeTab, searchType, selectedCategory, industryFilter, isicCodeFilter, hsCodeFilter, priceFilter, accuracyFilter, roleFilter, rangeStartFilter, rangeEndFilter 
+        activeTab, searchType, selectedCategory, industryFilter, isicCodeFilter, hsCodeFilter, priceFilter, accuracyFilter, roleFilter, rangeStartFilter, rangeEndFilter, yearOfStudyFilter
       });
     }
     
@@ -1260,7 +1336,8 @@ export default function HomePage() {
       accuracyFilter,
       roleFilter,
       rangeStartFilter,
-      rangeEndFilter
+      rangeEndFilter,
+      yearOfStudyFilter
     };
     
     // If nothing changed, don't fetch
@@ -1311,15 +1388,16 @@ export default function HomePage() {
         // This resets pagination when filters change but preserves it for page-only changes
         const pageToRequest = lastDirectPageRef.current || currentPage || 1;
         
-        console.log('Performing filter-based search with parameters:', { 
-          keyword, 
+        console.log('🚀 Performing filter-based search with parameters:', {
+          keyword,
           search_type,
           page: pageToRequest,
           locale,
           languageFilter,
-          countryFilter, 
+          countryFilter,
           regionFilter,
-          economicBlocFilter 
+          economicBlocFilter,
+          yearOfStudyFilter
         });
         
         const response = await fetchSearchResults(
@@ -1342,7 +1420,9 @@ export default function HomePage() {
           accuracyFilter,
           roleFilter,
           rangeStartFilter,
-          rangeEndFilter
+          rangeEndFilter,
+          yearOfStudyFilter?.startYear?.toString() || null,
+          yearOfStudyFilter?.endYear?.toString() || null
         );
 
         setSearchResults(response.data || []);
@@ -1378,7 +1458,7 @@ export default function HomePage() {
       }
     };
   // REMOVED searchQuery from dependencies - only trigger on filter changes, not query changes
-  }, [locale, languageFilter, countryFilter, regionFilter, economicBlocFilter, activeTab, searchType, initialized, toast, selectedCategory, industryFilter, isicCodeFilter, hsCodeFilter, priceFilter, accuracyFilter, roleFilter, rangeStartFilter, rangeEndFilter, fetchStatisticsIfNeeded]);
+  }, [locale, languageFilter, countryFilter, regionFilter, economicBlocFilter, activeTab, searchType, initialized, toast, selectedCategory, industryFilter, isicCodeFilter, hsCodeFilter, priceFilter, accuracyFilter, roleFilter, rangeStartFilter, rangeEndFilter, yearOfStudyFilter, fetchStatisticsIfNeeded]);
 
   return (
    <main className='min-h-screen flex flex-col bg-gray-50'>
@@ -1606,10 +1686,10 @@ export default function HomePage() {
               
               {/* Filters Sidebar */}
               <div 
-                className={`lg:flex-shrink-0 transition-all duration-300 ease-in-out overflow-hidden ${
+                className={`lg:flex-shrink-0 transition-all duration-300 ease-in-out ${
                   filtersVisible 
-                    ? 'lg:w-80 opacity-100 ' 
-                    : 'lg:w-0 opacity-0 max-h-0'
+                    ? 'overflow-visible lg:w-80 opacity-100 ' 
+                    : 'overflow-hidden lg:w-0 opacity-0 max-h-0'
                 }`}
               >
                 <div className={`sticky rounded-md top-2 transition-transform duration-300 ease-in-out ${
@@ -1642,6 +1722,8 @@ export default function HomePage() {
                       setAccuracyFilter={handleAccuracyFilterChange}
                       roleFilter={roleFilter}
                       setRoleFilter={handleRoleFilterChange}
+                      yearOfStudyFilter={yearOfStudyFilter}
+                      setYearOfStudyFilter={handleYearOfStudyFilterChange}
                       resetFilters={resetFilters}
                       isDrawerOpen={isFilterDrawerOpen}
                       setIsDrawerOpen={setIsFilterDrawerOpen}

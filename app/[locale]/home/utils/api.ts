@@ -125,6 +125,8 @@ export async function fetchStatisticsPerType(
   roleFilter: 'all' | 'company' | 'individual' = 'all',
   rangeStartFilter: string | null = null,
   rangeEndFilter: string | null = null,
+  coverStartFilter: string | null = null,
+  coverEndFilter: string | null = null,
   onError?: (errorMessage: any) => void
 ) {
   try {
@@ -188,7 +190,16 @@ export async function fetchStatisticsPerType(
     if (rangeEndFilter !== null) {
       url.searchParams.append('range_end', rangeEndFilter);
     }
-    
+
+    // Add cover start/end parameters for year of study
+    if (coverStartFilter !== null) {
+      url.searchParams.append('cover_start', coverStartFilter);
+    }
+
+    if (coverEndFilter !== null) {
+      url.searchParams.append('cover_end', coverEndFilter);
+    }
+
     // Get token from cookies (primary) or localStorage (fallback)
     const token = getAuthToken();
     const headers: HeadersInit = {
@@ -250,7 +261,9 @@ export async function fetchSearchResults(
   accuracyFilter: 'any' | 'all' = 'any',
   roleFilter: 'all' | 'company' | 'individual' = 'all',
   rangeStartFilter: string | null = null,
-  rangeEndFilter: string | null = null
+  rangeEndFilter: string | null = null,
+  coverStartFilter: string | null = null,
+  coverEndFilter: string | null = null
 ) {
   try {
     // Always use the search API endpoint
@@ -343,7 +356,16 @@ export async function fetchSearchResults(
     if (rangeEndFilter !== null) {
       url.searchParams.append('range_end', rangeEndFilter);
     }
-    
+
+    // Add cover start/end parameters for year of study
+    if (coverStartFilter !== null) {
+      url.searchParams.append('cover_start', coverStartFilter);
+    }
+
+    if (coverEndFilter !== null) {
+      url.searchParams.append('cover_end', coverEndFilter);
+    }
+
     // Keep the filters[country_id] for backward compatibility if needed
     // if (countryFilter !== null) {
     //   url.searchParams.append('filters[country_id]', countryFilter.toString());

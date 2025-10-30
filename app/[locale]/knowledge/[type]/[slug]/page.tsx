@@ -50,6 +50,8 @@ interface KnowledgeDetails {
   is_review: boolean;
   is_read_later?: boolean;
   purchased_status: 'non-purchased' | 'purchased' | 'partial-purchased';
+  cover_start?: number;
+  cover_end?: number;
   insighter: {
     name: string;
     profile_photo_url: string;
@@ -478,6 +480,8 @@ export default function KnowledgePage({ params }: Props) {
                 is_read_later={knowledge.is_read_later}
                 knowledgeUUID={knowledge.id}
                 insighterUUID={knowledge.insighter.uuid}
+                cover_start={knowledge.cover_start}
+                cover_end={knowledge.cover_end}
               />
             </div>
         </div>

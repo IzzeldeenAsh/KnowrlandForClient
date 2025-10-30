@@ -1,5 +1,10 @@
 // Consolidated types for home page state management
 
+export interface YearRange {
+  startYear: number | null;
+  endYear: number | null;
+}
+
 export interface SearchState {
   query: string;
   type: 'knowledge' | 'insighter';
@@ -23,6 +28,7 @@ export interface FilterState {
   accuracy: 'any' | 'all';
   role: 'all' | 'company' | 'individual';
   category: string;
+  yearOfStudy: YearRange | null;
 }
 
 export interface UIState {
@@ -64,6 +70,7 @@ export type FilterAction =
   | { type: 'SET_ACCURACY'; payload: 'any' | 'all' }
   | { type: 'SET_ROLE'; payload: 'all' | 'company' | 'individual' }
   | { type: 'SET_CATEGORY'; payload: string }
+  | { type: 'SET_YEAR_OF_STUDY'; payload: YearRange | null }
   | { type: 'RESET_FILTERS' }
   | { type: 'SET_FILTERS'; payload: Partial<FilterState> };
 

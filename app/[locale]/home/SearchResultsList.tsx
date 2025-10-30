@@ -302,6 +302,7 @@ export default function SearchResultsList({
                     { maximumFractionDigits: 2 }
                   )}`
                 : normalizedPrice;
+              const coverageText = formatCoverageRange(item.cover_start, item.cover_end);
 
               return (
                 <Card
@@ -361,6 +362,15 @@ export default function SearchResultsList({
                     </div>
                   )}
                 </div>
+                {coverageText && (
+                  <div className="absolute bottom-4 right-4">
+                    <div
+                      className="text-lg font-bold leading-none bg-clip-text text-transparent bg-gradient-to-r from-sky-600 via-cyan-300 to-blue-200 drop-shadow-lg"
+                    >
+                      {coverageText}
+                    </div>
+                  </div>
+                )}
                 </Link>
                 {item.searchable_type === "knowledge" && item.insighter && (
                   <div className="flex items-center gap-1 z-10">
@@ -588,6 +598,18 @@ export default function SearchResultsList({
       />
     </div>
   );
+}
+
+// Format coverage years nicely
+function formatCoverageRange(start?: number, end?: number): string {
+  const hasStart = typeof start === 'number' && !Number.isNaN(start);
+  const hasEnd = typeof end === 'number' && !Number.isNaN(end);
+  if (hasStart && hasEnd) {
+    return start === end ? String(start) : `${start}–${end}`;
+  }
+  if (hasStart) return String(start);
+  if (hasEnd) return String(end);
+  return '';
 }
 
 // Truncate description to avoid very long text
