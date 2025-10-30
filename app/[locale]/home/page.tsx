@@ -789,6 +789,8 @@ export default function HomePage() {
                 urlRole,
                 urlRangeStart,
                 urlRangeEnd,
+                null, // coverStartFilter
+                null, // coverEndFilter
                 (errorMsg) => toast.error(errorMsg, 'Statistics Error')
               );
               setStatistics(statsResponse.data || []);
