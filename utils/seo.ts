@@ -185,7 +185,7 @@ export function generateKnowledgeMetadata(
 
     // Twitter Card
     twitter: {
-      card: 'summary_large_image',
+      card: 'summary',
       site: '@KNOLDG',
       creator: `@${authorName.replace(/\s+/g, '')}`,
       title,
