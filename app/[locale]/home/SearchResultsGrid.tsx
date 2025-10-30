@@ -124,6 +124,8 @@ export interface SearchResultItem {
   review: string;
   is_read_later?: boolean; // Only for knowledge items
   total_downloads?: number; // Only for knowledge items
+  cover_start?: number; // Coverage start year
+  cover_end?: number;   // Coverage end year
 }
 
 interface SearchResultsGridProps {
@@ -196,6 +198,18 @@ function truncateDescription(
   return words.slice(0, wordLimit).join(" ") + "...";
 }
 
+// Format coverage years nicely
+function formatCoverageRange(start?: number, end?: number): string {
+  const hasStart = typeof start === 'number' && !Number.isNaN(start);
+  const hasEnd = typeof end === 'number' && !Number.isNaN(end);
+  if (hasStart && hasEnd) {
+    return start === end ? String(start) : `${start}–${end}`;
+  }
+  if (hasStart) return String(start);
+  if (hasEnd) return String(end);
+  return '';
+}
+
 export default function SearchResultsGrid({
   results,
   colNumbers = 3,
@@ -248,7 +262,7 @@ export default function SearchResultsGrid({
 
       const method = currentState ? 'DELETE' : 'POST';
       const slug = item.url.split('/').pop();
-      const url = `https://api.knoldg.com/api/account/favorite/knowledge/${slug}`;
+      const url = `https://api.foresighta.co/api/account/favorite/knowledge/${slug}`;
 
       const response = await axios({
         method,
@@ -300,6 +314,7 @@ export default function SearchResultsGrid({
     knowledge: isRTL ? "المعرفة" : "Knowledge",
     noItems: isRTL ? "لا توجد نتائج بحث متاحة" : "No search results available",
     posted: isRTL ? "نُشر" : "Posted",
+    coverage: isRTL ? "التغطية" : "Coverage",
     free: isRTL ? "مجاني" : "Free",
     insighter: isRTL ? "إنسايتر" : "Insighter",
     by: isRTL ? "من قبل" : "By",
@@ -357,6 +372,7 @@ export default function SearchResultsGrid({
                     { maximumFractionDigits: 2 }
                   )}`
                 : normalizedPrice;
+              const coverageText = formatCoverageRange(item.cover_start, item.cover_end);
 
               return (
                 <Card
@@ -402,6 +418,16 @@ export default function SearchResultsGrid({
                   >
                     {item.title}
                   </Text>
+                  {coverageText && (
+                  <div >
+                    <div
+                      
+                      className="text-md font-bold leading-none bg-clip-text text-transparent bg-gradient-to-r from-sky-600 via-cyan-300 to-blue-100  drop-shadow-lg"
+                    >
+                      {coverageText}
+                    </div>
+                  </div>
+                )}
                 </div>
                 
                 {item.review && parseInt(item.review) >= 1 && (
@@ -421,6 +447,7 @@ export default function SearchResultsGrid({
                     </Text>
                   </div>
                 )}
+               
               </div>
               </Link>
               <div className={cardStyles.whiteSection + " flex flex-col h-full "}>
@@ -597,7 +624,6 @@ export default function SearchResultsGrid({
                       {translations.posted} {safeFormatDate(item.published_at, currentLocale as string)}
                     </Text>
                   )}
-                  
                   {hasPrice && (
                     <Badge
                       color={isFreePrice ? "green" : "yellow"}
