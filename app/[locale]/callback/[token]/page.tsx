@@ -3,6 +3,7 @@
 import { useEffect } from 'react';
 import { useRouter, useParams, useSearchParams } from 'next/navigation';
 import { useGlobalProfile } from '@/components/auth/GlobalProfileProvider';
+import FullScreenLoader from '@/components/ui/FullScreenLoader';
 
 interface ProfileResponse {
   data: {
@@ -469,11 +470,5 @@ export default function AuthCallback() {
     document.cookie = cookieSettings.join('; ');
   };
 
-  return (
-    <div className="min-h-screen flex items-center justify-center">
-      <div className="animate-pulse">
-        <div className="w-12 h-12 border-4 border-blue-600 rounded-full border-t-transparent animate-spin"></div>
-      </div>
-    </div>
-  );
+  return <FullScreenLoader message="Signing you in..." />;
 }

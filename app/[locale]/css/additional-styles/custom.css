@@ -31,6 +31,7 @@
 .tp-course-details2-widget-list-item span {
     font-size: 13px;
     font-weight: 500;
+  max-width: 178px;
 }
 
 .tp-course-details2-widget-list-item:last-child {

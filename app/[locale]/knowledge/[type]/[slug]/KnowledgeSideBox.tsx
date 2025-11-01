@@ -208,6 +208,8 @@ const KnowledgeSideBox = ({
   
   // Maximum number of items to show initially
   const MAX_VISIBLE_ITEMS = 3;
+  // Maximum number of Target Market items to show initially
+  const MAX_VISIBLE_TARGET_MARKET_ITEMS = 2;
   
   // Share functionality
   const handleShare = () => {
@@ -614,20 +616,18 @@ const KnowledgeSideBox = ({
                   {translations.targetMarket}
                 </span>
                 <div className={`field-content-container ${expandedSections.economicBlocs ? 'expanded' : ''}`}>
-                  <div className="flex flex-wrap gap-1 justify-end">
+                  <div className={`flex flex-wrap gap-1 justify-end`}>
                     {economic_blocs
-                      .slice(0, expandedSections.economicBlocs ? economic_blocs.length : MAX_VISIBLE_ITEMS)
+                      .slice(0, expandedSections.economicBlocs ? economic_blocs.length : MAX_VISIBLE_TARGET_MARKET_ITEMS)
                       .map((economicBloc) => (
-                        <span key={economicBloc.id} className="badge bg-[#f1f1f4] text-[#4b5675] text-xs font-medium px-2.5 py-0.5 rounded">
+                        <span key={economicBloc.id} className={`badge bg-[#f1f1f4] text-[#4b5675] text-xs font-medium px-2.5 py-0.5 rounded ${isRTL ? 'text-left' : 'text-right'}`}>
                           {economicBloc.name}
                         </span>
                       ))}
                   </div>
-                  {economic_blocs.length > MAX_VISIBLE_ITEMS && (
+                  {economic_blocs.length > MAX_VISIBLE_TARGET_MARKET_ITEMS && (
                     <button 
-                  style={{marginInlineStart:'auto'}}
-
-                      className="text-blue-500 text-xs flex items-center whitespace-nowrap ml-1 mt-1"
+                      className="text-blue-500 text-xs flex items-center whitespace-nowrap ms-auto mt-1"
                       onClick={() => toggleSection('economicBlocs')}
                     >
                       {expandedSections.economicBlocs ? (
@@ -636,7 +636,7 @@ const KnowledgeSideBox = ({
                         </>
                       ) : (
                         <>
-                          +{economic_blocs.length - MAX_VISIBLE_ITEMS} {translations.more} <ChevronDownIcon className="w-3 h-3 ml-1" />
+                          +{economic_blocs.length - MAX_VISIBLE_TARGET_MARKET_ITEMS} {translations.more} <ChevronDownIcon className="w-3 h-3 ml-1" />
                         </>
                       )}
                     </button>
@@ -655,26 +655,24 @@ const KnowledgeSideBox = ({
                   {translations.targetMarket}
                 </span>
                 <div className={`field-content-container ${expandedSections.regions ? 'expanded' : ''}`}>
-                  <div className="flex flex-wrap justify-end gap-1">
+                  <div className={`flex flex-wrap gap-1 justify-end`}>
                     {regions.length === 6 ? (
-                      <span className="badge bg-[#f1f1f4] text-[#4b5675] text-xs font-medium px-2.5 py-0.5 rounded">
+                      <span className={`badge bg-[#f1f1f4] text-[#4b5675] text-xs font-medium px-2.5 py-0.5 rounded ${isRTL ? 'text-left' : 'text-right'}`}>
                      {translations.worldWide}
                       </span>
                     ) : (
                       regions
-                        .slice(0, expandedSections.regions ? regions.length : MAX_VISIBLE_ITEMS)
+                        .slice(0, expandedSections.regions ? regions.length : MAX_VISIBLE_TARGET_MARKET_ITEMS)
                         .map((region:any) => (
-                          <span key={region.id} className="badge bg-[#f1f1f4] text-[#4b5675] text-xs font-medium px-2.5 py-0.5 rounded">
+                          <span key={region.id} className={`badge bg-[#f1f1f4] text-[#4b5675] text-xs font-medium px-2.5 py-0.5 rounded ${isRTL ? 'text-left' : 'text-right'}`}>
                             {region.name}
                           </span>
                         ))
                     )}
                   </div>
-                  {regions.length > MAX_VISIBLE_ITEMS && regions.length !== 6 && (
+                  {regions.length > MAX_VISIBLE_TARGET_MARKET_ITEMS && regions.length !== 6 && (
                     <button 
-                  style={{marginInlineStart:'auto'}}
-
-                      className="text-blue-500 text-xs flex items-center whitespace-nowrap ml-1 mt-1"
+                      className="text-blue-500 text-xs flex items-center whitespace-nowrap ms-auto mt-1"
                       onClick={() => toggleSection('regions')}
                     >
                       {expandedSections.regions ? (
@@ -683,7 +681,7 @@ const KnowledgeSideBox = ({
                         </>
                       ) : (
                         <>
-                          +{regions.length - MAX_VISIBLE_ITEMS} {translations.more} <ChevronDownIcon className="w-3 h-3 ml-1" />
+                          +{regions.length - MAX_VISIBLE_TARGET_MARKET_ITEMS} {translations.more} <ChevronDownIcon className="w-3 h-3 ml-1" />
                         </>
                       )}
                     </button>
@@ -702,20 +700,18 @@ const KnowledgeSideBox = ({
                   {translations.targetMarket}
                 </span>
                 <div className={`field-content-container ${expandedSections.countries ? 'expanded' : ''}`}>
-                  <div className="flex flex-wrap justify-end gap-1">
+                  <div className={`flex flex-wrap gap-1 justify-end`}>
                     {countries
-                      .slice(0, expandedSections.countries ? countries.length : MAX_VISIBLE_ITEMS)
+                      .slice(0, expandedSections.countries ? countries.length : MAX_VISIBLE_TARGET_MARKET_ITEMS)
                       .map((country:any) => (
-                        <span key={country.id} className="badge bg-[#f1f1f4] text-[#4b5675] text-xs font-medium px-2.5 py-0.5 rounded">
+                        <span key={country.id} className={`badge bg-[#f1f1f4] text-[#4b5675] text-xs font-medium px-2.5 py-0.5 rounded ${isRTL ? 'text-left' : 'text-right'}`}>
                           {country.name}
                         </span>
                       ))}
                   </div>
-                  {countries.length > MAX_VISIBLE_ITEMS && (
+                  {countries.length > MAX_VISIBLE_TARGET_MARKET_ITEMS && (
                     <button 
-                  style={{marginInlineStart:'auto'}}
-
-                      className="text-blue-500 text-xs flex items-center whitespace-nowrap ml-1 mt-1"
+                      className="text-blue-500 text-xs flex items-center whitespace-nowrap ms-auto mt-1"
                       onClick={() => toggleSection('countries')}
                     >
                       {expandedSections.countries ? (
@@ -724,7 +720,7 @@ const KnowledgeSideBox = ({
                         </>
                       ) : (
                         <>
-                          +{countries.length - MAX_VISIBLE_ITEMS} {translations.more} <ChevronDownIcon className="w-3 h-3 ml-1" />
+                          +{countries.length - MAX_VISIBLE_TARGET_MARKET_ITEMS} {translations.more} <ChevronDownIcon className="w-3 h-3 ml-1" />
                         </>
                       )}
                     </button>
@@ -734,7 +730,7 @@ const KnowledgeSideBox = ({
             )
           }
 
-          {cover_start && cover_end && cover_start !== cover_end && (
+          {cover_start && cover_end && (
             <div className="tp-course-details2-widget-list-item flex items-center justify-between">
               <span className="flex items-center">
                 <div className="bg-blue-50 p-2 rounded-full me-2">
@@ -744,24 +740,13 @@ const KnowledgeSideBox = ({
               </span>
               <span className="field-content-container">
                 <span className="flex items-center justify-end">
-                  {`${cover_start} - ${cover_end}`}
+                  {cover_start === cover_end ? cover_start : `${cover_start} - ${cover_end}`}
                 </span>
               </span>
             </div>
           )}
 
-          <div className="tp-course-details2-widget-list-item flex items-center justify-between">
-            <span className="flex items-center">
-              <div className="bg-blue-50 p-2 rounded-full me-2">
-                <CalendarIcon className="w-4 h-4 text-blue-500" />
-              </div>
-              {translations.publishedAt}
-            </span>
-            <span className="field-content-container flex items-center justify-end">
-              {published_at ? new Date(published_at).toLocaleDateString(isRTL ? 'en-US' : undefined) : translations.na}
-            </span>
-          </div>
-
+       
           {/* Only show Last Update if it has a value */}
           {false && (
             <div className="tp-course-details2-widget-list-item flex items-center justify-between">
