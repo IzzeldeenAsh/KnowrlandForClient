@@ -1193,14 +1193,7 @@ const FilterBox: React.FC<FilterBoxProps> = React.memo(({
                     }}
                     disabled={isDisabled}
                   />
-                  {yearOfStudyFilter && (
-                    <div className="mt-2 text-xs text-gray-600">
-                      {yearOfStudyFilter.startYear === yearOfStudyFilter.endYear
-                        ? `${locale === 'ar' ? 'السنة المحددة:' : 'Selected year:'} ${yearOfStudyFilter.startYear}`
-                        : `${locale === 'ar' ? 'النطاق المحدد:' : 'Selected range:'} ${yearOfStudyFilter.startYear} - ${yearOfStudyFilter.endYear}`
-                      }
-                    </div>
-                  )}
+            
                 </div>
               </LoadingOverlay>
             </div>
