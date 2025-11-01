@@ -730,7 +730,7 @@ const KnowledgeSideBox = ({
             )
           }
 
-          {cover_start && cover_end && cover_start !== cover_end && (
+          {cover_start && cover_end && (
             <div className="tp-course-details2-widget-list-item flex items-center justify-between">
               <span className="flex items-center">
                 <div className="bg-blue-50 p-2 rounded-full me-2">
@@ -740,24 +740,13 @@ const KnowledgeSideBox = ({
               </span>
               <span className="field-content-container">
                 <span className="flex items-center justify-end">
-                  {`${cover_start} - ${cover_end}`}
+                  {cover_start === cover_end ? cover_start : `${cover_start} - ${cover_end}`}
                 </span>
               </span>
             </div>
           )}
 
-          <div className="tp-course-details2-widget-list-item flex items-center justify-between">
-            <span className="flex items-center">
-              <div className="bg-blue-50 p-2 rounded-full me-2">
-                <CalendarIcon className="w-4 h-4 text-blue-500" />
-              </div>
-              {translations.publishedAt}
-            </span>
-            <span className="field-content-container flex items-center justify-end">
-              {published_at ? new Date(published_at).toLocaleDateString(isRTL ? 'en-US' : undefined) : translations.na}
-            </span>
-          </div>
-
+       
           {/* Only show Last Update if it has a value */}
           {false && (
             <div className="tp-course-details2-widget-list-item flex items-center justify-between">
