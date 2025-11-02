@@ -1159,50 +1159,52 @@ const FilterBox: React.FC<FilterBoxProps> = React.memo(({
             )}
           </div>
         )}
-  {/* Year of Study Section */}
-  <div>
-          <button
-            onClick={() => !isDisabled && setYearOfStudyCollapsed(!yearOfStudyCollapsed)}
-            disabled={isDisabled}
-            className={`w-full flex items-center justify-between px-4 py-3 text-left bg-gray-50 hover:bg-gray-100 focus:outline-none transition-colors ${
-              isDisabled ? 'opacity-50 cursor-not-allowed' : ''
-            }`}
-          >
-            <span className="flex items-center gap-2 text-blue-500 font-semibold">
-              <IconCalendarEvent size={20} className="p-0.5 rounded-full" />
-              {locale === 'ar' ? 'سنة الدراسة' : 'Year of Study'}
-            </span>
-            <svg className={`w-4 h-4 text-gray-400 transition-transform ${yearOfStudyCollapsed ? '' : 'rotate-180'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-            </svg>
-          </button>
-          {!yearOfStudyCollapsed && (
-            <div className="px-4 py-3 bg-white">
-              <LoadingOverlay isLoading={isDisabled}>
-                <div className="flex flex-col gap-1">
-                  <span className="text-xs font-semibold text-gray-700 mb-2">
-                    {locale === 'ar' ? 'اختر سنة الدراسة' : 'Select Year of Study'}
-                  </span>
-                  <CustomYearPicker
-                    placeholder={locale === 'ar' ? 'اختر السنة' : 'Select year'}
-                    yearRangeStart={1900}
-                    yearRangeEnd={2030}
-                    allowRange={true}
-                    locale={locale}
-                    value={yearOfStudyFilter}
-                    onChange={(value) => {
-                      if (setYearOfStudyFilter) {
-                        setYearOfStudyFilter(value);
-                      }
-                    }}
-                    disabled={isDisabled}
-                  />
-            
-                </div>
-              </LoadingOverlay>
-            </div>
-          )}
-        </div>
+        {/* Year of Study Section */}
+        {searchType !== 'insighter' && (
+          <div>
+            <button
+              onClick={() => !isDisabled && setYearOfStudyCollapsed(!yearOfStudyCollapsed)}
+              disabled={isDisabled}
+              className={`w-full flex items-center justify-between px-4 py-3 text-left bg-gray-50 hover:bg-gray-100 focus:outline-none transition-colors ${
+                isDisabled ? 'opacity-50 cursor-not-allowed' : ''
+              }`}
+            >
+              <span className="flex items-center gap-2 text-blue-500 font-semibold">
+                <IconCalendarEvent size={20} className="p-0.5 rounded-full" />
+                {locale === 'ar' ? 'سنة الدراسة' : 'Year of Study'}
+              </span>
+              <svg className={`w-4 h-4 text-gray-400 transition-transform ${yearOfStudyCollapsed ? '' : 'rotate-180'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+              </svg>
+            </button>
+            {!yearOfStudyCollapsed && (
+              <div className="px-4 py-3 bg-white">
+                <LoadingOverlay isLoading={isDisabled}>
+                  <div className="flex flex-col gap-1">
+                    <span className="text-xs font-semibold text-gray-700 mb-2">
+                      {locale === 'ar' ? 'اختر سنة الدراسة' : 'Select Year of Study'}
+                    </span>
+                    <CustomYearPicker
+                      placeholder={locale === 'ar' ? 'اختر السنة' : 'Select year'}
+                      yearRangeStart={1900}
+                      yearRangeEnd={2030}
+                      allowRange={true}
+                      locale={locale}
+                      value={yearOfStudyFilter}
+                      onChange={(value) => {
+                        if (setYearOfStudyFilter) {
+                          setYearOfStudyFilter(value);
+                        }
+                      }}
+                      disabled={isDisabled}
+                    />
+
+                  </div>
+                </LoadingOverlay>
+              </div>
+            )}
+          </div>
+        )}
 
         {/* Industry Section */}
         <div>
