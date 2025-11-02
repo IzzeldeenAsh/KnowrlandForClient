@@ -214,17 +214,26 @@ const FilterBox: React.FC<FilterBoxProps> = React.memo(({
   const [yearOfStudyCollapsed, setYearOfStudyCollapsed] = useState(false);
   const [roleCollapsed, setRoleCollapsed] = useState(shouldUseDrawer);
 
-  // Range price filter states - using refs to prevent re-renders
+  // Range price filter states - using refs to avoid re-renders
   const tempRangeStartRef = useRef('');
   const tempRangeEndRef = useRef('');
   const [rangeError, setRangeError] = useState('');
 
-  // Refs to maintain focus during re-renders and store values
+  // Refs to maintain focus and store values
   const rangeStartInputRef = useRef<HTMLInputElement>(null);
   const rangeEndInputRef = useRef<HTMLInputElement>(null);
 
-  // Note: Range inputs use refs instead of state to prevent re-renders
-
+  // Sync input values with applied filters
+  useEffect(() => {
+    if (rangeStartInputRef.current && !document.activeElement?.isSameNode(rangeStartInputRef.current)) {
+      rangeStartInputRef.current.value = rangeStartFilter || '';
+      tempRangeStartRef.current = rangeStartFilter || '';
+    }
+    if (rangeEndInputRef.current && !document.activeElement?.isSameNode(rangeEndInputRef.current)) {
+      rangeEndInputRef.current.value = rangeEndFilter || '';
+      tempRangeEndRef.current = rangeEndFilter || '';
+    }
+  }, [rangeStartFilter, rangeEndFilter]);
 
   // Combobox Search States
   const [economicBlocSearch, setEconomicBlocSearch] = useState('');
@@ -913,19 +922,13 @@ const FilterBox: React.FC<FilterBoxProps> = React.memo(({
     }
   }, [setRangeStartFilter, setRangeEndFilter]);
 
-  // Memoized input change handlers using refs to prevent re-renders
+  // Input change handlers using refs to avoid re-renders
   const handleRangeStartChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     tempRangeStartRef.current = e.target.value;
-    if (rangeStartInputRef.current) {
-      rangeStartInputRef.current.value = e.target.value;
-    }
   }, []);
 
   const handleRangeEndChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     tempRangeEndRef.current = e.target.value;
-    if (rangeEndInputRef.current) {
-      rangeEndInputRef.current.value = e.target.value;
-    }
   }, []);
 
 
@@ -1041,11 +1044,11 @@ const FilterBox: React.FC<FilterBoxProps> = React.memo(({
                           ref={rangeStartInputRef}
                           type="number"
                           placeholder={locale === 'ar' ? 'الحد الأدنى' : 'Min price'}
-                          defaultValue=""
+                          defaultValue={rangeStartFilter || ''}
                           onChange={handleRangeStartChange}
                           className={`w-[100px] px-2 py-1 text-xs border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-transparent ${
-                            isDisabled ? 'opacity-50 cursor-not-allowed' : ''
-                          }`}
+                            rangeStartFilter ? 'bg-blue-50 border-blue-300' : ''
+                          } ${isDisabled ? 'opacity-50 cursor-not-allowed' : ''}`}
                           disabled={isDisabled}
                           min="0"
                           step="0.01"
@@ -1054,11 +1057,11 @@ const FilterBox: React.FC<FilterBoxProps> = React.memo(({
                           ref={rangeEndInputRef}
                           type="number"
                           placeholder={locale === 'ar' ? 'الحد الأقصى' : 'Max price'}
-                          defaultValue=""
+                          defaultValue={rangeEndFilter || ''}
                           onChange={handleRangeEndChange}
                           className={`w-[100px] px-2 py-1 text-xs border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-transparent ${
-                            isDisabled ? 'opacity-50 cursor-not-allowed' : ''
-                          }`}
+                            rangeEndFilter ? 'bg-blue-50 border-blue-300' : ''
+                          } ${isDisabled ? 'opacity-50 cursor-not-allowed' : ''}`}
                           disabled={isDisabled}
                           min="0"
                           step="0.01"
