@@ -928,6 +928,7 @@ const FilterBox: React.FC<FilterBoxProps> = React.memo(({
     }
   }, []);
 
+
   // Memoized applied range display to prevent unnecessary re-renders
   const appliedRangeDisplay = useMemo(() => {
     if (rangeStartFilter || rangeEndFilter) {
@@ -1221,10 +1222,10 @@ const FilterBox: React.FC<FilterBoxProps> = React.memo(({
             </div>
           </button>
           {!industryCollapsed && (
-            <div className="px-4 py-3 bg-white space-y-2">
+            <div className="px-4 py-3 bg-white space-y-5">
               <LoadingOverlay isLoading={isDisabled}>
                 {/* Industry Filter */}
-                <div className="flex flex-col gap-1">
+                <div className="flex flex-col gap-2 mb-4">
                   <span className="text-xs font-semibold text-gray-700">{locale === 'ar' ? 'المجال' : 'Industry'}</span>
                   <div
                     onClick={() => !isDisabled && setIsIndustryModalOpen(true)}
@@ -1246,7 +1247,7 @@ const FilterBox: React.FC<FilterBoxProps> = React.memo(({
                 </div>
 
                 {/* ISIC Code Filter */}
-                <div className="flex flex-col gap-1">
+                <div className="flex flex-col gap-2 mb-4">
                   <span className="text-xs font-semibold text-gray-700">{locale === 'ar' ? 'رمز ISIC' : 'ISIC Code'}</span>
                   <div
                     onClick={() => !isDisabled && setIsModalOpen(true)}
@@ -1268,7 +1269,7 @@ const FilterBox: React.FC<FilterBoxProps> = React.memo(({
                 </div>
 
                 {/* HS Code Filter */}
-                <div className="flex flex-col gap-1">
+                <div className="flex flex-col gap-2 mb-4">
                   <span className="text-xs font-semibold text-gray-700">{locale === 'ar' ? 'رمز HS' : 'HS Code'}</span>
                   <div
                     onClick={selectedIsicCode && !isDisabled ? () => setIsHsCodeModalOpen(true) : undefined}
@@ -1326,11 +1327,11 @@ const FilterBox: React.FC<FilterBoxProps> = React.memo(({
             </div>
           </button>
           {!targetMarketCollapsed && (
-            <div className="px-4 py-3 bg-white space-y-2">
+            <div className="px-4 py-3 bg-white space-y-5">
               <LoadingOverlay isLoading={isDisabled}>
                 {/* Economic Bloc */}
                 {searchType !== 'insighter' && (
-                  <div className="flex flex-col gap-1">
+                  <div className="flex flex-col gap-2 mb-4">
                     <span className="text-xs font-semibold text-gray-700">{locale === 'ar' ? 'المنطقة الاقتصادية' : 'By Economic Block'}</span>
                     <Combobox
                       store={economicBlocCombobox}
@@ -1351,9 +1352,26 @@ const FilterBox: React.FC<FilterBoxProps> = React.memo(({
                           component="button"
                           type="button"
                           pointer
-                          rightSection={<Combobox.Chevron />}
+                          rightSection={
+                            <div className="flex items-center gap-1">
+                              {economicBlocFilter && !isDisabled && (
+                                <button
+                                  aria-label="Clear economic bloc"
+                                  className="text-gray-400 hover:text-red-500"
+                                  onMouseDown={(e) => { e.preventDefault(); e.stopPropagation(); }}
+                                  onClick={(e) => {
+                                    e.preventDefault();
+                                    e.stopPropagation();
+                                    setEconomicBlocFilter && setEconomicBlocFilter(null);
+                                  }}
+                                >
+                                  <IconX size={14} />
+                                </button>
+                              )}
+                              <Combobox.Chevron />
+                            </div>
+                          }
                           onClick={() => !isDisabled && economicBlocCombobox.toggleDropdown()}
-                          rightSectionPointerEvents="none"
                           className={`text-sm font-semibold hover:border-blue-400 transition-colors ${
                             isDisabled ? 'opacity-50 cursor-not-allowed' : ''
                           }`}
@@ -1386,7 +1404,7 @@ const FilterBox: React.FC<FilterBoxProps> = React.memo(({
                 )}
 
                 {/* Region */}
-                <div className="flex flex-col gap-1">
+                <div className="flex flex-col gap-2 mb-4">
                   <span className="text-xs font-semibold text-gray-700">{locale === 'ar' ? 'اختر المنطقة الجغرافية' : 'Or By Region'}</span>
                   <Combobox
                     store={regionCombobox}
@@ -1407,9 +1425,26 @@ const FilterBox: React.FC<FilterBoxProps> = React.memo(({
                         component="button"
                         type="button"
                         pointer
-                        rightSection={<Combobox.Chevron />}
+                        rightSection={
+                          <div className="flex items-center gap-1">
+                            {regionFilter && !isDisabled && (
+                              <button
+                                aria-label="Clear region"
+                                className="text-gray-400 hover:text-red-500"
+                                onMouseDown={(e) => { e.preventDefault(); e.stopPropagation(); }}
+                                onClick={(e) => {
+                                  e.preventDefault();
+                                  e.stopPropagation();
+                                  setRegionFilter && setRegionFilter(null);
+                                }}
+                              >
+                                <IconX size={14} />
+                              </button>
+                            )}
+                            <Combobox.Chevron />
+                          </div>
+                        }
                         onClick={() => !isDisabled && regionCombobox.toggleDropdown()}
-                        rightSectionPointerEvents="none"
                         className={`text-sm font-semibold hover:border-blue-400 transition-colors ${
                           isDisabled ? 'opacity-50 cursor-not-allowed' : ''
                         }`}
@@ -1441,7 +1476,7 @@ const FilterBox: React.FC<FilterBoxProps> = React.memo(({
                 </div>
 
                 {/* Country */}
-                <div className="flex flex-col gap-1">
+                <div className="flex flex-col gap-2 mb-4">
                   <span className="text-xs font-semibold text-gray-700">{locale === 'ar' ? 'الدولة' : 'Or By Country'}</span>
                   <Combobox
                     store={countryCombobox}
@@ -1462,9 +1497,26 @@ const FilterBox: React.FC<FilterBoxProps> = React.memo(({
                         component="button"
                         type="button"
                         pointer
-                        rightSection={<Combobox.Chevron />}
+                        rightSection={
+                          <div className="flex items-center gap-1">
+                            {countryFilter && !isDisabled && (
+                              <button
+                                aria-label="Clear country"
+                                className="text-gray-400 hover:text-red-500"
+                                onMouseDown={(e) => { e.preventDefault(); e.stopPropagation(); }}
+                                onClick={(e) => {
+                                  e.preventDefault();
+                                  e.stopPropagation();
+                                  setCountryFilter && setCountryFilter(null);
+                                }}
+                              >
+                                <IconX size={14} />
+                              </button>
+                            )}
+                            <Combobox.Chevron />
+                          </div>
+                        }
                         onClick={() => !isDisabled && countryCombobox.toggleDropdown()}
-                        rightSectionPointerEvents="none"
                         className={`text-sm font-semibold hover:border-blue-400 transition-colors ${
                           isDisabled ? 'opacity-50 cursor-not-allowed' : ''
                         }`}
@@ -1577,7 +1629,7 @@ const FilterBox: React.FC<FilterBoxProps> = React.memo(({
             <div className="px-4 py-3 bg-white space-y-2">
               <LoadingOverlay isLoading={isDisabled}>
                 <p className="text-xs text-gray-500 mb-1">{locale === 'ar' ? 'اضبط دقة البحث الخاص بك.' : 'Adjust the accuracy of your search.'}</p>
-                <div className="flex flex-col gap-2">
+                <div className="flex flex-col gap-2 mb-4">
                   <label className={`flex items-center gap-2 text-xs text-gray-700 cursor-pointer ${
                     isDisabled ? 'opacity-50 cursor-not-allowed' : ''
                   }`}>
@@ -1695,13 +1747,13 @@ const FilterBox: React.FC<FilterBoxProps> = React.memo(({
         overlayProps={{ backgroundOpacity: 0.5, blur: 4 }}
       >
         <div className="h-full overflow-y-auto">
-          <FilterContent />
+          {FilterContent()}
         </div>
       </Drawer>
     );
   }
 
-  return <FilterContent />;
+  return FilterContent();
 }, (prevProps, nextProps) => {
   // Custom comparison function to prevent unnecessary re-renders
   // Only re-render if props that actually affect the component have changed

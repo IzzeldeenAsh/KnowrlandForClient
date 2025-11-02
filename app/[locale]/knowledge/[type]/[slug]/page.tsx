@@ -113,7 +113,7 @@ async function fetchKnowledgeData(type: string, slug: string, locale: string = '
     // Note: localStorage cleanup is handled by AuthHandler component
     
     const response = await fetch(
-      `https://api.knoldg.com/api/platform/industries/knowledge/${slug}`,
+      `https://api.foresighta.co/api/platform/industries/knowledge/${slug}`,
       {
         method: "GET",
         headers,
@@ -157,7 +157,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     return generateKnowledgeMetadata(data, locale, type, slug);
   } catch (error) {
     const isRTL = locale === 'ar';
-    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://knoldg.com';
+    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000';
     const defaultSocialImage = 'https://res.cloudinary.com/dsiku9ipv/image/upload/v1761746492/drilldown_1_cjpvli.jpg';
     const pageUrl = `${baseUrl}/${locale}/knowledge/${type}/${slug}`;
 
@@ -165,7 +165,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     try {
       metadataBase = new URL(baseUrl);
     } catch {
-      metadataBase = new URL('https://knoldg.com');
+      metadataBase = new URL('http://localhost:3000');
     }
 
     const title = isRTL ? "المعرفة غير موجودة | KNOLDG" : "Knowledge Not Found | KNOLDG";
