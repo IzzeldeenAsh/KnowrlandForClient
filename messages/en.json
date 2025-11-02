@@ -6,8 +6,8 @@
  
     "Hero": {
         "tagline": "Beyond Research Boundaries",
-        "title": "Unlock verified expert knowledge, trusted data, and Insights that lead your business to excellence.",
-        "description":"Bringing together specialized experts, valuable data, reports, and more — everything you need for your business success.",
+        "title": "Insights and experts that lead your business to excellence.",
+        "description":"Find data, reports, and subject matter experts, and more",
         "searchPlaceholder": "Search in&nbsp;<strong>Knowledge</strong>&nbsp;or&nbsp;<strong>Insighter</strong>&nbsp;(Insight Expert)...",        "searchPlaceholderMobile":"Search in data, reports, insights...",
         "direction": "ltr"
     },
