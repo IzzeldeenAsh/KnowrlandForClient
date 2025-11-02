@@ -160,11 +160,6 @@ const SearchBar: React.FC<SearchBarProps> = ({
     setSearchQuery(newQuery);
     setSuggestionSelected(false);
     
-    // Call onQueryChange for URL updates (debounced in parent)
-    if (onQueryChange) {
-      onQueryChange(newQuery);
-    }
-    
     // Always allow suggestions to show when typing
     allowSuggestions();
   };

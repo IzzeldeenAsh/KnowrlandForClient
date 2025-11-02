@@ -19,7 +19,6 @@
 
 .title {
   font-family: 'Greycliff CF', var(--mantine-font-family);
-  line-height: 1.2;
   transition: color 0.2s ease;
   font-size: 1.3rem;
   color: white;
