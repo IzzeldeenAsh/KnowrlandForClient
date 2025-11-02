@@ -142,7 +142,7 @@ export default function HomePageFinal() {
           searchState.type,
           locale,
           resetPage ? 1 : searchState.currentPage,
-          filterState.category !== 'all' ? filterState.category : null,
+          null,
           filterState.language,
           filterState.country,
           filterState.region,
@@ -152,6 +152,7 @@ export default function HomePageFinal() {
           30,
           handleError,
           filterState.industry,
+          null,
           filterState.price,
           filterState.hsCode ? parseInt(filterState.hsCode) : null,
           filterState.accuracy,
@@ -167,17 +168,18 @@ export default function HomePageFinal() {
             filterState.country,
             filterState.region,
             filterState.economicBloc,
-          filterState.isicCode ? parseInt(filterState.isicCode) : null,
-          filterState.industry,
-          filterState.price,
-          filterState.hsCode ? parseInt(filterState.hsCode) : null,
-          filterState.accuracy,
-          filterState.role,
-          null, // rangeStartFilter
-          null, // rangeEndFilter
-          null, // coverStartFilter
-          null, // coverEndFilter
-          handleError
+            filterState.isicCode ? parseInt(filterState.isicCode) : null,
+            null,
+            filterState.industry,
+            filterState.price,
+            filterState.hsCode ? parseInt(filterState.hsCode) : null,
+            filterState.accuracy,
+            filterState.role,
+            null,
+            null,
+            null,
+            null,
+            handleError
         );
           searchDispatch({ type: 'SET_STATISTICS', payload: statsResponse.data || [] });
         }
