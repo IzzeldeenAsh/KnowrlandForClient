@@ -46,6 +46,7 @@ export default function HomePage() {
   const initialCountry = searchParams.get('country') ? parseInt(searchParams.get('country')!) : null;
   const initialRegion = searchParams.get('region') ? parseInt(searchParams.get('region')!) : null;
   const initialEconomicBloc = searchParams.get('economic_bloc') ? parseInt(searchParams.get('economic_bloc')!) : null;
+  const initialTag = searchParams.get('tag') ? parseInt(searchParams.get('tag')!) : null;
   const initialIndustry = searchParams.get('industry') ? parseInt(searchParams.get('industry')!) : null;
   const initialIsicCode = searchParams.get('isic_code') ? parseInt(searchParams.get('isic_code')!) : null;
   const initialHsCode = searchParams.get('hs_code') ? parseInt(searchParams.get('hs_code')!) : null;
@@ -68,7 +69,7 @@ export default function HomePage() {
   
   const [searchQuery, setSearchQuery] = useState(initialQuery);
   const [searchType, setSearchType] = useState<'knowledge' | 'insighter'>(initialType);
-  const [activeTab, setActiveTab] = useState<string | null>('all');
+  const [activeTab] = useState<string | null>('all');
   
   // Keep searchType synchronized with URL
   useEffect(() => {
@@ -98,6 +99,7 @@ export default function HomePage() {
   const [countryFilter, setCountryFilter] = useState<number | null>(initialCountry);
   const [regionFilter, setRegionFilter] = useState<number | null>(initialRegion);
   const [economicBlocFilter, setEconomicBlocFilter] = useState<number | null>(initialEconomicBloc);
+  const [tagFilter, setTagFilter] = useState<number | null>(initialTag);
   const [industryFilter, setIndustryFilter] = useState<number | null>(initialIndustry);
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
   const [isicCodeFilter, setIsicCodeFilter] = useState<number | null>(initialIsicCode);
@@ -135,7 +137,6 @@ export default function HomePage() {
   
   const params = useParams();
   const locale = params.locale as string || 'en';
-  const t4 = useTranslations('Features4');
   
   // Access the toast context
   const toast = useToast();
@@ -158,6 +159,7 @@ export default function HomePage() {
           regionFilter,
           economicBlocFilter,
           isicCodeFilter,
+          tagFilter,
           industryFilter,
           priceFilter,
           hsCodeFilter,
@@ -177,7 +179,7 @@ export default function HomePage() {
       setStatistics([]);
     }
   }, [locale, languageFilter, countryFilter, regionFilter, economicBlocFilter,
-      isicCodeFilter, industryFilter, priceFilter, hsCodeFilter, accuracyFilter, roleFilter, rangeStartFilter, rangeEndFilter, yearOfStudyFilter, toast]);
+      isicCodeFilter, tagFilter, industryFilter, priceFilter, hsCodeFilter, accuracyFilter, roleFilter, rangeStartFilter, rangeEndFilter, yearOfStudyFilter, toast]);
   
   // Helper function to get count for a specific category type from statistics
   const getCategoryCount = useCallback((categoryType: string) => {
@@ -210,6 +212,7 @@ export default function HomePage() {
     setRegionFilter(null);
     setEconomicBlocFilter(null);
     setIndustryFilter(null);
+    setTagFilter(null);
     setIsicCodeFilter(null);
     setHsCodeFilter(null);
     setPriceFilter(null);
@@ -257,6 +260,7 @@ export default function HomePage() {
         30, // perPage
         handleError,
         null, // Reset industry filter
+        null, // Reset tag filter
         null, // Reset price filter
         null, // Reset HS code filter
         'all', // Reset accuracy filter
@@ -299,6 +303,7 @@ export default function HomePage() {
     country?: number | null,
     region?: number | null,
     economic_bloc?: number | null,
+    tag?: number | null,
     industry?: number | null,
     isic_code?: number | null,
     hs_code?: number | null,
@@ -327,6 +332,7 @@ export default function HomePage() {
     const country = params.country !== undefined ? params.country : countryFilter;
     const region = params.region !== undefined ? params.region : regionFilter;
     const economicBloc = params.economic_bloc !== undefined ? params.economic_bloc : economicBlocFilter;
+    const tag = params.tag !== undefined ? params.tag : tagFilter;
     const industry = params.industry !== undefined ? params.industry : industryFilter;
     const isicCode = params.isic_code !== undefined ? params.isic_code : isicCodeFilter;
     const hsCode = params.hs_code !== undefined ? params.hs_code : hsCodeFilter;
@@ -350,6 +356,7 @@ export default function HomePage() {
     if (country !== null) urlParams.set('country', country.toString());
     if (region !== null) urlParams.set('region', region.toString());
     if (economicBloc !== null) urlParams.set('economic_bloc', economicBloc.toString());
+    if (tag !== null) urlParams.set('tag', tag.toString());
     if (industry !== null) urlParams.set('industry', industry.toString());
     if (isicCode !== null) urlParams.set('isic_code', isicCode.toString());
     if (hsCode !== null) urlParams.set('hs_code', hsCode.toString());
@@ -369,7 +376,7 @@ export default function HomePage() {
     
     // Update URL without refreshing the page
     router.push(`/${locale}/home?${urlParams.toString()}`, { scroll: false });
-  }, [locale, router, searchType, searchQuery, currentPage, languageFilter, countryFilter, regionFilter, economicBlocFilter, industryFilter, isicCodeFilter, hsCodeFilter, priceFilter, selectedCategory, accuracyFilter, roleFilter, rangeStartFilter, rangeEndFilter, yearOfStudyFilter]);
+  }, [locale, router, searchType, searchQuery, currentPage, languageFilter, countryFilter, regionFilter, economicBlocFilter, tagFilter, industryFilter, isicCodeFilter, hsCodeFilter, priceFilter, selectedCategory, accuracyFilter, roleFilter, rangeStartFilter, rangeEndFilter, yearOfStudyFilter]);
 
   // Handler for search type changes
   const handleSearchTypeChange = useCallback(async (type: 'knowledge' | 'insighter') => {
@@ -397,34 +404,28 @@ export default function HomePage() {
       setTotalPages(1);
       setTotalItems(0);
       
-      // Reset type-specific filters when switching search types
-      if (type === 'knowledge') {
-        // When switching to knowledge, reset insighter-specific filters
-        setAccuracyFilter('all');
-        setRoleFilter('all');
-        // Reset category to 'all' for knowledge
-        setSelectedCategory('all');
-        console.log('🔄 Reset insighter filters for knowledge search');
-      } else if (type === 'insighter') {
-        // When switching to insighter, reset knowledge-specific filters
-        setIndustryFilter(null);
-        setIsicCodeFilter(null);
-        setHsCodeFilter(null);
-        setPriceFilter(null);
-        setSelectedCategory('all');
-        console.log('🔄 Reset knowledge filters for insighter search');
-      }
+      // Reset ALL filters when switching search types
+      setLanguageFilter('all');
+      setCountryFilter(null);
+      setRegionFilter(null);
+      setEconomicBlocFilter(null);
+      setTagFilter(null);
+      setIndustryFilter(null);
+      setIsicCodeFilter(null);
+      setHsCodeFilter(null);
+      setPriceFilter(null);
+      setRangeStartFilter(null);
+      setRangeEndFilter(null);
+      setYearOfStudyFilter(null);
+      setSelectedCategory('all');
+      setAccuracyFilter('all');
+      setRoleFilter('all');
     });
     
-    // Build URL parameters for the new search type with reset filters
+    // Build URL parameters for the new search type with reset filters (only keyword + search_type)
     const urlParams = new URLSearchParams();
     if (searchQuery && searchQuery.trim() !== '') urlParams.set('keyword', searchQuery);
     urlParams.set('search_type', type);
-    // Keep only common filters that apply to both types
-    if (languageFilter && languageFilter !== 'all') urlParams.set('language', languageFilter);
-    if (countryFilter !== null) urlParams.set('country', countryFilter.toString());
-    if (regionFilter !== null) urlParams.set('region', regionFilter.toString());
-    if (economicBlocFilter !== null) urlParams.set('economic_bloc', economicBlocFilter.toString());
     
     // Update URL with clean parameters for the new search type
     router.push(`/${locale}/home?${urlParams.toString()}`, { scroll: false });
@@ -443,21 +444,24 @@ export default function HomePage() {
         locale,
         1, // Reset to page 1
         activeTab,
-        languageFilter,
-        countryFilter,
-        regionFilter,
-        economicBlocFilter,
+        'all',
+        null,
+        null,
+        null,
         null, // Always reset ISIC code when switching types
         'all', // Always reset category to 'all'
         30, // perPage
         handleError,
         null, // Always reset industry when switching types
+        null, // Always reset tag when switching types
         null, // Always reset price when switching types
         null, // Always reset HS code when switching types
         'all', // Always reset accuracy to 'all' when switching types
         'all', // Always reset role to 'all' when switching types
         null, // Always reset range start when switching types
-        null // Always reset range end when switching types
+        null, // Always reset range end when switching types
+        null, // Always reset cover_start when switching types
+        null  // Always reset cover_end when switching types
       );
       
       console.log(`✅ API response for ${type}:`, response.data?.length, 'items');
@@ -651,6 +655,13 @@ export default function HomePage() {
     // The main search effect will be triggered by the state change
   }, [updateUrlWithFilters]);
 
+  // Custom setter for tag filter that triggers search
+  const handleTagFilterChange = useCallback((value: number | null) => {
+    setTagFilter(value);
+    updateUrlWithFilters({ tag: value });
+    setCurrentPage(1);
+  }, [updateUrlWithFilters]);
+
   const handleYearOfStudyFilterChange = useCallback((value: YearRange | null) => {
     console.log('🗓️ Year of Study filter changed:', value);
 
@@ -700,6 +711,7 @@ export default function HomePage() {
     const urlRegion = searchParams.get('region') ? parseInt(searchParams.get('region')!) : null;
     const urlEconomicBloc = searchParams.get('economic_bloc') ? parseInt(searchParams.get('economic_bloc')!) : null;
     const urlIndustry = searchParams.get('industry') ? parseInt(searchParams.get('industry')!) : null;
+    const urlTag = searchParams.get('tag') ? parseInt(searchParams.get('tag')!) : null;
     const urlIsicCode = searchParams.get('isic_code') ? parseInt(searchParams.get('isic_code')!) : null;
     const urlHsCode = searchParams.get('hs_code') ? parseInt(searchParams.get('hs_code')!) : null;
     const urlCountry = searchParams.get('country') ? parseInt(searchParams.get('country')!) : null;
@@ -751,6 +763,7 @@ export default function HomePage() {
             30, // perPage
           handleError, // onError callback
           urlIndustry, // Use URL value directly
+          urlTag,
           urlPriceFilter,
           urlHsCode,
           urlAccuracy,
@@ -782,6 +795,7 @@ export default function HomePage() {
                 urlRegion,
                 urlEconomicBloc,
                 urlIsicCode,
+                urlTag,
                 urlIndustry, // Use URL value directly
                 urlPriceFilter,
                 urlHsCode,
@@ -864,6 +878,7 @@ export default function HomePage() {
     if (industryFilter !== null) expectedUrlParams.set('industry', industryFilter.toString());
     if (isicCodeFilter !== null) expectedUrlParams.set('isic_code', isicCodeFilter.toString());
     if (hsCodeFilter !== null) expectedUrlParams.set('hs_code', hsCodeFilter.toString());
+    if (tagFilter !== null) expectedUrlParams.set('tag', tagFilter.toString());
     if (priceFilter !== null) expectedUrlParams.set('paid', priceFilter);
     if (selectedCategory && selectedCategory !== 'all') expectedUrlParams.set('type', selectedCategory);
     if (accuracyFilter && accuracyFilter !== 'all') expectedUrlParams.set('accuracy', accuracyFilter);
@@ -890,6 +905,7 @@ export default function HomePage() {
     const urlRegion = searchParams.get('region') ? parseInt(searchParams.get('region')!) : null;
     const urlEconomicBloc = searchParams.get('economic_bloc') ? parseInt(searchParams.get('economic_bloc')!) : null;
     const urlIndustry = searchParams.get('industry') ? parseInt(searchParams.get('industry')!) : null;
+    const urlTag = searchParams.get('tag') ? parseInt(searchParams.get('tag')!) : null;
     const urlIsicCode = searchParams.get('isic_code') ? parseInt(searchParams.get('isic_code')!) : null;
     const urlHsCode = searchParams.get('hs_code') ? parseInt(searchParams.get('hs_code')!) : null;
     const urlCategory = searchParams.get('type');
@@ -937,6 +953,9 @@ export default function HomePage() {
       
       if (urlIndustry !== industryFilter) {
         setIndustryFilter(urlIndustry);
+      }
+      if (urlTag !== tagFilter) {
+        setTagFilter(urlTag);
       }
       
       if (urlIsicCode !== isicCodeFilter) {
@@ -1001,20 +1020,6 @@ export default function HomePage() {
     updateStates();
   }, [searchParams, initialized]);
   
-  // Function to convert KnowledgeItem array to SearchResultItem array
-  const mapToSearchResults = useCallback((items: KnowledgeItem[]) => {
-    return items.map((item) => ({
-      searchable_id: parseInt(item.slug) || Math.random(), // Use slug as ID or fallback to random
-      searchable_type: 'knowledge',
-      title: item.title,
-      description: item.description,
-      url: `/${locale}/knowledge/${item.type}/${item.slug}`,
-      type: item.type,
-      published_at: item.published_at,
-      insighter: item.insighter?.name || '',
-      total_price: item.total_price
-    }));
-  }, [locale]);
 
   // Ref to track URL update timeout
   const urlUpdateTimeoutRef = useRef<NodeJS.Timeout | null>(null);
@@ -1072,6 +1077,7 @@ export default function HomePage() {
         30, // perPage
         handleError,
         industryFilter,
+        tagFilter,
         priceFilter,
         hsCodeFilter,
         accuracyFilter,
@@ -1117,6 +1123,7 @@ export default function HomePage() {
     countryFilter,
     regionFilter,
     economicBlocFilter,
+    tagFilter,
     activeTab,
     searchQuery,
     searchType,
@@ -1174,6 +1181,7 @@ export default function HomePage() {
     if (regionFilter) params.set('region', regionFilter.toString());
     if (economicBlocFilter) params.set('economic_bloc', economicBlocFilter.toString());
     if (industryFilter) params.set('industry', industryFilter.toString());
+    if (tagFilter) params.set('tag', tagFilter.toString());
     if (isicCodeFilter) params.set('isic_code', isicCodeFilter.toString());
     if (hsCodeFilter) params.set('hs_code', hsCodeFilter.toString());
     if (priceFilter) params.set('paid', priceFilter);
@@ -1206,6 +1214,7 @@ export default function HomePage() {
         30,
         (error) => toast.error(error, 'Error'),
         industryFilter,
+        tagFilter,
         priceFilter,
         hsCodeFilter,
         accuracyFilter,
@@ -1298,6 +1307,7 @@ export default function HomePage() {
       params.countryFilter !== countryFilter ||
       params.regionFilter !== regionFilter ||
       params.economicBlocFilter !== economicBlocFilter ||
+      params.tagFilter !== tagFilter ||
       params.activeTab !== activeTab ||
       params.searchType !== searchType ||
       params.selectedCategory !== selectedCategory ||
@@ -1314,7 +1324,7 @@ export default function HomePage() {
     // Log parameter changes for debugging (but don't include searchQuery)
     if (paramsChanged) {
       console.log('Search params changed (excluding query):', {
-        locale, languageFilter, countryFilter, regionFilter, economicBlocFilter,
+        locale, languageFilter, countryFilter, regionFilter, economicBlocFilter, tagFilter,
         activeTab, searchType, selectedCategory, industryFilter, isicCodeFilter, hsCodeFilter, priceFilter, accuracyFilter, roleFilter, rangeStartFilter, rangeEndFilter, yearOfStudyFilter
       });
     }
@@ -1327,6 +1337,7 @@ export default function HomePage() {
       countryFilter,
       regionFilter,
       economicBlocFilter,
+      tagFilter,
       activeTab,
       searchQuery: searchParamsRef.current.searchQuery, // Keep previous value
       searchType,
@@ -1417,6 +1428,7 @@ export default function HomePage() {
           30, // perPage - consistent with UI calculation (30 items per page)
           handleError, // onError callback
           industryFilter,
+          tagFilter,
           priceFilter,
           hsCodeFilter,
           accuracyFilter,
@@ -1460,7 +1472,7 @@ export default function HomePage() {
       }
     };
   // REMOVED searchQuery from dependencies - only trigger on filter changes, not query changes
-  }, [locale, languageFilter, countryFilter, regionFilter, economicBlocFilter, activeTab, searchType, initialized, toast, selectedCategory, industryFilter, isicCodeFilter, hsCodeFilter, priceFilter, accuracyFilter, roleFilter, rangeStartFilter, rangeEndFilter, yearOfStudyFilter, fetchStatisticsIfNeeded]);
+  }, [locale, languageFilter, countryFilter, regionFilter, economicBlocFilter, tagFilter, activeTab, searchType, initialized, toast, selectedCategory, industryFilter, isicCodeFilter, hsCodeFilter, priceFilter, accuracyFilter, roleFilter, rangeStartFilter, rangeEndFilter, yearOfStudyFilter, fetchStatisticsIfNeeded]);
 
   return (
    <main className='min-h-screen flex flex-col bg-gray-50'>
@@ -1471,7 +1483,7 @@ export default function HomePage() {
      <section className="relative flex-1">
       <PageIllustration />
   {/* Hero Banner Section */}
-  <div className="relative overflow-hidden pt-16 pb-8">
+  <div className="relative overflow-hidden pt-16 pb-16">
        <div className="absolute inset-0 z-0">
          <svg className="absolute right-0 top-0 h-full w-1/2 translate-x-1/3 transform text-white opacity-10" fill="none" viewBox="0 0 400 400">
            <defs>
@@ -1708,6 +1720,8 @@ export default function HomePage() {
                       setRegionFilter={handleRegionFilterChange}
                       economicBlocFilter={economicBlocFilter}
                       setEconomicBlocFilter={handleEconomicBlocFilterChange}
+                      tagFilter={tagFilter}
+                      setTagFilter={handleTagFilterChange}
                       isicCodeFilter={isicCodeFilter?.toString() || null}
                       setIsicCodeFilter={handleIsicCodeFilterChange}
                       industryFilter={industryFilter}

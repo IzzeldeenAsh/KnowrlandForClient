@@ -17,6 +17,7 @@ export const filterInitialState: FilterState = {
   country: null,
   region: null,
   economicBloc: null,
+  tag: null,
   industry: null,
   isicCode: null,
   hsCode: null,
@@ -106,6 +107,9 @@ export function filterReducer(state: FilterState, action: FilterAction): FilterS
         country: null,
         region: null,
       };
+    
+    case 'SET_TAG':
+      return { ...state, tag: action.payload };
     
     case 'SET_INDUSTRY':
       return { ...state, industry: action.payload };

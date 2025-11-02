@@ -1,14 +1,12 @@
 'use client'
 
 import React, { useState, useEffect, useCallback, useRef, useMemo } from 'react';
-import { Select, Modal, Loader, Chip, Combobox, Input, InputBase, useCombobox, Drawer } from '@mantine/core';
+import { Modal, Loader, Chip, Combobox, Input, InputBase, useCombobox, Drawer } from '@mantine/core';
 import { useMediaQuery } from '@mantine/hooks';
-import { IconRefresh, IconCode, IconBuildingFactory, IconWorldSearch, IconBuildingBank, IconMap, IconWorld, IconLanguage, IconCoin, IconSearch, IconX, IconCalendarEvent } from '@tabler/icons-react';
+import { IconCode, IconBuildingFactory, IconWorldSearch, IconBuildingBank, IconWorld, IconLanguage, IconCoin, IconSearch, IconX, IconCalendarEvent } from '@tabler/icons-react';
 import CustomYearPicker from './CustomYearPicker';
 
-import { useTranslations } from 'next-intl';
 import { getApiUrl } from '@/app/config';
-import { useSearchParams } from 'next/navigation';
 
 interface Region {
   id: number;
@@ -16,6 +14,11 @@ interface Region {
 }
 
 interface EconomicBloc {
+  id: number;
+  name: string;
+}
+
+interface TagItem {
   id: number;
   name: string;
 }
@@ -87,6 +90,8 @@ interface FilterBoxProps {
   setRegionFilter?: (filter: number | null) => void;
   economicBlocFilter?: number | null;
   setEconomicBlocFilter?: (filter: number | null) => void;
+  tagFilter?: number | null;
+  setTagFilter?: (filter: number | null) => void;
   isicCodeFilter?: string | null;
   setIsicCodeFilter?: (filter: string | null) => void;
   hsCodeFilter?: string | null;
@@ -125,6 +130,8 @@ const FilterBox: React.FC<FilterBoxProps> = React.memo(({
   setRegionFilter = () => {},
   economicBlocFilter = null,
   setEconomicBlocFilter = () => {},
+  tagFilter = null,
+  setTagFilter = () => {},
   isicCodeFilter = null,
   setIsicCodeFilter = noop,
   hsCodeFilter = null,
@@ -159,16 +166,18 @@ const FilterBox: React.FC<FilterBoxProps> = React.memo(({
   const [countries, setCountries] = useState<Country[]>([]);
   const [regions, setRegions] = useState<Region[]>([]);
   const [economicBlocs, setEconomicBlocs] = useState<EconomicBloc[]>([]);
+  const [tags, setTags] = useState<TagItem[]>([]);
   const [isicCodes, setIsicCodes] = useState<ISICCode[]>([]);
   const [hsCodes, setHsCodes] = useState<HSCode[]>([]);
   const [industries, setIndustries] = useState<IndustryNode[]>([]);
 
   // Loading States - Enhanced granular loading
-  const [apiLoading, setApiLoading] = useState(false); // Main API loading from parent
+  const [apiLoading] = useState(false); // Main API loading from parent
   const [dataLoading, setDataLoading] = useState({
     countries: false,
     regions: false,
     economicBlocs: false,
+    tags: false,
     isicCodes: false,
     hsCodes: false,
     industries: false
@@ -211,6 +220,7 @@ const FilterBox: React.FC<FilterBoxProps> = React.memo(({
   const [accuracyCollapsed, setAccuracyCollapsed] = useState(searchType === 'knowledge' || shouldUseDrawer);
   const [industryCollapsed, setIndustryCollapsed] = useState(searchType === 'insighter' || shouldUseDrawer);
   const [targetMarketCollapsed, setTargetMarketCollapsed] = useState(true);
+  const [tagsCollapsed, setTagsCollapsed] = useState(true);
   const [yearOfStudyCollapsed, setYearOfStudyCollapsed] = useState(false);
   const [roleCollapsed, setRoleCollapsed] = useState(shouldUseDrawer);
 
@@ -239,8 +249,7 @@ const FilterBox: React.FC<FilterBoxProps> = React.memo(({
   const [economicBlocSearch, setEconomicBlocSearch] = useState('');
   const [regionSearch, setRegionSearch] = useState('');
   const [countrySearch, setCountrySearch] = useState('');
-
-  const searchParams = useSearchParams();
+  const [tagSearch, setTagSearch] = useState('');
 
   // Detect if we're in a loading state from parent component
   // This assumes the parent passes some loading indication
@@ -279,6 +288,17 @@ const FilterBox: React.FC<FilterBoxProps> = React.memo(({
     },
     onDropdownOpen: () => {
       countryCombobox.focusSearchInput();
+    },
+  });
+
+  const tagCombobox = useCombobox({
+    onDropdownClose: () => {
+      tagCombobox.resetSelectedOption();
+      tagCombobox.focusTarget();
+      setTagSearch('');
+    },
+    onDropdownOpen: () => {
+      tagCombobox.focusSearchInput();
     },
   });
 
@@ -357,6 +377,19 @@ const FilterBox: React.FC<FilterBoxProps> = React.memo(({
       })) : [];
     };
 
+    const fetchTags = async () => {
+      const response = await fetch(getApiUrl('/api/common/setting/tag/common/list'), {
+        headers: {
+          'Accept-Language': locale,
+          'Accept': 'application/json',
+          "X-Timezone": Intl.DateTimeFormat().resolvedOptions().timeZone,
+        }
+      });
+      if (!response.ok) throw new Error('Failed to fetch tags');
+      const data = await response.json();
+      return data.data ? data.data.map((t: TagItem) => ({ id: t.id, name: t.name })) : [];
+    };
+
     const fetchIsicCodes = async () => {
       const response = await fetch(getApiUrl('/api/common/setting/isic-code/tree-list'), {
         headers: {
@@ -388,6 +421,7 @@ const FilterBox: React.FC<FilterBoxProps> = React.memo(({
       fetchWithLoading(fetchCountries, 'countries', setCountries),
       fetchWithLoading(fetchRegions, 'regions', setRegions),
       fetchWithLoading(fetchEconomicBlocs, 'economicBlocs', setEconomicBlocs),
+      fetchWithLoading(fetchTags, 'tags', setTags),
       fetchWithLoading(fetchIsicCodes, 'isicCodes', setIsicCodes),
       fetchWithLoading(fetchIndustries, 'industries', setIndustries)
     ]);
@@ -503,6 +537,11 @@ const FilterBox: React.FC<FilterBoxProps> = React.memo(({
     label: bloc.name
   }));
 
+  const tagOptions = tags.map((t: TagItem) => ({
+    value: t.id.toString(),
+    label: t.name
+  }));
+
   // Helper functions for selected values
   const getSelectedEconomicBlocLabel = () => {
     if (!economicBlocFilter) return null;
@@ -513,6 +552,18 @@ const FilterBox: React.FC<FilterBoxProps> = React.memo(({
   const getSelectedRegionLabel = () => {
     if (!regionFilter) return null;
     const selected = regions.find(region => region.id === regionFilter);
+    return selected ? selected.name : null;
+  };
+
+  const getSelectedTagLabel = () => {
+    // tagFilter prop is a number id
+    // tags state contains id + name
+    // Find selected tag name
+    // If not found return null
+    // Note: tagFilter may be undefined if not provided
+    const id = typeof tagFilter === 'number' ? tagFilter : null;
+    if (id === null) return null;
+    const selected = tags.find(t => t.id === id);
     return selected ? selected.name : null;
   };
 
@@ -533,6 +584,10 @@ const FilterBox: React.FC<FilterBoxProps> = React.memo(({
 
   const filteredCountryOptions = countryOptions.filter(option =>
     option.label.toLowerCase().includes(countrySearch.toLowerCase().trim())
+  );
+
+  const filteredTagOptions = tagOptions.filter(option =>
+    option.label.toLowerCase().includes(tagSearch.toLowerCase().trim())
   );
 
   // Leaf node helpers
@@ -1159,50 +1214,52 @@ const FilterBox: React.FC<FilterBoxProps> = React.memo(({
             )}
           </div>
         )}
-  {/* Year of Study Section */}
-  <div>
-          <button
-            onClick={() => !isDisabled && setYearOfStudyCollapsed(!yearOfStudyCollapsed)}
-            disabled={isDisabled}
-            className={`w-full flex items-center justify-between px-4 py-3 text-left bg-gray-50 hover:bg-gray-100 focus:outline-none transition-colors ${
-              isDisabled ? 'opacity-50 cursor-not-allowed' : ''
-            }`}
-          >
-            <span className="flex items-center gap-2 text-blue-500 font-semibold">
-              <IconCalendarEvent size={20} className="p-0.5 rounded-full" />
-              {locale === 'ar' ? 'سنة الدراسة' : 'Year of Study'}
-            </span>
-            <svg className={`w-4 h-4 text-gray-400 transition-transform ${yearOfStudyCollapsed ? '' : 'rotate-180'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-            </svg>
-          </button>
-          {!yearOfStudyCollapsed && (
-            <div className="px-4 py-3 bg-white">
-              <LoadingOverlay isLoading={isDisabled}>
-                <div className="flex flex-col gap-1">
-                  <span className="text-xs font-semibold text-gray-700 mb-2">
-                    {locale === 'ar' ? 'اختر سنة الدراسة' : 'Select Year of Study'}
-                  </span>
-                  <CustomYearPicker
-                    placeholder={locale === 'ar' ? 'اختر السنة' : 'Select year'}
-                    yearRangeStart={1900}
-                    yearRangeEnd={2030}
-                    allowRange={true}
-                    locale={locale}
-                    value={yearOfStudyFilter}
-                    onChange={(value) => {
-                      if (setYearOfStudyFilter) {
-                        setYearOfStudyFilter(value);
-                      }
-                    }}
-                    disabled={isDisabled}
-                  />
-            
-                </div>
-              </LoadingOverlay>
-            </div>
-          )}
-        </div>
+        {/* Year of Study Section */}
+        {searchType !== 'insighter' && (
+          <div>
+            <button
+              onClick={() => !isDisabled && setYearOfStudyCollapsed(!yearOfStudyCollapsed)}
+              disabled={isDisabled}
+              className={`w-full flex items-center justify-between px-4 py-3 text-left bg-gray-50 hover:bg-gray-100 focus:outline-none transition-colors ${
+                isDisabled ? 'opacity-50 cursor-not-allowed' : ''
+              }`}
+            >
+              <span className="flex items-center gap-2 text-blue-500 font-semibold">
+                <IconCalendarEvent size={20} className="p-0.5 rounded-full" />
+                {locale === 'ar' ? 'سنة الدراسة' : 'Year of Study'}
+              </span>
+              <svg className={`w-4 h-4 text-gray-400 transition-transform ${yearOfStudyCollapsed ? '' : 'rotate-180'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+              </svg>
+            </button>
+            {!yearOfStudyCollapsed && (
+              <div className="px-4 py-3 bg-white">
+                <LoadingOverlay isLoading={isDisabled}>
+                  <div className="flex flex-col gap-1">
+                    <span className="text-xs font-semibold text-gray-700 mb-2">
+                      {locale === 'ar' ? 'اختر سنة الدراسة' : 'Select Year of Study'}
+                    </span>
+                    <CustomYearPicker
+                      placeholder={locale === 'ar' ? 'اختر السنة' : 'Select year'}
+                      yearRangeStart={1900}
+                      yearRangeEnd={2030}
+                      allowRange={true}
+                      locale={locale}
+                      value={yearOfStudyFilter}
+                      onChange={(value) => {
+                        if (setYearOfStudyFilter) {
+                          setYearOfStudyFilter(value);
+                        }
+                      }}
+                      disabled={isDisabled}
+                    />
+
+                  </div>
+                </LoadingOverlay>
+              </div>
+            )}
+          </div>
+        )}
 
         {/* Industry Section */}
         <div>
@@ -1304,10 +1361,116 @@ const FilterBox: React.FC<FilterBoxProps> = React.memo(({
                     )}
                   </div>
                 </div>
+
               </LoadingOverlay>
             </div>
           )}
         </div>
+
+        {/* Tags Section */}
+        {searchType !== 'insighter' && (
+          <div>
+            <button
+              onClick={() => !isDisabled && setTagsCollapsed(!tagsCollapsed)}
+              disabled={isDisabled}
+              className={`w-full flex items-center justify-between px-4 py-3 text-left bg-gray-50 hover:bg-gray-100 focus:outline-none transition-colors ${
+                isDisabled ? 'opacity-50 cursor-not-allowed' : ''
+              }`}
+            >
+              <span className="flex items-center gap-2 text-blue-500 font-semibold">
+                <IconCode size={20} className="p-0.5 rounded-full" />
+                {locale === 'ar' ? 'الوسوم' : 'Tags'}
+              </span>
+              <div className="flex items-center gap-2">
+                {dataLoading.tags && <Loader size="xs" />}
+                <svg className={`w-4 h-4 text-gray-400 transition-transform ${tagsCollapsed ? '' : 'rotate-180'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                </svg>
+              </div>
+            </button>
+            {!tagsCollapsed && (
+              <div className="px-4 py-3 bg-white">
+                <LoadingOverlay isLoading={isDisabled}>
+                  <div className="flex flex-col gap-2">
+                    <span className="text-xs font-semibold text-gray-700 mb-2">{locale === 'ar' ? 'اختر وسمًا' : 'Select a tag'}</span>
+                    <Combobox
+                      store={tagCombobox}
+                      withinPortal={false}
+                      onOptionSubmit={(val) => {
+                        if (!isDisabled) {
+                          console.log('Tag selected:', val);
+                          if (setTagFilter) setTagFilter(parseInt(val));
+                          tagCombobox.closeDropdown();
+                        }
+                      }}
+                      disabled={isDisabled}
+                    >
+                      <Combobox.Target>
+                        <InputBase
+                          component="button"
+                          type="button"
+                          pointer
+                          rightSection={
+                            <div className="flex items-center gap-1">
+                              {typeof tagFilter === 'number' && !isDisabled && (
+                                <button
+                                  aria-label="Clear tag"
+                                  className="text-gray-400 hover:text-red-500"
+                                  onMouseDown={(e) => { e.preventDefault(); e.stopPropagation(); }}
+                                  onClick={(e) => {
+                                    e.preventDefault();
+                                    e.stopPropagation();
+                                    console.log('Clearing tag filter');
+                                    setTagFilter && setTagFilter(null);
+                                  }}
+                                >
+                                  <IconX size={14} />
+                                </button>
+                              )}
+                              <Combobox.Chevron />
+                            </div>
+                          }
+                          onClick={() => !isDisabled && tagCombobox.toggleDropdown()}
+                          className={`text-sm font-semibold hover:border-blue-400 transition-colors ${
+                            isDisabled ? 'opacity-50 cursor-not-allowed' : ''
+                          }`}
+                          disabled={isDisabled}
+                        >
+                          {getSelectedTagLabel() ? (
+                            <span className="text-gray-800 font-medium truncate block pr-8">
+                              {getSelectedTagLabel()}
+                            </span>
+                          ) : (
+                            <Input.Placeholder>{locale === 'ar' ? 'اختر وسمًا' : 'Select a tag'}</Input.Placeholder>
+                          )}
+                        </InputBase>
+                      </Combobox.Target>
+                      <Combobox.Dropdown>
+                        <Combobox.Search
+                          value={tagSearch}
+                          onChange={(event) => setTagSearch(event.currentTarget.value)}
+                          placeholder={locale === 'ar' ? 'ابحث في الوسوم' : 'Search tags'}
+                          disabled={isDisabled}
+                        />
+                        <Combobox.Options className="max-h-40 overflow-y-auto">
+                          {filteredTagOptions.length > 0 ? (
+                            filteredTagOptions.map((option) => (
+                              <Combobox.Option value={option.value} key={option.value}>
+                                {option.label}
+                              </Combobox.Option>
+                            ))
+                          ) : (
+                            <Combobox.Empty>{locale === 'ar' ? 'لا توجد نتائج' : 'Nothing found'}</Combobox.Empty>
+                          )}
+                        </Combobox.Options>
+                      </Combobox.Dropdown>
+                    </Combobox>
+                  </div>
+                </LoadingOverlay>
+              </div>
+            )}
+          </div>
+        )}
 
         {/* Target Market Section */}
         <div>
@@ -1762,7 +1925,7 @@ const FilterBox: React.FC<FilterBoxProps> = React.memo(({
   // Only re-render if props that actually affect the component have changed
   const propsToCompare: (keyof FilterBoxProps)[] = [
     'locale', 'searchType', 'languageFilter', 'countryFilter', 'regionFilter',
-    'economicBlocFilter', 'isicCodeFilter', 'hsCodeFilter', 'industryFilter',
+    'economicBlocFilter', 'tagFilter', 'isicCodeFilter', 'hsCodeFilter', 'industryFilter',
     'priceFilter', 'rangeStartFilter', 'rangeEndFilter', 'accuracyFilter',
     'roleFilter', 'isDrawerOpen', 'forceDrawerMode', 'yearOfStudyFilter'
   ];
