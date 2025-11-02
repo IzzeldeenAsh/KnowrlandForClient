@@ -58,6 +58,7 @@ export function useSearchState({ locale, onError }: UseSearchStateOptions) {
       country: urlParams.get('country') ? parseInt(urlParams.get('country')!) : null,
       region: urlParams.get('region') ? parseInt(urlParams.get('region')!) : null,
       economicBloc: urlParams.get('economic_bloc') ? parseInt(urlParams.get('economic_bloc')!) : null,
+      tag: urlParams.get('tag') ? parseInt(urlParams.get('tag')!) : null,
       industry: urlParams.get('industry') ? parseInt(urlParams.get('industry')!) : null,
       isicCode: urlParams.get('isic_code') || null,
       hsCode: urlParams.get('hs_code') || null,
@@ -89,6 +90,7 @@ export function useSearchState({ locale, onError }: UseSearchStateOptions) {
     if (filterState.country) params.set('country', filterState.country.toString());
     if (filterState.region) params.set('region', filterState.region.toString());
     if (filterState.economicBloc) params.set('economic_bloc', filterState.economicBloc.toString());
+    if (filterState.tag) params.set('tag', filterState.tag.toString());
     if (filterState.industry) params.set('industry', filterState.industry.toString());
     if (filterState.isicCode) params.set('isic_code', filterState.isicCode);
     if (filterState.hsCode) params.set('hs_code', filterState.hsCode);
@@ -136,6 +138,7 @@ export function useSearchState({ locale, onError }: UseSearchStateOptions) {
           30,
           onError,
           filterState.industry,
+          filterState.tag,
           filterState.price,
           filterState.hsCode ? parseInt(filterState.hsCode) : null,
           filterState.accuracy,
@@ -156,6 +159,7 @@ export function useSearchState({ locale, onError }: UseSearchStateOptions) {
             filterState.region,
             filterState.economicBloc,
             filterState.isicCode ? parseInt(filterState.isicCode) : null,
+            filterState.tag,
             filterState.industry,
             filterState.price,
             filterState.hsCode ? parseInt(filterState.hsCode) : null,

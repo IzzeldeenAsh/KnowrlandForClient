@@ -118,6 +118,7 @@ export async function fetchStatisticsPerType(
   regionFilter: number | null = null,
   economicBlocFilter: number | null = null,
   isicCodeFilter: number | null = null,
+  tagFilter: number | null = null,
   industryFilter: number | null = null,
   priceFilter: string | null = null,
   hsCodeFilter: number | null = null,
@@ -160,6 +161,11 @@ export async function fetchStatisticsPerType(
     // Add ISIC code parameter
     if (isicCodeFilter !== null) {
       url.searchParams.append('isic_code', isicCodeFilter.toString());
+    }
+    
+    // Add tag parameter
+    if (tagFilter !== null) {
+      url.searchParams.append('tag', tagFilter.toString());
     }
     
     // Add HS code parameter
@@ -256,6 +262,7 @@ export async function fetchSearchResults(
   perPage: number | string = 30,
   onError?: (errorMessage: any) => void,
   industryFilter: number | null = null,
+  tagFilter: number | null = null,
   priceFilter: string | null = null,
   hsCodeFilter: number | null = null,
   accuracyFilter: 'any' | 'all' = 'any',
@@ -336,6 +343,11 @@ export async function fetchSearchResults(
     // Add industry parameter for the API
     if (industryFilter !== null) {
       url.searchParams.append('industry', industryFilter.toString());
+    }
+    
+    // Add tag parameter for the API
+    if (tagFilter !== null) {
+      url.searchParams.append('tag', tagFilter.toString());
     }
     
     // Add price parameter for price filtering
