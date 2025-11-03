@@ -47,8 +47,8 @@ export default function AuthBanner({ onSignUp, onLogin }: AuthBannerProps) {
           </div>
           <div className="text-sm opacity-90">
             {isRTL ? 
-              'انضم إلى KNOLDG واحصل على رؤى حصرية وتقارير متخصصة.' :
-              'Join KNOLDG and access exclusive insights.'
+              'انضم إلى Insighta واحصل على رؤى حصرية وتقارير متخصصة.' :
+              'Join Insighta and access exclusive insights.'
             }
           </div>
         </div>

@@ -33,8 +33,8 @@ const tajawal = Tajawal({
 });
 
 export const metadata = {
-  title: 'KNOLDG - Buy & Sell Knowledge',
-  description: 'KNOLDG is a platform for buying and selling knowledge resources, insights and expertise.',
+  title: 'Insighta - Buy & Sell Knowledge',
+  description: 'Insighta is a platform for buying and selling knowledge resources, insights and expertise.',
 };
 
 type LayoutProps = {

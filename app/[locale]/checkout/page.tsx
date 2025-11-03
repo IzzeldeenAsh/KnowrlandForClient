@@ -219,7 +219,7 @@ export default function CheckoutPage() {
     selectDocuments: isRTL ? "المستندات المحددة" : "Selected Documents",
     totalPrice: isRTL ? "السعر الإجمالي" : "Total Price",
     paymentMethod: isRTL ? "طريقة الدفع" : "Payment Method",
-    knoldgWallet: isRTL ? "محفظة نولدج" : "Knoldg Wallet",
+    knoldgWallet: isRTL ? "محفظة نولدج" : "Insighta Wallet",
     stripeProvider: isRTL ? "مزود سترايب" : "Stripe Provider",
     confirmOrder: isRTL ? "تأكيد الطلب" : "Checkout",
     download: isRTL ? "تحميل" : "Download",
@@ -742,7 +742,7 @@ export default function CheckoutPage() {
                             >
                               <Image
                                 src="/images/wallet-icon.svg"
-                                alt="Knoldg Wallet"
+                                alt="Insighta Wallet"
                                 width={32}
                                 height={32}
                               />

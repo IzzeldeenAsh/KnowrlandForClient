@@ -63,13 +63,13 @@ export default function Faqs() {
 
             {/* Item */}
             <div className="space-y-2">
-              <h4 className="font-semibold">Can I use Knoldg for free?</h4>
+              <h4 className="font-semibold">Can I use Insighta for free?</h4>
               <p className="text-slate-400">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Quis enim lobortis scelerisque fermentum.</p>
             </div>
 
             {/* Item */}
             <div className="space-y-2">
-              <h4 className="font-semibold">Is Knoldg affordable for small businesses?</h4>
+              <h4 className="font-semibold">Is Insighta affordable for small businesses?</h4>
               <p className="text-slate-400">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Quis enim lobortis scelerisque fermentum.</p>
             </div>
 

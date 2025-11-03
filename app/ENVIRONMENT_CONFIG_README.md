@@ -1,4 +1,4 @@
-# Environment Configuration for KNOLDG Client
+# Environment Configuration for Insighta Client
 
 This document explains how to use the new environment configuration to handle different URLs for development and production environments.
 

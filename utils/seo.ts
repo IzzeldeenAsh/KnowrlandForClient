@@ -96,7 +96,7 @@ export function generateKnowledgeMetadata(
 
   const description = isRTL
     ? `اكتشف ${knowledge.title} - ${typeTranslation} من ${authorName}. باللغة ${languageText}. ${knowledge.documents.length} مستند متاح. ${ratingText}. احصل على رؤى قيمة ومعرفة متخصصة على منصة KNOLDG.`
-    : `Discover ${knowledge.title} - ${typeTranslation} by ${authorName}. Available in ${languageText}. ${knowledge.documents.length} documents included. ${ratingText}. Get valuable insights and expert knowledge on KNOLDG platform.`;
+    : `Discover ${knowledge.title} - ${typeTranslation} by ${authorName}. Available in ${languageText}. ${knowledge.documents.length} documents included. ${ratingText}. Get valuable insights and expert knowledge on Insighta platform.`;
 
   // Generate keywords
   const keywords = [

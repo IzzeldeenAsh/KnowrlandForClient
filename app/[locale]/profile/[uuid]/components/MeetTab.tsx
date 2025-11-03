@@ -861,7 +861,7 @@ export default function MeetTab({
 
                   {/* Payment methods in one row */}
                   <div className="flex flex-col gap-3">
-                    {/* Knoldg Wallet Option */}
+                    {/* Insighta Wallet Option */}
                     <div
                       className={`border rounded-lg p-4 cursor-pointer transition-all min-h-[72px] ${
                         paymentMethod === "manual"
@@ -896,7 +896,7 @@ export default function MeetTab({
                           <div className="flex items-center justify-between">
 
                             <div className="font-medium text-sm text-gray-800 dark:text-gray-200">
-                              {locale.startsWith('ar') ? 'محفظة نولدج' : 'Knoldg Wallet'}
+                              {locale.startsWith('ar') ? 'محفظة نولدج' : 'Insighta Wallet'}
                             </div>
                             <div className="flex items-center gap-3">
                             <div className="w-8 h-8 flex items-center justify-center flex-shrink-0">

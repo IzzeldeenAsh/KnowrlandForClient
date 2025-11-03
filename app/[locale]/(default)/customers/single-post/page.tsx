@@ -44,7 +44,7 @@ export default function CustomerSingle() {
                   </div>
 
                   <header>
-                    <h1 className="h2 inline-flex bg-clip-text text-transparent bg-gradient-to-r from-slate-200/60 via-slate-200 to-slate-200/60 pb-4">How Airbnb leverages Knoldg X to onboard new hosts</h1>
+                    <h1 className="h2 inline-flex bg-clip-text text-transparent bg-gradient-to-r from-slate-200/60 via-slate-200 to-slate-200/60 pb-4">How Airbnb leverages Insighta X to onboard new hosts</h1>
                     <div className="text-sm flex items-center space-x-4 mb-8">
                       <img className="rounded-full" src="../images/customer-avatar-03.jpg" width="32" height="32" alt="Customer Avatar 03" />
                       <div>
@@ -144,7 +144,7 @@ export default function CustomerSingle() {
                         </li>
                         <li className="flex items-center justify-between space-x-2 py-3 border-t [border-image:linear-gradient(to_right,theme(colors.slate.700/.3),theme(colors.slate.700),theme(colors.slate.700/.3))1]">
                           <span className="text-slate-400">Product</span>
-                          <span className="text-slate-300 font-medium">Knoldg X</span>
+                          <span className="text-slate-300 font-medium">Insighta X</span>
                         </li>
                         <li className="flex items-center justify-between space-x-2 py-3 border-t [border-image:linear-gradient(to_right,theme(colors.slate.700/.3),theme(colors.slate.700),theme(colors.slate.700/.3))1]">
                           <span className="text-slate-400">Impact</span>
