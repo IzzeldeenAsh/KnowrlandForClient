@@ -52,7 +52,7 @@ export default function UpdateCountryPage() {
       throw new Error('No authentication token found');
     }
 
-    const response = await fetch('https://api.knoldg.com/api/account/profile/country', {
+    const response = await fetch('https://api.insightabusiness.com/api/account/profile/country', {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${token}`,
@@ -123,7 +123,7 @@ export default function UpdateCountryPage() {
       // Check if it's an Angular route
       if (isAngularRoute(redirectUrl)) {
         const angularPath = redirectUrl.startsWith('/app/') ? redirectUrl : `/app${redirectUrl}`;
-        window.location.href = `https://app.knoldg.com${angularPath}`;
+        window.location.href = `https://app.insightabusiness.com${angularPath}`;
       } else {
         // Handle relative URLs by ensuring they start with the locale
         let finalUrl = redirectUrl;
@@ -162,7 +162,7 @@ export default function UpdateCountryPage() {
     if (isLocalhost) {
       document.cookie = `${name}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;`;
     } else {
-      document.cookie = `${name}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/; Domain=.knoldg.com; Secure; SameSite=None;`;
+      document.cookie = `${name}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/; Domain=.insightabusiness.com; Secure; SameSite=None;`;
     }
   };
 

@@ -116,7 +116,7 @@ export default function AuthCallback() {
         // Show error for a moment before redirecting to login
         setTimeout(() => {
           console.log('[token-callback] Redirecting to login due to error');
-          window.location.href = 'https://app.knoldg.com/auth/login';
+          window.location.href = 'https://app.insightabusiness.com/auth/login';
         }, 2000);
       }
     };
@@ -125,7 +125,7 @@ export default function AuthCallback() {
       fetchProfile();
     } else {
       console.error('No token found in URL parameters');
-      window.location.href = 'https://app.knoldg.com/auth/login';
+      window.location.href = 'https://app.insightabusiness.com/auth/login';
     }
   }, [token, locale]);
 
@@ -148,7 +148,7 @@ export default function AuthCallback() {
         `Path=/`,
         `Max-Age=${60 * 60 * 24 * 7}`, // 7 days
         `SameSite=None`,
-        `Domain=.knoldg.com`,
+        `Domain=.insightabusiness.com`,
         `Secure`
       ];
     }
@@ -214,7 +214,7 @@ export default function AuthCallback() {
         'Path=/',
         'Max-Age=-1',
         'SameSite=None',
-        'Domain=.knoldg.com',
+        'Domain=.insightabusiness.com',
         'Secure'
       ];
     }
@@ -228,7 +228,7 @@ export default function AuthCallback() {
       const userTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
       console.log('[TIMEZONE] Setting timezone:', userTimezone);
       
-      const timezoneResponse = await fetch('https://api.knoldg.com/api/account/timezone/set', {
+      const timezoneResponse = await fetch('https://api.insightabusiness.com/api/account/timezone/set', {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${authToken}`,
@@ -258,7 +258,7 @@ export default function AuthCallback() {
       try {
         console.log(`[token-callback] Profile fetch attempt ${attempt}/${maxRetries}`);
         
-        const response = await fetch('https://api.knoldg.com/api/account/profile', {
+        const response = await fetch('https://api.insightabusiness.com/api/account/profile', {
           headers: {
             'Authorization': `Bearer ${authToken}`,
             "Content-Type": "application/json",
@@ -314,7 +314,7 @@ export default function AuthCallback() {
     // Check if user has admin role
     if (userData.roles && userData.roles.includes('admin')) {
       console.log('[token-callback] Admin user detected, redirecting to admin dashboard');
-      window.location.href = 'https://app.knoldg.com/admin-dashboard/admin/dashboard/main-dashboard/requests';
+      window.location.href = 'https://app.insightabusiness.com/admin-dashboard/admin/dashboard/main-dashboard/requests';
       return;
     }
 
@@ -374,7 +374,7 @@ export default function AuthCallback() {
       if (isAngularRoute(finalReturnUrl)) {
         console.log('[token-callback] Detected Angular route, redirecting to Angular app');
         const angularPath = finalReturnUrl.startsWith('/app/') ? finalReturnUrl : `/app${finalReturnUrl}`;
-        window.location.href = `https://app.knoldg.com${angularPath}`;
+        window.location.href = `https://app.insightabusiness.com${angularPath}`;
       } else {
         // Handle Next.js routes
         console.log('[token-callback] Detected Next.js route, redirecting within app');
@@ -393,7 +393,7 @@ export default function AuthCallback() {
          userData.roles.includes('company-insighter'))) {
       // Redirect to insighter dashboard
       console.log('[token-callback] Redirecting to Angular insighter dashboard');
-      window.location.href = `https://app.knoldg.com/app/insighter-dashboard/my-dashboard`;
+      window.location.href = `https://app.insightabusiness.com/app/insighter-dashboard/my-dashboard`;
     } else {
       // Redirect to home page using current locale
       router.push(`/${locale}/home`);
@@ -433,7 +433,7 @@ export default function AuthCallback() {
         'Path=/',
         'Max-Age=-1',
         'SameSite=None',
-        'Domain=.knoldg.com',
+        'Domain=.insightabusiness.com',
         'Secure'
       ];
     }
@@ -462,7 +462,7 @@ export default function AuthCallback() {
         `Path=/`,
         `Max-Age=${60 * 60}`, // 1 hour
         `SameSite=None`,
-        `Domain=.knoldg.com`,
+        `Domain=.insightabusiness.com`,
         `Secure`
       ];
     }
