@@ -1,6 +1,6 @@
 export const metadata = {
-  title: 'Home - Knoldg',
-  description: 'Page description',
+  title: 'Home - Insighta Business',
+  description: 'Insighta Business is a platform for buying and selling insights resources, insights and a platform for experts to monetize their expertise.',
 }
 
 import Hero from '@/components/hero'

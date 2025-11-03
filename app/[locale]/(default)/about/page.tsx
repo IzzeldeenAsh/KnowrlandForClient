@@ -1,6 +1,6 @@
 export const metadata = {
   title: 'About - Knoldg',
-  description: 'Learn about Knoldg - the digital platform where knowledge meets opportunity.',
+  description: 'Learn about Insighta - the digital platform where knowledge meets opportunity.',
 }
 
 import Hero from '@/components/hero-about'

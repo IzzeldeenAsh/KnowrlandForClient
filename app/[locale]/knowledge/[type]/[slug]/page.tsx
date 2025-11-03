@@ -171,7 +171,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     const title = isRTL ? "المعرفة غير موجودة | KNOLDG" : "Knowledge Not Found | KNOLDG";
     const description = isRTL 
       ? "لم يتم العثور على المورد المعرفي المطلوب. تحقق من الرابط أو ابحث عن محتوى آخر على منصة KNOLDG."
-      : "The requested knowledge resource could not be found. Please check the URL or search for other content on KNOLDG platform.";
+      : "The requested knowledge resource could not be found. Please check the URL or search for other content on Insighta platform.";
 
     return {
       metadataBase,
