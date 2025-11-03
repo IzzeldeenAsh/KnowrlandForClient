@@ -9,25 +9,6 @@ import IntegrationImg03 from '@/public/images/integrations-03.svg'
 import IntegrationImg04 from '@/public/images/integrations-04.svg'
 import IntegrationImg05 from '@/public/images/integrations-05.svg'
 import Star from '@/public/images/star.svg'
-import Avatar01 from '@/public/images/avatar-01.jpg'
-import Avatar02 from '@/public/images/avatar-02.jpg'
-import Avatar03 from '@/public/images/avatar-03.jpg'
-import Avatar04 from '@/public/images/avatar-04.jpg'
-import Avatar05 from '@/public/images/avatar-05.jpg'
-import Avatar06 from '@/public/images/avatar-06.jpg'
-import Avatar07 from '@/public/images/avatar-07.jpg'
-import Avatar08 from '@/public/images/avatar-08.jpg'
-import Avatar09 from '@/public/images/avatar-09.jpg'
-import Avatar10 from '@/public/images/avatar-10.jpg'
-import Avatar11 from '@/public/images/avatar-11.jpg'
-import Avatar12 from '@/public/images/avatar-12.jpg'
-import Avatar13 from '@/public/images/avatar-13.jpg'
-import Avatar14 from '@/public/images/avatar-14.jpg'
-import Avatar15 from '@/public/images/avatar-15.jpg'
-import Avatar16 from '@/public/images/avatar-16.jpg'
-import Avatar17 from '@/public/images/avatar-17.jpg'
-import Avatar18 from '@/public/images/avatar-18.jpg'
-import Avatar19 from '@/public/images/avatar-19.jpg'
 
 // Import Swiper
 import Swiper, { Navigation } from 'swiper'
@@ -83,10 +64,7 @@ export default function IntegrationsCarousel() {
               </div>
               <div className="flex justify-between">
                 <div className="flex -space-x-3 -ml-0.5">
-                  <Image className="rounded-full border-2 border-slate-800 box-content" src={Avatar01} width={24} height={24} alt="Avatar 01" />
-                  <Image className="rounded-full border-2 border-slate-800 box-content" src={Avatar02} width={24} height={24} alt="Avatar 02" />
-                  <Image className="rounded-full border-2 border-slate-800 box-content" src={Avatar03} width={24} height={24} alt="Avatar 03" />
-                  <Image className="rounded-full border-2 border-slate-800 box-content" src={Avatar04} width={24} height={24} alt="Avatar 04" />
+               
                 </div>
                 <button className="flex items-center space-x-2 font-medium text-sm text-slate-300 hover:text-white transition-colors">
                   <span className="sr-only">Like</span>
@@ -112,9 +90,7 @@ export default function IntegrationsCarousel() {
               </div>
               <div className="flex justify-between">
                 <div className="flex -space-x-3 -ml-0.5">
-                  <Image className="rounded-full border-2 border-slate-800 box-content" src={Avatar05} width={24} height={24} alt="Avatar 05" />
-                  <Image className="rounded-full border-2 border-slate-800 box-content" src={Avatar06} width={24} height={24} alt="Avatar 06" />
-                  <Image className="rounded-full border-2 border-slate-800 box-content" src={Avatar07} width={24} height={24} alt="Avatar 07" />
+                  
                 </div>
                 <button className="flex items-center space-x-2 font-medium text-sm text-slate-300 hover:text-white transition-colors">
                   <span className="sr-only">Like</span>
@@ -140,10 +116,7 @@ export default function IntegrationsCarousel() {
               </div>
               <div className="flex justify-between">
                 <div className="flex -space-x-3 -ml-0.5">
-                  <Image className="rounded-full border-2 border-slate-800 box-content" src={Avatar08} width={24} height={24} alt="Avatar 08" />
-                  <Image className="rounded-full border-2 border-slate-800 box-content" src={Avatar09} width={24} height={24} alt="Avatar 09" />
-                  <Image className="rounded-full border-2 border-slate-800 box-content" src={Avatar10} width={24} height={24} alt="Avatar 10" />
-                  <Image className="rounded-full border-2 border-slate-800 box-content" src={Avatar11} width={24} height={24} alt="Avatar 11" />
+                 
                 </div>
                 <button className="flex items-center space-x-2 font-medium text-sm text-slate-300 hover:text-white transition-colors">
                   <span className="sr-only">Like</span>
@@ -169,10 +142,7 @@ export default function IntegrationsCarousel() {
               </div>
               <div className="flex justify-between">
                 <div className="flex -space-x-3 -ml-0.5">
-                  <Image className="rounded-full border-2 border-slate-800 box-content" src={Avatar12} width={24} height={24} alt="Avatar 12" />
-                  <Image className="rounded-full border-2 border-slate-800 box-content" src={Avatar13} width={24} height={24} alt="Avatar 13" />
-                  <Image className="rounded-full border-2 border-slate-800 box-content" src={Avatar14} width={24} height={24} alt="Avatar 14" />
-                  <Image className="rounded-full border-2 border-slate-800 box-content" src={Avatar15} width={24} height={24} alt="Avatar 15" />
+                 
                 </div>
                 <button className="flex items-center space-x-2 font-medium text-sm text-slate-300 hover:text-white transition-colors">
                   <span className="sr-only">Like</span>
@@ -198,10 +168,7 @@ export default function IntegrationsCarousel() {
               </div>
               <div className="flex justify-between">
                 <div className="flex -space-x-3 -ml-0.5">
-                  <Image className="rounded-full border-2 border-slate-800 box-content" src={Avatar16} width={24} height={24} alt="Avatar 16" />
-                  <Image className="rounded-full border-2 border-slate-800 box-content" src={Avatar17} width={24} height={24} alt="Avatar 17" />
-                  <Image className="rounded-full border-2 border-slate-800 box-content" src={Avatar18} width={24} height={24} alt="Avatar 18" />
-                  <Image className="rounded-full border-2 border-slate-800 box-content" src={Avatar19} width={24} height={24} alt="Avatar 19" />
+             
                 </div>
                 <button className="flex items-center space-x-2 font-medium text-sm text-slate-300 hover:text-white transition-colors">
                   <span className="sr-only">Like</span>
