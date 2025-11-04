@@ -1,5 +1,5 @@
 export const metadata = {
-  title: 'Customers - Knoldg',
+  title: 'Customers - Insighta',
   description: 'Page description',
 }
 
@@ -32,7 +32,7 @@ export default function Customers() {
 
             {/* Section header */}
             <div className="text-center pb-12 md:pb-20">
-              <div className="inline-flex font-medium bg-clip-text text-transparent bg-gradient-to-r from-blue-500 to-blue-200 pb-3">Leaders love Knoldg</div>
+              <div className="inline-flex font-medium bg-clip-text text-transparent bg-gradient-to-r from-blue-500 to-blue-200 pb-3">Leaders love Insighta</div>
               <h1 className="h1 bg-clip-text text-transparent bg-gradient-to-r from-slate-200/60 via-slate-200 to-slate-200/60 pb-4">Trusted by leading companies</h1>
               <div className="max-w-3xl mx-auto">
                 <p className="text-lg text-slate-400">Insighta powers thousands of high-impact product teams. From next-gen startups who reach for the stars to established greats who change the world.</p>

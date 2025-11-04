@@ -3,9 +3,9 @@
 import Link from 'next/link'
 import Image from 'next/image'
 import HomeLogoImgEn from '@/public/images/Business-white.png'
-import HomeLogoImgAr from '@/public/images/Business-white.png'
+import HomeLogoImgAr from '@/public/images/ANSIGHTAAr-.png'
 import InnerLogoImgEn from '@/public/images/Business-colored.png'
-import InnerLogoImgAr from '@/public/images/Business-colored.png'
+import InnerLogoImgAr from '@/public/images/ANSIGHTAAr-05.png'
 import SmallLogo from '@/public/images/smallLogo.png'
 import { useEffect, useState } from 'react'
 import { usePathname } from 'next/navigation'
@@ -41,10 +41,10 @@ export default function Logo({ isHomePage = true }: LogoProps) {
   }
 
   return (
-    <Link className="inline-flex" href={`/${locale}`} aria-label="Knoldg" onClick={handleLogoClick}>
+    <Link className="inline-flex" href={`/${locale}`} aria-label="Insighta" onClick={handleLogoClick}>
       {/* Use small logo for mobile devices, regular logo for larger screens */}
-      <Image className="hidden md:block max-w-none" src={logoImg} width={120} height={60} priority alt="Knoldg" />
-      <Image className="block md:hidden max-w-none" src={smallLogoImg} width={40} height={40} priority alt="Knoldg" />
+      <Image className="hidden md:block max-w-none" src={logoImg} width={120} height={60} priority alt="Insighta" />
+      <Image className="block md:hidden max-w-none" src={smallLogoImg} width={40} height={40} priority alt="Insighta" />
     </Link>
   )
 }

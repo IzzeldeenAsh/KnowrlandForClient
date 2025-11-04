@@ -1,5 +1,5 @@
 export const metadata = {
-  title: 'Changelog - Knoldg',
+  title: 'Changelog - Insighta',
   description: 'Page description',
 }
 
@@ -44,7 +44,7 @@ export default function Changelog() {
 
             {/* Page header */}
             <div className="text-center pb-12 md:pb-20">
-              <h2 className="h2 bg-clip-text text-transparent bg-gradient-to-r from-slate-200/60 via-slate-200 to-slate-200/60 pb-4">All Knowledge Counts</h2>
+              <h2 className="h2 bg-clip-text text-transparent bg-gradient-to-r from-slate-200/60 via-slate-200 to-slate-200/60 pb-4">All Insight Counts</h2>
               <div className="max-w-3xl mx-auto">
                 <h4 className="h4   bg-clip-text text-transparent bg-gradient-to-r from-slate-200/60 via-slate-200 to-slate-200/60 ">Someone out there is searching for the exact thing you know. Don’t keep them waiting.</h4>
               </div>

@@ -1,5 +1,5 @@
 export const metadata = {
-  title: 'Integrations Post - Knoldg',
+  title: 'Integrations Post - Insighta',
   description: 'Page description',
 }
 
@@ -74,7 +74,7 @@ export default function IntegrationsSingle() {
                         </p>
                         <h2>How it works</h2>
                         <p>
-                          Configure the GitHub integration <strong className="text-slate-50 font-medium">in a couple of minutes</strong> by authenticating and selecting which repos to connect to Knoldg. Once you do, anyone in the workspace can start linking PRs.
+                          Configure the GitHub integration <strong className="text-slate-50 font-medium">in a couple of minutes</strong> by authenticating and selecting which repos to connect to Insighta. Once you do, anyone in the workspace can start linking PRs.
                         </p>
                         <p>
                           Link PRs to issues in a few ways. Use the issue ID in the branch name or PR title before creating the PR. To link multiple PRs, or link issues after creating the PR, use magic words along with the issue ID in the PR description.

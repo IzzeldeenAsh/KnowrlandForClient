@@ -1,5 +1,5 @@
 export const metadata = {
-  title: 'The Most Valuable Asset in Business - Knoldg',
+  title: 'The Most Valuable Asset in Business - Insighta',
   description: 'Discover what truly matters for business success in today\'s competitive landscape and how to leverage it to your advantage.',
 }
 
@@ -75,80 +75,80 @@ export default function BlogPost() {
 
                       {/* Post content */}
                       <div className="prose max-w-none text-slate-400 prose-headings:text-slate-50 prose-h2:text-xl prose-h2:mt-8 prose-h2:mb-4 prose-p:leading-relaxed prose-a:text-purple-500 prose-a:no-underline hover:prose-a:underline prose-strong:text-slate-50 prose-strong:font-medium prose-blockquote:pl-5 prose-blockquote:xl:-ml-5 prose-blockquote:border-l-2 prose-blockquote:border-purple-500 prose-blockquote:font-medium prose-blockquote:text-slate-300 prose-blockquote:italic">
-                        <h2>The Hidden Value of Knowledge</h2>
+                        <h2>The Hidden Value of Insight</h2>
                         <p>
-                          In today's rapidly evolving business landscape, organizations are constantly seeking that elusive competitive edge. While many focus on cutting-edge technology, innovative products, or aggressive marketing strategies, they often overlook what has become the most valuable asset in modern business: <strong>knowledge</strong>.
+                          In today's rapidly evolving business landscape, organizations are constantly seeking that elusive competitive edge. While many focus on cutting-edge technology, innovative products, or aggressive marketing strategies, they often overlook what has become the most valuable asset in modern business: <strong>insight</strong>.
                         </p>
                         <p>
-                          Knowledge, when properly harnessed, becomes the cornerstone of innovation, efficiency, and sustainable growth. Unlike physical assets that depreciate over time, knowledge appreciates as it's shared, refined, and applied to new challenges. The question isn't whether knowledge is valuable—it's how to effectively capture, organize, and leverage it across your organization.
+                          Insight, when properly harnessed, becomes the cornerstone of innovation, efficiency, and sustainable growth. Unlike physical assets that depreciate over time, insight appreciates as it's shared, refined, and applied to new challenges. The question isn't whether insight is valuable—it's how to effectively capture, organize, and leverage it across your organization.
                         </p>
-                        <h2>Why Knowledge Management Matters</h2>
+                        <h2>Why Insight Management Matters</h2>
                         <p>
-                          Organizations that excel at knowledge management significantly outperform their peers. According to recent studies, companies with robust knowledge management systems experience:
+                          Organizations that excel at insight management significantly outperform their peers. According to recent studies, companies with robust insight management systems experience:
                         </p>
                         <ul>
-                          <li>25% higher productivity among knowledge workers</li>
+                          <li>25% higher productivity among insight workers</li>
                           <li>20% faster time-to-market for new products</li>
                           <li>18% reduction in costly mistakes and rework</li>
                           <li>35% improvement in employee onboarding efficiency</li>
                         </ul>
                         <p>
-                          These numbers translate directly to bottom-line results. But achieving these benefits requires more than just implementing a knowledge base or document repository. It demands a strategic approach that addresses both technology and culture.
+                          These numbers translate directly to bottom-line results. But achieving these benefits requires more than just implementing a insight base or document repository. It demands a strategic approach that addresses both technology and culture.
                         </p>
-                        <h2>Building a Knowledge-Driven Organization</h2>
+                        <h2>Building a Insight-Driven Organization</h2>
                         <p>
-                          Creating a knowledge-driven organization involves several key components:
+                          Creating a insight-driven organization involves several key components:
                         </p>
                         <ol>
-                          <li><strong>Culture of sharing</strong>: Foster an environment where knowledge sharing is recognized and rewarded.</li>
-                          <li><strong>Accessible systems</strong>: Implement intuitive tools that make knowledge easy to find and consume.</li>
-                          <li><strong>Structured processes</strong>: Establish clear workflows for capturing, validating, and updating knowledge.</li>
-                          <li><strong>Executive support</strong>: Ensure leadership actively participates in and champions knowledge initiatives.</li>
+                          <li><strong>Culture of sharing</strong>: Foster an environment where insight sharing is recognized and rewarded.</li>
+                          <li><strong>Accessible systems</strong>: Implement intuitive tools that make insight easy to find and consume.</li>
+                          <li><strong>Structured processes</strong>: Establish clear workflows for capturing, validating, and updating insight.</li>
+                          <li><strong>Executive support</strong>: Ensure leadership actively participates in and champions insight initiatives.</li>
                         </ol>
                         <p>
-                          When these elements align, organizations can transform tacit knowledge (experience and expertise residing in employees' minds) into explicit knowledge (documented and accessible resources).
+                          When these elements align, organizations can transform tacit insight (experience and expertise residing in employees' minds) into explicit insight (documented and accessible resources).
                         </p>
                         <blockquote>
-                          "The only sustainable advantage a company has is what it collectively knows, how efficiently it uses what it knows, and how quickly it acquires and uses new knowledge."
+                          "The only sustainable advantage a company has is what it collectively knows, how efficiently it uses what it knows, and how quickly it acquires and uses new insight."
                         </blockquote>
                         <h2>Overcoming Common Challenges</h2>
                         <p>
-                          Despite its value, many organizations struggle with knowledge management. Common obstacles include:
+                          Despite its value, many organizations struggle with insight management. Common obstacles include:
                         </p>
                         <ul>
                           <li>Information silos between departments</li>
-                          <li>Resistance to sharing (the "knowledge is power" mindset)</li>
-                          <li>Poor user experience in knowledge systems</li>
+                          <li>Resistance to sharing (the "insight is power" mindset)</li>
+                          <li>Poor user experience in insight systems</li>
                           <li>Difficulty keeping information current and relevant</li>
                         </ul>
                         <p>
-                          Addressing these challenges requires a combination of technological solutions and cultural initiatives. Modern AI-powered knowledge platforms can help bridge these gaps by automatically organizing information, suggesting relevant content, and even identifying knowledge gaps that need to be filled.
+                          Addressing these challenges requires a combination of technological solutions and cultural initiatives. Modern AI-powered insight platforms can help bridge these gaps by automatically organizing information, suggesting relevant content, and even identifying insight gaps that need to be filled.
                         </p>
-                        <h2>The Future of Knowledge Management</h2>
+                        <h2>The Future of Insight Management</h2>
                         <p>
-                          As we look ahead, several trends are reshaping how organizations approach knowledge management:
+                          As we look ahead, several trends are reshaping how organizations approach insight management:
                         </p>
                         <ul>
-                          <li><strong>AI and machine learning</strong>: Automating knowledge discovery and organization</li>
-                          <li><strong>Personalized knowledge delivery</strong>: Providing the right information at the right time</li>
-                          <li><strong>Community-driven knowledge</strong>: Harnessing collective intelligence through collaboration</li>
-                          <li><strong>Knowledge graphs</strong>: Mapping relationships between information to provide context</li>
+                          <li><strong>AI and machine learning</strong>: Automating insight discovery and organization</li>
+                          <li><strong>Personalized insight delivery</strong>: Providing the right information at the right time</li>
+                          <li><strong>Community-driven insight</strong>: Harnessing collective intelligence through collaboration</li>
+                          <li><strong>Insight graphs</strong>: Mapping relationships between information to provide context</li>
                         </ul>
                         <p>
-                          Organizations that embrace these innovations will be well-positioned to turn their knowledge into a sustainable competitive advantage.
+                          Organizations that embrace these innovations will be well-positioned to turn their insight into a sustainable competitive advantage.
                         </p>
                         <h2>Conclusion</h2>
                         <p>
-                          In a world where products can be copied, processes can be replicated, and technology quickly becomes commoditized, an organization's collective knowledge remains its most defensible asset. By investing in effective knowledge management strategies and tools, businesses can unlock innovation, improve decision-making, and build resilience against market disruptions.
+                          In a world where products can be copied, processes can be replicated, and technology quickly becomes commoditized, an organization's collective insight remains its most defensible asset. By investing in effective insight management strategies and tools, businesses can unlock innovation, improve decision-making, and build resilience against market disruptions.
                         </p>
                         <p>
-                          The most valuable asset in business isn't something you can put on a balance sheet—it's the knowledge that flows through your organization every day. The companies that succeed in capturing, sharing, and leveraging that knowledge will be the ones that thrive in the knowledge economy.
+                          The most valuable asset in business isn't something you can put on a balance sheet—it's the insight that flows through your organization every day. The companies that succeed in capturing, sharing, and leveraging that insight will be the ones that thrive in the insight economy.
                         </p>
                       </div>
                     </article>
 
                     <aside className="pl-6 border-l-2 border-purple-500">
-                      <p className="inline-flex font-medium italic text-lg bg-clip-text text-transparent bg-gradient-to-r from-slate-200/60 via-slate-200 to-slate-200/60 pb-4">"Effective knowledge management isn't just a competitive advantage—it's the foundation of sustainable business success in the digital age."</p>
+                      <p className="inline-flex font-medium italic text-lg bg-clip-text text-transparent bg-gradient-to-r from-slate-200/60 via-slate-200 to-slate-200/60 pb-4">"Effective insight management isn't just a competitive advantage—it's the foundation of sustainable business success in the digital age."</p>
                       <footer className="flex items-center space-x-4">
                         <Image className="shrink-0 rounded-full" src={Avatar} width={32} height={32} alt="Author" />
                         <div className="text-sm font-medium text-slate-300">

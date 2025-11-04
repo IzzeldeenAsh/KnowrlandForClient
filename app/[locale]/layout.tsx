@@ -34,7 +34,7 @@ const tajawal = Tajawal({
 
 export const metadata = {
   title: 'Insighta - Buy & Sell Knowledge',
-  description: 'Insighta is a platform for buying and selling knowledge resources, insights and expertise.',
+  description: 'Insighta is a platform for buying and selling insight resources, insights and expertise.',
 };
 
 type LayoutProps = {

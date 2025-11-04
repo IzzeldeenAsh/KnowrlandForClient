@@ -40,7 +40,7 @@ export default function Cta02() {
                 {t('button')} 
               </Link>
             </div>
-            <p className="text-sm text-slate-500">{t('contact')} <a href="mailto:info@knoldg.com" className="text-blue-400 hover:text-blue-300 transition-colors duration-150 ease-in-out">info@knoldg.com</a></p>
+            <p className="text-sm text-slate-500">{t('contact')} <a href="mailto:info@Insightabusiness.com" className="text-blue-400 hover:text-blue-300 transition-colors duration-150 ease-in-out">info@Insightabusiness.com</a></p>
           </div>
         </div>
       </div>

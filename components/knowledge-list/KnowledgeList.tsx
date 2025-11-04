@@ -111,7 +111,7 @@ export default function KnowledgeList({ knowledge, locale }: KnowledgeListProps)
             className="mb-4"
           />
           <Text ta="center" color="gray">
-            No knowledge items available yet.
+            No insight items available yet.
           </Text>
         </div>
       )}
