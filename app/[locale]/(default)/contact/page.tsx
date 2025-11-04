@@ -1,5 +1,5 @@
 export const metadata = {
-  title: 'Contact Us - Knoldg',
+  title: 'Contact Us - Insighta',
   description: 'Learn about Insighta - the digital platform where knowledge meets opportunity.',
 }
 

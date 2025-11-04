@@ -79,8 +79,8 @@ export function generateKnowledgeMetadata(
   }[knowledge.type] || knowledge.type : knowledge.type.charAt(0).toUpperCase() + knowledge.type.slice(1);
 
   const title = isRTL
-    ? `${knowledge.title} | ${typeTranslation} | KNOLDG`
-    : `${knowledge.title} | ${typeTranslation} | KNOLDG`;
+    ? `${knowledge.title} | ${typeTranslation} | Insighta`
+    : `${knowledge.title} | ${typeTranslation} | Insighta`;
 
   // Generate rich description
   const authorName = knowledge.insighter.company?.legal_name || knowledge.insighter.name;
@@ -95,7 +95,7 @@ export function generateKnowledgeMetadata(
     : '';
 
   const description = isRTL
-    ? `اكتشف ${knowledge.title} - ${typeTranslation} من ${authorName}. باللغة ${languageText}. ${knowledge.documents.length} مستند متاح. ${ratingText}. احصل على رؤى قيمة ومعرفة متخصصة على منصة KNOLDG.`
+    ? `اكتشف ${knowledge.title} - ${typeTranslation} من ${authorName}. باللغة ${languageText}. ${knowledge.documents.length} مستند متاح. ${ratingText}. احصل على رؤى قيمة ومعرفة متخصصة على منصة Insighta.`
     : `Discover ${knowledge.title} - ${typeTranslation} by ${authorName}. Available in ${languageText}. ${knowledge.documents.length} documents included. ${ratingText}. Get valuable insights and expert knowledge on Insighta platform.`;
 
   // Generate keywords
@@ -121,7 +121,7 @@ export function generateKnowledgeMetadata(
       url: defaultSocialImage,
       width: 1200,
       height: 630,
-      alt: `${knowledge.title} | KNOLDG`,
+      alt: `${knowledge.title} | Insighta`,
       type: 'image/jpeg',
     },
     ...[
@@ -171,7 +171,7 @@ export function generateKnowledgeMetadata(
       title,
       description,
       url: currentUrl,
-      siteName: 'KNOLDG',
+      siteName: 'INSIGHTA BUSINESS',
       locale: locale === 'ar' ? 'ar_SA' : 'en_US',
       
       // Article-specific tags
@@ -186,7 +186,7 @@ export function generateKnowledgeMetadata(
     // Twitter Card
     twitter: {
       card: 'summary',
-      site: '@KNOLDG',
+      site: '@INSIGHTA',
       creator: `@${authorName.replace(/\s+/g, '')}`,
       title,
       description,
@@ -245,7 +245,7 @@ export function generateStructuredData(knowledge: KnowledgeMetadata, locale: str
     },
     "publisher": {
       "@type": "Organization",
-      "name": "KNOLDG",
+      "name": "INSIGHTA BUSINESS",
       "url": baseUrl,
       "logo": `${baseUrl}/logo.png`
     },

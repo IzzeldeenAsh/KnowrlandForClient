@@ -86,7 +86,7 @@ export default function PostItem() {
 
               <div className="prose max-w-none text-slate-400 prose-p:leading-relaxed prose-a:text-blue-500 prose-a:no-underline hover:prose-a:underline prose-strong:text-slate-50 prose-strong:font-large">
                 Cut through the complexity of analysis—instantly access precise,
-                diverse Knowledge and act with confidence.
+                diverse Insight and act with confidence.
               </div>
               <div className="mt-8 max-w-xs max-md:mx-auto space-y-2">
                 <button
@@ -132,7 +132,7 @@ export default function PostItem() {
 
               <div className="prose max-w-none text-slate-400 prose-p:leading-relaxed prose-a:text-blue-500 prose-a:no-underline hover:prose-a:underline prose-strong:text-slate-50 prose-strong:font-large">
                 Cut through the complexity of analysis—instantly access precise,
-                diverse Knowledge and act with confidence.
+                diverse Insight and act with confidence.
               </div>
               <div className="mt-8 max-w-xs max-md:mx-auto space-y-2">
                 <button

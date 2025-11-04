@@ -52,16 +52,16 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     const { data } = await fetchTopicData(id, slug, locale)
     
     return {
-      title: `${data.name} Topic Analysis | KNOLDG`,
+      title: `${data.name} Topic Analysis | Insighta`,
       description: `Detailed analysis and insights about ${data.name} topic.`,
       openGraph: {
-        title: `${data.name} Topic Analysis | KNOLDG`,
+        title: `${data.name} Topic Analysis | Insighta`,
         description: `Detailed analysis and insights about ${data.name} topic.`,
       }
     }
   } catch (error) {
     return {
-      title: 'Topic Analysis | KNOLDG',
+      title: 'Topic Analysis | Insighta',
       description: 'Detailed topic analysis and insights'
     }
   }

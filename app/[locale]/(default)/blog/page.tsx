@@ -3,7 +3,7 @@ import BlogSection from "./blog-section"
 
 
 export const metadata = {
-  title: 'Blog - Knoldg',
+  title: 'Blog - Insighta',
   description: 'Latest insights, news and articles',
 }
 

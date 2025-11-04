@@ -219,7 +219,7 @@ export default function CheckoutPage() {
     selectDocuments: isRTL ? "المستندات المحددة" : "Selected Documents",
     totalPrice: isRTL ? "السعر الإجمالي" : "Total Price",
     paymentMethod: isRTL ? "طريقة الدفع" : "Payment Method",
-    knoldgWallet: isRTL ? "محفظة نولدج" : "Insighta Wallet",
+   InsightaWallet: isRTL ? "محفظة إنسايتا" : "Insighta Wallet",
     stripeProvider: isRTL ? "مزود سترايب" : "Stripe Provider",
     confirmOrder: isRTL ? "تأكيد الطلب" : "Checkout",
     download: isRTL ? "تحميل" : "Download",
@@ -567,7 +567,7 @@ export default function CheckoutPage() {
                   loading={isFetchingDownloadIds}
                   disabled={isFetchingDownloadIds}
                   onClick={() => {
-                    console.log('Download button clicked. Knowledge download ID:', knowledgeDownloadId); // Debug log
+                    console.log('Download button clicked. Insight download ID:', knowledgeDownloadId); // Debug log
                     // Use UUID if available, otherwise fall back to title search
                     if (knowledgeDownloadId) {
                       const uuidsParam = `?uuids=${knowledgeDownloadId}`;
@@ -748,7 +748,7 @@ export default function CheckoutPage() {
                               />
                             </div>
                             <div style={{ flex: 1 }}>
-                              <Text fw={500}>{translations.knoldgWallet}</Text>
+                              <Text fw={500}>{translations.InsightaWallet}</Text>
                               <Text size="sm" fw={600} c={walletBalance < totalPrice ? "red" : "green"} mt={2}>
                                 {isRTL ? "الرصيد المتاح: " : "Available Balance: "}
                                 {formatCurrency(walletBalance)}

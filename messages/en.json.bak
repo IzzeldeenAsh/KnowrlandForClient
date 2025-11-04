@@ -5,13 +5,13 @@
     },
     "Hero": {
         "tagline": "Beyond Research Boundaries",
-        "title": "Unlock Business Success with Expert Knowledge",
+        "title": "Unlock Business Success with Expert Insight",
         "description":"Explore a hub of expert data, insights, and business intelligence tailored for your business growth.",
         "searchPlaceholder":"Search business data, reports, insights... and more",
         "direction": "ltr"
     },
     "HeroInsighter":{
-        "title":"All Knowledge Counts",
+        "title":"All Insight Counts",
         "description":"Someone out there is searching for the exact thing you know. Don’t keep them waiting"
     },
     "Header": {
@@ -49,7 +49,7 @@
                 "alt": "Features Illustration"
             },
             "variableData": {
-                "title": "knowledge library Built on an International Database Structure (ISIC, HS Code)"
+                "title": "insight library Built on an International Database Structure (ISIC, HS Code)"
             },
             "fasterDecisions": {
                 "title": "AI-Powered Assistance"
@@ -141,14 +141,14 @@
     },
     "Cta": {
         "tagline": "",
-        "title": "Turn Your Expertise into Profit—Share Your Knowledge with the World!",
-        "description": "Start monetizing your knowledge and connect with prospective clients who need your expertise.",
+        "title": "Turn Your Expertise into Profit—Share Your Insight with the World!",
+        "description": "Start monetizing your insight and connect with prospective clients who need your expertise.",
         "button": "Get Started"
     },
     "Footer": {
-        "copyright": " knoldg.com - All rights reserved",
-        "knowledge": {
-            "title": "Knowledge",
+        "copyright": " insightabusiness.com - All rights reserved",
+        "insight": {
+            "title": "Insight",
             "insights": "Insights",
             "reports": "Reports",
             "data": "Data",

@@ -1,5 +1,5 @@
 export const metadata = {
-  title: 'Integrations - Knoldg',
+  title: 'Integrations - Insighta',
   description: 'Page description',
 }
 

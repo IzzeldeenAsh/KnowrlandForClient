@@ -8,39 +8,39 @@
         "tagline": "Beyond Research Boundaries",
         "title": "Insights and experts that lead your business to excellence.",
         "description":"Find data, reports, and subject matter experts, and more",
-        "searchPlaceholder": "Search in&nbsp;<strong>Knowledge</strong>&nbsp;or&nbsp;<strong>Insighter</strong>&nbsp;(Insight Expert)...",        "searchPlaceholderMobile":"Search in data, reports, insights...",
+        "searchPlaceholder": "Search in&nbsp;<strong>Insight</strong>&nbsp;or&nbsp;<strong>Insighter</strong>&nbsp;(Insight Expert)...",        "searchPlaceholderMobile":"Search in data, reports, insights...",
         "direction": "ltr"
     },
     "HeroInsighter":{
-        "title":"Welcome to Knoldg",
+        "title":"Welcome to Insighta",
         "description":"Where your expertise becomes a valuable currency"
     },
     "InsighterFeatures":{
-        "title":"Welcome to Knoldg",
+        "title":"Welcome to Insighta",
         "description":"Where your expertise becomes a valuable currency",
         "section3":{
-            "title":"A Sustainable Knowledge Ecosystem",
-            "description":"Insighta empowers experts like you to share knowledge continuously—turning expertise into sustainable income with every upload, whether new or updated."
+            "title":"A Sustainable Insight Ecosystem",
+            "description":"Insighta empowers experts like you to share insight continuously—turning expertise into sustainable income with every upload, whether new or updated."
         },
         "section4":{
             "title":"A Sustainable Revenue Stream",
-            "description":"Start earning by sharing your insights and experience on Knoldg. You Set the Value: Choose your price, and every time your work is downloaded, you're paid Directly."
+            "description":"Start earning by sharing your insights and experience on Insighta. You Set the Value: Choose your price, and every time your work is downloaded, you're paid Directly."
         },
         "section1":{
-            "title":"Bring your knowledge to light by sharing it on the platform",
+            "title":"Bring your insight to light by sharing it on the platform",
             "description":"Start earning today by Bringing your data, studies, reports, and insights out from the confines of your desk. Share them with the world to discover, value, and invest in."
         },
         "section2":{
             "title":"Don't let your expertise fade to silence; let it bloom into sustainable revenue",
-            "description":"Start earning by sharing your knowledge and experience on Knoldg. You Set the Value: Choose your price, and every time your work is downloaded, you're paid Directly."
+            "description":"Start earning by sharing your insight and experience onInsighta. You Set the Value: Choose your price, and every time your work is downloaded, you're paid Directly."
         },
         "section5":{
-            "title":"Join our knowledge Ecosystem to Unlock a Recurring Revenue Stream",
-            "description":"Start earning by sharing your insights and experience on Knoldg. You Set the Value: Choose your price, and every time your work is downloaded, you're paid directly."
+            "title":"Join our insight Ecosystem to Unlock a Recurring Revenue Stream",
+            "description":"Start earning by sharing your insights and experience on Insighta. You Set the Value: Choose your price, and every time your work is downloaded, you're paid directly."
         },
         "section6":{
             "title":"Insighta ecosystem keeps you aligned with client demand",
-            "description":"Start creating what clients truly need in your field. Once you register as an Insighter, you'll receive notifications about client requests, enabling you to produce relevant data, reports, and insights from your area of expertise.\n\nOn-Demand Knowledge Production\n\nSmart Alerts for You & Your Clients\n\nWork Anytime, Anywhere"
+            "description":"Start creating what clients truly need in your field. Once you register as an Insighter, you'll receive notifications about client requests, enabling you to produce relevant data, reports, and insights from your area of expertise.\n\nOn-Demand Insight Production\n\nSmart Alerts for You & Your Clients\n\nWork Anytime, Anywhere"
         },
         "dataTypeSection":{
             "title":"What data, insights, reports, or expertise have you locked away?",
@@ -53,7 +53,7 @@
             "insighterText2": "Insighter ?",
             "point1": "A subject matter expert, practitioner, consultant, strategist, technician, or field professional with hands-on experience,",
             "point2": "who shares valuable data, reports, insights, case studies, or practical tools on Insighta platform to empower others and help businesses grow;",
-            "point3": "A knowledge contributor who earns income each time their expertise is accessed.",
+            "point3": "A insight contributor who earns income each time their expertise is accessed.",
             "roles": {
               "fieldExpert": "Field expert",
               "strategist": "Strategist",
@@ -68,7 +68,7 @@
             "businessReports": "Business Reports & Market Insights",
             "playbooks": "Playbooks & Strategy Documents",
             "manuals": "Operational Manuals & SOPs",
-            "technicalGuides": "Technical Guides & Field Knowledge",
+            "technicalGuides": "Technical Guides & Field Insight",
             "trainingMaterials": "Training Materials & Courses",
             "dataSets": "Data Sets & Templates",
             "supplyChain": "Supply Chain",
@@ -120,7 +120,7 @@
                 "position": "right"
             },
             {
-              "title": "Bring your knowledge to light by sharing it on the platform",
+              "title": "Bring your insight to light by sharing it on the platform",
               "description": "Start earning today by bringing your data, studies, reports, and insights out from the confines of your desk. Share them with the world to discover, value, and invest in.",
               "image": "/images/insighter-1.png",
               "icon": "/images/insighter-1-icon.svg",
@@ -128,14 +128,14 @@
             },
             {
               "title": "Don't let your expertise fade to silence; let it bloom into sustainable revenue",
-              "description": "Start earning by sharing your knowledge and experience on Knoldiq. You Set the Value: Choose your price, and every time your work is downloaded, you're paid directly.",
+              "description": "Start earning by sharing your insight and experience on Knoldiq. You Set the Value: Choose your price, and every time your work is downloaded, you're paid directly.",
               "image": "/images/insighter-3.png",
               "icon": "/images/insighter-3-icon.svg",
               "position": "right"
             }
           ],
           "ctaButton": "Get Started",
-        "knowledgeSection": {
+        "insightSection": {
             "title": "What data, insights, reports, or expertise have you locked away?",
             "description": "Insighta is your platform to showcase and monetize your intellectual assets. The platform organizes all your published material—including data and insights by category, making it easy for global audiences to find and purchase your work."
         }
@@ -285,9 +285,9 @@
         "searchHSCode": "HS Code",
         "searchHSCodePlaceHolder": "Choose HS Code",
         "searchTags": "Tags",
-        "exploreKnowledge": "Explore Our Knowledge Database",
+        "exploreInsight": "Explore Our Insight Database",
         "filterByCategory": "Filter your search by category",
-        "searchTypeKnowledge": "Knowledge",
+        "searchTypeInsight": "Insight",
         "searchTypeInsighter": "Insighter"
     },
     "Features02": {
@@ -312,8 +312,8 @@
     },
     "Footer": {
         "copyright": " 2025 insightabusiness.com. All Rights Reserved.",
-        "knowledge": {
-            "title": "Knowledge",
+        "insight": {
+            "title": "Insight",
             "insights": "Insights",
             "reports": "Reports",
             "data": "Data",
@@ -341,38 +341,38 @@
         }
     },
     "aboutUsPage":{
-        "mainTitle":"About Knoldg",
-        "mainSubTitle":"Where Knowledge Meets Opportunity",
-        "firstParagraph":"Insighta is a pioneering digital platform that provides individuals and businesses with access to high-quality business knowledge, such as data, reports, insights, and manuals across various industries. Our mission is to facilitate seamless knowledge sharing by offering a structured and accessible marketplace for expert-driven content.",
-        "firstParagraphPartTwo": "Whether you're a professional seeking valuable knowledge or an industry expert looking to monetize your expertise, Insighta is your gateway to trusted insights.",
+        "mainTitle":"About Insighta",
+        "mainSubTitle":"Where Insight Meets Opportunity",
+        "firstParagraph":"Insighta is a pioneering digital platform that provides individuals and businesses with access to high-quality business insight, such as data, reports, insights, and manuals across various industries. Our mission is to facilitate seamless insight sharing by offering a structured and accessible marketplace for expert-driven content.",
+        "firstParagraphPartTwo": "Whether you're a professional seeking valuable insight or an industry expert looking to monetize your expertise, Insighta is your gateway to trusted insights.",
         "ourVision": "Our Vision",
-        "ourVisionPart1": "At Knoldg, we envision a world where expertise is easily accessible, enabling businesses and professionals to make informed decisions with confidence.",
-        "ourVisionPart2": "We aim to bridge the gap between knowledge seekers and knowledge creators",
+        "ourVisionPart1": "At Insighta, we envision a world where expertise is easily accessible, enabling businesses and professionals to make informed decisions with confidence.",
+        "ourVisionPart2": "We aim to bridge the gap between insight seekers and insight creators",
         "ourVisionPart3": ", fostering a dynamic ecosystem of learning and growth.",
         "whatOffer": "What We Offer",
-        "whatOffer1": "Flexible Knowledge Access",
-        "whatOffer1P": " – Users can browse and access a variety of knowledge types, including reports, data sets, insights, and manuals. Knowledge files are available for both personal and business use, with some being free and others available for purchase. Additionally, users can buy full reports or specific sections, such as individual chapters or particular datasets, on a pay-as-you-go basis.",
+        "whatOffer1": "Flexible Insight Access",
+        "whatOffer1P": " – Users can browse and access a variety of insight types, including reports, data sets, insights, and manuals. Insight files are available for both personal and business use, with some being free and others available for purchase. Additionally, users can buy full reports or specific sections, such as individual chapters or particular datasets, on a pay-as-you-go basis.",
         "whatOffer2": "Expert Consultation & Inquiries",
-        "whatOffer2P": " – Users can connect directly with knowledge experts for additional insights related to a particular uploaded knowledge file. They can also book consultation sessions with experts for deeper discussions and personalized guidance.",
+        "whatOffer2P": " – Users can connect directly with insight experts for additional insights related to a particular uploaded insight file. They can also book consultation sessions with experts for deeper discussions and personalized guidance.",
         "whatOffer3": "AI-Powered Search & Data Structuring",
         "whatOffer3P": " – Insighta features an advanced AI-supported search engine that enhances discoverability and accessibility of insights, making it easier for users to find relevant information. Our data is structured based on international standards such as ISIC and HS Codes, ensuring seamless integration into global business frameworks.",
         "whatOffer4": "Monetization for Experts",
-        "whatOffer4P": " – Subject matter experts, consultants, and analysts can publish and sell their data, report and insights, earning revenue from their knowledge contributions.",
+        "whatOffer4P": " – Subject matter experts, consultants, and analysts can publish and sell their data, report and insights, earning revenue from their insight contributions.",
          "whatOffer5": "Company & Expert Collaboration",
-        "whatOffer5P": " – Experts on Insighta can be individual professionals or companies. The platform supports company creation, allowing company owners to invite experts—both from within the platform and external professionals—to contribute knowledge, upload insights, and sell data and reports.",
+        "whatOffer5P": " – Experts on Insighta can be individual professionals or companies. The platform supports company creation, allowing company owners to invite experts—both from within the platform and external professionals—to contribute insight, upload insights, and sell data and reports.",
         "whatOffer6": "Global Accessibility",
         "whatOffer6P": " – Serving professionals and businesses worldwide, with a focus on the EU, GCC region, U.S., and Jordan.",
-        "benefitKnoldg":"Who Can Benefit from Knoldg?",
+        "benefitKnoldg":"Who Can Benefit from Insighta?",
         "benefitKnoldg1":"Businesses & Investors",
         "benefitKnoldgp1":" – Gain access to industry reports, market research, and expert analyses.",
         "benefitKnoldg2":"Consultants & Experts",
-        "benefitKnoldgp2":" – Share your expertise, grow your audience, and earn from your knowledge.",
+        "benefitKnoldgp2":" – Share your expertise, grow your audience, and earn from your insight.",
         "benefitKnoldg3":"Academics & Researchers",
         "benefitKnoldgp3":" – Distribute valuable insights to a wider professional audience.",
         "benefitKnoldg4":"Government & Policy Makers",
         "benefitKnoldgp4":" – Utilize expert insights for informed policymaking and economic development.",
         "parentCompanyTitle":"Our Parent Company - A&B Consulting",
-        "parentCompanyParagraph":"Insighta is proudly owned and operated by A&B Consulting, a firm dedicated to driving business success through strategic insights and sustainable solutions. With a strong foundation in consulting and research, A&B Consulting ensures that Insighta remains a trusted and professional platform for knowledge exchange."
+        "parentCompanyParagraph":"Insighta is proudly owned and operated by A&B Consulting, a firm dedicated to driving business success through strategic insights and sustainable solutions. With a strong foundation in consulting and research, A&B Consulting ensures that Insighta remains a trusted and professional platform for insight exchange."
     },
     "Resources": {
         "user-guide": "User Guide",
@@ -434,8 +434,8 @@
         "client": "Client",
         "ReceivedMeetings": "Received Meetings",
         "SentMeetings": "Sent Meetings",
-        "addKnowledge": "Add Knowledge +",
-        "knowledgeBase": "My knowledge library",
+        "addInsight": "Add Insight +",
+        "insightBase": "My insight library",
         "myReadLater": "Bookmarks",
         "myDownloads": "My Downloads",
         "myProfile": "My Profile",
@@ -444,7 +444,7 @@
         "accountSettings": "Account Settings",
         "settings":"Settings",
         "becomeInsighter": "Become an Insighter",
-        "becomeInsighterDescription": "Register as a knowledge provider and start uploading reports and data on the platform",
+        "becomeInsighterDescription": "Register as a insight provider and start uploading reports and data on the platform",
         "myCompany": "My Team",
         "signOut": "Sign Out"
     },
@@ -476,9 +476,9 @@
         "duplicateMeetingMessage": "You already have a meeting scheduled on {date} from {startTime} to {endTime}. Are you sure you want to book another meeting at the same time?",
         "continueBooking": "Continue Booking",
         "consultingFields": "Consulting Fields",
-        "knowledgeItems": "Knowledge Items",
+        "insightItems": "Insight Items",
         "showMore": "Show More",
-        "noKnowledgeItems": "No knowledge content available yet",
+        "noInsightItems": "No insight content available yet",
         "filterByType": "Filter by type",
         "all": "All",
         "insights": "Insights",
@@ -496,7 +496,7 @@
         "follow": "Follow",
         "meet":"Meet",
         "scheduleAMeeting": "Schedule a Meeting",
-        "publishedKnowledge": "Published <br/> Knowledge",
+        "publishedInsight": "Published <br/> Insight",
         "consultingSessions": "Sessions <br/> Held",
         "aboutMe": "About Insighter",
         "aboutCompany": "About Company",
@@ -505,7 +505,7 @@
         "previous":"Previous",
         "next":"Next",
       
-        "knowledge": "Knowledge Uploads",
+        "insight": "Insight Uploads",
         "availableTimes": "Available Times",
         "book": "Book",
         "noConsultingSessions": "No consulting sessions available",
@@ -556,9 +556,9 @@
     "termsAndConditions": {
         "mainTitle":"Terms of Service",
         "Introduction":"Introduction",
-        "welcomeKnoldg":"Welcome to Knoldg, an online platform that provides access to high-quality business knowledge, such as data, reports, insights, and manuals across various industries. By accessing or using our platform, you agree to comply with these Terms of Service. If you do not agree, please refrain from using Knoldg.",
+        "welcomeKnoldg":"Welcome toInsighta, an online platform that provides access to high-quality business insight, such as data, reports, insights, and manuals across various industries. By accessing or using our platform, you agree to comply with these Terms of Service. If you do not agree, please refrain from using Insighta.",
         "Definitions":"Definitions",
-        "authorizedUsers":"Authorized Users: Individuals or businesses that have registered and obtained access to Knoldg's services according to their account type.",
+        "authorizedUsers":"Authorized Users: Individuals or businesses that have registered and obtained access to Insighta's services according to their account type.",
         "expertContributors":"Expert Contributors: Individuals or companies that upload reports, insights, or data for sale.",
         "subscribersPurchasers":"Subscribers & Purchasers: Users who buy or subscribe to reports and insights.",
         "userRoles":"User Roles",
@@ -596,7 +596,7 @@
         "ForEU":"For EU users: Governed by GDPR and EU consumer laws.",
         "ForUS":"For U.S. users: Governed by CCPA and applicable state laws.",
         "ForJordan":"For Jordan & GCC: Governed by local data protection and e-commerce laws.",
-        "Jordanianlaw":"Jordanian law applies to all disputes. Any disputes shall be resolved through arbitration or courts in Knoldg's registered jurisdiction.",
+        "Jordanianlaw":"Jordanian law applies to all disputes. Any disputes shall be resolved through arbitration or courts in Insighta's registered jurisdiction.",
         "lastUpdatedTerms":"Last Updated: March 26, 2025"
     },
     "privacyPage": {
@@ -695,10 +695,10 @@
                 "sending": "Sending message...",
                 "contactUsSuccessSubtext": "We will get back to you as soon as possible"
         },
-    "dataNotAvailable": "No Knowledge Available Yet",
-    "industryKnowledge": "Explore by knowledge type",
+    "dataNotAvailable": "No Insight Available Yet",
+    "industryInsight": "Explore by insight type",
     "subIndustry": "Sub Industry",
-    "subIndustryKnowledge": "Explore by knowledge type",
+    "subIndustryInsight": "Explore by insight type",
     "topicLabel": "Topic",
     "Notifications": {
         "TITLE": "Notifications",

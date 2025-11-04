@@ -208,7 +208,7 @@ const { isLoading: isAppLoading, setIsLoading: setAppLoading } = useLoading();
     setAppLoading(true);
     
     // Enhanced cookie setting for better browser compatibility (especially Safari/Firefox)
-    const isProduction = typeof window !== 'undefined' && window.location.hostname.includes('knoldg.com');
+    const isProduction = typeof window !== 'undefined' && window.location.hostname.includes('insightabusiness.com');
     const expirationDate = new Date();
     expirationDate.setFullYear(expirationDate.getFullYear() + 1); // 1 year from now
     

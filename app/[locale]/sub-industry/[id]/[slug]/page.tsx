@@ -52,16 +52,16 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     const { data } = await fetchSubIndustryData(id, slug, locale)
     
     return {
-      title: `${data.name} Sub-Industry Analysis | KNOLDG`,
+      title: `${data.name} Sub-Industry Analysis | Insighta`,
       description: `Detailed analysis and insights about ${data.name} sub-industry, including ${data.topic.map((topic: TopicWithKnowledge) => topic.name).join(', ')}`,
       openGraph: {
-        title: `${data.name} Sub-Industry Analysis | KNOLDG`,
+        title: `${data.name} Sub-Industry Analysis | Insighta`,
         description: `Detailed analysis and insights about ${data.name} sub-industry, including ${data.topic.map((topic: TopicWithKnowledge) => topic.name).join(', ')}`,
       }
     }
   } catch (error) {
     return {
-      title: 'Sub-Industry Analysis | KNOLDG',
+      title: 'Sub-Industry Analysis | Insighta',
       description: 'Detailed sub-industry analysis and insights'
     }
   }

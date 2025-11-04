@@ -36,7 +36,7 @@ export default function GettingStarted() {
             
             <div className="text-slate-400 space-y-6">
               <p className="text-lg">
-                {t('getting-started-description') || 'Welcome to KNOLDG! This guide will help you get started with our platform.'}
+                {t('getting-started-description') || 'Welcome to Insighta! This guide will help you get started with our platform.'}
               </p>
               
               <h3 className="h4 bg-clip-text text-transparent bg-gradient-to-r from-slate-200/80 via-slate-200 to-slate-200/80 pt-4">

@@ -16,7 +16,7 @@ export default function CustomersList() {
   const items = [
     {
       text: {
-        en: 'On-Demand Knowledge Production',
+        en: 'On-Demand insights Production',
         ar: 'إنتاج معرفي قائم على الطلب'
       },
       bg: CustomerBg01,
