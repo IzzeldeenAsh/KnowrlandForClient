@@ -33,7 +33,7 @@ export default function TopicCard({ topic, locale, isRTL }: TopicCardProps) {
         {topic.knowledge && topic.knowledge.length > 0 ? (
           <>
             <Text size="xs" color="gray" fw={500} pb={5}>
-              {t('knowledgeItems') || (locale === 'ar' ? 'المعرفة:' : 'Knowledge:')}
+              {t('insightItems') || (locale === 'ar' ? 'المعرفة:' : 'Insights:')}
             </Text>
             <ul className="space-y-1">
               {topic.knowledge.map((item, index) => (
@@ -50,7 +50,7 @@ export default function TopicCard({ topic, locale, isRTL }: TopicCardProps) {
         ) : (
           <div className="text-xs text-gray-500 italic flex items-center">
             <span className={isRTL ? "ml-2" : "mr-2"}>•</span>
-            <p>{t('noKnowledgeItems') || (locale === 'ar' ? 'لا توجد عناصر معرفية متاحة' : 'No knowledge items available')}</p>
+            <p>{t('noInsightItems') || (locale === 'ar' ? 'لا توجد عناصر معرفية متاحة' : 'No knowledge items available')}</p>
           </div>
         )}
       </div>
