@@ -214,7 +214,7 @@ export default function KnowledgeGrid({
   const typeTranslations: Record<string, string> = {
     report: isRTL ? "تقرير" : "Reports",
     manual: isRTL ? "دليل" : "Manuals",
-    insight: isRTL ? "رؤى" : "Insights",
+    statistic: isRTL ? "إحصائيات" : "Statistics",
     data: isRTL ? "بيانات" : "Data",
     article: isRTL ? "مجالات" : "Articles",
     course: isRTL ? "دورة تدريبية" : "Course",
@@ -275,7 +275,7 @@ export default function KnowledgeGrid({
                     <div className="flex items-center mb-3">
                       {item.type === "report" && <ReportIcon width={20} height={20} />}
                       {item.type === "manual" && <ManualIcon width={20} height={20} />}
-                      {item.type === "insight" && <InsightIcon width={20} height={20} />}
+                      {item.type === "statistic" && <InsightIcon width={20} height={20} />}
                       {item.type === "data" && <DataIcon width={20} height={20} />}
                       {item.type === "article" && <CourseIcon width={20} height={20} />}
                       {item.type === "course" && <CourseIcon width={20} height={20} />}

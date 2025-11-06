@@ -297,7 +297,7 @@ export function UserProfile({ isHome }: { isHome: boolean }) {
                 onClick={() => setMenuOpen(false)}
                 style={{fontSize: '13px'}}
               >
-                {t("addKnowledge")}
+                {t("addInsight")}
               </Link>
                <Link
                href="https://app.insightabusiness.com/app/insighter-dashboard/my-knowledge/general"
@@ -305,7 +305,7 @@ export function UserProfile({ isHome }: { isHome: boolean }) {
                onClick={() => setMenuOpen(false)}
                style={{fontSize: '13px'}}
              >
-               {t("knowledgeBase")}
+               {t("insightBase")}
              </Link>
              </>
             )}

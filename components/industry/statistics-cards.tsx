@@ -44,9 +44,9 @@ export default function StatisticsCards({ type, id, entityName }: StatisticsCard
   // Get the appropriate message key based on the type
    const getMessageKey = () => {
       switch (type) {
-        case 'industry': return 'industryKnowledge';
-        case 'subIndustry': return 'subIndustryKnowledge';
-        case 'topic': return 'topic Knowledge';
+        case 'industry': return 'industryInsights';
+        case 'subIndustry': return 'subIndustryInsights';
+        case 'topic': return 'topic Insights';
         default: return '';
       }
     };
@@ -72,8 +72,7 @@ export default function StatisticsCards({ type, id, entityName }: StatisticsCard
     const translations: Record<string, string> = {
       'report': 'التقارير',
       'reports': 'التقارير',
-      'insight': 'الرؤى',
-      'insights': 'الرؤى',
+      'statistic': 'الإحصائيات',
       'data': 'البيانات',
       'manual': 'الأدلة',
       'manuals': 'الأدلة',
@@ -91,8 +90,7 @@ export default function StatisticsCards({ type, id, entityName }: StatisticsCard
       case 'reports':
       case 'report':
         return <ReportIcon width={24} height={24} />;
-      case 'insights':
-      case 'insight':
+      case 'statistic':
         return <InsightIcon width={24} height={24} />;
       case 'data':
         return <DataIcon width={21} height={21} />;
@@ -141,7 +139,7 @@ export default function StatisticsCards({ type, id, entityName }: StatisticsCard
   return (
     <div className="flex flex-col w-full">
       {entityName && (
-        <span className="inline-block px-5 py-1 text-xs font-semibold text-blue-500 bg-blue-100 rounded-md mb-2 uppercase w-100">
+        <span className="inline-block px-5 py-1 text-xs font-semibold text-blue-500 bg-blue-100 rounded-md mb-2 uppercase w-fit">
           {
           t.rich(getMessageKey(), {
               industry: () => <span className="font-extrabold underline">{entityName}</span>,

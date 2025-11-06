@@ -42,7 +42,7 @@ export default function SubIndustryCard({ child, locale, isRTL }: SubIndustryCar
         ) : (
           <div className="text-xs text-gray-500 italic flex items-center">
             <span className={isRTL ? "ml-2" : "mr-2"}></span>
-            <p>{t('noTopicsAvailable') || (locale === 'ar' ? 'لا توجد مواضيع متاحة' : 'No topics available')}</p>
+            <p>{ (locale === 'ar' ? 'لا توجد مواضيع متاحة' : 'No topics available')}</p>
           </div>
         )}
       </div>

@@ -88,7 +88,7 @@ export default function KnowledgeList({
   const typeTranslations: Record<string, string> = {
     report: isRTL ? "تقرير" : "Reports",
     manual: isRTL ? "دليل" : "Manuals",
-    insight: isRTL ? "رؤى" : "Insights",
+    statistic: isRTL ? "إحصائيات" : "Statistics",
     data: isRTL ? "بيانات" : "Data",
     article: isRTL ? "مجالات" : "Articles",
     course: isRTL ? "دورة تدريبية" : "Course",
@@ -136,7 +136,7 @@ export default function KnowledgeList({
                   <div className={styles.iconWrapper}>
                     {item.type === "report" && <ReportIcon width={24} height={24} />}
                     {item.type === "manual" && <ManualIcon width={24} height={24} />}
-                    {item.type === "insight" && <InsightIcon width={24} height={24} />}
+                    {item.type === "statistic" && <InsightIcon width={24} height={24} />}
                     {item.type === "data" && <DataIcon width={24} height={24} />}
                     {item.type === "article" && <CourseIcon width={24} height={24} />}
                     {item.type === "course" && <CourseIcon width={24} height={24} />}

@@ -1090,7 +1090,7 @@ export default function ProfilePage() {
                           <span
                             className="text-xs font-medium text-emerald-600 dark:text-emerald-300"
                             dangerouslySetInnerHTML={{
-                              __html: t("publishedKnowledge"),
+                              __html: t("publishedInsight"),
                             }}
                           />
                         </div>

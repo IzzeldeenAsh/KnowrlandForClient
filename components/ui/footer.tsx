@@ -49,22 +49,22 @@ export default function Footer() {
 
           {/* 2nd block */}
           <div className="sm:col-span-6 md:col-span-3 lg:col-span-2 text-center sm:text-left">
-            <h6 className="text-sm text-slate-50 font-medium mb-2 text-start">{t('knowledge.title')}</h6>
+            <h6 className="text-sm text-slate-50 font-medium mb-2 text-start">{t('insight.title')}</h6>
             <ul className="text-sm space-y-2 text-start">
               <li>
-                <a className="text-slate-400 hover:text-slate-200 transition duration-150 ease-in-out" href={`/${locale}/industries/insight`}>{t('knowledge.insights')}</a>
+                <a className="text-slate-400 hover:text-slate-200 transition duration-150 ease-in-out" href={`/${locale}/industries/insight`}>{t('insight.insights')}</a>
               </li>
               <li>
-                <a className="text-slate-400 hover:text-slate-200 transition duration-150 ease-in-out" href={`/${locale}/industries/report`}>{t('knowledge.reports')}</a>
+                <a className="text-slate-400 hover:text-slate-200 transition duration-150 ease-in-out" href={`/${locale}/industries/report`}>{t('insight.reports')}</a>
               </li>
               <li>
-                <a className="text-slate-400 hover:text-slate-200 transition duration-150 ease-in-out" href={`/${locale}/industries/data`}>{t('knowledge.data')}</a>
+                <a className="text-slate-400 hover:text-slate-200 transition duration-150 ease-in-out" href={`/${locale}/industries/data`}>{t('insight.data')}</a>
               </li>
               <li>
-                <a className="text-slate-400 hover:text-slate-200 transition duration-150 ease-in-out" href={`/${locale}/industries/manual`}>{t('knowledge.manual')}</a>
+                <a className="text-slate-400 hover:text-slate-200 transition duration-150 ease-in-out" href={`/${locale}/industries/manual`}>{t('insight.manual')}</a>
               </li>
               <li>
-                <a className="text-slate-400 hover:text-slate-200 transition duration-150 ease-in-out" href={`/${locale}/industries/course`}>{t('knowledge.courses')}</a>
+                <a className="text-slate-400 hover:text-slate-200 transition duration-150 ease-in-out" href={`/${locale}/industries/course`}>{t('insight.courses')}</a>
               </li>
             </ul>
           </div>

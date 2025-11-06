@@ -239,7 +239,7 @@ export default function Hero() {
                           </div>
                           <span className="text-gray-900 font-medium md:text-md text-sm">
                             {searchType === 'knowledge' 
-                              ? (currentLocale === 'ar' ? 'معرفة' : 'Knowledge') 
+                              ? (currentLocale === 'ar' ? 'رؤى' : 'Insights') 
                               : (currentLocale === 'ar' ? 'إنسايتر' : 'Insighter')}
                           </span>
                         </div>
