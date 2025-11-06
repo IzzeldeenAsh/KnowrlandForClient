@@ -27,7 +27,7 @@ interface Knowledge {
   topic_id: number;
 }
 
-const validTypes: IndustryType[] = ['report', 'insight', 'data', 'manual', 'course'];
+const validTypes: IndustryType[] = ['report', 'insight', 'data', 'manual', 'course', 'statistic'];
 
 interface Props {
   params: Promise<{
