@@ -393,9 +393,9 @@ export default function HomePageOptimized() {
                       onClick={() => handleCategorySelect('report')} 
                       count={categoryCounts['report']}
                     />
-                    <CategoryIconBox 
-                      name="insight" 
-                      label="Insights" 
+                   <CategoryIconBox 
+                        name="statistic" 
+                        label="Statistics" 
                       locale={locale} 
                       arLabel="الرؤى" 
                       isSelected={filterState.category === 'insight'} 
