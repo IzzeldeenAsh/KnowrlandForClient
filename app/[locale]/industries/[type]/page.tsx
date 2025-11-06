@@ -19,7 +19,7 @@ interface Topic {
 }
 
 
-const validTypes: IndustryType[] = ['report', 'insight', 'data', 'manual', 'course'];
+const validTypes: IndustryType[] = ['report', 'insight', 'data', 'manual', 'course', 'statistic'];
 
 interface Props {
   params: Promise<{
@@ -44,6 +44,7 @@ export default function IndustriesByTypePage({ params }: Props) {
     data: 'data',
     manual: 'manuals',
     course: 'courses',
+    statistic: 'statistics',
   };
 
   useEffect(() => {

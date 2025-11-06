@@ -11,7 +11,7 @@ import { safeAOSInit } from '@/components/aos-provider';
 import { useTopicsByType } from '@/hooks/industries/useTopicsByType';
 import KnowledgeGrid from '../../../../topic/[id]/[slug]/KnowledgeGrid';
 
-const validTypes: IndustryType[] = ['report', 'insight', 'data', 'manual', 'course'];
+const validTypes: IndustryType[] = ['report', 'insight', 'data', 'manual', 'course', 'statistic'];
 
 interface Props {
   params: Promise<{

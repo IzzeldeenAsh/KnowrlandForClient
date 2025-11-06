@@ -28,7 +28,7 @@ interface SubIndustry {
   topic: Topic[];
 }
 
-const validTypes: IndustryType[] = ['report', 'insight', 'data', 'manual', 'course'];
+const validTypes: IndustryType[] = ['report', 'insight', 'data', 'manual', 'course', 'statistic'];
 
 interface Props {
   params: Promise<{

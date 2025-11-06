@@ -72,4 +72,4 @@ export interface TopicDetails {
   knowledge: TopicKnowledge[];
 }
 
-export type IndustryType = 'report' | 'insight' | 'data' | 'manual' | 'course';
+export type IndustryType = 'report' | 'insight' | 'data' | 'manual' | 'course' | 'statistic';

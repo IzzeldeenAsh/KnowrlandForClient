@@ -144,6 +144,7 @@
         "navigation": {
             "industries": "Industries",
             "reports": "Reports",
+            "statistics": "Statistics",
             "data": "Data",
             "insights": "Insights",
             "manuals": "Manuals",
@@ -542,7 +543,7 @@
     "insights": "Insights",
     "manuals": "Manuals",
     "courses": "Courses",
-    "byIndustry": "by Industry",
+    "byIndustry": "By Industry",
     "noSubIndustries": "No sub-industries available",
     "Filters": {
         "filterBy": "Filter by",
