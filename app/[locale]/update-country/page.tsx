@@ -52,7 +52,7 @@ export default function UpdateCountryPage() {
       throw new Error('No authentication token found');
     }
 
-    const response = await fetch('https://api.insightabusiness.com/api/account/profile/country', {
+    const response = await fetch('https://api.foresighta.co/api/account/profile/country', {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${token}`,
@@ -123,7 +123,7 @@ export default function UpdateCountryPage() {
       // Check if it's an Angular route
       if (isAngularRoute(redirectUrl)) {
         const angularPath = redirectUrl.startsWith('/app/') ? redirectUrl : `/app${redirectUrl}`;
-        window.location.href = `https://app.insightabusiness.com${angularPath}`;
+        window.location.href = `https://app.foresighta.co${angularPath}`;
       } else {
         // Handle relative URLs by ensuring they start with the locale
         let finalUrl = redirectUrl;

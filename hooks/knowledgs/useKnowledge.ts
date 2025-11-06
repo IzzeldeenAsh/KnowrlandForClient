@@ -53,7 +53,7 @@ export function useKnowledge({ taxonomy, id, knowledgeType, page }: UseKnowledge
     params.append(taxonomy, id.toString());
     params.append('page', page.toString());
 
-    fetch(`https://api.insightabusiness.com/api/platform/industries/type/knowledge?${params.toString()}`, {
+    fetch(`https://api.foresighta.co/api/platform/industries/type/knowledge?${params.toString()}`, {
       headers: {
         "Content-Type": "application/json",
         "Accept": "application/json",
