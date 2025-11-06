@@ -272,7 +272,7 @@ export default function Overview({ knowledge, knowledgeSlug }: OverviewProps) {
                         <button
                           onClick={(e) => {
                             e.stopPropagation();
-                            window.location.href = process.env.NEXT_PUBLIC_DASHBOARD_URL + '/app/insighter-dashboard/my-downloads' || 'https://app.insightabusiness.com/app/insighter-dashboard/my-downloads';
+                            window.location.href = process.env.NEXT_PUBLIC_DASHBOARD_URL + '/app/insighter-dashboard/my-downloads' || 'https://app.foresighta.co/app/insighter-dashboard/my-downloads';
                           }}
                           className={`btn-sm mx-4 text-white bg-green-600 text-sm hover:bg-green-700 transition duration-150 ease-in-out group text-sm px-3 py-1 cursor-pointer ${styles.modernButton} ${styles.focusVisible}`}
                           aria-label={`${translations.alreadyPurchased} - ${doc.file_name}`}

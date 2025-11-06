@@ -242,44 +242,44 @@ export default function NotificationsInner({
     
     // Handle accept_knowledge notifications - redirect to insighter dashboard
     if (notification.sub_type === 'accept_knowledge') {
-      window.location.href = 'https://app.insightabusiness.com/app/insighter-dashboard/my-requests'
+      window.location.href = 'https://app.foresighta.co/app/insighter-dashboard/my-requests'
       return
     }
     if (notification.sub_type === 'declined' && notification.type === 'knowledge') {
-      window.location.href = `https://app.insightabusiness.com/app/my-knowledge-base/view-my-knowledge/${notification.param}/details`
+      window.location.href = `https://app.foresighta.co/app/my-knowledge-base/view-my-knowledge/${notification.param}/details`
       return
     }
     if(notification.sub_type.startsWith('client_')) {
-      window.location.href = 'https://app.insightabusiness.com/app/insighter-dashboard/my-meetings/sent'
+      window.location.href = 'https://app.foresighta.co/app/insighter-dashboard/my-meetings/sent'
       return
     }
     if(notification.sub_type.startsWith('insighter_')) {
-      window.location.href = 'https://app.insightabusiness.com/app/insighter-dashboard/my-meetings/received'
+      window.location.href = 'https://app.foresighta.co/app/insighter-dashboard/my-meetings/received'
       return
     }
     // Handle knowledge approved notifications - redirect to knowledge details page
     if (notification.type === 'knowledge' && notification.sub_type === 'approved') {
-      window.location.href = `https://app.insightabusiness.com/app/my-knowledge-base/view-my-knowledge/${notification.param}/details`
+      window.location.href = `https://app.foresighta.co/app/my-knowledge-base/view-my-knowledge/${notification.param}/details`
       return
     }
     if(notification.sub_type.startsWith('client_meeting_insighter_postponed')){
-      window.location.href = 'https://app.insightabusiness.com/app/insighter-dashboard/my-meetings/sent'
+      window.location.href = 'https://app.foresighta.co/app/insighter-dashboard/my-meetings/sent'
       return
     }
     if(notification.sub_type.startsWith('client_meeting_reschedule')){
-      window.location.href = 'https://app.insightabusiness.com/app/insighter-dashboard/my-meetings/sent'
+      window.location.href = 'https://app.foresighta.co/app/insighter-dashboard/my-meetings/sent'
       return
     }
     if(notification.sub_type.startsWith('insighter_meeting_client_reschedule')){
-      window.location.href = 'https://app.insightabusiness.com/app/insighter-dashboard/my-meetings/received'
+      window.location.href = 'https://app.foresighta.co/app/insighter-dashboard/my-meetings/received'
       return
     }
     if(notification.sub_type.startsWith('insighter_meeting_reminder')){
-      window.location.href = 'https://app.insightabusiness.com/app/insighter-dashboard/my-meetings/received'
+      window.location.href = 'https://app.foresighta.co/app/insighter-dashboard/my-meetings/received'
       return
     }
     if(notification.sub_type.startsWith('client_meeting_reminder')){
-      window.location.href = 'https://app.insightabusiness.com/app/insighter-dashboard/my-meetings/sent'
+      window.location.href = 'https://app.foresighta.co/app/insighter-dashboard/my-meetings/sent'
       return
     }
     // Handle knowledge accept/decline notifications
@@ -291,7 +291,7 @@ export default function NotificationsInner({
     
     // Handle knowledge notifications with category
     if (notification.type === 'knowledge' && notification.category) {
-      const knowledgeUrl = `https://insightabusiness.com/${currentLanguage}/knowledge/${notification.category}/${notification.param || ''}?tab=ask`
+      const knowledgeUrl = `https://foresighta.co/${currentLanguage}/knowledge/${notification.category}/${notification.param || ''}?tab=ask`
       window.open(knowledgeUrl, '_blank')
     }
   }
@@ -317,7 +317,7 @@ export default function NotificationsInner({
 
       <div
         className="px-5 py-4 text-white"
-        style={{ backgroundImage: 'url(https://app.insightabusiness.com/assets/media/misc/menu-header-bg.jpg)', backgroundSize: 'cover', backgroundPosition: 'center' }}
+        style={{ backgroundImage: 'url(https://app.foresighta.co/assets/media/misc/menu-header-bg.jpg)', backgroundSize: 'cover', backgroundPosition: 'center' }}
       >
         <h3 className="font-bold text-lg mt-4 mb-2">
           {t('TITLE')}

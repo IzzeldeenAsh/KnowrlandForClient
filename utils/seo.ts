@@ -48,7 +48,7 @@ export function generateKnowledgeMetadata(
   slug: string
 ): Metadata {
   const isRTL = locale === 'ar';
-  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://insightabusiness.com';
+  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://foresighta.co';
   const defaultSocialImage = 'https://res.cloudinary.com/dsiku9ipv/image/upload/v1761651021/drilldown_l7cdf2.jpg';
   let metadataBase: URL | undefined;
 
@@ -56,7 +56,7 @@ export function generateKnowledgeMetadata(
     metadataBase = new URL(baseUrl);
   } catch (error) {
     console.error('Invalid NEXT_PUBLIC_BASE_URL provided, falling back to default.', error);
-    metadataBase = new URL('https://insightabusiness.com');
+    metadataBase = new URL('https://foresighta.co');
   }
 
   const currentUrl = `${baseUrl}/${locale}/knowledge/${type}/${slug}`;
@@ -215,7 +215,7 @@ export function generateKnowledgeMetadata(
 }
 
 export function generateStructuredData(knowledge: KnowledgeMetadata, locale: string, type: string, slug: string) {
-  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://insightabusiness.com';
+  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://foresighta.co';
   const currentUrl = `${baseUrl}/${locale}/knowledge/${type}/${slug}`;
   
   const avgRating = knowledge.review && knowledge.review.length > 0

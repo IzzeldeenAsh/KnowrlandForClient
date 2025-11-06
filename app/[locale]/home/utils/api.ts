@@ -84,7 +84,7 @@ export async function fetchAutocomplete(
   if (!keyword.trim()) return [];
   
   try {
-    const response = await fetch(`https://api.insightabusiness.com/api/platform/search/autocomplete?keyword=${encodeURIComponent(keyword)}`, {
+    const response = await fetch(`https://api.foresighta.co/api/platform/search/autocomplete?keyword=${encodeURIComponent(keyword)}`, {
      headers
     });
     
@@ -131,7 +131,7 @@ export async function fetchStatisticsPerType(
   onError?: (errorMessage: any) => void
 ) {
   try {
-    const url = new URL('https://api.insightabusiness.com/api/platform/search/statistics-per-type');
+    const url = new URL('https://api.foresighta.co/api/platform/search/statistics-per-type');
     
     // Add base parameters
     url.searchParams.append('accuracy', accuracyFilter);
@@ -274,7 +274,7 @@ export async function fetchSearchResults(
 ) {
   try {
     // Always use the search API endpoint
-    const url = new URL('https://api.insightabusiness.com/api/platform/search');
+    const url = new URL('https://api.foresighta.co/api/platform/search');
     // Use the accuracy parameter passed to the function
     url.searchParams.append('accuracy', accuracyFilter);
     // Backend now returns all data when keyword is empty

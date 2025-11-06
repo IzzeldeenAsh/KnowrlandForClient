@@ -113,7 +113,7 @@ async function fetchKnowledgeData(type: string, slug: string, locale: string = '
     // Note: localStorage cleanup is handled by AuthHandler component
     
     const response = await fetch(
-      `https://api.insightabusiness.com/api/platform/industries/knowledge/${slug}`,
+      `https://api.foresighta.co/api/platform/industries/knowledge/${slug}`,
       {
         method: "GET",
         headers,
@@ -157,7 +157,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     return generateKnowledgeMetadata(data, locale, type, slug);
   } catch (error) {
     const isRTL = locale === 'ar';
-    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://insightabusiness.com';
+    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://foresighta.co';
     const defaultSocialImage = 'https://res.cloudinary.com/dsiku9ipv/image/upload/v1761746492/drilldown_1_cjpvli.jpg';
     const pageUrl = `${baseUrl}/${locale}/knowledge/${type}/${slug}`;
 
@@ -165,7 +165,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     try {
       metadataBase = new URL(baseUrl);
     } catch {
-      metadataBase = new URL('https://insightabusiness.com');
+      metadataBase = new URL('https://foresighta.co');
     }
 
     const title = isRTL ? "المعرفة غير موجودة | Insighta" : "Knowledge Not Found |Insighta";

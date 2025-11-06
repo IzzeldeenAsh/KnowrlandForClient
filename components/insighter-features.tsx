@@ -665,7 +665,7 @@ export default function InsighterFeatures() {
                 </span>
               </div>
               <Link
-                href="https://app.insightabusiness.com/app/insighter-register/vertical"
+                href="https://app.foresighta.co/app/insighter-register/vertical"
                 className="relative inline-flex items-center px-8 py-3 text-black font-medium rounded-full bg-gradient-to-r from-gray-200 via-white to-gray-200 hover:brightness-110 transition duration-300 ease-in-out shadow-[0_0_20px_rgba(78,113,255,0.4)] hover:shadow-[0_0_25px_rgba(78,113,255,0.7)]"
               >
                 {t("insighter.cta")}
