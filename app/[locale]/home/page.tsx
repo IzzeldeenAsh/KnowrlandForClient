@@ -1500,10 +1500,10 @@ export default function HomePage() {
       
            
        <div className="flex flex-col sm:flex-col align-center justify-center gap-2" style={{lineHeight: '1.3'}}>
-         <h1 className="text-3xl sm:text-4xl md:text-5xl font-extrabold tracking-tight text-gray-900 text-center " style={{lineHeight: '1.3'}}>
+         <h1 className="text-3xl sm:text-4xl md:text-5xl font-extrabold tracking-tight text-gray-900 text-center ">
            {locale === 'ar' ? 'ابحث في التقارير والبيانات والرؤى' : 'Search data, reports, and insights'}
          </h1>
-         <h1 className="text-3xl sm:text-4xl md:text-5xl font-extrabold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-blue-500 to-teal-400 text-center " style={{lineHeight: '1.3'}}>
+         <h1 className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-cyan-500 text-center " >
            {locale === 'ar' ? 'ابدأ الآن' : 'Start exploring now'}
          </h1>
        </div>
@@ -1521,7 +1521,7 @@ export default function HomePage() {
                searchType={searchType}
                setSearchType={handleSearchTypeChange}
                locale={locale}
-               placeholder={locale === 'ar' ? 'إبحث عن معرفة أو خبير...' : 'Search for Knowledge or Expert...'}
+               placeholder={locale === 'ar' ? 'إبحث عن رؤى أو إنسايتر...' : 'Search for Insights or Insighter...'}
                onSubmit={handleSubmit}
                onSearch={executeSearch}
                onQueryChange={handleQueryChange}
@@ -1612,13 +1612,13 @@ export default function HomePage() {
                         count={getCategoryCount('report')}
                       />
                       <CategoryIconBox 
-                        name="insight" 
-                        label="Insights" 
+                        name="statistic" 
+                        label="Statistics" 
                         locale={locale} 
-                        arLabel="الرؤى" 
-                        isSelected={selectedCategory === 'insight'} 
-                        onClick={(e) => { e.preventDefault(); handleCategorySelect('insight'); }} 
-                        count={getCategoryCount('insight')}
+                        arLabel="الإحصائيات" 
+                        isSelected={selectedCategory === 'statistic'} 
+                        onClick={(e) => { e.preventDefault(); handleCategorySelect('statistic'); }} 
+                        count={getCategoryCount('statistic')}
                       />
                       <CategoryIconBox 
                         name="manual" 

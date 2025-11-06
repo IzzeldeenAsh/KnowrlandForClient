@@ -225,7 +225,7 @@ const SearchBar: React.FC<SearchBarProps> = ({
               </div>
               <span className="text-gray-900 font-medium text-sm">
                 {searchType === 'knowledge' 
-                  ? (locale === 'ar' ? 'معرفة' : 'Knowledge') 
+                  ? (locale === 'ar' ? 'رؤى' : 'Insights') 
                   : (locale === 'ar' ? 'إنسايتر' : 'Insighter')}
               </span>
               <svg 

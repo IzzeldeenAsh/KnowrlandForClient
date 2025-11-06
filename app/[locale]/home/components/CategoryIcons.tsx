@@ -1,6 +1,6 @@
 import React, { memo } from 'react';
 
-type IconName = 'all' | 'data' | 'report' | 'insight' | 'manual' | 'course';
+type IconName = 'all' | 'data' | 'report' | 'statistic' | 'manual' | 'course';
 
 interface CategoryIconProps {
   name: IconName;
@@ -41,7 +41,7 @@ const CategoryIcon: React.FC<CategoryIconProps> = ({ name }) => {
           </svg>
         </div>
       );
-    case 'insight':
+    case 'statistic':
       return (
         <div className='bg-red-50 p-2 rounded-md'>
 <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -104,7 +104,7 @@ export const CategoryIconBox = memo<CategoryIconBoxProps>(({ name, label, locale
         return 'bg-gray-800'; // Dark gray for data
       case 'report':
         return 'bg-blue-600'; // Blue for reports
-      case 'insight':
+      case 'statistic':
         return 'bg-[#891638]'; // Custom red for insights
       case 'manual':
         return 'bg-yellow-500'; // Yellow/orange for manuals
