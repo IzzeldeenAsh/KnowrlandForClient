@@ -427,7 +427,7 @@ const SearchBar: React.FC<SearchBarProps> = ({
                     </svg>
                   )}
                 </div>
-                <span className="text-gray-900 font-medium text-sm">
+                <span className="text-gray-900 font-medium text-sm uppercase">
                   {searchType === 'knowledge'
                     ? (locale === 'ar' ? 'رؤى' : 'Insights')
                     : (locale === 'ar' ? 'إنسايتر' : 'Insighter')}
@@ -471,8 +471,8 @@ const SearchBar: React.FC<SearchBarProps> = ({
                         <path d="M21 6l0 13" />
                       </svg>
                     </div>
-                    <span className="text-gray-900 font-medium text-sm">
-                      {locale === 'ar' ? 'معرفة' : 'Knowledge'}
+                    <span className="text-gray-900 font-medium text-sm uppercase">
+                      {locale === 'ar' ? 'رؤى' : 'INSIGHTS'}
                     </span>
                   </div>
                   <div
@@ -490,7 +490,7 @@ const SearchBar: React.FC<SearchBarProps> = ({
                         <path d="M13.755 15C14.295 14.8875 14.805 14.67 15.225 14.3475C16.395 13.47 16.395 12.0225 15.225 11.145C14.8125 10.83 14.31 10.62 13.7775 10.5" stroke="#2463EB" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
                       </svg>
                     </div>
-                    <span className="text-gray-900 font-medium text-sm">
+                    <span className="text-gray-900 font-medium text-sm uppercase ">
                       {locale === 'ar' ? 'إنسايتر' : 'Insighter'}
                     </span>
                   </div>
