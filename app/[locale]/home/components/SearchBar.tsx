@@ -225,7 +225,8 @@ const SearchBar: React.FC<SearchBarProps> = ({
   // Sync selected HS from external filter when HS list updates
   useEffect(() => {
     if (hsCodeFilter && hsCodes.length > 0) {
-      const found = hsCodes.find(c => c.code === hsCodeFilter);
+      const numeric = parseInt(hsCodeFilter);
+      const found = hsCodes.find(c => c.id === numeric);
       if (found) setSelectedHs({ id: found.id, code: found.code, label: locale === 'ar' ? found.names.ar : found.names.en });
     } else if (!hsCodeFilter) {
       setSelectedHs(null);
@@ -282,17 +283,40 @@ const SearchBar: React.FC<SearchBarProps> = ({
     // When ISIC changes, clear HS
     setSelectedHs(null);
     setHsCodeFilter && setHsCodeFilter(null);
+    // Update URL: set isic_code, clear hs_code, reset page
+    try {
+      console.log('[SearchBar] handleSelectIsic -> node:', { id: node.key, code: node.code });
+      const params = new URLSearchParams(searchParams.toString());
+      params.set('isic_code', node.key.toString());
+      params.delete('hs_code');
+      params.delete('page');
+      params.set('search_type', searchType);
+      const nextUrl = `/${locale}/home?${params.toString()}`;
+      console.log('[SearchBar] handleSelectIsic -> push URL:', nextUrl);
+      router.push(nextUrl, { scroll: false });
+    } catch {}
     setIsIsicModalOpen(false);
-  }, [locale, setIsicCodeFilter, setHsCodeFilter]);
+  }, [locale, searchParams, router, locale, searchType, setIsicCodeFilter, setHsCodeFilter]);
 
   const handleSelectHs = useCallback((code: HSCode) => {
     setSelectedHs({ id: code.id, code: code.code, label: locale === 'ar' ? code.names.ar : code.names.en });
-    // Use HS code value to align with backend expectations and URL param
+    // Use HS ID value to align with backend expectations and URL param
     if (setHsCodeFilter) {
-      setHsCodeFilter(code.code);
+      setHsCodeFilter(code.id.toString());
     }
+    // Update URL: set hs_code, reset page
+    try {
+      console.log('[SearchBar] handleSelectHs -> code:', { id: code.id, code: code.code });
+      const params = new URLSearchParams(searchParams.toString());
+      params.set('hs_code', code.id.toString());
+      params.delete('page');
+      params.set('search_type', searchType);
+      const nextUrl = `/${locale}/home?${params.toString()}`;
+      console.log('[SearchBar] handleSelectHs -> push URL:', nextUrl);
+      router.push(nextUrl, { scroll: false });
+    } catch {}
     setIsHsModalOpen(false);
-  }, [locale, setHsCodeFilter]);
+  }, [locale, searchParams, router, locale, searchType, setHsCodeFilter]);
   
   // Handle keyboard navigation for suggestions
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
@@ -395,7 +419,7 @@ const SearchBar: React.FC<SearchBarProps> = ({
     }}>
       <div className="flex flex-col w-full" style={{ position: 'relative' }}>
         {/* Combined search bar with integrated dropdown */}
-        <div className={`${styles.searchBar} flex flex-wrap items-start bg-white border border-[#299af8] rounded-[4px] w-full p-2`}
+        <div className={`${styles.searchBar} flex flex-wrap items-center bg-white border border-[#299af8] rounded-[4px] w-full p-2`}
           style={{ fontSize: '16px' }}
         >
           {/* First row: Search type dropdown + ISIC/HS codes */}
@@ -523,7 +547,7 @@ const SearchBar: React.FC<SearchBarProps> = ({
                         className={`text-gray-400 hover:text-red-500 ${locale === 'ar' ? 'mr-1' : 'ml-1'}`}
                         aria-label="Clear ISIC"
                         onMouseDown={(e) => { e.preventDefault(); e.stopPropagation(); }}
-                        onClick={(e) => { e.preventDefault(); e.stopPropagation(); setSelectedIsic(null); setIsicCodeFilter && setIsicCodeFilter(null); setSelectedHs(null); setHsCodeFilter && setHsCodeFilter(null); }}
+                        onClick={(e) => { e.preventDefault(); e.stopPropagation(); setSelectedIsic(null); setIsicCodeFilter && setIsicCodeFilter(null); setSelectedHs(null); setHsCodeFilter && setHsCodeFilter(null); try { const params = new URLSearchParams(searchParams.toString()); params.delete('isic_code'); params.delete('hs_code'); params.delete('page'); params.set('search_type', searchType); const nextUrl = `/${locale}/home?${params.toString()}`; console.log('[SearchBar] clear ISIC -> push URL:', nextUrl); router.push(nextUrl, { scroll: false }); } catch {} }}
                       >
                         <IconX size={14} />
                       </button>
@@ -567,7 +591,7 @@ const SearchBar: React.FC<SearchBarProps> = ({
                         className={`text-gray-400 hover:text-red-500 ${locale === 'ar' ? 'mr-1' : 'ml-1'}`}
                         aria-label="Clear HS"
                         onMouseDown={(e) => { e.preventDefault(); e.stopPropagation(); }}
-                        onClick={(e) => { e.preventDefault(); e.stopPropagation(); setSelectedHs(null); setHsCodeFilter && setHsCodeFilter(null); }}
+                        onClick={(e) => { e.preventDefault(); e.stopPropagation(); setSelectedHs(null); setHsCodeFilter && setHsCodeFilter(null); try { const params = new URLSearchParams(searchParams.toString()); params.delete('hs_code'); params.delete('page'); params.set('search_type', searchType); const nextUrl = `/${locale}/home?${params.toString()}`; console.log('[SearchBar] clear HS -> push URL:', nextUrl); router.push(nextUrl, { scroll: false }); } catch {} }}
                       >
                         <IconX size={14} />
                       </button>

@@ -358,8 +358,33 @@ export default function HomePage() {
       urlParams.set('per_page', '30');
     }
     
+    const nextUrl = `/${locale}/home?${urlParams.toString()}`;
+    try {
+      console.log('[updateUrlWithFilters] applying params:', {
+        query,
+        type,
+        language,
+        country,
+        region,
+        economicBloc,
+        tag,
+        industry,
+        isicCode,
+        hsCode,
+        paid,
+        rangeStart,
+        rangeEnd,
+        coverStart,
+        coverEnd,
+        category,
+        accuracy,
+        role,
+        page
+      });
+      console.log('[updateUrlWithFilters] next URL:', nextUrl);
+    } catch {}
     // Update URL without refreshing the page
-    router.push(`/${locale}/home?${urlParams.toString()}`, { scroll: false });
+    router.push(nextUrl, { scroll: false });
   }, [locale, router, searchType, searchQuery, currentPage, languageFilter, countryFilter, regionFilter, economicBlocFilter, tagFilter, industryFilter, isicCodeFilter, hsCodeFilter, priceFilter, selectedCategory, accuracyFilter, roleFilter, rangeStartFilter, rangeEndFilter, yearOfStudyFilter]);
 
   // Handler for search type changes
@@ -599,6 +624,7 @@ export default function HomePage() {
     // Update the HS code filter state
     setHsCodeFilter(numericValue);
     // Update URL with new filter (use the numeric value)
+    console.log('[handleHsCodeFilterChange] value:', value, 'numeric:', numericValue);
     updateUrlWithFilters({ hs_code: numericValue });
 
     // Reset to page 1 when filter changes
@@ -1443,7 +1469,7 @@ export default function HomePage() {
            </p>  */}
            
            {/* Search Bar Prominent Placement */}
-           <div className="mx-auto mt-8 max-w-4xl shadow-md">
+           <div className="mx-auto mt-8 max-w-4xl ">
              <SearchBar
                searchQuery={searchQuery}
                setSearchQuery={setSearchQuery}

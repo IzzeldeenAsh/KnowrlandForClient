@@ -395,6 +395,9 @@ export async function fetchSearchResults(
       headers.Authorization = `Bearer ${token}`;
     }
     
+    try {
+      console.log('[fetchSearchResults] URL:', url.toString());
+    } catch {}
     const response = await fetch(url.toString(), {
       headers,
       cache: 'no-store'
