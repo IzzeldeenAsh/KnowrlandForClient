@@ -74,7 +74,6 @@ export function GlobalProfileProvider({ children }: { children: React.ReactNode 
   const fetchProfileWithRetry = async (token: string, maxRetries = 3): Promise<{ user: User | null; roles: string[] }> => {
     for (let attempt = 1; attempt <= maxRetries; attempt++) {
       try {
-        console.log(`[GlobalProfileProvider] Attempt ${attempt}/${maxRetries} to fetch profile`);
         
         const response = await fetch("https://api.foresighta.co/api/account/profile", {
           headers: {
@@ -115,14 +114,10 @@ export function GlobalProfileProvider({ children }: { children: React.ReactNode 
           country_id: data.data.country_id,
         };
 
-        console.log("[GlobalProfileProvider] Successfully retrieved profile", { 
-          userId: data.data.id,
-          roles: data.data.roles,
-        });
+    
 
         // Check if user is admin before caching
         if (data.data.roles && data.data.roles.includes('admin')) {
-          console.log("[GlobalProfileProvider] Admin user detected, not caching profile for Next.js app");
           // Still return the data but don't cache it
           return { user: userData, roles: data.data.roles };
         }
@@ -136,7 +131,6 @@ export function GlobalProfileProvider({ children }: { children: React.ReactNode 
         
         return { user: userData, roles: data.data.roles };
       } catch (error) {
-        console.error(`[GlobalProfileProvider] Attempt ${attempt} failed:`, error);
         
         if ((error instanceof Error && error.message.includes('Auth failed')) || attempt === maxRetries) {
           throw error;
@@ -156,14 +150,12 @@ export function GlobalProfileProvider({ children }: { children: React.ReactNode 
     
     // Return cached data if still valid and not forced refresh
     if (!forceRefresh && globalProfileCache.user && (now - globalProfileCache.lastFetchTime) < CACHE_DURATION) {
-      console.log("[GlobalProfileProvider] Using cached profile data");
       setUser(globalProfileCache.user);
       setRoles(globalProfileCache.roles);
       return;
     }
 
     if (!token) {
-      console.log("[GlobalProfileProvider] No token found");
       globalProfileCache.user = null;
       globalProfileCache.roles = [];
       setUser(null);
@@ -173,19 +165,16 @@ export function GlobalProfileProvider({ children }: { children: React.ReactNode 
 
     // If already fetching, return the pending promise
     if (globalProfileCache.pendingPromise) {
-      console.log("[GlobalProfileProvider] Using pending promise");
       try {
         const result = await globalProfileCache.pendingPromise;
         setUser(result.user);
         setRoles(result.roles);
       } catch (error) {
-        console.error("[GlobalProfileProvider] Error from pending promise:", error);
       }
       return;
     }
 
     // Start new fetch
-    console.log("[GlobalProfileProvider] Starting new profile fetch");
     setIsLoading(true);
     globalProfileCache.isLoading = true;
     globalProfileCache.pendingPromise = fetchProfileWithRetry(token);
@@ -195,12 +184,10 @@ export function GlobalProfileProvider({ children }: { children: React.ReactNode 
       setUser(result.user);
       setRoles(result.roles);
     } catch (error) {
-      console.error("[GlobalProfileProvider] Error fetching profile:", error);
       
       // Check if we have cached user data to fall back to
       const existingUser = localStorage.getItem("user");
       if (existingUser && !(error instanceof Error && error.message.includes('Auth failed'))) {
-        console.log("[GlobalProfileProvider] Using cached user data due to API error");
         const cachedUserData = JSON.parse(existingUser);
         globalProfileCache.user = cachedUserData;
         setUser(cachedUserData);
@@ -208,7 +195,6 @@ export function GlobalProfileProvider({ children }: { children: React.ReactNode 
       } else {
         // Only clear auth data on actual auth failures
         if (error instanceof Error && error.message.includes('Auth failed')) {
-          console.log('[GlobalProfileProvider] Auth error, clearing invalid token');
           localStorage.removeItem('token');
           localStorage.removeItem('user');
           document.cookie = 'token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
@@ -230,7 +216,6 @@ export function GlobalProfileProvider({ children }: { children: React.ReactNode 
   useEffect(() => {
     // Skip profile fetch for callback pages as they handle their own auth flow
     if (pathname.includes('/callback')) {
-      console.log('[GlobalProfileProvider] Skipping profile fetch for callback page');
       return;
     }
 
@@ -243,7 +228,6 @@ export function GlobalProfileProvider({ children }: { children: React.ReactNode 
       
       // If we had a user but token is gone, clear state
       if (globalProfileCache.user && !currentToken) {
-        console.log('[GlobalProfileProvider] Token lost, clearing profile state');
         globalProfileCache.user = null;
         globalProfileCache.roles = [];
         globalProfileCache.lastFetchTime = 0;
@@ -252,7 +236,6 @@ export function GlobalProfileProvider({ children }: { children: React.ReactNode 
       } 
       // If we have a token but no user, fetch profile
       else if (currentToken && !globalProfileCache.user) {
-        console.log('[GlobalProfileProvider] Token found but no user, fetching profile');
         refreshProfile();
       }
     };

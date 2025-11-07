@@ -107,7 +107,7 @@ export default function Features() {
                         width={700}
                         height={700}
                         alt="Feature 2 - Image 1"
-                        style={{ objectFit: 'contain' }}
+                        style={{ objectFit: 'contain', width: 'auto', height: 'auto' }}
                       />
                       <div className="absolute inset-0  rounded-[inherit]" />
                     </div>
@@ -117,7 +117,7 @@ export default function Features() {
                       width={500}
                       height={500}
                       alt="Feature 2 - Image 2"
-                      style={{ objectFit: 'contain' }}
+                      style={{ objectFit: 'contain', width: 'auto', height: 'auto' }}
                     />
                     <Image
                       className={`w-full h-full rounded-[inherit] transition-all duration-700 ease-in-out absolute ${hoveredTab1 === 3 || (hoveredTab1 === null && activeTab1 === 3) ? 'opacity-100' : 'opacity-0'}`}
@@ -125,7 +125,7 @@ export default function Features() {
                       width={500}
                       height={500}
                       alt="Feature 2 - Image 3"
-                      style={{ objectFit: 'contain' }}
+                      style={{ objectFit: 'contain', width: 'auto', height: 'auto' }}
                     />
                   </div>
                 </figure>

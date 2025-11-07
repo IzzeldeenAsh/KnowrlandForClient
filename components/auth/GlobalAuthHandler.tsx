@@ -25,16 +25,13 @@ export default function GlobalAuthHandler() {
 
     // Function to clean up all auth data
     const cleanupAuthData = () => {
-      console.log('[GlobalAuthHandler] Cleaning up auth data');
       
       // Clean localStorage
       try {
         localStorage.removeItem('token');
         localStorage.removeItem('user');
         localStorage.removeItem('foresighta-creds');
-        console.log('[GlobalAuthHandler] LocalStorage cleaned');
       } catch (e) {
-        console.error('[GlobalAuthHandler] Error cleaning localStorage:', e);
       }
     };
 
@@ -51,14 +48,12 @@ export default function GlobalAuthHandler() {
                           pathname.includes('/signout');
 
       if (isPublicRoute) {
-        console.log('[GlobalAuthHandler] Public route detected, skipping auth check');
         return;
       }
 
 
       // If we have localStorage data but no cookie token, we need to clean up and redirect
       if (!cookieToken && (localStorageToken || userData)) {
-        console.log('[GlobalAuthHandler] Auth mismatch detected - cleaning up and redirecting to logout');
         cleanupAuthData();
         
         // Get the current locale for the redirect

@@ -43,8 +43,8 @@ export default function Logo({ isHomePage = true }: LogoProps) {
   return (
     <Link className="inline-flex" href={`/${locale}`} aria-label="Insighta" onClick={handleLogoClick}>
       {/* Use small logo for mobile devices, regular logo for larger screens */}
-      <Image className="hidden md:block max-w-none" src={logoImg} width={120} height={60} priority alt="Insighta" />
-      <Image className="block md:hidden max-w-none" src={smallLogoImg} width={40} height={40} priority alt="Insighta" />
+      <Image className="hidden md:block max-w-none" src={logoImg} width={120} height={60} priority alt="Insighta" style={{ height: "auto" }} />
+      <Image className="block md:hidden max-w-none" src={smallLogoImg} width={40} height={40} priority alt="Insighta" style={{ height: "auto" }} />
     </Link>
   )
 }

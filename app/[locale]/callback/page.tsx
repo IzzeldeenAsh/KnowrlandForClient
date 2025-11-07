@@ -71,8 +71,6 @@ export default function QueryParamAuthCallback() {
           throw new Error('No token provided');
         }
 
-        console.log('[callback] Processing authentication with token:', token.substring(0, 20) + '...');
-        console.log('[callback] Return URL:', returnUrl);
         
         // Store token in cookie (primary storage) with error handling
         try {
