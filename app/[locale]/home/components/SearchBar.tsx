@@ -5,7 +5,6 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { IconSearch, IconX } from '@tabler/icons-react';
 import { useSuggestions, useClickAway } from '../utils/hooks';
 import styles from '../utils/custom-search-engine-styles.module.css';
-import { fetchSearchResults } from '../utils/api';
 import { Modal, Loader } from '@mantine/core';
 import { getApiUrl } from '@/app/config';
 
@@ -85,6 +84,15 @@ const SearchBar: React.FC<SearchBarProps> = ({
   const [selectedIsic, setSelectedIsic] = useState<{ id: number; code: string; label: string } | null>(null);
   const [selectedHs, setSelectedHs] = useState<{ id: number; code: string; label: string } | null>(null);
   
+  // Track initial URL params to prevent clearing them during load
+  const [initialUrlIsic] = useState(() => searchParams.get('isic_code'));
+  const [initialUrlHs] = useState(() => searchParams.get('hs_code'));
+  const [isDataLoaded, setIsDataLoaded] = useState(false);
+  
+  // Store the initial hs_code to restore after HS list loads
+  const [pendingHsCode, setPendingHsCode] = useState<string | null>(() => searchParams.get('hs_code'));
+  const [hasRestoredHsCode, setHasRestoredHsCode] = useState(false);
+  
   // Get suggestions functionality
   const {
     suggestions,
@@ -157,10 +165,19 @@ const SearchBar: React.FC<SearchBarProps> = ({
         const leaves = extractLeaves(tree);
         setIsicLeafNodes(leaves);
         setFilteredIsicLeafNodes(leaves);
+        
+        // If no initial URL params for ISIC/HS, mark as loaded immediately
+        if (!initialUrlIsic && !initialUrlHs) {
+          setIsDataLoaded(true);
+        }
       } catch (e) {
         setIsicTree([]);
         setIsicLeafNodes([]);
         setFilteredIsicLeafNodes([]);
+        // Mark as loaded even on error to prevent blocking
+        if (!initialUrlIsic && !initialUrlHs) {
+          setIsDataLoaded(true);
+        }
       } finally {
         setIsLoadingIsic(false);
       }
@@ -169,7 +186,7 @@ const SearchBar: React.FC<SearchBarProps> = ({
     return () => {
       mounted = false;
     };
-  }, [locale, searchType]);
+  }, [locale, searchType, initialUrlIsic, initialUrlHs]);
 
   // Sync selected ISIC from external filter once leaves are available
   useEffect(() => {
@@ -205,25 +222,65 @@ const SearchBar: React.FC<SearchBarProps> = ({
         const list: HSCode[] = data?.data || [];
         setHsCodes(list);
         setFilteredHsCodes(list);
+        
+        // Restore pending HS code after list loads
+        if (pendingHsCode && !hasRestoredHsCode && list.length > 0) {
+          const hsId = parseInt(pendingHsCode);
+          const found = list.find(c => c.id === hsId);
+          if (found) {
+            console.log('[SearchBar] Restoring pending HS code:', hsId, found.code);
+            setSelectedHs({ id: found.id, code: found.code, label: locale === 'ar' ? found.names.ar : found.names.en });
+            // Also restore the filter
+            if (setHsCodeFilter) {
+              setHsCodeFilter(pendingHsCode);
+            }
+          }
+          setHasRestoredHsCode(true);
+          setPendingHsCode(null);
+        }
+        
+        // Mark data as loaded if we have initial URL params
+        if (initialUrlIsic) {
+          setIsDataLoaded(true);
+        }
       } catch (e) {
         console.error('[HS] Fetch error', e);
         setHsCodes([]);
         setFilteredHsCodes([]);
+        // Mark as loaded even on error
+        if (initialUrlIsic) {
+          setIsDataLoaded(true);
+        }
+        // Clear pending on error
+        setPendingHsCode(null);
+        setHasRestoredHsCode(true);
       } finally {
         setIsLoadingHs(false);
       }
     };
-    if (selectedIsic?.id) fetchHs(selectedIsic.id);
-    else {
+    
+    if (selectedIsic?.id) {
+      fetchHs(selectedIsic.id);
+    } else if (isDataLoaded && !pendingHsCode) {
+      // Only clear HS codes after initial load is complete
+      // Don't clear if we still have a pending HS code to restore
       setHsCodes([]);
       setFilteredHsCodes([]);
-      setSelectedHs(null);
-      setHsCodeFilter && setHsCodeFilter(null);
+      // Only clear HS selection if there was no initial URL HS code
+      if (!initialUrlHs) {
+        setSelectedHs(null);
+        setHsCodeFilter && setHsCodeFilter(null);
+      }
     }
-  }, [selectedIsic?.id, locale, setHsCodeFilter]);
+  }, [selectedIsic?.id, locale, setHsCodeFilter, initialUrlIsic, initialUrlHs, isDataLoaded, pendingHsCode, hasRestoredHsCode]);
 
   // Sync selected HS from external filter when HS list updates
   useEffect(() => {
+    // Skip if we're waiting to restore a pending HS code
+    if (pendingHsCode && !hasRestoredHsCode) {
+      return;
+    }
+    
     if (hsCodeFilter && hsCodes.length > 0) {
       const numeric = parseInt(hsCodeFilter);
       const found = hsCodes.find(c => c.id === numeric);
@@ -231,7 +288,7 @@ const SearchBar: React.FC<SearchBarProps> = ({
     } else if (!hsCodeFilter) {
       setSelectedHs(null);
     }
-  }, [hsCodeFilter, hsCodes, locale]);
+  }, [hsCodeFilter, hsCodes, locale, pendingHsCode, hasRestoredHsCode]);
 
   // Clear ISIC/HS when switching to insighter
   useEffect(() => {
@@ -280,15 +337,22 @@ const SearchBar: React.FC<SearchBarProps> = ({
     setSelectedIsic({ id: node.key, code: node.code, label: locale === 'ar' ? (node.names?.ar || node.code) : (node.names?.en || node.code) });
     // Use ID for URL/state to match page.tsx handlers
     setIsicCodeFilter && setIsicCodeFilter(node.key.toString());
-    // When ISIC changes, clear HS
-    setSelectedHs(null);
-    setHsCodeFilter && setHsCodeFilter(null);
-    // Update URL: set isic_code, clear hs_code, reset page
+    
+    // When ISIC changes manually, clear HS (but not during initialization)
+    if (isDataLoaded) {
+      setSelectedHs(null);
+      setHsCodeFilter && setHsCodeFilter(null);
+    }
+    
+    // Update URL: set isic_code, clear hs_code only if user manually changed ISIC, reset page
     try {
       console.log('[SearchBar] handleSelectIsic -> node:', { id: node.key, code: node.code });
       const params = new URLSearchParams(searchParams.toString());
       params.set('isic_code', node.key.toString());
-      params.delete('hs_code');
+      // Only delete hs_code if we're changing ISIC after initialization
+      if (isDataLoaded) {
+        params.delete('hs_code');
+      }
       params.delete('page');
       params.set('search_type', searchType);
       const nextUrl = `/${locale}/home?${params.toString()}`;
@@ -296,7 +360,7 @@ const SearchBar: React.FC<SearchBarProps> = ({
       router.push(nextUrl, { scroll: false });
     } catch {}
     setIsIsicModalOpen(false);
-  }, [locale, searchParams, router, locale, searchType, setIsicCodeFilter, setHsCodeFilter]);
+  }, [locale, searchParams, router, searchType, setIsicCodeFilter, setHsCodeFilter, isDataLoaded]);
 
   const handleSelectHs = useCallback((code: HSCode) => {
     setSelectedHs({ id: code.id, code: code.code, label: locale === 'ar' ? code.names.ar : code.names.en });
@@ -527,19 +591,26 @@ const SearchBar: React.FC<SearchBarProps> = ({
               <>
                 {/* ISIC selector styled */}
                 <div
-                  onClick={() => setIsIsicModalOpen(true)}
-                  className={`flex items-center justify-between cursor-pointer px-2 ${locale === 'ar' ? 'ml-2' : 'mr-2'} relative`}
+                  onClick={() => !isLoadingIsic && setIsIsicModalOpen(true)}
+                  className={`flex items-center justify-between ${isLoadingIsic ? 'cursor-wait opacity-60' : 'cursor-pointer'} px-2 ${locale === 'ar' ? 'ml-2' : 'mr-2'} relative`}
                   data-isic-dropdown-toggle
                 >
                   <div className="flex items-center">
                     <div className={`flex items-center justify-center w-6 h-6 bg-blue-50 rounded-md ${locale === 'ar' ? 'ml-2' : 'mr-2'}`}>
-                      <svg className="w-4 h-4 text-blue-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M4 4h16v4H4z" />
-                        <path d="M4 10h16v10H4z" />
-                      </svg>
+                      {isLoadingIsic ? (
+                        <svg className="animate-spin h-4 w-4 text-blue-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                        </svg>
+                      ) : (
+                        <svg className="w-4 h-4 text-blue-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" xmlns="http://www.w3.org/2000/svg">
+                          <path d="M4 4h16v4H4z" />
+                          <path d="M4 10h16v10H4z" />
+                        </svg>
+                      )}
                     </div>
                     <span className="text-gray-900 font-medium text-sm">
-                      {selectedIsic ? selectedIsic.code : 'ISIC'}
+                      {isLoadingIsic ? (locale === 'ar' ? 'جاري التحميل...' : 'Loading...') : (selectedIsic ? selectedIsic.code : 'ISIC')}
                     </span>
                     {selectedIsic && (
                       <button
@@ -571,19 +642,26 @@ const SearchBar: React.FC<SearchBarProps> = ({
 
                 {/* HS selector styled (disabled when no ISIC) */}
                 <div
-                  onClick={() => selectedIsic && setIsHsModalOpen(true)}
-                  className={`flex items-center justify-between ${selectedIsic ? 'cursor-pointer' : 'cursor-not-allowed opacity-60'} px-2 relative`}
+                  onClick={() => selectedIsic && !isLoadingHs && setIsHsModalOpen(true)}
+                  className={`flex items-center justify-between ${(selectedIsic && !isLoadingHs) ? 'cursor-pointer' : 'cursor-not-allowed opacity-60'} px-2 relative`}
                   data-hs-dropdown-toggle
                 >
                   <div className="flex items-center">
                     <div className={`flex items-center justify-center w-6 h-6 bg-blue-50 rounded-md ${locale === 'ar' ? 'ml-2' : 'mr-2'}`}>
-                      <svg className="w-4 h-4 text-blue-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M3 3h18v6H3z" />
-                        <path d="M3 13h18v8H3z" />
-                      </svg>
+                      {isLoadingHs ? (
+                        <svg className="animate-spin h-4 w-4 text-blue-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                        </svg>
+                      ) : (
+                        <svg className="w-4 h-4 text-blue-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" xmlns="http://www.w3.org/2000/svg">
+                          <path d="M3 3h18v6H3z" />
+                          <path d="M3 13h18v8H3z" />
+                        </svg>
+                      )}
                     </div>
                     <span className="text-gray-900 font-medium text-sm">
-                      {selectedHs ? selectedHs.code : 'HS'}
+                      {isLoadingHs ? (locale === 'ar' ? 'جاري التحميل...' : 'Loading...') : (selectedHs ? selectedHs.code : 'HS')}
                     </span>
                     {selectedHs && (
                       <button

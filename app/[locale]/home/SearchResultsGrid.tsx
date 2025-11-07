@@ -422,7 +422,7 @@ export default function SearchResultsGrid({
                   <div >
                     <div
                       
-                      className="text-xl font-bold leading-none bg-clip-text text-transparent bg-gradient-to-r from-sky-300 via-cyan-800 to-blue-800  drop-shadow-lg"
+                      className="text-xl amiri-bold font-bold leading-none bg-clip-text text-transparent bg-gradient-to-r from-sky-300  to-sky-800  drop-shadow-lg"
                     >
                       {coverageText}
                     </div>

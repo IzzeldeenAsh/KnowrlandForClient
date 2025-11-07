@@ -306,6 +306,10 @@ export default function HomePage() {
     if (isPageChangeInProgressRef.current) {
       return;
     }
+    // Skip URL updates if component is still initializing to prevent overriding incoming URL parameters
+    if (!initialized) {
+      return;
+    }
     // Build URL parameters
     const urlParams = new URLSearchParams();
     
@@ -385,7 +389,7 @@ export default function HomePage() {
     } catch {}
     // Update URL without refreshing the page
     router.push(nextUrl, { scroll: false });
-  }, [locale, router, searchType, searchQuery, currentPage, languageFilter, countryFilter, regionFilter, economicBlocFilter, tagFilter, industryFilter, isicCodeFilter, hsCodeFilter, priceFilter, selectedCategory, accuracyFilter, roleFilter, rangeStartFilter, rangeEndFilter, yearOfStudyFilter]);
+  }, [locale, router, searchType, searchQuery, currentPage, languageFilter, countryFilter, regionFilter, economicBlocFilter, tagFilter, industryFilter, isicCodeFilter, hsCodeFilter, priceFilter, selectedCategory, accuracyFilter, roleFilter, rangeStartFilter, rangeEndFilter, yearOfStudyFilter, initialized]);
 
   // Handler for search type changes
   const handleSearchTypeChange = useCallback(async (type: 'knowledge' | 'insighter') => {
@@ -1016,16 +1020,21 @@ export default function HomePage() {
 
   // Handle immediate query change for URL updates - REMOVED LOADING STATE
   const handleQueryChange = useCallback((query: string) => {
+    // Skip URL updates if component is still initializing to prevent overriding incoming URL parameters
+    if (!initialized) {
+      return;
+    }
+
     // Clear previous timeout if user is still typing
     if (urlUpdateTimeoutRef.current) {
       clearTimeout(urlUpdateTimeoutRef.current);
     }
-    
+
     // Debounce URL updates to avoid interfering with typing and suggestions
     urlUpdateTimeoutRef.current = setTimeout(() => {
       updateUrlWithFilters({ query: query });
     }, 1000); // Wait 1 second after user stops typing
-  }, [updateUrlWithFilters]);
+  }, [updateUrlWithFilters, initialized]);
 
   // Dedicated search function for explicit user actions (Enter, button click, suggestion selection)
   const executeSearch = useCallback(async (queryToSearch?: string) => {
