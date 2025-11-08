@@ -9,6 +9,7 @@ import { usePathname, useRouter, useSearchParams } from 'next/navigation'
 import { useState, useEffect, useCallback, useRef } from 'react'
 import { Modal, Loader } from '@mantine/core'
 import { getApiUrl } from '@/app/config'
+import { IconBuildingBank } from '@tabler/icons-react'
 
 // Debounce hook
 function useDebounce<T>(value: T, delay: number): T {
@@ -565,18 +566,18 @@ export default function Hero() {
                               : (currentLocale === 'ar' ? 'إنسايتر' : 'Insighter')}
                           </span>
                         </div>
-                        <svg 
-                          className={`w-5 h-5 text-gray-500 ${currentLocale === 'ar' ? 'mr-2' : 'ml-2'}`} 
-                          fill="none" 
-                          stroke="currentColor" 
-                          viewBox="0 0 24 24" 
+                        <svg
+                          className={`w-5 h-5 text-gray-500 ${currentLocale === 'ar' ? 'mr-2' : 'ml-2'}`}
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
                           xmlns="http://www.w3.org/2000/svg"
                         >
-                          <path 
-                            strokeLinecap="round" 
-                            strokeLinejoin="round" 
-                            strokeWidth="2" 
-                            d={currentLocale === 'ar' ? "M15 19l-7-7 7-7" : "M19 9l-7 7-7-7"}
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth="2"
+                            d="M19 9l-7 7-7-7"
                           ></path>
                         </svg>
                       </div>
@@ -587,7 +588,7 @@ export default function Hero() {
                           {/* ISIC selector */}
                           <div
                             onClick={() => !isLoadingIsic && setIsIsicModalOpen(true)}
-                            className={`flex items-center justify-between ${isLoadingIsic ? 'cursor-wait opacity-60' : 'cursor-pointer'} px-2 mb-2 sm:mb-0 ${currentLocale === 'ar' ? 'sm:ml-2' : 'sm:mr-2'} relative`}
+                            className={`flex items-center justify-between ${isLoadingIsic ? 'cursor-wait opacity-60' : 'cursor-pointer'} px-2 mb-2 sm:mb-0 sm:me-3 w-full sm:w-auto ${currentLocale === 'ar' ? 'sm:border-l' : 'sm:border-r'} sm:border-gray-200 sm:pr-3 relative`}
                             data-isic-dropdown-toggle
                           >
                             <div className="flex items-center">
@@ -598,10 +599,7 @@ export default function Hero() {
                                     <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                                   </svg>
                                 ) : (
-                                  <svg className="w-4 h-4 text-blue-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" xmlns="http://www.w3.org/2000/svg">
-                                    <path d="M4 4h16v4H4z" />
-                                    <path d="M4 10h16v10H4z" />
-                                  </svg>
+                                  <IconBuildingBank className="w-4 h-4 text-blue-500" />
                                 )}
                               </div>
                               <span className="text-gray-900 font-medium text-sm">
@@ -642,7 +640,7 @@ export default function Hero() {
                                   strokeLinecap="round"
                                   strokeLinejoin="round"
                                   strokeWidth="2"
-                                  d={currentLocale === 'ar' ? 'M15 19l-7-7 7-7' : 'M19 9l-7 7-7-7'}
+                                  d="M19 9l-7 7-7-7"
                                 />
                               </svg>
                             </div>
@@ -651,7 +649,9 @@ export default function Hero() {
                           {/* HS selector (disabled when no ISIC) */}
                           <div
                             onClick={() => selectedIsic && !isLoadingHs && setIsHsModalOpen(true)}
-                            className={`flex items-center justify-between ${(selectedIsic && !isLoadingHs) ? 'cursor-pointer' : 'cursor-not-allowed opacity-60'} px-2 mb-2 sm:mb-0 relative`}
+                            className={`flex items-center justify-between px-2 mb-2 sm:mb-0 sm:me-3 w-full sm:w-auto ${currentLocale === 'ar' ? 'sm:border-l' : 'sm:border-r'} sm:border-gray-200 sm:pr-3 relative ${
+                              selectedIsic && !isLoadingHs ? 'cursor-pointer' : 'cursor-not-allowed opacity-50'
+                            }`}
                             data-hs-dropdown-toggle
                           >
                             <div className="flex items-center">
@@ -662,10 +662,25 @@ export default function Hero() {
                                     <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                                   </svg>
                                 ) : (
-                                  <svg className="w-4 h-4 text-blue-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" xmlns="http://www.w3.org/2000/svg">
-                                    <path d="M3 3h18v6H3z" />
-                                    <path d="M3 13h18v8H3z" />
-                                  </svg>
+                                  <div className="bg-blue-50 rounded-sm">
+                                  <svg
+                                      width="16"
+                                      height="16"
+                                      viewBox="0 0 64 64"
+                                      xmlns="http://www.w3.org/2000/svg"
+                                    >
+         <g transform="matrix(0.99,0,0,0.99,0.32,0.3)">
+           <path
+             d="m49.5 34c-.82842712 0-1.5.67157288-1.5 1.5v13c0 .82842712.67157288 1.5 1.5 1.5s1.5-.67157288 1.5-1.5v-13c0-.82842712-.67157288-1.5-1.5-1.5zm-6 0c-.82842712 0-1.5.67157288-1.5 1.5v13c0 .82842712.67157288 1.5 1.5 1.5s1.5-.67157288 1.5-1.5v-13c0-.82842712-.67157288-1.5-1.5-1.5zm-6 0c-.82842712 0-1.5.67157288-1.5 1.5v13c0 .82842712.67157288 1.5 1.5 1.5s1.5-.67157288 1.5-1.5v-13c0-.82842712-.67157288-1.5-1.5-1.5zm-6 0c-.82842712 0-1.5.67157288-1.5 1.5v13c0 .82842712.67157288 1.5 1.5 1.5s1.5-.67157288 1.5-1.5v-13c0-.82842712-.67157288-1.5-1.5-1.5z"
+             fill="#3b81f6"
+           />
+           <path
+             d="m32 3c-.82842712 0-1.5.67157288-1.5 1.5v2.8007812c-1.2649826.52060382-2.2043206 1.6749789-2.4335938 3.0566406l-14.742188 16.642578h-6.8242188c-1.3590542 0-2.5 1.1409458-2.5 2.5v25c0 1.3590542 1.1409458 2.5 2.5 2.5h51c1.3590542 0 2.5-1.1409458 2.5-2.5v-25c0-1.3590542-1.1409361-2.5000073-2.5-2.5h-28c-.82842712 0-1.5.67157288-1.5 1.5s.67157288 1.5 1.5 1.5h27.5v24h-33v-24.5c0-1.3590542-1.1409458-2.5-2.5-2.5h-4.1679688l11.761719-13.279297c.73236176.78125202 1.7636799 1.2792969 2.90625 1.2792969 1.1727683 0 2.2019554-.53489178 2.9160156-1.359375l9.125 9.765625c.56539461.60477567 1.51386.63711965 2.1191406.0722656.60606614-.56559238.63843164-1.5155634.0722656-2.1210937l-10.396484-11.123047c-.26624623-1.3120561-1.1427571-2.4088386-2.3359375-2.9199219v-2.8144531c0-.82842712-.67157288-1.5-1.5-1.5zm-17 27h5c.554 0 1 .446 1 1v22c0 .554-.446 1-1 1h-5c-.554 0-1-.446-1-1v-22c0-.554.446-1 1-1z"
+             fill="#3b81f6"
+           />
+         </g>
+       </svg>
+                   </div>
                                 )}
                               </div>
                               <span className="text-gray-900 font-medium text-sm">
@@ -706,7 +721,7 @@ export default function Hero() {
                                   strokeLinecap="round"
                                   strokeLinejoin="round"
                                   strokeWidth="2"
-                                  d={currentLocale === 'ar' ? 'M15 19l-7-7 7-7' : 'M19 9l-7 7-7-7'}
+                                  d="M19 9l-7 7-7-7"
                                 />
                               </svg>
                             </div>

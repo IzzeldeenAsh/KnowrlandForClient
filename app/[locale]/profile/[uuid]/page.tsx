@@ -1156,7 +1156,7 @@ export default function ProfilePage() {
                   value="knowledge"
                   className="text-base font-medium px-8 py-4 transition"
                 >
-                  {t("knowledge")}
+                  {t("insights")}
                 </Tabs.Tab>
                 <Tabs.Tab
                   value="about"

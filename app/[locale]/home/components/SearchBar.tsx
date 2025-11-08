@@ -2,7 +2,7 @@
 
 import React, { useRef, useEffect, useState, memo, useCallback } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { IconSearch, IconX } from '@tabler/icons-react';
+import { IconSearch, IconX, IconBuildingBank } from '@tabler/icons-react';
 import { useSuggestions, useClickAway } from '../utils/hooks';
 import styles from '../utils/custom-search-engine-styles.module.css';
 import { Modal, Loader } from '@mantine/core';
@@ -24,6 +24,10 @@ interface SearchBarProps {
   setIsicCodeFilter?: (value: string | null) => void;
   hsCodeFilter?: string | null;
   setHsCodeFilter?: (value: string | null) => void;
+  // Loading state callbacks
+  onIsicLoadingChange?: (loading: boolean) => void;
+  onHsLoadingChange?: (loading: boolean) => void;
+  onDataLoadedChange?: (loaded: boolean) => void;
 }
 
 const SearchBar: React.FC<SearchBarProps> = ({
@@ -40,7 +44,10 @@ const SearchBar: React.FC<SearchBarProps> = ({
   isicCodeFilter = null,
   setIsicCodeFilter,
   hsCodeFilter = null,
-  setHsCodeFilter
+  setHsCodeFilter,
+  onIsicLoadingChange,
+  onHsLoadingChange,
+  onDataLoadedChange
 }) => {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -127,6 +134,19 @@ const SearchBar: React.FC<SearchBarProps> = ({
       document.removeEventListener('mousedown', handleClickOutside);
     };
   }, []);
+
+  // Notify parent about loading state changes
+  useEffect(() => {
+    onIsicLoadingChange?.(isLoadingIsic);
+  }, [isLoadingIsic, onIsicLoadingChange]);
+
+  useEffect(() => {
+    onHsLoadingChange?.(isLoadingHs);
+  }, [isLoadingHs, onHsLoadingChange]);
+
+  useEffect(() => {
+    onDataLoadedChange?.(isDataLoaded);
+  }, [isDataLoaded, onDataLoadedChange]);
 
   // Ensure suggestions show when they become available and input is focused
   useEffect(() => {
@@ -272,7 +292,7 @@ const SearchBar: React.FC<SearchBarProps> = ({
         setHsCodeFilter && setHsCodeFilter(null);
       }
     }
-  }, [selectedIsic?.id, locale, setHsCodeFilter, initialUrlIsic, initialUrlHs, isDataLoaded, pendingHsCode, hasRestoredHsCode]);
+  }, [selectedIsic?.id, locale, initialUrlIsic, initialUrlHs, isDataLoaded, pendingHsCode, hasRestoredHsCode]);
 
   // Sync selected HS from external filter when HS list updates
   useEffect(() => {
@@ -491,27 +511,28 @@ const SearchBar: React.FC<SearchBarProps> = ({
             {/* Dropdown section */}
             <div
               onClick={() => setShowTypeDropdown(!showTypeDropdown)}
-              className={`flex items-center justify-between cursor-pointer px-2 ${locale === 'ar' ? 'ml-2' : 'mr-2'} relative`}
+              className={`flex items-center justify-between cursor-pointer px-2 mb-2 sm:mb-0 sm:me-3 w-full sm:w-auto ${locale === 'ar' ? 'sm:border-l' : 'sm:border-r'} sm:border-gray-200 sm:pr-3 relative`}
               data-type-dropdown-toggle
             >
               <div className="flex items-center">
                 {/* Display the icon based on selected option */}
                 <div className={`flex items-center justify-center w-6 h-6 bg-blue-50 rounded-md ${locale === 'ar' ? 'ml-2' : 'mr-2'}`}>
                   {searchType === 'knowledge' ? (
-                   <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4 text-blue-600" width="24" height="24" viewBox="0 0 24 24" strokeWidth="2" stroke="currentColor" fill="none" strokeLinecap="round" strokeLinejoin="round">
-                   <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-                   <path d="M3 19a9 9 0 0 1 9 0a9 9 0 0 1 9 0" />
-                   <path d="M3 6a9 9 0 0 1 9 0a9 9 0 0 1 9 0" />
-                   <path d="M3 6l0 13" />
-                   <path d="M12 6l0 13" />
-                   <path d="M21 6l0 13" />
-                 </svg>
+                    <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4 text-blue-600" width="24" height="24" viewBox="0 0 24 24" strokeWidth="2" stroke="currentColor" fill="none" strokeLinecap="round" strokeLinejoin="round">
+                      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                      <path d="M3 19a9 9 0 0 1 9 0a9 9 0 0 1 9 0" />
+                      <path d="M3 6a9 9 0 0 1 9 0a9 9 0 0 1 9 0" />
+                      <path d="M3 6l0 13" />
+                      <path d="M12 6l0 13" />
+                      <path d="M21 6l0 13" />
+                    </svg>
                   ) : (
-                    <svg width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
-                      <path d="M6.87004 8.1525C6.79504 8.145 6.70504 8.145 6.62254 8.1525C4.83754 8.0925 3.42004 6.63 3.42004 4.83C3.42004 2.9925 4.90504 1.5 6.75004 1.5C8.58754 1.5 10.08 2.9925 10.08 4.83C10.0725 6.63 8.65504 8.0925 6.87004 8.1525Z" stroke="#2463EB" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-                      <path d="M12.3075 3C13.7625 3 14.9325 4.1775 14.9325 5.625C14.9325 7.0425 13.8075 8.1975 12.405 8.25C12.345 8.2425 12.2775 8.2425 12.21 8.25" stroke="#2463EB" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-                      <path d="M3.12004 10.92C1.30504 12.135 1.30504 14.115 3.12004 15.3225C5.18254 16.7025 8.56504 16.7025 10.6275 15.3225C12.4425 14.1075 12.4425 12.1275 10.6275 10.92C8.57254 9.5475 5.19004 9.5475 3.12004 10.92Z" stroke="#2463EB" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-                      <path d="M13.755 15C14.295 14.8875 14.805 14.67 15.225 14.3475C16.395 13.47 16.395 12.0225 15.225 11.145C14.8125 10.83 14.31 10.62 13.7775 10.5" stroke="#2463EB" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                    <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4 text-blue-600" width="24" height="24" viewBox="0 0 24 24" strokeWidth="2" stroke="currentColor" fill="none" strokeLinecap="round" strokeLinejoin="round">
+                      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                      <path d="M9 7m-4 0a4 4 0 1 0 8 0a4 4 0 1 0 -8 0" />
+                      <path d="M3 21v-2a4 4 0 0 1 4 -4h4a4 4 0 0 1 4 4v2" />
+                      <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+                      <path d="M21 21v-2a4 4 0 0 0 -3 -3.85" />
                     </svg>
                   )}
                 </div>
@@ -531,7 +552,7 @@ const SearchBar: React.FC<SearchBarProps> = ({
                     strokeLinecap="round"
                     strokeLinejoin="round"
                     strokeWidth="2"
-                    d={locale === 'ar' ? "M15 19l-7-7 7-7" : "M19 9l-7 7-7-7"}
+                    d="M19 9l-7 7-7-7"
                   ></path>
                 </svg>
               </div>
@@ -571,11 +592,12 @@ const SearchBar: React.FC<SearchBarProps> = ({
                     }}
                   >
                     <div className={`flex items-center justify-center w-6 h-6 bg-blue-50 rounded-md ${locale === 'ar' ? 'ml-2' : 'mr-2'}`}>
-                      <svg width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M6.87004 8.1525C6.79504 8.145 6.70504 8.145 6.62254 8.1525C4.83754 8.0925 3.42004 6.63 3.42004 4.83C3.42004 2.9925 4.90504 1.5 6.75004 1.5C8.58754 1.5 10.08 2.9925 10.08 4.83C10.0725 6.63 8.65504 8.0925 6.87004 8.1525Z" stroke="#2463EB" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-                        <path d="M12.3075 3C13.7625 3 14.9325 4.1775 14.9325 5.625C14.9325 7.0425 13.8075 8.1975 12.405 8.25C12.345 8.2425 12.2775 8.2425 12.21 8.25" stroke="#2463EB" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-                        <path d="M3.12004 10.92C1.30504 12.135 1.30504 14.115 3.12004 15.3225C5.18254 16.7025 8.56504 16.7025 10.6275 15.3225C12.4425 14.1075 12.4425 12.1275 10.6275 10.92C8.57254 9.5475 5.19004 9.5475 3.12004 10.92Z" stroke="#2463EB" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-                        <path d="M13.755 15C14.295 14.8875 14.805 14.67 15.225 14.3475C16.395 13.47 16.395 12.0225 15.225 11.145C14.8125 10.83 14.31 10.62 13.7775 10.5" stroke="#2463EB" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                      <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4 text-blue-600" width="24" height="24" viewBox="0 0 24 24" strokeWidth="2" stroke="currentColor" fill="none" strokeLinecap="round" strokeLinejoin="round">
+                        <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                        <path d="M9 7m-4 0a4 4 0 1 0 8 0a4 4 0 1 0 -8 0" />
+                        <path d="M3 21v-2a4 4 0 0 1 4 -4h4a4 4 0 0 1 4 4v2" />
+                        <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+                        <path d="M21 21v-2a4 4 0 0 0 -3 -3.85" />
                       </svg>
                     </div>
                     <span className="text-gray-900 font-medium text-sm uppercase ">
@@ -592,7 +614,7 @@ const SearchBar: React.FC<SearchBarProps> = ({
                 {/* ISIC selector styled */}
                 <div
                   onClick={() => !isLoadingIsic && setIsIsicModalOpen(true)}
-                  className={`flex items-center justify-between ${isLoadingIsic ? 'cursor-wait opacity-60' : 'cursor-pointer'} px-2 ${locale === 'ar' ? 'ml-2' : 'mr-2'} relative`}
+                  className={`flex items-center justify-between ${isLoadingIsic ? 'cursor-wait opacity-60' : 'cursor-pointer'} px-2 mb-2 sm:mb-0 sm:me-3 w-full sm:w-auto ${locale === 'ar' ? 'sm:border-l' : 'sm:border-r'} sm:border-gray-200 sm:pr-3 relative`}
                   data-isic-dropdown-toggle
                 >
                   <div className="flex items-center">
@@ -603,10 +625,7 @@ const SearchBar: React.FC<SearchBarProps> = ({
                           <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                         </svg>
                       ) : (
-                        <svg className="w-4 h-4 text-blue-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" xmlns="http://www.w3.org/2000/svg">
-                          <path d="M4 4h16v4H4z" />
-                          <path d="M4 10h16v10H4z" />
-                        </svg>
+                        <IconBuildingBank className="w-4 h-4 text-blue-500" />
                       )}
                     </div>
                     <span className="text-gray-900 font-medium text-sm">
@@ -634,7 +653,7 @@ const SearchBar: React.FC<SearchBarProps> = ({
                         strokeLinecap="round"
                         strokeLinejoin="round"
                         strokeWidth="2"
-                        d={locale === 'ar' ? 'M15 19l-7-7 7-7' : 'M19 9l-7 7-7-7'}
+                        d="M19 9l-7 7-7-7"
                       />
                     </svg>
                   </div>
@@ -643,7 +662,9 @@ const SearchBar: React.FC<SearchBarProps> = ({
                 {/* HS selector styled (disabled when no ISIC) */}
                 <div
                   onClick={() => selectedIsic && !isLoadingHs && setIsHsModalOpen(true)}
-                  className={`flex items-center justify-between ${(selectedIsic && !isLoadingHs) ? 'cursor-pointer' : 'cursor-not-allowed opacity-60'} px-2 relative`}
+                  className={`flex items-center justify-between px-2 mb-2 sm:mb-0 sm:me-3 w-full sm:w-auto ${locale === 'ar' ? 'sm:border-l' : 'sm:border-r'} sm:border-gray-200 sm:pr-3 relative ${
+                    selectedIsic && !isLoadingHs ? 'cursor-pointer' : 'cursor-not-allowed opacity-50'
+                  }`}
                   data-hs-dropdown-toggle
                 >
                   <div className="flex items-center">
@@ -654,10 +675,25 @@ const SearchBar: React.FC<SearchBarProps> = ({
                           <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                         </svg>
                       ) : (
-                        <svg className="w-4 h-4 text-blue-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" xmlns="http://www.w3.org/2000/svg">
-                          <path d="M3 3h18v6H3z" />
-                          <path d="M3 13h18v8H3z" />
-                        </svg>
+                        <div className="bg-blue-50 rounded-sm">
+                          <svg
+                            width="16"
+                            height="16"
+                            viewBox="0 0 64 64"
+                            xmlns="http://www.w3.org/2000/svg"
+                          >
+                            <g transform="matrix(0.99,0,0,0.99,0.32,0.3)">
+                              <path
+                                d="m49.5 34c-.82842712 0-1.5.67157288-1.5 1.5v13c0 .82842712.67157288 1.5 1.5 1.5s1.5-.67157288 1.5-1.5v-13c0-.82842712-.67157288-1.5-1.5-1.5zm-6 0c-.82842712 0-1.5.67157288-1.5 1.5v13c0 .82842712.67157288 1.5 1.5 1.5s1.5-.67157288 1.5-1.5v-13c0-.82842712-.67157288-1.5-1.5-1.5zm-6 0c-.82842712 0-1.5.67157288-1.5 1.5v13c0 .82842712.67157288 1.5 1.5 1.5s1.5-.67157288 1.5-1.5v-13c0-.82842712-.67157288-1.5-1.5-1.5zm-6 0c-.82842712 0-1.5.67157288-1.5 1.5v13c0 .82842712.67157288 1.5 1.5 1.5s1.5-.67157288 1.5-1.5v-13c0-.82842712-.67157288-1.5-1.5-1.5z"
+                                fill="#3b81f6"
+                              />
+                              <path
+                                d="m32 3c-.82842712 0-1.5.67157288-1.5 1.5v2.8007812c-1.2649826.52060382-2.2043206 1.6749789-2.4335938 3.0566406l-14.742188 16.642578h-6.8242188c-1.3590542 0-2.5 1.1409458-2.5 2.5v25c0 1.3590542 1.1409458 2.5 2.5 2.5h51c1.3590542 0 2.5-1.1409458 2.5-2.5v-25c0-1.3590542-1.1409361-2.5000073-2.5-2.5h-28c-.82842712 0-1.5.67157288-1.5 1.5s.67157288 1.5 1.5 1.5h27.5v24h-33v-24.5c0-1.3590542-1.1409458-2.5-2.5-2.5h-4.1679688l11.761719-13.279297c.73236176.78125202 1.7636799 1.2792969 2.90625 1.2792969 1.1727683 0 2.2019554-.53489178 2.9160156-1.359375l9.125 9.765625c.56539461.60477567 1.51386.63711965 2.1191406.0722656.60606614-.56559238.63843164-1.5155634.0722656-2.1210937l-10.396484-11.123047c-.26624623-1.3120561-1.1427571-2.4088386-2.3359375-2.9199219v-2.8144531c0-.82842712-.67157288-1.5-1.5-1.5zm-17 27h5c.554 0 1 .446 1 1v22c0 .554-.446 1-1 1h-5c-.554 0-1-.446-1-1v-22c0-.554.446-1 1-1z"
+                                fill="#3b81f6"
+                              />
+                            </g>
+                          </svg>
+                        </div>
                       )}
                     </div>
                     <span className="text-gray-900 font-medium text-sm">
@@ -685,7 +721,7 @@ const SearchBar: React.FC<SearchBarProps> = ({
                         strokeLinecap="round"
                         strokeLinejoin="round"
                         strokeWidth="2"
-                        d={locale === 'ar' ? 'M15 19l-7-7 7-7' : 'M19 9l-7 7-7-7'}
+                        d="M19 9l-7 7-7-7"
                       />
                     </svg>
                   </div>
