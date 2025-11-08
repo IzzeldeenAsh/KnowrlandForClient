@@ -141,13 +141,7 @@ export default function HomePage() {
   const [isDataLoaded, setIsDataLoaded] = useState(false);
   const [hasCompletedInitialLoad, setHasCompletedInitialLoad] = useState(false);
   
-  // Compute global loading state - show full page loader during initial load only
-  const isGlobalLoading = !hasCompletedInitialLoad && (
-    loading || 
-    (searchType === 'knowledge' && !initialized) ||
-    (searchType === 'knowledge' && initialized && (!isDataLoaded || isLoadingIsic || (isicCodeFilter && isLoadingHs)))
-  );
-  
+
   // Mark initial load as complete when everything is ready
   useEffect(() => {
     if (initialized && (!loading) && (searchType === 'insighter' || (searchType === 'knowledge' && isDataLoaded && !isLoadingIsic && (!isicCodeFilter || !isLoadingHs)))) {
@@ -1463,24 +1457,7 @@ export default function HomePage() {
      <style dangerouslySetInnerHTML={{ __html: customScrollbarStyle }} />
      
      {/* Global Loading Overlay */}
-     {isGlobalLoading && (
-       <div className="fixed inset-0 z-50 flex items-center justify-center bg-white/90 backdrop-blur-sm">
-         <div className="flex flex-col items-center gap-4">
-           <div className="relative">
-             <div className="w-16 h-16 border-4 border-blue-200 border-t-blue-600 rounded-full animate-spin"></div>
-           </div>
-           <div className="text-center">
-             <p className="text-lg font-semibold text-gray-900">
-               {locale === 'ar' ? 'جاري التحميل...' : 'Loading...'}
-             </p>
-             <p className="text-sm text-gray-600 mt-1">
-               {locale === 'ar' ? 'يرجى الانتظار' : 'Please wait'}
-             </p>
-           </div>
-         </div>
-       </div>
-     )}
-     
+  
      <section className="relative flex-1">
       <PageIllustration />
   {/* Hero Banner Section */}
