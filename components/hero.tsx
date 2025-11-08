@@ -30,7 +30,7 @@ async function fetchAutocomplete(keyword: string, locale: string): Promise<strin
   if (!keyword.trim()) return [];
   
   try {
-    const response = await fetch(`https://api.foresighta.co/api/platform/search/autocomplete?keyword=${encodeURIComponent(keyword)}`, {
+    const response = await fetch(`https://api.insightabusiness.com/api/platform/search/autocomplete?keyword=${encodeURIComponent(keyword)}`, {
       headers: {
         'Accept-Language': locale, // Set the locale in the header
         'Accept': 'application/json'

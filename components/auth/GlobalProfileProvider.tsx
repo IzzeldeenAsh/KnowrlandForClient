@@ -76,7 +76,7 @@ export function GlobalProfileProvider({ children }: { children: React.ReactNode 
       try {
         console.log(`[GlobalProfileProvider] Attempt ${attempt}/${maxRetries} to fetch profile`);
         
-        const response = await fetch("https://api.foresighta.co/api/account/profile", {
+        const response = await fetch("https://api.insightabusiness.com/api/account/profile", {
           headers: {
             'Authorization': `Bearer ${token}`,
             "Content-Type": "application/json",
