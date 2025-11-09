@@ -108,7 +108,7 @@ const getNotificationIconName = (subType: string): string => {
     case 'client_meeting_insighter_approved':
       return 'duotune/general/gen014.svg';
     case 'client_meeting_new':
-      return 'duotune/general/gen014.svg'; 
+      return 'duotune/general/gen014.svg';
     case 'insighter_meeting_client_new':
       return 'duotune/general/gen014.svg';
     case 'insighter_meeting_approved':
@@ -147,43 +147,50 @@ const getNotificationIcon = (subType: string, color?: string): React.ReactNode =
   
   // Return a properly styled SVG Icon that can be colored like in Angular
   return (
-    <SvgIcon 
-      src={`/${iconPath}`} 
+    <SvgIcon
+      src={`/${iconPath}`}
       className={`h-6 w-6 ${colorClasses[tailwindColor as keyof typeof colorClasses]}`}
     />
   );
 }
 
-// Helper function to determine display name based on notification sub_type
-const getNotificationName = (subType: string): string => {
-  const nameMap: Record<string, string> = {
-    'accept_knowledge': 'Knowledge Accepted',
-    'declined': 'Knowledge Declined',
-    'approved': 'Knowledge Approved',
-    'download': 'Download',
-    'upload': 'Upload',
-    'comment': 'Comment',
-    'reply': 'Reply',
-    'like': 'Like',
-    'save': 'Save',
-    'share': 'Share',
-    'view': 'View',
-    'knowledge_accept': 'Knowledge Accepted',
-    'knowledge_declined': 'Knowledge Declined',
-    'activate_company': 'Active Company',
-    'client_meeting_new':'New Meeting Request',
-'insighter_meeting_client_new':'New Meeting Request',
-'insighter_meeting_approved':'Meeting Approved',
-'client_meeting_insighter_approved':'Meeting Approved',
-'client_meeting_insighter_postponed':'Meeting Postponed',
-'client_meeting_reschedule':'Meeting Rescheduled',
-'insighter_meeting_client_reschedule':'Meeting Rescheduled',
-'client_meeting_reminder':'Meeting Reminder',
-'insighter_meeting_reminder':'Meeting Reminder',
-'deactivate_delete_company':'Company Deactivation',
+// *** CHANGE 1: UPDATED BILINGUAL FUNCTION ***
+// Helper function to determine display name based on notification sub_type and language
+const getNotificationName = (subType: string, language: string): string => {
+  const nameMap: Record<string, { en: string; ar: string }> = {
+    'accept_knowledge': { en: 'Knowledge Accepted', ar: 'قبول المعرفة' },
+    'declined': { en: 'Knowledge Declined', ar: 'رفض المعرفة' },
+    'approved': { en: 'Knowledge Approved', ar: 'تمت الموافقة على المعرفة' },
+    'download': { en: 'Download', ar: 'تنزيل' },
+    'upload': { en: 'Upload', ar: 'رفع' },
+    'comment': { en: 'Comment', ar: 'تعليق' },
+    'reply': { en: 'Reply', ar: 'رد' },
+    'like': { en: 'Like', ar: 'إعجاب' },
+    'save': { en: 'Save', ar: 'حفظ' },
+    'share': { en: 'Share', ar: 'مشاركة' },
+    'view': { en: 'View', ar: 'عرض' },
+    'knowledge_accept': { en: 'Knowledge Accepted', ar: 'قبول المعرفة' },
+    'knowledge_declined': { en: 'Knowledge Declined', ar: 'رفض المعرفة' },
+    'activate_company': { en: 'Active Company', ar: 'تفعيل الشركة' },
+    'client_meeting_new': { en: 'New Meeting Request', ar: 'طلب اجتماع جديد' },
+    'insighter_meeting_client_new': { en: 'New Meeting Request', ar: 'طلب اجتماع جديد' },
+    'insighter_meeting_approved': { en: 'Meeting Approved', ar: 'تمت الموافقة على الاجتماع' },
+    'client_meeting_insighter_approved': { en: 'Meeting Approved', ar: 'تمت الموافقة على الاجتماع' },
+    'client_meeting_insighter_postponed': { en: 'Meeting Postponed', ar: 'تم تأجيل الاجتماع' },
+    'client_meeting_reschedule': { en: 'Meeting Rescheduled', ar: 'تمت إعادة جدولة الاجتماع' },
+    'insighter_meeting_client_reschedule': { en: 'Meeting Rescheduled', ar: 'تمت إعادة جدولة الاجتماع' },
+    'client_meeting_reminder': { en: 'Meeting Reminder', ar: 'تذكير بالاجتماع' },
+    'insighter_meeting_reminder': { en: 'Meeting Reminder', ar: 'تذكير بالاجتماع' },
+    'deactivate_delete_company': { en: 'Company Deactivation', ar: 'إلغاء تفعيل الشركة' },
+  };
+
+  const names = nameMap[subType];
+  if (!names) {
+    return subType; // Fallback to the subtype key if no translation exists
   }
-  return nameMap[subType] || subType
-}
+
+  return language === 'ar' ? names.ar : names.en; // Return Arabic if lang is 'ar', otherwise default to English
+};
 
 // Helper function to determine links based on notification type
 const getNotificationLink = (type: string, parent: string): string => {
@@ -210,9 +217,9 @@ const getNotificationLink = (type: string, parent: string): string => {
   return parentLinks[type] || parentLinks['default']
 }
 
-export default function NotificationsInner({ 
-  notifications, 
-  parent, 
+export default function NotificationsInner({
+  notifications,
+  parent,
   onNotificationClick,
   onClickOutside
 }: NotificationsInnerProps) {
@@ -297,7 +304,7 @@ export default function NotificationsInner({
   }
 
   return (
-    <div 
+    <div
       ref={componentRef}
       className="w-80 sm:w-96 bg-white rounded-lg shadow-2xl overflow-hidden animate-fadeIn"
       style={{
@@ -339,8 +346,8 @@ export default function NotificationsInner({
 
         {/* All Notifications */}
         {notifications.length > 0 && notifications.map((notification) => (
-          <div 
-            key={notification.id} 
+          <div
+            key={notification.id}
             onClick={() => handleNotificationClick(notification)}
             className="p-4 border-b border-gray-100 hover:bg-blue-50 cursor-pointer transition-colors duration-200"
           >
@@ -353,7 +360,8 @@ export default function NotificationsInner({
 
               <div className="flex-1 min-w-0">
                 <p className={`text-sm text-gray-900 ${!notification.read_at ? 'font-bold' : 'font-light'}`}>
-                  {getNotificationName(notification.sub_type)}
+                  {/* *** CHANGE 2: UPDATED FUNCTION CALL *** */}
+                  {getNotificationName(notification.sub_type, currentLanguage)}
                 </p>
                 <p className={`text-xs text-gray-400 ${!notification.read_at ? 'font-semibold' : 'font-normal'}`}>
                   {notification.message}
@@ -371,4 +379,4 @@ export default function NotificationsInner({
       </div>
     </div>
   )
-} 
+}
