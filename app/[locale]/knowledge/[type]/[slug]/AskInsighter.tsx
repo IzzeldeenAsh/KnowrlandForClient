@@ -776,7 +776,7 @@ export default function AskInsighter({ knowledgeSlug, questions = [], is_owner =
 
   // Redirect URL for login button with returnUrl parameter
   const getLoginUrl = () => {
-    return `https://app.foresighta.co/auth/login?returnUrl=${encodeURIComponent(typeof window !== 'undefined' ? window.location.href : '')}`;
+    return `http://localhost:4200/auth/login?returnUrl=${encodeURIComponent(typeof window !== 'undefined' ? window.location.href : '')}`;
   };
   
   // Determine if user is logged in

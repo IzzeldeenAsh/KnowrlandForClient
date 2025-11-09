@@ -12,8 +12,8 @@ export const apiBaseUrl = isDevelopment
   : 'https://api.foresighta.co';
 
 export const appBaseUrl = isDevelopment 
-  ? 'https://app.foresighta.co' 
-  : 'https://app.foresighta.co';
+  ? 'http://localhost:4200' 
+  : 'http://localhost:4200';
 
 // Function to get full API URL with path
 export const getApiUrl = (path: string): string => {

@@ -509,7 +509,7 @@ export default function MeetTab({
             </h3>
             <p className="text-gray-500 mb-4">{t("loginToView")}</p>
             <a
-              href={`https://app.foresighta.co/auth/login?returnUrl=${encodeURIComponent(
+              href={`http://localhost:4200/auth/login?returnUrl=${encodeURIComponent(
                 `https://foresighta.co/${locale}/profile/${uuid}${
                   typeof window !== "undefined"
                     ? window.location.search
@@ -1099,7 +1099,7 @@ export default function MeetTab({
               className="bg-gradient-to-r from-blue-500 to-teal-400 hover:from-blue-600 hover:to-teal-500 transition-all"
               onClick={() => {
                 // Redirect to meetings dashboard
-                window.location.href = "https://app.foresighta.co/app/insighter-dashboard/my-meetings/sent";
+                window.location.href = "http://localhost:4200/app/insighter-dashboard/my-meetings/sent";
               }}
             >
               {locale.startsWith('ar') ? 'اذهب إلى الاجتماعات' : 'Go to Meetings'}

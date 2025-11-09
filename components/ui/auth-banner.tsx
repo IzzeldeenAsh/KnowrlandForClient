@@ -19,7 +19,7 @@ export default function AuthBanner({ onSignUp, onLogin }: AuthBannerProps) {
       onSignUp();
     } else {
       // Default redirect to Angular app signup
-      window.location.href = `https://app.foresighta.co/auth/sign-up`;
+      window.location.href = `http://localhost:4200/auth/sign-up`;
     }
   };
 
@@ -28,7 +28,7 @@ export default function AuthBanner({ onSignUp, onLogin }: AuthBannerProps) {
       onLogin();
     } else {
       // Default redirect to Angular app login
-      window.location.href = `https://app.foresighta.co/auth/login?redirect_uri=${encodeURIComponent(window.location.href)}`;
+      window.location.href = `http://localhost:4200/auth/login?redirect_uri=${encodeURIComponent(window.location.href)}`;
     }
   };
 

@@ -4,7 +4,7 @@ import { useEffect } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
 import { useGlobalProfile } from '@/components/auth/GlobalProfileProvider';
 
-const ADMIN_REDIRECT_URL = 'https://app.foresighta.co/admin-dashboard/admin/dashboard/main-dashboard/requests';
+const ADMIN_REDIRECT_URL = 'http://localhost:4200/admin-dashboard/admin/dashboard/main-dashboard/requests';
 
 // List of paths that admins are allowed to access in Next.js app
 const ADMIN_ALLOWED_PATHS = [

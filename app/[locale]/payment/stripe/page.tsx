@@ -362,14 +362,14 @@ function PaymentForm({ orderUuid, amount, title, locale, isRTL, orderDetails, se
               if (orderDetails?.knowledge_download_id) {
                 const uuidsParam = `?uuids=${orderDetails.knowledge_download_id}`;
                 console.log('Redirecting with UUID:', uuidsParam); // Debug log
-                window.location.href = `https://app.foresighta.co/app/insighter-dashboard/my-downloads${uuidsParam}`;
+                window.location.href = `http://localhost:4200/app/insighter-dashboard/my-downloads${uuidsParam}`;
               } else {
                 console.log('No UUID available, falling back to search'); // Debug log
                 // Fallback to title search if no UUID available
                 const searchTitle = orderDetails?.orderable?.knowledge?.[0]?.title || "";
                 const searchParam = searchTitle ? `?search=${encodeURIComponent(searchTitle)}` : "";
                 console.log('Redirecting with search:', searchParam); // Debug log
-                window.location.href = `https://app.foresighta.co/app/insighter-dashboard/my-downloads${searchParam}`;
+                window.location.href = `http://localhost:4200/app/insighter-dashboard/my-downloads${searchParam}`;
               }
             }}
           >

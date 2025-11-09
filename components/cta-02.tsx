@@ -36,7 +36,7 @@ export default function Cta02() {
             <h2 className="h2 bg-clip-text text-transparent bg-gradient-to-r from-slate-200/60 via-slate-200 to-slate-200/60 pb-4">{t('title')}</h2>
             <p className="text-lg text-slate-400 mb-6">{t('description')}</p>
             <div className="mb-6">
-              <Link href="https://app.foresighta.co/auth/sign-up" className="btn text-slate-900 bg-gradient-to-r from-white/80 via-white to-white/80 hover:bg-white transition duration-150 ease-in-out group">
+              <Link href="http://localhost:4200/auth/sign-up" className="btn text-slate-900 bg-gradient-to-r from-white/80 via-white to-white/80 hover:bg-white transition duration-150 ease-in-out group">
                 {t('button')} 
               </Link>
             </div>

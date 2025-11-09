@@ -52,8 +52,7 @@ const SearchBar: React.FC<SearchBarProps> = ({
   const router = useRouter();
   const searchParams = useSearchParams();
   const searchInputRef = useRef<HTMLInputElement>(null);
-  const [showTypeDropdown, setShowTypeDropdown] = useState(false);
-  const typeDropdownRef = useRef<HTMLDivElement>(null);
+  const isRtl = locale === 'ar';
   
   // Simplified suggestion state management
   const [inputFocused, setInputFocused] = useState(false);
@@ -119,21 +118,6 @@ const SearchBar: React.FC<SearchBarProps> = ({
     setInputFocused(false);
     setMouseInSuggestions(false);
   });
-  
-  // Handle clicking outside the type dropdown
-  useEffect(() => {
-    function handleClickOutside(event: MouseEvent) {
-      if (typeDropdownRef.current && !typeDropdownRef.current.contains(event.target as Node) && 
-          event.target !== document.querySelector('[data-type-dropdown-toggle]')) {
-        setShowTypeDropdown(false);
-      }
-    }
-    
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
-    };
-  }, []);
 
   // Notify parent about loading state changes
   useEffect(() => {
@@ -400,7 +384,38 @@ const SearchBar: React.FC<SearchBarProps> = ({
       router.push(nextUrl, { scroll: false });
     } catch {}
     setIsHsModalOpen(false);
-  }, [locale, searchParams, router, locale, searchType, setHsCodeFilter]);
+  }, [locale, searchParams, router, searchType, setHsCodeFilter]);
+
+  const clearIsicSelection = useCallback(() => {
+    setSelectedIsic(null);
+    setIsicCodeFilter && setIsicCodeFilter(null);
+    setSelectedHs(null);
+    setHsCodeFilter && setHsCodeFilter(null);
+    try {
+      const params = new URLSearchParams(searchParams.toString());
+      params.delete('isic_code');
+      params.delete('hs_code');
+      params.delete('page');
+      params.set('search_type', searchType);
+      const nextUrl = `/${locale}/home?${params.toString()}`;
+      console.log('[SearchBar] clear ISIC -> push URL:', nextUrl);
+      router.push(nextUrl, { scroll: false });
+    } catch {}
+  }, [locale, router, searchParams, searchType, setIsicCodeFilter, setHsCodeFilter]);
+
+  const clearHsSelection = useCallback(() => {
+    setSelectedHs(null);
+    setHsCodeFilter && setHsCodeFilter(null);
+    try {
+      const params = new URLSearchParams(searchParams.toString());
+      params.delete('hs_code');
+      params.delete('page');
+      params.set('search_type', searchType);
+      const nextUrl = `/${locale}/home?${params.toString()}`;
+      console.log('[SearchBar] clear HS -> push URL:', nextUrl);
+      router.push(nextUrl, { scroll: false });
+    } catch {}
+  }, [locale, router, searchParams, searchType, setHsCodeFilter]);
   
   // Handle keyboard navigation for suggestions
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
@@ -492,6 +507,83 @@ const SearchBar: React.FC<SearchBarProps> = ({
   useEffect(() => {
   }, [showSuggestions, suggestions.length, inputFocused, suggestionSelected, shouldShowSuggestions]);
   
+  const searchTypeChipBaseClasses =
+    'flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-semibold transition-all duration-200 shadow-sm border';
+  const searchTypeChipActiveClasses = 'bg-[#299af8] border-[#299af8] text-white shadow-md';
+  const searchTypeChipInactiveClasses = 'bg-blue-50 border-blue-100 text-blue-600 hover:bg-blue-100';
+  const filterChipBaseClasses =
+    'flex items-center gap-2 px-3 py-1.5 rounded-full border text-xs font-medium transition-all duration-200 shadow-sm';
+  const filterChipActiveClasses = 'bg-blue-50 border-blue-200 text-blue-700 hover:bg-blue-100';
+  const filterChipInactiveClasses = 'bg-white border-gray-200 text-gray-700 hover:border-[#299af8] hover:text-[#299af8]';
+  const filterChipDisabledClasses = 'bg-gray-100 border-gray-200 text-gray-400 cursor-not-allowed';
+
+  const typeLabels = {
+    knowledge: isRtl ? 'حسب الرؤى' : 'By Insight',
+    insighter: isRtl ? 'حسب الإنسايتر' : 'By Insighter',
+  } as const;
+
+  const isHsDisabled = !selectedIsic || isLoadingHs;
+
+  const renderTypeIcon = (type: 'knowledge' | 'insighter', isActive: boolean) => (
+    <span
+      className={`flex items-center justify-center w-6 h-6 rounded-full border ${
+        isActive ? 'bg-white/20 border-white/40 text-white' : 'bg-white border-blue-100 text-[#299af8]'
+      }`}
+    >
+      {type === 'knowledge' ? (
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          className="w-3.5 h-3.5"
+          viewBox="0 0 24 24"
+          strokeWidth="2"
+          stroke="currentColor"
+          fill="none"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        >
+                      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                      <path d="M3 19a9 9 0 0 1 9 0a9 9 0 0 1 9 0" />
+                      <path d="M3 6a9 9 0 0 1 9 0a9 9 0 0 1 9 0" />
+                      <path d="M3 6l0 13" />
+                      <path d="M12 6l0 13" />
+                      <path d="M21 6l0 13" />
+                    </svg>
+                  ) : (
+        <svg
+                  xmlns="http://www.w3.org/2000/svg"
+          className="w-3.5 h-3.5"
+          viewBox="0 0 24 24"
+          strokeWidth="2"
+          stroke="currentColor"
+          fill="none"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+        >
+                        <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                        <path d="M9 7m-4 0a4 4 0 1 0 8 0a4 4 0 1 0 -8 0" />
+                        <path d="M3 21v-2a4 4 0 0 1 4 -4h4a4 4 0 0 1 4 4v2" />
+                        <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+                        <path d="M21 21v-2a4 4 0 0 0 -3 -3.85" />
+                      </svg>
+      )}
+                    </span>
+  );
+
+  const renderHsIcon = (isActive: boolean) => (
+    <span
+      className={`flex items-center justify-center w-6 h-6 rounded-full border ${
+        isActive ? 'bg-blue-100 border-blue-200 text-blue-700' : 'bg-blue-50 border-blue-100 text-[#299af8]'
+      }`}
+    >
+      <svg xmlns="http://www.w3.org/2000/svg" className="w-3.5 h-3.5" viewBox="0 0 64 64" fill="none">
+        <g transform="matrix(0.99,0,0,0.99,0.32,0.3)" stroke="none" fill="currentColor">
+          <path d="m49.5 34c-.82842712 0-1.5.67157288-1.5 1.5v13c0 .82842712.67157288 1.5 1.5 1.5s1.5-.67157288 1.5-1.5v-13c0-.82842712-.67157288-1.5-1.5-1.5zm-6 0c-.82842712 0-1.5.67157288-1.5 1.5v13c0 .82842712.67157288 1.5 1.5 1.5s1.5-.67157288 1.5-1.5v-13c0-.82842712-.67157288-1.5-1.5-1.5zm-6 0c-.82842712 0-1.5.67157288-1.5 1.5v13c0 .82842712.67157288 1.5 1.5 1.5s1.5-.67157288 1.5-1.5v-13c0-.82842712-.67157288-1.5-1.5-1.5zm-6 0c-.82842712 0-1.5.67157288-1.5 1.5v13c0 .82842712.67157288 1.5 1.5 1.5s1.5-.67157288 1.5-1.5v-13c0-.82842712-.67157288-1.5-1.5-1.5z" />
+          <path d="m32 3c-.82842712 0-1.5.67157288-1.5 1.5v2.8007812c-1.2649826.52060382-2.2043206 1.6749789-2.4335938 3.0566406l-14.742188 16.642578h-6.8242188c-1.3590542 0-2.5 1.1409458-2.5 2.5v25c0 1.3590542 1.1409458 2.5 2.5 2.5h51c1.3590542 0 2.5-1.1409458 2.5-2.5v-25c0-1.3590542-1.1409361-2.5000073-2.5-2.5h-28c-.82842712 0-1.5.67157288-1.5 1.5s.67157288 1.5 1.5 1.5h27.5v24h-33v-24.5c0-1.3590542-1.1409458-2.5-2.5-2.5h-4.1679688l11.761719-13.279297c.73236176.78125202 1.7636799 1.2792969 2.90625 1.2792969 1.1727683 0 2.2019554-.53489178 2.9160156-1.359375l9.125 9.765625c.56539461.60477567 1.51386.63711965 2.1191406.0722656.60606614-.56559238.63843164-1.5155634.0722656-2.1210937l-10.396484-11.123047c-.26624623-1.3120561-1.1427571-2.4088386-2.3359375-2.9199219v-2.8144531c0-.82842712-.67157288-1.5-1.5-1.5zm-17 27h5c.554 0 1 .446 1 1v22c0 .554-.446 1-1 1h-5c-.554 0-1-.446-1-1v-22c0-.554.446-1 1-1z" />
+                            </g>
+                          </svg>
+                    </span>
+  );
+  
   return (
     <form onSubmit={(e) => {
       // First close the suggestions
@@ -501,247 +593,45 @@ const SearchBar: React.FC<SearchBarProps> = ({
       // Then submit the form
       onSubmit(e);
     }}>
-      <div className="flex flex-col w-full" style={{ position: 'relative' }}>
-        {/* Combined search bar with integrated dropdown */}
-        <div className={`${styles.searchBar} flex flex-wrap items-center bg-white border border-[#299af8] rounded-[4px] w-full p-2`}
-          style={{ fontSize: '16px' }}
-        >
-          {/* First row: Search type dropdown + ISIC/HS codes */}
-          <div className="flex items-center w-full sm:w-auto mb-2 sm:mb-0">
-            {/* Dropdown section */}
-            <div
-              onClick={() => setShowTypeDropdown(!showTypeDropdown)}
-              className={`flex items-center justify-between cursor-pointer px-2 mb-2 sm:mb-0 sm:me-3 w-full sm:w-auto ${locale === 'ar' ? 'sm:border-l' : 'sm:border-r'} sm:border-gray-200 sm:pr-3 relative`}
-              data-type-dropdown-toggle
-            >
-              <div className="flex items-center">
-                {/* Display the icon based on selected option */}
-                <div className={`flex items-center justify-center w-6 h-6 bg-blue-50 rounded-md ${locale === 'ar' ? 'ml-2' : 'mr-2'}`}>
-                  {searchType === 'knowledge' ? (
-                    <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4 text-blue-600" width="24" height="24" viewBox="0 0 24 24" strokeWidth="2" stroke="currentColor" fill="none" strokeLinecap="round" strokeLinejoin="round">
-                      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-                      <path d="M3 19a9 9 0 0 1 9 0a9 9 0 0 1 9 0" />
-                      <path d="M3 6a9 9 0 0 1 9 0a9 9 0 0 1 9 0" />
-                      <path d="M3 6l0 13" />
-                      <path d="M12 6l0 13" />
-                      <path d="M21 6l0 13" />
-                    </svg>
-                  ) : (
-                    <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4 text-blue-600" width="24" height="24" viewBox="0 0 24 24" strokeWidth="2" stroke="currentColor" fill="none" strokeLinecap="round" strokeLinejoin="round">
-                      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-                      <path d="M9 7m-4 0a4 4 0 1 0 8 0a4 4 0 1 0 -8 0" />
-                      <path d="M3 21v-2a4 4 0 0 1 4 -4h4a4 4 0 0 1 4 4v2" />
-                      <path d="M16 3.13a4 4 0 0 1 0 7.75" />
-                      <path d="M21 21v-2a4 4 0 0 0 -3 -3.85" />
-                    </svg>
-                  )}
-                </div>
-                <span className="text-gray-900 font-medium text-sm uppercase">
-                  {searchType === 'knowledge'
-                    ? (locale === 'ar' ? 'رؤى' : 'Insights')
-                    : (locale === 'ar' ? 'إنسايتر' : 'Insighter')}
-                </span>
-                <svg
-                  className={`w-5 h-5 text-gray-500 ${locale === 'ar' ? 'mr-2' : 'ml-2'}`}
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                  xmlns="http://www.w3.org/2000/svg"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth="2"
-                    d="M19 9l-7 7-7-7"
-                  ></path>
-                </svg>
-              </div>
-
-              {/* Type dropdown menu */}
-              {showTypeDropdown && (
-                <div
-                  ref={typeDropdownRef}
-                  className={`absolute top-full mt-1 bg-white border border-gray-200 rounded-md shadow-lg z-30 w-40 ${locale === 'ar' ? 'right-0' : 'left-0'}`}
-                >
-                  <div
-                    className={`px-4 py-2 cursor-pointer hover:bg-blue-50 flex items-center ${searchType === 'knowledge' ? 'bg-blue-50' : ''}`}
-                    onClick={() => {
-                      setSearchType('knowledge');
-                      setShowTypeDropdown(false);
-                    }}
-                  >
-                    <div className={`flex items-center justify-center w-6 h-6 bg-blue-50 rounded-md ${locale === 'ar' ? 'ml-2' : 'mr-2'}`}>
-                      <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4 text-blue-600" width="24" height="24" viewBox="0 0 24 24" strokeWidth="2" stroke="currentColor" fill="none" strokeLinecap="round" strokeLinejoin="round">
-                        <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-                        <path d="M3 19a9 9 0 0 1 9 0a9 9 0 0 1 9 0" />
-                        <path d="M3 6a9 9 0 0 1 9 0a9 9 0 0 1 9 0" />
-                        <path d="M3 6l0 13" />
-                        <path d="M12 6l0 13" />
-                        <path d="M21 6l0 13" />
-                      </svg>
-                    </div>
-                    <span className="text-gray-900 font-medium text-sm uppercase">
-                      {locale === 'ar' ? 'رؤى' : 'INSIGHTS'}
-                    </span>
-                  </div>
-                  <div
-                    className={`px-4 py-2 cursor-pointer hover:bg-blue-50 flex items-center ${searchType === 'insighter' ? 'bg-blue-50' : ''}`}
-                    onClick={() => {
-                      setSearchType('insighter');
-                      setShowTypeDropdown(false);
-                    }}
-                  >
-                    <div className={`flex items-center justify-center w-6 h-6 bg-blue-50 rounded-md ${locale === 'ar' ? 'ml-2' : 'mr-2'}`}>
-                      <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4 text-blue-600" width="24" height="24" viewBox="0 0 24 24" strokeWidth="2" stroke="currentColor" fill="none" strokeLinecap="round" strokeLinejoin="round">
-                        <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-                        <path d="M9 7m-4 0a4 4 0 1 0 8 0a4 4 0 1 0 -8 0" />
-                        <path d="M3 21v-2a4 4 0 0 1 4 -4h4a4 4 0 0 1 4 4v2" />
-                        <path d="M16 3.13a4 4 0 0 1 0 7.75" />
-                        <path d="M21 21v-2a4 4 0 0 0 -3 -3.85" />
-                      </svg>
-                    </div>
-                    <span className="text-gray-900 font-medium text-sm uppercase ">
-                      {locale === 'ar' ? 'إنسايتر' : 'Insighter'}
-                    </span>
-                  </div>
-                </div>
-              )}
-            </div>
-
-            {/* ISIC/HS selectors - only for knowledge, styled like search type */}
-            {searchType === 'knowledge' && (
-              <>
-                {/* ISIC selector styled */}
-                <div
-                  onClick={() => !isLoadingIsic && setIsIsicModalOpen(true)}
-                  className={`flex items-center justify-between ${isLoadingIsic ? 'cursor-wait opacity-60' : 'cursor-pointer'} px-2 mb-2 sm:mb-0 sm:me-3 w-full sm:w-auto ${locale === 'ar' ? 'sm:border-l' : 'sm:border-r'} sm:border-gray-200 sm:pr-3 relative`}
-                  data-isic-dropdown-toggle
-                >
-                  <div className="flex items-center">
-                    <div className={`flex items-center justify-center w-6 h-6 bg-blue-50 rounded-md ${locale === 'ar' ? 'ml-2' : 'mr-2'}`}>
-                      {isLoadingIsic ? (
-                        <svg className="animate-spin h-4 w-4 text-blue-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                        </svg>
-                      ) : (
-                        <IconBuildingBank className="w-4 h-4 text-blue-500" />
-                      )}
-                    </div>
-                    <span className="text-gray-900 font-medium text-sm">
-                      {isLoadingIsic ? (locale === 'ar' ? 'جاري التحميل...' : 'Loading...') : (selectedIsic ? selectedIsic.code : 'ISIC')}
-                    </span>
-                    {selectedIsic && (
+      <div className="flex flex-col w-full gap-5">
+        <div className={`flex flex-wrap items-center gap-3 justify-center`}>
+          {(['knowledge', 'insighter'] as const).map((type) => {
+            const isActive = searchType === type;
+            return (
                       <button
+                key={type}
                         type="button"
-                        className={`text-gray-400 hover:text-red-500 ${locale === 'ar' ? 'mr-1' : 'ml-1'}`}
-                        aria-label="Clear ISIC"
-                        onMouseDown={(e) => { e.preventDefault(); e.stopPropagation(); }}
-                        onClick={(e) => { e.preventDefault(); e.stopPropagation(); setSelectedIsic(null); setIsicCodeFilter && setIsicCodeFilter(null); setSelectedHs(null); setHsCodeFilter && setHsCodeFilter(null); try { const params = new URLSearchParams(searchParams.toString()); params.delete('isic_code'); params.delete('hs_code'); params.delete('page'); params.set('search_type', searchType); const nextUrl = `/${locale}/home?${params.toString()}`; console.log('[SearchBar] clear ISIC -> push URL:', nextUrl); router.push(nextUrl, { scroll: false }); } catch {} }}
-                      >
-                        <IconX size={14} />
+                className={`${searchTypeChipBaseClasses} ${
+                  isActive ? searchTypeChipActiveClasses : searchTypeChipInactiveClasses
+                } ${isRtl ? 'flex-row-reverse' : ''}`}
+                onClick={() => {
+                  if (searchType !== type) {
+                    setSearchType(type);
+                  }
+                }}
+                aria-pressed={isActive}
+              >
+                {renderTypeIcon(type, isActive)}
+                <span>{typeLabels[type]}</span>
                       </button>
-                    )}
-                    <svg
-                      className={`w-5 h-5 text-gray-500 ${locale === 'ar' ? 'mr-2' : 'ml-2'}`}
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                      xmlns="http://www.w3.org/2000/svg"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth="2"
-                        d="M19 9l-7 7-7-7"
-                      />
-                    </svg>
-                  </div>
-                </div>
-
-                {/* HS selector styled (disabled when no ISIC) */}
-                <div
-                  onClick={() => selectedIsic && !isLoadingHs && setIsHsModalOpen(true)}
-                  className={`flex items-center justify-between px-2 mb-2 sm:mb-0 sm:me-3 w-full sm:w-auto ${locale === 'ar' ? 'sm:border-l' : 'sm:border-r'} sm:border-gray-200 sm:pr-3 relative ${
-                    selectedIsic && !isLoadingHs ? 'cursor-pointer' : 'cursor-not-allowed opacity-50'
-                  }`}
-                  data-hs-dropdown-toggle
-                >
-                  <div className="flex items-center">
-                    <div className={`flex items-center justify-center w-6 h-6 bg-blue-50 rounded-md ${locale === 'ar' ? 'ml-2' : 'mr-2'}`}>
-                      {isLoadingHs ? (
-                        <svg className="animate-spin h-4 w-4 text-blue-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                        </svg>
-                      ) : (
-                        <div className="bg-blue-50 rounded-sm">
-                          <svg
-                            width="16"
-                            height="16"
-                            viewBox="0 0 64 64"
-                            xmlns="http://www.w3.org/2000/svg"
-                          >
-                            <g transform="matrix(0.99,0,0,0.99,0.32,0.3)">
-                              <path
-                                d="m49.5 34c-.82842712 0-1.5.67157288-1.5 1.5v13c0 .82842712.67157288 1.5 1.5 1.5s1.5-.67157288 1.5-1.5v-13c0-.82842712-.67157288-1.5-1.5-1.5zm-6 0c-.82842712 0-1.5.67157288-1.5 1.5v13c0 .82842712.67157288 1.5 1.5 1.5s1.5-.67157288 1.5-1.5v-13c0-.82842712-.67157288-1.5-1.5-1.5zm-6 0c-.82842712 0-1.5.67157288-1.5 1.5v13c0 .82842712.67157288 1.5 1.5 1.5s1.5-.67157288 1.5-1.5v-13c0-.82842712-.67157288-1.5-1.5-1.5zm-6 0c-.82842712 0-1.5.67157288-1.5 1.5v13c0 .82842712.67157288 1.5 1.5 1.5s1.5-.67157288 1.5-1.5v-13c0-.82842712-.67157288-1.5-1.5-1.5z"
-                                fill="#3b81f6"
-                              />
-                              <path
-                                d="m32 3c-.82842712 0-1.5.67157288-1.5 1.5v2.8007812c-1.2649826.52060382-2.2043206 1.6749789-2.4335938 3.0566406l-14.742188 16.642578h-6.8242188c-1.3590542 0-2.5 1.1409458-2.5 2.5v25c0 1.3590542 1.1409458 2.5 2.5 2.5h51c1.3590542 0 2.5-1.1409458 2.5-2.5v-25c0-1.3590542-1.1409361-2.5000073-2.5-2.5h-28c-.82842712 0-1.5.67157288-1.5 1.5s.67157288 1.5 1.5 1.5h27.5v24h-33v-24.5c0-1.3590542-1.1409458-2.5-2.5-2.5h-4.1679688l11.761719-13.279297c.73236176.78125202 1.7636799 1.2792969 2.90625 1.2792969 1.1727683 0 2.2019554-.53489178 2.9160156-1.359375l9.125 9.765625c.56539461.60477567 1.51386.63711965 2.1191406.0722656.60606614-.56559238.63843164-1.5155634.0722656-2.1210937l-10.396484-11.123047c-.26624623-1.3120561-1.1427571-2.4088386-2.3359375-2.9199219v-2.8144531c0-.82842712-.67157288-1.5-1.5-1.5zm-17 27h5c.554 0 1 .446 1 1v22c0 .554-.446 1-1 1h-5c-.554 0-1-.446-1-1v-22c0-.554.446-1 1-1z"
-                                fill="#3b81f6"
-                              />
-                            </g>
-                          </svg>
-                        </div>
-                      )}
-                    </div>
-                    <span className="text-gray-900 font-medium text-sm">
-                      {isLoadingHs ? (locale === 'ar' ? 'جاري التحميل...' : 'Loading...') : (selectedHs ? selectedHs.code : 'HS')}
-                    </span>
-                    {selectedHs && (
-                      <button
-                        type="button"
-                        className={`text-gray-400 hover:text-red-500 ${locale === 'ar' ? 'mr-1' : 'ml-1'}`}
-                        aria-label="Clear HS"
-                        onMouseDown={(e) => { e.preventDefault(); e.stopPropagation(); }}
-                        onClick={(e) => { e.preventDefault(); e.stopPropagation(); setSelectedHs(null); setHsCodeFilter && setHsCodeFilter(null); try { const params = new URLSearchParams(searchParams.toString()); params.delete('hs_code'); params.delete('page'); params.set('search_type', searchType); const nextUrl = `/${locale}/home?${params.toString()}`; console.log('[SearchBar] clear HS -> push URL:', nextUrl); router.push(nextUrl, { scroll: false }); } catch {} }}
-                      >
-                        <IconX size={14} />
-                      </button>
-                    )}
-                    <svg
-                      className={`w-5 h-5 text-gray-500 ${locale === 'ar' ? 'mr-2' : 'ml-2'}`}
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                      xmlns="http://www.w3.org/2000/svg"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth="2"
-                        d="M19 9l-7 7-7-7"
-                      />
-                    </svg>
-                  </div>
-                </div>
-              </>
-            )}
+            );
+          })}
           </div>
 
-          {/* Second row: Search input */}
-          <div className="flex flex-1 items-center w-full">
+        <div className="relative">
+          <div
+            className={`${styles.searchBar} flex items-center bg-white border border-[#299af8] rounded-[6px] w-full px-3 py-2 gap-2`}
+            style={{ fontSize: '16px' }}
+          >
             <input
               ref={searchInputRef}
               type="text"
-              className="flex-1 outline-none bg-transparent border-none focus-outline-none focus:border-none focus:ring-0 w-full"
+              className="flex-1 outline-none bg-transparent border-none focus:outline-none focus:border-none focus:ring-0 w-full"
               placeholder={placeholder}
               value={searchQuery}
               onChange={handleInputChange}
               onFocus={handleInputFocus}
               onBlur={() => {
-                // Delay hiding suggestions to allow for clicks
                 setTimeout(() => {
                   if (!suggestionSelected && !mouseInSuggestions) {
                     setInputFocused(false);
@@ -751,22 +641,21 @@ const SearchBar: React.FC<SearchBarProps> = ({
               }}
               onKeyDown={handleKeyDown}
               autoComplete="off"
-              dir={locale === 'ar' ? 'rtl' : 'ltr'}
+              dir={isRtl ? 'rtl' : 'ltr'}
             />
-            {/* Clear button - show when there's text in the input */}
             {searchQuery.trim().length > 0 && (
               <button
                 type="button"
-                className="mr-2 p-1 text-gray-400 hover:text-gray-600 flex items-center justify-center"
+                className={`${isRtl ? 'ml-2' : 'mr-2'} p-1 text-gray-400 hover:text-gray-600 flex items-center justify-center`}
                 onClick={handleClearSearch}
-                aria-label="Clear search"
+                aria-label={isRtl ? 'امسح البحث' : 'Clear search'}
               >
                 <IconX size={16} />
               </button>
             )}
 
             {isLoadingSuggestions && (
-              <div className="flex items-center justify-center mr-2">
+              <div className={`flex items-center justify-center ${isRtl ? 'ml-2' : 'mr-2'}`}>
                 <svg className="animate-spin h-4 w-4 text-blue-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                   <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                   <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
@@ -774,37 +663,31 @@ const SearchBar: React.FC<SearchBarProps> = ({
               </div>
             )}
             
-            {/* Search button */}
             <button 
-              type="button" /* Changed to button type to prevent form submission */
-              className="ml-2 bg-[#299af8] text-white p-2 rounded-[4px] flex items-center justify-center"
+              type="button"
+              className={`${isRtl ? 'mr-2' : 'ml-2'} bg-[#299af8] text-white p-2 rounded-[4px] flex items-center justify-center hover:bg-[#2185d6] transition-colors duration-150`}
               onClick={async (e) => {
                 e.preventDefault();
-                // Close suggestions
                 hideSuggestions();
                 setSuggestionSelected(true);
                 setInputFocused(false);
                 
-                // Always execute search, even with empty query
                 if (onSearch) {
                   onSearch(searchQuery.trim());
                 } else {
-                  // Fallback: trigger form submission
                   onSubmit(e as any);
                 }
               }}
-              aria-label="Search"
+              aria-label={isRtl ? 'ابحث' : 'Search'}
             >
               <IconSearch size={18} />
             </button>
-          </div>
         </div>
         
-        {/* Suggestions dropdown */}
         {shouldShowSuggestions && (
           <div 
             ref={suggestionsRef}
-            className="absolute left-0 right-0 top-full mt-1 bg-white border border-gray-200 rounded-md shadow-lg z-20 max-h-40 overflow-y-auto custom-scrollbar"
+              className="absolute inset-x-0 mt-3 bg-white border border-gray-200 rounded-md shadow-lg z-20 max-h-48 overflow-y-auto custom-scrollbar"
             onMouseEnter={() => setMouseInSuggestions(true)}
             onMouseLeave={() => setMouseInSuggestions(false)}
           >
@@ -814,10 +697,16 @@ const SearchBar: React.FC<SearchBarProps> = ({
                 className={`px-4 py-2 cursor-pointer hover:bg-blue-50 ${activeSuggestionIndex === index ? 'bg-blue-50' : ''}`}
                 onClick={() => handleSuggestionSelect(suggestion)}
                 onMouseEnter={() => setActiveSuggestionIndex(index)}
-                dir={locale === 'ar' ? 'rtl' : 'ltr'}
+                  dir={isRtl ? 'rtl' : 'ltr'}
               >
                 <div className="flex items-center">
-                  <svg className={`w-5 h-5 text-gray-400 ${locale === 'ar' ? 'ml-2' : 'mr-2'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <svg
+                      className={`w-5 h-5 text-gray-400 ${isRtl ? 'ml-2' : 'mr-2'}`}
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                      xmlns="http://www.w3.org/2000/svg"
+                    >
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                   </svg>
                   <span className="text-gray-800">
@@ -829,7 +718,6 @@ const SearchBar: React.FC<SearchBarProps> = ({
                           const matchIndex = lowerSuggestion.indexOf(lowerSearchTerm);
                           
                           if (matchIndex >= 0) {
-                            // Split into three parts: before match, match, after match
                             const beforeMatch = suggestion.substring(0, matchIndex);
                             const match = suggestion.substring(matchIndex, matchIndex + searchQuery.length);
                             const afterMatch = suggestion.substring(matchIndex + searchQuery.length);
@@ -843,7 +731,6 @@ const SearchBar: React.FC<SearchBarProps> = ({
                             );
                           }
                           
-                          // Fallback if no match found (shouldn't happen in normal cases)
                           return suggestion;
                         })()}
                       </>
@@ -856,6 +743,97 @@ const SearchBar: React.FC<SearchBarProps> = ({
             ))}
           </div>
         )}
+        </div>
+
+        {searchType === 'knowledge' && (
+          <div className={`flex flex-wrap items-center gap-3 justify-center`}>
+            <button
+              type="button"
+              disabled={isLoadingIsic}
+              onClick={() => !isLoadingIsic && setIsIsicModalOpen(true)}
+              className={`${filterChipBaseClasses} ${isLoadingIsic ? filterChipDisabledClasses : selectedIsic ? filterChipActiveClasses : filterChipInactiveClasses} ${
+                isRtl ? 'flex-row-reverse' : ''
+              }`}
+              aria-label={isRtl ? 'اختر رمز ISIC' : 'Select ISIC code'}
+            >
+              <span
+                className={`flex items-center justify-center w-6 h-6 rounded-full border ${
+                  selectedIsic ? 'bg-blue-100 border-blue-200 text-blue-700' : 'bg-blue-50 border-blue-100 text-[#299af8]'
+                }`}
+              >
+                {isLoadingIsic ? (
+                  <svg className="animate-spin h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                  </svg>
+                ) : (
+                  <IconBuildingBank className="w-[14px] h-[14px]" />
+                )}
+              </span>
+              <span className="font-medium text-gray-900">
+                ISIC code
+              </span>
+              {selectedIsic && (
+                <span className={`font-mono text-[11px] bg-gray-100 px-1.5 py-0.5 rounded ${isRtl ? 'mr-2' : 'ml-2'}`}>
+                  {selectedIsic.code}
+                </span>
+              )}
+              {selectedIsic && (
+                <span
+                  className={`text-gray-400 hover:text-red-500 transition-colors ${isRtl ? 'mr-1' : 'ml-1'}`}
+                  role="button"
+                  aria-label={isRtl ? 'مسح اختيار ISIC' : 'Clear ISIC'}
+                  onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    clearIsicSelection();
+                  }}
+                >
+                  <IconX size={14} />
+                </span>
+              )}
+            </button>
+
+            <button
+              type="button"
+              disabled={isHsDisabled}
+              onClick={() => {
+                if (!isHsDisabled) {
+                  setIsHsModalOpen(true);
+                }
+              }}
+              className={`${filterChipBaseClasses} ${
+                isHsDisabled ? filterChipDisabledClasses : selectedHs ? filterChipActiveClasses : filterChipInactiveClasses
+              } ${isRtl ? 'flex-row-reverse' : ''}`}
+              aria-label={isRtl ? 'اختر رمز HS' : 'Select HS code'}
+            >
+              {renderHsIcon(!!selectedHs && !isHsDisabled)}
+              <span className="font-medium text-gray-900">
+                HS code
+              </span>
+              {selectedHs && !isHsDisabled && (
+                <span className={`font-mono text-[11px] bg-gray-100 px-1.5 py-0.5 rounded ${isRtl ? 'mr-2' : 'ml-2'}`}>
+                  {selectedHs.code}
+                </span>
+              )}
+              {selectedHs && !isHsDisabled && (
+                <span
+                  className={`text-gray-400 hover:text-red-500 transition-colors ${isRtl ? 'mr-1' : 'ml-1'}`}
+                  role="button"
+                  aria-label={isRtl ? 'مسح اختيار HS' : 'Clear HS'}
+                  onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    clearHsSelection();
+                  }}
+                >
+                  <IconX size={14} />
+                </span>
+              )}
+            </button>
+          </div>
+        )}
+      </div>
         {/* ISIC Modal */}
         <Modal
           opened={isIsicModalOpen}
@@ -929,7 +907,6 @@ const SearchBar: React.FC<SearchBarProps> = ({
             )}
           </div>
         </Modal>
-      </div>
     </form>
   );
 };
