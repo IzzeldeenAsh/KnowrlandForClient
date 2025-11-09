@@ -61,7 +61,7 @@ export default function GlobalAuthHandler() {
         const timestamp = new Date().getTime();
         
         // Redirect to Angular app's logout endpoint
-        window.location.href = `http://localhost:4200/auth/logout?redirect_uri=${encodeURIComponent(`https://foresighta.co/${locale}?t=${timestamp}`)}`;
+        window.location.href = `https://app.insightabusiness.com/auth/logout?redirect_uri=${encodeURIComponent(`https://foresighta.co/${locale}?t=${timestamp}`)}`;
       }
     };
 

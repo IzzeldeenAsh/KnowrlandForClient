@@ -20,7 +20,7 @@ export function useIndustryStatistic(industryId: number) {
     const fetchStatistics = async () => {
       try {
         setIsLoading(true);
-        const response = await fetch(`https://api.foresighta.co/api/platform/industries/statistic/industry/${industryId}`, {
+        const response = await fetch(`https://api.insightabusiness.com/api/platform/industries/statistic/industry/${industryId}`, {
           headers: {
             "Content-Type": "application/json",
             "Accept": "application/json",
