@@ -124,7 +124,7 @@ export default function CheckoutPage() {
         const token = getAuthToken();
 
         const response = await fetch(
-          `https://api.foresighta.co/api/platform/industries/knowledge/${slug}`,
+          `https://api.insightabusiness.com/api/platform/industries/knowledge/${slug}`,
           {
             headers: {
               "Content-Type": "application/json",
@@ -169,7 +169,7 @@ export default function CheckoutPage() {
         const token = getAuthToken();
 
         const response = await fetch(
-          "https://api.foresighta.co/api/account/wallet/balance",
+          "https://api.insightabusiness.com/api/account/wallet/balance",
           {
             headers: {
               "Content-Type": "application/json",
@@ -262,7 +262,7 @@ export default function CheckoutPage() {
       setIsFetchingDownloadIds(true);
       const token = getAuthToken();
       const response = await fetch(
-        `https://api.foresighta.co/api/account/order/knowledge/${uuid}`,
+        `https://api.insightabusiness.com/api/account/order/knowledge/${uuid}`,
         {
           headers: {
             "Content-Type": "application/json",
@@ -365,7 +365,7 @@ export default function CheckoutPage() {
       };
 
       const response = await fetch(
-        "https://api.foresighta.co/api/account/order/knowledge/checkout",
+        "https://api.insightabusiness.com/api/account/order/knowledge/checkout",
         {
           method: "POST",
           headers: {
