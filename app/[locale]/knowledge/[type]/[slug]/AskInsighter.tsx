@@ -557,7 +557,7 @@ export default function AskInsighter({ knowledgeSlug, questions = [], is_owner =
         <div aria-hidden="true" className={hasAnswer ? styles.commentsThreadLine : 'ps-10'} role="button"></div>
           {/* Question content */}
           <div className="flex justify-between items-start px-3 w-full">
-                  <p className="text-gray-800 mb-4 text-sm font-semibold">{question.question?.question}</p>
+                  <p className="flex-1 text-gray-800 mb-4 text-sm font-semibold">{question.question?.question}</p>
                   {question.is_owner && (
                     <Button
                       size="xs"
@@ -565,9 +565,9 @@ export default function AskInsighter({ knowledgeSlug, questions = [], is_owner =
                       variant="subtle"
                       onClick={() => deleteQuestion(question.id)}
                       disabled={isSubmitting}
-                      className="hover:bg-red-50 ml-2"
+                      className="hover:bg-red-50 ml-2 flex-shrink-0"
                     >
-                      <div className="flex items-center">
+                      <div className="flex items-center whitespace-nowrap">
                         <IconTrash size={16} className={`${isRTL ? 'ml-1' : 'mr-1'}`} />
                         {translations.deleteQuestion}
                       </div>

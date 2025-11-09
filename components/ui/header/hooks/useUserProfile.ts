@@ -58,7 +58,7 @@ export function useUserProfile() {
     const timestamp = new Date().getTime();
     
     // Perform a coordinated logout by redirecting to the Angular app's logout endpoint
-    window.location.href = `https://app.insightabusiness.com/auth/logout?redirect_uri=${encodeURIComponent(`https://foresighta.co/${locale}?t=${timestamp}`)}`;    
+    window.location.href = `https://app.insightabusiness.com/auth/logout?redirect_uri=${encodeURIComponent(`https://insightabusiness.com/${locale}?t=${timestamp}`)}`;    
   };
 
   return { user, roles, isLoading, handleSignOut };
