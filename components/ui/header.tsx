@@ -67,7 +67,7 @@ async function getIndustries(locale: string = 'en', forceRefresh: boolean = fals
 
 async function fetchIndustriesFromAPI(locale: string): Promise<Industry[]> {
   try {
-    const res = await fetch("https://api.insightabusiness.com/api/platform/industries/menu", {
+    const res = await fetch("https://api.foresighta.co/api/platform/industries/menu", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

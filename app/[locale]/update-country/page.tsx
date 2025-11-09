@@ -52,7 +52,7 @@ export default function UpdateCountryPage() {
       throw new Error('No authentication token found');
     }
 
-    const response = await fetch('https://api.insightabusiness.com/api/account/profile/country', {
+    const response = await fetch('https://api.foresighta.co/api/account/profile/country', {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${token}`,
