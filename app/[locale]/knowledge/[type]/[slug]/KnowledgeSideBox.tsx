@@ -180,7 +180,7 @@ const KnowledgeSideBox = ({
       }
 
       const method = isReadLater ? 'DELETE' : 'POST';
-      const url =  `https://api.foresighta.co/api/account/favorite/knowledge/${knowledgeSlug}`
+      const url =  `https://api.insightabusiness.com/api/account/favorite/knowledge/${knowledgeSlug}`
 
       
       const response = await fetch(url, {
@@ -288,9 +288,9 @@ const KnowledgeSideBox = ({
     download: isRTL ? 'تحميل' : 'Download',
     alreadyPurchased: isRTL ? 'تم الشراء ' : 'Purchased',
     partiallyPurchased: isRTL ? 'تم الشراء جزئياً' : 'Partially Purchased',
-    shareKnowledge: isRTL ? 'مشاركة المعرفة' : 'Share Knowledge',
-    customShareMessage: isRTL ? 'رسالة المشاركة' : 'Share Message',
-    shareMessageHint: isRTL ? 'اكتب رسالتك المخصصة لمشاركة هذه المعرفة' : 'Write your custom message to share this knowledge',
+    shareKnowledge: isRTL ? 'شارك المعرفة' : 'Share Knowledge',
+    customShareMessage: isRTL ? 'أضف رسالة شخصية' : 'Add a Personal Message',
+    shareMessageHint: isRTL ? 'أضف ملاحظة أو رسالة لتخصيص المشاركة...' : 'Add a note or message to personalize your share...',
     characterCount: isRTL ? 'عدد الأحرف' : 'Character Count',
     close: isRTL ? 'إغلاق' : 'Close',
     copyLink: isRTL ? 'نسخ الرابط' : 'Copy Link',
