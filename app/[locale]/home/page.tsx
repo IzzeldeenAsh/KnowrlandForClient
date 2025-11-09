@@ -75,24 +75,15 @@ export default function HomePage() {
   useEffect(() => {
     const urlSearchType = searchParams.get('search_type') as 'knowledge' | 'insighter';
     if (urlSearchType && urlSearchType !== searchType) {
-      console.log('Syncing searchType with URL parameter:', urlSearchType);
       setSearchType(urlSearchType);
     }
   }, [searchParams, searchType]);
   const [selectedCategory, setSelectedCategory] = useState<string | null>(initialCategory);
   const [knowledgeItems, setKnowledgeItems] = useState<KnowledgeItem[]>([]);
   const [searchResults, setSearchResults] = useState<SearchResultItem[]>([]);
-  // Add a useEffect to log searchResults changes for debugging
-  useEffect(() => {
-    console.log('searchResults state changed:', searchResults);
-  }, [searchResults]);
   const [loading, setLoading] = useState(false);
   const [currentPage, setCurrentPage] = useState(initialPage);
   
-  // DEBUG: Log when currentPage changes
-  useEffect(() => {
-    console.log('🟡 PARENT currentPage state changed to:', currentPage);
-  }, [currentPage]);
   const [totalPages, setTotalPages] = useState(1);
   const [totalItems, setTotalItems] = useState(0);
   const [languageFilter, setLanguageFilter] = useState<'all' | 'arabic' | 'english'>(initialLanguage);
@@ -143,6 +134,20 @@ export default function HomePage() {
   
   // Flag to track if component has initialized with URL params
   const [initialized, setInitialized] = useState(false);
+  
+  // Global loading states for ISIC/HS codes
+  const [isLoadingIsic, setIsLoadingIsic] = useState(false);
+  const [isLoadingHs, setIsLoadingHs] = useState(false);
+  const [isDataLoaded, setIsDataLoaded] = useState(false);
+  const [hasCompletedInitialLoad, setHasCompletedInitialLoad] = useState(false);
+  
+
+  // Mark initial load as complete when everything is ready
+  useEffect(() => {
+    if (initialized && (!loading) && (searchType === 'insighter' || (searchType === 'knowledge' && isDataLoaded && !isLoadingIsic && (!isicCodeFilter || !isLoadingHs)))) {
+      setHasCompletedInitialLoad(true);
+    }
+  }, [initialized, loading, searchType, isDataLoaded, isLoadingIsic, isLoadingHs, isicCodeFilter]);
   
   // Helper function to fetch statistics when search type is knowledge
   const fetchStatisticsIfNeeded = useCallback(async (
@@ -238,12 +243,6 @@ export default function HomePage() {
         toast.error(errorMessage, 'Validation Error');
       };
       
-      console.log('Executing search after filter reset with params:', {
-        keyword: searchQuery.trim(),
-        searchType,
-        locale,
-        page: 1
-      });
       
       const response = await fetchSearchResults(
         searchQuery.trim(),
@@ -319,7 +318,10 @@ export default function HomePage() {
   }) => {
     // Skip URL updates during pagination to prevent interference
     if (isPageChangeInProgressRef.current) {
-      console.log('🔴 BLOCKING updateUrlWithFilters - pagination in progress');
+      return;
+    }
+    // Skip URL updates if component is still initializing to prevent overriding incoming URL parameters
+    if (!initialized) {
       return;
     }
     // Build URL parameters
@@ -374,13 +376,37 @@ export default function HomePage() {
       urlParams.set('per_page', '30');
     }
     
+    const nextUrl = `/${locale}/home?${urlParams.toString()}`;
+    try {
+      console.log('[updateUrlWithFilters] applying params:', {
+        query,
+        type,
+        language,
+        country,
+        region,
+        economicBloc,
+        tag,
+        industry,
+        isicCode,
+        hsCode,
+        paid,
+        rangeStart,
+        rangeEnd,
+        coverStart,
+        coverEnd,
+        category,
+        accuracy,
+        role,
+        page
+      });
+      console.log('[updateUrlWithFilters] next URL:', nextUrl);
+    } catch {}
     // Update URL without refreshing the page
-    router.push(`/${locale}/home?${urlParams.toString()}`, { scroll: false });
-  }, [locale, router, searchType, searchQuery, currentPage, languageFilter, countryFilter, regionFilter, economicBlocFilter, tagFilter, industryFilter, isicCodeFilter, hsCodeFilter, priceFilter, selectedCategory, accuracyFilter, roleFilter, rangeStartFilter, rangeEndFilter, yearOfStudyFilter]);
+    router.push(nextUrl, { scroll: false });
+  }, [locale, router, searchType, searchQuery, currentPage, languageFilter, countryFilter, regionFilter, economicBlocFilter, tagFilter, industryFilter, isicCodeFilter, hsCodeFilter, priceFilter, selectedCategory, accuracyFilter, roleFilter, rangeStartFilter, rangeEndFilter, yearOfStudyFilter, initialized]);
 
   // Handler for search type changes
   const handleSearchTypeChange = useCallback(async (type: 'knowledge' | 'insighter') => {
-    console.log(`🔄 Search type change from ${searchType} to ${type}`);
     
     // Set flag to prevent main search effect from interfering
     isSearchTypeChangingRef.current = true;
@@ -436,7 +462,6 @@ export default function HomePage() {
         toast.error(errorMessage, 'Validation Error');
       };
       
-      console.log(`🔍 Making API call for ${type} search type`);
       
       const response = await fetchSearchResults(
         searchQuery.trim(),
@@ -464,7 +489,6 @@ export default function HomePage() {
         null  // Always reset cover_end when switching types
       );
       
-      console.log(`✅ API response for ${type}:`, response.data?.length, 'items');
       
       // Update results with the correct search type data
       setSearchResults(response.data || []);
@@ -473,11 +497,9 @@ export default function HomePage() {
       
       // Fetch statistics if search type is knowledge
       if (type === 'knowledge') {
-        console.log('📊 Fetching statistics for knowledge search');
         await fetchStatisticsIfNeeded(searchQuery.trim(), type);
       } else {
         setStatistics([]);
-        console.log('📊 Cleared statistics for insighter search');
       }
     } catch (error) {
       console.error('Search type change failed:', error);
@@ -488,7 +510,6 @@ export default function HomePage() {
       // Reset the flag after the search is complete
       setTimeout(() => {
         isSearchTypeChangingRef.current = false;
-        console.log('🏁 Search type change completed');
       }, 500); // Wait a bit to ensure no race conditions
     }
   }, [searchQuery, locale, router, activeTab, languageFilter, countryFilter, regionFilter, economicBlocFilter, toast, fetchStatisticsIfNeeded]);
@@ -617,15 +638,16 @@ export default function HomePage() {
   const handleHsCodeFilterChange = useCallback((value: string | null) => {
     // Convert string to number for internal state, or null if empty
     const numericValue = value ? parseInt(value) : null;
-    
+
     // Update the HS code filter state
     setHsCodeFilter(numericValue);
     // Update URL with new filter (use the numeric value)
+    console.log('[handleHsCodeFilterChange] value:', value, 'numeric:', numericValue);
     updateUrlWithFilters({ hs_code: numericValue });
-    
+
     // Reset to page 1 when filter changes
     setCurrentPage(1);
-    
+
     // The main search effect will be triggered by the state change
   }, [updateUrlWithFilters]);
   
@@ -663,7 +685,6 @@ export default function HomePage() {
   }, [updateUrlWithFilters]);
 
   const handleYearOfStudyFilterChange = useCallback((value: YearRange | null) => {
-    console.log('🗓️ Year of Study filter changed:', value);
 
     // Update the year of study filter state
     setYearOfStudyFilter(value);
@@ -683,7 +704,6 @@ export default function HomePage() {
       urlParams.cover_end = null;
     }
 
-    console.log('🗓️ Updating URL with params:', urlParams);
     updateUrlWithFilters(urlParams);
 
     // Reset to page 1 when filter changes
@@ -722,10 +742,6 @@ export default function HomePage() {
     const urlAccuracy = (searchParams.get('accuracy') as 'any' | 'all') || 'all';
     const urlRole = (searchParams.get('role') as 'all' | 'company' | 'individual') || 'all';
     
-    console.log('INITIAL URL PARAMETERS:', {
-      query, type, accuracy, language, country, categoryType,
-      urlIndustry, urlRegion, urlEconomicBloc, urlIsicCode, urlHsCode, urlRole
-    });
     
     // Set loading to true immediately if we have any search parameters
     const hasSearchParams = query || type || language || country || categoryType || accuracy || 
@@ -739,7 +755,6 @@ export default function HomePage() {
                                urlIndustry || urlRegion || urlEconomicBloc || urlIsicCode || urlHsCode || urlRole;
     
     if (shouldTriggerSearch) {
-      console.log('URL has search parameters, triggering search with direct URL values');
       
       const triggerSearch = async () => {
         try {
@@ -841,25 +856,21 @@ export default function HomePage() {
     
     // Skip if a page change is in progress to prevent interference
     if (isPageChangeInProgressRef.current) {
-      console.log('🟡 Skipping URL params effect because a page change is in progress');
       return;
     }
     
     // Skip if a search type change is in progress to prevent interference
     if (isSearchTypeChangingRef.current) {
-      console.log('🟡 Skipping URL params effect because a search type change is in progress');
       return;
     }
     
     // Skip if a filter reset is in progress to prevent interference
     if (isFilterResetInProgressRef.current) {
-      console.log('🟡 Skipping URL params effect because a filter reset is in progress');
       return;
     }
     
     // Skip if pagination flags are active
     if (skipNextSearchEffectRef.current) {
-      console.log('🟡 Skipping URL params effect because pagination is in progress');
       return;
     }
     
@@ -893,7 +904,6 @@ export default function HomePage() {
     
     // If only page parameter is different, skip this effect (let pagination handle it)
     if (currentWithoutPage.toString() === expectedWithoutPage.toString()) {
-      console.log('Skipping URL params effect because only page parameter changed (pagination)');
       return;
     }
     
@@ -1010,10 +1020,8 @@ export default function HomePage() {
           // Handle page parameter - CRITICAL for pagination
     // ONLY update page if we're not in the middle of a pagination operation
     if (urlPage !== currentPage && !isPageChangeInProgressRef.current && !skipNextSearchEffectRef.current) {
-      console.log('🟡 URL effect updating currentPage from', currentPage, 'to', urlPage);
       setCurrentPage(urlPage);
     } else if (isPageChangeInProgressRef.current || skipNextSearchEffectRef.current) {
-      console.log('🟡 URL effect SKIPPING page update due to pagination in progress');
     }
     };
     
@@ -1026,16 +1034,21 @@ export default function HomePage() {
 
   // Handle immediate query change for URL updates - REMOVED LOADING STATE
   const handleQueryChange = useCallback((query: string) => {
+    // Skip URL updates if component is still initializing to prevent overriding incoming URL parameters
+    if (!initialized) {
+      return;
+    }
+
     // Clear previous timeout if user is still typing
     if (urlUpdateTimeoutRef.current) {
       clearTimeout(urlUpdateTimeoutRef.current);
     }
-    
+
     // Debounce URL updates to avoid interfering with typing and suggestions
     urlUpdateTimeoutRef.current = setTimeout(() => {
       updateUrlWithFilters({ query: query });
     }, 1000); // Wait 1 second after user stops typing
-  }, [updateUrlWithFilters]);
+  }, [updateUrlWithFilters, initialized]);
 
   // Dedicated search function for explicit user actions (Enter, button click, suggestion selection)
   const executeSearch = useCallback(async (queryToSearch?: string) => {
@@ -1060,7 +1073,6 @@ export default function HomePage() {
         toast.error(errorMessage, 'Validation Error');
       };
       
-      console.log('Executing explicit search with query:', query);
       
       const response = await fetchSearchResults(
         query,
@@ -1159,16 +1171,12 @@ export default function HomePage() {
 
   // COMPLETELY NEW SIMPLE PAGINATION SYSTEM
   const handlePageChange = useCallback(async (newPage: number) => {
-    console.log('📄 NEW PAGINATION SYSTEM - Page change to:', newPage);
-    console.log('📄 Current state before change:', { currentPage, totalPages, totalItems });
     
     // Step 1: Set flags to prevent any other effects from interfering
     isPageChangeInProgressRef.current = true;
     skipNextSearchEffectRef.current = true;
-    console.log('📄 Flags set - blocking other effects');
     
     // Step 2: Update current page state immediately (this will make UI show correct active page)
-    console.log('📄 Setting currentPage to:', newPage);
     setCurrentPage(newPage);
     setLoading(true);
     
@@ -1192,7 +1200,6 @@ export default function HomePage() {
     params.set('per_page', '30');
     
     const newUrl = `/${locale}/home?${params.toString()}`;
-    console.log('📄 Updating URL to:', newUrl);
     
     // Update URL without triggering navigation
     window.history.pushState({}, '', newUrl);
@@ -1225,14 +1232,12 @@ export default function HomePage() {
         yearOfStudyFilter?.endYear?.toString() || null
       );
 
-      console.log('📄 API Response for page', newPage, ':', response.meta);
       
       // Step 5: Update results
       setSearchResults(response.data || []);
       setTotalPages(response.meta?.last_page || 1);
       setTotalItems(response.meta?.total || 0);
       
-      console.log('📄 Updated state - currentPage:', newPage, 'totalPages:', response.meta?.last_page);
       
     } catch (error) {
       console.error('📄 Pagination error:', error);
@@ -1244,7 +1249,6 @@ export default function HomePage() {
       setTimeout(() => {
         isPageChangeInProgressRef.current = false;
         skipNextSearchEffectRef.current = false;
-        console.log('📄 Pagination flags reset');
       }, 2000); // Increased to 2 seconds to ensure no interference
     }
   }, [searchQuery, searchType, locale, activeTab, languageFilter, countryFilter, regionFilter, economicBlocFilter, isicCodeFilter, selectedCategory, industryFilter, priceFilter, hsCodeFilter, accuracyFilter, roleFilter, rangeStartFilter, rangeEndFilter, yearOfStudyFilter, toast]);
@@ -1258,44 +1262,36 @@ export default function HomePage() {
 
   // Fetch search results when other parameters change (BUT NOT searchQuery - only on explicit search actions)
   useEffect(() => {
-    console.log('🔍 Main search effect triggered with yearOfStudyFilter:', yearOfStudyFilter);
 
     // Skip if not initialized yet (initial search is handled by the mount effect)
     if (!initialized) {
-      console.log('🔴 Skipping search effect - not initialized');
       return;
     }
     
     // Skip if a search type change is in progress to prevent interference
     if (isSearchTypeChangingRef.current) {
-      console.log('🔴 Skipping main search effect because a search type change is in progress');
       return;
     }
 
     // Skip if a direct page change is in progress to prevent interference
     if (isPageChangeInProgressRef.current) {
-      console.log('🔴 Skipping main search effect because a direct page change is in progress');
       return;
     }
 
     // Skip if a filter reset is in progress to prevent interference
     if (isFilterResetInProgressRef.current) {
-      console.log('🔴 Skipping main search effect because a filter reset is in progress');
       return;
     }
 
     // Skip this effect run if we just completed a pagination request
     if (skipNextSearchEffectRef.current) {
-      console.log('🔴 Skipping main search effect due to recent pagination');
       return; // Don't reset the flag here - let pagination handle it
     }
 
-    console.log('✅ All checks passed, proceeding with search...');
     
     // If this effect runs due to a change in search parameters (not pagination),
     // we should reset the lastDirectPageRef to ensure proper page handling
     if (!isPageChangeInProgressRef.current) {
-      console.log('Search parameters changed, resetting lastDirectPageRef');
       lastDirectPageRef.current = null;
     }
     
@@ -1323,10 +1319,6 @@ export default function HomePage() {
     
     // Log parameter changes for debugging (but don't include searchQuery)
     if (paramsChanged) {
-      console.log('Search params changed (excluding query):', {
-        locale, languageFilter, countryFilter, regionFilter, economicBlocFilter, tagFilter,
-        activeTab, searchType, selectedCategory, industryFilter, isicCodeFilter, hsCodeFilter, priceFilter, accuracyFilter, roleFilter, rangeStartFilter, rangeEndFilter, yearOfStudyFilter
-      });
     }
     
     // Update reference (but keep the searchQuery as is - don't update it here)
@@ -1377,7 +1369,6 @@ export default function HomePage() {
       const timeSinceLastCall = currentTime - lastApiCallTimeRef.current;
       
       if (timeSinceLastCall < MIN_API_CALL_INTERVAL) {
-        console.log('Skipping API call - too soon since last call');
         // Still turn off loading even if we skip the API call
         setLoading(false);
         return;
@@ -1401,17 +1392,6 @@ export default function HomePage() {
         // This resets pagination when filters change but preserves it for page-only changes
         const pageToRequest = lastDirectPageRef.current || currentPage || 1;
         
-        console.log('🚀 Performing filter-based search with parameters:', {
-          keyword,
-          search_type,
-          page: pageToRequest,
-          locale,
-          languageFilter,
-          countryFilter,
-          regionFilter,
-          economicBlocFilter,
-          yearOfStudyFilter
-        });
         
         const response = await fetchSearchResults(
           keyword,
@@ -1445,10 +1425,8 @@ export default function HomePage() {
         
         // Only reset pagination to page 1 when filter parameters have changed (not for pagination requests)
         if (!lastDirectPageRef.current) {
-          console.log('Resetting to page 1 because filter parameters changed');
           setCurrentPage(1);
         } else {
-          console.log('Keeping current page because this is a pagination request');
         }
         
         // Fetch statistics if search type is knowledge
@@ -1478,8 +1456,8 @@ export default function HomePage() {
    <main className='min-h-screen flex flex-col bg-gray-50'>
      <style dangerouslySetInnerHTML={{ __html: customScrollbarStyle }} />
      
-   
-     
+     {/* Global Loading Overlay */}
+  
      <section className="relative flex-1">
       <PageIllustration />
   {/* Hero Banner Section */}
@@ -1514,7 +1492,7 @@ export default function HomePage() {
            </p>  */}
            
            {/* Search Bar Prominent Placement */}
-           <div className="mx-auto mt-8 max-w-3xl shadow-md">
+           <div className="mx-auto mt-8 max-w-4xl ">
              <SearchBar
                searchQuery={searchQuery}
                setSearchQuery={setSearchQuery}
@@ -1524,7 +1502,14 @@ export default function HomePage() {
                placeholder={locale === 'ar' ? 'إبحث عن رؤى أو إنسايتر...' : 'Search for Insights or Insighter...'}
                onSubmit={handleSubmit}
                onSearch={executeSearch}
-               onQueryChange={handleQueryChange}
+              onQueryChange={handleQueryChange}
+              isicCodeFilter={isicCodeFilter?.toString() || null}
+              setIsicCodeFilter={handleIsicCodeFilterChange}
+              hsCodeFilter={hsCodeFilter?.toString() || null}
+              setHsCodeFilter={handleHsCodeFilterChange}
+              onIsicLoadingChange={setIsLoadingIsic}
+              onHsLoadingChange={setIsLoadingHs}
+              onDataLoadedChange={setIsDataLoaded}
              />
            </div>
             
@@ -1540,7 +1525,6 @@ export default function HomePage() {
                    const handleCategorySelect = async (category: string) => {
                      // Check if the category is already selected to prevent unnecessary loading
                      if (selectedCategory === category) {
-                       console.log('Category already selected, no action needed');
                        return;
                      }
                      
@@ -1571,7 +1555,6 @@ export default function HomePage() {
                      if (searchResults.length === 0 && !loading && initialized && 
                          !isPageChangeInProgressRef.current && !skipNextSearchEffectRef.current &&
                          !searchQuery.trim() && !hasUrlSearchParams && searchType === 'knowledge') {
-                       console.log('Auto-triggering "all" category search on initial load');
                        handleCategorySelect('all');
                      }
                    // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -1759,7 +1742,6 @@ export default function HomePage() {
                 
                 {/* Results section - conditionally show either ResultsSection or InsightersResultsSection based on searchType */}
                 {(() => {
-                  console.log(`🎯 Rendering results section for searchType: ${searchType}, results count: ${searchResults.length}`);
                   return searchType === 'insighter' ? (
                     <InsightersResultsSection
                       key={`insighter-section-${searchType}-${totalItems}`}

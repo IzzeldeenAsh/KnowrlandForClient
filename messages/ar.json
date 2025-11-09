@@ -436,6 +436,7 @@
         "compmay": "شركة",
         "enterMeetingTitle": "أدخل عنوانًا للاجتماع",
         "meetingDescription": "تفاصيل الاجتماع",
+        "insights": "الرؤى",
         "enterMeetingDescription": "أدخل تفاصيل حول ما ترغب في مناقشته",
         "minimum3Characters": "أدخل 3 أحرف على الأقل",
         "optional": "اختياري",
@@ -692,6 +693,8 @@
             "report": "التقرير",
             "insight": "الرؤية",
             "data": "البيانات",
+            "statistics": "الإحصائيات",
+            "statistic": "الإحصائيات",
             "manual": "الدليل",
             "course": "الدورة"
         },

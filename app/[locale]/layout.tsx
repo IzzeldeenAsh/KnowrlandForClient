@@ -47,7 +47,8 @@ export default async function RootLayout({
   params,
 }: LayoutProps) {
   // Properly await the params object
-  const locale = params?.locale;
+  const resolvedParams = await params;
+  const locale = resolvedParams?.locale;
   
   const direction = locale === 'ar' ? 'rtl' : 'ltr';
   

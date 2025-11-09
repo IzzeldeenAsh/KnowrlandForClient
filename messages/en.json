@@ -456,6 +456,7 @@
         "descriptionTooShort": "Description must be at least 3 characters",
         "industries": "Industries",
         "country": "Country",
+      
         "manager": "Manager",
         "compmay": "Company",
         "location": "Location",
@@ -714,6 +715,8 @@
     "report": "Report",
     "insight": "Insight",
     "data": "Data",
+    "statistics": "Statistics",
+    "statistic": "Statistic",
     "manual": "Manual",
     "course": "Course"
   },

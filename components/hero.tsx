@@ -64,7 +64,7 @@ function Placeholder() {
 
   return (
     <div
-      className="absolute inset-y-0 flex items-center pointer-events-none text-gray-500 md:text-lg text-base"
+      className="absolute inset-y-0 flex items-center pointer-events-none text-gray-500 md:text-lg text-base px-5"
       dangerouslySetInnerHTML={{ __html: placeholderText }}
     />
   );
@@ -76,17 +76,18 @@ export default function Hero() {
   const router = useRouter();
   const pathname = usePathname();
   const currentLocale = pathname.split('/')[1];
-  const [searchType, setSearchType] = useState<'knowledge' | 'insighter'>('knowledge');
-  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [searchInput, setSearchInput] = useState('');
   const [suggestions, setSuggestions] = useState<string[]>([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [activeSuggestionIndex, setActiveSuggestionIndex] = useState(-1);
-  
+
+
+
   const searchInputRef = useRef<HTMLInputElement>(null);
   const suggestionsRef = useRef<HTMLDivElement>(null);
-  
+
+
   // Close suggestions when clicking outside
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
@@ -126,6 +127,11 @@ export default function Hero() {
     getSuggestions();
   }, [debouncedSearchTerm, currentLocale]);
 
+
+
+
+
+
   // Handle keyboard navigation for suggestions
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     // Down arrow
@@ -157,7 +163,14 @@ export default function Hero() {
   const handleSuggestionSelect = (suggestion: string) => {
     setSearchInput(suggestion);
     setShowSuggestions(false);
-    router.push(`/${currentLocale}/home?search_type=${searchType}&keyword=${encodeURIComponent(suggestion)}&accuracy=any`);
+
+    // Build URL params
+    const params = new URLSearchParams();
+    params.set('search_type', 'knowledge');
+    params.set('keyword', suggestion);
+    params.set('accuracy', 'any');
+
+    router.push(`/${currentLocale}/home?${params.toString()}`);
   };
 
   // Handle clear search input
@@ -174,8 +187,14 @@ export default function Hero() {
   // Handle search submission
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    // Navigate to home page even with empty input
-    router.push(`/${currentLocale}/home?search_type=${searchType}&keyword=${encodeURIComponent(searchInput.trim())}&accuracy=any`);
+    // Build URL params
+    const params = new URLSearchParams();
+    params.set('search_type', 'knowledge');
+    params.set('keyword', searchInput.trim());
+    params.set('accuracy', 'any');
+
+    // Navigate to home page
+    router.push(`/${currentLocale}/home?${params.toString()}`);
   };
 
   return (
@@ -194,74 +213,25 @@ export default function Hero() {
 
         <div className="pt-14 pb-16  md:pb-32" >
           {/* Hero content */}
-          <div className="max-w-3xl mx-auto text-center" >
+          <div className="max-w-5xl mx-auto text-center" >
             <div className="mb-6" data-aos="fade-down">
             </div>
             <div className="flex justify-center mb-6" data-aos="fade-down" data-aos-delay="100">
               <Image src={LogoIcon} width={80} height={80} alt="Logo" priority />
             </div>
-            <h2 className="h2 bg-clip-text text-transparent bg-gradient-to-r from-slate-200/60 via-slate-200 to-slate-200/60 pb-5 leading-[1.5]" data-aos="fade-down">{t('title')}</h2>
+            <h2 className="h2 max-w-3xl mx-auto bg-clip-text text-transparent bg-gradient-to-r from-slate-200/60 via-slate-200 to-slate-200/60 pb-5 leading-[1.5]" data-aos="fade-down">{t('title')}</h2>
             <p className="text-lg text-slate-300 mb-8" data-aos="fade-down" data-aos-delay="200">
               {t('description')}
             </p>
-            <div className="max-w-3xl mx-auto w-full pb-4" data-aos="fade-down" data-aos-delay="300">
+            <div className="max-w-4xl mx-auto w-full pb-4" data-aos="fade-down" data-aos-delay="300">
               <div className="relative">
                 <form onSubmit={handleSubmit} className="flex flex-col items-center gap-3">
                   <div className="relative w-full">
-                    {/* Integrated search bar with dropdown */}
-                    <div className="flex flex-wrap sm:flex-nowrap items-center w-full bg-white border border-gray-300 rounded-md shadow-lg overflow-hidden p-2" style={{ minHeight: '60px' }}>
-                      {/* Dropdown selector */}
-                      <div 
-                        onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-                        className={`flex items-center justify-between cursor-pointer px-2 mb-2 sm:mb-0 sm:me-3 w-full sm:w-auto ${currentLocale === 'ar' ? 'sm:border-l' : 'sm:border-r'} sm:border-gray-200 sm:pr-3 relative`}
-                      >
-                        <div className="flex items-center">
-                          {/* Display the icon based on selected option */}
-                          <div className={`flex items-center justify-center w-6 h-6 bg-blue-50 rounded-md ${currentLocale === 'ar' ? 'ml-2' : 'mr-2'}`}>
-                            {searchType === 'knowledge' ? (
-                              <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4 text-blue-600" width="24" height="24" viewBox="0 0 24 24" strokeWidth="2" stroke="currentColor" fill="none" strokeLinecap="round" strokeLinejoin="round">
-                                <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-                                <path d="M3 19a9 9 0 0 1 9 0a9 9 0 0 1 9 0" />
-                                <path d="M3 6a9 9 0 0 1 9 0a9 9 0 0 1 9 0" />
-                                <path d="M3 6l0 13" />
-                                <path d="M12 6l0 13" />
-                                <path d="M21 6l0 13" />
-                              </svg>
-                            ) : (
-                              <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4 text-blue-600" width="24" height="24" viewBox="0 0 24 24" strokeWidth="2" stroke="currentColor" fill="none" strokeLinecap="round" strokeLinejoin="round">
-                                <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-                                <path d="M9 7m-4 0a4 4 0 1 0 8 0a4 4 0 1 0 -8 0" />
-                                <path d="M3 21v-2a4 4 0 0 1 4 -4h4a4 4 0 0 1 4 4v2" />
-                                <path d="M16 3.13a4 4 0 0 1 0 7.75" />
-                                <path d="M21 21v-2a4 4 0 0 0 -3 -3.85" />
-                              </svg>
-                            )}
-                          </div>
-                          <span className="text-gray-900 font-medium md:text-md text-sm">
-                            {searchType === 'knowledge' 
-                              ? (currentLocale === 'ar' ? 'رؤى' : 'Insights') 
-                              : (currentLocale === 'ar' ? 'إنسايتر' : 'Insighter')}
-                          </span>
-                        </div>
-                        <svg 
-                          className={`w-5 h-5 text-gray-500 ${currentLocale === 'ar' ? 'mr-2' : 'ml-2'}`} 
-                          fill="none" 
-                          stroke="currentColor" 
-                          viewBox="0 0 24 24" 
-                          xmlns="http://www.w3.org/2000/svg"
-                        >
-                          <path 
-                            strokeLinecap="round" 
-                            strokeLinejoin="round" 
-                            strokeWidth="2" 
-                            d={currentLocale === 'ar' ? "M15 19l-7-7 7-7" : "M19 9l-7 7-7-7"}
-                          ></path>
-                        </svg>
-                      </div>
-                      
+                    {/* Simple search bar */}
+                    <div className="flex items-center w-full bg-white border border-gray-300 rounded-md shadow-lg overflow-hidden p-2" style={{ minHeight: '60px' }}>
+
                       {/* Search input field */}
-                      {/* *** MODIFIED SECTION: Added relative positioning and custom placeholder *** */}
-                      <div className="relative flex flex-1 items-center w-full sm:w-auto">
+                      <div className="relative flex flex-1 items-center w-full">
                         {/* Render custom placeholder only when input is empty */}
                         {!searchInput && <Placeholder />}
 
@@ -336,53 +306,6 @@ export default function Hero() {
                         </button>
                       </div>
                     </div>
-                    
-                    {/* Dropdown menu */}
-                    {isDropdownOpen && (
-                      <div className={`absolute mt-1 w-[160px] bg-white border border-gray-200 rounded-md shadow-lg z-10 ${currentLocale === 'ar' ? 'right-0' : 'left-0'}`}>
-                        <div 
-                          className={`px-4 py-3 cursor-pointer hover:bg-blue-50 ${searchType === 'knowledge' ? 'bg-blue-50' : ''}`}
-                          onClick={() => {
-                            setSearchType('knowledge');
-                            setIsDropdownOpen(false);
-                          }}
-                        >
-                          <div className="flex items-center">
-                            <div className={`flex items-center justify-center w-6 h-6 bg-blue-50 rounded-md ${currentLocale === 'ar' ? 'ml-2' : 'mr-3'}`}>
-                              <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4 text-blue-600" width="24" height="24" viewBox="0 0 24 24" strokeWidth="2" stroke="currentColor" fill="none" strokeLinecap="round" strokeLinejoin="round">
-                                <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-                                <path d="M3 19a9 9 0 0 1 9 0a9 9 0 0 1 9 0" />
-                                <path d="M3 6a9 9 0 0 1 9 0a9 9 0 0 1 9 0" />
-                                <path d="M3 6l0 13" />
-                                <path d="M12 6l0 13" />
-                                <path d="M21 6l0 13" />
-                              </svg>
-                            </div>
-                            <span className="text-gray-900 font-medium md:text-md text-sm">{currentLocale === 'ar' ? 'معرفة' : 'Knowledge'}</span>
-                          </div>
-                        </div>
-                        <div 
-                          className={`px-4 py-3 cursor-pointer hover:bg-blue-50 ${searchType === 'insighter' ? 'bg-blue-50' : ''}`}
-                          onClick={() => {
-                            setSearchType('insighter');
-                            setIsDropdownOpen(false);
-                          }}
-                        >
-                          <div className="flex items-center">
-                            <div className={`flex items-center justify-center w-6 h-6 bg-blue-50 rounded-md ${currentLocale === 'ar' ? 'ml-2' : 'mr-3'}`}>
-                              <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4 text-blue-600" width="24" height="24" viewBox="0 0 24 24" strokeWidth="2" stroke="currentColor" fill="none" strokeLinecap="round" strokeLinejoin="round">
-                                <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-                                <path d="M9 7m-4 0a4 4 0 1 0 8 0a4 4 0 1 0 -8 0" />
-                                <path d="M3 21v-2a4 4 0 0 1 4 -4h4a4 4 0 0 1 4 4v2" />
-                                <path d="M16 3.13a4 4 0 0 1 0 7.75" />
-                                <path d="M21 21v-2a4 4 0 0 0 -3 -3.85" />
-                              </svg>
-                            </div>
-                            <span className="text-gray-900 font-medium md:text-md text-sm">{currentLocale === 'ar' ? 'إنسايتر' : 'Insighter'}</span>
-                          </div>
-                        </div>
-                      </div>
-                    )}
                     
                     {/* Suggestions dropdown */}
                     {showSuggestions && (

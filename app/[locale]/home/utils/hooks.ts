@@ -44,7 +44,6 @@ export function useSuggestions(searchQuery: string, locale: string) {
         // Use try/catch to handle potential network issues
         try {
           const suggestionResults = await fetchAutocomplete(debouncedSearchTerm, locale, handleError);
-          console.log('Autocomplete results for:', debouncedSearchTerm, 'Results:', suggestionResults);
           setSuggestions(suggestionResults);
           
           // Always show suggestions if we have results, regardless of forceHidden state
@@ -52,10 +51,8 @@ export function useSuggestions(searchQuery: string, locale: string) {
           if (suggestionResults.length > 0) {
             setShowSuggestions(true);
             setForceHidden(false); // Reset force hidden when we have new results
-            console.log('Showing suggestions:', suggestionResults.length, 'items');
           } else {
             setShowSuggestions(false);
-            console.log('No suggestions to show');
           }
         } catch (error) {
           console.error('Error fetching suggestions:', error);

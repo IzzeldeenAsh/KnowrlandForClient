@@ -5,16 +5,13 @@ import { useSearchParams, usePathname } from 'next/navigation';
 
 // Function to clean up all auth data
 const cleanupAuthData = () => {
-  console.log('[ClientLogoutHandler] Cleaning up auth data');
   
   // Clean localStorage
   try {
     localStorage.removeItem('token');
     localStorage.removeItem('user');
     localStorage.removeItem('foresighta-creds');
-    console.log('[ClientLogoutHandler] LocalStorage cleaned');
   } catch (e) {
-    console.error('[ClientLogoutHandler] Error cleaning localStorage:', e);
   }
 };
 
@@ -40,7 +37,6 @@ export default function ClientLogoutHandler() {
   useEffect(() => {
     // Handle logout parameter from Angular app redirect
     if (loggedOut === 'true') {
-      console.log('[ClientLogoutHandler] Processing logout from Angular app');
       cleanupAuthData();
       
       // Optionally remove the logged_out parameter from URL using history API
@@ -59,7 +55,6 @@ export default function ClientLogoutHandler() {
                          pathname.includes('/signout');
 
     if (isPublicRoute) {
-      console.log('[ClientLogoutHandler] Public route detected, skipping auth check');
       return;
     }
 
@@ -72,7 +67,6 @@ export default function ClientLogoutHandler() {
 
       // If we have localStorage data but no cookie token, we need to clean up and redirect
       if (!cookieToken && (localStorageToken || userData)) {
-        console.log('[ClientLogoutHandler] Auth mismatch detected - cleaning up and redirecting to logout');
         cleanupAuthData();
         
         // Get the current locale for the redirect

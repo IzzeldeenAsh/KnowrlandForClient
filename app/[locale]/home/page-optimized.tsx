@@ -341,7 +341,7 @@ export default function HomePageOptimized() {
               </div>
               
               {/* Search Bar */}
-              <div className="mx-auto mt-8 max-w-3xl shadow-md">
+              <div className="mx-auto mt-8 max-w-4xl ">
                 <MemoizedSearchBar
                   searchQuery={searchState.query}
                   setSearchQuery={(query) => searchDispatch({ type: 'SET_QUERY', payload: query })}

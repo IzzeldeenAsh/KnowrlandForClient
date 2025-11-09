@@ -464,7 +464,8 @@ const FilterBox: React.FC<FilterBoxProps> = React.memo(({
   // Initialize selected codes based on prop values
   useEffect(() => {
     if (isicCodeFilter && leafNodes.length > 0) {
-      const selectedCode = leafNodes.find(node => node.code === isicCodeFilter);
+      const numeric = parseInt(isicCodeFilter);
+      const selectedCode = leafNodes.find(node => node.key === numeric);
       if (selectedCode) {
         setSelectedIsicCode({
           id: selectedCode.key,
@@ -479,7 +480,8 @@ const FilterBox: React.FC<FilterBoxProps> = React.memo(({
 
   useEffect(() => {
     if (hsCodeFilter && hsCodes.length > 0) {
-      const selectedCode = hsCodes.find(code => code.code === hsCodeFilter);
+      const numeric = parseInt(hsCodeFilter);
+      const selectedCode = hsCodes.find(code => code.id === numeric);
       if (selectedCode) {
         setSelectedHsCode({
           id: selectedCode.id,
@@ -821,7 +823,8 @@ const FilterBox: React.FC<FilterBoxProps> = React.memo(({
         code: node.code,
         label: locale === 'ar' ? node.names.ar : node.names.en
       });
-      setIsicCodeFilter?.(node.code);
+      // Use ISIC id for filter/url
+      setIsicCodeFilter?.(node.key.toString());
       setIsModalOpen(false);
     }
   };
@@ -849,7 +852,7 @@ const FilterBox: React.FC<FilterBoxProps> = React.memo(({
     });
 
     if (setHsCodeFilter) {
-      setHsCodeFilter(code.code);
+      setHsCodeFilter(code.id.toString());
     }
 
     setIsHsCodeModalOpen(false);
@@ -879,7 +882,6 @@ const FilterBox: React.FC<FilterBoxProps> = React.memo(({
   // Reset handler
   const handleResetFilters = async () => {
     try {
-      console.log('Starting filter reset...');
 
       setSelectedIsicCode(null);
       setSelectedHsCode(null);
@@ -887,7 +889,6 @@ const FilterBox: React.FC<FilterBoxProps> = React.memo(({
 
       await resetFilters();
 
-      console.log('Filter reset completed successfully');
     } catch (error) {
       console.error('Error during filter reset:', error);
     }
@@ -1306,61 +1307,7 @@ const FilterBox: React.FC<FilterBoxProps> = React.memo(({
                   </div>
                 </div>
 
-                {/* ISIC Code Filter */}
-                <div className="flex flex-col gap-2 mb-4">
-                  <span className="text-xs font-semibold text-gray-700">{locale === 'ar' ? 'رمز ISIC' : 'ISIC Code'}</span>
-                  <div
-                    onClick={() => !isDisabled && setIsModalOpen(true)}
-                    className={`border border-gray-200 bg-white py-2 px-3 rounded text-sm cursor-pointer flex justify-between items-center hover:border-blue-400 transition-colors ${
-                      isDisabled ? 'opacity-50 cursor-not-allowed' : ''
-                    }`}
-                  >
-                    {selectedIsicCode ? (
-                      <span className="truncate text-gray-800 font-semibold">{selectedIsicCode.code} - {selectedIsicCode.label.length > 30 ? `${selectedIsicCode.label.substring(0, 30)}...` : selectedIsicCode.label}</span>
-                    ) : (
-                      <span className="text-gray-400 font-medium">{locale === 'ar' ? 'اختر رمز ISIC' : 'Select ISIC Code'}</span>
-                    )}
-                    {selectedIsicCode && !isDisabled && (
-                      <button onClick={handleClearIsicCode} className="ml-2 text-gray-400 hover:text-red-500">
-                        <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
-                      </button>
-                    )}
-                  </div>
-                </div>
-
-                {/* HS Code Filter */}
-                <div className="flex flex-col gap-2 mb-4">
-                  <span className="text-xs font-semibold text-gray-700">{locale === 'ar' ? 'رمز HS' : 'HS Code'}</span>
-                  <div
-                    onClick={selectedIsicCode && !isDisabled ? () => setIsHsCodeModalOpen(true) : undefined}
-                    className={`border border-gray-200 py-2 px-3 rounded text-sm flex justify-between items-center transition-colors ${
-                      selectedIsicCode && !isDisabled
-                        ? 'bg-white cursor-pointer hover:border-blue-400'
-                        : 'bg-gray-100 cursor-not-allowed opacity-60'
-                    }`}
-                  >
-                    {selectedHsCode ? (
-                      <span className="truncate text-gray-800 font-semibold">{selectedHsCode.code} - {selectedHsCode.label.length > 30 ? `${selectedHsCode.label.substring(0, 30)}...` : selectedHsCode.label}</span>
-                    ) : (
-                      <span className="text-gray-400 font-medium">
-                        {selectedIsicCode
-                          ? (locale === 'ar' ? 'اختر رمز HS' : 'Select HS Code')
-                          : (locale === 'ar' ? 'اختر رمز ISIC أولاً' : 'Select ISIC Code first')
-                        }
-                      </span>
-                    )}
-                    {selectedHsCode && selectedIsicCode && !isDisabled && (
-                      <button onClick={handleClearHsCode} className="ml-2 text-gray-400 hover:text-red-500">
-                        <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
-                      </button>
-                    )}
-                    {dataLoading.hsCodes && (
-                      <div className="ml-2">
-                        <Loader size="xs" />
-                      </div>
-                    )}
-                  </div>
-                </div>
+                {/* ISIC/HS filters moved to top SearchBar */}
 
               </LoadingOverlay>
             </div>
@@ -1398,7 +1345,6 @@ const FilterBox: React.FC<FilterBoxProps> = React.memo(({
                       withinPortal={false}
                       onOptionSubmit={(val) => {
                         if (!isDisabled) {
-                          console.log('Tag selected:', val);
                           if (setTagFilter) setTagFilter(parseInt(val));
                           tagCombobox.closeDropdown();
                         }
@@ -1420,7 +1366,6 @@ const FilterBox: React.FC<FilterBoxProps> = React.memo(({
                                   onClick={(e) => {
                                     e.preventDefault();
                                     e.stopPropagation();
-                                    console.log('Clearing tag filter');
                                     setTagFilter && setTagFilter(null);
                                   }}
                                 >
@@ -1504,7 +1449,6 @@ const FilterBox: React.FC<FilterBoxProps> = React.memo(({
                       withinPortal={false}
                       onOptionSubmit={(val) => {
                         if (!isDisabled) {
-                          console.log('🟦 Economic Bloc changed:', val, 'Clearing region and country filters');
                           if (setEconomicBlocFilter) setEconomicBlocFilter(parseInt(val));
                           if (setRegionFilter) setRegionFilter(null);
                           if (setCountryFilter) setCountryFilter(null);
@@ -1577,7 +1521,6 @@ const FilterBox: React.FC<FilterBoxProps> = React.memo(({
                     withinPortal={false}
                     onOptionSubmit={(val) => {
                       if (!isDisabled) {
-                        console.log('🟩 Region changed:', val, 'Clearing economic bloc and country filters');
                         if (setRegionFilter) setRegionFilter(parseInt(val));
                         if (setEconomicBlocFilter) setEconomicBlocFilter(null);
                         if (setCountryFilter) setCountryFilter(null);
@@ -1649,7 +1592,6 @@ const FilterBox: React.FC<FilterBoxProps> = React.memo(({
                     withinPortal={false}
                     onOptionSubmit={(val) => {
                       if (!isDisabled) {
-                        console.log('🟨 Country changed:', val, 'Clearing economic bloc and region filters');
                         if (setCountryFilter) setCountryFilter(parseInt(val));
                         if (setEconomicBlocFilter) setEconomicBlocFilter(null);
                         if (setRegionFilter) setRegionFilter(null);

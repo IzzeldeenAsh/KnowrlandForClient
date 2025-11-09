@@ -31,7 +31,6 @@ export default function TestSearchResults({ locale }: { locale: string }) {
     }
   ];
 
-  console.log('TestSearchResults rendering with sample data:', sampleData);
   
   return (
     <div className="grid grid-cols-3 gap-4">

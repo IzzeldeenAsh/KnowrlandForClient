@@ -67,7 +67,7 @@ const SearchSection = memo<SearchSectionProps>(({
             </div>
             
             {/* Search Bar */}
-            <div className="mx-auto mt-8 max-w-3xl shadow-md">
+            <div className="mx-auto mt-8 max-w-4xl ">
               <SearchBar
                 searchQuery={searchQuery}
                 setSearchQuery={onQueryChange}

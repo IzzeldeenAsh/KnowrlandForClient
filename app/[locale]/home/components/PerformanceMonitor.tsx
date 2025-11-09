@@ -33,11 +33,9 @@ const PerformanceMonitor: React.FC<PerformanceMonitorProps> = ({
     if (!enabled) return;
     
     // Log component mount
-    console.log(`[Performance] ${componentName} mounted`);
     
     return () => {
       // Log component unmount
-      console.log(`[Performance] ${componentName} unmounted after ${renderCountRef.current} renders`);
     };
   }, [componentName, enabled]);
   
