@@ -138,7 +138,7 @@ export default function QueryParamAuthCallback() {
         // Show error for a moment before redirecting to login
         setTimeout(() => {
           console.log('[callback] Redirecting to login due to error');
-          window.location.href = 'https://app.foresighta.co/auth/login';
+          window.location.href = 'https://app.insightabusiness.com/auth/login';
         }, 2000);
       }
     };
@@ -148,7 +148,7 @@ export default function QueryParamAuthCallback() {
     } else {
       console.error('[callback] No token found in URL parameters or cookies');
       // Redirect to login if no token
-      window.location.href = 'https://app.foresighta.co/auth/login';
+      window.location.href = 'https://app.insightabusiness.com/auth/login';
     }
   }, [token, locale, returnUrl]);
 
@@ -271,7 +271,7 @@ export default function QueryParamAuthCallback() {
     // Check if user has admin role
     if (userData.roles && userData.roles.includes('admin')) {
       console.log('[callback] Admin user detected, redirecting to admin dashboard');
-      window.location.href = 'https://app.foresighta.co/admin-dashboard/admin/dashboard/main-dashboard/requests';
+      window.location.href = 'https://app.insightabusiness.com/admin-dashboard/admin/dashboard/main-dashboard/requests';
       return;
     }
 
@@ -330,7 +330,7 @@ export default function QueryParamAuthCallback() {
       if (isAngularRoute(finalReturnUrl)) {
         console.log('[callback] Detected Angular route, redirecting to Angular app');
         const angularPath = finalReturnUrl.startsWith('/app/') ? finalReturnUrl : `/app${finalReturnUrl}`;
-        const redirectUrl = `https://app.foresighta.co${angularPath}`;
+        const redirectUrl = `https://app.insightabusiness.com${angularPath}`;
         console.log('[callback] Final Angular redirect URL:', redirectUrl);
         window.location.href = redirectUrl;
       } else {
@@ -351,7 +351,7 @@ export default function QueryParamAuthCallback() {
          userData.roles.includes('company-insighter'))) {
       // Redirect to insighter dashboard
       console.log('[callback] Redirecting to Angular insighter dashboard');
-      window.location.href = `https://app.foresighta.co/app/insighter-dashboard/my-dashboard`;
+      window.location.href = `https://app.insightabusiness.com/app/insighter-dashboard/my-dashboard`;
     } else {
       // Redirect to home page using current locale
       console.log('[callback] Redirecting to home page:', `/${locale}/home`);
