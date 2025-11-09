@@ -123,7 +123,7 @@ export default function UpdateCountryPage() {
       // Check if it's an Angular route
       if (isAngularRoute(redirectUrl)) {
         const angularPath = redirectUrl.startsWith('/app/') ? redirectUrl : `/app${redirectUrl}`;
-        window.location.href = `https://app.foresighta.co${angularPath}`;
+        window.location.href = `https://app.insightabusiness.com${angularPath}`;
       } else {
         // Handle relative URLs by ensuring they start with the locale
         let finalUrl = redirectUrl;
