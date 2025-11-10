@@ -172,7 +172,7 @@
     "Features": {
         "tagline": "We pave the way",
         "title": "Make Smarter, Faster Decisions",
-        "description": "Accelerate your decision-making by accessing authentic subject matter expertise instantly through AI-enhanced search capabilities.",
+        "description": " Find and evaluate knowledge instantly with a smart, AI-powered search engine.",
         "tabs": {
             "preciseResults": {
                 "title": "Smart Search Engine",
@@ -195,8 +195,8 @@
         "title":"Latest Reports",
         "description":"Stay ahead with newly uploaded expert reports, technical guides, and real-world analyses",
         "insights": {
-            "title": "Insights",
-            "description": "Explore the latest insights and analysis in your field",
+            "title": "Statistics",
+            "description": "Explore datasets and analysis for smarter next move in your business",
             "alt": "Insights Icon"
         },
         "reports": {
@@ -211,7 +211,7 @@
         },
         "data": {
             "title": "Data",
-            "description": "Accurate data and statistics to support your decisions",
+            "description": "Accurate data and findings to support your decisions",
             "alt": "Data Icon"
         },
         "courses": {
@@ -246,8 +246,8 @@
     },
     "Features3": {
         "tagline": "Value for the Money",
-        "title": "Tailored Pricing,  Pay only for what Matters",
-        "description": "Purchase exactly what you need without paying the price of full reports. Our platform offers on-demand buying options tailored to your specific needs.",
+        "title": "Purchase only what Matters, not full, lengthy reports",
+        "description": " With Insighta Business Tailored Pricing and on-demand buying options, purchase exactly what you need without paying the price of full reports.",
         "direction": "ltr",
         "tabs": {
             "no-monthly-subscription": {
@@ -257,7 +257,7 @@
                 "title": "No monthly fees- One time purchase"
             },
             "purchaseSpecific": {
-                "title": "Pay for only for the targeted insight or data"
+                "title": "Pay for only for the targeted insight"
             }
         }
     },
@@ -294,7 +294,7 @@
     "Features02": {
         "stayInformed": {
             "title": "Stay Informed",
-            "description": "Get notified instantly when new reports, insights, and valuable resources are published on topics that matters to you."
+            "description": "Get notified instantly once insights of your interest are published on the platform"
         },
         "connectWithExpert": {
             "title": "Book Meetings with Subject Matter Experts",
@@ -315,7 +315,7 @@
         "copyright": " 2025 insightabusiness.com. All Rights Reserved.",
         "insight": {
             "title": "Insight",
-            "insights": "Insights",
+            "insights": "Statistics",
             "reports": "Reports",
             "data": "Data",
             "manual": "Manuals",
