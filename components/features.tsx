@@ -102,12 +102,13 @@ export default function Features() {
                     <div className="relative w-full h-full">
                       <div className="absolute inset-0 bg-gradient-to-br from-blue-500/10 rounded-lg to-transparent rounded-[inherit]" />
                       <Image
-                        className={`w-full h-full rounded-[inherit] transition-all duration-700 ease-in-out absolute ${hoveredTab1 === 1 || (hoveredTab1 === null && activeTab1 === 1) ? 'opacity-100' : 'opacity-0'}`}
-                        src={'https://res.cloudinary.com/dsiku9ipv/image/upload/v1747036866/New_Project_8_tqsmzg.png'}
+                        className={`rounded-[inherit] transition-all duration-700 ease-in-out absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 max-w-full max-h-full ${hoveredTab1 === 1 || (hoveredTab1 === null && activeTab1 === 1) ? 'opacity-100' : 'opacity-0'}`}
+                        src={'/images/ask-screenshot.png'}
                         width={700}
                         height={700}
                         alt="Feature 2 - Image 1"
-                        style={{ objectFit: 'contain', width: 'auto', height: 'auto' }}
+                        
+                        style={{ objectFit: 'contain', borderRadius: '10px' }}
                       />
                       <div className="absolute inset-0  rounded-[inherit]" />
                     </div>

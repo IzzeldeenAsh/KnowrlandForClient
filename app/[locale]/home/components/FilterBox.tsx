@@ -1227,7 +1227,7 @@ const FilterBox: React.FC<FilterBoxProps> = React.memo(({
             >
               <span className="flex items-center gap-2 text-blue-500 font-semibold">
                 <IconCalendarEvent size={20} className="p-0.5 rounded-full" />
-                {locale === 'ar' ? "تاريخ الإنشاء" : 'Creation Date'}
+                {locale === 'ar' ? 'النطاق الزمني للبيانات' : 'Data Coverage Period'}
               </span>
               <svg className={`w-4 h-4 text-gray-400 transition-transform ${yearOfStudyCollapsed ? '' : 'rotate-180'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
@@ -1237,11 +1237,8 @@ const FilterBox: React.FC<FilterBoxProps> = React.memo(({
               <div className="px-4 py-3 bg-white">
                 <LoadingOverlay isLoading={isDisabled}>
                   <div className="flex flex-col gap-1">
-                    <span className="text-xs font-semibold text-gray-700 mb-2">
-                      {locale === 'ar' ? 'اختر سنة الدراسة' : 'Select Year of Study'}
-                    </span>
                     <CustomYearPicker
-                      placeholder={locale === 'ar' ? 'اختر السنة' : 'Select year'}
+                      placeholder={locale === 'ar' ? 'اختر النطاق الزمني للبيانات' : 'Select Data Coverage Period'}
                       yearRangeStart={1900}
                       yearRangeEnd={2030}
                       allowRange={true}
@@ -1254,7 +1251,6 @@ const FilterBox: React.FC<FilterBoxProps> = React.memo(({
                       }}
                       disabled={isDisabled}
                     />
-
                   </div>
                 </LoadingOverlay>
               </div>
@@ -1287,7 +1283,6 @@ const FilterBox: React.FC<FilterBoxProps> = React.memo(({
               <LoadingOverlay isLoading={isDisabled}>
                 {/* Industry Filter */}
                 <div className="flex flex-col gap-2 mb-4">
-                  <span className="text-xs font-semibold text-gray-700">{locale === 'ar' ? 'المجال' : 'Industry'}</span>
                   <div
                     onClick={() => !isDisabled && setIsIndustryModalOpen(true)}
                     className={`border border-gray-200 bg-white py-2 px-3 rounded text-sm cursor-pointer flex justify-between items-center hover:border-blue-400 transition-colors ${
@@ -1339,7 +1334,6 @@ const FilterBox: React.FC<FilterBoxProps> = React.memo(({
               <div className="px-4 py-3 bg-white">
                 <LoadingOverlay isLoading={isDisabled}>
                   <div className="flex flex-col gap-2">
-                    <span className="text-xs font-semibold text-gray-700 mb-2">{locale === 'ar' ? 'اختر وسمًا' : 'Select a tag'}</span>
                     <Combobox
                       store={tagCombobox}
                       withinPortal={false}

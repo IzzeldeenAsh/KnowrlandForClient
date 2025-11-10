@@ -141,7 +141,6 @@ const SearchBar: React.FC<SearchBarProps> = ({
 
   // Fetch ISIC tree on mount
   useEffect(() => {
-    if (searchType !== 'knowledge') return; // don't load for insighter
     let mounted = true;
     const loadIsic = async () => {
       try {
@@ -294,15 +293,8 @@ const SearchBar: React.FC<SearchBarProps> = ({
     }
   }, [hsCodeFilter, hsCodes, locale, pendingHsCode, hasRestoredHsCode]);
 
-  // Clear ISIC/HS when switching to insighter
-  useEffect(() => {
-    if (searchType === 'insighter') {
-      setSelectedIsic(null);
-      setSelectedHs(null);
-      setIsicCodeFilter && setIsicCodeFilter(null);
-      setHsCodeFilter && setHsCodeFilter(null);
-    }
-  }, [searchType, setIsicCodeFilter, setHsCodeFilter]);
+  // Note: ISIC/HS codes are now supported for both knowledge and insighter search types
+  // No need to clear them when switching between search types
 
   // ISIC search filter
   useEffect(() => {
@@ -745,8 +737,7 @@ const SearchBar: React.FC<SearchBarProps> = ({
         )}
         </div>
 
-        {searchType === 'knowledge' && (
-          <div className={`flex flex-wrap items-center gap-3 justify-center`}>
+        <div className={`flex flex-wrap items-center gap-3 justify-center`}>
             <button
               type="button"
               disabled={isLoadingIsic}
@@ -832,7 +823,6 @@ const SearchBar: React.FC<SearchBarProps> = ({
               )}
             </button>
           </div>
-        )}
       </div>
         {/* ISIC Modal */}
         <Modal
