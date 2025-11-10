@@ -86,7 +86,7 @@ app/[locale]/                    # Internationalized routes
 
 **Colors:**
 - Insighter badges: `bg-[#DFFEE9] text-[#1BC653]`
-- Company badges: `bg-[#EFF8FF] text-[#0978B9]` 
+- Company badges: `bg-[#EFF8FF] text-[#299AF8]` 
 - Primary buttons: `bg-blue-500`
 - Special gradient buttons: `bg-gradient-to-r from-blue-500 to-teal-400`
 

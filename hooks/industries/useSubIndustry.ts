@@ -43,7 +43,7 @@ async function fetchSubIndustryFromAPI(
   locale: string
 ): Promise<SubIndustryResponse> {
   const response = await fetch(
-    `https://api.insightabusiness.com/api/platform/industries/type/sub/${type}/${id}/${slug}`,
+    `https://api.foresighta.co/api/platform/industries/type/sub/${type}/${id}/${slug}`,
     {
       method: 'POST',
       headers: {

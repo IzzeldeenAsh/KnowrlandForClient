@@ -2,11 +2,8 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { DocumentTextIcon, CalendarIcon, ClockIcon, ChevronDownIcon, ChevronUpIcon, BookmarkIcon } from '@heroicons/react/24/outline';
 import { BookmarkIcon as BookmarkSolidIcon } from '@heroicons/react/24/solid';
-import { IconLanguage, IconCode, IconBuildingBank, IconMap, IconWorld, IconCrane } from '@tabler/icons-react';
+import { IconLanguage, IconCode, IconBuildingBank, IconMap, IconWorld, IconCrane, IconBrandFacebook, IconBrandTwitter, IconBrandLinkedin, IconBrandWhatsapp } from '@tabler/icons-react';
 import { useParams } from 'next/navigation';
-import FacebookIcon from '@/public/file-icons/facebook';
-import LinkedinIcon from '@/public/file-icons/linkedin';
-import WhatsappIcon from '@/public/file-icons/whatsapp';
 import BuyModal from './BuyModal';
 import AuthModal from './AuthModal';
 import { useGlobalProfile } from '@/components/auth/GlobalProfileProvider';
@@ -180,7 +177,7 @@ const KnowledgeSideBox = ({
       }
 
       const method = isReadLater ? 'DELETE' : 'POST';
-      const url =  `https://api.insightabusiness.com/api/account/favorite/knowledge/${knowledgeSlug}`
+      const url =  `https://api.foresighta.co/api/account/favorite/knowledge/${knowledgeSlug}`
 
       
       const response = await fetch(url, {
@@ -308,26 +305,26 @@ const KnowledgeSideBox = ({
 
   return (
     <div className='tp-course-details2-widget'>
-    <div className="tp-course-details2-widget-child rounded-lg p-4 sticky " dir={isRTL ? 'rtl' : 'ltr'}>
+    <div className="tp-course-details2-widget-child rounded-lg p-3 sticky " dir={isRTL ? 'rtl' : 'ltr'}>
       
-      <div className="p-4">
-        <div className="text-center mb-4">
+      <div className="p-3">
+        <div className="text-center mb-2">
           {isFree ? (
             <span className='text-xl font-bold text-green-600 bg-green-100 px-4 py-1 rounded-xl'>{translations.free}</span>
           ) : (
-            <span className='text-3xl font-bold'>  ${total_price}</span>   
+            <span className='text-2xl font-bold'>  ${total_price}</span>   
           )}
           {!isFree && (
-            <span className="text-md text-gray-500 ml-2 capitalize">{translations.oneTimePurchase}</span>
+            <span className="text-sm text-gray-500 ml-2 capitalize">{translations.oneTimePurchase}</span>
           )}
         </div>
 
-        <div className="space-y-3 mb-4">
+        <div className="space-y-2 mb-3">
           {!isOwner && (
             <>
               {purchased_status === 'purchased' ? (
                 <button 
-                  onClick={() => window.location.href = (process.env.NEXT_PUBLIC_DASHBOARD_URL || 'https://app.insightabusiness.com') + '/app/insighter-dashboard/my-downloads'}
+                  onClick={() => window.location.href = (process.env.NEXT_PUBLIC_DASHBOARD_URL || 'http://localhost:4200') + '/app/insighter-dashboard/my-downloads'}
                   className="w-full font-semibold bg-green-600 text-white py-2 px-4 rounded-lg hover:bg-green-700 transition-colors"
                 >
                   {translations.alreadyPurchased}
@@ -390,7 +387,7 @@ const KnowledgeSideBox = ({
               {translations.documents}
             </span>
             <div className={`field-content-container ${expandedSections.documents ? 'expanded' : ''}`}>
-              <div className="flex flex-wrap gap-2">
+              <div className="flex flex-nowrap gap-2 overflow-hidden no-wrap">
                 {Object.entries(documentCounts).map(([ext, count]) => {
                   let badgeStyle = "";
                   
@@ -445,7 +442,7 @@ const KnowledgeSideBox = ({
               </div>
               {translations.documentsLanguage}
             </span>
-            <span className="field-content-container flex items-center justify-center capitalize">
+            <span className="field-content-container flex items-center justify-center capitalize truncate">
               {language ? (
                 currentLocale === 'ar' ?
                   (language.toLowerCase() === 'english' ? 'الإنجليزية' : 'العربية') :
@@ -484,7 +481,7 @@ const KnowledgeSideBox = ({
                 {translations.isicCode}
               </span>
               <div className={`field-content-container ${expandedSections.isicCode ? 'expanded' : ''}`}>
-                <div className="flex flex-wrap gap-1 justify-end">
+                <div className="flex flex-nowrap gap-1 justify-end overflow-hidden no-wrap">
                   {isic_code
                     .slice(0, expandedSections.isicCode ? isic_code.length : MAX_VISIBLE_ITEMS)
                     .map((code, index) => (
@@ -577,7 +574,7 @@ const KnowledgeSideBox = ({
                 {translations.hsCode}
               </span>
               <div className={`field-content-container ${expandedSections.hsCode ? 'expanded' : ''}`}>
-                <div className="flex flex-wrap gap-1 justify-end">
+                <div className="flex flex-nowrap gap-1 justify-end overflow-hidden no-wrap">
                   {hs_code
                     .slice(0, expandedSections.hsCode ? hs_code.length : MAX_VISIBLE_ITEMS)
                     .map((code, index) => (
@@ -606,129 +603,7 @@ const KnowledgeSideBox = ({
             </div>
           )}
 
-          {
-            economic_blocs && economic_blocs.length > 0 && (
-              <div className="tp-course-details2-widget-list-item flex items-center justify-between">
-                <span className="flex items-center gap-2 font-medium ">
-                  <div className="bg-blue-50 p-2 rounded-full me-2">
-                    <IconWorld className="w-4 h-4 text-blue-500" />
-                  </div>
-                  {translations.targetMarket}
-                </span>
-                <div className={`field-content-container ${expandedSections.economicBlocs ? 'expanded' : ''}`}>
-                  <div className={`flex flex-wrap gap-1 justify-end`}>
-                    {economic_blocs
-                      .slice(0, expandedSections.economicBlocs ? economic_blocs.length : MAX_VISIBLE_TARGET_MARKET_ITEMS)
-                      .map((economicBloc) => (
-                        <span key={economicBloc.id} className={`badge bg-[#f1f1f4] text-[#4b5675] text-xs font-medium px-2.5 py-0.5 rounded ${isRTL ? 'text-left' : 'text-right'}`}>
-                          {economicBloc.name}
-                        </span>
-                      ))}
-                  </div>
-                  {economic_blocs.length > MAX_VISIBLE_TARGET_MARKET_ITEMS && (
-                    <button 
-                      className="text-blue-500 text-xs flex items-center whitespace-nowrap ms-auto mt-1"
-                      onClick={() => toggleSection('economicBlocs')}
-                    >
-                      {expandedSections.economicBlocs ? (
-                        <>
-                          {translations.showLess} <ChevronUpIcon className="w-3 h-3 ml-1" />
-                        </>
-                      ) : (
-                        <>
-                          +{economic_blocs.length - MAX_VISIBLE_TARGET_MARKET_ITEMS} {translations.more} <ChevronDownIcon className="w-3 h-3 ml-1" />
-                        </>
-                      )}
-                    </button>
-                  )}
-                </div>
-              </div>
-            )
-          }
-          {
-            regions && regions.length > 0 && (
-              <div className="tp-course-details2-widget-list-item flex items-center justify-between">
-                <span className="flex items-center gap-2 font-medium ">
-                  <div className="bg-blue-50 p-2 rounded-full me-2">
-                    <IconWorld className="w-4 h-4 text-blue-500" />
-                  </div>
-                  {translations.targetMarket}
-                </span>
-                <div className={`field-content-container ${expandedSections.regions ? 'expanded' : ''}`}>
-                  <div className={`flex flex-wrap gap-1 justify-end`}>
-                    {regions.length === 6 ? (
-                      <span className={`badge bg-[#f1f1f4] text-[#4b5675] text-xs font-medium px-2.5 py-0.5 rounded ${isRTL ? 'text-left' : 'text-right'}`}>
-                     {translations.worldWide}
-                      </span>
-                    ) : (
-                      regions
-                        .slice(0, expandedSections.regions ? regions.length : MAX_VISIBLE_TARGET_MARKET_ITEMS)
-                        .map((region:any) => (
-                          <span key={region.id} className={`badge bg-[#f1f1f4] text-[#4b5675] text-xs font-medium px-2.5 py-0.5 rounded ${isRTL ? 'text-left' : 'text-right'}`}>
-                            {region.name}
-                          </span>
-                        ))
-                    )}
-                  </div>
-                  {regions.length > MAX_VISIBLE_TARGET_MARKET_ITEMS && regions.length !== 6 && (
-                    <button 
-                      className="text-blue-500 text-xs flex items-center whitespace-nowrap ms-auto mt-1"
-                      onClick={() => toggleSection('regions')}
-                    >
-                      {expandedSections.regions ? (
-                        <>
-                          {translations.showLess} <ChevronUpIcon className="w-3 h-3 ml-1" />
-                        </>
-                      ) : (
-                        <>
-                          +{regions.length - MAX_VISIBLE_TARGET_MARKET_ITEMS} {translations.more} <ChevronDownIcon className="w-3 h-3 ml-1" />
-                        </>
-                      )}
-                    </button>
-                  )}
-                </div>
-              </div>
-            )
-          }
-          {
-            countries && countries.length > 0 && (
-              <div className="tp-course-details2-widget-list-item flex items-center justify-between">
-                <span className="flex items-center gap-2 font-medium ">
-                  <div className="bg-blue-50 p-2 rounded-full me-2">
-                    <IconWorld className="w-4 h-4 text-blue-500" />
-                  </div>
-                  {translations.targetMarket}
-                </span>
-                <div className={`field-content-container ${expandedSections.countries ? 'expanded' : ''}`}>
-                  <div className={`flex flex-wrap gap-1 justify-end`}>
-                    {countries
-                      .slice(0, expandedSections.countries ? countries.length : MAX_VISIBLE_TARGET_MARKET_ITEMS)
-                      .map((country:any) => (
-                        <span key={country.id} className={`badge bg-[#f1f1f4] text-[#4b5675] text-xs font-medium px-2.5 py-0.5 rounded ${isRTL ? 'text-left' : 'text-right'}`}>
-                          {country.name}
-                        </span>
-                      ))}
-                  </div>
-                  {countries.length > MAX_VISIBLE_TARGET_MARKET_ITEMS && (
-                    <button 
-                      className="text-blue-500 text-xs flex items-center whitespace-nowrap ms-auto mt-1"
-                      onClick={() => toggleSection('countries')}
-                    >
-                      {expandedSections.countries ? (
-                        <>
-                          {translations.showLess} <ChevronUpIcon className="w-3 h-3 ml-1" />
-                        </>
-                      ) : (
-                        <>
-                          +{countries.length - MAX_VISIBLE_TARGET_MARKET_ITEMS} {translations.more} <ChevronDownIcon className="w-3 h-3 ml-1" />
-                        </>
-                      )}
-                    </button>
-                  )}
-                </div>
-              </div>
-            )
-          }
+          
 
           {cover_start && cover_end && (
             <div className="tp-course-details2-widget-list-item flex items-center justify-between">
@@ -746,6 +621,129 @@ const KnowledgeSideBox = ({
             </div>
           )}
 
+          {
+            economic_blocs && economic_blocs.length > 0 && (
+              <div className="tp-course-details2-widget-list-item flex items-center justify-between">
+                <span className="flex items-center gap-2 font-medium ">
+                  <div className="bg-blue-50 p-2 rounded-full me-2">
+                    <IconWorld className="w-4 h-4 text-blue-500" />
+                  </div>
+                  {translations.targetMarket}
+                </span>
+                <div className={`field-content-container ${expandedSections.economicBlocs ? 'expanded' : ''}`}>
+                  <div className={`chips-row ${economic_blocs.length > MAX_VISIBLE_TARGET_MARKET_ITEMS ? 'with-more' : ''} flex flex-nowrap gap-1 justify-end overflow-hidden no-wrap`}>
+                    {economic_blocs
+                      .slice(0, expandedSections.economicBlocs ? economic_blocs.length : MAX_VISIBLE_TARGET_MARKET_ITEMS)
+                      .map((economicBloc) => (
+                        <span key={economicBloc.id} className={`badge bg-[#f1f1f4] text-[#4b5675] text-xs font-medium px-2.5 py-0.5 rounded ${isRTL ? 'text-left' : 'text-right'}`}>
+                          {economicBloc.name}
+                        </span>
+                      ))}
+                    {economic_blocs.length > MAX_VISIBLE_TARGET_MARKET_ITEMS && (
+                      <button 
+                        className="inline-more-btn text-blue-500 text-xs flex items-center whitespace-nowrap"
+                        onClick={() => toggleSection('economicBlocs')}
+                      >
+                        {expandedSections.economicBlocs ? (
+                          <>
+                            {translations.showLess} <ChevronUpIcon className="w-3 h-3 ml-1" />
+                          </>
+                        ) : (
+                          <>
+                            +{economic_blocs.length - MAX_VISIBLE_TARGET_MARKET_ITEMS} {translations.more} <ChevronDownIcon className="w-3 h-3 ml-1" />
+                          </>
+                        )}
+                      </button>
+                    )}
+                  </div>
+                </div>
+              </div>
+            )
+          }
+          {
+            regions && regions.length > 0 && (
+              <div className="tp-course-details2-widget-list-item flex items-center justify-between">
+                <span className="flex items-center gap-2 font-medium ">
+                  <div className="bg-blue-50 p-2 rounded-full me-2">
+                    <IconWorld className="w-4 h-4 text-blue-500" />
+                  </div>
+                  {translations.targetMarket}
+                </span>
+                <div className={`field-content-container ${expandedSections.regions ? 'expanded' : ''}`}>
+                  <div className={`chips-row ${(regions.length > MAX_VISIBLE_TARGET_MARKET_ITEMS && regions.length !== 6) ? 'with-more' : ''} flex flex-nowrap gap-1 justify-end overflow-hidden no-wrap`}>
+                    {regions.length === 6 ? (
+                      <span className={`badge bg-[#f1f1f4] text-[#4b5675] text-xs font-medium px-2.5 py-0.5 rounded ${isRTL ? 'text-left' : 'text-right'}`}>
+                     {translations.worldWide}
+                      </span>
+                    ) : (
+                      regions
+                        .slice(0, expandedSections.regions ? regions.length : MAX_VISIBLE_TARGET_MARKET_ITEMS)
+                        .map((region:any) => (
+                          <span key={region.id} className={`badge bg-[#f1f1f4] text-[#4b5675] text-xs font-medium px-2.5 py-0.5 rounded ${isRTL ? 'text-left' : 'text-right'}`}>
+                            {region.name}
+                          </span>
+                        ))
+                    )}
+                    {regions.length > MAX_VISIBLE_TARGET_MARKET_ITEMS && regions.length !== 6 && (
+                      <button 
+                        className="inline-more-btn text-blue-500 text-xs flex items-center whitespace-nowrap"
+                        onClick={() => toggleSection('regions')}
+                      >
+                        {expandedSections.regions ? (
+                          <>
+                            {translations.showLess} <ChevronUpIcon className="w-3 h-3 ml-1" />
+                          </>
+                        ) : (
+                          <>
+                            +{regions.length - MAX_VISIBLE_TARGET_MARKET_ITEMS} {translations.more} <ChevronDownIcon className="w-3 h-3 ml-1" />
+                          </>
+                        )}
+                      </button>
+                    )}
+                  </div>
+                </div>
+              </div>
+            )
+          }
+          {
+            countries && countries.length > 0 && (
+              <div className="tp-course-details2-widget-list-item flex items-center justify-between">
+                <span className="flex items-center gap-2 font-medium ">
+                  <div className="bg-blue-50 p-2 rounded-full me-2">
+                    <IconWorld className="w-4 h-4 text-blue-500" />
+                  </div>
+                  {translations.targetMarket}
+                </span>
+                <div className={`field-content-container ${expandedSections.countries ? 'expanded' : ''}`}>
+                  <div className={`chips-row ${countries.length > MAX_VISIBLE_TARGET_MARKET_ITEMS ? 'with-more' : ''} flex flex-nowrap gap-1 justify-end overflow-hidden no-wrap`}>
+                    {countries
+                      .slice(0, expandedSections.countries ? countries.length : MAX_VISIBLE_TARGET_MARKET_ITEMS)
+                      .map((country:any) => (
+                        <span key={country.id} className={`badge bg-[#f1f1f4] text-[#4b5675] text-xs font-medium px-2.5 py-0.5 rounded ${isRTL ? 'text-left' : 'text-right'}`}>
+                          {country.name}
+                        </span>
+                      ))}
+                    {countries.length > MAX_VISIBLE_TARGET_MARKET_ITEMS && (
+                      <button 
+                        className="inline-more-btn text-blue-500 text-xs flex items-center whitespace-nowrap"
+                        onClick={() => toggleSection('countries')}
+                      >
+                        {expandedSections.countries ? (
+                          <>
+                            {translations.showLess} <ChevronUpIcon className="w-3 h-3 ml-1" />
+                          </>
+                        ) : (
+                          <>
+                            +{countries.length - MAX_VISIBLE_TARGET_MARKET_ITEMS} {translations.more} <ChevronDownIcon className="w-3 h-3 ml-1" />
+                          </>
+                        )}
+                      </button>
+                    )}
+                  </div>
+                </div>
+              </div>
+            )
+          }
        
           {/* Only show Last Update if it has a value */}
           {false && (
@@ -828,7 +826,7 @@ const KnowledgeSideBox = ({
                       onClick={() => shareToSocial('facebook')}
                       title="Share on Facebook"
                     >
-                      <FacebookIcon />
+                      <IconBrandFacebook size={20} />
                     </button>
 
                     {/* Twitter */}
@@ -837,9 +835,7 @@ const KnowledgeSideBox = ({
                       onClick={() => shareToSocial('twitter')}
                       title="Share on Twitter"
                     >
-                      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20" fill="currentColor">
-                        <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
-                      </svg>
+                      <IconBrandTwitter size={20} />
                     </button>
 
                     {/* LinkedIn */}
@@ -848,7 +844,7 @@ const KnowledgeSideBox = ({
                       onClick={() => shareToSocial('linkedin')}
                       title="Share on LinkedIn"
                     >
-                      <LinkedinIcon />
+                      <IconBrandLinkedin size={20} />
                     </button>
 
                     {/* WhatsApp */}
@@ -857,7 +853,7 @@ const KnowledgeSideBox = ({
                       onClick={() => shareToSocial('whatsapp')}
                       title="Share on WhatsApp"
                     >
-                      <WhatsappIcon />
+                      <IconBrandWhatsapp size={20} />
                     </button>
                   </div>
 
@@ -876,7 +872,7 @@ const KnowledgeSideBox = ({
         {/* Field content styles */}
         <style jsx>{`
           .field-content-container {
-            min-height: 40px;
+            min-height: 28px;
             overflow: hidden;
             transition: max-height 0.3s ease;
             width: 60%;
@@ -885,6 +881,46 @@ const KnowledgeSideBox = ({
             flex-direction: column;
             align-items: flex-end;
           }
+
+          /* Left label: keep on one line and ellipsize */
+          .tp-course-details2-widget-list-item > span:first-child {
+          
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            display: inline-flex;
+            align-items: center;
+          }
+
+          /* Prevent wrapping in collapsed state */
+          .field-content-container:not(.expanded) .no-wrap {
+            white-space: nowrap;
+            text-overflow: ellipsis;
+            overflow: hidden;
+            flex-wrap: nowrap !important;
+          }
+
+          /* Allow wrapping when expanded */
+          .field-content-container.expanded .no-wrap {
+            white-space: normal;
+            overflow: visible;
+            flex-wrap: wrap !important;
+          }
+
+          /* Inline +more button for Target Market */
+          .inline-more-btn {
+            position: absolute;
+            right: 0;
+            top: 50%;
+            transform: translateY(-50%);
+            background: transparent;
+          }
+
+          /* Reserve space for inline button so chips don't overlap it */
+          .chips-row {
+            width: 100%;
+          }
+          .chips-row.with-more { padding-right: 72px; }
 
           .field-content-container.overflow-visible {
             overflow: visible;
@@ -895,7 +931,7 @@ const KnowledgeSideBox = ({
           }
 
           .field-content-container:not(.expanded) {
-            max-height: 80px;
+            max-height: 28px;
           }
 
           .field-content-container:not(.expanded).overflow-visible {
@@ -903,8 +939,8 @@ const KnowledgeSideBox = ({
           }
 
           .tp-course-details2-widget-list-item {
-            min-height: 50px;
-            padding: 12px 0;
+            min-height: 40px;
+            padding: 8px 0;
             border-bottom: 1px solid #f3f4f6;
             align-items: center;
             position: relative;
