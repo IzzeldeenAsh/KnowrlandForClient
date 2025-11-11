@@ -172,7 +172,7 @@ const InsightersResultsSection: React.FC<InsightersResultsSectionProps> = ({
                         <div className='flex flex-col items-center gap-3'>
                             {/* Role-based badges */}
                             {isCompanyInsighter && company && (
-                            <span className="bg-[#EFF8FF] text-[#0978B9] font-bold uppercase text-[10px] px-3 py-1 rounded-full">
+                            <span className="bg-[#EFF8FF] text-[#299AF8] font-bold uppercase text-[10px] px-3 py-1 rounded-full">
                               {company.legal_name} 
                             </span>
                           )}
@@ -185,7 +185,7 @@ const InsightersResultsSection: React.FC<InsightersResultsSectionProps> = ({
                           
                           {isCompany && !isCompanyInsighter && company && (
                             <>
-                              <span className="bg-[#EFF8FF] text-[#0978B9] font-bold text-[10px] px-3 py-1 rounded-full uppercase">
+                              <span className="bg-[#EFF8FF] text-[#299AF8] font-bold text-[10px] px-3 py-1 rounded-full uppercase">
                                 {company.legal_name} 
                               </span>
                         

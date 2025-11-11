@@ -369,7 +369,7 @@ export default function NotificationsInner({
               </div>
               
               <div className={`${isRTL ? 'mr-3' : 'ml-3'} mt-4`}>
-              <span className={`inline-flex items-center px-2 py-0.5 rounded-md text-xs font-semibold bg-[#EEF6FF] text-[#0978B9]`}>
+              <span className={`inline-flex items-center px-2 py-0.5 rounded-md text-xs font-semibold bg-[#EEF6FF] text-[#299AF8]`}>
                   {t('VIEW')}
                 </span>
               </div>

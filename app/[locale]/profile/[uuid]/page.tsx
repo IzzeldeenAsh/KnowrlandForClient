@@ -1023,13 +1023,13 @@ export default function ProfilePage() {
 
                         <IconRosetteDiscountCheckFilled className="w-5 h-5 text-blue-500" />
                         {isCompany && enterpriseType !== "insighter" && (
-                          <span className="bg-[#EFF8FF] text-[#0978B9] font-bold  text-xs px-2 py-0.5 rounded-full inline-flex items-center">
+                          <span className="bg-[#EFF8FF] text-[#299AF8] font-bold  text-xs px-2 py-0.5 rounded-full inline-flex items-center">
                             {userProfileT("company")}
                           </span>
                         )}
                         {isCompany && enterpriseType === "insighter" && (
                           <Link href={`${profileData.company?.uuid}`}>
-                            <span className="bg-[#EFF8FF] text-[#0978B9] font-bold  text-xs px-2 py-0.5 rounded-full inline-flex items-center">
+                            <span className="bg-[#EFF8FF] text-[#299AF8] font-bold  text-xs px-2 py-0.5 rounded-full inline-flex items-center">
                               {profileData.company?.legal_name} {t("compmay")}
                             </span>
                           </Link>
@@ -1041,7 +1041,7 @@ export default function ProfilePage() {
                         )}
                         {isCompanyInsighter && (
                           <Link href={`${profileData.company?.uuid}`}>
-                            <span className="bg-[#EFF8FF] text-[#0978B9] font-bold uppercase text-xs px-2 py-0.5 rounded-full inline-flex items-center">
+                            <span className="bg-[#EFF8FF] text-[#299AF8] font-bold uppercase text-xs px-2 py-0.5 rounded-full inline-flex items-center">
                               {profileData.company?.legal_name} {t("compmay")}
                             </span>
                           </Link>
