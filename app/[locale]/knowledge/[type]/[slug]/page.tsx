@@ -318,11 +318,12 @@ export default function KnowledgePage({ params }: Props) {
               </div>
             </div>
             <div className="flex flex-wrap gap-4 sm:gap-6 text-sm mt-4">
-              {(knowledge.insighter.roles?.includes('company') || knowledge.insighter.roles?.includes('company-insighter')) ? (
+              {
+              (knowledge.insighter.roles?.includes('company') || knowledge.insighter.roles?.includes('company-insighter')) ? (
                 // Company display
                 <>
                   <div className="relative w-[40px] h-[40px] sm:w-[50px] sm:h-[50px]">
-                    <Link href={`/${locale}/profile/${knowledge.insighter.company?.uuid || knowledge.insighter.uuid}`} className="block h-full">
+                    <Link href={`/${locale}/profile/${knowledge.insighter.company?.uuid || knowledge.insighter.uuid}?entity=company`} className="block h-full">
                       {knowledge.insighter.company?.logo ? (
                         <Image
                           src={knowledge.insighter.company.logo}
@@ -386,7 +387,7 @@ export default function KnowledgePage({ params }: Props) {
                 // Original insighter display
                 <>
                   <div className="relative w-[40px] h-[40px] sm:w-[50px] sm:h-[50px]">
-                    <Link href={`/${locale}/profile/${knowledge.insighter.uuid}`} className="block h-full">
+                    <Link href={`/${locale}/profile/${knowledge.insighter.uuid}?entity=insighter`} className="block h-full">
                       {knowledge.insighter.profile_photo_url ? (
                         <Image
                           src={knowledge.insighter.profile_photo_url}
