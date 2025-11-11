@@ -905,7 +905,6 @@ const KnowledgeSideBox = ({
           .tp-course-details2-widget-list-item > span:first-child {
           
             white-space: nowrap;
-            overflow: hidden;
             text-overflow: ellipsis;
             display: inline-flex;
             align-items: center;
@@ -915,7 +914,6 @@ const KnowledgeSideBox = ({
           .field-content-container:not(.expanded) .no-wrap {
             white-space: nowrap;
             text-overflow: ellipsis;
-            overflow: hidden;
             flex-wrap: nowrap !important;
           }
 
