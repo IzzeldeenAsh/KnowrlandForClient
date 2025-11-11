@@ -288,7 +288,7 @@ const { isLoading: isAppLoading, setIsLoading: setAppLoading } = useLoading();
           </div>
 
           {/* Desktop navigation */}
-          <nav className="hidden md:flex flex-1 overflow-hidden">
+          <nav className="hidden md:flex flex-1 overflow-visible">
             <ul className="flex justify-start items-center w-full">
               <li>
                 <HoverCard  
@@ -296,7 +296,7 @@ const { isLoading: isAppLoading, setIsLoading: setAppLoading } = useLoading();
                   radius="sm" shadow="md" withinPortal>
                   <HoverCard.Target>
                     <Link href={`/${pathname.split('/')[1]}/all-industries`}>
-                      <button className={`font-medium text-sm ${textColorClass} mx-1 lg:mx-2 flex items-center group ${isActiveLink('all-industries')}`}>
+                      <button className={`font-medium text-sm ${textColorClass}  xl:mx-1 flex items-center group ${isActiveLink('all-industries')}`}>
                         <span className="mr-1">{t('navigation.industries')}</span>
                         <IconChevronDown size={16} className="group-hover:translate-y-0.5 transition-transform duration-200" />
                       </button>
@@ -367,26 +367,26 @@ const { isLoading: isAppLoading, setIsLoading: setAppLoading } = useLoading();
                 </HoverCard>
               </li>
               <li>
-                <Link className={`font-medium text-sm ${menuTextColorClass} mx-1 lg:mx-2 ${isActiveLink('data')}`} href={`/${pathname.split('/')[1]}/industries/data`}>{t('navigation.data')}</Link>
+                <Link className={`font-medium text-sm ${menuTextColorClass}  xl:mx-1 ${isActiveLink('data')}`} href={`/${pathname.split('/')[1]}/industries/data`}>{t('navigation.data')}</Link>
               </li>
               <li>
-                <Link className={`font-medium text-sm ${menuTextColorClass} mx-1 lg:mx-2 ${isActiveLink('report')}`} href={`/${pathname.split('/')[1]}/industries/report`}>{t('navigation.reports')}</Link>
+                <Link className={`font-medium text-sm ${menuTextColorClass}  xl:mx-1 ${isActiveLink('report')}`} href={`/${pathname.split('/')[1]}/industries/report`}>{t('navigation.reports')}</Link>
               </li>
               <li>
-                <Link className={`font-medium text-sm ${menuTextColorClass} mx-1 lg:mx-2 ${isActiveLink('statistic')}`} href={`/${pathname.split('/')[1]}/industries/statistic`}>{t('navigation.statistics')}</Link>
+                <Link className={`font-medium text-sm ${menuTextColorClass}  xl:mx-1 ${isActiveLink('statistic')}`} href={`/${pathname.split('/')[1]}/industries/statistic`}>{t('navigation.statistics')}</Link>
               </li>
               <li className='lg:block hidden'>
-                <Link className={`font-medium text-sm ${menuTextColorClass} mx-1 lg:mx-2 ${isActiveLink('manual')}`} href={`/${pathname.split('/')[1]}/industries/manual`}>{t('navigation.manuals')}</Link>
+                <Link className={`font-medium text-sm ${menuTextColorClass}  xl:mx-1 ${isActiveLink('manual')}`} href={`/${pathname.split('/')[1]}/industries/manual`}>{t('navigation.manuals')}</Link>
               </li>
               <li className='lg:block hidden'>
-                <Link className={`font-medium text-sm ${menuTextColorClass} mx-1 lg:mx-2 ${isActiveLink('course')}`} href={`/${pathname.split('/')[1]}/industries/course`}>{t('navigation.courses')}</Link>
+                <Link className={`font-medium text-sm ${menuTextColorClass}  xl:mx-1 ${isActiveLink('course')}`} href={`/${pathname.split('/')[1]}/industries/course`}>{t('navigation.courses')}</Link>
               </li>
             </ul>
           </nav>
 
           {/* Header Search Bar */}
           {!shouldHideSearchBar() && (
-            <div className="hidden lg:flex items-center mx-4">
+            <div className="hidden xl:flex items-center mx-4">
               <form onSubmit={handleSearchSubmit} className="flex items-center">
                 <TextInput
                   placeholder={pathname.split('/')[1] === 'ar' ? 'البحث...' : 'Search...'}
@@ -473,7 +473,7 @@ const { isLoading: isAppLoading, setIsLoading: setAppLoading } = useLoading();
             
             {/* Mobile search button - only show on smaller screens */}
             {!shouldHideSearchBar() && (
-              <li className="lg:hidden mr-2">
+              <li className="xl:hidden mr-2">
                 <button
                   onClick={() => {
                     router.push(`/${pathname.split('/')[1]}/home`);
