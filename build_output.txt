@@ -1,0 +1,17 @@
+ ⚠ Linting is disabled.
+   ▲ Next.js 15.0.4
+
+
+> Build error occurred
+Error: EACCES: permission denied, unlink '/Users/izzeddinashour/Desktop/Production-KNOLDG/KnowrlandForClient/.next/build/chunks/[root of the server]__70c6ec._.js'
+    at async unlinkPath (/Users/izzeddinashour/Desktop/Production-KNOLDG/KnowrlandForClient/node_modules/next/dist/lib/recursive-delete.js:25:13)
+    at async recursiveDelete (/Users/izzeddinashour/Desktop/Production-KNOLDG/KnowrlandForClient/node_modules/next/dist/lib/recursive-delete.js:51:5)
+    at async (/Users/izzeddinashour/Desktop/Production-KNOLDG/KnowrlandForClient/node_modules/next/dist/lib/recursive-delete.js:68:17)
+    at async recursiveDelete (/Users/izzeddinashour/Desktop/Production-KNOLDG/KnowrlandForClient/node_modules/next/dist/lib/recursive-delete.js:51:5)
+    at async (/Users/izzeddinashour/Desktop/Production-KNOLDG/KnowrlandForClient/node_modules/next/dist/lib/recursive-delete.js:68:17)
+    at async recursiveDelete (/Users/izzeddinashour/Desktop/Production-KNOLDG/KnowrlandForClient/node_modules/next/dist/lib/recursive-delete.js:51:5) {
+  errno: -13,
+  code: 'EACCES',
+  syscall: 'unlink',
+  path: '/Users/izzeddinashour/Desktop/Production-KNOLDG/KnowrlandForClient/.next/build/chunks/[root of the server]__70c6ec._.js'
+}

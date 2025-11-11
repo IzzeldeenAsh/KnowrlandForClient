@@ -427,9 +427,9 @@ const FilterBox: React.FC<FilterBoxProps> = React.memo(({
     ]);
   }, [locale, fetchWithLoading]);
 
-  // Fetch HS codes when ISIC code is selected
+  // Fetch HS codes
   useEffect(() => {
-    const fetchHsCodes = async (isicCodeId: number) => {
+    const fetchHsCodesByIsic = async (isicCodeId: number) => {
       setDataLoading(prev => ({ ...prev, hsCodes: true }));
       try {
         const response = await fetch(getApiUrl(`/api/common/setting/hs-code/isic-code/${isicCodeId}`), {
@@ -452,14 +452,34 @@ const FilterBox: React.FC<FilterBoxProps> = React.memo(({
       }
     };
 
+    const fetchAllHsCodes = async () => {
+      setDataLoading(prev => ({ ...prev, hsCodes: true }));
+      try {
+        const response = await fetch(getApiUrl('/api/common/setting/hs-code/list'), {
+          headers: {
+            'Accept-Language': locale,
+            'Accept': 'application/json',
+            "X-Timezone": Intl.DateTimeFormat().resolvedOptions().timeZone,
+          }
+        });
+        if (!response.ok) throw new Error('Failed to fetch HS codes');
+        const data = await response.json();
+        setHsCodes(data.data || []);
+      } catch (error) {
+        console.error('Error fetching HS codes:', error);
+        setHsCodes([]);
+      } finally {
+        setDataLoading(prev => ({ ...prev, hsCodes: false }));
+      }
+    };
+
     if (selectedIsicCode?.id) {
-      fetchHsCodes(selectedIsicCode.id);
+      fetchHsCodesByIsic(selectedIsicCode.id);
     } else {
-      setHsCodes([]);
-      setSelectedHsCode(null);
-      setHsCodeFilter?.(null);
+      // Decoupled behavior: allow HS without ISIC
+      fetchAllHsCodes();
     }
-  }, [selectedIsicCode?.id, locale, setHsCodeFilter]);
+  }, [selectedIsicCode?.id, locale]);
 
   // Initialize selected codes based on prop values
   useEffect(() => {
@@ -815,9 +835,6 @@ const FilterBox: React.FC<FilterBoxProps> = React.memo(({
   // Selection handlers
   const handleSelectIsicCode = (node: ISICCode) => {
     if (isLeafNode(node)) {
-      setSelectedHsCode(null);
-      setHsCodeFilter?.(null);
-
       setSelectedIsicCode({
         id: node.key,
         code: node.code,
@@ -862,9 +879,7 @@ const FilterBox: React.FC<FilterBoxProps> = React.memo(({
   const handleClearIsicCode = (e: React.MouseEvent) => {
     e.stopPropagation();
     setSelectedIsicCode(null);
-    setSelectedHsCode(null);
     if (setIsicCodeFilter) setIsicCodeFilter(null);
-    if (setHsCodeFilter) setHsCodeFilter(null);
   };
 
   const handleClearIndustry = (e: React.MouseEvent) => {

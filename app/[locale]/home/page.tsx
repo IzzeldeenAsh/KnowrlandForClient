@@ -1771,6 +1771,7 @@ export default function HomePage() {
                 locale={locale}
                 onPageChange={handlePageChange}
                 searchType={searchType}
+                filtersVisible={filtersVisible}
               />
                   );
                 })()}

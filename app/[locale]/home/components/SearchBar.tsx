@@ -73,6 +73,7 @@ const SearchBar: React.FC<SearchBarProps> = ({
   type HSCode = {
     id: number;
     code: string;
+    isic_code_id: number;
     names: { en: string; ar: string };
   };
 
@@ -208,12 +209,12 @@ const SearchBar: React.FC<SearchBarProps> = ({
     }
   }, [isicCodeFilter, isicLeafNodes, locale]);
 
-  // Fetch HS codes whenever selected ISIC changes
+  // Fetch all HS codes once (independent of ISIC)
   useEffect(() => {
-    const fetchHs = async (isicId: number) => {
+    const fetchAllHs = async () => {
       try {
         setIsLoadingHs(true);
-        const resp = await fetch(getApiUrl(`/api/common/setting/hs-code/isic-code/${isicId}`), {
+        const resp = await fetch(getApiUrl('/api/common/setting/hs-code/list'), {
           headers: {
             'Accept-Language': locale,
             'Accept': 'application/json',
@@ -233,7 +234,6 @@ const SearchBar: React.FC<SearchBarProps> = ({
           if (found) {
             console.log('[SearchBar] Restoring pending HS code:', hsId, found.code);
             setSelectedHs({ id: found.id, code: found.code, label: locale === 'ar' ? found.names.ar : found.names.en });
-            // Also restore the filter
             if (setHsCodeFilter) {
               setHsCodeFilter(pendingHsCode);
             }
@@ -243,7 +243,7 @@ const SearchBar: React.FC<SearchBarProps> = ({
         }
         
         // Mark data as loaded if we have initial URL params
-        if (initialUrlIsic) {
+        if (initialUrlIsic || initialUrlHs) {
           setIsDataLoaded(true);
         }
       } catch (e) {
@@ -251,7 +251,7 @@ const SearchBar: React.FC<SearchBarProps> = ({
         setHsCodes([]);
         setFilteredHsCodes([]);
         // Mark as loaded even on error
-        if (initialUrlIsic) {
+        if (initialUrlIsic || initialUrlHs) {
           setIsDataLoaded(true);
         }
         // Clear pending on error
@@ -261,24 +261,17 @@ const SearchBar: React.FC<SearchBarProps> = ({
         setIsLoadingHs(false);
       }
     };
-    
-    if (selectedIsic?.id) {
-      fetchHs(selectedIsic.id);
-    } else if (isDataLoaded && !pendingHsCode) {
-      // Only clear HS codes after initial load is complete
-      // Don't clear if we still have a pending HS code to restore
-      setHsCodes([]);
-      setFilteredHsCodes([]);
-      // Only clear HS selection if there was no initial URL HS code
-      if (!initialUrlHs) {
-        setSelectedHs(null);
-        setHsCodeFilter && setHsCodeFilter(null);
-      }
-    }
-  }, [selectedIsic?.id, locale, initialUrlIsic, initialUrlHs, isDataLoaded, pendingHsCode, hasRestoredHsCode]);
+    fetchAllHs();
+  }, [locale]);
 
   // Sync selected HS from external filter when HS list updates
   useEffect(() => {
+    // If component is uncontrolled for HS (no setter provided), do not
+    // override internal selection based on external filter prop.
+    if (!setHsCodeFilter) {
+      return;
+    }
+    
     // Skip if we're waiting to restore a pending HS code
     if (pendingHsCode && !hasRestoredHsCode) {
       return;
@@ -288,8 +281,6 @@ const SearchBar: React.FC<SearchBarProps> = ({
       const numeric = parseInt(hsCodeFilter);
       const found = hsCodes.find(c => c.id === numeric);
       if (found) setSelectedHs({ id: found.id, code: found.code, label: locale === 'ar' ? found.names.ar : found.names.en });
-    } else if (!hsCodeFilter) {
-      setSelectedHs(null);
     }
   }, [hsCodeFilter, hsCodes, locale, pendingHsCode, hasRestoredHsCode]);
 
@@ -334,21 +325,11 @@ const SearchBar: React.FC<SearchBarProps> = ({
     // Use ID for URL/state to match page.tsx handlers
     setIsicCodeFilter && setIsicCodeFilter(node.key.toString());
     
-    // When ISIC changes manually, clear HS (but not during initialization)
-    if (isDataLoaded) {
-      setSelectedHs(null);
-      setHsCodeFilter && setHsCodeFilter(null);
-    }
-    
-    // Update URL: set isic_code, clear hs_code only if user manually changed ISIC, reset page
+    // Update URL: set isic_code, do not clear hs_code, reset page
     try {
       console.log('[SearchBar] handleSelectIsic -> node:', { id: node.key, code: node.code });
       const params = new URLSearchParams(searchParams.toString());
       params.set('isic_code', node.key.toString());
-      // Only delete hs_code if we're changing ISIC after initialization
-      if (isDataLoaded) {
-        params.delete('hs_code');
-      }
       params.delete('page');
       params.set('search_type', searchType);
       const nextUrl = `/${locale}/home?${params.toString()}`;
@@ -356,7 +337,7 @@ const SearchBar: React.FC<SearchBarProps> = ({
       router.push(nextUrl, { scroll: false });
     } catch {}
     setIsIsicModalOpen(false);
-  }, [locale, searchParams, router, searchType, setIsicCodeFilter, setHsCodeFilter, isDataLoaded]);
+  }, [locale, searchParams, router, searchType, setIsicCodeFilter]);
 
   const handleSelectHs = useCallback((code: HSCode) => {
     setSelectedHs({ id: code.id, code: code.code, label: locale === 'ar' ? code.names.ar : code.names.en });
@@ -381,19 +362,16 @@ const SearchBar: React.FC<SearchBarProps> = ({
   const clearIsicSelection = useCallback(() => {
     setSelectedIsic(null);
     setIsicCodeFilter && setIsicCodeFilter(null);
-    setSelectedHs(null);
-    setHsCodeFilter && setHsCodeFilter(null);
     try {
       const params = new URLSearchParams(searchParams.toString());
       params.delete('isic_code');
-      params.delete('hs_code');
       params.delete('page');
       params.set('search_type', searchType);
       const nextUrl = `/${locale}/home?${params.toString()}`;
       console.log('[SearchBar] clear ISIC -> push URL:', nextUrl);
       router.push(nextUrl, { scroll: false });
     } catch {}
-  }, [locale, router, searchParams, searchType, setIsicCodeFilter, setHsCodeFilter]);
+  }, [locale, router, searchParams, searchType, setIsicCodeFilter]);
 
   const clearHsSelection = useCallback(() => {
     setSelectedHs(null);
@@ -453,7 +431,16 @@ const SearchBar: React.FC<SearchBarProps> = ({
     } else {
       // Fallback behavior
       setSearchQuery(suggestion);
-      router.push(`/${locale}/home?search_type=${searchType}&keyword=${encodeURIComponent(suggestion)}`);
+      try {
+        const params = new URLSearchParams(searchParams.toString());
+        params.set('keyword', suggestion);
+        params.set('search_type', searchType);
+        params.delete('page');
+        const nextUrl = `/${locale}/home?${params.toString()}`;
+        router.push(nextUrl, { scroll: false });
+      } catch {
+        // no-op
+      }
     }
   };
 
@@ -514,7 +501,7 @@ const SearchBar: React.FC<SearchBarProps> = ({
     insighter: isRtl ? 'حسب الإنسايتر' : 'By Insighter',
   } as const;
 
-  const isHsDisabled = !selectedIsic || isLoadingHs;
+  const isHsDisabled = isLoadingHs;
 
   const renderTypeIcon = (type: 'knowledge' | 'insighter', isActive: boolean) => (
     <span
@@ -667,7 +654,21 @@ const SearchBar: React.FC<SearchBarProps> = ({
                 if (onSearch) {
                   onSearch(searchQuery.trim());
                 } else {
-                  onSubmit(e as any);
+                  // Fallback: navigate preserving existing filters
+                  try {
+                    const params = new URLSearchParams(searchParams.toString());
+                    if (searchQuery.trim().length > 0) {
+                      params.set('keyword', searchQuery.trim());
+                    } else {
+                      params.delete('keyword');
+                    }
+                    params.set('search_type', searchType);
+                    params.delete('page');
+                    const nextUrl = `/${locale}/home?${params.toString()}`;
+                    router.push(nextUrl, { scroll: false });
+                  } catch {
+                    onSubmit(e as any);
+                  }
                 }
               }}
               aria-label={isRtl ? 'ابحث' : 'Search'}
@@ -762,7 +763,7 @@ const SearchBar: React.FC<SearchBarProps> = ({
                 )}
               </span>
               <span className="font-medium text-gray-900">
-                ISIC code
+               {locale === 'ar' ? 'بواسطة رمز ISIC' : 'By ISIC code'}
               </span>
               {selectedIsic && (
                 <span className={`font-mono text-[11px] bg-gray-100 px-1.5 py-0.5 rounded ${isRtl ? 'mr-2' : 'ml-2'}`}>
@@ -800,7 +801,7 @@ const SearchBar: React.FC<SearchBarProps> = ({
             >
               {renderHsIcon(!!selectedHs && !isHsDisabled)}
               <span className="font-medium text-gray-900">
-                HS code
+               {locale === 'ar' ? 'بواسطة رمز HS' : 'By HS code'}
               </span>
               {selectedHs && !isHsDisabled && (
                 <span className={`font-mono text-[11px] bg-gray-100 px-1.5 py-0.5 rounded ${isRtl ? 'mr-2' : 'ml-2'}`}>
@@ -878,20 +879,74 @@ const SearchBar: React.FC<SearchBarProps> = ({
               <div className="flex justify-center py-8"><Loader size="md" /></div>
             ) : (
               <div className="grid grid-cols-1 gap-2 max-h-[60vh] overflow-y-auto pr-2">
-                {filteredHsCodes.map((code) => (
-                  <button
-                    key={code.id}
-                    className={`py-2 px-3 rounded-md text-sm flex text-start items-start w-full transition-colors hover:bg-gray-100 border border-gray-200`}
-                    onClick={() => handleSelectHs(code)}
-                  >
-                    <span className={`font-mono text-xs bg-gray-100 px-1.5 py-0.5 rounded ${locale === 'ar' ? 'ml-2' : 'mr-2'}`}>{code.code}</span>
-                    <span className="flex-1">{locale === 'ar' ? code.names.ar : code.names.en}</span>
-                  </button>
-                ))}
-                {filteredHsCodes.length === 0 && (
-                  <div className="flex flex-col items-center justify-center py-8 text-center text-gray-500 text-sm">
-                    {locale === 'ar' ? 'لا توجد رموز HS متاحة' : 'No HS codes available'}
-                  </div>
+                {selectedIsic ? (
+                  <>
+                    {(() => {
+                      const related = filteredHsCodes.filter(c => c.isic_code_id === selectedIsic.id);
+                      const others = filteredHsCodes.filter(c => c.isic_code_id !== selectedIsic.id);
+                      return (
+                        <>
+                          {related.length > 0 && (
+                            <>
+                              <div className="text-sm font-semibold text-blue-500 px-1">
+                                {locale === 'ar' ? 'ذات صلة' : 'Related'}
+                              </div>
+                              {related.map((code) => (
+                                <button
+                                  key={code.id}
+                                  className={`py-2 px-3 rounded-md text-sm flex text-start items-start w-full transition-colors hover:bg-gray-100 border border-gray-200`}
+                                  onClick={() => handleSelectHs(code)}
+                                >
+                                  <span className={`font-mono text-xs bg-gray-100 px-1.5 py-0.5 rounded ${locale === 'ar' ? 'ml-2' : 'mr-2'}`}>{code.code}</span>
+                                  <span className="flex-1">{locale === 'ar' ? code.names.ar : code.names.en}</span>
+                                </button>
+                              ))}
+                            </>
+                          )}
+                          {others.length > 0 && (
+                            <>
+                              <div className="text-sm font-semibold text-gray-700 px-1 mt-2">
+                                {locale === 'ar' ? 'أكواد HS أخرى' : 'Other HS code'}
+                              </div>
+                              {others.map((code) => (
+                                <button
+                                  key={code.id}
+                                  className={`py-2 px-3 rounded-md text-sm flex text-start items-start w-full transition-colors hover:bg-gray-100 border border-gray-200`}
+                                  onClick={() => handleSelectHs(code)}
+                                >
+                                  <span className={`font-mono text-xs bg-gray-100 px-1.5 py-0.5 rounded ${locale === 'ar' ? 'ml-2' : 'mr-2'}`}>{code.code}</span>
+                                  <span className="flex-1">{locale === 'ar' ? code.names.ar : code.names.en}</span>
+                                </button>
+                              ))}
+                            </>
+                          )}
+                          {related.length === 0 && others.length === 0 && (
+                            <div className="flex flex-col items-center justify-center py-8 text-center text-gray-500 text-sm">
+                              {locale === 'ar' ? 'لا توجد رموز HS متاحة' : 'No HS codes available'}
+                            </div>
+                          )}
+                        </>
+                      );
+                    })()}
+                  </>
+                ) : (
+                  <>
+                    {filteredHsCodes.map((code) => (
+                      <button
+                        key={code.id}
+                        className={`py-2 px-3 rounded-md text-sm flex text-start items-start w-full transition-colors hover:bg-gray-100 border border-gray-200`}
+                        onClick={() => handleSelectHs(code)}
+                      >
+                        <span className={`font-mono text-xs bg-gray-100 px-1.5 py-0.5 rounded ${locale === 'ar' ? 'ml-2' : 'mr-2'}`}>{code.code}</span>
+                        <span className="flex-1">{locale === 'ar' ? code.names.ar : code.names.en}</span>
+                      </button>
+                    ))}
+                    {filteredHsCodes.length === 0 && (
+                      <div className="flex flex-col items-center justify-center py-8 text-center text-gray-500 text-sm">
+                        {locale === 'ar' ? 'لا توجد رموز HS متاحة' : 'No HS codes available'}
+                      </div>
+                    )}
+                  </>
                 )}
               </div>
             )}
