@@ -255,7 +255,7 @@ export function UserProfile({ isHome }: { isHome: boolean }) {
                   )}
                   {(
                     roles.includes("company-insighter")) && (
-                    <span className="bg-[#EFF8FF] text-[#0978B9]  text-xs font-semibold px-1.5 rounded-sm dark:bg-yellow-900 dark:text-yellow-300 whitespace-nowrap">
+                    <span className="bg-[#EFF8FF] text-[#299AF8]  text-xs font-semibold px-1.5 rounded-sm dark:bg-yellow-900 dark:text-yellow-300 whitespace-nowrap">
                      {user.company?.legal_name + " " + t("insighter")}
                     </span>
                   )}
@@ -263,10 +263,10 @@ export function UserProfile({ isHome }: { isHome: boolean }) {
                     !roles.includes("company-insighter")) && (
                    <div className="flex gap-1 pt-1">
                     
-                    <span className="bg-[#EFF8FF] text-[#0978B9]  text-xs font-semibold px-1.5 rounded-sm dark:bg-yellow-900 dark:text-yellow-300 whitespace-nowrap">
+                    <span className="bg-[#EFF8FF] text-[#299AF8]  text-xs font-semibold px-1.5 rounded-sm dark:bg-yellow-900 dark:text-yellow-300 whitespace-nowrap">
                      {user.company?.legal_name}
                     </span>
-                    <span className="bg-[#EFF8FF] text-[#0978B9]  text-xs font-semibold px-1.5 rounded-sm dark:bg-yellow-900 dark:text-yellow-300 whitespace-nowrap">
+                    <span className="bg-[#EFF8FF] text-[#299AF8]  text-xs font-semibold px-1.5 rounded-sm dark:bg-yellow-900 dark:text-yellow-300 whitespace-nowrap">
                      {t("manager")}
                       </span>
                    </div>

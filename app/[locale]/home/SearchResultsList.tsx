@@ -293,10 +293,7 @@ export default function SearchResultsList({
               const isNumericPrice = normalizedPrice !== "" && !Number.isNaN(numericPrice);
               const isFreePrice = isNumericPrice && numericPrice === 0;
               const formattedPrice = isNumericPrice
-                ? `$${numericPrice.toLocaleString(
-                    currentLocale === "ar" ? "ar-SA" : "en-US",
-                    { maximumFractionDigits: 2 }
-                  )}`
+                ? `$${numericPrice.toLocaleString('en-US', { maximumFractionDigits: 2 })}`
                 : normalizedPrice;
               const coverageText = formatCoverageRange(item.cover_start, item.cover_end);
 
@@ -369,7 +366,7 @@ export default function SearchResultsList({
                 )}
                 </Link>
                 {item.searchable_type === "knowledge" && item.insighter && (
-                  <div className="flex items-center gap-1 z-10">
+                  <div className="flex items-center gap-3 z-10">
                     <div className="relative">
                    <div className="object-cover object-top">
                    <Link 
@@ -398,8 +395,9 @@ export default function SearchResultsList({
                           <Avatar
                             src={item.insighter.profile_photo_url}
                             radius="xl"
+                            
                             size="xs"
-                            className="absolute bottom-0 right-0 translate-x-1/3 rounded-full translate-y-1/3 z-10 avatar-top-position"
+                            className={`absolute bottom-0 ${isRTL ? 'left-0 -translate-x-1/3' : 'right-0 translate-x-1/3'} rounded-full translate-y-1/3 z-10 avatar-top-position`}
                             alt={item.insighter.name}
                             style={{
                               boxShadow: '0 0 0 2px white',
@@ -503,7 +501,7 @@ export default function SearchResultsList({
                             variant="light"
                             className={listStyles.priceBadge}
                           >
-                            {isFreePrice ? translations.free : formattedPrice}
+                            {isFreePrice ? translations.free : <span dir="ltr" lang="en">{formattedPrice}</span>}
                           </Badge>
                         )}
                         

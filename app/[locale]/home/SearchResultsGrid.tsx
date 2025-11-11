@@ -133,6 +133,7 @@ interface SearchResultsGridProps {
   colNumbers?: number;
   locale?: string;
   viewMode: 'grid' | 'list';
+  filtersVisible?: boolean;
 }
 function getInitials(name: string) {
   if (!name) return '';
@@ -215,6 +216,7 @@ export default function SearchResultsGrid({
   colNumbers = 3,
   locale,
   viewMode,
+  filtersVisible = true,
 }: SearchResultsGridProps) {
   const params = useParams();
   const currentLocale = locale || params.locale || "en";
@@ -353,12 +355,12 @@ export default function SearchResultsGrid({
   const topicItems = results.filter(item => item.searchable_type === "topic");
 
   return (
-    <div className="max-w-6xl 2xl:max-w-none 2xl:mx-8 mx-auto" dir={isRTL ? "rtl" : "ltr"}>
+    <div className=" 2xl:max-w-none 2xl:mx-8 mx-auto" dir={isRTL ? "rtl" : "ltr"}>
       {/* Knowledge items section */}
       {knowledgeItems.length > 0 && (
         <div className="mb-6">
           <div
-            className={`grid sm:grid-cols-2 xl:grid-cols-3 3xl:grid-cols-4 gap-4 max-w-7xl 2xl:max-w-none 2xl:mx-8 mx-auto`}
+            className={`grid sm:grid-cols-2 ${filtersVisible ? 'xl:grid-cols-3' : 'xl:grid-cols-4'} 3xl:grid-cols-4 gap-4 max-w-10xl 2xl:max-w-none 2xl:mx-8 mx-auto`}
           >
             {knowledgeItems.map((item, index) => {
               const normalizedPrice = String(item.price ?? "").trim();
@@ -367,10 +369,7 @@ export default function SearchResultsGrid({
               const isNumericPrice = normalizedPrice !== "" && !Number.isNaN(numericPrice);
               const isFreePrice = isNumericPrice && numericPrice === 0;
               const formattedPrice = isNumericPrice
-                ? `$${numericPrice.toLocaleString(
-                    currentLocale === "ar" ? "ar-SA" : "en-US",
-                    { maximumFractionDigits: 2 }
-                  )}`
+                ? `$${numericPrice.toLocaleString('en-US', { maximumFractionDigits: 2 })}`
                 : normalizedPrice;
               const coverageText = formatCoverageRange(item.cover_start, item.cover_end);
 
@@ -630,7 +629,7 @@ export default function SearchResultsGrid({
                       variant="light"
                       className={cardStyles.priceBadge}
                     >
-                      {isFreePrice ? translations.free : formattedPrice}
+                      {isFreePrice ? translations.free : <span dir="ltr" lang="en">{formattedPrice}</span>}
                     </Badge>
                   )}
                 </div>

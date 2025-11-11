@@ -44,6 +44,7 @@ interface ResultsSectionProps {
   onPageChange?: (page: number) => void;
   // Add search type to force re-render when it changes
   searchType?: 'knowledge' | 'insighter';
+  filtersVisible?: boolean;
 }
 
 const ResultsSection: React.FC<ResultsSectionProps> = ({
@@ -59,7 +60,8 @@ const ResultsSection: React.FC<ResultsSectionProps> = ({
   setViewMode,
   locale,
   onPageChange,
-  searchType
+  searchType,
+  filtersVisible = true
 }) => {
   const t4 = useTranslations('Features4');
   const isRtl = locale === 'ar';
@@ -130,6 +132,7 @@ const ResultsSection: React.FC<ResultsSectionProps> = ({
                 colNumbers={3}
                 locale={locale}
                 viewMode={viewMode}
+                filtersVisible={filtersVisible}
               />
             ) : knowledgeItems.length > 0 ? (
               // Show knowledge items if we have them
