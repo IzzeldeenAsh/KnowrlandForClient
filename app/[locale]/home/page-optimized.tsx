@@ -301,9 +301,9 @@ export default function HomePageOptimized() {
   // Memoized translations
   const translations = useMemo(() => ({
     searchPlaceholder: locale === 'ar' ? 'إبحث عن معرفة أو خبير...' : 'Search for Knowledge or Expert...',
-    searchTitle: locale === 'ar' ? 'ابحث في التقارير والبيانات والرؤى' : 'Search data, reports, and insights',
+    searchTitle: locale === 'ar' ? 'ابحث في التقارير والبيانات والإحصائيات' : 'Search data, reports, and statistics',
     searchSubtitle: locale === 'ar' ? 'ابدأ الآن' : 'Start exploring now',
-    exploreByCategory: locale === 'ar' ? 'استكشف بحسب الفئة' : 'Explore by category',
+    exploreByCategory: locale === 'ar' ? 'عرض حسب الفئة' : 'Explore by category',
     filters: locale === 'ar' ? 'الفلاتر' : 'Filters',
     showFilters: locale === 'ar' ? 'إظهار الفلاتر' : 'Show Filters',
     hideFilters: locale === 'ar' ? 'إخفاء الفلاتر' : 'Hide Filters',

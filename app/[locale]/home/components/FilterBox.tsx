@@ -1107,9 +1107,9 @@ const FilterBox: React.FC<FilterBoxProps> = React.memo(({
                     {/* Range Price Filter - Hidden when Free is selected */}
                     {priceFilter !== 'false' && (
                       <div className="border-t pt-3">
-                      <span className="text-xs font-semibold text-gray-700 mb-2 block">
+                      {/* <span className="text-xs font-semibold text-gray-700 mb-2 block">
                         {locale === 'ar' ? 'أو حسب النطاق السعري' : 'Or by price range'}
-                      </span>
+                      </span> */}
                       <div className="flex items-center gap-2 mb-2">
                         <input
                           ref={rangeStartInputRef}
@@ -1336,7 +1336,7 @@ const FilterBox: React.FC<FilterBoxProps> = React.memo(({
             >
               <span className="flex items-center gap-2 text-blue-500 font-semibold">
                 <IconCode size={20} className="p-0.5 rounded-full" />
-                {locale === 'ar' ? 'الوسوم' : 'Tags'}
+                {locale === 'ar' ? 'الوسوم (Tags)' : 'Tags'}
               </span>
               <div className="flex items-center gap-2">
                 {dataLoading.tags && <Loader size="xs" />}
@@ -1437,7 +1437,7 @@ const FilterBox: React.FC<FilterBoxProps> = React.memo(({
           >
             <span className="flex items-center gap-2 text-blue-500 font-semibold">
               <IconWorld size={20} className="p-0.5 rounded-full" />
-              {locale === 'ar' ? (searchType === 'insighter' ? 'بلد الإنسايتر' : 'السوق المستهدف') : (searchType === 'insighter' ? 'Insighter Origin' : 'Target Market')}
+              {locale === 'ar' ? (searchType === 'insighter' ? 'بلد الإنسايتر' : 'السوق المستهدفة') : (searchType === 'insighter' ? 'Insighter Origin' : 'Target Market')}
             </span>
             <div className="flex items-center gap-2">
               {(dataLoading.countries || dataLoading.regions || dataLoading.economicBlocs) && <Loader size="xs" />}

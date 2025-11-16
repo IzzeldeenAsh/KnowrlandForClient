@@ -50,7 +50,7 @@ export default function TopicCard({ topic, locale, isRTL }: TopicCardProps) {
         ) : (
           <div className="text-xs text-gray-500 italic flex items-center">
             <span className={isRTL ? "ml-2" : "mr-2"}>•</span>
-            <p>{ (locale === 'ar' ? 'لا توجد عناصر معرفية متاحة' : 'No knowledge items available')}</p>
+            <p>{ (locale === 'ar' ? 'لا يوجد منشورات حالياً' : 'No knowledge items available')}</p>
           </div>
         )}
       </div>

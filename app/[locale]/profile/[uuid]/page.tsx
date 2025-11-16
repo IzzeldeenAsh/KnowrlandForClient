@@ -1023,14 +1023,28 @@ export default function ProfilePage() {
 
                         <IconRosetteDiscountCheckFilled className="w-5 h-5 text-blue-500" />
                         {isCompany && enterpriseType !== "insighter" && (
-                          <span className="bg-[#EFF8FF] text-[#299AF8] font-bold  text-xs px-2 py-0.5 rounded-full inline-flex items-center">
-                            {userProfileT("company")}
+                          <span
+                            className={`bg-[#EFF8FF] text-[#299AF8] font-bold text-xs px-2 py-0.5 rounded-full inline-flex items-center ${
+                              locale === "ar" ? "flex-row-reverse" : ""
+                            }`}
+                            dir={locale === "ar" ? "rtl" : "ltr"}
+                          >
+                            {locale === "ar"
+                              ? `${userProfileT("company")} ${profileData.company?.legal_name ?? ""}`.trim()
+                              : `${profileData.company?.legal_name ?? ""} ${userProfileT("company")}`.trim()}
                           </span>
                         )}
                         {isCompany && enterpriseType === "insighter" && (
                           <Link href={`${profileData.company?.uuid}`}>
-                            <span className="bg-[#EFF8FF] text-[#299AF8] font-bold  text-xs px-2 py-0.5 rounded-full inline-flex items-center">
-                              {profileData.company?.legal_name} {t("compmay")}
+                            <span
+                              className={`bg-[#EFF8FF] text-[#299AF8] font-bold text-xs px-2 py-0.5 rounded-full inline-flex items-center ${
+                                locale === "ar" ? "flex-row-reverse" : ""
+                              }`}
+                              dir={locale === "ar" ? "rtl" : "ltr"}
+                            >
+                              {locale === "ar"
+                                ? `${t("compmay")} ${profileData.company?.legal_name ?? ""}`.trim()
+                                : `${profileData.company?.legal_name ?? ""} ${t("compmay")}`.trim()}
                             </span>
                           </Link>
                         )}
@@ -1041,8 +1055,15 @@ export default function ProfilePage() {
                         )}
                         {isCompanyInsighter && (
                           <Link href={`${profileData.company?.uuid}`}>
-                            <span className="bg-[#EFF8FF] text-[#299AF8] font-bold uppercase text-xs px-2 py-0.5 rounded-full inline-flex items-center">
-                              {profileData.company?.legal_name} {t("compmay")}
+                            <span
+                              className={`bg-[#EFF8FF] text-[#299AF8] font-bold text-xs px-2 py-0.5 rounded-full inline-flex items-center ${
+                                locale === "ar" ? "flex-row-reverse" : ""
+                              }`}
+                              dir={locale === "ar" ? "rtl" : "ltr"}
+                            >
+                              {locale === "ar"
+                                ? `${t("compmay")} ${profileData.company?.legal_name ?? ""}`.trim()
+                                : `${profileData.company?.legal_name ?? ""} ${t("compmay")}`.trim()}
                             </span>
                           </Link>
                         )}
@@ -1156,7 +1177,7 @@ export default function ProfilePage() {
                   value="knowledge"
                   className="text-base font-medium px-8 py-4 transition"
                 >
-                  {t("insights")}
+                  {t("posts")}
                 </Tabs.Tab>
                 <Tabs.Tab
                   value="about"

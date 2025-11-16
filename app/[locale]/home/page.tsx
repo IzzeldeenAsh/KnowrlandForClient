@@ -1479,7 +1479,7 @@ export default function HomePage() {
            
        <div className="flex flex-col sm:flex-col align-center justify-center gap-2" style={{lineHeight: '1.3'}}>
          <h1 className="text-3xl sm:text-4xl md:text-5xl font-extrabold tracking-tight text-gray-900 text-center ">
-           {locale === 'ar' ? 'ابحث في التقارير والبيانات والرؤى' : 'Search data, reports, and insights'}
+           {locale === 'ar' ? 'ابحث في التقارير والبيانات والإحصائيات' : 'Search data, reports, and statistics'}
          </h1>
          <h1 className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-cyan-500 text-center " >
            {locale === 'ar' ? 'ابدأ الآن' : 'Start exploring now'}
@@ -1499,7 +1499,7 @@ export default function HomePage() {
                searchType={searchType}
                setSearchType={handleSearchTypeChange}
                locale={locale}
-               placeholder={locale === 'ar' ? 'إبحث عن رؤى أو إنسايتر...' : 'Search for Insights or Insighter...'}
+               placeholder={locale === 'ar' ? 'ابحث في المنشورات أو عن الخبراء (انسايتر) لمختلف القطاعات' : 'Search for Insights or Insighter...'}
                onSubmit={handleSubmit}
                onSearch={executeSearch}
               onQueryChange={handleQueryChange}
@@ -1517,7 +1517,7 @@ export default function HomePage() {
            {/* Only show categories when searchType is 'knowledge' */}
         
              <div className="mt-4">
-        {searchType === 'knowledge' && (       <p className="text-sm font-medium text-gray-500 mb-4">{locale === 'ar' ? 'استكشف بحسب الفئة' : 'Explore by category'}</p>)}
+        {searchType === 'knowledge' && (       <p className="text-sm font-medium text-gray-500 mb-4">{locale === 'ar' ? 'عرض حسب الفئة' : 'Explore by category'}</p>)}
                <div className="flex flex-wrap justify-center gap-6 md:gap-8">
                  {/* Using the top-level selectedCategory state */}
                  {(() => {
