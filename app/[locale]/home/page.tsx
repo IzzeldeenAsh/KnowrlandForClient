@@ -1588,7 +1588,7 @@ export default function HomePage() {
        
        <div className="relative z-10 mx-auto max-w-7xl px-4 sm:px-6">
          <div className="text-center">
-       <div className="flex  sm:flex-col align-center justify-center gap-2" style={{lineHeight: '1.3'}}>
+       <div className="flex  flex-col align-center justify-center gap-2" style={{lineHeight: '1.3'}}>
          <h1 className="text-3xl sm:text-4xl md:text-4xl font-extrabold tracking-tight text-gray-900 text-center ">
            {locale === 'ar' ? 'ابحث في التقارير والبيانات والرؤى' : 'Search data, reports, and insights'}
          </h1>
@@ -1613,6 +1613,8 @@ export default function HomePage() {
               setIsicCodeFilter={handleIsicCodeFilterChange}
               hsCodeFilter={hsCodeFilter?.toString() || null}
               setHsCodeFilter={handleHsCodeFilterChange}
+                accuracyFilter={accuracyFilter}
+                setAccuracyFilter={handleAccuracyFilterChange}
               onIsicLoadingChange={setIsLoadingIsic}
               onHsLoadingChange={setIsLoadingHs}
               onDataLoadedChange={setIsDataLoaded}

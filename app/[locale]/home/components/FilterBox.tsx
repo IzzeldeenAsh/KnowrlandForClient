@@ -3,7 +3,7 @@
 import React, { useState, useEffect, useCallback, useRef, useMemo } from 'react';
 import { Modal, Loader, Chip, Combobox, Input, InputBase, useCombobox, Drawer } from '@mantine/core';
 import { useMediaQuery } from '@mantine/hooks';
-import { IconCode, IconBuildingFactory, IconWorldSearch, IconBuildingBank, IconWorld, IconLanguage, IconCoin, IconSearch, IconX, IconCalendarEvent } from '@tabler/icons-react';
+import { IconCode, IconBuildingFactory, IconBuildingBank, IconWorld, IconLanguage, IconCoin, IconSearch, IconX, IconCalendarEvent } from '@tabler/icons-react';
 import CustomYearPicker from './CustomYearPicker';
 
 import { getApiUrl } from '@/app/config';
@@ -217,7 +217,6 @@ const FilterBox: React.FC<FilterBoxProps> = React.memo(({
   // Collapse States - adjust based on search type and screen size
   const [priceCollapsed, setPriceCollapsed] = useState(shouldUseDrawer);
   const [languageCollapsed, setLanguageCollapsed] = useState(shouldUseDrawer);
-  const [accuracyCollapsed, setAccuracyCollapsed] = useState(searchType === 'knowledge' || shouldUseDrawer);
   const [industryCollapsed, setIndustryCollapsed] = useState(searchType === 'insighter' || shouldUseDrawer);
   const [targetMarketCollapsed, setTargetMarketCollapsed] = useState(true);
   const [tagsCollapsed, setTagsCollapsed] = useState(true);
@@ -306,7 +305,6 @@ const FilterBox: React.FC<FilterBoxProps> = React.memo(({
   useEffect(() => {
     // When viewing insighters, expand all sections regardless of screen size
     if (searchType === 'insighter') {
-      setAccuracyCollapsed(false);
       setIndustryCollapsed(false);
       setPriceCollapsed(false);
       setLanguageCollapsed(false);
@@ -316,8 +314,7 @@ const FilterBox: React.FC<FilterBoxProps> = React.memo(({
       return;
     }
     // Default behavior for other types (e.g., knowledge)
-    setAccuracyCollapsed(searchType === 'knowledge' || shouldUseDrawer);
-    setIndustryCollapsed(searchType === 'insighter' || shouldUseDrawer);
+    setIndustryCollapsed(shouldUseDrawer);
     setPriceCollapsed(shouldUseDrawer);
     setLanguageCollapsed(shouldUseDrawer);
     setRoleCollapsed(shouldUseDrawer);
@@ -1736,61 +1733,7 @@ const FilterBox: React.FC<FilterBoxProps> = React.memo(({
           </div>
         )}
 
-        {/* Accuracy Section */}
-        <div>
-          <button
-            onClick={() => !isDisabled && setAccuracyCollapsed(!accuracyCollapsed)}
-            disabled={isDisabled}
-            className={`w-full flex items-center justify-between px-4 py-3 text-left bg-gray-50 hover:bg-gray-100 focus:outline-none transition-colors ${
-              isDisabled ? 'opacity-50 cursor-not-allowed' : ''
-            }`}
-          >
-            <span className="flex items-center gap-2 text-blue-500 font-semibold">
-              <IconWorldSearch size={20} className="p-0.5 rounded-full" />
-              {locale === 'ar' ? 'دقة البحث' : 'Accuracy'}
-            </span>
-            <svg className={`w-4 h-4 text-gray-400 transition-transform ${accuracyCollapsed ? '' : 'rotate-180'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-            </svg>
-          </button>
-          {!accuracyCollapsed && (
-            <div className="px-4 py-3 bg-white space-y-2">
-              <LoadingOverlay isLoading={isDisabled}>
-                <p className="text-xs text-gray-500 mb-1">{locale === 'ar' ? 'اضبط دقة البحث الخاص بك.' : 'Adjust the accuracy of your search.'}</p>
-                <div className="flex flex-col gap-2 mb-4">
-                  <label className={`flex items-center gap-2 text-xs text-gray-700 cursor-pointer ${
-                    isDisabled ? 'opacity-50 cursor-not-allowed' : ''
-                  }`}>
-                    <input
-                      type="radio"
-                      name="accuracy"
-                      value="all"
-                      checked={accuracyFilter === 'all'}
-                      onChange={(e) => !isDisabled && setAccuracyFilter(e.target.value as 'any' | 'all')}
-                      className="accent-blue-500"
-                      disabled={isDisabled}
-                    />
-                    {locale === 'ar' ? 'تضمين جميع الكلمات' : 'Include all words'}
-                  </label>
-                  <label className={`flex items-center gap-2 text-xs text-gray-700 cursor-pointer ${
-                    isDisabled ? 'opacity-50 cursor-not-allowed' : ''
-                  }`}>
-                    <input
-                      type="radio"
-                      name="accuracy"
-                      value="any"
-                      checked={accuracyFilter === 'any'}
-                      onChange={(e) => !isDisabled && setAccuracyFilter(e.target.value as 'any' | 'all')}
-                      className="accent-blue-500"
-                      disabled={isDisabled}
-                    />
-                    {locale === 'ar' ? 'تضمين أي من كلمات' : 'Include any words'}
-                  </label>
-                </div>
-              </LoadingOverlay>
-            </div>
-          )}
-        </div>
+        {/* Accuracy filter moved to SearchBar */}
       </div>
 
       {/* Enhanced Modals */}
