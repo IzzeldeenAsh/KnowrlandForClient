@@ -2,10 +2,10 @@
 
 import React, { useRef, useEffect, useState, memo, useCallback } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { IconSearch, IconX, IconBuildingBank } from '@tabler/icons-react';
+import { IconSearch, IconX, IconBuildingBank, IconWorldSearch } from '@tabler/icons-react';
 import { useSuggestions, useClickAway } from '../utils/hooks';
 import styles from '../utils/custom-search-engine-styles.module.css';
-import { Modal, Loader } from '@mantine/core';
+import { Modal, Loader, Popover } from '@mantine/core';
 import { getApiUrl } from '@/app/config';
 
 interface SearchBarProps {
@@ -24,6 +24,9 @@ interface SearchBarProps {
   setIsicCodeFilter?: (value: string | null) => void;
   hsCodeFilter?: string | null;
   setHsCodeFilter?: (value: string | null) => void;
+  // Accuracy moved from sidebar to search bar
+  accuracyFilter?: 'any' | 'all';
+  setAccuracyFilter?: (filter: 'any' | 'all') => void;
   // Loading state callbacks
   onIsicLoadingChange?: (loading: boolean) => void;
   onHsLoadingChange?: (loading: boolean) => void;
@@ -45,6 +48,8 @@ const SearchBar: React.FC<SearchBarProps> = ({
   setIsicCodeFilter,
   hsCodeFilter = null,
   setHsCodeFilter,
+  accuracyFilter = 'all',
+  setAccuracyFilter,
   onIsicLoadingChange,
   onHsLoadingChange,
   onDataLoadedChange
@@ -61,6 +66,8 @@ const SearchBar: React.FC<SearchBarProps> = ({
   // ISIC/HS UI state
   const [isIsicModalOpen, setIsIsicModalOpen] = useState(false);
   const [isHsModalOpen, setIsHsModalOpen] = useState(false);
+  // Accuracy dropdown state
+  const [isAccuracyOpen, setIsAccuracyOpen] = useState(false);
 
   // ISIC/HS data state
   type ISICNode = {
@@ -642,6 +649,150 @@ const SearchBar: React.FC<SearchBarProps> = ({
               </div>
             )}
             
+            {/* Filter chips inline on md+ screens */}
+            <div className="hidden md:flex items-center gap-2">
+              <button
+                type="button"
+                disabled={isLoadingIsic}
+                onClick={() => !isLoadingIsic && setIsIsicModalOpen(true)}
+                className={`${filterChipBaseClasses} ${isLoadingIsic ? filterChipDisabledClasses : selectedIsic ? filterChipActiveClasses : filterChipInactiveClasses} ${isRtl ? 'flex-row-reverse' : ''}`}
+                aria-label={isRtl ? 'اختر رمز ISIC' : 'Select ISIC code'}
+              >
+                <span
+                  className={`flex items-center justify-center w-6 h-6 rounded-full border ${selectedIsic ? 'bg-blue-100 border-blue-200 text-blue-700' : 'bg-blue-50 border-blue-100 text-[#299af8]'}`}
+                >
+                  {isLoadingIsic ? (
+                    <svg className="animate-spin h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                  ) : (
+                    <IconBuildingBank className="w-[14px] h-[14px]" />
+                  )}
+                </span>
+                <span className="font-medium text-gray-900">
+                 {locale === 'ar' ? ' رمز ISIC' : 'ISIC code'}
+                </span>
+                {selectedIsic && (
+                  <span className={`font-mono text-[11px] bg-gray-100 px-1.5 py-0.5 rounded ${isRtl ? 'mr-2' : 'ml-2'}`}>
+                    {selectedIsic.code}
+                  </span>
+                )}
+                {selectedIsic && (
+                  <span
+                    className={`text-gray-400 hover:text-red-500 transition-colors ${isRtl ? 'mr-1' : 'ml-1'}`}
+                    role="button"
+                    aria-label={isRtl ? 'مسح اختيار ISIC' : 'Clear ISIC'}
+                    onClick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      clearIsicSelection();
+                    }}
+                  >
+                    <IconX size={14} />
+                  </span>
+                )}
+              </button>
+
+              <button
+                type="button"
+                disabled={isHsDisabled}
+                onClick={() => {
+                  if (!isHsDisabled) {
+                    setIsHsModalOpen(true);
+                  }
+                }}
+                className={`${filterChipBaseClasses} ${isHsDisabled ? filterChipDisabledClasses : selectedHs ? filterChipActiveClasses : filterChipInactiveClasses} ${isRtl ? 'flex-row-reverse' : ''}`}
+                aria-label={isRtl ? 'اختر رمز HS' : 'Select HS code'}
+              >
+                {renderHsIcon(!!selectedHs && !isHsDisabled)}
+                <span className="font-medium text-gray-900">
+                 {locale === 'ar' ? ' رمز HS' : 'HS code'}
+                </span>
+                {selectedHs && !isHsDisabled && (
+                  <span className={`font-mono text-[11px] bg-gray-100 px-1.5 py-0.5 rounded ${isRtl ? 'mr-2' : 'ml-2'}`}>
+                    {selectedHs.code}
+                  </span>
+                )}
+                {selectedHs && !isHsDisabled && (
+                  <span
+                    className={`text-gray-400 hover:text-red-500 transition-colors ${isRtl ? 'mr-1' : 'ml-1'}`}
+                    role="button"
+                    aria-label={isRtl ? 'مسح اختيار HS' : 'Clear HS'}
+                    onClick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      clearHsSelection();
+                    }}
+                  >
+                    <IconX size={14} />
+                  </span>
+                )}
+              </button>
+              
+              <Popover
+                opened={isAccuracyOpen}
+                onChange={setIsAccuracyOpen}
+                position="bottom"
+                withinPortal={false}
+              >
+                <Popover.Target>
+                  <button
+                    type="button"
+                    className={`${filterChipBaseClasses} ${(accuracyFilter && accuracyFilter !== 'all') ? filterChipActiveClasses : filterChipInactiveClasses} ${isRtl ? 'flex-row-reverse' : ''}`}
+                    aria-label={isRtl ? 'دقة البحث' : 'Accuracy'}
+                    onClick={() => setIsAccuracyOpen((o) => !o)}
+                  >
+                    <span
+                      className={`flex items-center justify-center w-6 h-6 rounded-full border ${(accuracyFilter && accuracyFilter !== 'all') ? 'bg-blue-100 border-blue-200 text-blue-700' : 'bg-blue-50 border-blue-100 text-[#299af8]'}`}
+                    >
+                      <IconWorldSearch className="w-[14px] h-[14px]" />
+                    </span>
+                    <span className="font-medium text-gray-900">
+                      {isRtl ? 'الدقة' : 'Accuracy'}
+                    </span>
+                    <span className={`text-[11px] ${isRtl ? 'mr-1' : 'ml-1'} text-gray-600`}>
+                      {accuracyFilter === 'any'
+                        ? (isRtl ? 'أي كلمات' : 'Any words')
+                        : (isRtl ? 'كل الكلمات' : 'All words')}
+                    </span>
+                  </button>
+                </Popover.Target>
+                <Popover.Dropdown>
+                  <div className="flex flex-col gap-2 text-xs min-w-[180px]" dir={isRtl ? 'rtl' : 'ltr'}>
+                    <label className="flex items-center gap-2 cursor-pointer">
+                      <input
+                        type="radio"
+                        name="accuracy"
+                        value="all"
+                        checked={accuracyFilter === 'all'}
+                        onChange={() => {
+                          setAccuracyFilter && setAccuracyFilter('all');
+                          setIsAccuracyOpen(false);
+                        }}
+                        className="accent-blue-500"
+                      />
+                      {isRtl ? 'تضمين جميع الكلمات' : 'Include all words'}
+                    </label>
+                    <label className="flex items-center gap-2 cursor-pointer">
+                      <input
+                        type="radio"
+                        name="accuracy"
+                        value="any"
+                        checked={accuracyFilter === 'any'}
+                        onChange={() => {
+                          setAccuracyFilter && setAccuracyFilter('any');
+                          setIsAccuracyOpen(false);
+                        }}
+                        className="accent-blue-500"
+                      />
+                      {isRtl ? 'تضمين أي من كلمات' : 'Include any words'}
+                    </label>
+                  </div>
+                </Popover.Dropdown>
+              </Popover>
+            </div>
+            
             <button 
               type="button"
               className={`${isRtl ? 'mr-2' : 'ml-2'} bg-[#299af8] text-white p-2 rounded-[4px] flex items-center justify-center hover:bg-[#2185d6] transition-colors duration-150`}
@@ -675,6 +826,149 @@ const SearchBar: React.FC<SearchBarProps> = ({
             >
               <IconSearch size={18} />
             </button>
+        </div>
+        {/* Filter chips below the input on small screens */}
+        <div className={`mt-2 md:hidden flex flex-wrap gap-2 ${isRtl ? 'justify-end' : 'justify-start'}`}>
+          <button
+            type="button"
+            disabled={isLoadingIsic}
+            onClick={() => !isLoadingIsic && setIsIsicModalOpen(true)}
+            className={`${filterChipBaseClasses} ${isLoadingIsic ? filterChipDisabledClasses : selectedIsic ? filterChipActiveClasses : filterChipInactiveClasses} ${isRtl ? 'flex-row-reverse' : ''}`}
+            aria-label={isRtl ? 'اختر رمز ISIC' : 'Select ISIC code'}
+          >
+            <span
+              className={`flex items-center justify-center w-6 h-6 rounded-full border ${selectedIsic ? 'bg-blue-100 border-blue-200 text-blue-700' : 'bg-blue-50 border-blue-100 text-[#299af8]'}`}
+            >
+              {isLoadingIsic ? (
+                <svg className="animate-spin h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+              ) : (
+                <IconBuildingBank className="w-[14px] h-[14px]" />
+              )}
+            </span>
+            <span className="font-medium text-gray-900">
+             {locale === 'ar' ? ' رمز ISIC' : 'ISIC code'}
+            </span>
+            {selectedIsic && (
+              <span className={`font-mono text-[11px] bg-gray-100 px-1.5 py-0.5 rounded ${isRtl ? 'mr-2' : 'ml-2'}`}>
+                {selectedIsic.code}
+              </span>
+            )}
+            {selectedIsic && (
+              <span
+                className={`text-gray-400 hover:text-red-500 transition-colors ${isRtl ? 'mr-1' : 'ml-1'}`}
+                role="button"
+                aria-label={isRtl ? 'مسح اختيار ISIC' : 'Clear ISIC'}
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  clearIsicSelection();
+                }}
+              >
+                <IconX size={14} />
+              </span>
+            )}
+          </button>
+
+          <button
+            type="button"
+            disabled={isHsDisabled}
+            onClick={() => {
+              if (!isHsDisabled) {
+                setIsHsModalOpen(true);
+              }
+            }}
+            className={`${filterChipBaseClasses} ${isHsDisabled ? filterChipDisabledClasses : selectedHs ? filterChipActiveClasses : filterChipInactiveClasses} ${isRtl ? 'flex-row-reverse' : ''}`}
+            aria-label={isRtl ? 'اختر رمز HS' : 'Select HS code'}
+          >
+            {renderHsIcon(!!selectedHs && !isHsDisabled)}
+            <span className="font-medium text-gray-900">
+             {locale === 'ar' ? ' رمز HS' : 'HS code'}
+            </span>
+            {selectedHs && !isHsDisabled && (
+              <span className={`font-mono text-[11px] bg-gray-100 px-1.5 py-0.5 rounded ${isRtl ? 'mr-2' : 'ml-2'}`}>
+                {selectedHs.code}
+              </span>
+            )}
+            {selectedHs && !isHsDisabled && (
+              <span
+                className={`text-gray-400 hover:text-red-500 transition-colors ${isRtl ? 'mr-1' : 'ml-1'}`}
+                role="button"
+                aria-label={isRtl ? 'مسح اختيار HS' : 'Clear HS'}
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  clearHsSelection();
+                }}
+              >
+                <IconX size={14} />
+              </span>
+            )}
+          </button>
+          
+          <Popover
+            opened={isAccuracyOpen}
+            onChange={setIsAccuracyOpen}
+            position="bottom"
+            withinPortal={false}
+          >
+            <Popover.Target>
+              <button
+                type="button"
+                className={`${filterChipBaseClasses} ${(accuracyFilter && accuracyFilter !== 'all') ? filterChipActiveClasses : filterChipInactiveClasses} ${isRtl ? 'flex-row-reverse' : ''}`}
+                aria-label={isRtl ? 'دقة البحث' : 'Accuracy'}
+                onClick={() => setIsAccuracyOpen((o) => !o)}
+              >
+                <span
+                  className={`flex items-center justify-center w-6 h-6 rounded-full border ${(accuracyFilter && accuracyFilter !== 'all') ? 'bg-blue-100 border-blue-200 text-blue-700' : 'bg-blue-50 border-blue-100 text-[#299af8]'}`}
+                >
+                  <IconWorldSearch className="w-[14px] h-[14px]" />
+                </span>
+                <span className="font-medium text-gray-900">
+                  {isRtl ? 'الدقة' : 'Accuracy'}
+                </span>
+                <span className={`text-[11px] ${isRtl ? 'mr-1' : 'ml-1'} text-gray-600`}>
+                  {accuracyFilter === 'any'
+                    ? (isRtl ? 'أي كلمات' : 'Any words')
+                    : (isRtl ? 'كل الكلمات' : 'All words')}
+                </span>
+              </button>
+            </Popover.Target>
+            <Popover.Dropdown>
+              <div className="flex flex-col gap-2 text-xs min-w-[180px]" dir={isRtl ? 'rtl' : 'ltr'}>
+                <label className="flex items-center gap-2 cursor-pointer">
+                  <input
+                    type="radio"
+                    name="accuracy"
+                    value="all"
+                    checked={accuracyFilter === 'all'}
+                    onChange={() => {
+                      setAccuracyFilter && setAccuracyFilter('all');
+                      setIsAccuracyOpen(false);
+                    }}
+                    className="accent-blue-500"
+                  />
+                  {isRtl ? 'تضمين جميع الكلمات' : 'Include all words'}
+                </label>
+                <label className="flex items-center gap-2 cursor-pointer">
+                  <input
+                    type="radio"
+                    name="accuracy"
+                    value="any"
+                    checked={accuracyFilter === 'any'}
+                    onChange={() => {
+                      setAccuracyFilter && setAccuracyFilter('any');
+                      setIsAccuracyOpen(false);
+                    }}
+                    className="accent-blue-500"
+                  />
+                  {isRtl ? 'تضمين أي من كلمات' : 'Include any words'}
+                </label>
+              </div>
+            </Popover.Dropdown>
+          </Popover>
         </div>
         
         {shouldShowSuggestions && (
@@ -736,94 +1030,54 @@ const SearchBar: React.FC<SearchBarProps> = ({
             ))}
           </div>
         )}
-        </div>
-
-        <div className={`flex flex-wrap items-center gap-3 justify-center`}>
-            <button
-              type="button"
-              disabled={isLoadingIsic}
-              onClick={() => !isLoadingIsic && setIsIsicModalOpen(true)}
-              className={`${filterChipBaseClasses} ${isLoadingIsic ? filterChipDisabledClasses : selectedIsic ? filterChipActiveClasses : filterChipInactiveClasses} ${
-                isRtl ? 'flex-row-reverse' : ''
-              }`}
-              aria-label={isRtl ? 'اختر رمز ISIC' : 'Select ISIC code'}
-            >
-              <span
-                className={`flex items-center justify-center w-6 h-6 rounded-full border ${
-                  selectedIsic ? 'bg-blue-100 border-blue-200 text-blue-700' : 'bg-blue-50 border-blue-100 text-[#299af8]'
-                }`}
+        {/* Selected ISIC/HS details under the search bar */}
+        {(selectedIsic || selectedHs) && (
+          <div className={`mt-2 flex flex-wrap gap-2 items-start ${isRtl ? 'justify-end' : 'justify-start'} text-xs`}>
+            {selectedIsic && (
+              <div
+                className={`flex items-center gap-1 px-2 py-1 rounded-full border bg-blue-50 border-blue-200 text-blue-700 ${isRtl ? 'flex-row-reverse' : ''}`}
+                aria-label={isRtl ? 'تفاصيل رمز ISIC المحدد' : 'Selected ISIC details'}
               >
-                {isLoadingIsic ? (
-                  <svg className="animate-spin h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                  </svg>
-                ) : (
-                  <IconBuildingBank className="w-[14px] h-[14px]" />
-                )}
-              </span>
-              <span className="font-medium text-gray-900">
-               {locale === 'ar' ? 'بواسطة رمز ISIC' : 'By ISIC code'}
-              </span>
-              {selectedIsic && (
-                <span className={`font-mono text-[11px] bg-gray-100 px-1.5 py-0.5 rounded ${isRtl ? 'mr-2' : 'ml-2'}`}>
-                  {selectedIsic.code}
-                </span>
-              )}
-              {selectedIsic && (
-                <span
-                  className={`text-gray-400 hover:text-red-500 transition-colors ${isRtl ? 'mr-1' : 'ml-1'}`}
-                  role="button"
-                  aria-label={isRtl ? 'مسح اختيار ISIC' : 'Clear ISIC'}
+                <span className="font-medium">{isRtl ? 'رمز ISIC:' : 'ISIC Code:'}</span>
+                <span className="line-clamp-1 truncate max-w-[260px]">{selectedIsic.label}</span>
+                <button
+                  type="button"
+                  className={`text-blue-500 hover:text-blue-700 transition-colors ${isRtl ? 'mr-1' : 'ml-1'}`}
                   onClick={(e) => {
                     e.preventDefault();
-                    e.stopPropagation();
                     clearIsicSelection();
                   }}
+                  aria-label={isRtl ? 'مسح اختيار ISIC' : 'Clear ISIC'}
                 >
-                  <IconX size={14} />
-                </span>
-              )}
-            </button>
-
-            <button
-              type="button"
-              disabled={isHsDisabled}
-              onClick={() => {
-                if (!isHsDisabled) {
-                  setIsHsModalOpen(true);
-                }
-              }}
-              className={`${filterChipBaseClasses} ${
-                isHsDisabled ? filterChipDisabledClasses : selectedHs ? filterChipActiveClasses : filterChipInactiveClasses
-              } ${isRtl ? 'flex-row-reverse' : ''}`}
-              aria-label={isRtl ? 'اختر رمز HS' : 'Select HS code'}
-            >
-              {renderHsIcon(!!selectedHs && !isHsDisabled)}
-              <span className="font-medium text-gray-900">
-               {locale === 'ar' ? 'بواسطة رمز HS' : 'By HS code'}
-              </span>
-              {selectedHs && !isHsDisabled && (
-                <span className={`font-mono text-[11px] bg-gray-100 px-1.5 py-0.5 rounded ${isRtl ? 'mr-2' : 'ml-2'}`}>
-                  {selectedHs.code}
-                </span>
-              )}
-              {selectedHs && !isHsDisabled && (
-                <span
-                  className={`text-gray-400 hover:text-red-500 transition-colors ${isRtl ? 'mr-1' : 'ml-1'}`}
-                  role="button"
-                  aria-label={isRtl ? 'مسح اختيار HS' : 'Clear HS'}
+                  <IconX size={12} />
+                </button>
+              </div>
+            )}
+            {selectedHs && (
+              <div
+                className={`flex items-center gap-1 px-2 py-1 rounded-full border bg-blue-50 border-blue-200 text-blue-700 ${isRtl ? 'flex-row-reverse' : ''}`}
+                aria-label={isRtl ? 'تفاصيل رمز HS المحدد' : 'Selected HS details'}
+              >
+                <span className="font-medium">{isRtl ? 'رمز HS:' : 'HS Code:'}</span>
+                <span className="line-clamp-1 truncate max-w-[260px]">{selectedHs.label}</span>
+                <button
+                  type="button"
+                  className={`text-blue-500 hover:text-blue-700 transition-colors ${isRtl ? 'mr-1' : 'ml-1'}`}
                   onClick={(e) => {
                     e.preventDefault();
-                    e.stopPropagation();
                     clearHsSelection();
                   }}
+                  aria-label={isRtl ? 'مسح اختيار HS' : 'Clear HS'}
                 >
-                  <IconX size={14} />
-                </span>
-              )}
-            </button>
+                  <IconX size={12} />
+                </button>
+              </div>
+            )}
           </div>
+        )}
+        </div>
+
+        
       </div>
         {/* ISIC Modal */}
         <Modal
@@ -906,7 +1160,7 @@ const SearchBar: React.FC<SearchBarProps> = ({
                           {others.length > 0 && (
                             <>
                               <div className="text-sm font-semibold text-gray-700 px-1 mt-2">
-                                {locale === 'ar' ? 'أكواد HS أخرى' : 'Other HS code'}
+                                {locale === 'ar' ? 'أكواد HS كل' : 'All HS code'}
                               </div>
                               {others.map((code) => (
                                 <button
@@ -964,7 +1218,8 @@ export default memo(SearchBar, (prevProps, nextProps) => {
     prevProps.locale === nextProps.locale &&
     prevProps.placeholder === nextProps.placeholder &&
     prevProps.isicCodeFilter === nextProps.isicCodeFilter &&
-    prevProps.hsCodeFilter === nextProps.hsCodeFilter
+    prevProps.hsCodeFilter === nextProps.hsCodeFilter &&
+    prevProps.accuracyFilter === nextProps.accuracyFilter
   );
 });
 

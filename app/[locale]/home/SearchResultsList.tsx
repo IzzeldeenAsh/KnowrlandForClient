@@ -281,7 +281,7 @@ export default function SearchResultsList({
   const topicItems = results.filter(item => item.searchable_type === "topic");
 
   return (
-    <div className="max-w-6xl mx-auto" dir={isRTL ? "rtl" : "ltr"}>
+    <div className="max-w-6xl mx-auto px-10" dir={isRTL ? "rtl" : "ltr"}>
       {/* Knowledge items in list view */}
       {knowledgeItems.length > 0 && (
         <div className="mb-6" >

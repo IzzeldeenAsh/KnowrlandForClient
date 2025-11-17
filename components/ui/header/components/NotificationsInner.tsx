@@ -248,8 +248,16 @@ export default function NotificationsInner({
     await onNotificationClick(notification.id)
     
     // Handle accept_knowledge notifications - redirect to insighter dashboard
+    if(notification.sub_type.startsWith('client_meeting_reminder')){
+      window.location.href = 'https://app.insightabusiness.com/app/insighter-dashboard/my-meetings?tab=client'
+      return
+    }
     if (notification.sub_type === 'accept_knowledge') {
       window.location.href = 'https://app.insightabusiness.com/app/insighter-dashboard/my-requests'
+      return
+    }
+    if(notification.sub_type === 'client_meeting_new'){
+      window.location.href = 'https://app.insightabusiness.com/app/insighter-dashboard/my-meetings?tab=client'
       return
     }
     if (notification.sub_type === 'declined' && notification.type === 'knowledge') {
@@ -257,11 +265,11 @@ export default function NotificationsInner({
       return
     }
     if(notification.sub_type.startsWith('client_')) {
-      window.location.href = 'https://app.insightabusiness.com/app/insighter-dashboard/my-meetings/sent'
+      window.location.href = 'https://app.insightabusiness.com/app/insighter-dashboard/my-meetings/tab=client'
       return
     }
     if(notification.sub_type.startsWith('insighter_')) {
-      window.location.href = 'https://app.insightabusiness.com/app/insighter-dashboard/my-meetings/received'
+      window.location.href = 'https://app.insightabusiness.com/app/insighter-dashboard/my-meetings?tab=client'
       return
     }
     // Handle knowledge approved notifications - redirect to knowledge details page
@@ -278,17 +286,14 @@ export default function NotificationsInner({
       return
     }
     if(notification.sub_type.startsWith('insighter_meeting_client_reschedule')){
-      window.location.href = 'https://app.insightabusiness.com/app/insighter-dashboard/my-meetings/received'
+      window.location.href = 'https://app.insightabusiness.com/app/insighter-dashboard/my-meetings?tab=client'
       return
     }
     if(notification.sub_type.startsWith('insighter_meeting_reminder')){
-      window.location.href = 'https://app.insightabusiness.com/app/insighter-dashboard/my-meetings/received'
+      window.location.href = 'https://app.insightabusiness.com/app/insighter-dashboard/my-meetings?tab=client'
       return
     }
-    if(notification.sub_type.startsWith('client_meeting_reminder')){
-      window.location.href = 'https://app.insightabusiness.com/app/insighter-dashboard/my-meetings/sent'
-      return
-    }
+  
     // Handle knowledge accept/decline notifications
     if (notification.type === 'knowledge' && (notification.sub_type === 'accept_knowledge' || notification.sub_type === 'declined')) {
       // For company-insighter role, we would handle this differently

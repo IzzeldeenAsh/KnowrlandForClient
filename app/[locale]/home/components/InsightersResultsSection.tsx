@@ -5,7 +5,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import LoadingState from './LoadingState';
 import { IconRosetteDiscountCheckFilled } from '@tabler/icons-react';
-import { Rating } from '@mantine/core';
+import { Rating, Pagination } from '@mantine/core';
 
 // Import existing SearchResultItem type or define a compatible type
 export interface InsighterProfile {
@@ -35,6 +35,7 @@ interface InsightersResultsSectionProps {
   totalItems: number;
   locale: string;
   onPageChange?: (page: number) => void;
+  filtersVisible?: boolean; // Add prop to track filter visibility
 }
 
 const InsightersResultsSection: React.FC<InsightersResultsSectionProps> = ({
@@ -46,13 +47,14 @@ const InsightersResultsSection: React.FC<InsightersResultsSectionProps> = ({
   totalPages,
   totalItems,
   locale,
-  onPageChange
+  onPageChange,
+  filtersVisible = true
 }) => {
   const isRtl = locale === 'ar';
   
   return (
     <div dir={isRtl ? 'rtl' : 'ltr'}>
-      <div className="flex justify-between items-center mb-4">
+      <div className="flex justify-between items-center mb-4 px-10">
       <p className="text-gray-700 font-semibold text-sm capitalize">
          {locale === 'ar' ? '\u0625\u062c\u0645\u0627\u0644\u064a \u0627\u0644\u0646\u062a\u0627\u0626\u062c:' : 'Total results:'}  <span className="font-light lowercase"> {totalItems} {locale === 'ar' ? 'نتيجة' : 'result'}</span>
         </p>
@@ -64,7 +66,9 @@ const InsightersResultsSection: React.FC<InsightersResultsSectionProps> = ({
         ) : (
           <>
             {searchResults.length > 0 ? (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              <div className={`grid grid-cols-1 md:grid-cols-2 gap-6 px-10 ${
+                filtersVisible ? 'lg:grid-cols-3' : 'lg:grid-cols-4'
+              }`}>
                 {searchResults.map((insighter) => {
                   // Extract properties safely with fallbacks
                   const uuid = insighter.uuid || insighter.id || '';
@@ -243,97 +247,35 @@ const InsightersResultsSection: React.FC<InsightersResultsSectionProps> = ({
               </div>
             )}
             
-            {totalItems > 0 && (
-              <div className="flex flex-col items-center mt-8">
+            {/* Pagination - only show when we have results and not loading */}
+            {!loading && totalItems > 0 && (
+              <div className="flex flex-col items-center mt-8 mb-8">
                 {/* <div className="text-sm text-gray-600 mb-2">
-                  {locale === 'ar' ? 
-                    `عرض ${(currentPage - 1) * 10 + 1} - ${Math.min(currentPage * 10, totalItems)} من ${totalItems}` : 
-                    `Showing ${(currentPage - 1) * 10 + 1} - ${Math.min(currentPage * 10, totalItems)} of ${totalItems}`
+                  {locale === 'ar' ?
+                    `عرض ${(currentPage - 1) * 30 + 1} - ${Math.min(currentPage * 30, totalItems)} من ${totalItems}` :
+                    `Showing ${(currentPage - 1) * 30 + 1} - ${Math.min(currentPage * 30, totalItems)} of ${totalItems}`
                   }
                 </div> */}
-                <div className="flex items-center justify-center space-x-2">
-                  <button 
-                    onClick={() => {
-                      if (currentPage > 1) {
-                        const newPage = currentPage - 1;
-                        setCurrentPage(newPage);
-                        if (onPageChange) {
-                          onPageChange(newPage);
-                        }
-                        window.scrollTo({
-                          top: 0,
-                          behavior: 'smooth'
-                        });
-                      }
-                    }}
-                    disabled={currentPage <= 1}
-                    className={`px-3 py-1 rounded ${currentPage <= 1 ? 'bg-gray-200 text-gray-500 cursor-not-allowed' : 'bg-blue-500 text-white hover:bg-blue-600'}`}
-                  >
-                    {locale === 'ar' ? 'السابق' : 'Previous'}
-                  </button>
-                  
-                  {/* Generate page buttons */}
-                  {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
-                    // Show pages around current page
-                    let pageNum;
-                    if (totalPages <= 5) {
-                      // If 5 or fewer pages, show all
-                      pageNum = i + 1;
-                    } else if (currentPage <= 3) {
-                      // If at start, show first 5
-                      pageNum = i + 1;
-                    } else if (currentPage >= totalPages - 2) {
-                      // If at end, show last 5
-                      pageNum = totalPages - 4 + i;
-                    } else {
-                      // Otherwise show current and 2 on each side
-                      pageNum = currentPage - 2 + i;
+                <Pagination
+                  key={`pagination-${totalPages}-${totalItems}`}
+                  total={totalPages}
+                  value={currentPage}
+                  onChange={(page) => {
+                    // Simply call the pagination handler - it will update URL which will update our display
+                    setCurrentPage(page);
+                    if (onPageChange) {
+                      onPageChange(page);
                     }
 
-                    return (
-                      <button
-                        key={pageNum}
-                        onClick={() => {
-                          setCurrentPage(pageNum);
-                          if (onPageChange) {
-                            onPageChange(pageNum);
-                          }
-                          window.scrollTo({
-                            top: 0,
-                            behavior: 'smooth'
-                          });
-                        }}
-                        className={`px-3 py-1 rounded ${
-                          pageNum === currentPage
-                            ? 'bg-blue-500 text-white'
-                            : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
-                        }`}
-                      >
-                        {pageNum}
-                      </button>
-                    );
-                  })}
-                  
-                  <button 
-                    onClick={() => {
-                      if (currentPage < totalPages) {
-                        const newPage = currentPage + 1;
-                        setCurrentPage(newPage);
-                        if (onPageChange) {
-                          onPageChange(newPage);
-                        }
-                        window.scrollTo({
-                          top: 0,
-                          behavior: 'smooth'
-                        });
-                      }
-                    }}
-                    disabled={currentPage >= totalPages}
-                    className={`px-3 py-1 rounded ${currentPage >= totalPages ? 'bg-gray-200 text-gray-500 cursor-not-allowed' : 'bg-blue-500 text-white hover:bg-blue-600'}`}
-                  >
-                    {locale === 'ar' ? 'التالي' : 'Next'}
-                  </button>
-                </div>
+                    // Scroll back to top of results for better UX
+                    window.scrollTo({
+                      top: 0,
+                      behavior: 'smooth'
+                    });
+                  }}
+                  withControls
+                  boundaries={1}
+                />
               </div>
             )}
           </>
