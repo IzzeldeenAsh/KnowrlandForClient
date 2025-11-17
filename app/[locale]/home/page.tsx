@@ -15,7 +15,7 @@ import SearchBar from './components/SearchBar';
 import ResultsSection from './components/ResultsSection';
 import InsightersResultsSection from './components/InsightersResultsSection';
 import FilterBox from './components/FilterBox';
-import { CategoryIconBox } from './components/CategoryIcons';
+ 
 
 // Import utils
 import { fetchSearchResults, fetchStatisticsPerType } from './utils/api';
@@ -1460,8 +1460,121 @@ export default function HomePage() {
   
      <section className="relative flex-1">
       <PageIllustration />
-  {/* Hero Banner Section */}
-  <div className="relative overflow-hidden pt-16 pb-16">
+      {/* Main content area with left sidebar */}
+      <div className="flex flex-col relative z-3 pt-0 pb-0">
+        <div className="w-full">
+          <div className="max-w-8xl 2xl:max-w-none">
+            <div className="flex gap-0 items-start">
+              {/* Sidebar (FilterBox) */}
+              <aside 
+                className={`hidden lg:block lg:flex-shrink-0 transition-all duration-300 ease-in-out ${
+                  filtersVisible 
+                    ? 'overflow-visible lg:w-80 opacity-100' 
+                    : 'overflow-hidden lg:w-0 opacity-0 max-h-0'
+                }`}
+              >
+                <div className={`sticky top-0 h-[100vh] overflow-y-auto transition-transform duration-300 ease-in-out ${
+                  filtersVisible ? 'transform translate-x-0' : 'transform -translate-x-full lg:translate-x-0'
+                }`}>
+                  <FilterBox
+                    locale={locale}
+                    searchType={searchType}
+                    languageFilter={languageFilter}
+                    setLanguageFilter={handleLanguageFilterChange}
+                    countryFilter={countryFilter}
+                    setCountryFilter={handleCountryFilterChange}
+                    regionFilter={regionFilter}
+                    setRegionFilter={handleRegionFilterChange}
+                    economicBlocFilter={economicBlocFilter}
+                    setEconomicBlocFilter={handleEconomicBlocFilterChange}
+                    tagFilter={tagFilter}
+                    setTagFilter={handleTagFilterChange}
+                    isicCodeFilter={isicCodeFilter?.toString() || null}
+                    setIsicCodeFilter={handleIsicCodeFilterChange}
+                    industryFilter={industryFilter}
+                    setIndustryFilter={handleIndustryFilterChange}
+                    hsCodeFilter={hsCodeFilter?.toString() || null}
+                    setHsCodeFilter={handleHsCodeFilterChange}
+                    priceFilter={priceFilter}
+                    setPriceFilter={handlePriceFilterChange}
+                    rangeStartFilter={rangeStartFilter}
+                    setRangeStartFilter={handleRangeStartFilterChange}
+                    rangeEndFilter={rangeEndFilter}
+                    setRangeEndFilter={handleRangeEndFilterChange}
+                    accuracyFilter={accuracyFilter}
+                    setAccuracyFilter={handleAccuracyFilterChange}
+                    roleFilter={roleFilter}
+                    setRoleFilter={handleRoleFilterChange}
+                    yearOfStudyFilter={yearOfStudyFilter}
+                    setYearOfStudyFilter={handleYearOfStudyFilterChange}
+                    resetFilters={resetFilters}
+                    isDrawerOpen={isFilterDrawerOpen}
+                    setIsDrawerOpen={setIsFilterDrawerOpen}
+                  />
+                </div>
+              </aside>
+
+              {/* Content (Hero + Controls + Results) */}
+              <div className="flex-1 h-[100vh] overflow-y-auto">
+                {/* Filters toggle - sticky toolbar (desktop) */}
+                <div className={`${!filtersVisible ? 'sticky top-0 z-20 bg-white/80 backdrop-blur border-b' : ''} ${locale === 'ar' ? 'pr-3' : 'pl-3'}`}>
+                  <div className={`flex ${locale === 'ar' ? 'justify-end' : 'justify-start'}`}>
+                    <button
+                      onClick={() => {
+                        if (isTabletOrMobile) {
+                          setIsFilterDrawerOpen(true);
+                        } else {
+                          setFiltersVisible(!filtersVisible);
+                        }
+                      }}
+                      className="my-2 inline-flex items-center gap-2 px-3 py-1.5 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 hover:text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 shadow-sm"
+                    >
+                      {filtersVisible && !isTabletOrMobile ? (
+                        <>
+                          <svg fill="none" height="20" viewBox="0 0 24 24" width="20" xmlns="http://www.w3.org/2000/svg"><g clipRule="evenodd" fillRule="evenodd"><path d="m11 20v-16h2v16z" fill="#90caea"/><g fill="#3747d6"><path d="m16.9142 12 2.7929-2.79289-1.4142-1.41422-3.5 3.50001c-.3905.3905-.3905 1.0237 0 1.4142l3.5 3.5 1.4142-1.4142z"/><path d="m7.0858 12-2.79289-2.79289 1.41421-1.41422 3.5 3.50001c.39053.3905.39053 1.0237 0 1.4142l-3.5 3.5-1.41421-1.4142z"/></g></g></svg>
+                          {locale === 'ar' ? 'إخفاء الفلاتر' : 'Hide Filters'}
+                        </>
+                      ) : (
+                        <>
+                          <svg width="22" height="22" viewBox="0 0 25 25" fill="none" xmlns="http://www.w3.org/2000/svg">
+<path d="M4.44336 5.9082H14.6973V7.37305H4.44336V5.9082Z" fill="#4DC4FF"/>
+<path d="M16.1621 5.9082H20.5566V7.37305H16.1621V5.9082Z" fill="#4DA6FF"/>
+<path d="M4.44336 11.7676H8.83789V13.2324H4.44336V11.7676Z" fill="#4DC4FF"/>
+<path d="M10.3027 11.7676H20.5566V13.2324H10.3027V11.7676Z" fill="#4DC4FF"/>
+<path d="M9.57031 14.6973C8.35869 14.6973 7.37305 13.7116 7.37305 12.5C7.37305 11.2884 8.35869 10.3027 9.57031 10.3027C10.7819 10.3027 11.7676 11.2884 11.7676 12.5C11.7676 13.7116 10.7819 14.6973 9.57031 14.6973Z" fill="#5A77B3"/>
+<path d="M4.44336 17.627H14.6973V19.0918H4.44336V17.627Z" fill="#4DC4FF"/>
+<path d="M16.1621 17.627H20.5566V19.0918H16.1621V17.627Z" fill="#4DA6FF"/>
+<path d="M12.5 17.627H14.6973V19.0918H12.5V17.627Z" fill="#4DA6FF"/>
+<path d="M12.5 11.7676H20.5566V13.2324H12.5V11.7676Z" fill="#4DA6FF"/>
+<path d="M12.5 5.9082H14.6973V7.37305H12.5V5.9082Z" fill="#4DA6FF"/>
+<path d="M15.4297 8.83789C14.2181 8.83789 13.2324 7.85225 13.2324 6.64062C13.2324 5.429 14.2181 4.44336 15.4297 4.44336C16.6413 4.44336 17.627 5.429 17.627 6.64062C17.627 7.85225 16.6413 8.83789 15.4297 8.83789Z" fill="#4D5B99"/>
+<path d="M15.4297 20.5566C14.2181 20.5566 13.2324 19.571 13.2324 18.3594C13.2324 17.1478 14.2181 16.1621 15.4297 16.1621C16.6413 16.1621 17.627 17.1478 17.627 18.3594C17.627 19.571 16.6413 20.5566 15.4297 20.5566Z" fill="#4D5B99"/>
+                            </svg>
+
+                          {locale === 'ar' ? 'إظهار الفلاتر' : 'Show Filters'}
+                        </>
+                      )}
+                    </button>
+                  </div>
+                </div>
+
+                {/* Mobile floating Filters button */}
+                <button
+                  onClick={() => setIsFilterDrawerOpen(true)}
+                  className={`lg:hidden fixed bottom-4 ${locale === 'ar' ? 'left-4' : 'right-4'} z-30 inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-full shadow-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500`}
+                  aria-label={locale === 'ar' ? 'فتح الفلاتر' : 'Open filters'}
+                >
+                  <svg width="20" height="20" viewBox="0 0 25 25" fill="none" xmlns="http://www.w3.org/2000/svg">
+<path d="M4.44336 5.9082H14.6973V7.37305H4.44336V5.9082Z" fill="#ffffff"/>
+<path d="M16.1621 5.9082H20.5566V7.37305H16.1621V5.9082Z" fill="#ffffff"/>
+<path d="M4.44336 11.7676H8.83789V13.2324H4.44336V11.7676Z" fill="#ffffff"/>
+<path d="M10.3027 11.7676H20.5566V13.2324H10.3027V11.7676Z" fill="#ffffff"/>
+                  </svg>
+                  {locale === 'ar' ? 'الفلاتر' : 'Filters'}
+                </button>
+
+                {/* Hero Banner Section (inside content column) */}
+  <div className="relative overflow-hidden pt-5 pb-16">
        <div className="absolute inset-0 z-0">
          <svg className="absolute right-0 top-0 h-full w-1/2 translate-x-1/3 transform text-white opacity-10" fill="none" viewBox="0 0 400 400">
            <defs>
@@ -1475,24 +1588,17 @@ export default function HomePage() {
        
        <div className="relative z-10 mx-auto max-w-7xl px-4 sm:px-6">
          <div className="text-center">
-      
-           
-       <div className="flex flex-col sm:flex-col align-center justify-center gap-2" style={{lineHeight: '1.3'}}>
-         <h1 className="text-3xl sm:text-4xl md:text-5xl font-extrabold tracking-tight text-gray-900 text-center ">
+       <div className="flex  flex-col align-center justify-center gap-2" style={{lineHeight: '1.3'}}>
+         <h1 className="text-3xl sm:text-4xl md:text-4xl font-extrabold tracking-tight text-gray-900 text-center ">
            {locale === 'ar' ? 'ابحث في التقارير والبيانات والرؤى' : 'Search data, reports, and insights'}
          </h1>
-         <h1 className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-cyan-500 text-center " >
+         <h1 className="text-3xl sm:text-4xl md:text-4xl font-extrabold text-cyan-500 text-center " >
            {locale === 'ar' ? 'ابدأ الآن' : 'Start exploring now'}
          </h1>
        </div>
-            {/* <h1 className="text-4xl font-extrabold tracking-tight sm:text-5xl md:text-6xl">{locale === 'ar' ? 'اكتشف المعرفة بسرعة الضوء' : 'Discover Knowledge at Light Speed'}</h1>*/}
-           
-           {/* <p className="mx-auto mt-4 max-w-2xl text-base text-gray-600 sm:text-lg md:mt-5 md:max-w-4xl md:text-lg">
-             {locale === 'ar' ? 'الوصول للمعلومات المميزة والمقالات والتحليلات. ابحث واكتشف وتعلم.' : 'Access premium information, data, and insights. Search, discover, and learn.'}
-           </p>  */}
            
            {/* Search Bar Prominent Placement */}
-           <div className="mx-auto mt-8 max-w-4xl ">
+           <div className="mx-auto mt-8  ">
              <SearchBar
                searchQuery={searchQuery}
                setSearchQuery={setSearchQuery}
@@ -1507,240 +1613,19 @@ export default function HomePage() {
               setIsicCodeFilter={handleIsicCodeFilterChange}
               hsCodeFilter={hsCodeFilter?.toString() || null}
               setHsCodeFilter={handleHsCodeFilterChange}
+                accuracyFilter={accuracyFilter}
+                setAccuracyFilter={handleAccuracyFilterChange}
               onIsicLoadingChange={setIsLoadingIsic}
               onHsLoadingChange={setIsLoadingHs}
               onDataLoadedChange={setIsDataLoaded}
              />
            </div>
             
-                      {/* Category Icons */}
-           {/* Only show categories when searchType is 'knowledge' */}
-        
-             <div className="mt-4">
-        {searchType === 'knowledge' && (       <p className="text-sm font-medium text-gray-500 mb-4">{locale === 'ar' ? 'استكشف بحسب الفئة' : 'Explore by category'}</p>)}
-               <div className="flex flex-wrap justify-center gap-6 md:gap-8">
-                 {/* Using the top-level selectedCategory state */}
-                 {(() => {
-                   // Function to handle category selection and trigger search API directly
-                   const handleCategorySelect = async (category: string) => {
-                     // Check if the category is already selected to prevent unnecessary loading
-                     if (selectedCategory === category) {
-                       return;
-                     }
-                     
-                     // Update the top-level state
-                     setSelectedCategory(category);
-                     // Update URL with new category
-                     updateUrlWithFilters({ category: category });
-                     
-                     // Reset to page 1 when category changes
-                     setCurrentPage(1);
-                     
-                     // The main search effect will be triggered by the setSelectedCategory above
-                     // and will handle the API call and loading state
-                   };
-                   
-                   // Call handleCategorySelect with 'all' on initial load to get results
-                   React.useEffect(() => {
-                     // Only call when searchResults is empty AND we're not in the middle of pagination
-                     // AND there's no current search query AND no URL search parameters to prevent overriding existing search results
-                     const hasUrlSearchParams = searchParams.get('keyword') || 
-                                               searchParams.get('search_type') || 
-                                               searchParams.get('accuracy') || 
-                                               searchParams.get('language') || 
-                                               searchParams.get('country') || 
-                                               searchParams.get('type');
-                     
-                     // Only trigger if no results, not loading, initialized, no search query, and no URL params
-                     if (searchResults.length === 0 && !loading && initialized && 
-                         !isPageChangeInProgressRef.current && !skipNextSearchEffectRef.current &&
-                         !searchQuery.trim() && !hasUrlSearchParams && searchType === 'knowledge') {
-                       handleCategorySelect('all');
-                     }
-                   // eslint-disable-next-line react-hooks/exhaustive-deps
-                   }, [searchResults.length, loading, initialized, searchParams, searchType]);
-                   
-                   return (
-                    searchType === 'knowledge' && (
-                      <>
-                      {/* Show loading indicator when fetching results */}
-                 
-                      <CategoryIconBox 
-                        name="all" 
-                        label="All" 
-                        locale={locale} 
-                        arLabel="الكل" 
-                        isSelected={selectedCategory === 'all'} 
-                        onClick={(e) => { e.preventDefault(); handleCategorySelect('all'); }} 
-                        count={getCategoryCount('all')}
-                      />
-                      {/* Separator between "All" and specific categories */}
-                      <div className="hidden sm:block w-px h-16 bg-gray-300 mx-2"></div>
-                      <CategoryIconBox 
-                        name="data" 
-                        label="Data" 
-                        locale={locale} 
-                        arLabel="البيانات" 
-                        isSelected={selectedCategory === 'data'} 
-                        onClick={(e) => { e.preventDefault(); handleCategorySelect('data'); }} 
-                        count={getCategoryCount('data')}
-                      />
-                      <CategoryIconBox 
-                        name="report" 
-                        label="Reports" 
-                        locale={locale} 
-                        arLabel="التقارير" 
-                        isSelected={selectedCategory === 'report'} 
-                        onClick={(e) => { e.preventDefault(); handleCategorySelect('report'); }} 
-                        count={getCategoryCount('report')}
-                      />
-                      <CategoryIconBox 
-                        name="statistic" 
-                        label="Statistics" 
-                        locale={locale} 
-                        arLabel="الإحصائيات" 
-                        isSelected={selectedCategory === 'statistic'} 
-                        onClick={(e) => { e.preventDefault(); handleCategorySelect('statistic'); }} 
-                        count={getCategoryCount('statistic')}
-                      />
-                      <CategoryIconBox 
-                        name="manual" 
-                        label="Manuals" 
-                        locale={locale} 
-                        arLabel="الأدلة" 
-                        isSelected={selectedCategory === 'manual'} 
-                        onClick={(e) => { e.preventDefault(); handleCategorySelect('manual'); }} 
-                        count={getCategoryCount('manual')}
-                      />
-                      <CategoryIconBox 
-                        name="course" 
-                        label="Courses" 
-                        locale={locale} 
-                        arLabel="الدورات" 
-                        isSelected={selectedCategory === 'course'} 
-                        onClick={(e) => { e.preventDefault(); handleCategorySelect('course'); }} 
-                        count={getCategoryCount('course')}
-                      />
-                    </>
-                    )
-                    
-                   );
-                 })()}
-               </div>
-             </div>
-         </div>
-       </div>
-     </div>
-      {/* Main content area */}
-      <div className="flex flex-col relative z-3 pt-2 pb-8">
-        <div className="w-full">
-          <div className="mx-auto max-w-8xl 2xl:max-w-none 2xl:mx-8 px-4 sm:px-6">
-            {/* Total results display moved to ResultsSection */}
-            
-            {/* Filter toggle button */}
-            <div className="mb-1 flex justify-start">
-              <button
-                onClick={() => {
-                  // On tablet/mobile, open drawer instead of toggling sidebar
-                  if (isTabletOrMobile) {
-                    setIsFilterDrawerOpen(true);
-                  } else {
-                    setFiltersVisible(!filtersVisible);
-                  }
-                }}
-                className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 hover:text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 shadow-sm"
-              >
-                {filtersVisible && !isTabletOrMobile ? (
-                  <>
-                   <svg fill="none" height="24" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg"><g clipRule="evenodd" fillRule="evenodd"><path d="m11 20v-16h2v16z" fill="#90caea"/><g fill="#3747d6"><path d="m16.9142 12 2.7929-2.79289-1.4142-1.41422-3.5 3.50001c-.3905.3905-.3905 1.0237 0 1.4142l3.5 3.5 1.4142-1.4142z"/><path d="m7.0858 12-2.79289-2.79289 1.41421-1.41422 3.5 3.50001c.39053.3905.39053 1.0237 0 1.4142l-3.5 3.5-1.41421-1.4142z"/></g></g></svg>
-                    {locale === 'ar' ? 'إخفاء الفلاتر' : 'Hide Filters'}
-                  </>
-                ) : (
-                  <>
-                    <svg width="25" height="25" viewBox="0 0 25 25" fill="none" xmlns="http://www.w3.org/2000/svg">
-<path d="M4.44336 5.9082H14.6973V7.37305H4.44336V5.9082Z" fill="#4DC4FF"/>
-<path d="M16.1621 5.9082H20.5566V7.37305H16.1621V5.9082Z" fill="#4DA6FF"/>
-<path d="M4.44336 11.7676H8.83789V13.2324H4.44336V11.7676Z" fill="#4DC4FF"/>
-<path d="M10.3027 11.7676H20.5566V13.2324H10.3027V11.7676Z" fill="#4DC4FF"/>
-<path d="M9.57031 14.6973C8.35869 14.6973 7.37305 13.7116 7.37305 12.5C7.37305 11.2884 8.35869 10.3027 9.57031 10.3027C10.7819 10.3027 11.7676 11.2884 11.7676 12.5C11.7676 13.7116 10.7819 14.6973 9.57031 14.6973Z" fill="#5A77B3"/>
-<path d="M4.44336 17.627H14.6973V19.0918H4.44336V17.627Z" fill="#4DC4FF"/>
-<path d="M16.1621 17.627H20.5566V19.0918H16.1621V17.627Z" fill="#4DA6FF"/>
-<path d="M12.5 17.627H14.6973V19.0918H12.5V17.627Z" fill="#4DA6FF"/>
-<path d="M12.5 11.7676H20.5566V13.2324H12.5V11.7676Z" fill="#4DA6FF"/>
-<path d="M12.5 5.9082H14.6973V7.37305H12.5V5.9082Z" fill="#4DA6FF"/>
-<path d="M15.4297 8.83789C14.2181 8.83789 13.2324 7.85225 13.2324 6.64062C13.2324 5.429 14.2181 4.44336 15.4297 4.44336C16.6413 4.44336 17.627 5.429 17.627 6.64062C17.627 7.85225 16.6413 8.83789 15.4297 8.83789Z" fill="#4D5B99"/>
-<path d="M15.4297 20.5566C14.2181 20.5566 13.2324 19.571 13.2324 18.3594C13.2324 17.1478 14.2181 16.1621 15.4297 16.1621C16.6413 16.1621 17.627 17.1478 17.627 18.3594C17.627 19.571 16.6413 20.5566 15.4297 20.5566Z" fill="#4D5B99"/>
-</svg>
-
-                    {locale === 'ar' ? 'إظهار الفلاتر' : 'Show Filters'}
-                  </>
-                )}
-              </button>
             </div>
-            
-            {/* Responsive layout for filters and content */}
-            <div className="flex flex-col lg:flex-row gap-8 relative">
-              
-              {/* Filters Sidebar */}
-              <div 
-                className={`lg:flex-shrink-0 transition-all duration-300 ease-in-out ${
-                  filtersVisible 
-                    ? 'overflow-visible lg:w-80 opacity-100 ' 
-                    : 'overflow-hidden lg:w-0 opacity-0 max-h-0'
-                }`}
-              >
-                <div className={`sticky rounded-md top-2 transition-transform duration-300 ease-in-out ${
-                  filtersVisible ? 'transform translate-x-0' : 'transform -translate-x-full lg:translate-x-0'
-                }`}>
-                    <FilterBox
-                      locale={locale}
-                      searchType={searchType}
-                      languageFilter={languageFilter}
-                      setLanguageFilter={handleLanguageFilterChange}
-                      countryFilter={countryFilter}
-                      setCountryFilter={handleCountryFilterChange}
-                      regionFilter={regionFilter}
-                      setRegionFilter={handleRegionFilterChange}
-                      economicBlocFilter={economicBlocFilter}
-                      setEconomicBlocFilter={handleEconomicBlocFilterChange}
-                      tagFilter={tagFilter}
-                      setTagFilter={handleTagFilterChange}
-                      isicCodeFilter={isicCodeFilter?.toString() || null}
-                      setIsicCodeFilter={handleIsicCodeFilterChange}
-                      industryFilter={industryFilter}
-                      setIndustryFilter={handleIndustryFilterChange}
-                      hsCodeFilter={hsCodeFilter?.toString() || null}
-                      setHsCodeFilter={handleHsCodeFilterChange}
-                      priceFilter={priceFilter}
-                      setPriceFilter={handlePriceFilterChange}
-                      rangeStartFilter={rangeStartFilter}
-                      setRangeStartFilter={handleRangeStartFilterChange}
-                      rangeEndFilter={rangeEndFilter}
-                      setRangeEndFilter={handleRangeEndFilterChange}
-                      accuracyFilter={accuracyFilter}
-                      setAccuracyFilter={handleAccuracyFilterChange}
-                      roleFilter={roleFilter}
-                      setRoleFilter={handleRoleFilterChange}
-                      yearOfStudyFilter={yearOfStudyFilter}
-                      setYearOfStudyFilter={handleYearOfStudyFilterChange}
-                      resetFilters={resetFilters}
-                      isDrawerOpen={isFilterDrawerOpen}
-                      setIsDrawerOpen={setIsFilterDrawerOpen}
-                    />
                 </div>
               </div>
-              {/* Main Content */}
-              <div className={`transition-all duration-300 ease-in-out ${
-                filtersVisible ? 'flex-1' : 'flex-1 lg:max-w-none'
-              }`}>
-                {/* Search bar above tabs */}
-                <div className=" p-4 pt-0 pb-0 rounded-md">
-                
-                  
-                  {/* Content tabs have been removed */}
-                </div>
-                
-                {/* Results section - conditionally show either ResultsSection or InsightersResultsSection based on searchType */}
+
+                {/* Results section */}
                 {(() => {
                   return searchType === 'insighter' ? (
                     <InsightersResultsSection
@@ -1754,6 +1639,7 @@ export default function HomePage() {
                       totalPages={totalPages}
                       locale={locale}
                       onPageChange={handlePageChange}
+                      filtersVisible={filtersVisible}
                     />
                   ) : (
                     <ResultsSection
@@ -1772,6 +1658,14 @@ export default function HomePage() {
                 onPageChange={handlePageChange}
                 searchType={searchType}
                 filtersVisible={filtersVisible}
+                selectedCategory={selectedCategory || 'all'}
+                onCategoryChange={(category: string) => {
+                  if (selectedCategory === category) return;
+                  setSelectedCategory(category);
+                  updateUrlWithFilters({ category });
+                  setCurrentPage(1);
+                }}
+                getCategoryCount={getCategoryCount}
               />
                   );
                 })()}
