@@ -1605,7 +1605,7 @@ export default function HomePage() {
                searchType={searchType}
                setSearchType={handleSearchTypeChange}
                locale={locale}
-               placeholder={locale === 'ar' ? 'إبحث عن رؤى أو إنسايتر...' : 'Search for Insights or Insighter...'}
+               placeholder={locale === 'ar' ? 'ابحث في المنشورات أو عن الخبراء (انسايتر) لمختلف القطاعات' : 'Search for Insights or Insighter...'}
                onSubmit={handleSubmit}
                onSearch={executeSearch}
               onQueryChange={handleQueryChange}

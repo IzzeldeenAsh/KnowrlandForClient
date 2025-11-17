@@ -83,11 +83,11 @@ export default function Overview({ knowledge, knowledgeSlug }: OverviewProps) {
 
   // Translations
   const translations = {
-    chooseReportSections: isRTL ? 'اختر أقسام التقرير التي تناسب احتياجاتك وميزانيتك!' : 'Choose the report section that fits your needs and budget!',
+    chooseReportSections: isRTL ? "عدة مستندات؟ يمكنك الاختيار وتنزيلها بشكل منفصل." : 'Multiple files? You can select and download separately.',
      thisIncludes: isRTL
-    ? 'هذه المعرفة تتضمن'
-    : 'This knowledge includes',   
-    documents: isRTL ? 'المستندات' : 'documents',
+    ? 'هذا المنشور يتضمن'
+    : 'This insight includes',   
+    documents: isRTL ? 'مستندات' : 'File',
     free: isRTL ? 'مجاني' : 'Free',
     download: isRTL ? 'تحميل' : 'Download',
     buyNow: isRTL ? 'شراء الآن' : 'Buy Now',

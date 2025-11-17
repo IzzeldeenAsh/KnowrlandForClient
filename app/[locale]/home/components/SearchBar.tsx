@@ -504,8 +504,8 @@ const SearchBar: React.FC<SearchBarProps> = ({
   const filterChipDisabledClasses = 'bg-gray-100 border-gray-200 text-gray-400 cursor-not-allowed';
 
   const typeLabels = {
-    knowledge: isRtl ? 'حسب الرؤى' : 'By Insight',
-    insighter: isRtl ? 'حسب الإنسايتر' : 'By Insighter',
+    knowledge: isRtl ? 'المنشورات' : 'By Insight',
+    insighter: isRtl ? "الخبراء (انسايتر)" : 'By Insighter',
   } as const;
 
   const isHsDisabled = isLoadingHs;

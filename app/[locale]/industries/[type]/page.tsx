@@ -47,6 +47,15 @@ export default function IndustriesByTypePage({ params }: Props) {
     statistic: 'statistics',
   };
 
+  const arabicFallbackLabels: { [key in IndustryType]: string } = {
+    report: 'تقارير',
+    insight: 'رؤى',
+    data: 'بيانات',
+    manual: 'أدلة',
+    course: 'دورات',
+    statistic: 'إحصائيات',
+  };
+
   useEffect(() => {
     safeAOSInit({
       duration: 800,
@@ -58,6 +67,21 @@ export default function IndustriesByTypePage({ params }: Props) {
   if (!validTypes.includes(type)) {
     notFound();
   }
+  const formatTypeLabel = (label?: string) => {
+    if (!label) return '';
+    if (locale !== 'ar') return label;
+    return label.replace(/^ال/, '');
+  };
+
+  const rawTranslation = messages[translationKeys[type]];
+  const typeLabel =
+    locale === 'ar'
+      ? formatTypeLabel(rawTranslation) || arabicFallbackLabels[type]
+      : rawTranslation;
+  const englishTypeLabel = capitalizeFirstLetter(type);
+
+  const displayLabel = locale === 'ar' ? typeLabel : typeLabel || englishTypeLabel;
+
 
   const { industries, isLoading, error } = useIndustriesByType({
     type,
@@ -114,7 +138,7 @@ export default function IndustriesByTypePage({ params }: Props) {
               {messages[translationKeys[type]]}
               </span> */}
               <h3 className="text-md bg-gradient-to-r from-blue-500 to-teal-400 md:text-3xl font-extrabold text-transparent bg-clip-text mb-4">
-              {messages[translationKeys[type]]} {messages.byIndustry}
+                {displayLabel} {messages.byIndustry}
               </h3>
            
             </div>

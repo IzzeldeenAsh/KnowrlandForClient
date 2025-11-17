@@ -52,10 +52,10 @@ export default function Reviews({ knowledgeSlug, reviews, is_review, is_owner }:
   const translations = {
     allReviews: isRTL ? 'جميع المراجعات' : 'All Reviews',
     noReviewsYet: isRTL ? 'لا توجد مراجعات حتى الآن.' : 'No reviews yet.',
-    rateKnowledge: isRTL ? 'قيّم هذه المعرفة' : 'Rate This Knowledge',
+    rateKnowledge: isRTL ? 'قيّم هذا المستند' : 'Rate This Knowledge',
     comment: isRTL ? 'التعليق' : 'Comment',
-    writeReview: isRTL ? 'اكتب مراجعتك...' : 'Write your review...',
-    submitReview: isRTL ? 'إرسال المراجعة' : 'Submit Review',
+    writeReview: isRTL ? 'اكتب ملاحظاتك هنا' : 'Write your review...',
+    submitReview: isRTL ? 'تقييم' : 'Submit Review',
     allGood: isRTL ? 'كل شيء جيد!' : 'All good!',
     reviewSuccess: isRTL ? 'تم إرسال المراجعة بنجاح!' : 'Review submitted successfully!',
     signInRequired: isRTL ? 'يجب أن تكون مسجلاً للإضافة مراجعة.' : 'You must be signed in to leave a review.',

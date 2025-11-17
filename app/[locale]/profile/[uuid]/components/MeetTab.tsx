@@ -732,9 +732,9 @@ export default function MeetTab({
                       size={48}
                       className="text-gray-300 mx-auto mb-4"
                     />
-                    <p className="text-gray-500">
-                      Please select a date to view available times
-                    </p>
+                      <p className="text-gray-500">
+                        {locale.startsWith('ar') ? "اختر تاريخ الجلسة ليتم عرض الأوقات المتاحة" : 'Please select a date to view available times'}
+                      </p>
                   </div>
                 )}
               </div>
