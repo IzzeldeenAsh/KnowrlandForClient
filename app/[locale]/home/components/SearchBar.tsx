@@ -642,6 +642,86 @@ const SearchBar: React.FC<SearchBarProps> = ({
               </div>
             )}
             
+            {/* ISIC and HS chips inside the search bar */}
+            <button
+              type="button"
+              disabled={isLoadingIsic}
+              onClick={() => !isLoadingIsic && setIsIsicModalOpen(true)}
+              className={`${filterChipBaseClasses} ${isLoadingIsic ? filterChipDisabledClasses : selectedIsic ? filterChipActiveClasses : filterChipInactiveClasses} ${isRtl ? 'flex-row-reverse' : ''}`}
+              aria-label={isRtl ? 'اختر رمز ISIC' : 'Select ISIC code'}
+            >
+              <span
+                className={`flex items-center justify-center w-6 h-6 rounded-full border ${selectedIsic ? 'bg-blue-100 border-blue-200 text-blue-700' : 'bg-blue-50 border-blue-100 text-[#299af8]'}`}
+              >
+                {isLoadingIsic ? (
+                  <svg className="animate-spin h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                  </svg>
+                ) : (
+                  <IconBuildingBank className="w-[14px] h-[14px]" />
+                )}
+              </span>
+              <span className="font-medium text-gray-900">
+               {locale === 'ar' ? ' رمز ISIC' : 'ISIC code'}
+              </span>
+              {selectedIsic && (
+                <span className={`font-mono text-[11px] bg-gray-100 px-1.5 py-0.5 rounded ${isRtl ? 'mr-2' : 'ml-2'}`}>
+                  {selectedIsic.code}
+                </span>
+              )}
+              {selectedIsic && (
+                <span
+                  className={`text-gray-400 hover:text-red-500 transition-colors ${isRtl ? 'mr-1' : 'ml-1'}`}
+                  role="button"
+                  aria-label={isRtl ? 'مسح اختيار ISIC' : 'Clear ISIC'}
+                  onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    clearIsicSelection();
+                  }}
+                >
+                  <IconX size={14} />
+                </span>
+              )}
+            </button>
+
+            <button
+              type="button"
+              disabled={isHsDisabled}
+              onClick={() => {
+                if (!isHsDisabled) {
+                  setIsHsModalOpen(true);
+                }
+              }}
+              className={`${filterChipBaseClasses} ${isHsDisabled ? filterChipDisabledClasses : selectedHs ? filterChipActiveClasses : filterChipInactiveClasses} ${isRtl ? 'flex-row-reverse' : ''}`}
+              aria-label={isRtl ? 'اختر رمز HS' : 'Select HS code'}
+            >
+              {renderHsIcon(!!selectedHs && !isHsDisabled)}
+              <span className="font-medium text-gray-900">
+               {locale === 'ar' ? ' رمز HS' : 'HS code'}
+              </span>
+              {selectedHs && !isHsDisabled && (
+                <span className={`font-mono text-[11px] bg-gray-100 px-1.5 py-0.5 rounded ${isRtl ? 'mr-2' : 'ml-2'}`}>
+                  {selectedHs.code}
+                </span>
+              )}
+              {selectedHs && !isHsDisabled && (
+                <span
+                  className={`text-gray-400 hover:text-red-500 transition-colors ${isRtl ? 'mr-1' : 'ml-1'}`}
+                  role="button"
+                  aria-label={isRtl ? 'مسح اختيار HS' : 'Clear HS'}
+                  onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    clearHsSelection();
+                  }}
+                >
+                  <IconX size={14} />
+                </span>
+              )}
+            </button>
+            
             <button 
               type="button"
               className={`${isRtl ? 'mr-2' : 'ml-2'} bg-[#299af8] text-white p-2 rounded-[4px] flex items-center justify-center hover:bg-[#2185d6] transition-colors duration-150`}
@@ -736,94 +816,54 @@ const SearchBar: React.FC<SearchBarProps> = ({
             ))}
           </div>
         )}
-        </div>
-
-        <div className={`flex flex-wrap items-center gap-3 justify-center`}>
-            <button
-              type="button"
-              disabled={isLoadingIsic}
-              onClick={() => !isLoadingIsic && setIsIsicModalOpen(true)}
-              className={`${filterChipBaseClasses} ${isLoadingIsic ? filterChipDisabledClasses : selectedIsic ? filterChipActiveClasses : filterChipInactiveClasses} ${
-                isRtl ? 'flex-row-reverse' : ''
-              }`}
-              aria-label={isRtl ? 'اختر رمز ISIC' : 'Select ISIC code'}
-            >
-              <span
-                className={`flex items-center justify-center w-6 h-6 rounded-full border ${
-                  selectedIsic ? 'bg-blue-100 border-blue-200 text-blue-700' : 'bg-blue-50 border-blue-100 text-[#299af8]'
-                }`}
+        {/* Selected ISIC/HS details under the search bar */}
+        {(selectedIsic || selectedHs) && (
+          <div className={`mt-2 flex flex-wrap gap-2 items-start ${isRtl ? 'justify-end' : 'justify-start'} text-xs`}>
+            {selectedIsic && (
+              <div
+                className={`flex items-center gap-1 px-2 py-1 rounded-full border bg-blue-50 border-blue-200 text-blue-700 ${isRtl ? 'flex-row-reverse' : ''}`}
+                aria-label={isRtl ? 'تفاصيل رمز ISIC المحدد' : 'Selected ISIC details'}
               >
-                {isLoadingIsic ? (
-                  <svg className="animate-spin h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                  </svg>
-                ) : (
-                  <IconBuildingBank className="w-[14px] h-[14px]" />
-                )}
-              </span>
-              <span className="font-medium text-gray-900">
-               {locale === 'ar' ? 'بواسطة رمز ISIC' : 'By ISIC code'}
-              </span>
-              {selectedIsic && (
-                <span className={`font-mono text-[11px] bg-gray-100 px-1.5 py-0.5 rounded ${isRtl ? 'mr-2' : 'ml-2'}`}>
-                  {selectedIsic.code}
-                </span>
-              )}
-              {selectedIsic && (
-                <span
-                  className={`text-gray-400 hover:text-red-500 transition-colors ${isRtl ? 'mr-1' : 'ml-1'}`}
-                  role="button"
-                  aria-label={isRtl ? 'مسح اختيار ISIC' : 'Clear ISIC'}
+                <span className="font-medium">{isRtl ? 'رمز ISIC:' : 'ISIC Code:'}</span>
+                <span className="line-clamp-1 truncate max-w-[260px]">{selectedIsic.label}</span>
+                <button
+                  type="button"
+                  className={`text-blue-500 hover:text-blue-700 transition-colors ${isRtl ? 'mr-1' : 'ml-1'}`}
                   onClick={(e) => {
                     e.preventDefault();
-                    e.stopPropagation();
                     clearIsicSelection();
                   }}
+                  aria-label={isRtl ? 'مسح اختيار ISIC' : 'Clear ISIC'}
                 >
-                  <IconX size={14} />
-                </span>
-              )}
-            </button>
-
-            <button
-              type="button"
-              disabled={isHsDisabled}
-              onClick={() => {
-                if (!isHsDisabled) {
-                  setIsHsModalOpen(true);
-                }
-              }}
-              className={`${filterChipBaseClasses} ${
-                isHsDisabled ? filterChipDisabledClasses : selectedHs ? filterChipActiveClasses : filterChipInactiveClasses
-              } ${isRtl ? 'flex-row-reverse' : ''}`}
-              aria-label={isRtl ? 'اختر رمز HS' : 'Select HS code'}
-            >
-              {renderHsIcon(!!selectedHs && !isHsDisabled)}
-              <span className="font-medium text-gray-900">
-               {locale === 'ar' ? 'بواسطة رمز HS' : 'By HS code'}
-              </span>
-              {selectedHs && !isHsDisabled && (
-                <span className={`font-mono text-[11px] bg-gray-100 px-1.5 py-0.5 rounded ${isRtl ? 'mr-2' : 'ml-2'}`}>
-                  {selectedHs.code}
-                </span>
-              )}
-              {selectedHs && !isHsDisabled && (
-                <span
-                  className={`text-gray-400 hover:text-red-500 transition-colors ${isRtl ? 'mr-1' : 'ml-1'}`}
-                  role="button"
-                  aria-label={isRtl ? 'مسح اختيار HS' : 'Clear HS'}
+                  <IconX size={12} />
+                </button>
+              </div>
+            )}
+            {selectedHs && (
+              <div
+                className={`flex items-center gap-1 px-2 py-1 rounded-full border bg-blue-50 border-blue-200 text-blue-700 ${isRtl ? 'flex-row-reverse' : ''}`}
+                aria-label={isRtl ? 'تفاصيل رمز HS المحدد' : 'Selected HS details'}
+              >
+                <span className="font-medium">{isRtl ? 'رمز HS:' : 'HS Code:'}</span>
+                <span className="line-clamp-1 truncate max-w-[260px]">{selectedHs.label}</span>
+                <button
+                  type="button"
+                  className={`text-blue-500 hover:text-blue-700 transition-colors ${isRtl ? 'mr-1' : 'ml-1'}`}
                   onClick={(e) => {
                     e.preventDefault();
-                    e.stopPropagation();
                     clearHsSelection();
                   }}
+                  aria-label={isRtl ? 'مسح اختيار HS' : 'Clear HS'}
                 >
-                  <IconX size={14} />
-                </span>
-              )}
-            </button>
+                  <IconX size={12} />
+                </button>
+              </div>
+            )}
           </div>
+        )}
+        </div>
+
+        
       </div>
         {/* ISIC Modal */}
         <Modal
@@ -906,7 +946,7 @@ const SearchBar: React.FC<SearchBarProps> = ({
                           {others.length > 0 && (
                             <>
                               <div className="text-sm font-semibold text-gray-700 px-1 mt-2">
-                                {locale === 'ar' ? 'أكواد HS أخرى' : 'Other HS code'}
+                                {locale === 'ar' ? 'أكواد HS كل' : 'All HS code'}
                               </div>
                               {others.map((code) => (
                                 <button

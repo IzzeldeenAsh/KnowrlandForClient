@@ -304,7 +304,18 @@ const FilterBox: React.FC<FilterBoxProps> = React.memo(({
 
   // Update collapsed states when search type or screen size changes
   useEffect(() => {
-    // Update collapsed states when searchType or screen size changes
+    // When viewing insighters, expand all sections regardless of screen size
+    if (searchType === 'insighter') {
+      setAccuracyCollapsed(false);
+      setIndustryCollapsed(false);
+      setPriceCollapsed(false);
+      setLanguageCollapsed(false);
+      setRoleCollapsed(false);
+      setTargetMarketCollapsed(false);
+      setTagsCollapsed(false);
+      return;
+    }
+    // Default behavior for other types (e.g., knowledge)
     setAccuracyCollapsed(searchType === 'knowledge' || shouldUseDrawer);
     setIndustryCollapsed(searchType === 'insighter' || shouldUseDrawer);
     setPriceCollapsed(shouldUseDrawer);
@@ -1032,7 +1043,7 @@ const FilterBox: React.FC<FilterBoxProps> = React.memo(({
 
   // Filter content component
   const FilterContent = () => (
-    <div className={`${shouldUseDrawer ? '' : 'bg-gray-50 rounded-xl shadow border border-gray-200 w-full max-w-xs'}`} dir={locale === 'ar' ? 'rtl' : 'ltr'}>
+    <div className={`${shouldUseDrawer ? '' : 'bg-gray-50 shadow border border-gray-200 w-full max-w-xs'}`} dir={locale === 'ar' ? 'rtl' : 'ltr'}>
       {/* Top Bar */}
       <div className="flex items-center justify-between px-4 pt-4 pb-2 border-b border-gray-200">
         <h2 className="text-base font-semibold text-gray-800">{locale === 'ar' ? 'الفلاتر' : 'Filters'}</h2>

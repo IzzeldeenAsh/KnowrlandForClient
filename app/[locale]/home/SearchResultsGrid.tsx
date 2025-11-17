@@ -355,7 +355,7 @@ export default function SearchResultsGrid({
   const topicItems = results.filter(item => item.searchable_type === "topic");
 
   return (
-    <div className=" 2xl:max-w-none 2xl:mx-8 mx-auto" dir={isRTL ? "rtl" : "ltr"}>
+    <div className=" 2xl:max-w-none 2xl:mx-8 mx-auto px-10" dir={isRTL ? "rtl" : "ltr"}>
       {/* Knowledge items section */}
       {knowledgeItems.length > 0 && (
         <div className="mb-6">
