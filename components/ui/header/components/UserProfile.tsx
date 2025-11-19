@@ -287,7 +287,8 @@ export function UserProfile({ isHome }: { isHome: boolean }) {
           </div>
 
           <div className="py-2 px-3">
-            {(roles.includes("insighter") ||
+          <div className="border-b border-slate-100">
+              {(roles.includes("insighter") ||
               roles.includes("company") ||
               roles.includes("company-insighter")) && (
             <>
@@ -309,6 +310,18 @@ export function UserProfile({ isHome }: { isHome: boolean }) {
              </Link>
              </>
             )}
+
+            {(roles.includes('company') && (
+              <Link
+                href="https://app.insightabusiness.com/app/insighter-dashboard/my-company-settings"
+                className="block px-4 py-2.5  font-semibold text-slate-900 hover:bg-indigo-50 hover:text-sky-700"
+                onClick={() => setMenuOpen(false)}
+                style={{fontSize: '13px'}}
+              >
+                {t("myCompany")}
+              </Link>
+            ))}
+              </div>
             <Link
               href="https://app.insightabusiness.com/app/profile/overview"
               className="block px-4 py-3  font-semibold text-slate-900 hover:bg-indigo-50 hover:text-sky-700"
@@ -397,7 +410,9 @@ export function UserProfile({ isHome }: { isHome: boolean }) {
                 </p>
                </>
               )}
+             
             <div className="border-t border-slate-100">
+              
               <button
                 onClick={() => {
                   setMenuOpen(false);

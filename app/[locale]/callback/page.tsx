@@ -31,7 +31,7 @@ export default function QueryParamAuthCallback() {
   let token = searchParams.get('token');
   
   // If no token parameter, check if the entire query string is a token (JWT format)
-  if (!token) {
+  if (!token && typeof window !== 'undefined') {
     const queryString = window.location.search.substring(1);
     if (queryString && queryString.startsWith('eyJ') && queryString.includes('.')) {
       token = queryString;

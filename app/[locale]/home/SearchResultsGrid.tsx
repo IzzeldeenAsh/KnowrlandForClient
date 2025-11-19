@@ -411,7 +411,7 @@ export default function SearchResultsGrid({
                   
                   <Text
                     fw={700}
-                    className={`${cardStyles.title} amiri-bold`}
+                    className={`${cardStyles.title} `}
                     pt={4}
                     lineClamp={2}
                   >
@@ -421,7 +421,7 @@ export default function SearchResultsGrid({
                   <div >
                     <div
                       
-                      className="text-xl amiri-bold font-bold leading-none bg-clip-text text-transparent bg-gradient-to-r from-sky-300  to-sky-800  drop-shadow-lg"
+                      className="text-xl  font-bold leading-none bg-clip-text text-transparent bg-gradient-to-r from-sky-300  to-sky-800  drop-shadow-lg"
                     >
                       {coverageText}
                     </div>

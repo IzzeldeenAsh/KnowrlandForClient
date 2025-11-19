@@ -466,6 +466,7 @@ export default function KnowledgePage({ params }: Props) {
                   </div>
                 </div>
               )}
+        
             </div>
           </div>
         </div>

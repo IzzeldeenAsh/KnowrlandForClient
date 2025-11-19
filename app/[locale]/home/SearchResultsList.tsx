@@ -344,7 +344,7 @@ export default function SearchResultsList({
                 <div className={listStyles.titleSection}>
                   <Text
                     component="h3"
-                    className={`${listStyles.title} amiri-bold`}
+                    className={`${listStyles.title} `}
                   >
                     {item.title}
                   </Text>

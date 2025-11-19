@@ -1,7 +1,7 @@
 'use client'
 
 import React, { useState, useEffect, useCallback, useRef, useMemo } from 'react';
-import { Modal, Loader, Chip, Combobox, Input, InputBase, useCombobox, Drawer } from '@mantine/core';
+import { Modal, Chip, Combobox, Input, InputBase, useCombobox, Drawer } from '@mantine/core';
 import { useMediaQuery } from '@mantine/hooks';
 import { IconCode, IconBuildingFactory, IconBuildingBank, IconWorld, IconLanguage, IconCoin, IconSearch, IconX, IconCalendarEvent } from '@tabler/icons-react';
 import CustomYearPicker from './CustomYearPicker';
@@ -215,13 +215,13 @@ const FilterBox: React.FC<FilterBoxProps> = React.memo(({
   const [filteredIndustryLeafNodes, setFilteredIndustryLeafNodes] = useState<IndustryNode[]>([]);
 
   // Collapse States - adjust based on search type and screen size
-  const [priceCollapsed, setPriceCollapsed] = useState(shouldUseDrawer);
-  const [languageCollapsed, setLanguageCollapsed] = useState(shouldUseDrawer);
-  const [industryCollapsed, setIndustryCollapsed] = useState(searchType === 'insighter' || shouldUseDrawer);
+  const [priceCollapsed, setPriceCollapsed] = useState(true);
+  const [languageCollapsed, setLanguageCollapsed] = useState(true);
+  const [industryCollapsed, setIndustryCollapsed] = useState(true);
   const [targetMarketCollapsed, setTargetMarketCollapsed] = useState(true);
   const [tagsCollapsed, setTagsCollapsed] = useState(true);
-  const [yearOfStudyCollapsed, setYearOfStudyCollapsed] = useState(false);
-  const [roleCollapsed, setRoleCollapsed] = useState(shouldUseDrawer);
+  const [yearOfStudyCollapsed, setYearOfStudyCollapsed] = useState(true);
+  const [roleCollapsed, setRoleCollapsed] = useState(true);
 
   // Range price filter states - using refs to avoid re-renders
   const tempRangeStartRef = useRef('');
@@ -303,21 +303,13 @@ const FilterBox: React.FC<FilterBoxProps> = React.memo(({
 
   // Update collapsed states when search type or screen size changes
   useEffect(() => {
-    // When viewing insighters, expand all sections regardless of screen size
-    if (searchType === 'insighter') {
-      setIndustryCollapsed(false);
-      setPriceCollapsed(false);
-      setLanguageCollapsed(false);
-      setRoleCollapsed(false);
-      setTargetMarketCollapsed(false);
-      setTagsCollapsed(false);
-      return;
-    }
-    // Default behavior for other types (e.g., knowledge)
-    setIndustryCollapsed(shouldUseDrawer);
-    setPriceCollapsed(shouldUseDrawer);
-    setLanguageCollapsed(shouldUseDrawer);
-    setRoleCollapsed(shouldUseDrawer);
+    // Always keep filters collapsed by default on any context change
+    setIndustryCollapsed(true);
+    setPriceCollapsed(true);
+    setLanguageCollapsed(true);
+    setRoleCollapsed(true);
+    setTargetMarketCollapsed(true);
+    setTagsCollapsed(true);
   }, [searchType, shouldUseDrawer]);
 
   // Enhanced API fetch functions with better loading states
@@ -724,11 +716,7 @@ const FilterBox: React.FC<FilterBoxProps> = React.memo(({
   // Render functions
   const renderLeafNodes = () => {
     if (dataLoading.isicCodes) {
-      return (
-        <div className="flex justify-center py-8">
-          <Loader size="md" />
-        </div>
-      );
+      return <div className="py-8" />;
     }
 
     return (
@@ -759,11 +747,7 @@ const FilterBox: React.FC<FilterBoxProps> = React.memo(({
 
   const renderHsCodes = () => {
     if (dataLoading.hsCodes) {
-      return (
-        <div className="flex justify-center py-8">
-          <Loader size="md" />
-        </div>
-      );
+      return <div className="py-8" />;
     }
 
     if (filteredHsCodes.length === 0) {
@@ -809,11 +793,7 @@ const FilterBox: React.FC<FilterBoxProps> = React.memo(({
 
   const renderIndustryLeafNodes = () => {
     if (dataLoading.industries) {
-      return (
-        <div className="flex justify-center py-8">
-          <Loader size="md" />
-        </div>
-      );
+      return <div className="py-8" />;
     }
 
     return (
@@ -1025,22 +1005,12 @@ const FilterBox: React.FC<FilterBoxProps> = React.memo(({
     isLoading: boolean;
     message?: string;
   }) => (
-    <div className="relative">
-      {children}
-      {isLoading && (
-        <div className="absolute inset-0 bg-white bg-opacity-75 flex items-center justify-center z-10 rounded">
-          <div className="flex flex-col items-center gap-2">
-            <Loader size="sm" />
-            {message && <span className="text-xs text-gray-600">{message}</span>}
-          </div>
-        </div>
-      )}
-    </div>
+    <div>{children}</div>
   );
 
   // Filter content component
   const FilterContent = () => (
-    <div className={`${shouldUseDrawer ? '' : 'bg-gray-50 shadow border border-gray-200 w-full max-w-xs'}`} dir={locale === 'ar' ? 'rtl' : 'ltr'}>
+    <div className={`${shouldUseDrawer ? '' : 'bg-gray-50  border border-gray-200 w-full max-w-xs'}`} dir={locale === 'ar' ? 'rtl' : 'ltr'}>
       {/* Top Bar */}
       <div className="flex items-center justify-between px-4 pt-4 pb-2 border-b border-gray-200">
         <h2 className="text-base font-semibold text-gray-800">{locale === 'ar' ? 'الفلاتر' : 'Filters'}</h2>
@@ -1071,7 +1041,6 @@ const FilterBox: React.FC<FilterBoxProps> = React.memo(({
                 {locale === 'ar' ? 'السعر' : 'Price'}
               </span>
               <div className="flex items-center gap-2">
-                {dataLoading.countries && <Loader size="xs" />}
                 <svg className={`w-4 h-4 text-gray-400 transition-transform ${priceCollapsed ? '' : 'rotate-180'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
                 </svg>
@@ -1295,7 +1264,6 @@ const FilterBox: React.FC<FilterBoxProps> = React.memo(({
               {locale === 'ar' ? 'المجال' : 'Industry'}
             </span>
             <div className="flex items-center gap-2">
-              {(dataLoading.industries || dataLoading.isicCodes) && <Loader size="xs" />}
               <svg className={`w-4 h-4 text-gray-400 transition-transform ${industryCollapsed ? '' : 'rotate-180'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
               </svg>
@@ -1347,7 +1315,6 @@ const FilterBox: React.FC<FilterBoxProps> = React.memo(({
                 {locale === 'ar' ? 'الوسوم (Tags)' : 'Tags'}
               </span>
               <div className="flex items-center gap-2">
-                {dataLoading.tags && <Loader size="xs" />}
                 <svg className={`w-4 h-4 text-gray-400 transition-transform ${tagsCollapsed ? '' : 'rotate-180'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
                 </svg>
@@ -1448,7 +1415,6 @@ const FilterBox: React.FC<FilterBoxProps> = React.memo(({
               {locale === 'ar' ? (searchType === 'insighter' ? 'بلد الإنسايتر' : 'السوق المستهدفة') : (searchType === 'insighter' ? 'Insighter Origin' : 'Target Market')}
             </span>
             <div className="flex items-center gap-2">
-              {(dataLoading.countries || dataLoading.regions || dataLoading.economicBlocs) && <Loader size="xs" />}
               <svg className={`w-4 h-4 text-gray-400 transition-transform ${targetMarketCollapsed ? '' : 'rotate-180'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
               </svg>

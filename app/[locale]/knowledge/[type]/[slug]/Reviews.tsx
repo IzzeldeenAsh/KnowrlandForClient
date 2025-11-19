@@ -28,6 +28,7 @@ interface ReviewsProps {
   reviews: ReviewItem[];
   is_review: boolean;
   is_owner?: boolean;
+  hasPurchasedAny?: boolean;
 }
 
 // Helper function to get initials from name
@@ -39,7 +40,7 @@ function getInitials(name: string) {
     .toUpperCase();
 }
 
-export default function Reviews({ knowledgeSlug, reviews, is_review, is_owner }: ReviewsProps) {
+export default function Reviews({ knowledgeSlug, reviews, is_review, is_owner, hasPurchasedAny }: ReviewsProps) {
   // Get locale and determine RTL
   const params = useParams();
   const locale = params.locale as string;
@@ -65,7 +66,8 @@ export default function Reviews({ knowledgeSlug, reviews, is_review, is_owner }:
     deleteReview: isRTL ? 'حذف المراجعة' : 'Delete Review',
     deleteSuccess: isRTL ? 'تم حذف المراجعة بنجاح!' : 'Review deleted successfully!',
     deleteError: isRTL ? 'حدث خطأ في حذف المراجعة. يرجى المحاولة مرة أخرى.' : 'Error deleting review. Please try again.',
-    confirmDelete: isRTL ? 'هل أنت متأكد أنك تريد حذف هذه المراجعة؟' : 'Are you sure you want to delete this review?'
+    confirmDelete: isRTL ? 'هل أنت متأكد أنك تريد حذف هذه المراجعة؟' : 'Are you sure you want to delete this review?',
+    purchaseRequired: isRTL ? 'لترك مراجعة، يجب شراء مستند واحد على الأقل.' : 'To leave a review, you must purchase at least one document.'
   };
 
   // Retrieve the token from localStorage
@@ -149,6 +151,12 @@ export default function Reviews({ knowledgeSlug, reviews, is_review, is_owner }:
     
     // Prevent multiple submissions
     if (loading || submitting) {
+      return;
+    }
+    
+    // Ensure purchase requirement is met
+    if (!hasPurchasedAny) {
+      toast.error(translations.purchaseRequired);
       return;
     }
     
@@ -299,7 +307,7 @@ export default function Reviews({ knowledgeSlug, reviews, is_review, is_owner }:
 
   return (
     <div dir={isRTL ? 'rtl' : 'ltr'}>
-     {token && !is_review && !is_owner && (
+     {token && !is_review && !is_owner && hasPurchasedAny && (
         <>
           {!submit && (
             <Card padding="lg" radius="md" withBorder mt={'md'} mb={'md'}>
@@ -337,6 +345,13 @@ export default function Reviews({ knowledgeSlug, reviews, is_review, is_owner }:
             </Card>
           )}
         </>
+      )}
+      {token && !is_review && !is_owner && !hasPurchasedAny && (
+        <Card className="mt-4">
+          <Text color="dimmed" className={isRTL ? 'text-right' : 'text-start'}>
+            {translations.purchaseRequired}
+          </Text>
+        </Card>
       )}
         <div>
           {isLoading && !displayReviews.length ? (
@@ -418,7 +433,7 @@ export default function Reviews({ knowledgeSlug, reviews, is_review, is_owner }:
               ))}
             </div>
           ) : (
-            <div className="p-4">
+            <div>
             <Card className="mt-4 ">
           <Text color="dimmed" className={isRTL ? 'text-right' : 'text-start'}>
             {isRTL ? 'لايوجد مراجعات حتى الآن' : 'No Reviews Yet'}
