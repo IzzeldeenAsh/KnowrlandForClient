@@ -2,7 +2,7 @@
 
 import React, { createContext, useState, useContext, useEffect } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
-import AppLoader from '../ui/AppLoader';
+import FullScreenLoader from '../ui/FullScreenLoader';
 
 type LoadingContextType = {
   isLoading: boolean;
@@ -83,7 +83,8 @@ export function LoadingProvider({ children }: { children: React.ReactNode }) {
   const stopPageLoading = () => setIsManualLoading(false);
 
   // Show loader either during initial load, during navigation, or when manually triggered
-  const showLoader = isLoading || isNavigating || isManualLoading;
+  const isCallbackRoute = pathname.includes('/callback');
+  const showLoader = !isCallbackRoute && (isLoading || isNavigating || isManualLoading);
 
   return (
     <LoadingContext.Provider value={{ 
@@ -92,7 +93,7 @@ export function LoadingProvider({ children }: { children: React.ReactNode }) {
       startPageLoading,
       stopPageLoading
     }}>
-      {showLoader ? <AppLoader /> : children}
+      {showLoader ? <FullScreenLoader message="Loading..." /> : children}
     </LoadingContext.Provider>
   );
 }

@@ -6,6 +6,7 @@ import { KnowledgeDetails } from "./types";
 import Reviews from "./Reviews";
 import AskInsighter from "./AskInsighter";
 import { useParams, useRouter, useSearchParams } from "next/navigation";
+import Link from "next/link";
 
 function TabContent({ activeTab, knowledge, knowledgeSlug, onRefreshData }: { activeTab: string; knowledge: KnowledgeDetails; knowledgeSlug: string; onRefreshData?: () => void }) {
   const params = useParams();
@@ -23,12 +24,20 @@ function TabContent({ activeTab, knowledge, knowledgeSlug, onRefreshData }: { ac
     case "Overview":
       return <Overview knowledge={knowledge} knowledgeSlug={knowledgeSlug} />;
     case "Reviews":
-      return <Reviews 
-        knowledgeSlug={knowledge.slug} 
-        reviews={knowledge.review} 
-        is_review={knowledge.is_review ? true : false} 
-        is_owner={knowledge.is_owner} 
-      />;
+      // Determine if the user has purchased at least one document
+      const hasPurchasedAny =
+        knowledge.purchased_status === 'purchased' ||
+        knowledge.purchased_status === 'partial-purchased' ||
+        (Array.isArray(knowledge.documents) && knowledge.documents.some((doc) => !!doc.is_purchased));
+      return (
+        <Reviews
+          knowledgeSlug={knowledge.slug}
+          reviews={knowledge.review}
+          is_review={knowledge.is_review ? true : false}
+          is_owner={knowledge.is_owner}
+          hasPurchasedAny={hasPurchasedAny}
+        />
+      );
     case "Ask":
       return <AskInsighter knowledgeSlug={knowledge.slug} questions={knowledge.questions} is_owner={knowledge.is_owner} onRefreshData={onRefreshData} />;
     case "Meet":
@@ -144,11 +153,25 @@ export default function TabsContent({ knowledge, knowledgeSlug }: { knowledge: K
               {tab}
             </button>
           ))}
+           <div className="flex flex-col justify-center ps-4 sm:ps-8  sm:mt-0 ms-auto">
+           <Link
+              href={`/${locale}/profile/${knowledge.insighter.uuid}?entity=insighter&tab=meet`}
+              className="relative inline-flex shadow-none items-center gap-2 px-3 py-1.5 text-sm bg-gradient-to-r from-blue-500 to-teal-400 text-white rounded-md shadow-lg hover:from-blue-600 hover:to-teal-500 focus:outline-none focus:ring-2 focus:ring-blue-300"
+            >
+              <span className="pointer-events-none absolute inset-0 rounded-md bg-gradient-to-r from-blue-500 to-teal-400 opacity-20 animate-ping [animation-duration:2.5s]"></span>
+              <span className="relative font-semibold capitalize">
+                {locale ==='en' ? 'Meet ' + knowledge.insighter.name.toLowerCase() : 'قابل الخبير ' + knowledge.insighter.name.toLowerCase()}
+              </span>
+            </Link>
+           </div>
         </nav>
+
+        
       </div>
       <div className="mt-6" role="tabpanel" id={`tabpanel-${activeTab}`} aria-labelledby={`tab-${activeTab}`}>
         <TabContent activeTab={activeTab} knowledge={knowledgeData} knowledgeSlug={knowledgeSlug} onRefreshData={refreshData} />
       </div>
+     
     </div>
   );
 }

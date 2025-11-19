@@ -67,7 +67,7 @@ async function getIndustries(locale: string = 'en', forceRefresh: boolean = fals
 
 async function fetchIndustriesFromAPI(locale: string): Promise<Industry[]> {
   try {
-    const res = await fetch("https://api.insightabusiness.com/api/platform/industries/menu", {
+    const res = await fetch("https://api.foresighta.co/api/platform/industries/menu", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -258,6 +258,11 @@ const { isLoading: isAppLoading, setIsLoading: setAppLoading } = useLoading();
     // This ensures all components are properly re-rendered with the new locale
     window.location.href = fullUrl;
   };
+
+  // Hide header on callback routes to avoid visual flicker/loaders during auth
+  if (pathname.includes('/callback')) {
+    return null;
+  }
 
   return (
     <>
@@ -499,7 +504,7 @@ const { isLoading: isAppLoading, setIsLoading: setAppLoading } = useLoading();
             ) : (
               <li>
                 <Link className="btn-sm text-slate-300 hover:text-white [background:linear-gradient(theme(colors.slate.900),_theme(colors.slate.900))_padding-box,_conic-gradient(theme(colors.slate.400),_theme(colors.slate.700)_25%,_theme(colors.slate.700)_75%,_theme(colors.slate.400)_100%)_border-box] before:bg-slate-800/30 hover:scale-105 active:scale-95 transition-all duration-150 ease-in-out group relative before:absolute before:inset-0 before:rounded-full before:pointer-events-none" 
-                href={`https://app.insightabusiness.com/auth/login?returnUrl=${encodeURIComponent(typeof window !== 'undefined' ? window.location.href : '')}`}>
+                href={`http://localhost:4200/auth/login?returnUrl=${encodeURIComponent(typeof window !== 'undefined' ? window.location.href : '')}`}>
                   <span className="relative inline-flex items-center">
                     {t('auth.login')} <span className="tracking-normal text-blue-500 group-hover:translate-x-1 transition-transform duration-150 ease-in-out ml-1">-&gt;</span>
                   </span>

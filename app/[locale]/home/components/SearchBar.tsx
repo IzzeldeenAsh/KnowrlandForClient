@@ -730,67 +730,7 @@ const SearchBar: React.FC<SearchBarProps> = ({
                 )}
               </button>
               
-              <Popover
-                opened={isAccuracyOpen}
-                onChange={setIsAccuracyOpen}
-                position="bottom"
-                withinPortal={false}
-              >
-                <Popover.Target>
-                  <button
-                    type="button"
-                    className={`${filterChipBaseClasses} ${(accuracyFilter && accuracyFilter !== 'all') ? filterChipActiveClasses : filterChipInactiveClasses} ${isRtl ? 'flex-row-reverse' : ''}`}
-                    aria-label={isRtl ? 'دقة البحث' : 'Accuracy'}
-                    onClick={() => setIsAccuracyOpen((o) => !o)}
-                  >
-                    <span
-                      className={`flex items-center justify-center w-6 h-6 rounded-full border ${(accuracyFilter && accuracyFilter !== 'all') ? 'bg-blue-100 border-blue-200 text-blue-700' : 'bg-blue-50 border-blue-100 text-[#299af8]'}`}
-                    >
-                      <IconWorldSearch className="w-[14px] h-[14px]" />
-                    </span>
-                    <span className="font-medium text-gray-900">
-                      {isRtl ? 'الدقة' : 'Accuracy'}
-                    </span>
-                    <span className={`text-[11px] ${isRtl ? 'mr-1' : 'ml-1'} text-gray-600`}>
-                      {accuracyFilter === 'any'
-                        ? (isRtl ? 'أي كلمات' : 'Any words')
-                        : (isRtl ? 'كل الكلمات' : 'All words')}
-                    </span>
-                  </button>
-                </Popover.Target>
-                <Popover.Dropdown>
-                  <div className="flex flex-col gap-2 text-xs min-w-[180px]" dir={isRtl ? 'rtl' : 'ltr'}>
-                    <label className="flex items-center gap-2 cursor-pointer">
-                      <input
-                        type="radio"
-                        name="accuracy"
-                        value="all"
-                        checked={accuracyFilter === 'all'}
-                        onChange={() => {
-                          setAccuracyFilter && setAccuracyFilter('all');
-                          setIsAccuracyOpen(false);
-                        }}
-                        className="accent-blue-500"
-                      />
-                      {isRtl ? 'تضمين جميع الكلمات' : 'Include all words'}
-                    </label>
-                    <label className="flex items-center gap-2 cursor-pointer">
-                      <input
-                        type="radio"
-                        name="accuracy"
-                        value="any"
-                        checked={accuracyFilter === 'any'}
-                        onChange={() => {
-                          setAccuracyFilter && setAccuracyFilter('any');
-                          setIsAccuracyOpen(false);
-                        }}
-                        className="accent-blue-500"
-                      />
-                      {isRtl ? 'تضمين أي من كلمات' : 'Include any words'}
-                    </label>
-                  </div>
-                </Popover.Dropdown>
-              </Popover>
+              {/* Accuracy filter moved below the search field */}
             </div>
             
             <button 
@@ -826,6 +766,65 @@ const SearchBar: React.FC<SearchBarProps> = ({
             >
               <IconSearch size={18} />
             </button>
+        </div>
+        {/* Accuracy control under the search field */}
+        <div className={`mt-2 flex ${isRtl ? 'justify-start' : 'justify-end'}`}>
+          <Popover
+            opened={isAccuracyOpen}
+            onChange={setIsAccuracyOpen}
+            position="bottom"
+            withinPortal={false}
+          >
+            <Popover.Target>
+              <button
+                type="button"
+                className="flex  items-center text-sm text-blue-500 text-xs"
+                aria-label={isRtl ? 'دقة البحث' : 'Accuracy'}
+                dir={isRtl ? 'rtl' : 'ltr'}
+                onClick={() => setIsAccuracyOpen((o) => !o)}
+              >
+                <IconWorldSearch className={`w-[16px] h-[16px] ${isRtl ? 'ml-1' : 'mr-1'}`} />
+                <span className="font-medium">{isRtl ? 'الدقة:' : 'Accuracy:'}</span>
+                <span className={`${isRtl ? 'mr-1' : 'ml-1'} text-xs text-blue-600 hover:text-blue-700 underline underline-offset-2`}>
+                  {accuracyFilter === 'any'
+                    ? (isRtl ? 'أي كلمات' : 'Any words')
+                    : (isRtl ? 'كل الكلمات' : 'All words')}
+                </span>
+              </button>
+            </Popover.Target>
+            <Popover.Dropdown>
+              <div className="flex flex-col gap-2 text-xs min-w-[180px]" dir={isRtl ? 'rtl' : 'ltr'}>
+                <label className="flex items-center gap-2 cursor-pointer">
+                  <input
+                    type="radio"
+                    name="accuracy"
+                    value="all"
+                    checked={accuracyFilter === 'all'}
+                    onChange={() => {
+                      setAccuracyFilter && setAccuracyFilter('all');
+                      setIsAccuracyOpen(false);
+                    }}
+                    className="accent-blue-500"
+                  />
+                  {isRtl ? 'تضمين جميع الكلمات' : 'Include all words'}
+                </label>
+                <label className="flex items-center gap-2 cursor-pointer">
+                  <input
+                    type="radio"
+                    name="accuracy"
+                    value="any"
+                    checked={accuracyFilter === 'any'}
+                    onChange={() => {
+                      setAccuracyFilter && setAccuracyFilter('any');
+                      setIsAccuracyOpen(false);
+                    }}
+                    className="accent-blue-500"
+                  />
+                  {isRtl ? 'تضمين أي من كلمات' : 'Include any words'}
+                </label>
+              </div>
+            </Popover.Dropdown>
+          </Popover>
         </div>
         {/* Filter chips below the input on small screens */}
         <div className={`mt-2 md:hidden flex flex-wrap gap-2 ${isRtl ? 'justify-end' : 'justify-start'}`}>
@@ -908,67 +907,7 @@ const SearchBar: React.FC<SearchBarProps> = ({
             )}
           </button>
           
-          <Popover
-            opened={isAccuracyOpen}
-            onChange={setIsAccuracyOpen}
-            position="bottom"
-            withinPortal={false}
-          >
-            <Popover.Target>
-              <button
-                type="button"
-                className={`${filterChipBaseClasses} ${(accuracyFilter && accuracyFilter !== 'all') ? filterChipActiveClasses : filterChipInactiveClasses} ${isRtl ? 'flex-row-reverse' : ''}`}
-                aria-label={isRtl ? 'دقة البحث' : 'Accuracy'}
-                onClick={() => setIsAccuracyOpen((o) => !o)}
-              >
-                <span
-                  className={`flex items-center justify-center w-6 h-6 rounded-full border ${(accuracyFilter && accuracyFilter !== 'all') ? 'bg-blue-100 border-blue-200 text-blue-700' : 'bg-blue-50 border-blue-100 text-[#299af8]'}`}
-                >
-                  <IconWorldSearch className="w-[14px] h-[14px]" />
-                </span>
-                <span className="font-medium text-gray-900">
-                  {isRtl ? 'الدقة' : 'Accuracy'}
-                </span>
-                <span className={`text-[11px] ${isRtl ? 'mr-1' : 'ml-1'} text-gray-600`}>
-                  {accuracyFilter === 'any'
-                    ? (isRtl ? 'أي كلمات' : 'Any words')
-                    : (isRtl ? 'كل الكلمات' : 'All words')}
-                </span>
-              </button>
-            </Popover.Target>
-            <Popover.Dropdown>
-              <div className="flex flex-col gap-2 text-xs min-w-[180px]" dir={isRtl ? 'rtl' : 'ltr'}>
-                <label className="flex items-center gap-2 cursor-pointer">
-                  <input
-                    type="radio"
-                    name="accuracy"
-                    value="all"
-                    checked={accuracyFilter === 'all'}
-                    onChange={() => {
-                      setAccuracyFilter && setAccuracyFilter('all');
-                      setIsAccuracyOpen(false);
-                    }}
-                    className="accent-blue-500"
-                  />
-                  {isRtl ? 'تضمين جميع الكلمات' : 'Include all words'}
-                </label>
-                <label className="flex items-center gap-2 cursor-pointer">
-                  <input
-                    type="radio"
-                    name="accuracy"
-                    value="any"
-                    checked={accuracyFilter === 'any'}
-                    onChange={() => {
-                      setAccuracyFilter && setAccuracyFilter('any');
-                      setIsAccuracyOpen(false);
-                    }}
-                    className="accent-blue-500"
-                  />
-                  {isRtl ? 'تضمين أي من كلمات' : 'Include any words'}
-                </label>
-              </div>
-            </Popover.Dropdown>
-          </Popover>
+          {/* Accuracy chip removed on mobile; control placed under search field */}
         </div>
         
         {shouldShowSuggestions && (

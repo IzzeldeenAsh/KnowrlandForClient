@@ -1473,7 +1473,7 @@ export default function HomePage() {
                     : 'overflow-hidden lg:w-0 opacity-0 max-h-0'
                 }`}
               >
-                <div className={`sticky top-0 h-[100vh] overflow-y-auto transition-transform duration-300 ease-in-out ${
+                <div className={`sticky top-0 h-[100vh] overflow-y-auto bg-white transition-transform duration-300 ease-in-out ${
                   filtersVisible ? 'transform translate-x-0' : 'transform -translate-x-full lg:translate-x-0'
                 }`}>
                   <FilterBox
@@ -1518,7 +1518,7 @@ export default function HomePage() {
               <div className="flex-1 h-[100vh] overflow-y-auto">
                 {/* Filters toggle - sticky toolbar (desktop) */}
                 <div className={`${!filtersVisible ? 'sticky top-0 z-20 bg-white/80 backdrop-blur border-b' : ''} ${locale === 'ar' ? 'pr-3' : 'pl-3'}`}>
-                  <div className={`flex ${locale === 'ar' ? 'justify-end' : 'justify-start'}`}>
+                  <div className={`flex ${locale === 'ar' ? 'justify-start' : 'justify-start'}`}>
                     <button
                       onClick={() => {
                         if (isTabletOrMobile) {
@@ -1532,7 +1532,6 @@ export default function HomePage() {
                       {filtersVisible && !isTabletOrMobile ? (
                         <>
                           <svg fill="none" height="20" viewBox="0 0 24 24" width="20" xmlns="http://www.w3.org/2000/svg"><g clipRule="evenodd" fillRule="evenodd"><path d="m11 20v-16h2v16z" fill="#90caea"/><g fill="#3747d6"><path d="m16.9142 12 2.7929-2.79289-1.4142-1.41422-3.5 3.50001c-.3905.3905-.3905 1.0237 0 1.4142l3.5 3.5 1.4142-1.4142z"/><path d="m7.0858 12-2.79289-2.79289 1.41421-1.41422 3.5 3.50001c.39053.3905.39053 1.0237 0 1.4142l-3.5 3.5-1.41421-1.4142z"/></g></g></svg>
-                          {locale === 'ar' ? 'إخفاء الفلاتر' : 'Hide Filters'}
                         </>
                       ) : (
                         <>
@@ -1551,7 +1550,6 @@ export default function HomePage() {
 <path d="M15.4297 20.5566C14.2181 20.5566 13.2324 19.571 13.2324 18.3594C13.2324 17.1478 14.2181 16.1621 15.4297 16.1621C16.6413 16.1621 17.627 17.1478 17.627 18.3594C17.627 19.571 16.6413 20.5566 15.4297 20.5566Z" fill="#4D5B99"/>
                             </svg>
 
-                          {locale === 'ar' ? 'إظهار الفلاتر' : 'Show Filters'}
                         </>
                       )}
                     </button>
@@ -1605,7 +1603,7 @@ export default function HomePage() {
                searchType={searchType}
                setSearchType={handleSearchTypeChange}
                locale={locale}
-               placeholder={locale === 'ar' ? 'ابحث في المنشورات أو عن الخبراء (انسايتر) لمختلف القطاعات' : 'Search for Insights or Insighter...'}
+               placeholder={locale === 'ar' ? 'ابحث في المنشورات أو عن الخبراء (انسايتر) لمختلف القطاعات' : 'Write or Search by ISIC,HS Codes...'}
                onSubmit={handleSubmit}
                onSearch={executeSearch}
               onQueryChange={handleQueryChange}

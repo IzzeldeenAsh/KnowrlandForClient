@@ -57,6 +57,8 @@ export interface KnowledgeDetails {
   title: string;
   slug: string;
   description: string;
+  // Overall purchase status for the knowledge
+  purchased_status?: 'non-purchased' | 'purchased' | 'partial-purchased';
   isic_code: {
     id: number;
     key: number;
@@ -102,6 +104,8 @@ export interface KnowledgeDetails {
     file_extension: string;
     price: string;
     description: string | null;
+    // Whether this specific document was purchased by current user
+    is_purchased?: boolean;
     table_of_content: Array<{
       chapter: {
         title: string;

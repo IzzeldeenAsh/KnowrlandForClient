@@ -198,7 +198,7 @@ export default function SearchResultsList({
 
       const method = currentState ? 'DELETE' : 'POST';
       const slug = item.url.split('/').pop();
-      const url = `https://api.insightabusiness.com/api/account/favorite/knowledge/${slug}`;
+      const url = `https://api.foresighta.co/api/account/favorite/knowledge/${slug}`;
 
 
       const axiosConfig = {
@@ -344,7 +344,7 @@ export default function SearchResultsList({
                 <div className={listStyles.titleSection}>
                   <Text
                     component="h3"
-                    className={`${listStyles.title} amiri-bold`}
+                    className={`${listStyles.title} `}
                   >
                     {item.title}
                   </Text>
