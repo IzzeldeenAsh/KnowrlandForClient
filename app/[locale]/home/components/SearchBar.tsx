@@ -147,7 +147,7 @@ const SearchBar: React.FC<SearchBarProps> = ({
     }
   }, [suggestions, inputFocused, suggestionSelected, allowSuggestions]);
 
-  // Fetch ISIC tree on mount
+  // Fetch ISIC tree on mount (by locale only)
   useEffect(() => {
     let mounted = true;
     const loadIsic = async () => {
@@ -197,7 +197,7 @@ const SearchBar: React.FC<SearchBarProps> = ({
     return () => {
       mounted = false;
     };
-  }, [locale, searchType, initialUrlIsic, initialUrlHs]);
+  }, [locale]);
 
   // Sync selected ISIC from external filter once leaves are available
   useEffect(() => {
