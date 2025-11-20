@@ -390,19 +390,6 @@ const FilterBox: React.FC<FilterBoxProps> = React.memo(({
       return data.data ? data.data.map((t: TagItem) => ({ id: t.id, name: t.name })) : [];
     };
 
-    const fetchIsicCodes = async () => {
-      const response = await fetch(getApiUrl('/api/common/setting/isic-code/tree-list'), {
-        headers: {
-          'Accept-Language': locale,
-          'Accept': 'application/json',
-          "X-Timezone": Intl.DateTimeFormat().resolvedOptions().timeZone,
-        }
-      });
-      if (!response.ok) throw new Error('Failed to fetch ISIC codes');
-      const data = await response.json();
-      return data || [];
-    };
-
     const fetchIndustries = async () => {
       const response = await fetch(getApiUrl('/api/common/setting/industry/tree'), {
         headers: {
@@ -422,64 +409,11 @@ const FilterBox: React.FC<FilterBoxProps> = React.memo(({
       fetchWithLoading(fetchRegions, 'regions', setRegions),
       fetchWithLoading(fetchEconomicBlocs, 'economicBlocs', setEconomicBlocs),
       fetchWithLoading(fetchTags, 'tags', setTags),
-      fetchWithLoading(fetchIsicCodes, 'isicCodes', setIsicCodes),
       fetchWithLoading(fetchIndustries, 'industries', setIndustries)
     ]);
   }, [locale, fetchWithLoading]);
 
-  // Fetch HS codes
-  useEffect(() => {
-    const fetchHsCodesByIsic = async (isicCodeId: number) => {
-      setDataLoading(prev => ({ ...prev, hsCodes: true }));
-      try {
-        const response = await fetch(getApiUrl(`/api/common/setting/hs-code/isic-code/${isicCodeId}`), {
-          headers: {
-            'Accept-Language': locale,
-            'Accept': 'application/json',
-            "X-Timezone": Intl.DateTimeFormat().resolvedOptions().timeZone,
-          }
-        });
-
-        if (!response.ok) throw new Error('Failed to fetch HS codes');
-
-        const data = await response.json();
-        setHsCodes(data.data || []);
-      } catch (error) {
-        console.error('Error fetching HS codes:', error);
-        setHsCodes([]);
-      } finally {
-        setDataLoading(prev => ({ ...prev, hsCodes: false }));
-      }
-    };
-
-    const fetchAllHsCodes = async () => {
-      setDataLoading(prev => ({ ...prev, hsCodes: true }));
-      try {
-        const response = await fetch(getApiUrl('/api/common/setting/hs-code/list'), {
-          headers: {
-            'Accept-Language': locale,
-            'Accept': 'application/json',
-            "X-Timezone": Intl.DateTimeFormat().resolvedOptions().timeZone,
-          }
-        });
-        if (!response.ok) throw new Error('Failed to fetch HS codes');
-        const data = await response.json();
-        setHsCodes(data.data || []);
-      } catch (error) {
-        console.error('Error fetching HS codes:', error);
-        setHsCodes([]);
-      } finally {
-        setDataLoading(prev => ({ ...prev, hsCodes: false }));
-      }
-    };
-
-    if (selectedIsicCode?.id) {
-      fetchHsCodesByIsic(selectedIsicCode.id);
-    } else {
-      // Decoupled behavior: allow HS without ISIC
-      fetchAllHsCodes();
-    }
-  }, [selectedIsicCode?.id, locale]);
+  // HS codes fetching moved to SearchBar. Avoid duplicate calls here.
 
   // Initialize selected codes based on prop values
   useEffect(() => {
