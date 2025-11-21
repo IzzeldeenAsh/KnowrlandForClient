@@ -324,7 +324,9 @@ export default function SearchResultsGrid({
     downloads: isRTL ? "تحميل" : "Downloads",
     downloaded: isRTL ? "تم التحميل" : "Downloaded",
     time: isRTL ? "مرة" : "time",
-    times: isRTL ? "مرات" : "times"
+    times: isRTL ? "مرات" : "times",
+    download: isRTL ? "تحميل" : "Download",
+
   };
 
   if (results.length === 0) {
@@ -421,7 +423,7 @@ export default function SearchResultsGrid({
                   <div >
                     <div
                       
-                      className="text-xl  font-bold leading-none bg-clip-text text-transparent bg-gradient-to-r from-sky-300  to-sky-800  drop-shadow-lg"
+                      className="text-lg  font-bold leading-none bg-clip-text text-transparent bg-gradient-to-r from-sky-300  to-sky-800  drop-shadow-lg"
                     >
                       {coverageText}
                     </div>
@@ -442,7 +444,7 @@ export default function SearchResultsGrid({
                       <ArrowDownTrayIcon className="w-3 h-3 text-white" />
                     </div>
                     <Text size="xs" className="text-white font-medium">
-                      {translations.downloaded} {item.total_downloads.toLocaleString()} {item.total_downloads === 1 ? translations.time : translations.times}
+                       {item.total_downloads.toLocaleString()} {item.total_downloads === 1 ? translations.download : translations.downloads}
                     </Text>
                   </div>
                 )}
