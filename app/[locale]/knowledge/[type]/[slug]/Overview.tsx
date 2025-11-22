@@ -93,7 +93,7 @@ export default function Overview({ knowledge, knowledgeSlug }: OverviewProps) {
     buyNow: isRTL ? 'شراء الآن' : 'Buy Now',
     evaluateWithAI: isRTL ? 'تقييم باستخدام الذكاء الاصطناعي' : 'Evaluate with AI',
     description: isRTL ? 'الوصف' : 'Description',
-    tableOfContents: isRTL ? 'جدول المحتويات' : 'Table of Contents',
+    tableOfContents: isRTL ? 'المحتويات' : 'Table of Contents',
     chapter: isRTL ? 'الفصل' : 'Chapter',
     title: isRTL ? 'العنوان' : 'Title',
     noDocumentsAvailable: isRTL ? 'لا توجد مستندات متاحة.' : 'No documents available.',

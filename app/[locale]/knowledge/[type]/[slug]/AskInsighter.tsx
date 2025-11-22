@@ -65,7 +65,7 @@ export default function AskInsighter({ knowledgeSlug, questions = [], is_owner =
   // Translations for the component
   const translations = {
     discussion: isRTL ? '\u0627\u0644\u0623\u0633\u0626\u0644\u0629' : 'Questions',
-    writeQuestion: isRTL ? '\u0627\u0643\u062a\u0628 \u0633\u0624\u0627\u0644\u0643 \u0644\u0644\u062e\u0628\u064a\u0631...' : 'Write your question to the insighter...',
+    writeQuestion: isRTL ? 'اكتب سؤالك هنا. سيكون سؤالك مرئيًا للآخرين' : 'Write your question here. It will be visible to others.',
     writeReply: isRTL ? '\u0627\u0643\u062a\u0628 \u0631\u062f\u0643...' : 'Add your comment...',
     writeAnswer: isRTL ? '\u0627\u0643\u062a\u0628 \u0625\u062c\u0627\u0628\u062a\u0643...' : 'Add your reply...',
     postQuestion: isRTL ? '\u0625\u0631\u0633\u0627\u0644 \u0627\u0644\u0633\u0624\u0627\u0644' : 'Send Question',

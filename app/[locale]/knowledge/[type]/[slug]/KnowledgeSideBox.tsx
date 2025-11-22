@@ -276,7 +276,7 @@ const KnowledgeSideBox = ({
     readLater: isRTL ? 'قراءة لاحقا' : 'Read Later',
     removeReadLater: isRTL ? 'إزالة من قراءة لاحقا' : 'Remove Read Later',
     na: isRTL ? 'غير متوفر' : 'N/A',
-    free: isRTL ? 'مجاني' : 'Free',
+    free: isRTL ? 'صدقة جارية' : 'Goodwill Release',
     share: isRTL ? 'مشاركة' : 'Share',
     worldWide: isRTL ? 'كافة أنحاء العالم': 'Worldwide',
     showMore: isRTL ? 'عرض المزيد' : 'Show more',
