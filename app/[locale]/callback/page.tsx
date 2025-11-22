@@ -4,7 +4,7 @@ import { useEffect } from 'react';
 import { useRouter, useParams, useSearchParams } from 'next/navigation';
 import { useGlobalProfile } from '@/components/auth/GlobalProfileProvider';
 import FullScreenLoader from '@/components/ui/FullScreenLoader';
-
+import { useLocale } from 'next-intl';
 interface ProfileResponse {
   data: {
     id: number;
@@ -26,7 +26,7 @@ export default function QueryParamAuthCallback() {
   const params = useParams();
   const searchParams = useSearchParams();
   const { refreshProfile } = useGlobalProfile();
-  
+  const currentLocale = useLocale();
   // Get token from query parameters or cookies
   let token = searchParams.get('token');
   
@@ -484,5 +484,5 @@ export default function QueryParamAuthCallback() {
     throw new Error('Failed to fetch profile after all retry attempts');
   };
 
-  return <FullScreenLoader message="Signing you in..." />;
+  return <FullScreenLoader message={currentLocale === 'ar' ? 'جاري تسجيل الدخول...' : 'Signing you in...'} />;
 } 

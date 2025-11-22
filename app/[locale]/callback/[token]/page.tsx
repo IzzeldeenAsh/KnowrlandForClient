@@ -4,7 +4,7 @@ import { useEffect } from 'react';
 import { useRouter, useParams, useSearchParams } from 'next/navigation';
 import { useGlobalProfile } from '@/components/auth/GlobalProfileProvider';
 import FullScreenLoader from '@/components/ui/FullScreenLoader';
-
+import { useLocale } from 'next-intl';
 interface ProfileResponse {
   data: {
     id: number;
@@ -26,7 +26,7 @@ export default function AuthCallback() {
   const params = useParams();
   const searchParams = useSearchParams();
   const { refreshProfile } = useGlobalProfile();
-  
+  const currentLocale = useLocale();
   // Get token from either path parameter or query parameter
   const pathToken = params.token as string;
   const queryToken = searchParams.get('token');
@@ -470,5 +470,5 @@ export default function AuthCallback() {
     document.cookie = cookieSettings.join('; ');
   };
 
-  return <FullScreenLoader message="Signing you in..." />;
+  return <FullScreenLoader message={currentLocale === 'ar' ? 'جاري تسجيل الدخول...' : 'Signing you in...'} />;
 }
