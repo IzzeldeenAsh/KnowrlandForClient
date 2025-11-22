@@ -3,7 +3,7 @@
 import React, { createContext, useState, useContext, useEffect } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
 import FullScreenLoader from '../ui/FullScreenLoader';
-
+import { useLocale } from 'next-intl';
 type LoadingContextType = {
   isLoading: boolean;
   setIsLoading: React.Dispatch<React.SetStateAction<boolean>>;
@@ -19,7 +19,7 @@ export function LoadingProvider({ children }: { children: React.ReactNode }) {
   const [isManualLoading, setIsManualLoading] = useState(false);
   const pathname = usePathname();
   const router = useRouter();
-
+  const currentLocale = useLocale();
   // Check for preferred language cookie and determine if loading should be shown
   useEffect(() => {
     const getCookie = (name: string) => {
@@ -93,7 +93,7 @@ export function LoadingProvider({ children }: { children: React.ReactNode }) {
       startPageLoading,
       stopPageLoading
     }}>
-      {showLoader ? <FullScreenLoader message="Loading..." /> : children}
+      {showLoader ? <FullScreenLoader message={currentLocale === 'ar' ? 'جاري تحميل الصفحة...' : 'Loading...'} /> : children}
     </LoadingContext.Provider>
   );
 }
