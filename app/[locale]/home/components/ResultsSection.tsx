@@ -240,9 +240,11 @@ const ResultsSection: React.FC<ResultsSectionProps> = ({
                         <span className={`${isRtl ? 'me-2' : 'ml-2'} font-medium text-xs`}>
                         {isRtl ? cat.arLabel : cat.label}
                       </span>
-                        <span className={`${styles.countBadge} ${isRtl ? 'me-0' : 'ml-2'}`}>
-                        {count > 999 ? '999+' : count}
-                        </span>
+                        {cat.name !== 'all' && (
+                          <span className={`${styles.countBadge} ${isRtl ? 'me-0' : 'ml-2'}`}>
+                            {count > 999 ? '999+' : count}
+                          </span>
+                        )}
                       </span>
                     </button>
                   );
