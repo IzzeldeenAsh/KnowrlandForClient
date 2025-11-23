@@ -78,11 +78,12 @@ export default async function RootLayout({
           dangerouslySetInnerHTML={{
             __html: `
             (function() {
+              var currentLocale = '${locale}';
               // Check if the current path is one of our problematic routes
               var path = window.location.pathname;
               
               // Specifically handle the route that's causing 404s
-              if (path === '/en/filter-knowledges/topic/139/insight') {
+              if (path === '/' + currentLocale + '/filter-knowledges/topic/139/insight') {
                 console.log('Detected problematic route, attempting to handle...');
                 
                 // This approach won't trigger a full page reload but will update the React router
@@ -90,7 +91,7 @@ export default async function RootLayout({
                   window.history.replaceState(
                     {}, 
                     '', 
-                    '/en/filter-knowledges/topic/139/insight'
+                    '/' + currentLocale + '/filter-knowledges/topic/139/insight'
                   );
                   console.log('URL state updated');
                 }
