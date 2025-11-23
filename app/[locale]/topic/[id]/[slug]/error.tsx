@@ -4,13 +4,15 @@ import { useEffect } from 'react'
 import Link from 'next/link'
 import { useParams } from 'next/navigation'
 
-export default function TopicError({
+export default function Error({
   error,
   reset,
 }: {
   error: Error & { digest?: string }
   reset: () => void
 }) {
+  const params = useParams()
+  const locale = (params?.locale as string) || 'en'
   useEffect(() => {
     console.error('Topic page error:', error)
   }, [error])
@@ -32,7 +34,7 @@ export default function TopicError({
             Try again
           </button>
           <Link
-            href={\`/\${(useParams().locale as string) || 'en'}/all-industries\`}
+            href={`/${locale}/all-industries`}
             className="bg-gray-500 text-white px-6 py-2 rounded-lg hover:bg-gray-600 transition-colors inline-block"
           >
             Back to Industries
