@@ -768,7 +768,7 @@ const SearchBar: React.FC<SearchBarProps> = ({
             </button>
         </div>
         {/* Accuracy control under the search field */}
-        <div className={`mt-2 flex ${isRtl ? 'justify-start' : 'justify-end'}`}>
+        <div className={`mt-2 flex ${isRtl ? 'justify-end' : 'justify-end'}`}>
           <Popover
             opened={isAccuracyOpen}
             onChange={setIsAccuracyOpen}
@@ -971,7 +971,7 @@ const SearchBar: React.FC<SearchBarProps> = ({
         )}
         {/* Selected ISIC/HS details under the search bar */}
         {(selectedIsic || selectedHs) && (
-          <div className={`mt-2 flex flex-wrap gap-2 items-start ${isRtl ? 'justify-end' : 'justify-start'} text-xs`}>
+          <div className={`mt-2 flex flex-wrap gap-2 items-start ${isRtl ? 'justify-start' : 'justify-start'} text-xs`}>
             {selectedIsic && (
               <div
                 className={`flex items-center gap-1 px-2 py-1 rounded-full border bg-blue-50 border-blue-200 text-blue-700 ${isRtl ? 'flex-row-reverse' : ''}`}
