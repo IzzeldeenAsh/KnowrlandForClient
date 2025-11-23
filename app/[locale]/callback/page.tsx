@@ -265,6 +265,27 @@ export default function QueryParamAuthCallback() {
     console.log('[callback] Handling redirect for user:', userData.email);
     console.log('[callback] User roles:', userData.roles);
     console.log('[callback] Return URL from params:', returnUrl);
+    const preferredLanguage = getCookie('preferred_language') || locale;
+    const normalizeNextUrlToLocale = (url: string | null, targetLocale: string): string | null => {
+      if (!url) return url;
+      try {
+        const u = new URL(url, window.location.origin);
+        // Consider localhost:3000 and production Next.js host as internal
+        const isNextHost = (u.hostname === 'localhost' && u.port === '3000') || (!u.hostname.includes('localhost') && !u.hostname.startsWith('app.'));
+        if (isNextHost) {
+          const withoutLocale = u.pathname.replace(/^\/(en|ar)(\/|$)/, '/');
+          u.pathname = `/${targetLocale}${withoutLocale === '/' ? '' : withoutLocale}`;
+          return u.toString();
+        }
+        return url;
+      } catch {
+        if (url.startsWith('/')) {
+          const withoutLocale = url.replace(/^\/(en|ar)(\/|$)/, '/');
+          return `/${targetLocale}${withoutLocale === '/' ? '' : withoutLocale}`;
+        }
+        return url;
+      }
+    };
 
     // Check if user has admin role
     if (userData.roles && userData.roles.includes('admin')) {
@@ -295,7 +316,7 @@ export default function QueryParamAuthCallback() {
         storeCountryUpdateReturnUrl(redirectUrl);
       } else {
         // Store home page as return URL
-        redirectUrl = `/${locale}/home`;
+        redirectUrl = `/${preferredLanguage}/home`;
         storeCountryUpdateReturnUrl(redirectUrl);
       }
 
@@ -305,7 +326,7 @@ export default function QueryParamAuthCallback() {
       }
 
       // Redirect to country update page with redirect parameter
-      window.location.href = `/${locale}/update-country?redirect=${encodeURIComponent(redirectUrl)}`;
+      window.location.href = `/${preferredLanguage}/update-country?redirect=${encodeURIComponent(redirectUrl)}`;
       return;
     }
 
@@ -313,7 +334,8 @@ export default function QueryParamAuthCallback() {
     const storedReturnUrl = getCookie('auth_return_url');
     console.log('[callback] Stored return URL from cookie:', storedReturnUrl);
 
-    const finalReturnUrl = returnUrl || storedReturnUrl;
+    const finalReturnUrlRaw = returnUrl || storedReturnUrl;
+    const finalReturnUrl = normalizeNextUrlToLocale(finalReturnUrlRaw, preferredLanguage || 'en');
     console.log('[callback] Final return URL:', finalReturnUrl);
 
     // Clean up the stored return URL cookie
@@ -352,8 +374,8 @@ export default function QueryParamAuthCallback() {
       window.location.href = `https://app.insightabusiness.com/app/insighter-dashboard/my-dashboard`;
     } else {
       // Redirect to home page using current locale
-      console.log('[callback] Redirecting to home page:', `/${locale}/home`);
-      router.push(`/${locale}/home`);
+      console.log('[callback] Redirecting to home page:', `/${preferredLanguage}/home`);
+      router.push(`/${preferredLanguage}/home`);
     }
   };
 
