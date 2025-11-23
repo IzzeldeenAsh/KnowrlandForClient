@@ -64,6 +64,8 @@ export const config = {
   // Match internationalized pathnames
   matcher: [
     '/', 
-    '/(ar|en)/:path*'
+    '/(ar|en)/:path*',
+    // Ensure bare callback without locale gets handled and redirected to preferred language
+    '/callback'
   ]
 };
