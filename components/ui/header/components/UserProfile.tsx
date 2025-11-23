@@ -287,7 +287,7 @@ export function UserProfile({ isHome }: { isHome: boolean }) {
           </div>
 
           <div className="py-2 px-3">
-          <div className="border-b border-slate-100">
+          <div className={roles.includes("insighter") || roles.includes("company") || roles.includes("company-insighter") ? "border-b border-slate-100" : ""}>
               {(roles.includes("insighter") ||
               roles.includes("company") ||
               roles.includes("company-insighter")) && (

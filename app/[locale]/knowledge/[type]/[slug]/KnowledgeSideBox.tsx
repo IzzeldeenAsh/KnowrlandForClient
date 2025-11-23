@@ -631,17 +631,19 @@ const KnowledgeSideBox = ({
                   {translations.targetMarket}
                 </span>
                 <div className={`field-content-container ${expandedSections.economicBlocs ? 'expanded' : ''}`}>
-                  <div className={`chips-row ${economic_blocs.length > MAX_VISIBLE_TARGET_MARKET_ITEMS ? 'with-more' : ''} flex flex-nowrap gap-1 justify-end overflow-hidden no-wrap`}>
-                    {economic_blocs
-                      .slice(0, expandedSections.economicBlocs ? economic_blocs.length : MAX_VISIBLE_TARGET_MARKET_ITEMS)
-                      .map((economicBloc) => (
-                        <span key={economicBloc.id} className={`badge bg-[#f1f1f4] text-[#4b5675] text-xs font-medium px-2.5 py-0.5 rounded ${isRTL ? 'text-left' : 'text-right'}`}>
-                          {economicBloc.name}
-                        </span>
-                      ))}
+                  <div className={`chips-container ${economic_blocs.length > MAX_VISIBLE_TARGET_MARKET_ITEMS && !expandedSections.economicBlocs ? 'with-more' : ''}`}>
+                    <div className="chips-wrapper">
+                      {economic_blocs
+                        .slice(0, expandedSections.economicBlocs ? economic_blocs.length : MAX_VISIBLE_TARGET_MARKET_ITEMS)
+                        .map((economicBloc) => (
+                          <span key={economicBloc.id} className={`chip-badge ${isRTL ? 'text-left' : 'text-right'}`} title={economicBloc.name}>
+                            {economicBloc.name}
+                          </span>
+                        ))}
+                    </div>
                     {economic_blocs.length > MAX_VISIBLE_TARGET_MARKET_ITEMS && (
-                      <button 
-                        className="inline-more-btn text-blue-500 text-xs flex items-center whitespace-nowrap"
+                      <button
+                        className={`more-btn ${expandedSections.economicBlocs ? 'expanded' : ''}`}
                         onClick={() => toggleSection('economicBlocs')}
                       >
                         {expandedSections.economicBlocs ? (
@@ -670,23 +672,25 @@ const KnowledgeSideBox = ({
                   {translations.targetMarket}
                 </span>
                 <div className={`field-content-container ${expandedSections.regions ? 'expanded' : ''}`}>
-                  <div className={`chips-row ${(regions.length > MAX_VISIBLE_TARGET_MARKET_ITEMS && regions.length !== 6) ? 'with-more' : ''} flex flex-nowrap gap-1 justify-end overflow-hidden no-wrap`}>
-                    {regions.length === 6 ? (
-                      <span className={`badge bg-[#f1f1f4] text-[#4b5675] text-xs font-medium px-2.5 py-0.5 rounded ${isRTL ? 'text-left' : 'text-right'}`}>
-                     {translations.worldWide}
-                      </span>
-                    ) : (
-                      regions
-                        .slice(0, expandedSections.regions ? regions.length : MAX_VISIBLE_TARGET_MARKET_ITEMS)
-                        .map((region:any) => (
-                          <span key={region.id} className={`badge bg-[#f1f1f4] text-[#4b5675] text-xs font-medium px-2.5 py-0.5 rounded ${isRTL ? 'text-left' : 'text-right'}`}>
-                            {region.name}
-                          </span>
-                        ))
-                    )}
+                  <div className={`chips-container ${(regions.length > MAX_VISIBLE_TARGET_MARKET_ITEMS && regions.length !== 6 && !expandedSections.regions) ? 'with-more' : ''}`}>
+                    <div className="chips-wrapper">
+                      {regions.length === 6 ? (
+                        <span className="chip-badge" title={translations.worldWide}>
+                          {translations.worldWide}
+                        </span>
+                      ) : (
+                        regions
+                          .slice(0, expandedSections.regions ? regions.length : MAX_VISIBLE_TARGET_MARKET_ITEMS)
+                          .map((region:any) => (
+                            <span key={region.id} className="chip-badge" title={region.name}>
+                              {region.name}
+                            </span>
+                          ))
+                      )}
+                    </div>
                     {regions.length > MAX_VISIBLE_TARGET_MARKET_ITEMS && regions.length !== 6 && (
-                      <button 
-                        className="inline-more-btn text-blue-500 text-xs flex items-center whitespace-nowrap"
+                      <button
+                        className={`more-btn ${expandedSections.regions ? 'expanded' : ''}`}
                         onClick={() => toggleSection('regions')}
                       >
                         {expandedSections.regions ? (
@@ -715,17 +719,19 @@ const KnowledgeSideBox = ({
                   {translations.targetMarket}
                 </span>
                 <div className={`field-content-container ${expandedSections.countries ? 'expanded' : ''}`}>
-                  <div className={`chips-row ${countries.length > MAX_VISIBLE_TARGET_MARKET_ITEMS ? 'with-more' : ''} flex flex-nowrap gap-1 justify-end overflow-hidden no-wrap`}>
-                    {countries
-                      .slice(0, expandedSections.countries ? countries.length : MAX_VISIBLE_TARGET_MARKET_ITEMS)
-                      .map((country:any) => (
-                        <span key={country.id} className={`badge bg-[#f1f1f4] text-[#4b5675] text-xs font-medium px-2.5 py-0.5 rounded ${isRTL ? 'text-left' : 'text-right'}`}>
-                          {country.name}
-                        </span>
-                      ))}
+                  <div className={`chips-container ${countries.length > MAX_VISIBLE_TARGET_MARKET_ITEMS && !expandedSections.countries ? 'with-more' : ''}`}>
+                    <div className="chips-wrapper">
+                      {countries
+                        .slice(0, expandedSections.countries ? countries.length : MAX_VISIBLE_TARGET_MARKET_ITEMS)
+                        .map((country:any) => (
+                          <span key={country.id} className="chip-badge" title={country.name}>
+                            {country.name}
+                          </span>
+                        ))}
+                    </div>
                     {countries.length > MAX_VISIBLE_TARGET_MARKET_ITEMS && (
-                      <button 
-                        className="inline-more-btn text-blue-500 text-xs flex items-center whitespace-nowrap"
+                      <button
+                        className={`more-btn ${expandedSections.countries ? 'expanded' : ''}`}
                         onClick={() => toggleSection('countries')}
                       >
                         {expandedSections.countries ? (
@@ -903,11 +909,117 @@ const KnowledgeSideBox = ({
 
           /* Left label: keep on one line and ellipsize */
           .tp-course-details2-widget-list-item > span:first-child {
-          
             white-space: nowrap;
             text-overflow: ellipsis;
             display: inline-flex;
             align-items: center;
+          }
+
+          /* Chips container styling */
+          .chips-container {
+            width: 100%;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+          }
+
+          .chips-wrapper {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 4px;
+            justify-content: flex-end;
+            align-items: center;
+            width: 100%;
+            max-height: 28px;
+            overflow: hidden;
+            transition: max-height 0.3s ease;
+          }
+
+          .field-content-container.expanded .chips-wrapper {
+            max-height: none;
+          }
+
+          /* Chip badge styling with text truncation */
+          .chip-badge {
+            background-color: #f1f1f4;
+            color: #4b5675;
+            font-size: 12px;
+            font-weight: 500;
+            padding: 2px 10px;
+            border-radius: 4px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 120px;
+            display: inline-block;
+            cursor: help;
+            transition: all 0.2s ease;
+          }
+
+          .chip-badge:hover {
+            background-color: #e5e7eb;
+            max-width: none;
+            z-index: 10;
+            position: relative;
+          }
+
+          /* More button styling */
+          .more-btn {
+            color: #3b82f6;
+            font-size: 12px;
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            white-space: nowrap;
+            margin-top: 4px;
+            padding: 2px 4px;
+            border-radius: 4px;
+            transition: background-color 0.2s ease;
+          }
+
+          .more-btn:hover {
+            background-color: #eff6ff;
+          }
+
+          /* Responsive design for smaller screens */
+          @media (max-width: 640px) {
+            .field-content-container {
+              width: 70%;
+            }
+
+            .chip-badge {
+              max-width: 100px;
+              font-size: 11px;
+              padding: 2px 8px;
+            }
+
+            .tp-course-details2-widget-list-item > span:first-child {
+              width: 30%;
+              font-size: 13px;
+            }
+          }
+
+          @media (max-width: 480px) {
+            .field-content-container {
+              width: 100%;
+            }
+
+            .chip-badge {
+              max-width: 80px;
+            }
+
+            .tp-course-details2-widget-list-item {
+              flex-direction: column;
+              align-items: flex-start;
+              gap: 8px;
+            }
+
+            .tp-course-details2-widget-list-item > span:first-child {
+              width: 100%;
+            }
           }
 
           /* Prevent wrapping in collapsed state */
@@ -924,21 +1036,6 @@ const KnowledgeSideBox = ({
             flex-wrap: wrap !important;
           }
 
-          /* Inline +more button for Target Market */
-          .inline-more-btn {
-            position: absolute;
-            right: 0;
-            top: 50%;
-            transform: translateY(-50%);
-            background: transparent;
-          }
-
-          /* Reserve space for inline button so chips don't overlap it */
-          .chips-row {
-            width: 100%;
-          }
-          .chips-row.with-more { padding-right: 72px; }
-
           .field-content-container.overflow-visible {
             overflow: visible;
           }
@@ -948,7 +1045,7 @@ const KnowledgeSideBox = ({
           }
 
           .field-content-container:not(.expanded) {
-            max-height: 28px;
+            max-height: 60px;
           }
 
           .field-content-container:not(.expanded).overflow-visible {
@@ -966,6 +1063,19 @@ const KnowledgeSideBox = ({
 
           .tp-course-details2-widget-list-item:last-child {
             border-bottom: none;
+          }
+
+          /* RTL support */
+          [dir="rtl"] .chips-wrapper {
+            justify-content: flex-end;
+          }
+
+          [dir="rtl"] .chip-badge {
+            text-align: right;
+          }
+
+          [dir="rtl"] .more-btn {
+            margin-right: 4px;
           }
         `}</style>
 
