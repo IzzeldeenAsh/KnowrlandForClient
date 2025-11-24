@@ -221,7 +221,7 @@ export default function IndustriesByTypePage({ params }: Props) {
                   priority={false}
                 />
                 <h3 className="mt-4 text-lg font-semibold text-gray-900">
-                  {locale === 'ar' ? 'لا توجد صناعات لهذا النوع' : 'No industries found for this type'}
+                  {locale === 'ar' ? 'لا توجد رؤى لهذا النوع' : 'No insights found for this type'}
                 </h3>
                 <p className="mt-2 text-sm text-gray-600 max-w-md">
                   {locale === 'ar'

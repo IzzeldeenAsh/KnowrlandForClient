@@ -202,61 +202,73 @@ const { isLoading: isAppLoading, setIsLoading: setAppLoading } = useLoading();
     return `${firstName[0]}${lastName[0]}`.toUpperCase();
   };
 
+  // Helper function to clear duplicate cookies
+  const clearDuplicateCookies = (cookieName: string) => {
+    const isProduction = typeof window !== 'undefined' && window.location.hostname.includes('insightabusiness.com');
+
+    // Clear all possible variations of the cookie to prevent duplicates
+    const clearVariations = [
+      // Local variation
+      `${cookieName}=; Path=/; Max-Age=-1`,
+      // Production domain variation
+      `${cookieName}=; Domain=.insightabusiness.com; Path=/; Max-Age=-1; Secure; SameSite=None`,
+      // Fallback without domain
+      `${cookieName}=; Path=/; Max-Age=-1; ${isProduction ? 'Secure; SameSite=None' : 'SameSite=Lax'}`
+    ];
+
+    clearVariations.forEach(variation => {
+      document.cookie = variation;
+    });
+  };
+
   // Function to switch locale
   const switchLocale = (locale: string) => {
     // Set loading state before switching locale
     setAppLoading(true);
-    
-    // Enhanced cookie setting for better browser compatibility (especially Safari/Firefox)
-    const isProduction = typeof window !== 'undefined' && window.location.hostname.includes('insightabusiness.com');
-    const expirationDate = new Date();
-    expirationDate.setFullYear(expirationDate.getFullYear() + 1); // 1 year from now
-    
-    const cookieParts = [
-      `preferred_language=${locale}`,
-      `Path=/`,                       // send on all paths
-      `Expires=${expirationDate.toUTCString()}`, // Use Expires for better Safari/Firefox compatibility
-      `Max-Age=${60 * 60 * 24 * 365}`,// one year (keeping both for compatibility)
-      `SameSite=Lax`                  // prevent CSRF, still send on top-level nav
-    ];
-    
-    if (isProduction) {
-      cookieParts.push(`Domain=.insightabusiness.com`); // leading dot = include subdomains
-      cookieParts.push(`Secure`);                // HTTPS only in production
-    }
-    
-    // Set cookie with improved browser compatibility
-    document.cookie = cookieParts.join('; ');
-    
-    // Also try to set cookie without domain for local fallback (helps with Safari)
-    if (isProduction) {
-      const fallbackCookie = [
+
+    // Clear any existing duplicate cookies first
+    clearDuplicateCookies('preferred_language');
+
+    // Wait a moment for cookie clearing to take effect
+    setTimeout(() => {
+      // Enhanced cookie setting for better browser compatibility (especially Safari/Firefox)
+      const isProduction = typeof window !== 'undefined' && window.location.hostname.includes('insightabusiness.com');
+      const expirationDate = new Date();
+      expirationDate.setFullYear(expirationDate.getFullYear() + 1); // 1 year from now
+
+      const cookieParts = [
         `preferred_language=${locale}`,
-        `Path=/`,
-        `Expires=${expirationDate.toUTCString()}`,
-        `Max-Age=${60 * 60 * 24 * 365}`,
-        `SameSite=Lax`,
-        `Secure`
-      ].join('; ');
-      document.cookie = fallbackCookie;
-    }
-    
-    // Get the current path without locale prefix
-    const currentPath = pathname.split('/').slice(2).join('/');
-    
-    // Get current query parameters
-    const currentSearch = typeof window !== 'undefined' ? window.location.search : '';
-    
-    // Navigate to the same route with the new locale
-    // If we're on the home page (or empty path), just use '/'
-    const newPath = currentPath ? `/${currentPath}` : '/';
-    
-    // Preserve query parameters when switching locale
-    const fullUrl = `/${locale}${newPath}${currentSearch}`;
-    
-    // Force a complete page reload to prevent client-side errors
-    // This ensures all components are properly re-rendered with the new locale
-    window.location.href = fullUrl;
+        `Path=/`,                       // send on all paths
+        `Expires=${expirationDate.toUTCString()}`, // Use Expires for better Safari/Firefox compatibility
+        `Max-Age=${60 * 60 * 24 * 365}`,// one year (keeping both for compatibility)
+        `SameSite=Lax`                  // prevent CSRF, still send on top-level nav
+      ];
+
+      if (isProduction) {
+        cookieParts.push(`Domain=.insightabusiness.com`); // leading dot = include subdomains
+        cookieParts.push(`Secure`);                // HTTPS only in production
+      }
+
+      // Set single, clean cookie
+      document.cookie = cookieParts.join('; ');
+
+      // Get the current path without locale prefix
+      const currentPath = pathname.split('/').slice(2).join('/');
+
+      // Get current query parameters
+      const currentSearch = typeof window !== 'undefined' ? window.location.search : '';
+
+      // Navigate to the same route with the new locale
+      // If we're on the home page (or empty path), just use '/'
+      const newPath = currentPath ? `/${currentPath}` : '/';
+
+      // Preserve query parameters when switching locale
+      const fullUrl = `/${locale}${newPath}${currentSearch}`;
+
+      // Force a complete page reload to prevent client-side errors
+      // This ensures all components are properly re-rendered with the new locale
+      window.location.href = fullUrl;
+    }, 100); // Small delay to ensure cookie clearing
   };
 
   // Hide header on callback routes to avoid visual flicker/loaders during auth
