@@ -42,7 +42,7 @@ export default function AuthBanner({ onSignUp, onLogin }: AuthBannerProps) {
           <div className=" text-md sm:text-lg font-bold mb-1">
             {isRTL ? 
               'اكتشف المعرفة المهنية' :
-              'Unlock business knowledge'
+              'Unlock business insights'
             }
           </div>
           <div className="text-sm opacity-90">
