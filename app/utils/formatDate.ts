@@ -11,7 +11,7 @@ export function formatDate(dateString: string, locale: string): string {
     const date = new Date(dateString);
     
     // Return formatted date based on locale
-    return date.toLocaleDateString(locale === 'ar' ? 'ar-SA' : 'en-US', {
+    return date.toLocaleDateString(locale === 'ar' ? 'en-US' : 'en-US', {
       year: 'numeric',
       month: 'long',
       day: 'numeric',

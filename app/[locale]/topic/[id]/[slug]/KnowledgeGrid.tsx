@@ -251,7 +251,7 @@ export default function KnowledgeGrid({
           const isFree = isNumericPrice ? numericPrice === 0 : priceString === "0";
           const formattedPrice = isNumericPrice
             ? `$${numericPrice.toLocaleString(
-                currentLocale === "ar" ? "ar-SA" : "en-US",
+                currentLocale === "ar" ? "en-US" : "en-US",
                 { maximumFractionDigits: 2 }
               )}`
             : priceString || translations.paid;

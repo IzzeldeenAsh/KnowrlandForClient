@@ -66,7 +66,7 @@ const TransactionDetailsModal: React.FC<TransactionDetailsModalProps> = ({
   if (!transaction) return null;
 
   const formatCurrency = (amount: number) => {
-    return new Intl.NumberFormat(locale === 'ar' ? 'ar-SA' : 'en-US', {
+    return new Intl.NumberFormat(locale === 'ar' ? 'en-US' : 'en-US', {
       style: 'currency',
       currency: 'USD',
       minimumFractionDigits: 2,
@@ -75,7 +75,7 @@ const TransactionDetailsModal: React.FC<TransactionDetailsModalProps> = ({
 
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString(
-      locale === 'ar' ? 'ar-SA' : 'en-US',
+      locale === 'ar' ? 'en-US' : 'en-US',
       {
         year: 'numeric',
         month: 'long',
@@ -86,7 +86,7 @@ const TransactionDetailsModal: React.FC<TransactionDetailsModalProps> = ({
 
   const formatDateTime = (dateString: string) => {
     return new Date(dateString).toLocaleString(
-      locale === 'ar' ? 'ar-SA' : 'en-US',
+      locale === 'ar' ? 'en-US' : 'en-US',
       {
         year: 'numeric',
         month: 'short',

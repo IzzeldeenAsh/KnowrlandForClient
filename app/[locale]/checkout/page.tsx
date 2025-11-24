@@ -248,7 +248,7 @@ export default function CheckoutPage() {
 
   // Format currency with proper formatting
   const formatCurrency = (amount: number) => {
-    return new Intl.NumberFormat(locale === 'ar' ? 'ar-SA' : 'en-US', {
+    return new Intl.NumberFormat(locale === 'ar' ? 'en-US' : 'en-US', {
       style: 'currency',
       currency: 'USD',
       minimumFractionDigits: 2,

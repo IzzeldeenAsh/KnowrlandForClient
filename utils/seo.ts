@@ -253,7 +253,7 @@ export function generateStructuredData(knowledge: KnowledgeMetadata, locale: str
     "dateModified": knowledge.published_at,
     "url": currentUrl,
     "image": defaultSocialImage,
-    "inLanguage": locale === 'ar' ? 'ar-SA' : 'en-US',
+    "inLanguage": locale === 'ar' ? 'en-US' : 'en-US',
     "keywords": [knowledge.type, ...knowledge.countries.map(c => c.name)].join(', ')
   };
 
