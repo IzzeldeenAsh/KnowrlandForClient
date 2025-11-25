@@ -195,7 +195,7 @@ const InsightersResultsSection: React.FC<InsightersResultsSectionProps> = ({
                         
                             </>
                           )}
-                          <div className='flex items-center gap-2'>
+                          <div className='flex items-center gap-2' style={{direction:'ltr'}}>
                             <div className='text-lg font-semibold text-center'>{name}</div>
                             <IconRosetteDiscountCheckFilled className="w-5 h-5 text-blue-500" />
                           </div>

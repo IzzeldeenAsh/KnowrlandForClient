@@ -1,7 +1,7 @@
 // app/[locale]/layout.tsx
 import './css/style.css';
 import AOSProvider from "@/components/aos-provider";
-import { Inter, Tajawal } from 'next/font/google';
+import { Inter, Almarai } from 'next/font/google';
 import { MantineProvider } from '@mantine/core';
 import '@mantine/core/styles.css';
 import {NextIntlClientProvider} from 'next-intl';
@@ -25,10 +25,10 @@ const inter = Inter({
   display: 'swap'
 });
 
-const tajawal = Tajawal({
-  subsets: ['arabic'],
-  weight: ['400', '500', '700'],
-  variable: '--font-tajawal',
+const almarai = Almarai({
+  subsets: ['arabic', 'latin'],
+  weight: ['300', '400', '700', '800'],
+  variable: '--font-almarai',
   display: 'swap'
 });
 
@@ -61,8 +61,8 @@ export default async function RootLayout({
   const messages = await getMessages();
 
   // Choose font based on directions
-  const fontClass = direction === 'rtl' ? tajawal.variable : inter.variable;
-  const fontFamily = direction === 'rtl' ? 'font-tajawal' : 'font-inter';
+  const fontClass = direction === 'rtl' ? almarai.variable : inter.variable;
+  const fontFamily = direction === 'rtl' ? 'font-almarai' : 'font-inter';
   
   return (
     <html lang={locale} dir={direction} className="scroll-smooth">

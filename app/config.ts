@@ -8,12 +8,12 @@ const isDevelopment = FORCE_DEVELOPMENT || process.env.NODE_ENV === 'development
 
 // API and App URLs based on environment
 export const apiBaseUrl = isDevelopment 
-  ? 'https://api.foresighta.co' 
-  : 'https://api.foresighta.co';
+  ? 'https://api.insightabusiness.com' 
+  : 'https://api.insightabusiness.com';
 
 export const appBaseUrl = isDevelopment 
-  ? 'http://localhost:4200' 
-  : 'http://localhost:4200';
+  ? 'https://app.insightabusiness.com' 
+  : 'https://app.insightabusiness.com';
 
 // Function to get full API URL with path
 export const getApiUrl = (path: string): string => {
@@ -28,8 +28,8 @@ export const getAppUrl = (path: string): string => {
 // Stripe configuration
 export const getStripePublishableKey = (): string => {
   if (isDevelopment) {
-    return 'pk_test_51RpQiFL3mrWP7a0P1OYWGeFJWtgMwcWJtiEDLvn29CpYn5x8Ou77YViA1yoimlixKU5aUAeOeN5VTfoC4sMpvFVF00qq9a6BNm';
+    return 'pk_live_51RvbpYRIE7WtDi9SLKPBxKTPyTkULT1e36AZMOcmtUomKgW99akiph2PVg5mmUcPtyAjvlXwP1wy70OFvooJLpQc00CNQYKb96';
   } else {
-    return process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY || 'pk_test_51RpQiFL3mrWP7a0P1OYWGeFJWtgMwcWJtiEDLvn29CpYn5x8Ou77YViA1yoimlixKU5aUAeOeN5VTfoC4sMpvFVF00qq9a6BNm';
+    return process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY || 'pk_live_51RvbpYRIE7WtDi9SLKPBxKTPyTkULT1e36AZMOcmtUomKgW99akiph2PVg5mmUcPtyAjvlXwP1wy70OFvooJLpQc00CNQYKb96';
   }
 }
