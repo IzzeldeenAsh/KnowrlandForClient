@@ -7,6 +7,7 @@ import { useSuggestions, useClickAway } from '../utils/hooks';
 import styles from '../utils/custom-search-engine-styles.module.css';
 import { Modal, Loader, Popover } from '@mantine/core';
 import { getApiUrl } from '@/app/config';
+import { createPortal } from 'react-dom';
 
 interface SearchBarProps {
   searchQuery: string;
@@ -63,6 +64,9 @@ const SearchBar: React.FC<SearchBarProps> = ({
   const [inputFocused, setInputFocused] = useState(false);
   const [suggestionSelected, setSuggestionSelected] = useState(false);
   const [mouseInSuggestions, setMouseInSuggestions] = useState(false);
+  // Portal mount + dropdown positioning
+  const [isMounted, setIsMounted] = useState(false);
+  const [dropdownRect, setDropdownRect] = useState<{ top: number; left: number; width: number }>({ top: 0, left: 0, width: 0 });
   // ISIC/HS UI state
   const [isIsicModalOpen, setIsIsicModalOpen] = useState(false);
   const [isHsModalOpen, setIsHsModalOpen] = useState(false);
@@ -126,6 +130,43 @@ const SearchBar: React.FC<SearchBarProps> = ({
     setInputFocused(false);
     setMouseInSuggestions(false);
   });
+
+  // Suggestion visibility
+  const shouldShowSuggestions =
+    showSuggestions &&
+    suggestions.length > 0 &&
+    inputFocused &&
+    !suggestionSelected;
+
+  // Enable portal rendering on client
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
+
+  // Compute dropdown position anchored to the input field
+  const updateDropdownPosition = useCallback(() => {
+    const inputEl = searchInputRef.current;
+    if (!inputEl) return;
+    const rect = inputEl.getBoundingClientRect();
+    const offset = 0; // flush under the input
+    setDropdownRect({
+      top: rect.bottom + offset,
+      left: rect.left,
+      width: rect.width,
+    });
+  }, []);
+
+  // Reposition when suggestions open and on viewport changes
+  useEffect(() => {
+    if (!shouldShowSuggestions) return;
+    updateDropdownPosition();
+    window.addEventListener('resize', updateDropdownPosition);
+    window.addEventListener('scroll', updateDropdownPosition, true);
+    return () => {
+      window.removeEventListener('resize', updateDropdownPosition);
+      window.removeEventListener('scroll', updateDropdownPosition, true);
+    };
+  }, [shouldShowSuggestions, updateDropdownPosition]);
 
   // Notify parent about loading state changes
   useEffect(() => {
@@ -482,17 +523,6 @@ const SearchBar: React.FC<SearchBarProps> = ({
     allowSuggestions();
   };
 
-  // Simplified suggestion visibility logic - show suggestions if we have them and input is focused
-  const shouldShowSuggestions = 
-    showSuggestions && 
-    suggestions.length > 0 &&
-    inputFocused &&
-    !suggestionSelected;
-  
-  // Debug log for suggestion visibility
-  useEffect(() => {
-  }, [showSuggestions, suggestions.length, inputFocused, suggestionSelected, shouldShowSuggestions]);
-  
   const searchTypeChipBaseClasses =
     'flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-semibold transition-all duration-200 shadow-sm border';
   const searchTypeChipActiveClasses = 'bg-[#299af8] border-[#299af8] text-white shadow-md';
@@ -910,22 +940,30 @@ const SearchBar: React.FC<SearchBarProps> = ({
           {/* Accuracy chip removed on mobile; control placed under search field */}
         </div>
         
-        {shouldShowSuggestions && (
-          <div 
-            ref={suggestionsRef}
-              className="absolute inset-x-0 mt-3 bg-white border border-gray-200 rounded-md shadow-lg z-20 max-h-48 overflow-y-auto custom-scrollbar"
-            onMouseEnter={() => setMouseInSuggestions(true)}
-            onMouseLeave={() => setMouseInSuggestions(false)}
-          >
-            {suggestions.map((suggestion, index) => (
-              <div 
-                key={index}
-                className={`px-4 py-2 cursor-pointer hover:bg-blue-50 ${activeSuggestionIndex === index ? 'bg-blue-50' : ''}`}
-                onClick={() => handleSuggestionSelect(suggestion)}
-                onMouseEnter={() => setActiveSuggestionIndex(index)}
+        {shouldShowSuggestions && isMounted &&
+          createPortal(
+            <div
+              ref={suggestionsRef}
+              style={{
+                position: 'fixed',
+                top: dropdownRect.top,
+                left: dropdownRect.left,
+                width: dropdownRect.width,
+                zIndex: 10000,
+              }}
+              className="mt-0 bg-white border border-gray-200 rounded-md shadow-lg max-h-60 overflow-y-auto custom-scrollbar"
+              onMouseEnter={() => setMouseInSuggestions(true)}
+              onMouseLeave={() => setMouseInSuggestions(false)}
+            >
+              {suggestions.map((suggestion, index) => (
+                <div
+                  key={index}
+                  className={`px-4 py-2 cursor-pointer hover:bg-blue-50 ${activeSuggestionIndex === index ? 'bg-blue-50' : ''}`}
+                  onClick={() => handleSuggestionSelect(suggestion)}
+                  onMouseEnter={() => setActiveSuggestionIndex(index)}
                   dir={isRtl ? 'rtl' : 'ltr'}
-              >
-                <div className="flex items-center">
+                >
+                  <div className="flex items-center">
                     <svg
                       className={`w-5 h-5 text-gray-400 ${isRtl ? 'ml-2' : 'mr-2'}`}
                       fill="none"
@@ -933,42 +971,44 @@ const SearchBar: React.FC<SearchBarProps> = ({
                       viewBox="0 0 24 24"
                       xmlns="http://www.w3.org/2000/svg"
                     >
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                  </svg>
-                  <span className="text-gray-800">
-                    {searchQuery && suggestion.toLowerCase().includes(searchQuery.toLowerCase()) ? (
-                      <>
-                        {(() => {
-                          const lowerSuggestion = suggestion.toLowerCase();
-                          const lowerSearchTerm = searchQuery.toLowerCase();
-                          const matchIndex = lowerSuggestion.indexOf(lowerSearchTerm);
-                          
-                          if (matchIndex >= 0) {
-                            const beforeMatch = suggestion.substring(0, matchIndex);
-                            const match = suggestion.substring(matchIndex, matchIndex + searchQuery.length);
-                            const afterMatch = suggestion.substring(matchIndex + searchQuery.length);
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                    </svg>
+                    <span className="text-gray-800">
+                      {searchQuery && suggestion.toLowerCase().includes(searchQuery.toLowerCase()) ? (
+                        <>
+                          {(() => {
+                            const lowerSuggestion = suggestion.toLowerCase();
+                            const lowerSearchTerm = searchQuery.toLowerCase();
+                            const matchIndex = lowerSuggestion.indexOf(lowerSearchTerm);
                             
-                            return (
-                              <>
-                                {beforeMatch}
-                                <strong className="font-bold">{match}</strong>
-                                {afterMatch}
-                              </>
-                            );
-                          }
-                          
-                          return suggestion;
-                        })()}
-                      </>
-                    ) : (
-                      suggestion
-                    )}
-                  </span>
+                            if (matchIndex >= 0) {
+                              const beforeMatch = suggestion.substring(0, matchIndex);
+                              const match = suggestion.substring(matchIndex, matchIndex + searchQuery.length);
+                              const afterMatch = suggestion.substring(matchIndex + searchQuery.length);
+                              
+                              return (
+                                <>
+                                  {beforeMatch}
+                                  <strong className="font-bold">{match}</strong>
+                                  {afterMatch}
+                                </>
+                              );
+                            }
+                            
+                            return suggestion;
+                          })()}
+                        </>
+                      ) : (
+                        suggestion
+                      )}
+                    </span>
+                  </div>
                 </div>
-              </div>
-            ))}
-          </div>
-        )}
+              ))}
+            </div>,
+            document.body
+          )
+        }
         {/* Selected ISIC/HS details under the search bar */}
         {(selectedIsic || selectedHs) && (
           <div className={`mt-2 flex flex-wrap gap-2 items-start ${isRtl ? 'justify-start' : 'justify-start'} text-xs`}>

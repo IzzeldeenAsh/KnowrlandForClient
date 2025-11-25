@@ -22,7 +22,7 @@ import { VisaIcon, MasterCardIcon, GooglePayIcon, ApplePayIcon } from "@/compone
 import { useUserProfile } from "@/app/lib/useUserProfile";
 
 // Initialize Stripe
-const stripePromise = loadStripe("pk_live_51RvbpYRIE7WtDi9SLKPBxKTPyTkULT1e36AZMOcmtUomKgW99akiph2PVg5mmUcPtyAjvlXwP1wy70OFvooJLpQc00CNQYKb96");
+const stripePromise = loadStripe("pk_test_51RpQiFL3mrWP7a0P1OYWGeFJWtgMwcWJtiEDLvn29CpYn5x8Ou77YViA1yoimlixKU5aUAeOeN5VTfoC4sMpvFVF00qq9a6BNm");
 
 interface MeetingTime {
   start_time: string;
@@ -70,6 +70,7 @@ interface StripePaymentFormProps {
   isProcessing: boolean;
   setIsProcessing: (processing: boolean) => void;
   locale: string;
+  externalError?: string;
 }
 
 function StripePaymentForm({
@@ -78,10 +79,12 @@ function StripePaymentForm({
   onError,
   isProcessing,
   setIsProcessing,
-  locale
+  locale,
+  externalError
 }: StripePaymentFormProps) {
   const stripe = useStripe();
   const elements = useElements();
+  const [submitError, setSubmitError] = useState<string | null>(null);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -90,6 +93,7 @@ function StripePaymentForm({
       return;
     }
 
+    setSubmitError(null);
     setIsProcessing(true);
 
     const { error } = await stripe.confirmPayment({
@@ -101,7 +105,9 @@ function StripePaymentForm({
     });
 
     if (error) {
-      onError(error.message || "Payment failed");
+      const message = error.message || "Payment failed";
+      setSubmitError(message);
+      onError(message);
     } else {
       onSuccess();
     }
@@ -112,6 +118,11 @@ function StripePaymentForm({
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
       <PaymentElement />
+      {(submitError || externalError) && (
+        <div className="p-3 rounded-md bg-red-50 text-red-700 text-sm">
+          {submitError || externalError}
+        </div>
+      )}
       <Button
         type="submit"
         disabled={!stripe || !elements || isProcessing}
@@ -182,6 +193,8 @@ export default function MeetTab({
   const [showStripeElements, setShowStripeElements] = useState(false);
   const [isPollingStatus, setIsPollingStatus] = useState(false);
   const [isStripeProcessing, setIsStripeProcessing] = useState(false);
+  const [hasCheckedDuplicate, setHasCheckedDuplicate] = useState(false);
+  const [stripeErrorMessage, setStripeErrorMessage] = useState<string | null>(null);
 
   // Fetch wallet balance when component mounts
   useEffect(() => {
@@ -197,12 +210,17 @@ export default function MeetTab({
     }
   }, [isBookingModalOpen, isAuthenticated]);
 
+  // Reset duplicate-check memo when selection changes or modal toggles
+  useEffect(() => {
+    setHasCheckedDuplicate(false);
+  }, [selectedDate, selectedMeetingTime, isBookingModalOpen]);
+
   const fetchWalletBalance = async () => {
     try {
       const token = typeof window !== "undefined" ? localStorage.getItem("token") : null;
       if (!token) return;
 
-      const response = await fetch("https://api.insightabusiness.com/api/account/wallet/balance", {
+      const response = await fetch("https://api.foresighta.co/api/account/wallet/balance", {
         headers: {
           "Content-Type": "application/json",
           Accept: "application/json",
@@ -287,7 +305,7 @@ export default function MeetTab({
         typeof window !== "undefined" ? localStorage.getItem("token") : null;
 
       const response = await fetch(
-        "https://api.insightabusiness.com/api/account/meeting/client/check-duplicate-time",
+        "https://api.foresighta.co/api/account/meeting/client/check-duplicate-time",
         {
           method: "POST",
           headers: {
@@ -328,7 +346,7 @@ export default function MeetTab({
     const checkStatus = async (): Promise<boolean> => {
       try {
         const response = await fetch(
-          `https://api.insightabusiness.com/api/account/order/meeting/${orderUuid}`,
+          `https://api.foresighta.co/api/account/order/meeting/${orderUuid}`,
           {
             headers: {
               "Content-Type": "application/json",
@@ -377,7 +395,8 @@ export default function MeetTab({
 
     try {
       // Check for duplicate meeting time first (unless skipped)
-      if (!skipDuplicateCheck) {
+      const shouldSkipDuplicate = skipDuplicateCheck || hasCheckedDuplicate;
+      if (!shouldSkipDuplicate) {
         setIsDuplicateCheckLoading(true);
         const isDuplicate = await checkDuplicateMeetingTime(
           selectedDate,
@@ -391,6 +410,11 @@ export default function MeetTab({
           setIsBookingLoading(false);
           return;
         }
+        // Remember that we have already validated this selection
+        setHasCheckedDuplicate(true);
+      } else if (skipDuplicateCheck) {
+        // If caller explicitly skipped (e.g., from warning), mark as checked
+        setHasCheckedDuplicate(true);
       }
 
       // Get auth token from localStorage
@@ -412,7 +436,7 @@ export default function MeetTab({
       }
 
       const response = await fetch(
-        `https://api.insightabusiness.com/api/account/order/meeting/checkout/${uuid}`,
+        `https://api.foresighta.co/api/account/order/meeting/checkout/${uuid}`,
         {
           method: "POST",
           headers: {
@@ -466,6 +490,7 @@ export default function MeetTab({
         if (client_secret && order_uuid) {
           setClientSecret(client_secret);
           setOrderUuid(order_uuid);
+          setStripeErrorMessage(null);
           setShowStripeElements(true);
         } else {
           console.error('Missing payment data in response:', responseData);
@@ -485,6 +510,12 @@ export default function MeetTab({
   // Override the handleBookMeeting from props to open modal
   const handleBookMeetingClick = () => {
     setIsBookingModalOpen(true);
+  };
+
+  const closeBookingModal = () => {
+    setIsBookingModalOpen(false);
+    setHasCheckedDuplicate(false);
+    fetchMeetingAvailability();
   };
 
   return (
@@ -509,8 +540,8 @@ export default function MeetTab({
             </h3>
             <p className="text-gray-500 mb-4">{t("loginToView")}</p>
             <a
-              href={`https://app.insightabusiness.com/auth/login?returnUrl=${encodeURIComponent(
-                `https://insightabusiness.com/${locale}/profile/${uuid}${
+              href={`http://localhost:4200/auth/login?returnUrl=${encodeURIComponent(
+                `http://localhost:3000/${locale}/profile/${uuid}${
                   typeof window !== "undefined"
                     ? window.location.search
                     : ""
@@ -745,9 +776,7 @@ export default function MeetTab({
         {/* Meeting Booking Modal */}
         <Modal
           opened={isBookingModalOpen}
-          onClose={() => {
-            setIsBookingModalOpen(false);
-          }}
+          onClose={closeBookingModal}
           title={t("bookASession")}
           size="lg"
           centered
@@ -987,9 +1016,7 @@ export default function MeetTab({
               <div className="flex justify-end gap-3 mt-6">
                 <Button
                   variant="subtle"
-                  onClick={() => {
-                    setIsBookingModalOpen(false);
-                  }}
+                  onClick={closeBookingModal}
                 >
                   {t("cancel")}
                 </Button>
@@ -1099,7 +1126,7 @@ export default function MeetTab({
               className="bg-gradient-to-r from-blue-500 to-teal-400 hover:from-blue-600 hover:to-teal-500 transition-all"
               onClick={() => {
                 // Redirect to meetings dashboard
-                window.location.href = "https://app.insightabusiness.com/app/insighter-dashboard/my-meetings";
+                window.location.href = "http://localhost:4200/app/insighter-dashboard/my-meetings";
               }}
             >
               {locale.startsWith('ar') ? 'اذهب إلى الاجتماعات' : 'Go to Meetings'}
@@ -1132,24 +1159,25 @@ export default function MeetTab({
                 clientSecret={clientSecret}
                 onSuccess={async () => {
                   if (orderUuid) {
+                    setIsPollingStatus(true);
                     const success = await pollOrderStatus(orderUuid);
+                    setIsPollingStatus(false);
                     if (success) {
                       setShowStripeElements(false);
                       setShowSuccessUI(true);
                       setIsBookingModalOpen(false);
                     } else {
-                      setBookingError(t("paymentVerificationFailed"));
-                      setShowStripeElements(false);
+                      setStripeErrorMessage(t("paymentVerificationFailed"));
                     }
                   }
                 }}
                 onError={(error: string) => {
-                  setBookingError(error);
-                  setShowStripeElements(false);
+                  setStripeErrorMessage(error);
                 }}
                 isProcessing={isStripeProcessing || isPollingStatus}
                 setIsProcessing={setIsStripeProcessing}
                 locale={locale}
+                externalError={stripeErrorMessage || undefined}
               />
 
               {isPollingStatus && (

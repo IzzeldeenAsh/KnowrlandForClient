@@ -177,7 +177,7 @@ const KnowledgeSideBox = ({
       }
 
       const method = isReadLater ? 'DELETE' : 'POST';
-      const url =  `https://api.insightabusiness.com/api/account/favorite/knowledge/${knowledgeSlug}`
+      const url =  `https://api.foresighta.co/api/account/favorite/knowledge/${knowledgeSlug}`
 
       
       const response = await fetch(url, {
@@ -324,7 +324,7 @@ const KnowledgeSideBox = ({
             <>
               {purchased_status === 'purchased' ? (
                 <button 
-                  onClick={() => window.location.href = (process.env.NEXT_PUBLIC_DASHBOARD_URL || 'https://app.insightabusiness.com') + '/app/insighter-dashboard/my-downloads'}
+                  onClick={() => window.location.href = (process.env.NEXT_PUBLIC_DASHBOARD_URL || 'http://localhost:4200') + '/app/insighter-dashboard/my-downloads'}
                   className="w-full font-semibold bg-green-600 text-white py-2 px-4 rounded-lg hover:bg-green-700 transition-colors"
                 >
                   {translations.alreadyPurchased}
@@ -897,7 +897,7 @@ const KnowledgeSideBox = ({
         {/* Field content styles */}
         <style jsx>{`
           .field-content-container {
-            min-height: 28px;
+            min-height: 32px;
             overflow: hidden;
             transition: max-height 0.3s ease;
             width: 60%;
@@ -931,7 +931,7 @@ const KnowledgeSideBox = ({
             justify-content: flex-end;
             align-items: center;
             width: 100%;
-            max-height: 28px;
+            max-height: 32px;
             overflow: hidden;
             transition: max-height 0.3s ease;
           }
@@ -946,15 +946,17 @@ const KnowledgeSideBox = ({
             color: #4b5675;
             font-size: 12px;
             font-weight: 500;
-            padding: 2px 10px;
+            padding: 4px 10px;
             border-radius: 4px;
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
-            max-width: 120px;
+            max-width: 160px;
             display: inline-block;
             cursor: help;
             transition: all 0.2s ease;
+            line-height: 1.2;
+            min-height: 20px;
           }
 
           .chip-badge:hover {
@@ -991,7 +993,7 @@ const KnowledgeSideBox = ({
             }
 
             .chip-badge {
-              max-width: 100px;
+              max-width: 140px;
               font-size: 11px;
               padding: 2px 8px;
             }
@@ -1008,7 +1010,7 @@ const KnowledgeSideBox = ({
             }
 
             .chip-badge {
-              max-width: 80px;
+              max-width: 120px;
             }
 
             .tp-course-details2-widget-list-item {
