@@ -182,6 +182,7 @@ const getNotificationName = (subType: string, language: string): string => {
     'client_meeting_reminder': { en: 'Meeting Reminder', ar: 'تذكير بالاجتماع' },
     'insighter_meeting_reminder': { en: 'Meeting Reminder', ar: 'تذكير بالاجتماع' },
     'deactivate_delete_company': { en: 'Company Deactivation', ar: 'إلغاء تفعيل الشركة' },
+    'deactivate_company': { en: 'Company Deactivation', ar: 'إلغاء تفعيل الشركة' },
   };
 
   const names = nameMap[subType];

@@ -18,7 +18,14 @@ module.exports = {
     extend: {
       fontFamily: {
         inter: ['var(--font-inter)', 'sans-serif'],
-        tajawal: ['var(--font-tajawal)', 'sans-serif'],
+        'almarai': ['var(--font-almarai)', 'sans-serif'],
+        'almarai-light': ['var(--font-almarai-light)', 'sans-serif'],
+        'almarai-regular': ['var(--font-almarai-regular)', 'sans-serif'],
+        'almarai-bold': ['var(--font-almarai-bold)', 'sans-serif'],
+        'almarai-extra-bold': ['var(--font-almarai-extra-bold)', 'sans-serif'],
+        'almarai-black': ['var(--font-almarai-black)', 'sans-serif'],
+        'almarai-extra-black': ['var(--font-almarai-extra-black)', 'sans-serif'],
+        'almarai-extra-light': ['var(--font-almarai-extra-light)', 'sans-serif'],
       },
       fontSize: {
         xs: ['0.75rem', { lineHeight: '1.5' }],

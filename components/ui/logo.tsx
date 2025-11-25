@@ -2,7 +2,7 @@
 
 import Link from 'next/link'
 import Image from 'next/image'
-import HomeLogoImgEn from '@/public/images/Business-white-2.png'
+import HomeLogoImgEn from '@/public/images/Business-white.png'
 import HomeLogoImgAr from '@/public/images/ANSIGHTAAr-.png'
 import InnerLogoImgEn from '@/public/images/Business-colored.png'
 import InnerLogoImgAr from '@/public/images/ANSIGHTAAr-05.png'

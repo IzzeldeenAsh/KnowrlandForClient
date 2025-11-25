@@ -10,6 +10,7 @@ import InsightIcon from "@/components/icons/InsightIcon";
 import ManualIcon from "@/components/icons/ManualIcon";
 import ReportIcon from "@/components/icons/ReportIcon";
 import CourseIcon from "@/components/icons/CourseIcon";
+import { ArrowDownTrayIcon } from '@heroicons/react/24/outline';
 import { arSA, enUS } from 'date-fns/locale';
 import { useParams } from "next/navigation";
 import { SearchResultItem } from './SearchResultsGrid';
@@ -256,7 +257,9 @@ export default function SearchResultsList({
     free: isRTL ? "مجاني" : "Free",
     insighter: isRTL ? "إنسايتر" : "Insighter",
     by: isRTL ? "من قبل" : "By",
-    company: isRTL ? "الشركة" : "Company"
+    company: isRTL ? "الشركة" : "Company",
+    downloads: isRTL ? "تحميل" : "Downloads",
+    download: isRTL ? "تحميل" : "Download"
   };
 
   if (results.length === 0) {
@@ -362,6 +365,16 @@ export default function SearchResultsList({
                     >
                       {coverageText}
                     </div>
+                  </div>
+                )}
+                {item.total_downloads !== undefined && item.total_downloads > 0 && (
+                  <div className="absolute bottom-4 left-4 flex items-center gap-2">
+                    <div className="flex items-center justify-center w-6 h-6 bg-white bg-opacity-20 rounded-full">
+                      <ArrowDownTrayIcon className="w-3 h-3 text-white" />
+                    </div>
+                    <Text size="xs" className="text-white font-medium">
+                      {item.total_downloads.toLocaleString()} {item.total_downloads === 1 ? translations.download : translations.downloads}
+                    </Text>
                   </div>
                 )}
                 </Link>
@@ -509,6 +522,16 @@ export default function SearchResultsList({
                           <Text c="dimmed" size="xs" dir={currentLocale === 'ar' ? 'rtl' : 'ltr'}>
                             {translations.posted} {safeFormatDate(item.published_at, currentLocale as string)}
                           </Text>
+                        )}
+                        {item.total_downloads !== undefined && item.total_downloads > 0 && (
+                        
+                          <div className="flex items-center gap-2">
+                              <span className='text-gray-300'>|</span>  
+                            <ArrowDownTrayIcon className="w-4 h-4 text-gray-600" />
+                            <Text size="xs" className="text-gray-700 font-medium">
+                              {item.total_downloads.toLocaleString()} {item.total_downloads === 1 ? translations.download : translations.downloads}
+                            </Text>
+                          </div>
                         )}
                       </div>
                       

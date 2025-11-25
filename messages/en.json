@@ -473,7 +473,7 @@
         "enterMeetingDescription": "Enter details about what you'd like to discuss",
         "bookingFor": "Booking for",
         "cancel": "Cancel",
-        "confirmBooking": "Confirm Booking",
+        "confirmBooking": "Continue",
         "duplicateMeetingWarning": "Meeting Time Conflict",
         "duplicateMeetingMessage": "You already have a meeting scheduled on {date} from {startTime} to {endTime}. Are you sure you want to book another meeting at the same time?",
         "continueBooking": "Continue Booking",

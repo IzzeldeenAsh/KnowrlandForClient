@@ -153,6 +153,7 @@ export default function TabsContent({ knowledge, knowledgeSlug }: { knowledge: K
               {tab}
             </button>
           ))}
+           {!knowledgeData.is_owner && (
            <div className="flex flex-col justify-center ps-4 sm:ps-8  sm:mt-0 ms-auto">
            <Link
               href={`/${locale}/profile/${knowledge.insighter.uuid}?entity=insighter&tab=meet`}
@@ -164,6 +165,7 @@ export default function TabsContent({ knowledge, knowledgeSlug }: { knowledge: K
               </span>
             </Link>
            </div>
+           )}
         </nav>
 
         

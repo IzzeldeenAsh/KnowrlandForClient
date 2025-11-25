@@ -78,6 +78,7 @@ function PaymentForm({ orderUuid, amount, title, locale, isRTL, orderDetails, se
   const [downloadProgress, setDownloadProgress] = useState(0);
   const [showDocumentsAdded, setShowDocumentsAdded] = useState(false);
   const [isFetchingDownloadIds, setIsFetchingDownloadIds] = useState(false);
+  const [isRetrying, setIsRetrying] = useState(false);
 
   // Get auth token from cookies
   const getAuthToken = () => {
@@ -233,6 +234,8 @@ function PaymentForm({ orderUuid, amount, title, locale, isRTL, orderDetails, se
         // For other errors, show full error UI
         if (result.error.type === 'validation_error' ||
             result.error.type === 'card_error' ||
+            result.error.code === 'payment_intent_unexpected_state' ||
+            result.error.message?.includes('already succeeded') ||
             result.error.message?.includes('incomplete') ||
             result.error.message?.includes('card number')) {
           setErrorMessage(result.error.message || "Payment failed");
@@ -255,10 +258,43 @@ function PaymentForm({ orderUuid, amount, title, locale, isRTL, orderDetails, se
     }
   };
 
-  const handleRetry = () => {
-    setPaymentStatus("idle");
+  const handleRetry = async () => {
+    setIsRetrying(true);
     setErrorMessage("");
     setShowInlineError(false);
+    try {
+      const token = getAuthToken();
+      const response = await fetch(
+        `https://api.insightabusiness.com/api/account/order/knowledge/check-payment-succeeded/${orderUuid}`,
+        {
+          method: "POST",
+          headers: {
+            Accept: "application/json",
+            "Accept-Language": locale,
+            "X-Timezone": Intl.DateTimeFormat().resolvedOptions().timeZone,
+            ...(token && { Authorization: `Bearer ${token}` }),
+          },
+        }
+      );
+      if (response.status === 204) {
+        setPaymentStatus("success");
+      } else {
+        setPaymentStatus("error");
+        setErrorMessage(
+          isRTL
+            ? "لم يتم تأكيد الدفع بعد. يرجى المحاولة لاحقًا."
+            : "Payment could not be verified. Please try again later."
+        );
+      }
+    } catch (error) {
+      console.error("Error verifying payment:", error);
+      setPaymentStatus("error");
+      setErrorMessage(
+        isRTL ? "تعذر التحقق من الدفع." : "Unable to verify payment."
+      );
+    } finally {
+      setIsRetrying(false);
+    }
   };
 
   // Handle download progress animation when payment succeeds
@@ -392,6 +428,8 @@ function PaymentForm({ orderUuid, amount, title, locale, isRTL, orderDetails, se
           size="lg"
           onClick={handleRetry}
           className="bg-gradient-to-r from-blue-500 to-teal-400"
+          loading={isRetrying}
+          disabled={isRetrying}
         >
           {translations.tryAgain}
         </Button>

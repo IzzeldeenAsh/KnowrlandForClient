@@ -120,8 +120,8 @@ export default async function SubIndustryPage({ params }: Props) {
 
               <div className="flex flex-col lg:flex-row justify-between gap-8">
                 <div className="flex-1">
-                  <div className={`${isRTL ? 'text-right' : 'text-left'} mb-4`} data-aos="fade-down">
-                    <h1 className="text-3xl md:text-5xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-blue-500 to-teal-400 mb-4">
+                  <div className={`${isRTL ? 'text-right' : 'text-left'} mb-4 `} data-aos="fade-down">
+                    <h1 className="text-3xl md:text-5xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-blue-500 to-teal-400 mb-4 leading-[2]">
                       {subIndustry.name}
                     </h1>
                   </div>
