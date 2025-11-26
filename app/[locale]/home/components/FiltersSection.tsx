@@ -41,7 +41,7 @@ const FiltersSection = memo<FiltersSectionProps>(({
       
       <div className={`lg:flex-shrink-0 transition-all duration-300 ease-in-out overflow-hidden ${
         isVisible 
-          ? 'lg:w-80 opacity-100' 
+          ? 'lg:w-90 opacity-100' 
           : 'lg:w-0 opacity-0 max-h-0'
       }`}>
         <div className={`sticky rounded-md top-2 transition-transform duration-300 ease-in-out ${

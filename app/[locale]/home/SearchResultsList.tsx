@@ -301,7 +301,7 @@ export default function SearchResultsList({
 
       const method = currentState ? 'DELETE' : 'POST';
       const slug = item.url.split('/').pop();
-      const url = `https://api.foresighta.co/api/account/favorite/knowledge/${slug}`;
+      const url = `https://api.insightabusiness.com/api/account/favorite/knowledge/${slug}`;
 
 
       const axiosConfig = {
@@ -450,7 +450,8 @@ export default function SearchResultsList({
                   <Text
                     component="h3"
                     style={{wordBreak:'break-word'}}
-                    className={`${listStyles.title} `}
+                    className={`${listStyles.title} ${item.language === 'arabic' ? 'text-right' : 'text-left'}`}
+                    dir={item.language === 'arabic' ? 'rtl' : 'ltr'}
                   >
                     {item.title}
                   </Text>
@@ -462,7 +463,7 @@ export default function SearchResultsList({
                   )}
                 </div>
                 {coverageText && (
-                  <div className="absolute bottom-4 right-4">
+                  <div className={`absolute bottom-4 ${item.language === 'arabic' ? 'right-4' : 'left-4'}`} dir={item.language === 'arabic' ? 'rtl' : 'ltr'}>
                     <div
                       className="text-lg font-bold leading-none bg-clip-text text-transparent bg-gradient-to-r from-sky-600 via-cyan-300 to-blue-200 drop-shadow-lg"
                     >

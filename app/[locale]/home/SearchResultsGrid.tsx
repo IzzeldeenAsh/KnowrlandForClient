@@ -122,6 +122,7 @@ export interface SearchResultItem {
   paid?: boolean; // Only for knowledge items
   price?: string; // Only for knowledge items - price as string from API
   review: string;
+  language?: 'english' | 'arabic'; // Language of the item title/content
   is_read_later?: boolean; // Only for knowledge items
   total_downloads?: number; // Only for knowledge items
   cover_start?: number; // Coverage start year
@@ -264,7 +265,7 @@ export default function SearchResultsGrid({
 
       const method = currentState ? 'DELETE' : 'POST';
       const slug = item.url.split('/').pop();
-      const url = `https://api.foresighta.co/api/account/favorite/knowledge/${slug}`;
+      const url = `https://api.insightabusiness.com/api/account/favorite/knowledge/${slug}`;
 
       const response = await axios({
         method,
@@ -414,17 +415,18 @@ export default function SearchResultsGrid({
                   <Text
                   style={{wordBreak:'break-word'}}
                     fw={700}
-                    className={`${cardStyles.title} `}
+                    className={`${cardStyles.title} ${item.language === 'arabic' ? 'text-right' : 'text-left'}`}
                     pt={4}
                     lineClamp={2}
+                    dir={item.language === 'arabic' ? 'rtl' : 'ltr'}
                   >
                     {item.title}
                   </Text>
                   {coverageText && (
-                  <div >
+                  <div className={`${item.language === 'arabic' ? 'text-right' : 'text-left'}`} dir={item.language === 'arabic' ? 'rtl' : 'ltr'}>
                     <div
                       
-                      className={`text-lg  font-bold leading-none bg-clip-text text-transparent   drop-shadow-lg ${isRTL ? 'bg-gradient-to-l from-sky-300  to-sky-800' : 'bg-gradient-to-r from-sky-300  to-sky-800'}`}
+                      className={`text-lg  font-bold leading-none bg-clip-text text-transparent   drop-shadow-lg ${isRTL || item.language === 'arabic' ? 'bg-gradient-to-l from-sky-300  to-sky-800' : 'bg-gradient-to-r from-sky-300  to-sky-00'}`}
                     >
                       {coverageText}
                     </div>
