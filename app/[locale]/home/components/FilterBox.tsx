@@ -732,6 +732,27 @@ const FilterBox: React.FC<FilterBoxProps> = React.memo(({
 
     return (
       <div className="grid grid-cols-1 gap-2 max-h-[60vh] overflow-y-auto pr-2">
+        {/* All option */}
+        <button
+          className={`py-2 px-3 rounded-md text-sm flex items-start text-start w-full transition-colors ${
+            !selectedIndustry
+              ? 'bg-blue-50 border-blue-200 text-blue-800 font-medium'
+              : 'hover:bg-gray-100 border border-gray-200'
+          } ${isDisabled ? 'opacity-50 cursor-not-allowed' : ''}`}
+          onClick={() => {
+            if (!isDisabled) {
+              setSelectedIndustry(null);
+              if (setIndustryFilter) {
+                setIndustryFilter(null);
+              }
+              setIsIndustryModalOpen(false);
+            }
+          }}
+          disabled={isDisabled}
+        >
+          <span className="flex-1 font-medium">{locale === 'ar' ? 'الكل' : 'All'}</span>
+        </button>
+
         {filteredIndustryLeafNodes.map((node) => {
           const isSelected = selectedIndustry?.id === node.key;
 
@@ -1223,7 +1244,7 @@ const FilterBox: React.FC<FilterBoxProps> = React.memo(({
                     {selectedIndustry ? (
                       <span className="truncate text-gray-800 font-semibold">{selectedIndustry.label.length > 30 ? `${selectedIndustry.label.substring(0, 30)}...` : selectedIndustry.label}</span>
                     ) : (
-                      <span className="text-gray-400 font-medium">{locale === 'ar' ? 'اختر المجال' : 'Select Industry'}</span>
+                      <span className="text-gray-800 font-semibold">{locale === 'ar' ? 'الكل' : 'All'}</span>
                     )}
                     {selectedIndustry && !isDisabled && (
                       <button onClick={handleClearIndustry} className="ml-2 text-gray-400 hover:text-red-500">
@@ -1310,7 +1331,7 @@ const FilterBox: React.FC<FilterBoxProps> = React.memo(({
                               {getSelectedTagLabel()}
                             </span>
                           ) : (
-                            <Input.Placeholder>{locale === 'ar' ? 'اختر وسمًا' : 'Select a tag'}</Input.Placeholder>
+                            <span className="text-gray-800 font-semibold">{locale === 'ar' ? 'الكل' : 'All'}</span>
                           )}
                         </InputBase>
                       </Combobox.Target>
@@ -1410,7 +1431,11 @@ const FilterBox: React.FC<FilterBoxProps> = React.memo(({
                           }`}
                           disabled={isDisabled}
                         >
-                          {getSelectedEconomicBlocLabel() || <Input.Placeholder>{locale === 'ar' ? 'اختر المنطقة الاقتصادية' : 'Select an economic bloc'}</Input.Placeholder>}
+                          {getSelectedEconomicBlocLabel() ? (
+                            getSelectedEconomicBlocLabel()
+                          ) : (
+                            <span className="text-gray-800 font-semibold">{locale === 'ar' ? 'الكل' : 'All'}</span>
+                          )}
                         </InputBase>
                       </Combobox.Target>
                       <Combobox.Dropdown>
@@ -1482,7 +1507,11 @@ const FilterBox: React.FC<FilterBoxProps> = React.memo(({
                         }`}
                         disabled={isDisabled}
                       >
-                        {getSelectedRegionLabel() || <Input.Placeholder>{locale === 'ar' ? 'اختر منطقة' : 'Select a region'}</Input.Placeholder>}
+                        {getSelectedRegionLabel() ? (
+                          getSelectedRegionLabel()
+                        ) : (
+                          <span className="text-gray-800 font-semibold">{locale === 'ar' ? 'الكل' : 'All'}</span>
+                        )}
                       </InputBase>
                     </Combobox.Target>
                     <Combobox.Dropdown>
@@ -1553,7 +1582,11 @@ const FilterBox: React.FC<FilterBoxProps> = React.memo(({
                         }`}
                         disabled={isDisabled}
                       >
-                        {getSelectedCountryLabel() || <Input.Placeholder>{locale === 'ar' ? 'اختر دولة' : 'Select a country'}</Input.Placeholder>}
+                        {getSelectedCountryLabel() ? (
+                          getSelectedCountryLabel()
+                        ) : (
+                          <span className="text-gray-800 font-semibold">{locale === 'ar' ? 'الكل' : 'All'}</span>
+                        )}
                       </InputBase>
                     </Combobox.Target>
                     <Combobox.Dropdown>
