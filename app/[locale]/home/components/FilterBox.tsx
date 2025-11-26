@@ -855,8 +855,8 @@ const FilterBox: React.FC<FilterBoxProps> = React.memo(({
     setRangeError('');
 
     // Validate inputs
-    const startValue = tempRangeStartRef.current.trim();
-    const endValue = tempRangeEndRef.current.trim();
+    const startValue = (rangeStartInputRef.current?.value ?? tempRangeStartRef.current).trim();
+    const endValue = (rangeEndInputRef.current?.value ?? tempRangeEndRef.current).trim();
 
     // If both are empty, do nothing
     if (!startValue && !endValue) {
@@ -867,6 +867,12 @@ const FilterBox: React.FC<FilterBoxProps> = React.memo(({
     // Parse values
     const start = startValue ? parseFloat(startValue) : null;
     const end = endValue ? parseFloat(endValue) : null;
+
+    // Disallow providing only maximum without minimum
+    if (start === null && end !== null) {
+      setRangeError(locale === 'ar' ? 'يرجى إدخال الحد الأدنى فقط (لا يمكن استخدام الحد الأقصى بمفرده)' : 'Please provide a minimum price only (maximum cannot be used alone)');
+      return;
+    }
 
     // Validate numbers
     if ((startValue && (isNaN(start!) || start! < 0)) ||

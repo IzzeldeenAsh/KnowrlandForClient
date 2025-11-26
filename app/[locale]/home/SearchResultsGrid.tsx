@@ -264,7 +264,7 @@ export default function SearchResultsGrid({
 
       const method = currentState ? 'DELETE' : 'POST';
       const slug = item.url.split('/').pop();
-      const url = `https://api.insightabusiness.com/api/account/favorite/knowledge/${slug}`;
+      const url = `https://api.foresighta.co/api/account/favorite/knowledge/${slug}`;
 
       const response = await axios({
         method,
@@ -412,6 +412,7 @@ export default function SearchResultsGrid({
                   </div>
                   
                   <Text
+                  style={{wordBreak:'break-word'}}
                     fw={700}
                     className={`${cardStyles.title} `}
                     pt={4}

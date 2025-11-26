@@ -111,6 +111,69 @@
   margin-bottom: 20px;
 }
 
+.richDescription {
+  font-size: 1rem;
+  color: #4b5563;
+  line-height: 1.6;
+  margin-bottom: 12px;
+}
+
+.richDescription h1,
+.richDescription h2,
+.richDescription h3 {
+  color: #111827;
+  margin: 0 0 6px 0;
+  line-height: 1.3;
+}
+
+.richDescription h1 { font-size: 1.05rem; }
+.richDescription h2 { font-size: 1rem; }
+.richDescription h3 { font-size: 0.95rem; }
+
+.richDescription p {
+  margin: 0 0 8px 0;
+}
+
+.richDescription ul,
+.richDescription ol {
+  margin: 0 0 8px 1.25rem;
+  padding: 0;
+}
+
+.richDescription li {
+  margin: 0 0 6px 0;
+}
+
+.richDescriptionCollapsed {
+  max-height: 88px; /* ~3-4 lines depending on content */
+  overflow: hidden;
+  position: relative;
+}
+
+.richDescriptionCollapsed::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 28px;
+  background: linear-gradient(to bottom, rgba(255, 255, 255, 0), #ffffff);
+}
+
+.richDescriptionExpanded {
+  max-height: none;
+}
+
+.toggleLink {
+  background: none;
+  border: none;
+  color: #2563eb;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 0;
+  margin: 4px 0 0 0;
+}
+
 .detailsSection {
   display: flex;
   align-items: center;

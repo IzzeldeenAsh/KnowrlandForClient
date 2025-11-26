@@ -222,7 +222,7 @@ export default function MeetTab({
       const token = typeof window !== "undefined" ? localStorage.getItem("token") : null;
       if (!token) return;
 
-      const response = await fetch("https://api.insightabusiness.com/api/account/wallet/balance", {
+      const response = await fetch("https://api.foresighta.co/api/account/wallet/balance", {
         headers: {
           "Content-Type": "application/json",
           Accept: "application/json",
@@ -307,7 +307,7 @@ export default function MeetTab({
         typeof window !== "undefined" ? localStorage.getItem("token") : null;
 
       const response = await fetch(
-        "https://api.insightabusiness.com/api/account/meeting/client/check-duplicate-time",
+        "https://api.foresighta.co/api/account/meeting/client/check-duplicate-time",
         {
           method: "POST",
           headers: {
@@ -348,7 +348,7 @@ export default function MeetTab({
     const checkStatus = async (): Promise<boolean> => {
       try {
         const response = await fetch(
-          `https://api.insightabusiness.com/api/account/order/meeting/${orderUuid}`,
+          `https://api.foresighta.co/api/account/order/meeting/${orderUuid}`,
           {
             headers: {
               "Content-Type": "application/json",
@@ -438,7 +438,7 @@ export default function MeetTab({
       }
 
       const response = await fetch(
-        `https://api.insightabusiness.com/api/account/order/meeting/checkout/${uuid}`,
+        `https://api.foresighta.co/api/account/order/meeting/checkout/${uuid}`,
         {
           method: "POST",
           headers: {
@@ -515,7 +515,7 @@ export default function MeetTab({
       setIsFinalVerifying(true);
       const token = typeof window !== "undefined" ? localStorage.getItem("token") : null;
       const response = await fetch(
-        `https://api.insightabusiness.com/api/account/order/meeting/check-payment-succeeded/${orderUuid}`,
+        `https://api.foresighta.co/api/account/order/meeting/check-payment-succeeded/${orderUuid}`,
         {
           method: "POST",
           headers: {
@@ -588,8 +588,8 @@ export default function MeetTab({
             </h3>
             <p className="text-gray-500 mb-4">{t("loginToView")}</p>
             <a
-              href={`https://app.insightabusiness.com/auth/login?returnUrl=${encodeURIComponent(
-                `https://insightabusiness.com/${locale}/profile/${uuid}${
+              href={`http://localhost:4200/auth/login?returnUrl=${encodeURIComponent(
+                `http://localhost:3000/${locale}/profile/${uuid}${
                   typeof window !== "undefined"
                     ? window.location.search
                     : ""
@@ -1245,7 +1245,7 @@ export default function MeetTab({
               className="bg-gradient-to-r from-blue-500 to-teal-400 hover:from-blue-600 hover:to-teal-500 transition-all"
               onClick={() => {
                 // Redirect to meetings dashboard
-                window.location.href = "https://app.insightabusiness.com/app/insighter-dashboard/my-meetings";
+                window.location.href = "http://localhost:4200/app/insighter-dashboard/my-meetings";
               }}
             >
               {locale.startsWith('ar') ? 'اذهب إلى الاجتماعات' : 'Go to Meetings'}
