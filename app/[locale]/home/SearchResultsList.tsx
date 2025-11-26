@@ -152,6 +152,91 @@ function formatPublishedDate(dateString: string, locale: string = 'en') {
   });
 }
 
+// Sanitize and keep only a safe subset of HTML tags (for description preview)
+function sanitizeLimitedHtml(html: string | null): string {
+  if (!html) return "";
+  if (typeof window === "undefined") return "";
+  const container = document.createElement("div");
+  container.innerHTML = html;
+
+  const allowedTags = new Set([
+    "H1",
+    "H2",
+    "H3",
+    "P",
+    "UL",
+    "OL",
+    "LI",
+    "STRONG",
+    "EM",
+    "A",
+    "BR",
+    "SPAN",
+  ]);
+
+  function sanitizeNode(node: Node): Node | null {
+    if (node.nodeType === Node.TEXT_NODE) return node;
+
+    if (node.nodeType === Node.ELEMENT_NODE) {
+      const element = node as HTMLElement;
+      const tag = element.tagName.toUpperCase();
+
+      if (!allowedTags.has(tag)) {
+        const fragment = document.createDocumentFragment();
+        while (element.firstChild) {
+          const child = element.firstChild;
+          const sanitizedChild = sanitizeNode(child);
+          if (sanitizedChild) {
+            fragment.appendChild(sanitizedChild);
+          } else {
+            element.removeChild(child);
+          }
+        }
+        return fragment;
+      }
+
+      // Strip all attributes except safe href on anchors
+      Array.from(element.attributes).forEach((attr) => {
+        const attrName = attr.name.toLowerCase();
+        if (!(tag === "A" && attrName === "href")) {
+          element.removeAttribute(attr.name);
+        }
+      });
+
+      if (tag === "A") {
+        const href = element.getAttribute("href") || "";
+        const isSafe = /^(https?:|mailto:|tel:)/i.test(href);
+        if (!isSafe) {
+          element.removeAttribute("href");
+        }
+      }
+
+      // Recurse children
+      Array.from(element.childNodes).forEach((child) => {
+        const sanitizedChild = sanitizeNode(child);
+        if (sanitizedChild !== child) {
+          if (sanitizedChild) {
+            element.replaceChild(sanitizedChild, child);
+          } else {
+            element.removeChild(child);
+          }
+        }
+      });
+
+      return element;
+    }
+
+    return null;
+  }
+
+  const sanitizedChildren = Array.from(container.childNodes)
+    .map((n) => sanitizeNode(n))
+    .filter(Boolean) as Node[];
+  const output = document.createElement("div");
+  sanitizedChildren.forEach((n) => output.appendChild(n));
+  return output.innerHTML;
+}
+
 export default function SearchResultsList({
   results,
   locale,
@@ -163,6 +248,8 @@ export default function SearchResultsList({
   // State for tracking read later status for each item
   const [readLaterStates, setReadLaterStates] = useState<{[key: number]: boolean}>({});
   const [loadingStates, setLoadingStates] = useState<{[key: number]: boolean}>({});
+  const [needsToggleMap, setNeedsToggleMap] = useState<{[key: number]: boolean}>({});
+  const descRefs = React.useRef<{[key: number]: HTMLDivElement | null}>({});
   
   // Check if user is logged in
   const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
@@ -173,6 +260,21 @@ export default function SearchResultsList({
   
   // Generate a unique prefix for this render to avoid key conflicts
   const uniquePrefix = React.useMemo(() => Date.now().toString(), [results]);
+
+  // Measure description overflow to decide whether to show "Read more"
+  React.useEffect(() => {
+    const nextNeeds: {[key: number]: boolean} = {};
+    // Only measure knowledge items that have descriptions
+    results
+      .filter((i) => i.searchable_type === "knowledge" && i.description)
+      .forEach((item) => {
+        const el = descRefs.current[item.searchable_id];
+        if (el) {
+          nextNeeds[item.searchable_id] = el.scrollHeight > 96; // heuristic threshold
+        }
+      });
+    setNeedsToggleMap(nextNeeds);
+  }, [results, isRTL]);
 
   // Handle read later toggle
   const handleReadLaterToggle = async (item: SearchResultItem, e: React.MouseEvent) => {
@@ -347,7 +449,9 @@ export default function SearchResultsList({
                 <div className={listStyles.titleSection}>
                   <Text
                     component="h3"
-                    className={`${listStyles.title} `}
+                    style={{wordBreak:'break-word'}}
+                    className={`${listStyles.title} ${item.language === 'arabic' ? 'text-right' : 'text-left'}`}
+                    dir={item.language === 'arabic' ? 'rtl' : 'ltr'}
                   >
                     {item.title}
                   </Text>
@@ -359,7 +463,7 @@ export default function SearchResultsList({
                   )}
                 </div>
                 {coverageText && (
-                  <div className="absolute bottom-4 right-4">
+                  <div className={`absolute bottom-4 ${item.language === 'arabic' ? 'right-4' : 'left-4'}`} dir={item.language === 'arabic' ? 'rtl' : 'ltr'}>
                     <div
                       className="text-lg font-bold leading-none bg-clip-text text-transparent bg-gradient-to-r from-sky-600 via-cyan-300 to-blue-200 drop-shadow-lg"
                     >
@@ -498,11 +602,24 @@ export default function SearchResultsList({
               {(item.description || (item.searchable_type === "knowledge" && (hasPrice || item.published_at))) && (
                 <div className={listStyles.contentColumn} style={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-between', height: '100%' }}>
                   {item.description && (
+                    <>
                       <Link href={`/${currentLocale}/${item.url}`}>
-                    <Text className={listStyles.description} lineClamp={3}>
-                      {truncateDescription(item.description, 50)}
-                    </Text>
-                    </Link>
+                        <div
+                          className={`${listStyles.richDescription} ${listStyles.richDescriptionCollapsed}`}
+                          ref={(el) => { descRefs.current[item.searchable_id] = el; }}
+                          dir={isRTL ? "rtl" : "ltr"}
+                          dangerouslySetInnerHTML={{ __html: sanitizeLimitedHtml(item.description) }}
+                        />
+                      </Link>
+                      {needsToggleMap[item.searchable_id] && (
+                        <Link
+                          href={`/${currentLocale}/${item.url}`}
+                          className={listStyles.toggleLink}
+                        >
+                          {isRTL ? "قراءة المزيد" : "Read more"}
+                        </Link>
+                      )}
+                    </>
                   )}
                   
                   {item.searchable_type === "knowledge" && (

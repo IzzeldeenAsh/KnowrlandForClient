@@ -732,6 +732,27 @@ const FilterBox: React.FC<FilterBoxProps> = React.memo(({
 
     return (
       <div className="grid grid-cols-1 gap-2 max-h-[60vh] overflow-y-auto pr-2">
+        {/* All option */}
+        <button
+          className={`py-2 px-3 rounded-md text-sm flex items-start text-start w-full transition-colors ${
+            !selectedIndustry
+              ? 'bg-blue-50 border-blue-200 text-blue-800 font-medium'
+              : 'hover:bg-gray-100 border border-gray-200'
+          } ${isDisabled ? 'opacity-50 cursor-not-allowed' : ''}`}
+          onClick={() => {
+            if (!isDisabled) {
+              setSelectedIndustry(null);
+              if (setIndustryFilter) {
+                setIndustryFilter(null);
+              }
+              setIsIndustryModalOpen(false);
+            }
+          }}
+          disabled={isDisabled}
+        >
+          <span className="flex-1 font-medium">{locale === 'ar' ? 'الكل' : 'All'}</span>
+        </button>
+
         {filteredIndustryLeafNodes.map((node) => {
           const isSelected = selectedIndustry?.id === node.key;
 
@@ -855,8 +876,8 @@ const FilterBox: React.FC<FilterBoxProps> = React.memo(({
     setRangeError('');
 
     // Validate inputs
-    const startValue = tempRangeStartRef.current.trim();
-    const endValue = tempRangeEndRef.current.trim();
+    const startValue = (rangeStartInputRef.current?.value ?? tempRangeStartRef.current).trim();
+    const endValue = (rangeEndInputRef.current?.value ?? tempRangeEndRef.current).trim();
 
     // If both are empty, do nothing
     if (!startValue && !endValue) {
@@ -867,6 +888,12 @@ const FilterBox: React.FC<FilterBoxProps> = React.memo(({
     // Parse values
     const start = startValue ? parseFloat(startValue) : null;
     const end = endValue ? parseFloat(endValue) : null;
+
+    // Disallow providing only maximum without minimum
+    if (start === null && end !== null) {
+      setRangeError(locale === 'ar' ? 'يرجى إدخال الحد الأدنى فقط (لا يمكن استخدام الحد الأقصى بمفرده)' : 'Please provide a minimum price only (maximum cannot be used alone)');
+      return;
+    }
 
     // Validate numbers
     if ((startValue && (isNaN(start!) || start! < 0)) ||
@@ -944,7 +971,7 @@ const FilterBox: React.FC<FilterBoxProps> = React.memo(({
 
   // Filter content component
   const FilterContent = () => (
-    <div className={`${shouldUseDrawer ? '' : 'bg-gray-50  border border-gray-200 w-full max-w-xs'}`} dir={locale === 'ar' ? 'rtl' : 'ltr'}>
+    <div className={`${shouldUseDrawer ? '' : 'bg-gray-50  border border-gray-200 h-full w-full max-w-xs'}`} dir={locale === 'ar' ? 'rtl' : 'ltr'}>
       {/* Top Bar */}
       <div className="flex items-center justify-between px-4 pt-4 pb-2 border-b border-gray-200">
         <h2 className="text-base font-semibold text-gray-800">{locale === 'ar' ? 'الفلاتر' : 'Filters'}</h2>
@@ -959,14 +986,14 @@ const FilterBox: React.FC<FilterBoxProps> = React.memo(({
         </div>
       </div>
 
-      <div className="p-0 divide-y divide-gray-200">
+      <div className="p-4 space-y-3">
         {/* Price Types Section */}
         {searchType !== 'insighter' && (
-          <div data-debug={`Price section visible for ${searchType}`}>
+          <div className="rounded-lg border border-gray-200 overflow-hidden bg-white" data-debug={`Price section visible for ${searchType}`}>
             <button
               onClick={() => !isDisabled && setPriceCollapsed(!priceCollapsed)}
               disabled={isDisabled}
-              className={`w-full flex items-center justify-between px-4 py-3 text-left bg-gray-50 hover:bg-gray-100 focus:outline-none transition-colors ${
+              className={`w-full flex items-center justify-between px-4 py-3 text-left bg-white hover:bg-gray-50 focus:outline-none transition-colors ${
                 isDisabled ? 'opacity-50 cursor-not-allowed' : ''
               }`}
             >
@@ -1048,7 +1075,8 @@ const FilterBox: React.FC<FilterBoxProps> = React.memo(({
                           min="0"
                           step="0.01"
                         />
-                        <button
+                     <div className="flex flex-col">
+                     <button
                           onClick={handleRangePriceSearch}
                           disabled={isDisabled}
                           className={`p-1 text-blue-500 hover:text-blue-700 hover:bg-blue-50 rounded transition-colors ${
@@ -1068,6 +1096,7 @@ const FilterBox: React.FC<FilterBoxProps> = React.memo(({
                         >
                           <IconX size={16} />
                         </button>
+                     </div>
                       </div>
                       {rangeError && (
                         <p className="text-xs text-red-500 mt-1">{rangeError}</p>
@@ -1088,11 +1117,11 @@ const FilterBox: React.FC<FilterBoxProps> = React.memo(({
 
         {/* Language Section */}
         {searchType !== 'insighter' && (
-          <div data-debug={`Language section visible for ${searchType}`}>
+          <div className="rounded-lg border border-gray-200 overflow-hidden bg-white" data-debug={`Language section visible for ${searchType}`}>
             <button
               onClick={() => !isDisabled && setLanguageCollapsed(!languageCollapsed)}
               disabled={isDisabled}
-              className={`w-full flex items-center justify-between px-4 py-3 text-left bg-gray-50 hover:bg-gray-100 focus:outline-none transition-colors ${
+              className={`w-full flex items-center justify-between px-4 py-3 text-left bg-white hover:bg-gray-50 focus:outline-none transition-colors ${
                 isDisabled ? 'opacity-50 cursor-not-allowed' : ''
               }`}
             >
@@ -1143,11 +1172,11 @@ const FilterBox: React.FC<FilterBoxProps> = React.memo(({
         )}
         {/* Year of Study Section */}
         {searchType !== 'insighter' && (
-          <div>
+          <div className="rounded-lg border border-gray-200 overflow-hidden bg-white">
             <button
               onClick={() => !isDisabled && setYearOfStudyCollapsed(!yearOfStudyCollapsed)}
               disabled={isDisabled}
-              className={`w-full flex items-center justify-between px-4 py-3 text-left bg-gray-50 hover:bg-gray-100 focus:outline-none transition-colors ${
+              className={`w-full flex items-center justify-between px-4 py-3 text-left bg-white hover:bg-gray-50 focus:outline-none transition-colors ${
                 isDisabled ? 'opacity-50 cursor-not-allowed' : ''
               }`}
             >
@@ -1185,11 +1214,11 @@ const FilterBox: React.FC<FilterBoxProps> = React.memo(({
         )}
 
         {/* Industry Section */}
-        <div>
+        <div className="rounded-lg border border-gray-200 overflow-hidden bg-white">
           <button
             onClick={() => !isDisabled && setIndustryCollapsed(!industryCollapsed)}
             disabled={isDisabled}
-            className={`w-full flex items-center justify-between px-4 py-3 text-left bg-gray-50 hover:bg-gray-100 focus:outline-none transition-colors ${
+            className={`w-full flex items-center justify-between px-4 py-3 text-left bg-white hover:bg-gray-50 focus:outline-none transition-colors ${
               isDisabled ? 'opacity-50 cursor-not-allowed' : ''
             }`}
           >
@@ -1217,7 +1246,7 @@ const FilterBox: React.FC<FilterBoxProps> = React.memo(({
                     {selectedIndustry ? (
                       <span className="truncate text-gray-800 font-semibold">{selectedIndustry.label.length > 30 ? `${selectedIndustry.label.substring(0, 30)}...` : selectedIndustry.label}</span>
                     ) : (
-                      <span className="text-gray-400 font-medium">{locale === 'ar' ? 'اختر المجال' : 'Select Industry'}</span>
+                      <span className="text-gray-800 font-semibold">{locale === 'ar' ? 'الكل' : 'All'}</span>
                     )}
                     {selectedIndustry && !isDisabled && (
                       <button onClick={handleClearIndustry} className="ml-2 text-gray-400 hover:text-red-500">
@@ -1236,11 +1265,11 @@ const FilterBox: React.FC<FilterBoxProps> = React.memo(({
 
         {/* Tags Section */}
         {searchType !== 'insighter' && (
-          <div>
+          <div className="rounded-lg border border-gray-200 overflow-hidden bg-white">
             <button
               onClick={() => !isDisabled && setTagsCollapsed(!tagsCollapsed)}
               disabled={isDisabled}
-              className={`w-full flex items-center justify-between px-4 py-3 text-left bg-gray-50 hover:bg-gray-100 focus:outline-none transition-colors ${
+              className={`w-full flex items-center justify-between px-4 py-3 text-left bg-white hover:bg-gray-50 focus:outline-none transition-colors ${
                 isDisabled ? 'opacity-50 cursor-not-allowed' : ''
               }`}
             >
@@ -1304,7 +1333,7 @@ const FilterBox: React.FC<FilterBoxProps> = React.memo(({
                               {getSelectedTagLabel()}
                             </span>
                           ) : (
-                            <Input.Placeholder>{locale === 'ar' ? 'اختر وسمًا' : 'Select a tag'}</Input.Placeholder>
+                            <span className="text-gray-800 font-semibold">{locale === 'ar' ? 'الكل' : 'All'}</span>
                           )}
                         </InputBase>
                       </Combobox.Target>
@@ -1336,11 +1365,11 @@ const FilterBox: React.FC<FilterBoxProps> = React.memo(({
         )}
 
         {/* Target Market Section */}
-        <div>
+        <div className="rounded-lg border border-gray-200 overflow-hidden bg-white">
           <button
             onClick={() => !isDisabled && setTargetMarketCollapsed(!targetMarketCollapsed)}
             disabled={isDisabled}
-            className={`w-full flex items-center justify-between px-4 py-3 text-left bg-gray-50 hover:bg-gray-100 focus:outline-none transition-colors ${
+            className={`w-full flex items-center justify-between px-4 py-3 text-left bg-white hover:bg-gray-50 focus:outline-none transition-colors ${
               isDisabled ? 'opacity-50 cursor-not-allowed' : ''
             }`}
           >
@@ -1404,7 +1433,11 @@ const FilterBox: React.FC<FilterBoxProps> = React.memo(({
                           }`}
                           disabled={isDisabled}
                         >
-                          {getSelectedEconomicBlocLabel() || <Input.Placeholder>{locale === 'ar' ? 'اختر المنطقة الاقتصادية' : 'Select an economic bloc'}</Input.Placeholder>}
+                          {getSelectedEconomicBlocLabel() ? (
+                            getSelectedEconomicBlocLabel()
+                          ) : (
+                            <span className="text-gray-800 font-semibold">{locale === 'ar' ? 'الكل' : 'All'}</span>
+                          )}
                         </InputBase>
                       </Combobox.Target>
                       <Combobox.Dropdown>
@@ -1476,7 +1509,11 @@ const FilterBox: React.FC<FilterBoxProps> = React.memo(({
                         }`}
                         disabled={isDisabled}
                       >
-                        {getSelectedRegionLabel() || <Input.Placeholder>{locale === 'ar' ? 'اختر منطقة' : 'Select a region'}</Input.Placeholder>}
+                        {getSelectedRegionLabel() ? (
+                          getSelectedRegionLabel()
+                        ) : (
+                          <span className="text-gray-800 font-semibold">{locale === 'ar' ? 'الكل' : 'All'}</span>
+                        )}
                       </InputBase>
                     </Combobox.Target>
                     <Combobox.Dropdown>
@@ -1547,7 +1584,11 @@ const FilterBox: React.FC<FilterBoxProps> = React.memo(({
                         }`}
                         disabled={isDisabled}
                       >
-                        {getSelectedCountryLabel() || <Input.Placeholder>{locale === 'ar' ? 'اختر دولة' : 'Select a country'}</Input.Placeholder>}
+                        {getSelectedCountryLabel() ? (
+                          getSelectedCountryLabel()
+                        ) : (
+                          <span className="text-gray-800 font-semibold">{locale === 'ar' ? 'الكل' : 'All'}</span>
+                        )}
                       </InputBase>
                     </Combobox.Target>
                     <Combobox.Dropdown>
@@ -1579,11 +1620,11 @@ const FilterBox: React.FC<FilterBoxProps> = React.memo(({
       
         {/* Role Section - Only for insighter */}
         {searchType === 'insighter' && (
-          <div data-debug={`Role section visible for ${searchType}`}>
+          <div className="rounded-lg border border-gray-200 overflow-hidden bg-white" data-debug={`Role section visible for ${searchType}`}>
             <button
               onClick={() => !isDisabled && setRoleCollapsed(!roleCollapsed)}
               disabled={isDisabled}
-              className={`w-full flex items-center justify-between px-4 py-3 text-left bg-gray-50 hover:bg-gray-100 focus:outline-none transition-colors ${
+              className={`w-full flex items-center justify-between px-4 py-3 text-left bg-white hover:bg-gray-50 focus:outline-none transition-colors ${
                 isDisabled ? 'opacity-50 cursor-not-allowed' : ''
               }`}
             >

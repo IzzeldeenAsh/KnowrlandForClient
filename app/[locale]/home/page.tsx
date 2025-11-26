@@ -314,14 +314,16 @@ export default function HomePage() {
     cover_end?: string | null,
     accuracy?: 'any' | 'all',
     role?: 'all' | 'company' | 'individual',
-    page?: number
+    page?: number,
+    // Allow forcing URL update even if not initialized yet (user-triggered)
+    force?: boolean
   }) => {
     // Skip URL updates during pagination to prevent interference
     if (isPageChangeInProgressRef.current) {
       return;
     }
     // Skip URL updates if component is still initializing to prevent overriding incoming URL parameters
-    if (!initialized) {
+    if (!initialized && !params.force) {
       return;
     }
     // Build URL parameters
@@ -584,7 +586,7 @@ export default function HomePage() {
     // Update the range start filter state
     setRangeStartFilter(value);
     // Update URL with new filter
-    updateUrlWithFilters({ range_start: value });
+    updateUrlWithFilters({ range_start: value, force: true });
 
     // Reset to page 1 when filter changes
     setCurrentPage(1);
@@ -597,7 +599,7 @@ export default function HomePage() {
     // Update the range end filter state
     setRangeEndFilter(value);
     // Update URL with new filter
-    updateUrlWithFilters({ range_end: value });
+    updateUrlWithFilters({ range_end: value, force: true });
 
     // Reset to page 1 when filter changes
     setCurrentPage(1);
@@ -1467,13 +1469,13 @@ export default function HomePage() {
             <div className="flex gap-0 items-start">
               {/* Sidebar (FilterBox) */}
               <aside 
-                className={`hidden lg:block lg:flex-shrink-0 transition-all duration-300 ease-in-out ${
+                className={`hidden lg:block lg:flex-shrink-0 transition-all duration-300 ease-in-out min-w-[350px] ${
                   filtersVisible 
-                    ? 'overflow-visible lg:w-80 opacity-100' 
+                    ? 'overflow-visible lg:w-90 opacity-100' 
                     : 'overflow-hidden lg:w-0 opacity-0 max-h-0'
                 }`}
               >
-                <div className={`sticky top-0 h-[100vh] overflow-y-auto bg-white transition-transform duration-300 ease-in-out ${
+                <div className={`sticky top-0 h-[100vh] overflow-y-auto bg-[#f9fafb] transition-transform duration-300 ease-in-out ${
                   filtersVisible ? 'transform translate-x-0' : 'transform -translate-x-full lg:translate-x-0'
                 }`}>
                   <FilterBox
