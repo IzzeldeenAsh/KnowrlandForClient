@@ -12,7 +12,7 @@ import { Elements, PaymentElement, useElements, useStripe } from "@stripe/react-
 import styles from "./payment.module.css";
 
 // Initialize Stripe
-const stripePromise = loadStripe("");
+const stripePromise = loadStripe("pk_live_51RvbpYRIE7WtDi9SLKPBxKTPyTkULT1e36AZMOcmtUomKgW99akiph2PVg5mmUcPtyAjvlXwP1wy70OFvooJLpQc00CNQYKb96");
 
 // File icon mapping function
 const getFileIconByExtension = (extension: string) => {
