@@ -293,7 +293,7 @@ export default function SearchResultsList({
     setLoadingStates(prev => ({ ...prev, [itemId]: true }));
 
     try {
-      const token = localStorage.getItem('token');
+      const token = getAuthToken();
       if (!token) {
         console.error('No auth token found');
         return;
@@ -401,6 +401,10 @@ export default function SearchResultsList({
                 ? `$${numericPrice.toLocaleString('en-US', { maximumFractionDigits: 2 })}`
                 : normalizedPrice;
               const coverageText = formatCoverageRange(item.cover_start, item.cover_end);
+              const roles = Array.isArray(item.insighter?.roles) ? item.insighter.roles : [];
+              const isCompany = roles.includes("company");
+              const isCompanyInsighter = roles.includes("company-insighter");
+              const isInsighter = roles.includes("insighter");
 
               return (
                 <Card
@@ -487,12 +491,12 @@ export default function SearchResultsList({
                     <div className="relative">
                    <div className="object-cover object-top">
                    <Link 
-                     href={item.insighter.roles.includes("company") || item.insighter.roles.includes("company-insighter") ? 
-                       `/${currentLocale}/profile/${item.insighter.company?.uuid}` : 
-                       `/${currentLocale}/profile/${item.insighter.uuid}?entity=insighter`}
+                    href={isCompany || isCompanyInsighter ? 
+                      `/${currentLocale}/profile/${item.insighter.company?.uuid}` : 
+                      `/${currentLocale}/profile/${item.insighter.uuid}?entity=insighter`}
                    >
                      <Avatar
-                       src={(item.insighter.roles.includes("company") || item.insighter.roles.includes("company-insighter")) && item.insighter.company?.logo ? 
+                       src={(isCompany || isCompanyInsighter) && item.insighter.company?.logo ? 
                          item.insighter.company.logo : 
                          item.insighter.profile_photo_url}
                        radius="xl"
@@ -500,14 +504,14 @@ export default function SearchResultsList({
                        size="md"
                        className={`${cardStyles.avatar} avatar-top-position`}
                      >
-                       {!((item.insighter.roles.includes("company") || item.insighter.roles.includes("company-insighter")) && item.insighter.company?.logo) && 
+                       {!((isCompany || isCompanyInsighter) && item.insighter.company?.logo) && 
                        !item.insighter.profile_photo_url &&
                          getInitials(item.insighter.name)}
                      </Avatar>
                    </Link>
                    </div>
                         
-                        {item.insighter.roles.includes("company-insighter") && item.insighter.profile_photo_url && (
+                        {isCompanyInsighter && item.insighter.profile_photo_url && (
                           <Link href={`/${currentLocale}/profile/${item.insighter.uuid}?entity=insighter`}>
                           <Avatar
                             src={item.insighter.profile_photo_url}
@@ -523,7 +527,7 @@ export default function SearchResultsList({
                           />
                           </Link>
                         )}
-                         {item.insighter.roles.includes("company") && item.insighter.profile_photo_url && (
+                         {isCompany && item.insighter.profile_photo_url && (
                           <Link href={`/${currentLocale}/profile/${item.insighter.uuid}?entity=insighter`}>
                           <Avatar
                             src={item.insighter.profile_photo_url}
@@ -543,11 +547,11 @@ export default function SearchResultsList({
                     <div>
                     <Text fw={600} size="sm" className="capitalize" c="white" ps={4}>
                           <Link href={`/${currentLocale}/profile/${item.insighter.uuid}?entity=insighter`}>
-                          {item.insighter.roles.includes("insighter") && item.insighter.name.toLowerCase()}
+                          {isInsighter && item.insighter.name.toLowerCase()}
                           </Link>
 
                         <Link href={`/${currentLocale}/profile/${item.insighter.company?.uuid}`}>
-                          {item.insighter.roles.includes("company") && (
+                          {isCompany && (
                             item.insighter.company
                               ? isRTL
                                 ? ` ${item.insighter.company.legal_name}`
@@ -557,7 +561,7 @@ export default function SearchResultsList({
                           </Link>
 
                           <Link href={`/${currentLocale}/profile/${item.insighter.company?.uuid}`}>
-                          {item.insighter.roles.includes("company-insighter") && (
+                          {isCompanyInsighter && (
                             item.insighter.company
                               ? isRTL
                                 ? ` ${item.insighter.company.legal_name}`
@@ -569,11 +573,11 @@ export default function SearchResultsList({
 
                         <Text c="dimmed" size="xs" className="capitalize" ps={4}>
                           <Link href={`/${currentLocale}/profile/${item.insighter.uuid}?entity=insighter`}>
-                          {item.insighter.roles.includes("insighter") && translations.insighter}
+                          {isInsighter && translations.insighter}
                           </Link>
 
                          
-                          {item.insighter.roles.includes("company") && (
+                          {isCompany && (
                             item.insighter.company
                               ? (<Link href={`/${currentLocale}/profile/${item.insighter?.uuid}?entity=insighter`}>
                                 {translations.by} {item.insighter.name.toLowerCase()}
@@ -584,7 +588,7 @@ export default function SearchResultsList({
                           )}
 
                           <Link href={`/${currentLocale}/profile/${item.insighter.company?.uuid}`}>
-                          {item.insighter.roles.includes("company-insighter") && (
+                          {isCompanyInsighter && (
                             item.insighter.company
                               ? (<Link href={`/${currentLocale}/profile/${item.insighter?.uuid}?entity=insighter`}>
                                 {translations.by} {item.insighter.name.toLowerCase()}
