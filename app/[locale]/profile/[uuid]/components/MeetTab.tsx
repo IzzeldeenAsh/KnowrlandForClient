@@ -197,6 +197,9 @@ export default function MeetTab({
   const [stripeErrorMessage, setStripeErrorMessage] = useState<string | null>(null);
   const [bookingStep, setBookingStep] = useState<1 | 2>(1);
   const [isFinalVerifying, setIsFinalVerifying] = useState(false);
+  const [didStripeConfirm, setDidStripeConfirm] = useState(false);
+  const [pollFinished, setPollFinished] = useState(false);
+  const [pollFoundPaid, setPollFoundPaid] = useState<boolean | null>(null);
 
   // Fetch wallet balance when component mounts
   useEffect(() => {
@@ -510,7 +513,11 @@ export default function MeetTab({
   };
 
   const finalVerifyMeetingPayment = async () => {
-    if (!orderUuid) return;
+    // Allow final verification ONLY if:
+    // - Stripe confirmation succeeded (card accepted)
+    // - Polling attempts have finished
+    // - Polling did not observe a paid status (still pending)
+    if (!orderUuid || !didStripeConfirm || !pollFinished || pollFoundPaid !== false) return;
     try {
       setIsFinalVerifying(true);
       const token = typeof window !== "undefined" ? localStorage.getItem("token") : null;
@@ -527,10 +534,51 @@ export default function MeetTab({
         }
       );
       if (response.status === 204) {
-        setStripeErrorMessage(null);
-        setShowSuccessUI(true);
-        setIsBookingModalOpen(false);
-        setBookingStep(1);
+        // After backend confirmation, re-fetch order to verify status is paid
+        try {
+          const verifyResp = await fetch(
+            `https://api.insightabusiness.com/api/account/order/meeting/${orderUuid}`,
+            {
+              headers: {
+                "Content-Type": "application/json",
+                Accept: "application/json",
+                "Accept-Language": locale,
+                "X-Timezone": Intl.DateTimeFormat().resolvedOptions().timeZone,
+                ...(token && { Authorization: `Bearer ${token}` }),
+              },
+            }
+          );
+          if (verifyResp.ok) {
+            const verifyData = await verifyResp.json();
+            const isPaid =
+              verifyData?.data?.status === "paid" ||
+              verifyData?.data?.payment_status === "completed";
+            if (isPaid) {
+              setStripeErrorMessage(null);
+              setShowSuccessUI(true);
+              setIsBookingModalOpen(false);
+              setBookingStep(1);
+            } else {
+              setStripeErrorMessage(
+                locale.startsWith('ar')
+                  ? "لم يتم تأكيد حالة الطلب كمدفوع."
+                  : "Order status is not paid after verification."
+              );
+            }
+          } else {
+            setStripeErrorMessage(
+              locale.startsWith('ar')
+                ? "تعذر التحقق من حالة الطلب."
+                : "Unable to verify order status."
+            );
+          }
+        } catch (e) {
+          setStripeErrorMessage(
+            locale.startsWith('ar')
+              ? "حدث خطأ أثناء التحقق من حالة الطلب."
+              : "An error occurred while verifying order status."
+          );
+        }
       } else {
         setStripeErrorMessage(
           locale.startsWith('ar')
@@ -563,6 +611,9 @@ export default function MeetTab({
     setStripeErrorMessage(null);
     setIsStripeProcessing(false);
     setIsPollingStatus(false);
+    setDidStripeConfirm(false);
+    setPollFinished(false);
+    setPollFoundPaid(null);
     fetchMeetingAvailability();
   };
 
@@ -1096,9 +1147,12 @@ export default function MeetTab({
                       clientSecret={clientSecret}
                       onSuccess={async () => {
                         if (orderUuid) {
+                          setDidStripeConfirm(true);
                           setIsPollingStatus(true);
                           const success = await pollOrderStatus(orderUuid);
                           setIsPollingStatus(false);
+                          setPollFinished(true);
+                          setPollFoundPaid(success);
                           if (success) {
                             setShowSuccessUI(true);
                             setIsBookingModalOpen(false);
@@ -1109,6 +1163,10 @@ export default function MeetTab({
                         }
                       }}
                       onError={(error: string) => {
+                        // Card declined or Stripe confirmation failed
+                        setDidStripeConfirm(false);
+                        setPollFinished(false);
+                        setPollFoundPaid(null);
                         setStripeErrorMessage(error);
                       }}
                       isProcessing={isStripeProcessing || isPollingStatus}
@@ -1127,7 +1185,7 @@ export default function MeetTab({
                     )}
 
                     <div className="mt-4 flex items-center gap-3 justify-start">
-                      {stripeErrorMessage && orderUuid && !isStripeProcessing && !isPollingStatus && (
+                      {didStripeConfirm && pollFinished && pollFoundPaid === false && orderUuid && !isStripeProcessing && !isPollingStatus && (
                         <Button
                           onClick={finalVerifyMeetingPayment}
                           loading={isFinalVerifying}
@@ -1142,6 +1200,9 @@ export default function MeetTab({
                         onClick={() => {
                           if (!isStripeProcessing && !isPollingStatus) {
                             setBookingStep(1);
+                            setDidStripeConfirm(false);
+                            setPollFinished(false);
+                            setPollFoundPaid(null);
                           }
                         }}
                         disabled={isStripeProcessing || isPollingStatus}

@@ -426,7 +426,7 @@ export default function SearchResultsGrid({
                   <div className={`${item.language === 'arabic' ? 'text-right' : 'text-left'}`} dir={item.language === 'arabic' ? 'rtl' : 'ltr'}>
                     <div
                       
-                      className={`text-lg  font-bold leading-none bg-clip-text text-transparent   drop-shadow-lg ${isRTL || item.language === 'arabic' ? 'bg-gradient-to-l from-sky-300  to-sky-800' : 'bg-gradient-to-r from-sky-300  to-sky-00'}`}
+                      className={`text-lg  font-bold leading-none   drop-shadow-lg text-blue-400`}
                     >
                       {coverageText}
                     </div>

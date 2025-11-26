@@ -465,7 +465,7 @@ export default function SearchResultsList({
                 {coverageText && (
                   <div className={`absolute bottom-4 ${item.language === 'arabic' ? 'right-4' : 'left-4'}`} dir={item.language === 'arabic' ? 'rtl' : 'ltr'}>
                     <div
-                      className="text-lg font-bold leading-none bg-clip-text text-transparent bg-gradient-to-r from-sky-600 via-cyan-300 to-blue-200 drop-shadow-lg"
+                      className="text-lg font-bold leading-none text-blue-400 drop-shadow-lg"
                     >
                       {coverageText}
                     </div>
@@ -607,7 +607,7 @@ export default function SearchResultsList({
                         <div
                           className={`${listStyles.richDescription} ${listStyles.richDescriptionCollapsed}`}
                           ref={(el) => { descRefs.current[item.searchable_id] = el; }}
-                          dir={isRTL ? "rtl" : "ltr"}
+                          dir={(item.language === 'arabic') ? "rtl" : "ltr"}
                           dangerouslySetInnerHTML={{ __html: sanitizeLimitedHtml(item.description) }}
                         />
                       </Link>

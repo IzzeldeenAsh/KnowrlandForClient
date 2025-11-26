@@ -12,7 +12,7 @@ import { Elements, PaymentElement, useElements, useStripe } from "@stripe/react-
 import styles from "./payment.module.css";
 
 // Initialize Stripe
-const stripePromise = loadStripe("pk_live_51RvbpYRIE7WtDi9SLKPBxKTPyTkULT1e36AZMOcmtUomKgW99akiph2PVg5mmUcPtyAjvlXwP1wy70OFvooJLpQc00CNQYKb96");
+const stripePromise = loadStripe("");
 
 // File icon mapping function
 const getFileIconByExtension = (extension: string) => {
@@ -79,6 +79,8 @@ function PaymentForm({ orderUuid, amount, title, locale, isRTL, orderDetails, se
   const [showDocumentsAdded, setShowDocumentsAdded] = useState(false);
   const [isFetchingDownloadIds, setIsFetchingDownloadIds] = useState(false);
   const [isRetrying, setIsRetrying] = useState(false);
+  const [stripeAccepted, setStripeAccepted] = useState(false);
+  const [pollAttemptsEnded, setPollAttemptsEnded] = useState(false);
 
   // Get auth token from cookies
   const getAuthToken = () => {
@@ -147,6 +149,7 @@ function PaymentForm({ orderUuid, amount, title, locale, isRTL, orderDetails, se
     const token = getAuthToken();
     let attempts = 0;
     const maxAttempts = 18; // ~2 minutes with progressive delays
+    setPollAttemptsEnded(false);
     
     // Progressive delay calculation
     const getPollingDelay = (attempt: number): number => {
@@ -204,6 +207,7 @@ function PaymentForm({ orderUuid, amount, title, locale, isRTL, orderDetails, se
 
     setPaymentStatus("error");
     setErrorMessage("Payment verification timed out");
+    setPollAttemptsEnded(true);
     return false;
   }, [orderUuid, locale]);
 
@@ -218,6 +222,8 @@ function PaymentForm({ orderUuid, amount, title, locale, isRTL, orderDetails, se
     setPaymentStatus("processing");
     setErrorMessage("");
     setShowInlineError(false);
+    setStripeAccepted(false);
+    setPollAttemptsEnded(false);
 
     try {
       // Confirm the payment
@@ -246,6 +252,7 @@ function PaymentForm({ orderUuid, amount, title, locale, isRTL, orderDetails, se
           setPaymentStatus("error"); // Show full error UI
         }
       } else {
+        setStripeAccepted(true);
         // Payment succeeded, start polling for order status
         await pollOrderStatus();
       }
@@ -259,6 +266,10 @@ function PaymentForm({ orderUuid, amount, title, locale, isRTL, orderDetails, se
   };
 
   const handleRetry = async () => {
+    // Guard: only allow retry if Stripe accepted the card and polling attempts ended without success
+    if (!stripeAccepted || !pollAttemptsEnded) {
+      return;
+    }
     setIsRetrying(true);
     setErrorMessage("");
     setShowInlineError(false);
@@ -277,7 +288,18 @@ function PaymentForm({ orderUuid, amount, title, locale, isRTL, orderDetails, se
         }
       );
       if (response.status === 204) {
-        setPaymentStatus("success");
+        // After backend confirmation, re-fetch order to verify status
+        const updated = await fetchUpdatedOrderDetails(orderUuid, setOrderDetails);
+        if (updated?.status === "paid") {
+          setPaymentStatus("success");
+        } else {
+          setPaymentStatus("error");
+          setErrorMessage(
+            isRTL
+              ? "لم يتم تأكيد حالة الطلب كمدفوع."
+              : "Order status is not paid after verification."
+          );
+        }
       } else {
         setPaymentStatus("error");
         setErrorMessage(
@@ -424,15 +446,17 @@ function PaymentForm({ orderUuid, amount, title, locale, isRTL, orderDetails, se
       <div className="max-w-md mx-auto text-center">
         <h2 className="text-2xl font-bold mb-2 text-red-600">{translations.paymentFailed}</h2>
         <p className="text-gray-600 mb-6">{errorMessage}</p>
-        <Button
-          size="lg"
-          onClick={handleRetry}
-          className="bg-gradient-to-r from-blue-500 to-teal-400"
-          loading={isRetrying}
-          disabled={isRetrying}
-        >
-          {translations.tryAgain}
-        </Button>
+        {stripeAccepted && pollAttemptsEnded && (
+          <Button
+            size="lg"
+            onClick={handleRetry}
+            className="bg-gradient-to-r from-blue-500 to-teal-400"
+            loading={isRetrying}
+            disabled={isRetrying}
+          >
+            {translations.tryAgain}
+          </Button>
+        )}
       </div>
     );
   }
