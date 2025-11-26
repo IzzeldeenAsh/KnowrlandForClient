@@ -1075,7 +1075,6 @@ const FilterBox: React.FC<FilterBoxProps> = React.memo(({
                           min="0"
                           step="0.01"
                         />
-                     <div className="flex flex-col">
                      <button
                           onClick={handleRangePriceSearch}
                           disabled={isDisabled}
@@ -1096,7 +1095,6 @@ const FilterBox: React.FC<FilterBoxProps> = React.memo(({
                         >
                           <IconX size={16} />
                         </button>
-                     </div>
                       </div>
                       {rangeError && (
                         <p className="text-xs text-red-500 mt-1">{rangeError}</p>

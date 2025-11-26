@@ -323,7 +323,7 @@ export default function KnowledgePage({ params }: Props) {
               </div>
               <div className="flex flex-col items-start">
                 <div className="flex flex-col items-start mb-6 sm:mb-10">
-                  <h3 className="text-3xl  md:text-4xl bg-gradient-to-r from-blue-500 to-teal-400 pt-4 font-extrabold text-transparent bg-clip-text " >
+                  <h3 className="text-3xl  md:text-4xl bg-gradient-to-r from-blue-500 to-teal-400 pt-4 font-extrabold text-transparent bg-clip-text " style={{wordBreak: 'break-word'}}>
                     {knowledge.title}
                   </h3>
                   
