@@ -1469,7 +1469,7 @@ export default function HomePage() {
             <div className="flex gap-0 items-start">
               {/* Sidebar (FilterBox) */}
               <aside 
-                className={`hidden lg:block lg:flex-shrink-0 transition-all duration-300 ease-in-out min-w-[350px] ${
+                className={`hidden lg:block lg:flex-shrink-0 transition-all duration-300 ease-in-out ${
                   filtersVisible 
                     ? 'overflow-visible lg:w-90 opacity-100' 
                     : 'overflow-hidden lg:w-0 opacity-0 max-h-0'
