@@ -184,7 +184,7 @@ function sanitizeLimitedHtml(html: string | null): string {
     const NODE_LIMIT = 4000;
     let visited = 0;
 
-    function sanitizeNode(node: Node): Node | null {
+    const sanitizeNode = (node: Node): Node | null => {
       visited += 1;
       if (visited > NODE_LIMIT) {
         return document.createTextNode("");
