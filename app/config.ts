@@ -8,8 +8,8 @@ const isDevelopment = FORCE_DEVELOPMENT || process.env.NODE_ENV === 'development
 
 // API and App URLs based on environment
 export const apiBaseUrl = isDevelopment 
-  ? 'https://api.foresighta.co' 
-  : 'https://api.foresighta.co';
+  ? 'https://api.insightabusiness.com' 
+  : 'https://api.insightabusiness.com';
 
 export const appBaseUrl = isDevelopment 
   ? 'http://localhost:4200' 
