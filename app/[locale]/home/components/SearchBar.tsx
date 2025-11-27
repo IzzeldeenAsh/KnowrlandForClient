@@ -495,9 +495,19 @@ const SearchBar: React.FC<SearchBarProps> = ({
   // Handle clearing the search input
   const handleClearSearch = () => {
     setSearchQuery('');
+    onQueryChange?.('');
     resetSuggestions();
     setSuggestionSelected(false);
     setInputFocused(false);
+    // Remove keyword from URL so it doesn't come back on next interactions
+    try {
+      const params = new URLSearchParams(searchParams.toString());
+      params.delete('keyword');
+      params.delete('page');
+      params.set('search_type', searchType);
+      const nextUrl = `/${locale}/home?${params.toString()}`;
+      router.push(nextUrl, { scroll: false });
+    } catch {}
     // Focus back to the input after clearing
     if (searchInputRef.current) {
       searchInputRef.current.focus();
