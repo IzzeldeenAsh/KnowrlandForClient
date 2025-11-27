@@ -6,6 +6,7 @@ import Image from 'next/image';
 import { useTranslations } from 'next-intl';
 import { useSearchParams } from 'next/navigation';
 import dynamic from 'next/dynamic';
+import ViewModeToggle from './ViewModeToggle';
 import LoadingState from './LoadingState';
 import type { KnowledgeItem } from '../../topic/[id]/[slug]/KnowledgeGrid';
 import type { SearchResultItem } from '../SearchResultsGrid';
@@ -15,6 +16,11 @@ import styles from '../../profile/[uuid]/profile.module.css';
 // Dynamically import components with no SSR to avoid hydration issues
 const KnowledgeGrid = dynamic(
   () => import('../../topic/[id]/[slug]/KnowledgeGrid'),
+  { ssr: false }
+);
+
+const KnowledgeList = dynamic(
+  () => import('../../topic/[id]/[slug]/KnowledgeList'),
   { ssr: false }
 );
 
@@ -55,8 +61,8 @@ const ResultsSection: React.FC<ResultsSectionProps> = ({
   setCurrentPage,
   totalPages,
   totalItems,
-  viewMode: _viewMode,
-  setViewMode: _setViewMode,
+  viewMode,
+  setViewMode,
   locale,
   onPageChange,
   searchType,
@@ -247,6 +253,7 @@ const ResultsSection: React.FC<ResultsSectionProps> = ({
             </div>
           )}
         </div>
+        <ViewModeToggle viewMode={viewMode} setViewMode={setViewMode} />
       </Group>
     </div>
       <div className="border-b border-gray-300 mb-4"/>
@@ -263,18 +270,27 @@ const ResultsSection: React.FC<ResultsSectionProps> = ({
                 results={searchResults}
                 colNumbers={3}
                 locale={locale}
-                viewMode="grid"
+                viewMode={viewMode}
                 filtersVisible={filtersVisible}
               />
             ) : knowledgeItems.length > 0 ? (
-              // Show knowledge items in grid view only
-              <KnowledgeGrid 
-                knowledge={knowledgeItems} 
-                topicName="All Topics"
-                showHeader={false}
-                colNumbers={3}
-                locale={locale}
-              />
+              // Show knowledge items if we have them
+              viewMode === 'grid' ? (
+                <KnowledgeGrid 
+                  knowledge={knowledgeItems} 
+                  topicName="All Topics"
+                  showHeader={false}
+                  colNumbers={3}
+                  locale={locale}
+                />
+              ) : (
+                <KnowledgeList
+                  knowledge={knowledgeItems}
+                  topicName="All Topics"
+                  showHeader={false}
+                  locale={locale}
+                />
+              )
             ) : (
               // Only show empty state when not loading and no results
               <EmptyState />
