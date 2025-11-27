@@ -456,6 +456,7 @@
         "descriptionTooShort": "Description must be at least 3 characters",
         "industries": "Industries",
         "country": "Country",
+        "freeSession": "Free Session",
         "posts": "Insights",
         "manager": "Manager",
         "compmay": "Company",
