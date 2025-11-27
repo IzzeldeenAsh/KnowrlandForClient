@@ -20,7 +20,7 @@ export function useSubIndustryStatistic(subIndustryId: number) {
     const fetchStatistics = async () => {
       try {
         setIsLoading(true);
-        const response = await fetch(`https://api.foresighta.co/api/platform/industries/statistic/industry/sub/${subIndustryId}`, {
+        const response = await fetch(`https://api.insightabusiness.com/api/platform/industries/statistic/industry/sub/${subIndustryId}`, {
           headers: {
             "Content-Type": "application/json",
             "Accept": "application/json",

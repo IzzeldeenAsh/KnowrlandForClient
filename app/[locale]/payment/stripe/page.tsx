@@ -97,7 +97,7 @@ function PaymentForm({ orderUuid, amount, title, locale, isRTL, orderDetails, se
       setIsFetchingDownloadIds(true);
       const token = getAuthToken();
       const response = await fetch(
-        `https://api.foresighta.co/api/account/order/knowledge/${uuid}`,
+        `https://api.insightabusiness.com/api/account/order/knowledge/${uuid}`,
         {
           headers: {
             "Content-Type": "application/json",
@@ -161,7 +161,7 @@ function PaymentForm({ orderUuid, amount, title, locale, isRTL, orderDetails, se
     const checkStatus = async (): Promise<boolean> => {
       try {
         const response = await fetch(
-          `https://api.foresighta.co/api/account/order/knowledge/${orderUuid}`,
+          `https://api.insightabusiness.com/api/account/order/knowledge/${orderUuid}`,
           {
             headers: {
               "Content-Type": "application/json",
@@ -276,7 +276,7 @@ function PaymentForm({ orderUuid, amount, title, locale, isRTL, orderDetails, se
     try {
       const token = getAuthToken();
       const response = await fetch(
-        `https://api.foresighta.co/api/account/order/knowledge/check-payment-succeeded/${orderUuid}`,
+        `https://api.insightabusiness.com/api/account/order/knowledge/check-payment-succeeded/${orderUuid}`,
         {
           method: "POST",
           headers: {
@@ -609,7 +609,7 @@ export default function StripePaymentPage() {
       try {
         const token = getAuthToken();
         const response = await fetch(
-          `https://api.foresighta.co/api/account/order/knowledge/${orderUuid}`,
+          `https://api.insightabusiness.com/api/account/order/knowledge/${orderUuid}`,
           {
             headers: {
               "Content-Type": "application/json",
