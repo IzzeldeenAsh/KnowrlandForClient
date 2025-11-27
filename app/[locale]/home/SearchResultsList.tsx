@@ -260,6 +260,17 @@ function sanitizeLimitedHtml(html: string | null): string {
   }
 }
 
+// Convert HTML to plain text and preserve basic line breaks
+function htmlToPlainTextWithBreaks(html: string | null): string {
+  if (!html) return "";
+  let text = html
+    .replace(/<\s*br\s*\/?>/gi, '\n')
+    .replace(/<\/\s*(p|div|h[1-6]|li|ul|ol)\s*>/gi, '\n');
+  text = text.replace(/<[^>]+>/g, '');
+  text = text.replace(/\n{3,}/g, '\n\n').trim();
+  return text;
+}
+
 export default function SearchResultsList({
   results,
   locale,
@@ -273,7 +284,6 @@ export default function SearchResultsList({
   const [loadingStates, setLoadingStates] = useState<{[key: number]: boolean}>({});
   const [needsToggleMap, setNeedsToggleMap] = useState<{[key: number]: boolean}>({});
   const descRefs = React.useRef<{[key: number]: HTMLDivElement | null}>({});
-  const sanitizedDescCacheRef = React.useRef<Map<number, { raw: string | null; sanitized: string }>>(new Map());
   
   // Check if user is logged in
   const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
@@ -284,17 +294,6 @@ export default function SearchResultsList({
   
   // Generate a unique prefix for this render to avoid key conflicts
   const uniquePrefix = React.useMemo(() => Date.now().toString(), [results]);
-
-  const getSanitizedDescription = React.useCallback((id: number, raw: string | null) => {
-    if (!raw) return "";
-    const cached = sanitizedDescCacheRef.current.get(id);
-    if (cached && cached.raw === raw) {
-      return cached.sanitized;
-    }
-    const sanitized = sanitizeLimitedHtml(raw);
-    sanitizedDescCacheRef.current.set(id, { raw, sanitized });
-    return sanitized;
-  }, []);
 
   // Measure description overflow to decide whether to show "Read more"
   React.useEffect(() => {
@@ -647,8 +646,10 @@ export default function SearchResultsList({
                           className={`${listStyles.richDescription} ${listStyles.richDescriptionCollapsed}`}
                           ref={(el) => { descRefs.current[item.searchable_id] = el; }}
                           dir={(item.language === 'arabic') ? "rtl" : "ltr"}
-                          dangerouslySetInnerHTML={{ __html: getSanitizedDescription(item.searchable_id, item.description) }}
-                        />
+                          style={{ whiteSpace: 'pre-line' }}
+                        >
+                          {htmlToPlainTextWithBreaks(item.description)}
+                        </div>
                       </Link>
                       {needsToggleMap[item.searchable_id] && (
                         <Link
