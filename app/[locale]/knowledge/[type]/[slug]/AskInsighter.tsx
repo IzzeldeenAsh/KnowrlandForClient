@@ -776,7 +776,7 @@ export default function AskInsighter({ knowledgeSlug, questions = [], is_owner =
 
   // Redirect URL for login button with returnUrl parameter
   const getLoginUrl = () => {
-    return `http://localhost:4200/auth/login?returnUrl=${encodeURIComponent(typeof window !== 'undefined' ? window.location.href : '')}`;
+    return `https://app.insightabusiness.com/auth/login?returnUrl=${encodeURIComponent(typeof window !== 'undefined' ? window.location.href : '')}`;
   };
   
   // Determine if user is logged in

@@ -639,8 +639,8 @@ export default function MeetTab({
             </h3>
             <p className="text-gray-500 mb-4">{t("loginToView")}</p>
             <a
-              href={`http://localhost:4200/auth/login?returnUrl=${encodeURIComponent(
-                `http://localhost:3000/${locale}/profile/${uuid}${
+              href={`https://app.insightabusiness.com/auth/login?returnUrl=${encodeURIComponent(
+                `https://insightabusiness.com/${locale}/profile/${uuid}${
                   typeof window !== "undefined"
                     ? window.location.search
                     : ""
@@ -1306,7 +1306,7 @@ export default function MeetTab({
               className="bg-gradient-to-r from-blue-500 to-teal-400 hover:from-blue-600 hover:to-teal-500 transition-all"
               onClick={() => {
                 // Redirect to meetings dashboard
-                window.location.href = "http://localhost:4200/app/insighter-dashboard/my-meetings";
+                window.location.href = "https://app.insightabusiness.com/app/insighter-dashboard/my-meetings";
               }}
             >
               {locale.startsWith('ar') ? 'اذهب إلى الاجتماعات' : 'Go to Meetings'}
