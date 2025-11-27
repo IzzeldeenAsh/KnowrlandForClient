@@ -12,8 +12,8 @@ export const apiBaseUrl = isDevelopment
   : 'https://api.insightabusiness.com';
 
 export const appBaseUrl = isDevelopment 
-  ? 'http://localhost:4200' 
-  : 'http://localhost:4200';
+  ? 'https://app.insightabusiness.com' 
+  : 'https://app.insightabusiness.com';
 
 // Function to get full API URL with path
 export const getApiUrl = (path: string): string => {
