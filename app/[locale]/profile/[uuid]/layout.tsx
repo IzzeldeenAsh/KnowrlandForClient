@@ -83,8 +83,10 @@ async function getProfileData(uuid: string, locale: string): Promise<ProfileData
   }
 }
 
-export async function generateMetadata({ params }: ProfileLayoutProps): Promise<Metadata> {
-  const { uuid, locale } = params;
+export async function generateMetadata(
+  { params }: { params: Promise<{ uuid: string; locale: string }> }
+): Promise<Metadata> {
+  const { uuid, locale } = await params;
   const profileData = await getProfileData(uuid, locale);
 
   if (!profileData) {
