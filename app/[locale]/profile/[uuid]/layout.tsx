@@ -91,7 +91,7 @@ export async function generateMetadata(
 
   if (!profileData) {
     return {
-      title: 'Profile Not Found - Foresighta',
+      title: 'Profile Not Found - Insighta',
       description: 'The requested profile could not be found.',
     };
   }
@@ -113,7 +113,7 @@ export async function generateMetadata(
     ? (isCompany ? 'شركة' : 'خبير')
     : (isCompany ? 'Company' : 'Insighter');
 
-  const platformText = locale === 'ar' ? 'فورسايتا' : 'Foresighta';
+  const platformText = locale === 'ar' ? 'انسايتا' : 'Insighta';
 
   const description = profileData.bio
     ? `${profileData.bio.slice(0, 155)}...`
@@ -158,12 +158,12 @@ export async function generateMetadata(
       ],
     },
     twitter: {
-      card: 'summary_large_image',
+      card: 'summary',
       title,
       description,
       images: profileImage ? [profileImage] : [`${baseUrl}/api/og-image?name=${encodeURIComponent(profileName)}&type=${roleText}`],
-      creator: '@foresighta_co',
-      site: '@foresighta_co',
+      creator: '@insightabusiness_com',
+      site: '@insightabusiness_com',
     },
     robots: {
       index: true,
