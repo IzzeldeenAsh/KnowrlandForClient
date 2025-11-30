@@ -104,6 +104,7 @@ interface FilterBoxProps {
   setRangeStartFilter?: (filter: string | null) => void;
   rangeEndFilter?: string | null;
   setRangeEndFilter?: (filter: string | null) => void;
+  applyRangeFilters?: (start: string | null, end: string | null) => void;
   accuracyFilter?: 'any' | 'all';
   setAccuracyFilter?: (filter: 'any' | 'all') => void;
   roleFilter?: 'all' | 'company' | 'individual';
@@ -144,6 +145,7 @@ const FilterBox: React.FC<FilterBoxProps> = React.memo(({
   setRangeStartFilter = noop,
   rangeEndFilter = null,
   setRangeEndFilter = noop,
+  applyRangeFilters = noop as unknown as (start: string | null, end: string | null) => void,
   accuracyFilter = 'all',
   setAccuracyFilter = noop,
   roleFilter = 'all',
@@ -187,6 +189,12 @@ const FilterBox: React.FC<FilterBoxProps> = React.memo(({
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isHsCodeModalOpen, setIsHsCodeModalOpen] = useState(false);
   const [isIndustryModalOpen, setIsIndustryModalOpen] = useState(false);
+  const [isYearPickerModalOpen, setIsYearPickerModalOpen] = useState(false);
+
+  // Debug log for modal state
+  useEffect(() => {
+    console.log('Year picker modal state changed:', isYearPickerModalOpen);
+  }, [isYearPickerModalOpen]);
 
   // Selection States
   const [selectedIsicCode, setSelectedIsicCode] = useState<{
@@ -908,14 +916,16 @@ const FilterBox: React.FC<FilterBoxProps> = React.memo(({
       return;
     }
 
-    // Apply filters
-    if (setRangeStartFilter) {
-      setRangeStartFilter(start !== null ? start.toString() : null);
+    // Apply both filters together to avoid race conditions with URL updates
+    const startStr = start !== null ? start.toString() : null;
+    const endStr = end !== null ? end.toString() : null;
+    if (applyRangeFilters) {
+      applyRangeFilters(startStr, endStr);
+    } else {
+      if (setRangeStartFilter) setRangeStartFilter(startStr);
+      if (setRangeEndFilter) setRangeEndFilter(endStr);
     }
-    if (setRangeEndFilter) {
-      setRangeEndFilter(end !== null ? end.toString() : null);
-    }
-  }, [locale, setRangeStartFilter, setRangeEndFilter]);
+  }, [locale, setRangeStartFilter, setRangeEndFilter, applyRangeFilters]);
 
   const handleRangePriceClear = useCallback(() => {
     // Clear ref values
@@ -1172,8 +1182,10 @@ const FilterBox: React.FC<FilterBoxProps> = React.memo(({
         {searchType !== 'insighter' && (
           <div className="rounded-lg border border-gray-200 overflow-hidden bg-white">
             <button
-              onClick={() => !isDisabled && setYearOfStudyCollapsed(!yearOfStudyCollapsed)}
-              disabled={isDisabled}
+              onClick={() => {
+                console.log('Opening year picker modal from header');
+                setIsYearPickerModalOpen(true);
+              }}
               className={`w-full flex items-center justify-between px-4 py-3 text-left bg-white hover:bg-gray-50 focus:outline-none transition-colors ${
                 isDisabled ? 'opacity-50 cursor-not-allowed' : ''
               }`}
@@ -1189,21 +1201,42 @@ const FilterBox: React.FC<FilterBoxProps> = React.memo(({
             {!yearOfStudyCollapsed && (
               <div className="px-4 py-3 bg-white">
                 <LoadingOverlay isLoading={isDisabled}>
-                  <div className="flex flex-col gap-1">
-                    <CustomYearPicker
-                      placeholder={locale === 'ar' ? 'اختر النطاق الزمني للبيانات' : 'Select Data Coverage Period'}
-                      yearRangeStart={1900}
-                      yearRangeEnd={2030}
-                      allowRange={true}
-                      locale={locale}
-                      value={yearOfStudyFilter}
-                      onChange={(value) => {
-                        if (setYearOfStudyFilter) {
-                          setYearOfStudyFilter(value);
-                        }
+                  <div className="flex flex-col gap-2">
+                    <div
+                      onClick={() => {
+                        console.log('Year picker clicked, isDisabled:', isDisabled);
+                        console.log('Opening year picker modal');
+                        setIsYearPickerModalOpen(true);
                       }}
-                      disabled={isDisabled}
-                    />
+                      className={`border border-gray-200 bg-white py-2 px-3 rounded text-sm cursor-pointer flex justify-between items-center hover:border-blue-400 transition-colors ${
+                        isDisabled ? 'opacity-50 cursor-not-allowed' : ''
+                      }`}
+                    >
+                      {yearOfStudyFilter && (yearOfStudyFilter.startYear || yearOfStudyFilter.endYear) ? (
+                        <span className="truncate text-gray-800 font-medium">
+                          {yearOfStudyFilter.startYear || 'Any'} - {yearOfStudyFilter.endYear || 'Any'}
+                        </span>
+                      ) : (
+                        <span className="text-gray-800 font-semibold">
+                          {locale === 'ar' ? 'جميع السنوات' : 'All Years'}
+                        </span>
+                      )}
+                      {yearOfStudyFilter && (yearOfStudyFilter.startYear || yearOfStudyFilter.endYear) && !isDisabled && (
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            if (setYearOfStudyFilter) {
+                              setYearOfStudyFilter(null);
+                            }
+                          }}
+                          className="ml-2 text-gray-400 hover:text-red-500"
+                        >
+                          <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                          </svg>
+                        </button>
+                      )}
+                    </div>
                   </div>
                 </LoadingOverlay>
               </div>
@@ -1682,6 +1715,7 @@ const FilterBox: React.FC<FilterBoxProps> = React.memo(({
         title={locale === 'ar' ? 'اختر رمز ISIC' : 'Select ISIC Code'}
         size="lg"
         overlayProps={{ backgroundOpacity: 0.55, blur: 3 }}
+        zIndex={4000}
       >
         <div className="space-y-4">
           <input
@@ -1704,6 +1738,7 @@ const FilterBox: React.FC<FilterBoxProps> = React.memo(({
         title={locale === 'ar' ? 'اختر رمز HS' : 'Select HS Code'}
         size="lg"
         overlayProps={{ backgroundOpacity: 0.55, blur: 3 }}
+        zIndex={4000}
       >
         <div className="space-y-4">
           <input
@@ -1726,6 +1761,7 @@ const FilterBox: React.FC<FilterBoxProps> = React.memo(({
         title={locale === 'ar' ? 'اختر المجال' : 'Select Industry'}
         size="lg"
         overlayProps={{ backgroundOpacity: 0.55, blur: 3 }}
+        zIndex={4000}
       >
         <div className="space-y-4">
           <input
@@ -1739,6 +1775,37 @@ const FilterBox: React.FC<FilterBoxProps> = React.memo(({
             disabled={isDisabled}
           />
           {renderIndustryLeafNodes()}
+        </div>
+      </Modal>
+
+      <Modal
+        opened={isYearPickerModalOpen}
+        onClose={() => {
+          console.log('Closing year picker modal');
+          setIsYearPickerModalOpen(false);
+        }}
+        title={locale === 'ar' ? 'اختر النطاق الزمني للبيانات' : 'Select Data Coverage Period'}
+        size="md"
+        overlayProps={{ backgroundOpacity: 0.55, blur: 3 }}
+        zIndex={4000}
+      >
+        <div className="space-y-4">
+          <CustomYearPicker
+            placeholder={locale === 'ar' ? 'اختر النطاق الزمني للبيانات' : 'Select Data Coverage Period'}
+            yearRangeStart={1900}
+            yearRangeEnd={2030}
+            allowRange={true}
+            locale={locale}
+            value={yearOfStudyFilter}
+            onChange={(value) => {
+              if (setYearOfStudyFilter) {
+                setYearOfStudyFilter(value);
+              }
+              setIsYearPickerModalOpen(false);
+            }}
+            disabled={isDisabled}
+            inline
+          />
         </div>
       </Modal>
     </div>
