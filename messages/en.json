@@ -457,6 +457,7 @@
         "descriptionTooShort": "Description must be at least 3 characters",
         "industries": "Industries",
         "country": "Country",
+        "noKnowledgeItems": "No insights available yet",
         "freeSession": "Free Session",
         "posts": "Insights",
         "manager": "Manager",

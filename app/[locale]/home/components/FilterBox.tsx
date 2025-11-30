@@ -1182,10 +1182,8 @@ const FilterBox: React.FC<FilterBoxProps> = React.memo(({
         {searchType !== 'insighter' && (
           <div className="rounded-lg border border-gray-200 overflow-hidden bg-white">
             <button
-              onClick={() => {
-                console.log('Opening year picker modal from header');
-                setIsYearPickerModalOpen(true);
-              }}
+              onClick={() => !isDisabled && setYearOfStudyCollapsed(!yearOfStudyCollapsed)}
+              disabled={isDisabled}
               className={`w-full flex items-center justify-between px-4 py-3 text-left bg-white hover:bg-gray-50 focus:outline-none transition-colors ${
                 isDisabled ? 'opacity-50 cursor-not-allowed' : ''
               }`}
