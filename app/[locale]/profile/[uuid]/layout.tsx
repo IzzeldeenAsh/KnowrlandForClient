@@ -2,10 +2,10 @@ import { Metadata } from 'next'
 
 interface ProfileLayoutProps {
   children: React.ReactNode
-  params: {
+  params: Promise<{
     uuid: string
     locale: string
-  }
+  }>
 }
 
 interface ProfileData {
