@@ -117,11 +117,11 @@ export async function fetchStatisticsPerType(
   countryFilter: number | null,
   regionFilter: number | null = null,
   economicBlocFilter: number | null = null,
-  isicCodeFilter: number | null = null,
+  isicCodeFilter: string | null = null,
   tagFilter: number | null = null,
   industryFilter: number | null = null,
   priceFilter: string | null = null,
-  hsCodeFilter: number | null = null,
+  hsCodeFilter: string | null = null,
   accuracyFilter: 'any' | 'all' = 'any',
   roleFilter: 'all' | 'company' | 'individual' = 'all',
   rangeStartFilter: string | null = null,
@@ -160,7 +160,7 @@ export async function fetchStatisticsPerType(
     
     // Add ISIC code parameter
     if (isicCodeFilter !== null) {
-      url.searchParams.append('isic_code', isicCodeFilter.toString());
+      url.searchParams.append('isic_code', isicCodeFilter);
     }
     
     // Add tag parameter
@@ -170,7 +170,7 @@ export async function fetchStatisticsPerType(
     
     // Add HS code parameter
     if (hsCodeFilter !== null) {
-      url.searchParams.append('hs_code', hsCodeFilter.toString());
+      url.searchParams.append('hs_code', hsCodeFilter);
     }
     
     // Add industry parameter
@@ -257,14 +257,14 @@ export async function fetchSearchResults(
   countryFilter: number | null,
   regionFilter: number | null = null,
   economicBlocFilter: number | null = null,
-  isicCodeFilter: number | null = null,
+  isicCodeFilter: string | null = null,
   categoryType: string | null = null,
   perPage: number | string = 30,
   onError?: (errorMessage: any) => void,
   industryFilter: number | null = null,
   tagFilter: number | null = null,
   priceFilter: string | null = null,
-  hsCodeFilter: number | null = null,
+  hsCodeFilter: string | null = null,
   accuracyFilter: 'any' | 'all' = 'any',
   roleFilter: 'all' | 'company' | 'individual' = 'all',
   rangeStartFilter: string | null = null,
@@ -332,12 +332,12 @@ export async function fetchSearchResults(
     
     // Add ISIC code parameter for the API
     if (isicCodeFilter !== null) {
-      url.searchParams.append('isic_code', isicCodeFilter.toString());
+      url.searchParams.append('isic_code', isicCodeFilter);
     }
     
     // Add HS code parameter for the API
     if (hsCodeFilter !== null) {
-      url.searchParams.append('hs_code', hsCodeFilter.toString());
+      url.searchParams.append('hs_code', hsCodeFilter);
     }
     
     // Add industry parameter for the API

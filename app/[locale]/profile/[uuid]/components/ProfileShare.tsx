@@ -52,7 +52,7 @@ const ProfileShare = ({ profileData, enterpriseType, locale }: ProfileShareProps
     linkCopied: isRTL ? 'تم نسخ الرابط!' : 'Link Copied!',
     checkOutProfile: isRTL ? 'اعرض ملف الإنسايتر على انسايتا: ' : 'View insighter profile on Insighta: ',
     viewProfile: isRTL ? 'عرض الملف الشخصي على' : 'View profile on',
-    foresighta: isRTL ? 'فورسايتا' : 'Foresighta'
+    foresighta: isRTL ? 'انسايتا' : 'Insighta'
   };
 
   // Share functionality

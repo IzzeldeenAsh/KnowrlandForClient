@@ -426,8 +426,7 @@ const FilterBox: React.FC<FilterBoxProps> = React.memo(({
   // Initialize selected codes based on prop values
   useEffect(() => {
     if (isicCodeFilter && leafNodes.length > 0) {
-      const numeric = parseInt(isicCodeFilter);
-      const selectedCode = leafNodes.find(node => node.key === numeric);
+      const selectedCode = leafNodes.find(node => node.code === isicCodeFilter);
       if (selectedCode) {
         setSelectedIsicCode({
           id: selectedCode.key,
@@ -442,8 +441,7 @@ const FilterBox: React.FC<FilterBoxProps> = React.memo(({
 
   useEffect(() => {
     if (hsCodeFilter && hsCodes.length > 0) {
-      const numeric = parseInt(hsCodeFilter);
-      const selectedCode = hsCodes.find(code => code.id === numeric);
+      const selectedCode = hsCodes.find(code => code.code === hsCodeFilter);
       if (selectedCode) {
         setSelectedHsCode({
           id: selectedCode.id,
@@ -791,8 +789,8 @@ const FilterBox: React.FC<FilterBoxProps> = React.memo(({
         code: node.code,
         label: locale === 'ar' ? node.names.ar : node.names.en
       });
-      // Use ISIC id for filter/url
-      setIsicCodeFilter?.(node.key.toString());
+      // Use ISIC code string for filter/url
+      setIsicCodeFilter?.(node.code);
       setIsModalOpen(false);
     }
   };
@@ -820,7 +818,7 @@ const FilterBox: React.FC<FilterBoxProps> = React.memo(({
     });
 
     if (setHsCodeFilter) {
-      setHsCodeFilter(code.id.toString());
+      setHsCodeFilter(code.code);
     }
 
     setIsHsCodeModalOpen(false);

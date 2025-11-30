@@ -243,8 +243,7 @@ const SearchBar: React.FC<SearchBarProps> = ({
   // Sync selected ISIC from external filter once leaves are available
   useEffect(() => {
     if (isicCodeFilter && isicLeafNodes.length > 0) {
-      const numeric = parseInt(isicCodeFilter);
-      const found = isicLeafNodes.find(n => n.key === numeric);
+      const found = isicLeafNodes.find(n => n.code === isicCodeFilter);
       if (found) {
         setSelectedIsic({
           id: found.key,
@@ -277,13 +276,12 @@ const SearchBar: React.FC<SearchBarProps> = ({
         
         // Restore pending HS code after list loads
         if (pendingHsCode && !hasRestoredHsCode && list.length > 0) {
-          const hsId = parseInt(pendingHsCode);
-          const found = list.find(c => c.id === hsId);
+          const found = list.find(c => c.code === pendingHsCode);
           if (found) {
-            console.log('[SearchBar] Restoring pending HS code:', hsId, found.code);
+            console.log('[SearchBar] Restoring pending HS code:', found.code);
             setSelectedHs({ id: found.id, code: found.code, label: locale === 'ar' ? found.names.ar : found.names.en });
             if (setHsCodeFilter) {
-              setHsCodeFilter(pendingHsCode);
+              setHsCodeFilter(found.code);
             }
           }
           setHasRestoredHsCode(true);
@@ -326,8 +324,7 @@ const SearchBar: React.FC<SearchBarProps> = ({
     }
     
     if (hsCodeFilter && hsCodes.length > 0) {
-      const numeric = parseInt(hsCodeFilter);
-      const found = hsCodes.find(c => c.id === numeric);
+      const found = hsCodes.find(c => c.code === hsCodeFilter);
       if (found) setSelectedHs({ id: found.id, code: found.code, label: locale === 'ar' ? found.names.ar : found.names.en });
     }
   }, [hsCodeFilter, hsCodes, locale, pendingHsCode, hasRestoredHsCode]);
@@ -370,14 +367,14 @@ const SearchBar: React.FC<SearchBarProps> = ({
   const handleSelectIsic = useCallback((node: ISICNode) => {
     if (node.children && node.children.length > 0) return;
     setSelectedIsic({ id: node.key, code: node.code, label: locale === 'ar' ? (node.names?.ar || node.code) : (node.names?.en || node.code) });
-    // Use ID for URL/state to match page.tsx handlers
-    setIsicCodeFilter && setIsicCodeFilter(node.key.toString());
+    // Use code string for URL/state
+    setIsicCodeFilter && setIsicCodeFilter(node.code);
     
     // Update URL: set isic_code, do not clear hs_code, reset page
     try {
       console.log('[SearchBar] handleSelectIsic -> node:', { id: node.key, code: node.code });
       const params = new URLSearchParams(searchParams.toString());
-      params.set('isic_code', node.key.toString());
+      params.set('isic_code', node.code);
       params.delete('page');
       params.set('search_type', searchType);
       const nextUrl = `/${locale}/home?${params.toString()}`;
@@ -389,15 +386,15 @@ const SearchBar: React.FC<SearchBarProps> = ({
 
   const handleSelectHs = useCallback((code: HSCode) => {
     setSelectedHs({ id: code.id, code: code.code, label: locale === 'ar' ? code.names.ar : code.names.en });
-    // Use HS ID value to align with backend expectations and URL param
+    // Use HS code string for URL/state
     if (setHsCodeFilter) {
-      setHsCodeFilter(code.id.toString());
+      setHsCodeFilter(code.code);
     }
     // Update URL: set hs_code, reset page
     try {
       console.log('[SearchBar] handleSelectHs -> code:', { id: code.id, code: code.code });
       const params = new URLSearchParams(searchParams.toString());
-      params.set('hs_code', code.id.toString());
+      params.set('hs_code', code.code);
       params.delete('page');
       params.set('search_type', searchType);
       const nextUrl = `/${locale}/home?${params.toString()}`;

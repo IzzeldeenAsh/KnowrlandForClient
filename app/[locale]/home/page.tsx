@@ -48,8 +48,8 @@ export default function HomePage() {
   const initialEconomicBloc = searchParams.get('economic_bloc') ? parseInt(searchParams.get('economic_bloc')!) : null;
   const initialTag = searchParams.get('tag') ? parseInt(searchParams.get('tag')!) : null;
   const initialIndustry = searchParams.get('industry') ? parseInt(searchParams.get('industry')!) : null;
-  const initialIsicCode = searchParams.get('isic_code') ? parseInt(searchParams.get('isic_code')!) : null;
-  const initialHsCode = searchParams.get('hs_code') ? parseInt(searchParams.get('hs_code')!) : null;
+  const initialIsicCode = searchParams.get('isic_code') || null;
+  const initialHsCode = searchParams.get('hs_code') || null;
   const initialPriceFilter = searchParams.get('paid') || null;
   const initialRangeStart = searchParams.get('range_start') || null;
   const initialRangeEnd = searchParams.get('range_end') || null;
@@ -93,8 +93,8 @@ export default function HomePage() {
   const [tagFilter, setTagFilter] = useState<number | null>(initialTag);
   const [industryFilter, setIndustryFilter] = useState<number | null>(initialIndustry);
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
-  const [isicCodeFilter, setIsicCodeFilter] = useState<number | null>(initialIsicCode);
-  const [hsCodeFilter, setHsCodeFilter] = useState<number | null>(initialHsCode);
+  const [isicCodeFilter, setIsicCodeFilter] = useState<string | null>(initialIsicCode);
+  const [hsCodeFilter, setHsCodeFilter] = useState<string | null>(initialHsCode);
   const [priceFilter, setPriceFilter] = useState<string | null>(initialPriceFilter);
   const [rangeStartFilter, setRangeStartFilter] = useState<string | null>(initialRangeStart);
   const [rangeEndFilter, setRangeEndFilter] = useState<string | null>(initialRangeEnd);
@@ -304,8 +304,8 @@ export default function HomePage() {
     economic_bloc?: number | null,
     tag?: number | null,
     industry?: number | null,
-    isic_code?: number | null,
-    hs_code?: number | null,
+    isic_code?: string | null,
+    hs_code?: string | null,
     category?: string | null,
     paid?: string | null,
     range_start?: string | null,
@@ -362,8 +362,8 @@ export default function HomePage() {
     if (economicBloc !== null) urlParams.set('economic_bloc', economicBloc.toString());
     if (tag !== null) urlParams.set('tag', tag.toString());
     if (industry !== null) urlParams.set('industry', industry.toString());
-    if (isicCode !== null) urlParams.set('isic_code', isicCode.toString());
-    if (hsCode !== null) urlParams.set('hs_code', hsCode.toString());
+    if (isicCode !== null) urlParams.set('isic_code', isicCode);
+    if (hsCode !== null) urlParams.set('hs_code', hsCode);
     if (paid !== null) urlParams.set('paid', paid);
     if (rangeStart !== null) urlParams.set('range_start', rangeStart);
     if (rangeEnd !== null) urlParams.set('range_end', rangeEnd);
@@ -631,35 +631,17 @@ export default function HomePage() {
   
   // Custom setter for ISIC code filter that triggers search
   const handleIsicCodeFilterChange = useCallback((value: string | null) => {
-    // Convert string to number for internal state, or null if empty
-    const numericValue = value ? parseInt(value) : null;
-    
-    // Update the ISIC code filter state
-    setIsicCodeFilter(numericValue);
-    // Update URL with new filter (use the numeric value)
-    updateUrlWithFilters({ isic_code: numericValue });
-    
-    // Reset to page 1 when filter changes
+    setIsicCodeFilter(value);
+    updateUrlWithFilters({ isic_code: value });
     setCurrentPage(1);
-    
-    // The main search effect will be triggered by the state change
   }, [updateUrlWithFilters]);
   
   // Custom setter for HS code filter that triggers search
   const handleHsCodeFilterChange = useCallback((value: string | null) => {
-    // Convert string to number for internal state, or null if empty
-    const numericValue = value ? parseInt(value) : null;
-
-    // Update the HS code filter state
-    setHsCodeFilter(numericValue);
-    // Update URL with new filter (use the numeric value)
-    console.log('[handleHsCodeFilterChange] value:', value, 'numeric:', numericValue);
-    updateUrlWithFilters({ hs_code: numericValue });
-
-    // Reset to page 1 when filter changes
+    setHsCodeFilter(value);
+    console.log('[handleHsCodeFilterChange] value:', value);
+    updateUrlWithFilters({ hs_code: value });
     setCurrentPage(1);
-
-    // The main search effect will be triggered by the state change
   }, [updateUrlWithFilters]);
   
   // Custom setter for accuracy filter that triggers search
@@ -743,8 +725,8 @@ export default function HomePage() {
     const urlEconomicBloc = searchParams.get('economic_bloc') ? parseInt(searchParams.get('economic_bloc')!) : null;
     const urlIndustry = searchParams.get('industry') ? parseInt(searchParams.get('industry')!) : null;
     const urlTag = searchParams.get('tag') ? parseInt(searchParams.get('tag')!) : null;
-    const urlIsicCode = searchParams.get('isic_code') ? parseInt(searchParams.get('isic_code')!) : null;
-    const urlHsCode = searchParams.get('hs_code') ? parseInt(searchParams.get('hs_code')!) : null;
+    const urlIsicCode = searchParams.get('isic_code') || null;
+    const urlHsCode = searchParams.get('hs_code') || null;
     const urlCountry = searchParams.get('country') ? parseInt(searchParams.get('country')!) : null;
     const urlLanguage = (searchParams.get('language') as 'all' | 'arabic' | 'english') || 'all';
     const urlPriceFilter = searchParams.get('paid') || null;
@@ -898,8 +880,8 @@ export default function HomePage() {
     if (regionFilter !== null) expectedUrlParams.set('region', regionFilter.toString());
     if (economicBlocFilter !== null) expectedUrlParams.set('economic_bloc', economicBlocFilter.toString());
     if (industryFilter !== null) expectedUrlParams.set('industry', industryFilter.toString());
-    if (isicCodeFilter !== null) expectedUrlParams.set('isic_code', isicCodeFilter.toString());
-    if (hsCodeFilter !== null) expectedUrlParams.set('hs_code', hsCodeFilter.toString());
+    if (isicCodeFilter !== null) expectedUrlParams.set('isic_code', isicCodeFilter);
+    if (hsCodeFilter !== null) expectedUrlParams.set('hs_code', hsCodeFilter);
     if (tagFilter !== null) expectedUrlParams.set('tag', tagFilter.toString());
     if (priceFilter !== null) expectedUrlParams.set('paid', priceFilter);
     if (selectedCategory && selectedCategory !== 'all') expectedUrlParams.set('type', selectedCategory);
@@ -927,8 +909,8 @@ export default function HomePage() {
     const urlEconomicBloc = searchParams.get('economic_bloc') ? parseInt(searchParams.get('economic_bloc')!) : null;
     const urlIndustry = searchParams.get('industry') ? parseInt(searchParams.get('industry')!) : null;
     const urlTag = searchParams.get('tag') ? parseInt(searchParams.get('tag')!) : null;
-    const urlIsicCode = searchParams.get('isic_code') ? parseInt(searchParams.get('isic_code')!) : null;
-    const urlHsCode = searchParams.get('hs_code') ? parseInt(searchParams.get('hs_code')!) : null;
+    const urlIsicCode = searchParams.get('isic_code') || null;
+    const urlHsCode = searchParams.get('hs_code') || null;
     const urlCategory = searchParams.get('type');
     const urlAccuracy = searchParams.get('accuracy') as 'any' | 'all';
     const urlPriceFilter = searchParams.get('paid');
@@ -1201,8 +1183,8 @@ export default function HomePage() {
     if (economicBlocFilter) params.set('economic_bloc', economicBlocFilter.toString());
     if (industryFilter) params.set('industry', industryFilter.toString());
     if (tagFilter) params.set('tag', tagFilter.toString());
-    if (isicCodeFilter) params.set('isic_code', isicCodeFilter.toString());
-    if (hsCodeFilter) params.set('hs_code', hsCodeFilter.toString());
+    if (isicCodeFilter) params.set('isic_code', isicCodeFilter);
+    if (hsCodeFilter) params.set('hs_code', hsCodeFilter);
     if (priceFilter) params.set('paid', priceFilter);
     if (selectedCategory && selectedCategory !== 'all') params.set('type', selectedCategory);
     if (accuracyFilter !== 'all') params.set('accuracy', accuracyFilter);
@@ -1500,11 +1482,11 @@ export default function HomePage() {
                     setEconomicBlocFilter={handleEconomicBlocFilterChange}
                     tagFilter={tagFilter}
                     setTagFilter={handleTagFilterChange}
-                    isicCodeFilter={isicCodeFilter?.toString() || null}
+                    isicCodeFilter={isicCodeFilter}
                     setIsicCodeFilter={handleIsicCodeFilterChange}
                     industryFilter={industryFilter}
                     setIndustryFilter={handleIndustryFilterChange}
-                    hsCodeFilter={hsCodeFilter?.toString() || null}
+                    hsCodeFilter={hsCodeFilter}
                     setHsCodeFilter={handleHsCodeFilterChange}
                     priceFilter={priceFilter}
                     setPriceFilter={handlePriceFilterChange}
@@ -1619,9 +1601,9 @@ export default function HomePage() {
                onSubmit={handleSubmit}
                onSearch={executeSearch}
               onQueryChange={handleQueryChange}
-              isicCodeFilter={isicCodeFilter?.toString() || null}
+              isicCodeFilter={isicCodeFilter}
               setIsicCodeFilter={handleIsicCodeFilterChange}
-              hsCodeFilter={hsCodeFilter?.toString() || null}
+              hsCodeFilter={hsCodeFilter}
               setHsCodeFilter={handleHsCodeFilterChange}
                 accuracyFilter={accuracyFilter}
                 setAccuracyFilter={handleAccuracyFilterChange}
