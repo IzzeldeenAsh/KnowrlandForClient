@@ -128,6 +128,11 @@ export async function generateMetadata(
   // Construct the profile URL
   const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://insightabusiness.com';
   const profileUrl = `${baseUrl}/${locale}/profile/${uuid}`;
+  const absoluteProfileImage = profileImage
+    ? (profileImage.startsWith('http')
+      ? profileImage
+      : `${baseUrl}${profileImage.startsWith('/') ? '' : '/'}${profileImage}`)
+    : null;
 
   return {
     title,
@@ -139,21 +144,15 @@ export async function generateMetadata(
       siteName: platformText,
       locale: locale === 'ar' ? 'ar_AE' : 'en_US',
       type: 'profile',
-      images: profileImage ? [
+      images: absoluteProfileImage ? [
         {
-          url: profileImage,
-          width: 400,
-          height: 400,
+          url: absoluteProfileImage,
           alt: `${profileName}'s profile picture`,
-          type: 'image/jpeg',
         },
       ] : [
         {
           url: `${baseUrl}/api/og-image?name=${encodeURIComponent(profileName)}&type=${roleText}`,
-          width: 1200,
-          height: 630,
           alt: `${profileName}'s profile`,
-          type: 'image/png',
         },
       ],
     },
@@ -161,7 +160,9 @@ export async function generateMetadata(
       card: 'summary',
       title,
       description,
-      images: profileImage ? [profileImage] : [`${baseUrl}/api/og-image?name=${encodeURIComponent(profileName)}&type=${roleText}`],
+      images: absoluteProfileImage
+        ? [absoluteProfileImage]
+        : [`${baseUrl}/api/og-image?name=${encodeURIComponent(profileName)}&type=${roleText}`],
       creator: '@insightabusiness_com',
       site: '@insightabusiness_com',
     },
