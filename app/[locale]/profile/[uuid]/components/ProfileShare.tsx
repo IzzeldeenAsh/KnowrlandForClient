@@ -50,7 +50,7 @@ const ProfileShare = ({ profileData, enterpriseType, locale }: ProfileShareProps
     close: isRTL ? 'إغلاق' : 'Close',
     copyLink: isRTL ? 'نسخ الرابط' : 'Copy Link',
     linkCopied: isRTL ? 'تم نسخ الرابط!' : 'Link Copied!',
-    checkOutProfile: isRTL ? 'تحقق من هذا الملف الشخصي: ' : 'Check out this profile: ',
+    checkOutProfile: isRTL ? 'اعرض ملف الإنسايتر على انسايتا: ' : 'View insighter profile on Insighta: ',
     viewProfile: isRTL ? 'عرض الملف الشخصي على' : 'View profile on',
     foresighta: isRTL ? 'فورسايتا' : 'Foresighta'
   };

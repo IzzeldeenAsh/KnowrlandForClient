@@ -200,6 +200,9 @@ export default function MeetTab({
   const [didStripeConfirm, setDidStripeConfirm] = useState(false);
   const [pollFinished, setPollFinished] = useState(false);
   const [pollFoundPaid, setPollFoundPaid] = useState<boolean | null>(null);
+  const [paymentExpiresAt, setPaymentExpiresAt] = useState<number | null>(null);
+  const [timeLeftMs, setTimeLeftMs] = useState<number>(0);
+  const [showPaymentExpiredModal, setShowPaymentExpiredModal] = useState(false);
 
   // Fetch wallet balance when component mounts
   useEffect(() => {
@@ -219,6 +222,50 @@ export default function MeetTab({
   useEffect(() => {
     setHasCheckedDuplicate(false);
   }, [selectedDate, selectedMeetingTime, isBookingModalOpen]);
+
+  // Start/stop payment countdown when entering/leaving Stripe payment step
+  useEffect(() => {
+    if (clientSecret && bookingStep === 2) {
+      if (!paymentExpiresAt) {
+        const expires = Date.now() + 30 * 60 * 1000;
+        setPaymentExpiresAt(expires);
+        setTimeLeftMs(expires - Date.now());
+      }
+    } else {
+      setPaymentExpiresAt(null);
+      setTimeLeftMs(0);
+    }
+  }, [clientSecret, bookingStep, paymentExpiresAt]);
+
+  // Tick countdown every second
+  useEffect(() => {
+    if (!paymentExpiresAt) return;
+    const tick = () => {
+      const remaining = paymentExpiresAt - Date.now();
+      setTimeLeftMs(Math.max(0, remaining));
+    };
+    tick();
+    const id = setInterval(tick, 1000);
+    return () => clearInterval(id);
+  }, [paymentExpiresAt]);
+
+  // Auto-expire payment session when time runs out
+  useEffect(() => {
+    if (paymentExpiresAt && timeLeftMs === 0 && bookingStep === 2) {
+      // Close modal, reset states, notify user, and refresh availability
+      setShowPaymentExpiredModal(true);
+      closeBookingModal();
+    }
+  }, [timeLeftMs, paymentExpiresAt, bookingStep]);
+
+  const formatTimeLeft = (ms: number): string => {
+    const totalSeconds = Math.max(0, Math.floor(ms / 1000));
+    const minutes = Math.floor(totalSeconds / 60);
+    const seconds = totalSeconds % 60;
+    return `${minutes.toString().padStart(2, "0")}:${seconds
+      .toString()
+      .padStart(2, "0")}`;
+  };
 
   const fetchWalletBalance = async () => {
     try {
@@ -497,6 +544,10 @@ export default function MeetTab({
           setOrderUuid(order_uuid);
           setStripeErrorMessage(null);
           setBookingStep(2);
+          // initialize 30-min payment session
+          const expires = Date.now() + 30 * 60 * 1000;
+          setPaymentExpiresAt(expires);
+          setTimeLeftMs(expires - Date.now());
         } else {
           console.error('Missing payment data in response:', responseData);
           throw new Error("Payment setup failed - missing payment information");
@@ -614,6 +665,8 @@ export default function MeetTab({
     setDidStripeConfirm(false);
     setPollFinished(false);
     setPollFoundPaid(null);
+    setPaymentExpiresAt(null);
+    setTimeLeftMs(0);
     fetchMeetingAvailability();
   };
 
@@ -1143,6 +1196,25 @@ export default function MeetTab({
                       clientSecret,
                     }}
                   >
+                    <div className="mb-4 p-3 rounded-md bg-yellow-50 text-yellow-800 text-sm">
+                      {locale.startsWith('ar') ? (
+                        <>
+                          لأسباب أمنية، تنتهي صلاحية جلسة الدفع خلال{" "}
+                          <span className="font-semibold">
+                            {formatTimeLeft(paymentExpiresAt ? timeLeftMs : 30 * 60 * 1000)}
+                          </span>
+                          . إذا انتهى الوقت، يجب بدء عملية دفع جديدة.
+                        </>
+                      ) : (
+                        <>
+                          For security, this payment session will expire in{" "}
+                          <span className="font-semibold">
+                            {formatTimeLeft(paymentExpiresAt ? timeLeftMs : 30 * 60 * 1000)}
+                          </span>
+                          . If time runs out, you’ll need to start a new payment.
+                        </>
+                      )}
+                    </div>
                     <StripePaymentForm
                       clientSecret={clientSecret}
                       onSuccess={async () => {
@@ -1311,6 +1383,28 @@ export default function MeetTab({
             >
               {locale.startsWith('ar') ? 'اذهب إلى الاجتماعات' : 'Go to Meetings'}
             </Button>
+          </div>
+        </Modal>
+
+        {/* Payment Session Expired Modal */}
+        <Modal
+          opened={showPaymentExpiredModal}
+          onClose={() => setShowPaymentExpiredModal(false)}
+          title={locale.startsWith('ar') ? 'انتهت جلسة الدفع' : 'Payment Session Expired'}
+          size="md"
+          centered
+        >
+          <div className="p-2">
+            <p className="text-gray-700 mb-6">
+              {locale.startsWith('ar')
+                ? 'انتهت صلاحية جلسة الدفع بعد 30 دقيقة. يرجى المحاولة مرة أخرى لاحقاً.'
+                : 'Your payment session expired after 30 minutes. Please try again later.'}
+            </p>
+            <div className="flex justify-end">
+              <Button onClick={() => setShowPaymentExpiredModal(false)}>
+                {locale.startsWith('ar') ? 'حسناً' : 'OK'}
+              </Button>
+            </div>
           </div>
         </Modal>
 
