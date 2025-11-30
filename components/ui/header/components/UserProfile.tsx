@@ -330,6 +330,14 @@ export function UserProfile({ isHome }: { isHome: boolean }) {
             >
               {t("myProfile")}
             </Link>
+            <Link
+              href={`https://insightabusiness.com/en/profile/${user.uuid}?entity=insighter`}
+              className="block px-4 py-2.5  font-semibold text-slate-900 hover:bg-indigo-50 hover:text-sky-700"
+              style={{fontSize: '13px'}}
+              onClick={() => setMenuOpen(false)}
+            >
+              {t("myInsighterPage")}
+            </Link>
             {/* Show dashboard for all users */}
             <Link
               href="https://app.insightabusiness.com/app/insighter-dashboard/my-dashboard"

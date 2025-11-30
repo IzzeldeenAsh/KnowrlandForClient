@@ -17,6 +17,7 @@ interface CustomYearPickerProps {
   value?: YearRange | null;
   onChange?: (value: YearRange | null) => void;
   disabled?: boolean;
+  inline?: boolean;
 }
 
 const CustomYearPicker: React.FC<CustomYearPickerProps> = ({
@@ -27,7 +28,8 @@ const CustomYearPicker: React.FC<CustomYearPickerProps> = ({
   locale,
   value,
   onChange,
-  disabled = false
+  disabled = false,
+  inline = false
 }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [selectedYears, setSelectedYears] = useState<number[]>([]);
@@ -66,20 +68,21 @@ const CustomYearPicker: React.FC<CustomYearPickerProps> = ({
 
   // Handle click outside to close picker
   useEffect(() => {
+    if (inline) return; // No outside-click handling in inline mode
     const handleClickOutside = (event: MouseEvent) => {
       if (containerRef.current && !containerRef.current.contains(event.target as Node)) {
         setIsOpen(false);
       }
     };
 
-    if (isOpen) {
+    if (isOpen && !inline) {
       document.addEventListener('mousedown', handleClickOutside);
     }
 
     return () => {
       document.removeEventListener('mousedown', handleClickOutside);
     };
-  }, [isOpen]);
+  }, [isOpen, inline]);
 
   const togglePicker = () => {
     if (!disabled) {
@@ -200,33 +203,8 @@ const CustomYearPicker: React.FC<CustomYearPickerProps> = ({
 
   return (
     <div className="relative w-full" ref={containerRef} dir={isRTL ? 'rtl' : 'ltr'}>
-      {/* Input field */}
-      <div
-        className={`relative cursor-pointer ${disabled ? 'opacity-50 cursor-not-allowed' : ''}`}
-        onClick={togglePicker}
-      >
-        <input
-          type="text"
-          readOnly
-          value={getDisplayText()}
-          placeholder={placeholder}
-          className={`w-full px-3 py-2 text-sm border border-gray-200 rounded-md bg-gray-50 cursor-pointer transition-all focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent focus:bg-white ${
-            isRTL ? 'pr-10 pl-3' : 'pl-3 pr-10'
-          } ${disabled ? 'cursor-not-allowed' : 'hover:border-blue-400'}`}
-          disabled={disabled}
-        />
-        <IconCalendar
-          size={16}
-          className={`absolute top-1/2 transform -translate-y-1/2 text-gray-400 pointer-events-none ${
-            isRTL ? 'left-3' : 'right-3'
-          }`}
-        />
-      </div>
-
-      {/* Dropdown panel */}
-      {isOpen && (
-        <div className="absolute top-full left-0 right-0 z-50 mt-1 bg-white border border-gray-200 rounded-md shadow-lg min-w-80 max-h-96 overflow-hidden animate-in slide-in-from-top-2 duration-200">
-          {/* Header with clear button */}
+      {inline ? (
+        <div className="bg-white border border-gray-200 rounded-md shadow-sm overflow-hidden">
           <div className="flex justify-between items-center px-4 py-3 border-b border-gray-200 bg-gray-50">
             <span className="font-semibold text-gray-800">
               {isRTL ? 'اختر السنة' : 'Select Year'}
@@ -252,9 +230,7 @@ const CustomYearPicker: React.FC<CustomYearPickerProps> = ({
               )}
             </div>
           </div>
-
-          {/* Years grid */}
-          <div className="grid grid-cols-4 gap-2 p-4 max-h-60 overflow-y-auto">
+          <div className="grid grid-cols-4 gap-2 p-4 max-h-80 overflow-y-auto">
             {years.map((year) => (
               <div
                 key={year}
@@ -271,22 +247,98 @@ const CustomYearPicker: React.FC<CustomYearPickerProps> = ({
               </div>
             ))}
           </div>
-
-          {/* Footer instructions */}
           <div className="px-4 py-3 border-t border-gray-200 bg-gray-50 text-center">
             <small className="text-gray-500 text-xs">
               {isRTL ? 'انقر مرة لاختيار سنة ثم اضغط تم، أو مرتين لاختيار نطاق' : 'Click once then Done for single year, or twice for a range'}
             </small>
           </div>
         </div>
-      )}
+      ) : (
+        <>
+          {/* Input field */}
+          <div
+            className={`relative cursor-pointer ${disabled ? 'opacity-50 cursor-not-allowed' : ''}`}
+            onClick={togglePicker}
+          >
+            <input
+              type="text"
+              readOnly
+              value={getDisplayText()}
+              placeholder={placeholder}
+              className={`w-full px-3 py-2 text-sm border border-gray-200 rounded-md bg-gray-50 cursor-pointer transition-all focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent focus:bg-white ${
+                isRTL ? 'pr-10 pl-3' : 'pl-3 pr-10'
+              } ${disabled ? 'cursor-not-allowed' : 'hover:border-blue-400'}`}
+              disabled={disabled}
+            />
+            <IconCalendar
+              size={16}
+              className={`absolute top-1/2 transform -translate-y-1/2 text-gray-400 pointer-events-none ${
+                isRTL ? 'left-3' : 'right-3'
+              }`}
+            />
+          </div>
 
-      {/* Backdrop */}
-      {isOpen && (
-        <div
-          className="fixed inset-0 z-40 bg-transparent"
-          onClick={closePicker}
-        />
+          {/* Dropdown panel */}
+          {isOpen && (
+            <div className="absolute top-full left-0 right-0 z-50 mt-1 bg-white border border-gray-200 rounded-md shadow-lg min-w-80 max-h-96 overflow-hidden animate-in slide-in-from-top-2 duration-200">
+              <div className="flex justify-between items-center px-4 py-3 border-b border-gray-200 bg-gray-50">
+                <span className="font-semibold text-gray-800">
+                  {isRTL ? 'اختر السنة' : 'Select Year'}
+                </span>
+                <div className="flex items-center gap-2">
+                  {selectedYears.length === 1 && !disabled && (
+                    <button
+                      type="button"
+                      className="px-2 py-1 text-xs text-blue-600 hover:text-blue-800 hover:bg-blue-50 rounded transition-colors"
+                      onClick={applySingleSelection}
+                    >
+                      {isRTL ? 'تم' : 'Done'}
+                    </button>
+                  )}
+                  {selectedYears.length > 0 && !disabled && (
+                    <button
+                      type="button"
+                      className="px-2 py-1 text-xs text-red-600 hover:text-red-800 hover:bg-red-50 rounded transition-colors"
+                      onClick={clearSelection}
+                    >
+                      {isRTL ? 'مسح' : 'Clear'}
+                    </button>
+                  )}
+                </div>
+              </div>
+              <div className="grid grid-cols-4 gap-2 p-4 max-h-60 overflow-y-auto">
+                {years.map((year) => (
+                  <div
+                    key={year}
+                    className={`flex items-center justify-center p-2 rounded-md cursor-pointer transition-all text-sm font-medium border ${
+                      isYearSelected(year)
+                        ? 'bg-blue-500 text-white border-blue-500'
+                        : isYearInRange(year)
+                        ? 'bg-blue-50 text-blue-600 border-blue-200'
+                        : 'text-gray-600 border-transparent hover:bg-gray-50 hover:text-gray-800'
+                    } ${disabled ? 'cursor-not-allowed opacity-50' : 'active:scale-95'}`}
+                    onClick={() => selectYear(year)}
+                  >
+                    {year}
+                  </div>
+                ))}
+              </div>
+              <div className="px-4 py-3 border-t border-gray-200 bg-gray-50 text-center">
+                <small className="text-gray-500 text-xs">
+                  {isRTL ? 'انقر مرة لاختيار سنة ثم اضغط تم، أو مرتين لاختيار نطاق' : 'Click once then Done for single year, or twice for a range'}
+                </small>
+              </div>
+            </div>
+          )}
+
+          {/* Backdrop */}
+          {isOpen && (
+            <div
+              className="fixed inset-0 z-40 bg-transparent"
+              onClick={closePicker}
+            />
+          )}
+        </>
       )}
     </div>
   );

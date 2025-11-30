@@ -447,7 +447,8 @@
         "becomeInsighter": "Become an Insighter",
         "becomeInsighterDescription": "Register as a insight provider and start uploading reports and data on the platform",
         "myCompany": "My Team",
-        "signOut": "Sign Out"
+        "signOut": "Sign Out",
+        "myInsighterPage": "My Insighter Page"
     },
     "ProfilePage": {
         "profileNotFound": "Profile not found",

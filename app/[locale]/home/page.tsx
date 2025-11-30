@@ -607,6 +607,15 @@ export default function HomePage() {
     // The main search effect will be triggered by the state change
   }, [updateUrlWithFilters]);
   
+  // Apply both range filters together to avoid race conditions
+  const handleApplyRangeFilters = useCallback((start: string | null, end: string | null) => {
+    setRangeStartFilter(start);
+    setRangeEndFilter(end);
+    updateUrlWithFilters({ range_start: start, range_end: end, force: true });
+    // Reset to page 1 when filter changes
+    setCurrentPage(1);
+  }, [updateUrlWithFilters]);
+  
   // Custom setter for industry filter that triggers search
   const handleIndustryFilterChange = useCallback((value: number | null) => {
     // Update the industry filter state
@@ -1503,6 +1512,7 @@ export default function HomePage() {
                     setRangeStartFilter={handleRangeStartFilterChange}
                     rangeEndFilter={rangeEndFilter}
                     setRangeEndFilter={handleRangeEndFilterChange}
+                    applyRangeFilters={handleApplyRangeFilters}
                     accuracyFilter={accuracyFilter}
                     setAccuracyFilter={handleAccuracyFilterChange}
                     roleFilter={roleFilter}
