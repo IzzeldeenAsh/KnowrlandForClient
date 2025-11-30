@@ -322,14 +322,7 @@ export function UserProfile({ isHome }: { isHome: boolean }) {
               </Link>
             ))}
               </div>
-            <Link
-              href="https://app.insightabusiness.com/app/profile/overview"
-              className="block px-4 py-3  font-semibold text-slate-900 hover:bg-indigo-50 hover:text-sky-700"
-              style={{fontSize: '13px'}}
-              onClick={() => setMenuOpen(false)}
-            >
-              {t("myProfile")}
-            </Link>
+           
             <Link
               href={`https://insightabusiness.com/en/profile/${user.uuid}?entity=insighter`}
               className="block px-4 py-2.5  font-semibold text-slate-900 hover:bg-indigo-50 hover:text-sky-700"
@@ -356,6 +349,14 @@ export function UserProfile({ isHome }: { isHome: boolean }) {
               {t("myConsultingSchedule")}
             </Link> */}
             {/* Hide requests, received meetings and account settings for client-only role */}
+            <Link
+              href="https://app.insightabusiness.com/app/profile/overview"
+              className="block px-4 py-3  font-semibold text-slate-900 hover:bg-indigo-50 hover:text-sky-700"
+              style={{fontSize: '13px'}}
+              onClick={() => setMenuOpen(false)}
+            >
+              {t("myProfile")}
+            </Link>
             {!isClient$() && (
               <>
                 {/* <Link

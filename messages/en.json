@@ -439,7 +439,7 @@
         "insightBase": "My insights library",
         "myReadLater": "Bookmarks",
         "myDownloads": "My Downloads",
-        "myProfile": "My Profile",
+        "myProfile": "Profile Settings",
         "dashboard": "Dashboard",
         "myRequests": "Requests",
         "accountSettings": "Account Settings",
@@ -448,7 +448,7 @@
         "becomeInsighterDescription": "Register as a insight provider and start uploading reports and data on the platform",
         "myCompany": "My Team",
         "signOut": "Sign Out",
-        "myInsighterPage": "My Insighter Page"
+        "myInsighterPage": "My Page"
     },
     "ProfilePage": {
         "profileNotFound": "Profile not found",
