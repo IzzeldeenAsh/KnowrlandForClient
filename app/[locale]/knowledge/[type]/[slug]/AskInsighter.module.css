@@ -38,6 +38,7 @@
   color: #374151;
 }
 .commentAvatar img {
+  object-fit: cover;
   object-position: top;
 }
 

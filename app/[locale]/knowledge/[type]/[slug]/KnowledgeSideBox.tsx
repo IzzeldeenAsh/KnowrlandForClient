@@ -208,6 +208,14 @@ const KnowledgeSideBox = ({
   // Maximum number of Target Market items to show initially
   const MAX_VISIBLE_TARGET_MARKET_ITEMS = 2;
   
+  // Helpers to know when we need a "more" clamp
+  const hasMoreEconomicBlocs =
+    Array.isArray(economic_blocs) && economic_blocs.length > MAX_VISIBLE_TARGET_MARKET_ITEMS;
+  const hasMoreRegions =
+    Array.isArray(regions) && regions.length > MAX_VISIBLE_TARGET_MARKET_ITEMS && regions.length !== 6;
+  const hasMoreCountries =
+    Array.isArray(countries) && countries.length > MAX_VISIBLE_TARGET_MARKET_ITEMS;
+  
   // Share functionality
   const handleShare = () => {
     setShareModalOpened(true);
@@ -630,7 +638,7 @@ const KnowledgeSideBox = ({
                   </div>
                   {translations.targetMarket}
                 </span>
-                <div className={`field-content-container ${expandedSections.economicBlocs ? 'expanded' : ''}`}>
+                <div className={`field-content-container ${expandedSections.economicBlocs ? 'expanded' : ''} ${!hasMoreEconomicBlocs ? 'no-clamp' : ''}`}>
                   <div className={`chips-container ${economic_blocs.length > MAX_VISIBLE_TARGET_MARKET_ITEMS && !expandedSections.economicBlocs ? 'with-more' : ''}`}>
                     <div className="chips-wrapper">
                       {economic_blocs
@@ -671,7 +679,7 @@ const KnowledgeSideBox = ({
                   </div>
                   {translations.targetMarket}
                 </span>
-                <div className={`field-content-container ${expandedSections.regions ? 'expanded' : ''}`}>
+                <div className={`field-content-container ${expandedSections.regions ? 'expanded' : ''} ${!hasMoreRegions ? 'no-clamp' : ''}`}>
                   <div className={`chips-container ${(regions.length > MAX_VISIBLE_TARGET_MARKET_ITEMS && regions.length !== 6 && !expandedSections.regions) ? 'with-more' : ''}`}>
                     <div className="chips-wrapper">
                       {regions.length === 6 ? (
@@ -718,7 +726,7 @@ const KnowledgeSideBox = ({
                   </div>
                   {translations.targetMarket}
                 </span>
-                <div className={`field-content-container ${expandedSections.countries ? 'expanded' : ''}`}>
+                <div className={`field-content-container ${expandedSections.countries ? 'expanded' : ''} ${!hasMoreCountries ? 'no-clamp' : ''}`}>
                   <div className={`chips-container ${countries.length > MAX_VISIBLE_TARGET_MARKET_ITEMS && !expandedSections.countries ? 'with-more' : ''}`}>
                     <div className="chips-wrapper">
                       {countries
@@ -936,6 +944,16 @@ const KnowledgeSideBox = ({
             transition: max-height 0.3s ease;
           }
 
+          /* Only clamp when there is a "more" state; otherwise show fully */
+          .field-content-container:not(.expanded) .chips-container.with-more .chips-wrapper {
+            max-height: 32px;
+            overflow: hidden;
+          }
+          .chips-container:not(.with-more) .chips-wrapper {
+            max-height: none;
+            overflow: visible;
+          }
+
           .field-content-container.expanded .chips-wrapper {
             max-height: none;
           }
@@ -957,6 +975,15 @@ const KnowledgeSideBox = ({
             transition: all 0.2s ease;
             line-height: 1.2;
             min-height: 20px;
+          }
+
+          /* In expanded or unclamped state, allow full wrapping and width */
+          .field-content-container.expanded .chip-badge,
+          .field-content-container.no-clamp .chip-badge {
+            white-space: normal;
+            overflow: visible;
+            text-overflow: clip;
+            max-width: 100%;
           }
 
           .chip-badge:hover {
@@ -1048,6 +1075,16 @@ const KnowledgeSideBox = ({
 
           .field-content-container:not(.expanded) {
             max-height: 60px;
+          }
+
+          /* When there are ≤ 2 chips, don't clamp or hide overflow */
+          .field-content-container.no-clamp {
+            max-height: none;
+            overflow: visible;
+          }
+          .field-content-container.no-clamp .chips-wrapper {
+            max-height: none;
+            overflow: visible;
           }
 
           .field-content-container:not(.expanded).overflow-visible {

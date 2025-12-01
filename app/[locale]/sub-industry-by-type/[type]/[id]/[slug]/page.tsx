@@ -154,7 +154,7 @@ export default function SubIndustryByTypePage({ params }: Props) {
                       {topic?.knowledge && topic.knowledge.length > 0 ? (
                         <div>
                           <Text size="xs" color="gray" fw={500} pb={5}>
-                          {locale === 'ar' ? 'المعرفة:' : 'Knowledge:'}
+                          {locale === 'ar' ? 'الرؤى:' : 'Insights:'}
                         </Text>
                           <ul className="space-y-2">
                             {topic.knowledge.map((item: any) => (
