@@ -365,11 +365,11 @@ export default function NotificationsInner({
               </div>
 
               <div className="flex-1 min-w-0">
-                <p className={`text-sm text-gray-900 ${!notification.read_at ? 'font-bold' : 'font-light'}`}>
+                <p className={`text-sm text-gray-900 ${!notification.read_at ? 'font-bold' : 'font-light'}`} style={{wordBreak: 'break-word'}}>
                   {/* *** CHANGE 2: UPDATED FUNCTION CALL *** */}
                   {getNotificationName(notification.sub_type, currentLanguage)}
                 </p>
-                <p className={`text-xs text-gray-400 ${!notification.read_at ? 'font-semibold' : 'font-normal'}`}>
+                <p className={`text-xs text-gray-400 ${!notification.read_at ? 'font-semibold' : 'font-normal'}`} style={{wordBreak: 'break-word'}}>
                   {notification.message}
                 </p>
               </div>

@@ -134,6 +134,16 @@ export async function generateMetadata(
       : `${baseUrl}${profileImage.startsWith('/') ? '' : '/'}${profileImage}`)
     : null;
 
+  // WhatsApp limitations:
+  // - Doesn't reliably preview SVG/WEBP
+  // - Prefers absolute HTTPS URLs with sensible dimensions
+  // Use a PNG OG-image fallback in those cases and provide dimensions.
+  const lowerImage = absoluteProfileImage?.toLowerCase() || '';
+  const isUnsupportedForWhatsApp = lowerImage.endsWith('.svg') || lowerImage.endsWith('.webp');
+  const ogImageFallback = `${baseUrl}/api/og-image?name=${encodeURIComponent(profileName)}&type=${roleText}`;
+  const ogImageUrl = absoluteProfileImage && !isUnsupportedForWhatsApp ? absoluteProfileImage : ogImageFallback;
+  const isHttps = ogImageUrl.startsWith('https://');
+
   return {
     title,
     description,
@@ -144,25 +154,22 @@ export async function generateMetadata(
       siteName: platformText,
       locale: locale === 'ar' ? 'ar_AE' : 'en_US',
       type: 'profile',
-      images: absoluteProfileImage ? [
+      images: [
         {
-          url: absoluteProfileImage,
+          url: ogImageUrl,
+          // Provide secureUrl for crawlers like WhatsApp/Facebook when available
+          ...(isHttps ? { secureUrl: ogImageUrl } : {}),
+          width: 1200,
+          height: 630,
           alt: `${profileName}'s profile picture`,
-        },
-      ] : [
-        {
-          url: `${baseUrl}/api/og-image?name=${encodeURIComponent(profileName)}&type=${roleText}`,
-          alt: `${profileName}'s profile`,
         },
       ],
     },
     twitter: {
-      card: 'summary',
+      card: 'summary_large_image',
       title,
       description,
-      images: absoluteProfileImage
-        ? [absoluteProfileImage]
-        : [`${baseUrl}/api/og-image?name=${encodeURIComponent(profileName)}&type=${roleText}`],
+      images: [ogImageUrl],
       creator: '@insightabusiness_com',
       site: '@insightabusiness_com',
     },
@@ -192,6 +199,7 @@ export async function generateMetadata(
       'profile:last_name': isInsighter ? profileData.last_name : '',
       'profile:username': profileName,
       'og:image:alt': `${profileName}'s profile picture`,
+      ...(isHttps ? { 'og:image:secure_url': ogImageUrl } : {}),
     },
   };
 }

@@ -42,7 +42,7 @@ const ProfileShare = ({ profileData, enterpriseType, locale }: ProfileShareProps
 
   // Translations
   const translations = {
-    share: isRTL ? 'مشاركة' : 'Share',
+    share: isRTL ? 'شارك الصفحة' : 'Share Page',
     shareProfile: isRTL ? 'شارك الملف الشخصي' : 'Share Profile',
     customShareMessage: isRTL ? 'أضف رسالة شخصية' : 'Add a Personal Message',
     shareMessageHint: isRTL ? 'أضف ملاحظة أو رسالة لتخصيص المشاركة...' : 'Add a note or message to personalize your share...',
@@ -109,7 +109,7 @@ const ProfileShare = ({ profileData, enterpriseType, locale }: ProfileShareProps
     <>
       {/* Share Button */}
       <button
-        className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-blue-500 to-teal-400 text-white rounded-lg hover:from-blue-600 hover:to-teal-500 transition-all duration-200 transform hover:-translate-y-0.5 hover:shadow-lg font-medium text-sm"
+        className="flex items-center gap-2 px-3 py-2 bg-gradient-to-r from-blue-500 to-teal-400 text-white rounded-md hover:from-blue-600 hover:to-teal-500 transition-all duration-200 transform hover:-translate-y-0.5 hover:shadow-lg font-medium text-xs"
         onClick={handleShare}
         dir={isRTL ? 'rtl' : 'ltr'}
       >
@@ -157,6 +157,7 @@ const ProfileShare = ({ profileData, enterpriseType, locale }: ProfileShareProps
                       src={enterpriseType === "insighter" ? profileData.profile_photo_url! : profileData.company!.logo}
                       alt={enterpriseType === "insighter" ? `${profileData.first_name} ${profileData.last_name}` : profileData.company!.legal_name}
                       className="w-full h-full object-cover"
+                      style={{objectPosition: 'top', objectFit: 'cover'}}
                     />
                   ) : (
                     <div className="w-full h-full flex items-center justify-center bg-blue-500 text-white font-semibold text-sm">

@@ -156,3 +156,23 @@
 .filterCourseActive {
   background-color: #0ABB87 !important; /* custom course green */
 }
+
+/* Shiny animated gradient text for "Meet" tab */
+@keyframes shinyGradientSlide {
+  0% {
+    background-position: 0% 50%;
+  }
+  100% {
+    background-position: 200% 50%;
+  }
+}
+
+.shinyGradientText {
+  background-image: linear-gradient(90deg, #3b82f6 0%, #2dd4bf 50%, #3b82f6 100%);
+  background-size: 200% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
+  animation: shinyGradientSlide 2.5s linear infinite;
+}

@@ -307,6 +307,19 @@ export default function Reviews({ knowledgeSlug, reviews, is_review, is_owner, h
 
   return (
     <div dir={isRTL ? 'rtl' : 'ltr'}>
+      <style jsx global>{`
+        .rtl-rating {
+          transform: scaleX(-1);
+          display: inline-flex;
+          justify-content: flex-start;
+        }
+        .rtl-rating .mantine-Rating-symbol {
+          transform: scaleX(-1);
+        }
+        .rtl-rating .mantine-Rating-root {
+          justify-content: flex-start;
+        }
+      `}</style>
      {token && !is_review && !is_owner && hasPurchasedAny && (
         <>
           {!submit && (
@@ -317,11 +330,13 @@ export default function Reviews({ knowledgeSlug, reviews, is_review, is_owner, h
                     {translations.rateKnowledge}
                   </Text>
                   {/* @ts-ignore: The current Rating type doesn't include the `max` prop */}
-                  <Rating
-                    fractions={1}
-                    value={rate}
-                    onChange={(value) => setRate(value)}
-                  />
+                  <div className={isRTL ? 'rtl-rating' : ''}>
+                    <Rating
+                      fractions={1}
+                      value={rate}
+                      onChange={(value) => setRate(value)}
+                    />
+                  </div>
                 </div>
                 <div>
                   <Textarea
@@ -399,11 +414,13 @@ export default function Reviews({ knowledgeSlug, reviews, is_review, is_owner, h
                   <div className="mt-2">
                     <div className="flex items-center">
                       {/* @ts-ignore: The current Rating type doesn't include the `max` prop */}
-                      <Rating
-                        fractions={1}
-                        value={review.rate}
-                        readOnly
-                      />
+                      <div className={isRTL ? 'rtl-rating' : ''}>
+                        <Rating
+                          fractions={1}
+                          value={review.rate}
+                          readOnly
+                        />
+                      </div>
                       <span className={`${isRTL ? 'mr-2' : 'ml-2'} text-sm`}>
                         {review.rate}/5
                       </span>

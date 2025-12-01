@@ -113,6 +113,7 @@ outline: none !important;
 }
 
 .avatar-top-position img {
+  object-fit: cover !important;
   object-position: top !important;
 }
 
@@ -153,4 +154,9 @@ outline: none !important;
 
 .p-datatable .p-datatable-tbody > tr {
   border-bottom: 1px solid #e5e7eb !important;
+}
+
+img{
+  object-fit: cover !important;
+  object-position: top !important;
 }

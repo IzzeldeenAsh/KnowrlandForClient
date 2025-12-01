@@ -38,3 +38,8 @@
   margin-bottom: 0.5rem;
   display: block;
 }
+
+.card img {
+  object-fit: cover;
+  object-position: top;
+}
