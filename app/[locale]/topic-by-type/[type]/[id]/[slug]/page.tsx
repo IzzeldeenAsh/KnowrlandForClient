@@ -96,8 +96,8 @@ export default function TopicByTypePage({ params }: Props) {
             </div>
           ) : (
             <>
-             <h2 className="text-xl font-bold text-transparent bg-gradient-to-r from-blue-500 to-teal-400 bg-clip-text mb-8">
-              {locale === 'ar' ? 'المعرفة' : 'Knowledge'}
+              <h2 className="text-xl font-bold text-transparent bg-gradient-to-r from-blue-500 to-teal-400 bg-clip-text mb-8">
+                {locale === 'ar' ? 'الرؤى' : 'Insights'}
             </h2>
             <KnowledgeGrid 
               knowledge={knowledge || []}

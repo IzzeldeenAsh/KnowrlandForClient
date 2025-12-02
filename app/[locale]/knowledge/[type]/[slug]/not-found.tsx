@@ -27,7 +27,7 @@ export default function KnowledgeNotFound() {
           </div>
           
           <h1 className="text-4xl font-extrabold text-gray-900 tracking-tight sm:text-5xl mb-4">
-            {locale === 'ar' ? 'المعرفة غير موجودة' : 'Knowledge Not Found'}
+            {locale === 'ar' ? 'الرؤى غير موجودة' : 'Insights Not Found'}
           </h1>
           
           <p className="text-xl text-gray-500 mb-8">

@@ -387,7 +387,7 @@ export default function SearchResultsList({
   // Localized strings
   const translations = {
     topic: isRTL ? "موضوع" : "Topic",
-    knowledge: isRTL ? "المعرفة" : "Knowledge",
+    knowledge: isRTL ? "الرؤى" : "Insights",
     noItems: isRTL ? "لا توجد نتائج بحث متاحة" : "No search results available",
     posted: isRTL ? "نُشر" : "Posted",
     free: isRTL ? "مجاني" : "Free",

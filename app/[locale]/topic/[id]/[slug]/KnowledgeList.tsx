@@ -96,7 +96,7 @@ export default function KnowledgeList({
   
   // Localized strings
   const translations = {
-    knowledge: isRTL ? "المعرفة" : "Knowledge",
+    knowledge: isRTL ? "الرؤى" : "Insights",
     exploreInsights: isRTL ? `استكشف الرؤى ضمن ${topicName}` : `Explore insights within ${topicName}`,
     noItems: isRTL ? "لا توجد عناصر معرفية متاحة بعد" : "No knowledge items available yet",
     posted: isRTL ? "نُشر" : "Posted",

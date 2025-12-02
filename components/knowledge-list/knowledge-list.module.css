@@ -17,7 +17,7 @@
 }
 
 .title {
-  font-family: "Greycliff CF", var(--mantine-font-family);
+  font-family: "Almarai", sans-serif;
   font-weight: 600;
   font-size: 1.7rem;
   transition: color 0.2s ease;

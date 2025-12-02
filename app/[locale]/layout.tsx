@@ -1,8 +1,8 @@
 // app/[locale]/layout.tsx
 import './css/style.css';
 import AOSProvider from "@/components/aos-provider";
-import { Inter, Almarai } from 'next/font/google';
-import { MantineProvider } from '@mantine/core';
+import { Almarai } from 'next/font/google';
+import { MantineProvider, createTheme } from '@mantine/core';
 import '@mantine/core/styles.css';
 import {NextIntlClientProvider} from 'next-intl';
 import {getMessages} from 'next-intl/server';
@@ -19,11 +19,6 @@ import { GlobalProfileProvider } from '@/components/auth/GlobalProfileProvider';
 import GlobalAuthHandler from '@/components/auth/GlobalAuthHandler';
 import RoleGuard from '@/components/auth/RoleGuard';
 
-const inter = Inter({
-  subsets: ['latin'],
-  variable: '--font-inter',
-  display: 'swap'
-});
 
 const almarai = Almarai({
   subsets: ['arabic', 'latin'],
@@ -32,8 +27,14 @@ const almarai = Almarai({
   display: 'swap'
 });
 
+const theme = createTheme({
+  fontFamily: 'var(--font-almarai), sans-serif',
+  fontFamilyMonospace: 'Monaco, Courier, monospace',
+  headings: { fontFamily: 'var(--font-almarai), sans-serif' },
+});
+
 export const metadata = {
-  title: 'Insighta - Buy & Sell Knowledge',
+  title: 'Insighta - Buy & Sell Insights',
   description: 'Insighta is a platform for buying and selling insight resources, insights and expertise.',
 };
 
@@ -60,9 +61,9 @@ export default async function RootLayout({
   // Get messages for translations
   const messages = await getMessages();
 
-  // Choose font based on directions
-  const fontClass = direction === 'rtl' ? almarai.variable : inter.variable;
-  const fontFamily = direction === 'rtl' ? 'font-almarai' : 'font-inter';
+  // Use Almarai for both RTL and LTR
+  const fontClass = almarai.variable;
+  const fontFamily = 'font-almarai';
   
   return (
     <html lang={locale} dir={direction} className="scroll-smooth">
@@ -118,7 +119,7 @@ export default async function RootLayout({
         />
       </head>
       <body className={`${fontClass} ${fontFamily} antialiased tracking-tight`} suppressHydrationWarning>
-        <MantineProvider>
+        <MantineProvider theme={theme}>
           <AOSProvider>
             <NextIntlClientProvider messages={messages}>
               <ToastProvider>

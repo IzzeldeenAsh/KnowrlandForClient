@@ -158,9 +158,9 @@ const getNotificationIcon = (subType: string, color?: string): React.ReactNode =
 // Helper function to determine display name based on notification sub_type and language
 const getNotificationName = (subType: string, language: string): string => {
   const nameMap: Record<string, { en: string; ar: string }> = {
-    'accept_knowledge': { en: 'Knowledge Accepted', ar: 'قبول المعرفة' },
-    'declined': { en: 'Knowledge Declined', ar: 'رفض المعرفة' },
-    'approved': { en: 'Knowledge Approved', ar: 'تمت الموافقة على المعرفة' },
+    'accept_knowledge': { en: 'Insights Accepted', ar: 'قبول الرؤى' },
+    'declined': { en: 'Insights Declined', ar: 'رفض الرؤى' },
+    'approved': { en: 'Insights Approved', ar: 'تمت الموافقة على الرؤى' },
     'download': { en: 'Download', ar: 'تنزيل' },
     'upload': { en: 'Upload', ar: 'رفع' },
     'comment': { en: 'Comment', ar: 'تعليق' },
@@ -169,8 +169,8 @@ const getNotificationName = (subType: string, language: string): string => {
     'save': { en: 'Save', ar: 'حفظ' },
     'share': { en: 'Share', ar: 'مشاركة' },
     'view': { en: 'View', ar: 'عرض' },
-    'knowledge_accept': { en: 'Knowledge Accepted', ar: 'قبول المعرفة' },
-    'knowledge_declined': { en: 'Knowledge Declined', ar: 'رفض المعرفة' },
+    'knowledge_accept': { en: 'Insights Accepted', ar: 'قبول الرؤى' },
+    'knowledge_declined': { en: 'Insights Declined', ar: 'رفض الرؤى' },
     'activate_company': { en: 'Active Company', ar: 'تفعيل الشركة' },
     'client_meeting_new': { en: 'New Meeting Request', ar: 'طلب اجتماع جديد' },
     'insighter_meeting_client_new': { en: 'New Meeting Request', ar: 'طلب اجتماع جديد' },
