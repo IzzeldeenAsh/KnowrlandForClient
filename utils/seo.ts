@@ -325,7 +325,7 @@ export function generateStructuredData(knowledge: KnowledgeMetadata, locale: str
       {
         "@type": "ListItem",
         "position": 2,
-        "name": "Knowledge",
+        "name": "Insights",
         "item": `${baseUrl}/${locale}/knowledges`
       },
       {

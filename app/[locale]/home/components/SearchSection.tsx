@@ -34,7 +34,7 @@ const SearchSection = memo<SearchSectionProps>(({
   const translations = useMemo(() => ({
     searchTitle: locale === 'ar' ? 'ابحث في التقارير والبيانات والإحصائيات' : 'Search data, reports, and statistics',
     searchSubtitle: locale === 'ar' ? 'ابدأ الآن' : 'Start exploring now',
-    searchPlaceholder: locale === 'ar' ? 'إبحث عن معرفة أو خبير...' : 'Search for Knowledge or Expert...',
+    searchPlaceholder: locale === 'ar' ? 'إبحث عن رؤى أو خبير...' : 'Search for Insights or Expert...',
     exploreByCategory: locale === 'ar' ? 'عرض حسب الفئة' : 'Explore by category',
   }), [locale]);
 

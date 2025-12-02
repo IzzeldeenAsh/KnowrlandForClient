@@ -314,7 +314,7 @@ export default function SearchResultsGrid({
   const translations = {
     topic: isRTL ? "موضوع" : "Topic",
     topicsRelated: isRTL ? "المواضيع المتعلقة بالبحث" : "Topics related to your search",
-    knowledge: isRTL ? "المعرفة" : "Knowledge",
+    knowledge: isRTL ? "الرؤى" : "Insights",
     noItems: isRTL ? "لا توجد نتائج بحث متاحة" : "No search results available",
     posted: isRTL ? "نُشر" : "Posted",
     coverage: isRTL ? "التغطية" : "Coverage",

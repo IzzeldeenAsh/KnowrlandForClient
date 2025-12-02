@@ -17,7 +17,7 @@ module.exports = {
     },
     extend: {
       fontFamily: {
-        inter: ['var(--font-inter)', 'sans-serif'],
+        sans: ['var(--font-almarai)', 'sans-serif'],
         'almarai': ['var(--font-almarai)', 'sans-serif'],
         'almarai-light': ['var(--font-almarai-light)', 'sans-serif'],
         'almarai-regular': ['var(--font-almarai-regular)', 'sans-serif'],

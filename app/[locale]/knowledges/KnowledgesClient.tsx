@@ -118,7 +118,7 @@ export default function KnowledgesClient() {
     selectIndustry: isRTL ? 'حدد صناعة' : 'Select an industry',
     selectSubIndustry: isRTL ? 'حدد صناعة فرعية' : 'Select a sub-industry',
     selectTopic: isRTL ? 'حدد موضوعًا' : 'Select a topic',
-    knowledgeType: isRTL ? 'نوع المعرفة' : 'Knowledge Type',
+    knowledgeType: isRTL ? 'نوع الرؤى' : 'Insights Type',
     selectType: isRTL ? 'حدد النوع' : 'Select type',
     data: isRTL ? 'بيانات' : 'Data',
     insight: isRTL ? 'رؤى' : 'Insight',
@@ -126,8 +126,8 @@ export default function KnowledgesClient() {
     course: isRTL ? 'دورات' : 'Course',
     report: isRTL ? 'تقارير' : 'Report',
     filteredResults: isRTL ? 'نتائج الفلاتر' : 'Filtered Results',
-    knowledge: isRTL ? 'معرفة' : 'Knowledge'
-  };
+    knowledge: isRTL ? 'رؤى' : 'Insights'
+  };  
 
   // Get filter values from URL query parameters
   const taxonomyParam = searchParams.get('taxonomy') || 'industry';

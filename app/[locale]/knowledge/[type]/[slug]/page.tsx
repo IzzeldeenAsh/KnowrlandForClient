@@ -168,7 +168,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       metadataBase = new URL('https://insightabusiness.com');
     }
 
-    const title = isRTL ? "المعرفة غير موجودة | Insighta" : "Knowledge Not Found |Insighta";
+    const title = isRTL ? "الرؤى غير موجودة | Insighta" : "Insights Not Found |Insighta";
     const description = isRTL 
       ? "لم يتم العثور على المورد المعرفي المطلوب. تحقق من الرابط أو ابحث عن محتوى آخر على منصة Insighta."
       : "The requested knowledge resource could not be found. Please check the URL or search for other content on Insighta platform.";
