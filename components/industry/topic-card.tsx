@@ -24,7 +24,7 @@ export default function TopicCard({ topic, locale, isRTL }: TopicCardProps) {
             height={20} 
             className={`${!isDisabled ? 'text-blue-500' : 'text-gray-400'}`} 
           />
-          <h3 className={`text-base font-bold ${!isDisabled ? 'text-transparent bg-gradient-to-r from-blue-500 to-teal-400 bg-clip-text' : 'text-gray-900'}`}>
+          <h3 className={`text-base font-bold ${!isDisabled ? `text-transparent ${isRTL ? 'bg-gradient-to-l from-blue-400 to-teal-500' : 'bg-gradient-to-r from-blue-500 to-teal-400'} bg-clip-text` : 'text-gray-900'}`}>
             {topic.name}
             {isDisabled && <span className="ml-2 text-xs text-gray-500"></span>}
           </h3>

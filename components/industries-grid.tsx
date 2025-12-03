@@ -32,7 +32,7 @@ export default function IndustriesGrid({ industries, locale }: IndustriesGridPro
                 className="w-8 h-8 object-contain flex-shrink-0"
               />
             )}
-            <h3 className={`text-base font-bold ${!isDisabled ? 'text-transparent bg-gradient-to-r from-blue-500 to-teal-400 bg-clip-text' : 'text-gray-900'}`}>
+            <h3 className={`text-base font-bold ${!isDisabled ? `text-transparent ${isRTL ? 'bg-gradient-to-l from-blue-400 to-teal-500' : 'bg-gradient-to-r from-blue-500 to-teal-400'} bg-clip-text` : 'text-gray-900'}`}>
               {industry.name}
               {isDisabled && <span className="ml-2 text-xs text-gray-500"></span>}
             </h3>

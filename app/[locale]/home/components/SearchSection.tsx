@@ -30,6 +30,7 @@ const SearchSection = memo<SearchSectionProps>(({
   onCategorySelect,
   onSearch,
 }) => {
+  const isRTL = locale === 'ar';
   // Memoized translations
   const translations = useMemo(() => ({
     searchTitle: locale === 'ar' ? 'ابحث في التقارير والبيانات والإحصائيات' : 'Search data, reports, and statistics',
@@ -61,7 +62,7 @@ const SearchSection = memo<SearchSectionProps>(({
               <h1 className="text-3xl sm:text-4xl md:text-5xl font-extrabold tracking-tight text-gray-900 text-center " style={{lineHeight: '1.3'}}>
                 {translations.searchTitle}
               </h1>
-              <h1 className="text-3xl sm:text-4xl md:text-5xl font-extrabold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-blue-500 to-teal-400 text-center " style={{lineHeight: '1.3'}}>
+              <h1 className={`text-3xl sm:text-4xl md:text-5xl font-extrabold tracking-tight bg-clip-text text-transparent ${isRTL ? 'bg-gradient-to-l from-blue-400 to-teal-500' : 'bg-gradient-to-r from-blue-500 to-teal-400'} text-center`} style={{lineHeight: '1.3'}}>
                 {translations.searchSubtitle}
               </h1>
             </div>

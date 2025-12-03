@@ -97,6 +97,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 export default async function PackagePage({ params }: Props) {
   // Await params to access its properties
   const { slug, locale = 'en' } = await params;
+  const isRTL = locale === 'ar';
   
   try {
     const packageData: PackageData = await fetchPackageData(slug, locale);
@@ -121,7 +122,7 @@ export default async function PackagePage({ params }: Props) {
                      Package
                     </span>
                 <div className="text-start mb-4" data-aos="fade-down">
-                  <h3 className="text-md bg-gradient-to-r from-blue-500 to-teal-400 md:text-4xl font-extrabold text-transparent bg-clip-text">
+                  <h3 className={`text-md ${isRTL ? 'bg-gradient-to-l from-blue-400 to-teal-500' : 'bg-gradient-to-r from-blue-500 to-teal-400'} md:text-4xl font-extrabold text-transparent bg-clip-text`}>
                     {packageData.name} Package
                   </h3>
                 </div>

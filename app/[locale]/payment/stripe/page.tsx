@@ -465,7 +465,7 @@ function PaymentForm({ orderUuid, amount, title, locale, isRTL, orderDetails, se
     <div className="space-y-6">
       {/* Payment Header - Only show for normal payment state */}
       <div className="text-center mb-8">
-        <h1 className="text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-500 to-teal-400 mb-2">
+        <h1 className={`text-3xl font-bold text-transparent bg-clip-text ${isRTL ? 'bg-gradient-to-l from-blue-400 to-teal-500' : 'bg-gradient-to-r from-blue-500 to-teal-400'} mb-2`}>
           {isRTL ? "إتمام الدفع" : "Complete Your Payment"}
         </h1>
         <p className="text-gray-600">

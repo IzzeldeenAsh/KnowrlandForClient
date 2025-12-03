@@ -37,6 +37,7 @@ export default function IndustriesByTypePage({ params }: Props) {
   const type = resolvedParams.type as IndustryType;
   const routeParams = useParams();
   const locale = routeParams.locale as string || 'en';
+  const isRTL = locale === 'ar';
   const messages = require(`@/messages/${locale}.json`);
 
   const translationKeys: { [key in IndustryType]: string } = {
@@ -147,7 +148,7 @@ export default function IndustriesByTypePage({ params }: Props) {
               {/* <span className="inline-block px-5 py-1 text-xs font-semibold text-blue-500 bg-blue-100 rounded-md mb-2 uppercase">
               {messages[translationKeys[type]]}
               </span> */}
-              <h3 className="text-md bg-gradient-to-r from-blue-500 to-teal-400 md:text-3xl font-extrabold text-transparent bg-clip-text mb-4">
+              <h3 className={`text-md ${isRTL ? 'bg-gradient-to-l from-blue-400 to-teal-500' : 'bg-gradient-to-r from-blue-500 to-teal-400'} md:text-3xl font-extrabold text-transparent bg-clip-text mb-4`}>
                 {displayLabel} {messages.byIndustry}
               </h3>
            

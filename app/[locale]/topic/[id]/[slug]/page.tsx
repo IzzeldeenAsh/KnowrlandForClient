@@ -122,7 +122,7 @@ export default async function TopicPage({ params }: Props) {
               <div className="flex flex-col lg:flex-row justify-between gap-8">
                 <div className="flex-1">
                   <div className={`${isRTL ? 'text-right' : 'text-left'} mb-4`} data-aos="fade-down">
-                    <h1 className="text-3xl md:text-5xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-blue-500 to-teal-400 mb-4 leading-[2]">
+                    <h1 className={`text-3xl md:text-4xl font-extrabold text-transparent bg-clip-text ${isRTL ? 'bg-gradient-to-l from-blue-400 to-teal-500' : 'bg-gradient-to-r from-blue-500 to-teal-400'} mb-4 leading-[2]`}>
                       {topic.name}
                     </h1>
                   </div>
@@ -140,7 +140,7 @@ export default async function TopicPage({ params }: Props) {
 
           <section className="max-w-container relative mx-auto mt-10 w-full px-4 sm:px-6 lg:px-8 pb-12">
             <div className="max-w-6xl mx-auto">
-              <h2 className="text-xl font-bold text-transparent bg-gradient-to-r from-blue-500 to-teal-400 bg-clip-text mb-8">
+              <h2 className={`text-xl font-bold text-transparent ${isRTL ? 'bg-gradient-to-l from-blue-400 to-teal-500' : 'bg-gradient-to-r from-blue-500 to-teal-400'} bg-clip-text mb-8`}>
                 {messages?.topic?.knowledge || (locale === 'ar' ? 'الرؤى' : 'Insights')}
               </h2>
               <KnowledgeGrid knowledge={topic.knowledge} topicName={topic.name} showHeader={false} />

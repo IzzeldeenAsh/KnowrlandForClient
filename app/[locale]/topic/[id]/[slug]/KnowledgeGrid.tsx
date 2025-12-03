@@ -95,6 +95,7 @@ export interface KnowledgeItem {
     };
   };
   is_read_later?: boolean;
+  language?: 'english' | 'arabic';
 }
 
 function getInitials(name: string) {
@@ -289,6 +290,7 @@ export default function KnowledgeGrid({
                       fw={700}
                       className={`${cardStyles.title} `}
                       lineClamp={2}
+                      style={{ textAlign: item.language?.toLowerCase() === 'arabic' ? 'right' : 'left' }}
                     >
                       {item.title}
                     </Text>
