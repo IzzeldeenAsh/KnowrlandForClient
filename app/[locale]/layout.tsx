@@ -129,7 +129,7 @@ export default async function RootLayout({
                       <GlobalAuthHandler />
                       <ClientLogoutHandler />
                       <Header />
-                      <div className="flex flex-col min-h-screen overflow-hidden supports-[overflow:clip]:overflow-clip">
+                      <div className="flex flex-col min-h-screen overflow-hidden supports-[overflow:clip]:overflow-clip" style={{ paddingBottom: 'var(--auth-banner-offset, 0px)' }}>
                         {children}
                       </div>
                       <ConditionalAuthBanner />

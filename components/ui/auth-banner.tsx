@@ -2,6 +2,7 @@
 
 import { useTranslations } from 'next-intl';
 import { useParams } from 'next/navigation';
+import { useEffect, useRef } from 'react';
 
 interface AuthBannerProps {
   onSignUp?: () => void;
@@ -13,6 +14,29 @@ export default function AuthBanner({ onSignUp, onLogin }: AuthBannerProps) {
   const params = useParams();
   const locale = params.locale as string;
   const isRTL = locale === 'ar';
+  const bannerRef = useRef<HTMLDivElement | null>(null);
+
+  useEffect(() => {
+    const element = bannerRef.current;
+    if (!element) return;
+
+    const updateOffset = () => {
+      const height = element.offsetHeight || 0;
+      document.body.style.setProperty('--auth-banner-offset', `${height}px`);
+    };
+
+    updateOffset();
+
+    const resizeObserver = new ResizeObserver(() => updateOffset());
+    resizeObserver.observe(element);
+    window.addEventListener('resize', updateOffset);
+
+    return () => {
+      resizeObserver.disconnect();
+      window.removeEventListener('resize', updateOffset);
+      document.body.style.removeProperty('--auth-banner-offset');
+    };
+  }, []);
 
   const handleSignUp = () => {
     if (onSignUp) {
@@ -34,6 +58,7 @@ export default function AuthBanner({ onSignUp, onLogin }: AuthBannerProps) {
 
   return (
     <div 
+      ref={bannerRef}
       className="fixed bottom-0 left-0 right-0 z-50 bg-gradient-to-r from-blue-500 to-cyan-500 px-4 py-4"
       dir={isRTL ? 'rtl' : 'ltr'}
     >
