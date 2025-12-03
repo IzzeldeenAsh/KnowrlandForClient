@@ -133,20 +133,7 @@ export default function MobileMenu({ isHomePage = true }: MobileMenuProps) {
           <li>
             <Link className={`flex font-medium text-sm ${menuTextColorClass} py-1.5`} href={`/${currentLocale}/industries/course`}>{t('navigation.courses')}</Link>
           </li>
-          <li className={`border-t ${borderColorClass} mt-1.5 pt-1.5`}>
-            <button 
-              onClick={() => {
-                switchLocale(currentLocale === 'en' ? 'ar' : 'en');
-                setMobileNavOpen(false);
-              }}
-              className={`flex items-center font-medium text-sm ${menuTextColorClass} py-1.5 w-full text-left`}
-            >
-              <IconLanguage size={18} className={`${isRtl ? 'ml-2' : 'mr-2'}`} />
-              <span>
-                {currentLocale === 'en' ? t('language.switchToArabic') : t('language.switchToEnglish')}
-              </span>
-            </button>
-          </li>
+          
         </ul>
       </nav>
     </div>

@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react';
 import { IconInfoCircle, IconLanguage } from '@tabler/icons-react';
+import { usePathname } from 'next/navigation';
 
 interface LanguageMismatchNotifierProps {
   knowledgeLanguage: string;
@@ -13,10 +14,60 @@ export default function LanguageMismatchNotifier({
   currentLocale 
 }: LanguageMismatchNotifierProps) {
   const isRTL = currentLocale === 'ar';
+  const pathname = usePathname();
   const hasShownWarning = useRef(false);
   const [showWarning, setShowWarning] = useState(false);
   const [animationState, setAnimationState] = useState('hidden'); // 'hidden', 'entering', 'visible', 'exiting'
   const [targetLanguage, setTargetLanguage] = useState('');
+
+  // Helper to clear duplicate cookies similar to header.tsx
+  const clearDuplicateCookies = (cookieName: string) => {
+    const isProduction = typeof window !== 'undefined' && window.location.hostname.includes('insightabusiness.com');
+    const clearVariations = [
+      `${cookieName}=; Path=/; Max-Age=-1`,
+      `${cookieName}=; Domain=.insightabusiness.com; Path=/; Max-Age=-1; Secure; SameSite=None`,
+      `${cookieName}=; Path=/; Max-Age=-1; ${isProduction ? 'Secure; SameSite=None' : 'SameSite=Lax'}`
+    ];
+    clearVariations.forEach(variation => {
+      document.cookie = variation;
+    });
+  };
+
+  const switchLocale = (locale: 'en' | 'ar') => {
+    // Clear any existing duplicate cookies first
+    clearDuplicateCookies('preferred_language');
+
+    setTimeout(() => {
+      const isProduction = typeof window !== 'undefined' && window.location.hostname.includes('insightabusiness.com');
+      const expirationDate = new Date();
+      expirationDate.setFullYear(expirationDate.getFullYear() + 1);
+
+      const cookieParts = [
+        `preferred_language=${locale}`,
+        `Path=/`,
+        `Expires=${expirationDate.toUTCString()}`,
+        `Max-Age=${60 * 60 * 24 * 365}`,
+        `SameSite=Lax`
+      ];
+
+      if (isProduction) {
+        cookieParts.push(`Domain=.insightabusiness.com`);
+        cookieParts.push(`Secure`);
+      }
+
+      document.cookie = cookieParts.join('; ');
+
+      // Compute current path without locale prefix
+      const segments = (pathname || '/').split('/').filter(Boolean);
+      const currentPath = segments.slice(1).join('/'); // drop existing locale segment
+      const newPath = currentPath ? `/${currentPath}` : '/';
+      const currentSearch = typeof window !== 'undefined' ? window.location.search : '';
+
+      // Navigate to same route with new locale
+      const fullUrl = `/${locale}${newPath}${currentSearch}`;
+      window.location.href = fullUrl;
+    }, 100);
+  };
 
   useEffect(() => {
     if (knowledgeLanguage && !hasShownWarning.current) {
@@ -63,27 +114,27 @@ export default function LanguageMismatchNotifier({
 
   if (!showWarning) return null;
   
-  // Animation and positioning styles - sliding from top
+  // Animation and positioning styles - sliding from bottom
   const getAnimationStyles = () => {
     switch (animationState) {
       case 'hidden':
-        return { opacity: 0, transform: 'translateY(-100px)' };
+        return { opacity: 0, transform: 'translateY(100px)' };
       case 'entering':
         return { opacity: 1, transform: 'translateY(0px)' };
       case 'visible':
         return { opacity: 1, transform: 'translateY(0px)' };
       case 'exiting':
-        return { opacity: 0, transform: 'translateY(-100px)' };
+        return { opacity: 0, transform: 'translateY(100px)' };
       default:
-        return { opacity: 0, transform: 'translateY(-100px)' };
+        return { opacity: 0, transform: 'translateY(100px)' };
     }
   };
 
   return (
     <div 
-      className="fixed top-20 left-1/2 z-50 px-4 w-full max-w-lg"
+      className={`fixed z-50 px-4 w-full max-w-lg ${isRTL ? 'bottom-6 left-6' : 'bottom-6 right-6'}`}
       style={{
-        transform: `translateX(-50%) ${getAnimationStyles().transform || ''}`,
+        transform: `${getAnimationStyles().transform || ''}`,
         opacity: getAnimationStyles().opacity,
         transition: 'all 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94)' // Slower, smoother animation
       }}
@@ -138,12 +189,26 @@ export default function LanguageMismatchNotifier({
           <div className="text-left space-y-2 sm:space-y-3">
             {/* English message */}
             <div className="text-white/90 text-sm sm:text-base font-medium leading-relaxed">
-              For better experience, it's recommended to switch to {targetLanguage}
+              For better experience, it's recommended to switch to{' '}
+              <button
+                type="button"
+                className="underline underline-offset-2 decoration-white/80 hover:decoration-white font-semibold"
+                onClick={() => switchLocale(targetLanguage === 'Arabic' ? 'ar' : 'en')}
+              >
+                {targetLanguage}
+              </button>
             </div>
             
             {/* Arabic message (with explicit left alignment) */}
             <div className="text-white/90 text-sm sm:text-base font-medium text-right leading-relaxed">
-              للحصول على تجربة أفضل، يُفضل التبديل إلى اللغة {targetLanguage === 'Arabic' ? 'العربية' : 'الإنجليزية'}
+              للحصول على تجربة أفضل، يُفضل التبديل إلى اللغة{' '}
+              <button
+                type="button"
+                className="underline underline-offset-2 decoration-white/80 hover:decoration-white font-semibold"
+                onClick={() => switchLocale(targetLanguage === 'Arabic' ? 'ar' : 'en')}
+              >
+                {targetLanguage === 'Arabic' ? 'العربية' : 'الإنجليزية'}
+              </button>
             </div>
           </div>
         </div>

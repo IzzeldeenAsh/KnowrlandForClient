@@ -34,7 +34,7 @@ export default function AllIndustries() {
               <Breadcrumb items={breadcrumbItems} />
               <div className="mx-auto max-w-3xl text-center pb-12">
                 <h2 
-                  className="h2 font-bold text-4xl md:text-6xl bg-clip-text text-transparent bg-gradient-to-r from-blue-500 to-teal-400" 
+                  className={`h2 font-bold text-4xl md:text-6xl bg-clip-text text-transparent ${isRTL ? 'bg-gradient-to-l from-blue-400 to-teal-500' : 'bg-gradient-to-r from-blue-500 to-teal-400'}`} 
                   data-aos="zoom-y-out"
                   style={{lineHeight: '1.2'}}
                 >

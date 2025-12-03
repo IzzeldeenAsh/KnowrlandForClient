@@ -611,7 +611,7 @@ export default function CheckoutPage() {
                   : "mx-auto max-w-6xl text-start "
               }
             >
-              <h1 className="text-3xl md:text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-500 to-teal-400 mb-2">
+              <h1 className={`text-3xl md:text-4xl font-bold text-transparent bg-clip-text ${isRTL ? 'bg-gradient-to-l from-blue-400 to-teal-500' : 'bg-gradient-to-r from-blue-500 to-teal-400'} mb-2`}>
                 {translations.checkout}
               </h1>
               <p className="text-gray-600">
