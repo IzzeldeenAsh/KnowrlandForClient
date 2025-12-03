@@ -1584,7 +1584,7 @@ export default function HomePage() {
          <h1 className="text-3xl sm:text-4xl md:text-4xl font-extrabold tracking-tight text-gray-900 text-center ">
            {locale === 'ar' ? 'ابحث في التقارير والبيانات والرؤى' : 'Search data, reports, and insights'}
          </h1>
-         <h1 className="text-3xl sm:text-4xl md:text-4xl font-extrabold text-cyan-500 text-center " >
+         <h1 className="text-3xl sm:text-4xl md:text-4xl font-extrabold bg-clip-text text-transparent bg-gradient-to-r from-blue-500 to-teal-400 text-center " >
            {locale === 'ar' ? 'ابدأ الآن' : 'Start exploring now'}
          </h1>
        </div>

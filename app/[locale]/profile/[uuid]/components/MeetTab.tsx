@@ -832,7 +832,9 @@ export default function MeetTab({
                           })}`}
                     </h3>
                     <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">
-                      {locale.startsWith('ar') ? 'جميع الأوقات بتوقيت 24 ساعة' : 'All times shown in 24-hour format'}
+                      {locale.startsWith('ar')
+                        ? `جميع الأوقات بتوقيت 24 ساعة في المنطقة الزمنية المحلية (${Intl.DateTimeFormat().resolvedOptions().timeZone})`
+                        : `All times shown in 24-hour format in your local timezone (${Intl.DateTimeFormat().resolvedOptions().timeZone})`}
                     </p>
 
                     <div className="space-y-3 mb-6">
