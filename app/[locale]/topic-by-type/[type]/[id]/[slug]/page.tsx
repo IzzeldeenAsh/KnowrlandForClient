@@ -32,6 +32,7 @@ export default function TopicByTypePage({ params }: Props) {
   const id = parseInt(resolvedParams.id, 10);
   const slug = resolvedParams.slug;
   const locale = resolvedParams.locale || 'en';
+  const isRTL = locale === 'ar';
 
   useEffect(() => {
     safeAOSInit({
@@ -96,11 +97,14 @@ export default function TopicByTypePage({ params }: Props) {
             </div>
           ) : (
             <>
-              <h2 className="text-xl font-bold text-transparent bg-gradient-to-r from-blue-500 to-teal-400 bg-clip-text mb-8">
+              <h2 className={`text-xl font-bold text-transparent ${isRTL ? 'bg-gradient-to-l from-teal-400 to-blue-500' : 'bg-gradient-to-r from-blue-500 to-teal-400'} bg-clip-text mb-8`}>
                 {locale === 'ar' ? 'الرؤى' : 'Insights'}
             </h2>
-            <KnowledgeGrid 
-              knowledge={knowledge || []}
+            <KnowledgeGrid
+              knowledge={(knowledge || []).map(item => ({
+                ...item,
+                language: item.language === 'arabic' ? 'arabic' as const : item.language === 'english' ? 'english' as const : undefined
+              }))}
               topicName={subIndustry?.name || ''}
               locale={locale}
               showHeader={true}

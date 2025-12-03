@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { IconInfoCircle, IconLanguage } from '@tabler/icons-react';
 import { usePathname } from 'next/navigation';
+import { useAuth } from '@/hooks/useAuth';
 
 interface LanguageMismatchNotifierProps {
   knowledgeLanguage: string;
@@ -15,6 +16,7 @@ export default function LanguageMismatchNotifier({
 }: LanguageMismatchNotifierProps) {
   const isRTL = currentLocale === 'ar';
   const pathname = usePathname();
+  const { isLoggedIn } = useAuth();
   const hasShownWarning = useRef(false);
   const [showWarning, setShowWarning] = useState(false);
   const [animationState, setAnimationState] = useState('hidden'); // 'hidden', 'entering', 'visible', 'exiting'
@@ -132,8 +134,10 @@ export default function LanguageMismatchNotifier({
 
   return (
     <div 
-      className={`fixed z-50 px-4 w-full max-w-lg ${isRTL ? 'bottom-6 left-6' : 'bottom-6 right-6'}`}
+      className={`fixed z-50 px-4 w-full max-w-lg ${isRTL ? 'left-6' : 'right-6'}`}
       style={{
+        // When logged out, keep it above the auth banner (uses a CSS var set by the banner)
+        bottom: isLoggedIn ? '1.5rem' : 'calc(var(--auth-banner-offset, 0px) + 1rem)',
         transform: `${getAnimationStyles().transform || ''}`,
         opacity: getAnimationStyles().opacity,
         transition: 'all 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94)' // Slower, smoother animation
