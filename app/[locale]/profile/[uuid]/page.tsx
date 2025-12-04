@@ -784,8 +784,8 @@ export default function ProfilePage() {
       filterClass: styles.filterDataActive,
     },
     {
-      id: "insight",
-      label: "insight",
+      id: "statistic",
+      label: "statistics",
       icon: (isActive: boolean) => (
         <svg
           className={`${styles.icon} ${styles.iconInsight} ${
