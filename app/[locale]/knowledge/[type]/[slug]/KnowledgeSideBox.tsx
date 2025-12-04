@@ -1103,6 +1103,14 @@ const KnowledgeSideBox = ({
           .tp-course-details2-widget-list-item:last-child {
             border-bottom: none;
           }
+.tp-course-details2-widget {
+    top: 100px !important;
+    margin-top: -320px !important;
+    position: sticky;
+    max-width: 400px;
+    z-index: 25 !important;
+}
+
 
           /* RTL support */
           [dir="rtl"] .chips-wrapper {
