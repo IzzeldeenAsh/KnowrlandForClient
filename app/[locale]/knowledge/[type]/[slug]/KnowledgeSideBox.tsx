@@ -313,7 +313,7 @@ const KnowledgeSideBox = ({
 
   return (
     <div className='tp-course-details2-widget'>
-    <div className="tp-course-details2-widget-child rounded-lg p-3 sticky " dir={isRTL ? 'rtl' : 'ltr'}>
+    <div className="tp-course-details2-widget-child rounded-lg p-3 lg:sticky " dir={isRTL ? 'rtl' : 'ltr'}>
       
       <div className="p-3">
         <div className="text-center mb-2">
@@ -1103,14 +1103,31 @@ const KnowledgeSideBox = ({
           .tp-course-details2-widget-list-item:last-child {
             border-bottom: none;
           }
-.tp-course-details2-widget {
+@media (min-width: 1024px) {
+  .tp-course-details2-widget {
     top: 100px !important;
-    margin-top: -320px !important;
+    margin-top: -130px !important;
     position: sticky;
     max-width: 400px;
     z-index: 25 !important;
+  }
 }
 
+          /* Make side box flow normally and full-width on <= 1023px */
+          @media (max-width: 1023px) {
+            .tp-course-details2-widget {
+              position: static !important;
+              top: auto !important;
+              margin-top: 0 !important;
+              max-width: none;
+              width: 100% !important;
+            }
+            .tp-course-details2-widget-child {
+              position: static !important;
+              width: 100%;
+            }
+          }
+ 
 
           /* RTL support */
           [dir="rtl"] .chips-wrapper {

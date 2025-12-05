@@ -291,7 +291,7 @@ export default function KnowledgePage({ params }: Props) {
           
           {/* Header */}
           <div className={`${isRTL ? 'text-right' : 'text-start'} mb-4 w-full`}    data-aos="fade-down">
-            <div className="flex-row gap-3 sm:gap-4 flex-wrap sm:flex-nowrap sm:flex max-w-80-per px-4" >
+            <div className="flex-row gap-3 sm:gap-4 flex-wrap sm:flex-nowrap sm:flex lg:max-w-80-per px-4" >
               <div className="mb-4 mt-1 hidden sm:block">
                 
                 {knowledge.type === 'data' && <div className="bg-white p-2 sm:p-3 rounded flex items-center justify-center"><span className="hidden sm:block"><DataIcon width={40} height={40} /></span><span className="sm:hidden"><DataIcon width={30} height={30} /></span></div>}
@@ -323,7 +323,7 @@ export default function KnowledgePage({ params }: Props) {
               </div>
               <div className="flex flex-col items-start">
                 <div className="flex flex-col items-start mb-6 sm:mb-10">
-                  <h3 className={`text-3xl  md:text-4xl ${isRTL ? 'bg-gradient-to-l from-blue-400 to-teal-500' : 'bg-gradient-to-r from-blue-500 to-teal-400'} pt-4 font-extrabold text-transparent bg-clip-text`} style={{wordBreak: 'break-word'}}>
+                  <h3 className={`text-3xl  md:text-4xl ${isRTL ? 'bg-gradient-to-l from-blue-400 to-teal-500' : 'bg-gradient-to-r from-blue-500 to-teal-400'} pt-4 font-extrabold text-transparent bg-clip-text w-full lg:w-auto`} style={{wordBreak: 'break-word'}}>
                     {knowledge.title}
                   </h3>
                   
