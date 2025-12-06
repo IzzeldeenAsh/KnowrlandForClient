@@ -18,6 +18,7 @@ import ConditionalAuthBanner from '@/components/ui/conditional-auth-banner';
 import { GlobalProfileProvider } from '@/components/auth/GlobalProfileProvider';
 import GlobalAuthHandler from '@/components/auth/GlobalAuthHandler';
 import RoleGuard from '@/components/auth/RoleGuard';
+import AnalyticsProvider from '@/app/analytics-provider';
 
 
 const almarai = Almarai({
@@ -38,7 +39,7 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
   const locale = resolvedParams.locale;
   const isArabic = locale === 'ar';
   
-  const baseUrl = 'http://insightabusiness.com';
+  const baseUrl = 'https://insightabusiness.com';
   
   return {
     metadataBase: new URL(baseUrl),
@@ -152,7 +153,11 @@ export default async function RootLayout({
               window.dataLayer = window.dataLayer || [];
               function gtag(){dataLayer.push(arguments);}
               gtag('js', new Date());
-              gtag('config', 'G-R1XT5PMHG0');
+              gtag('config', 'G-R1XT5PMHG0', {
+                page_path: window.location.pathname,
+                page_location: window.location.href,
+                send_page_view: false
+              });
             `,
           }}
         />
@@ -214,6 +219,7 @@ export default async function RootLayout({
                 <LoadingProvider>
                   <GlobalProfileProvider>
                     <RoleGuard>
+                      <AnalyticsProvider />
                       <GlobalAuthHandler />
                       <ClientLogoutHandler />
                       <Header />
