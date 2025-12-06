@@ -1,5 +1,5 @@
 import { Metadata } from 'next'
-
+import { generateProfileStructuredData } from '@/utils/seo'
 interface ProfileLayoutProps {
   children: React.ReactNode
   params: Promise<{
@@ -204,6 +204,48 @@ export async function generateMetadata(
   };
 }
 
-export default function ProfileLayout({ children }: ProfileLayoutProps) {
-  return <>{children}</>;
+export default async function ProfileLayout({ 
+  children,
+  params 
+}: ProfileLayoutProps) {
+  const { uuid, locale } = await params;
+  
+  // Fetch profile data for structured data
+  let structuredDataScript = null;
+  try {
+    const profileData = await getProfileData(uuid, locale);
+    if (profileData) {
+      const structuredData = generateProfileStructuredData(
+        {
+          uuid: profileData.uuid,
+          name: profileData.company?.legal_name || profileData.name,
+          first_name: profileData.first_name,
+          last_name: profileData.last_name,
+          profile_photo_url: profileData.profile_photo_url,
+          bio: profileData.bio,
+          company: profileData.company,
+          roles: profileData.roles
+        },
+        locale
+      );
+      
+      structuredDataScript = (
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify(Object.values(structuredData).filter(Boolean))
+          }}
+        />
+      );
+    }
+  } catch (error) {
+    console.error('Error generating profile structured data:', error);
+  }
+  
+  return (
+    <>
+      {structuredDataScript}
+      {children}
+    </>
+  );
 }

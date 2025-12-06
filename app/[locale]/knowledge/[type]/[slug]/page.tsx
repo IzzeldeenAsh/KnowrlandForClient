@@ -3,7 +3,6 @@ import Breadcrumb from "@/components/ui/breadcrumb";
 import Image from "next/image";
 import { Metadata } from "next";
 import { generateKnowledgeMetadata, generateStructuredData } from '@/utils/seo';
-import { use } from "react";
 import { notFound } from "next/navigation";
 import { cookies } from "next/headers";
 import DataIcon from "@/components/icons/DataIcon";
@@ -139,7 +138,17 @@ async function fetchKnowledgeData(type: string, slug: string, locale: string = '
     }
   
     const data = await response.json();
-    console.log('Knowledge Data' , data)  
+    
+    // Validate response structure
+    if (!data || typeof data !== 'object') {
+      throw new Error('Invalid API response structure');
+    }
+    
+    // Ensure data property exists
+    if (!data.data) {
+      throw new Error('API response missing data property');
+    }
+    
     return data;
   } catch (error) {
     console.error("Error fetching knowledge data:", error);
@@ -209,13 +218,13 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   }
 }
 
-export default function KnowledgePage({ params }: Props) {
-  const resolvedParams = use(params);
+export default async function KnowledgePage({ params }: Props) {
+  const resolvedParams = await params;
   const { type, slug, locale } = resolvedParams;
   const isRTL = locale === 'ar';
   
-  // Get translations - use the use() hook instead of await since we're in a client component
-  const messages = use(getMessages(locale));
+  // Get translations
+  const messages = await getMessages(locale);
   
   // Translations
   const translations = {
@@ -227,9 +236,21 @@ export default function KnowledgePage({ params }: Props) {
   };
 
   // No try/catch here - let any errors be caught by the not-found page
-  // Use the use() hook instead of await since we're in a client component
-  const { data: knowledge } = use(fetchKnowledgeData(type, slug, locale));
-  const breadcrumbData = use(fetchBreadcrumb("knowledge", slug, locale));
+  const response = await fetchKnowledgeData(type, slug, locale);
+  
+  // Validate response structure
+  if (!response || !response.data) {
+    notFound();
+  }
+  
+  const knowledge = response.data;
+  
+  // Validate required knowledge properties
+  if (!knowledge || !knowledge.insighter) {
+    notFound();
+  }
+  
+  const breadcrumbData = await fetchBreadcrumb("knowledge", slug, locale);
   const breadcrumbItems = breadcrumbData.map((item, index) => ({
     label: index === breadcrumbData.length - 1 ? "" : item.label,
     href: item.url,
@@ -238,27 +259,40 @@ export default function KnowledgePage({ params }: Props) {
   // Generate structured data
   const structuredData = generateStructuredData(knowledge, locale, type, slug);
 
+  // Filter and organize structured data
+  const schemas = [
+    structuredData.article,
+    structuredData.product,
+    structuredData.organization,
+    structuredData.breadcrumb,
+    structuredData.course,
+    structuredData.learningResource,
+    structuredData.service,
+    structuredData.creativeWork,
+    structuredData.howTo
+  ].filter(Boolean);
+
   return (
     <>
-      {/* Structured Data */}
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{
-          __html: JSON.stringify([
-            structuredData.article,
-            structuredData.product,
-            structuredData.organization,
-            structuredData.breadcrumb
-          ].filter(Boolean))
-        }}
-      />
+      {/* Structured Data - Multiple schemas for better SEO */}
+      {schemas.map((schema, index) => (
+        <script
+          key={index}
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify(schema)
+          }}
+        />
+      ))}
       
-    <div className="min-h-screen bg-gray-50 relative" dir={isRTL ? 'rtl' : 'ltr' }>
+    <div className="min-h-screen bg-gray-50 relative" dir={isRTL ? 'rtl' : 'ltr'} lang={locale === 'ar' ? 'ar' : 'en'}>
       {/* Language mismatch notifier */}
-      <LanguageMismatchNotifier 
-        knowledgeLanguage={knowledge.language} 
-        currentLocale={locale} 
-      />
+      {knowledge?.language && (
+        <LanguageMismatchNotifier 
+          knowledgeLanguage={knowledge.language} 
+          currentLocale={locale} 
+        />
+      )}
       
       {/* Background decoration */}
       <div className="pointer-events-none absolute z-10 left-[10%] top-0 hidden md:block" aria-hidden="true">
@@ -268,20 +302,22 @@ export default function KnowledgePage({ params }: Props) {
           width={768}
           height={768}
           style={{ width: 'auto', height: 'auto' }}
-          alt="Stripes"
+          alt=""
+          aria-hidden="true"
           priority
         />
       </div>
       
       {/* Header Section */}
-      <div className="section-header px-4 sm:px-6 lg:px-8 py-6 sm:py-8 relative overflow-hidden rounded-lg">
+      <header className="section-header px-4 sm:px-6 lg:px-8 py-6 sm:py-8 relative overflow-hidden rounded-lg" role="banner">
         <Image
-          alt="Section background"
+          alt=""
           src="https://res.cloudinary.com/dsiku9ipv/image/upload/v1737266454/breadcrumb-bg-2_anwto8.png"
           fill
           className="object-cover z-0"
           priority
           sizes="100vw"
+          aria-hidden="true"
         />
         <div className="container mx-auto px-2 sm:px-4 relative z-10 mt-3 sm:mt-5">
           {/* Breadcrumb */}
@@ -323,16 +359,16 @@ export default function KnowledgePage({ params }: Props) {
               </div>
               <div className="flex flex-col items-start">
                 <div className="flex flex-col items-start mb-6 sm:mb-10">
-                  <h3 className={`text-3xl  md:text-4xl ${isRTL ? 'bg-gradient-to-l from-blue-400 to-teal-500' : 'bg-gradient-to-r from-blue-500 to-teal-400'} pt-4 font-extrabold text-transparent bg-clip-text w-full lg:w-auto`} style={{wordBreak: 'break-word'}}>
+                  <h1 className={`text-3xl md:text-4xl ${isRTL ? 'bg-gradient-to-l from-blue-400 to-teal-500' : 'bg-gradient-to-r from-blue-500 to-teal-400'} pt-4 font-extrabold text-transparent bg-clip-text w-full lg:w-auto`} style={{wordBreak: 'break-word'}}>
                     {knowledge.title}
-                  </h3>
+                  </h1>
                   
                 </div>
               </div>
             </div>
             <div className="flex flex-wrap gap-4 sm:gap-6 text-sm mt-4">
               {
-              (knowledge.insighter.roles?.includes('company') || knowledge.insighter.roles?.includes('company-insighter')) ? (
+              (knowledge.insighter?.roles?.includes('company') || knowledge.insighter?.roles?.includes('company-insighter')) ? (
                 // Company display
                 <>
                   <div className="relative w-[40px] h-[40px] sm:w-[50px] sm:h-[50px]">
@@ -340,7 +376,7 @@ export default function KnowledgePage({ params }: Props) {
                       {knowledge.insighter.company?.logo ? (
                         <Image
                           src={knowledge.insighter.company.logo}
-                          alt={knowledge.insighter.company.legal_name || 'Company'}
+                          alt={`${knowledge.insighter.company.legal_name || 'Company'} logo - ${knowledge.title} publisher`}
                           fill={true}
                           sizes="(max-width: 640px) 40px, 50px"
                           className="rounded-full object-cover object-top"
@@ -350,7 +386,7 @@ export default function KnowledgePage({ params }: Props) {
                           <span className="text-sm sm:text-lg text-white font-semibold">
                             {(knowledge.insighter.company?.legal_name || 'C')
                               .split(" ")
-                              .map((word:any) => word[0])
+                              .map((word: string) => word[0])
                               .join("")
                               .toUpperCase()}
                           </span>
@@ -373,7 +409,7 @@ export default function KnowledgePage({ params }: Props) {
                         {knowledge.insighter.profile_photo_url ? (
                           <Image
                             src={knowledge.insighter.profile_photo_url}
-                            alt={knowledge.insighter.name}
+                            alt={`${knowledge.insighter.name} profile photo - ${knowledge.title} author`}
                             fill={true}
                             sizes="20px"
                             className="rounded-full object-cover object-top"
@@ -383,7 +419,7 @@ export default function KnowledgePage({ params }: Props) {
                             <span className="text-[6px] sm:text-[8px] text-white font-semibold">
                               {knowledge.insighter.name
                                 .split(" ")
-                                .map((word:any) => word[0])
+                                .map((word: string) => word[0])
                                 .join("")
                                 .toUpperCase()}
                             </span>
@@ -404,7 +440,7 @@ export default function KnowledgePage({ params }: Props) {
                       {knowledge.insighter.profile_photo_url ? (
                         <Image
                           src={knowledge.insighter.profile_photo_url}
-                          alt={knowledge.insighter.name}
+                          alt={`${knowledge.insighter.name} profile photo - ${knowledge.title} insighter`}
                           fill={true}
                           sizes="(max-width: 640px) 40px, 50px"
                           className="rounded-full object-cover object-top"
@@ -414,7 +450,7 @@ export default function KnowledgePage({ params }: Props) {
                           <span className="text-sm sm:text-lg text-white font-semibold">
                             {knowledge.insighter.name
                               .split(" ")
-                              .map((word:any) => word[0])
+                              .map((word: string) => word[0])
                               .join("")
                               .toUpperCase()}
                           </span>
@@ -449,8 +485,8 @@ export default function KnowledgePage({ params }: Props) {
                     {(() => {
                       // Calculate average rating, capping individual ratings at 5
                       const validRatings = knowledge.review
-                        .map((review: any) => Math.min(5, review.rate))
-                        .filter((rate: number) => !isNaN(rate));
+                        .map((review: { rate?: number }) => Math.min(5, review.rate || 0))
+                        .filter((rate: number) => !isNaN(rate) && rate > 0);
                       
                       const avgRating = validRatings.length > 0
                         ? validRatings.reduce((sum: number, rate: number) => sum + rate, 0) / validRatings.length
@@ -470,15 +506,20 @@ export default function KnowledgePage({ params }: Props) {
             </div>
           </div>
         </div>
-      </div>
+      </header>
       
       {/* Main Content */}
-        <div className="container mx-auto px-3 sm:px-4 pb-12 sm:pb-16 md:pb-20">
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-8">
-            <div className="lg:col-span-2">
-              <TabsContent knowledge={knowledge} knowledgeSlug={slug} />
-            </div>
-          <div className="lg:col-span-1">
+      <main className="container mx-auto px-3 sm:px-4 pb-12 sm:pb-16 md:pb-20" role="main">
+        <article itemScope itemType="https://schema.org/Article" className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-8">
+          <div className="lg:col-span-2">
+            <meta itemProp="headline" content={knowledge.title} />
+            <meta itemProp="description" content={knowledge.description} />
+            <meta itemProp="author" content={knowledge.insighter.company?.legal_name || knowledge.insighter.name} />
+            <meta itemProp="datePublished" content={knowledge.published_at} />
+            <meta itemProp="dateModified" content={knowledge.published_at} />
+            <TabsContent knowledge={knowledge} knowledgeSlug={slug} />
+          </div>
+          <aside className="lg:col-span-1">
               <KnowledgeSideBox
                 total_price={knowledge.total_price}
                 documents={knowledge.documents}
@@ -498,9 +539,9 @@ export default function KnowledgePage({ params }: Props) {
                 cover_start={knowledge.cover_start}
                 cover_end={knowledge.cover_end}
               />
-            </div>
-        </div>
-      </div>
+            </aside>
+        </article>
+      </main>
 
       <Footer />
     </div>

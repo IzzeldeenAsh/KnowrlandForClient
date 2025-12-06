@@ -33,14 +33,90 @@ const theme = createTheme({
   headings: { fontFamily: 'var(--font-almarai), sans-serif' },
 });
 
-export const metadata = {
-  title: 'Insighta - Buy & Sell Insights',
-  description: 'Insighta is a platform for buying and selling insight resources, insights and expertise.',
-};
+export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }): Promise<import('next').Metadata> {
+  const resolvedParams = await params;
+  const locale = resolvedParams.locale;
+  const isArabic = locale === 'ar';
+  
+  const baseUrl = 'http://insightabusiness.com';
+  
+  return {
+    metadataBase: new URL(baseUrl),
+    title: {
+      default: isArabic ? 'إنسايتا - شراء وبيع الرؤى' : 'Insighta - Buy & Sell Insights',
+      template: isArabic ? '%s | إنسايتا' : '%s | Insighta',
+    },
+    description: isArabic 
+      ? 'إنسايتا هي منصة لشراء وبيع موارد الرؤى والرؤى والخبرة. اكتشف رؤى الأعمال القيمة من الخبراء.'
+      : 'Insighta is a platform for buying and selling insight resources, insights and expertise. Discover valuable business insights from experts.',
+    keywords: isArabic
+      ? ['رؤى الأعمال', 'تحليل السوق', 'البحث', 'البيانات', 'التقارير', 'الدورات', 'الخبراء']
+      : ['business insights', 'market analysis', 'research', 'data', 'reports', 'courses', 'experts'],
+    authors: [{ name: 'Insighta Business' }],
+    creator: 'Insighta Business',
+    publisher: 'Insighta Business',
+    formatDetection: {
+      email: false,
+      address: false,
+      telephone: false,
+    },
+    openGraph: {
+      type: 'website',
+      locale: locale === 'ar' ? 'ar_SA' : 'en_US',
+      url: `${baseUrl}/${locale}`,
+      siteName: 'Insighta Business',
+      title: isArabic ? 'إنسايتا - شراء وبيع الرؤى' : 'Insighta - Buy & Sell Insights',
+      description: isArabic 
+        ? 'إنسايتا هي منصة لشراء وبيع موارد الرؤى والرؤى والخبرة.'
+        : 'Insighta is a platform for buying and selling insight resources, insights and expertise.',
+      images: [
+        {
+          url: `${baseUrl}/images/og-image.jpg`,
+          width: 1200,
+          height: 630,
+          alt: 'Insighta Business',
+        },
+      ],
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title: isArabic ? 'إنسايتا - شراء وبيع الرؤى' : 'Insighta - Buy & Sell Insights',
+      description: isArabic 
+        ? 'إنسايتا هي منصة لشراء وبيع موارد الرؤى والرؤى والخبرة.'
+        : 'Insighta is a platform for buying and selling insight resources, insights and expertise.',
+      images: [`${baseUrl}/images/og-image.jpg`],
+    },
+    alternates: {
+      canonical: `${baseUrl}/${locale}`,
+      languages: {
+        'en': `${baseUrl}/en`,
+        'ar': `${baseUrl}/ar`,
+        'x-default': `${baseUrl}/en`,
+      },
+    },
+    robots: {
+      index: true,
+      follow: true,
+      googleBot: {
+        index: true,
+        follow: true,
+        'max-video-preview': -1,
+        'max-image-preview': 'large',
+        'max-snippet': -1,
+      },
+    },
+    verification: {
+      // Add your verification codes here when available
+      // google: 'your-google-verification-code',
+      // yandex: 'your-yandex-verification-code',
+      // yahoo: 'your-yahoo-verification-code',
+    },
+  };
+}
 
 type LayoutProps = {
   children: React.ReactNode;
-  params: { locale: string };
+  params: Promise<{ locale: string }>;
 };
 
 export default async function RootLayout({
@@ -68,6 +144,18 @@ export default async function RootLayout({
   return (
     <html lang={locale} dir={direction} className="scroll-smooth">
       <head>
+        {/* Google tag (gtag.js) */}
+        <script async src="https://www.googletagmanager.com/gtag/js?id=G-R1XT5PMHG0"></script>
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              window.dataLayer = window.dataLayer || [];
+              function gtag(){dataLayer.push(arguments);}
+              gtag('js', new Date());
+              gtag('config', 'G-R1XT5PMHG0');
+            `,
+          }}
+        />
         {/* Add keenicons CSS */}
         <link rel="stylesheet" href="/keenicons.css" />
         <link rel="stylesheet" href="/assets/plugins/keenicons/duotone/style.css" />

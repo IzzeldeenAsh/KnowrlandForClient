@@ -680,7 +680,7 @@ export default function MeetTab({
 
         {!authChecked ? (
           <div className="flex justify-center items-center py-12">
-            <div className="animate-spin rounded-full h-10 w-10 border-t-2 border-b-2 border-blue-500"></div>
+            <div className="animate-spin rounded-full h-10 w-10 border-4 border-gray-200 border-t-blue-500"></div>
           </div>
         ) : !isAuthenticated ? (
           <div className="text-center py-16">
@@ -706,7 +706,7 @@ export default function MeetTab({
           </div>
         ) : loadingMeetings ? (
           <div className="flex justify-center items-center py-12">
-            <div className="animate-spin rounded-full h-10 w-10 border-t-2 border-b-2 border-blue-500"></div>
+            <div className="animate-spin rounded-full h-10 w-10 border-4 border-gray-200 border-t-blue-500"></div>
           </div>
         ) : meetingAvailability.length === 0 ? (
           <div className="text-center py-16">
@@ -1251,7 +1251,7 @@ export default function MeetTab({
 
                     {isPollingStatus && (
                       <div className="mt-4 text-center">
-                        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500 mx-auto mb-2"></div>
+                        <div className="animate-spin rounded-full h-8 w-8 border-4 border-gray-200 border-t-blue-500 mx-auto mb-2"></div>
                         <p className="text-sm text-gray-600">
                           {t("verifyingPayment")}
                         </p>

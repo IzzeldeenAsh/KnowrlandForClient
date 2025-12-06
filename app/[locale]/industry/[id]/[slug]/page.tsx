@@ -11,6 +11,7 @@ import Stripes from "@/public/images/stripes-dark.svg";
 import { getMessages } from '@/utils/get-messages'
 import { getApiUrl } from '@/app/config'
 import { IndustryDetails, IndustryChild } from '@/hooks/industries/types'
+import { generateIndustryStructuredData } from '@/utils/seo'
 
 interface Params {
   id: string;
@@ -78,9 +79,32 @@ export default async function IndustryPage({ params }: Props) {
   try {
     const { data: industry } = await fetchIndustryData(id, slug, locale)
     const breadcrumbItems = await fetchBreadcrumb('industry', parseInt(id), locale)
+    
+    // Generate structured data
+    const structuredData = generateIndustryStructuredData(
+      {
+        id: parseInt(id),
+        name: industry.name,
+        slug: slug,
+        children: industry.children
+      },
+      breadcrumbItems.map(item => ({ label: item.label, url: item.url })),
+      locale
+    )
 
     return (
       <>
+      {/* Structured Data */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify([
+            structuredData.breadcrumb,
+            structuredData.collectionPage,
+            structuredData.itemList
+          ].filter(Boolean))
+        }}
+      />
       <div className="relative z-10 max-w-6xl relative mx-auto  w-full ">
       <div
         className="pointer-events-none absolute z-10 -translate-x-1/2 transform hidden md:block"

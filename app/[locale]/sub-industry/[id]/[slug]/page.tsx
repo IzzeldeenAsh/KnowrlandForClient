@@ -10,6 +10,7 @@ import Stripes from "@/public/images/stripes-dark.svg";
 import { getMessages } from '@/utils/get-messages'
 import { getApiUrl } from '@/app/config'
 import { SubIndustryDetails, TopicWithKnowledge } from '@/hooks/industries/types'
+import { generateTopicStructuredData } from '@/utils/seo'
 
 interface Params {
   id: string;
@@ -81,9 +82,29 @@ export default async function SubIndustryPage({ params }: Props) {
       label: item.label,
       href: item.url
     }))
+    
+    // Generate structured data
+    const structuredData = generateTopicStructuredData(
+      {
+        id: parseInt(id),
+        name: subIndustry.name,
+        slug: slug,
+        description: `Detailed analysis and insights about ${subIndustry.name} sub-industry`
+      },
+      breadcrumbData.map(item => ({ label: item.label, url: item.url })),
+      locale,
+      'sub-industry'
+    )
 
     return (
       <>
+      {/* Structured Data */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify([structuredData.breadcrumb, structuredData.webPage])
+        }}
+      />
       
         <div className="relative z-10 max-w-6xl relative mx-auto  w-full ">
       <div

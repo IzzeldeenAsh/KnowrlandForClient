@@ -8,13 +8,29 @@ import Clients from '@/components/clients'
 import Features02 from '@/components/features-02'
 import TestimonialsCarousel from '@/components/testimonials-carousel'
 import Cta from '@/components/cta'
-import { useTranslations } from 'next-intl'
 import Features from '@/components/features'
+import { generateOrganizationSchema, generateWebSiteSchema } from '@/utils/seo'
 
-export default function Home() {
-  const t = useTranslations()
+type HomeProps = {
+  params: Promise<{ locale: string }>
+}
+
+export default async function Home({ params }: HomeProps) {
+  const resolvedParams = await params
+  const locale = resolvedParams.locale || 'en'
+  
+  const organizationSchema = generateOrganizationSchema(locale)
+  const webSiteSchema = generateWebSiteSchema(locale)
+  
   return (
     <>
+      {/* Structured Data */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify([organizationSchema, webSiteSchema])
+        }}
+      />
       <Hero />
       <TestimonialsCarousel />
       <Features/>
