@@ -237,3 +237,6 @@ Structured data is generated server-side using:
 - Error handling prevents build failures if data is missing
 - Structured data complements existing metadata tags
 
+
+
+

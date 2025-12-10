@@ -1,0 +1,81 @@
+Arguments: 
+  /Users/izzeddinashour/.nvm/versions/node/v22.16.0/bin/node /usr/local/bin/yarn add next@15.0.5
+
+PATH: 
+  /Users/izzeddinashour/.codeium/windsurf/bin:/Users/izzeddinashour/.nvm/versions/node/v22.16.0/bin:/Users/izzeddinashour/.npm-global/bin:/opt/homebrew/lib/ruby/gems/3.3.0/gems/cocoapods-1.15.2/lib/cocoapods.rb:/usr/local/opt/postgresql/bin:/Users/izzeddinashour/.gem/bin:/Library/Java/JavaVirtualMachines/jdk-17.jdk/Contents/Home/bin:/Library/Frameworks/Python.framework/Versions/3.12/bin:/opt/homebrew/bin:/opt/homebrew/sbin:/usr/local/bin:/System/Cryptexes/App/usr/bin:/usr/bin:/bin:/usr/sbin:/sbin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/local/bin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/bin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/appleinternal/bin:/opt/pmk/env/global/bin:/Library/Apple/usr/bin:/usr/local/share/dotnet:/Users/izzeddinashour/.dotnet/tools:/Library/Frameworks/Mono.framework/Versions/Current/Commands:/Users/izzeddinashour/.codeium/windsurf/bin:/Users/izzeddinashour/.nvm/versions/node/v22.16.0/bin:/Users/izzeddinashour/.npm-global/bin:/opt/homebrew/lib/ruby/gems/3.3.0/gems/cocoapods-1.15.2/lib/cocoapods.rb:/usr/local/opt/postgresql/bin:/Users/izzeddinashour/.gem/bin:/Library/Java/JavaVirtualMachines/jdk-17.jdk/Contents/Home/bin:/Library/Frameworks/Python.framework/Versions/3.12/bin:/Applications/apache-maven-3.9.6/bin:/usr/local/mysql-8.3.0-macos14-arm64/bin:/Users/izzeddinashour/Library/Android/sdk/tools/bin:/Users/izzeddinashour/Library/Android/sdk/platform-tools:/Users/izzeddinashour/Library/Android/sdk/emulator:/Users/izzeddinashour/.rvm/bin:/Applications/apache-maven-3.9.6/bin:/usr/local/mysql-8.3.0-macos14-arm64/bin:/Users/izzeddinashour/Library/Android/sdk/tools/bin:/Users/izzeddinashour/Library/Android/sdk/platform-tools:/Users/izzeddinashour/Library/Android/sdk/emulator:/Users/izzeddinashour/.rvm/bin
+
+Yarn version: 
+  1.22.19
+
+Node version: 
+  22.16.0
+
+Platform: 
+  darwin arm64
+
+Trace: 
+  Error: EACCES: permission denied, mkdir '/Users/izzeddinashour/Desktop/Production-KNOLDG/KnowrlandForClient/node_modules/@babel/helper-globals'
+
+npm manifest: 
+  {
+    "name": "stellar-next",
+    "version": "0.1.0",
+    "private": true,
+    "scripts": {
+      "dev": "next dev --turbopack",
+      "build": "next build",
+      "start": "NODE_ENV=development next start",
+      "start:prod": "next start",
+      "lint": "next lint",
+      "security:audit": "npm audit",
+      "security:fix": "npm audit fix",
+      "security:check": "npm audit --audit-level=moderate && node scripts/security-check.js",
+      "security:verify": "node scripts/verify-integrity.js"
+    },
+    "dependencies": {
+      "@emotion/react": "^11.14.0",
+      "@headlessui/react": "^2.1.2",
+      "@heroicons/react": "^2.2.0",
+      "@mantine/core": "^7.16.3",
+      "@mantine/hooks": "^7.16.3",
+      "@mdx-js/loader": "^3.0.1",
+      "@mdx-js/react": "^3.0.1",
+      "@next/mdx": "15.0.4",
+      "@stripe/react-stripe-js": "^3.9.2",
+      "@stripe/stripe-js": "^7.9.0",
+      "@tabler/icons-react": "^3.31.0",
+      "@types/mdx": "^2.0.13",
+      "@types/node": "^22.10.1",
+      "@types/react": "19.0.1",
+      "@types/react-dom": "19.0.1",
+      "aos": "^3.0.0-beta.6",
+      "axios": "^1.10.0",
+      "date-fns": "^4.1.0",
+      "next": "15.0.5",
+      "next-intl": "^3.26.3",
+      "next-mdx-remote": "^5.0.0",
+      "react": "19.0.0",
+      "react-dom": "19.0.0",
+      "react-scroll-parallax": "^3.4.5",
+      "rehype-pretty-code": "^0.14.0",
+      "shiki": "^1.10.1",
+      "stripe": "^18.5.0",
+      "swiper": "^8.4.7",
+      "typescript": "^5.3.3"
+    },
+    "devDependencies": {
+      "@tailwindcss/forms": "^0.5.7",
+      "@tailwindcss/typography": "^0.5.10",
+      "@types/aos": "^3.0.7",
+      "autoprefixer": "^10.4.16",
+      "cross-env": "^7.0.3",
+      "postcss": "^8.4.32",
+      "tailwindcss": "^3.3.6"
+    }
+  }
+
+yarn manifest: 
+  No manifest
+
+Lockfile: 
+  No lockfile
