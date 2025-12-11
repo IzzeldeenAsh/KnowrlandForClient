@@ -14,17 +14,28 @@ interface TopicCardProps {
 export default function TopicCard({ topic, locale, isRTL }: TopicCardProps) {
   const t = useTranslations();
   const isDisabled = topic.weight === 0;
+  const isArabicFirstWord = (text: string): boolean => {
+    if (!text) return false;
+    const firstWord = text.trim().split(/\s+/)[0] || '';
+    for (let i = 0; i < firstWord.length; i++) {
+      const ch = firstWord[i];
+      if (/[\u0600-\u06FF]/.test(ch)) return true;
+      if (/[A-Za-z0-9]/.test(ch)) return false;
+    }
+    return false;
+  };
+  const isTopicNameRTL = isRTL || isArabicFirstWord(topic.name);
 
   return (
     <div className={`relative group bg-gradient-to-br from-white to-slate-50 rounded-sm p-6 shadow-md border border-slate-100 h-full flex flex-col ${!isDisabled ? 'hover:shadow-lg hover:border-blue-100 hover:from-white hover:to-blue-50 transition-all duration-300 cursor-pointer' : 'opacity-50 cursor-not-allowed'}`}>
       <div className="space-y-2 flex-grow">
-        <div className="flex items-center gap-2">
+        <div className={`flex items-center gap-2 ${isTopicNameRTL ? 'flex-row-reverse text-right' : 'text-left'}`} dir={isTopicNameRTL ? 'rtl' : 'ltr'}>
           <FolderIcon 
             width={20} 
             height={20} 
             className={`${!isDisabled ? 'text-blue-500' : 'text-gray-400'}`} 
           />
-          <h3 className={`text-base font-bold ${!isDisabled ? `text-transparent ${isRTL ? 'bg-gradient-to-l from-blue-400 to-teal-500' : 'bg-gradient-to-r from-blue-500 to-teal-400'} bg-clip-text` : 'text-gray-900'}`}>
+          <h3 className={`text-base font-bold ${!isDisabled ? `text-transparent ${isTopicNameRTL ? 'bg-gradient-to-l from-blue-400 to-teal-500' : 'bg-gradient-to-r from-blue-500 to-teal-400'} bg-clip-text` : 'text-gray-900'}`}>
             {topic.name}
             {isDisabled && <span className="ml-2 text-xs text-gray-500"></span>}
           </h3>
@@ -36,15 +47,27 @@ export default function TopicCard({ topic, locale, isRTL }: TopicCardProps) {
               { (locale === 'ar' ? 'المعرفة:' : 'Insights:')}
             </Text>
             <ul className="space-y-1">
-              {topic.knowledge.map((item, index) => (
-                <li
-                  key={`${item.id}-${index}`}
-                  className="text-sm text-gray-700 flex items-center"
-                >
-                  <span className={isRTL ? "ml-2" : "mr-2"}>•</span>
-                  <span>{item.title}</span>
-                </li>
-              ))}
+              {topic.knowledge.map((item, index) => {
+                const itemRTL = isRTL || isArabicFirstWord(item.title);
+                return (
+                  <li
+                    key={`${item.id}-${index}`}
+                    className={`text-sm text-gray-700 flex items-center ${itemRTL ? 'text-right' : 'text-left'}`}
+                  >
+                    {itemRTL ? (
+                      <>
+                        <span dir="rtl" className="break-words">{item.title}</span>
+                        <span className="ml-2">•</span>
+                      </>
+                    ) : (
+                      <>
+                        <span className="mr-2">•</span>
+                        <span dir="ltr" className="break-words">{item.title}</span>
+                      </>
+                    )}
+                  </li>
+                );
+              })}
             </ul>
           </>
         ) : (

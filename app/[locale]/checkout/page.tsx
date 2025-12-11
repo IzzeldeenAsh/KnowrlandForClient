@@ -82,7 +82,11 @@ export default function CheckoutPage() {
   const toast = useToast();
 
   // Hooks
-  const { user } = useUserProfile();
+  const { user, roles } = useUserProfile();
+  const isClientOnly =
+    Array.isArray(roles) &&
+    roles.includes("client") &&
+    !roles.some((r) => ["insighter", "company", "company-insighter", "admin"].includes(r));
 
   const slug = searchParams.get("slug") || "";
   const documentIds =
@@ -708,61 +712,62 @@ export default function CheckoutPage() {
                     </Text>
 
                     <Stack gap="md">
-                      {/* Wallet Method */}
-                      <div>
-                        <div
-                          className={`${styles.paymentMethodCard} ${
-                            paymentMethod === "manual" ? styles.selected : ""
-                          } ${walletBalance < totalPrice ? styles.disabled : ""}`}
-                          onClick={() =>
-                            walletBalance >= totalPrice &&
-                            setPaymentMethod("manual")
-                          }
-                        >
-                          <Group gap="lg" align="center">
-                            <div className={styles.methodCheckbox}>
-                              <Checkbox
-                                checked={paymentMethod === "manual"}
-                                onChange={() =>
-                                  walletBalance >= totalPrice &&
-                                  setPaymentMethod("manual")
-                                }
-                                disabled={walletBalance < totalPrice}
-                                size="md"
-                              />
-                            </div>
-                            <div
-                              style={{
-                                width: 40,
-                                height: 40,
-                                display: "flex",
-                                alignItems: "center",
-                                justifyContent: "center",
-                              }}
-                            >
-                              <Image
-                                src="/images/wallet-icon.svg"
-                                alt="Insighta Wallet"
-                                width={32}
-                                height={32}
-                              />
-                            </div>
-                            <div style={{ flex: 1 }}>
-                              <Text fw={500}>{translations.InsightaWallet}</Text>
-                              <Text size="sm" fw={600} c={walletBalance < totalPrice ? "red" : "green"} mt={2}>
-                                {isRTL ? "الرصيد المتاح: " : "Available Balance: "}
-                                {formatCurrency(walletBalance)}
-                              </Text>
-                              {walletBalance < totalPrice && (
-                                <Text size="xs" c="red">
-                                  {translations.insufficientBalance}
+                      {/* Wallet Method (hidden for client-only users) */}
+                      {!isClientOnly && (
+                        <div>
+                          <div
+                            className={`${styles.paymentMethodCard} ${
+                              paymentMethod === "manual" ? styles.selected : ""
+                            } ${walletBalance < totalPrice ? styles.disabled : ""}`}
+                            onClick={() =>
+                              walletBalance >= totalPrice &&
+                              setPaymentMethod("manual")
+                            }
+                          >
+                            <Group gap="lg" align="center">
+                              <div className={styles.methodCheckbox}>
+                                <Checkbox
+                                  checked={paymentMethod === "manual"}
+                                  onChange={() =>
+                                    walletBalance >= totalPrice &&
+                                    setPaymentMethod("manual")
+                                  }
+                                  disabled={walletBalance < totalPrice}
+                                  size="md"
+                                />
+                              </div>
+                              <div
+                                style={{
+                                  width: 40,
+                                  height: 40,
+                                  display: "flex",
+                                  alignItems: "center",
+                                  justifyContent: "center",
+                                }}
+                              >
+                                <Image
+                                  src="/images/wallet-icon.svg"
+                                  alt="Insighta Wallet"
+                                  width={32}
+                                  height={32}
+                                />
+                              </div>
+                              <div style={{ flex: 1 }}>
+                                <Text fw={500}>{translations.InsightaWallet}</Text>
+                                <Text size="sm" fw={600} c={walletBalance < totalPrice ? "red" : "green"} mt={2}>
+                                  {isRTL ? "الرصيد المتاح: " : "Available Balance: "}
+                                  {formatCurrency(walletBalance)}
                                 </Text>
-                              )}
-                            </div>
-                          </Group>
+                                {walletBalance < totalPrice && (
+                                  <Text size="xs" c="red">
+                                    {translations.insufficientBalance}
+                                  </Text>
+                                )}
+                              </div>
+                            </Group>
+                          </div>
                         </div>
-
-                      </div>
+                      )}
 
                       {/* Stripe Method */}
                       <div

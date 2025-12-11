@@ -166,10 +166,10 @@ export default function MeetTab({
   const { roles } = useUserProfile();
 
   // Check if user is client-only (has "client" role but not insighter, company, or company-insighter)
-  const isClientOnlyUser = roles?.includes("client") &&
-    !roles?.includes("insighter") &&
-    !roles?.includes("company") &&
-    !roles?.includes("company-insighter");
+  const isClientOnlyUser =
+    Array.isArray(roles) &&
+    roles.includes("client") &&
+    !roles.some((r) => ["insighter", "company", "company-insighter", "admin"].includes(r));
 
   // Modal and booking states
   const [isBookingModalOpen, setIsBookingModalOpen] = useState(false);
@@ -1048,72 +1048,70 @@ export default function MeetTab({
 
                     {/* Payment methods in one row */}
                     <div className="flex flex-col gap-3">
-                      {/* Insighta Wallet Option */}
-                      <div
-                        className={`border rounded-lg p-4 cursor-pointer transition-all min-h-[72px] ${
-                          paymentMethod === "manual"
-                            ? "border-blue-500 bg-blue-50 dark:bg-blue-900/20"
-                            : "border-gray-200 dark:border-slate-600 hover:border-gray-300 dark:hover:border-slate-500"
-                        } ${
-                          isClientOnlyUser || walletBalance < parseFloat(selectedMeetingTime.rate)
-                            ? "opacity-50 cursor-not-allowed"
-                            : ""
-                        }`}
-                        onClick={() => {
-                          if (!isClientOnlyUser && walletBalance >= parseFloat(selectedMeetingTime.rate)) {
-                            setPaymentMethod("manual")
-                          }
-                        }}
-                      >
-                        <div className="flex items-center justify-center  gap-4 h-full">
-                          <input
-                            type="radio"
-                            name="paymentMethod"
-                            value="manual"
-                            checked={paymentMethod === "manual"}
-                            disabled={isClientOnlyUser || walletBalance < parseFloat(selectedMeetingTime.rate)}
-                            onChange={() => {
-                              if (!isClientOnlyUser && walletBalance >= parseFloat(selectedMeetingTime.rate)) {
-                                setPaymentMethod("manual")
-                              }
-                            }}
-                            className="w-4 h-4 flex-shrink-0"
-                          />
-                          <div className="flex-1">
-                            <div className="flex items-center justify-between">
-                              <div className="font-medium text-sm text-gray-800 dark:text-gray-200">
-                                {locale.startsWith('ar') ? 'محفظة إنسايتا' : 'Insighta Wallet'}
-                              </div>
-                              <div className="flex items-center gap-3">
-                                <div className="w-8 h-8 flex items-center justify-center flex-shrink-0">
-                                  <IconWallet
-                                    size={24}
-                                    color="#1BC653"
-                                  />
+                      {/* Insighta Wallet Option (hidden for client-only users) */}
+                      {!isClientOnlyUser && (
+                        <div
+                          className={`border rounded-lg p-4 cursor-pointer transition-all min-h-[72px] ${
+                            paymentMethod === "manual"
+                              ? "border-blue-500 bg-blue-50 dark:bg-blue-900/20"
+                              : "border-gray-200 dark:border-slate-600 hover:border-gray-300 dark:hover:border-slate-500"
+                          } ${
+                            walletBalance < parseFloat(selectedMeetingTime.rate)
+                              ? "opacity-50 cursor-not-allowed"
+                              : ""
+                          }`}
+                          onClick={() => {
+                            if (walletBalance >= parseFloat(selectedMeetingTime.rate)) {
+                              setPaymentMethod("manual")
+                            }
+                          }}
+                        >
+                          <div className="flex items-center justify-center  gap-4 h-full">
+                            <input
+                              type="radio"
+                              name="paymentMethod"
+                              value="manual"
+                              checked={paymentMethod === "manual"}
+                              disabled={walletBalance < parseFloat(selectedMeetingTime.rate)}
+                              onChange={() => {
+                                if (walletBalance >= parseFloat(selectedMeetingTime.rate)) {
+                                  setPaymentMethod("manual")
+                                }
+                              }}
+                              className="w-4 h-4 flex-shrink-0"
+                            />
+                            <div className="flex-1">
+                              <div className="flex items-center justify-between">
+                                <div className="font-medium text-sm text-gray-800 dark:text-gray-200">
+                                  {locale.startsWith('ar') ? 'محفظة إنسايتا' : 'Insighta Wallet'}
                                 </div>
-                                <div className="text-right">
-                                  <div className="text-sm font-semibold text-gray-700 dark:text-gray-300">
-                                    ${walletBalance.toFixed(2)}
+                                <div className="flex items-center gap-3">
+                                  <div className="w-8 h-8 flex items-center justify-center flex-shrink-0">
+                                    <IconWallet
+                                      size={24}
+                                      color="#1BC653"
+                                    />
                                   </div>
-                                  {isClientOnlyUser ? (
-                                    <div className="text-xs text-blue-500 font-medium">
-                                      {locale.startsWith('ar') ? 'قريباً' : 'Coming Soon'}
+                                  <div className="text-right">
+                                    <div className="text-sm font-semibold text-gray-700 dark:text-gray-300">
+                                      ${walletBalance.toFixed(2)}
                                     </div>
-                                  ) : walletBalance >= parseFloat(selectedMeetingTime.rate) ? (
-                                    <div className="text-xs text-green-600 dark:text-green-400 font-medium">
-                                      {locale.startsWith('ar') ? 'رصيد كافي' : 'Sufficient'}
-                                    </div>
-                                  ) : (
-                                    <div className="text-xs text-red-500 font-medium">
-                                      {locale.startsWith('ar') ? 'رصيد غير كافي' : 'Insufficient'}
-                                    </div>
-                                  )}
+                                    {walletBalance >= parseFloat(selectedMeetingTime.rate) ? (
+                                      <div className="text-xs text-green-600 dark:text-green-400 font-medium">
+                                        {locale.startsWith('ar') ? 'رصيد كافي' : 'Sufficient'}
+                                      </div>
+                                    ) : (
+                                      <div className="text-xs text-red-500 font-medium">
+                                        {locale.startsWith('ar') ? 'رصيد غير كافي' : 'Insufficient'}
+                                      </div>
+                                    )}
+                                  </div>
                                 </div>
                               </div>
                             </div>
                           </div>
                         </div>
-                      </div>
+                      )}
 
                       {/* Stripe Provider Option */}
                       <div

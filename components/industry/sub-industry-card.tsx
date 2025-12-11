@@ -12,6 +12,19 @@ interface SubIndustryCardProps {
 export default function SubIndustryCard({ child, locale, isRTL }: SubIndustryCardProps) {
   const t = useTranslations()
   const isDisabled = child.weight === 0
+  const isArabicFirstWord = (text: string): boolean => {
+    if (!text) return false
+    const firstWord = text.trim().split(/\s+/)[0] || ''
+    // Check if the first meaningful character of the first word is Arabic
+    for (let i = 0; i < firstWord.length; i++) {
+      const ch = firstWord[i]
+      if (/[\u0600-\u06FF]/.test(ch)) return true
+      // If we hit an ASCII letter/number, we can stop early
+      if (/[A-Za-z0-9]/.test(ch)) return false
+      // Otherwise skip punctuation/symbols and continue
+    }
+    return false
+  }
 
   return (
     <div 
@@ -27,14 +40,25 @@ export default function SubIndustryCard({ child, locale, isRTL }: SubIndustryCar
           <ul className="space-y-1">
             {child.topic.map((topic) => {
               const isTopicDisabled = topic.weight === 0
+              const isTopicRTL = isArabicFirstWord(topic.name)
+              const effectiveRTL = isRTL || isTopicRTL
               
               return (
                 <li 
                   key={topic.id} 
-                  className="text-sm text-gray-700 flex items-center"
+                  className={`text-sm text-gray-700 flex items-center ${effectiveRTL ? 'text-right' : 'text-left'}`}
                 >
-                  <span className={isRTL ? "ml-2" : "mr-2"}>•</span>
-                  <span className={isTopicDisabled ? "opacity-50" : ""}>{topic.name}</span>
+                  {effectiveRTL ? (
+                    <>
+                      <span dir="rtl" className={`${isTopicDisabled ? 'opacity-50' : ''} break-words`}>{topic.name}</span>
+                      <span className="ml-2">•</span>
+                    </>
+                  ) : (
+                    <>
+                      <span className="mr-2">•</span>
+                      <span dir="ltr" className={`${isTopicDisabled ? 'opacity-50' : ''} break-words`}>{topic.name}</span>
+                    </>
+                  )}
                 </li>
               )
             })}
