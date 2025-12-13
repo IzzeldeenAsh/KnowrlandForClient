@@ -178,7 +178,7 @@ export default function AuthCallback() {
     return null;
   };
 
-  // Helper function to get cookie value
+  // Helper function to get a cookie by name
   const getCookie = (name: string): string | null => {
     if (typeof document === 'undefined') return null;
     

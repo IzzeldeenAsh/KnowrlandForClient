@@ -9,6 +9,30 @@ function customMiddleware(request: NextRequest) {
   
   // Get the current pathname
   const pathname = request.nextUrl.pathname;
+  const search = request.nextUrl.search;
+
+  // Normalize callback URLs that embed the JWT in the path to use a query param instead.
+  // This avoids proxy/CDN issues with long/dotted path segments and is more interoperable.
+  // Examples handled:
+  // - /en/callback/<JWT>[?returnUrl=...]
+  // - /ar/callback/<JWT>/
+  // - /callback/<JWT>
+  const callbackWithTokenMatch = pathname.match(/^\/(en|ar)?\/?callback\/([^/?#]+)\/?$/);
+  if (callbackWithTokenMatch) {
+    const localeFromPath = callbackWithTokenMatch[1] || (preferredLanguage && ['en','ar'].includes(preferredLanguage) ? preferredLanguage : 'en');
+    const rawToken = callbackWithTokenMatch[2];
+    // Basic sanity check: looks like a JWT
+    if (rawToken.includes('.')) {
+      const url = new URL(`/${localeFromPath}/callback`, request.url);
+      // Preserve existing query params (e.g., returnUrl)
+      // and move the path token into ?token=
+      url.search = search; // start with existing params
+      const params = new URLSearchParams(url.search);
+      params.set('token', rawToken);
+      url.search = params.toString();
+      return NextResponse.redirect(url, { status: 307 });
+    }
+  }
   
   // Check if pathname already has a locale
   const pathnameHasLocale = routing.locales.some(
