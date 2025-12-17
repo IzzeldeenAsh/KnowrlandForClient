@@ -214,7 +214,7 @@ export default function ProfilePage() {
         if (entityType === "insighter") {
           // Try insighter API first
           let response = await fetch(
-            `https://api.insightabusiness.com/api/platform/insighter/profile/${uuid}`,
+            `https://api.foresighta.co/api/platform/insighter/profile/${uuid}`,
             {
               headers: {
                 "Content-Type": "application/json",
@@ -230,7 +230,7 @@ export default function ProfilePage() {
           } else {
             // Fall back to company API if insighter fails
             response = await fetch(
-              `https://api.insightabusiness.com/api/platform/company/profile/${uuid}`,
+              `https://api.foresighta.co/api/platform/company/profile/${uuid}`,
               {
                 headers: {
                   "Content-Type": "application/json",
@@ -278,7 +278,7 @@ export default function ProfilePage() {
         } else {
           // Default behavior: try company API first
           let response = await fetch(
-            `https://api.insightabusiness.com/api/platform/company/profile/${uuid}`,
+            `https://api.foresighta.co/api/platform/company/profile/${uuid}`,
             {
               headers: {
                 "Content-Type": "application/json",
@@ -323,7 +323,7 @@ export default function ProfilePage() {
           } else {
             // Try insighter API if company API fails
             response = await fetch(
-              `https://api.insightabusiness.com/api/platform/insighter/profile/${uuid}`,
+              `https://api.foresighta.co/api/platform/insighter/profile/${uuid}`,
               {
                 headers: {
                   "Content-Type": "application/json",
@@ -366,8 +366,8 @@ export default function ProfilePage() {
         // Now fetch the filtered data
         let url =
           entityType === "insighter"
-            ? `https://api.insightabusiness.com/api/platform/insighter/knowledge/${uuid}?page=${knowledgePage}&per_page=12`
-            : `https://api.insightabusiness.com/api/platform/company/knowledge/${uuid}?page=${knowledgePage}&per_page=12`;
+            ? `https://api.foresighta.co/api/platform/insighter/knowledge/${uuid}?page=${knowledgePage}&per_page=12`
+            : `https://api.foresighta.co/api/platform/company/knowledge/${uuid}?page=${knowledgePage}&per_page=12`;
 
         if (selectedType) {
           url += `&type=${selectedType}`;
@@ -406,7 +406,7 @@ export default function ProfilePage() {
       }
       try {
         const response = await fetch(
-          `https://api.insightabusiness.com/api/platform/insighter/profile/statistics/${uuid}`,
+          `https://api.foresighta.co/api/platform/insighter/profile/statistics/${uuid}`,
           {
             headers: {
               "Content-Type": "application/json",
@@ -446,7 +446,7 @@ export default function ProfilePage() {
       if (isAuth && token) {
         try {
           const response = await fetch(
-            "https://api.insightabusiness.com/api/account/profile",
+            "https://api.foresighta.co/api/account/profile",
             {
               headers: {
                 "Content-Type": "application/json",
@@ -539,7 +539,7 @@ export default function ProfilePage() {
       endDate.setFullYear(tomorrow.getFullYear() + 1);
       const endDateStr = endDate.toISOString().split("T")[0]; // YYYY-MM-DD format
       const response = await axios.post(
-        `https://api.insightabusiness.com/api/account/meeting/available/hours/${uuid}`,
+        `https://api.foresighta.co/api/account/meeting/available/hours/${uuid}`,
         {
           start_date: startDate,
           end_date: endDateStr,

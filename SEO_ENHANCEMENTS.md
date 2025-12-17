@@ -91,9 +91,9 @@ This document outlines the SEO improvements implemented for the Insighta Busines
 To verify the sitemap is working:
 1. Build the project: `npm run build`
 2. Start the server: `npm run start`
-3. Visit: `https://insightabusiness.com/sitemap.xml`
-4. Check robots.txt: `https://insightabusiness.com/robots.txt`
-5. Check manifest: `https://insightabusiness.com/manifest.json`
+3. Visit: `http://localhost:3000/sitemap.xml`
+4. Check robots.txt: `http://localhost:3000/robots.txt`
+5. Check manifest: `http://localhost:3000/manifest.json`
 
 ## Search Engine Submission
 
@@ -110,6 +110,9 @@ Submit the sitemap URL: `http://insightabusiness.com/sitemap.xml`
 - Dynamic routes are cached for 1 hour (`revalidate: 3600`) to improve performance
 - The sitemap is limited to the first 50 items per industry type to keep it manageable
 - Individual knowledge items are not included in the sitemap but can be discovered through internal links
+
+
+
 
 
 

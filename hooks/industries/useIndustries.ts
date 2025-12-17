@@ -15,7 +15,7 @@ const industriesCacheByLocale: Record<string, IndustriesCacheEntry> = {};
 const INDUSTRIES_CACHE_DURATION_MS = 60 * 60 * 1000; // 1 hour
 
 async function fetchIndustriesFromAPI(locale: string): Promise<Industry[]> {
-  const res = await fetch('https://api.insightabusiness.com/api/platform/industries/menu', {
+  const res = await fetch('https://api.foresighta.co/api/platform/industries/menu', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',

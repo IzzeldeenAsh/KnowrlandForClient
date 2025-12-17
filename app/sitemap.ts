@@ -1,7 +1,7 @@
 import { MetadataRoute } from 'next';
-import { getApiUrl } from './config';
+import { getApiUrl, publicBaseUrl } from './config';
 
-const DOMAIN = 'https://insightabusiness.com';
+const DOMAIN = publicBaseUrl;
 const LOCALES = ['en', 'ar'] as const;
 
 // Static routes that don't require dynamic data

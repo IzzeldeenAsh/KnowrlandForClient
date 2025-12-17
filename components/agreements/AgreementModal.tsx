@@ -1,7 +1,8 @@
 'use client'
 
 import React, { useEffect, useMemo, useState, useRef } from 'react';
-import { Modal, Button, Text, Group, Stack, ScrollArea, Loader, Alert } from '@mantine/core';
+import { Modal, Button, Text, Group, Stack, ScrollArea, Loader, Alert, ActionIcon } from '@mantine/core';
+import { IconPrinter } from '@tabler/icons-react';
 import { useRoleCheck } from '@/hooks/useRoleCheck';
 
 type AgreementType = 'insighter_agreement' | 'company_agreement';
@@ -111,7 +112,7 @@ const AgreementModal: React.FC<AgreementModalProps> = ({
       setError(null);
       setCanAccept(false);
       try {
-        const res = await fetch(`https://api.insightabusiness.com/api/common/setting/guideline/type/last/${computedAgreementType}`, {
+        const res = await fetch(`https://api.foresighta.co/api/common/setting/guideline/type/last/${computedAgreementType}`, {
           headers: {
             Accept: 'application/json',
             'Accept-Language': (locale as string) || 'en',
@@ -154,6 +155,62 @@ const AgreementModal: React.FC<AgreementModalProps> = ({
     };
   }, [html, opened, loading]);
 
+  const printTerms = () => {
+    const printContent = `
+      <html>
+        <head>
+          <title>${title}</title>
+          <style>
+            body {
+              font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+              margin: 20px;
+              line-height: 1.6;
+              color: #333;
+            }
+            h1, h2, h3, h4, h5, h6 {
+              margin-top: 1.5rem;
+              margin-bottom: 0.75rem;
+              font-weight: 700;
+            }
+            h1 { font-size: 1.75rem; }
+            h2 { font-size: 1.5rem; }
+            h3 { font-size: 1.25rem; }
+            p {
+              margin: 12px 0;
+              line-height: 1.75;
+            }
+            hr { margin: 16px 0; }
+            ul, ol {
+              padding-left: 1.25rem;
+              margin: 12px 0;
+            }
+            li { margin: 6px 0; }
+            blockquote {
+              margin: 12px 0;
+              padding: 8px 12px;
+              border-left: 3px solid #e5e7eb;
+              background: #fafafa;
+              border-radius: 6px;
+            }
+          </style>
+        </head>
+        <body ${isRTL ? 'dir="rtl"' : ''}>
+          <h1>${title}</h1>
+          ${html}
+        </body>
+      </html>
+    `;
+
+    const printWindow = window.open('', '_blank');
+    if (printWindow) {
+      printWindow.document.open();
+      printWindow.document.write(printContent);
+      printWindow.document.close();
+      printWindow.focus();
+      printWindow.print();
+    }
+  };
+
   const onAccept = async () => {
     if (submitting) return;
     const finalUuid = acceptUuid ?? serverUuid;
@@ -165,7 +222,7 @@ const AgreementModal: React.FC<AgreementModalProps> = ({
     setError(null);
     try {
       const token = getAuthToken();
-      const res = await fetch(`https://api.insightabusiness.com/api/account/agreement/accept/${finalUuid}`, {
+      const res = await fetch(`https://api.foresighta.co/api/account/agreement/accept/${finalUuid}`, {
         method: 'PUT',
         headers: {
           Accept: 'application/json',
@@ -189,7 +246,22 @@ const AgreementModal: React.FC<AgreementModalProps> = ({
     <Modal
       opened={opened}
       onClose={onClose}
-      title={<Text size="lg" fw={600}>{title}</Text>}
+      title={
+        <Group style={{ width: '100%' }}>
+          <Text size="lg" fw={600}>{title}</Text>
+          <div style={{ marginLeft: 'auto', marginRight: '8px' }}>
+            <ActionIcon
+              variant="subtle"
+              color="gray"
+              onClick={printTerms}
+              disabled={loading || !html}
+              size="sm"
+            >
+              <IconPrinter size={16} />
+            </ActionIcon>
+          </div>
+        </Group>
+      }
       centered
       size="xl"
       dir={isRTL ? 'rtl' : 'ltr'}
