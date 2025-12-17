@@ -8,7 +8,8 @@
         "tagline": "Beyond Research Boundaries",
         "title": "Insights and experts that lead your business to excellence.",
         "description":"Find data, reports, and subject matter experts, and more",
-        "searchPlaceholder": "Search in&nbsp;<strong>Insight</strong>&nbsp;or&nbsp;<strong>Insighter</strong>&nbsp;(Insight Expert)...",        "searchPlaceholderMobile":"Search in data, reports, insights...",
+        "searchPlaceholder": "Search&nbsp;<strong>Insight</strong>&nbsp;and&nbsp;<strong>Insighters</strong>&nbsp;(Insight Expert)...",        
+        "searchPlaceholderMobile":"Search in data, reports, insights...",
         "direction": "ltr"
     },
     "HeroInsighter":{
