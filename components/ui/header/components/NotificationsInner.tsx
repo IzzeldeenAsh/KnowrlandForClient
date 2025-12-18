@@ -256,7 +256,7 @@ export default function NotificationsInner({
     
     // New: Order notifications redirect to Sales page
     if (notification.type === 'order') {
-      window.location.href = 'https://app.insightabusiness.com/app/insighter-dashboard/sales'
+      window.location.href = 'https://app.insightabusiness.com/app/insighter-dashboard/sales?tab=2'
       return
     }
     
