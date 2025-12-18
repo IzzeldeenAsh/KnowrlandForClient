@@ -18,6 +18,9 @@ interface NotificationsInnerProps {
 // This matches the Angular notificationsBg pipe
 const getNotificationBg = (subType: string): string => {
   switch (subType) {
+    case 'order':
+    case 'knowledge': // used as sub_type for order notifications
+      return 'success';
     case 'activate_company':
       return 'success';
     case 'deactivate_company':
@@ -66,6 +69,9 @@ const getTailwindColor = (color: string): string => {
 // Helper function to get icon name based on notification sub_type (like the Angular notificationsIcons pipe)
 const getNotificationIconName = (subType: string): string => {
   switch (subType) {
+    case 'order':
+    case 'knowledge': // used as sub_type for order notifications
+      return 'duotune/finance/fin010.svg';
     case 'activate_company':
       return 'duotune/arrows/arr086.svg';
     case 'deactivate_company':
@@ -247,6 +253,12 @@ export default function NotificationsInner({
   const handleNotificationClick = async (notification: Notification) => {
     // Always mark the notification as read first and wait for it to complete
     await onNotificationClick(notification.id)
+    
+    // New: Order notifications redirect to Sales page
+    if (notification.type === 'order') {
+      window.location.href = 'https://app.insightabusiness.com/app/insighter-dashboard/sales'
+      return
+    }
     
     // Handle accept_knowledge notifications - redirect to insighter dashboard
     if(notification.sub_type.startsWith('client_meeting_reminder')){

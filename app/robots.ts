@@ -1,7 +1,8 @@
 import { MetadataRoute } from 'next';
+import { publicBaseUrl } from './config';
 
 export default function robots(): MetadataRoute.Robots {
-  const baseUrl = 'http://insightabusiness.com';
+  const baseUrl = publicBaseUrl;
   
   return {
     rules: [

@@ -50,6 +50,7 @@ export default function IndustryByTypePage({ params }: Props) {
   const slug = resolvedParams.slug;
   const locale = resolvedParams.locale || 'en';
   const t = useTranslations();
+  const isRtl = locale === 'ar';
 
   useEffect(() => {
     safeAOSInit({
@@ -117,7 +118,7 @@ export default function IndustryByTypePage({ params }: Props) {
              <span className={styles.typeLabel}>
                 {t(`typeLabel.${type}`)}
               </span>
-              <h3 className={styles.headerTitle}>
+              <h3 className={` text-transparent font-extrabold text-3xl ${isRtl ? 'bg-gradient-to-l from-blue-400 to-teal-500' : 'bg-gradient-to-r from-blue-500 to-teal-400'} bg-clip-text`}>
                 {industry?.name || 'Loading...'}
               </h3>
              
@@ -134,7 +135,7 @@ export default function IndustryByTypePage({ params }: Props) {
             </div>
           ) : (
             <div>
-            <h2 className="text-xl font-bold text-transparent bg-gradient-to-r from-blue-500 to-teal-400 bg-clip-text mb-8">
+            <h2 className={`text-xl font-bold text-transparent ${isRtl ? 'bg-gradient-to-l from-blue-400 to-teal-500' : 'bg-gradient-to-r from-blue-500 to-teal-400'} bg-clip-text mb-8`}>
               {locale === 'ar' ? 'الصناعات الفرعية' : 'Sub-industries:'}
             </h2>
               <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">

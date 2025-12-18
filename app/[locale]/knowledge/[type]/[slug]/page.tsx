@@ -17,6 +17,7 @@ import { StarIcon } from "@heroicons/react/20/solid";
 import TabsContent from "./TabsContent";
 import Stripes from "@/public/images/stripes-dark.svg";
 import { getMessages } from '@/utils/get-messages';
+import { publicBaseUrl } from '@/app/config';
 import Link from 'next/link';
 import { Rating, Text } from "@mantine/core";
 import LanguageMismatchNotifier from './LanguageMismatchNotifier';
@@ -166,7 +167,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     return generateKnowledgeMetadata(data, locale, type, slug);
   } catch (error) {
     const isRTL = locale === 'ar';
-    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://insightabusiness.com';
+    const baseUrl =  'https://insightabusiness.com';
     const defaultSocialImage = 'https://res.cloudinary.com/dsiku9ipv/image/upload/v1761746492/drilldown_1_cjpvli.jpg';
     const pageUrl = `${baseUrl}/${locale}/knowledge/${type}/${slug}`;
 
@@ -186,7 +187,9 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       metadataBase,
       title,
       description,
-      robots: { index: false, follow: false },
+      // Do not mark as noindex here. If the page truly doesn't exist,
+      // the route component will call notFound() and return a 404.
+      robots: { index: true, follow: true },
       alternates: {
         canonical: pageUrl,
       },

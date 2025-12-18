@@ -11,9 +11,17 @@ export const apiBaseUrl = isDevelopment
   ? 'https://api.insightabusiness.com' 
   : 'https://api.insightabusiness.com';
 
+// Public-facing base URL for this Next.js app (used for canonical, sitemap, robots)
+// Prefer NEXT_PUBLIC_BASE_URL if provided; otherwise fall back to sensible defaults
+export const publicBaseUrl: string =
+  (typeof process !== 'undefined' && 'https://insightabusiness.com')
+    ? process.env.NEXT_PUBLIC_BASE_URL!
+    : (isDevelopment ? 'https://insightabusiness.com' : 'https://insightabusiness.com');
+
+// (Unused at the moment) App URL helper for legacy clients; keep for compatibility
 export const appBaseUrl = isDevelopment 
-  ? 'https://app.insightabusiness.com' 
-  : 'https://app.insightabusiness.com';
+  ? 'https://insightabusiness.com' 
+  : 'https://insightabusiness.com';
 
 // Function to get full API URL with path
 export const getApiUrl = (path: string): string => {
@@ -22,7 +30,7 @@ export const getApiUrl = (path: string): string => {
 
 // Function to get full App URL with path
 export const getAppUrl = (path: string): string => {
-  return `${appBaseUrl}${path}`;
+  return `${publicBaseUrl}${path}`;
 };
 
 // Stripe configuration

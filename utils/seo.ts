@@ -1,4 +1,5 @@
 import { Metadata } from 'next';
+import { publicBaseUrl } from '@/app/config';
 
 export interface KnowledgeMetadata {
   id?: number;
@@ -48,14 +49,14 @@ export function generateKnowledgeMetadata(
   slug: string
 ): Metadata {
   const isRTL = locale === 'ar';
-  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://insightabusiness.com';
+  const baseUrl = 'https://insightabusiness.com';
   const defaultSocialImage = 'https://res.cloudinary.com/dsiku9ipv/image/upload/v1761651021/drilldown_l7cdf2.jpg';
   let metadataBase: URL | undefined;
 
   try {
     metadataBase = new URL(baseUrl);
   } catch (error) {
-    console.error('Invalid NEXT_PUBLIC_BASE_URL provided, falling back to default.', error);
+    console.error('Invalid base URL provided, falling back to default.', error);
     metadataBase = new URL('https://insightabusiness.com');
   }
 
@@ -145,9 +146,12 @@ export function generateKnowledgeMetadata(
     ...(isFree ? ['free', 'no cost'] : ['premium', 'paid'])
   ].filter(Boolean).slice(0, 20);
 
-  // Generate alternate languages
-  const alternateLanguages: Record<string, string> = {};
-  alternateLanguages[locale === 'ar' ? 'en' : 'ar'] = `${baseUrl}/${locale === 'ar' ? 'en' : 'ar'}/knowledge/${type}/${slug}`;
+  // Generate alternate languages (both locales + x-default)
+  const languageAlternates: Record<string, string> = {
+    en: `${baseUrl}/en/knowledge/${type}/${slug}`,
+    ar: `${baseUrl}/ar/knowledge/${type}/${slug}`,
+    'x-default': `${baseUrl}/en/knowledge/${type}/${slug}`,
+  };
 
   const openGraphImages = [
     {
@@ -195,7 +199,7 @@ export function generateKnowledgeMetadata(
     // Canonical URL
     alternates: {
       canonical: currentUrl,
-      languages: alternateLanguages,
+      languages: languageAlternates,
     },
 
     // Open Graph
@@ -204,7 +208,7 @@ export function generateKnowledgeMetadata(
       title,
       description,
       url: currentUrl,
-      siteName: 'INSIGHTA BUSINESS',
+      siteName: 'Insighta',
       locale: locale === 'ar' ? 'ar_SA' : 'en_US',
       
       // Article-specific tags
@@ -258,7 +262,7 @@ export function generateKnowledgeMetadata(
 }
 
 export function generateStructuredData(knowledge: KnowledgeMetadata, locale: string, type: string, slug: string) {
-  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://insightabusiness.com';
+  const baseUrl = 'https://insightabusiness.com';
   const currentUrl = `${baseUrl}/${locale}/knowledge/${type}/${slug}`;
   
   const avgRating = knowledge.review && knowledge.review.length > 0
@@ -294,11 +298,11 @@ export function generateStructuredData(knowledge: KnowledgeMetadata, locale: str
     },
     "publisher": {
       "@type": "Organization",
-      "name": "INSIGHTA BUSINESS",
+      "name": "Insighta",
       "url": baseUrl,
       "logo": {
         "@type": "ImageObject",
-        "url": `${baseUrl}/logo.png`
+        "url": `${baseUrl}/icon.png`
       }
     },
     "datePublished": knowledge.published_at,
@@ -386,7 +390,7 @@ export function generateStructuredData(knowledge: KnowledgeMetadata, locale: str
     },
     "publisher": {
       "@type": "Organization",
-      "name": "INSIGHTA BUSINESS"
+      "name": "Insighta"
     },
     ...(avgRating > 0 && knowledge.review && knowledge.review.length > 0 && {
       "aggregateRating": {
@@ -592,15 +596,15 @@ export function generateStructuredData(knowledge: KnowledgeMetadata, locale: str
 
 // Organization and WebSite Schema for Home Page
 export function generateOrganizationSchema(locale: string) {
-  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'http://insightabusiness.com';
+  const baseUrl = 'https://insightabusiness.com';
   
   return {
     "@context": "https://schema.org",
     "@type": "Organization",
-    "name": "Insighta Business",
-    "alternateName": "Insighta",
+    "name": "Insighta",
+    "alternateName": "إنسايتا",
     "url": baseUrl,
-    "logo": `${baseUrl}/logo.png`,
+    "logo": `${baseUrl}/icon.png`,
     "description": locale === 'ar' 
       ? "منصة لشراء وبيع موارد الرؤى والرؤى والخبرة"
       : "Platform for buying and selling insight resources, insights and expertise",
@@ -620,13 +624,14 @@ export function generateOrganizationSchema(locale: string) {
 
 // WebSite Schema with SearchAction
 export function generateWebSiteSchema(locale: string) {
-  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'http://insightabusiness.com';
+  const baseUrl = 'https://insightabusiness.com';
   
   return {
     "@context": "https://schema.org",
     "@type": "WebSite",
-    "name": "Insighta Business",
-    "url": `${baseUrl}/${locale}`,
+    "name": "Insighta",
+    "alternateName": "إنسايتا",
+    "url": baseUrl,
     "description": locale === 'ar'
       ? "منصة لشراء وبيع موارد الرؤى والرؤى والخبرة"
       : "Platform for buying and selling insight resources, insights and expertise",
@@ -641,10 +646,10 @@ export function generateWebSiteSchema(locale: string) {
     },
     "publisher": {
       "@type": "Organization",
-      "name": "Insighta Business",
+      "name": "Insighta",
       "logo": {
         "@type": "ImageObject",
-        "url": `${baseUrl}/logo.png`
+        "url": `${baseUrl}/icon.png`
       }
     }
   };
@@ -667,7 +672,7 @@ export function generateIndustryStructuredData(
   breadcrumbItems: Array<{ label: string; url: string }>,
   locale: string
 ) {
-  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'http://insightabusiness.com';
+  const baseUrl = 'https://insightabusiness.com';
   const currentUrl = `${baseUrl}/${locale}/industry/${industry.id}/${industry.slug}`;
   
   // ItemList Schema for sub-industries
@@ -748,7 +753,7 @@ export function generateProfileStructuredData(
   profile: ProfileData,
   locale: string
 ) {
-  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'http://insightabusiness.com';
+  const baseUrl = 'https://insightabusiness.com';
   const profileUrl = `${baseUrl}/${locale}/profile/${profile.uuid}`;
   
   // If it's a company profile
@@ -827,7 +832,7 @@ export function generateTopicStructuredData(
   locale: string,
   type: 'topic' | 'sub-industry'
 ) {
-  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'http://insightabusiness.com';
+  const baseUrl = 'https://insightabusiness.com';
   const currentUrl = `${baseUrl}/${locale}/${type === 'topic' ? 'topic' : 'sub-industry'}/${topic.id}/${topic.slug}`;
   
   // BreadcrumbList Schema
