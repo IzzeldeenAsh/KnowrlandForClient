@@ -113,7 +113,7 @@ async function fetchKnowledgeData(type: string, slug: string, locale: string = '
     // Note: localStorage cleanup is handled by AuthHandler component
     
     const response = await fetch(
-      `https://api.foresighta.co/api/platform/industries/knowledge/${slug}`,
+      `https://api.insightabusiness.com/api/platform/industries/knowledge/${slug}`,
       {
         method: "GET",
         headers,

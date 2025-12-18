@@ -653,6 +653,39 @@ const FilterBox: React.FC<FilterBoxProps> = React.memo(({
     setFilteredHsCodes(filtered);
   }, [hsCodeSearchTerm, hsCodes]);
 
+  // Group industry leaf nodes by their parent label (top-level parent)
+  const groupedIndustryLeaves = useMemo(() => {
+    // Build a quick lookup for filtered leaf keys
+    const filteredKeys = new Set(filteredIndustryLeafNodes.map((n) => n.key));
+    type Group = { parentKey: number; parentLabel: string; children: IndustryNode[] };
+    const groups: Group[] = [];
+
+    // Collect leaf descendants of a parent that are included in the filtered list
+    const collectLeaves = (node: IndustryNode, acc: IndustryNode[]) => {
+      if (node.children.length === 0) {
+        if (filteredKeys.has(node.key)) acc.push(node);
+        return;
+      }
+      for (const child of node.children) {
+        collectLeaves(child, acc);
+      }
+    };
+
+    for (const parent of industries) {
+      const leaves: IndustryNode[] = [];
+      collectLeaves(parent, leaves);
+      if (leaves.length > 0) {
+        groups.push({
+          parentKey: parent.key,
+          parentLabel: parent.label,
+          children: leaves,
+        });
+      }
+    }
+
+    return groups;
+  }, [industries, filteredIndustryLeafNodes]);
+
   // Render functions
   const renderLeafNodes = () => {
     if (dataLoading.isicCodes) {
@@ -759,24 +792,30 @@ const FilterBox: React.FC<FilterBoxProps> = React.memo(({
           <span className="flex-1 font-medium">{locale === 'ar' ? 'الكل' : 'All'}</span>
         </button>
 
-        {filteredIndustryLeafNodes.map((node) => {
-          const isSelected = selectedIndustry?.id === node.key;
-
-          return (
-            <button
-              key={node.key}
-              className={`py-2 px-3 rounded-md text-sm flex items-start text-start w-full transition-colors ${
-                isSelected
-                  ? 'bg-blue-50 border-blue-200 text-blue-800 font-medium'
-                  : 'hover:bg-gray-100 border border-gray-200'
-              } ${isDisabled ? 'opacity-50 cursor-not-allowed' : ''}`}
-              onClick={() => !isDisabled && handleSelectIndustry(node)}
-              disabled={isDisabled}
-            >
-              <span className="flex-1">{node.label}</span>
-            </button>
-          );
-        })}
+        {groupedIndustryLeaves.map((group) => (
+          <div key={group.parentKey} className="mt-2">
+            <div className="text-blue-600 font-semibold text-xs mb-1 px-1 cursor-default select-none">
+              {group.parentLabel}
+            </div>
+            {group.children.map((node) => {
+              const isSelected = selectedIndustry?.id === node.key;
+              return (
+                <button
+                  key={node.key}
+                  className={`py-2 px-3 mb-2 rounded-md text-sm flex items-start text-start w-full transition-colors ${
+                    isSelected
+                      ? 'bg-blue-50 border-blue-200 text-blue-800 font-medium'
+                      : 'hover:bg-gray-100 border border-gray-200'
+                  } ${isDisabled ? 'opacity-50 cursor-not-allowed' : ''}`}
+                  onClick={() => !isDisabled && handleSelectIndustry(node)}
+                  disabled={isDisabled}
+                >
+                  <span className="flex-1">{node.label}</span>
+                </button>
+              );
+            })}
+          </div>
+        ))}
       </div>
     );
   };

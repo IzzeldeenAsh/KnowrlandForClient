@@ -27,7 +27,7 @@ async function getProfileData(uuid: string, locale: string): Promise<ProfileData
   try {
     // Try insighter API first
     let response = await fetch(
-      `https://api.foresighta.co/api/platform/insighter/profile/${uuid}`,
+      `https://api.insightabusiness.com/api/platform/insighter/profile/${uuid}`,
       {
         headers: {
           'Content-Type': 'application/json',
@@ -45,7 +45,7 @@ async function getProfileData(uuid: string, locale: string): Promise<ProfileData
 
     // Fall back to company API
     response = await fetch(
-      `https://api.foresighta.co/api/platform/company/profile/${uuid}`,
+      `https://api.insightabusiness.com/api/platform/company/profile/${uuid}`,
       {
         headers: {
           'Content-Type': 'application/json',
@@ -126,7 +126,7 @@ export async function generateMetadata(
     : `${profileName} - Profile | ${platformText}`;
 
   // Construct the profile URL
-  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
+  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://insightabusiness.com';
   const profileUrl = `${baseUrl}/${locale}/profile/${uuid}`;
   const absoluteProfileImage = profileImage
     ? (profileImage.startsWith('http')
