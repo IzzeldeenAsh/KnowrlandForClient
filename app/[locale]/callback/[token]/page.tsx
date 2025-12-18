@@ -1,10 +1,11 @@
 'use client';
 
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useRouter, useParams, useSearchParams } from 'next/navigation';
 import { useGlobalProfile } from '@/components/auth/GlobalProfileProvider';
 import FullScreenLoader from '@/components/ui/FullScreenLoader';
 import { useLocale } from 'next-intl';
+import AgreementModal from '@/components/agreements/AgreementModal';
 interface ProfileResponse {
   data: {
     id: number;
@@ -27,6 +28,9 @@ export default function AuthCallback() {
   const searchParams = useSearchParams();
   const { refreshProfile } = useGlobalProfile();
   const currentLocale = useLocale();
+  const [showAgreement, setShowAgreement] = useState(false);
+  const [postAcceptUser, setPostAcceptUser] = useState<any | null>(null);
+  const [loading, setLoading] = useState(true);
   // Get token from either path parameter or query parameter
   const pathToken = params.token as string;
   const queryToken = searchParams.get('token');
@@ -46,6 +50,7 @@ export default function AuthCallback() {
   useEffect(() => {
     const fetchProfile = async () => {
       try {
+        setLoading(true);
         if (!token) {
           throw new Error('No token provided');
         }
@@ -101,11 +106,18 @@ export default function AuthCallback() {
         
         // Refresh the global profile state
         await refreshProfile();
-        
-        // Add small delay to ensure all storage operations complete
-        setTimeout(() => {
-          handleRedirect(response.data);
-        }, 200);
+        // Check agreement only for insighter/company roles
+        if (response.data.roles && (response.data.roles.includes('insighter') || response.data.roles.includes('company') || response.data.roles.includes('company-insighter'))) {
+          const accepted = await checkLatestAgreement(token, locale);
+          if (!accepted) {
+            setPostAcceptUser(response.data);
+            setShowAgreement(true);
+            setLoading(false); // stop loader to let user interact with modal
+            return;
+          }
+        }
+        // Proceed to redirect
+        setTimeout(() => handleRedirect(response.data), 200);
         
       } catch (error) {
         console.error('[token-callback] Error in authentication flow:', error);
@@ -309,6 +321,23 @@ export default function AuthCallback() {
     throw new Error('Failed to fetch profile after all retry attempts');
   };
 
+  const checkLatestAgreement = async (authToken: string, lang: string): Promise<boolean> => {
+    try {
+      const res = await fetch('https://api.insightabusiness.com/api/account/agreement/check', {
+        headers: {
+          'Authorization': `Bearer ${authToken}`,
+          'Accept': 'application/json',
+          'Accept-Language': lang,
+        }
+      });
+      if (!res.ok) return true; // don't block on error
+      const data = await res.json();
+      return !!data?.data?.accept;
+    } catch {
+      return true; // fail-open
+    }
+  };
+
   // Helper function to handle redirects
   const handleRedirect = (userData: any) => {
     // Check if user has admin role
@@ -470,5 +499,24 @@ export default function AuthCallback() {
     document.cookie = cookieSettings.join('; ');
   };
 
-  return <FullScreenLoader message={currentLocale === 'ar' ? 'جاري تسجيل الدخول...' : 'Signing you in...'} />;
+  return (
+    <>
+      {loading && (
+        <FullScreenLoader message={currentLocale === 'ar' ? 'جاري تسجيل الدخول...' : 'Signing you in...'} />
+      )}
+      <AgreementModal
+        opened={showAgreement}
+        onClose={() => {
+          // proceed even if user cancels/closes
+          setLoading(true);
+          if (postAcceptUser) handleRedirect(postAcceptUser);
+        }}
+        onAccepted={() => {
+          setLoading(true);
+          if (postAcceptUser) handleRedirect(postAcceptUser);
+        }}
+        locale={locale}
+      />
+    </>
+  );
 }

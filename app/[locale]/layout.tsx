@@ -19,6 +19,8 @@ import { GlobalProfileProvider } from '@/components/auth/GlobalProfileProvider';
 import GlobalAuthHandler from '@/components/auth/GlobalAuthHandler';
 import RoleGuard from '@/components/auth/RoleGuard';
 import AnalyticsProvider from '@/app/analytics-provider';
+import { publicBaseUrl } from '@/app/config';
+import { generateOrganizationSchema, generateWebSiteSchema } from '@/utils/seo';
 
 
 const almarai = Almarai({
@@ -43,6 +45,7 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
   
   return {
     metadataBase: new URL(baseUrl),
+    applicationName: isArabic ? 'إنسايتا' : 'Insighta',
     title: {
       default: isArabic ? 'إنسايتا - شراء وبيع الرؤى' : 'Insighta - Buy & Sell Insights',
       template: isArabic ? '%s | إنسايتا' : '%s | Insighta',
@@ -65,7 +68,7 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
       type: 'website',
       locale: locale === 'ar' ? 'ar_SA' : 'en_US',
       url: `${baseUrl}/${locale}`,
-      siteName: 'Insighta Business',
+      siteName: 'Insighta',
       title: isArabic ? 'إنسايتا - شراء وبيع الرؤى' : 'Insighta - Buy & Sell Insights',
       description: isArabic 
         ? 'إنسايتا هي منصة لشراء وبيع موارد الرؤى والرؤى والخبرة.'
@@ -215,6 +218,19 @@ export default async function RootLayout({
         <MantineProvider theme={theme}>
           <AOSProvider>
             <NextIntlClientProvider messages={messages}>
+              {/* Global JSON-LD for Site name and Logo */}
+              <script
+                type="application/ld+json"
+                dangerouslySetInnerHTML={{
+                  __html: JSON.stringify(generateWebSiteSchema(locale)),
+                }}
+              />
+              <script
+                type="application/ld+json"
+                dangerouslySetInnerHTML={{
+                  __html: JSON.stringify(generateOrganizationSchema(locale)),
+                }}
+              />
               <ToastProvider>
                 <LoadingProvider>
                   <GlobalProfileProvider>

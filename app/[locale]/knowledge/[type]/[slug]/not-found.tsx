@@ -38,7 +38,7 @@ export default function KnowledgeNotFound() {
           
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Button
-              onClick={() => window.location.href = `https://insightabusiness.com/${locale}/home?search_type=knowledge`}
+              onClick={() => window.location.href = `/${locale}/home?search_type=knowledge`}
               variant="outline"
               color="blue"
               className="py-3 px-6"

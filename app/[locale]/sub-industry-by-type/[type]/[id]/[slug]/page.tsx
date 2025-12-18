@@ -42,12 +42,24 @@ function capitalizeFirstLetter(string: string) {
   return string.charAt(0).toUpperCase() + string.slice(1);
 }
 
+function isArabicFirstWord(text: string): boolean {
+  if (!text) return false;
+  const firstWord = text.trim().split(/\s+/)[0] || '';
+  for (let i = 0; i < firstWord.length; i++) {
+    const ch = firstWord[i];
+    if (/[\u0600-\u06FF]/.test(ch)) return true;
+    if (/[A-Za-z0-9]/.test(ch)) return false;
+  }
+  return false;
+}
+
 export default function SubIndustryByTypePage({ params }: Props) {
   const resolvedParams = use(params);
   const type = resolvedParams.type as IndustryType;
   const id = parseInt(resolvedParams.id, 10);
   const slug = resolvedParams.slug;
   const locale = resolvedParams.locale || 'en';
+  const isRtl = locale === 'ar';
 
   useEffect(() => {
     safeAOSInit({
@@ -115,7 +127,7 @@ export default function SubIndustryByTypePage({ params }: Props) {
               <span className={styles.typeLabel}>
                 {capitalizeFirstLetter(type)}
               </span>
-              <h3 className={styles.headerTitle}>
+              <h3  className={` text-transparent font-extrabold text-3xl ${isRtl ? 'bg-gradient-to-l from-blue-400 to-teal-500' : 'bg-gradient-to-r from-blue-500 to-teal-400'} bg-clip-text`}>
                 {subIndustry?.name || 'Loading...'}
               </h3>
             
@@ -132,7 +144,7 @@ export default function SubIndustryByTypePage({ params }: Props) {
             </div>
           ) : (
             <div>
-            <h2 className="text-xl font-bold text-transparent bg-gradient-to-r from-blue-500 to-teal-400 bg-clip-text mb-8">
+            <h2 className={`text-xl font-bold text-transparent ${isRtl ? 'bg-gradient-to-l from-blue-400 to-teal-500' : 'bg-gradient-to-r from-blue-500 to-teal-400'} bg-clip-text mb-8`}>
               {locale === 'ar' ? 'المواضيع:' : 'Topics:'}
             </h2>
               <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -157,20 +169,27 @@ export default function SubIndustryByTypePage({ params }: Props) {
                           {locale === 'ar' ? 'الرؤى:' : 'Insights:'}
                         </Text>
                           <ul className="space-y-2">
-                            {topic.knowledge.map((item: any) => (
-                              <li key={item.id} className="text-xs text-gray-600 hover:text-blue-600 transition-colors flex items-center">
-                                <span className="mr-2">•</span>
-                                <Link href={`/${locale}/knowledge/${item.type}/${item.slug}`} className="block">
-                                  {item.title}
-                                </Link>
-                              </li>
-                            ))}
+                            {topic.knowledge.map((item: any, index: number) => {
+                              const itemRTL = isArabicFirstWord(item.title);
+                              return (
+                                <li
+                                  key={`${item.id}-${index}`}
+                                  dir={itemRTL ? 'rtl' : 'ltr'}
+                                  className={`text-xs text-gray-600 hover:text-blue-600 transition-colors flex items-center ${itemRTL ? 'text-right' : 'text-left'}`}
+                                >
+                                  <span className={itemRTL ? 'ml-2' : 'mr-2'}>•</span>
+                                  <Link href={`/${locale}/knowledge/${item.type}/${item.slug}`} className="block">
+                                    <span dir="auto" className="break-words">{item.title}</span>
+                                  </Link>
+                                </li>
+                              );
+                            })}
                           </ul>
                         </div>
                       ) : (
                         <div className="text-xs text-gray-500 italic flex items-center">
-                          <span className="mr-2">•</span>
-                          <p>No knowledge items available</p>
+                          <span className={isRtl ? "ml-2" : "mr-2"}>•</span>
+                          <p>{locale === 'ar' ? 'لا يوجد منشورات حالياً' : 'No knowledge items available'}</p>
                         </div>
                       )}
                     </div>
