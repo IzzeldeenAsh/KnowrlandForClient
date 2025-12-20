@@ -302,7 +302,7 @@ export function generateStructuredData(knowledge: KnowledgeMetadata, locale: str
       "url": baseUrl,
       "logo": {
         "@type": "ImageObject",
-        "url": `${baseUrl}/icon.png`
+        "url": `${baseUrl}/logo.png`
       }
     },
     "datePublished": knowledge.published_at,
@@ -604,7 +604,7 @@ export function generateOrganizationSchema(locale: string) {
     "name": "Insighta",
     "alternateName": "إنسايتا",
     "url": baseUrl,
-    "logo": `${baseUrl}/icon.png`,
+    "logo": `${baseUrl}/logo.png`,
     "description": locale === 'ar' 
       ? "منصة لشراء وبيع موارد الرؤى والرؤى والخبرة"
       : "Platform for buying and selling insight resources, insights and expertise",
@@ -649,7 +649,7 @@ export function generateWebSiteSchema(locale: string) {
       "name": "Insighta",
       "logo": {
         "@type": "ImageObject",
-        "url": `${baseUrl}/icon.png`
+        "url": `${baseUrl}/logo.png`
       }
     }
   };
