@@ -1,14 +1,10 @@
-'use client';
-
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
 import Footer from '@/components/ui/footer';
 
 export default function GlobalNotFound() {
-  const pathname = usePathname();
-  const firstSegment = pathname?.split('/')[1] || 'en';
-  const locale = (firstSegment === 'ar' || firstSegment === 'en') ? firstSegment : 'en';
-  const isRTL = locale === 'ar';
+  // Render a static 404 page to allow prerendering/export without runtime hooks
+  const locale = 'en';
+  const isRTL = false;
 
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col" dir={isRTL ? 'rtl' : 'ltr'}>
