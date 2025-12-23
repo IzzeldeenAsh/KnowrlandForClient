@@ -138,16 +138,18 @@ type KnowledgeCardProps = {
 }
 
 function KnowledgeCard({ item, locale, isRTL }: KnowledgeCardProps) {
+  // Parse and format the price
   const priceString = item.total_price?.toString().trim() ?? ""
-  const numericPrice = Number(priceString)
-  const isNumericPrice = priceString !== "" && !Number.isNaN(numericPrice)
-  const isFree = isNumericPrice ? numericPrice === 0 : priceString === "0"
-  const formattedPrice = isNumericPrice
-    ? `$${numericPrice.toLocaleString(
-        locale === "ar" ? "en-US" : "en-US",
-        { maximumFractionDigits: 2 }
-      )}`
-    : priceString || (isRTL ? "مدفوع" : "PAID")
+  const numericPrice = parseFloat(priceString)
+  const isValidPrice = !isNaN(numericPrice) && priceString !== ""
+  const isFree = isValidPrice && numericPrice === 0
+
+  const formattedPrice = isValidPrice
+    ? `$${numericPrice.toLocaleString("en-US", {
+        minimumFractionDigits: 0,
+        maximumFractionDigits: 2
+      })}`
+    : (isRTL ? "مدفوع" : "PAID")
 
   const typeTranslations: Record<string, string> = {
     report: isRTL ? "تقرير" : "Reports",
