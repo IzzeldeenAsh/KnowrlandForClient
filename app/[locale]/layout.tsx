@@ -115,6 +115,11 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
       // yandex: 'your-yandex-verification-code',
       // yahoo: 'your-yahoo-verification-code',
     },
+    icons: {
+      icon: '/favicon.ico',
+      apple: '/apple-touch-icon.png',
+    },
+    manifest: '/manifest.webmanifest',
   };
 }
 
