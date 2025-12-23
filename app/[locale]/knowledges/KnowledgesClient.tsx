@@ -391,9 +391,9 @@ export default function KnowledgesClient() {
            )}
            
            <div className="text-start" data-aos="fade-down">
-             <h3 className={`text-md ${isRTL ? 'bg-gradient-to-l from-blue-400 to-teal-500' : 'bg-gradient-to-r from-blue-500 to-teal-400'} md:text-3xl font-extrabold text-transparent bg-clip-text mb-4`}>
+             <h3 className={`text-md ${isRTL ? 'bg-gradient-to-l from-blue-400 to-teal-500' : 'bg-gradient-to-r from-blue-500 to-teal-400'} md:text-3xl font-extrabold text-transparent bg-clip-text mb-4 `} style={{'lineHeight': '2.2'}}>
                {getCurrentTypeLabel()} 
-               {entityName && ` in ${entityName}`}
+               {entityName && ` ${isRTL ? 'في' : 'in'} ${entityName}`}
              </h3>
            </div>
          </div>

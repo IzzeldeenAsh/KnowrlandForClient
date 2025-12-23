@@ -80,7 +80,7 @@ export default function TopicByTypePage({ params }: Props) {
               <span className={styles.typeLabel}>
                 {capitalizeFirstLetter(type)}
               </span>
-              <h3 className={styles.headerTitle}>
+              <h3  className={` text-transparent font-extrabold text-3xl ${isRTL ? 'bg-gradient-to-l from-blue-400 to-teal-500' : 'bg-gradient-to-r from-blue-500 to-teal-400'} bg-clip-text`}>
                 {subIndustry?.name || 'Loading...'}
               </h3>
              
@@ -97,7 +97,7 @@ export default function TopicByTypePage({ params }: Props) {
             </div>
           ) : (
             <>
-              <h2 className={`text-xl font-bold text-transparent ${isRTL ? 'bg-gradient-to-l from-teal-400 to-blue-500' : 'bg-gradient-to-r from-blue-500 to-teal-400'} bg-clip-text mb-8`}>
+              <h2 className={`text-xl font-bold text-transparent ${isRTL ? 'bg-gradient-to-l from-blue-400 to-teal-500' : 'bg-gradient-to-r from-blue-500 to-teal-400'} bg-clip-text mb-8`}>
                 {locale === 'ar' ? 'الرؤى' : 'Insights'}
             </h2>
             <KnowledgeGrid

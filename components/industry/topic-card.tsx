@@ -34,7 +34,7 @@ export default function TopicCard({ topic, locale, isRTL }: TopicCardProps) {
             height={20} 
             className={`${!isDisabled ? 'text-blue-500' : 'text-gray-400'}`} 
           />
-          <h3 className={`text-base font-bold ${!isDisabled ? `text-transparent ${isRTL ? 'bg-gradient-to-l from-blue-400 to-teal-500' : 'bg-gradient-to-r from-blue-500 to-teal-400'} bg-clip-text` : 'text-gray-900'}`}>
+          <h3 title={topic.name} className={`flex-1 min-w-0 truncate text-base font-bold ${!isDisabled ? `text-transparent ${isRTL ? 'bg-gradient-to-l from-blue-400 to-teal-500' : 'bg-gradient-to-r from-blue-500 to-teal-400'} bg-clip-text` : 'text-gray-900'}`}>
             {topic.name}
             {isDisabled && <span className="ml-2 text-xs text-gray-500"></span>}
           </h3>
@@ -55,7 +55,7 @@ export default function TopicCard({ topic, locale, isRTL }: TopicCardProps) {
                     className={`text-sm text-gray-700 flex items-center ${itemRTL ? 'text-right' : 'text-left'}`}
                   >
                     <span className={itemRTL ? 'ml-2' : 'mr-2'}>•</span>
-                    <span dir="auto" className="break-words">{item.title}</span>
+                    <span title={item.title} dir="auto" className="flex-1 min-w-0 truncate">{item.title}</span>
                   </li>
                 );
               })}
@@ -69,7 +69,7 @@ export default function TopicCard({ topic, locale, isRTL }: TopicCardProps) {
         )}
       </div>
       
-      <div className={`absolute top-6 ${isRTL ? 'left-6' : 'right-6'}`}>
+      <div className={`absolute top-6 ${isRTL ? 'left-2' : 'right-2'}`}>
         <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path 
             strokeLinecap="round" 

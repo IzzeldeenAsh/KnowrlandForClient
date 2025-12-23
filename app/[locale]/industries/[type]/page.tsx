@@ -179,7 +179,7 @@ export default function IndustriesByTypePage({ params }: Props) {
                         <Link href={`/${locale}/industry-by-type/${type}/${industry.id}/${industry.slug}`} className="block">
                           <div className="flex items-center gap-2">
                             {getIndustryIcon(industry)}
-                            <h3 className="text-sm font-semibold text-gray-900 hover:text-blue-600">
+                            <h3 className="text-sm truncate max-w-[140px] sm:max-w-[220px] md:max-w-[280px] font-semibold text-gray-900 hover:text-blue-600">
                               {industry.name}
                             </h3>
                           </div>
@@ -192,7 +192,7 @@ export default function IndustriesByTypePage({ params }: Props) {
                             {industry.children.map((child: Industry) => (
                               <Link href={`/${locale}/sub-industry-by-type/${type}/${child.id}/${child.slug}`} key={child.id} className="block">
                                 <li
-                                  className="text-xs text-blue-800 hover:text-blue-600 transition-colors flex items-center"
+                                  className="text-xs truncate max-w-[140px] sm:max-w-[220px] md:max-w-[280px] text-blue-800 hover:text-blue-600 transition-colors flex items-center"
                                 >
                                   <span className="mr-2">•</span>
                                   {child.name}

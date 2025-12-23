@@ -158,7 +158,7 @@ export default function SubIndustryByTypePage({ params }: Props) {
                       <Link href={`/${locale}/topic-by-type/${type}/${topic.id}/${topic.slug}`} className="block">
                         <div className="flex items-center gap-2">
                           <IndustryIcon />
-                          <h3 className="text-sm font-semibold text-gray-900 hover:text-blue-600">
+                          <h3 className="text-sm truncate max-w-[140px] sm:max-w-[220px] md:max-w-[280px] font-semibold text-gray-900 hover:text-blue-600">
                             {topic.name}
                           </h3>
                         </div>

@@ -71,7 +71,7 @@ export default function Breadcrumb({ items, makeLastItemClickable = false }: Bre
     const isLastItem = index === items.length - 1;
     
     return (
-      <li key={item.href} className="flex items-center">
+      <li key={item.href} className="flex items-center min-w-0">
         {isRTL ? (
           <ChevronLeftIcon className="h-4 w-4 text-gray-400 flex-shrink-0" />
         ) : (
@@ -79,7 +79,7 @@ export default function Breadcrumb({ items, makeLastItemClickable = false }: Bre
         )}
         {isLastItem && !makeLastItemClickable ? (
           <span
-            className={`${isRTL ? 'mr-2' : 'ml-2'} text-sm whitespace-nowrap truncate max-w-[150px] sm:max-w-none inline-block text-gray-900 font-medium`}
+            className={`${isRTL ? 'mr-2' : 'ml-2'} text-sm whitespace-nowrap truncate inline-block text-gray-900 font-medium max-w-[140px] sm:max-w-[220px] md:max-w-[280px]`}
             aria-current="page"
             title={item.label} // Add title for hover tooltip on truncated text
           >
@@ -99,7 +99,7 @@ export default function Breadcrumb({ items, makeLastItemClickable = false }: Bre
             return (
               <Link
                 href={finalHref}
-                className={`${isRTL ? 'mr-2' : 'ml-2'} text-sm whitespace-nowrap truncate max-w-[150px] sm:max-w-none inline-block ${isLastItem && makeLastItemClickable ? 'text-gray-900 font-medium' : 'text-gray-500 hover:text-gray-700'}`}
+                className={`${isRTL ? 'mr-2' : 'ml-2'} text-sm whitespace-nowrap truncate inline-block max-w-[140px] sm:max-w-[220px] md:max-w-[280px] ${isLastItem && makeLastItemClickable ? 'text-gray-900 font-medium' : 'text-gray-500 hover:text-gray-700'}`}
                 title={item.label}
               >
                 {item.label}
@@ -113,7 +113,7 @@ export default function Breadcrumb({ items, makeLastItemClickable = false }: Bre
   
   return (
     <nav className="flex w-full" aria-label="Breadcrumb">
-      <ol className={`flex items-center flex-wrap sm:flex-nowrap w-full ${isRTL ? 'space-x-reverse space-x-2' : 'space-x-2'}`}>
+      <ol className={`flex items-center flex-wrap sm:flex-nowrap w-full min-w-0 ${isRTL ? 'space-x-reverse space-x-2' : 'space-x-2'}`}>
         <li>
           <Link
             href={`/${currentLocale}`}

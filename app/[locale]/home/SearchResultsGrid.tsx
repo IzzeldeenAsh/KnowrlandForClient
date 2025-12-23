@@ -662,7 +662,7 @@ export default function SearchResultsGrid({
                 <Link
                   key={`${uniquePrefix}-topic-${item.searchable_id}-${index}`}
                   href={`/${currentLocale}/${item.url}`}
-                  className="inline-block px-4 py-2 bg-gray-100 hover:bg-gray-200 rounded-full text-gray-700 text-xs font-medium transition-colors duration-200"
+                  className="truncate inline-block max-w-[140px] sm:max-w-[220px] md:max-w-[280px] px-4 py-2 bg-gray-100 hover:bg-gray-200 rounded-full text-gray-700 text-xs font-medium transition-colors duration-200"
                 >
                   {item.title}
                 </Link>

@@ -31,7 +31,7 @@ export default function SubIndustryCard({ child, locale, isRTL }: SubIndustryCar
       className={`relative group bg-gradient-to-br from-white to-slate-50 rounded-sm p-6 shadow-md border border-slate-100 h-full flex flex-col ${!isDisabled ? 'hover:shadow-lg hover:border-blue-100 hover:from-white hover:to-blue-50 transition-all duration-300 cursor-pointer' : 'opacity-50 cursor-not-allowed'}`}
     >
       <div className="space-y-2 flex-grow">
-        <h3 className={`text-base font-bold ${isRTL ? 'text-right' : 'text-left'} ${!isDisabled ? `text-transparent ${isRTL ? 'bg-gradient-to-l from-blue-400 to-teal-500' : 'bg-gradient-to-r from-blue-500 to-teal-400'} bg-clip-text` : 'text-gray-900'}`}>
+        <h3 title={child.name} className={`truncate text-base font-bold ${isRTL ? 'text-right' : 'text-left'} ${!isDisabled ? `text-transparent ${isRTL ? 'bg-gradient-to-l from-blue-400 to-teal-500' : 'bg-gradient-to-r from-blue-500 to-teal-400'} bg-clip-text` : 'text-gray-900'}`}>
           {child.name}
           {isDisabled && <span className="ml-2 text-xs text-gray-500"></span>}
         </h3>
@@ -50,7 +50,7 @@ export default function SubIndustryCard({ child, locale, isRTL }: SubIndustryCar
                   className={`text-sm text-gray-700 flex items-center ${effectiveRTL ? 'text-right' : 'text-left'}`}
                 >
                   <span className={effectiveRTL ? 'ml-2' : 'mr-2'}>•</span>
-                  <span dir="auto" className={`${isTopicDisabled ? 'opacity-50' : ''} break-words`}>{topic.name}</span>
+                  <span title={topic.name} dir="auto" className={`${isTopicDisabled ? 'opacity-50' : ''} flex-1 min-w-0 truncate`}>{topic.name}</span>
                 </li>
               )
             })}
@@ -62,7 +62,7 @@ export default function SubIndustryCard({ child, locale, isRTL }: SubIndustryCar
           </div>
         )}
       </div>
-      <div className={`absolute top-6 ${isRTL ? 'left-6' : 'right-6'}`}>
+      <div className={`absolute top-6 ${isRTL ? 'left-2' : 'right-2'}`}>
         <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path 
             strokeLinecap="round" 
