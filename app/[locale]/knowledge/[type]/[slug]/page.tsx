@@ -10,7 +10,6 @@ import InsightIcon from "@/components/icons/InsightIcon";
 import ManualIcon from "@/components/icons/ManualIcon";
 import ReportIcon from "@/components/icons/ReportIcon";
 import CourseIcon from "@/components/icons/CourseIcon";
-import KnowledgeIcon from "@/components/icons/knowledge-icon";
 import { fetchBreadcrumb } from "@/utils/breadcrumb";
 import KnowledgeSideBox from './KnowledgeSideBox';
 import { StarIcon } from "@heroicons/react/20/solid";
@@ -164,7 +163,26 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
   try {
     const { data } = await fetchKnowledgeData(type, slug, locale);
-    return generateKnowledgeMetadata(data, locale, type, slug);
+    const metadata = generateKnowledgeMetadata(data, locale, type, slug) as Metadata;
+
+    // Remove trailing " | Report | Insighta | Insighta" (and similar variants) to shorten title
+    if (metadata && typeof metadata.title === 'string') {
+      const cleanedTitle = metadata.title.replace(
+        /\s*\|\s*(Report|Manual|Course|Data|Statistic|Insight)s?\s*\|\s*Insighta(?:\s*\|\s*Insighta)?$/i,
+        ''
+      );
+      metadata.title = cleanedTitle;
+
+      // Keep social titles in sync
+      if (metadata.openGraph && typeof metadata.openGraph === 'object') {
+        (metadata.openGraph as any).title = cleanedTitle;
+      }
+      if (metadata.twitter && typeof metadata.twitter === 'object') {
+        (metadata.twitter as any).title = cleanedTitle;
+      }
+    }
+
+    return metadata;
   } catch (error) {
     const isRTL = locale === 'ar';
     const baseUrl =  'https://insightabusiness.com';
@@ -278,15 +296,12 @@ export default async function KnowledgePage({ params }: Props) {
   return (
     <>
       {/* Structured Data - Multiple schemas for better SEO */}
-      {schemas.map((schema, index) => (
-        <script
-          key={index}
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{
-            __html: JSON.stringify(schema)
-          }}
-        />
-      ))}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify(schemas)
+        }}
+      />
       
     <div className="min-h-screen bg-gray-50 relative" dir={isRTL ? 'rtl' : 'ltr'} lang={locale === 'ar' ? 'ar' : 'en'}>
       {/* Language mismatch notifier */}
@@ -515,11 +530,6 @@ export default async function KnowledgePage({ params }: Props) {
       <main className="container mx-auto px-3 sm:px-4 pb-12 sm:pb-16 md:pb-20" role="main">
         <article itemScope itemType="https://schema.org/Article" className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-8">
           <div className="lg:col-span-2">
-            <meta itemProp="headline" content={knowledge.title} />
-            <meta itemProp="description" content={knowledge.description} />
-            <meta itemProp="author" content={knowledge.insighter.company?.legal_name || knowledge.insighter.name} />
-            <meta itemProp="datePublished" content={knowledge.published_at} />
-            <meta itemProp="dateModified" content={knowledge.published_at} />
             <TabsContent knowledge={knowledge} knowledgeSlug={slug} />
           </div>
           <aside className="lg:col-span-1">

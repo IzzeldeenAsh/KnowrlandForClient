@@ -4,6 +4,14 @@ import { NextRequest, NextResponse } from 'next/server';
 
 // Custom middleware to handle cookie-based locale detection
 function customMiddleware(request: NextRequest) {
+  // Enforce canonical host: redirect www. to apex domain
+  const host = request.headers.get('host') || '';
+  if (host.startsWith('www.')) {
+    const url = new URL(request.url);
+    url.hostname = host.replace(/^www\./, '');
+    return NextResponse.redirect(url, { status: 308 });
+  }
+
   // Get the preferred language from cookie
   const preferredLanguage = request.cookies.get('preferred_language')?.value;
   

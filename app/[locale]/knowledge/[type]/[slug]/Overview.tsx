@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState, useCallback, useMemo } from 'react'
 import Image from 'next/image'
 import styles from './knowledge.module.css'
 import { SparklesIcon } from '@heroicons/react/20/solid'
@@ -130,6 +130,38 @@ export default function Overview({ knowledge, knowledgeSlug }: OverviewProps) {
     setBuyModalOpened(true);
   };
 
+  // Ensure all <img> in HTML have meaningful alt text
+  const ensureImageAlts = useCallback((html?: string) => {
+    if (!html || typeof window === 'undefined') return html || '';
+    try {
+      const container = document.createElement('div');
+      container.innerHTML = html;
+      const images = container.querySelectorAll('img');
+      images.forEach((img) => {
+        const existingAlt = img.getAttribute('alt');
+        if (existingAlt === null || existingAlt.trim() === '') {
+          const src = img.getAttribute('src') || '';
+          const fileName = src.split('/').pop()?.split('?')[0] || '';
+          const baseAlt = isRTL ? 'صورة من المحتوى' : 'Content image';
+          const contextualAlt = knowledge?.slug
+            ? `${baseAlt}: ${knowledge.slug}`
+            : `${baseAlt}`;
+          img.setAttribute(
+            'alt',
+            fileName ? `${contextualAlt} - ${fileName}` : contextualAlt
+          );
+        }
+      });
+      return container.innerHTML;
+    } catch {
+      return html;
+    }
+  }, [isRTL, knowledge?.slug]);
+
+  const processedKnowledgeDescription = useMemo(() => {
+    return ensureImageAlts(knowledge.description);
+  }, [ensureImageAlts, knowledge.description]);
+
   return (
     <div className={styles.container}>
       <div className={styles.py10}>
@@ -137,7 +169,7 @@ export default function Overview({ knowledge, knowledgeSlug }: OverviewProps) {
         <div 
           className={`${styles.description} bg-transparent p-3 rounded mb-3`}
            dir={isArabicContent? 'rtl' : 'ltr'}
-          dangerouslySetInnerHTML={{ __html: knowledge.description }}
+          dangerouslySetInnerHTML={{ __html: processedKnowledgeDescription }}
         />
 
       
@@ -241,7 +273,7 @@ export default function Overview({ knowledge, knowledgeSlug }: OverviewProps) {
                   {doc.description && (
                     <div className={styles.description}>
                       <h6>{translations.description}</h6>
-                      <p dangerouslySetInnerHTML={{ __html: doc.description }}></p>
+                      <p dangerouslySetInnerHTML={{ __html: ensureImageAlts(doc.description || '') }}></p>
                     </div>
                   )}
                   {doc.table_of_content && Array.isArray(doc.table_of_content) && doc.table_of_content.length > 0 && (

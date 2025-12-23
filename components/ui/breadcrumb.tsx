@@ -86,13 +86,26 @@ export default function Breadcrumb({ items, makeLastItemClickable = false }: Bre
             {item.label}
           </span>
         ) : (
-          <Link
-            href={(item.label === "Industries" || item.label === "المجالات") ? `/${currentLocale}/all-industries` : `/${currentLocale}/${item.href}`}
-            className={`${isRTL ? 'mr-2' : 'ml-2'} text-sm whitespace-nowrap truncate max-w-[150px] sm:max-w-none inline-block ${isLastItem && makeLastItemClickable ? 'text-gray-900 font-medium' : 'text-gray-500 hover:text-gray-700'}`}
-            title={item.label} // Add title for hover tooltip on truncated text
-          >
-            {item.label}
-          </Link>
+          (() => {
+            // Normalize API-provided hrefs to avoid double slashes
+            const rawHref = (item.href || '').replace(/^\/+/, '');
+            // Handle known API alias: route '/industry' does not exist; send to '/all-industries'
+            const normalizedHref =
+              rawHref === 'industry' ? 'all-industries' : rawHref;
+            const finalHref =
+              (item.label === 'Industries' || item.label === 'المجالات')
+                ? `/${currentLocale}/all-industries`
+                : `/${currentLocale}/${normalizedHref}`;
+            return (
+              <Link
+                href={finalHref}
+                className={`${isRTL ? 'mr-2' : 'ml-2'} text-sm whitespace-nowrap truncate max-w-[150px] sm:max-w-none inline-block ${isLastItem && makeLastItemClickable ? 'text-gray-900 font-medium' : 'text-gray-500 hover:text-gray-700'}`}
+                title={item.label}
+              >
+                {item.label}
+              </Link>
+            );
+          })()
         )}
       </li>
     );
