@@ -1,5 +1,4 @@
 import Link from 'next/link';
-import Footer from '@/components/ui/footer';
 
 export default function GlobalNotFound() {
   // Render a static 404 page to allow prerendering/export without runtime hooks
@@ -35,7 +34,6 @@ export default function GlobalNotFound() {
           </div>
         </div>
       </div>
-      <Footer />
     </div>
   );
 }
