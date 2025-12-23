@@ -2,7 +2,6 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Button } from '@mantine/core';
 import Footer from '@/components/ui/footer';
 
 export default function GlobalNotFound() {
@@ -28,14 +27,14 @@ export default function GlobalNotFound() {
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link href={`/${locale}`} passHref>
-              <Button variant="filled" color="blue" className="py-3 px-6">
+              <span className="inline-flex items-center justify-center rounded-md bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 font-semibold cursor-pointer">
                 {isRTL ? 'الصفحة الرئيسية' : 'Return Home'}
-              </Button>
+              </span>
             </Link>
             <Link href={`/${locale}/home`} passHref>
-              <Button variant="outline" color="blue" className="py-3 px-6">
+              <span className="inline-flex items-center justify-center rounded-md border border-blue-600 text-blue-600 hover:bg-blue-50 px-6 py-3 font-semibold cursor-pointer">
                 {isRTL ? 'استكشف المحتوى' : 'Explore Content'}
-              </Button>
+              </span>
             </Link>
           </div>
         </div>
