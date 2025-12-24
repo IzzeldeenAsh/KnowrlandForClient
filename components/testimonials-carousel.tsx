@@ -287,14 +287,14 @@ function KnowledgeCard({ item, locale, isRTL }: KnowledgeCardProps) {
               </div>
 
               <div className="flex-shrink-0">
-                {isFree ? (
-                  <Badge color="green" variant="light" size="sm">
-                    {translations.free}
+                {isValidPrice && (
+                  <Badge
+                    color={isFree ? "green" : "yellow"}
+                    variant="light"
+                    size="sm"
+                  >
+                    {isFree ? translations.free : <span dir="ltr" lang="en">{formattedPrice}</span>}
                   </Badge>
-                ) : (
-                  <Text fw={700} size="sm" className="text-blue-600">
-                    {formattedPrice}
-                  </Text>
                 )}
               </div>
             </div>
