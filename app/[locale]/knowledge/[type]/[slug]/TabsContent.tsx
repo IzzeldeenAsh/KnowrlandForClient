@@ -110,6 +110,17 @@ export default function TabsContent({ knowledge, knowledgeSlug }: { knowledge: K
   return (
     <div className="mb-6" dir={isRTL ? 'rtl' : 'ltr' }>
       <div className="border-b border-gray-200">
+      <div className="flex flex-col justify-center ps-4 sm:ps-8 w-fit  sm:mt-0 sm:ms-auto block sm:hidden">
+           <Link
+              href={`/${locale}/profile/${knowledge.insighter.uuid}?entity=insighter&tab=meet`}
+              className="relative inline-flex shadow-none items-center gap-2 px-3 py-1.5 text-sm bg-gradient-to-r from-blue-500 to-teal-400 text-white rounded-md shadow-lg hover:from-blue-600 hover:to-teal-500 focus:outline-none focus:ring-2 focus:ring-blue-300"
+            >
+              <span className="pointer-events-none absolute inset-0 rounded-md bg-gradient-to-r from-blue-500 to-teal-400 opacity-20 animate-ping [animation-duration:2.5s]"></span>
+              <span className="relative font-semibold capitalize">
+                {locale ==='en' ? 'Meet ' + knowledge.insighter.name.toLowerCase() : 'قابل الخبير ' + knowledge.insighter.name.toLowerCase()}
+              </span>
+            </Link>
+           </div>
         <nav className="-mb-px flex  knowledge-tab-nav relative" aria-label={isRTL ? 'تبويبات المحتوى' : 'Content tabs'} role="tablist">
       
           {tabs.map((tab) => (
@@ -154,7 +165,7 @@ export default function TabsContent({ knowledge, knowledgeSlug }: { knowledge: K
             </button>
           ))}
            {!knowledgeData.is_owner && (
-           <div className="flex flex-col justify-center ps-4 sm:ps-8  sm:mt-0 ms-auto">
+           <div className="flex flex-col justify-center ps-4 sm:ps-8  sm:mt-0 sm:ms-auto hidden sm:block">
            <Link
               href={`/${locale}/profile/${knowledge.insighter.uuid}?entity=insighter&tab=meet`}
               className="relative inline-flex shadow-none items-center gap-2 px-3 py-1.5 text-sm bg-gradient-to-r from-blue-500 to-teal-400 text-white rounded-md shadow-lg hover:from-blue-600 hover:to-teal-500 focus:outline-none focus:ring-2 focus:ring-blue-300"
@@ -167,7 +178,7 @@ export default function TabsContent({ knowledge, knowledgeSlug }: { knowledge: K
            </div>
            )}
         </nav>
-
+     
         
       </div>
       <div className="mt-6" role="tabpanel" id={`tabpanel-${activeTab}`} aria-labelledby={`tab-${activeTab}`}>

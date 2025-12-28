@@ -194,6 +194,9 @@
     "Testimonials": {
         "tagline": "Bringing You Closer to Resolution",
         "title":"Latest Reports",
+
+        "paid": "Paid",
+        "free": "Free",
         "description":"Stay ahead with newly uploaded expert reports, technical guides, and real-world analyses",
         "insights": {
             "title": "Statistics",

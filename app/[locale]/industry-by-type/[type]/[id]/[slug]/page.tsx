@@ -164,7 +164,8 @@ export default function IndustryByTypePage({ params }: Props) {
                               <Link href={`/${locale}/topic-by-type/${type}/${topic.id}/${topic.slug}`} key={topic.id} className="block">
                                 <li className="text-xs text-gray-600 hover:text-blue-600 transition-colors flex items-center">
                                   <span className="mr-2">•</span>
-                                  {topic.name}
+                                  <h3 className="text-xs truncate max-w-[140px] sm:max-w-[220px] md:max-w-[280px]  text-gray-900 hover:text-blue-600">
+                                  {topic.name}</h3>
                                 </li>
                               </Link>
                             ))}

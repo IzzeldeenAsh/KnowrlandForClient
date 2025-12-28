@@ -377,7 +377,7 @@ export default async function KnowledgePage({ params }: Props) {
               </div>
               <div className="flex flex-col items-start">
                 <div className="flex flex-col items-start mb-6 sm:mb-10">
-                  <h1 className={`text-3xl md:text-4xl ${isRTL ? 'bg-gradient-to-l from-blue-400 to-teal-500' : 'bg-gradient-to-r from-blue-500 to-teal-400'} pt-4 font-extrabold text-transparent bg-clip-text w-full lg:w-auto`} style={{wordBreak: 'break-word'}}>
+                  <h1 className={`md:max-w-3xl text-3xl md:text-4xl ${isRTL ? 'bg-gradient-to-l from-blue-400 to-teal-500' : 'bg-gradient-to-r from-blue-500 to-teal-400'} font-extrabold text-transparent bg-clip-text w-full lg:w-auto`} style={{wordBreak: 'break-word'}}>
                     {knowledge.title}
                   </h1>
                   

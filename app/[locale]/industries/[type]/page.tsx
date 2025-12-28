@@ -196,6 +196,7 @@ export default function IndustriesByTypePage({ params }: Props) {
                                 >
                                   <span className="mr-2">•</span>
                                   {child.name}
+                                  
                                 </li>
                               </Link>
                             ))}

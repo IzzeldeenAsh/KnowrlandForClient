@@ -165,6 +165,7 @@ function KnowledgeCard({ item, locale, isRTL }: KnowledgeCardProps) {
     free: isRTL ? "مجاني" : "Free",
     insighter: isRTL ? "إنسايتر" : "Insighter",
     company: isRTL ? "شركة" : "Company",
+    paid: isRTL ? "مدفوع" : "Paid",
     by: isRTL ? "من قبل" : "By"
   }
 
@@ -293,7 +294,7 @@ function KnowledgeCard({ item, locale, isRTL }: KnowledgeCardProps) {
                     variant="light"
                     size="sm"
                   >
-                    {isFree ? translations.free : <span dir="ltr" lang="en">{formattedPrice}</span>}
+                    {isFree ? translations.free : translations.paid}
                   </Badge>
                 )}
               </div>

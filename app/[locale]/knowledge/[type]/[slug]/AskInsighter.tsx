@@ -797,7 +797,7 @@ export default function AskInsighter({ knowledgeSlug, questions = [], is_owner =
   };
   
   return (
-    <section className="dark:bg-gray-900 py-8 antialiased" dir={isRTL ? 'rtl' : 'ltr'}>
+    <section className="dark:bg-gray-900 antialiased" dir={isRTL ? 'rtl' : 'ltr'}>
       <div className="max-w-4xl mx-auto px-4">
         <div className={styles.threadWrapper}>
         
