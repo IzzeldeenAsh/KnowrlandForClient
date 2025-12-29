@@ -41,7 +41,7 @@ export function usePopularKnowledge() {
   const locale = params.locale as string || 'en';
 
   useEffect(() => {
-    fetch(`https://api.insightabusiness.com/api/platform/industries/knowledge/popular`, {
+    fetch(`https://api.foresighta.co/api/platform/industries/knowledge/popular`, {
       headers: {
         "Content-Type": "application/json",
         "Accept": "application/json",

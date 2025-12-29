@@ -1,6 +1,8 @@
 'use client'
 import { useEffect, useState } from 'react'
-import { usePathname } from 'next/navigation'
+import type React from 'react'
+import { createPortal } from 'react-dom'
+import { useParams, usePathname } from 'next/navigation'
 import NotificationsInner from './NotificationsInner'
 import { 
   getNotifications, 
@@ -10,6 +12,16 @@ import {
   subscribeToNotifications,
   Notification
 } from '@/services/notifications.service'
+import { useUserProfile } from '@/components/ui/header/hooks/useUserProfile'
+import {usePusherNotifications} from '@/hooks/usePusherNotifications';
+
+function getAuthToken(): string | null {
+  // Prefer cookie if present, otherwise localStorage
+  const cookieToken = typeof document !== 'undefined'
+    ? document.cookie.split('; ').find((r) => r.startsWith('token='))?.split('=')[1]
+    : null
+  return cookieToken || (typeof window !== 'undefined' ? localStorage.getItem('token') : null)
+}
 
 // Notification bell icon as SVG
 const NotificationIcon = () => (
@@ -29,9 +41,21 @@ const NotificationIcon = () => (
 )
 
 export default function NotificationBell() {
+  const { user } = useUserProfile()
+  const token = getAuthToken()
+ const params = useParams();
+    const currentLocale = params.locale as string;
+    
+  usePusherNotifications({
+    userId: user?.id,
+    token: token || undefined,
+    currentLocale: currentLocale,
+    eventNames: ['account.activated', 'account.deactivated']
+  })
   // Use mock data for testing or real notifications when they're available
   const [notifications, setNotifications] = useState<Notification[]>([])
   const [isOpen, setIsOpen] = useState(false)
+  const [mounted, setMounted] = useState(false)
   const pathname = usePathname()
   const locale = pathname.split('/')[1] || 'en'
   const isRTL = locale === 'ar' || locale === 'he'
@@ -40,6 +64,7 @@ export default function NotificationBell() {
   const notificationCount = notifications.filter(n => !n.read_at).length
   
   useEffect(() => {
+    setMounted(true)
     // Initialize notifications
     getNotifications(locale).then(apiNotifications => {
       // Always use API notifications, even if empty
@@ -56,17 +81,23 @@ export default function NotificationBell() {
       }
     });
     
-    // Start polling for notifications every 30 seconds
-    const intervalId = startNotificationPolling(locale, 30000)
     
-    // Clean up on component unmount
     return () => {
       unsubscribe()
-      if (intervalId) {
-        clearInterval(intervalId)
-      }
     }
   }, [locale])
+  
+  // Close drawer with Escape
+  useEffect(() => {
+    if (!isOpen) return
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        setIsOpen(false)
+      }
+    }
+    window.addEventListener('keydown', onKeyDown)
+    return () => window.removeEventListener('keydown', onKeyDown)
+  }, [isOpen])
   
   const toggleNotifications = (event: React.MouseEvent) => {
     event.stopPropagation()
@@ -111,13 +142,22 @@ export default function NotificationBell() {
         </span>
       </button>
       
-      {/* Notification dropdown - higher z-index and fixed position */}
-      {isOpen && (
-        <div className="fixed inset-0 w-full h-full bg-transparent z-[100]" onClick={closeNotifications}>
-          <div 
-            className={`absolute top-16 md:top-16 ${
-              isRTL ? 'left-5 md:left-20' : 'right-5 md:right-20'
-            }`} 
+      {/* Notification Drawer via Portal to avoid parent stacking contexts */}
+      {mounted && createPortal(
+        <div
+          className={`fixed inset-0 z-[1000] ${isOpen ? '' : 'pointer-events-none'}`}
+          aria-hidden={!isOpen}
+        >
+          {/* Backdrop */}
+          <div
+            className={`absolute inset-0 bg-black/30 transition-opacity duration-300 ${isOpen ? 'opacity-100' : 'opacity-0'}`}
+            onClick={closeNotifications}
+          />
+          {/* Drawer panel */}
+          <div
+            role="dialog"
+            aria-modal="true"
+            className={`absolute top-0 bottom-0 ${isRTL ? 'left-0' : 'right-0'} w-full max-w-md sm:max-w-lg bg-white shadow-xl transition-transform duration-300 ease-out transform ${isOpen ? 'translate-x-0' : (isRTL ? '-translate-x-full' : 'translate-x-full')}`}
             onClick={e => e.stopPropagation()}
           >
             <NotificationsInner 
@@ -127,7 +167,8 @@ export default function NotificationBell() {
               onClickOutside={closeNotifications}
             />
           </div>
-        </div>
+        </div>,
+        document.body
       )}
     </div>
   )
