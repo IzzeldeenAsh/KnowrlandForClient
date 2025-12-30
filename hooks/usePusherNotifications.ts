@@ -1,7 +1,7 @@
 'use client'
 import { useEffect } from 'react'
 import type { Channel } from 'pusher-js'
-import { subscribePrivateUser, disconnectPusher } from '@/lib/pusher-client'
+import { subscribePrivateUser } from '@/lib/pusher-client'
 
 type Params = {
   userId?: number
@@ -10,9 +10,16 @@ type Params = {
   eventNames?: string[]
 }
 
-export function usePusherNotifications({ userId, token, currentLocale, eventNames = [] }: Params) {
+export function usePusherNotificaitons({ userId, token, currentLocale, eventNames = [] }: Params) {
   useEffect(() => {
-    if (!userId || !token || !currentLocale) return
+    const hasEnv =
+      !!process.env.NEXT_PUBLIC_PUSHER_KEY &&
+      !!process.env.NEXT_PUBLIC_PUSHER_AUTH_ENDPOINT
+
+    if (!hasEnv || !userId || !token || !currentLocale) {
+      if (!hasEnv) console.warn('[Pusher] Skipping: env vars missing')
+      return
+    }
 
     const channel: Channel = subscribePrivateUser(userId, token, currentLocale)
 
@@ -22,16 +29,10 @@ export function usePusherNotifications({ userId, token, currentLocale, eventName
       channel.bind(evt, handler)
       unbinders.push(() => channel.unbind(evt, handler))
     }
-
     const globalHandler = (eventName: string, data: any) => {
       console.log(`[Pusher] ${eventName}`, data)
     }
     ;(channel as any).bind_global?.(globalHandler)
-
-    const onVis = () => {
-      if (document.hidden) disconnectPusher()
-    }
-    document.addEventListener('visibilitychange', onVis)
 
     return () => {
       try {
@@ -39,7 +40,6 @@ export function usePusherNotifications({ userId, token, currentLocale, eventName
         unbinders.forEach((u) => u())
         channel.unsubscribe?.()
       } catch {}
-      document.removeEventListener('visibilitychange', onVis)
     }
   }, [userId, token, currentLocale, eventNames])
 }

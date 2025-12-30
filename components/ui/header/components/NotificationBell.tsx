@@ -13,7 +13,8 @@ import {
   Notification
 } from '@/services/notifications.service'
 import { useUserProfile } from '@/components/ui/header/hooks/useUserProfile'
-import {usePusherNotifications} from '@/hooks/usePusherNotifications';
+import {usePusherNotificaitons} from '@/hooks/usePusherNotifications';
+import { subscribePrivateUser, unsubscribePrivateUser, bindGlobal, unbindGlobal } from '@/lib/pusher-client';
 
 function getAuthToken(): string | null {
   // Prefer cookie if present, otherwise localStorage
@@ -46,12 +47,93 @@ export default function NotificationBell() {
  const params = useParams();
     const currentLocale = params.locale as string;
     
-  usePusherNotifications({
+  // Map realtime event payloads to our Notification shape
+  const mapEventToNotification = (data: any): Notification => {
+    return {
+      id: data?.id ?? `evt-${Date.now()}`,
+      message: data?.message ?? '',
+      type: data?.type ?? 'notification',
+      notifiable_group_id: data?.notifiable_group_id ?? '',
+      notifiable_id: data?.notifiable_id ?? 0,
+      request_id: data?.request_id ?? 0,
+      param: data?.param ?? null,
+      sub_type: data?.sub_type ?? 'info',
+      redirect_page: !!data?.redirect_page,
+      read_at: undefined,
+      sub_page: data?.sub_page,
+      tap: data?.tap,
+      category: data?.category,
+    }
+  }
+
+  usePusherNotificaitons({
     userId: user?.id,
     token: token || undefined,
     currentLocale: currentLocale,
-    eventNames: ['account.activated', 'account.deactivated']
+    eventNames: [
+      'account.activated',
+      'account.deactivated',
+      'knowledge.accepted',
+      'knowledge.declined',
+      'order.insight',
+      'knowledge.answer_question',
+      'knowledge.ask_question',
+      'meeting.client_meeting_insighter_approved',
+      'meeting.client_meeting_insighter_postponed',
+      'meeting.client_meeting_reminder',
+      'meeting.client_meeting_new',
+      'meeting.client_meeting_reschedule',
+      'meeting.insighter_meeting_approved',
+      'meeting.insighter_meeting_reminder',
+      'meeting.insighter_meeting_client_new',
+      'requests.action',
+      'requests'
+    ]
   })
+  // Bind handlers that push new events to the top of the list
+  useEffect(() => {
+    if (!user?.id || !token || !currentLocale) return
+    const channel = subscribePrivateUser(user.id, token, currentLocale)
+    const events = [
+      'account.activated',
+      'account.deactivated',
+      'knowledge.accepted',
+      'knowledge.declined',
+      'order.insight',
+      'knowledge.answer_question',
+      'knowledge.ask_question',
+      'meeting.client_meeting_insighter_approved',
+      'meeting.client_meeting_insighter_postponed',
+      'meeting.client_meeting_reminder',
+      'meeting.client_meeting_new',
+      'meeting.client_meeting_reschedule',
+      'meeting.insighter_meeting_approved',
+      'meeting.insighter_meeting_reminder',
+      'meeting.insighter_meeting_client_new',
+      'requests.action',
+      'requests'
+    ]
+    const handler = (data: any) => {
+      const next = mapEventToNotification(data)
+      // Insert at top; keep unread (read_at undefined) so badge increases
+      setNotifications(prev => [next, ...prev])
+    }
+    events.forEach(evt => channel.bind(evt, handler))
+    // Fallback: also listen globally to catch any server-side event names
+    const globalHandler = (eventName: string, data: any) => {
+      if (eventName.startsWith('pusher:') || eventName.startsWith('pusher_internal:')) return
+      const next = mapEventToNotification(data)
+      setNotifications(prev => (prev.some(n => n.id === next.id) ? prev : [next, ...prev]))
+    }
+    bindGlobal(globalHandler)
+    return () => {
+      try {
+        events.forEach(evt => channel.unbind(evt, handler))
+        unbindGlobal(globalHandler)
+        unsubscribePrivateUser(user.id)
+      } catch {}
+    }
+  }, [user?.id, token, currentLocale])
   // Use mock data for testing or real notifications when they're available
   const [notifications, setNotifications] = useState<Notification[]>([])
   const [isOpen, setIsOpen] = useState(false)

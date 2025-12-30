@@ -2,6 +2,7 @@
 import Pusher, { Channel } from 'pusher-js'
 
 let pusher: Pusher | null = null
+let lastChannelName: string | null = null
 
 type PusherOpts = {
   key: string
@@ -24,7 +25,6 @@ export function getPusher(token: string, currentLocale: string): Pusher {
   const cfg = getConfig()
 
   // Helpful debug (sanitized)
-  console.log('[Pusher] init', { cluster: cfg.cluster, authEndpoint: cfg.authEndpoint.replace(/([^/])[^/]+$/, '$1…') })
 
   pusher = new Pusher(cfg.key, {
     cluster: cfg.cluster,
@@ -43,16 +43,13 @@ export function getPusher(token: string, currentLocale: string): Pusher {
   })
 
   pusher.connection.bind('state_change', (states: any) => {
-    console.log('[Pusher] state', states)
   })
   pusher.connection.bind('connected', () => {
-    console.log('[Pusher] Connected')
   })
   pusher.connection.bind('failed', () => {
     console.error('[Pusher] Connection failed')
   })
   pusher.connection.bind('error', (err: any) => {
-    console.error('[Pusher] Error', err)
     if (err?.error?.data?.code === 4100) {
       console.warn('[Pusher] Connection limit reached')
     }
@@ -64,13 +61,37 @@ export function getPusher(token: string, currentLocale: string): Pusher {
 export function subscribePrivateUser(userId: number, token: string, currentLocale: string): Channel {
   const client = getPusher(token, currentLocale)
   const channelName = `private-user.${userId}`
+  lastChannelName = channelName
   return client.subscribe(channelName)
+}
+
+export function unsubscribePrivateUser(userId: number) {
+  const channelName = `private-user.${userId}`
+  if (pusher) {
+    try {
+      pusher.unsubscribe(channelName)
+      if (lastChannelName === channelName) lastChannelName = null
+    } catch (e) {
+      console.warn('[Pusher] Unsubscribe warning', e)
+    }
+  }
+}
+
+export function bindGlobal(handler: (eventName: string, data: any) => void) {
+  if (pusher && (pusher as any).bind_global) {
+    ;(pusher as any).bind_global(handler)
+  }
+}
+
+export function unbindGlobal(handler: (eventName: string, data: any) => void) {
+  if (pusher && (pusher as any).unbind_global) {
+    ;(pusher as any).unbind_global(handler)
+  }
 }
 
 export function disconnectPusher() {
   if (pusher) {
     pusher.disconnect()
     pusher = null
-    console.log('[Pusher] Disconnected')
   }
 }

@@ -12,7 +12,7 @@ import { Elements, PaymentElement, useElements, useStripe } from "@stripe/react-
 import styles from "./payment.module.css";
 
 // Initialize Stripe
-const stripePromise = loadStripe("pk_live_51RvbpYRIE7WtDi9SLKPBxKTPyTkULT1e36AZMOcmtUomKgW99akiph2PVg5mmUcPtyAjvlXwP1wy70OFvooJLpQc00CNQYKb96");
+const stripePromise = loadStripe("pk_test_51RpQiFL3mrWP7a0P1OYWGeFJWtgMwcWJtiEDLvn29CpYn5x8Ou77YViA1yoimlixKU5aUAeOeN5VTfoC4sMpvFVF00qq9a6BNm");
 
 // File icon mapping function
 const getFileIconByExtension = (extension: string) => {
@@ -97,7 +97,7 @@ function PaymentForm({ orderUuid, amount, title, locale, isRTL, orderDetails, se
       setIsFetchingDownloadIds(true);
       const token = getAuthToken();
       const response = await fetch(
-        `https://api.foresighta.co/api/account/order/knowledge/${uuid}`,
+        `https://api.insightabusiness.com/api/account/order/knowledge/${uuid}`,
         {
           headers: {
             "Content-Type": "application/json",
@@ -161,7 +161,7 @@ function PaymentForm({ orderUuid, amount, title, locale, isRTL, orderDetails, se
     const checkStatus = async (): Promise<boolean> => {
       try {
         const response = await fetch(
-          `https://api.foresighta.co/api/account/order/knowledge/${orderUuid}`,
+          `https://api.insightabusiness.com/api/account/order/knowledge/${orderUuid}`,
           {
             headers: {
               "Content-Type": "application/json",
@@ -276,7 +276,7 @@ function PaymentForm({ orderUuid, amount, title, locale, isRTL, orderDetails, se
     try {
       const token = getAuthToken();
       const response = await fetch(
-        `https://api.foresighta.co/api/account/order/knowledge/check-payment-succeeded/${orderUuid}`,
+        `https://api.insightabusiness.com/api/account/order/knowledge/check-payment-succeeded/${orderUuid}`,
         {
           method: "POST",
           headers: {
@@ -420,14 +420,14 @@ function PaymentForm({ orderUuid, amount, title, locale, isRTL, orderDetails, se
               if (orderDetails?.knowledge_download_id) {
                 const uuidsParam = `?uuids=${orderDetails.knowledge_download_id}`;
                 console.log('Redirecting with UUID:', uuidsParam); // Debug log
-                window.location.href = `http://localhost:4200/app/insighter-dashboard/my-downloads${uuidsParam}`;
+                window.location.href = `https://app.insightabusiness.com/app/insighter-dashboard/my-downloads${uuidsParam}`;
               } else {
                 console.log('No UUID available, falling back to search'); // Debug log
                 // Fallback to title search if no UUID available
                 const searchTitle = orderDetails?.orderable?.knowledge?.[0]?.title || "";
                 const searchParam = searchTitle ? `?search=${encodeURIComponent(searchTitle)}` : "";
                 console.log('Redirecting with search:', searchParam); // Debug log
-                window.location.href = `http://localhost:4200/app/insighter-dashboard/my-downloads${searchParam}`;
+                window.location.href = `https://app.insightabusiness.com/app/insighter-dashboard/my-downloads${searchParam}`;
               }
             }}
           >
@@ -609,7 +609,7 @@ export default function StripePaymentPage() {
       try {
         const token = getAuthToken();
         const response = await fetch(
-          `https://api.foresighta.co/api/account/order/knowledge/${orderUuid}`,
+          `https://api.insightabusiness.com/api/account/order/knowledge/${orderUuid}`,
           {
             headers: {
               "Content-Type": "application/json",
