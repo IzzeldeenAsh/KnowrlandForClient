@@ -206,9 +206,9 @@ class NotificationService {
     this.getNotifications(locale);
     
     // Set up interval
-    this.pollingInterval = setInterval(() => {
-      this.getNotifications(locale, true); // Force refresh during polling
-    }, interval);
+    // this.pollingInterval = setInterval(() => {
+    //   this.getNotifications(locale, true);
+    // }, interval);
     
     console.log('Notification polling started');
     return this.pollingInterval;

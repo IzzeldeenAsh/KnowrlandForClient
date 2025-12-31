@@ -16,7 +16,7 @@ import Particles from '@/components/particles'
 import './text-glow.css'
 import NotificationBell from './header/components/NotificationBell'
 import { useUserProfile } from '@/components/ui/header/hooks/useUserProfile';
-import { startNotificationPolling, stopNotificationPolling } from '@/services/notifications.service';
+import {  stopNotificationPolling } from '@/services/notifications.service';
 
 interface Industry {
   id: number;
@@ -185,22 +185,6 @@ const { isLoading: isAppLoading, setIsLoading: setAppLoading } = useLoading();
     loadIndustries();
   }, [pathname]);
 
-  // Start notification polling when user is logged in
-  useEffect(() => {
-    if (user) {
-      const currentLocale = pathname.split('/')[1] || 'en';
-      startNotificationPolling(currentLocale);
-      
-      // Cleanup on unmount or when user logs out
-      return () => {
-        stopNotificationPolling();
-      };
-    }
-  }, [user, pathname]);
-
-  const getInitials = (firstName: string, lastName: string) => {
-    return `${firstName[0]}${lastName[0]}`.toUpperCase();
-  };
 
   // Helper function to clear duplicate cookies
   const clearDuplicateCookies = (cookieName: string) => {

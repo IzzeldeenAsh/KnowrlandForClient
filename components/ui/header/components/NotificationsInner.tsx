@@ -1,10 +1,9 @@
 'use client'
-import { useEffect, useRef } from 'react'
-import Link from 'next/link'
+import { useEffect, useRef, useCallback } from 'react'
+import type React from 'react'
 import { useTranslations } from 'next-intl'
-import { usePathname, useParams } from 'next/navigation'
+import { usePathname } from 'next/navigation'
 import { SvgIcon } from '../../SvgIcon'
-import Image from 'next/image'
 import { Notification } from '@/services/notifications.service'
 
 interface NotificationsInnerProps {
@@ -12,6 +11,64 @@ interface NotificationsInnerProps {
   parent: string
   onNotificationClick: (id: string) => Promise<void>
   onClickOutside: () => void
+}
+
+// ---- Color helpers (stable Tailwind class mapping) ----
+type Variant = 'success' | 'danger' | 'info' | 'warning' | 'primary'
+type TailwindColor = 'green' | 'red' | 'blue' | 'yellow' | 'purple'
+
+const VARIANT_TO_TW_COLOR: Record<Variant, TailwindColor> = {
+  success: 'green',
+  danger: 'red',
+  info: 'blue',
+  warning: 'yellow',
+  primary: 'purple'
+}
+
+const COLOR_CLASSES_BY_TW: Record<TailwindColor, { bg: string; text: string; icon: string }> = {
+  blue: { bg: 'bg-blue-50', text: 'text-blue-600', icon: 'text-blue-500' },
+  yellow: { bg: 'bg-yellow-50', text: 'text-yellow-600', icon: 'text-yellow-500' },
+  purple: { bg: 'bg-purple-50', text: 'text-purple-600', icon: 'text-purple-500' },
+  red: { bg: 'bg-red-50', text: 'text-red-600', icon: 'text-red-500' },
+  green: { bg: 'bg-green-50', text: 'text-green-600', icon: 'text-green-500' }
+}
+
+const getVariantForSubType = (subType: string): Variant => {
+  switch (subType) {
+    case 'order':
+    case 'knowledge':
+    case 'activate_company':
+    case 'save':
+      return 'success'
+    case 'deactivate_company':
+    case 'deactivate_company_with_delete':
+    case 'deactivate_delete_company':
+    case 'declined':
+    case 'knowledge_declined':
+      return 'danger'
+    case 'activate_insighter':
+    case 'accept_knowledge':
+    case 'knowledge_accept':
+    case 'approved':
+    case 'download':
+    case 'view':
+    case 'like':
+      return 'info'
+    case 'upload':
+    case 'share':
+      return 'warning'
+    case 'comment':
+    case 'reply':
+      return 'primary'
+    default:
+      return 'info'
+  }
+}
+
+const getColorClassesForSubType = (subType: string) => {
+  const variant = getVariantForSubType(subType)
+  const color = VARIANT_TO_TW_COLOR[variant] ?? 'blue'
+  return COLOR_CLASSES_BY_TW[color]
 }
 
 // Helper function to determine background color based on notification sub_type
@@ -160,6 +217,12 @@ const getNotificationIcon = (subType: string, color?: string): React.ReactNode =
   );
 }
 
+// Render icon using precomputed class (refactored usage)
+const getNotificationIconV2 = (subType: string, iconColorClass: string): React.ReactNode => {
+  const iconPath = getNotificationIconName(subType)
+  return <SvgIcon src={`/${iconPath}`} className={`h-6 w-6 ${iconColorClass}`} />
+}
+
 // *** CHANGE 1: UPDATED BILINGUAL FUNCTION ***
 // Helper function to determine display name based on notification sub_type and language
 const getNotificationName = (subType: string, language: string): string => {
@@ -167,6 +230,10 @@ const getNotificationName = (subType: string, language: string): string => {
     'accept_knowledge': { en: 'Insights Accepted', ar: 'قبول الرؤى' },
     'declined': { en: 'Insights Declined', ar: 'رفض الرؤى' },
     'approved': { en: 'Insights Approved', ar: 'تمت الموافقة على الرؤى' },
+    'activate_insighter': { en: 'Insighter Activated', ar: 'تفعيل حساب الانسايتر' },
+    'deactivate_insighter': { en: 'Insighter Deactivated', ar: 'إلغاء تفعيل حساب الانسايتر' },
+    'deactivate_insighter_with_delete': { en: 'Insighter Deactivated', ar: 'إلغاء تفعيل حساب الانسايتر' },
+    'deactivate_delete_insighter': { en: 'Insighter Deactivated', ar: 'إلغاء تفعيل حساب الانسايتر' },
     'download': { en: 'Download', ar: 'تنزيل' },
     'upload': { en: 'Upload', ar: 'رفع' },
     'comment': { en: 'Comment', ar: 'تعليق' },
@@ -198,6 +265,9 @@ const getNotificationName = (subType: string, language: string): string => {
 
   return language === 'ar' ? names.ar : names.en; // Return Arabic if lang is 'ar', otherwise default to English
 };
+
+// We intentionally avoid using i18n keys for sub-type titles to prevent
+// MISSING_MESSAGE errors; the bilingual map above is authoritative.
 
 // Helper function to determine links based on notification type
 const getNotificationLink = (type: string, parent: string): string => {
@@ -232,10 +302,88 @@ export default function NotificationsInner({
 }: NotificationsInnerProps) {
   const t = useTranslations('Notifications')
   const pathname = usePathname()
-  const params = useParams()
   const currentLanguage = pathname.split('/')[1] || 'en'
   const isRTL = currentLanguage === 'ar' || currentLanguage === 'he'
   const componentRef = useRef<HTMLDivElement>(null)
+  
+  // ---- Subcomponents ----
+  const NotificationsHeader = ({
+    onClose
+  }: {
+    onClose: () => void
+  }) => (
+    <div
+      className="sticky top-0 z-10 bg-cover bg-center"
+      style={{
+        // Use gradient to avoid external image blocked by CSP (img-src disallows http:)
+        backgroundImage: 'linear-gradient(135deg,rgb(81, 175, 246) 0%, #01B5D5 100%)'
+      }}
+    >
+      <div className="bg-black/30">
+        <div className="px-5 py-4 flex items-center justify-between">
+          <h3 className="font-bold text-lg text-white">
+            {t('TITLE')}
+          </h3>
+          <button
+            type="button"
+            aria-label="Close notifications"
+            onClick={onClose}
+            className="inline-flex items-center justify-center w-8 h-8 rounded-full hover:bg-white/20 focus:outline-none focus:ring-2 focus:ring-white/40 transition"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
+        </div>
+      </div>
+    </div>
+  )
+
+  const NotificationItem = ({
+    notification
+  }: {
+    notification: Notification
+  }) => {
+    const colorClasses = getColorClassesForSubType(notification.sub_type)
+    const title = getNotificationName(notification.sub_type, currentLanguage)
+    return (
+      <div
+        onClick={() => handleNotificationClick(notification)}
+        role="button"
+        tabIndex={0}
+        onKeyDown={(e) => {
+          if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault()
+            handleNotificationClick(notification)
+          }
+        }}
+        className="px-5 py-4 border-b border-gray-100 hover:bg-blue-50 cursor-pointer transition-colors duration-200 outline-none focus:ring-2 focus:ring-blue-200"
+      >
+        <div className="flex items-start">
+          <div className={`flex-shrink-0 ${isRTL ? 'ml-3' : 'mr-3'}`}>
+            <div className={`h-12 w-12 rounded-md flex items-center justify-center  ${colorClasses.text}`}>
+              {getNotificationIconV2(notification.sub_type, colorClasses.icon)}
+            </div>
+          </div>
+
+          <div className="flex-1 min-w-0">
+            <p className={`text-xs text-blue-600 ${!notification.read_at ? 'font-bold' : 'font-light'}`} style={{wordBreak: 'break-word'}}>
+              {title}
+            </p>
+            <p className={`mt-0.5 ${!notification.read_at ? 'text-gray-900 font-medium' : 'text-gray-700 font-light'} text-sm`} style={{wordBreak: 'break-word'}}>
+              {notification.message}
+            </p>
+          </div>
+          
+          <div className={`${isRTL ? 'mr-3' : 'ml-3'} mt-4`}>
+            <span className="inline-flex items-center px-2 py-0.5 rounded-md text-xs font-semibold bg-[#EEF6FF] text-[#299AF8]">
+              {t('VIEW')}
+            </span>
+          </div>
+        </div>
+      </div>
+    )
+  }
   
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -250,87 +398,71 @@ export default function NotificationsInner({
     }
   }, [onClickOutside])
 
-  const handleNotificationClick = async (notification: Notification) => {
-    // Always mark the notification as read first and wait for it to complete
-    await onNotificationClick(notification.id)
-    
-    // New: Order notifications redirect to Sales page
-    if (notification.type === 'order') {
-      window.location.href = 'https://app.insightabusiness.com/app/insighter-dashboard/sales?tab=2'
-      return
-    }
-    
-    // Handle accept_knowledge notifications - redirect to insighter dashboard
-    if(notification.sub_type.startsWith('client_meeting_reminder')){
-      window.location.href = 'https://app.insightabusiness.com/app/insighter-dashboard/my-meetings?tab=client'
-      return
-    }
-    if (notification.sub_type === 'accept_knowledge') {
-      window.location.href = 'https://app.insightabusiness.com/app/insighter-dashboard/my-requests'
-      return
-    }
-    if(notification.sub_type === 'client_meeting_new'){
-      window.location.href = 'https://app.insightabusiness.com/app/insighter-dashboard/my-meetings?tab=client'
-      return
-    }
-    if (notification.sub_type === 'declined' && notification.type === 'knowledge') {
-      window.location.href = `https://app.insightabusiness.com/app/my-knowledge-base/view-my-knowledge/${notification.param}/details`
-      return
-    }
-    if(notification.sub_type.startsWith('client_')) {
-      window.location.href = 'https://app.insightabusiness.com/app/insighter-dashboard/my-meetings/tab=client'
-      return
-    }
-    if(notification.sub_type.startsWith('insighter_')) {
-      window.location.href = 'https://app.insightabusiness.com/app/insighter-dashboard/my-meetings?tab=client'
-      return
-    }
-    // Handle knowledge approved notifications - redirect to knowledge details page
-    if (notification.type === 'knowledge' && notification.sub_type === 'approved') {
-      window.location.href = `https://app.insightabusiness.com/app/my-knowledge-base/view-my-knowledge/${notification.param}/details`
-      return
-    }
-    if(notification.sub_type.startsWith('client_meeting_insighter_postponed')){
-      window.location.href = 'https://app.insightabusiness.com/app/insighter-dashboard/my-meetings/sent'
-      return
-    }
-    if(notification.sub_type.startsWith('client_meeting_reschedule')){
-      window.location.href = 'https://app.insightabusiness.com/app/insighter-dashboard/my-meetings/sent'
-      return
-    }
-    if(notification.sub_type.startsWith('insighter_meeting_client_reschedule')){
-      window.location.href = 'https://app.insightabusiness.com/app/insighter-dashboard/my-meetings?tab=client'
-      return
-    }
-    if(notification.sub_type.startsWith('insighter_meeting_reminder')){
-      window.location.href = 'https://app.insightabusiness.com/app/insighter-dashboard/my-meetings?tab=client'
-      return
-    }
-  
-    // Handle knowledge accept/decline notifications
-    if (notification.type === 'knowledge' && (notification.sub_type === 'accept_knowledge' || notification.sub_type === 'declined')) {
-      // For company-insighter role, we would handle this differently
-      // This would require checking user roles from context/state
-      return
-    }
-    
-    // Handle knowledge notifications with category
-    if (notification.type === 'knowledge' && notification.category) {
-      const knowledgeUrl = `https://insightabusiness.com/${currentLanguage}/knowledge/${notification.category}/${notification.param || ''}?tab=ask`
-      window.open(knowledgeUrl, '_blank')
-    }
-  }
+  const handleNotificationClick = useCallback(
+    async (notification: Notification) => {
+      // Compute destination
+      // Case 1: Knowledge page opens in new tab (must be synchronous to keep user gesture)
+      if (notification.type === 'knowledge' && notification.category) {
+        const knowledgeUrl = `https://insightabusiness.com/${currentLanguage}/knowledge/${notification.category}/${notification.param || ''}?tab=ask`
+        const win = window.open(knowledgeUrl, '_blank', 'noopener,noreferrer')
+        if (win) win.opener = null
+        // Fire-and-forget mark-as-read
+        void onNotificationClick(notification.id).catch(() => {})
+        return
+      }
+
+      // Case 2: Compute single-page redirects
+      let url: string | null = null
+      if (notification.type === 'order') {
+        url = 'https://app.insightabusiness.com/app/insighter-dashboard/sales?tab=2'
+      } else if (notification.sub_type.startsWith('client_meeting_reminder')) {
+        url = 'https://app.insightabusiness.com/app/insighter-dashboard/my-meetings?tab=client'
+      } else if (notification.sub_type === 'accept_knowledge') {
+        url = 'https://app.insightabusiness.com/app/insighter-dashboard/my-requests'
+      } else if (notification.sub_type === 'client_meeting_new') {
+        url = 'https://app.insightabusiness.com/app/insighter-dashboard/my-meetings?tab=client'
+      } else if (notification.sub_type === 'declined' && notification.type === 'knowledge') {
+        url = `https://app.insightabusiness.com/app/my-knowledge-base/view-my-knowledge/${notification.param}/details`
+      } else if (notification.sub_type.startsWith('client_')) {
+        url = 'https://app.insightabusiness.com/app/insighter-dashboard/my-meetings?tab=client'
+      } else if (notification.sub_type.startsWith('insighter_')) {
+        url = 'https://app.insightabusiness.com/app/insighter-dashboard/my-meetings?tab=client'
+      } else if (notification.type === 'knowledge' && notification.sub_type === 'approved') {
+        url = `https://app.insightabusiness.com/app/my-knowledge-base/view-my-knowledge/${notification.param}/details`
+      } else if (notification.sub_type.startsWith('client_meeting_insighter_postponed')) {
+        url = 'https://app.insightabusiness.com/app/insighter-dashboard/my-meetings/sent'
+      } else if (notification.sub_type.startsWith('client_meeting_reschedule')) {
+        url = 'https://app.insightabusiness.com/app/insighter-dashboard/my-meetings/sent'
+      } else if (notification.sub_type.startsWith('insighter_meeting_client_reschedule')) {
+        url = 'https://app.insightabusiness.com/app/insighter-dashboard/my-meetings?tab=client'
+      } else if (notification.sub_type.startsWith('insighter_meeting_reminder')) {
+        url = 'https://app.insightabusiness.com/app/insighter-dashboard/my-meetings?tab=client'
+      }else if (notification.sub_type ==='activate_insighter') {
+        url = 'https://app.insightabusiness.com/app/profile/overview'
+      }else if (notification.sub_type ==='deactivate_insighter') {
+        url = 'https://app.insightabusiness.com/app/profile/overview'
+      }
+
+      // Mark-as-read BEFORE redirect to avoid request being cancelled by navigation
+      try {
+        await onNotificationClick(notification.id)
+      } catch {
+        // ignore errors and still navigate
+      }
+      if (url) {
+        window.location.href = url
+      }
+    },
+    [onNotificationClick, currentLanguage]
+  )
 
   return (
     <div
       ref={componentRef}
-      className="w-80 sm:w-96 bg-white rounded-lg shadow-2xl overflow-hidden animate-fadeIn"
+      className="w-full h-full bg-white shadow-xl overflow-hidden flex flex-col animate-fadeIn"
+      dir={isRTL ? 'rtl' : 'ltr'}
       style={{
-        animation: 'fadeIn 0.2s ease-out',
-        boxShadow: '0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)',
-        direction: isRTL ? 'rtl' : 'ltr',
-        right: isRTL ? '0' : 'auto',
-        left: isRTL ? 'auto' : '0'
+        animation: 'fadeIn 0.2s ease-out'
       }}
     >
       <style jsx>{`
@@ -340,19 +472,14 @@ export default function NotificationsInner({
         }
       `}</style>
 
-      <div
-        className="px-5 py-4 text-white"
-        style={{ backgroundImage: 'url(https://app.insightabusiness.com/assets/media/misc/menu-header-bg.jpg)', backgroundSize: 'cover', backgroundPosition: 'center' }}
-      >
-        <h3 className="font-bold text-lg mt-4 mb-2">
-          {t('TITLE')}
-        </h3>
-      </div>
+      {/* Header */}
+      <NotificationsHeader onClose={onClickOutside} />
 
-      <div className="max-h-[400px] overflow-y-auto">
+      {/* Scrollable content */}
+      <div className="flex-1 overflow-y-auto">
         {/* Show message when no notifications are available */}
         {notifications.length === 0 && (
-          <div className="text-center py-10 px-4">
+          <div className="text-center py-10 px-6">
             <div className="text-gray-500 flex flex-col items-center">
               <svg xmlns="http://www.w3.org/2000/svg" className="h-12 w-12 text-gray-300 mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
@@ -364,35 +491,7 @@ export default function NotificationsInner({
 
         {/* All Notifications */}
         {notifications.length > 0 && notifications.map((notification) => (
-          <div
-            key={notification.id}
-            onClick={() => handleNotificationClick(notification)}
-            className="p-4 border-b border-gray-100 hover:bg-blue-50 cursor-pointer transition-colors duration-200"
-          >
-            <div className="flex items-start">
-              <div className={`flex-shrink-0 ${isRTL ? 'ml-3' : 'mr-3'}`}>
-                <div className={` h-12 w-12 rounded-md flex items-center justify-center bg-${getTailwindColor(getNotificationBg(notification.sub_type))}-50 text-${getTailwindColor(getNotificationBg(notification.sub_type))}-600`}>
-                {getNotificationIcon(notification.sub_type, getNotificationBg(notification.sub_type))}
-                </div>
-              </div>
-
-              <div className="flex-1 min-w-0">
-                <p className={`text-sm text-gray-900 ${!notification.read_at ? 'font-bold' : 'font-light'}`} style={{wordBreak: 'break-word'}}>
-                  {/* *** CHANGE 2: UPDATED FUNCTION CALL *** */}
-                  {getNotificationName(notification.sub_type, currentLanguage)}
-                </p>
-                <p className={`text-xs text-gray-400 ${!notification.read_at ? 'font-semibold' : 'font-normal'}`} style={{wordBreak: 'break-word'}}>
-                  {notification.message}
-                </p>
-              </div>
-              
-              <div className={`${isRTL ? 'mr-3' : 'ml-3'} mt-4`}>
-              <span className={`inline-flex items-center px-2 py-0.5 rounded-md text-xs font-semibold bg-[#EEF6FF] text-[#299AF8]`}>
-                  {t('VIEW')}
-                </span>
-              </div>
-            </div>
-          </div>
+          <NotificationItem key={notification.id} notification={notification} />
         ))}
       </div>
     </div>
