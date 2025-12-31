@@ -62,7 +62,33 @@ export function subscribePrivateUser(userId: number, token: string, currentLocal
   const client = getPusher(token, currentLocale)
   const channelName = `private-user.${userId}`
   lastChannelName = channelName
-  return client.subscribe(channelName)
+  const channel = client.subscribe(channelName)
+  const events = [
+    'account.activated',
+    'account.deactivated',
+    'knowledge.accepted',
+    'knowledge.declined',
+    'order.insight',
+    'knowledge.answer_question',
+    'knowledge.ask_question',
+    'meeting.client_meeting_insighter_approved',
+    'meeting.client_meeting_insighter_postponed',
+    'meeting.client_meeting_reminder',
+    'meeting.client_meeting_new',
+    'meeting.client_meeting_reschedule',
+    'meeting.insighter_meeting_approved',
+    'meeting.insighter_meeting_reminder',
+    'meeting.insighter_meeting_client_new',
+    'requests.action',
+    'requests'
+  ]
+  events.forEach((evt) => {
+    channel.bind(evt, (data: any) => {
+      // eslint-disable-next-line no-console
+      console.log('[Pusher] Event:', evt, data)
+    })
+  })
+  return channel
 }
 
 export function unsubscribePrivateUser(userId: number) {
