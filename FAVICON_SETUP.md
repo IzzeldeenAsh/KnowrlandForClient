@@ -173,3 +173,4 @@ If favicon still doesn't appear after 4 weeks:
 - Ensure no robots.txt rules block favicon
 - Check CDN/caching configuration
 
+

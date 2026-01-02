@@ -252,3 +252,4 @@ If you encounter issues:
 3. Verify all icon files load without 404 errors
 4. Ensure manifest is not blocked by CSP headers
 
+
