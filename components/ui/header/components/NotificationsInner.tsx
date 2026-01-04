@@ -45,6 +45,9 @@ const getVariantForSubType = (subType: string): Variant => {
     case 'deactivate_delete_company':
     case 'declined':
     case 'knowledge_declined':
+    case 'deactivate_insighter':
+    case 'deactivate_insighter_with_delete':
+    case 'deactivate_delete_insighter':
       return 'danger'
     case 'activate_insighter':
     case 'accept_knowledge':
@@ -77,35 +80,38 @@ const getNotificationBg = (subType: string): string => {
   switch (subType) {
     case 'order':
     case 'knowledge': // used as sub_type for order notifications
-      return 'success';
+      return 'green';
     case 'activate_company':
-      return 'success';
+      return 'green';
     case 'deactivate_company':
     case 'deactivate_company_with_delete':
     case 'deactivate_delete_company':
     case 'declined':
     case 'knowledge_declined':
-      return 'danger';
+    case 'deactivate_insighter':
+    case 'deactivate_insighter_with_delete':
+    case 'deactivate_delete_insighter':
+      return 'red';
     case 'activate_insighter':
     case 'accept_knowledge':
     case 'knowledge_accept':
     case 'approved':
     case 'download':
     case 'view':
-      return 'info';
+      return 'green';
     case 'upload':
-      return 'warning';
+      return 'yellow';
     case 'comment':
     case 'reply':
-      return 'primary';
+      return 'blue';
     case 'like':
-      return 'info';
+      return 'blue';
     case 'save':
-      return 'success';
+      return 'green';
     case 'share':
-      return 'warning';
+      return 'yellow';
     default:
-      return 'info';
+      return 'blue';
   }
 }
 
@@ -120,6 +126,8 @@ const colorMap: Record<string, string> = {
 
 // Helper function to get Tailwind color from Bootstrap/Angular color
 const getTailwindColor = (color: string): string => {
+  // Allow passing already-normalized Tailwind colors (e.g. "red") directly.
+  if (color in COLOR_CLASSES_BY_TW) return color
   return colorMap[color] || 'blue';
 }
 
@@ -128,7 +136,7 @@ const getNotificationIconName = (subType: string): string => {
   switch (subType) {
     case 'order':
     case 'knowledge': // used as sub_type for order notifications
-      return 'duotune/finance/fin010.svg';
+    return 'duotune/finance/Knlg010.svg';
     case 'activate_company':
       return 'duotune/arrows/arr086.svg';
     case 'deactivate_company':
@@ -220,11 +228,7 @@ const getNotificationIcon = (subType: string, color?: string): React.ReactNode =
   );
 }
 
-// Render icon using precomputed class (refactored usage)
-const getNotificationIconV2 = (subType: string): React.ReactNode => {
-  const iconPath = getNotificationIconName(subType)
-  return <SvgIcon src={`/${iconPath}`} className={`h-6 w-6 `} />
-}
+
 
 // *** CHANGE 1: UPDATED BILINGUAL FUNCTION ***
 // Helper function to determine display name based on notification sub_type and language
@@ -352,6 +356,9 @@ export default function NotificationsInner({
     const colorClasses = COLOR_CLASSES_BY_TW[color]
     const title = getNotificationName(notification.sub_type, currentLanguage)
     const iconPath = getNotificationIconName(notification.sub_type)
+    const bg = getNotificationBg(notification.sub_type)
+
+ 
     
     return (
       <div
@@ -368,13 +375,9 @@ export default function NotificationsInner({
       >
         <div className="flex items-start">
           <div className={`flex-shrink-0 ${isRTL ? 'ml-3' : 'mr-4'}`}>
-            <div className="w-[35px] h-[35px]">
-              <img
-                src={`/${iconPath}`}
-                className={`w-full h-full ${colorClasses.icon}`}
-                alt="notification icon"
-              />
-            </div>
+          <div className={` h-12 w-12 rounded-md flex items-center justify-center `}>
+                {getNotificationIcon(notification.sub_type, getNotificationBg(notification.sub_type))}
+                </div>
           </div>
 
           <div className="flex-1 min-w-0">

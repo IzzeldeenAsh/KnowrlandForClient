@@ -30,9 +30,10 @@ export function usePusherNotificaitons({ userId, token, currentLocale, eventName
       unbinders.push(() => channel.unbind(evt, handler))
     }
     const globalHandler = (eventName: string, data: any) => {
-      console.log(`[Pusher] ${eventName}`, data)
+      console.log('[Pusher][GLOBAL EVENT]', eventName, data)
     }
-    ;(channel as any).bind_global?.(globalHandler)
+// 👇 هذا المهم
+;(channel as any).bind_global(globalHandler)  
 
     return () => {
       try {

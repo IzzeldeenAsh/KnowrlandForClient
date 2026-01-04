@@ -43,11 +43,13 @@ export function getPusher(token: string, currentLocale: string): Pusher {
   })
 
   pusher.connection.bind('state_change', (states: any) => {
+    console.log('[Pusher] State change', states);
   })
   pusher.connection.bind('connected', () => {
+    console.log('[Pusher] Connected');
   })
   pusher.connection.bind('failed', () => {
-    console.error('[Pusher] Connection failed')
+    console.log('[Pusher] Connection failed');
   })
   pusher.connection.bind('error', (err: any) => {
     if (err?.error?.data?.code === 4100) {

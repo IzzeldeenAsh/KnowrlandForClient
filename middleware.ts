@@ -82,6 +82,24 @@ const intlMiddleware = createMiddleware({
 });
 
 export default function middleware(request: NextRequest) {
+  // Never run i18n/cookie middleware for Next.js internals or static assets.
+  // This prevents 500s for requests like /favicon.ico or /en/favicon.ico when
+  // the app is configured with locale prefixes.
+  const pathname = request.nextUrl.pathname;
+  const isNextInternal =
+    pathname.startsWith('/_next') ||
+    pathname.startsWith('/api') ||
+    pathname.startsWith('/_vercel');
+  const isStaticAsset =
+    pathname === '/favicon.ico' ||
+    pathname === '/robots.txt' ||
+    pathname === '/sitemap.xml' ||
+    /\.[a-z0-9]+$/i.test(pathname); // any file extension (png, ico, css, js, etc.)
+
+  if (isNextInternal || isStaticAsset) {
+    return NextResponse.next();
+  }
+
   // First try custom cookie-based logic
   const customResponse = customMiddleware(request);
   if (customResponse) {
