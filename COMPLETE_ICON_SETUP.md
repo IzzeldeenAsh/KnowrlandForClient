@@ -106,7 +106,7 @@ After deployment, verify:
 ```bash
 npm run build
 npm run start
-# Visit http://localhost:3000
+# Visit https://insightabusiness.com
 ```
 
 Check:
@@ -292,5 +292,7 @@ For Google Search specifically:
 - Ensure robots.txt allows favicon crawling
 - Verify no authentication required for icon files
 - Use Search Console for troubleshooting
+
+
 
 

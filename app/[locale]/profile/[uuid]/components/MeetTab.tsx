@@ -47,6 +47,7 @@ interface MeetTabProps {
   selectedDate: string | null;
   selectedMeetingTime: MeetingTime | null;
   uuid: string;
+  isOwnProfile: boolean;
   handlePreviousMonth: () => void;
   handleNextMonth: () => void;
   handleDateClick: (dateStr: string) => void;
@@ -148,6 +149,7 @@ export default function MeetTab({
   selectedDate,
   selectedMeetingTime,
   uuid,
+  isOwnProfile,
   handlePreviousMonth,
   handleNextMonth,
   handleDateClick,
@@ -895,21 +897,25 @@ export default function MeetTab({
                       )}
                     </div>
 
-                    {/* Always visible Book button */}
-                    <button
-                      onClick={handleBookMeetingClick}
-                      disabled={!selectedMeetingTime}
-                      className={`
-                        w-full py-3 px-6 rounded-lg font-medium transition-colors
-                        ${
-                          selectedMeetingTime
-                            ? "bg-blue-500 text-white hover:bg-blue-600"
-                            : "bg-gray-200 text-gray-400 cursor-not-allowed"
-                        }
-                      `}
-                    >
-                      {t("book")}
-                    </button>
+                    {/* Book button - hide when viewing own profile */}
+                    {!isOwnProfile && (
+                      <button
+                        onClick={handleBookMeetingClick}
+                        disabled={!selectedMeetingTime}
+                        className={`
+                          w-full py-3 px-6 rounded-lg font-medium transition-colors
+                          ${
+                            selectedMeetingTime
+                              ? "bg-blue-500 text-white hover:bg-blue-600"
+                              : "bg-gray-200 text-gray-400 cursor-not-allowed"
+                          }
+                        `}
+                      >
+                        {t("book")}
+                      </button>
+                    )}
+
+                   
                   </>
                 ) : (
                   <div className="text-center py-12">
