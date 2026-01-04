@@ -174,6 +174,7 @@ export default function ProfilePage() {
 
   const params = useParams();
   const searchParams = useSearchParams();
+  const router = useRouter();
   const uuid = params.uuid as string;
   const locale = params.locale as string;
   const isRTL = locale === "ar";
@@ -574,6 +575,21 @@ export default function ProfilePage() {
 
   // Load meeting availability data when tab changes to "meet"
   const handleTabChange = (value: string | null) => {
+    // Update URL with tab parameter
+    if (typeof window !== "undefined") {
+      const currentParams = new URLSearchParams(window.location.search);
+      
+      if (value) {
+        currentParams.set("tab", value);
+      } else {
+        currentParams.delete("tab");
+      }
+      
+      const newUrl = `${window.location.pathname}?${currentParams.toString()}`;
+      router.push(newUrl, { scroll: false });
+    }
+
+    // Fetch meeting availability when switching to meet tab
     if (value === "meet" && entityParam === "insighter") {
       fetchMeetingAvailability();
     }
@@ -1236,9 +1252,8 @@ export default function ProfilePage() {
                             : null
                   }
                 </Tabs.Tab>
-                {/* Hide Meet tab if user is viewing their own profile */}
+                {/* Show Meet tab for insighters */}
                 {(isInsighter || isCompanyInsighter || isCompany) &&
-                  !isOwnProfile &&
                   enterpriseType === "insighter" && (
                     <Tabs.Tab
                       value="meet"
@@ -1288,6 +1303,7 @@ export default function ProfilePage() {
                   selectedDate={selectedDate}
                   selectedMeetingTime={selectedMeetingTime}
                   uuid={uuid}
+                  isOwnProfile={isOwnProfile}
                   handlePreviousMonth={handlePreviousMonth}
                   handleNextMonth={handleNextMonth}
                   handleDateClick={handleDateClick}

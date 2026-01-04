@@ -34,7 +34,7 @@ npm run build
 npm run start
 ```
 
-Then visit: `http://localhost:3000` and check:
+Then visit: `https://insightabusiness.com` and check:
 - Browser tab shows favicon
 - View source shows all icon link tags
 - Check browser DevTools > Network tab for favicon requests
@@ -172,5 +172,7 @@ If favicon still doesn't appear after 4 weeks:
 - Verify favicon loads without authentication
 - Ensure no robots.txt rules block favicon
 - Check CDN/caching configuration
+
+
 
 

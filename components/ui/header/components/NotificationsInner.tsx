@@ -126,66 +126,39 @@ const getTailwindColor = (color: string): string => {
 // Helper function to get icon name based on notification sub_type (like the Angular notificationsIcons pipe)
 const getNotificationIconName = (subType: string): string => {
   switch (subType) {
-    case 'order':
     case 'knowledge': // used as sub_type for order notifications
-      return 'duotune/finance/fin010.svg';
-    case 'activate_company':
-      return 'duotune/arrows/arr086.svg';
+      return 'duotune/notificaitons/knowledge.svg';
     case 'deactivate_company':
     case 'deactivate_company_with_delete':
-    case 'deactivate_delete_company':
-      return 'duotune/general/gen047.svg';
-    case 'activate_insighter':
-      return 'duotune/arrows/arr086.svg';
     case 'deactivate_insighter':
     case 'deactivate_insighter_with_delete':
-    case 'deactivate_delete_insighter':
-      return 'duotune/general/gen047.svg';
-    case 'accept_knowledge':
-    case 'knowledge_accept':
-    case 'approved':
-      return 'duotune/files/fil025.svg';
+      return 'duotune/notificaitons/deactivate.svg';
+    case 'activate_company':
+    case 'activate_insighter':
+      return 'duotune/notificaitons/activate.svg';
     case 'declined':
     case 'knowledge_declined':
-      return 'duotune/general/gen050.svg';
-    case 'download':
-      return 'duotune/files/fil025.svg';
-    case 'upload':
-      return 'duotune/files/fil022.svg';
-    case 'comment':
-      return 'duotune/communication/com003.svg';
-    case 'reply':
-      return 'duotune/communication/com012.svg';
-    case 'like':
-      return 'duotune/general/gen030.svg';
-    case 'save':
-      return 'duotune/general/gen019.svg';
-    case 'share':
-      return 'duotune/general/gen016.svg';
-    case 'view':
-      return 'duotune/general/gen007.svg';
-    case 'Question':
-      return 'duotune/communication/com007.svg';
-    case 'Answer Question':
-      return 'duotune/communication/com007.svg';
+      return 'duotune/notificaitons/decline.svg';
+    case 'accept_knowledge':
+      return 'duotune/notificaitons/accept_knlg.svg';
     case 'client_meeting_insighter_approved':
-      return 'duotune/general/gen014.svg';
+      return 'duotune/notificaitons/accept_mtg.svg';
     case 'client_meeting_new':
-      return 'duotune/general/gen014.svg';
+      return 'duotune/notificaitons/mtg.svg';
     case 'insighter_meeting_client_new':
-      return 'duotune/general/gen014.svg';
+      return 'duotune/notificaitons/mtg.svg';
     case 'insighter_meeting_approved':
-      return 'duotune/general/gen014.svg';
-      case "client_meeting_insighter_postponed":
-        return 'duotune/general/gen014.svg';
-    case 'insighter_meeting_client_reschedule':
-      return 'duotune/general/gen014.svg';
-      case "insighter_meeting_reminder":
-        return 'duotune/general/gen014.svg';
+      return 'duotune/notificaitons/accept_mtg.svg';
+    case 'client_meeting_insighter_postponed':
+      return 'duotune/notificaitons/postp_mtg.svg';
     case 'client_meeting_reschedule':
-      return 'duotune/general/gen014.svg';
+      return 'duotune/notificaitons/mtg.svg';
+    case 'insighter_meeting_client_reschedule':
+      return 'duotune/notificaitons/mtg.svg';
+    case 'insighter_meeting_reminder':
+      return 'duotune/notificaitons/mtg.svg';
     case 'client_meeting_reminder':
-      return 'duotune/general/gen014.svg';
+      return 'duotune/notificaitons/mtg.svg';
     default:
       return 'duotune/general/gen007.svg';
   }
@@ -218,9 +191,9 @@ const getNotificationIcon = (subType: string, color?: string): React.ReactNode =
 }
 
 // Render icon using precomputed class (refactored usage)
-const getNotificationIconV2 = (subType: string, iconColorClass: string): React.ReactNode => {
+const getNotificationIconV2 = (subType: string): React.ReactNode => {
   const iconPath = getNotificationIconName(subType)
-  return <SvgIcon src={`/${iconPath}`} className={`h-6 w-6 ${iconColorClass}`} />
+  return <SvgIcon src={`/${iconPath}`} className={`h-6 w-6 `} />
 }
 
 // *** CHANGE 1: UPDATED BILINGUAL FUNCTION ***
@@ -344,8 +317,12 @@ export default function NotificationsInner({
   }: {
     notification: Notification
   }) => {
-    const colorClasses = getColorClassesForSubType(notification.sub_type)
+    const variant = getVariantForSubType(notification.sub_type)
+    const color = VARIANT_TO_TW_COLOR[variant] ?? 'blue'
+    const colorClasses = COLOR_CLASSES_BY_TW[color]
     const title = getNotificationName(notification.sub_type, currentLanguage)
+    const iconPath = getNotificationIconName(notification.sub_type)
+    
     return (
       <div
         onClick={() => handleNotificationClick(notification)}
@@ -360,9 +337,13 @@ export default function NotificationsInner({
         className="px-5 py-4 border-b border-gray-100 hover:bg-blue-50 cursor-pointer transition-colors duration-200 outline-none focus:ring-2 focus:ring-blue-200"
       >
         <div className="flex items-start">
-          <div className={`flex-shrink-0 ${isRTL ? 'ml-3' : 'mr-3'}`}>
-            <div className={`h-12 w-12 rounded-md flex items-center justify-center  ${colorClasses.text}`}>
-              {getNotificationIconV2(notification.sub_type, colorClasses.icon)}
+          <div className={`flex-shrink-0 ${isRTL ? 'ml-3' : 'mr-4'}`}>
+            <div className="w-[35px] h-[35px]">
+              <img
+                src={`/${iconPath}`}
+                className={`w-full h-full ${colorClasses.icon}`}
+                alt="notification icon"
+              />
             </div>
           </div>
 
