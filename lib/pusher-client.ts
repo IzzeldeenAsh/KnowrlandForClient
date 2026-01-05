@@ -11,9 +11,9 @@ type PusherOpts = {
 }
 
 function getConfig(): PusherOpts {
-  const key = process.env.NEXT_PUBLIC_PUSHER_KEY
-  const cluster = process.env.NEXT_PUBLIC_PUSHER_CLUSTER || 'eu'
-  const authEndpoint = process.env.NEXT_PUBLIC_PUSHER_AUTH_ENDPOINT
+  const key = '41745ad5e299f4af9e36';
+  const cluster =  'eu';
+  const authEndpoint = 'https://api.insightabusiness.com/broadcasting/auth';
   if (!key || !authEndpoint) {
     console.error('[Pusher] Missing env: NEXT_PUBLIC_PUSHER_KEY or NEXT_PUBLIC_PUSHER_AUTH_ENDPOINT')
   }
