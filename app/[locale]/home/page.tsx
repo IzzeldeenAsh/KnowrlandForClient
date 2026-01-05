@@ -4,7 +4,6 @@ import React, { useState, useEffect, useCallback, useRef } from 'react'
 import { useParams, useSearchParams, useRouter } from 'next/navigation';
 import { useTranslations } from 'next-intl'
 import { useToast } from '@/components/toast/ToastContext';
-import Footer from '@/components/ui/footer'
 import PageIllustration from "@/components/page-illustration";
 import type { KnowledgeItem } from '../topic/[id]/[slug]/KnowledgeGrid';
 import type { SearchResultItem } from './SearchResultsGrid';
@@ -1668,7 +1667,6 @@ export default function HomePage() {
         </div>
       </div>
       </section>
-      <Footer/>
    </main>
   )
 }
