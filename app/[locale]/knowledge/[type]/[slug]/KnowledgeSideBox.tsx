@@ -1041,7 +1041,6 @@ const KnowledgeSideBox = ({
             }
 
             .tp-course-details2-widget-list-item {
-              flex-direction: column;
               align-items: flex-start;
               gap: 8px;
             }

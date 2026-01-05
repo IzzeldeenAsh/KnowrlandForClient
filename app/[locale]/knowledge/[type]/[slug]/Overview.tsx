@@ -71,6 +71,7 @@ export default function Overview({ knowledge, knowledgeSlug }: OverviewProps) {
   const locale = params.locale;
   const isRTL = locale === 'ar';
   const isArabicContent = knowledge.language === 'arabic';
+  const isContentRTL = isRTL || isArabicContent;
   const { user } = useGlobalProfile();
   const router = useRouter();
 
@@ -277,19 +278,21 @@ export default function Overview({ knowledge, knowledgeSlug }: OverviewProps) {
                     </div>
                   )}
                   {doc.table_of_content && Array.isArray(doc.table_of_content) && doc.table_of_content.length > 0 && (
-                    <div className={styles.tableOfContents}>
+                    <div className={styles.tableOfContents} dir={isContentRTL ? 'rtl' : 'ltr'}>
                       <h6>{translations.tableOfContents}</h6>
                       <table className={styles.tocTable}>
-                        <thead>
+                        {/* <thead>
                           <tr>
                             <th>{translations.chapter}</th>
-                            <th>{translations.title}</th>
+                            <th className={styles.tocTitleHeader}></th>
                           </tr>
-                        </thead>
+                        </thead> */}
                         <tbody>
                           {doc.table_of_content.map((toc, index) => (
                             <tr key={index}>
-                              <td>{translations.chapter} {index + 1}</td>
+                              <td className={styles.tocChapterCol}>
+                                {translations.chapter} {index + 1}
+                              </td>
                               <td>{toc.chapter?.title || toc.title}</td>
                             </tr>
                           ))}
