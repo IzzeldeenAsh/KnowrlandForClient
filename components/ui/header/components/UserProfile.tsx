@@ -40,7 +40,8 @@ export function UserProfile({ isHome }: { isHome: boolean }) {
       // For smaller screens, center the menu
       if (viewportWidth < 640) {
         setMenuPosition({
-          top: rect.bottom + window.scrollY,
+          // Menu is `position: fixed`, so use viewport coordinates (no scrollY offset)
+          top: rect.bottom,
           left: Math.max(10, viewportWidth / 2 - 150),
           right: null,
         });
@@ -48,13 +49,15 @@ export function UserProfile({ isHome }: { isHome: boolean }) {
         // For larger screens, align with profile button
         if (isRtl) {
           setMenuPosition({
-            top: rect.bottom + window.scrollY,
+            // Menu is `position: fixed`, so use viewport coordinates (no scrollY offset)
+            top: rect.bottom,
             left: Math.max(10, rect.left),
             right: null,
           });
         } else {
           setMenuPosition({
-            top: rect.bottom + window.scrollY,
+            // Menu is `position: fixed`, so use viewport coordinates (no scrollY offset)
+            top: rect.bottom,
             left: null,
             right: Math.max(10, viewportWidth - rect.right),
           });

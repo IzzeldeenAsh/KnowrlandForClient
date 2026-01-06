@@ -98,7 +98,8 @@ export default function Overview({ knowledge, knowledgeSlug }: OverviewProps) {
     chapter: isRTL ? 'الفصل' : 'Chapter',
     title: isRTL ? 'العنوان' : 'Title',
     noDocumentsAvailable: isRTL ? 'لا توجد مستندات متاحة.' : 'No documents available.',
-    alreadyPurchased: isRTL ? 'تم الشراء ' : 'Purchased'
+    alreadyPurchased: isRTL ? 'تم الشراء ' : 'Purchased',
+    purchasedMini: isRTL ? 'تم الشراء' : 'Purchased',
   };
 
   // Check if user is logged in
@@ -251,6 +252,11 @@ export default function Overview({ knowledge, knowledgeSlug }: OverviewProps) {
     <span id={`doc-price-${doc.id}`} className={`${styles.badge} ${styles.badgeFree}`} role="text" aria-label={`${translations.free} document`}>{translations.free}</span>
   ) : (
     <span id={`doc-price-${doc.id}`} className={styles.badge} role="text" aria-label={`Price: $${parseFloat(doc.price).toFixed(2)}`}>${parseFloat(doc.price).toFixed(2)}</span>
+  )}
+  {doc.is_purchased && (
+    <span className={styles.purchasedMini} aria-label={`${translations.purchasedMini} - ${doc.file_name}`}>
+    {translations.purchasedMini}
+    </span>
   )}
 </div>
                   <div className={styles.expandIcon}>

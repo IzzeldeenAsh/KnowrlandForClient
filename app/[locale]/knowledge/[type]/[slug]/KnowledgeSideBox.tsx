@@ -114,9 +114,17 @@ const KnowledgeSideBox = ({
 
   useEffect(() => {
     if (shareModalOpened) {
+      // Seed a default share message (only if the user hasn't typed anything yet)
+      if (!customShareMessage.trim()) {
+        const defaultBase = isRTL
+          ? 'اطّلع على هذه الرؤية  :'
+          : 'Check out this insight:';
+        const title = typeof document !== 'undefined' ? document.title : '';
+        setCustomShareMessage(title ? `${defaultBase} ${title}` : defaultBase);
+      }
       shareTextareaRef.current?.focus();
     }
-  }, [shareModalOpened]);
+  }, [shareModalOpened, customShareMessage, isRTL]);
   
   // Function to toggle section expansion
   const toggleSection = (section: 'economicBlocs' | 'regions' | 'countries' | 'documents' | 'isicCode' | 'hsCode') => {

@@ -340,6 +340,20 @@
 .priceTag {
   position: relative;
   z-index: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+}
+
+.purchasedMini {
+  font-size: 0.52rem;
+  line-height: 1;
+  color: #277dce; /* green */
+  font-weight: 400;
+  opacity: 0.95;
+  white-space: nowrap;
+  padding-top: 2px;
 }
 
 .badge {
