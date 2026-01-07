@@ -18,6 +18,7 @@ import listStyles from "../topic/[id]/[slug]/knowledge-list.module.css";
 import cardStyles from "../topic/[id]/[slug]/knowledge-card.module.css";
 import axios from 'axios';
 import AuthModal from '../knowledge/[type]/[slug]/AuthModal';
+import { isFirstWordArabic } from '@/app/utils/textUtils';
 
 const BookmarkUnselectedIcon = (props: React.SVGProps<SVGSVGElement>) => {
   const { width = 33, height = 33, ...rest } = props;
@@ -391,6 +392,7 @@ export default function SearchResultsList({
     noItems: isRTL ? "لا توجد نتائج بحث متاحة" : "No search results available",
     posted: isRTL ? "نُشر" : "Posted",
     free: isRTL ? "مجاني" : "Free",
+    partial: isRTL ? "مدفوع جزئي" : "Partial",
     insighter: isRTL ? "إنسايتر" : "Insighter",
     by: isRTL ? "من قبل" : "By",
     company: isRTL ? "الشركة" : "Company",
@@ -430,10 +432,19 @@ export default function SearchResultsList({
               const hasPrice = normalizedPrice !== "";
               const numericPrice = Number(normalizedPrice);
               const isNumericPrice = normalizedPrice !== "" && !Number.isNaN(numericPrice);
-              const isFreePrice = isNumericPrice && numericPrice === 0;
               const formattedPrice = isNumericPrice
                 ? `$${numericPrice.toLocaleString('en-US', { maximumFractionDigits: 2 })}`
                 : normalizedPrice;
+              const paidStatus: 'free' | 'partial_paid' | 'paid' | undefined =
+                typeof item.paid === 'string'
+                  ? (item.paid as 'free' | 'partial_paid' | 'paid')
+                  : typeof item.paid === 'boolean'
+                    ? (item.paid ? 'paid' : 'free')
+                    : undefined;
+              const shouldShowFree = paidStatus === 'free' || (!paidStatus && isNumericPrice && numericPrice === 0);
+              const shouldShowPartial = paidStatus === 'partial_paid';
+              const shouldShowPaid = paidStatus === 'paid';
+              const shouldShowPricing = shouldShowFree || shouldShowPartial || (shouldShowPaid && hasPrice) || (!paidStatus && hasPrice);
               const coverageText = formatCoverageRange(item.cover_start, item.cover_end);
               const roles = Array.isArray(item.insighter?.roles) ? item.insighter.roles : [];
               const isCompany = roles.includes("company");
@@ -488,8 +499,8 @@ export default function SearchResultsList({
                   <Text
                     component="h3"
                     style={{wordBreak:'break-word'}}
-                    className={`${listStyles.title} ${item.language === 'arabic' ? 'text-right' : 'text-left'}`}
-                    dir={item.language === 'arabic' ? 'rtl' : 'ltr'}
+                    className={`${listStyles.title} ${isFirstWordArabic(item.title) ? 'text-right' : 'text-left'}`}
+                    dir={isFirstWordArabic(item.title) ? 'rtl' : 'ltr'}
                   >
                     {item.title}
                   </Text>
@@ -501,7 +512,7 @@ export default function SearchResultsList({
                   )}
                 </div>
                 {coverageText && (
-                  <div className={`absolute bottom-4 ${item.language === 'arabic' ? 'right-4' : 'left-4'}`} dir={item.language === 'arabic' ? 'rtl' : 'ltr'}>
+                  <div className={`absolute bottom-4 ${isFirstWordArabic(item.title) ? 'right-4' : 'left-4'}`} dir={isFirstWordArabic(item.title) ? 'rtl' : 'ltr'}>
                     <div
                       className="text-lg font-bold leading-none text-blue-400 drop-shadow-lg"
                     >
@@ -637,7 +648,7 @@ export default function SearchResultsList({
               </div>
             
               {/* Only show contentColumn if there's content to display */}
-              {(item.description || (item.searchable_type === "knowledge" && (hasPrice || item.published_at))) && (
+              {(item.description || (item.searchable_type === "knowledge" && (shouldShowPricing || item.published_at))) && (
                 <div className={listStyles.contentColumn} style={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-between', height: '100%' }}>
                   {item.description && (
                     <>
@@ -645,7 +656,7 @@ export default function SearchResultsList({
                         <div
                           className={`${listStyles.richDescription} ${listStyles.richDescriptionCollapsed}`}
                           ref={(el) => { descRefs.current[item.searchable_id] = el; }}
-                          dir={(item.language === 'arabic') ? "rtl" : "ltr"}
+                          dir={isFirstWordArabic(item.title) ? "rtl" : "ltr"}
                           style={{ whiteSpace: 'pre-line' }}
                         >
                           {htmlToPlainTextWithBreaks(item.description)}
@@ -665,14 +676,36 @@ export default function SearchResultsList({
                   {item.searchable_type === "knowledge" && (
                     <div className={listStyles.detailsSection}>
                       <div className="flex items-center gap-3">
-                        {hasPrice && (
-                          <Badge
-                            color={isFreePrice ? "green" : "yellow"}
-                            variant="light"
-                            className={listStyles.priceBadge}
-                          >
-                            {isFreePrice ? translations.free : <span dir="ltr" lang="en">{formattedPrice}</span>}
-                          </Badge>
+                        {shouldShowPricing && (
+                          <>
+                            {shouldShowPartial && (
+                              <Badge
+                                color="yellow"
+                                variant="light"
+                                className={listStyles.priceBadge}
+                              >
+                                {translations.partial}
+                              </Badge>
+                            )}
+                            {(shouldShowPaid || (!paidStatus && hasPrice) || (shouldShowPartial && hasPrice)) && (
+                              <Badge
+                                color="yellow"
+                                variant="light"
+                                className={listStyles.priceBadge}
+                              >
+                                <span dir="ltr" lang="en">{formattedPrice}</span>
+                              </Badge>
+                            )}
+                            {shouldShowFree && !shouldShowPartial && !(shouldShowPaid && hasPrice) && (
+                              <Badge
+                                color="green"
+                                variant="light"
+                                className={listStyles.priceBadge}
+                              >
+                                {translations.free}
+                              </Badge>
+                            )}
+                          </>
                         )}
                         
                         {item.published_at && (

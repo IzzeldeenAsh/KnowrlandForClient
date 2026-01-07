@@ -170,14 +170,14 @@ export default async function SubIndustryPage({ params }: Props) {
                   const isDisabled = topic.weight === 0;
                   
                   return isDisabled ? (
-                    <div key={topic.id} className="h-full" role="listitem">
+                    <div key={topic.id} className="h-full block max-w-[320px] sm:max-w-[100%]" role="listitem">
                       <TopicCard topic={topic} locale={locale} isRTL={isRTL} />
                     </div>
                   ) : (
                     <Link 
                       key={topic.id} 
                       href={`/${locale}/topic/${topic.id}/${topic.slug}`} 
-                      className="h-full block"
+                      className="h-full block max-w-[320px] sm:max-w-[100%]"
                       role="listitem"
                       aria-label={`View ${topic.name} topic details`}
                     >

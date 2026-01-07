@@ -4,6 +4,7 @@ import React, { useState } from 'react';
 import { Text, Card, Badge, Group, Avatar, Rating } from "@mantine/core";
 import Link from "next/link";
 import Image from "next/image";
+import { ArrowDownTrayIcon } from '@heroicons/react/24/outline';
 import DataIcon from "@/components/icons/DataIcon";
 import InsightIcon from "@/components/icons/InsightIcon";
 import ManualIcon from "@/components/icons/ManualIcon";
@@ -78,13 +79,16 @@ export interface KnowledgeItem {
   type: string;
   title: string;
   description: string;
-  total_price: string;
+  total_price?: string;
+  price?: string; // Price as string from API
   published_at: string;
+  review?: string; // Review as string (e.g., "4.5")
   review_summary?: {
     count: number;
     average: number;
   };
   insighter: {
+    uuid?: string;
     name: string;
     profile_photo_url: string | null;
     roles: string[];
@@ -92,10 +96,15 @@ export interface KnowledgeItem {
       uuid: string;
       legal_name: string;
       logo: string;
+      verified?: boolean;
     };
   };
   is_read_later?: boolean;
   language?: 'english' | 'arabic';
+  cover_start?: number; // Coverage start year
+  cover_end?: number;   // Coverage end year
+  total_downloads?: number;
+  paid?:  'free' | 'partial_paid' | 'paid';
 }
 
 function getInitials(name: string) {
@@ -142,6 +151,18 @@ function truncateDescription(
   if (words.length <= wordLimit) return plainText;
 
   return words.slice(0, wordLimit).join(" ") + "...";
+}
+
+// Format coverage years nicely
+function formatCoverageRange(start?: number, end?: number): string {
+  const hasStart = typeof start === 'number' && !Number.isNaN(start);
+  const hasEnd = typeof end === 'number' && !Number.isNaN(end);
+  if (hasStart && hasEnd) {
+    return start === end ? String(start) : `${start}–${end}`;
+  }
+  if (hasStart) return String(start);
+  if (hasEnd) return String(end);
+  return '';
 }
 
 export default function KnowledgeGrid({
@@ -228,10 +249,16 @@ export default function KnowledgeGrid({
     noItems: isRTL ? "لا توجد عناصر معرفية متاحة بعد" : "No knowledge items available yet",
     posted: isRTL ? "نُشر" : "Posted",
     free: isRTL ? "مجاني" : "Free",
+    partial: isRTL ? "مدفوع جزئي" : "Partial Paid",
     paid: isRTL ? "مدفوع" : "PAID",
     insighter: isRTL ? "إنسايتر" : "Insighter",
-    company: isRTL ? "شركة" : "Company" ,
-    by: isRTL ? "من قبل" : "By"
+    company: isRTL ? "الشركة" : "Company",
+    by: isRTL ? "من قبل" : "By",
+    downloads: isRTL ? "تحميل" : "Downloads",
+    downloaded: isRTL ? "تم التحميل" : "Downloaded",
+    time: isRTL ? "مرة" : "time",
+    times: isRTL ? "مرات" : "times",
+    download: isRTL ? "تحميل" : "Download",
   };
 
   return (
@@ -245,218 +272,291 @@ export default function KnowledgeGrid({
       <div
         className={`grid sm:grid-cols-2 lg:grid-cols-${colNumbers} gap-4 max-w-7xl mx-auto`}
       >
-        {knowledge.map((item: KnowledgeItem) => {
-          const priceString = item.total_price?.toString().trim() ?? "";
-          const numericPrice = Number(priceString);
-          const isNumericPrice = priceString !== "" && !Number.isNaN(numericPrice);
-          const isFree = isNumericPrice ? numericPrice === 0 : priceString === "0";
+        {knowledge.map((item: KnowledgeItem, index) => {
+          const normalizedPrice = String(item.price ?? item.total_price ?? "").trim();
+          const hasPrice = normalizedPrice !== "";
+          const numericPrice = Number(normalizedPrice);
+          const isNumericPrice = normalizedPrice !== "" && !Number.isNaN(numericPrice);
           const formattedPrice = isNumericPrice
-            ? `$${numericPrice.toLocaleString(
-                currentLocale === "ar" ? "en-US" : "en-US",
-                { maximumFractionDigits: 2 }
-              )}`
-            : priceString || translations.paid;
+            ? `$${numericPrice.toLocaleString('en-US', { maximumFractionDigits: 2 })}`
+            : normalizedPrice;
+          const paidStatus: 'free' | 'partial_paid' | 'paid' | undefined =
+            typeof item.paid === 'string'
+              ? (item.paid as 'free' | 'partial_paid' | 'paid')
+              : typeof item.paid === 'boolean'
+                ? (item.paid ? 'paid' : 'free')
+                : undefined;
+          const shouldShowFree = paidStatus === 'free' || (!paidStatus && isNumericPrice && numericPrice === 0);
+          const shouldShowPartial = paidStatus === 'partial_paid';
+          const shouldShowPaid = paidStatus === 'paid';
+          const shouldShowPricing = shouldShowFree || shouldShowPartial || (shouldShowPaid && hasPrice && numericPrice > 0) || (!paidStatus && hasPrice && numericPrice > 0);
+          const coverageText = formatCoverageRange(item.cover_start, item.cover_end);
+          
+          // Get review value - prefer review string, fallback to review_summary.average
+          const reviewValue = item.review ? parseFloat(item.review) : (item.review_summary?.average ?? 0);
+          const reviewCount = item.review_summary?.count ?? 0;
 
           return (
             <Card
-              key={`${item.type}-${item.slug}`}
+              key={`${item.type}-${item.slug}-${index}`}
               withBorder
               padding="lg"
               radius="xs"
               className={cardStyles.card}
-              data-aos="fade-up"
               component="div"
             >
               <Link
                 href={`/${currentLocale}/knowledge/${item.type}/${item.slug}`}
                 className="block relative h-full flex flex-col"
+                onClick={(e) => {
+                  // Check if the URL is valid before navigation
+                  if (!item.slug || item.slug.trim() === '') {
+                    e.preventDefault();
+                    console.error('Invalid slug for item:', item);
+                    return;
+                  }
+                }}
               >
-                <div className={cardStyles.darkSection}>
-                  <div>
-                    <div className="flex items-center mb-3">
-                      {item.type === "report" && <ReportIcon width={20} height={20} />}
-                      {item.type === "manual" && <ManualIcon width={20} height={20} />}
-                      {item.type === "statistic" && <InsightIcon width={20} height={20} />}
-                      {item.type === "data" && <DataIcon width={20} height={20} />}
-                      {item.type === "article" && <CourseIcon width={20} height={20} />}
-                      {item.type === "course" && <CourseIcon width={20} height={20} />}
+             
+              <div className={`${cardStyles.darkSection} relative`}>
+                <div>
+                  <div className="flex items-center mb-3">
+                    {item.type === "report" && <ReportIcon width={20} height={20} />}
+                    {item.type === "manual" && <ManualIcon width={20} height={20} />}
+                    {item.type === "statistic" && <InsightIcon width={20} height={20} />}
+                    {item.type === "data" && <DataIcon width={20} height={20} />}
+                    {item.type === "course" && <CourseIcon width={20} height={20} />}
 
-                      <Badge w="fit-content" className="capitalize ml-2" variant="light">
-                        {typeTranslations[item.type.toLowerCase()] || item.type}
-                      </Badge>
-                    </div>
-                    
-                    <Text
-                      fw={700}
-                      className={`${cardStyles.title} `}
-                      lineClamp={2}
-                      style={{ textAlign: item.language?.toLowerCase() === 'arabic' ? 'right' : 'left' }}
-                    >
-                      {item.title}
-                    </Text>
+                    <Badge c={'#67b5f6'} w="fit-content" className="capitalize ml-2 " variant="light">
+                      {item.type && typeof item.type === 'string' ? (typeTranslations[item.type.toLowerCase()] || item.type) : ''}
+                    </Badge>
                   </div>
                   
-                  {item.review_summary && item.review_summary.count >= 1 && item.review_summary.average > 0 && (
-                    <div className="flex items-center mt-auto gap-1">
-                      <Rating value={item.review_summary.average} fractions={2} readOnly size="sm" />
-                      <Text size="xs" fw={500} className="mx-2 text-sky-500">{item.review_summary.average.toFixed(1)}</Text>
-                      <Text size="xs" c="dimmed" className="mx-2 text-gray-300">({item.review_summary.count})</Text>
+                  <Text
+                  style={{wordBreak:'break-word'}}
+                    fw={700}
+                    className={`${cardStyles.title} ${item.language === 'arabic' ? 'text-right' : 'text-left'}`}
+                    pt={4}
+                    lineClamp={2}
+                    dir={item.language === 'arabic' ? 'rtl' : 'ltr'}
+                  >
+                    {item.title}
+                  </Text>
+                  {coverageText && (
+                  <div className={`${item.language === 'arabic' ? 'text-right' : 'text-left'}`} dir={item.language === 'arabic' ? 'rtl' : 'ltr'}>
+                    <div
+                      
+                      className={`text-lg  font-bold leading-none   drop-shadow-lg text-blue-400`}
+                    >
+                      {coverageText}
                     </div>
-                  )}
+                  </div>
+                )}
                 </div>
+                
+                {reviewValue >= 1 && (
+                  <div className="flex items-center mt-auto gap-1">
+                    <Rating value={reviewValue} fractions={2} readOnly size="sm" />
+                    <Text size="xs" fw={500} className="mx-2 text-sky-500">{reviewValue.toFixed(1)}</Text>
+                  </div>
+                )}
+                
+                {item.total_downloads !== undefined && item.total_downloads > 0 && (
+                  <div className="absolute bottom-4 left-4 flex items-center gap-2">
+                    <div className="flex items-center justify-center w-6 h-6 bg-white bg-opacity-20 rounded-full">
+                      <ArrowDownTrayIcon className="w-3 h-3 text-white" />
+                    </div>
+                    <Text size="xs" className="text-white font-medium">
+                       {item.total_downloads.toLocaleString()} {item.total_downloads === 1 ? translations.download : translations.downloads}
+                    </Text>
+                  </div>
+                )}
+               
+              </div>
               </Link>
               <div className={cardStyles.whiteSection + " flex flex-col h-full "}>
                 {/* Top row with insighter info and action buttons */}
                 <div className="flex justify-between items-center pb-4">
-                  <Link
-                    href={`/${currentLocale}/knowledge/${item.type}/${item.slug}`}
-                    className="block relative h-full flex flex-col"
-                  >
-                    {showInsighter && (
-                      <div className="flex items-center">
-                        <div className="relative">
-                          <div className="object-cover object-top">
-                            <Avatar
-                              src={(item.insighter.roles.includes("company") || item.insighter.roles.includes("company-insighter")) && item.insighter.company?.logo
-                                ? item.insighter.company.logo
-                                : item.insighter.profile_photo_url}
-                              radius="xl"
-                              alt={item.insighter.name}
-                              size="md"
-                              className={`${cardStyles.avatar} avatar-top-position`}
-                            >
-                              {!((item.insighter.roles.includes("company") || item.insighter.roles.includes("company-insighter")) && item.insighter.company?.logo) &&
-                                !item.insighter.profile_photo_url &&
-                                getInitials(item.insighter.name)}
-                            </Avatar>
-                          </div>
+                  {showInsighter && item.insighter && (
+                    <div className="flex items-center">
+                      <div className="relative">
+                   <div className="object-cover object-top">
+                   <Link 
+                     href={item.insighter.roles.includes("company") || item.insighter.roles.includes("company-insighter") ? 
+                       `/${currentLocale}/profile/${item.insighter.company?.uuid}` : 
+                       `/${currentLocale}/profile/${item.insighter.uuid || item.insighter.name}?entity=insighter`}
+                   >
+                     <Avatar
+                       src={(item.insighter.roles.includes("company") || item.insighter.roles.includes("company-insighter")) && item.insighter.company?.logo ? 
+                         item.insighter.company.logo : 
+                         item.insighter.profile_photo_url}
+                       radius="xl"
+                       alt={item.insighter.name}
+                       size="md"
+                       className={`${cardStyles.avatar} avatar-top-position`}
+                     >
+                       {!((item.insighter.roles.includes("company") || item.insighter.roles.includes("company-insighter")) && item.insighter.company?.logo) && 
+                       !item.insighter.profile_photo_url &&
+                         getInitials(item.insighter.name)}
+                     </Avatar>
+                   </Link>
+                   </div>
+                        
+                        {item.insighter.roles.includes("company-insighter") && item.insighter.profile_photo_url && (
+                          <Link href={`/${currentLocale}/profile/${item.insighter.uuid || item.insighter.name}?entity=insighter`}>
+                          <Avatar
+                            src={item.insighter.profile_photo_url}
+                            radius="xl"
+                            size="xs"
+                            className="absolute bottom-0 right-0 translate-x-1/3 rounded-full translate-y-1/3 z-10 avatar-top-position"
+                            alt={item.insighter.name}
+                            style={{
+                              boxShadow: '0 0 0 2px white',
+                              position: 'absolute',
+                            }}
+                          />
+                          </Link>
+                        )}
+                         {item.insighter.roles.includes("company") && item.insighter.profile_photo_url && (
+                          <Link href={`/${currentLocale}/profile/${item.insighter.uuid || item.insighter.name}?entity=insighter`}>
+                          <Avatar
+                            src={item.insighter.profile_photo_url}
+                            radius="xl"
+                            size="xs"
+                            className="absolute bottom-0 right-0 translate-x-1/3 rounded-full translate-y-1/3 z-10 avatar-top-position"
+                            alt={item.insighter.name}
+                            style={{
+                              boxShadow: '0 0 0 2px white',
+                              position: 'absolute',
+                            }}
+                          />
+                          </Link>
+                        )}
+                      </div>
 
-                          {item.insighter.roles.includes("company-insighter") && item.insighter.profile_photo_url && (
-                            <Avatar
-                              src={item.insighter.profile_photo_url}
-                              radius="xl"
-                              size="xs"
-                              className="absolute bottom-0 right-0 translate-x-1/3 rounded-full translate-y-1/3 z-10 avatar-top-position"
-                              alt={item.insighter.name}
-                              style={{
-                                boxShadow: "0 0 0 2px white",
-                                position: "absolute",
-                              }}
-                            />
+                      <div className="ms-3">
+                        <Text fw={600} size="sm" className="capitalize">
+                          <Link href={`/${currentLocale}/profile/${item.insighter.uuid || item.insighter.name}?entity=insighter`}>
+                          {item.insighter.roles.includes("insighter") && item.insighter.name.toLowerCase()}
+                          </Link>
+
+                        <Link href={`/${currentLocale}/profile/${item.insighter.company?.uuid}`}>
+                          {item.insighter.roles.includes("company") && (
+                            item.insighter.company
+                              ? isRTL
+                                ? ` ${item.insighter.company.legal_name}`
+                                : `${item.insighter.company.legal_name} `
+                              : translations.company
                           )}
+                          </Link>
 
-                          {item.insighter.roles.includes("company") && item.insighter.profile_photo_url && (
-                            <Avatar
-                              src={item.insighter.profile_photo_url}
-                              radius="xl"
-                              size="xs"
-                              className="absolute bottom-0 right-0 translate-x-1/3 rounded-full translate-y-1/3 z-10 avatar-top-position"
-                              alt={item.insighter.name}
-                              style={{
-                                boxShadow: "0 0 0 2px white",
-                                position: "absolute",
-                              }}
-                            />
+                          <Link href={`/${currentLocale}/profile/${item.insighter.company?.uuid}`}>
+                          {item.insighter.roles.includes("company-insighter") && (
+                            item.insighter.company
+                              ? isRTL
+                                ? ` ${item.insighter.company.legal_name}`
+                                : `${item.insighter.company.legal_name} `
+                              : translations.company
                           )}
-                        </div>
-
-                        <div className="ms-3">
-                          <Text fw={600} size="sm" className="capitalize">
-                            {item.insighter.roles.includes("insighter") && item.insighter.name.toLowerCase()}
-
-                            {item.insighter.roles.includes("company") && (
-                              item.insighter.company
-                                ? isRTL
-                                  ? ` ${item.insighter.company.legal_name}`
-                                  : `${item.insighter.company.legal_name} `
-                                : translations.company
-                            )}
-
-                            {item.insighter.roles.includes("company-insighter") && (
-                              item.insighter.company
-                                ? isRTL
-                                  ? ` ${item.insighter.company.legal_name}`
-                                  : `${item.insighter.company.legal_name} `
-                                : translations.company
-                            )}
+                        </Link>
                           </Text>
 
-                          <Text c="dimmed" size="xs" className="capitalize">
-                            {item.insighter.roles.includes("insighter") && translations.insighter}
+                        <Text c="dimmed" size="xs" className="capitalize">
+                          <Link href={`/${currentLocale}/profile/${item.insighter.uuid || item.insighter.name}?entity=insighter`}>
+                          {item.insighter.roles.includes("insighter") && translations.insighter}
+                          </Link>
 
-                            {item.insighter.roles.includes("company") && (
-                              item.insighter.company
-                                ? `${translations.by} ${item.insighter.name.toLowerCase()}`
-                                : translations.company
-                            )}
+                         
+                          {item.insighter.roles.includes("company") && (
+                            item.insighter.company
+                              ? (<Link href={`/${currentLocale}/profile/${item.insighter.uuid || item.insighter.name}?entity=insighter`}>
+                                {translations.by} {item.insighter.name.toLowerCase()}
+                                </Link>)
+                              : <Link href={`/${currentLocale}/profile/${item.insighter.uuid || item.insighter.name}?entity=insighter`}>
+                            Company
+                              </Link>
+                          )}
 
-                            {item.insighter.roles.includes("company-insighter") && (
-                              item.insighter.company
-                                ? `${translations.by} ${item.insighter.name.toLowerCase()}`
-                                : translations.company
-                            )}
-                          </Text>
-                        </div>
+                          <Link href={`/${currentLocale}/profile/${item.insighter.company?.uuid}`}>
+                          {item.insighter.roles.includes("company-insighter") && (
+                            item.insighter.company
+                              ? (<Link href={`/${currentLocale}/profile/${item.insighter.uuid || item.insighter.name}?entity=insighter`}>
+                                {translations.by} {item.insighter.name.toLowerCase()}
+                                </Link>)
+                              : translations.company
+                          )}
+                          </Link>
+                        </Text>
+                      </div>
+                    </div>
+                  )}
+                  
+                  <div className="flex gap-2">
+                    {(
+                      <div className="relative">
+                        {loadingStates[item.slug] ? (
+                          <div className="w-5 h-5 border-2 border-gray-400 border-t-transparent rounded-full animate-spin" />
+                        ) : (
+                          (item.slug in readLaterStates ? readLaterStates[item.slug] : item.is_read_later) ? (
+                            <BookmarkSelectedIcon 
+                              width={17}
+                              height={17}
+                              className="text-[#861536] cursor-pointer hover:text-[#861536] transition-colors"
+                              onClick={(e) => {
+                                e.preventDefault();
+                                e.stopPropagation();
+                                if (!loadingStates[item.slug]) {
+                                  handleReadLaterToggle(item, e);
+                                }
+                              }}
+                              aria-label="Remove from Read Later"
+                            />
+                          ) : (
+                            <BookmarkUnselectedIcon 
+                              width={17}
+                              height={17}
+                              className="text-gray-600 cursor-pointer hover:text-gray-700 transition-colors"
+                              onClick={(e) => {
+                                e.preventDefault();
+                                e.stopPropagation();
+                                if (!loadingStates[item.slug]) {
+                                  handleReadLaterToggle(item, e);
+                                }
+                              }}
+                              aria-label="Add to Read Later"
+                            />
+                          )
+                        )}
                       </div>
                     )}
-                  </Link>
-                  <div className="flex gap-2">
-                    <div className="relative">
-                      {loadingStates[item.slug] ? (
-                        <div className="w-5 h-5 border-2 border-gray-400 border-t-transparent rounded-full animate-spin" />
-                      ) : (
-                        (item.slug in readLaterStates ? readLaterStates[item.slug] : item.is_read_later) ? (
-                          <BookmarkSelectedIcon
-                            width={17}
-                            height={17}
-                            className="text-[#861536] cursor-pointer hover:text-[#861536] transition-colors"
-                            onClick={(e) => {
-                              e.preventDefault();
-                              e.stopPropagation();
-                              if (!loadingStates[item.slug]) {
-                                handleReadLaterToggle(item, e);
-                              }
-                            }}
-                            aria-label="Remove from Read Later"
-                          />
-                        ) : (
-                          <BookmarkUnselectedIcon
-                            width={17}
-                            height={17}
-                            className="text-gray-600 cursor-pointer hover:text-gray-700 transition-colors"
-                            onClick={(e) => {
-                              e.preventDefault();
-                              e.stopPropagation();
-                              if (!loadingStates[item.slug]) {
-                                handleReadLaterToggle(item, e);
-                              }
-                            }}
-                            aria-label="Add to Read Later"
-                          />
-                        )
-                      )}
-                    </div>
                   </div>
                 </div>
-
-                {/* Bottom row with published date and price info */}
+                
+                {/* Bottom row with published date and price badge */}
                 <div className="flex justify-between items-center pt-2 mt-auto mt-6 border-t border-gray-100 w-full">
-                  <Text c="dimmed" size="xs" dir={isRTL ? "rtl" : "ltr"}>
-                    {translations.posted} {formatPublishedDate(item.published_at, currentLocale as string)}
-                  </Text>
-
-                  {isFree ? (
-                    <Badge
-                      color="green"
-                      variant="light"
-                      className={cardStyles.priceBadge}
-                    >
-                      {translations.free}
-                    </Badge>
-                  ) : (
-                    <Text fw={700} size="sm" className={cardStyles.priceBadge}>
-                      {formattedPrice}
+                  {item.published_at && (
+                    <Text c="dimmed" size="xs" dir={isRTL ? 'rtl' : 'ltr'}>
+                      {translations.posted} {formatPublishedDate(item.published_at, currentLocale as string)}
                     </Text>
+                  )}
+                  {shouldShowPricing && (
+                    <div className="flex items-center gap-2">
+                      {shouldShowPartial && (
+                        <Badge color="yellow" variant="light" className={cardStyles.priceBadge}>
+                          {translations.partial}
+                        </Badge>
+                      )}
+                      {(shouldShowPaid || (!paidStatus && hasPrice && numericPrice > 0) || (shouldShowPartial && hasPrice && numericPrice > 0)) && (
+                        <Badge color="yellow" variant="light" className={cardStyles.priceBadge}>
+                          <span dir="ltr" lang="en">{formattedPrice}</span>
+                        </Badge>
+                      )}
+                      {shouldShowFree && !shouldShowPartial && !(shouldShowPaid && hasPrice && numericPrice > 0) && (
+                        <Badge color="green" variant="light" className={cardStyles.priceBadge}>
+                          {translations.free}
+                        </Badge>
+                      )}
+                    </div>
                   )}
                 </div>
               </div>

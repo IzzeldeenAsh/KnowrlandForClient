@@ -17,7 +17,6 @@ import {
 } from "@mantine/core";
 import { useParams, useRouter } from "next/navigation";
 import {
-  IconBrandX,
   IconRosetteDiscountCheckFilled,
   IconFileReport,
   IconBrandHipchat,
@@ -26,10 +25,6 @@ import {
 } from "@tabler/icons-react";
 
 import Toast from "@/components/toast/Toast";
-import FacebookIcon from "@/public/file-icons/facebook";
-import YoutubeIcon from "@/public/file-icons/youtube";
-import LinkedinIcon from "@/public/file-icons/linkedin";
-import InstagramIcon from "@/public/file-icons/instagram";
 import { useTranslations } from "next-intl";
 import styles from "./profile.module.css";
 import Link from "next/link";
@@ -41,6 +36,12 @@ import KnowledgeTab from "./components/KnowledgeTab";
 import AboutTab from "./components/AboutTab";
 import MeetTab from "./components/MeetTab";
 import ProfileShare from "./components/ProfileShare";
+import FacebookSocialIcon from "@/app/components/icons/social/FacebookSocialIcon";
+import InstagramSocialIcon from "@/app/components/icons/social/InstagramSocialIcon";
+import LinkedinSocialIcon from "@/app/components/icons/social/LinkedinSocialIcon";
+import YoutubeSocialIcon from "@/app/components/icons/social/YoutubeSocialIcon";
+import XSocialIcon from "@/app/components/icons/social/XSocialIcon";
+import TiktokSocialIcon from "@/app/components/icons/social/TiktokSocialIcon";
 
 
 
@@ -611,18 +612,30 @@ export default function ProfilePage() {
 
 
   const getSocialIcon = (type: string) => {
-    switch (type) {
+    const normalized = (type || "")
+      .toLowerCase()
+      .trim()
+      .replace(/\s+/g, "")
+      .replace(/[_-]/g, "");
+
+    switch (normalized) {
       case "facebook":
-        return <FacebookIcon />;
+      case "fb":
+        return <FacebookSocialIcon size={30} />;
       case "x":
       case "twitter":
-        return <IconBrandX className="text-blue-400" size={24} />;
+        return <XSocialIcon size={30} />;
       case "youtube":
-        return <YoutubeIcon />;
+      case "yt":
+        return <YoutubeSocialIcon size={30} />;
       case "linkedin":
-        return <LinkedinIcon />;
+        return <LinkedinSocialIcon size={30} />;
       case "instagram":
-        return <InstagramIcon />;
+      case "insta":
+        return <InstagramSocialIcon size={30} />;
+      case "tiktok":
+      case "ticktok":
+        return <TiktokSocialIcon size={30} />;
       default:
         return null;
     }

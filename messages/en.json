@@ -1,7 +1,8 @@
 {
     "HomePage": {
         "title": "Home Page",
-        "description": "Home Page Description"
+        "description": "Home Page Description",
+        "publishButton": "Publish your work here!"
     },
  
     "Hero": {
@@ -168,7 +169,8 @@
         },
         "beta": {
             "notice": "🚀 Welcome to Insighta Beta. Some features and tools are still being refined. Stay tuned for upcoming updates!"
-        }
+        },
+        "becomeInsighter": "Become an Insighter"
     },
     "Features": {
         "tagline": "We pave the way",

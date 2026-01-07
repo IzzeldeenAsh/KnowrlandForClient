@@ -7,6 +7,25 @@ import LoadingState from './LoadingState';
 import { IconRosetteDiscountCheckFilled } from '@tabler/icons-react';
 import { Rating, Pagination } from '@mantine/core';
 
+function getInitials(fullName: string, maxLetters = 2) {
+  const cleaned = (fullName || '').trim();
+  if (!cleaned) return '';
+
+  const parts = cleaned.split(/\s+/).filter(Boolean);
+
+  if (parts.length === 1) {
+    // If there's only one word, take up to the first 2 characters (unicode-safe)
+    return Array.from(parts[0]).slice(0, maxLetters).join('').toUpperCase();
+  }
+
+  // Take first letter of first two words (unicode-safe)
+  return parts
+    .slice(0, maxLetters)
+    .map((p) => (Array.from(p)[0] ?? ''))
+    .join('')
+    .toUpperCase();
+}
+
 // Import existing SearchResultItem type or define a compatible type
 export interface InsighterProfile {
   uuid: string;
@@ -111,7 +130,7 @@ const InsightersResultsSection: React.FC<InsightersResultsSectionProps> = ({
                                 // Fallback to initials
                                 <div className="w-full h-full bg-blue-100 flex items-center justify-center rounded-full">
                                   <span className="text-2xl font-semibold text-blue-600 rounded-full">
-                                    {name.split(' ').map((word: string) => word.charAt(0)).join('').toUpperCase()}
+                                    {getInitials(name)}
                                   </span>
                                 </div>
                               )}
@@ -147,7 +166,7 @@ const InsightersResultsSection: React.FC<InsightersResultsSectionProps> = ({
                               ) : (
                                 <div className="absolute -bottom-4 -right-7 w-14 h-14 rounded-full bg-blue-100 border-4 border-white z-10 flex items-center justify-center">
                                   <span className="text-sm font-semibold text-blue-600 rounded-full">
-                                    {name.split(' ').map((word: string) => word.charAt(0)).join('').toUpperCase()}
+                                    {getInitials(name)}
                                   </span>
                                 </div>
                               )}
@@ -164,7 +183,7 @@ const InsightersResultsSection: React.FC<InsightersResultsSectionProps> = ({
                             // Fallback: Show initials
                             <div className="w-full h-full bg-blue-100 flex items-center justify-center rounded-full">
                               <span className="text-2xl font-semibold text-blue-600 rounded-full">
-                                {name.charAt(0)}
+                                {getInitials(name)}
                               </span>
                             </div>
                           )}

@@ -26,7 +26,20 @@ export default function TopicCard({ topic, locale, isRTL }: TopicCardProps) {
   };
 
   return (
-    <div className={`relative group bg-gradient-to-br from-white to-slate-50 rounded-sm p-6 shadow-md border border-slate-100 h-full flex flex-col ${!isDisabled ? 'hover:shadow-lg hover:border-blue-100 hover:from-white hover:to-blue-50 transition-all duration-300 cursor-pointer' : 'opacity-50 cursor-not-allowed'}`}>
+    <div className={`
+    relative 
+    group 
+    bg-gradient-to-br 
+    from-white 
+    to-slate-50 
+    rounded-sm 
+    p-6 
+    shadow-md 
+    border 
+    border-slate-100 
+    h-full 
+    flex 
+    flex-col ${!isDisabled ? 'hover:shadow-lg hover:border-blue-100 hover:from-white hover:to-blue-50 transition-all duration-300 cursor-pointer' : 'opacity-50 cursor-not-allowed'}`}>
       <div className="space-y-2 flex-grow">
         <div className={`flex items-center gap-2 ${isRTL ? 'text-right' : 'text-left'} justify-start`} dir={isRTL ? 'rtl' : 'ltr'}>
           <FolderIcon 

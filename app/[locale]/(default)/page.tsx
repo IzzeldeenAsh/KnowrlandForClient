@@ -9,6 +9,7 @@ import Features02 from '@/components/features-02'
 import TestimonialsCarousel from '@/components/testimonials-carousel'
 import Cta from '@/components/cta'
 import Features from '@/components/features'
+import FloatingPublishButton from '@/components/floating-publish-button'
 import { generateOrganizationSchema, generateWebSiteSchema } from '@/utils/seo'
 
 type HomeProps = {
@@ -34,8 +35,9 @@ export default async function Home({ params }: HomeProps) {
       <Hero />
       <TestimonialsCarousel />
       <Features/>
-      <Features02 />
       <Cta />
+      <Features02 />
+      <FloatingPublishButton />
      </>
   )
 }

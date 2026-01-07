@@ -17,6 +17,7 @@ import { arSA, enUS } from 'date-fns/locale';
 import dynamic from 'next/dynamic';
 import axios from 'axios';
 import AuthModal from '../knowledge/[type]/[slug]/AuthModal';
+import { isFirstWordArabic } from '@/app/utils/textUtils';
 
 const BookmarkUnselectedIcon = (props: React.SVGProps<SVGSVGElement>) => {
   const { width = 33, height = 33, ...rest } = props;
@@ -119,7 +120,7 @@ export interface SearchResultItem {
       verified?: boolean;
     };
   }; // Only for knowledge items
-  paid?: boolean; // Only for knowledge items
+  paid?: boolean | 'free' | 'partial_paid' | 'paid'; // Only for knowledge items
   price?: string; // Only for knowledge items - price as string from API
   review: string;
   language?: 'english' | 'arabic'; // Language of the item title/content
@@ -319,6 +320,7 @@ export default function SearchResultsGrid({
     posted: isRTL ? "نُشر" : "Posted",
     coverage: isRTL ? "التغطية" : "Coverage",
     free: isRTL ? "مجاني" : "Free",
+    partial: isRTL ? "مدفوع جزئي" : "Partial Paid",
     insighter: isRTL ? "إنسايتر" : "Insighter",
     by: isRTL ? "من قبل" : "By",
     company: isRTL ? "الشركة" : "Company",
@@ -370,10 +372,19 @@ export default function SearchResultsGrid({
               const hasPrice = normalizedPrice !== "";
               const numericPrice = Number(normalizedPrice);
               const isNumericPrice = normalizedPrice !== "" && !Number.isNaN(numericPrice);
-              const isFreePrice = isNumericPrice && numericPrice === 0;
               const formattedPrice = isNumericPrice
                 ? `$${numericPrice.toLocaleString('en-US', { maximumFractionDigits: 2 })}`
                 : normalizedPrice;
+              const paidStatus: 'free' | 'partial_paid' | 'paid' | undefined =
+                typeof item.paid === 'string'
+                  ? (item.paid as 'free' | 'partial_paid' | 'paid')
+                  : typeof item.paid === 'boolean'
+                    ? (item.paid ? 'paid' : 'free')
+                    : undefined;
+              const shouldShowFree = paidStatus === 'free' || (!paidStatus && isNumericPrice && numericPrice === 0);
+              const shouldShowPartial = paidStatus === 'partial_paid';
+              const shouldShowPaid = paidStatus === 'paid';
+              const shouldShowPricing = shouldShowFree || shouldShowPartial || (shouldShowPaid && hasPrice) || (!paidStatus && hasPrice);
               const coverageText = formatCoverageRange(item.cover_start, item.cover_end);
 
               return (
@@ -415,15 +426,15 @@ export default function SearchResultsGrid({
                   <Text
                   style={{wordBreak:'break-word'}}
                     fw={700}
-                    className={`${cardStyles.title} ${item.language === 'arabic' ? 'text-right' : 'text-left'}`}
+                    className={`${cardStyles.title} ${isFirstWordArabic(item.title) ? 'text-right' : 'text-left'}`}
                     pt={4}
                     lineClamp={2}
-                    dir={item.language === 'arabic' ? 'rtl' : 'ltr'}
+                    dir={isFirstWordArabic(item.title) ? 'rtl' : 'ltr'}
                   >
                     {item.title}
                   </Text>
                   {coverageText && (
-                  <div className={`${item.language === 'arabic' ? 'text-right' : 'text-left'}`} dir={item.language === 'arabic' ? 'rtl' : 'ltr'}>
+                  <div className={`${isFirstWordArabic(item.title) ? 'text-right' : 'text-left'}`} dir={isFirstWordArabic(item.title) ? 'rtl' : 'ltr'}>
                     <div
                       
                       className={`text-lg  font-bold leading-none   drop-shadow-lg text-blue-400`}
@@ -628,14 +639,24 @@ export default function SearchResultsGrid({
                       {translations.posted} {safeFormatDate(item.published_at, currentLocale as string)}
                     </Text>
                   )}
-                  {hasPrice && (
-                    <Badge
-                      color={isFreePrice ? "green" : "yellow"}
-                      variant="light"
-                      className={cardStyles.priceBadge}
-                    >
-                      {isFreePrice ? translations.free : <span dir="ltr" lang="en">{formattedPrice}</span>}
-                    </Badge>
+                  {shouldShowPricing && (
+                    <div className="flex items-center gap-2">
+                      {shouldShowPartial && (
+                        <Badge color="yellow" variant="light" className={cardStyles.priceBadge}>
+                          {translations.partial}
+                        </Badge>
+                      )}
+                      {(shouldShowPaid || (!paidStatus && hasPrice) || (shouldShowPartial && hasPrice)) && (
+                        <Badge color="yellow" variant="light" className={cardStyles.priceBadge}>
+                          <span dir="ltr" lang="en">{formattedPrice}</span>
+                        </Badge>
+                      )}
+                      {shouldShowFree && !shouldShowPartial && !(shouldShowPaid && hasPrice) && (
+                        <Badge color="green" variant="light" className={cardStyles.priceBadge}>
+                          {translations.free}
+                        </Badge>
+                      )}
+                    </div>
                   )}
                 </div>
               </div>

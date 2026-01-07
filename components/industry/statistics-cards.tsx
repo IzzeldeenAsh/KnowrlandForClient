@@ -119,7 +119,7 @@ export default function StatisticsCards({ type, id, entityName }: StatisticsCard
 
   if (isLoading) {
     return (
-      <div className={`grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 ${styles.statsContainer}`} dir={isRTL ? 'rtl' : 'ltr'}>
+      <div className={`grid md:grid-cols-3 gap-4 ${styles.statsContainer}`} dir={isRTL ? 'rtl' : 'ltr'}>
         <div className={styles.statsCard}>
           <div className="animate-pulse bg-gray-200 h-8 w-16 rounded mb-2"></div>
           <div className="animate-pulse bg-gray-200 h-4 w-20 rounded"></div>
@@ -150,7 +150,7 @@ export default function StatisticsCards({ type, id, entityName }: StatisticsCard
     </span>
       )}
       
-      <div className={`grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 ${styles.statsContainer}`} dir={isRTL ? 'rtl' : 'ltr'}>
+      <div className={`grid grid-cols-2  md:grid-cols-3 gap-4 ${styles.statsContainer}`} dir={isRTL ? 'rtl' : 'ltr'}>
         {statistics.map((stat) => (
           <Link 
             key={stat.type} 
