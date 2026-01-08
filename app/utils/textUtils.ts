@@ -34,3 +34,5 @@ export function isFirstWordArabic(text: string): boolean {
 }
 
 
+
+

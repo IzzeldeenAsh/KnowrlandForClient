@@ -26,13 +26,16 @@ export interface KnowledgeItem {
   type: string;
   title: string;
   description: string;
-  total_price: string;
+  total_price?: string;
+  price?: string; // Price as string from API
   published_at: string;
+  review?: string; // Review as string (e.g., "4.5")
   review_summary?: {
     count: number;
     average: number;
   };
   insighter: {
+    uuid?: string;
     name: string;
     profile_photo_url: string | null;
     roles: string[];
@@ -40,8 +43,15 @@ export interface KnowledgeItem {
       uuid: string;
       legal_name: string;
       logo: string;
+      verified?: boolean;
     };
   };
+  is_read_later?: boolean;
+  language?: 'english' | 'arabic';
+  cover_start?: number; // Coverage start year
+  cover_end?: number;   // Coverage end year
+  total_downloads?: number;
+  paid?:  'free' | 'partial_paid' | 'paid';
 }
 
 function getInitials(name: string) {
@@ -175,11 +185,11 @@ export default function KnowledgeList({
                 <div className={styles.detailsSection}>
                   <div className="flex items-center gap-3">
                     <Badge
-                      color={item.total_price === "0" ? "green" : "yellow"}
+                      color={(item.total_price === "0" || item.price === "0" || (!item.total_price && !item.price)) ? "green" : "yellow"}
                       variant="light"
                       className={styles.priceBadge}
                     >
-                      {item.total_price === "0" ? translations.free : translations.paid}
+                      {(item.total_price === "0" || item.price === "0" || (!item.total_price && !item.price)) ? translations.free : translations.paid}
                     </Badge>
                     
                     <Text c="dimmed" size="xs" dir={locale === 'ar' ? 'rtl' : 'ltr'}>
