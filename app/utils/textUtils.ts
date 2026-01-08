@@ -22,7 +22,8 @@ export function isFirstWordArabic(text: string): boolean {
   }
 
   // Remove punctuation and special characters from the beginning/end of the word
-  const cleanedWord = firstWord.replace(/^[^\p{L}\p{N}]+|[^\p{L}\p{N}]+$/gu, '');
+  // Using character classes compatible with ES5 (no Unicode property escapes)
+  const cleanedWord = firstWord.replace(/^[^\w\u0600-\u06FF]+|[^\w\u0600-\u06FF]+$/g, '');
   if (!cleanedWord) {
     return false;
   }
