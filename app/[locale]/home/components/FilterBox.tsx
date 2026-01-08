@@ -309,6 +309,48 @@ const FilterBox: React.FC<FilterBoxProps> = React.memo(({
     },
   });
 
+  // Wrapper functions to maintain focus after state updates
+  const handleEconomicBlocSearchChange = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
+    const value = event.currentTarget.value;
+    setEconomicBlocSearch(value);
+    // Maintain focus after state update using the combobox's focus method
+    if (economicBlocCombobox.dropdownOpened) {
+      setTimeout(() => {
+        economicBlocCombobox.focusSearchInput();
+      }, 0);
+    }
+  }, [economicBlocCombobox]);
+
+  const handleRegionSearchChange = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
+    const value = event.currentTarget.value;
+    setRegionSearch(value);
+    if (regionCombobox.dropdownOpened) {
+      setTimeout(() => {
+        regionCombobox.focusSearchInput();
+      }, 0);
+    }
+  }, [regionCombobox]);
+
+  const handleCountrySearchChange = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
+    const value = event.currentTarget.value;
+    setCountrySearch(value);
+    if (countryCombobox.dropdownOpened) {
+      setTimeout(() => {
+        countryCombobox.focusSearchInput();
+      }, 0);
+    }
+  }, [countryCombobox]);
+
+  const handleTagSearchChange = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
+    const value = event.currentTarget.value;
+    setTagSearch(value);
+    if (tagCombobox.dropdownOpened) {
+      setTimeout(() => {
+        tagCombobox.focusSearchInput();
+      }, 0);
+    }
+  }, [tagCombobox]);
+
   // Update collapsed states when search type or screen size changes
   useEffect(() => {
     // Always keep filters collapsed by default on any context change
@@ -1406,7 +1448,7 @@ const FilterBox: React.FC<FilterBoxProps> = React.memo(({
                       <Combobox.Dropdown>
                         <Combobox.Search
                           value={tagSearch}
-                          onChange={(event) => setTagSearch(event.currentTarget.value)}
+                          onChange={handleTagSearchChange}
                           placeholder={locale === 'ar' ? 'ابحث في الوسوم' : 'Search tags'}
                           disabled={isDisabled}
                         />
@@ -1509,7 +1551,7 @@ const FilterBox: React.FC<FilterBoxProps> = React.memo(({
                       <Combobox.Dropdown>
                         <Combobox.Search
                           value={economicBlocSearch}
-                          onChange={(event) => setEconomicBlocSearch(event.currentTarget.value)}
+                          onChange={handleEconomicBlocSearchChange}
                           placeholder={locale === 'ar' ? 'البحث في الكتل الاقتصادية' : 'Search economic blocs'}
                           disabled={isDisabled}
                         />
@@ -1585,7 +1627,7 @@ const FilterBox: React.FC<FilterBoxProps> = React.memo(({
                     <Combobox.Dropdown>
                       <Combobox.Search
                         value={regionSearch}
-                        onChange={(event) => setRegionSearch(event.currentTarget.value)}
+                        onChange={handleRegionSearchChange}
                         placeholder={locale === 'ar' ? 'البحث في المناطق' : 'Search regions'}
                         disabled={isDisabled}
                       />
@@ -1660,7 +1702,7 @@ const FilterBox: React.FC<FilterBoxProps> = React.memo(({
                     <Combobox.Dropdown>
                       <Combobox.Search
                         value={countrySearch}
-                        onChange={(event) => setCountrySearch(event.currentTarget.value)}
+                        onChange={handleCountrySearchChange}
                         placeholder={locale === 'ar' ? 'البحث في البلدان' : 'Search countries'}
                         disabled={isDisabled}
                       />

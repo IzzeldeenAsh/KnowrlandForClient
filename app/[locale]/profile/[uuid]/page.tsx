@@ -1074,7 +1074,7 @@ export default function ProfilePage() {
                     <div>
                       {/* Name and Badges */}
                       <div className="flex flex-wrap items-center gap-2 mb-1 capitalize">
-                      {isRTL && <IconRosetteDiscountCheckFilled className="w-5 h-5 text-blue-500" />}
+                      {/* {isRTL && <IconRosetteDiscountCheckFilled className="w-5 h-5 text-blue-500" />} */}
                         {enterpriseType === "insighter" && (
                           <div>
                             <h1 className="text-2xl font-bold">
@@ -1088,19 +1088,8 @@ export default function ProfilePage() {
                             {profileData.company?.legal_name || ""}
                           </h1>
                         )}
-                     {!isRTL && <IconRosetteDiscountCheckFilled className="w-5 h-5 text-blue-500" />}
-                        {isCompany && enterpriseType !== "insighter" && (
-                          <span
-                            className={`bg-[#EFF8FF] text-[#299AF8] font-bold text-xs px-2 py-0.5 rounded-full inline-flex items-center ${
-                              locale === "ar" ? "flex-row-reverse" : ""
-                            }`}
-                            dir={locale === "ar" ? "rtl" : "ltr"}
-                          >
-                            {locale === "ar"
-                              ? `${userProfileT("company")} ${profileData.company?.legal_name ?? ""}`.trim()
-                              : `${profileData.company?.legal_name ?? ""} ${userProfileT("company")}`.trim()}
-                          </span>
-                        )}
+                     <IconRosetteDiscountCheckFilled className="w-5 h-5 text-blue-500" />
+                    
                         {isCompany && enterpriseType === "insighter" && (
                           <Link href={`${profileData.company?.uuid}`}>
                             <span
@@ -1299,6 +1288,7 @@ export default function ProfilePage() {
                   profileData={profileData}
                   isCompany={isCompany || false}
                   getSocialIcon={getSocialIcon}
+                  enterpriseType={enterpriseType}
                 />
               </Tabs.Panel>
 

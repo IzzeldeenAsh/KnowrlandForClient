@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
 import { useTranslations } from "next-intl";
 import NewCertificationIcon from "@/app/components/icons/NewCertificationIcon";
 
@@ -47,6 +47,7 @@ interface ProfileData {
 
 interface AboutTabProps {
   locale: string;
+  enterpriseType?: string | null;
   isRTL: boolean;
   profileData: ProfileData;
   isCompany: boolean;
@@ -59,8 +60,37 @@ export default function AboutTab({
   profileData,
   isCompany,
   getSocialIcon,
+  enterpriseType,
 }: AboutTabProps) {
   const t = useTranslations("ProfilePage");
+  const [copied, setCopied] = useState(false);
+
+  const formatWebsiteUrl = (url: string) => {
+    if (!url) return "";
+    const trimmed = url.trim();
+    if (trimmed.startsWith("http://") || trimmed.startsWith("https://")) {
+      return trimmed;
+    }
+    return `https://${trimmed}`;
+  };
+
+  const handleCopyWebsite = async (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    
+    const websiteUrl = profileData.company?.website;
+    if (!websiteUrl) return;
+
+    const formattedUrl = formatWebsiteUrl(websiteUrl);
+    
+    try {
+      await navigator.clipboard.writeText(formattedUrl);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    } catch (err) {
+      console.error("Failed to copy:", err);
+    }
+  };
 
   const SOCIAL_PLATFORMS: Array<{ key: string; label: string }> = [
     { key: "facebook", label: "Facebook" },
@@ -226,7 +256,7 @@ export default function AboutTab({
         )}
 
         {/* Company Information (if applicable) with better styling */}
-        {isCompany && profileData.company && (
+        {isCompany && profileData.company && enterpriseType !== "insighter" && (
           <div
             className="bg-gray-50 dark:bg-slate-700/30 rounded-xl p-4"
             data-aos="fade-up"
@@ -258,7 +288,22 @@ export default function AboutTab({
                 <p className="text-sm text-gray-500 dark:text-gray-400 mb-2">
                   {t("aboutUs")}
                 </p>
-                <p className="whitespace-pre-line">
+                <p
+                  className={`whitespace-pre-line ${
+                    typeof profileData.company.about_us === "string" &&
+                    profileData.company.about_us.trim() &&
+                    require('@/app/utils/textUtils').isFirstWordArabic(profileData.company.about_us)
+                      ? 'text-right'
+                      : 'text-left'
+                  }`}
+                  dir={
+                    typeof profileData.company.about_us === "string" &&
+                    profileData.company.about_us.trim() &&
+                    require('@/app/utils/textUtils').isFirstWordArabic(profileData.company.about_us)
+                      ? 'rtl'
+                      : 'ltr'
+                  }
+                >
                   {profileData.company.about_us}
                 </p>
               </div>
@@ -270,9 +315,54 @@ export default function AboutTab({
                   <p className="text-sm text-gray-500 dark:text-gray-400 mb-1">
                     {t("websiteLabel")}
                   </p>
-                  <p className="font-medium m-0">
-                    {profileData.company.website}
-                  </p>
+                  <div className="flex items-center gap-2">
+                    <a
+                      href={formatWebsiteUrl(profileData.company.website)}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="font-medium m-0 text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 hover:underline flex-1 truncate"
+                    >
+                      {profileData.company.website}
+                    </a>
+                    <button
+                      onClick={handleCopyWebsite}
+                      className="flex-shrink-0 p-1.5 rounded-md hover:bg-gray-100 dark:hover:bg-slate-700 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-1"
+                      title={copied ? (locale === "ar" ? "تم النسخ!" : "Copied!") : (locale === "ar" ? "نسخ الرابط" : "Copy link")}
+                      aria-label={locale === "ar" ? "نسخ الرابط" : "Copy link"}
+                    >
+                      {copied ? (
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          className="h-5 w-5 text-green-600 dark:text-green-400"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                          stroke="currentColor"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M5 13l4 4L19 7"
+                          />
+                        </svg>
+                      ) : (
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          className="h-5 w-5 text-gray-600 dark:text-gray-400"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                          stroke="currentColor"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"
+                          />
+                        </svg>
+                      )}
+                    </button>
+                  </div>
                 </div>
 
                 {/* Social Media */}
