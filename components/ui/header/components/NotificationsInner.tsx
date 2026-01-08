@@ -135,7 +135,7 @@ const getTailwindColor = (color: string): string => {
 const getNotificationIconName = (subType: string): string => {
   switch (subType) {
     case 'order':
-    case 'knowledge': // used as sub_type for order notifications
+    case 'sale': // used as sub_type for order notifications
     return 'duotune/finance/Knlg010.svg';
     case 'activate_company':
       return 'duotune/arrows/arr086.svg';
@@ -244,6 +244,7 @@ const getNotificationName = (subType: string, language: string): string => {
     'download': { en: 'Download', ar: 'تنزيل' },
     'upload': { en: 'Upload', ar: 'رفع' },
     'comment': { en: 'Comment', ar: 'تعليق' },
+    'sale': { en: 'Sales Order', ar: 'طلب شراء' },
     'reply': { en: 'Reply', ar: 'رد' },
     'like': { en: 'Like', ar: 'إعجاب' },
     'save': { en: 'Save', ar: 'حفظ' },
@@ -382,7 +383,7 @@ export default function NotificationsInner({
 
           <div className="flex-1 min-w-0">
             <p className={`text-xs text-blue-600 ${!notification.read_at ? 'font-bold' : 'font-light'}`} style={{wordBreak: 'break-word'}}>
-              {title}
+              {notification.sub_type_value ? notification.sub_type_value : title}
             </p>
             <p className={`mt-0.5 ${!notification.read_at ? 'text-gray-900 font-medium' : 'text-gray-700 font-light'} text-sm`} style={{wordBreak: 'break-word'}}>
               {notification.message}
