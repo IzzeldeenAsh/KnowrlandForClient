@@ -103,7 +103,12 @@ export default function TopicByTypePage({ params }: Props) {
             <KnowledgeGrid
               knowledge={(knowledge || []).map(item => ({
                 ...item,
-                language: item.language === 'arabic' ? 'arabic' as const : item.language === 'english' ? 'english' as const : undefined
+                language: item.language === 'arabic' ? 'arabic' as const : item.language === 'english' ? 'english' as const : undefined,
+                review: Array.isArray(item.review) && item.review.length > 0
+                  ? (item.review.every((r: any) => typeof r === 'number')
+                      ? (item.review.reduce((sum: number, r: number) => sum + r, 0) / item.review.length).toFixed(1)
+                      : undefined)
+                  : typeof item.review === 'string' ? item.review : undefined
               }))}
               topicName={subIndustry?.name || ''}
               locale={locale}
