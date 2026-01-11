@@ -649,7 +649,7 @@ export default function ProfilePage() {
   const countryCodeToFlagEmoji = (countryCode: string | undefined): string => {
     if (!countryCode) return "";
     const OFFSET = 127397;
-    const codePoints = [...countryCode.toUpperCase()].map(
+    const codePoints = Array.from(countryCode.toUpperCase()).map(
       (char) => char.charCodeAt(0) + OFFSET
     );
     return String.fromCodePoint(...codePoints);
