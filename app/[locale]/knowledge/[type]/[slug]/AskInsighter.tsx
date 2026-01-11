@@ -66,7 +66,7 @@ export default function AskInsighter({ knowledgeSlug, questions = [], is_owner =
   const translations = {
     discussion: isRTL ? 'الأسئلة' : 'Questions',
     writeQuestion: isRTL ? 'اكتب سؤالك للخبير...' : 'Write your question to the insighter...',
-    writeReply: isRTL ? 'اكتب ردك...' : 'Add your comment...',
+    writeReply: isRTL ? 'اكتب تعليقك...' : 'Add your comment...',
     writeAnswer: isRTL ? 'اكتب إجابتك...' : 'Add your reply...',
     postQuestion: isRTL ? 'إرسال السؤال' : 'Send Question',
     postReply: isRTL ? 'أضف تعليق' : 'Comment',

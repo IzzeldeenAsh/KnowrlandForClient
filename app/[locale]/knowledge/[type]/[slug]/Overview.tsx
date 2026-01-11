@@ -248,16 +248,11 @@ export default function Overview({ knowledge, knowledgeSlug }: OverviewProps) {
                     </small>
                   </div>
                   <div className={styles.priceTag}>
-  {parseFloat(doc.price) === 0 ? (
+  {doc.is_purchased ? (
+    <span id={`doc-price-${doc.id}`} className={`${styles.badge} ${styles.badgePurchased}`} role="text" aria-label={`${translations.purchasedMini} - ${doc.file_name}`}>{translations.purchasedMini}</span>
+  ) : parseFloat(doc.price) === 0 ? (
     <span id={`doc-price-${doc.id}`} className={`${styles.badge} ${styles.badgeFree}`} role="text" aria-label={`${translations.free} document`}>{translations.free}</span>
-  ) : (
-    <span id={`doc-price-${doc.id}`} className={styles.badge} role="text" aria-label={`Price: $${parseFloat(doc.price).toFixed(2)}`}>${parseFloat(doc.price).toFixed(2)}</span>
-  )}
-  {doc.is_purchased && (
-    <span className={styles.purchasedMini} aria-label={`${translations.purchasedMini} - ${doc.file_name}`}>
-    {translations.purchasedMini}
-    </span>
-  )}
+  ) : null}
 </div>
                   <div className={styles.expandIcon}>
                     <svg 
@@ -308,8 +303,9 @@ export default function Overview({ knowledge, knowledgeSlug }: OverviewProps) {
                   )}
                   <div className="max-w-xs mx-auto sm:max-w-none sm:inline-flex sm:justify-start space-y-2 sm:space-y-0 sm:space-x-2 mt-4">
                     {!isOwner && (
-                      <div>
+                      <div className="flex items-center gap-2">
                       {doc.is_purchased ? (
+                        <>
                         <button
                           onClick={(e) => {
                             e.stopPropagation();
@@ -320,6 +316,12 @@ export default function Overview({ knowledge, knowledgeSlug }: OverviewProps) {
                         >
                           {translations.alreadyPurchased} <span className="tracking-normal text-white group-hover:translate-x-0.5 transition-transform duration-150 ease-in-out ml-1" aria-hidden="true">-&gt;</span>
                         </button>
+                        {parseFloat(doc.price) > 0 && (
+                          <span  role="text" aria-label={`Price: $${parseFloat(doc.price).toFixed(2)}`}>
+                            ${parseFloat(doc.price).toFixed(2)}
+                          </span>
+                        )}
+                        </>
                       ) : doc.price === "0" ? (
                         <button
                           onClick={(e) => {

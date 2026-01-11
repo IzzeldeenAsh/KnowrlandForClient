@@ -92,6 +92,8 @@ interface ProfileData {
   first_name: string;
   last_name: string;
   email: string;
+  country: string;
+  country_code?: string;
   roles: string[];
   profile_photo_url: string | null;
   bio: string | null;
@@ -251,6 +253,7 @@ export default function ProfilePage() {
             // Create a ProfileData object from company data
             const companyProfileData: ProfileData = {
               uuid: data.data.uuid,
+              country: data.data.country,
               name: data.data.legal_name,
               first_name: "",
               last_name: "",
@@ -297,6 +300,7 @@ export default function ProfilePage() {
             // Create a ProfileData object from company data
             const companyProfileData: ProfileData = {
               uuid: data.data.uuid,
+              country: data.data.country,
               name: data.data.legal_name,
               first_name: "",
               last_name: "",
@@ -639,6 +643,16 @@ export default function ProfilePage() {
       default:
         return null;
     }
+  };
+
+  // Helper function to convert country code to flag emoji
+  const countryCodeToFlagEmoji = (countryCode: string | undefined): string => {
+    if (!countryCode) return "";
+    const OFFSET = 127397;
+    const codePoints = [...countryCode.toUpperCase()].map(
+      (char) => char.charCodeAt(0) + OFFSET
+    );
+    return String.fromCodePoint(...codePoints);
   };
 
   const isCompany = profileData?.roles.includes("company");
@@ -1125,26 +1139,23 @@ export default function ProfilePage() {
                         )}
                         
                       </div>
-                      {(isCompany && entityParam) && <div className="text-blue-500 text-sm font-semibold text-center md:text-start">{t("manager")}</div>}
+                      {(isCompany && entityParam) && <div className="text-blue-500 mb-2 text-sm font-semibold text-center md:text-start">{t("manager")}</div>}
 
-                      {/* Title/Role & Location */}
-                      <div className="mb-3">
-                        {/* 5-Star Rating */}
-                        {/* <div className="flex items-center">
-                          {[1, 2, 3, 4, 5].map((star) => (
-                            <svg 
-                              key={star} 
-                              xmlns="http://www.w3.org/2000/svg" 
-                              className={`h-4 w-4 ${star <= 4 ? 'text-yellow-400' : 'text-gray-300'}`} 
-                              viewBox="0 0 20 20" 
-                              fill="currentColor"
-                            >
-                              <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 01-3.138-3.138 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00.806 1.946 3.42 3.42 0 013.138 3.138z" />
-                            </svg>
-                          ))}
-                          <span className="ml-1 text-xs text-gray-600 dark:text-gray-400">(4.0)</span>
-                        </div> */}
-                      </div>
+           
+
+                      {/* Country with Flag */}
+                      {profileData?.country && (
+                        <div className="mb-3 flex items-center justify-center md:justify-start gap-2">
+                          {profileData.country_code && (
+                            <span className="text-xl" role="img" aria-label={profileData.country}>
+                              {countryCodeToFlagEmoji(profileData.country_code)}
+                            </span>
+                          )}
+                          <span className="text-sm text-gray-600 dark:text-gray-400 font-medium">
+                            {profileData.country}
+                          </span>
+                        </div>
+                      )}
 
                       {/* Action Buttons */}
                       <div className="flex flex-wrap gap-3 mb-4 justify-center md:justify-start">
