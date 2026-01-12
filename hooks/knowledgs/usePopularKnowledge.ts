@@ -27,6 +27,7 @@ export interface PopularKnowledgeItem {
     average: number;
   };
   language: 'arabic' | 'english';
+  paid_status?: 'free' | 'partial_paid' | 'paid';
 }
 
 interface PopularKnowledgeResponse {
