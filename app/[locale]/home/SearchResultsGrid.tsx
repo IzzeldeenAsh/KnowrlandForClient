@@ -644,7 +644,9 @@ export default function SearchResultsGrid({
                       {(shouldShowPaid || (!paidStatus && hasPrice) || (shouldShowPartial && hasPrice)) && (
                         <Badge color="yellow" variant="light" className={cardStyles.priceBadge}>
                           {shouldShowPartial && hasPrice ? (
-                            <span dir="ltr" lang="en">{formattedPrice} | {translations.partial}</span>
+                            <span dir="ltr" lang="en" >{formattedPrice} 
+                            <span style={{fontWeight: '600' , textTransform: 'capitalize' ,paddingLeft: '4px',paddingRight: '4px'}}>{translations.partial}</span>
+                            </span>
                           ) : (
                             <span dir="ltr" lang="en">{formattedPrice}</span>
                           )}
