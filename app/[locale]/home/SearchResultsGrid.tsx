@@ -641,14 +641,18 @@ export default function SearchResultsGrid({
                   )}
                   {shouldShowPricing && (
                     <div className="flex items-center gap-2">
-                      {shouldShowPartial && (
-                        <Badge color="yellow" variant="light" className={cardStyles.priceBadge}>
-                          {translations.partial}
-                        </Badge>
-                      )}
                       {(shouldShowPaid || (!paidStatus && hasPrice) || (shouldShowPartial && hasPrice)) && (
                         <Badge color="yellow" variant="light" className={cardStyles.priceBadge}>
-                          <span dir="ltr" lang="en">{formattedPrice}</span>
+                          {shouldShowPartial && hasPrice ? (
+                            <span dir="ltr" lang="en">{formattedPrice} | {translations.partial}</span>
+                          ) : (
+                            <span dir="ltr" lang="en">{formattedPrice}</span>
+                          )}
+                        </Badge>
+                      )}
+                      {shouldShowPartial && !hasPrice && (
+                        <Badge color="yellow" variant="light" className={cardStyles.priceBadge} style={{fontWeight: '500'}}>
+                          {translations.partial}
                         </Badge>
                       )}
                       {shouldShowFree && !shouldShowPartial && !(shouldShowPaid && hasPrice) && (

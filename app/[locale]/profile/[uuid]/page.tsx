@@ -93,6 +93,7 @@ interface ProfileData {
   last_name: string;
   email: string;
   country: string;
+  country_flag?: string;
   country_code?: string;
   roles: string[];
   profile_photo_url: string | null;
@@ -254,6 +255,7 @@ export default function ProfilePage() {
             const companyProfileData: ProfileData = {
               uuid: data.data.uuid,
               country: data.data.country,
+              country_flag: data.data.country_flag,
               name: data.data.legal_name,
               first_name: "",
               last_name: "",
@@ -301,6 +303,7 @@ export default function ProfilePage() {
             const companyProfileData: ProfileData = {
               uuid: data.data.uuid,
               country: data.data.country,
+              country_flag: data.data.country_flag,
               name: data.data.legal_name,
               first_name: "",
               last_name: "",
@@ -1146,11 +1149,19 @@ export default function ProfilePage() {
                       {/* Country with Flag */}
                       {profileData?.country && (
                         <div className="mb-3 flex items-center justify-center md:justify-start gap-2">
-                          {profileData.country_code && (
+                          {profileData.country_flag ? (
+                            <Image
+                              src={`/images/flags/${profileData.country_flag}.svg`}
+                              alt={profileData.country}
+                              width={15}
+                              height={15}
+                              className="object-contain"
+                            />
+                          ) : profileData.country_code ? (
                             <span className="text-xl" role="img" aria-label={profileData.country}>
                               {countryCodeToFlagEmoji(profileData.country_code)}
                             </span>
-                          )}
+                          ) : null}
                           <span className="text-sm text-gray-600 dark:text-gray-400 font-medium">
                             {profileData.country}
                           </span>

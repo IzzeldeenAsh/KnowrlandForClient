@@ -151,6 +151,12 @@ function KnowledgeCard({ item, locale, isRTL }: KnowledgeCardProps) {
       })}`
     : (isRTL ? "مدفوع" : "PAID")
 
+  // Check paid_status from item
+  const paidStatus = item.paid_status
+  const shouldShowFree = paidStatus === 'free' || (!paidStatus && isValidPrice && numericPrice === 0)
+  const shouldShowPartial = paidStatus === 'partial_paid'
+  const shouldShowPaid = paidStatus === 'paid' || (!paidStatus && isValidPrice && numericPrice > 0)
+
   const typeTranslations: Record<string, string> = {
     report: isRTL ? "تقرير" : "Reports",
     manual: isRTL ? "دليل" : "Manuals",
@@ -166,6 +172,7 @@ function KnowledgeCard({ item, locale, isRTL }: KnowledgeCardProps) {
     insighter: isRTL ? "إنسايتر" : "Insighter",
     company: isRTL ? "شركة" : "Company",
     paid: isRTL ? "مدفوع" : "Paid",
+    partial: isRTL ? "مدفوع جزئي" : "Partial Paid",
     by: isRTL ? "من قبل" : "By"
   }
 
@@ -288,13 +295,13 @@ function KnowledgeCard({ item, locale, isRTL }: KnowledgeCardProps) {
               </div>
 
               <div className="flex-shrink-0">
-                {isValidPrice && (
+                {(shouldShowFree || shouldShowPartial || shouldShowPaid) && (
                   <Badge
-                    color={isFree ? "green" : "yellow"}
+                    color={shouldShowFree ? "green" : shouldShowPartial ? "yellow" : "yellow"}
                     variant="light"
                     size="sm"
                   >
-                    {isFree ? translations.free : translations.paid}
+                    {shouldShowPartial ? translations.partial : shouldShowFree ? translations.free : translations.paid}
                   </Badge>
                 )}
               </div>
