@@ -180,13 +180,13 @@ export default function QueryParamAuthCallback() {
         `SameSite=Lax` // More permissive for localhost
       ];
     } else {
-      // Use .foresighta.co domain for cross-domain cookie sharing between app.foresighta.co and www.foresighta.co
+      // Use .insightabusiness.com domain for cross-domain cookie sharing between app.insightabusiness.com and www.insightabusiness.com
       cookieSettings = [
         `token=${token}`,
         `Path=/`,
         `Max-Age=${60 * 60 * 24 * 7}`, // 7 days
         `SameSite=None`,
-        `Domain=.foresighta.co`,
+        `Domain=.insightabusiness.com`,
         `Secure`
       ];
     }
@@ -237,13 +237,13 @@ export default function QueryParamAuthCallback() {
         'Max-Age=-1'
       ];
     } else {
-      // Use .foresighta.co domain to match the cookie set by Angular app
+      // Use .insightabusiness.com domain to match the cookie set by Angular app
       cookieSettings = [
         'token=',
         'Path=/',
         'Max-Age=-1',
         'SameSite=None',
-        'Domain=.foresighta.co',
+        'Domain=.insightabusiness.com',
         'Secure'
       ];
     }
@@ -431,13 +431,13 @@ export default function QueryParamAuthCallback() {
         'Max-Age=-1'
       ];
     } else {
-      // Use .foresighta.co domain to match the cookie set by Angular app
+      // Use .insightabusiness.com domain to match the cookie set by Angular app
       cookieSettings = [
         'auth_return_url=',
         'Path=/',
         'Max-Age=-1',
         'SameSite=None',
-        'Domain=.foresighta.co',
+        'Domain=.insightabusiness.com',
         'Secure'
       ];
     }
@@ -464,13 +464,13 @@ export default function QueryParamAuthCallback() {
         `SameSite=Lax`
       ];
     } else {
-      // Use .foresighta.co domain to match the cookie set by Angular app
+      // Use .insightabusiness.com domain to match the cookie set by Angular app
       cookieSettings = [
         `countryUpdateReturnUrl=${encodeURIComponent(url)}`,
         `Path=/`,
         `Max-Age=${60 * 60}`, // 1 hour
         `SameSite=None`,
-        `Domain=.foresighta.co`,
+        `Domain=.insightabusiness.com`,
         `Secure`
       ];
     }

@@ -18,7 +18,7 @@ const getAngularAppUrl = (): string => {
   
   // Production domains
   if (hostname.includes('foresighta.co')) {
-    return `${protocol}//app.foresighta.co`;
+    return `${protocol}//app.insightabusiness.com`;
   }
   if (hostname.includes('insightabusiness.com')) {
     return `${protocol}//app.insightabusiness.com`;

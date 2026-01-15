@@ -49,7 +49,7 @@ const getAngularAppUrl = (): string => {
   
   // Production domains
   if (hostname.includes('foresighta.co')) {
-    return `${protocol}//app.foresighta.co`;
+    return `${protocol}//app.insightabusiness.com`;
   }
   if (hostname.includes('insightabusiness.com')) {
     return `${protocol}//app.insightabusiness.com`;
@@ -244,7 +244,7 @@ const { isLoading: isAppLoading, setIsLoading: setAppLoading } = useLoading();
       return '.insightabusiness.com';
     }
     if (hostname.includes('foresighta.co')) {
-      return '.foresighta.co';
+      return '.insightabusiness.com';
     }
     
     // Local development - no domain needed
