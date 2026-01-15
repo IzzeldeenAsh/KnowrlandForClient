@@ -40,6 +40,25 @@ let industriesCache: {
 
 const INDUSTRIES_CACHE_DURATION = 300000; // 5 minutes cache for industries
 
+// Helper function to get the Angular app URL based on current domain
+const getAngularAppUrl = (): string => {
+  if (typeof window === 'undefined') return 'https://app.insightabusiness.com';
+  
+  const hostname = window.location.hostname;
+  const protocol = window.location.protocol;
+  
+  // Production domains
+  if (hostname.includes('foresighta.co')) {
+    return `${protocol}//app.insightabusiness.com`;
+  }
+  if (hostname.includes('insightabusiness.com')) {
+    return `${protocol}//app.insightabusiness.com`;
+  }
+  
+  // Local development
+  return 'https://app.insightabusiness.com';
+};
+
 async function getIndustries(locale: string = 'en', forceRefresh: boolean = false): Promise<Industry[]> {
   const now = Date.now();
   
@@ -215,19 +234,53 @@ const { isLoading: isAppLoading, setIsLoading: setAppLoading } = useLoading();
   }, []);
 
 
+  // Helper function to get the base domain for cookies
+  const getCookieDomain = (): string | null => {
+    if (typeof window === 'undefined') return null;
+    const hostname = window.location.hostname;
+    
+    // Check for production domains
+    if (hostname.includes('insightabusiness.com')) {
+      return '.insightabusiness.com';
+    }
+    if (hostname.includes('foresighta.co')) {
+      return '.insightabusiness.com';
+    }
+    
+    // Local development - no domain needed
+    return null;
+  };
+
+  // Helper function to check if we're in production
+  const isProduction = (): boolean => {
+    if (typeof window === 'undefined') return false;
+    const hostname = window.location.hostname;
+    return hostname.includes('insightabusiness.com') || hostname.includes('foresighta.co');
+  };
+
   // Helper function to clear duplicate cookies
   const clearDuplicateCookies = (cookieName: string) => {
-    const isProduction = typeof window !== 'undefined' && window.location.hostname.includes('insightabusiness.com');
+    const cookieDomain = getCookieDomain();
+    const prod = isProduction();
 
     // Clear all possible variations of the cookie to prevent duplicates
     const clearVariations = [
       // Local variation
       `${cookieName}=; Path=/; Max-Age=-1`,
-      // Production domain variation
-      `${cookieName}=; Domain=.insightabusiness.com; Path=/; Max-Age=-1; Secure; SameSite=None`,
-      // Fallback without domain
-      `${cookieName}=; Path=/; Max-Age=-1; ${isProduction ? 'Secure; SameSite=None' : 'SameSite=Lax'}`
     ];
+
+    // Add domain-specific clearing for production
+    if (cookieDomain) {
+      clearVariations.push(
+        `${cookieName}=; Domain=${cookieDomain}; Path=/; Max-Age=-1; Secure; SameSite=None`,
+        `${cookieName}=; Domain=${cookieDomain}; Path=/; Max-Age=-1; Secure; SameSite=Lax`
+      );
+    }
+
+    // Fallback without domain
+    clearVariations.push(
+      `${cookieName}=; Path=/; Max-Age=-1; ${prod ? 'Secure; SameSite=None' : 'SameSite=Lax'}`
+    );
 
     clearVariations.forEach(variation => {
       document.cookie = variation;
@@ -245,7 +298,8 @@ const { isLoading: isAppLoading, setIsLoading: setAppLoading } = useLoading();
     // Wait a moment for cookie clearing to take effect
     setTimeout(() => {
       // Enhanced cookie setting for better browser compatibility (especially Safari/Firefox)
-      const isProduction = typeof window !== 'undefined' && window.location.hostname.includes('insightabusiness.com');
+      const cookieDomain = getCookieDomain();
+      const prod = isProduction();
       const expirationDate = new Date();
       expirationDate.setFullYear(expirationDate.getFullYear() + 1); // 1 year from now
 
@@ -257,8 +311,11 @@ const { isLoading: isAppLoading, setIsLoading: setAppLoading } = useLoading();
         `SameSite=Lax`                  // prevent CSRF, still send on top-level nav
       ];
 
-      if (isProduction) {
-        cookieParts.push(`Domain=.insightabusiness.com`); // leading dot = include subdomains
+      if (cookieDomain) {
+        cookieParts.push(`Domain=${cookieDomain}`); // leading dot = include subdomains
+      }
+      
+      if (prod) {
         cookieParts.push(`Secure`);                // HTTPS only in production
       }
 
@@ -495,7 +552,7 @@ const { isLoading: isAppLoading, setIsLoading: setAppLoading } = useLoading();
             {user && roles.includes('client') && !roles.includes('insighter') && !roles.includes('company') && !roles.includes('company-insighter') && (
               <li className="mx-1 md:mx-2 hidden lg:block">
                 <Link 
-                  href="https://app.insightabusiness.com/app/insighter-register/vertical"
+                  href={`${getAngularAppUrl()}/app/insighter-register/vertical`}
                   className="font-medium text-sm text-white px-2 md:px-3 py-2 rounded-md bg-gradient-to-r from-blue-500 to-cyan-500 hover:from-blue-600 hover:to-cyan-600 transition-all duration-300 ease-in-out whitespace-nowrap"
                 >
                   {t('becomeInsighter')}
@@ -531,7 +588,7 @@ const { isLoading: isAppLoading, setIsLoading: setAppLoading } = useLoading();
             ) : (
               <li>
                 <Link className="btn-sm text-slate-300 hover:text-white [background:linear-gradient(theme(colors.slate.900),_theme(colors.slate.900))_padding-box,_conic-gradient(theme(colors.slate.400),_theme(colors.slate.700)_25%,_theme(colors.slate.700)_75%,_theme(colors.slate.400)_100%)_border-box] before:bg-slate-800/30 hover:scale-105 active:scale-95 transition-all duration-150 ease-in-out group relative before:absolute before:inset-0 before:rounded-full before:pointer-events-none" 
-                href={`https://app.insightabusiness.com/auth/login?returnUrl=${encodeURIComponent(typeof window !== 'undefined' ? window.location.href : '')}`}>
+                href={`${getAngularAppUrl()}/auth/login?returnUrl=${encodeURIComponent(typeof window !== 'undefined' ? window.location.href : '')}`}>
                   <span className="relative inline-flex items-center">
                     {t('auth.login')} <span className="tracking-normal text-blue-500 group-hover:translate-x-1 transition-transform duration-150 ease-in-out ml-1">-&gt;</span>
                   </span>

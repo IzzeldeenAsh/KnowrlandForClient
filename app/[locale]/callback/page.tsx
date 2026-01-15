@@ -101,7 +101,7 @@ export default function QueryParamAuthCallback() {
         
         console.log('[callback] Profile fetched successfully:', response.data.email, 'Roles:', response.data.roles);
         
-        // Store user data in localStorage
+        // Store user data in localStorage (including country_id for redirect logic)
         console.log('[callback] Storing user data in localStorage');
         const userData = {
           id: response.data.id,
@@ -110,6 +110,8 @@ export default function QueryParamAuthCallback() {
           profile_photo_url: response.data.profile_photo_url,
           first_name: response.data.first_name,
           last_name: response.data.last_name,
+          country_id: response.data.country_id, // Include country_id for redirect logic
+          roles: response.data.roles, // Include roles for redirect logic
         };
         
         localStorage.setItem('user', JSON.stringify(userData));
@@ -163,7 +165,10 @@ export default function QueryParamAuthCallback() {
 
   // Helper function to set token in cookie with improved localhost settings
   const setTokenCookie = (token: string) => {
-    const isLocalhost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+    const isLocalhost = window.location.hostname === 'localhost' || 
+                       window.location.hostname === '127.0.0.1' ||
+                       window.location.hostname.startsWith('localhost:') ||
+                       window.location.hostname.startsWith('127.0.0.1:');
     
     let cookieSettings;
     if (isLocalhost) {
@@ -175,6 +180,7 @@ export default function QueryParamAuthCallback() {
         `SameSite=Lax` // More permissive for localhost
       ];
     } else {
+      // Use .insightabusiness.com domain for cross-domain cookie sharing between app.insightabusiness.com and www.insightabusiness.com
       cookieSettings = [
         `token=${token}`,
         `Path=/`,
@@ -218,7 +224,10 @@ export default function QueryParamAuthCallback() {
     localStorage.removeItem('foresighta-creds');
     
     // Clear token cookie
-    const isLocalhost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+    const isLocalhost = window.location.hostname === 'localhost' || 
+                       window.location.hostname === '127.0.0.1' ||
+                       window.location.hostname.startsWith('localhost:') ||
+                       window.location.hostname.startsWith('127.0.0.1:');
     let cookieSettings;
     
     if (isLocalhost) {
@@ -228,6 +237,7 @@ export default function QueryParamAuthCallback() {
         'Max-Age=-1'
       ];
     } else {
+      // Use .insightabusiness.com domain to match the cookie set by Angular app
       cookieSettings = [
         'token=',
         'Path=/',
@@ -408,7 +418,10 @@ export default function QueryParamAuthCallback() {
 
   // Helper function to clear return URL cookie
   const clearReturnUrlCookie = () => {
-    const isLocalhost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+    const isLocalhost = window.location.hostname === 'localhost' || 
+                       window.location.hostname === '127.0.0.1' ||
+                       window.location.hostname.startsWith('localhost:') ||
+                       window.location.hostname.startsWith('127.0.0.1:');
 
     let cookieSettings;
     if (isLocalhost) {
@@ -418,6 +431,7 @@ export default function QueryParamAuthCallback() {
         'Max-Age=-1'
       ];
     } else {
+      // Use .insightabusiness.com domain to match the cookie set by Angular app
       cookieSettings = [
         'auth_return_url=',
         'Path=/',
@@ -436,7 +450,10 @@ export default function QueryParamAuthCallback() {
     localStorage.setItem('countryUpdateReturnUrl', url);
 
     // Also store in cookie for cross-domain compatibility
-    const isLocalhost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+    const isLocalhost = window.location.hostname === 'localhost' || 
+                       window.location.hostname === '127.0.0.1' ||
+                       window.location.hostname.startsWith('localhost:') ||
+                       window.location.hostname.startsWith('127.0.0.1:');
 
     let cookieSettings;
     if (isLocalhost) {
@@ -447,6 +464,7 @@ export default function QueryParamAuthCallback() {
         `SameSite=Lax`
       ];
     } else {
+      // Use .insightabusiness.com domain to match the cookie set by Angular app
       cookieSettings = [
         `countryUpdateReturnUrl=${encodeURIComponent(url)}`,
         `Path=/`,
