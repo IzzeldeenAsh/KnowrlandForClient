@@ -42,6 +42,11 @@ export interface InsighterProfile {
     logo: string;
     verified: boolean;
   };
+  country?: {
+    id: number;
+    name: string;
+    flag: string;
+  };
 }
 
 interface InsightersResultsSectionProps {
@@ -99,6 +104,7 @@ const InsightersResultsSection: React.FC<InsightersResultsSectionProps> = ({
                   const isCompanyInsighter = roles.includes('company-insighter');
                   const reviewsSummary = insighter.reviews_summary || { count: 0, average: 0 };
                   const company = insighter.company;
+                  const country = insighter.country;
                   
                   return (
                     <Link 
@@ -219,6 +225,25 @@ const InsightersResultsSection: React.FC<InsightersResultsSectionProps> = ({
                             <IconRosetteDiscountCheckFilled className="w-5 h-5 text-blue-500" />
                           </div>
                           
+                          {/* Country Flag and Name */}
+                          {country && country.flag && (
+                            <div className="flex items-center gap-2">
+                              <div className="relative w-4 h-4 flex-shrink-0">
+                                <Image
+                                  src={`/images/flags/${country.flag}.svg`}
+                                  alt={country.name || 'Country flag'}
+                                  fill
+                                  className="object-cover rounded-sm"
+                                  onError={(e) => {
+                                    // Fallback to default flag if country flag doesn't exist
+                                    const target = e.target as HTMLImageElement;
+                                    target.src = '/images/flags/default.svg';
+                                  }}
+                                />
+                              </div>
+                              <span className="text-sm text-gray-600">{country.name}</span>
+                            </div>
+                          )}
                         
                         </div>
                         

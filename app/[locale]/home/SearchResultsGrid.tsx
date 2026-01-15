@@ -454,7 +454,7 @@ export default function SearchResultsGrid({
                 )}
                 
                 {item.total_downloads !== undefined && item.total_downloads > 0 && (
-                  <div className="absolute bottom-4 left-4 flex items-center gap-2">
+                  <div className="absolute bottom-4 left-4 flex items-center gap-1">
                     <div className="flex items-center justify-center w-6 h-6 bg-white bg-opacity-20 rounded-full">
                       <ArrowDownTrayIcon className="w-3 h-3 text-white" />
                     </div>

@@ -9,12 +9,7 @@ import React, { useEffect, useState, useRef, Suspense } from "react";
 import axios from "axios";
 
 import Stripes from "@/public/images/stripes-dark.svg";
-import {
-  Container,
-  Tabs,
-  Group,
-  Text,
-} from "@mantine/core";
+import { Avatar, Container, Tabs, Group, Text, Tooltip } from "@mantine/core";
 import { useParams, useRouter } from "next/navigation";
 import {
   IconRosetteDiscountCheckFilled,
@@ -74,6 +69,41 @@ interface Certification {
   url: string;
 }
 
+interface ManagerCountry {
+  id: number;
+  region_id: number;
+  iso2: string;
+  iso3: string;
+  name: {
+    en: string;
+    ar: string;
+  };
+  nationality: {
+    en: string;
+    ar: string;
+  };
+  international_code: string;
+  flag: string;
+  status: string;
+  created_at: string;
+  updated_at: string;
+  deleted_at: string | null;
+}
+
+interface CompanyInsighterCountry {
+  id: number;
+  name: string;
+  flag: string;
+}
+
+interface CompanyInsighter {
+  id: number;
+  uuid: string;
+  name: string;
+  profile_photo_url: string | null;
+  country?: CompanyInsighterCountry | null;
+}
+
 interface Company {
   legal_name: string;
   website: string;
@@ -84,6 +114,7 @@ interface Company {
   verified: boolean;
   social: SocialLink[];
   uuid?: string;
+  manager_country?: ManagerCountry;
 }
 
 interface ProfileData {
@@ -103,6 +134,7 @@ interface ProfileData {
   consulting_field: ConsultingField[];
   social: SocialLink[];
   company?: Company;
+  insighter_company?: CompanyInsighter[];
 }
 
 // Updated Knowledge interface to match API response
@@ -157,6 +189,21 @@ interface MeetingAvailabilityResponse {
 }
 
 function ProfilePageContent() {
+  // Helper to get initials from full name (unicode-safe)
+  const getInitials = (fullName: string, maxLetters = 2) => {
+    const cleaned = (fullName || "").trim();
+    if (!cleaned) return "";
+    const parts = cleaned.split(/\s+/).filter(Boolean);
+    if (parts.length === 1) {
+      return Array.from(parts[0]).slice(0, maxLetters).join("").toUpperCase();
+    }
+    return parts
+      .slice(0, maxLetters)
+      .map((p) => (Array.from(p)[0] ?? ""))
+      .join("")
+      .toUpperCase();
+  };
+
   const [profileData, setProfileData] = useState<ProfileData | null>(null);
   const [loading, setLoading] = useState(true);
   const [knowledgeData, setKnowledgeData] = useState<KnowledgeResponse | null>(
@@ -272,6 +319,7 @@ function ProfilePageContent() {
               industries: data.data.industries || [],
               consulting_field: data.data.consulting_field || [],
               social: data.data.social || [],
+              insighter_company: data.data.insighter_company || [],
               company: {
                 legal_name: data.data.legal_name,
                 website: data.data.website,
@@ -281,6 +329,7 @@ function ProfilePageContent() {
                 address: data.data.address,
                 verified: data.data.verified,
                 social: data.data.social || [],
+                manager_country: data.data.manager_country,
                 uuid: data.data.uuid,
               },
             };
@@ -320,6 +369,7 @@ function ProfilePageContent() {
               industries: data.data.industries || [],
               consulting_field: data.data.consulting_field || [],
               social: data.data.social || [],
+              insighter_company: data.data.insighter_company || [],
               company: {
                 legal_name: data.data.legal_name,
                 website: data.data.website,
@@ -329,6 +379,7 @@ function ProfilePageContent() {
                 address: data.data.address,
                 verified: data.data.verified,
                 social: data.data.social || [],
+                manager_country: data.data.manager_country,
                 uuid: data.data.uuid,
               },
             };
@@ -1165,26 +1216,152 @@ function ProfilePageContent() {
            
 
                       {/* Country with Flag */}
-                      {profileData?.country && (
+                      {(profileData?.country ||
+                        (!enterpriseType &&
+                          profileData?.company?.manager_country)) && (
                         <div className="mb-3 flex items-center justify-center md:justify-start gap-2">
-                          {profileData.country_flag ? (
-                            <Image
-                              src={`/images/flags/${profileData.country_flag}.svg`}
-                              alt={profileData.country}
-                              width={15}
-                              height={15}
-                              className="object-contain"
-                            />
-                          ) : profileData.country_code ? (
-                            <span className="text-xl" role="img" aria-label={profileData.country}>
-                              {countryCodeToFlagEmoji(profileData.country_code)}
-                            </span>
-                          ) : null}
-                          <span className="text-sm text-gray-600 dark:text-gray-400 font-medium">
-                            {profileData.country}
-                          </span>
+                          {/* Company manager country when viewing company profile */}
+                          {!enterpriseType &&
+                          profileData?.company?.manager_country ? (
+                            <>
+                              {profileData.company.manager_country.flag ? (
+                                <Image
+                                  src={`/images/flags/${profileData.company.manager_country.flag}.svg`}
+                                  alt={
+                                    isRTL
+                                      ? profileData.company.manager_country.name
+                                          .ar ||
+                                        profileData.company.manager_country
+                                          .name.en
+                                      : profileData.company.manager_country.name
+                                          .en ||
+                                        profileData.company.manager_country
+                                          .name.ar
+                                  }
+                                  width={15}
+                                  height={15}
+                                  className="object-contain"
+                                />
+                              ) : profileData.company.manager_country.iso2 ? (
+                                <span
+                                  className="text-xl"
+                                  role="img"
+                                  aria-label={
+                                    isRTL
+                                      ? profileData.company.manager_country.name
+                                          .ar ||
+                                        profileData.company.manager_country
+                                          .name.en
+                                      : profileData.company.manager_country.name
+                                          .en ||
+                                        profileData.company.manager_country
+                                          .name.ar
+                                  }
+                                >
+                                  {countryCodeToFlagEmoji(
+                                    profileData.company.manager_country.iso2
+                                  )}
+                                </span>
+                              ) : null}
+                              <span className="text-sm text-gray-600 dark:text-gray-400 font-medium">
+                                {isRTL
+                                  ? profileData.company.manager_country.name
+                                      .ar ||
+                                    profileData.company.manager_country.name.en
+                                  : profileData.company.manager_country.name
+                                      .en ||
+                                    profileData.company.manager_country.name.ar}
+                              </span>
+                            </>
+                          ) : (
+                            <>
+                              {profileData?.country_flag ? (
+                                <Image
+                                  src={`/images/flags/${profileData.country_flag}.svg`}
+                                  alt={profileData.country}
+                                  width={15}
+                                  height={15}
+                                  className="object-contain"
+                                />
+                              ) : profileData?.country_code ? (
+                                <span
+                                  className="text-xl"
+                                  role="img"
+                                  aria-label={profileData.country}
+                                >
+                                  {countryCodeToFlagEmoji(
+                                    profileData.country_code
+                                  )}
+                                </span>
+                              ) : null}
+                              <span className="text-sm text-gray-600 dark:text-gray-400 font-medium">
+                                {profileData?.country}
+                              </span>
+                            </>
+                          )}
                         </div>
                       )}
+
+                      {/* Company Insighters (Avatar Group) */}
+                      {isCompany &&
+                        !enterpriseType &&
+                        profileData?.insighter_company &&
+                        profileData.insighter_company.length > 0 && (
+                          <div className="mb-4 flex items-center justify-center md:justify-start">
+                            <Avatar.Group spacing="sm">
+                              {profileData.insighter_company
+                                .slice(0, 3)
+                                .map((insighter) => {
+                                  const initials = insighter.name
+                                    .split(" ")
+                                    .filter(Boolean)
+                                    .slice(0, 2)
+                                    .map((part) => part.charAt(0).toUpperCase())
+                                    .join("");
+
+                                  return (
+                                    <Tooltip
+                                      key={insighter.id}
+                                      label={insighter.name}
+                                      withArrow
+                                      position="top"
+                                    >
+                                      <Link
+                                        href={`/${locale}/profile/${insighter.uuid}?entity=insighter`}
+                                        className="block"
+                                      >
+                                        <Avatar
+                                          src={insighter.profile_photo_url || undefined}
+                                          radius="xl"
+                                          size="md"
+                                          color="blue"
+                                        >
+                                          {!insighter.profile_photo_url
+                                            ? initials
+                                            : null}
+                                        </Avatar>
+                                      </Link>
+                                    </Tooltip>
+                                  );
+                                })}
+                              {profileData.insighter_company.length > 3 && (
+                                <Link
+                                  href={`/${locale}/profile/${uuid}?tab=company-insighters`}
+                                  className="block"
+                                >
+                                  <Avatar
+                                    radius="xl"
+                                    size="md"
+                                    color="gray"
+                                  >
+                                    +
+                                    {profileData.insighter_company.length - 3}
+                                  </Avatar>
+                                </Link>
+                              )}
+                            </Avatar.Group>
+                          </div>
+                        )}
 
                       {/* Action Buttons */}
                       <div className="flex flex-wrap gap-3 mb-4 justify-center md:justify-start">
@@ -1294,6 +1471,18 @@ function ProfilePageContent() {
                             : null
                   }
                 </Tabs.Tab>
+                {/* Company Insighters tab - only for company profiles with insighters */}
+                {isCompany &&
+                  !enterpriseType &&
+                  profileData.insighter_company &&
+                  profileData.insighter_company.length > 0 && (
+                    <Tabs.Tab
+                      value="company-insighters"
+                      className="text-base font-medium px-8 py-4 transition"
+                    >
+                      {locale === "ar" ? "خبراء الشركة" : "Company Insighters"}
+                    </Tabs.Tab>
+                  )}
                 {/* Show Meet tab for insighters */}
                 {(isInsighter || isCompanyInsighter || isCompany) &&
                   enterpriseType === "insighter" && (
@@ -1330,6 +1519,110 @@ function ProfilePageContent() {
                   getSocialIcon={getSocialIcon}
                   enterpriseType={enterpriseType}
                 />
+              </Tabs.Panel>
+
+              {/* Company Insighters Tab Panel */}
+              <Tabs.Panel value="company-insighters">
+                {isCompany &&
+                !enterpriseType &&
+                profileData.insighter_company &&
+                profileData.insighter_company.length > 0 ? (
+                  <div className="p-6 sm:p-8">
+                    <div className="mb-4 flex justify-between items-center">
+                    
+                      <span className="text-sm text-gray-500">
+                        {profileData.insighter_company.length}{" "}
+                        {locale === "ar" ? "خبراء" : "insighters"}
+                      </span>
+                    </div>
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                      {profileData.insighter_company.map((insighter) => (
+                        <Link
+                          key={insighter.uuid}
+                          href={`/${locale}/profile/${insighter.uuid}?entity=insighter`}
+                          className="flex flex-col justify-between gap-4 bg-white rounded-lg border border-gray-200 overflow-hidden duration-300 p-5 hover:-translate-y-1 hover:shadow-md"
+                          style={{
+                            backgroundImage:
+                              "url('https://res.cloudinary.com/dsiku9ipv/image/upload/v1746774672/Artboard_2_qzimiu.png')",
+                            backgroundSize: "cover",
+                            backgroundPosition: "center",
+                          }}
+                        >
+                          <div className="flex flex-col justify-center items-center gap-4">
+                            <div className="relative w-16 h-16 rounded-full border border-blue-500 overflow-hidden bg-blue-50 flex items-center justify-center">
+                              {insighter.profile_photo_url ? (
+                                <Image
+                                  src={insighter.profile_photo_url}
+                                  alt={insighter.name}
+                                  fill
+                                  className="object-cover rounded-full object-top"
+                                />
+                              ) : (
+                                <span className="text-xl font-semibold text-blue-600">
+                                  {getInitials(insighter.name)}
+                                </span>
+                              )}
+                            </div>
+                            <div className="flex-1 min-w-0">
+                              <div className="flex items-center gap-2">
+                                <p className="font-semibold text-gray-900 truncate">
+                                  {insighter.name}
+                                </p>
+                                <IconRosetteDiscountCheckFilled className="w-4 h-4 text-blue-500 flex-shrink-0" />
+                              </div>
+                              {insighter.country && (
+                                <div className="mt-1 justify-center flex items-center gap-2 text-xs text-gray-600">
+                                  {insighter.country.flag && (
+                                    <Image
+                                      src={`/images/flags/${insighter.country.flag}.svg`}
+                                      alt={insighter.country.name}
+                                      width={14}
+                                      height={14}
+                                      className="object-contain"
+                                    />
+                                  )}
+                                  <span className="truncate">
+                                    {insighter.country.name}
+                                  </span>
+                                </div>
+                              )}
+                            </div>
+                          </div>
+                          <div className="flex flex-col  gap-2 w-full">
+                            <Link
+                              href={`/${locale}/profile/${insighter.uuid}?entity=insighter&tab=meet`}
+                              onClick={(e) => e.stopPropagation()}
+                              className="flex-1"
+                            >
+                              <button className="w-full bg-gradient-to-r from-blue-500 to-teal-400 text-xs text-white px-6 py-2 rounded-md font-medium hover:shadow-lg transition-all duration-300">
+                                {locale === "ar"
+                                  ? "حجز مقابلة"
+                                  : "Meet"}
+                              </button>
+                            </Link>
+                            <Link
+                              href={`/${locale}/profile/${insighter.uuid}?entity=insighter`}
+                              onClick={(e) => e.stopPropagation()}
+                              className="flex-1"
+                            >
+                              <button className="w-full bg-white text-xs text-gray-900 border border-gray-300 px-6 py-2 rounded-md font-medium hover:bg-blue-50 transition-all duration-300">
+                                {locale === "ar"
+                                  ? "عرض الرؤى المنشورة"
+                                  : "View Published Insights"}
+                              </button>
+                            </Link>
+                          </div>
+                        </Link>
+                      ))}
+                    </div>
+                  </div>
+                ) : (
+                  <div className="py-10 text-center text-gray-500">
+                    {locale === "ar"
+                      ? "لا يوجد خبراء للشركة حتى الآن"
+                      : "No company insighters available yet."}
+                  </div>
+                )}
               </Tabs.Panel>
 
               {/* Meet Tab Panel with Booking Calendar */}
