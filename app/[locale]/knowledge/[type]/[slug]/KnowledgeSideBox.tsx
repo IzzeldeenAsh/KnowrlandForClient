@@ -426,7 +426,7 @@ const KnowledgeSideBox = ({
                       key={ext} 
                       className={`px-2.5 py-0.75 uppercase ${badgeStyle} rounded-md text-xs font-semibold`}
                     >
-                      {count} {ext}
+                     ( {count} ) {ext}
                     </span>
                   );
                 })}

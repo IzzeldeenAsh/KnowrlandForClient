@@ -45,7 +45,7 @@ export default function HomePage() {
   const initialCountry = searchParams.get('country') ? parseInt(searchParams.get('country')!) : null;
   const initialRegion = searchParams.get('region') ? parseInt(searchParams.get('region')!) : null;
   const initialEconomicBloc = searchParams.get('economic_bloc') ? parseInt(searchParams.get('economic_bloc')!) : null;
-  const initialTag = searchParams.get('tag') ? parseInt(searchParams.get('tag')!) : null;
+  const initialTag = searchParams.get('tag') || null;
   const initialIndustry = searchParams.get('industry') ? parseInt(searchParams.get('industry')!) : null;
   const initialIsicCode = searchParams.get('isic_code') || null;
   const initialHsCode = searchParams.get('hs_code') || null;
@@ -89,7 +89,7 @@ export default function HomePage() {
   const [countryFilter, setCountryFilter] = useState<number | null>(initialCountry);
   const [regionFilter, setRegionFilter] = useState<number | null>(initialRegion);
   const [economicBlocFilter, setEconomicBlocFilter] = useState<number | null>(initialEconomicBloc);
-  const [tagFilter, setTagFilter] = useState<number | null>(initialTag);
+  const [tagFilter, setTagFilter] = useState<string | null>(initialTag);
   const [industryFilter, setIndustryFilter] = useState<number | null>(initialIndustry);
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
   const [isicCodeFilter, setIsicCodeFilter] = useState<string | null>(initialIsicCode);
@@ -302,7 +302,7 @@ export default function HomePage() {
     country?: number | null,
     region?: number | null,
     economic_bloc?: number | null,
-    tag?: number | null,
+    tag?: string | null,
     industry?: number | null,
     isic_code?: string | null,
     hs_code?: string | null,
@@ -671,7 +671,7 @@ export default function HomePage() {
   }, [updateUrlWithFilters]);
 
   // Custom setter for tag filter that triggers search
-  const handleTagFilterChange = useCallback((value: number | null) => {
+  const handleTagFilterChange = useCallback((value: string | null) => {
     setTagFilter(value);
     updateUrlWithFilters({ tag: value });
     setCurrentPage(1);
@@ -724,7 +724,7 @@ export default function HomePage() {
     const urlRegion = searchParams.get('region') ? parseInt(searchParams.get('region')!) : null;
     const urlEconomicBloc = searchParams.get('economic_bloc') ? parseInt(searchParams.get('economic_bloc')!) : null;
     const urlIndustry = searchParams.get('industry') ? parseInt(searchParams.get('industry')!) : null;
-    const urlTag = searchParams.get('tag') ? parseInt(searchParams.get('tag')!) : null;
+    const urlTag = searchParams.get('tag') || null;
     const urlIsicCode = searchParams.get('isic_code') || null;
     const urlHsCode = searchParams.get('hs_code') || null;
     const urlCountry = searchParams.get('country') ? parseInt(searchParams.get('country')!) : null;
@@ -882,7 +882,7 @@ export default function HomePage() {
     if (industryFilter !== null) expectedUrlParams.set('industry', industryFilter.toString());
     if (isicCodeFilter !== null) expectedUrlParams.set('isic_code', isicCodeFilter);
     if (hsCodeFilter !== null) expectedUrlParams.set('hs_code', hsCodeFilter);
-    if (tagFilter !== null) expectedUrlParams.set('tag', tagFilter.toString());
+    if (tagFilter !== null) expectedUrlParams.set('tag', tagFilter);
     if (priceFilter !== null) expectedUrlParams.set('paid', priceFilter);
     if (selectedCategory && selectedCategory !== 'all') expectedUrlParams.set('type', selectedCategory);
     if (accuracyFilter && accuracyFilter !== 'all') expectedUrlParams.set('accuracy', accuracyFilter);
@@ -908,7 +908,7 @@ export default function HomePage() {
     const urlRegion = searchParams.get('region') ? parseInt(searchParams.get('region')!) : null;
     const urlEconomicBloc = searchParams.get('economic_bloc') ? parseInt(searchParams.get('economic_bloc')!) : null;
     const urlIndustry = searchParams.get('industry') ? parseInt(searchParams.get('industry')!) : null;
-    const urlTag = searchParams.get('tag') ? parseInt(searchParams.get('tag')!) : null;
+    const urlTag = searchParams.get('tag') || null;
     const urlIsicCode = searchParams.get('isic_code') || null;
     const urlHsCode = searchParams.get('hs_code') || null;
     const urlCategory = searchParams.get('type');
@@ -1182,7 +1182,7 @@ export default function HomePage() {
     if (regionFilter) params.set('region', regionFilter.toString());
     if (economicBlocFilter) params.set('economic_bloc', economicBlocFilter.toString());
     if (industryFilter) params.set('industry', industryFilter.toString());
-    if (tagFilter) params.set('tag', tagFilter.toString());
+    if (tagFilter) params.set('tag', tagFilter);
     if (isicCodeFilter) params.set('isic_code', isicCodeFilter);
     if (hsCodeFilter) params.set('hs_code', hsCodeFilter);
     if (priceFilter) params.set('paid', priceFilter);

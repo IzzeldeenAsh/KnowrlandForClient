@@ -248,12 +248,30 @@ export default function Overview({ knowledge, knowledgeSlug }: OverviewProps) {
                     </small>
                   </div>
                   <div className={styles.priceTag}>
-  {doc.is_purchased ? (
-    <span id={`doc-price-${doc.id}`} className={`${styles.badge} ${styles.badgePurchased}`} role="text" aria-label={`${translations.purchasedMini} - ${doc.file_name}`}>{translations.purchasedMini}</span>
-  ) : parseFloat(doc.price) === 0 ? (
-    <span id={`doc-price-${doc.id}`} className={`${styles.badge} ${styles.badgeFree}`} role="text" aria-label={`${translations.free} document`}>{translations.free}</span>
-  ) : null}
-</div>
+                    {parseFloat(doc.price) === 0 ? (
+                      <>
+                        <span id={`doc-price-${doc.id}`} className={`${styles.badge} ${styles.badgeFree}`} role="text" aria-label={`${translations.free} document`}>
+                          {translations.free}
+                        </span>
+                        {doc.is_purchased && (
+                          <span className={styles.purchasedMini} role="text" aria-label={`${translations.purchasedMini} - ${doc.file_name}`}>
+                            {translations.purchasedMini}
+                          </span>
+                        )}
+                      </>
+                    ) : (
+                      <>
+                        <span id={`doc-price-${doc.id}`} className={`${styles.badge}`} role="text" aria-label={`Price: $${parseFloat(doc.price).toFixed(2)}`}>
+                          ${parseFloat(doc.price).toFixed(2)}
+                        </span>
+                        {doc.is_purchased && (
+                          <span className={styles.purchasedMini} role="text" aria-label={`${translations.purchasedMini} - ${doc.file_name}`}>
+                            {translations.purchasedMini}
+                          </span>
+                        )}
+                      </>
+                    )}
+                  </div>
                   <div className={styles.expandIcon}>
                     <svg 
                       width="24" 

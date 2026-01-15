@@ -347,13 +347,14 @@
 }
 
 .purchasedMini {
-  font-size: 0.52rem;
-  line-height: 1;
-  color: #277dce; /* green */
+  font-size: 0.7rem;
+  line-height: 1.2;
+  color: #6b7280; /* muted gray, similar to Apple's "In-App Purchases" */
   font-weight: 400;
-  opacity: 0.95;
+  opacity: 0.9;
   white-space: nowrap;
-  padding-top: 2px;
+  margin-top: 2px;
+  text-align: center;
 }
 
 .badge {

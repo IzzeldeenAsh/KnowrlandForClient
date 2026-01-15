@@ -21,7 +21,7 @@ export interface FilterState {
   country: number | null;
   region: number | null;
   economicBloc: number | null;
-  tag: number | null;
+  tag: string | null;
   industry: number | null;
   isicCode: string | null;
   hsCode: string | null;
@@ -64,7 +64,7 @@ export type FilterAction =
   | { type: 'SET_COUNTRY'; payload: number | null }
   | { type: 'SET_REGION'; payload: number | null }
   | { type: 'SET_ECONOMIC_BLOC'; payload: number | null }
-  | { type: 'SET_TAG'; payload: number | null }
+  | { type: 'SET_TAG'; payload: string | null }
   | { type: 'SET_INDUSTRY'; payload: number | null }
   | { type: 'SET_ISIC_CODE'; payload: string | null }
   | { type: 'SET_HS_CODE'; payload: string | null }

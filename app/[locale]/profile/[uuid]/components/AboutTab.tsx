@@ -247,7 +247,8 @@ export default function AboutTab({
                 {/* Location/Country */}
                 {profileData.country && (
                   <div className="bg-white dark:bg-slate-800 p-4 rounded-xl shadow-sm">
-                    <div className="flex items-center">
+                    <div className="flex items-start">
+                      <div className="py-5">
                       <svg
                         xmlns="http://www.w3.org/2000/svg"
                         className={`h-5 w-5 text-gray-500 dark:text-gray-400 ${
@@ -270,9 +271,11 @@ export default function AboutTab({
                           d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
                         />
                       </svg>
+                      </div>
                       <div>
+                        
                         <p className="text-sm text-gray-500 dark:text-gray-400">
-                          {t("location")}
+                          {t("address")}
                         </p>
                         <p className="font-medium">
                           {profileData.country}
@@ -439,7 +442,7 @@ export default function AboutTab({
                       </svg>
                       <div>
                         <p className="text-sm text-gray-500 dark:text-gray-400">
-                          {t("location")}
+                          {t("address")}
                         </p>
                         <p className="font-medium">
                           {profileData.company?.address}

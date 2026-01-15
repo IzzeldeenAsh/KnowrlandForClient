@@ -138,24 +138,25 @@ type KnowledgeCardProps = {
 }
 
 function KnowledgeCard({ item, locale, isRTL }: KnowledgeCardProps) {
-  // Parse and format the price
-  const priceString = item.total_price?.toString().trim() ?? ""
-  const numericPrice = parseFloat(priceString)
-  const isValidPrice = !isNaN(numericPrice) && priceString !== ""
-  const isFree = isValidPrice && numericPrice === 0
-
-  const formattedPrice = isValidPrice
-    ? `$${numericPrice.toLocaleString("en-US", {
-        minimumFractionDigits: 0,
-        maximumFractionDigits: 2
-      })}`
-    : (isRTL ? "مدفوع" : "PAID")
+  // Parse and format the price - following SearchResultsGrid structure
+  const normalizedPrice = String(item.total_price ?? "").trim()
+  const hasPrice = normalizedPrice !== ""
+  const numericPrice = Number(normalizedPrice)
+  const isNumericPrice = normalizedPrice !== "" && !Number.isNaN(numericPrice)
+  const formattedPrice = isNumericPrice
+    ? `$${numericPrice.toLocaleString('en-US', { maximumFractionDigits: 2 })}`
+    : normalizedPrice
 
   // Check paid_status from item
-  const paidStatus = item.paid_status
-  const shouldShowFree = paidStatus === 'free' || (!paidStatus && isValidPrice && numericPrice === 0)
+  const paidStatus: 'free' | 'partial_paid' | 'paid' | undefined =
+    typeof item.paid_status === 'string'
+      ? (item.paid_status as 'free' | 'partial_paid' | 'paid')
+      : undefined
+
+  const shouldShowFree = paidStatus === 'free' || (!paidStatus && isNumericPrice && numericPrice === 0)
   const shouldShowPartial = paidStatus === 'partial_paid'
-  const shouldShowPaid = paidStatus === 'paid' || (!paidStatus && isValidPrice && numericPrice > 0)
+  const shouldShowPaid = paidStatus === 'paid'
+  const shouldShowPricing = shouldShowFree || shouldShowPartial || (shouldShowPaid && hasPrice) || (!paidStatus && hasPrice)
 
   const typeTranslations: Record<string, string> = {
     report: isRTL ? "تقرير" : "Reports",
@@ -173,6 +174,7 @@ function KnowledgeCard({ item, locale, isRTL }: KnowledgeCardProps) {
     company: isRTL ? "شركة" : "Company",
     paid: isRTL ? "مدفوع" : "Paid",
     partial: isRTL ? "مدفوع جزئي" : "Partial Paid",
+    freeDocs: isRTL ? "مستندات مجانية" : "Free docs",
     by: isRTL ? "من قبل" : "By"
   }
 
@@ -294,17 +296,34 @@ function KnowledgeCard({ item, locale, isRTL }: KnowledgeCardProps) {
                 </div>
               </div>
 
-              <div className="flex-shrink-0">
-                {(shouldShowFree || shouldShowPartial || shouldShowPaid) && (
-                  <Badge
-                    color={shouldShowFree ? "green" : shouldShowPartial ? "yellow" : "yellow"}
-                    variant="light"
-                    size="sm"
-                  >
-                    {shouldShowPartial ? translations.partial : shouldShowFree ? translations.free : translations.paid}
-                  </Badge>
-                )}
-              </div>
+              {shouldShowPricing && (
+                <div className="flex-shrink-0 flex items-center gap-2">
+                  {shouldShowPartial && (
+                    <Text size="xs" c="dimmed" className="whitespace-nowrap">
+                      {translations.freeDocs} +
+                    </Text>
+                  )}
+                  {(shouldShowPaid || (!paidStatus && hasPrice) || (shouldShowPartial && hasPrice)) && (
+                    <Badge color="yellow" variant="light" size="sm">
+                      {shouldShowPartial && hasPrice ? (
+                        <span dir="ltr" lang="en">{formattedPrice}</span>
+                      ) : (
+                        <span dir="ltr" lang="en">{formattedPrice}</span>
+                      )}
+                    </Badge>
+                  )}
+                  {shouldShowPartial && !hasPrice && (
+                    <Badge color="yellow" variant="light" size="sm" style={{fontWeight: '500'}}>
+                      {translations.partial}
+                    </Badge>
+                  )}
+                  {shouldShowFree && !shouldShowPartial && !(shouldShowPaid && hasPrice) && (
+                    <Badge color="green" variant="light" size="sm">
+                      {translations.free}
+                    </Badge>
+                  )}
+                </div>
+              )}
             </div>
 
             <div className="mt-auto pt-3 border-t border-gray-100">

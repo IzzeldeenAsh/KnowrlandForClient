@@ -58,7 +58,7 @@ export function useSearchState({ locale, onError }: UseSearchStateOptions) {
       country: urlParams.get('country') ? parseInt(urlParams.get('country')!) : null,
       region: urlParams.get('region') ? parseInt(urlParams.get('region')!) : null,
       economicBloc: urlParams.get('economic_bloc') ? parseInt(urlParams.get('economic_bloc')!) : null,
-      tag: urlParams.get('tag') ? parseInt(urlParams.get('tag')!) : null,
+      tag: urlParams.get('tag') || null,
       industry: urlParams.get('industry') ? parseInt(urlParams.get('industry')!) : null,
       isicCode: urlParams.get('isic_code') || null,
       hsCode: urlParams.get('hs_code') || null,

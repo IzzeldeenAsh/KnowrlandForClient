@@ -321,6 +321,7 @@ export default function SearchResultsGrid({
     coverage: isRTL ? "التغطية" : "Coverage",
     free: isRTL ? "مجاني" : "Free",
     partial: isRTL ? "مدفوع جزئي" : "Partial Paid",
+    freeDocs: isRTL ? "مستندات مجانية" : "Free docs",
     insighter: isRTL ? "إنسايتر" : "Insighter",
     by: isRTL ? "من قبل" : "By",
     company: isRTL ? "الشركة" : "Company",
@@ -641,11 +642,16 @@ export default function SearchResultsGrid({
                   )}
                   {shouldShowPricing && (
                     <div className="flex items-center gap-2">
+                         {shouldShowPartial && (
+                        <Text size="xs" c="dimmed" className="whitespace-nowrap">
+                           {translations.freeDocs} +
+                        </Text>
+                      )}
                       {(shouldShowPaid || (!paidStatus && hasPrice) || (shouldShowPartial && hasPrice)) && (
                         <Badge color="yellow" variant="light" className={cardStyles.priceBadge}>
                           {shouldShowPartial && hasPrice ? (
                             <span dir="ltr" lang="en" >{formattedPrice} 
-                            <span style={{fontWeight: '600' , textTransform: 'capitalize' ,paddingLeft: '4px',paddingRight: '4px'}}>{translations.partial}</span>
+                            {/* <span style={{fontWeight: '600' , textTransform: 'capitalize' ,paddingLeft: '4px',paddingRight: '4px'}}>{translations.partial}</span> */}
                             </span>
                           ) : (
                             <span dir="ltr" lang="en">{formattedPrice}</span>
@@ -662,6 +668,7 @@ export default function SearchResultsGrid({
                           {translations.free}
                         </Badge>
                       )}
+                   
                     </div>
                   )}
                 </div>

@@ -1,4 +1,5 @@
 import { Metadata } from 'next'
+import { cache } from 'react'
 import { generateProfileStructuredData } from '@/utils/seo'
 interface ProfileLayoutProps {
   children: React.ReactNode
@@ -23,7 +24,8 @@ interface ProfileData {
   };
 }
 
-async function getProfileData(uuid: string, locale: string): Promise<ProfileData | null> {
+// Cache the profile data fetch to avoid duplicate API calls
+const getProfileData = cache(async (uuid: string, locale: string): Promise<ProfileData | null> => {
   try {
     // Try insighter API first
     let response = await fetch(
@@ -81,7 +83,7 @@ async function getProfileData(uuid: string, locale: string): Promise<ProfileData
     console.error('Error fetching profile data for metadata:', error);
     return null;
   }
-}
+});
 
 export async function generateMetadata(
   { params }: { params: Promise<{ uuid: string; locale: string }> }

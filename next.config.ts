@@ -10,6 +10,7 @@ const nextConfig: NextConfig = {
       '4sighta-common.s3.eu-north-1.amazonaws.com'
     ],
   },
+  reactStrictMode: false,
   // Add these settings for better dynamic route handling
   output: 'standalone',
   // This helps with dynamic routes in production

@@ -90,8 +90,8 @@ interface FilterBoxProps {
   setRegionFilter?: (filter: number | null) => void;
   economicBlocFilter?: number | null;
   setEconomicBlocFilter?: (filter: number | null) => void;
-  tagFilter?: number | null;
-  setTagFilter?: (filter: number | null) => void;
+  tagFilter?: string | null;
+  setTagFilter?: (filter: string | null) => void;
   isicCodeFilter?: string | null;
   setIsicCodeFilter?: (filter: string | null) => void;
   hsCodeFilter?: string | null;
@@ -560,14 +560,13 @@ const FilterBox: React.FC<FilterBoxProps> = React.memo(({
   };
 
   const getSelectedTagLabel = () => {
-    // tagFilter prop is a number id
+    // tagFilter prop is now a string (tag name)
     // tags state contains id + name
-    // Find selected tag name
+    // Find selected tag by name
     // If not found return null
     // Note: tagFilter may be undefined if not provided
-    const id = typeof tagFilter === 'number' ? tagFilter : null;
-    if (id === null) return null;
-    const selected = tags.find(t => t.id === id);
+    if (!tagFilter) return null;
+    const selected = tags.find(t => t.name === tagFilter);
     return selected ? selected.name : null;
   };
 
@@ -1400,7 +1399,11 @@ const FilterBox: React.FC<FilterBoxProps> = React.memo(({
                       withinPortal={false}
                       onOptionSubmit={(val) => {
                         if (!isDisabled) {
-                          if (setTagFilter) setTagFilter(parseInt(val));
+                          // Find the tag by ID and use its name as the filter value
+                          const selectedTag = tags.find(t => t.id.toString() === val);
+                          if (selectedTag && setTagFilter) {
+                            setTagFilter(selectedTag.name);
+                          }
                           tagCombobox.closeDropdown();
                         }
                       }}
@@ -1413,7 +1416,7 @@ const FilterBox: React.FC<FilterBoxProps> = React.memo(({
                           pointer
                           rightSection={
                             <div className="flex items-center gap-1">
-                              {typeof tagFilter === 'number' && !isDisabled && (
+                              {tagFilter && !isDisabled && (
                                 <button
                                   aria-label="Clear tag"
                                   className="text-gray-400 hover:text-red-500"

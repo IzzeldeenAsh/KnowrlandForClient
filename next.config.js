@@ -10,6 +10,7 @@ const nextConfig = {
       'knoldg-common.s3.us-east-1.amazonaws.com'
     ],
   },
+  reactStrictMode: false,
   async headers() {
     return [
       {

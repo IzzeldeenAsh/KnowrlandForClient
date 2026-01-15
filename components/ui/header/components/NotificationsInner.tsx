@@ -386,7 +386,7 @@ export default function NotificationsInner({
               {notification.sub_type_value ? notification.sub_type_value : title}
             </p>
             <p className={`mt-0.5 ${!notification.read_at ? 'text-gray-900 font-medium' : 'text-gray-700 font-light'} text-sm`} style={{wordBreak: 'break-word'}}>
-              {notification.message}
+              <span dangerouslySetInnerHTML={{ __html: notification.message }} />
             </p>
           </div>
           

@@ -5,7 +5,7 @@ import { useSearchParams } from "next/navigation";
 
 import Footer from "@/components/ui/footer";
 import Image from "next/image";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef, Suspense } from "react";
 import axios from "axios";
 
 import Stripes from "@/public/images/stripes-dark.svg";
@@ -156,7 +156,7 @@ interface MeetingAvailabilityResponse {
   data: MeetingAvailability[];
 }
 
-export default function ProfilePage() {
+function ProfilePageContent() {
   const [profileData, setProfileData] = useState<ProfileData | null>(null);
   const [loading, setLoading] = useState(true);
   const [knowledgeData, setKnowledgeData] = useState<KnowledgeResponse | null>(
@@ -204,16 +204,21 @@ export default function ProfilePage() {
 
   // Get entity type from search params (safe for SSR)
   const entityParam = searchParams.get("entity");
+  
+  // Ref to prevent duplicate API calls
+  const fetchingProfileRef = useRef(false);
 
   useEffect(() => {
     const fetchProfileData = async () => {
+      // Prevent duplicate calls
+      if (fetchingProfileRef.current) {
+        return;
+      }
+      
+      fetchingProfileRef.current = true;
+      
       try {
-        // Use a safe way to access window object
-        const urlParams =
-          typeof window !== "undefined"
-            ? new URLSearchParams(window.location.search)
-            : new URLSearchParams("");
-        const entityType = urlParams.get("entity");
+        const entityType = entityParam;
         setEnterpriseType(entityType);
         // If entity=insighter is specified, try insighter API first
         if (entityType === "insighter") {
@@ -354,13 +359,14 @@ export default function ProfilePage() {
         console.error("Error fetching profile data:", error);
       } finally {
         setLoading(false);
+        fetchingProfileRef.current = false;
       }
     };
 
     if (uuid) {
       fetchProfileData();
     }
-  }, [uuid, locale]);
+  }, [uuid, locale, entityParam]);
 
   useEffect(() => {
     const fetchKnowledgeData = async () => {
@@ -1108,18 +1114,14 @@ export default function ProfilePage() {
                      <IconRosetteDiscountCheckFilled className="w-5 h-5 text-blue-500" />
                     
                         {isCompany && enterpriseType === "insighter" && (
-                          <Link href={`${profileData.company?.uuid}`}>
-                            <span
-                              className={`bg-[#EFF8FF] text-[#299AF8] font-bold text-xs px-2 py-0.5 rounded-full inline-flex items-center ${
-                                locale === "ar" ? "flex-row-reverse" : ""
-                              }`}
-                              dir={locale === "ar" ? "rtl" : "ltr"}
-                            >
-                              {locale === "ar"
-                                ? `${t("compmay")} ${profileData.company?.legal_name ?? ""}`.trim()
-                                : `${profileData.company?.legal_name ?? ""} ${t("compmay")}`.trim()}
-                            </span>
-                          </Link>
+                          <span
+                            className={`bg-[#EFF8FF] text-[#299AF8] font-bold text-xs px-2 py-0.5 rounded-full inline-flex items-center ${
+                              locale === "ar" ? "flex-row-reverse" : ""
+                            }`}
+                            dir={locale === "ar" ? "rtl" : "ltr"}
+                          >
+                            {userProfileT("company")}
+                          </span>
                         )}
                         {isInsighter && (
                           <span className="bg-green-100  text-[#1BC653] font-bold uppercase text-xs px-2 py-0.5 rounded-full inline-flex items-center">
@@ -1127,22 +1129,38 @@ export default function ProfilePage() {
                           </span>
                         )}
                         {isCompanyInsighter && (
-                          <Link href={`${profileData.company?.uuid}`}>
-                            <span
-                              className={`bg-[#EFF8FF] text-[#299AF8] font-bold text-xs px-2 py-0.5 rounded-full inline-flex items-center ${
-                                locale === "ar" ? "flex-row-reverse" : ""
-                              }`}
-                              dir={locale === "ar" ? "rtl" : "ltr"}
-                            >
-                              {locale === "ar"
-                                ? `${t("compmay")} ${profileData.company?.legal_name ?? ""}`.trim()
-                                : `${profileData.company?.legal_name ?? ""} ${t("compmay")}`.trim()}
-                            </span>
-                          </Link>
+                          <span
+                            className={`bg-[#EFF8FF] text-[#299AF8] font-bold text-xs px-2 py-0.5 rounded-full inline-flex items-center ${
+                              locale === "ar" ? "flex-row-reverse" : ""
+                            }`}
+                            dir={locale === "ar" ? "rtl" : "ltr"}
+                          >
+                            {userProfileT("company")}
+                          </span>
                         )}
                         
                       </div>
-                      {(isCompany && entityParam) && <div className="text-blue-500 mb-2 text-sm font-semibold text-center md:text-start">{t("manager")}</div>}
+                      {isCompany && enterpriseType === "insighter" && profileData.company?.legal_name && (
+                        <div className="text-blue-500 mb-2 text-sm font-semibold text-center md:text-start">
+                          {locale === "ar" ? "مدير في " : "Manager at "}
+                          <Link
+                            href={`${profileData.company?.uuid}`}
+                            className="underline underline-offset-2 hover:opacity-80"
+                          >
+                            {profileData.company.legal_name}
+                          </Link>
+                        </div>
+                      )}
+                      {isCompanyInsighter && profileData.company?.legal_name && (
+                        <div className="text-blue-500 mb-2 text-sm font-semibold text-center md:text-start">
+                          <Link
+                            href={`${profileData.company?.uuid}`}
+                            className="underline underline-offset-2 hover:opacity-80"
+                          >
+                            {profileData.company.legal_name}
+                          </Link>
+                        </div>
+                      )}
 
            
 
@@ -1378,5 +1396,19 @@ export default function ProfilePage() {
         <Footer />
       </div>
     </CountryGuard>
+  );
+}
+
+export default function ProfilePage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="flex justify-center items-center min-h-[60vh]">
+          <div className="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-blue-500"></div>
+        </div>
+      }
+    >
+      <ProfilePageContent />
+    </Suspense>
   );
 }
