@@ -20,6 +20,7 @@ import { Elements, useStripe, useElements, PaymentElement } from "@stripe/react-
 import { loadStripe } from "@stripe/stripe-js";
 import { VisaIcon, MasterCardIcon, GooglePayIcon, ApplePayIcon } from "@/components/payment-icons";
 import { useUserProfile } from "@/app/lib/useUserProfile";
+import { getAuthToken } from "@/hooks/useAuth";
 
 // Initialize Stripe
 const stripePromise = loadStripe("pk_live_51RvbpYRIE7WtDi9SLKPBxKTPyTkULT1e36AZMOcmtUomKgW99akiph2PVg5mmUcPtyAjvlXwP1wy70OFvooJLpQc00CNQYKb96");
@@ -271,7 +272,7 @@ export default function MeetTab({
 
   const fetchWalletBalance = async () => {
     try {
-      const token = typeof window !== "undefined" ? localStorage.getItem("token") : null;
+      const token = getAuthToken();
       if (!token) return;
 
       const response = await fetch("https://api.insightabusiness.com/api/account/wallet/balance", {
@@ -355,8 +356,7 @@ export default function MeetTab({
     endTime: string
   ): Promise<boolean> => {
     try {
-      const token =
-        typeof window !== "undefined" ? localStorage.getItem("token") : null;
+      const token = getAuthToken();
 
       const response = await fetch(
         "https://api.insightabusiness.com/api/account/meeting/client/check-duplicate-time",
@@ -389,7 +389,7 @@ export default function MeetTab({
   };
 
   const pollOrderStatus = async (orderUuid: string): Promise<boolean> => {
-    const token = typeof window !== "undefined" ? localStorage.getItem("token") : null;
+    const token = getAuthToken();
     if (!token) return false;
 
     const getPollingDelay = (attempt: number): number => {
@@ -471,9 +471,8 @@ export default function MeetTab({
         setHasCheckedDuplicate(true);
       }
 
-      // Get auth token from localStorage
-      const token =
-        typeof window !== "undefined" ? localStorage.getItem("token") : null;
+      // Get auth token from cookies
+      const token = getAuthToken();
 
       // Get profile name from URL if profileData is unavailable
       const defaultName = uuid.toString().split("-")[0] || "consultant";
@@ -573,7 +572,7 @@ export default function MeetTab({
     if (!orderUuid || !didStripeConfirm || !pollFinished || pollFoundPaid !== false) return;
     try {
       setIsFinalVerifying(true);
-      const token = typeof window !== "undefined" ? localStorage.getItem("token") : null;
+      const token = getAuthToken();
       const response = await fetch(
         `https://api.insightabusiness.com/api/account/order/meeting/check-payment-succeeded/${orderUuid}`,
         {
