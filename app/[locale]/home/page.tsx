@@ -105,6 +105,7 @@ export default function HomePage() {
   const [filtersVisible, setFiltersVisible] = useState(true);
   const [isFilterDrawerOpen, setIsFilterDrawerOpen] = useState(false);
   const [isTabletOrMobile, setIsTabletOrMobile] = useState(false);
+  const contentScrollRef = useRef<HTMLDivElement | null>(null);
 
   // Handle responsive behavior
   useEffect(() => {
@@ -120,6 +121,57 @@ export default function HomePage() {
     
     // Cleanup
     return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
+  // Sync outer page scroll when inner scroll hits top/bottom.
+  // Requirement: outer should jump immediately to the same edge.
+  useEffect(() => {
+    const el = contentScrollRef.current;
+    if (!el) return;
+
+    let lastScrollTop = el.scrollTop;
+    let lastEdge: 'none' | 'top' | 'bottom' = 'none';
+
+    const getDocMaxScrollTop = () => {
+      const doc = document.documentElement;
+      const body = document.body;
+      return Math.max(
+        0,
+        (doc?.scrollHeight ?? 0) - (window.innerHeight || doc?.clientHeight || 0),
+        (body?.scrollHeight ?? 0) - (window.innerHeight || body?.clientHeight || 0)
+      );
+    };
+
+    const onInnerScroll = () => {
+      // If the element isn't actually scrollable, don't interfere.
+      if (el.scrollHeight <= el.clientHeight) return;
+
+      const EPS = 1;
+      const st = el.scrollTop;
+      const direction: 'up' | 'down' | 'none' =
+        st > lastScrollTop ? 'down' : st < lastScrollTop ? 'up' : 'none';
+
+      const atTop = st <= EPS;
+      const atBottom = st + el.clientHeight >= el.scrollHeight - EPS;
+
+      // Only trigger when we ENTER an edge (avoid spamming).
+      if (direction === 'down' && atBottom && lastEdge !== 'bottom') {
+        lastEdge = 'bottom';
+        window.scrollTo({ top: getDocMaxScrollTop(), left: 0, behavior: 'auto' });
+      } else if (direction === 'up' && atTop && lastEdge !== 'top') {
+        lastEdge = 'top';
+        window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
+      } else if (!atTop && !atBottom) {
+        lastEdge = 'none';
+      }
+
+      lastScrollTop = st;
+    };
+
+    el.addEventListener('scroll', onInnerScroll, { passive: true });
+    return () => {
+      el.removeEventListener('scroll', onInnerScroll as EventListener);
+    };
   }, []);
   
   // Add state for statistics
@@ -1509,7 +1561,7 @@ export default function HomePage() {
               </aside>
 
               {/* Content (Hero + Controls + Results) */}
-              <div className="flex-1 h-[100vh] overflow-y-auto">
+              <div ref={contentScrollRef} className="flex-1 h-[100vh] overflow-y-auto">
                 {/* Filters toggle - sticky toolbar (desktop) */}
                 <div className={`${!filtersVisible ? 'sticky top-0 z-20 bg-white/80 backdrop-blur border-b' : ''} ${locale === 'ar' ? 'pr-3' : 'pl-3'}`}>
                   <div className={`flex ${locale === 'ar' ? 'justify-start' : 'justify-start'}`}>
