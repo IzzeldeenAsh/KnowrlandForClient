@@ -87,7 +87,7 @@ export default function AskInsighter({ knowledgeSlug, questions = [], is_owner =
     replySubmitted: isRTL ? 'تم إرسال الرد بنجاح!' : 'Reply submitted successfully!',
     answerSubmitted: isRTL ? 'تم إرسال الإجابة بنجاح!' : 'Answer submitted successfully!',
     errorSubmitting: isRTL ? 'حدث خطأ في إرسال السؤال. يرجى المحاولة مرة أخرى.' : 'Error submitting. Please try again.',
-    loginRequired: isRTL ? 'للتواصل مع الخبير يرجى تسجيل الدخول' : 'To ask with the Insighter, please log in.',
+    loginRequired: isRTL ? 'للتواصل مع الخبير يرجى تسجيل الدخول' : 'To ask the Insighter, please log in.',
     loginButton: isRTL ? 'تسجيل الدخول' : 'Login',
     questions: isRTL ? 'أسئلة' : 'Questions',
     question: isRTL ? 'سؤال' : 'Question',
