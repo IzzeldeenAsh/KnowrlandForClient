@@ -5,6 +5,7 @@ import { useRouter, useParams, useSearchParams } from 'next/navigation';
 import { useTranslations } from 'next-intl';
 import { useCountries, Country } from '@/app/lib/useCountries';
 import { useGlobalProfile } from '@/components/auth/GlobalProfileProvider';
+import { getAuthToken } from '@/lib/authToken';
 
 export default function UpdateCountryPage() {
   const [selectedCountry, setSelectedCountry] = useState<Country | null>(null);
@@ -27,23 +28,6 @@ export default function UpdateCountryPage() {
       handleRedirect();
     }
   }, [user]);
-
-  // Helper function to get auth token
-  const getAuthToken = (): string | null => {
-    if (typeof document === 'undefined') return null;
-
-    // First try cookie
-    const cookies = document.cookie.split(';');
-    for (let cookie of cookies) {
-      const [name, value] = cookie.trim().split('=');
-      if (name === 'token') {
-        return value;
-      }
-    }
-
-    // Fallback to localStorage
-    return localStorage.getItem('token');
-  };
 
   // Update user's country
   const updateCountry = async (countryId: number) => {

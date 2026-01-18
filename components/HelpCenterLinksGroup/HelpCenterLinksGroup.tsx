@@ -38,7 +38,7 @@ function NestedLinkItem({ item, initiallyOpened, onLinkClick }: NestedLinkItemPr
   };
   const isItemActive = checkIsActive(item);
   const [itemOpened, setItemOpened] = useState(
-    isItemActive || (initiallyOpened && hasNestedLinks)
+    !!(isItemActive || (initiallyOpened && hasNestedLinks))
   );
 
   const handleLinkClick = () => {

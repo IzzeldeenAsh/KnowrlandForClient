@@ -7,6 +7,7 @@ import { useParams } from 'next/navigation';
 import BuyModal from './BuyModal';
 import AuthModal from './AuthModal';
 import { useGlobalProfile } from '@/components/auth/GlobalProfileProvider';
+import { getAuthToken } from '@/lib/authToken';
 
 interface KnowledgeDocument {
   id: number;
@@ -136,8 +137,7 @@ const KnowledgeSideBox = ({
 
   // Check if user is logged in
   const isUserLoggedIn = () => {
-    const token = localStorage.getItem('token');
-    return !!token;
+    return !!getAuthToken();
   };
 
   // Handle buy/download click
@@ -178,7 +178,7 @@ const KnowledgeSideBox = ({
     
     setIsReadLaterLoading(true);
     try {
-      const token = localStorage.getItem('token');
+      const token = getAuthToken();
       if (!token) {
         console.error('No auth token found');
         return;

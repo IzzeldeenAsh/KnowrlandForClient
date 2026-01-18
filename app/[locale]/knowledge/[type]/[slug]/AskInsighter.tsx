@@ -16,6 +16,7 @@ import styles from './AskInsighter.module.css';
 import { useToast } from '@/components/toast/ToastContext';
 
 import { Question, KnowledgeDetails } from './types';
+import { getAuthToken } from '@/lib/authToken';
 
 // Update User interface to include roles
 interface User {
@@ -57,8 +58,7 @@ export default function AskInsighter({ knowledgeSlug, questions = [], is_owner =
   // Get the authentication token from localStorage
   useEffect(() => {
     if (typeof window !== 'undefined') {
-      const token = localStorage.getItem('token');
-      setAuthToken(token);
+      setAuthToken(getAuthToken());
     }
   }, []);
   

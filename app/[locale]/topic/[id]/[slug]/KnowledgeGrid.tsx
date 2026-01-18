@@ -16,8 +16,9 @@ import { useParams } from "next/navigation";
 import { arSA, enUS } from 'date-fns/locale';
 import axios from 'axios';
 import AuthModal from '../../../knowledge/[type]/[slug]/AuthModal';
-import { useAuth, getAuthToken } from '@/hooks/useAuth';
+import { useAuth } from '@/hooks/useAuth';
 import { getApiUrl } from '@/app/config';
+import { getAuthToken } from '@/lib/authToken';
 
 const BookmarkUnselectedIcon = (props: React.SVGProps<SVGSVGElement>) => {
   const { width = 33, height = 33, ...rest } = props;

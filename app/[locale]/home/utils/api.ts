@@ -1,39 +1,10 @@
 // API-related utility functions for the home page
 // Error response interface for the API
+import { getAuthToken } from '@/lib/authToken';
+
 export interface ErrorResponse {
   message: string;
   errors?: Record<string, string[]>;
-}
-
-// Helper function to get token from cookie
-function getTokenFromCookie(): string | null {
-  if (typeof document === 'undefined') return null;
-  
-  const cookies = document.cookie.split(';');
-  for (let cookie of cookies) {
-    const [name, value] = cookie.trim().split('=');
-    if (name === 'token') {
-      return decodeURIComponent(value);
-    }
-  }
-  return null;
-}
-
-// Helper function to get token from any available source (cookie first, then localStorage as fallback)
-function getAuthToken(): string | null {
-  // First try cookie (primary storage)
-  const cookieToken = getTokenFromCookie();
-  if (cookieToken) {
-    return cookieToken;
-  }
-
-  // Fallback to localStorage for backward compatibility
-  const localStorageToken = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
-  if (localStorageToken) {
-    return localStorageToken;
-  }
-
-  return null;
 }
 
 // Function to format error messages from 422 responses

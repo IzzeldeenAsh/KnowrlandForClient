@@ -1,5 +1,7 @@
 'use client'
 
+import { getAuthToken } from '@/lib/authToken'
+
 export interface Notification {
   id: string
   message: string
@@ -67,7 +69,7 @@ class NotificationService {
     this.isFetching = true;
     
     try {
-      const token = localStorage.getItem('token');
+      const token = getAuthToken();
       
       if (!token) {
         this.currentNotifications = [];
@@ -114,7 +116,7 @@ class NotificationService {
   // Mark a notification as read
   public async markNotificationAsRead(id: string, locale: string = 'en'): Promise<boolean> {
     try {
-      const token = localStorage.getItem('token');
+      const token = getAuthToken();
       
       if (!token) {
         return false;
@@ -156,7 +158,7 @@ class NotificationService {
   // Mark all notifications as read
   public async markAllNotificationsAsRead(locale: string = 'en'): Promise<boolean> {
     try {
-      const token = localStorage.getItem('token');
+      const token = getAuthToken();
       
       if (!token) {
         return false;

@@ -11,6 +11,7 @@ import BuyModal from './BuyModal'
 import AuthModal from './AuthModal'
 import { useGlobalProfile } from '@/components/auth/GlobalProfileProvider'
 import { useRouter } from 'next/navigation'
+import { getAuthToken } from '@/lib/authToken'
 
 // Define interfaces for minimal typing, you can expand these as needed
 interface Document {
@@ -104,8 +105,7 @@ export default function Overview({ knowledge, knowledgeSlug }: OverviewProps) {
 
   // Check if user is logged in
   const isUserLoggedIn = () => {
-    const token = localStorage.getItem('token');
-    return !!token;
+    return !!getAuthToken();
   };
 
   const handleBuyClick = (documentId: number) => {

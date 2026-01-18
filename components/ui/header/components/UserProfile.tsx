@@ -4,6 +4,7 @@ import { useUserProfile } from "../hooks/useUserProfile";
 import { usePathname } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { useTranslations } from "next-intl";
+import { getAuthToken } from "@/lib/authToken";
 
 const getInitials = (firstName: string, lastName: string) => {
   return `${firstName[0]}${lastName[0]}`.toUpperCase();
@@ -127,7 +128,7 @@ export function UserProfile({ isHome }: { isHome: boolean }) {
   }, [menuOpen]);
 
   // Only show loading state if we have a token (potential user)  
-  const hasToken = typeof localStorage !== 'undefined' && localStorage.getItem('token');
+  const hasToken = !!getAuthToken();
   const isClient$ = () => {
     return roles.includes("client") && 
       !roles.includes("insighter") && 

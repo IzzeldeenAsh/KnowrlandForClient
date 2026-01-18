@@ -18,6 +18,7 @@ import dynamic from 'next/dynamic';
 import axios from 'axios';
 import AuthModal from '../knowledge/[type]/[slug]/AuthModal';
 import { isFirstWordArabic } from '@/app/utils/textUtils';
+import { getAuthToken } from '@/lib/authToken';
 
 const BookmarkUnselectedIcon = (props: React.SVGProps<SVGSVGElement>) => {
   const { width = 33, height = 33, ...rest } = props;
@@ -64,37 +65,6 @@ const BookmarkSelectedIcon = (props: React.SVGProps<SVGSVGElement>) => {
     </svg>
   );
 };
-
-// Helper function to get token from cookie
-function getTokenFromCookie(): string | null {
-  if (typeof document === 'undefined') return null;
-  
-  const cookies = document.cookie.split(';');
-  for (let cookie of cookies) {
-    const [name, value] = cookie.trim().split('=');
-    if (name === 'token') {
-      return decodeURIComponent(value);
-    }
-  }
-  return null;
-}
-
-// Helper function to get token from any available source (cookie first, then localStorage as fallback)
-function getAuthToken(): string | null {
-  // First try cookie (primary storage)
-  const cookieToken = getTokenFromCookie();
-  if (cookieToken) {
-    return cookieToken;
-  }
-
-  // Fallback to localStorage for backward compatibility
-  const localStorageToken = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
-  if (localStorageToken) {
-    return localStorageToken;
-  }
-
-  return null;
-}
 
 // Dynamically import the SearchResultsList component
 const SearchResultsList = dynamic(() => import('./SearchResultsList'), { ssr: false });
@@ -258,7 +228,7 @@ export default function SearchResultsGrid({
     setLoadingStates(prev => ({ ...prev, [itemId]: true }));
     
     try {
-      const token = localStorage.getItem('token');
+      const token = getAuthToken();
       if (!token) {
         console.error('No auth token found');
         return;

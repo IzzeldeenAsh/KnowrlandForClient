@@ -8,6 +8,7 @@ import { useReview } from "@/hooks/knowledgs/useReview";
 import { useRouter, useParams } from "next/navigation";
 import Link from "next/link";
 import { useToast } from "@/components/toast/ToastContext";
+import { getAuthToken } from "@/lib/authToken";
 
 interface ReviewItem {
   id: number;
@@ -138,7 +139,7 @@ export default function Reviews({ knowledgeSlug, reviews, is_review, is_owner, h
   };
 
   // Retrieve the token from localStorage
-  const token = typeof window !== "undefined" ? localStorage.getItem("token") : null;
+  const token = getAuthToken();
 
   // Even if the user is not signed in, we want to show all reviews.
   // But only show the review form if token exists.
@@ -250,7 +251,7 @@ export default function Reviews({ knowledgeSlug, reviews, is_review, is_owner, h
     try {
       // Instead of relying on the hook's state which may not update immediately,
       // let's directly check the response from the API
-      const token = localStorage.getItem("token");
+      const token = getAuthToken();
       
       if (!token) {
         toast.error(translations.signInRequired);

@@ -20,7 +20,8 @@ import { Elements, useStripe, useElements, PaymentElement } from "@stripe/react-
 import { loadStripe } from "@stripe/stripe-js";
 import { VisaIcon, MasterCardIcon, GooglePayIcon, ApplePayIcon } from "@/components/payment-icons";
 import { useUserProfile } from "@/app/lib/useUserProfile";
-import { getAuthToken } from "@/hooks/useAuth";
+import { getAuthToken } from "@/lib/authToken";
+
 
 // Initialize Stripe
 const stripePromise = loadStripe("pk_live_51RvbpYRIE7WtDi9SLKPBxKTPyTkULT1e36AZMOcmtUomKgW99akiph2PVg5mmUcPtyAjvlXwP1wy70OFvooJLpQc00CNQYKb96");

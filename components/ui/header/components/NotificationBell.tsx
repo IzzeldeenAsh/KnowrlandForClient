@@ -4,6 +4,7 @@ import type React from 'react'
 import { createPortal } from 'react-dom'
 import { useParams, usePathname } from 'next/navigation'
 import NotificationsInner from './NotificationsInner'
+import { getAuthToken } from '@/lib/authToken'
 import { 
   getNotifications, 
   markNotificationAsRead, 
@@ -15,14 +16,6 @@ import {
 import { useUserProfile } from '@/components/ui/header/hooks/useUserProfile'
 import {usePusherNotificaitons} from '@/hooks/usePusherNotifications';
 import { subscribePrivateUser, unsubscribePrivateUser, bindGlobal, unbindGlobal } from '@/lib/pusher-client';
-
-function getAuthToken(): string | null {
-  // Prefer cookie if present, otherwise localStorage
-  const cookieToken = typeof document !== 'undefined'
-    ? document.cookie.split('; ').find((r) => r.startsWith('token='))?.split('=')[1]
-    : null
-  return cookieToken || (typeof window !== 'undefined' ? localStorage.getItem('token') : null)
-}
 
 // Notification bell icon as SVG
 const NotificationIcon = () => (

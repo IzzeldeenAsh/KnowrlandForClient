@@ -6,6 +6,7 @@ import { useGlobalProfile } from '@/components/auth/GlobalProfileProvider';
 import FullScreenLoader from '@/components/ui/FullScreenLoader';
 import { useLocale } from 'next-intl';
 import AgreementModal from '@/components/agreements/AgreementModal';
+import { getAuthToken, getTokenFromCookie } from '@/lib/authToken';
 interface ProfileResponse {
   data: {
     id: number;
@@ -46,23 +47,9 @@ export default function QueryParamAuthCallback() {
   const returnUrl = searchParams.get('returnUrl');
   const locale = params.locale as string || 'en';
 
-  // Helper function to get token from cookie
-  const getTokenFromCookie = (): string | null => {
-    if (typeof document === 'undefined') return null;
-    
-    const cookies = document.cookie.split(';');
-    for (let cookie of cookies) {
-      const [name, value] = cookie.trim().split('=');
-      if (name === 'token') {
-        return value;
-      }
-    }
-    return null;
-  };
-
   // If still no token, try to get it from cookie
   if (!token) {
-    token = getTokenFromCookie();
+    token = getTokenFromCookie('token');
     if (token) {
       console.log('[callback] Found token in cookie:', token.substring(0, 20) + '...');
     }
@@ -117,7 +104,7 @@ export default function QueryParamAuthCallback() {
         localStorage.setItem('user', JSON.stringify(userData));
         
         // Verify authentication was successful
-        const storedToken = getTokenFromCookie() || localStorage.getItem('token');
+        const storedToken = getAuthToken();
         const storedUser = localStorage.getItem('user');
         
         if (!storedToken || !storedUser) {
@@ -197,7 +184,7 @@ export default function QueryParamAuthCallback() {
     
     // Verify the cookie was set
     setTimeout(() => {
-      const verification = getTokenFromCookie();
+      const verification = getTokenFromCookie('token');
       console.log('[callback] Cookie set verification:', verification ? 'Success' : 'Failed');
     }, 100);
   };

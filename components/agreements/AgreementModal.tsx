@@ -4,6 +4,7 @@ import React, { useEffect, useMemo, useState, useRef } from 'react';
 import { Modal, Button, Text, Group, Stack, ScrollArea, Loader, Alert, ActionIcon } from '@mantine/core';
 import { IconPrinter } from '@tabler/icons-react';
 import { useRoleCheck } from '@/hooks/useRoleCheck';
+import { getAuthToken } from '@/lib/authToken';
 
 type AgreementType = 'insighter_agreement' | 'company_agreement';
 
@@ -86,22 +87,6 @@ const AgreementModal: React.FC<AgreementModalProps> = ({
     if (isScrolledToBottom(el)) {
       setCanAccept(true);
     }
-  };
-
-  const getTokenFromCookie = (): string | null => {
-    if (typeof document === 'undefined') return null;
-    const cookies = document.cookie.split(';');
-    for (let cookie of cookies) {
-      const [name, value] = cookie.trim().split('=');
-      if (name === 'token') {
-        return decodeURIComponent(value);
-      }
-    }
-    return null;
-  };
-
-  const getAuthToken = (): string | null => {
-    return getTokenFromCookie() || (typeof window !== 'undefined' ? localStorage.getItem('token') : null);
   };
 
   useEffect(() => {

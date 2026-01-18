@@ -4,13 +4,14 @@
  * instead of combining localStorage and cookies
  */
 
+import { getAuthToken } from '@/lib/authToken';
+
 /**
  * Gets the access token from localStorage
  * @returns The access token or null if not found
  */
 export function getAccessToken(): string | null {
-  if (typeof window === 'undefined') return null;
-  return localStorage.getItem('token');
+  return getAuthToken();
 }
 
 /**
@@ -36,6 +37,5 @@ export function removeAccessToken(): void {
  * @returns Boolean indicating if user is authenticated
  */
 export function isAuthenticated(): boolean {
-  if (typeof window === 'undefined') return false;
-  return !!localStorage.getItem('token');
+  return !!getAuthToken();
 }

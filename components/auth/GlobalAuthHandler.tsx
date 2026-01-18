@@ -3,26 +3,13 @@
 import { useEffect } from 'react';
 import { useUserProfile } from '@/components/ui/header/hooks/useUserProfile';
 import { usePathname } from 'next/navigation';
+import { getTokenFromCookie } from '@/lib/authToken';
 
 export default function GlobalAuthHandler() {
   const { handleSignOut } = useUserProfile();
   const pathname = usePathname();
 
   useEffect(() => {
-    // Helper function to get token from cookie
-    const getTokenFromCookie = (): string | null => {
-      if (typeof document === 'undefined') return null;
-      
-      const cookies = document.cookie.split(';');
-      for (let cookie of cookies) {
-        const [name, value] = cookie.trim().split('=');
-        if (name === 'token') {
-          return decodeURIComponent(value);
-        }
-      }
-      return null;
-    };
-
     // Function to clean up all auth data
     const cleanupAuthData = () => {
       
@@ -37,8 +24,7 @@ export default function GlobalAuthHandler() {
 
     // Check auth state and handle cleanup
     const checkAuth = () => {
-      const cookieToken = getTokenFromCookie();
-      const localStorageToken = localStorage.getItem('token');
+      const cookieToken = getTokenFromCookie('token');
       const userData = localStorage.getItem('user');
 
       // Skip auth check for public routes
@@ -52,8 +38,8 @@ export default function GlobalAuthHandler() {
       }
 
 
-      // If we have localStorage data but no cookie token, we need to clean up and redirect
-      if (!cookieToken && (localStorageToken || userData)) {
+      // If we have localStorage user data but no cookie token, we need to clean up and redirect
+      if (!cookieToken && userData) {
         cleanupAuthData();
         
         // Get the current locale for the redirect

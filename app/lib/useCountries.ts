@@ -2,6 +2,7 @@
 import { useState, useEffect } from 'react';
 import { useLocale } from 'next-intl';
 import { getApiUrl } from '@/app/config';
+import { getAuthToken } from '@/lib/authToken';
 
 export interface Country {
   id: number;
@@ -46,22 +47,6 @@ export function useCountries() {
   const [isLoading, setIsLoading] = useState(countriesCache.isLoading);
   const [error, setError] = useState<string | null>(null);
   const locale = useLocale();
-
-  const getAuthToken = (): string | null => {
-    if (typeof document === 'undefined') return null;
-    
-    // First try cookie
-    const cookies = document.cookie.split(';');
-    for (let cookie of cookies) {
-      const [name, value] = cookie.trim().split('=');
-      if (name === 'token') {
-        return value;
-      }
-    }
-    
-    // Fallback to localStorage
-    return localStorage.getItem("token");
-  };
 
   const fetchCountriesWithRetry = async (maxRetries = 3): Promise<Country[]> => {
     const token = getAuthToken();

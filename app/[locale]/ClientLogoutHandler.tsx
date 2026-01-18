@@ -2,6 +2,7 @@
 
 import { useEffect } from 'react';
 import { useSearchParams, usePathname } from 'next/navigation';
+import { getTokenFromCookie } from '@/lib/authToken';
 
 // Function to clean up all auth data
 const cleanupAuthData = () => {
@@ -13,20 +14,6 @@ const cleanupAuthData = () => {
     localStorage.removeItem('foresighta-creds');
   } catch (e) {
   }
-};
-
-// Helper function to get token from cookie
-const getTokenFromCookie = (): string | null => {
-  if (typeof document === 'undefined') return null;
-  
-  const cookies = document.cookie.split(';');
-  for (let cookie of cookies) {
-    const [name, value] = cookie.trim().split('=');
-    if (name === 'token') {
-      return decodeURIComponent(value);
-    }
-  }
-  return null;
 };
 
 export default function ClientLogoutHandler() {
@@ -60,13 +47,12 @@ export default function ClientLogoutHandler() {
 
     // Check auth state and handle cleanup
     const checkAuth = () => {
-      const cookieToken = getTokenFromCookie();
-      const localStorageToken = localStorage.getItem('token');
+      const cookieToken = getTokenFromCookie('token');
       const userData = localStorage.getItem('user');
 
 
       // If we have localStorage data but no cookie token, we need to clean up and redirect
-      if (!cookieToken && (localStorageToken || userData)) {
+      if (!cookieToken && userData) {
         cleanupAuthData();
         
         // Get the current locale for the redirect

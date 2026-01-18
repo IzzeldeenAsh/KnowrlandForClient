@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { getAuthToken } from '@/lib/authToken';
 
 export default function TestAuth() {
   const [token, setToken] = useState('');
@@ -10,7 +11,7 @@ export default function TestAuth() {
 
   // Try to get token from localStorage if available
   useEffect(() => {
-    const storedToken = localStorage.getItem('token');
+    const storedToken = getAuthToken();
     if (storedToken) {
       setToken(storedToken);
     }
