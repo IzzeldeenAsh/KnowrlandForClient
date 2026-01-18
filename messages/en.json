@@ -339,6 +339,12 @@
             "faqs": "FAQs",
             "userGuide": "User Guide"
         },
+        "firstSteps": {
+            "title": "First Steps",
+            "aboutInsighta": "About Insighta",
+            "insighterGuide": "Insighter Guide",
+            "clientGuide": "Client Guide"
+        },
         "legals": {
             "title": "Legals",
             "terms": "Terms & Conditions",

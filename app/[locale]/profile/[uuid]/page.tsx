@@ -613,7 +613,7 @@ function ProfilePageContent() {
       endDate.setFullYear(tomorrow.getFullYear() + 1);
       const endDateStr = endDate.toISOString().split("T")[0]; // YYYY-MM-DD format
       const response = await axios.post(
-        `https://api.insightabusiness.com/api/account/meeting/available/hours/${uuid}`,
+        `https://api.insightabusiness.com/api/platform/insighter/meeting/available/hours/${uuid}`,
         {
           start_date: startDate,
           end_date: endDateStr,

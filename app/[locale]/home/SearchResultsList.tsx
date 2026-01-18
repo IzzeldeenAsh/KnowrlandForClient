@@ -392,7 +392,8 @@ export default function SearchResultsList({
     noItems: isRTL ? "لا توجد نتائج بحث متاحة" : "No search results available",
     posted: isRTL ? "نُشر" : "Posted",
     free: isRTL ? "مجاني" : "Free",
-    partial: isRTL ? "مدفوع جزئي" : "Partial",
+    partial: isRTL ? "مدفوع جزئي" : "Partial Paid",
+    freeDocs: isRTL ? "مستندات مجانية" : "Free docs",
     insighter: isRTL ? "إنسايتر" : "Insighter",
     by: isRTL ? "من قبل" : "By",
     company: isRTL ? "الشركة" : "Company",
@@ -677,15 +678,11 @@ export default function SearchResultsList({
                     <div className={listStyles.detailsSection}>
                       <div className="flex items-center gap-3">
                         {shouldShowPricing && (
-                          <>
+                          <div className="flex items-center gap-2">
                             {shouldShowPartial && (
-                              <Badge
-                                color="yellow"
-                                variant="light"
-                                className={listStyles.priceBadge}
-                              >
-                                {translations.partial}
-                              </Badge>
+                              <Text size="xs" c="dimmed" className="whitespace-nowrap">
+                                {translations.freeDocs} +
+                              </Text>
                             )}
                             {(shouldShowPaid || (!paidStatus && hasPrice) || (shouldShowPartial && hasPrice)) && (
                               <Badge
@@ -693,7 +690,22 @@ export default function SearchResultsList({
                                 variant="light"
                                 className={listStyles.priceBadge}
                               >
-                                <span dir="ltr" lang="en">{formattedPrice}</span>
+                                {shouldShowPartial && hasPrice ? (
+                                  <span dir="ltr" lang="en" >{formattedPrice} 
+                                  </span>
+                                ) : (
+                                  <span dir="ltr" lang="en">{formattedPrice}</span>
+                                )}
+                              </Badge>
+                            )}
+                            {shouldShowPartial && !hasPrice && (
+                              <Badge
+                                color="yellow"
+                                variant="light"
+                                className={listStyles.priceBadge}
+                                style={{fontWeight: '500'}}
+                              >
+                                {translations.partial}
                               </Badge>
                             )}
                             {shouldShowFree && !shouldShowPartial && !(shouldShowPaid && hasPrice) && (
@@ -705,7 +717,7 @@ export default function SearchResultsList({
                                 {translations.free}
                               </Badge>
                             )}
-                          </>
+                          </div>
                         )}
                         
                         {item.published_at && (

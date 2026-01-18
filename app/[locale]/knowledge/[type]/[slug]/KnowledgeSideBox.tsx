@@ -422,11 +422,25 @@ const KnowledgeSideBox = ({
                   }
                   
                   return (
-                    <span 
-                      key={ext} 
-                      className={`px-2.5 py-0.75 uppercase ${badgeStyle} rounded-md text-xs font-semibold`}
+                    <span
+                      key={ext}
+                      className={`px-2.5 py-0.75 uppercase ${badgeStyle} rounded-md text-xs font-semibold flex items-center gap-1`}
                     >
-                     ( {count} ) {ext}
+                      {ext}
+                      <span
+                        className={`
+                          rounded-full
+                          w-4
+                          h-4
+                          flex
+                          items-center
+                          justify-center
+                          font-bold
+                        `}
+                        style={{ fontSize: '10px' }}
+                      >
+                        ( {count} )
+                      </span>
                     </span>
                   );
                 })}

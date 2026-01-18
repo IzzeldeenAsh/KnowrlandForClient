@@ -105,6 +105,7 @@ export interface KnowledgeItem {
   cover_end?: number;   // Coverage end year
   total_downloads?: number;
   paid?:  'free' | 'partial_paid' | 'paid';
+  paid_status?: 'free' | 'partial_paid' | 'paid';
 }
 
 function getInitials(name: string) {
@@ -250,6 +251,7 @@ export default function KnowledgeGrid({
     posted: isRTL ? "نُشر" : "Posted",
     free: isRTL ? "مجاني" : "Free",
     partial: isRTL ? "مدفوع جزئي" : "Partial Paid",
+    freeDocs: isRTL ? "مستندات مجانية" : "Free docs",
     paid: isRTL ? "مدفوع" : "PAID",
     insighter: isRTL ? "إنسايتر" : "Insighter",
     company: isRTL ? "الشركة" : "Company",
@@ -285,7 +287,9 @@ export default function KnowledgeGrid({
               ? (item.paid as 'free' | 'partial_paid' | 'paid')
               : typeof item.paid === 'boolean'
                 ? (item.paid ? 'paid' : 'free')
-                : undefined;
+                : typeof item.paid_status === 'string'
+                  ? (item.paid_status as 'free' | 'partial_paid' | 'paid')
+                  : undefined;
           const shouldShowFree = paidStatus === 'free' || (!paidStatus && isNumericPrice && numericPrice === 0);
           const shouldShowPartial = paidStatus === 'partial_paid';
           const shouldShowPaid = paidStatus === 'paid';
@@ -541,14 +545,24 @@ export default function KnowledgeGrid({
                   )}
                   {shouldShowPricing && (
                     <div className="flex items-center gap-2">
-                      {shouldShowPartial && (
-                        <Badge color="yellow" variant="light" className={cardStyles.priceBadge}>
-                          {translations.partial}
-                        </Badge>
+                       {shouldShowPartial && (
+                        <Text size="xs" c="dimmed" className="whitespace-nowrap">
+                           {translations.freeDocs} +
+                        </Text>
                       )}
                       {(shouldShowPaid || (!paidStatus && hasPrice && numericPrice > 0) || (shouldShowPartial && hasPrice && numericPrice > 0)) && (
                         <Badge color="yellow" variant="light" className={cardStyles.priceBadge}>
-                          <span dir="ltr" lang="en">{formattedPrice}</span>
+                          {shouldShowPartial && hasPrice && numericPrice > 0 ? (
+                            <span dir="ltr" lang="en" >{formattedPrice} 
+                            </span>
+                          ) : (
+                            <span dir="ltr" lang="en">{formattedPrice}</span>
+                          )}
+                        </Badge>
+                      )}
+                      {shouldShowPartial && !hasPrice && (
+                        <Badge color="yellow" variant="light" className={cardStyles.priceBadge} style={{fontWeight: '500'}}>
+                          {translations.partial}
                         </Badge>
                       )}
                       {shouldShowFree && !shouldShowPartial && !(shouldShowPaid && hasPrice && numericPrice > 0) && (
@@ -556,6 +570,7 @@ export default function KnowledgeGrid({
                           {translations.free}
                         </Badge>
                       )}
+                   
                     </div>
                   )}
                 </div>

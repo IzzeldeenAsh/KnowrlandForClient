@@ -1,0 +1,131 @@
+.control {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  padding: 14px 20px;
+  border-radius: 0;
+  font-weight: 500;
+  transition: all 200ms ease;
+  color: #374151;
+  margin-bottom: 0;
+  cursor: pointer;
+  text-align: left;
+  border-left: 3px solid transparent;
+  position: relative;
+}
+
+.control:hover {
+  background-color: #f9fafb;
+}
+
+.control:hover .text {
+  color: #111827;
+}
+
+.control:hover .chevron {
+  color: #2563eb;
+}
+
+.controlActive {
+  background-color: #eff6ff;
+  border-left-color: #2563eb;
+}
+
+.controlActive .text {
+  color: #2563eb;
+}
+
+.controlActive .chevron {
+  color: #2563eb;
+}
+
+/* RTL Support */
+[dir='rtl'] .control {
+  border-left: none;
+  border-right: 3px solid transparent;
+  text-align: right;
+}
+
+[dir='rtl'] .controlActive {
+  border-right-color: #2563eb;
+}
+
+.text {
+  color: #374151;
+  font-size: 15px;
+  line-height: 1.6;
+  font-weight: 500;
+  transition: color 200ms ease;
+}
+
+.textActive {
+  color: #2563eb;
+  font-size: 15px;
+  line-height: 1.6;
+  font-weight: 600;
+}
+
+.chevronContainer {
+  display: flex;
+  align-items: center;
+  margin-right: 10px;
+  color: #6b7280;
+  flex-shrink: 0;
+  transition: color 200ms ease;
+}
+
+[dir='rtl'] .chevronContainer {
+  margin-right: 0;
+  margin-left: 10px;
+}
+
+.chevron {
+  transition: transform 200ms ease, color 200ms ease;
+  color: #6b7280;
+}
+
+.link {
+  display: block;
+  text-decoration: none;
+  padding: 12px 20px 12px 40px;
+  font-size: 14px;
+  line-height: 1.6;
+  color: #6b7280;
+  transition: all 200ms ease;
+  font-weight: 400;
+  border-left: 3px solid transparent;
+  position: relative;
+}
+
+.link:hover {
+  background-color: #f9fafb;
+  color: #111827;
+  border-left-color: #93c5fd;
+  padding-left: 37px;
+}
+
+.linkActive {
+  color: #2563eb;
+  font-weight: 600;
+  background-color: #eff6ff;
+  border-left-color: #2563eb;
+}
+
+/* RTL Support for links */
+[dir='rtl'] .link {
+  border-left: none;
+  border-right: 3px solid transparent;
+  padding: 12px 40px 12px 20px;
+}
+
+[dir='rtl'] .link:hover {
+  border-right-color: #93c5fd;
+  border-left-color: transparent;
+  padding-left: 20px;
+  padding-right: 37px;
+}
+
+[dir='rtl'] .linkActive {
+  border-right-color: #2563eb;
+  border-left-color: transparent;
+}

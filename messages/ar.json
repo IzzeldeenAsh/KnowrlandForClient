@@ -335,6 +335,12 @@
             "faqs": "الأسئلة الشائعة",
             "userGuide": "دليل المستخدم"
         },
+        "firstSteps": {
+            "title": "الخطوات الأولى",
+            "aboutInsighta": "حول إنسايتا",
+            "insighterGuide": "دليل الإنسايتر",
+            "clientGuide": "دليل العميل"
+        },
         "legals": {
             "title": "قانوني",
             "terms": "الشروط والأحكام",
