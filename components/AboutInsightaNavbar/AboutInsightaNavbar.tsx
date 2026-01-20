@@ -45,86 +45,86 @@ export function AboutInsightaNavbar({ onLinkClick }: AboutInsightaNavbarProps) {
       label: t('Types of Content Available', 'أنواع المحتوى المتاح'), 
       link: `${basePath}/content-types`,
     },
-    { 
-      label: t('Why Insighta', 'لماذا إنسايتا'), 
-      link: `${basePath}/why-insighta`,
-    },
-    {
-      label: t('Account Types', 'أنواع الحسابات'),
-      initiallyOpened: pathname.includes('/account-types'),
-      links: [
-        {
-          label: t('Client Account', 'حساب العميل'),
-          links: [
-            { 
-              label: t('What you can do', 'ما يمكنك فعله'), 
-              link: `${basePath}/account-types/client-account/what-you-can-do` 
-            },
-            { 
-              label: t('Why Insighta is', 'لماذا إنسايتا هي'), 
-              link: `${basePath}/account-types/client-account/why-insighta-is` 
-            },
-            { 
-              label: t('Insighta\'s Transparent', 'شفافية إنسايتا'), 
-              link: `${basePath}/account-types/client-account/insightas-transparent` 
-            },
-            { 
-              label: t('Pillars of Trust in', 'ركائز الثقة في'), 
-              link: `${basePath}/account-types/client-account/pillars-of-trust` 
-            },
-            { 
-              label: t('Value Proposition', 'قيمة مقترحة'), 
-              link: `${basePath}/account-types/client-account/value-proposition` 
-            },
-          ]
-        },
-        {
-          label: t('The Insighter Account', 'حساب الإنسايتر'),
-          links: [
-            { 
-              label: t('Who Can Become an', 'من يمكنه أن يصبح'), 
-              link: `${basePath}/account-types/insighter-account/who-can-become-an` 
-            },
-            { 
-              label: t('Your Digital Knowledge', 'معرفتك الرقمية'), 
-              link: `${basePath}/account-types/insighter-account/your-digital-knowledge` 
-            },
-            { 
-              label: t('How Do Clients Reach', 'كيف يصل العملاء'), 
-              link: `${basePath}/account-types/insighter-account/how-do-clients-reach` 
-            },
-          ]
-        },
-        {
-          label: t('Company Accounts', 'حسابات الشركات'),
-          links: [
-            { 
-              label: t('Why a Company', 'لماذا شركة'), 
-              link: `${basePath}/account-types/company-accounts/why-a-company` 
-            },
-          ]
-        },
-      ]
-    },
-    {
-      label: t('Getting Started', 'البدء'),
-      initiallyOpened: pathname.includes('/getting-started'),
-      links: [
-        { label: t('For Clients', 'للعملاء'), link: `${basePath}/getting-started/for-clients` },
-      ]
-    },
-    {
-      label: t('For Experts', 'للخبراء'),
-      initiallyOpened: pathname.includes('/for-experts'),
-      links: [
-        { label: t('Publishing and Content', 'النشر والمحتوى'), link: `${basePath}/for-experts/publishing-and-content` },
-        { label: t('After Publishing', 'بعد النشر'), link: `${basePath}/for-experts/after-publishing` },
-        { label: t('Online Consulting', 'الاستشارة عبر الإنترنت'), link: `${basePath}/for-experts/online-consulting` },
-        { label: t('Strategies to Increase', 'استراتيجيات لزيادة'), link: `${basePath}/for-experts/strategies-to-increase` },
-        { label: t('The Real Value of', 'القيمة الحقيقية لـ'), link: `${basePath}/for-experts/real-value` },
-        { label: t('Golden Tips for', 'نصائح ذهبية لـ'), link: `${basePath}/for-experts/golden-tips` },
-      ]
-    },
+    // { 
+    //   label: t('Why Insighta', 'لماذا إنسايتا'), 
+    //   link: `${basePath}/why-insighta`,
+    // },
+    // {
+    //   label: t('Account Types', 'أنواع الحسابات'),
+    //   initiallyOpened: pathname.includes('/account-types'),
+    //   links: [
+    //     {
+    //       label: t('Client Account', 'حساب العميل'),
+    //       links: [
+    //         { 
+    //           label: t('What you can do', 'ما يمكنك فعله'), 
+    //           link: `${basePath}/account-types/client-account/what-you-can-do` 
+    //         },
+    //         { 
+    //           label: t('Why Insighta is', 'لماذا إنسايتا هي'), 
+    //           link: `${basePath}/account-types/client-account/why-insighta-is` 
+    //         },
+    //         { 
+    //           label: t('Insighta\'s Transparent', 'شفافية إنسايتا'), 
+    //           link: `${basePath}/account-types/client-account/insightas-transparent` 
+    //         },
+    //         { 
+    //           label: t('Pillars of Trust in', 'ركائز الثقة في'), 
+    //           link: `${basePath}/account-types/client-account/pillars-of-trust` 
+    //         },
+    //         { 
+    //           label: t('Value Proposition', 'قيمة مقترحة'), 
+    //           link: `${basePath}/account-types/client-account/value-proposition` 
+    //         },
+    //       ]
+    //     },
+    //     {
+    //       label: t('The Insighter Account', 'حساب الإنسايتر'),
+    //       links: [
+    //         { 
+    //           label: t('Who Can Become an', 'من يمكنه أن يصبح'), 
+    //           link: `${basePath}/account-types/insighter-account/who-can-become-an` 
+    //         },
+    //         { 
+    //           label: t('Your Digital Knowledge', 'معرفتك الرقمية'), 
+    //           link: `${basePath}/account-types/insighter-account/your-digital-knowledge` 
+    //         },
+    //         { 
+    //           label: t('How Do Clients Reach', 'كيف يصل العملاء'), 
+    //           link: `${basePath}/account-types/insighter-account/how-do-clients-reach` 
+    //         },
+    //       ]
+    //     },
+    //     {
+    //       label: t('Company Accounts', 'حسابات الشركات'),
+    //       links: [
+    //         { 
+    //           label: t('Why a Company', 'لماذا شركة'), 
+    //           link: `${basePath}/account-types/company-accounts/why-a-company` 
+    //         },
+    //       ]
+    //     },
+    //   ]
+    // },
+    // {
+    //   label: t('Getting Started', 'البدء'),
+    //   initiallyOpened: pathname.includes('/getting-started'),
+    //   links: [
+    //     { label: t('For Clients', 'للعملاء'), link: `${basePath}/getting-started/for-clients` },
+    //   ]
+    // },
+    // {
+    //   label: t('For Experts', 'للخبراء'),
+    //   initiallyOpened: pathname.includes('/for-experts'),
+    //   links: [
+    //     { label: t('Publishing and Content', 'النشر والمحتوى'), link: `${basePath}/for-experts/publishing-and-content` },
+    //     { label: t('After Publishing', 'بعد النشر'), link: `${basePath}/for-experts/after-publishing` },
+    //     { label: t('Online Consulting', 'الاستشارة عبر الإنترنت'), link: `${basePath}/for-experts/online-consulting` },
+    //     { label: t('Strategies to Increase', 'استراتيجيات لزيادة'), link: `${basePath}/for-experts/strategies-to-increase` },
+    //     { label: t('The Real Value of', 'القيمة الحقيقية لـ'), link: `${basePath}/for-experts/real-value` },
+    //     { label: t('Golden Tips for', 'نصائح ذهبية لـ'), link: `${basePath}/for-experts/golden-tips` },
+    //   ]
+    // },
   ];
 
   // Helper function to recursively filter links

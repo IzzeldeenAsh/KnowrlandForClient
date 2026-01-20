@@ -589,15 +589,9 @@ function ProfilePageContent() {
   const fetchMeetingAvailability = async () => {
     if (!uuid) return;
 
-    // If user is not authenticated, don't make the API call
-    if (!isAuthenticated) {
-      setLoadingMeetings(false);
-      return;
-    }
-
     setLoadingMeetings(true);
     try {
-      // Get auth token from cookies
+      // Token is optional: guests should be able to see the calendar
       const token = getAuthToken();
 
       // Calculate start and end date (3 months range starting from tomorrow)
@@ -624,7 +618,7 @@ function ProfilePageContent() {
             Accept: "application/json",
             "Accept-Language": locale,
             "X-Timezone": Intl.DateTimeFormat().resolvedOptions().timeZone,
-            Authorization: `Bearer ${token}`,
+            ...(token ? { Authorization: `Bearer ${token}` } : {}),
           },
         }
       );
@@ -674,7 +668,6 @@ function ProfilePageContent() {
     if (
       tabParam === "meet" &&
       entityParam === "insighter" &&
-      isAuthenticated &&
       authChecked
     ) {
       fetchMeetingAvailability();
@@ -782,22 +775,38 @@ function ProfilePageContent() {
     setSelectedMeetingTime(null);
   };
 
+  const normalizeDateKey = (input: string | null | undefined): string | null => {
+    if (!input) return null;
+    const match = String(input).match(/\d{4}-\d{2}-\d{2}/);
+    return match ? match[0] : null;
+  };
+
   // Check if a date is active (available for booking)
   const isDateActive = (dateStr: string) => {
-    return meetingAvailability.some(
-      (day) => day.date === dateStr && day.active
-    );
+    const key = normalizeDateKey(dateStr);
+    if (!key) return false;
+    return meetingAvailability.some((day) => {
+      const sameDay = normalizeDateKey(day.date) === key;
+      if (!sameDay) return false;
+      const hasTimes = Array.isArray((day as any).times) && ((day as any).times.length ?? 0) > 0;
+      return Boolean((day as any).active) || hasTimes;
+    });
   };
 
   // Get meeting times for a specific date
   const getMeetingTimesForDate = (dateStr: string) => {
-    const dayData = meetingAvailability.find((day) => day.date === dateStr);
+    const key = normalizeDateKey(dateStr);
+    if (!key) return [];
+    const dayData = meetingAvailability.find((day) => normalizeDateKey(day.date) === key);
     return dayData?.times || [];
   };
 
   const handleDateClick = (dateStr: string) => {
-    if (isDateActive(dateStr)) {
-      setSelectedDate(dateStr);
+    const key = normalizeDateKey(dateStr);
+    if (!key) return;
+    if (isDateActive(key)) {
+      // store normalized YYYY-MM-DD so downstream matching is consistent
+      setSelectedDate(key);
       setSelectedMeetingTime(null);
     }
   };
@@ -1639,7 +1648,6 @@ function ProfilePageContent() {
                   locale={locale}
                   isRTL={isRTL}
                   profileData={profileData}
-                  authChecked={authChecked}
                   isAuthenticated={isAuthenticated}
                   loadingMeetings={loadingMeetings}
                   meetingAvailability={meetingAvailability}

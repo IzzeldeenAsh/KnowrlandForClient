@@ -129,7 +129,7 @@ export default function Header() {
 const { isLoading: isAppLoading, setIsLoading: setAppLoading } = useLoading();
   const pathname = usePathname();
   const router = useRouter();
-  const locale = useTranslations('Header');
+  const currentLocale = pathname.split('/')[1] || 'en';
   
   // Use the centralized user profile hook
   const { user, roles, isLoading, handleSignOut } = useUserProfile();
@@ -142,7 +142,7 @@ const { isLoading: isAppLoading, setIsLoading: setAppLoading } = useLoading();
       backgroundColor: isScrolled ? 'rgb(255, 255, 255)' : 'rgba(255, 255, 255, 0.1)',
       border: isScrolled ? '1px solid rgba(255, 255, 255, 0.18)' : '1px solid rgba(255, 255, 255, 0.2)',
       color: 'white',
-      direction: pathname.split('/')[1] === 'ar' ? 'rtl' : 'ltr',
+      direction: currentLocale === 'ar' ? 'rtl' : 'ltr',
       '&::placeholder': {
         color: isScrolled ? 'rgba(255, 255, 255, 0.75)' : 'rgba(255, 255, 255, 0.6)',
       },
@@ -168,7 +168,7 @@ const { isLoading: isAppLoading, setIsLoading: setAppLoading } = useLoading();
     searchParams.set('search_type', searchType);
     
     // Navigate to the search page with parameters - router already handles locale
-    router.push(`/${pathname.split('/')[1]}/home?${searchParams.toString()}`);
+    router.push(`/${currentLocale}/home?${searchParams.toString()}`);
     setSearchQuery('');
   };
 
@@ -219,12 +219,12 @@ const { isLoading: isAppLoading, setIsLoading: setAppLoading } = useLoading();
   useEffect(() => {
     // Fetch industries data with caching
     const loadIndustries = async () => {
-      const data = await getIndustries(pathname.split('/')[1] || 'en');
+      const data = await getIndustries(currentLocale);
       setIndustries(data);
     };
 
     loadIndustries();
-  }, [pathname]);
+  }, [currentLocale]);
 
   useEffect(() => {
     const onScroll = () => setIsScrolled(window.scrollY > 0);
@@ -387,7 +387,7 @@ const { isLoading: isAppLoading, setIsLoading: setAppLoading } = useLoading();
                   position='bottom'
                   radius="sm" shadow="md" withinPortal>
                   <HoverCard.Target>
-                    <Link href={`/${pathname.split('/')[1]}/all-industries`}>
+                    <Link href={`/${currentLocale}/all-industries`}>
                       <button className={` text-white ${textColorClass} font-medium text-xs md:text-sm xl:mx-1 flex items-center group ${isActiveLink('all-industries')}`}>
                         <span className="mr-1">{t('navigation.industries')}</span>
                         <IconChevronDown size={16} className="group-hover:translate-y-0.5 transition-transform duration-200" />
@@ -402,7 +402,7 @@ const { isLoading: isAppLoading, setIsLoading: setAppLoading } = useLoading();
                     <Group justify="space-between" px="md" className="transition-colors duration-200 hover:bg-slate-800/20 rounded p-2">
                       <Text fw={500} c='white' className="text-glow">{t('industriesDropdown.featuredTitle')}</Text>
                       <Anchor 
-                        href={`/${pathname.split('/')[1]}/all-industries`} 
+                        href={`/${currentLocale}/all-industries`} 
                         fz="xs" 
                         className="text-blue-300 hover:text-blue-200 transition-all duration-200 hover:underline hover:translate-x-0.5"
                       >
@@ -416,7 +416,7 @@ const { isLoading: isAppLoading, setIsLoading: setAppLoading } = useLoading();
                       {industries.map((industry) => (
                         <Link 
                           key={industry.id} 
-                          href={`/${pathname.split('/')[1]}/industry/${industry.id}/${industry.slug}`}
+                          href={`/${currentLocale}/industry/${industry.id}/${industry.slug}`}
                           className="block"
                         >
                           <div className="p-3 rounded transition-all duration-200 industry-nav  hover:shadow-inner hover:translate-y-[-2px] hover:bg-blue-400/50 group">
@@ -448,7 +448,7 @@ const { isLoading: isAppLoading, setIsLoading: setAppLoading } = useLoading();
                         <Button 
                           variant="light" 
                           component={Link} 
-                          href={`/${pathname.split('/')[1]}/all-industries`}
+                          href={`/${currentLocale}/all-industries`}
                           className="bg-blue-50 text-blue-600 hover:bg-blue-200 hover:text-blue-800 transition-all duration-300 transform hover:scale-105 hover:shadow-lg"
                         >
                           {t('industriesDropdown.browseAll')}
@@ -459,19 +459,19 @@ const { isLoading: isAppLoading, setIsLoading: setAppLoading } = useLoading();
                 </HoverCard>
               </li>
               <li>
-                <Link className={`font-medium text-xs md:text-sm ${menuTextColorClass} text-white xl:mx-1 ${isActiveLink('data')}`} href={`/${pathname.split('/')[1]}/industries/data`}>{t('navigation.data')}</Link>
+                <Link className={`font-medium text-xs md:text-sm ${menuTextColorClass} text-white xl:mx-1 ${isActiveLink('data')}`} href={`/${currentLocale}/industries/data`}>{t('navigation.data')}</Link>
               </li>
               <li>
-                <Link className={`font-medium text-xs md:text-sm ${menuTextColorClass} text-white xl:mx-1 ${isActiveLink('report')}`} href={`/${pathname.split('/')[1]}/industries/report`}>{t('navigation.reports')}</Link>
+                <Link className={`font-medium text-xs md:text-sm ${menuTextColorClass} text-white xl:mx-1 ${isActiveLink('report')}`} href={`/${currentLocale}/industries/report`}>{t('navigation.reports')}</Link>
               </li>
               <li>
-                <Link className={`font-medium text-xs md:text-sm ${menuTextColorClass} text-white xl:mx-1 ${isActiveLink('statistic')}`} href={`/${pathname.split('/')[1]}/industries/statistic`}>{t('navigation.statistics')}</Link>
+                <Link className={`font-medium text-xs md:text-sm ${menuTextColorClass} text-white xl:mx-1 ${isActiveLink('statistic')}`} href={`/${currentLocale}/industries/statistic`}>{t('navigation.statistics')}</Link>
               </li>
               <li className='xl:block hidden'>
-                <Link className={`font-medium text-xs md:text-sm ${menuTextColorClass} text-white xl:mx-1 ${isActiveLink('manual')}`} href={`/${pathname.split('/')[1]}/industries/manual`}>{t('navigation.manuals')}</Link>
+                <Link className={`font-medium text-xs md:text-sm ${menuTextColorClass} text-white xl:mx-1 ${isActiveLink('manual')}`} href={`/${currentLocale}/industries/manual`}>{t('navigation.manuals')}</Link>
               </li>
               <li className='xl:block hidden'>
-                <Link className={`font-medium text-xs md:text-sm ${menuTextColorClass} text-white xl:mx-1 ${isActiveLink('course')}`} href={`/${pathname.split('/')[1]}/industries/course`}>{t('navigation.courses')}</Link>
+                <Link className={`font-medium text-xs md:text-sm ${menuTextColorClass} text-white xl:mx-1 ${isActiveLink('course')}`} href={`/${currentLocale}/industries/course`}>{t('navigation.courses')}</Link>
               </li>
             </ul>
           </nav>
@@ -481,7 +481,7 @@ const { isLoading: isAppLoading, setIsLoading: setAppLoading } = useLoading();
             <div className="hidden xl:flex items-center mx-4">
               <form onSubmit={handleSearchSubmit} className="flex items-center">
                 <TextInput
-                  placeholder={pathname.split('/')[1] === 'ar' ? 'البحث...' : 'Search...'}
+                  placeholder={currentLocale === 'ar' ? 'البحث...' : 'Search...'}
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.currentTarget.value)}
                   onKeyDown={(e) => {
@@ -493,7 +493,7 @@ const { isLoading: isAppLoading, setIsLoading: setAppLoading } = useLoading();
                   radius="md"
                   className="w-64"
                   // Position search icon based on locale - right for LTR, left for RTL
-                  {...(pathname.split('/')[1] === 'ar' 
+                  {...(currentLocale === 'ar' 
                     ? { 
                         leftSection: (
                           <button
@@ -537,12 +537,12 @@ const { isLoading: isAppLoading, setIsLoading: setAppLoading } = useLoading();
             <li className="mx-1 md:mx-2">
               <div className="flex items-center">
                 <button
-                  onClick={() => switchLocale(pathname.split('/')[1] === 'en' ? 'ar' : 'en')}
+                  onClick={() => switchLocale(currentLocale === 'en' ? 'ar' : 'en')}
                   className={`flex items-center px-2 md:px-3 py-2 rounded-md text-slate-300 hover:text-white hover:bg-[#3B8AEF]/20 transition-all duration-300 ease-in-out group`}
                 >
                   <IconLanguage size={18} className={`${isScrolled ? 'text-white' : 'text-gray-200'}`} />
                   <span className={`hidden lg:inline text-sm font-medium whitespace-nowrap ml-1 ${isScrolled ? 'text-white' : 'text-gray-200'}`}>
-                    {pathname.split('/')[1] === 'en' ? t('language.switchToArabic') : t('language.switchToEnglish')}
+                    {currentLocale === 'en' ? t('language.switchToArabic') : t('language.switchToEnglish')}
                   </span>
                 </button>
               </div>
@@ -565,7 +565,7 @@ const { isLoading: isAppLoading, setIsLoading: setAppLoading } = useLoading();
               <li className="xl:hidden mr-1 md:mr-2">
                 <button
                   onClick={() => {
-                    router.push(`/${pathname.split('/')[1]}/home`);
+                    router.push(`/${currentLocale}/home`);
                   }}
                   className="flex items-center p-2 text-slate-300 hover:text-white hover:bg-[#3B8AEF]/20 rounded-md transition-all duration-200"
                 >

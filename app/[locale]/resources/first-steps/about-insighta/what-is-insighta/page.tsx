@@ -1,6 +1,6 @@
-import { useTranslations } from 'next-intl'
-import { getMessages } from 'next-intl/server'
-import { Metadata } from 'next'
+import type { Metadata } from 'next'
+import KnowledgeEconomy from './knowledge-economy'
+import SecurePlatform from './secure-platform'
 
 export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }): Promise<Metadata> {
   const resolvedParams = await params
@@ -24,6 +24,7 @@ export default async function WhatIsInsightaPage({ params }: { params: Promise<{
     <div className="relative min-h-screen">
       {/* Hero Section - Similar to home page */}
       <div className="relative overflow-hidden pt-5 pb-16">
+        
         <div className="relative z-10 mx-auto max-w-7xl px-4 sm:px-6">
           {/* Breadcrumbs */}
           <nav className={`mb-6 md:mb-8 text-xs md:text-sm ${isRTL ? 'text-right' : 'text-left'}`} aria-label="Breadcrumb">
@@ -51,7 +52,7 @@ export default async function WhatIsInsightaPage({ params }: { params: Promise<{
           </nav>
 
           {/* Hero Title Section */}
-          <div className="text-center mb-12 md:mb-16">
+          <div className="text-center mb-2 md:mb-4">
             <div className={`flex flex-col align-center justify-center gap-2 ${isRTL ? 'text-right' : 'text-left'} text-left`} style={{lineHeight: '1.3'}}>
               <h1 className="text-3xl sm:text-4xl md:text-5xl font-extrabold tracking-tight text-gray-900">
                 {locale === 'ar' ? 'ما هي إنسايتا' : 'What is Insighta'}
@@ -65,29 +66,54 @@ export default async function WhatIsInsightaPage({ params }: { params: Promise<{
           {/* Main Content */}
           <div className={`max-w-4xl  space-y-6 md:space-y-8 ${isRTL ? 'text-right' : 'text-left'}`}>
             <div className="prose prose-lg max-w-none">
-              <p className={`text-gray-700 text-base md:text-lg lg:text-xl leading-relaxed ${isRTL ? 'text-right' : 'text-left'}`}>
-                {locale === 'ar' 
-                  ? 'إنسايتا هي سوق رائدة في اقتصاد المعرفة—حيث المعرفة هي الأصول الأكثر قيمة. إنها منصة متخصصة لشراء وبيع محتوى الأعمال عالي القيمة بما في ذلك التقارير والمؤشرات والدراسات والتحليلات ورؤى الخبراء. تربط المنصة منشئي المعرفة بأولئك الذين يحتاجون إلى هذه المعرفة في بيئة موثوقة وفعالة.'
-                  : 'Insighta is a leading digital marketplace in the knowledge economy—where knowledge is the most valuable asset. It is a specialized platform for buying and selling high-value business content including reports, indicators, studies, analytics, and expert insights. The platform connects knowledge creators with those who need that knowledge in a trusted and efficient environment.'
-                }
-              </p>
+              <div className={`text-gray-700 text-base md:text-lg lg:text-xl leading-relaxed ${isRTL ? 'text-right' : 'text-left'}`}>
+                {locale === 'ar' ? (
+                  <>
+                    <span>
+                      <b>إنسايتا</b> هي منصة متخصصة ورائدة في <b>اقتصاد المعرفة</b>، حيث تعد المعرفة الأصل الأكثر قيمة.
+                      <br />
+                      توفر إنسايتا <b>سوقًا رقمية متقدمة</b> لشراء وبيع محتوى الأعمال عالي القيمة مثل التقارير، المؤشرات، الدراسات، التحليلات، ورؤى الخبراء.
+                      <br />
+                      كما تربط المنصة <b>منشئي المعرفة</b> بمن يحتاج إليها في بيئة <b>آمنة</b> و<b>موثوقة</b> و<b>فعالة</b>.
+                    </span>
+                  </>
+                ) : (
+                  <>
+                    <span>
+                      <b>Insighta</b> is a leading digital marketplace in the <b>knowledge economy</b>—where knowledge is the most valuable asset.
+                      <br />
+                      It is a <b>specialized platform</b> for buying and selling <b>high-value business content</b> including reports, indicators, studies, analytics, and expert insights.
+                      <br />
+                      The platform connects <b>knowledge creators</b> with those who need that knowledge, in a <b>trusted</b> and <b>efficient</b> environment.
+                    </span>
+                  </>
+                )}
+              </div>
             </div>
 
             {/* Additional Content Cards */}
             <div className="grid md:grid-cols-2 gap-6 mt-12">
               <div className="bg-white/80 backdrop-blur-sm rounded-lg p-6 shadow-md border border-gray-100 hover:shadow-lg transition-shadow">
-                <h3 className={`text-xl font-bold text-gray-900 mb-3 ${isRTL ? 'text-right' : 'text-left'}`}>
+               <div className="flex gap-4">
+               <KnowledgeEconomy />
+               <div>
+               <h3 className={`text-xl font-bold text-gray-900 mb-3 ${isRTL ? 'text-right' : 'text-left'}`}>
                   {locale === 'ar' ? 'اقتصاد المعرفة' : 'Knowledge Economy'}
                 </h3>
                 <p className={`text-gray-600 ${isRTL ? 'text-right' : 'text-left'}`}>
                   {locale === 'ar' 
                     ? 'في عالم اليوم، أصبحت المعرفة والرؤى الأصول الأكثر قيمة للشركات والمهنيين.'
-                    : 'In today\'s world, knowledge and insights have become the most valuable assets for businesses and professionals.'
+                    : 'Today, knowledge and insights are the top assets for businesses and professionals.'
                   }
                 </p>
+               </div>
+               </div>
               </div>
 
               <div className="bg-white/80 backdrop-blur-sm rounded-lg p-6 shadow-md border border-gray-100 hover:shadow-lg transition-shadow">
+              <div className="flex gap-4">
+              <SecurePlatform />
+              <div>
                 <h3 className={`text-xl font-bold text-gray-900 mb-3 ${isRTL ? 'text-right' : 'text-left'}`}>
                   {locale === 'ar' ? 'منصة متخصصة' : 'Specialized Platform'}
                 </h3>
@@ -97,6 +123,8 @@ export default async function WhatIsInsightaPage({ params }: { params: Promise<{
                     : 'We connect knowledge creators with those who need it in a secure and trusted environment.'
                   }
                 </p>
+                </div>
+              </div>
               </div>
             </div>
 
@@ -110,7 +138,6 @@ export default async function WhatIsInsightaPage({ params }: { params: Promise<{
               }}>
                 <div className="p-4 md:p-5">
                   <p className={`text-gray-700 text-sm md:text-base leading-relaxed ${isRTL ? 'text-right' : 'text-left'}`}>
-                    <span className="font-bold text-gray-900">{locale === 'ar' ? 'نصيحة:' : 'TIP:'}</span>{' '}
                     {locale === 'ar' ? (
                       <>هل تريد معرفة المزيد؟ يمكنك الاطلاع على{' '}
                         <a 

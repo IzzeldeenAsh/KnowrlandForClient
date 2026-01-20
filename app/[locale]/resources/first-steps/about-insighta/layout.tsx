@@ -5,12 +5,15 @@ import { AboutInsightaNavbar } from '@/components/AboutInsightaNavbar/AboutInsig
 import Footer from '@/components/ui/footer'
 import { IconMenu2, IconX } from '@tabler/icons-react'
 import PageIllustration from '@/components/page-illustration'
+import { useLocale } from 'next-intl'
 
 export default function AboutInsightaLayout({
   children,
 }: {
   children: React.ReactNode
 }) {
+  const locale = useLocale()
+  const isRTL = locale === 'ar'
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
   const [isMobile, setIsMobile] = useState(false)
 
@@ -39,10 +42,38 @@ export default function AboutInsightaLayout({
 
   return (
     <>
+    
       <section className="relative min-h-screen w-full overflow-hidden bg-gray-50">
         {/* Page Illustrations - same as home page */}
+             {/* Decorative background */}
+             <div aria-hidden className="pointer-events-none absolute inset-0">
+          <div className="absolute inset-0 bg-gradient-to-b from-white via-white to-gray-50" />
+          <div
+            className="absolute inset-0 opacity-[0.08]"
+            style={{
+              backgroundImage:
+                'radial-gradient(circle at 1px 1px, rgb(15 23 42) 1px, transparent 0)',
+              backgroundSize: '22px 22px',
+            }}
+          />
+
+          {/* Gradient blobs */}
+          <div
+            className={`absolute -top-24 h-72 w-72 rounded-full blur-3xl opacity-20 ${
+              isRTL ? 'left-24 bg-gradient-to-l from-blue-500 to-teal-400' : 'right-24 bg-gradient-to-r from-blue-500 to-teal-400'
+            }`}
+          />
+          <div
+            className={`absolute top-16 h-72 w-72 rounded-full blur-3xl opacity-15 ${
+              isRTL ? 'right-20 bg-gradient-to-l from-indigo-500 to-cyan-400' : 'left-40 bg-gradient-to-r from-indigo-500 to-cyan-400'
+            }`}
+          />
+
+          {/* Bottom divider line */}
+          <div className="absolute inset-x-0 bottom-0 h-px bg-gradient-to-r from-transparent via-gray-200 to-transparent" />
+        </div>
         <PageIllustration top={true} middle={true} bottom={true} />
-        
+     
         {/* Background pattern overlay */}
         <div className="absolute inset-0 z-0">
           <svg className="absolute right-0 top-0 h-full w-1/2 translate-x-1/3 transform text-white opacity-5" fill="none" viewBox="0 0 400 400">

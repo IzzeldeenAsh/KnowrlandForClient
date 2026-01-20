@@ -2,7 +2,6 @@
 
 import React, { useState, useEffect } from "react";
 import {
-  IconLock,
   IconCalendarX,
   IconChevronLeft,
   IconChevronRight,
@@ -41,7 +40,6 @@ interface MeetTabProps {
   locale: string;
   isRTL: boolean;
   profileData: any;
-  authChecked: boolean;
   isAuthenticated: boolean;
   loadingMeetings: boolean;
   meetingAvailability: MeetingAvailability[];
@@ -143,7 +141,6 @@ export default function MeetTab({
   locale,
   isRTL,
   profileData,
-  authChecked,
   isAuthenticated,
   loadingMeetings,
   meetingAvailability,
@@ -199,7 +196,7 @@ export default function MeetTab({
   const [isStripeProcessing, setIsStripeProcessing] = useState(false);
   const [hasCheckedDuplicate, setHasCheckedDuplicate] = useState(false);
   const [stripeErrorMessage, setStripeErrorMessage] = useState<string | null>(null);
-  const [bookingStep, setBookingStep] = useState<1 | 2>(1);
+  const [bookingStep, setBookingStep] = useState<1 | 2 | 3>(1);
   const [isFinalVerifying, setIsFinalVerifying] = useState(false);
   const [didStripeConfirm, setDidStripeConfirm] = useState(false);
   const [pollFinished, setPollFinished] = useState(false);
@@ -207,6 +204,8 @@ export default function MeetTab({
   const [paymentExpiresAt, setPaymentExpiresAt] = useState<number | null>(null);
   const [timeLeftMs, setTimeLeftMs] = useState<number>(0);
   const [showPaymentExpiredModal, setShowPaymentExpiredModal] = useState(false);
+  const [authRedirectUrl, setAuthRedirectUrl] = useState<string | null>(null);
+  const [processedMeetPrefillKey, setProcessedMeetPrefillKey] = useState<string | null>(null);
 
   // Fetch wallet balance when component mounts
   useEffect(() => {
@@ -261,6 +260,139 @@ export default function MeetTab({
       closeBookingModal();
     }
   }, [timeLeftMs, paymentExpiresAt, bookingStep]);
+
+  const buildReturnUrlWithMeetingParams = () => {
+    if (typeof window === "undefined") return null;
+    if (!selectedDate || !selectedMeetingTime) return null;
+
+    const url = new URL(window.location.href);
+    const sp = url.searchParams;
+
+    // Ensure we remain on Meet tab when returning
+    sp.set("tab", "meet");
+
+    sp.set("meetModal", "1");
+    sp.set("meet_date", selectedDate);
+    sp.set("start", selectedMeetingTime.start_time.substring(0, 5));
+    sp.set("end", selectedMeetingTime.end_time.substring(0, 5));
+    sp.set("title", meetingTitle || "");
+    sp.set("description", meetingDescription || "");
+    sp.set("payment_method", paymentMethod || "");
+
+    url.search = sp.toString();
+    return url.toString();
+  };
+
+  const normalizeDateKey = (input: string | null | undefined): string | null => {
+    if (!input) return null;
+    // Extract YYYY-MM-DD from possible ISO strings
+    const match = String(input).match(/\d{4}-\d{2}-\d{2}/);
+    return match ? match[0] : null;
+  };
+
+  const normalizeTimeKey = (input: string | null | undefined): string | null => {
+    if (!input) return null;
+    // Extract HH:MM from formats like 09:00, 09:00:00, 09:00:00.000Z, etc.
+    const match = String(input).match(/(\d{2}):(\d{2})/);
+    return match ? `${match[1]}:${match[2]}` : null;
+  };
+
+  const stripMeetParamsFromUrl = () => {
+    if (typeof window === "undefined") return;
+    const url = new URL(window.location.href);
+    const sp = url.searchParams;
+    const keys = [
+      "meetModal",
+      "meet_date",
+      "start",
+      "end",
+      "title",
+      "description",
+      "payment_method",
+    ];
+    keys.forEach((k) => sp.delete(k));
+    url.search = sp.toString();
+    window.history.replaceState(null, "", url.toString());
+  };
+
+  // If we came back from Angular with booking params, auto-select and prefill
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+
+    const sp = new URLSearchParams(window.location.search);
+    const shouldAutoOpen = sp.get("meetModal") === "1";
+    const meetDateRaw = sp.get("meet_date");
+    const meetStartRaw = sp.get("start");
+    const meetEndRaw = sp.get("end");
+    const meetTitle = sp.get("title");
+    const meetDesc = sp.get("description");
+    const meetPayment = sp.get("payment_method");
+
+    const meetDate = normalizeDateKey(meetDateRaw);
+    const meetStart = normalizeTimeKey(meetStartRaw);
+    const meetEnd = normalizeTimeKey(meetEndRaw);
+
+    if (!shouldAutoOpen || !meetDate) return;
+    if (meetingAvailability.length === 0) return;
+
+    const currentKey = [
+      meetDate,
+      meetStart || "",
+      meetEnd || "",
+      meetTitle || "",
+      meetDesc || "",
+      meetPayment || "",
+    ].join("|");
+    if (processedMeetPrefillKey === currentKey) return;
+
+    // Prefill text fields
+    setMeetingTitle(meetTitle || "");
+    setMeetingDescription(meetDesc || "");
+
+    // Prefill payment method (free is inferred from rate)
+    if (meetPayment === "manual" || meetPayment === "provider") {
+      setPaymentMethod(meetPayment);
+    } else {
+      setPaymentMethod(null);
+    }
+
+    // Open modal
+    setIsBookingModalOpen(true);
+    setBookingStep(1);
+
+    // Select date/time once availability is present
+    // Find matching day using tolerant date matching
+    const dayData = meetingAvailability.find((d) => {
+      const dKey = normalizeDateKey(d.date);
+      return dKey === meetDate;
+    });
+
+    const dateToSelect = dayData?.date || meetDate;
+    handleDateClick(dateToSelect);
+
+    const times = dayData?.times || getMeetingTimesForDate(dateToSelect);
+    const found = times.find((t) => {
+      const s = normalizeTimeKey(t.start_time);
+      const e = normalizeTimeKey(t.end_time);
+      return s === meetStart && e === meetEnd;
+    });
+
+    if (found) {
+      handleTimeClick(found);
+      // Only strip params after successful selection, so we don't lose them if slot isn't found
+      stripMeetParamsFromUrl();
+      setProcessedMeetPrefillKey(currentKey);
+    } else {
+      // Keep params for retry and show a helpful error
+      setBookingError(
+        locale.startsWith("ar")
+          ? "تعذر تحديد الوقت تلقائياً. يرجى اختيار الوقت من القائمة."
+          : "Could not auto-select the time. Please pick the time from the list."
+      );
+      setProcessedMeetPrefillKey(currentKey);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [meetingAvailability, processedMeetPrefillKey]);
 
   const formatTimeLeft = (ms: number): string => {
     const totalSeconds = Math.max(0, Math.floor(ms / 1000));
@@ -438,10 +570,39 @@ export default function MeetTab({
     console.log("=== Starting submitBookMeeting ===");
     console.log("Current paymentMethod:", paymentMethod);
 
-    if (!selectedDate || !selectedMeetingTime) return;
+    if (!selectedDate || !selectedMeetingTime) {
+      setBookingError(
+        locale.startsWith("ar")
+          ? "يرجى اختيار التاريخ والوقت أولاً."
+          : "Please select the date and time first."
+      );
+      return;
+    }
 
     // Validate form before submission
     if (!validateBookingForm()) {
+      return;
+    }
+
+    // Guests: allow filling form, then redirect to login/signup with params
+    if (!isAuthenticated) {
+      const meetingPrice = parseFloat(selectedMeetingTime.rate);
+      const isFree = meetingPrice === 0;
+
+      if (!isFree && !paymentMethod) {
+        setBookingError("Please select a payment method");
+        return;
+      }
+
+      if (isFree) {
+        // keep URL param consistent (even though UI doesn't need selection for free sessions)
+        setPaymentMethod(null);
+      }
+
+      const returnUrl = buildReturnUrlWithMeetingParams();
+      if (!returnUrl) return;
+      setAuthRedirectUrl(returnUrl);
+      setBookingStep(3);
       return;
     }
 
@@ -669,6 +830,7 @@ export default function MeetTab({
     setPollFoundPaid(null);
     setPaymentExpiresAt(null);
     setTimeLeftMs(0);
+    setAuthRedirectUrl(null);
     fetchMeetingAvailability();
   };
 
@@ -680,33 +842,7 @@ export default function MeetTab({
           {profileData?.first_name || ""}
         </h2>
 
-        {!authChecked ? (
-          <div className="flex justify-center items-center py-12">
-            <div className="animate-spin rounded-full h-10 w-10 border-4 border-gray-200 border-t-blue-500"></div>
-          </div>
-        ) : !isAuthenticated ? (
-          <div className="text-center py-16">
-            <div className="flex justify-center mb-4">
-              <IconLock size={48} className="text-gray-400" />
-            </div>
-            <h3 className="text-xl font-medium mb-2">
-              {t("loginRequired")}
-            </h3>
-            <p className="text-gray-500 mb-4">{t("loginToView")}</p>
-            <a
-              href={`https://app.insightabusiness.com/auth/login?returnUrl=${encodeURIComponent(
-                `https://insightabusiness.com/${locale}/profile/${uuid}${
-                  typeof window !== "undefined"
-                    ? window.location.search
-                    : ""
-                }`
-              )}`}
-              className="px-6 py-3 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition font-medium"
-            >
-              {t("login")}
-            </a>
-          </div>
-        ) : loadingMeetings ? (
+        {loadingMeetings ? (
           <div className="flex justify-center items-center py-12">
             <div className="animate-spin rounded-full h-10 w-10 border-4 border-gray-200 border-t-blue-500"></div>
           </div>
@@ -941,7 +1077,13 @@ export default function MeetTab({
               closeBookingModal();
             }
           }}
-          title={bookingStep === 1 ? t("bookASession") : (locale.startsWith('ar') ? 'إتمام الدفع' : 'Complete Payment')}
+          title={
+            bookingStep === 1
+              ? t("bookASession")
+              : bookingStep === 2
+                ? (locale.startsWith('ar') ? 'إتمام الدفع' : 'Complete Payment')
+                : (locale.startsWith('ar') ? 'تسجيل الدخول أو إنشاء حساب' : 'Login or Sign Up')
+          }
           size="lg"
           centered
         >
@@ -990,7 +1132,35 @@ export default function MeetTab({
               </div>
             )}
 
-            {bookingStep === 1 ? (
+            {bookingStep === 3 ? (
+              // Guest auth step: show ONLY login/signup buttons
+              <div className="flex items-center justify-center gap-3">
+                <Button
+                  className="bg-blue-500 hover:bg-blue-600"
+                  onClick={() => {
+                    if (!authRedirectUrl) return;
+                    const loginUrl = `https://app.insightabusiness.com/auth/login?returnUrl=${encodeURIComponent(
+                      authRedirectUrl
+                    )}`;
+                    window.location.href = loginUrl;
+                  }}
+                >
+                  {locale.startsWith("ar") ? "تسجيل الدخول" : "Login"}
+                </Button>
+                <Button
+                  variant="outline"
+                  onClick={() => {
+                    if (!authRedirectUrl) return;
+                    const signupUrl = `https://app.insightabusiness.com/auth/sign-up?returnUrl=${encodeURIComponent(
+                      authRedirectUrl
+                    )}`;
+                    window.location.href = signupUrl;
+                  }}
+                >
+                  {locale.startsWith("ar") ? "إنشاء حساب" : "Sign Up"}
+                </Button>
+              </div>
+            ) : bookingStep === 1 ? (
               <form
                 onSubmit={(e) => {
                   e.preventDefault();
@@ -1054,8 +1224,8 @@ export default function MeetTab({
 
                     {/* Payment methods in one row */}
                     <div className="flex flex-col gap-3">
-                      {/* Insighta Wallet Option (hidden for client-only users) */}
-                      {!isClientOnlyUser && (
+                      {/* Insighta Wallet Option (requires authentication + non-client-only) */}
+                      {isAuthenticated && !isClientOnlyUser && (
                         <div
                           className={`border rounded-lg p-4 cursor-pointer transition-all min-h-[72px] ${
                             paymentMethod === "manual"
@@ -1189,7 +1359,9 @@ export default function MeetTab({
                       )
                     }
                   >
-                    {t("confirmBooking")}
+                    {!isAuthenticated
+                      ? (locale.startsWith("ar") ? "متابعة" : "Continue")
+                      : t("confirmBooking")}
                   </Button>
                 </div>
               </form>
