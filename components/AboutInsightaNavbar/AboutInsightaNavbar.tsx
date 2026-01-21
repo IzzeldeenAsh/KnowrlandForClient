@@ -45,74 +45,61 @@ export function AboutInsightaNavbar({ onLinkClick }: AboutInsightaNavbarProps) {
       label: t('Types of Content Available', 'أنواع المحتوى المتاح'), 
       link: `${basePath}/content-types`,
     },
-    // { 
-    //   label: t('Why Insighta', 'لماذا إنسايتا'), 
-    //   link: `${basePath}/why-insighta`,
-    // },
-    // {
-    //   label: t('Account Types', 'أنواع الحسابات'),
-    //   initiallyOpened: pathname.includes('/account-types'),
-    //   links: [
-    //     {
-    //       label: t('Client Account', 'حساب العميل'),
-    //       links: [
-    //         { 
-    //           label: t('What you can do', 'ما يمكنك فعله'), 
-    //           link: `${basePath}/account-types/client-account/what-you-can-do` 
-    //         },
-    //         { 
-    //           label: t('Why Insighta is', 'لماذا إنسايتا هي'), 
-    //           link: `${basePath}/account-types/client-account/why-insighta-is` 
-    //         },
-    //         { 
-    //           label: t('Insighta\'s Transparent', 'شفافية إنسايتا'), 
-    //           link: `${basePath}/account-types/client-account/insightas-transparent` 
-    //         },
-    //         { 
-    //           label: t('Pillars of Trust in', 'ركائز الثقة في'), 
-    //           link: `${basePath}/account-types/client-account/pillars-of-trust` 
-    //         },
-    //         { 
-    //           label: t('Value Proposition', 'قيمة مقترحة'), 
-    //           link: `${basePath}/account-types/client-account/value-proposition` 
-    //         },
-    //       ]
-    //     },
-    //     {
-    //       label: t('The Insighter Account', 'حساب الإنسايتر'),
-    //       links: [
-    //         { 
-    //           label: t('Who Can Become an', 'من يمكنه أن يصبح'), 
-    //           link: `${basePath}/account-types/insighter-account/who-can-become-an` 
-    //         },
-    //         { 
-    //           label: t('Your Digital Knowledge', 'معرفتك الرقمية'), 
-    //           link: `${basePath}/account-types/insighter-account/your-digital-knowledge` 
-    //         },
-    //         { 
-    //           label: t('How Do Clients Reach', 'كيف يصل العملاء'), 
-    //           link: `${basePath}/account-types/insighter-account/how-do-clients-reach` 
-    //         },
-    //       ]
-    //     },
-    //     {
-    //       label: t('Company Accounts', 'حسابات الشركات'),
-    //       links: [
-    //         { 
-    //           label: t('Why a Company', 'لماذا شركة'), 
-    //           link: `${basePath}/account-types/company-accounts/why-a-company` 
-    //         },
-    //       ]
-    //     },
-    //   ]
-    // },
-    // {
-    //   label: t('Getting Started', 'البدء'),
-    //   initiallyOpened: pathname.includes('/getting-started'),
-    //   links: [
-    //     { label: t('For Clients', 'للعملاء'), link: `${basePath}/getting-started/for-clients` },
-    //   ]
-    // },
+    { 
+      label: t('Why Insighta', 'لماذا إنسايتا'), 
+      link: `${basePath}/why-insighta`,
+    },
+    {
+      label: t('Client Account', 'حساب العميل'),
+      links: [
+        { 
+          label: t('What you can do', 'ما يمكنك فعله'), 
+          link: `${basePath}/account-types/client-account/what-you-can-do` 
+        },
+        { 
+          label: t('Why Insighta is different', 'لماذا إنسايتا مميزة'), 
+          link: `${basePath}/account-types/client-account/why-insighta-is` 
+        },
+        { 
+          label: t('Insighta\'s Transparent', 'شفافية إنسايتا'), 
+          link: `${basePath}/account-types/client-account/insightas-transparent` 
+        },
+        { 
+          label: t('Pillars of Trust in Insighta', 'ركائز الثقة في إنسايتا'), 
+          link: `${basePath}/account-types/client-account/pillars-of-trust` 
+        }
+      ]
+    },
+    {
+      label: t('The Insighter Account', 'حساب الإنسايتر'),
+      links: [
+        { 
+          label: t('Who Can Become an Insighter', 'من يمكنه أن ينضم كـ إنسايتر ( خبير)'), 
+          link: `${basePath}/account-types/insighter-account/who-can-become-an-insighter` 
+        },
+        { 
+          label: t('Your Digital Knowledge Base', 'قاعدتك المعرفية الرقمية  '), 
+          link: `${basePath}/account-types/insighter-account/your-digital-knowledge-base` 
+        },
+        { 
+          label: t('How Do Clients Reach', 'كيف يصل العملاء'), 
+          link: `${basePath}/account-types/insighter-account/how-do-clients-reach` 
+        },
+      ]
+    },
+    {
+      label: t('Company Accounts', 'حسابات الشركات'),
+      links: [
+        { 
+          label: t('Why a Company', 'لماذا شركة'), 
+          link: `${basePath}/account-types/company-accounts/why-a-company` 
+        },
+      ]
+    },
+    {
+      label: t('Getting Started', 'البدء'),
+      link: `${basePath}/getting-started`,
+    },
     // {
     //   label: t('For Experts', 'للخبراء'),
     //   initiallyOpened: pathname.includes('/for-experts'),

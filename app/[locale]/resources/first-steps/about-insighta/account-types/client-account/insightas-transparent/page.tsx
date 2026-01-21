@@ -50,6 +50,219 @@ export default async function InsightasTransparentPage({ params }: { params: Pro
               </h2>
             </div>
           </div>
+
+          <div className={`${isRTL ? 'text-right' : 'text-left'}`}>
+            <p className="text-lg md:text-xl text-gray-700 leading-relaxed mb-8">
+              {locale === 'ar'
+                ? 'إنسايتا تستبدل نموذج "الصندوق الأسود" بالوضوح الكامل:'
+                : 'Insighta replaces the black-box approach with full clarity:'}
+            </p>
+
+            <div className="overflow-x-auto">
+              <table className="w-full border border-gray-200 text-sm md:text-base">
+                <thead>
+                  <tr className="bg-gray-50">
+                    <th className={`border border-gray-200 px-4 py-3 font-semibold text-gray-900 ${isRTL ? 'text-right' : 'text-left'}`}>
+                      {locale === 'ar' ? 'النموذج التقليدي' : 'Traditional Model'}
+                    </th>
+                    <th className={`border border-gray-200 px-4 py-3 font-semibold text-gray-900 ${isRTL ? 'text-right' : 'text-left'}`}>
+                      {locale === 'ar' ? 'نموذج إنسايتا' : 'Insighta Model'}
+                    </th>
+                  </tr>
+                </thead>
+                <tbody className="text-gray-700">
+                  <tr className="odd:bg-white even:bg-gray-50">
+                    <td className="border border-gray-200 px-4 py-3">
+                      <span className={`inline-flex items-start gap-2 ${isRTL ? 'flex-row-reverse' : ''}`}>
+                        <svg className="mt-0.5 h-4 w-4 text-red-500 flex-shrink-0" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                          <path
+                            d="M12 9v4m0 4h.01M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0Z"
+                            stroke="currentColor"
+                            strokeWidth="2"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                          />
+                        </svg>
+                        <span>{locale === 'ar' ? 'محتوى مغلق المصدر' : 'Closed content'}</span>
+                      </span>
+                    </td>
+                    <td className="border border-gray-200 px-4 py-3">
+                      <span className={`inline-flex items-start gap-2 ${isRTL ? 'flex-row-reverse' : ''}`}>
+                        <svg className="mt-0.5 h-4 w-4 text-green-600 flex-shrink-0" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                          <path
+                            d="M20 6 9 17l-5-5"
+                            stroke="currentColor"
+                            strokeWidth="2"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                          />
+                        </svg>
+                        <span>
+                          {locale === 'ar'
+                            ? 'شفافية كاملة + ملخص تنفيذي ووصف منهجي'
+                            : 'Full transparency + executive summary'}
+                        </span>
+                      </span>
+                    </td>
+                  </tr>
+                  <tr className="odd:bg-white even:bg-gray-50">
+                    <td className="border border-gray-200 px-4 py-3">
+                      <span className={`inline-flex items-start gap-2 ${isRTL ? 'flex-row-reverse' : ''}`}>
+                        <svg className="mt-0.5 h-4 w-4 text-red-500 flex-shrink-0" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                          <path
+                            d="M12 9v4m0 4h.01M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0Z"
+                            stroke="currentColor"
+                            strokeWidth="2"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                          />
+                        </svg>
+                        <span>{locale === 'ar' ? 'لا قناة تواصل مع المصدر' : 'No access to source'}</span>
+                      </span>
+                    </td>
+                    <td className="border border-gray-200 px-4 py-3">
+                      <span className={`inline-flex items-start gap-2 ${isRTL ? 'flex-row-reverse' : ''}`}>
+                        <svg className="mt-0.5 h-4 w-4 text-green-600 flex-shrink-0" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                          <path
+                            d="M20 6 9 17l-5-5"
+                            stroke="currentColor"
+                            strokeWidth="2"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                          />
+                        </svg>
+                        <span>
+                          {locale === 'ar'
+                            ? 'إمكانية عقد اجتماع مع الناشر قبل الشراء'
+                            : 'Direct communication with publisher'}
+                        </span>
+                      </span>
+                    </td>
+                  </tr>
+                  <tr className="odd:bg-white even:bg-gray-50">
+                    <td className="border border-gray-200 px-4 py-3">
+                      <span className={`inline-flex items-start gap-2 ${isRTL ? 'flex-row-reverse' : ''}`}>
+                        <svg className="mt-0.5 h-4 w-4 text-red-500 flex-shrink-0" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                          <path
+                            d="M12 9v4m0 4h.01M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0Z"
+                            stroke="currentColor"
+                            strokeWidth="2"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                          />
+                        </svg>
+                        <span>{locale === 'ar' ? 'محتوى معاد إنتاجه' : 'Recycled content'}</span>
+                      </span>
+                    </td>
+                    <td className="border border-gray-200 px-4 py-3">
+                      <span className={`inline-flex items-start gap-2 ${isRTL ? 'flex-row-reverse' : ''}`}>
+                        <svg className="mt-0.5 h-4 w-4 text-green-600 flex-shrink-0" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                          <path
+                            d="M20 6 9 17l-5-5"
+                            stroke="currentColor"
+                            strokeWidth="2"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                          />
+                        </svg>
+                        <span>{locale === 'ar' ? 'محتوى أصلي من المصدر الأول مباشرة' : 'Original native content'}</span>
+                      </span>
+                    </td>
+                  </tr>
+                  <tr className="odd:bg-white even:bg-gray-50">
+                    <td className="border border-gray-200 px-4 py-3">
+                      <span className={`inline-flex items-start gap-2 ${isRTL ? 'flex-row-reverse' : ''}`}>
+                        <svg className="mt-0.5 h-4 w-4 text-red-500 flex-shrink-0" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                          <path
+                            d="M12 9v4m0 4h.01M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0Z"
+                            stroke="currentColor"
+                            strokeWidth="2"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                          />
+                        </svg>
+                        <span>{locale === 'ar' ? 'التزامات مالية دورية' : 'Subscription fees'}</span>
+                      </span>
+                    </td>
+                    <td className="border border-gray-200 px-4 py-3">
+                      <span className={`inline-flex items-start gap-2 ${isRTL ? 'flex-row-reverse' : ''}`}>
+                        <svg className="mt-0.5 h-4 w-4 text-green-600 flex-shrink-0" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                          <path
+                            d="M20 6 9 17l-5-5"
+                            stroke="currentColor"
+                            strokeWidth="2"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                          />
+                        </svg>
+                        <span>{locale === 'ar' ? 'الدفع عند الاستخدام (Pay-Per-Use)' : 'Pay only when you use'}</span>
+                      </span>
+                    </td>
+                  </tr>
+                  <tr className="odd:bg-white even:bg-gray-50">
+                    <td className="border border-gray-200 px-4 py-3">
+                      <span className={`inline-flex items-start gap-2 ${isRTL ? 'flex-row-reverse' : ''}`}>
+                        <svg className="mt-0.5 h-4 w-4 text-red-500 flex-shrink-0" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                          <path
+                            d="M12 9v4m0 4h.01M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0Z"
+                            stroke="currentColor"
+                            strokeWidth="2"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                          />
+                        </svg>
+                        <span>{locale === 'ar' ? 'مُعدّ مجهول الهوية' : 'Anonymous publishers'}</span>
+                      </span>
+                    </td>
+                    <td className="border border-gray-200 px-4 py-3">
+                      <span className={`inline-flex items-start gap-2 ${isRTL ? 'flex-row-reverse' : ''}`}>
+                        <svg className="mt-0.5 h-4 w-4 text-green-600 flex-shrink-0" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                          <path
+                            d="M20 6 9 17l-5-5"
+                            stroke="currentColor"
+                            strokeWidth="2"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                          />
+                        </svg>
+                        <span>{locale === 'ar' ? 'هوية موثقة ومسؤول عن المحتوى' : 'Verified identity'}</span>
+                      </span>
+                    </td>
+                  </tr>
+                  <tr className="odd:bg-white even:bg-gray-50">
+                    <td className="border border-gray-200 px-4 py-3">
+                      <span className={`inline-flex items-start gap-2 ${isRTL ? 'flex-row-reverse' : ''}`}>
+                        <svg className="mt-0.5 h-4 w-4 text-red-500 flex-shrink-0" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                          <path
+                            d="M12 9v4m0 4h.01M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0Z"
+                            stroke="currentColor"
+                            strokeWidth="2"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                          />
+                        </svg>
+                        <span>{locale === 'ar' ? 'لا متابعة بعد الشراء' : 'No follow-up'}</span>
+                      </span>
+                    </td>
+                    <td className="border border-gray-200 px-4 py-3">
+                      <span className={`inline-flex items-start gap-2 ${isRTL ? 'flex-row-reverse' : ''}`}>
+                        <svg className="mt-0.5 h-4 w-4 text-green-600 flex-shrink-0" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                          <path
+                            d="M20 6 9 17l-5-5"
+                            stroke="currentColor"
+                            strokeWidth="2"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                          />
+                        </svg>
+                        <span>{locale === 'ar' ? 'تحديثات استباقية وإشعارات فورية' : 'Proactive updates'}</span>
+                      </span>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
         </div>
       </div>
     </div>

@@ -160,7 +160,7 @@ export default async function ContentTypesPage({ params }: { params: Promise<{ l
               {contentTypes.map((item) => (
                 <div
                   key={item.key}
-                  className="group rounded-xl border border-gray-200 bg-white/70 backdrop-blur-sm px-5 py-5 md:px-6 md:py-6 transition-colors hover:bg-white"
+                  className="group rounded-xl border border-gray-200 bg-white/70 backdrop-blur-sm min-h-[170px] px-5 py-5 md:px-6 md:py-6 transition-colors hover:bg-white"
                 >
                   <div className="flex items-start gap-4">
                     

@@ -369,13 +369,13 @@ export default function SecurePlatform() {
 <path d="M56.2736 84.7417C54.9425 89.9968 52.7698 96.0726 51.2021 101.807C51.1296 101.536 51.0378 101.154 51.0597 100.63C51.1932 97.427 54.1963 92.8667 54.3131 89.7079C54.2296 86.2543 56.0482 83.6348 56.0482 83.6348L56.2736 84.7417Z" fill="#456CBF"/>
 <defs>
 <linearGradient id="paint0_linear_629_814" x1="61.9343" y1="240.264" x2="61.9343" y2="30.0322" gradientUnits="userSpaceOnUse">
-<stop offset="0.0045" stop-color="#241F3C"/>
-<stop offset="0.1212" stop-color="#262541"/>
-<stop offset="0.2732" stop-color="#2A354F"/>
-<stop offset="0.4445" stop-color="#315065"/>
-<stop offset="0.6302" stop-color="#3C7585"/>
-<stop offset="0.8251" stop-color="#49A5AD"/>
-<stop offset="1" stop-color="#56D6D6"/>
+<stop offset="0.0045" stopColor="#241F3C"/>
+<stop offset="0.1212" stopColor="#262541"/>
+<stop offset="0.2732" stopColor="#2A354F"/>
+<stop offset="0.4445" stopColor="#315065"/>
+<stop offset="0.6302" stopColor="#3C7585"/>
+<stop offset="0.8251" stopColor="#49A5AD"/>
+<stop offset="1" stopColor="#56D6D6"/>
 </linearGradient>
 </defs>
 </svg>

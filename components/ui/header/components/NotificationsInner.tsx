@@ -196,6 +196,8 @@ const getNotificationIconName = (subType: string): string => {
       return 'duotune/general/gen014.svg';
       case 'ask_question':
         return 'duotune/communication/com007.svg';
+        case 'stripe':
+          return 'duotune/general/Capa_1.svg';
       case 'answer_question':
         return 'duotune/communication/com007.svg';
     default:

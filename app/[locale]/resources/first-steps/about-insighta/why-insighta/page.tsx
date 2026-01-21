@@ -1,4 +1,5 @@
 import { Metadata } from 'next'
+import Image from 'next/image'
 
 export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }): Promise<Metadata> {
   const resolvedParams = await params
@@ -17,6 +18,7 @@ export default async function WhyInsightaPage({ params }: { params: Promise<{ lo
   const resolvedParams = await params
   const locale = resolvedParams.locale
   const isRTL = locale === 'ar'
+  const t = (en: string, ar: string) => (isRTL ? ar : en)
 
   return (
     <div className="relative min-h-screen">
@@ -46,14 +48,207 @@ export default async function WhyInsightaPage({ params }: { params: Promise<{ lo
             </ol>
           </nav>
 
-          <div className="text-center mb-12 md:mb-16">
-            <div className={`flex flex-col align-center justify-center gap-2 ${isRTL ? 'text-right' : 'text-left'} text-left`} style={{lineHeight: '1.3'}}>
+          <div className="text-center mb-2 md:mb-4">
+            <div className={`flex flex-col align-center justify-center gap-2 ${isRTL ? 'text-right' : 'text-left'}`} style={{ lineHeight: '1.3' }}>
               <h1 className="text-3xl sm:text-4xl md:text-5xl font-extrabold tracking-tight text-gray-900">
-                {locale === 'ar' ? 'لماذا إنسايتا' : 'Why Insighta'}
+                {t('Why Insighta', 'لماذا إنسايتا؟')}
               </h1>
               <h2 className={`text-3xl sm:text-4xl md:text-5xl font-extrabold bg-clip-text text-transparent ${isRTL ? 'bg-gradient-to-l from-blue-500 to-teal-400' : 'bg-gradient-to-r from-blue-500 to-teal-400'}`}>
-                {locale === 'ar' ? 'الخيار الأفضل' : 'The Best Choice'}
+                {t('The Best Choice', 'الخيار الأفضل')}
               </h2>
+            </div>
+          </div>
+
+          {/* Main Content */}
+          <div className={`max-w-4xl space-y-8 md:space-y-10 ${isRTL ? 'text-right' : 'text-left'}`}>
+            <p className={`text-gray-700 text-base md:text-lg leading-relaxed ${isRTL ? 'text-right' : 'text-left'}`}>
+              {t(
+                'Insighta gives you a flexible way to access high-value knowledge and connect with experts—without subscriptions, without waste, and with clearer quality signals before you buy.',
+                'إنسايتا تمنحك طريقة مرنة للوصول إلى معرفة عالية القيمة والتواصل مع الخبراء—بدون اشتراكات، بدون هدر، ومع أدوات تساعدك على التحقق من الجودة قبل الشراء.'
+              )}
+            </p>
+
+            <div className="space-y-8">
+              <section className="space-y-2">
+                <h3 className="text-xl md:text-2xl font-bold text-gray-900">{t('Pay-as-you-go – No Subscriptions', 'بدون اشتراكات – Pay as You Go')}</h3>
+                <p className="text-gray-700 leading-relaxed">
+                  {t('You only pay for what you buy. There are no monthly or annual commitments.', 'ادفع فقط مقابل ما تشتريه دون التزامات شهرية أو سنوية.')}
+                </p>
+                <Image
+                  src="https://res.cloudinary.com/dsiku9ipv/image/upload/v1768900043/Group_13546_1_1_v35urv.png"
+                  alt="Pay-as-you-go"
+                  width={300}
+                  height={150}
+                  style={{
+                    display: 'block',
+                    margin: isRTL ? '10px 0 0 auto' : '10px auto 0 0'
+                  }}
+                  priority
+                />
+              </section>
+
+              <section className="space-y-2">
+                <h3 className="text-xl md:text-2xl font-bold text-gray-900">{t('Buy Only the Value You Need', 'اشترِ ما تحتاجه فقط')}</h3>
+                <p className="text-gray-700 leading-relaxed">
+                  {t(
+                    'Instead of paying large amounts for full reports just to access a few pages of information, you can buy only the exact content you need.',
+                    'لا داعي لشراء تقارير كبيرة بمبالغ كبيرة للوصول لمعلومات محددة فقط.'
+                  )}
+                </p>
+                <Image
+                  src="https://res.cloudinary.com/dsiku9ipv/image/upload/v1768900304/New_Project_2_ovc7dk.png"
+                  alt="Buy Only the Value You Need"
+                  width={500}
+                  height={150}
+                  style={{
+                    display: 'block',
+                    margin: isRTL ? '0px 0 0 auto' : '20px auto 0 0'
+                  }}
+                  priority
+                />
+              </section>
+
+              <section className="space-y-3">
+                <h3 className="text-xl md:text-2xl font-bold text-gray-900">{t('Verify Quality Before You Buy', 'تحقق من الجودة قبل الشراء')}</h3>
+                <p className="text-gray-700 leading-relaxed">
+                  {t(
+                    'You can request a meeting with the expert, read authentic buyer reviews, or ask the expert directly through the inquiry feature.',
+                    'اتخذ قرارك بثقة عبر الأدوات التالية:'
+                  )}
+                </p>
+                <ul className="space-y-2">
+                  {(
+                    isRTL
+                      ? [
+                          'اطلب اجتماعاً مع الخبير',
+                          'اقرأ تقييمات حقيقية من مشترين فعليين',
+                          'اسأل الخبير مباشرة عبر نافذة الاستفسارات',
+                        ]
+                      : [
+                          'Request a meeting with the expert',
+                          'Read authentic buyer reviews',
+                          'Ask the expert directly through inquiries',
+                        ]
+                  ).map((item,index) => (
+                    <li key={item} className={`flex gap-2 text-gray-800 ${isRTL ? 'flex-row-reverse' : ''}`}>
+                        <span className="mt-[0.45rem] h-2 w-2 rounded-full bg-gray-900/70 shrink-0" />
+                   <div className="flex flex-col">
+                   <div>
+                   
+                     <span className="leading-relaxed">{item}</span>
+                     </div>
+                      <div className="flex my-5">
+                      {index === 1 && (
+                        <Image
+                          src="https://res.cloudinary.com/dsiku9ipv/image/upload/v1768903734/New_Project_3_ckdwlg.png"
+                          alt={isRTL ? "توضيح تحقق الجودة" : "Verify Quality Before You Buy"}
+                          width={600}
+                          height={100}
+                          style={{
+                            display: 'block',
+                            margin: isRTL ? '0 0 0 auto' : '0 auto 0 0'
+                          }}
+                          priority
+                        />
+                      )}
+                      {index === 0 && (
+                        <Image
+                          src="https://res.cloudinary.com/dsiku9ipv/image/upload/v1768904159/New_Project_5_eydjdz.png"
+                          alt={isRTL ? "توضيح تحقق الجودة" : "Free and Easy Registration"}
+                          width={600}
+                          height={100}
+                          style={{
+                            display: 'block',
+                            margin: isRTL ? '0 0 0 auto' : '0 auto 0 0'
+                          }}
+                          priority
+                        />
+                      )}
+                      {index === 2 && (
+                        <Image
+                          src="https://res.cloudinary.com/dsiku9ipv/image/upload/v1768904423/Group_13551_jhlfaz.png"
+                          alt={isRTL ? "توضيح تحقق الجودة" : "Free and Easy Registration"}
+                          width={600}
+                          height={100}
+                          style={{
+                            display: 'block',
+                            margin: isRTL ? '0 0 0 auto' : '0 auto 0 0'
+                          }}
+                          priority
+                        />
+                      )}
+                      </div>
+                   </div>
+                    </li>
+                  ))}
+                </ul>
+              </section>
+
+              <section className="space-y-2">
+                <h3 className="text-xl md:text-2xl font-bold text-gray-900">{t('Free and Easy Registration', 'تسجيل مجاني')}</h3>
+                <p className="text-gray-700 leading-relaxed">{t('Join easily using Gmail or LinkedIn.', 'انضم مجاناً عبر Gmail أو LinkedIn.')}</p>
+              </section>
+
+              <section className="space-y-2 flex flex-col gap-4">
+              <div>
+              <h3 className="text-xl md:text-2xl font-bold text-gray-900">{t('Full Flexibility for Publishers', 'مرونة كاملة')}</h3>
+                <p className="text-gray-700 leading-relaxed">
+                  {t('Upload, price, and market your content the way that suits you.', 'ارفع، سعّر، وسوّق محتواك بالطريقة التي تناسبك.')}
+                </p>
+              </div>
+                <Image
+                  src="https://res.cloudinary.com/dsiku9ipv/image/upload/v1768905644/Artboard_1_xajry5.png"
+                  alt="Full Flexibility for Publishers"
+                  width={700}
+                  height={700}
+                  style={{
+                    display: 'block',
+                    margin: isRTL ? '0 0 0 auto' : '0 auto 0 0'
+                  }}
+                  priority
+                />
+              </section>
+            </div>
+
+            {/* Tip / CTA */}
+            <div className="mt-4">
+              <div
+                className={`bg-white border border-gray-300 rounded-md overflow-hidden relative ${isRTL ? 'pl-0 pr-4' : 'pl-4 pr-0'}`}
+                style={{
+                  borderLeft: isRTL ? '1px solid #d1d5db' : '4px solid #2563eb',
+                  borderRight: isRTL ? '4px solid #2563eb' : '1px solid #d1d5db',
+                  borderTop: '1px solid #d1d5db',
+                  borderBottom: '1px solid #d1d5db',
+                }}
+              >
+                <div className="p-4 md:p-5">
+                  <p className={`text-gray-700 text-sm md:text-base leading-relaxed ${isRTL ? 'text-right' : 'text-left'}`}>
+                    {isRTL ? (
+                      <>
+                        هل تريد معرفة المزيد؟ اطلع على{' '}
+                        <a
+                          href={`/${locale}/resources/first-steps/about-insighta/content-types`}
+                          className="text-blue-600 hover:text-blue-700 underline transition-colors"
+                        >
+                          أنواع المحتوى المتاحة
+                        </a>{' '}
+                        للتعرّف على ما يمكنك شراؤه على المنصة.
+                      </>
+                    ) : (
+                      <>
+                        Want to learn more? Check out the{' '}
+                        <a
+                          href={`/${locale}/resources/first-steps/about-insighta/content-types`}
+                          className="text-blue-600 hover:text-blue-700 underline transition-colors"
+                        >
+                          Types of Content Available
+                        </a>{' '}
+                        to see what you can buy on the platform.
+                      </>
+                    )}
+                  </p>
+                </div>
+              </div>
             </div>
           </div>
         </div>

@@ -20,6 +20,7 @@ export function LoadingProvider({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const router = useRouter();
   const currentLocale = useLocale();
+  const isAboutInsightaSection = pathname.includes('/resources/first-steps/about-insighta');
   // Check for preferred language cookie and determine if loading should be shown
   useEffect(() => {
     const getCookie = (name: string) => {
@@ -67,6 +68,12 @@ export function LoadingProvider({ children }: { children: React.ReactNode }) {
           !link.download && 
           !link.rel?.includes('external') &&
           link.origin === window.location.origin) {
+        // Avoid showing the GLOBAL fullscreen loader for in-section navigation
+        // (these routes have their own local content loader so the sidebar stays visible)
+        const destinationPathname = new URL(link.href).pathname;
+        const isDestinationAboutInsighta = destinationPathname.includes('/resources/first-steps/about-insighta');
+        if (isAboutInsightaSection && isDestinationAboutInsighta) return;
+
         setIsNavigating(true);
       }
     };
@@ -76,7 +83,7 @@ export function LoadingProvider({ children }: { children: React.ReactNode }) {
     return () => {
       document.removeEventListener('click', handleLinkClick);
     };
-  }, [pathname]);
+  }, [pathname, isAboutInsightaSection]);
 
   // Functions to manually control loading state
   const startPageLoading = () => setIsManualLoading(true);

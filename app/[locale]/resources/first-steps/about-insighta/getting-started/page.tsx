@@ -1,4 +1,4 @@
-import { Metadata } from 'next'
+import type { Metadata } from 'next'
 
 export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }): Promise<Metadata> {
   const resolvedParams = await params
@@ -6,22 +6,25 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
   const isArabic = locale === 'ar'
 
   return {
-    title: isArabic ? 'من يمكنه أن يصبح | إنسايتا' : 'Who Can Become an | Insighta',
+    title: isArabic ? 'ما هي إنسايتا | إنسايتا' : 'What is Insighta | Insighta',
     description: isArabic 
-      ? 'تعرف على من يمكنه أن يصبح إنسايتر'
-      : 'Learn who can become an Insighter',
+      ? 'إنسايتا هي منصة رائدة في السوق الرقمي لاقتصاد المعرفة—حيث المعرفة هي الأصول الأكثر قيمة.'
+      : 'Insighta is a leading digital marketplace in the knowledge economy—where knowledge is the most valuable asset.',
   }
 }
 
-export default async function WhoCanBecomeAnPage({ params }: { params: Promise<{ locale: string }> }) {
+export default async function GettingStartedPage({ params }: { params: Promise<{ locale: string }> }) {
   const resolvedParams = await params
   const locale = resolvedParams.locale
   const isRTL = locale === 'ar'
 
   return (
     <div className="relative min-h-screen">
+      {/* Hero Section - Similar to home page */}
       <div className="relative overflow-hidden pt-5 pb-16">
+        
         <div className="relative z-10 mx-auto max-w-7xl px-4 sm:px-6">
+          {/* Breadcrumbs */}
           <nav className={`mb-6 md:mb-8 text-xs md:text-sm ${isRTL ? 'text-right' : 'text-left'}`} aria-label="Breadcrumb">
             <ol className={`flex items-center gap-2 text-gray-500 flex-wrap`}>
               <li>
@@ -37,19 +40,26 @@ export default async function WhoCanBecomeAnPage({ params }: { params: Promise<{
                   {locale === 'ar' ? 'حول إنسايتا' : 'About Insighta'}
                 </a>
               </li>
+              <li>
+                <span className="text-gray-400">/</span>
+              </li>
+              <li className="text-gray-900" aria-current="page">
+                {locale === 'ar' ? 'البدء' : 'Getting Started'}
+              </li>
             </ol>
           </nav>
 
-          <div className="text-center mb-12 md:mb-16">
+          {/* Hero Title Section */}
+          <div className="text-center mb-2 md:mb-4">
             <div className={`flex flex-col align-center justify-center gap-2 ${isRTL ? 'text-right' : 'text-left'} text-left`} style={{lineHeight: '1.3'}}>
               <h1 className="text-3xl sm:text-4xl md:text-5xl font-extrabold tracking-tight text-gray-900">
-                {locale === 'ar' ? 'من يمكنه أن يصبح' : 'Who Can Become an'}
+                {locale === 'ar' ? 'البدء' : 'Getting Started'}
               </h1>
-              <h2 className={`text-3xl sm:text-4xl md:text-5xl font-extrabold bg-clip-text text-transparent ${isRTL ? 'bg-gradient-to-l from-blue-500 to-teal-400' : 'bg-gradient-to-r from-blue-500 to-teal-400'}`}>
-                {locale === 'ar' ? 'ابدأ رحلتك' : 'Start Your Journey'}
-              </h2>
+            
             </div>
           </div>
+
+      
         </div>
       </div>
     </div>

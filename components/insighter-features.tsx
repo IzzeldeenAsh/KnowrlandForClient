@@ -559,8 +559,8 @@ export default function InsighterFeatures() {
             <svg xmlns="http://www.w3.org/2000/svg" width="1440" height="427">
   <defs>
     <linearGradient id="a" x1="19.609%" x2="50%" y1="14.544%" y2="100%">
-      <stop offset="0%" stop-color="#4E71FF"/>
-      <stop offset="100%" stop-color="#4E71FF" stop-opacity="0"/>
+      <stop offset="0%" stopColor="#4E71FF"/>
+      <stop offset="100%" stopColor="#4E71FF" stopOpacity="0"/>
     </linearGradient>
   </defs>
   <path fill="url(#a)" fillRule="evenodd" d="m403 0 461 369-284 58z"/>
