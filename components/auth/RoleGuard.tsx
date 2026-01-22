@@ -43,14 +43,23 @@ export default function RoleGuard({ children }: { children: React.ReactNode }) {
     }
   }, [user, roles, isLoading, pathname]);
 
-  // Show loading state while checking roles
+  // IMPORTANT:
+  // Don't unmount the entire app tree while loading roles.
+  // Unmounting/remounting router-hook consumers (usePathname/useSearchParams)
+  // during the same navigation can trigger "Rendered more hooks than during the previous render"
+  // in Next's internal Router.
+  //
+  // Instead, keep rendering children and show a lightweight overlay.
   if (isLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-pulse">
-          <div className="w-12 h-12 border-4 border-blue-600 rounded-full border-t-transparent animate-spin"></div>
+      <>
+        {children}
+        <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-white/60 backdrop-blur-sm">
+          <div className="animate-pulse">
+            <div className="w-12 h-12 border-4 border-blue-600 rounded-full border-t-transparent animate-spin"></div>
+          </div>
         </div>
-      </div>
+      </>
     );
   }
 

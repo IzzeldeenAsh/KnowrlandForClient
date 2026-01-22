@@ -1,14 +1,15 @@
 'use client';
 
-import { useState, useCallback, useEffect } from "react";
+import { useState, useCallback, useEffect, useRef } from "react";
 import Overview from "./Overview";
 import { KnowledgeDetails } from "./types";
 import Reviews from "./Reviews";
 import AskInsighter from "./AskInsighter";
 import { useParams, useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
+import { getAuthToken } from "@/lib/authToken";
 
-function TabContent({ activeTab, knowledge, knowledgeSlug, onRefreshData }: { activeTab: string; knowledge: KnowledgeDetails; knowledgeSlug: string; onRefreshData?: () => void }) {
+function TabContent({ activeTab, knowledge, knowledgeSlug, onRefreshData }: { activeTab: string; knowledge: KnowledgeDetails; knowledgeSlug: string; onRefreshData?: () => void | Promise<void> }) {
   const params = useParams();
   const locale = params.locale as string;
   const isRTL = locale === 'ar';
@@ -36,6 +37,7 @@ function TabContent({ activeTab, knowledge, knowledgeSlug, onRefreshData }: { ac
           is_review={knowledge.is_review ? true : false}
           is_owner={knowledge.is_owner}
           hasPurchasedAny={hasPurchasedAny}
+          onRefreshData={onRefreshData}
         />
       );
     case "Ask":
@@ -78,18 +80,53 @@ export default function TabsContent({ knowledge, knowledgeSlug }: { knowledge: K
     }
   }, [searchParams]);
 
-  // Enhanced function to refresh the knowledge data
-  const refreshData = useCallback(() => {
-    console.log('[TabsContent] Refreshing knowledge data...');
-    
-    // Force a hard refresh to ensure data is updated
-    router.refresh();
-    
-    // After a short delay, reload the page to guarantee fresh data
-    setTimeout(() => {
-      window.location.href = window.location.href;
-    }, 1000);
-  }, [router]);
+  const refreshInFlightRef = useRef(false);
+
+  // Refresh knowledge data without hard reloading the page
+  const refreshData = useCallback(async () => {
+    if (refreshInFlightRef.current) return;
+    refreshInFlightRef.current = true;
+
+    try {
+      const token = getAuthToken();
+
+      const headers: HeadersInit = {
+        "Content-Type": "application/json",
+        Accept: "application/json",
+        "Accept-Language": locale,
+        "X-Timezone": Intl.DateTimeFormat().resolvedOptions().timeZone,
+      };
+
+      if (token) {
+        (headers as Record<string, string>).Authorization = `Bearer ${token}`;
+      }
+
+      const response = await fetch(
+        `https://api.insightabusiness.com/api/platform/industries/knowledge/${knowledgeSlug}`,
+        {
+          method: "GET",
+          headers,
+          cache: "no-store",
+        }
+      );
+
+      if (response.ok) {
+        const json = await response.json();
+        if (json?.data) {
+          setKnowledgeData(json.data);
+          return;
+        }
+      }
+
+      // Fallback: soft refresh (no full page reload)
+      router.refresh();
+    } catch (e) {
+      // Fallback: soft refresh (no full page reload)
+      router.refresh();
+    } finally {
+      refreshInFlightRef.current = false;
+    }
+  }, [knowledgeSlug, locale, router]);
   
   // Translations for tab labels
   const translations = {
@@ -146,7 +183,7 @@ export default function TabsContent({ knowledge, knowledgeSlug }: { knowledge: K
                 
                 // If switching to Reviews tab, force a refresh to get the latest reviews
                 if (tabKey === 'Reviews') {
-                  router.refresh();
+                  refreshData();
                 }
               }}
               className={`

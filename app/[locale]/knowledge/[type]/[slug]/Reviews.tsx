@@ -30,6 +30,7 @@ interface ReviewsProps {
   is_review: boolean;
   is_owner?: boolean;
   hasPurchasedAny?: boolean;
+  onRefreshData?: () => void | Promise<void>;
 }
 
 // Helper function to get initials from name
@@ -108,7 +109,7 @@ function CustomRating({ value, onChange, isRTL, max = 5, readOnly = false }: Cus
   );
 }
 
-export default function Reviews({ knowledgeSlug, reviews, is_review, is_owner, hasPurchasedAny }: ReviewsProps) {
+export default function Reviews({ knowledgeSlug, reviews, is_review, is_owner, hasPurchasedAny, onRefreshData }: ReviewsProps) {
   // Get locale and determine RTL
   const params = useParams();
   const locale = params.locale as string;
@@ -156,6 +157,9 @@ export default function Reviews({ knowledgeSlug, reviews, is_review, is_owner, h
   
   // Add state to store the temporary review before page refresh
   const [localReviews, setLocalReviews] = useState<ReviewItem[]>([]);
+
+  // Track review state locally so we can update UI without a full reload
+  const [hasReviewed, setHasReviewed] = useState<boolean>(!!is_review);
   
   // Add a state to track which error messages we've already shown
   const [displayedErrors, setDisplayedErrors] = useState<{[key: string]: boolean}>({});
@@ -179,6 +183,10 @@ export default function Reviews({ knowledgeSlug, reviews, is_review, is_owner, h
   useEffect(() => {
     setLocalReviews(reviews || []);
   }, [reviews]);
+
+  useEffect(() => {
+    setHasReviewed(!!is_review);
+  }, [is_review]);
   
   // Function to fetch updated reviews directly
   const fetchUpdatedReviews = async () => {
@@ -301,11 +309,17 @@ export default function Reviews({ knowledgeSlug, reviews, is_review, is_owner, h
       
       // If we got here, the submission was successful
       toast.success(translations.reviewSuccess);
-      
-      // Refresh the page after a successful API call
-      setTimeout(() => {
-        window.location.reload();
-      }, 500);
+
+      // Update UI immediately (hide form) and refresh data without reloading the page
+      setHasReviewed(true);
+      setRate(0);
+      setComment("");
+
+      if (onRefreshData) {
+        await onRefreshData();
+      } else {
+        await fetchUpdatedReviews();
+      }
     } catch (error) {
       console.error("Error submitting review:", error);
       
@@ -316,10 +330,7 @@ export default function Reviews({ knowledgeSlug, reviews, is_review, is_owner, h
         toast.error(translations.errorSubmitting);
       }
     } finally {
-      // Always end the submitting state if we didn't already return early
-      if (submitting) {
-        setSubmitting(false);
-      }
+      setSubmitting(false);
     }
   };
   
@@ -350,11 +361,15 @@ export default function Reviews({ knowledgeSlug, reviews, is_review, is_owner, h
 
       if (response.ok) {
         toast.success(translations.deleteSuccess);
-        
-        // Refresh the page after a successful deletion
-        setTimeout(() => {
-          window.location.reload();
-        }, 500);
+
+        // Update UI immediately and refresh underlying knowledge data (rating, is_review, etc.)
+        setLocalReviews((prev) => prev.filter((r) => r.id !== reviewId));
+
+        if (onRefreshData) {
+          await onRefreshData();
+        } else {
+          await fetchUpdatedReviews();
+        }
       } else {
         const data = await response.json();
         toast.error(data.message || translations.deleteError);
@@ -375,7 +390,7 @@ export default function Reviews({ knowledgeSlug, reviews, is_review, is_owner, h
 
   return (
     <div dir={isRTL ? 'rtl' : 'ltr'}>
-     {token && !is_review && !is_owner && hasPurchasedAny && (
+     {token && !hasReviewed && !is_owner && hasPurchasedAny && (
         <>
           {!submit && (
             <Card padding="lg" radius="md" withBorder mt={'md'} mb={'md'}>

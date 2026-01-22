@@ -23,48 +23,85 @@ export default async function WhatIsInsightaPage({ params }: { params: Promise<{
   return (
     <div className="relative min-h-screen">
       {/* Hero Section - Similar to home page */}
-      <div className="relative overflow-hidden pt-5 pb-16">
-        
-        <div className="relative z-10 mx-auto max-w-7xl px-4 sm:px-6">
-          {/* Breadcrumbs */}
-          <nav className={`mb-6 md:mb-8 text-xs md:text-sm ${isRTL ? 'text-right' : 'text-left'}`} aria-label="Breadcrumb">
-            <ol className={`flex items-center gap-2 text-gray-500 flex-wrap`}>
-              <li>
-                <a href={`/${locale}/resources/first-steps`} className="hover:text-gray-900 transition-colors">
-                  {locale === 'ar' ? 'الخطوات الأولى' : 'First Steps'}
-                </a>
-              </li>
-              <li>
-                <span className="text-gray-400">/</span>
-              </li>
-              <li>
-                <a href={`/${locale}/resources/first-steps/about-insighta`} className="hover:text-gray-900 transition-colors">
-                  {locale === 'ar' ? 'حول إنسايتا' : 'About Insighta'}
-                </a>
-              </li>
-              <li>
-                <span className="text-gray-400">/</span>
-              </li>
-              <li className="text-gray-900" aria-current="page">
-                {locale === 'ar' ? 'ما هي إنسايتا' : 'What is Insighta'}
-              </li>
-            </ol>
-          </nav>
+      <div className="relative overflow-hidden pb-16">
+           {/* Breadcrumbs + Hero Title Section (with bg + overlay) */}
+           <div className="relative overflow-hidden px-4 sm:px-12 py-8 md:py-20 mb-6 md:mb-8">
+            <div
+              className="absolute inset-0 bg-center bg-cover"
+              style={{
+                backgroundImage:
+                  "url('https://res.cloudinary.com/dsiku9ipv/image/upload/v1769062659/New_Project_11_qcbplb.png')",
+              }}
+              aria-hidden="true"
+            />
+            {/* Brighter/less dark overlay */}
+            <div
+              className="absolute inset-0 bg-gradient-to-b from-white/30 via-white/20 to-white/20"
+              aria-hidden="true"
+            />
 
-          {/* Hero Title Section */}
-          <div className="text-center mb-2 md:mb-4">
-            <div className={`flex flex-col align-center justify-center gap-2 ${isRTL ? 'text-right' : 'text-left'} text-left`} style={{lineHeight: '1.3'}}>
-              <h1 className="text-3xl sm:text-4xl md:text-5xl font-extrabold tracking-tight text-gray-900">
-                {locale === 'ar' ? 'ما هي إنسايتا' : 'What is Insighta'}
-              </h1>
-              <h2 className={`text-3xl sm:text-4xl md:text-5xl font-extrabold bg-clip-text text-transparent ${isRTL ? 'bg-gradient-to-l from-blue-500 to-teal-400' : 'bg-gradient-to-r from-blue-500 to-teal-400'}`}>
-                {locale === 'ar' ? 'منصة المعرفة الرائدة' : 'Leading Knowledge Platform'}
-              </h2>
+            <div className="relative z-10 px-4 sm:px-12">
+              {/* Breadcrumbs */}
+              <nav
+                className={`mb-6 text-xs md:text-sm ${isRTL ? 'text-right' : 'text-left'}`}
+                aria-label="Breadcrumb"
+              >
+                <ol className="flex items-center gap-2 text-gray-700/80 flex-wrap">
+                  <li>
+                    <a
+                      href={`/${locale}/resources/first-steps`}
+                      className="hover:text-gray-900 transition-colors"
+                    >
+                      {locale === 'ar' ? 'الخطوات الأولى' : 'First Steps'}
+                    </a>
+                  </li>
+                  <li>
+                    <span className="text-gray-400">/</span>
+                  </li>
+                  <li>
+                    <a
+                      href={`/${locale}/resources/first-steps/about-insighta`}
+                      className="hover:text-gray-900 transition-colors"
+                    >
+                      {locale === 'ar' ? 'حول إنسايتا' : 'About Insighta'}
+                    </a>
+                  </li>
+                  <li>
+                    <span className="text-gray-400">/</span>
+                  </li>
+                  <li className="text-gray-900 font-bold" aria-current="page">
+                    {locale === 'ar' ? 'ما هي إنسايتا' : 'What is Insighta'}
+                  </li>
+                </ol>
+              </nav>
+
+              {/* Hero Title Section */}
+              <div className="text-center ">
+                <div
+                  className={`flex flex-col align-center justify-center gap-2 ${isRTL ? 'text-right' : 'text-left'} text-left`}
+                  style={{ lineHeight: '1.3' }}
+                >
+                  <h1 className="text-3xl sm:text-4xl md:text-5xl font-extrabold tracking-tight text-black">
+                    {locale === 'ar' ? 'ما هي إنسايتا' : 'What is Insighta'}
+                  </h1>
+                  <h2
+                    className={`text-3xl sm:text-4xl md:text-5xl font-extrabold bg-clip-text text-transparent ${
+                      isRTL
+                        ? 'bg-gradient-to-l from-blue-800 to-teal-600'
+                        : 'bg-gradient-to-r from-blue-500 to-teal-400'
+                    }`}
+                  >
+                    {locale === 'ar' ? 'منصة المعرفة الرائدة' : 'Leading Knowledge Platform'}
+                  </h2>
+                </div>
+              </div>
             </div>
           </div>
 
+        <div className="relative z-10 mx-auto max-w-7xl px-4 sm:px-6">
+       
           {/* Main Content */}
-          <div className={`max-w-4xl  space-y-6 md:space-y-8 ${isRTL ? 'text-right' : 'text-left'}`}>
+          <div className={`max-w-5xl px-8 sm:px-16  space-y-6 md:space-y-8 ${isRTL ? 'text-right' : 'text-left'}`}>
             <div className="prose prose-lg max-w-none">
               <div className={`text-gray-700 text-base md:text-lg lg:text-xl leading-relaxed ${isRTL ? 'text-right' : 'text-left'}`}>
                 {locale === 'ar' ? (

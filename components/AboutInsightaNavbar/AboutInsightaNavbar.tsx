@@ -6,7 +6,6 @@ import { ScrollArea, Box, TextInput, Text } from '@mantine/core';
 import { IconSearch, IconX } from '@tabler/icons-react';
 import classes from './AboutInsightaNavbar.module.css';
 import { useLocale } from 'next-intl';
-import { usePathname } from 'next/navigation';
 
 interface AboutInsightaNavbarProps {
   onLinkClick?: () => void;
@@ -27,7 +26,6 @@ interface NavItem {
 
 export function AboutInsightaNavbar({ onLinkClick }: AboutInsightaNavbarProps) {
   const locale = useLocale();
-  const pathname = usePathname();
   const [searchQuery, setSearchQuery] = useState('');
   const isRtl = locale === 'ar';
   

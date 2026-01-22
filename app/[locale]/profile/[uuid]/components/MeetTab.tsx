@@ -1077,18 +1077,12 @@ export default function MeetTab({
               closeBookingModal();
             }
           }}
-          title={
-            bookingStep === 1
-              ? t("bookASession")
-              : bookingStep === 2
-                ? (locale.startsWith('ar') ? 'إتمام الدفع' : 'Complete Payment')
-                : (locale.startsWith('ar') ? 'تسجيل الدخول أو إنشاء حساب' : 'Login or Sign Up')
-          }
+          
           size="lg"
           centered
         >
           <div className="p-2">
-            {selectedDate && selectedMeetingTime && (
+            {bookingStep !== 3 && selectedDate && selectedMeetingTime && (
               <div className="mb-4 p-3 bg-blue-50 dark:bg-slate-700 rounded-lg">
                 <p className="text-sm text-gray-600 dark:text-gray-300">
                   {t("bookingFor")}:
@@ -1126,39 +1120,59 @@ export default function MeetTab({
               </div>
             )}
 
-            {bookingError && (
+            {bookingStep !== 3 && bookingError && (
               <div className="mb-4 p-3 bg-red-50 dark:bg-red-900/30 text-red-700 dark:text-red-300 rounded-lg">
                 {bookingError}
               </div>
             )}
 
             {bookingStep === 3 ? (
-              // Guest auth step: show ONLY login/signup buttons
-              <div className="flex items-center justify-center gap-3">
-                <Button
-                  className="bg-blue-500 hover:bg-blue-600"
-                  onClick={() => {
-                    if (!authRedirectUrl) return;
-                    const loginUrl = `https://app.insightabusiness.com/auth/login?returnUrl=${encodeURIComponent(
-                      authRedirectUrl
-                    )}`;
-                    window.location.href = loginUrl;
-                  }}
-                >
-                  {locale.startsWith("ar") ? "تسجيل الدخول" : "Login"}
-                </Button>
-                <Button
-                  variant="outline"
-                  onClick={() => {
-                    if (!authRedirectUrl) return;
-                    const signupUrl = `https://app.insightabusiness.com/auth/sign-up?returnUrl=${encodeURIComponent(
-                      authRedirectUrl
-                    )}`;
-                    window.location.href = signupUrl;
-                  }}
-                >
-                  {locale.startsWith("ar") ? "إنشاء حساب" : "Sign Up"}
-                </Button>
+              // Guest auth step: hide all details and show a clean CTA
+              <div className="w-full">
+                <div className="rounded-xl border border-gray-100 dark:border-slate-700 bg-gradient-to-br from-blue-50 via-white to-teal-50 dark:from-slate-800 dark:via-slate-800 dark:to-slate-900 p-6 sm:p-8">
+                  <div className="text-center mb-6">
+                    <h3 className="text-xl sm:text-2xl font-semibold text-gray-900 dark:text-gray-100">
+                      {locale.startsWith("ar")
+                        ? "سجّل الدخول أو أنشئ حساباً للمتابعة"
+                        : "Login or Sign up to continue"}
+                    </h3>
+                  </div>
+
+                  <div className="grid grid-cols-1 gap-3 sm:gap-4">
+                    <Button
+                      fullWidth
+                      size="lg"
+                      radius="md"
+                      className="h-12 sm:h-14 text-base sm:text-lg bg-blue-600 hover:bg-blue-700"
+                      onClick={() => {
+                        if (!authRedirectUrl) return;
+                        const loginUrl = `https://app.insightabusiness.com/auth/login?returnUrl=${encodeURIComponent(
+                          authRedirectUrl
+                        )}`;
+                        window.location.href = loginUrl;
+                      }}
+                    >
+                      {locale.startsWith("ar") ? "تسجيل الدخول" : "Login"}
+                    </Button>
+
+                    <Button
+                      fullWidth
+                      size="lg"
+                      radius="md"
+                      variant="outline"
+                      className="h-12 sm:h-14 text-base sm:text-lg border-blue-600 text-blue-700 hover:bg-blue-50"
+                      onClick={() => {
+                        if (!authRedirectUrl) return;
+                        const signupUrl = `https://app.insightabusiness.com/auth/sign-up?returnUrl=${encodeURIComponent(
+                          authRedirectUrl
+                        )}`;
+                        window.location.href = signupUrl;
+                      }}
+                    >
+                      {locale.startsWith("ar") ? "إنشاء حساب" : "Sign Up"}
+                    </Button>
+                  </div>
+                </div>
               </div>
             ) : bookingStep === 1 ? (
               <form

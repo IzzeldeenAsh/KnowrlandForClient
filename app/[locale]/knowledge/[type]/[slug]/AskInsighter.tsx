@@ -34,7 +34,7 @@ interface AskInsighterProps {
   knowledgeSlug: string;
   questions?: Question[];
   is_owner?: boolean;
-  onRefreshData?: () => void; // Function to refresh knowledge data
+  onRefreshData?: () => void | Promise<void>; // Function to refresh knowledge data
 }
 
 export default function AskInsighter({ knowledgeSlug, questions = [], is_owner = false, onRefreshData }: AskInsighterProps) {
@@ -51,6 +51,7 @@ export default function AskInsighter({ knowledgeSlug, questions = [], is_owner =
   // Track which question's reply form is currently visible
   const [visibleReplyForm, setVisibleReplyForm] = useState<number | null>(null);
   const [authToken, setAuthToken] = useState<string | null>(null);
+  const [localQuestions, setLocalQuestions] = useState<Question[]>(questions || []);
   const params = useParams();
   const locale = params.locale as string;
   const isRTL = locale === 'ar';
@@ -61,6 +62,11 @@ export default function AskInsighter({ knowledgeSlug, questions = [], is_owner =
       setAuthToken(getAuthToken());
     }
   }, []);
+
+  // Keep local questions in sync with props updates (after refresh)
+  useEffect(() => {
+    setLocalQuestions(questions || []);
+  }, [questions]);
   
   // Translations for the component
   const translations = {
@@ -421,11 +427,24 @@ export default function AskInsighter({ knowledgeSlug, questions = [], is_owner =
         // Show success message
         setSubmitSuccess(true);
         success(translations.questionDeleted);
-        
-        // Refresh the page after successful deletion
-        setTimeout(() => {
-          window.location.reload();
-        }, 500);
+
+        // Update UI immediately (remove from local tree), then refresh data softly
+        const removeFromTree = (items: Question[], targetId: number): Question[] => {
+          return items
+            .filter((q) => q.id !== targetId)
+            .map((q) => ({
+              ...q,
+              children: q.children ? removeFromTree(q.children, targetId) : [],
+            }));
+        };
+
+        setLocalQuestions((prev) => removeFromTree(prev, questionId));
+
+        if (onRefreshData) {
+          setTimeout(() => {
+            onRefreshData();
+          }, 300);
+        }
       } else {
         const errorData = await response.json().catch(() => null);
         const errorMessage = errorData?.message || translations.deleteError;
@@ -490,7 +509,7 @@ export default function AskInsighter({ knowledgeSlug, questions = [], is_owner =
                 borderTopRightRadius: '5px' 
               }}
             >
-              {translations.question} {questions.findIndex(q => q.id === question.id) + 1}
+              {translations.question} {localQuestions.findIndex(q => q.id === question.id) + 1}
             </div>
           </div>
         )}
@@ -711,7 +730,7 @@ export default function AskInsighter({ knowledgeSlug, questions = [], is_owner =
                     } else {
                       // For regular users, ALWAYS find the top-level parent question ID
                       // This ensures replies are always attached to the original parent question, not an immediate parent
-                      const topLevelParentId = findTopLevelParent(questions, question.id);
+                      const topLevelParentId = findTopLevelParent(localQuestions, question.id);
                       handleReplySubmit(e, question.id, topLevelParentId);
                     }
                   }}>
@@ -849,7 +868,7 @@ export default function AskInsighter({ knowledgeSlug, questions = [], is_owner =
         )}
         
         {/* Display all questions */}
-        {renderQuestions(questions)}
+        {renderQuestions(localQuestions)}
         </div>
       </div>
     </section>

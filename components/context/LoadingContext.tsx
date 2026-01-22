@@ -100,7 +100,17 @@ export function LoadingProvider({ children }: { children: React.ReactNode }) {
       startPageLoading,
       stopPageLoading
     }}>
-      {showLoader ? <FullScreenLoader message={currentLocale === 'ar' ? 'جاري تحميل الصفحة...' : 'Loading...'} /> : children}
+      {/* 
+        IMPORTANT:
+        Don't unmount the entire application tree while showing a loader.
+        Unmounting/remounting router-hook consumers (usePathname/useSearchParams) during navigation
+        can surface as "Rendered more hooks than during the previous render" in Next's internal Router.
+        Instead, keep rendering children and overlay a fullscreen loader.
+      */}
+      {children}
+      {showLoader ? (
+        <FullScreenLoader message={currentLocale === 'ar' ? 'جاري تحميل الصفحة...' : 'Loading...'} />
+      ) : null}
     </LoadingContext.Provider>
   );
 }

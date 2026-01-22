@@ -1,0 +1,19 @@
+export default async function SearchResultsAndInsightPage({
+  params,
+}: {
+  params: Promise<{ locale: string }>
+}) {
+  const resolvedParams = await params
+  const locale = resolvedParams.locale
+  const isRTL = locale === 'ar'
+
+  return (
+    <div className="mx-auto max-w-5xl px-4 sm:px-6 py-10" dir={isRTL ? 'rtl' : 'ltr'}>
+      <h1 className="text-2xl md:text-3xl font-bold text-gray-900">
+        {locale === 'ar' ? 'نتائج البحث وصفحة الرؤية' : 'Search Results & Insight Page'}
+      </h1>
+      <p className="mt-3 text-gray-600">{locale === 'ar' ? 'قريباً' : 'Coming soon.'}</p>
+    </div>
+  )
+}
+
