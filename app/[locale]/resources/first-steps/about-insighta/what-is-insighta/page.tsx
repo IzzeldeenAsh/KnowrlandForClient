@@ -31,6 +31,8 @@ export default async function WhatIsInsightaPage({ params }: { params: Promise<{
               style={{
                 backgroundImage:
                   "url('https://res.cloudinary.com/dsiku9ipv/image/upload/v1769062659/New_Project_11_qcbplb.png')",
+                transform: isRTL ? 'scaleX(-1)' : 'none',
+                transformOrigin: 'center',
               }}
               aria-hidden="true"
             />

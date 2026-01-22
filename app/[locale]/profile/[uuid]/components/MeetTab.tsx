@@ -1388,92 +1388,100 @@ export default function MeetTab({
                       clientSecret,
                     }}
                   >
-                    <div className="mb-4 p-3 rounded-md bg-yellow-50 text-yellow-800 text-sm">
-                      {locale.startsWith('ar') ? (
-                        <>
-                          لأسباب أمنية، تنتهي صلاحية جلسة الدفع خلال{" "}
-                          <span className="font-semibold">
-                            {formatTimeLeft(paymentExpiresAt ? timeLeftMs : 30 * 60 * 1000)}
-                          </span>
-                          . إذا انتهى الوقت، يجب بدء عملية دفع جديدة.
-                        </>
-                      ) : (
-                        <>
-                          For security, this payment session will expire in{" "}
-                          <span className="font-semibold">
-                            {formatTimeLeft(paymentExpiresAt ? timeLeftMs : 30 * 60 * 1000)}
-                          </span>
-                          . If time runs out, you’ll need to start a new payment.
-                        </>
-                      )}
-                    </div>
-                    <StripePaymentForm
-                      clientSecret={clientSecret}
-                      onSuccess={async () => {
-                        if (orderUuid) {
-                          setDidStripeConfirm(true);
-                          setIsPollingStatus(true);
-                          const success = await pollOrderStatus(orderUuid);
-                          setIsPollingStatus(false);
-                          setPollFinished(true);
-                          setPollFoundPaid(success);
-                          if (success) {
-                            setShowSuccessUI(true);
-                            setIsBookingModalOpen(false);
-                            setBookingStep(1);
-                          } else {
-                            setStripeErrorMessage(t("paymentVerificationFailed"));
-                          }
-                        }
-                      }}
-                      onError={(error: string) => {
-                        // Card declined or Stripe confirmation failed
-                        setDidStripeConfirm(false);
-                        setPollFinished(false);
-                        setPollFoundPaid(null);
-                        setStripeErrorMessage(error);
-                      }}
-                      isProcessing={isStripeProcessing || isPollingStatus}
-                      setIsProcessing={setIsStripeProcessing}
-                      locale={locale}
-                      externalError={stripeErrorMessage || undefined}
-                    />
-
-                    {isPollingStatus && (
-                      <div className="mt-4 text-center">
-                        <div className="animate-spin rounded-full h-8 w-8 border-4 border-gray-200 border-t-blue-500 mx-auto mb-2"></div>
-                        <p className="text-sm text-gray-600">
+                    {isPollingStatus ? (
+                      <div className="py-10 text-center">
+                        <div className="animate-spin rounded-full h-10 w-10 border-4 border-gray-200 border-t-blue-500 mx-auto mb-3"></div>
+                        <p className="text-base font-medium text-gray-800 dark:text-gray-100">
                           {t("verifyingPayment")}
                         </p>
+                        <p className="mt-2 text-sm text-gray-600 dark:text-gray-300">
+                          {locale.startsWith("ar")
+                            ? "يرجى الانتظار... يتم التحقق من الدفع الآن."
+                            : "Please wait... we’re verifying your payment now."}
+                        </p>
                       </div>
-                    )}
+                    ) : (
+                      <>
+                        <div className="mb-4 p-3 rounded-md bg-yellow-50 text-yellow-800 text-sm">
+                          {locale.startsWith('ar') ? (
+                            <>
+                              لأسباب أمنية، تنتهي صلاحية جلسة الدفع خلال{" "}
+                              <span className="font-semibold">
+                                {formatTimeLeft(paymentExpiresAt ? timeLeftMs : 30 * 60 * 1000)}
+                              </span>
+                              . إذا انتهى الوقت، يجب بدء عملية دفع جديدة.
+                            </>
+                          ) : (
+                            <>
+                              For security, this payment session will expire in{" "}
+                              <span className="font-semibold">
+                                {formatTimeLeft(paymentExpiresAt ? timeLeftMs : 30 * 60 * 1000)}
+                              </span>
+                              . If time runs out, you’ll need to start a new payment.
+                            </>
+                          )}
+                        </div>
 
-                    <div className="mt-4 flex items-center gap-3 justify-start">
-                      {didStripeConfirm && pollFinished && pollFoundPaid === false && orderUuid && !isStripeProcessing && !isPollingStatus && (
-                        <Button
-                          onClick={finalVerifyMeetingPayment}
-                          loading={isFinalVerifying}
-                          disabled={isFinalVerifying}
-                          className="bg-blue-500 hover:bg-blue-600"
-                        >
-                          {locale.startsWith('ar') ? 'محاولة أخيرة' : 'Retry Verification'}
-                        </Button>
-                      )}
-                      <Button
-                        variant="subtle"
-                        onClick={() => {
-                          if (!isStripeProcessing && !isPollingStatus) {
-                            setBookingStep(1);
+                        <StripePaymentForm
+                          clientSecret={clientSecret}
+                          onSuccess={async () => {
+                            if (orderUuid) {
+                              setDidStripeConfirm(true);
+                              setIsPollingStatus(true);
+                              const success = await pollOrderStatus(orderUuid);
+                              setIsPollingStatus(false);
+                              setPollFinished(true);
+                              setPollFoundPaid(success);
+                              if (success) {
+                                setShowSuccessUI(true);
+                                setIsBookingModalOpen(false);
+                                setBookingStep(1);
+                              } else {
+                                setStripeErrorMessage(t("paymentVerificationFailed"));
+                              }
+                            }
+                          }}
+                          onError={(error: string) => {
+                            // Card declined or Stripe confirmation failed
                             setDidStripeConfirm(false);
                             setPollFinished(false);
                             setPollFoundPaid(null);
-                          }
-                        }}
-                        disabled={isStripeProcessing || isPollingStatus}
-                      >
-                        {locale.startsWith('ar') ? 'رجوع' : 'Back'}
-                      </Button>
-                    </div>
+                            setStripeErrorMessage(error);
+                          }}
+                          isProcessing={isStripeProcessing}
+                          setIsProcessing={setIsStripeProcessing}
+                          locale={locale}
+                          externalError={stripeErrorMessage || undefined}
+                        />
+
+                        <div className="mt-4 flex items-center gap-3 justify-start">
+                          {didStripeConfirm && pollFinished && pollFoundPaid === false && orderUuid && !isStripeProcessing && (
+                            <Button
+                              onClick={finalVerifyMeetingPayment}
+                              loading={isFinalVerifying}
+                              disabled={isFinalVerifying}
+                              className="bg-blue-500 hover:bg-blue-600"
+                            >
+                              {locale.startsWith('ar') ? 'محاولة أخيرة' : 'Retry Verification'}
+                            </Button>
+                          )}
+                          <Button
+                            variant="subtle"
+                            onClick={() => {
+                              if (!isStripeProcessing) {
+                                setBookingStep(1);
+                                setDidStripeConfirm(false);
+                                setPollFinished(false);
+                                setPollFoundPaid(null);
+                              }
+                            }}
+                            disabled={isStripeProcessing}
+                          >
+                            {locale.startsWith('ar') ? 'رجوع' : 'Back'}
+                          </Button>
+                        </div>
+                      </>
+                    )}
                   </Elements>
                 )}
               </>
