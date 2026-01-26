@@ -306,7 +306,7 @@ export default function SearchResultsList({
 
       const method = currentState ? 'DELETE' : 'POST';
       const slug = item.url.split('/').pop();
-      const url = `https://api.insightabusiness.com/api/account/favorite/knowledge/${slug}`;
+      const url = `https://api.foresighta.co/api/account/favorite/knowledge/${slug}`;
 
 
       const axiosConfig = {

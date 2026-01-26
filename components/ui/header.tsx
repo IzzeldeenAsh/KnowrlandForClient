@@ -42,7 +42,7 @@ const INDUSTRIES_CACHE_DURATION = 300000; // 5 minutes cache for industries
 
 // Helper function to get the Angular app URL based on current domain
 const getAngularAppUrl = (): string => {
-  if (typeof window === 'undefined') return 'https://app.insightabusiness.com';
+  if (typeof window === 'undefined') return 'http://localhost:4200';
   
   const hostname = window.location.hostname;
   const protocol = window.location.protocol;
@@ -56,7 +56,7 @@ const getAngularAppUrl = (): string => {
   }
   
   // Local development
-  return 'https://app.insightabusiness.com';
+  return 'http://localhost:4200';
 };
 
 async function getIndustries(locale: string = 'en', forceRefresh: boolean = false): Promise<Industry[]> {
@@ -86,7 +86,7 @@ async function getIndustries(locale: string = 'en', forceRefresh: boolean = fals
 
 async function fetchIndustriesFromAPI(locale: string): Promise<Industry[]> {
   try {
-    const res = await fetch("https://api.insightabusiness.com/api/platform/industries/menu", {
+    const res = await fetch("https://api.foresighta.co/api/platform/industries/menu", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -371,7 +371,7 @@ const { isLoading: isAppLoading, setIsLoading: setAppLoading } = useLoading();
       {/* Illustration */}
    
       
-      <div className="mx-auto px-2 sm:px-4 md:px-8 lg:px-12 max-w-full relative z-10">
+      <div className="mx-auto px-2 sm:px-4 md:px-8 lg:px-12 max-w-full relative z-100">
         <div className="flex items-center justify-between h-16 md:h-20 gap-1 md:gap-2">
 
           {/* Site branding */}

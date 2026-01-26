@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useRef, useState, useEffect } from "react";
 import { useSearchParams, useParams, useRouter } from "next/navigation";
 
 import {
@@ -19,6 +19,7 @@ import Image from "next/image";
 import { useToast } from "@/components/toast/ToastContext";
 import PageIllustration from "@/components/page-illustration";
 import CountryGuard from "@/components/auth/CountryGuard";
+import { getAuthToken } from "@/lib/authToken";
 import {
   VisaIcon,
   MasterCardIcon,
@@ -53,6 +54,21 @@ interface Knowledge {
   description: string;
   documents: Document[];
   total_price: string;
+}
+
+interface Country {
+  id: number;
+  region_id: number;
+  iso2: string;
+  iso3: string;
+  international_code: string;
+  flag: string;
+  name: string;
+  names?: {
+    en?: string;
+    ar?: string;
+  };
+  status: string;
 }
 
 const getFileIconByExtension = (extension: string) => {
@@ -108,15 +124,124 @@ export default function CheckoutPage() {
   const [orderUuid, setOrderUuid] = useState<string>("");
   const [isFetchingDownloadIds, setIsFetchingDownloadIds] = useState(false);
 
+  const authToken = getAuthToken();
+  const isGuest = !authToken;
 
-  // Get auth token from cookies
-  const getAuthToken = () => {
-    const token = document.cookie
-      .split("; ")
-      .find((row) => row.startsWith("token="))
-      ?.split("=")[1];
-    return token;
+  // Guest checkout fields
+  const [guestEmail, setGuestEmail] = useState("");
+  const [guestFirstName, setGuestFirstName] = useState("");
+  const [guestLastName, setGuestLastName] = useState("");
+  const [guestCountryId, setGuestCountryId] = useState<number | null>(null);
+  const [guestPhoneCode, setGuestPhoneCode] = useState("");
+  const [guestPhone, setGuestPhone] = useState("");
+  const [isPhoneCodeManuallySet, setIsPhoneCodeManuallySet] = useState(false);
+
+  // Countries list (with flags)
+  const [countries, setCountries] = useState<Country[]>([]);
+  const [countriesLoading, setCountriesLoading] = useState(false);
+  const [countryDropdownOpen, setCountryDropdownOpen] = useState(false);
+  const [countrySearch, setCountrySearch] = useState("");
+  const [phoneCodeDropdownOpen, setPhoneCodeDropdownOpen] = useState(false);
+  const [phoneCodeSearch, setPhoneCodeSearch] = useState("");
+  const countryDropdownRef = useRef<HTMLDivElement | null>(null);
+  const phoneCodeDropdownRef = useRef<HTMLDivElement | null>(null);
+
+  const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+
+  const getCountryLabel = (c: Country) => {
+    if (locale === "ar") return c.names?.ar || c.name;
+    return c.names?.en || c.name;
   };
+
+  const getCountryFlagSrc = (c: Country) => {
+    const candidate = `/images/flags/${c.flag}.svg`;
+    return candidate;
+  };
+
+  const selectedCountry = guestCountryId
+    ? countries.find((c) => c.id === guestCountryId) || null
+    : null;
+
+  const selectedPhoneCountry =
+    (selectedCountry && selectedCountry.international_code === guestPhoneCode.trim()
+      ? selectedCountry
+      : countries.find((c) => String(c.international_code) === guestPhoneCode.trim())) || null;
+
+  const filteredCountries = countries
+    .filter((c) => c.status === "active")
+    .filter((c) => {
+      const q = countrySearch.trim().toLowerCase();
+      if (!q) return true;
+      const label = getCountryLabel(c).toLowerCase();
+      return (
+        label.includes(q) ||
+        c.iso2.toLowerCase().includes(q) ||
+        c.iso3.toLowerCase().includes(q) ||
+        String(c.international_code || "").includes(q)
+      );
+    })
+    .slice(0, 150); // hard cap for UI performance
+
+  // If country is selected first, default the phone code from it (unless user manually picked another)
+  useEffect(() => {
+    if (!isGuest) return;
+    if (!guestCountryId) return;
+    if (isPhoneCodeManuallySet) return;
+    if (guestPhoneCode.trim()) return;
+
+    const c = countries.find((x) => x.id === guestCountryId);
+    if (c?.international_code) {
+      setGuestPhoneCode(String(c.international_code));
+    }
+  }, [countries, guestCountryId, guestPhoneCode, isGuest, isPhoneCodeManuallySet]);
+
+  // Close dropdowns on outside click
+  useEffect(() => {
+    if (!countryDropdownOpen && !phoneCodeDropdownOpen) return;
+
+    const onPointerDown = (event: MouseEvent | TouchEvent) => {
+      const target = event.target as Node | null;
+      if (!target) return;
+
+      if (
+        countryDropdownOpen &&
+        countryDropdownRef.current &&
+        !countryDropdownRef.current.contains(target)
+      ) {
+        setCountryDropdownOpen(false);
+      }
+
+      if (
+        phoneCodeDropdownOpen &&
+        phoneCodeDropdownRef.current &&
+        !phoneCodeDropdownRef.current.contains(target)
+      ) {
+        setPhoneCodeDropdownOpen(false);
+      }
+    };
+
+    document.addEventListener("mousedown", onPointerDown);
+    document.addEventListener("touchstart", onPointerDown, { passive: true });
+    return () => {
+      document.removeEventListener("mousedown", onPointerDown);
+      document.removeEventListener("touchstart", onPointerDown);
+    };
+  }, [countryDropdownOpen, phoneCodeDropdownOpen]);
+
+  const filteredPhoneCodeCountries = countries
+    .filter((c) => c.status === "active")
+    .filter((c) => {
+      const q = phoneCodeSearch.trim().toLowerCase();
+      if (!q) return true;
+      const label = getCountryLabel(c).toLowerCase();
+      return (
+        label.includes(q) ||
+        c.iso2.toLowerCase().includes(q) ||
+        c.iso3.toLowerCase().includes(q) ||
+        String(c.international_code || "").includes(q)
+      );
+    })
+    .slice(0, 150);
 
   // Fetch knowledge data
   useEffect(() => {
@@ -128,7 +253,7 @@ export default function CheckoutPage() {
         const token = getAuthToken();
 
         const response = await fetch(
-          `https://api.insightabusiness.com/api/platform/industries/knowledge/${slug}`,
+          `https://api.foresighta.co/api/platform/industries/knowledge/${slug}`,
           {
             headers: {
               "Content-Type": "application/json",
@@ -171,9 +296,10 @@ export default function CheckoutPage() {
     const fetchWalletBalance = async () => {
       try {
         const token = getAuthToken();
+        if (!token) return;
 
         const response = await fetch(
-          "https://api.insightabusiness.com/api/account/wallet/balance",
+          "https://api.foresighta.co/api/account/wallet/balance",
           {
             headers: {
               "Content-Type": "application/json",
@@ -203,6 +329,58 @@ export default function CheckoutPage() {
 
     fetchWalletBalance();
   }, [locale]);
+
+  // Guest: force provider method only
+  useEffect(() => {
+    if (isGuest) {
+      setPaymentMethod("provider");
+    }
+  }, [isGuest]);
+
+  // Guest: fetch countries list for guest form
+  useEffect(() => {
+    const fetchCountries = async () => {
+      if (!isGuest) return;
+      if (countries.length > 0) return;
+      try {
+        setCountriesLoading(true);
+        const res = await fetch(
+          "https://api.foresighta.co/api/common/setting/country/list",
+          {
+            headers: {
+              "Content-Type": "application/json",
+              Accept: "application/json",
+              "Accept-Language": locale,
+              "X-Timezone": timezone,
+            },
+          }
+        );
+        if (!res.ok) throw new Error(`Failed to fetch countries: ${res.status}`);
+        const data = await res.json();
+        setCountries(Array.isArray(data?.data) ? data.data : []);
+      } catch (e) {
+        console.error(e);
+      } finally {
+        setCountriesLoading(false);
+      }
+    };
+    fetchCountries();
+  }, [countries.length, isGuest, locale, timezone]);
+
+  // Guest: remove free documents from selection (free docs require login)
+  useEffect(() => {
+    if (!knowledge) return;
+    if (!isGuest) return;
+
+    setSelectedDocuments((prev) => {
+      const next = prev.filter((id) => {
+        const doc = knowledge.documents.find((d) => d.id === id);
+        if (!doc) return false;
+        return parseFloat(doc.price) > 0;
+      });
+      return next;
+    });
+  }, [knowledge, isGuest]);
 
   // Calculate total price
   const calculateTotalPrice = () => {
@@ -248,6 +426,24 @@ export default function CheckoutPage() {
     accessGranted: isRTL ? (isFree ? "يمكنك الآن الوصول إلى جميع المستندات" : "يمكنك الآن الوصول إلى جميع المستندات المشتراة") : (isFree ? "You now have access to all your documents" : "You now have access to all your purchased documents"),
     preparingDownloads: isRTL ? "جاري تجهيز التنزيلات..." : "Preparing your downloads...",
     documentsAdded: isRTL ? "تمت إضافة المستندات إلى التنزيلات الخاصة بك" : "Documents added to your Downloads",
+    guestCheckoutTitle: isRTL ? "إكمال بيانات الشراء" : "Complete checkout details",
+    email: isRTL ? "البريد الإلكتروني" : "Email",
+    firstName: isRTL ? "الاسم الأول" : "First name",
+    lastName: isRTL ? "اسم العائلة" : "Last name",
+    country: isRTL ? "الدولة" : "Country",
+    phoneCode: isRTL ? "رمز الهاتف" : "Phone code",
+    phone: isRTL ? "رقم الهاتف" : "Phone number",
+    selectCountry: isRTL ? "اختر الدولة" : "Select country",
+    searchCountry: isRTL ? "بحث عن دولة..." : "Search country...",
+    loginRequiredForFree: isRTL
+      ? "تسجيل الدخول مطلوب لتنزيل المستندات المجانية"
+      : "Login is required for downloading the free documents",
+    selectPaidDocs: isRTL
+      ? "يرجى اختيار مستند مدفوع واحد على الأقل"
+      : "Please select at least one paid document",
+    guestFieldMissing: isRTL
+      ? "يرجى تعبئة جميع الحقول المطلوبة"
+      : "Please fill all required fields",
   };
 
   // Format currency with proper formatting
@@ -266,7 +462,7 @@ export default function CheckoutPage() {
       setIsFetchingDownloadIds(true);
       const token = getAuthToken();
       const response = await fetch(
-        `https://api.insightabusiness.com/api/account/order/knowledge/${uuid}`,
+        `https://api.foresighta.co/api/account/order/knowledge/${uuid}`,
         {
           headers: {
             "Content-Type": "application/json",
@@ -347,18 +543,99 @@ export default function CheckoutPage() {
 
   // Handle checkout
   const handleCheckout = async () => {
+    // Guest: only provider allowed
     if (!isFree && !paymentMethod) {
       toast.error(translations.pleaseSelectPayment, translations.orderError);
       return;
     }
 
     if (selectedDocuments.length === 0) {
+      toast.error(translations.selectPaidDocs, translations.orderError);
       return;
     }
 
     setIsCheckingOut(true);
     try {
       const token = getAuthToken();
+
+      // Guest checkout flow (paid docs only)
+      if (!token) {
+        const email = guestEmail.trim();
+        const first_name = guestFirstName.trim();
+        const last_name = guestLastName.trim();
+        const country_id = guestCountryId;
+        const phone_code = guestPhoneCode.trim();
+        const phone = guestPhone.trim();
+
+        if (!email || !first_name || !last_name || !country_id || !phone_code || !phone) {
+          toast.error(translations.guestFieldMissing, translations.orderError);
+          return;
+        }
+
+        const guestBody = {
+          payment_method: "provider",
+          email,
+          first_name,
+          last_name,
+          country_id,
+          phone_code,
+          phone,
+          timezone,
+          order_data: {
+            knowledge_slug: slug,
+            knowledge_document_ids: selectedDocuments,
+          },
+        };
+
+        const response = await fetch(
+          "https://api.foresighta.co/api/platform/guest/order/knowledge/checkout",
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              Accept: "application/json",
+              "Accept-Language": locale,
+              "X-Timezone": timezone,
+            },
+            body: JSON.stringify(guestBody),
+          }
+        );
+
+        if (!response.ok) {
+          let errorMessage = `HTTP error! status: ${response.status}`;
+          try {
+            const text = await response.text();
+            if (text.trim()) {
+              const errorData = JSON.parse(text);
+              errorMessage = errorData.message || errorMessage;
+            }
+          } catch {}
+          throw new Error(errorMessage);
+        }
+
+        const text = await response.text();
+        const parsed = text.trim() ? JSON.parse(text) : null;
+        const responseData = parsed?.data || parsed;
+        const client_secret = responseData?.client_secret;
+        const order_uuid = responseData?.order_uuid;
+        const guestToken = responseData?.token;
+
+        if (!client_secret || !order_uuid || !guestToken) {
+          throw new Error("Invalid checkout response");
+        }
+
+        localStorage.setItem("guest-token", guestToken);
+
+        const paymentParams = new URLSearchParams({
+          client_secret,
+          order_uuid,
+          amount: totalPrice.toFixed(2),
+          title: knowledge?.title || "Knowledge Purchase",
+          guest: "1",
+        });
+        router.push(`/${locale}/payment/stripe?${paymentParams.toString()}`);
+        return;
+      }
 
       const body = {
         payment_method: isFree ? "free" : paymentMethod,
@@ -369,7 +646,7 @@ export default function CheckoutPage() {
       };
 
       const response = await fetch(
-        "https://api.insightabusiness.com/api/account/order/knowledge/checkout",
+        "https://api.foresighta.co/api/account/order/knowledge/checkout",
         {
           method: "POST",
           headers: {
@@ -492,6 +769,16 @@ export default function CheckoutPage() {
     ? knowledge.documents.filter((doc) => documentIds.includes(doc.id))
     : knowledge.documents;
 
+  const hasFreeDocsInCart = documentsToShow.some((d) => parseFloat(d.price) === 0);
+  const isGuestFormValid =
+    !isGuest ||
+    (!!guestEmail.trim() &&
+      !!guestFirstName.trim() &&
+      !!guestLastName.trim() &&
+      !!guestCountryId &&
+      !!guestPhoneCode.trim() &&
+      !!guestPhone.trim());
+
   // Debug logging
   console.log('Knowledge object:', knowledge);
   console.log('DocumentIds from URL:', documentIds);
@@ -576,14 +863,14 @@ export default function CheckoutPage() {
                     if (knowledgeDownloadId) {
                       const uuidsParam = `?uuids=${knowledgeDownloadId}`;
                       console.log('Redirecting with UUID:', uuidsParam); // Debug log
-                      window.location.href = `https://app.insightabusiness.com/app/insighter-dashboard/my-downloads${uuidsParam}`;
+                      window.location.href = `http://localhost:4200/app/insighter-dashboard/my-downloads${uuidsParam}`;
                     } else {
                       console.log('No UUID available, falling back to search'); // Debug log
                       // Fallback to title search if no UUID available
                       const searchTitle = knowledge?.title || "";
                       const searchParam = searchTitle ? `?search=${encodeURIComponent(searchTitle)}` : "";
                       console.log('Redirecting with search:', searchParam); // Debug log
-                      window.location.href = `https://app.insightabusiness.com/app/insighter-dashboard/my-downloads${searchParam}`;
+                      window.location.href = `http://localhost:4200/app/insighter-dashboard/my-downloads${searchParam}`;
                     }
                   }}
                 >
@@ -635,6 +922,13 @@ export default function CheckoutPage() {
               <Text size="lg" fw={600} mb="xs">
                 {knowledge.title}
               </Text>
+              {isGuest && hasFreeDocsInCart && (
+                <div className="mb-3 rounded-md border border-amber-200 bg-amber-50 px-3 py-2">
+                  <Text size="sm" c="dimmed">
+                    {translations.loginRequiredForFree}
+                  </Text>
+                </div>
+              )}
               <Stack gap="md">
                 {documentsToShow.length === 0 ? (
                   <Text size="sm" c="dimmed" ta="center">
@@ -652,8 +946,16 @@ export default function CheckoutPage() {
                   >
                     <Group gap="md" wrap="nowrap">
                       <Checkbox
-                        checked={selectedDocuments.includes(doc.id)}
-                        onChange={() => handleDocumentToggle(doc.id)}
+                        checked={
+                          isGuest && parseFloat(doc.price) === 0
+                            ? false
+                            : selectedDocuments.includes(doc.id)
+                        }
+                        disabled={isGuest && parseFloat(doc.price) === 0}
+                        onChange={() => {
+                          if (isGuest && parseFloat(doc.price) === 0) return;
+                          handleDocumentToggle(doc.id);
+                        }}
                         size="md"
                       />
 
@@ -705,15 +1007,268 @@ export default function CheckoutPage() {
             {!isFree && (
               <>
                 <div className={styles.rightColumn}>
+                  {/* Guest checkout details */}
+                  {isGuest && (
+                    <div
+                      className="border border-[#e2e8f0] rounded-lg p-4 mb-6 relative z-[10] overflow-visible"
+                      style={{ background: 'rgba(255, 255, 255, 0.7)', backdropFilter: 'blur(10px)', WebkitBackdropFilter: 'blur(10px)' }}
+                    >
+                      <Text className={styles.sectionTitle}>
+                        {translations.guestCheckoutTitle}
+                      </Text>
+
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-3">
+                        <div className="sm:col-span-2">
+                          <label className="block text-sm font-medium text-gray-700 mb-1">
+                            {translations.email}
+                          </label>
+                          <input
+                            value={guestEmail}
+                            onChange={(e) => setGuestEmail(e.target.value)}
+                            type="email"
+                            className="w-full rounded-md border border-gray-200 bg-white px-3 py-2 text-sm outline-none focus:border-blue-400"
+                            placeholder="name@example.com"
+                          />
+                        </div>
+
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-1">
+                            {translations.firstName}
+                          </label>
+                          <input
+                            value={guestFirstName}
+                            onChange={(e) => setGuestFirstName(e.target.value)}
+                            className="w-full rounded-md border border-gray-200 bg-white px-3 py-2 text-sm outline-none focus:border-blue-400"
+                          />
+                        </div>
+
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-1">
+                            {translations.lastName}
+                          </label>
+                          <input
+                            value={guestLastName}
+                            onChange={(e) => setGuestLastName(e.target.value)}
+                            className="w-full rounded-md border border-gray-200 bg-white px-3 py-2 text-sm outline-none focus:border-blue-400"
+                          />
+                        </div>
+
+                        <div className="sm:col-span-2">
+                          <label className="block text-sm font-medium text-gray-700 mb-1">
+                            {translations.country}
+                          </label>
+                          <div className="relative" ref={countryDropdownRef}>
+                            <button
+                              type="button"
+                              onClick={() => {
+                                setCountryDropdownOpen((v) => !v);
+                                setPhoneCodeDropdownOpen(false);
+                              }}
+                              className="w-full rounded-md border border-gray-200 bg-white px-3 py-2 text-sm flex items-center justify-between gap-2"
+                            >
+                              <div className="flex items-center gap-2 min-w-0">
+                                {selectedCountry ? (
+                                  <>
+                                    <Image
+                                      src={getCountryFlagSrc(selectedCountry)}
+                                      alt={getCountryLabel(selectedCountry)}
+                                      width={18}
+                                      height={18}
+                                      className="rounded-sm"
+                                      onError={(e: any) => {
+                                        try {
+                                          e.currentTarget.src = "/images/flags/default.svg";
+                                        } catch {}
+                                      }}
+                                    />
+                                    <span className="truncate">{getCountryLabel(selectedCountry)}</span>
+                                  </>
+                                ) : (
+                                  <span className="text-gray-500">{translations.selectCountry}</span>
+                                )}
+                              </div>
+                              <span className="text-gray-400">▾</span>
+                            </button>
+
+                            {countryDropdownOpen && (
+                              <div className="absolute z-[9999] mt-2 w-full rounded-md border border-gray-200 bg-white shadow-sm">
+                                <div className="p-2 border-b border-gray-100">
+                                  <input
+                                    value={countrySearch}
+                                    onChange={(e) => setCountrySearch(e.target.value)}
+                                    className="w-full rounded-md border border-gray-200 px-3 py-2 text-sm outline-none focus:border-blue-400"
+                                    placeholder={translations.searchCountry}
+                                  />
+                                </div>
+                                <div className="max-h-72 overflow-auto">
+                                  {countriesLoading ? (
+                                    <div className="p-3 text-sm text-gray-500">
+                                      {translations.loading}
+                                    </div>
+                                  ) : filteredCountries.length === 0 ? (
+                                    <div className="p-3 text-sm text-gray-500">
+                                      {isRTL ? "لا توجد نتائج" : "No results"}
+                                    </div>
+                                  ) : (
+                                    filteredCountries.map((c) => (
+                                      <button
+                                        key={c.id}
+                                        type="button"
+                                        onClick={() => {
+                                          setGuestCountryId(c.id);
+                                          // helpful default
+                                          if (!guestPhoneCode.trim()) {
+                                            setGuestPhoneCode(String(c.international_code || ""));
+                                          }
+                                          setCountryDropdownOpen(false);
+                                          setCountrySearch("");
+                                        }}
+                                        className="w-full px-3 py-2 text-sm hover:bg-gray-50 flex items-center gap-2 text-left"
+                                      >
+                                        <Image
+                                          src={getCountryFlagSrc(c)}
+                                          alt={getCountryLabel(c)}
+                                          width={18}
+                                          height={18}
+                                          className="rounded-sm"
+                                          onError={(e: any) => {
+                                            try {
+                                              e.currentTarget.src = "/images/flags/default.svg";
+                                            } catch {}
+                                          }}
+                                        />
+                                        <span className="flex-1 truncate">{getCountryLabel(c)}</span>
+                                        <span className="text-gray-400 text-xs">+{c.international_code}</span>
+                                      </button>
+                                    ))
+                                  )}
+                                </div>
+                              </div>
+                            )}
+                          </div>
+                        </div>
+
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-1">
+                            {translations.phoneCode}
+                          </label>
+                          <div className="relative" ref={phoneCodeDropdownRef}>
+                            <button
+                              type="button"
+                              onClick={() => {
+                                setPhoneCodeDropdownOpen((v) => !v);
+                                setCountryDropdownOpen(false);
+                              }}
+                              className="w-full rounded-md border border-gray-200 bg-white px-3 py-2 text-sm flex items-center justify-between gap-2"
+                            >
+                              <div className="flex items-center gap-2 min-w-0">
+                                {selectedPhoneCountry ? (
+                                  <>
+                                    <Image
+                                      src={getCountryFlagSrc(selectedPhoneCountry)}
+                                      alt={getCountryLabel(selectedPhoneCountry)}
+                                      width={18}
+                                      height={18}
+                                      className="rounded-sm"
+                                      onError={(e: any) => {
+                                        try {
+                                          e.currentTarget.src = "/images/flags/default.svg";
+                                        } catch {}
+                                      }}
+                                    />
+                                    <span className="truncate">+{selectedPhoneCountry.international_code}</span>
+                                  </>
+                                ) : guestPhoneCode.trim() ? (
+                                  <span className="truncate">+{guestPhoneCode.trim()}</span>
+                                ) : (
+                                  <span className="text-gray-500">+---</span>
+                                )}
+                              </div>
+                              <span className="text-gray-400">▾</span>
+                            </button>
+
+                            {phoneCodeDropdownOpen && (
+                              <div className="absolute z-[9999] mt-2 w-full rounded-md border border-gray-200 bg-white shadow-sm">
+                                <div className="p-2 border-b border-gray-100">
+                                  <input
+                                    value={phoneCodeSearch}
+                                    onChange={(e) => setPhoneCodeSearch(e.target.value)}
+                                    className="w-full rounded-md border border-gray-200 px-3 py-2 text-sm outline-none focus:border-blue-400"
+                                    placeholder={translations.searchCountry}
+                                  />
+                                </div>
+                                <div className="max-h-72 overflow-auto">
+                                  {countriesLoading ? (
+                                    <div className="p-3 text-sm text-gray-500">
+                                      {translations.loading}
+                                    </div>
+                                  ) : filteredPhoneCodeCountries.length === 0 ? (
+                                    <div className="p-3 text-sm text-gray-500">
+                                      {isRTL ? "لا توجد نتائج" : "No results"}
+                                    </div>
+                                  ) : (
+                                    filteredPhoneCodeCountries.map((c) => (
+                                      <button
+                                        key={c.id}
+                                        type="button"
+                                        onClick={() => {
+                                          setGuestPhoneCode(String(c.international_code || ""));
+                                          setIsPhoneCodeManuallySet(true);
+                                          if (!guestCountryId) {
+                                            setGuestCountryId(c.id);
+                                          }
+                                          setPhoneCodeDropdownOpen(false);
+                                          setPhoneCodeSearch("");
+                                        }}
+                                        className="w-full px-3 py-2 text-sm hover:bg-gray-50 flex items-center gap-2 text-left"
+                                      >
+                                        <Image
+                                          src={getCountryFlagSrc(c)}
+                                          alt={getCountryLabel(c)}
+                                          width={18}
+                                          height={18}
+                                          className="rounded-sm"
+                                          onError={(e: any) => {
+                                            try {
+                                              e.currentTarget.src = "/images/flags/default.svg";
+                                            } catch {}
+                                          }}
+                                        />
+                                        <span className="flex-1 truncate">{getCountryLabel(c)}</span>
+                                        <span className="text-gray-400 text-xs">+{c.international_code}</span>
+                                      </button>
+                                    ))
+                                  )}
+                                </div>
+                              </div>
+                            )}
+                          </div>
+                        </div>
+
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-1">
+                            {translations.phone}
+                          </label>
+                          <input
+                            value={guestPhone}
+                            onChange={(e) => setGuestPhone(e.target.value)}
+                            className="w-full rounded-md border border-gray-200 bg-white px-3 py-2 text-sm outline-none focus:border-blue-400"
+                            placeholder="790000000"
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
                   {/* Payment Methods */}
-                  <div className="border border-[#e2e8f0] rounded-lg p-4" style={{ background: 'rgba(255, 255, 255, 0.7)', backdropFilter: 'blur(10px)', WebkitBackdropFilter: 'blur(10px)' }}>
+                  <div className="border border-[#e2e8f0] rounded-lg p-4 relative z-0" style={{ background: 'rgba(255, 255, 255, 0.7)', backdropFilter: 'blur(10px)', WebkitBackdropFilter: 'blur(10px)' }}>
                     <Text className={styles.sectionTitle}>
                       {translations.paymentMethod}
                     </Text>
 
                     <Stack gap="md">
                       {/* Wallet Method (hidden for client-only users) */}
-                      {!isClientOnly && (
+                      {!isGuest && !isClientOnly && (
                         <div>
                           <div
                             className={`${styles.paymentMethodCard} ${
@@ -774,14 +1329,21 @@ export default function CheckoutPage() {
                         className={`${styles.paymentMethodCard} ${
                           paymentMethod === "provider" ? styles.selected : ""
                         }`}
-                        onClick={() => setPaymentMethod("provider")}
+                        onClick={() => {
+                          if (isGuest) return;
+                          setPaymentMethod("provider");
+                        }}
                       >
                         <Group gap="lg" align="center">
                           <div className={styles.methodCheckbox}>
                             <Checkbox
                               checked={paymentMethod === "provider"}
-                              onChange={() => setPaymentMethod("provider")}
+                              onChange={() => {
+                                if (isGuest) return;
+                                setPaymentMethod("provider");
+                              }}
                               size="md"
+                              disabled={isGuest}
                             />
                           </div>
                           <div className={styles.paymentIconsContainer}>
@@ -811,7 +1373,8 @@ export default function CheckoutPage() {
                       loading={isCheckingOut}
                       disabled={
                         selectedDocuments.length === 0 ||
-                        (!isFree && !paymentMethod)
+                        (!isFree && !paymentMethod) ||
+                        (isGuest && !isGuestFormValid)
                       }
                       className={styles.confirmButton}
                       fullWidth

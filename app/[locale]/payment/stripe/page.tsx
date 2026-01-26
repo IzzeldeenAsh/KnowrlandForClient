@@ -12,7 +12,7 @@ import { Elements, PaymentElement, useElements, useStripe } from "@stripe/react-
 import styles from "./payment.module.css";
 
 // Initialize Stripe
-const stripePromise = loadStripe("pk_live_51RvbpYRIE7WtDi9SLKPBxKTPyTkULT1e36AZMOcmtUomKgW99akiph2PVg5mmUcPtyAjvlXwP1wy70OFvooJLpQc00CNQYKb96");
+const stripePromise = loadStripe("pk_test_51RpQiFL3mrWP7a0P1OYWGeFJWtgMwcWJtiEDLvn29CpYn5x8Ou77YViA1yoimlixKU5aUAeOeN5VTfoC4sMpvFVF00qq9a6BNm");
 
 // File icon mapping function
 const getFileIconByExtension = (extension: string) => {
@@ -64,11 +64,12 @@ interface PaymentFormProps {
   title: string;
   locale: string;
   isRTL: boolean;
+  isGuest: boolean;
   orderDetails: OrderDetails | null;
   setOrderDetails: (details: OrderDetails) => void;
 }
 
-function PaymentForm({ orderUuid, amount, title, locale, isRTL, orderDetails, setOrderDetails }: PaymentFormProps) {
+function PaymentForm({ orderUuid, amount, title, locale, isRTL, isGuest, orderDetails, setOrderDetails }: PaymentFormProps) {
   const stripe = useStripe();
   const elements = useElements();
   const [isProcessing, setIsProcessing] = useState(false);
@@ -91,13 +92,59 @@ function PaymentForm({ orderUuid, amount, title, locale, isRTL, orderDetails, se
     return token;
   };
 
+  const getGuestToken = () => {
+    if (typeof window === "undefined") return null;
+    return localStorage.getItem("guest-token");
+  };
+
+  const triggerGuestDownload = useCallback(async () => {
+    const guestToken = getGuestToken();
+    if (!guestToken) {
+      throw new Error("Missing guest token");
+    }
+
+    const response = await fetch(
+      `https://api.foresighta.co/api/platform/guest/order/knowledge/download/${orderUuid}`,
+      {
+        method: "POST",
+        headers: {
+          Accept: "application/json",
+          "Accept-Language": locale,
+          "X-Timezone": Intl.DateTimeFormat().resolvedOptions().timeZone,
+          "X-GUEST-TOKEN": guestToken,
+        },
+      }
+    );
+
+    if (!response.ok) {
+      throw new Error(`Download failed: ${response.status}`);
+    }
+
+    const blob = await response.blob();
+    const cd = response.headers.get("content-disposition") || "";
+    const match = cd.match(/filename\*?=(?:UTF-8''|")?([^\";]+)"?/i);
+    const filename = match?.[1]
+      ? decodeURIComponent(match[1])
+      : `${title || "download"}.zip`;
+
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    window.URL.revokeObjectURL(url);
+  }, [locale, orderUuid, title]);
+
   // Fetch updated order details to get knowledge_download_id
   const fetchUpdatedOrderDetails = useCallback(async (uuid: string, setOrderDetails: (details: OrderDetails) => void) => {
     try {
+      if (isGuest) return null;
       setIsFetchingDownloadIds(true);
       const token = getAuthToken();
       const response = await fetch(
-        `https://api.insightabusiness.com/api/account/order/knowledge/${uuid}`,
+        `https://api.foresighta.co/api/account/order/knowledge/${uuid}`,
         {
           headers: {
             "Content-Type": "application/json",
@@ -122,7 +169,7 @@ function PaymentForm({ orderUuid, amount, title, locale, isRTL, orderDetails, se
       setIsFetchingDownloadIds(false);
     }
     return null;
-  }, [locale]);
+  }, [isGuest, locale]);
 
   // Translations
   const translations = {
@@ -134,6 +181,7 @@ function PaymentForm({ orderUuid, amount, title, locale, isRTL, orderDetails, se
     paymentSuccess: isRTL ? "تم الدفع بنجاح!" : "Payment Successful!",
     redirecting: isRTL ? "جاري التوجيه إلى التنزيلات..." : "Redirecting to downloads...",
     goToDownloads: isRTL ? "الذهاب إلى التنزيلات" : "Go to Downloads",
+    downloadNow: isRTL ? "تحميل الآن" : "Download",
     paymentFailed: isRTL ? "فشل الدفع" : "Payment Failed",
     tryAgain: isRTL ? "حاول مرة أخرى" : "Try Again",
     preparingDownloads: isRTL ? "جاري تجهيز التنزيلات..." : "Preparing your downloads...",
@@ -146,7 +194,6 @@ function PaymentForm({ orderUuid, amount, title, locale, isRTL, orderDetails, se
 
   // Poll order status
   const pollOrderStatus = useCallback(async () => {
-    const token = getAuthToken();
     let attempts = 0;
     const maxAttempts = 18; // ~2 minutes with progressive delays
     setPollAttemptsEnded(false);
@@ -160,8 +207,32 @@ function PaymentForm({ orderUuid, amount, title, locale, isRTL, orderDetails, se
 
     const checkStatus = async (): Promise<boolean> => {
       try {
+        if (isGuest) {
+          const guestToken = getGuestToken();
+          if (!guestToken) return false;
+
+          const response = await fetch(
+            `https://api.foresighta.co/api/platform/guest/order/knowledge/check-payment-succeeded/${orderUuid}`,
+            {
+              method: "POST",
+              headers: {
+                Accept: "application/json",
+                "Accept-Language": locale,
+                "X-Timezone": Intl.DateTimeFormat().resolvedOptions().timeZone,
+                "X-GUEST-TOKEN": guestToken,
+              },
+            }
+          );
+
+          if (response.status === 204) {
+            return true;
+          }
+          return false;
+        }
+
+        const token = getAuthToken();
         const response = await fetch(
-          `https://api.insightabusiness.com/api/account/order/knowledge/${orderUuid}`,
+          `https://api.foresighta.co/api/account/order/knowledge/${orderUuid}`,
           {
             headers: {
               "Content-Type": "application/json",
@@ -178,12 +249,7 @@ function PaymentForm({ orderUuid, amount, title, locale, isRTL, orderDetails, se
         }
 
         const data = await response.json();
-        
-        if (data.data?.status === "paid") {
-          return true;
-        }
-        
-        return false;
+        return data.data?.status === "paid";
       } catch (error) {
         console.error("Error checking order status:", error);
         return false;
@@ -196,6 +262,13 @@ function PaymentForm({ orderUuid, amount, title, locale, isRTL, orderDetails, se
       const isPaid = await checkStatus();
       
       if (isPaid) {
+        if (isGuest) {
+          try {
+            await triggerGuestDownload();
+          } catch (e) {
+            console.error(e);
+          }
+        }
         setPaymentStatus("success");
         return true;
       }
@@ -209,7 +282,7 @@ function PaymentForm({ orderUuid, amount, title, locale, isRTL, orderDetails, se
     setErrorMessage("Payment verification timed out");
     setPollAttemptsEnded(true);
     return false;
-  }, [orderUuid, locale]);
+  }, [isGuest, locale, orderUuid, triggerGuestDownload]);
 
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
@@ -274,9 +347,46 @@ function PaymentForm({ orderUuid, amount, title, locale, isRTL, orderDetails, se
     setErrorMessage("");
     setShowInlineError(false);
     try {
+      if (isGuest) {
+        const guestToken = getGuestToken();
+        if (!guestToken) {
+          setPaymentStatus("error");
+          setErrorMessage(isRTL ? "رمز الضيف غير موجود." : "Guest token is missing.");
+          return;
+        }
+        const response = await fetch(
+          `https://api.foresighta.co/api/platform/guest/order/knowledge/check-payment-succeeded/${orderUuid}`,
+          {
+            method: "POST",
+            headers: {
+              Accept: "application/json",
+              "Accept-Language": locale,
+              "X-Timezone": Intl.DateTimeFormat().resolvedOptions().timeZone,
+              "X-GUEST-TOKEN": guestToken,
+            },
+          }
+        );
+        if (response.status === 204) {
+          try {
+            await triggerGuestDownload();
+          } catch (e) {
+            console.error(e);
+          }
+          setPaymentStatus("success");
+          return;
+        }
+        setPaymentStatus("error");
+        setErrorMessage(
+          isRTL
+            ? "لم يتم تأكيد الدفع بعد. يرجى المحاولة لاحقًا."
+            : "Payment could not be verified. Please try again later."
+        );
+        return;
+      }
+
       const token = getAuthToken();
       const response = await fetch(
-        `https://api.insightabusiness.com/api/account/order/knowledge/check-payment-succeeded/${orderUuid}`,
+        `https://api.foresighta.co/api/account/order/knowledge/check-payment-succeeded/${orderUuid}`,
         {
           method: "POST",
           headers: {
@@ -335,8 +445,10 @@ function PaymentForm({ orderUuid, amount, title, locale, isRTL, orderDetails, se
             setTimeout(async () => {
               setShowDocumentsAdded(true);
               // Recall the API to get updated knowledge_download_id after documents are processed
-              console.log('Documents processed, fetching updated order details...'); // Debug log
-              await fetchUpdatedOrderDetails(orderUuid, setOrderDetails);
+              if (!isGuest) {
+                console.log('Documents processed, fetching updated order details...'); // Debug log
+                await fetchUpdatedOrderDetails(orderUuid, setOrderDetails);
+              }
             }, 300);
             return 100;
           }
@@ -346,7 +458,7 @@ function PaymentForm({ orderUuid, amount, title, locale, isRTL, orderDetails, se
 
       return () => clearInterval(timer);
     }
-  }, [paymentStatus, orderUuid, fetchUpdatedOrderDetails, setOrderDetails]);
+  }, [paymentStatus, orderUuid, fetchUpdatedOrderDetails, isGuest, setOrderDetails]);
 
   // Success UI
   if (paymentStatus === "success") {
@@ -397,14 +509,18 @@ function PaymentForm({ orderUuid, amount, title, locale, isRTL, orderDetails, se
               />
             </div>
           ) : (
-            <div className={styles.documentsAddedText}>
-              <div className="flex items-center justify-center gap-2 mb-2">
-                <IconCheck size={20} className="text-emerald-600" />
-                <Text size="md" fw={600} className="text-gray-700">
-                  {translations.documentsAdded}
-                </Text>
-              </div>
-            </div>
+            <>
+              {!isGuest && (
+                <div className={styles.documentsAddedText}>
+                  <div className="flex items-center justify-center gap-2 mb-2">
+                    <IconCheck size={20} className="text-emerald-600" />
+                    <Text size="md" fw={600} className="text-gray-700">
+                      {translations.documentsAdded}
+                    </Text>
+                  </div>
+                </div>
+              )}
+            </>
           )}
         </div>
 
@@ -415,25 +531,29 @@ function PaymentForm({ orderUuid, amount, title, locale, isRTL, orderDetails, se
             loading={isFetchingDownloadIds}
             disabled={isFetchingDownloadIds}
             onClick={() => {
+              if (isGuest) {
+                triggerGuestDownload().catch((e) => console.error(e));
+                return;
+              }
               console.log('Download button clicked. Order details:', orderDetails); // Debug log
               // Use knowledge_download_id if available, otherwise fall back to title search
               if (orderDetails?.knowledge_download_id) {
                 const uuidsParam = `?uuids=${orderDetails.knowledge_download_id}`;
                 console.log('Redirecting with UUID:', uuidsParam); // Debug log
-                window.location.href = `https://app.insightabusiness.com/app/insighter-dashboard/my-downloads${uuidsParam}`;
+                window.location.href = `http://localhost:4200/app/insighter-dashboard/my-downloads${uuidsParam}`;
               } else {
                 console.log('No UUID available, falling back to search'); // Debug log
                 // Fallback to title search if no UUID available
                 const searchTitle = orderDetails?.orderable?.knowledge?.[0]?.title || "";
                 const searchParam = searchTitle ? `?search=${encodeURIComponent(searchTitle)}` : "";
                 console.log('Redirecting with search:', searchParam); // Debug log
-                window.location.href = `https://app.insightabusiness.com/app/insighter-dashboard/my-downloads${searchParam}`;
+                window.location.href = `http://localhost:4200/app/insighter-dashboard/my-downloads${searchParam}`;
               }
             }}
           >
             {isFetchingDownloadIds
               ? (isRTL ? "جاري التحديث..." : "Updating...")
-              : translations.goToDownloads}
+              : (isGuest ? translations.downloadNow : translations.goToDownloads)}
           </Button>
         )}
       </div>
@@ -589,6 +709,7 @@ export default function StripePaymentPage() {
   const orderUuid = searchParams.get("order_uuid") || "";
   const amount = searchParams.get("amount") || "0";
   const title = searchParams.get("title") || "";
+  const isGuest = searchParams.get("guest") === "1";
   
   const [orderDetails, setOrderDetails] = useState<OrderDetails | null>(null);
 
@@ -605,11 +726,12 @@ export default function StripePaymentPage() {
   useEffect(() => {
     const fetchOrderDetails = async () => {
       if (!orderUuid) return;
+      if (isGuest) return;
       
       try {
         const token = getAuthToken();
         const response = await fetch(
-          `https://api.insightabusiness.com/api/account/order/knowledge/${orderUuid}`,
+          `https://api.foresighta.co/api/account/order/knowledge/${orderUuid}`,
           {
             headers: {
               "Content-Type": "application/json",
@@ -632,7 +754,7 @@ export default function StripePaymentPage() {
     };
 
     fetchOrderDetails();
-  }, [orderUuid, locale]);
+  }, [isGuest, orderUuid, locale]);
 
   // Redirect if missing required params
   useEffect(() => {
@@ -674,6 +796,7 @@ export default function StripePaymentPage() {
                 title={title}
                 locale={locale}
                 isRTL={isRTL}
+                isGuest={isGuest}
                 orderDetails={orderDetails}
                 setOrderDetails={setOrderDetails}
               />

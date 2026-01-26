@@ -142,13 +142,27 @@ const KnowledgeSideBox = ({
 
   // Handle buy/download click
   const handleBuyClick = () => {
-    if (!isUserLoggedIn()) {
-      setAuthModalOpened(true);
-      return;
-    }
-
     // Check if all documents are free or if total price is 0
     const areAllDocumentsFree = documents.every(doc => parseFloat(doc.price) === 0);
+    const isLoggedIn = isUserLoggedIn();
+
+    // Guest behavior:
+    // - If ALL documents are free => keep existing auth modal requirement
+    // - If there is any paid document => allow proceeding to checkout (free docs will be disabled there)
+    if (!isLoggedIn) {
+      if (isFree || areAllDocumentsFree) {
+        setAuthModalOpened(true);
+        return;
+      }
+
+      const allDocumentIds = documents.map(doc => doc.id);
+      const queryParams = new URLSearchParams({
+        slug: knowledgeSlug || '',
+        documents: allDocumentIds.join(','),
+      });
+      window.location.href = `/${currentLocale}/checkout?${queryParams.toString()}`;
+      return;
+    }
 
     if (isFree || areAllDocumentsFree) {
       // Skip modal and go directly to checkout for free documents
@@ -185,7 +199,7 @@ const KnowledgeSideBox = ({
       }
 
       const method = isReadLater ? 'DELETE' : 'POST';
-      const url =  `https://api.insightabusiness.com/api/account/favorite/knowledge/${knowledgeSlug}`
+      const url =  `https://api.foresighta.co/api/account/favorite/knowledge/${knowledgeSlug}`
 
       
       const response = await fetch(url, {
@@ -340,7 +354,7 @@ const KnowledgeSideBox = ({
             <>
               {purchased_status === 'purchased' ? (
                 <button 
-                  onClick={() => window.location.href = (process.env.NEXT_PUBLIC_DASHBOARD_URL || 'https://app.insightabusiness.com') + '/app/insighter-dashboard/my-downloads'}
+                  onClick={() => window.location.href = (process.env.NEXT_PUBLIC_DASHBOARD_URL || 'http://localhost:4200') + '/app/insighter-dashboard/my-downloads'}
                   className="w-full font-semibold bg-green-600 text-white py-2 px-4 rounded-lg hover:bg-green-700 transition-colors"
                 >
                   {translations.alreadyPurchased}

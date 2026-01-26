@@ -13,7 +13,7 @@ type PusherOpts = {
 function getConfig(): PusherOpts {
   const key = '41745ad5e299f4af9e36';
   const cluster =  'eu';
-  const authEndpoint = 'https://api.insightabusiness.com/broadcasting/auth';
+  const authEndpoint = 'https://api.foresighta.co/broadcasting/auth';
   if (!key || !authEndpoint) {
     console.error('[Pusher] Missing env: NEXT_PUBLIC_PUSHER_KEY or NEXT_PUBLIC_PUSHER_AUTH_ENDPOINT')
   }
