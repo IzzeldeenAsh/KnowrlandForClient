@@ -103,6 +103,8 @@ const KnowledgeSideBox = ({
   
   // Auth Modal state
   const [authModalOpened, setAuthModalOpened] = useState(false);
+  const [authModalGuestCheckoutUrl, setAuthModalGuestCheckoutUrl] = useState<string | null>(null);
+  const [authModalDisableGuestCheckout, setAuthModalDisableGuestCheckout] = useState(false);
 
   // Read Later state
   const [isReadLater, setIsReadLater] = useState(is_read_later || false);
@@ -145,22 +147,21 @@ const KnowledgeSideBox = ({
     // Check if all documents are free or if total price is 0
     const areAllDocumentsFree = documents.every(doc => parseFloat(doc.price) === 0);
     const isLoggedIn = isUserLoggedIn();
+    const returnUrl = typeof window !== 'undefined' ? window.location.href : '';
 
     // Guest behavior:
     // - If ALL documents are free => keep existing auth modal requirement
     // - If there is any paid document => allow proceeding to checkout (free docs will be disabled there)
     if (!isLoggedIn) {
-      if (isFree || areAllDocumentsFree) {
-        setAuthModalOpened(true);
-        return;
-      }
-
       const allDocumentIds = documents.map(doc => doc.id);
       const queryParams = new URLSearchParams({
         slug: knowledgeSlug || '',
         documents: allDocumentIds.join(','),
+        returnUrl,
       });
-      window.location.href = `/${currentLocale}/checkout?${queryParams.toString()}`;
+      setAuthModalGuestCheckoutUrl(`/${currentLocale}/checkout?${queryParams.toString()}`);
+      setAuthModalDisableGuestCheckout(isFree || areAllDocumentsFree);
+      setAuthModalOpened(true);
       return;
     }
 
@@ -186,6 +187,8 @@ const KnowledgeSideBox = ({
     if (!knowledgeSlug) return;
     
     if (!isUserLoggedIn()) {
+      setAuthModalGuestCheckoutUrl(null);
+      setAuthModalDisableGuestCheckout(false);
       setAuthModalOpened(true);
       return;
     }
@@ -199,7 +202,7 @@ const KnowledgeSideBox = ({
       }
 
       const method = isReadLater ? 'DELETE' : 'POST';
-      const url =  `https://api.foresighta.co/api/account/favorite/knowledge/${knowledgeSlug}`
+      const url =  `https://api.insightabusiness.com/api/account/favorite/knowledge/${knowledgeSlug}`
 
       
       const response = await fetch(url, {
@@ -354,7 +357,7 @@ const KnowledgeSideBox = ({
             <>
               {purchased_status === 'purchased' ? (
                 <button 
-                  onClick={() => window.location.href = (process.env.NEXT_PUBLIC_DASHBOARD_URL || 'http://localhost:4200') + '/app/insighter-dashboard/my-downloads'}
+                  onClick={() => window.location.href = (process.env.NEXT_PUBLIC_DASHBOARD_URL || 'https://app.insightabusiness.com') + '/app/insighter-dashboard/my-downloads'}
                   className="w-full font-semibold bg-green-600 text-white py-2 px-4 rounded-lg hover:bg-green-700 transition-colors"
                 >
                   {translations.alreadyPurchased}
@@ -1192,8 +1195,14 @@ const KnowledgeSideBox = ({
       {/* Auth Modal */}
       <AuthModal
         opened={authModalOpened}
-        onClose={() => setAuthModalOpened(false)}
+        onClose={() => {
+          setAuthModalOpened(false);
+          setAuthModalGuestCheckoutUrl(null);
+          setAuthModalDisableGuestCheckout(false);
+        }}
         locale={currentLocale}
+        guestCheckoutUrl={authModalGuestCheckoutUrl}
+        disableGuestCheckout={authModalDisableGuestCheckout}
       />
   </div>
   );

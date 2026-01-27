@@ -146,13 +146,13 @@ export default function AboutContent() {
               </div>
               
               {/* Our Parent Company section */}
-              <div className="mt-10 pt-2">
+              {/* <div className="mt-10 pt-2">
                 <h3 className="h4 bg-clip-text text-transparent bg-gradient-to-r from-slate-200/80 via-slate-200 to-slate-200/80 pb-3">{t("parentCompanyTitle")}</h3>
                 <p className="text-slate-400">
                 {t("parentCompanyParagraph")}
                 </p>
               </div>
-              
+               */}
              
             </div>
           </div>

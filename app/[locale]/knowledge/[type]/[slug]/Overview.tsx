@@ -79,6 +79,8 @@ export default function Overview({ knowledge, knowledgeSlug }: OverviewProps) {
   const [buyModalOpened, setBuyModalOpened] = useState(false);
   const [selectedDocumentId, setSelectedDocumentId] = useState<number | undefined>(undefined);
   const [authModalOpened, setAuthModalOpened] = useState(false);
+  const [authModalGuestCheckoutUrl, setAuthModalGuestCheckoutUrl] = useState<string | null>(null);
+  const [authModalDisableGuestCheckout, setAuthModalDisableGuestCheckout] = useState(false);
 
   // Check if the current user is the owner of this knowledge
   const isOwner = user && knowledge.insighter?.uuid && user.uuid === knowledge.insighter.uuid;
@@ -112,11 +114,14 @@ export default function Overview({ knowledge, knowledgeSlug }: OverviewProps) {
     // Find the specific document
     const selectedDoc = knowledge.documents.find(doc => doc.id === documentId);
     const isLoggedIn = isUserLoggedIn();
+    const returnUrl = typeof window !== 'undefined' ? window.location.href : '';
 
     // Check if this document is free
     if (selectedDoc && parseFloat(selectedDoc.price) === 0) {
       // Guests must login to download free documents
       if (!isLoggedIn) {
+        setAuthModalGuestCheckoutUrl(null);
+        setAuthModalDisableGuestCheckout(true);
         setAuthModalOpened(true);
         return;
       }
@@ -135,8 +140,11 @@ export default function Overview({ knowledge, knowledgeSlug }: OverviewProps) {
       const queryParams = new URLSearchParams({
         slug: knowledgeSlug,
         documents: documentId.toString(),
+        returnUrl,
       });
-      router.push(`/${locale}/checkout?${queryParams.toString()}`);
+      setAuthModalGuestCheckoutUrl(`/${locale}/checkout?${queryParams.toString()}`);
+      setAuthModalDisableGuestCheckout(false);
+      setAuthModalOpened(true);
       return;
     }
 
@@ -339,7 +347,7 @@ export default function Overview({ knowledge, knowledgeSlug }: OverviewProps) {
                         <button
                           onClick={(e) => {
                             e.stopPropagation();
-                            window.location.href = process.env.NEXT_PUBLIC_DASHBOARD_URL + '/app/insighter-dashboard/my-downloads' || 'http://localhost:4200/app/insighter-dashboard/my-downloads';
+                            window.location.href = process.env.NEXT_PUBLIC_DASHBOARD_URL + '/app/insighter-dashboard/my-downloads' || 'https://app.insightabusiness.com/app/insighter-dashboard/my-downloads';
                           }}
                           className={`btn-sm mx-4 text-white bg-green-600 text-sm hover:bg-green-700 transition duration-150 ease-in-out group text-sm px-3 py-1 cursor-pointer ${styles.modernButton} ${styles.focusVisible}`}
                           aria-label={`${translations.alreadyPurchased} - ${doc.file_name}`}
@@ -413,8 +421,14 @@ export default function Overview({ knowledge, knowledgeSlug }: OverviewProps) {
       {/* Auth Modal */}
       <AuthModal
         opened={authModalOpened}
-        onClose={() => setAuthModalOpened(false)}
+        onClose={() => {
+          setAuthModalOpened(false);
+          setAuthModalGuestCheckoutUrl(null);
+          setAuthModalDisableGuestCheckout(false);
+        }}
         locale={locale as string}
+        guestCheckoutUrl={authModalGuestCheckoutUrl}
+        disableGuestCheckout={authModalDisableGuestCheckout}
       />
     </div>
   )

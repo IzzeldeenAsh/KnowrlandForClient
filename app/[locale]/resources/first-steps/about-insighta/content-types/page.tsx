@@ -110,116 +110,154 @@ export default async function ContentTypesPage({ params }: { params: Promise<{ l
 
   return (
     <div className="relative min-h-screen" dir={isRTL ? 'rtl' : 'ltr'}>
-      <div className="relative overflow-hidden pt-5 pb-10 md:pb-14">
-      
+      {/* Hero Section - same structure as "what-is-insighta" */}
+      <div className="relative overflow-hidden pb-16">
+        {/* Breadcrumbs + Hero Title Section (with bg + overlay) */}
+        <div className="relative overflow-hidden px-4 sm:px-12 py-8 md:py-20 mb-6 md:mb-8">
+          <div
+            className="absolute inset-0 bg-center bg-cover"
+            style={{
+              backgroundImage:
+                "url('https://res.cloudinary.com/dsiku9ipv/image/upload/v1769511246/Group_13553_2_swpcdf.webp')",
+              transform: isRTL ? 'scaleX(-1)' : 'none',
+              transformOrigin: 'center',
+            }}
+            aria-hidden="true"
+          />
+          {/* Brighter/less dark overlay */}
+          <div className="absolute inset-0 bg-gradient-to-b from-white/30 via-white/20 to-white/20" aria-hidden="true" />
 
-        <div className="relative z-10 mx-auto max-w-7xl px-4 sm:px-6">
-          <nav className={`mb-6 md:mb-8 text-xs md:text-sm ${isRTL ? 'text-right' : 'text-left'}`} aria-label="Breadcrumb">
-            <ol className={`flex items-center gap-2 text-gray-500 flex-wrap`}>
-              <li>
-                <a href={`/${locale}/resources/first-steps`} className="hover:text-gray-900 transition-colors">
-                  {locale === 'ar' ? 'الخطوات الأولى' : 'First Steps'}
-                </a>
-              </li>
-              <li>
-                <span className="text-gray-400">/</span>
-              </li>
-              <li>
-                <a href={`/${locale}/resources/first-steps/about-insighta`} className="hover:text-gray-900 transition-colors">
-                  {locale === 'ar' ? 'حول إنسايتا' : 'About Insighta'}
-                </a>
-              </li>
-              <li>
-                <span className="text-gray-400">/</span>
-              </li>
-              <li className="text-gray-900" aria-current="page">
-                {locale === 'ar' ? 'أنواع المحتوى المتاح' : 'Types of Content Available'}
-              </li>
-            </ol>
-          </nav>
+          <div className="relative z-10 px-4 sm:px-12">
+            {/* Breadcrumbs */}
+            <nav className={`mb-6 text-xs md:text-sm ${isRTL ? 'text-right' : 'text-left'}`} aria-label="Breadcrumb">
+              <ol className="flex items-center gap-2 text-gray-700/80 flex-wrap">
+                <li>
+                  <a href={`/${locale}/resources/first-steps`} className="hover:text-gray-900 transition-colors">
+                    {locale === 'ar' ? 'الخطوات الأولى' : 'First Steps'}
+                  </a>
+                </li>
+                <li>
+                  <span className="text-gray-400">/</span>
+                </li>
+                <li>
+                  <a href={`/${locale}/resources/first-steps/about-insighta`} className="hover:text-gray-900 transition-colors">
+                    {locale === 'ar' ? 'حول إنسايتا' : 'About Insighta'}
+                  </a>
+                </li>
+                <li>
+                  <span className="text-gray-400">/</span>
+                </li>
+                <li className="text-gray-900 font-bold" aria-current="page">
+                  {locale === 'ar' ? 'أنواع المحتوى المتاح' : 'Types of Content Available'}
+                </li>
+              </ol>
+            </nav>
 
-          <div className="mb-10 md:mb-12">
-            <div className={`flex flex-col justify-center gap-2 ${isRTL ? 'text-right' : 'text-left'}`} style={{ lineHeight: '1.3' }}>
-              <h1 className="text-3xl sm:text-4xl md:text-5xl font-extrabold tracking-tight text-gray-900">
-                {locale === 'ar' ? 'أنواع المحتوى المتاح' : 'Types of Content Available'}
-              </h1>
-              <h2 className={`text-3xl sm:text-4xl md:text-5xl font-extrabold bg-clip-text text-transparent ${isRTL ? 'bg-gradient-to-l from-blue-500 to-teal-400' : 'bg-gradient-to-r from-blue-500 to-teal-400'}`} style={{lineHeight: '1.3'}}>
-                {locale === 'ar' ? 'محتوى متنوع' : 'Diverse Content'}
-              </h2>
-              <p className={`mt-3 max-w-3xl text-base md:text-lg text-gray-600 ${isRTL ? 'ml-auto' : ''}`}>
-                {locale === 'ar'
-                  ? 'لا تقتصر المنصة على أبحاث السوق فقط، بل تشمل:'
-                  : "Insighta is not limited to market research. It includes a wide range of professional knowledge content such as reports, insights, data, guides, and courses for teams and professionals."}
-              </p>
+            {/* Hero Title Section */}
+            <div className="text-center ">
+              <div
+                className={`flex flex-col align-center justify-center gap-2 ${isRTL ? 'text-right' : 'text-left'} text-left`}
+                style={{ lineHeight: '1.3' }}
+              >
+                <h1 className="text-3xl sm:text-4xl md:text-5xl font-extrabold tracking-tight text-black">
+                  {locale === 'ar' ? 'أنواع المحتوى المتاح' : 'Types of Content Available'}
+                </h1>
+                <h2
+                  className={`text-3xl sm:text-4xl md:text-5xl font-extrabold bg-clip-text text-transparent ${
+                    isRTL ? 'bg-gradient-to-l from-blue-800 to-teal-600' : 'bg-gradient-to-r from-blue-500 to-teal-400'
+                  }`}
+                >
+                  {locale === 'ar' ? 'محتوى متنوع' : 'Diverse Content'}
+                </h2>
+              </div>
             </div>
           </div>
+        </div>
 
-          {/* Content */}
-          <div className={`pb-10 md:pb-14 ${isRTL ? 'text-right' : 'text-left'}`}>
-            <div className="grid gap-4 sm:gap-5 md:grid-cols-2 lg:grid-cols-3">
-              {contentTypes.map((item) => (
-                <div
-                  key={item.key}
-                  className="group rounded-xl border border-gray-200 bg-white/70 backdrop-blur-sm min-h-[170px] px-5 py-5 md:px-6 md:py-6 transition-colors hover:bg-white"
-                >
-                  <div className="flex items-start gap-4">
-                    
-                    <div className='mt-1'>
-                      {item.type === 'report' && <ReportIcon width={22} height={22} />}
-                      {item.type === 'manual' && <ManualIcon width={22} height={22} />}
-                      {item.type === 'statistic' && <InsightIcon width={22} height={22} />}
-                      {item.type === 'data' && <DataIcon width={22} height={22} />}
-                      {item.type === 'course' && <CourseIcon width={22} height={22} />}
-                      {item.type === 'case' && <CaseIcon width={22} height={25} />}
-                      {item.type === 'visual' && <MediaIcon width={22} height={22} />}
-                      {item.type === 'business-intelligence' && <BusinessIntelligenceIcon width={25} height={25} />}
-                    </div>
-
-                    <div className="min-w-0">
-                      <div className="flex items-center gap-2">
-                      <span
-                          className={`h-1.5 w-1.5 rounded-full ${
-                            isRTL ? 'bg-gradient-to-l from-blue-500 to-teal-400' : 'bg-gradient-to-r from-blue-500 to-teal-400'
-                          }`}
-                        />
-                        <h3 className="text-base md:text-lg font-semibold text-gray-900">{item.title}</h3>
-                        
-                      </div>
-                      <p className="mt-2 text-sm md:text-[15px] leading-relaxed text-gray-600">{item.description}</p>
-                    </div>
-                  </div>
-
-             
-                </div>
-              ))}
+        <div className="relative z-10 mx-auto max-w-7xl px-4 sm:px-6">
+          {/* Main Content */}
+          <div className={`max-w-5xl px-8 sm:px-16  space-y-6 md:space-y-8 ${isRTL ? 'text-right' : 'text-left'}`}>
+            <div className="prose prose-lg max-w-none">
+              <div className={`text-gray-700 text-base md:text-lg lg:text-xl leading-relaxed ${isRTL ? 'text-right' : 'text-left'}`}>
+                {locale === 'ar' ? (
+                  <>
+                    <span>لا تقتصر المنصة على أبحاث السوق فقط، بل تشمل:</span>
+                  </>
+                ) : (
+                  <>
+                    <span>
+                      Insighta is not limited to market research. It includes a wide range of professional knowledge content such as
+                      reports, insights, data, guides, and courses for teams and professionals.
+                    </span>
+                  </>
+                )}
+              </div>
             </div>
 
-            {/* Tip / Next step */}
-            {/* <div className="mt-10 md:mt-12">
-              <div
-                className={`bg-white border border-gray-300 rounded-md overflow-hidden relative ${isRTL ? 'pl-0 pr-4' : 'pl-4 pr-0'}`}
-                style={{
-                  borderLeft: isRTL ? '1px solid #d1d5db' : '4px solid #2563eb',
-                  borderRight: isRTL ? '4px solid #2563eb' : '1px solid #d1d5db',
-                  borderTop: '1px solid #d1d5db',
-                  borderBottom: '1px solid #d1d5db',
-                }}
-              >
-                <div className="p-4 md:p-5">
-                  <p className={`text-gray-700 text-sm md:text-base leading-relaxed ${isRTL ? 'text-right' : 'text-left'}`}>
-                    {locale === 'ar' ? (
-                      <>
-                        نصيحة: ابدأ بالمحتوى الأقرب لاحتياجك (رؤى سريعة أو دليل تشغيل)، ثم انتقل إلى التقارير والبيانات لتعميق القرار.
-                      </>
-                    ) : (
-                      <>
-                        Tip: Start with what matches your need (quick insights or a practical guide), then move to reports and data to go deeper.
-                      </>
-                    )}
-                  </p>
-                </div>
+            {/* Content */}
+            <div className="pb-10 md:pb-14">
+              <div className="grid gap-4 sm:gap-5 md:grid-cols-2 lg:grid-cols-3">
+                {contentTypes.map((item) => (
+                  <div
+                    key={item.key}
+                    className="group rounded-xl border border-gray-200 bg-white/70 backdrop-blur-sm min-h-[170px] px-5 py-5 md:px-6 md:py-6 transition-colors hover:bg-white"
+                  >
+                    <div className="flex items-start gap-4">
+                      <div className="mt-1">
+                        {item.type === 'report' && <ReportIcon width={22} height={22} />}
+                        {item.type === 'manual' && <ManualIcon width={22} height={22} />}
+                        {item.type === 'statistic' && <InsightIcon width={22} height={22} />}
+                        {item.type === 'data' && <DataIcon width={22} height={22} />}
+                        {item.type === 'course' && <CourseIcon width={22} height={22} />}
+                        {item.type === 'case' && <CaseIcon width={22} height={25} />}
+                        {item.type === 'visual' && <MediaIcon width={22} height={22} />}
+                        {item.type === 'business-intelligence' && <BusinessIntelligenceIcon width={25} height={25} />}
+                      </div>
+
+                      <div className="min-w-0">
+                        <div className="flex items-center gap-2">
+                          <span
+                            className={`h-1.5 w-1.5 rounded-full ${
+                              isRTL ? 'bg-gradient-to-l from-blue-500 to-teal-400' : 'bg-gradient-to-r from-blue-500 to-teal-400'
+                            }`}
+                          />
+                          <h3 className="text-base md:text-lg font-semibold text-gray-900">{item.title}</h3>
+                        </div>
+                        <p className="mt-2 text-sm md:text-[15px] leading-relaxed text-gray-600">{item.description}</p>
+                      </div>
+                    </div>
+                  </div>
+                ))}
               </div>
-            </div> */}
+
+              {/* Tip / Next step */}
+              {/* <div className="mt-10 md:mt-12">
+                <div
+                  className={`bg-white border border-gray-300 rounded-md overflow-hidden relative ${isRTL ? 'pl-0 pr-4' : 'pl-4 pr-0'}`}
+                  style={{
+                    borderLeft: isRTL ? '1px solid #d1d5db' : '4px solid #2563eb',
+                    borderRight: isRTL ? '4px solid #2563eb' : '1px solid #d1d5db',
+                    borderTop: '1px solid #d1d5db',
+                    borderBottom: '1px solid #d1d5db',
+                  }}
+                >
+                  <div className="p-4 md:p-5">
+                    <p className={`text-gray-700 text-sm md:text-base leading-relaxed ${isRTL ? 'text-right' : 'text-left'}`}>
+                      {locale === 'ar' ? (
+                        <>
+                          نصيحة: ابدأ بالمحتوى الأقرب لاحتياجك (رؤى سريعة أو دليل تشغيل)، ثم انتقل إلى التقارير والبيانات لتعميق القرار.
+                        </>
+                      ) : (
+                        <>
+                          Tip: Start with what matches your need (quick insights or a practical guide), then move to reports and data to go
+                          deeper.
+                        </>
+                      )}
+                    </p>
+                  </div>
+                </div>
+              </div> */}
+            </div>
           </div>
         </div>
       </div>

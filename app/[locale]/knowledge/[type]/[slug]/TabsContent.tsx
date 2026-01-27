@@ -102,7 +102,7 @@ export default function TabsContent({ knowledge, knowledgeSlug }: { knowledge: K
       }
 
       const response = await fetch(
-        `https://api.foresighta.co/api/platform/industries/knowledge/${knowledgeSlug}`,
+        `https://api.insightabusiness.com/api/platform/industries/knowledge/${knowledgeSlug}`,
         {
           method: "GET",
           headers,

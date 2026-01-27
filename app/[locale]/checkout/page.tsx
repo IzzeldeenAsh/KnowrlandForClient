@@ -253,7 +253,7 @@ export default function CheckoutPage() {
         const token = getAuthToken();
 
         const response = await fetch(
-          `https://api.foresighta.co/api/platform/industries/knowledge/${slug}`,
+          `https://api.insightabusiness.com/api/platform/industries/knowledge/${slug}`,
           {
             headers: {
               "Content-Type": "application/json",
@@ -299,7 +299,7 @@ export default function CheckoutPage() {
         if (!token) return;
 
         const response = await fetch(
-          "https://api.foresighta.co/api/account/wallet/balance",
+          "https://api.insightabusiness.com/api/account/wallet/balance",
           {
             headers: {
               "Content-Type": "application/json",
@@ -345,7 +345,7 @@ export default function CheckoutPage() {
       try {
         setCountriesLoading(true);
         const res = await fetch(
-          "https://api.foresighta.co/api/common/setting/country/list",
+          "https://api.insightabusiness.com/api/common/setting/country/list",
           {
             headers: {
               "Content-Type": "application/json",
@@ -462,7 +462,7 @@ export default function CheckoutPage() {
       setIsFetchingDownloadIds(true);
       const token = getAuthToken();
       const response = await fetch(
-        `https://api.foresighta.co/api/account/order/knowledge/${uuid}`,
+        `https://api.insightabusiness.com/api/account/order/knowledge/${uuid}`,
         {
           headers: {
             "Content-Type": "application/json",
@@ -588,7 +588,7 @@ export default function CheckoutPage() {
         };
 
         const response = await fetch(
-          "https://api.foresighta.co/api/platform/guest/order/knowledge/checkout",
+          "https://api.insightabusiness.com/api/platform/guest/order/knowledge/checkout",
           {
             method: "POST",
             headers: {
@@ -625,6 +625,25 @@ export default function CheckoutPage() {
         }
 
         localStorage.setItem("guest-token", guestToken);
+        try {
+          const docsSummary = (knowledge?.documents || [])
+            .filter((d) => selectedDocuments.includes(d.id))
+            .map((d) => ({
+              id: d.id,
+              file_name: d.file_name,
+              file_extension: d.file_extension,
+              price: parseFloat(d.price),
+            }));
+          localStorage.setItem(
+            `guest-knowledge-order-summary:${order_uuid}`,
+            JSON.stringify({
+              title: knowledge?.title || "Knowledge Purchase",
+              documents: docsSummary,
+            })
+          );
+        } catch (e) {
+          console.warn("Failed to store guest order summary", e);
+        }
 
         const paymentParams = new URLSearchParams({
           client_secret,
@@ -646,7 +665,7 @@ export default function CheckoutPage() {
       };
 
       const response = await fetch(
-        "https://api.foresighta.co/api/account/order/knowledge/checkout",
+        "https://api.insightabusiness.com/api/account/order/knowledge/checkout",
         {
           method: "POST",
           headers: {
@@ -716,6 +735,28 @@ export default function CheckoutPage() {
         console.log('Client secret:', client_secret, 'Order UUID:', order_uuid); // Debug log
         
         if (client_secret && order_uuid) {
+          // Store selected documents summary so Stripe page can always render order summary
+          // (API order details may not include documents immediately).
+          try {
+            const docsSummary = (knowledge?.documents || [])
+              .filter((d) => selectedDocuments.includes(d.id))
+              .map((d) => ({
+                id: d.id,
+                file_name: d.file_name,
+                file_extension: d.file_extension,
+                price: parseFloat(d.price),
+              }));
+            localStorage.setItem(
+              `knowledge-order-summary:${order_uuid}`,
+              JSON.stringify({
+                title: knowledge?.title || "Knowledge Purchase",
+                documents: docsSummary,
+              })
+            );
+          } catch (e) {
+            console.warn("Failed to store order summary", e);
+          }
+
           // Redirect to Stripe payment page with necessary data
           const paymentParams = new URLSearchParams({
             client_secret,
@@ -863,14 +904,14 @@ export default function CheckoutPage() {
                     if (knowledgeDownloadId) {
                       const uuidsParam = `?uuids=${knowledgeDownloadId}`;
                       console.log('Redirecting with UUID:', uuidsParam); // Debug log
-                      window.location.href = `http://localhost:4200/app/insighter-dashboard/my-downloads${uuidsParam}`;
+                      window.location.href = `https://app.insightabusiness.com/app/insighter-dashboard/my-downloads${uuidsParam}`;
                     } else {
                       console.log('No UUID available, falling back to search'); // Debug log
                       // Fallback to title search if no UUID available
                       const searchTitle = knowledge?.title || "";
                       const searchParam = searchTitle ? `?search=${encodeURIComponent(searchTitle)}` : "";
                       console.log('Redirecting with search:', searchParam); // Debug log
-                      window.location.href = `http://localhost:4200/app/insighter-dashboard/my-downloads${searchParam}`;
+                      window.location.href = `https://app.insightabusiness.com/app/insighter-dashboard/my-downloads${searchParam}`;
                     }
                   }}
                 >

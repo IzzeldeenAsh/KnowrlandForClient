@@ -32,7 +32,7 @@ const nextConfig: NextConfig = {
               "img-src 'self' data: https: blob:",
               "font-src 'self' data: https://fonts.gstatic.com",
               // Allow Pusher (HTTPS + WSS) and backend API
-              "connect-src 'self' https://www.google-analytics.com https://www.googletagmanager.com https://api.foresighta.co https://api.foresighta.com https://api.stripe.com https://*.pusher.com wss://*.pusher.com https://sockjs-eu.pusher.com",
+              "connect-src 'self' https://www.google-analytics.com https://www.googletagmanager.com https://api.insightabusiness.com https://api.insightabusiness.comm https://api.stripe.com https://*.pusher.com wss://*.pusher.com https://sockjs-eu.pusher.com",
               "frame-src https://js.stripe.com https://hooks.stripe.com",
               "frame-ancestors 'none'",
               "base-uri 'self'",

@@ -424,7 +424,7 @@ export default function NotificationsInner({
       // Compute destination
       // Case 1: Knowledge page opens in new tab (must be synchronous to keep user gesture)
       if (notification.type === 'knowledge' && notification.category) {
-        const knowledgeUrl = `http://localhost:3000/${currentLanguage}/knowledge/${notification.category}/${notification.param || ''}?tab=ask`
+        const knowledgeUrl = `https://insightabusiness.com/${currentLanguage}/knowledge/${notification.category}/${notification.param || ''}?tab=ask`
         const win = window.open(knowledgeUrl, '_blank', 'noopener,noreferrer')
         if (win) win.opener = null
         // Fire-and-forget mark-as-read
@@ -435,33 +435,33 @@ export default function NotificationsInner({
       // Case 2: Compute single-page redirects
       let url: string | null = null
       if (notification.type === 'order') {
-        url = 'http://localhost:4200/app/insighter-dashboard/sales?tab=2'
+        url = 'https://app.insightabusiness.com/app/insighter-dashboard/sales?tab=2'
       } else if (notification.sub_type.startsWith('client_meeting_reminder')) {
-        url = 'http://localhost:4200/app/insighter-dashboard/my-meetings?tab=client'
+        url = 'https://app.insightabusiness.com/app/insighter-dashboard/my-meetings?tab=client'
       } else if (notification.sub_type === 'accept_knowledge') {
-        url = 'http://localhost:4200/app/insighter-dashboard/my-requests'
+        url = 'https://app.insightabusiness.com/app/insighter-dashboard/my-requests'
       } else if (notification.sub_type === 'client_meeting_new') {
-        url = 'http://localhost:4200/app/insighter-dashboard/my-meetings?tab=client'
+        url = 'https://app.insightabusiness.com/app/insighter-dashboard/my-meetings?tab=client'
       } else if (notification.sub_type === 'declined' && notification.type === 'knowledge') {
-        url = `http://localhost:4200/app/my-knowledge-base/view-my-knowledge/${notification.param}/details`
+        url = `https://app.insightabusiness.com/app/my-knowledge-base/view-my-knowledge/${notification.param}/details`
       } else if (notification.sub_type.startsWith('client_')) {
-        url = 'http://localhost:4200/app/insighter-dashboard/my-meetings?tab=client'
+        url = 'https://app.insightabusiness.com/app/insighter-dashboard/my-meetings?tab=client'
       } else if (notification.sub_type.startsWith('insighter_')) {
-        url = 'http://localhost:4200/app/insighter-dashboard/my-meetings?tab=client'
+        url = 'https://app.insightabusiness.com/app/insighter-dashboard/my-meetings?tab=client'
       } else if (notification.type === 'knowledge' && notification.sub_type === 'approved') {
-        url = `http://localhost:4200/app/my-knowledge-base/view-my-knowledge/${notification.param}/details`
+        url = `https://app.insightabusiness.com/app/my-knowledge-base/view-my-knowledge/${notification.param}/details`
       } else if (notification.sub_type.startsWith('client_meeting_insighter_postponed')) {
-        url = 'http://localhost:4200/app/insighter-dashboard/my-meetings/sent'
+        url = 'https://app.insightabusiness.com/app/insighter-dashboard/my-meetings/sent'
       } else if (notification.sub_type.startsWith('client_meeting_reschedule')) {
-        url = 'http://localhost:4200/app/insighter-dashboard/my-meetings/sent'
+        url = 'https://app.insightabusiness.com/app/insighter-dashboard/my-meetings/sent'
       } else if (notification.sub_type.startsWith('insighter_meeting_client_reschedule')) {
-        url = 'http://localhost:4200/app/insighter-dashboard/my-meetings?tab=client'
+        url = 'https://app.insightabusiness.com/app/insighter-dashboard/my-meetings?tab=client'
       } else if (notification.sub_type.startsWith('insighter_meeting_reminder')) {
-        url = 'http://localhost:4200/app/insighter-dashboard/my-meetings?tab=client'
+        url = 'https://app.insightabusiness.com/app/insighter-dashboard/my-meetings?tab=client'
       }else if (notification.sub_type ==='activate_insighter') {
-        url = 'http://localhost:4200/app/profile/overview'
+        url = 'https://app.insightabusiness.com/app/profile/overview'
       }else if (notification.sub_type ==='deactivate_insighter') {
-        url = 'http://localhost:4200/app/profile/overview'
+        url = 'https://app.insightabusiness.com/app/profile/overview'
       }
 
       // Mark-as-read BEFORE redirect to avoid request being cancelled by navigation
