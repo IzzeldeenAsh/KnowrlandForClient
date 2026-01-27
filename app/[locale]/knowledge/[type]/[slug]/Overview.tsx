@@ -79,6 +79,8 @@ export default function Overview({ knowledge, knowledgeSlug }: OverviewProps) {
   const [buyModalOpened, setBuyModalOpened] = useState(false);
   const [selectedDocumentId, setSelectedDocumentId] = useState<number | undefined>(undefined);
   const [authModalOpened, setAuthModalOpened] = useState(false);
+  const [authModalGuestCheckoutUrl, setAuthModalGuestCheckoutUrl] = useState<string | null>(null);
+  const [authModalDisableGuestCheckout, setAuthModalDisableGuestCheckout] = useState(false);
 
   // Check if the current user is the owner of this knowledge
   const isOwner = user && knowledge.insighter?.uuid && user.uuid === knowledge.insighter.uuid;
@@ -109,22 +111,40 @@ export default function Overview({ knowledge, knowledgeSlug }: OverviewProps) {
   };
 
   const handleBuyClick = (documentId: number) => {
-    if (!isUserLoggedIn()) {
-      setAuthModalOpened(true);
-      return;
-    }
-
     // Find the specific document
     const selectedDoc = knowledge.documents.find(doc => doc.id === documentId);
+    const isLoggedIn = isUserLoggedIn();
+    const returnUrl = typeof window !== 'undefined' ? window.location.href : '';
 
     // Check if this document is free
     if (selectedDoc && parseFloat(selectedDoc.price) === 0) {
+      // Guests must login to download free documents
+      if (!isLoggedIn) {
+        setAuthModalGuestCheckoutUrl(null);
+        setAuthModalDisableGuestCheckout(true);
+        setAuthModalOpened(true);
+        return;
+      }
+
       // Skip modal and go directly to checkout for free document
       const queryParams = new URLSearchParams({
         slug: knowledgeSlug,
         documents: documentId.toString(),
       });
       router.push(`/${locale}/checkout?${queryParams.toString()}`);
+      return;
+    }
+
+    // Guest: allow paid documents checkout without login
+    if (!isLoggedIn) {
+      const queryParams = new URLSearchParams({
+        slug: knowledgeSlug,
+        documents: documentId.toString(),
+        returnUrl,
+      });
+      setAuthModalGuestCheckoutUrl(`/${locale}/checkout?${queryParams.toString()}`);
+      setAuthModalDisableGuestCheckout(false);
+      setAuthModalOpened(true);
       return;
     }
 
@@ -401,8 +421,14 @@ export default function Overview({ knowledge, knowledgeSlug }: OverviewProps) {
       {/* Auth Modal */}
       <AuthModal
         opened={authModalOpened}
-        onClose={() => setAuthModalOpened(false)}
+        onClose={() => {
+          setAuthModalOpened(false);
+          setAuthModalGuestCheckoutUrl(null);
+          setAuthModalDisableGuestCheckout(false);
+        }}
         locale={locale as string}
+        guestCheckoutUrl={authModalGuestCheckoutUrl}
+        disableGuestCheckout={authModalDisableGuestCheckout}
       />
     </div>
   )

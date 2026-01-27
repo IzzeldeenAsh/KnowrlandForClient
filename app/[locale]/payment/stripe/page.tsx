@@ -38,6 +38,18 @@ interface KnowledgeDocument {
   price: number;
 }
 
+interface GuestOrderSummary {
+  title: string;
+  documents: Array<{
+    id: number;
+    file_name: string;
+    file_extension: string;
+    price: number;
+  }>;
+}
+
+type StoredOrderSummary = GuestOrderSummary;
+
 interface Knowledge {
   type: string;
   title: string;
@@ -64,11 +76,14 @@ interface PaymentFormProps {
   title: string;
   locale: string;
   isRTL: boolean;
+  isGuest: boolean;
   orderDetails: OrderDetails | null;
+  guestSummary: GuestOrderSummary | null;
+  storedSummary: StoredOrderSummary | null;
   setOrderDetails: (details: OrderDetails) => void;
 }
 
-function PaymentForm({ orderUuid, amount, title, locale, isRTL, orderDetails, setOrderDetails }: PaymentFormProps) {
+function PaymentForm({ orderUuid, amount, title, locale, isRTL, isGuest, orderDetails, guestSummary, storedSummary, setOrderDetails }: PaymentFormProps) {
   const stripe = useStripe();
   const elements = useElements();
   const [isProcessing, setIsProcessing] = useState(false);
@@ -91,9 +106,55 @@ function PaymentForm({ orderUuid, amount, title, locale, isRTL, orderDetails, se
     return token;
   };
 
+  const getGuestToken = () => {
+    if (typeof window === "undefined") return null;
+    return localStorage.getItem("guest-token");
+  };
+
+  const triggerGuestDownload = useCallback(async () => {
+    const guestToken = getGuestToken();
+    if (!guestToken) {
+      throw new Error("Missing guest token");
+    }
+
+    const response = await fetch(
+      `https://api.insightabusiness.com/api/platform/guest/order/knowledge/download/${orderUuid}`,
+      {
+        method: "POST",
+        headers: {
+          Accept: "application/json",
+          "Accept-Language": locale,
+          "X-Timezone": Intl.DateTimeFormat().resolvedOptions().timeZone,
+          "X-GUEST-TOKEN": guestToken,
+        },
+      }
+    );
+
+    if (!response.ok) {
+      throw new Error(`Download failed: ${response.status}`);
+    }
+
+    const blob = await response.blob();
+    const cd = response.headers.get("content-disposition") || "";
+    const match = cd.match(/filename\*?=(?:UTF-8''|")?([^\";]+)"?/i);
+    const filename = match?.[1]
+      ? decodeURIComponent(match[1])
+      : `${title || "download"}.zip`;
+
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    window.URL.revokeObjectURL(url);
+  }, [locale, orderUuid, title]);
+
   // Fetch updated order details to get knowledge_download_id
   const fetchUpdatedOrderDetails = useCallback(async (uuid: string, setOrderDetails: (details: OrderDetails) => void) => {
     try {
+      if (isGuest) return null;
       setIsFetchingDownloadIds(true);
       const token = getAuthToken();
       const response = await fetch(
@@ -122,7 +183,7 @@ function PaymentForm({ orderUuid, amount, title, locale, isRTL, orderDetails, se
       setIsFetchingDownloadIds(false);
     }
     return null;
-  }, [locale]);
+  }, [isGuest, locale]);
 
   // Translations
   const translations = {
@@ -134,6 +195,8 @@ function PaymentForm({ orderUuid, amount, title, locale, isRTL, orderDetails, se
     paymentSuccess: isRTL ? "تم الدفع بنجاح!" : "Payment Successful!",
     redirecting: isRTL ? "جاري التوجيه إلى التنزيلات..." : "Redirecting to downloads...",
     goToDownloads: isRTL ? "الذهاب إلى التنزيلات" : "Go to Downloads",
+    downloadNow: isRTL ? "تحميل الآن" : "Download",
+    redownload: isRTL ? "إعادة التحميل" : "Redownload",
     paymentFailed: isRTL ? "فشل الدفع" : "Payment Failed",
     tryAgain: isRTL ? "حاول مرة أخرى" : "Try Again",
     preparingDownloads: isRTL ? "جاري تجهيز التنزيلات..." : "Preparing your downloads...",
@@ -144,9 +207,26 @@ function PaymentForm({ orderUuid, amount, title, locale, isRTL, orderDetails, se
     securityNote: isRTL ? "معلومات بطاقتك آمنة ولن يتم حفظها" : "Your card information is secure and will not be saved",
   };
 
+  const orderTitle = (isGuest ? guestSummary?.title : storedSummary?.title) || title;
+  const apiDocs = !isGuest ? (orderDetails?.orderable?.knowledge_documents || []).flat() : [];
+  const fallbackDocs = (isGuest ? guestSummary?.documents : storedSummary?.documents) || [];
+  const docsToRender =
+    apiDocs.length > 0
+      ? apiDocs.map((d, idx) => ({
+          key: `api-${idx}-${d.file_name}`,
+          file_name: d.file_name,
+          file_extension: d.file_extension,
+          price: d.price,
+        }))
+      : fallbackDocs.map((d) => ({
+          key: `cached-${d.id}-${d.file_name}`,
+          file_name: d.file_name,
+          file_extension: d.file_extension,
+          price: d.price,
+        }));
+
   // Poll order status
   const pollOrderStatus = useCallback(async () => {
-    const token = getAuthToken();
     let attempts = 0;
     const maxAttempts = 18; // ~2 minutes with progressive delays
     setPollAttemptsEnded(false);
@@ -160,6 +240,30 @@ function PaymentForm({ orderUuid, amount, title, locale, isRTL, orderDetails, se
 
     const checkStatus = async (): Promise<boolean> => {
       try {
+        if (isGuest) {
+          const guestToken = getGuestToken();
+          if (!guestToken) return false;
+
+          const response = await fetch(
+            `https://api.insightabusiness.com/api/platform/guest/order/knowledge/check-payment-succeeded/${orderUuid}`,
+            {
+              method: "POST",
+              headers: {
+                Accept: "application/json",
+                "Accept-Language": locale,
+                "X-Timezone": Intl.DateTimeFormat().resolvedOptions().timeZone,
+                "X-GUEST-TOKEN": guestToken,
+              },
+            }
+          );
+
+          if (response.status === 204) {
+            return true;
+          }
+          return false;
+        }
+
+        const token = getAuthToken();
         const response = await fetch(
           `https://api.insightabusiness.com/api/account/order/knowledge/${orderUuid}`,
           {
@@ -178,12 +282,7 @@ function PaymentForm({ orderUuid, amount, title, locale, isRTL, orderDetails, se
         }
 
         const data = await response.json();
-        
-        if (data.data?.status === "paid") {
-          return true;
-        }
-        
-        return false;
+        return data.data?.status === "paid";
       } catch (error) {
         console.error("Error checking order status:", error);
         return false;
@@ -196,6 +295,13 @@ function PaymentForm({ orderUuid, amount, title, locale, isRTL, orderDetails, se
       const isPaid = await checkStatus();
       
       if (isPaid) {
+        if (isGuest) {
+          try {
+            await triggerGuestDownload();
+          } catch (e) {
+            console.error(e);
+          }
+        }
         setPaymentStatus("success");
         return true;
       }
@@ -209,7 +315,7 @@ function PaymentForm({ orderUuid, amount, title, locale, isRTL, orderDetails, se
     setErrorMessage("Payment verification timed out");
     setPollAttemptsEnded(true);
     return false;
-  }, [orderUuid, locale]);
+  }, [isGuest, locale, orderUuid, triggerGuestDownload]);
 
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
@@ -274,6 +380,43 @@ function PaymentForm({ orderUuid, amount, title, locale, isRTL, orderDetails, se
     setErrorMessage("");
     setShowInlineError(false);
     try {
+      if (isGuest) {
+        const guestToken = getGuestToken();
+        if (!guestToken) {
+          setPaymentStatus("error");
+          setErrorMessage(isRTL ? "رمز الضيف غير موجود." : "Guest token is missing.");
+          return;
+        }
+        const response = await fetch(
+          `https://api.insightabusiness.com/api/platform/guest/order/knowledge/check-payment-succeeded/${orderUuid}`,
+          {
+            method: "POST",
+            headers: {
+              Accept: "application/json",
+              "Accept-Language": locale,
+              "X-Timezone": Intl.DateTimeFormat().resolvedOptions().timeZone,
+              "X-GUEST-TOKEN": guestToken,
+            },
+          }
+        );
+        if (response.status === 204) {
+          try {
+            await triggerGuestDownload();
+          } catch (e) {
+            console.error(e);
+          }
+          setPaymentStatus("success");
+          return;
+        }
+        setPaymentStatus("error");
+        setErrorMessage(
+          isRTL
+            ? "لم يتم تأكيد الدفع بعد. يرجى المحاولة لاحقًا."
+            : "Payment could not be verified. Please try again later."
+        );
+        return;
+      }
+
       const token = getAuthToken();
       const response = await fetch(
         `https://api.insightabusiness.com/api/account/order/knowledge/check-payment-succeeded/${orderUuid}`,
@@ -322,6 +465,13 @@ function PaymentForm({ orderUuid, amount, title, locale, isRTL, orderDetails, se
   // Handle download progress animation when payment succeeds
   useEffect(() => {
     if (paymentStatus === "success") {
+      // Guest purchases: skip the "preparing downloads" animation and show the action button immediately
+      if (isGuest) {
+        setDownloadProgress(100);
+        setShowDocumentsAdded(true);
+        return;
+      }
+
       // Animate progress bar over 5 seconds
       const duration = 5000;
       const interval = 50;
@@ -335,8 +485,10 @@ function PaymentForm({ orderUuid, amount, title, locale, isRTL, orderDetails, se
             setTimeout(async () => {
               setShowDocumentsAdded(true);
               // Recall the API to get updated knowledge_download_id after documents are processed
-              console.log('Documents processed, fetching updated order details...'); // Debug log
-              await fetchUpdatedOrderDetails(orderUuid, setOrderDetails);
+              if (!isGuest) {
+                console.log('Documents processed, fetching updated order details...'); // Debug log
+                await fetchUpdatedOrderDetails(orderUuid, setOrderDetails);
+              }
             }, 300);
             return 100;
           }
@@ -346,7 +498,7 @@ function PaymentForm({ orderUuid, amount, title, locale, isRTL, orderDetails, se
 
       return () => clearInterval(timer);
     }
-  }, [paymentStatus, orderUuid, fetchUpdatedOrderDetails, setOrderDetails]);
+  }, [paymentStatus, orderUuid, fetchUpdatedOrderDetails, isGuest, setOrderDetails]);
 
   // Success UI
   if (paymentStatus === "success") {
@@ -382,39 +534,45 @@ function PaymentForm({ orderUuid, amount, title, locale, isRTL, orderDetails, se
           {translations.accessGranted}
         </p>
         
-        {/* Progress section */}
-        <div className={`mb-8 ${styles.progressSection}`}>
-          {!showDocumentsAdded ? (
-            <div className="space-y-4">
-              <Text size="sm" c="dimmed" fw={500}>{translations.preparingDownloads}</Text>
-              <Progress 
-                value={downloadProgress} 
-                size="xl" 
-                radius="xl"
-                color="teal"
-                striped
-                animated={downloadProgress < 100}
-              />
-            </div>
-          ) : (
-            <div className={styles.documentsAddedText}>
-              <div className="flex items-center justify-center gap-2 mb-2">
-                <IconCheck size={20} className="text-emerald-600" />
-                <Text size="md" fw={600} className="text-gray-700">
-                  {translations.documentsAdded}
-                </Text>
+        {/* Progress section (non-guest only) */}
+        {!isGuest && (
+          <div className={`mb-8 ${styles.progressSection}`}>
+            {!showDocumentsAdded ? (
+              <div className="space-y-4">
+                <Text size="sm" c="dimmed" fw={500}>{translations.preparingDownloads}</Text>
+                <Progress 
+                  value={downloadProgress} 
+                  size="xl" 
+                  radius="xl"
+                  color="teal"
+                  striped
+                  animated={downloadProgress < 100}
+                />
               </div>
-            </div>
-          )}
-        </div>
+            ) : (
+              <div className={styles.documentsAddedText}>
+                <div className="flex items-center justify-center gap-2 mb-2">
+                  <IconCheck size={20} className="text-emerald-600" />
+                  <Text size="md" fw={600} className="text-gray-700">
+                    {translations.documentsAdded}
+                  </Text>
+                </div>
+              </div>
+            )}
+          </div>
+        )}
 
-        {showDocumentsAdded && (
+        {(isGuest || showDocumentsAdded) && (
           <Button
             size="md"
             className={`bg-gradient-to-r from-blue-500 to-teal-400 hover:from-blue-600 hover:to-teal-500 transition-all ${styles.downloadButton}`}
             loading={isFetchingDownloadIds}
             disabled={isFetchingDownloadIds}
             onClick={() => {
+              if (isGuest) {
+                triggerGuestDownload().catch((e) => console.error(e));
+                return;
+              }
               console.log('Download button clicked. Order details:', orderDetails); // Debug log
               // Use knowledge_download_id if available, otherwise fall back to title search
               if (orderDetails?.knowledge_download_id) {
@@ -433,7 +591,7 @@ function PaymentForm({ orderUuid, amount, title, locale, isRTL, orderDetails, se
           >
             {isFetchingDownloadIds
               ? (isRTL ? "جاري التحديث..." : "Updating...")
-              : translations.goToDownloads}
+              : (isGuest ? translations.redownload : translations.goToDownloads)}
           </Button>
         )}
       </div>
@@ -485,15 +643,15 @@ function PaymentForm({ orderUuid, amount, title, locale, isRTL, orderDetails, se
           </Text>
           <Stack gap="sm">
             <Group justify="space-between">
-              <Text>{title}</Text>
+              <Text>{orderTitle}</Text>
             </Group>
             
-            {/* Display ordered files */}
-            {orderDetails && orderDetails.orderable && orderDetails.orderable.knowledge_documents && (
+            {/* Display ordered files (API first; localStorage fallback) */}
+            {docsToRender.length > 0 ? (
               <div className="mt-2">
-                <div className="flex flex-col  flex-wrap gap-3">
-                  {orderDetails.orderable.knowledge_documents.flat().map((doc, docIndex) => (
-                    <div key={docIndex} className="flex items-center gap-2 bg-gray-50 rounded-md px-3 py-2">
+                <div className="flex flex-col flex-wrap gap-3">
+                  {docsToRender.map((doc) => (
+                    <div key={doc.key} className="flex items-center gap-2 bg-gray-50 rounded-md px-3 py-2">
                       <Image
                         src={getFileIconByExtension(doc.file_extension)}
                         alt={`${doc.file_extension.toUpperCase()} file`}
@@ -510,7 +668,7 @@ function PaymentForm({ orderUuid, amount, title, locale, isRTL, orderDetails, se
                   ))}
                 </div>
               </div>
-            )}
+            ) : null}
             
             <Group justify="space-between" className="mt-3">
               <Text fw={600}>Total</Text>
@@ -589,8 +747,11 @@ export default function StripePaymentPage() {
   const orderUuid = searchParams.get("order_uuid") || "";
   const amount = searchParams.get("amount") || "0";
   const title = searchParams.get("title") || "";
+  const isGuest = searchParams.get("guest") === "1";
   
   const [orderDetails, setOrderDetails] = useState<OrderDetails | null>(null);
+  const [guestSummary, setGuestSummary] = useState<GuestOrderSummary | null>(null);
+  const [storedSummary, setStoredSummary] = useState<StoredOrderSummary | null>(null);
 
   // Get auth token from cookies
   const getAuthToken = () => {
@@ -605,6 +766,7 @@ export default function StripePaymentPage() {
   useEffect(() => {
     const fetchOrderDetails = async () => {
       if (!orderUuid) return;
+      if (isGuest) return;
       
       try {
         const token = getAuthToken();
@@ -632,7 +794,39 @@ export default function StripePaymentPage() {
     };
 
     fetchOrderDetails();
-  }, [orderUuid, locale]);
+  }, [isGuest, orderUuid, locale]);
+
+  // Guest: load summary from localStorage
+  useEffect(() => {
+    if (!isGuest) return;
+    if (!orderUuid) return;
+    try {
+      const raw = localStorage.getItem(`guest-knowledge-order-summary:${orderUuid}`);
+      if (!raw) return;
+      const parsed = JSON.parse(raw);
+      if (parsed && Array.isArray(parsed.documents)) {
+        setGuestSummary(parsed);
+      }
+    } catch (e) {
+      console.warn("Failed to load guest order summary", e);
+    }
+  }, [isGuest, orderUuid]);
+
+  // Logged-in: load selected-documents summary from localStorage (fallback for order summary rendering)
+  useEffect(() => {
+    if (isGuest) return;
+    if (!orderUuid) return;
+    try {
+      const raw = localStorage.getItem(`knowledge-order-summary:${orderUuid}`);
+      if (!raw) return;
+      const parsed = JSON.parse(raw);
+      if (parsed && Array.isArray(parsed.documents)) {
+        setStoredSummary(parsed);
+      }
+    } catch (e) {
+      console.warn("Failed to load order summary", e);
+    }
+  }, [isGuest, orderUuid]);
 
   // Redirect if missing required params
   useEffect(() => {
@@ -674,7 +868,10 @@ export default function StripePaymentPage() {
                 title={title}
                 locale={locale}
                 isRTL={isRTL}
+                isGuest={isGuest}
                 orderDetails={orderDetails}
+                guestSummary={guestSummary}
+                storedSummary={storedSummary}
                 setOrderDetails={setOrderDetails}
               />
             </Elements>

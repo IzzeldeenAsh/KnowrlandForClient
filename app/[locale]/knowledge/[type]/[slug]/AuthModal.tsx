@@ -9,10 +9,38 @@ interface AuthModalProps {
   opened: boolean;
   onClose: () => void;
   locale?: string | string[];
+  guestCheckoutUrl?: string | null;
+  disableGuestCheckout?: boolean;
 }
 
-const AuthModal: React.FC<AuthModalProps> = ({ opened, onClose, locale }) => {
+// Helper function to get the Angular app URL based on current domain
+const getAngularAppUrl = (): string => {
+  if (typeof window === 'undefined') return 'https://app.insightabusiness.com';
+
+  const hostname = window.location.hostname;
+  const protocol = window.location.protocol;
+
+  // Production domains
+  if (hostname.includes('foresighta.co')) {
+    return `${protocol}//app.insightabusiness.com`;
+  }
+  if (hostname.includes('insightabusiness.com')) {
+    return `${protocol}//app.insightabusiness.com`;
+  }
+
+  // Local development
+  return 'https://app.insightabusiness.com';
+};
+
+const AuthModal: React.FC<AuthModalProps> = ({
+  opened,
+  onClose,
+  locale,
+  guestCheckoutUrl = null,
+  disableGuestCheckout = false,
+}) => {
   const isRTL = locale === 'ar';
+  const angularAppUrl = getAngularAppUrl();
 
   const translations = {
     title: isRTL ? 'مطلوب تسجيل الدخول' : 'Login Required',
@@ -21,16 +49,23 @@ const AuthModal: React.FC<AuthModalProps> = ({ opened, onClose, locale }) => {
       : 'You are currently not logged in. Please sign up or log in to gain access to this feature.',
     signUp: isRTL ? 'إنشاء حساب جديد' : 'Sign Up',
     logIn: isRTL ? 'تسجيل الدخول' : 'Log In',
+    buyAsGuest: isRTL ? 'الشراء كضيف' : 'Buy as Guest',
     cancel: isRTL ? 'إلغاء' : 'Cancel'
   };
 
   const handleSignUp = () => {
-    window.location.href = 'https://app.insightabusiness.com/auth/sign-up';
+    const currentUrl = window.location.href;
+    window.location.href = `${angularAppUrl}/auth/sign-up?returnUrl=${encodeURIComponent(currentUrl)}`;
   };
 
   const handleLogIn = () => {
     const currentUrl = window.location.href;
-    window.location.href = `https://app.insightabusiness.com/auth/login?returnUrl=${encodeURIComponent(currentUrl)}`;
+    window.location.href = `${angularAppUrl}/auth/login?returnUrl=${encodeURIComponent(currentUrl)}`;
+  };
+
+  const handleBuyAsGuest = () => {
+    if (!guestCheckoutUrl || disableGuestCheckout) return;
+    window.location.href = guestCheckoutUrl;
   };
 
   return (
@@ -77,6 +112,18 @@ const AuthModal: React.FC<AuthModalProps> = ({ opened, onClose, locale }) => {
           >
             {translations.signUp}
           </Button>
+
+          {guestCheckoutUrl && (
+            <Button
+              onClick={handleBuyAsGuest}
+              variant="outline"
+              size="md"
+              fullWidth
+              disabled={disableGuestCheckout}
+            >
+              {translations.buyAsGuest}
+            </Button>
+          )}
         </Stack>
       </Stack>
     </Modal>

@@ -8,7 +8,6 @@ const LOCALES = ['en', 'ar'] as const;
 const STATIC_ROUTES = [
   '',
   '/about',
-  '/blog',
   '/contact',
   '/insighter',
   '/customers',
@@ -234,9 +233,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       
       if (route === '') {
         priority = 1.0;
-        changeFrequency = 'daily';
-      } else if (route === '/blog' || route === '/knowledges') {
-        priority = 0.9;
         changeFrequency = 'daily';
       } else if (route.startsWith('/legals') || route.startsWith('/resources')) {
         priority = 0.5;

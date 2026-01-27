@@ -146,7 +146,11 @@ export default function Reviews({ knowledgeSlug, reviews, is_review, is_owner, h
   // But only show the review form if token exists.
   const { postReview, loading, error: hookError, success } = useReview(knowledgeSlug);
   const [rate, setRate] = useState(0);
+  const [rateTouched, setRateTouched] = useState(false);
+  const [rateDirty, setRateDirty] = useState(false);
   const [comment, setComment] = useState("");
+  const [commentTouched, setCommentTouched] = useState(false);
+  const [commentDirty, setCommentDirty] = useState(false);
   const router = useRouter();
   const [submit, setSubmit] = useState(false);
   
@@ -237,13 +241,15 @@ export default function Reviews({ knowledgeSlug, reviews, is_review, is_owner, h
     }
     
     if (rate === 0) {
-      toast.error(isRTL ? "يرجى اختيار تقييم قبل الإرسال" : "Please select a rating before submitting");
+      setRateTouched(true);
+      setRateDirty(true);
       return;
     }
     
     // Add validation for empty comment
     if (!comment.trim()) {
-      toast.error(isRTL ? "يرجى كتابة تعليق قبل الإرسال" : "Please write a comment before submitting");
+      setCommentTouched(true);
+      setCommentDirty(true);
       return;
     }
     
@@ -314,6 +320,8 @@ export default function Reviews({ knowledgeSlug, reviews, is_review, is_owner, h
       setHasReviewed(true);
       setRate(0);
       setComment("");
+      setCommentTouched(false);
+      setCommentDirty(false);
 
       if (onRefreshData) {
         await onRefreshData();
@@ -387,6 +395,14 @@ export default function Reviews({ knowledgeSlug, reviews, is_review, is_owner, h
 
   // Determine which reviews to display - prioritize fresh data
   const displayReviews = localReviews && localReviews.length > 0 ? localReviews : reviews || [];
+  const rateError =
+    rateTouched && rateDirty && rate === 0
+      ? (isRTL ? "يرجى اختيار تقييم" : "Please select a rating")
+      : undefined;
+  const commentError =
+    commentTouched && commentDirty && !comment.trim()
+      ? translations.commentRequired
+      : undefined;
 
   return (
     <div dir={isRTL ? 'rtl' : 'ltr'}>
@@ -399,20 +415,51 @@ export default function Reviews({ knowledgeSlug, reviews, is_review, is_owner, h
                   <Text fw={500} fs="xs" mb={5} className={isRTL ? 'text-right' : 'text-start'}>
                     {translations.rateKnowledge}
                   </Text>
-                  <CustomRating
-                    value={rate}
-                    onChange={(value) => setRate(value)}
-                    isRTL={isRTL}
-                  />
+                  <div
+                    className={`rounded-md w-fit p-2 ${
+                      rateError ? "border-red-500 bg-red-50" : "border-gray-200 bg-white"
+                    }`}
+                  >
+                    <CustomRating
+                      value={rate}
+                      onChange={(value) => {
+                        setRate(value);
+                        setRateTouched(true);
+                        setRateDirty(true);
+                      }}
+                      isRTL={isRTL}
+                    />
+                  </div>
+                  {rateError && (
+                    <Text size="xs" c="red" mt={6} className={isRTL ? "text-right" : "text-start"}>
+                      {rateError}
+                    </Text>
+                  )}
                 </div>
                 <div>
                   <Textarea
                     placeholder={translations.writeReview}
                     value={comment}
-                    onChange={(e) => setComment(e.currentTarget.value)}
+                    
+                    error={commentError ? true : undefined}
+                    styles={{
+                      input: commentError
+                        ? { borderColor: "#ef4444", backgroundColor: "#fef2f2" }
+                        : undefined,
+                    }}
+                    onChange={(e) => {
+                      setComment(e.currentTarget.value);
+                      setCommentDirty(true);
+                    }}
+                    onBlur={() => setCommentTouched(true)}
                     autosize
                     minRows={3}
                   />
+                  {commentError && (
+                    <Text size="xs" c="red" mt={6} className={isRTL ? "text-right" : "text-start"}>
+                      {commentError}
+                    </Text>
+                  )}
                 </div>
               
                 <Button

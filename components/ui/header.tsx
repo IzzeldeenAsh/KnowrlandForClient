@@ -371,7 +371,7 @@ const { isLoading: isAppLoading, setIsLoading: setAppLoading } = useLoading();
       {/* Illustration */}
    
       
-      <div className="mx-auto px-2 sm:px-4 md:px-8 lg:px-12 max-w-full relative z-10">
+      <div className="mx-auto px-2 sm:px-4 md:px-8 lg:px-12 max-w-full relative z-100">
         <div className="flex items-center justify-between h-16 md:h-20 gap-1 md:gap-2">
 
           {/* Site branding */}

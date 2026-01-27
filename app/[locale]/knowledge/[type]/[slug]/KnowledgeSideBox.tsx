@@ -103,6 +103,8 @@ const KnowledgeSideBox = ({
   
   // Auth Modal state
   const [authModalOpened, setAuthModalOpened] = useState(false);
+  const [authModalGuestCheckoutUrl, setAuthModalGuestCheckoutUrl] = useState<string | null>(null);
+  const [authModalDisableGuestCheckout, setAuthModalDisableGuestCheckout] = useState(false);
 
   // Read Later state
   const [isReadLater, setIsReadLater] = useState(is_read_later || false);
@@ -142,13 +144,26 @@ const KnowledgeSideBox = ({
 
   // Handle buy/download click
   const handleBuyClick = () => {
-    if (!isUserLoggedIn()) {
+    // Check if all documents are free or if total price is 0
+    const areAllDocumentsFree = documents.every(doc => parseFloat(doc.price) === 0);
+    const isLoggedIn = isUserLoggedIn();
+    const returnUrl = typeof window !== 'undefined' ? window.location.href : '';
+
+    // Guest behavior:
+    // - If ALL documents are free => keep existing auth modal requirement
+    // - If there is any paid document => allow proceeding to checkout (free docs will be disabled there)
+    if (!isLoggedIn) {
+      const allDocumentIds = documents.map(doc => doc.id);
+      const queryParams = new URLSearchParams({
+        slug: knowledgeSlug || '',
+        documents: allDocumentIds.join(','),
+        returnUrl,
+      });
+      setAuthModalGuestCheckoutUrl(`/${currentLocale}/checkout?${queryParams.toString()}`);
+      setAuthModalDisableGuestCheckout(isFree || areAllDocumentsFree);
       setAuthModalOpened(true);
       return;
     }
-
-    // Check if all documents are free or if total price is 0
-    const areAllDocumentsFree = documents.every(doc => parseFloat(doc.price) === 0);
 
     if (isFree || areAllDocumentsFree) {
       // Skip modal and go directly to checkout for free documents
@@ -172,6 +187,8 @@ const KnowledgeSideBox = ({
     if (!knowledgeSlug) return;
     
     if (!isUserLoggedIn()) {
+      setAuthModalGuestCheckoutUrl(null);
+      setAuthModalDisableGuestCheckout(false);
       setAuthModalOpened(true);
       return;
     }
@@ -1178,8 +1195,14 @@ const KnowledgeSideBox = ({
       {/* Auth Modal */}
       <AuthModal
         opened={authModalOpened}
-        onClose={() => setAuthModalOpened(false)}
+        onClose={() => {
+          setAuthModalOpened(false);
+          setAuthModalGuestCheckoutUrl(null);
+          setAuthModalDisableGuestCheckout(false);
+        }}
         locale={currentLocale}
+        guestCheckoutUrl={authModalGuestCheckoutUrl}
+        disableGuestCheckout={authModalDisableGuestCheckout}
       />
   </div>
   );

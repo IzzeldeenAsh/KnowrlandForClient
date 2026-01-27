@@ -112,41 +112,34 @@ export const ToastProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   const handleServerErrors = useCallback((err: any) => {
     // Consolidate all error messages into a single message
     let errorMessage = '';
+
+    const extractErrors = (serverErrors: any): string[] => {
+      if (!serverErrors || typeof serverErrors !== 'object') return [];
+      const allMessages: string[] = [];
+      for (const key in serverErrors) {
+        if (!Object.prototype.hasOwnProperty.call(serverErrors, key)) continue;
+        const messages = serverErrors[key];
+        if (Array.isArray(messages)) {
+          allMessages.push(...messages.filter((m) => typeof m === 'string'));
+        } else if (typeof messages === 'string') {
+          allMessages.push(messages);
+        }
+      }
+      return allMessages;
+    };
     
     if (err.error && err.error.errors) {
       // Handle Angular-style error responses
-      const serverErrors = err.error.errors;
-      const allMessages: string[] = [];
-      
-      for (const key in serverErrors) {
-        if (serverErrors.hasOwnProperty(key)) {
-          const messages = serverErrors[key];
-          if (Array.isArray(messages)) {
-            allMessages.push(...messages);
-          } else if (typeof messages === 'string') {
-            allMessages.push(messages);
-          }
-        }
-      }
-      
+      const allMessages = extractErrors(err.error.errors);
       errorMessage = allMessages.join('. ');
     } else if (err.response && err.response.data && err.response.data.errors) {
       // Handle axios/fetch style error responses
-      const serverErrors = err.response.data.errors;
-      const allMessages: string[] = [];
-      
-      for (const key in serverErrors) {
-        if (serverErrors.hasOwnProperty(key)) {
-          const messages = serverErrors[key];
-          if (Array.isArray(messages)) {
-            allMessages.push(...messages);
-          } else if (typeof messages === 'string') {
-            allMessages.push(messages);
-          }
-        }
-      }
-      
+      const allMessages = extractErrors(err.response.data.errors);
       errorMessage = allMessages.join('. ');
+    } else if (err && err.errors) {
+      // Handle plain API error shape: { message, errors: { field: string[] } }
+      const allMessages = extractErrors(err.errors);
+      errorMessage = allMessages.join('. ') || err.message || '';
     } else if (err.response && err.response.data && err.response.data.message) {
       // Handle single error message
       errorMessage = err.response.data.message;

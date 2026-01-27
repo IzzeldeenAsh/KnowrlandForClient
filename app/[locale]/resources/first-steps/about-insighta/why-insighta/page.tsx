@@ -22,51 +22,82 @@ export default async function WhyInsightaPage({ params }: { params: Promise<{ lo
 
   return (
     <div className="relative min-h-screen">
-      <div className="relative overflow-hidden pt-5 pb-16">
-        <div className="relative z-10 mx-auto max-w-7xl px-4 sm:px-6">
-          <nav className={`mb-6 md:mb-8 text-xs md:text-sm ${isRTL ? 'text-right' : 'text-left'}`} aria-label="Breadcrumb">
-            <ol className={`flex items-center gap-2 text-gray-500 flex-wrap`}>
-              <li>
-                <a href={`/${locale}/resources/first-steps`} className="hover:text-gray-900 transition-colors">
-                  {locale === 'ar' ? 'الخطوات الأولى' : 'First Steps'}
-                </a>
-              </li>
-              <li>
-                <span className="text-gray-400">/</span>
-              </li>
-              <li>
-                <a href={`/${locale}/resources/first-steps/about-insighta`} className="hover:text-gray-900 transition-colors">
-                  {locale === 'ar' ? 'حول إنسايتا' : 'About Insighta'}
-                </a>
-              </li>
-              <li>
-                <span className="text-gray-400">/</span>
-              </li>
-              <li className="text-gray-900" aria-current="page">
-                {locale === 'ar' ? 'لماذا إنسايتا' : 'Why Insighta'}
-              </li>
-            </ol>
-          </nav>
+      <div className="relative overflow-hidden pb-16">
+        {/* Breadcrumbs + Hero Title Section (with bg + overlay) */}
+        <div className="relative overflow-hidden px-4 sm:px-12 py-8 md:py-20 mb-6 md:mb-8">
+          <div
+            className="absolute inset-0 bg-center bg-cover"
+            style={{
+              backgroundImage:
+                "url('https://images.unsplash.com/photo-1490093158370-1a6be674437b?q=80&w=1914&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D')",
+              transform: isRTL ? 'scaleX(-1)' : 'none',
+              transformOrigin: 'center',
+            }}
+            aria-hidden="true"
+          />
+          {/* Brighter/less dark overlay */}
+          <div className="absolute inset-0 bg-gradient-to-b from-white/30 via-white/20 to-white/20" aria-hidden="true" />
 
-          <div className="text-center mb-2 md:mb-4">
-            <div className={`flex flex-col align-center justify-center gap-2 ${isRTL ? 'text-right' : 'text-left'}`} style={{ lineHeight: '1.3' }}>
-              <h1 className="text-3xl sm:text-4xl md:text-5xl font-extrabold tracking-tight text-gray-900">
-                {t('Why Insighta', 'لماذا إنسايتا؟')}
-              </h1>
-              <h2 className={`text-3xl sm:text-4xl md:text-5xl font-extrabold bg-clip-text text-transparent ${isRTL ? 'bg-gradient-to-l from-blue-500 to-teal-400' : 'bg-gradient-to-r from-blue-500 to-teal-400'}`}>
-                {t('The Best Choice', 'الخيار الأفضل')}
-              </h2>
+          <div className="relative z-10 px-4 sm:px-12">
+            {/* Breadcrumbs */}
+            <nav className={`mb-6 text-xs md:text-sm ${isRTL ? 'text-right' : 'text-left'}`} aria-label="Breadcrumb">
+              <ol className="flex items-center gap-2 text-gray-700/80 flex-wrap">
+                <li>
+                  <a href={`/${locale}/resources/first-steps`} className="hover:text-gray-900 transition-colors">
+                    {locale === 'ar' ? 'الخطوات الأولى' : 'First Steps'}
+                  </a>
+                </li>
+                <li>
+                  <span className="text-gray-400">/</span>
+                </li>
+                <li>
+                  <a href={`/${locale}/resources/first-steps/about-insighta`} className="hover:text-gray-900 transition-colors">
+                    {locale === 'ar' ? 'حول إنسايتا' : 'About Insighta'}
+                  </a>
+                </li>
+                <li>
+                  <span className="text-gray-400">/</span>
+                </li>
+                <li className="text-gray-900 font-bold" aria-current="page">
+                  {locale === 'ar' ? 'لماذا إنسايتا' : 'Why Insighta'}
+                </li>
+              </ol>
+            </nav>
+
+            {/* Hero Title Section */}
+            <div className="text-center ">
+              <div
+                className={`flex flex-col align-center justify-center gap-2 ${isRTL ? 'text-right' : 'text-left'} text-left`}
+                style={{ lineHeight: '1.3' }}
+              >
+                <h1 className="text-3xl sm:text-4xl md:text-5xl font-extrabold tracking-tight text-black">
+                  {t('Why Insighta', 'لماذا إنسايتا؟')}
+                </h1>
+                <h2
+                  className={`text-3xl sm:text-4xl md:text-5xl font-extrabold bg-clip-text text-transparent ${
+                    isRTL ? 'bg-gradient-to-l from-blue-800 to-teal-600' : 'bg-gradient-to-r from-blue-500 to-teal-400'
+                  }`}
+                >
+                  {t('The Best Choice', 'الخيار الأفضل')}
+                </h2>
+              </div>
             </div>
           </div>
+        </div>
 
+        <div className="relative z-10 mx-auto max-w-7xl px-4 sm:px-6">
           {/* Main Content */}
-          <div className={`max-w-4xl space-y-8 md:space-y-10 ${isRTL ? 'text-right' : 'text-left'}`}>
-            <p className={`text-gray-700 text-base md:text-lg leading-relaxed ${isRTL ? 'text-right' : 'text-left'}`}>
-              {t(
-                'Insighta gives you a flexible way to access high-value knowledge and connect with experts—without subscriptions, without waste, and with clearer quality signals before you buy.',
-                'إنسايتا تمنحك طريقة مرنة للوصول إلى معرفة عالية القيمة والتواصل مع الخبراء—بدون اشتراكات، بدون هدر، ومع أدوات تساعدك على التحقق من الجودة قبل الشراء.'
-              )}
-            </p>
+          <div className={`max-w-5xl px-8 sm:px-16  space-y-6 md:space-y-8 ${isRTL ? 'text-right' : 'text-left'}`}>
+            <div className="prose prose-lg max-w-none">
+              <div className={`text-gray-700 text-base md:text-lg lg:text-xl leading-relaxed ${isRTL ? 'text-right' : 'text-left'}`}>
+                <span>
+                  {t(
+                    'Insighta gives you a flexible way to access high-value knowledge and connect with experts—without subscriptions, without waste, and with clearer quality signals before you buy.',
+                    'إنسايتا تمنحك طريقة مرنة للوصول إلى معرفة عالية القيمة والتواصل مع الخبراء—بدون اشتراكات، بدون هدر، ومع أدوات تساعدك على التحقق من الجودة قبل الشراء.'
+                  )}
+                </span>
+              </div>
+            </div>
 
             <div className="space-y-8">
               <section className="space-y-2">

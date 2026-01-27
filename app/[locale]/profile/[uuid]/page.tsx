@@ -219,6 +219,7 @@ function ProfilePageContent() {
   // Insighter statistics (e.g., total meetings)
   interface InsighterStatistics {
     total_meeting: number;
+    total_published?: number;
   }
   const [insighterStatistics, setInsighterStatistics] =
     useState<InsighterStatistics | null>(null);
@@ -1409,7 +1410,11 @@ function ProfilePageContent() {
                           />
                         </div>
                         <p className="bg-clip-text text-transparent bg-gradient-to-r from-emerald-600 to-teal-500 font-bold text-4xl">
-                          {knowledgeData?.meta.total || 0}
+                          {enterpriseType === "insighter"
+                            ? (insighterStatistics?.total_published ??
+                              knowledgeData?.meta.total ??
+                              0)
+                            : (knowledgeData?.meta.total ?? 0)}
                         </p>
                       </div>
                       {enterpriseType === "insighter" && (

@@ -23,6 +23,25 @@ export default async function InsighterGuidePage({
       className={`mx-auto max-w-5xl px-4 sm:px-6 py-10 ${isRTL ? 'text-right' : 'text-left'}`}
       dir={isRTL ? 'rtl' : 'ltr'}
     >
+      <nav className={`mb-6 text-xs md:text-sm ${isRTL ? 'text-right' : 'text-left'}`} aria-label="Breadcrumb">
+        <ol className="flex items-center gap-2 text-gray-700/80 flex-wrap">
+          <li>
+            <a
+              href={`/${locale}/resources/first-steps`}
+              className="hover:text-gray-900 transition-colors"
+            >
+              {t('First Steps', 'الخطوات الأولى')}
+            </a>
+          </li>
+          <li>
+            <span className="text-gray-400">/</span>
+          </li>
+          <li className="text-gray-900 font-bold" aria-current="page">
+            {t('Insighter Guide', 'دليل الخبير')}
+          </li>
+        </ol>
+      </nav>
+
       <h1 className="text-2xl md:text-3xl font-bold text-gray-900">
         {t('What is an Insighter?', 'ما هو دور الخبير (Insighter)؟')}
       </h1>
