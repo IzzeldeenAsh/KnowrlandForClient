@@ -2,7 +2,7 @@
 
 import React, { useRef, useEffect, useState, memo, useCallback } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { IconSearch, IconX, IconBuildingBank, IconWorldSearch } from '@tabler/icons-react';
+import { IconSearch, IconX, IconBuildingBank, IconWorldSearch, IconLock } from '@tabler/icons-react';
 import { useSuggestions, useClickAway } from '../utils/hooks';
 import styles from '../utils/custom-search-engine-styles.module.css';
 import { Modal, Loader, Popover } from '@mantine/core';
@@ -534,6 +534,7 @@ const SearchBar: React.FC<SearchBarProps> = ({
     'flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-semibold transition-all duration-200 shadow-sm border';
   const searchTypeChipActiveClasses = 'bg-[#299af8] border-[#299af8] text-white shadow-md';
   const searchTypeChipInactiveClasses = 'bg-blue-50 border-blue-100 text-blue-600 hover:bg-blue-100';
+  const searchTypeChipDisabledClasses = 'bg-gray-100 border-gray-200 text-gray-400 cursor-not-allowed opacity-70';
   const filterChipBaseClasses =
     'flex items-center gap-2 px-3 py-1.5 rounded-full border text-xs font-medium transition-all duration-200 shadow-sm';
   const filterChipActiveClasses = 'bg-blue-50 border-blue-200 text-blue-700 hover:bg-blue-100';
@@ -547,13 +548,19 @@ const SearchBar: React.FC<SearchBarProps> = ({
 
   const isHsDisabled = isLoadingHs;
 
-  const renderTypeIcon = (type: 'knowledge' | 'insighter', isActive: boolean) => (
+  const renderTypeIcon = (type: 'knowledge' | 'insighter', isActive: boolean, isLocked: boolean) => (
     <span
       className={`flex items-center justify-center w-6 h-6 rounded-full border ${
-        isActive ? 'bg-white/20 border-white/40 text-white' : 'bg-white border-blue-100 text-[#299af8]'
+        isLocked
+          ? 'bg-gray-200 border-gray-300 text-gray-500'
+          : isActive
+            ? 'bg-white/20 border-white/40 text-white'
+            : 'bg-white border-blue-100 text-[#299af8]'
       }`}
     >
-      {type === 'knowledge' ? (
+      {isLocked ? (
+        <IconLock className="w-3.5 h-3.5" />
+      ) : type === 'knowledge' ? (
         <svg
           xmlns="http://www.w3.org/2000/svg"
           className="w-3.5 h-3.5"
@@ -620,21 +627,27 @@ const SearchBar: React.FC<SearchBarProps> = ({
         <div className={`flex flex-wrap items-center gap-3 justify-center`}>
           {(['knowledge', 'insighter'] as const).map((type) => {
             const isActive = searchType === type;
+            const isLocked = type === 'insighter';
             return (
                       <button
                 key={type}
                         type="button"
+                disabled={isLocked}
+                aria-disabled={isLocked}
+               
+                title={isLocked ? (isRtl ? 'مغلق حالياً' : 'Locked for now') : undefined}
                 className={`${searchTypeChipBaseClasses} ${
-                  isActive ? searchTypeChipActiveClasses : searchTypeChipInactiveClasses
+                  isLocked ? searchTypeChipDisabledClasses : isActive ? searchTypeChipActiveClasses : searchTypeChipInactiveClasses
                 } ${isRtl ? 'flex-row-reverse' : ''}`}
                 onClick={() => {
+                  if (isLocked) return;
                   if (searchType !== type) {
                     setSearchType(type);
                   }
                 }}
-                aria-pressed={isActive}
+                aria-pressed={isLocked ? false : isActive}
               >
-                {renderTypeIcon(type, isActive)}
+                {renderTypeIcon(type, isActive, isLocked)}
                 <span>{typeLabels[type]}</span>
                       </button>
             );

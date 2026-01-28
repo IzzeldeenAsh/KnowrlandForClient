@@ -6,13 +6,13 @@ import { loadStripe } from "@stripe/stripe-js";
 import Image from "next/image";
 
 import { Container, Text, Button, Paper, Group, Stack, Badge, Progress } from "@mantine/core";
-import { IconCreditCard, IconCheck, IconLock } from "@tabler/icons-react";
+import { IconCreditCard, IconCheck, IconLock, IconInfoCircle } from "@tabler/icons-react";
 import PageIllustration from "@/components/page-illustration";
 import { Elements, PaymentElement, useElements, useStripe } from "@stripe/react-stripe-js";
 import styles from "./payment.module.css";
 
 // Initialize Stripe
-const stripePromise = loadStripe("pk_live_51RvbpYRIE7WtDi9SLKPBxKTPyTkULT1e36AZMOcmtUomKgW99akiph2PVg5mmUcPtyAjvlXwP1wy70OFvooJLpQc00CNQYKb96");
+const stripePromise = loadStripe("pk_test_51RpQiFL3mrWP7a0P1OYWGeFJWtgMwcWJtiEDLvn29CpYn5x8Ou77YViA1yoimlixKU5aUAeOeN5VTfoC4sMpvFVF00qq9a6BNm");
 
 // File icon mapping function
 const getFileIconByExtension = (extension: string) => {
@@ -205,6 +205,11 @@ function PaymentForm({ orderUuid, amount, title, locale, isRTL, isGuest, orderDe
     paymentComplete: isRTL ? "تمت معالجة دفعتك بنجاح" : "Your payment has been processed successfully",
     accessGranted: isRTL ? "يمكنك الآن الوصول إلى جميع المستندات المشتراة" : "You now have access to all your purchased documents",
     securityNote: isRTL ? "معلومات بطاقتك آمنة ولن يتم حفظها" : "Your card information is secure and will not be saved",
+    guestLinkNote: isRTL
+      ? "لقد أرسلنا لك رسالة بريد إلكتروني تحتوي على رابط التحميل. سيبقى الرابط فعالًا لمدة 24 ساعة. يُرجى تنزيل ملفك قبل انتهاء صلاحية الرابط."
+      : "We’ve also sent you an email with a download link. The link will remain active for 24 hours—please download your Insight before it expires.",
+    guestSupportNotePrefix: isRTL ? "إذا واجهت أي مشكلة، لا تتردد في " : "If you run into any issues, feel free to ",
+    contactUs: isRTL ? "التواصل معنا" : "contact us",
   };
 
   const orderTitle = (isGuest ? guestSummary?.title : storedSummary?.title) || title;
@@ -503,7 +508,7 @@ function PaymentForm({ orderUuid, amount, title, locale, isRTL, isGuest, orderDe
   // Success UI
   if (paymentStatus === "success") {
     return (
-      <div className={`max-w-md mx-auto text-center ${styles.successContainer}`}>
+      <div className={`max-w-lg mx-auto text-center ${styles.successContainer}`}>
         {/* Animated Checkmark */}
         <div className="mb-8">
           <div className={`mx-auto w-24 h-24 relative ${styles.checkmarkCircle}`}>
@@ -563,36 +568,62 @@ function PaymentForm({ orderUuid, amount, title, locale, isRTL, isGuest, orderDe
         )}
 
         {(isGuest || showDocumentsAdded) && (
-          <Button
-            size="md"
-            className={`bg-gradient-to-r from-blue-500 to-teal-400 hover:from-blue-600 hover:to-teal-500 transition-all ${styles.downloadButton}`}
-            loading={isFetchingDownloadIds}
-            disabled={isFetchingDownloadIds}
-            onClick={() => {
-              if (isGuest) {
-                triggerGuestDownload().catch((e) => console.error(e));
-                return;
-              }
-              console.log('Download button clicked. Order details:', orderDetails); // Debug log
-              // Use knowledge_download_id if available, otherwise fall back to title search
-              if (orderDetails?.knowledge_download_id) {
-                const uuidsParam = `?uuids=${orderDetails.knowledge_download_id}`;
-                console.log('Redirecting with UUID:', uuidsParam); // Debug log
-                window.location.href = `https://app.insightabusiness.com/app/insighter-dashboard/my-downloads${uuidsParam}`;
-              } else {
-                console.log('No UUID available, falling back to search'); // Debug log
-                // Fallback to title search if no UUID available
-                const searchTitle = orderDetails?.orderable?.knowledge?.[0]?.title || "";
-                const searchParam = searchTitle ? `?search=${encodeURIComponent(searchTitle)}` : "";
-                console.log('Redirecting with search:', searchParam); // Debug log
-                window.location.href = `https://app.insightabusiness.com/app/insighter-dashboard/my-downloads${searchParam}`;
-              }
-            }}
-          >
-            {isFetchingDownloadIds
-              ? (isRTL ? "جاري التحديث..." : "Updating...")
-              : (isGuest ? translations.redownload : translations.goToDownloads)}
-          </Button>
+          <div className="mt-2">
+            <Button
+              size="md"
+              className={`bg-gradient-to-r from-blue-500 to-teal-400 hover:from-blue-600 hover:to-teal-500 transition-all ${styles.downloadButton}`}
+              loading={isFetchingDownloadIds}
+              disabled={isFetchingDownloadIds}
+              onClick={() => {
+                if (isGuest) {
+                  triggerGuestDownload().catch((e) => console.error(e));
+                  return;
+                }
+                console.log('Download button clicked. Order details:', orderDetails); // Debug log
+                // Use knowledge_download_id if available, otherwise fall back to title search
+                if (orderDetails?.knowledge_download_id) {
+                  const uuidsParam = `?uuids=${orderDetails.knowledge_download_id}`;
+                  console.log('Redirecting with UUID:', uuidsParam); // Debug log
+                  window.location.href = `https://app.insightabusiness.com/app/insighter-dashboard/my-downloads${uuidsParam}`;
+                } else {
+                  console.log('No UUID available, falling back to search'); // Debug log
+                  // Fallback to title search if no UUID available
+                  const searchTitle = orderDetails?.orderable?.knowledge?.[0]?.title || "";
+                  const searchParam = searchTitle ? `?search=${encodeURIComponent(searchTitle)}` : "";
+                  console.log('Redirecting with search:', searchParam); // Debug log
+                  window.location.href = `https://app.insightabusiness.com/app/insighter-dashboard/my-downloads${searchParam}`;
+                }
+              }}
+            >
+              {isFetchingDownloadIds
+                ? (isRTL ? "جاري التحديث..." : "Updating...")
+                : (isGuest ? translations.redownload : translations.goToDownloads)}
+            </Button>
+
+            {isGuest && (
+              <div className="mt-10 space-y-2 border gap-4 border-blue-200 bg-blue-50 flex justify-start rounded-md p-5 w-full">
+               <IconInfoCircle size={40} className="text-blue-600 ms-2" />
+              <div>
+              <Text size="md" ta="start" >
+               
+               {translations.guestLinkNote}
+             </Text>
+             <Text size="md" ta="start" >
+               {translations.guestSupportNotePrefix}
+               <a
+                 href="https://insightabusiness.com/en/contact"
+                 target="_blank"
+                 rel="noopener noreferrer"
+                 className="text-blue-600 hover:text-blue-700 underline underline-offset-2"
+               >
+                 {translations.contactUs}
+               </a>
+               .
+             </Text>
+             </div>
+              </div>
+            )}
+          </div>
         )}
       </div>
     );

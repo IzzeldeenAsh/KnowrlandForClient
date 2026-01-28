@@ -13,6 +13,98 @@ interface NotificationsInnerProps {
   onClickOutside: () => void
 }
 
+// ---- Message rendering helpers ----
+// Backend sometimes sends HTML in `notification.message` (e.g. <strong>, <a>, inline styles).
+// Rendering raw HTML can override parent font styles, making read/unread weights unreliable.
+// We convert to plain text so the parent `font-*` class always applies consistently.
+const htmlToText = (html: string): string => {
+  if (!html) return ''
+
+  // Fast path: no tags
+  if (!/[<>]/.test(html)) return html
+
+  // If somehow executed outside the browser, fall back to best-effort stripping.
+  if (typeof window === 'undefined' || typeof DOMParser === 'undefined') {
+    return html.replace(/<[^>]*>/g, '').trim()
+  }
+
+  try {
+    // Replace <br> with newlines before parsing so we preserve basic formatting.
+    const normalized = html.replace(/<br\s*\/?>/gi, '\n')
+    const doc = new DOMParser().parseFromString(normalized, 'text/html')
+    return (doc.body?.textContent ?? '').trim()
+  } catch {
+    // Fallback: strip tags (best-effort)
+    return html.replace(/<[^>]*>/g, '').trim()
+  }
+}
+
+const escapeHtml = (value: string): string =>
+  value
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;')
+
+const escapeAttribute = (value: string): string => escapeHtml(value)
+
+// For **unread** notifications we still want emphasis (<b>/<strong>) and links,
+// but we must strip ALL attributes/styles to prevent overriding font weights.
+// This sanitizer produces safe, minimal HTML for rendering via dangerouslySetInnerHTML.
+const sanitizeNotificationHtml = (html: string): string => {
+  if (!html) return ''
+
+  // If not in browser, don’t attempt to sanitize HTML tags; render plain text.
+  if (typeof window === 'undefined' || typeof DOMParser === 'undefined') {
+    return escapeHtml(htmlToText(html))
+  }
+
+  try {
+    const doc = new DOMParser().parseFromString(html, 'text/html')
+    const allowedTags = new Set(['B', 'STRONG', 'I', 'EM', 'BR', 'A', 'SPAN'])
+
+    const sanitizeNode = (node: Node): string => {
+      if (node.nodeType === Node.TEXT_NODE) return escapeHtml(node.textContent ?? '')
+      if (node.nodeType !== Node.ELEMENT_NODE) return ''
+
+      const el = node as HTMLElement
+      const tag = el.tagName.toUpperCase()
+
+      // Drop disallowed tags but keep their text/children.
+      if (!allowedTags.has(tag)) {
+        return Array.from(el.childNodes).map(sanitizeNode).join('')
+      }
+
+      if (tag === 'BR') return '<br />'
+
+      if (tag === 'A') {
+        const rawHref = (el.getAttribute('href') ?? '').trim()
+        const href =
+          rawHref.startsWith('http://') ||
+          rawHref.startsWith('https://') ||
+          rawHref.startsWith('/') ||
+          rawHref.startsWith('#')
+            ? rawHref
+            : '#'
+
+        const inner = Array.from(el.childNodes).map(sanitizeNode).join('')
+        return `<a href="${escapeAttribute(href)}" target="_blank" rel="noopener noreferrer" class="underline">${inner}</a>`
+      }
+
+      // Allowed inline tags with NO attributes
+      const lower = tag.toLowerCase()
+      const inner = Array.from(el.childNodes).map(sanitizeNode).join('')
+      return `<${lower}>${inner}</${lower}>`
+    }
+
+    return Array.from(doc.body.childNodes).map(sanitizeNode).join('')
+  } catch {
+    // Fallback: render as escaped plain text (safe)
+    return escapeHtml(htmlToText(html))
+  }
+}
+
 // ---- Color helpers (stable Tailwind class mapping) ----
 type Variant = 'success' | 'danger' | 'info' | 'warning' | 'primary'
 type TailwindColor = 'green' | 'red' | 'blue' | 'yellow' | 'purple'
@@ -364,6 +456,8 @@ export default function NotificationsInner({
     const title = getNotificationName(notification.sub_type, currentLanguage)
     const iconPath = getNotificationIconName(notification.sub_type)
     const bg = getNotificationBg(notification.sub_type)
+    const messageText = htmlToText(notification.message)
+    const unreadMessageHtml = sanitizeNotificationHtml(notification.message)
 
  
     
@@ -391,8 +485,18 @@ export default function NotificationsInner({
             <p className={`text-xs text-blue-600 ${!notification.read_at ? 'font-bold' : 'font-light'}`} style={{wordBreak: 'break-word'}}>
               {notification.sub_type_value ? notification.sub_type_value : title}
             </p>
-            <p className={`mt-0.5 ${!notification.read_at ? 'text-gray-900 font-medium' : 'text-gray-700 font-light'} text-sm`} style={{wordBreak: 'break-word'}}>
-              <span dangerouslySetInnerHTML={{ __html: notification.message }} />
+            <p
+              className={`mt-0.5 ${!notification.read_at ? 'text-gray-900 font-medium' : 'text-gray-700 font-light'} text-sm whitespace-pre-line`}
+              style={{ wordBreak: 'break-word' }}
+            >
+              {!notification.read_at ? (
+                <span
+                  // Safe minimal HTML (only emphasis/links), used ONLY for unread messages.
+                  dangerouslySetInnerHTML={{ __html: unreadMessageHtml }}
+                />
+              ) : (
+                messageText
+              )}
             </p>
           </div>
           

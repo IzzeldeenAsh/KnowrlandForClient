@@ -135,6 +135,14 @@ export default function CheckoutPage() {
   const [guestPhoneCode, setGuestPhoneCode] = useState("");
   const [guestPhone, setGuestPhone] = useState("");
   const [isPhoneCodeManuallySet, setIsPhoneCodeManuallySet] = useState(false);
+  type GuestRequiredField = "email" | "firstName" | "lastName" | "country";
+  const [guestSubmitAttempted, setGuestSubmitAttempted] = useState(false);
+  const [guestTouched, setGuestTouched] = useState<Record<GuestRequiredField, boolean>>({
+    email: false,
+    firstName: false,
+    lastName: false,
+    country: false,
+  });
 
   // Countries list (with flags)
   const [countries, setCountries] = useState<Country[]>([]);
@@ -444,6 +452,23 @@ export default function CheckoutPage() {
     guestFieldMissing: isRTL
       ? "يرجى تعبئة جميع الحقول المطلوبة"
       : "Please fill all required fields",
+    requiredField: isRTL ? "هذا الحقل مطلوب" : "This field is required",
+  };
+
+  const getGuestValidationErrors = (): Record<GuestRequiredField, string> => {
+    const errors: Record<GuestRequiredField, string> = {
+      email: "",
+      firstName: "",
+      lastName: "",
+      country: "",
+    };
+
+    if (!guestEmail.trim()) errors.email = translations.requiredField;
+    if (!guestFirstName.trim()) errors.firstName = translations.requiredField;
+    if (!guestLastName.trim()) errors.lastName = translations.requiredField;
+    if (!guestCountryId) errors.country = translations.requiredField;
+
+    return errors;
   };
 
   // Format currency with proper formatting
@@ -566,9 +591,20 @@ export default function CheckoutPage() {
         const country_id = guestCountryId;
         const phone_code = guestPhoneCode.trim();
         const phone = guestPhone.trim();
+        const includePhone = !!phone_code && !!phone;
 
-        if (!email || !first_name || !last_name || !country_id || !phone_code || !phone) {
-          toast.error(translations.guestFieldMissing, translations.orderError);
+        // phone_code and phone are optional for guest checkout
+        if (!email || !first_name || !last_name || !country_id) {
+          setGuestSubmitAttempted(true);
+          const errors = getGuestValidationErrors();
+          setGuestTouched((prev) => ({
+            ...prev,
+            email: prev.email || !!errors.email,
+            firstName: prev.firstName || !!errors.firstName,
+            lastName: prev.lastName || !!errors.lastName,
+            country: prev.country || !!errors.country,
+          }));
+         
           return;
         }
 
@@ -578,8 +614,7 @@ export default function CheckoutPage() {
           first_name,
           last_name,
           country_id,
-          phone_code,
-          phone,
+          ...(includePhone ? { phone_code, phone } : {}),
           timezone,
           order_data: {
             knowledge_slug: slug,
@@ -811,14 +846,9 @@ export default function CheckoutPage() {
     : knowledge.documents;
 
   const hasFreeDocsInCart = documentsToShow.some((d) => parseFloat(d.price) === 0);
-  const isGuestFormValid =
-    !isGuest ||
-    (!!guestEmail.trim() &&
-      !!guestFirstName.trim() &&
-      !!guestLastName.trim() &&
-      !!guestCountryId &&
-      !!guestPhoneCode.trim() &&
-      !!guestPhone.trim());
+  const guestErrors = isGuest ? getGuestValidationErrors() : null;
+  const showGuestError = (field: GuestRequiredField) =>
+    isGuest && (guestSubmitAttempted || guestTouched[field]) && !!guestErrors?.[field];
 
   // Debug logging
   console.log('Knowledge object:', knowledge);
@@ -963,13 +993,13 @@ export default function CheckoutPage() {
               <Text size="lg" fw={600} mb="xs">
                 {knowledge.title}
               </Text>
-              {isGuest && hasFreeDocsInCart && (
+              {/* {isGuest && hasFreeDocsInCart && (
                 <div className="mb-3 rounded-md border border-amber-200 bg-amber-50 px-3 py-2">
                   <Text size="sm" c="dimmed">
                     {translations.loginRequiredForFree}
                   </Text>
                 </div>
-              )}
+              )} */}
               <Stack gap="md">
                 {documentsToShow.length === 0 ? (
                   <Text size="sm" c="dimmed" ta="center">
@@ -1060,42 +1090,76 @@ export default function CheckoutPage() {
 
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-3">
                         <div className="sm:col-span-2">
-                          <label className="block text-sm font-medium text-gray-700 mb-1">
+                          <label
+                            className={`block text-sm font-medium mb-1 ${
+                              showGuestError("email") ? "text-red-600" : "text-gray-700"
+                            }`}
+                          >
                             {translations.email}
                           </label>
                           <input
                             value={guestEmail}
                             onChange={(e) => setGuestEmail(e.target.value)}
                             type="email"
-                            className="w-full rounded-md border border-gray-200 bg-white px-3 py-2 text-sm outline-none focus:border-blue-400"
+                            onBlur={() => setGuestTouched((p) => ({ ...p, email: true }))}
+                            className={`w-full rounded-md border bg-white px-3 py-2 text-sm outline-none focus:border-blue-400 ${
+                              showGuestError("email") ? "border-red-400" : "border-gray-200"
+                            }`}
                             placeholder="name@example.com"
                           />
+                          {showGuestError("email") && (
+                            <div className="mt-1 text-xs text-red-600">{guestErrors?.email}</div>
+                          )}
                         </div>
 
                         <div>
-                          <label className="block text-sm font-medium text-gray-700 mb-1">
+                          <label
+                            className={`block text-sm font-medium mb-1 ${
+                              showGuestError("firstName") ? "text-red-600" : "text-gray-700"
+                            }`}
+                          >
                             {translations.firstName}
                           </label>
                           <input
                             value={guestFirstName}
                             onChange={(e) => setGuestFirstName(e.target.value)}
-                            className="w-full rounded-md border border-gray-200 bg-white px-3 py-2 text-sm outline-none focus:border-blue-400"
+                            onBlur={() => setGuestTouched((p) => ({ ...p, firstName: true }))}
+                            className={`w-full rounded-md border bg-white px-3 py-2 text-sm outline-none focus:border-blue-400 ${
+                              showGuestError("firstName") ? "border-red-400" : "border-gray-200"
+                            }`}
                           />
+                          {showGuestError("firstName") && (
+                            <div className="mt-1 text-xs text-red-600">{guestErrors?.firstName}</div>
+                          )}
                         </div>
 
                         <div>
-                          <label className="block text-sm font-medium text-gray-700 mb-1">
+                          <label
+                            className={`block text-sm font-medium mb-1 ${
+                              showGuestError("lastName") ? "text-red-600" : "text-gray-700"
+                            }`}
+                          >
                             {translations.lastName}
                           </label>
                           <input
                             value={guestLastName}
                             onChange={(e) => setGuestLastName(e.target.value)}
-                            className="w-full rounded-md border border-gray-200 bg-white px-3 py-2 text-sm outline-none focus:border-blue-400"
+                            onBlur={() => setGuestTouched((p) => ({ ...p, lastName: true }))}
+                            className={`w-full rounded-md border bg-white px-3 py-2 text-sm outline-none focus:border-blue-400 ${
+                              showGuestError("lastName") ? "border-red-400" : "border-gray-200"
+                            }`}
                           />
+                          {showGuestError("lastName") && (
+                            <div className="mt-1 text-xs text-red-600">{guestErrors?.lastName}</div>
+                          )}
                         </div>
 
                         <div className="sm:col-span-2">
-                          <label className="block text-sm font-medium text-gray-700 mb-1">
+                          <label
+                            className={`block text-sm font-medium mb-1 ${
+                              showGuestError("country") ? "text-red-600" : "text-gray-700"
+                            }`}
+                          >
                             {translations.country}
                           </label>
                           <div className="relative" ref={countryDropdownRef}>
@@ -1105,7 +1169,10 @@ export default function CheckoutPage() {
                                 setCountryDropdownOpen((v) => !v);
                                 setPhoneCodeDropdownOpen(false);
                               }}
-                              className="w-full rounded-md border border-gray-200 bg-white px-3 py-2 text-sm flex items-center justify-between gap-2"
+                              onBlur={() => setGuestTouched((p) => ({ ...p, country: true }))}
+                              className={`w-full rounded-md border bg-white px-3 py-2 text-sm flex items-center justify-between gap-2 ${
+                                showGuestError("country") ? "border-red-400" : "border-gray-200"
+                              }`}
                             >
                               <div className="flex items-center gap-2 min-w-0">
                                 {selectedCountry ? (
@@ -1130,6 +1197,9 @@ export default function CheckoutPage() {
                               </div>
                               <span className="text-gray-400">▾</span>
                             </button>
+                            {showGuestError("country") && (
+                              <div className="mt-1 text-xs text-red-600">{guestErrors?.country}</div>
+                            )}
 
                             {countryDropdownOpen && (
                               <div className="absolute z-[9999] mt-2 w-full rounded-md border border-gray-200 bg-white shadow-sm">
@@ -1157,6 +1227,7 @@ export default function CheckoutPage() {
                                         type="button"
                                         onClick={() => {
                                           setGuestCountryId(c.id);
+                                          setGuestTouched((p) => ({ ...p, country: true }));
                                           // helpful default
                                           if (!guestPhoneCode.trim()) {
                                             setGuestPhoneCode(String(c.international_code || ""));
@@ -1225,7 +1296,41 @@ export default function CheckoutPage() {
                                   <span className="text-gray-500">+---</span>
                                 )}
                               </div>
-                              <span className="text-gray-400">▾</span>
+                              <div className="flex items-center gap-2">
+                                {!!guestPhoneCode.trim() && (
+                                  <span
+                                    role="button"
+                                    tabIndex={0}
+                                    aria-label={isRTL ? "مسح رمز الهاتف" : "Clear phone code"}
+                                    className="text-gray-400 hover:text-gray-600 select-none leading-none"
+                                    onMouseDown={(e) => {
+                                      // prevent focusing the parent button / toggling dropdown
+                                      e.preventDefault();
+                                      e.stopPropagation();
+                                    }}
+                                    onClick={(e) => {
+                                      e.preventDefault();
+                                      e.stopPropagation();
+                                      setGuestPhoneCode("");
+                                      setIsPhoneCodeManuallySet(true); // keep it empty (don't auto-fill)
+                                      setPhoneCodeDropdownOpen(false);
+                                      setPhoneCodeSearch("");
+                                    }}
+                                    onKeyDown={(e) => {
+                                      if (e.key !== "Enter" && e.key !== " ") return;
+                                      e.preventDefault();
+                                      e.stopPropagation();
+                                      setGuestPhoneCode("");
+                                      setIsPhoneCodeManuallySet(true);
+                                      setPhoneCodeDropdownOpen(false);
+                                      setPhoneCodeSearch("");
+                                    }}
+                                  >
+                                    ×
+                                  </span>
+                                )}
+                                <span className="text-gray-400">▾</span>
+                              </div>
                             </button>
 
                             {phoneCodeDropdownOpen && (
@@ -1414,8 +1519,7 @@ export default function CheckoutPage() {
                       loading={isCheckingOut}
                       disabled={
                         selectedDocuments.length === 0 ||
-                        (!isFree && !paymentMethod) ||
-                        (isGuest && !isGuestFormValid)
+                        (!isFree && !paymentMethod)
                       }
                       className={styles.confirmButton}
                       fullWidth

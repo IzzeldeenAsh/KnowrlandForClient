@@ -85,7 +85,7 @@ export default function Footer() {
             </ul>
           </div>
             {/* 3rd block */}
-            {/* <div className="sm:col-span-6 md:col-span-3 lg:col-span-2 text-center sm:text-left">
+            <div className="sm:col-span-6 md:col-span-3 lg:col-span-2 text-center sm:text-left">
             <h6 className="text-sm text-slate-50 font-medium mb-2 text-start">First Steps</h6>
             <ul className="text-sm space-y-2 text-start">
               <li>
@@ -99,7 +99,7 @@ export default function Footer() {
               </li>
             </ul>
           </div>
-           */}
+          
           {/* 4th block - Resources */}
           {/* <div className="sm:col-span-6 md:col-span-3 lg:col-span-2 text-center sm:text-left">
             <h6 className="text-sm text-slate-50 font-medium mb-2 text-start">{t('resources.title')}</h6>
