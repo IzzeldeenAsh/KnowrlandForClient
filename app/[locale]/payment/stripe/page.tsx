@@ -668,7 +668,7 @@ function PaymentForm({ orderUuid, amount, title, locale, isRTL, isGuest, orderDe
         {/* Two column layout for larger screens */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Order Summary - Left Column */}
-        <Paper p={0} radius="md" className="border border-gray-200 h-fit p-4 sm:p-6 lg:min-h-[407px]">
+        <Paper radius="md" className="border border-gray-200 h-fit p-4 sm:p-6 lg:min-h-[407px]">
           <Text size="lg" fw={600} mb="md">
             {translations.orderSummary}
           </Text>
@@ -684,7 +684,7 @@ function PaymentForm({ orderUuid, amount, title, locale, isRTL, isGuest, orderDe
                   {docsToRender.map((doc) => (
                     <div
                       key={doc.key}
-                      className="flex flex-wrap items-center gap-2 bg-gray-50 rounded-md px-3 py-2 min-w-0"
+                      className="flex flex-wrap items-center gap-3 bg-gray-50 border border-gray-100 rounded-md px-4 py-3 min-w-0"
                     >
                       <Image
                         src={getFileIconByExtension(doc.file_extension)}
@@ -715,19 +715,19 @@ function PaymentForm({ orderUuid, amount, title, locale, isRTL, isGuest, orderDe
 
         {/* Payment Element - Right Column */}
         <div className="space-y-6">
-          <Paper p={0} radius="md" className="border border-gray-200 p-4 sm:p-6">
-          <PaymentElement
-  options={{
-    layout: "tabs",
-    fields: {
-      billingDetails: {
-        address: {
-          country: "auto",
-        },
-      },
-    },
-  }}
-/>
+          <Paper radius="md" className="border border-gray-200 p-4 sm:p-6">
+            <PaymentElement
+              options={{
+                layout: "tabs",
+                fields: {
+                  billingDetails: {
+                    address: {
+                      country: "auto",
+                    },
+                  },
+                },
+              }}
+            />
           </Paper>
 
           {/* Security Note */}
