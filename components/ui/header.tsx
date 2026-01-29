@@ -41,24 +41,13 @@ let industriesCache: {
 
 const INDUSTRIES_CACHE_DURATION = 300000; // 5 minutes cache for industries
 
-// Helper function to get the Angular app URL based on current domain
-const getAngularAppUrl = (): string => {
-  if (typeof window === 'undefined') return 'https://app.insightabusiness.com';
-  
-  const hostname = window.location.hostname;
-  const protocol = window.location.protocol;
-  
-  // Production domains
-  if (hostname.includes('foresighta.co')) {
-    return `${protocol}//app.insightabusiness.com`;
-  }
-  if (hostname.includes('insightabusiness.com')) {
-    return `${protocol}//app.insightabusiness.com`;
-  }
-  
-  // Local development
-  return 'https://app.insightabusiness.com';
-};
+// IMPORTANT: This must be deterministic on BOTH server + client render to avoid hydration mismatches.
+// Prefer env var override; otherwise choose a build-time default.
+const ANGULAR_APP_URL: string =
+  process.env.NEXT_PUBLIC_ANGULAR_APP_URL ||
+  (process.env.NODE_ENV === 'development'
+    ? 'https://app.insightabusiness.com'
+    : 'https://app.insightabusiness.com');
 
 async function getIndustries(locale: string = 'en', forceRefresh: boolean = false): Promise<Industry[]> {
   const now = Date.now();
@@ -131,12 +120,14 @@ const { isLoading: isAppLoading, setIsLoading: setAppLoading } = useLoading();
   const pathname = usePathname();
   const router = useRouter();
   const currentLocale = pathname.split('/')[1] || 'en';
+  const [returnUrl, setReturnUrl] = useState<string>('');
   
   // Use the centralized user profile hook
   const { user, roles, isLoading, isAuthResolved, handleSignOut } = useUserProfile();
 
-  // Used only to decide which skeleton shape to show while auth is resolving
-  const hasToken = typeof window !== 'undefined' && !!getAuthToken();
+  // Used only to decide which skeleton shape to show while auth is resolving.
+  // Must be stable for SSR + first client render to avoid hydration mismatch.
+  const [hasToken, setHasToken] = useState<boolean>(false);
   const shouldShowAuthSkeleton = !isAuthResolved;
   
   // Always use dark style with white text, as requested
@@ -176,6 +167,12 @@ const { isLoading: isAppLoading, setIsLoading: setAppLoading } = useLoading();
     router.push(`/${currentLocale}/home?${searchParams.toString()}`);
     setSearchQuery('');
   };
+
+  useEffect(() => {
+    // Client-only values (token + current full URL) must be read after mount.
+    setHasToken(!!getAuthToken());
+    setReturnUrl(window.location.href);
+  }, [pathname]);
 
   // Handle search input submission
   const handleSearchSubmit = (e: React.FormEvent) => {
@@ -557,7 +554,7 @@ const { isLoading: isAppLoading, setIsLoading: setAppLoading } = useLoading();
             {user && roles.includes('client') && !roles.includes('insighter') && !roles.includes('company') && !roles.includes('company-insighter') && (
               <li className="mx-1 md:mx-2 hidden lg:block">
                 <Link 
-                  href={`${getAngularAppUrl()}/app/insighter-register/vertical`}
+                  href={`${ANGULAR_APP_URL}/app/insighter-register/vertical`}
                   className="font-medium text-sm text-white px-2 md:px-3 py-2 rounded-md bg-gradient-to-r from-blue-500 to-cyan-500 hover:from-blue-600 hover:to-cyan-600 transition-all duration-300 ease-in-out whitespace-nowrap"
                 >
                   {t('becomeInsighter')}
@@ -599,7 +596,7 @@ const { isLoading: isAppLoading, setIsLoading: setAppLoading } = useLoading();
             ) : (
               <li>
                 <Link className="btn-sm text-slate-300 hover:text-white [background:linear-gradient(theme(colors.slate.900),_theme(colors.slate.900))_padding-box,_conic-gradient(theme(colors.slate.400),_theme(colors.slate.700)_25%,_theme(colors.slate.700)_75%,_theme(colors.slate.400)_100%)_border-box] before:bg-slate-800/30 hover:scale-105 active:scale-95 transition-all duration-150 ease-in-out group relative before:absolute before:inset-0 before:rounded-full before:pointer-events-none" 
-                href={`${getAngularAppUrl()}/auth/login?returnUrl=${encodeURIComponent(typeof window !== 'undefined' ? window.location.href : '')}`}>
+                href={`${ANGULAR_APP_URL}/auth/login?returnUrl=${encodeURIComponent(returnUrl)}`}>
                   <span className="relative inline-flex items-center">
                     {t('auth.login')} <span className="tracking-normal text-blue-500 group-hover:translate-x-1 transition-transform duration-150 ease-in-out ml-1">-&gt;</span>
                   </span>

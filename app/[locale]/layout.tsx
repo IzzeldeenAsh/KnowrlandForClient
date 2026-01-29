@@ -19,8 +19,8 @@ import { GlobalProfileProvider } from '@/components/auth/GlobalProfileProvider';
 import GlobalAuthHandler from '@/components/auth/GlobalAuthHandler';
 import RoleGuard from '@/components/auth/RoleGuard';
 import AnalyticsProvider from '@/app/analytics-provider';
-import { publicBaseUrl } from '@/app/config';
 import { generateOrganizationSchema, generateWebSiteSchema } from '@/utils/seo';
+import { publicBaseUrl } from '@/app/config';
 
 
 const almarai = Almarai({
@@ -41,7 +41,7 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
   const locale = resolvedParams.locale;
   const isArabic = locale === 'ar';
   
-  const baseUrl = 'https://insightabusiness.com';
+  const baseUrl = publicBaseUrl;
   
   return {
     metadataBase: new URL(baseUrl),
@@ -170,127 +170,48 @@ export default async function RootLayout({
   const fontFamily = 'font-almarai';
   
   return (
-    <html lang={locale} dir={direction} className="scroll-smooth">
-      <head>
-        {/* Favicon and Icons - Explicit definitions for better Google indexing */}
-        <link rel="icon" type="image/x-icon" href="/favicon.ico" sizes="any" />
-        <link rel="icon" type="image/png" sizes="32x32" href="/icon.png" />
-        <link rel="icon" type="image/png" sizes="192x192" href="/icons-192.png" />
-        <link rel="icon" type="image/png" sizes="512x512" href="/icons-512.png" />
-        <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
-        <link rel="shortcut icon" href="/favicon.ico" />
-        
-        {/* Web App Manifest */}
-        <link rel="manifest" href="/manifest.webmanifest" />
-        <meta name="theme-color" content="#6366f1" />
-        <meta name="mobile-web-app-capable" content="yes" />
-        <meta name="apple-mobile-web-app-capable" content="yes" />
-        <meta name="apple-mobile-web-app-status-bar-style" content="default" />
-        <meta name="apple-mobile-web-app-title" content="Insighta" />
-        
-        {/* Google tag (gtag.js) */}
-        <script async src="https://www.googletagmanager.com/gtag/js?id=G-R1XT5PMHG0"></script>
-        <script
-          dangerouslySetInnerHTML={{
-            __html: `
-              window.dataLayer = window.dataLayer || [];
-              function gtag(){dataLayer.push(arguments);}
-              gtag('js', new Date());
-              gtag('config', 'G-R1XT5PMHG0', {
-                page_path: window.location.pathname,
-                page_location: window.location.href,
-                send_page_view: false
-              });
-            `,
-          }}
-        />
-        {/* Add keenicons CSS */}
-        <link rel="stylesheet" href="/keenicons.css" />
-        <link rel="stylesheet" href="/assets/plugins/keenicons/duotone/style.css" />
-        <link rel="stylesheet" href="/assets/plugins/keenicons/outline/style.css" />
-        <link rel="stylesheet" href="/assets/plugins/keenicons/solid/style.css" />
-        
-        {/* Add a client-side script to handle problematic routes */}
-        <script
-          dangerouslySetInnerHTML={{
-            __html: `
-            (function() {
-              var currentLocale = '${locale}';
-              // Check if the current path is one of our problematic routes
-              var path = window.location.pathname;
-              
-              // Specifically handle the route that's causing 404s
-              if (path === '/' + currentLocale + '/filter-knowledges/topic/139/insight') {
-                console.log('Detected problematic route, attempting to handle...');
-                
-                // This approach won't trigger a full page reload but will update the React router
-                if (window.history && window.history.replaceState) {
-                  window.history.replaceState(
-                    {}, 
-                    '', 
-                    '/' + currentLocale + '/filter-knowledges/topic/139/insight'
-                  );
-                  console.log('URL state updated');
-                }
-              }
-              
-              // More general detection for filter-knowledges routes
-              if (path.includes('/filter-knowledges/')) {
-                var pathParts = path.split('/');
-                // Check if we have the expected number of segments
-                if (pathParts.length === 6) {
-                  var locale = pathParts[1];
-                  var taxonomy = pathParts[3];
-                  var id = pathParts[4];
-                  var type = pathParts[5];
-                  
-                  console.log('Detected filter-knowledges route:', {
-                    locale, taxonomy, id, type
-                  });
-                }
-              }
-            })();
-            `
-          }}
-        />
-      </head>
-      <body className={`${fontClass} ${fontFamily} antialiased tracking-tight`} suppressHydrationWarning>
-        <MantineProvider theme={theme}>
-          <AOSProvider>
-            <NextIntlClientProvider messages={messages}>
-              {/* Global JSON-LD for Site name and Logo */}
-              <script
-                type="application/ld+json"
-                dangerouslySetInnerHTML={{
-                  __html: JSON.stringify(generateWebSiteSchema(locale)),
-                }}
-              />
-              <script
-                type="application/ld+json"
-                dangerouslySetInnerHTML={{
-                  __html: JSON.stringify(generateOrganizationSchema(locale)),
-                }}
-              />
-              <ToastProvider>
-                <LoadingProvider>
-                  <GlobalProfileProvider>
-                    <RoleGuard>
-                      <AnalyticsProvider />
-                      <GlobalAuthHandler />
-                      <ClientLogoutHandler />
-                      <Header />
-                      <div className="flex flex-col min-h-screen overflow-hidden supports-[overflow:clip]:overflow-clip" style={{ paddingBottom: 'var(--auth-banner-offset, 0px)' }}>
-                        {children}
-                      </div>
-                      <ConditionalAuthBanner />
-                    </RoleGuard>
-                  </GlobalProfileProvider>
-                </LoadingProvider>
-              </ToastProvider>
-            </NextIntlClientProvider>
-          </AOSProvider>
-        </MantineProvider>
-      </body>
-    </html>
+    <div
+      dir={direction}
+      className={`${fontClass} ${fontFamily} antialiased tracking-tight`}
+    >
+      <MantineProvider theme={theme}>
+        <AOSProvider>
+          <NextIntlClientProvider messages={messages}>
+            {/* Global JSON-LD for Site name and Logo */}
+            <script
+              type="application/ld+json"
+              dangerouslySetInnerHTML={{
+                __html: JSON.stringify(generateWebSiteSchema(locale)),
+              }}
+            />
+            <script
+              type="application/ld+json"
+              dangerouslySetInnerHTML={{
+                __html: JSON.stringify(generateOrganizationSchema(locale)),
+              }}
+            />
+            <ToastProvider>
+              <LoadingProvider>
+                <GlobalProfileProvider>
+                  <RoleGuard>
+                    <AnalyticsProvider />
+                    <GlobalAuthHandler />
+                    <ClientLogoutHandler />
+                    <Header />
+                    <div
+                      className="flex flex-col min-h-screen overflow-hidden supports-[overflow:clip]:overflow-clip"
+                      style={{ paddingBottom: 'var(--auth-banner-offset, 0px)' }}
+                    >
+                      {children}
+                    </div>
+                    <ConditionalAuthBanner />
+                  </RoleGuard>
+                </GlobalProfileProvider>
+              </LoadingProvider>
+            </ToastProvider>
+          </NextIntlClientProvider>
+        </AOSProvider>
+      </MantineProvider>
+    </div>
   );
 }
