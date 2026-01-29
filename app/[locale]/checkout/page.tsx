@@ -1015,7 +1015,7 @@ export default function CheckoutPage() {
                         : ""
                     }`}
                   >
-                    <Group gap="md" wrap="nowrap">
+                    <Group gap="md" wrap="wrap" className={styles.documentRow}>
                       <Checkbox
                         checked={
                           isGuest && parseFloat(doc.price) === 0

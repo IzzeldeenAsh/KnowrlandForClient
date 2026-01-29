@@ -6,7 +6,7 @@
 
 .checkoutGrid {
   display: grid;
-  grid-template-columns: 1.5fr 1fr;
+  grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr);
   gap: 2rem;
   align-items: start;
 }
@@ -39,6 +39,12 @@
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
   transition: all 0.2s ease;
+  min-width: 0;
+}
+
+.documentRow {
+  width: 100%;
+  min-width: 0;
 }
 
 .documentCard:hover {
@@ -59,7 +65,7 @@
   margin-bottom: 0.75rem;
   display: flex;
   align-items: center;
-  height: 100px;
+  min-height: 92px;
   background: #fff;
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
@@ -133,7 +139,8 @@
   }
 }
 .freeDownloadButton {
-  max-width: 200px;
+  width: 100%;
+  max-width: 420px;
   margin: 0 auto;
 }
 
@@ -142,13 +149,32 @@
   .container {
     padding: 1rem;
   }
+
+  .paymentMethodCard {
+    padding: 0.875rem;
+    min-height: unset;
+    height: auto;
+  }
   
   .documentCard {
     padding: 0.75rem;
   }
+
+  .paymentIconsContainer {
+    gap: 0.5rem;
+  }
+
+  .paymentIcon {
+    width: 52px;
+    height: 28px;
+  }
   
   .confirmButton {
     width: 100%;
+  }
+
+  .freeDownloadButton {
+    max-width: 100%;
   }
 }
 

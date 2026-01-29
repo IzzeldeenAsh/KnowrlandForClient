@@ -107,7 +107,7 @@ const AuthModal: React.FC<AuthModalProps> = ({
         <Text size="sm" c="dimmed" ta="center">
           {translations.message}
         </Text>
-<div className='flex gap-2 w-full'>
+<div className='flex flex-col sm:flex-row gap-2 w-full'>
           <Button
             leftSection={<IconLogin size={18} />}
             onClick={handleLogIn}

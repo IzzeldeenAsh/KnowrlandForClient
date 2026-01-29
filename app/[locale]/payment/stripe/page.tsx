@@ -601,14 +601,14 @@ function PaymentForm({ orderUuid, amount, title, locale, isRTL, isGuest, orderDe
             </Button>
 
             {isGuest && (
-              <div className="mt-10 space-y-2 border gap-4 border-blue-200 bg-blue-50 flex justify-start rounded-md p-5 w-full">
-               <IconInfoCircle size={40} className="text-blue-600 ms-2" />
-              <div>
-              <Text size="md" ta="start" >
+              <div className="mt-10 border border-blue-200 bg-blue-50 flex flex-col sm:flex-row items-start gap-3 rounded-md p-4 sm:p-5 w-full min-w-0">
+               <IconInfoCircle size={32} className="text-blue-600 ms-2 flex-shrink-0" />
+              <div className="min-w-0">
+              <Text size="md" ta="start">
                
                {translations.guestLinkNote}
              </Text>
-             <Text size="md" ta="start" >
+             <Text size="md" ta="start">
                {translations.guestSupportNotePrefix}
                <a
                  href="https://insightabusiness.com/en/contact"
@@ -668,7 +668,7 @@ function PaymentForm({ orderUuid, amount, title, locale, isRTL, isGuest, orderDe
         {/* Two column layout for larger screens */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Order Summary - Left Column */}
-        <Paper  p="lg" radius="md" className="border border-gray-200 h-fit min-h-[407px]">
+        <Paper p={0} radius="md" className="border border-gray-200 h-fit p-4 sm:p-6 lg:min-h-[407px]">
           <Text size="lg" fw={600} mb="md">
             {translations.orderSummary}
           </Text>
@@ -680,16 +680,19 @@ function PaymentForm({ orderUuid, amount, title, locale, isRTL, isGuest, orderDe
             {/* Display ordered files (API first; localStorage fallback) */}
             {docsToRender.length > 0 ? (
               <div className="mt-2">
-                <div className="flex flex-col flex-wrap gap-3">
+                <div className="flex flex-col gap-3">
                   {docsToRender.map((doc) => (
-                    <div key={doc.key} className="flex items-center gap-2 bg-gray-50 rounded-md px-3 py-2">
+                    <div
+                      key={doc.key}
+                      className="flex flex-wrap items-center gap-2 bg-gray-50 rounded-md px-3 py-2 min-w-0"
+                    >
                       <Image
                         src={getFileIconByExtension(doc.file_extension)}
                         alt={`${doc.file_extension.toUpperCase()} file`}
                         width={20}
                         height={20}
                       />
-                      <Text size="xs" c="dimmed" style={{ maxWidth: '150px' }} truncate>
+                      <Text size="xs" c="dimmed" className="min-w-0 flex-1" truncate>
                         {doc.file_name}
                       </Text>
                       <Badge size="xs" color="blue" variant="light" className="bg-blue-100">
@@ -712,7 +715,7 @@ function PaymentForm({ orderUuid, amount, title, locale, isRTL, isGuest, orderDe
 
         {/* Payment Element - Right Column */}
         <div className="space-y-6">
-          <Paper  p="lg" radius="md" className="border border-gray-200">
+          <Paper p={0} radius="md" className="border border-gray-200 p-4 sm:p-6">
           <PaymentElement
   options={{
     layout: "tabs",
@@ -890,7 +893,7 @@ export default function StripePaymentPage() {
       <PageIllustration middle={false} />
       
       <div className="min-h-screen relative z-1" dir={isRTL ? "rtl" : "ltr"}>
-        <Container size="lg" className="py-12">
+        <Container size="lg" className="py-8 sm:py-12 px-4">
           <div className="max-w-5xl mx-auto">
             <Elements stripe={stripePromise} options={options}>
               <PaymentForm 
