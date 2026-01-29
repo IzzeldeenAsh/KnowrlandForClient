@@ -37,7 +37,7 @@ interface MenuPosition {
 
 export function UserProfile({ isHome }: { isHome: boolean }) {
   const t = useTranslations("UserProfile");
-  const { user, roles, isLoading, handleSignOut } = useUserProfile();
+  const { user, roles, isLoading, isAuthResolved, handleSignOut } = useUserProfile();
   const pathname = usePathname();
   const isRtl = pathname.startsWith("/ar");
   const [menuOpen, setMenuOpen] = useState(false);
@@ -136,6 +136,14 @@ export function UserProfile({ isHome }: { isHome: boolean }) {
       !roles.includes("company-insighter");
   };
   
+  if (!isAuthResolved) {
+    return hasToken ? (
+      <div className="w-10 h-10 bg-white animate-pulse rounded-full overflow-hidden border border-gray-200"></div>
+    ) : (
+      <div className="h-9 w-24 bg-gray-200 animate-pulse rounded-full overflow-hidden border border-gray-200"></div>
+    );
+  }
+
   if (isLoading && hasToken) {
     return <div className="w-10 h-10 bg-white animate-pulse rounded-full overflow-hidden border border-gray-200"></div>;
   }

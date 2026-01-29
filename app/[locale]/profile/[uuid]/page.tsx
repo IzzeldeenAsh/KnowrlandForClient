@@ -100,6 +100,7 @@ interface CompanyInsighter {
   id: number;
   uuid: string;
   name: string;
+  owner?: boolean;
   profile_photo_url: string | null;
   country?: CompanyInsighterCountry | null;
 }
@@ -209,6 +210,11 @@ function ProfilePageContent() {
   const [knowledgeData, setKnowledgeData] = useState<KnowledgeResponse | null>(
     null
   );
+  // Store the "All" (unfiltered) total so the top stat doesn't change
+  // when the user switches filter chips on company profiles.
+  const [allKnowledgeTotal, setAllKnowledgeTotal] = useState<number | null>(
+    null
+  );
   const [knowledgePage, setKnowledgePage] = useState(1);
   const [loadingKnowledge, setLoadingKnowledge] = useState(false);
   const [selectedType, setSelectedType] = useState<string | null>(null);
@@ -235,6 +241,10 @@ function ProfilePageContent() {
   const filterT = useTranslations("Filters");
   const [enterpriseType, setEnterpriseType] = useState<string | null>(null);
 
+  // Tab navigation loader (shows during URL/tab switch)
+  const [tabNavigating, setTabNavigating] = useState(false);
+  const [pendingTab, setPendingTab] = useState<string | null>(null);
+
   // Calendar booking states
   const [loadingMeetings, setLoadingMeetings] = useState(false);
   const [meetingAvailability, setMeetingAvailability] = useState<
@@ -252,9 +262,29 @@ function ProfilePageContent() {
 
   // Get entity type from search params (safe for SSR)
   const entityParam = searchParams.get("entity");
+  const activeTab = searchParams.get("tab") || "knowledge";
+  const isViewingInsighterEntity = (enterpriseType ?? entityParam) === "insighter";
   
   // Ref to prevent duplicate API calls
   const fetchingProfileRef = useRef(false);
+
+  // Turn off the loader when the URL "tab" param actually changes to the desired value
+  useEffect(() => {
+    if (!tabNavigating) return;
+    if (pendingTab && activeTab === pendingTab) {
+      setTabNavigating(false);
+      setPendingTab(null);
+      return;
+    }
+
+    // Safety: never keep the loader stuck (e.g., aborted navigation)
+    const timeout = window.setTimeout(() => {
+      setTabNavigating(false);
+      setPendingTab(null);
+    }, 2000);
+
+    return () => window.clearTimeout(timeout);
+  }, [activeTab, pendingTab, tabNavigating]);
 
   useEffect(() => {
     const fetchProfileData = async () => {
@@ -454,6 +484,15 @@ function ProfilePageContent() {
 
         const data = await response.json();
         setKnowledgeData(data);
+
+        // When on a company page, cache the "All" total when the current request is unfiltered.
+        // This ensures the Published Insight stat stays stable while filters change.
+        if (entityType !== "insighter" && !selectedType) {
+          const total = data?.meta?.total;
+          if (typeof total === "number") {
+            setAllKnowledgeTotal(total);
+          }
+        }
       } catch (error) {
         console.error("Error fetching knowledge data:", error);
       } finally {
@@ -463,6 +502,41 @@ function ProfilePageContent() {
 
     fetchKnowledgeData();
   }, [uuid, locale, knowledgePage, selectedType, profileData]);
+
+  // Fetch the unfiltered "All" total for company profiles (so the stat doesn't follow filters),
+  // even if the user lands directly on a filtered URL.
+  useEffect(() => {
+    const fetchAllKnowledgeTotal = async () => {
+      if (!uuid || !profileData) return;
+      if (isViewingInsighterEntity) return;
+
+      try {
+        const response = await fetch(
+          `https://api.insightabusiness.com/api/platform/company/knowledge/${uuid}?page=1&per_page=1`,
+          {
+            headers: {
+              "Content-Type": "application/json",
+              Accept: "application/json",
+              "Accept-Language": locale,
+            },
+          }
+        );
+        if (!response.ok) return;
+        const data = await response.json();
+        const total = data?.meta?.total;
+        if (typeof total === "number") {
+          setAllKnowledgeTotal(total);
+        }
+      } catch {
+        // ignore - UI will fall back to knowledgeData?.meta.total
+      }
+    };
+
+    // Only fetch when we don't already have it.
+    if (allKnowledgeTotal == null) {
+      fetchAllKnowledgeTotal();
+    }
+  }, [uuid, locale, profileData, isViewingInsighterEntity, allKnowledgeTotal]);
 
   // Fetch insighter statistics when viewing an insighter profile
   useEffect(() => {
@@ -643,6 +717,10 @@ function ProfilePageContent() {
 
   // Load meeting availability data when tab changes to "meet"
   const handleTabChange = (value: string | null) => {
+    // Show a loader immediately on tab click (URL update can feel like a pause)
+    setTabNavigating(true);
+    setPendingTab(value ?? "knowledge");
+
     // Update URL with tab parameter
     if (typeof window !== "undefined") {
       const currentParams = new URLSearchParams(window.location.search);
@@ -653,7 +731,10 @@ function ProfilePageContent() {
         currentParams.delete("tab");
       }
       
-      const newUrl = `${window.location.pathname}?${currentParams.toString()}`;
+      const qs = currentParams.toString();
+      const newUrl = qs
+        ? `${window.location.pathname}?${qs}`
+        : window.location.pathname;
       router.push(newUrl, { scroll: false });
     }
 
@@ -665,15 +746,14 @@ function ProfilePageContent() {
 
   // Check URL parameters on initial load to fetch meeting data if needed
   useEffect(() => {
-    const tabParam = searchParams.get("tab");
     if (
-      tabParam === "meet" &&
+      activeTab === "meet" &&
       entityParam === "insighter" &&
       authChecked
     ) {
       fetchMeetingAvailability();
     }
-  }, [entityParam, isAuthenticated, authChecked]); // Run once authentication status is confirmed
+  }, [activeTab, entityParam, authChecked]); // Run once authentication status is confirmed
 
 
 
@@ -1330,6 +1410,7 @@ function ProfilePageContent() {
                               {profileData.insighter_company
                                 .slice(0, 3)
                                 .map((insighter) => {
+                                  const isOwner = Boolean(insighter.owner);
                                   const initials = insighter.name
                                     .split(" ")
                                     .filter(Boolean)
@@ -1340,7 +1421,13 @@ function ProfilePageContent() {
                                   return (
                                     <Tooltip
                                       key={insighter.id}
-                                      label={insighter.name}
+                                      label={
+                                        isOwner
+                                          ? `${insighter.name} • ${
+                                              locale === "ar" ? "المدير" : "Manager"
+                                            }`
+                                          : insighter.name
+                                      }
                                       withArrow
                                       position="top"
                                     >
@@ -1348,24 +1435,42 @@ function ProfilePageContent() {
                                         href={`/${locale}/profile/${insighter.uuid}?entity=insighter`}
                                         className="block"
                                       >
-                                        <Avatar
-                                          src={insighter.profile_photo_url || undefined}
-                                          radius="xl"
-                                          size="md"
-                                          color="blue"
+                                        <div
+                                         
                                         >
-                                          {!insighter.profile_photo_url
-                                            ? initials
-                                            : null}
-                                        </Avatar>
+                                          <Avatar
+                                            src={insighter.profile_photo_url || undefined}
+                                            radius="xl"
+                                            size="md"
+                                            color="blue"
+                                          >
+                                            {!insighter.profile_photo_url
+                                              ? initials
+                                              : null}
+                                          </Avatar>
+                                        </div>
                                       </Link>
                                     </Tooltip>
                                   );
                                 })}
                               {profileData.insighter_company.length > 3 && (
                                 <Link
-                                  href={`/${locale}/profile/${uuid}?tab=company-insighters`}
+                                  href={`/${locale}/profile/${uuid}?${(() => {
+                                    // Preserve any existing params (e.g. entity), only switch the tab.
+                                    const params = new URLSearchParams(
+                                      searchParams.toString()
+                                    );
+                                    params.set("tab", "company-insighters");
+                                    return params.toString();
+                                  })()}`}
                                   className="block"
+                                  prefetch={false}
+                                  onClick={(e) => {
+                                    // Avoid full navigation (can get stuck in loading);
+                                    // behave like a tab switch and still update the URL.
+                                    e.preventDefault();
+                                    handleTabChange("company-insighters");
+                                  }}
                                 >
                                   <Avatar
                                     radius="xl"
@@ -1410,14 +1515,14 @@ function ProfilePageContent() {
                           />
                         </div>
                         <p className="bg-clip-text text-transparent bg-gradient-to-r from-emerald-600 to-teal-500 font-bold text-4xl">
-                          {enterpriseType === "insighter"
+                          {isViewingInsighterEntity
                             ? (insighterStatistics?.total_published ??
                               knowledgeData?.meta.total ??
                               0)
-                            : (knowledgeData?.meta.total ?? 0)}
+                            : (allKnowledgeTotal ?? knowledgeData?.meta.total ?? 0)}
                         </p>
                       </div>
-                      {enterpriseType === "insighter" && (
+                      {isViewingInsighterEntity && (
                         <div className="text-start bg-gradient-to-br from-white to-blue-50 dark:from-slate-700 dark:to-slate-600 p-3 rounded-lg hover:shadow-md transition-all duration-300 transform hover:-translate-y-1 border border-gray-100 dark:border-slate-600 group">
                           <div className="flex items-center mb-2">
                             <div className="p-1.5 bg-blue-100 dark:bg-blue-900/30 rounded-full me-2 group-hover:scale-110 transition-transform">
@@ -1454,7 +1559,7 @@ function ProfilePageContent() {
           >
             {/* Get the tab parameter from the search params, default to 'knowledge' if not provided */}
             <Tabs
-              defaultValue={searchParams.get("tab") || "knowledge"}
+              value={activeTab}
               onChange={handleTabChange}
               styles={{
                 tab: {
@@ -1517,165 +1622,206 @@ function ProfilePageContent() {
                   )}
               </Tabs.List>
 
-              <Tabs.Panel value="knowledge">
-                <KnowledgeTab
-                  locale={locale}
-                  isRTL={isRTL}
-                  knowledgeData={knowledgeData}
-                  loadingKnowledge={loadingKnowledge}
-                  knowledgeTypes={knowledgeTypes}
-                  selectedType={selectedType}
-                  profileData={profileData}
-                  handleTypeChange={handleTypeChange}
-                  handlePageChange={handlePageChange}
-                  formatKnowledgeItems={formatKnowledgeItems}
-                />
-              </Tabs.Panel>
-
-              <Tabs.Panel value="about">
-                <AboutTab
-                  locale={locale}
-                  isRTL={isRTL}
-                  profileData={profileData}
-                  isCompany={isCompany || false}
-                  getSocialIcon={getSocialIcon}
-                  enterpriseType={enterpriseType}
-                />
-              </Tabs.Panel>
-
-              {/* Company Insighters Tab Panel */}
-              <Tabs.Panel value="company-insighters">
-                {isCompany &&
-                !enterpriseType &&
-                profileData.insighter_company &&
-                profileData.insighter_company.length > 0 ? (
-                  <div className="p-6 sm:p-8">
-                    <div className="mb-4 flex justify-between items-center">
-                    
-                      <span className="text-sm text-gray-500">
-                        {profileData.insighter_company.length}{" "}
-                        {locale === "ar" ? "خبراء" : "insighters"}
+              <div className="relative">
+                {tabNavigating && (
+                  <div className="absolute inset-0 z-20 flex items-center justify-center bg-white/70 dark:bg-slate-800/70 backdrop-blur-sm">
+                    <div className="flex items-center gap-3">
+                      <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-blue-500" />
+                      <span className="text-sm font-medium text-gray-600 dark:text-gray-300">
+                        {locale === "ar" ? "جارٍ التحميل..." : "Loading..."}
                       </span>
                     </div>
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                      {profileData.insighter_company.map((insighter) => (
-                        <Link
-                          key={insighter.uuid}
-                          href={`/${locale}/profile/${insighter.uuid}?entity=insighter`}
-                          className="flex flex-col justify-between gap-4 bg-white rounded-lg border border-gray-200 overflow-hidden duration-300 p-5 hover:-translate-y-1 hover:shadow-md"
-                          style={{
-                            backgroundImage:
-                              "url('https://res.cloudinary.com/dsiku9ipv/image/upload/v1746774672/Artboard_2_qzimiu.png')",
-                            backgroundSize: "cover",
-                            backgroundPosition: "center",
-                          }}
-                        >
-                          <div className="flex flex-col justify-center items-center gap-4">
-                            <div className="relative w-16 h-16 rounded-full border border-blue-500 overflow-hidden bg-blue-50 flex items-center justify-center">
-                              {insighter.profile_photo_url ? (
-                                <Image
-                                  src={insighter.profile_photo_url}
-                                  alt={insighter.name}
-                                  fill
-                                  className="object-cover rounded-full object-top"
-                                />
-                              ) : (
-                                <span className="text-xl font-semibold text-blue-600">
-                                  {getInitials(insighter.name)}
-                                </span>
-                              )}
-                            </div>
-                            <div className="flex-1 min-w-0">
-                              <div className="flex items-center gap-2">
-                                <p className="font-semibold text-gray-900 truncate">
-                                  {insighter.name}
-                                </p>
-                                <IconRosetteDiscountCheckFilled className="w-4 h-4 text-blue-500 flex-shrink-0" />
-                              </div>
-                              {insighter.country && (
-                                <div className="mt-1 justify-center flex items-center gap-2 text-xs text-gray-600">
-                                  {insighter.country.flag && (
-                                    <Image
-                                      src={`/images/flags/${insighter.country.flag}.svg`}
-                                      alt={insighter.country.name}
-                                      width={14}
-                                      height={14}
-                                      className="object-contain"
-                                    />
-                                  )}
-                                  <span className="truncate">
-                                    {insighter.country.name}
-                                  </span>
-                                </div>
-                              )}
-                            </div>
-                          </div>
-                          <div className="flex flex-col  gap-2 w-full">
-                            <Link
-                              href={`/${locale}/profile/${insighter.uuid}?entity=insighter&tab=meet`}
-                              onClick={(e) => e.stopPropagation()}
-                              className="flex-1"
-                            >
-                              <button className="w-full bg-gradient-to-r from-blue-500 to-teal-400 text-xs text-white px-6 py-2 rounded-md font-medium hover:shadow-lg transition-all duration-300">
-                                {locale === "ar"
-                                  ? "حجز مقابلة"
-                                  : "Meet"}
-                              </button>
-                            </Link>
-                            <Link
-                              href={`/${locale}/profile/${insighter.uuid}?entity=insighter`}
-                              onClick={(e) => e.stopPropagation()}
-                              className="flex-1"
-                            >
-                              <button className="w-full bg-white text-xs text-gray-900 border border-gray-300 px-6 py-2 rounded-md font-medium hover:bg-blue-50 transition-all duration-300">
-                                {locale === "ar"
-                                  ? "عرض الرؤى المنشورة"
-                                  : "View Published Insights"}
-                              </button>
-                            </Link>
-                          </div>
-                        </Link>
-                      ))}
-                    </div>
-                  </div>
-                ) : (
-                  <div className="py-10 text-center text-gray-500">
-                    {locale === "ar"
-                      ? "لا يوجد خبراء للشركة حتى الآن"
-                      : "No company insighters available yet."}
                   </div>
                 )}
-              </Tabs.Panel>
 
-              {/* Meet Tab Panel with Booking Calendar */}
-              <Tabs.Panel value="meet">
-                <MeetTab
-                  locale={locale}
-                  isRTL={isRTL}
-                  profileData={profileData}
-                  isAuthenticated={isAuthenticated}
-                  loadingMeetings={loadingMeetings}
-                  meetingAvailability={meetingAvailability}
-                  currentMonth={currentMonth}
-                  selectedDate={selectedDate}
-                  selectedMeetingTime={selectedMeetingTime}
-                  uuid={uuid}
-                  isOwnProfile={isOwnProfile}
-                  handlePreviousMonth={handlePreviousMonth}
-                  handleNextMonth={handleNextMonth}
-                  handleDateClick={handleDateClick}
-                  handleTimeClick={handleTimeClick}
-                  fetchMeetingAvailability={fetchMeetingAvailability}
-                  isDateActive={isDateActive}
-                  getMeetingTimesForDate={getMeetingTimesForDate}
-                  getMonthName={getMonthName}
-                  getShortWeekdayNames={getShortWeekdayNames}
-                  getDaysInMonth={getDaysInMonth}
-                  getFirstDayOfMonth={getFirstDayOfMonth}
-                  formatDateString={formatDateString}
-                  getDayName={getDayName}
-                />
-              </Tabs.Panel>
+                <Tabs.Panel value="knowledge">
+                  <KnowledgeTab
+                    locale={locale}
+                    isRTL={isRTL}
+                    knowledgeData={knowledgeData}
+                    loadingKnowledge={loadingKnowledge}
+                    knowledgeTypes={knowledgeTypes}
+                    selectedType={selectedType}
+                    profileData={profileData}
+                    handleTypeChange={handleTypeChange}
+                    handlePageChange={handlePageChange}
+                    formatKnowledgeItems={formatKnowledgeItems}
+                  />
+                </Tabs.Panel>
+
+                <Tabs.Panel value="about">
+                  <AboutTab
+                    locale={locale}
+                    isRTL={isRTL}
+                    profileData={profileData}
+                    isCompany={isCompany || false}
+                    getSocialIcon={getSocialIcon}
+                    enterpriseType={enterpriseType}
+                  />
+                </Tabs.Panel>
+
+                {/* Company Insighters Tab Panel */}
+                <Tabs.Panel value="company-insighters">
+                  {isCompany &&
+                  !enterpriseType &&
+                  profileData.insighter_company &&
+                  profileData.insighter_company.length > 0 ? (
+                    <div className="p-6 sm:p-8">
+                      <div className="mb-4 flex justify-between items-center">
+                        <span className="text-sm text-gray-500">
+                          {profileData.insighter_company.length}{" "}
+                          {locale === "ar" ? "خبراء" : "insighters"}
+                        </span>
+                      </div>
+                      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        {profileData.insighter_company.map((insighter) => (
+                          (() => {
+                            const isOwner = Boolean(insighter.owner);
+                            const managerLabel =
+                              locale === "ar" ? "المدير" : "Manager";
+
+                            return (
+                          <Link
+                            key={insighter.uuid}
+                            href={`/${locale}/profile/${insighter.uuid}?entity=insighter`}
+                            className={`flex flex-col justify-between gap-4 bg-white rounded-lg border overflow-hidden duration-300 p-5 hover:-translate-y-1 hover:shadow-md ${
+                              isOwner
+                                ? "border-blue-200 ring-1 ring-blue-100"
+                                : "border-gray-200"
+                            }`}
+                            style={{
+                              backgroundImage:
+                                "url('https://res.cloudinary.com/dsiku9ipv/image/upload/v1746774672/Artboard_2_qzimiu.png')",
+                              backgroundSize: "cover",
+                              backgroundPosition: "center",
+                            }}
+                          >
+                            <div className="flex flex-col justify-center items-center gap-4">
+                              <div
+                                className={`relative w-16 h-16 rounded-full border overflow-hidden bg-blue-50 flex items-center justify-center ${
+                                  isOwner
+                                    ? "border-blue-500 ring-2 ring-blue-200"
+                                    : "border-blue-500"
+                                }`}
+                              >
+                                {insighter.profile_photo_url ? (
+                                  <Image
+                                    src={insighter.profile_photo_url}
+                                    alt={insighter.name}
+                                    fill
+                                    className="object-cover rounded-full object-top"
+                                  />
+                                ) : (
+                                  <span className="text-xl font-semibold text-blue-600">
+                                    {getInitials(insighter.name)}
+                                  </span>
+                                )}
+                              
+                              </div>
+                              <div className="flex-1 min-w-0">
+                                <div className="flex flex-col items-center gap-2">
+                                      <div className="flex items-center gap-2">
+                                      <p className="font-semibold text-gray-900 truncate">
+                                            {insighter.name}
+                                          </p>
+                                          <IconRosetteDiscountCheckFilled className="w-4 h-4 text-blue-500 flex-shrink-0" />
+                                      </div>
+                                          {isOwner && (
+                                            <span
+                                              className={`inline-flex items-center rounded-full border mb-2 border-amber-200 bg-amber-50 text-amber-800 text-[11px] font-semibold px-2 py-0.5 ${
+                                                locale === "ar" ? "flex-row-reverse" : ""
+                                              }`}
+                                              dir={locale === "ar" ? "rtl" : "ltr"}
+                                            >
+                                              {managerLabel}
+                                            </span>
+                                          )}
+                                </div>
+                                {insighter.country && (
+                                  <div className="mt-1 justify-center flex items-center gap-2 text-xs text-gray-600">
+                                    {insighter.country.flag && (
+                                      <Image
+                                        src={`/images/flags/${insighter.country.flag}.svg`}
+                                        alt={insighter.country.name}
+                                        width={14}
+                                        height={14}
+                                        className="object-contain"
+                                      />
+                                    )}
+                                    <span className="truncate">
+                                      {insighter.country.name}
+                                    </span>
+                                  </div>
+                                )}
+                              </div>
+                            </div>
+                            <div className="flex flex-col  gap-2 w-full">
+                              <Link
+                                href={`/${locale}/profile/${insighter.uuid}?entity=insighter&tab=meet`}
+                                onClick={(e) => e.stopPropagation()}
+                                className="flex-1"
+                              >
+                                <button className="w-full bg-gradient-to-r from-blue-500 to-teal-400 text-xs text-white px-6 py-2 rounded-md font-medium hover:shadow-lg transition-all duration-300">
+                                  {locale === "ar" ? "حجز مقابلة" : "Meet"}
+                                </button>
+                              </Link>
+                              <Link
+                                href={`/${locale}/profile/${insighter.uuid}?entity=insighter`}
+                                onClick={(e) => e.stopPropagation()}
+                                className="flex-1"
+                              >
+                                <button className="w-full bg-white text-xs text-gray-900 border border-gray-300 px-6 py-2 rounded-md font-medium hover:bg-blue-50 transition-all duration-300">
+                                  {locale === "ar"
+                                    ? "عرض الرؤى المنشورة"
+                                    : "View Published Insights"}
+                                </button>
+                              </Link>
+                            </div>
+                          </Link>
+                            );
+                          })()
+                        ))}
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="py-10 text-center text-gray-500">
+                      {locale === "ar"
+                        ? "لا يوجد خبراء للشركة حتى الآن"
+                        : "No company insighters available yet."}
+                    </div>
+                  )}
+                </Tabs.Panel>
+
+                {/* Meet Tab Panel with Booking Calendar */}
+                <Tabs.Panel value="meet">
+                  <MeetTab
+                    locale={locale}
+                    isRTL={isRTL}
+                    profileData={profileData}
+                    isAuthenticated={isAuthenticated}
+                    loadingMeetings={loadingMeetings}
+                    meetingAvailability={meetingAvailability}
+                    currentMonth={currentMonth}
+                    selectedDate={selectedDate}
+                    selectedMeetingTime={selectedMeetingTime}
+                    uuid={uuid}
+                    isOwnProfile={isOwnProfile}
+                    handlePreviousMonth={handlePreviousMonth}
+                    handleNextMonth={handleNextMonth}
+                    handleDateClick={handleDateClick}
+                    handleTimeClick={handleTimeClick}
+                    fetchMeetingAvailability={fetchMeetingAvailability}
+                    isDateActive={isDateActive}
+                    getMeetingTimesForDate={getMeetingTimesForDate}
+                    getMonthName={getMonthName}
+                    getShortWeekdayNames={getShortWeekdayNames}
+                    getDaysInMonth={getDaysInMonth}
+                    getFirstDayOfMonth={getFirstDayOfMonth}
+                    formatDateString={formatDateString}
+                    getDayName={getDayName}
+                  />
+                </Tabs.Panel>
+              </div>
             </Tabs>
 
           </div>

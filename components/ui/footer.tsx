@@ -22,7 +22,11 @@ export default function Footer() {
                 <div className="mb-4 flex justify-center sm:justify-start">
                   <Logo />
                 </div>
-                <div className="text-sm text-start text-slate-300" dangerouslySetInnerHTML={{ __html: t('copyright') }} />
+                <div className="text-sm sm:text-start text-center text-slate-300" >
+                  {isRTL ? 'جميع الحقوق محفوظة   ' : 'All Rights Reserved.'}
+                  <br />
+                    &copy; 2025 insightabusiness.com 
+                  </div>
               </div>
               {/* Social links */}
               <ul className="flex space-x-4 justify-center sm:justify-start">

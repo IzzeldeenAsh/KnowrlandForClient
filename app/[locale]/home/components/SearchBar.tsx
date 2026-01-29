@@ -629,7 +629,8 @@ const SearchBar: React.FC<SearchBarProps> = ({
             const isActive = searchType === type;
             const isLocked = type === 'insighter';
             return (
-                      <button
+              <div className="flex flex-col">
+                         <button
                 key={type}
                         type="button"
                 disabled={isLocked}
@@ -650,8 +651,19 @@ const SearchBar: React.FC<SearchBarProps> = ({
                 {renderTypeIcon(type, isActive, isLocked)}
                 <span>{typeLabels[type]}</span>
                       </button>
+          {/* {isLocked && (
+             <div className='text-xs pt-1 text-green-600'> {isRtl ? 'قريباً' : 'Coming Soon'}</div>
+          )}
+          {!isLocked && (
+             <div className='text-xs pt-1 text-gray-800'>&nbsp;</div>
+          )} */}
+              </div>
+             
+                     
             );
+           
           })}
+          
           </div>
 
         <div className="relative">

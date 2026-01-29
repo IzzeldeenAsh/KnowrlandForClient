@@ -4,8 +4,6 @@ import { useState, useEffect } from "react";
 import { useTranslations } from "next-intl";
 import Image from "next/image";
 import Illustration from "@/public/images/glow-top-blue.svg";
-import ChangelogImg04 from "@/public/images/Budget.png";
-import { useLocale } from "next-intl";
 import { UserGroupIcon, 
   CalendarIcon,
   StarIcon,
@@ -20,18 +18,16 @@ export default function Features() {
   const t = useTranslations("Features");
   const t2 = useTranslations("Features2");
   const t3 = useTranslations("Features3");
-  const [tab, setTab] = useState<number>(1);
-  const locale = useLocale();
-  const isRTL = locale === "ar";
-  
-  // Add state for video hover
-  const [isVideoHovered, setIsVideoHovered] = useState(false);
-  const [isButtonsHovered, setIsButtonsHovered] = useState(false);
 
   // States to track which tab is being hovered for each section
   const [hoveredTab1, setHoveredTab1] = useState<number | null>(null);
   const [hoveredTab2, setHoveredTab2] = useState<number | null>(null);
   const [hoveredTab3, setHoveredTab3] = useState<number | null>(null);
+
+  // Click-selected tab (overrides auto-cycling until toggled off)
+  const [selectedTab1, setSelectedTab1] = useState<number | null>(null);
+  const [selectedTab2, setSelectedTab2] = useState<number | null>(null);
+  const [selectedTab3, setSelectedTab3] = useState<number | null>(null);
 
   // States for automatic cycling
   const [activeTab1, setActiveTab1] = useState<number>(1);
@@ -43,33 +39,33 @@ export default function Features() {
 
   // Auto-cycling effect for section 1
   useEffect(() => {
-    if (!isHovering1) {
+    if (!isHovering1 && selectedTab1 === null) {
       const interval = setInterval(() => {
         setActiveTab1(prev => prev >= 3 ? 1 : prev + 1);
       }, 4000);
       return () => clearInterval(interval);
     }
-  }, [isHovering1]);
+  }, [isHovering1, selectedTab1]);
 
   // Auto-cycling effect for section 2
   useEffect(() => {
-    if (!isHovering2) {
+    if (!isHovering2 && selectedTab2 === null) {
       const interval = setInterval(() => {
         setActiveTab2(prev => prev >= 3 ? 1 : prev + 1);
       }, 4000);
       return () => clearInterval(interval);
     }
-  }, [isHovering2]);
+  }, [isHovering2, selectedTab2]);
 
   // Auto-cycling effect for section 3
   useEffect(() => {
-    if (!isHovering3) {
+    if (!isHovering3 && selectedTab3 === null) {
       const interval = setInterval(() => {
         setActiveTab3(prev => prev >= 3 ? 1 : prev + 1);
       }, 4000);
       return () => clearInterval(interval);
     }
-  }, [isHovering3]);
+  }, [isHovering3, selectedTab3]);
 
   return (
     <section>
@@ -102,7 +98,7 @@ export default function Features() {
                     <div className="relative w-full h-full">
                       <div className="absolute inset-0 bg-gradient-to-br from-blue-500/10 rounded-lg to-transparent rounded-[inherit]" />
                       <Image
-                        className={`rounded-[inherit] transition-all duration-700 ease-in-out absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 max-w-full max-h-full ${hoveredTab1 === 1 || (hoveredTab1 === null && activeTab1 === 1) ? 'opacity-100' : 'opacity-0'}`}
+                        className={`rounded-[inherit] transition-all duration-700 ease-in-out absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 max-w-full max-h-full ${(hoveredTab1 ?? selectedTab1 ?? activeTab1) === 1 ? 'opacity-100' : 'opacity-0'}`}
                         src={'/images/ask-screenshot.png'}
                         width={700}
                         height={700}
@@ -113,7 +109,7 @@ export default function Features() {
                       <div className="absolute inset-0  rounded-[inherit]" />
                     </div>
                     <Image
-                      className={`w-full h-full rounded-[inherit] transition-all duration-700 ease-in-out absolute ${hoveredTab1 === 2 || (hoveredTab1 === null && activeTab1 === 2) ? 'opacity-100' : 'opacity-0'}`}
+                      className={`w-full h-full rounded-[inherit] transition-all duration-700 ease-in-out absolute ${(hoveredTab1 ?? selectedTab1 ?? activeTab1) === 2 ? 'opacity-100' : 'opacity-0'}`}
                       src={'/images/book-meeting.png'}
                       width={500}
                       height={500}
@@ -121,7 +117,7 @@ export default function Features() {
                       style={{ objectFit: 'contain', width: 'auto', height: 'auto' }}
                     />
                     <Image
-                      className={`w-full h-full rounded-[inherit] transition-all duration-700 ease-in-out absolute ${hoveredTab1 === 3 || (hoveredTab1 === null && activeTab1 === 3) ? 'opacity-100' : 'opacity-0'}`}
+                      className={`w-full h-full rounded-[inherit] transition-all duration-700 ease-in-out absolute ${(hoveredTab1 ?? selectedTab1 ?? activeTab1) === 3 ? 'opacity-100' : 'opacity-0'}`}
                       src={'/images/rating.png'}
                       width={500}
                       height={500}
@@ -151,6 +147,10 @@ export default function Features() {
                 </p>
                 <div className="mt-8 max-w-md space-y-2">
                   <button
+                    onClick={() => {
+                      setActiveTab1(1);
+                      setSelectedTab1((prev) => (prev === 1 ? null : 1));
+                    }}
                     onMouseEnter={() => {
                       setHoveredTab1(1);
                       setIsHovering1(true);
@@ -159,13 +159,27 @@ export default function Features() {
                       setHoveredTab1(null);
                       setIsHovering1(false);
                     }}
-                    className={`flex items-center gap-2 text-start text-sm font-medium text-slate-50 rounded border bg-slate-800/25 w-full px-3 py-2 transition duration-150 ease-in-out hover:opacity-100 border-slate-700 ${hoveredTab1 === 1 || (hoveredTab1 === null && activeTab1 === 1) ? 'opacity-100' : 'opacity-70'} min-h-[60px]`}
+                    className={`group relative overflow-hidden flex items-center gap-2 text-start text-sm font-medium text-slate-50 rounded-lg border w-full px-3 py-2 transition duration-200 ease-in-out min-h-[60px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-400/60 ${
+                      (hoveredTab1 ?? selectedTab1 ?? activeTab1) === 1
+                        ? "opacity-100 border-blue-400/50 ring-1 ring-blue-400/30 bg-slate-800/35"
+                        : "opacity-70 border-slate-700 bg-slate-800/25 hover:opacity-100 hover:border-slate-500"
+                    }`}
                   >
-                    <UserGroupIcon className="h-5 w-5 text-blue-300" />
-                    <span>{t2("tabs.directExpertEngagement.title")}</span>
+                    <span
+                      aria-hidden="true"
+                      className={`absolute inset-0 rounded-[inherit] bg-gradient-to-r from-blue-500/20 via-blue-500/10 to-transparent transition-opacity duration-200 ${
+                        (hoveredTab1 ?? selectedTab1 ?? activeTab1) === 1 ? "opacity-100" : "opacity-0 group-hover:opacity-60"
+                      }`}
+                    />
+                    <UserGroupIcon className="relative z-10 h-5 w-5 text-blue-300" />
+                    <span className="relative z-10">{t2("tabs.directExpertEngagement.title")}</span>
                   </button>
 
                   <button
+                    onClick={() => {
+                      setActiveTab1(2);
+                      setSelectedTab1((prev) => (prev === 2 ? null : 2));
+                    }}
                     onMouseEnter={() => {
                       setHoveredTab1(2);
                       setIsHovering1(true);
@@ -174,13 +188,27 @@ export default function Features() {
                       setHoveredTab1(null);
                       setIsHovering1(false);
                     }}
-                    className={`flex items-center gap-2 text-start text-sm font-medium text-slate-50 rounded border bg-slate-800/25 w-full px-3 py-2 transition duration-150 ease-in-out hover:opacity-100 border-slate-700 ${hoveredTab1 === 2 || (hoveredTab1 === null && activeTab1 === 2) ? 'opacity-100' : 'opacity-70'} min-h-[60px]`}
+                    className={`group relative overflow-hidden flex items-center gap-2 text-start text-sm font-medium text-slate-50 rounded-lg border w-full px-3 py-2 transition duration-200 ease-in-out min-h-[60px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-400/60 ${
+                      (hoveredTab1 ?? selectedTab1 ?? activeTab1) === 2
+                        ? "opacity-100 border-blue-400/50 ring-1 ring-blue-400/30 bg-slate-800/35"
+                        : "opacity-70 border-slate-700 bg-slate-800/25 hover:opacity-100 hover:border-slate-500"
+                    }`}
                   >
-                    <CalendarIcon className="h-5 w-5 text-blue-300" />
-                    <span>{t2("tabs.consultingSessions.title")}</span>
+                    <span
+                      aria-hidden="true"
+                      className={`absolute inset-0 rounded-[inherit] bg-gradient-to-r from-blue-500/20 via-blue-500/10 to-transparent transition-opacity duration-200 ${
+                        (hoveredTab1 ?? selectedTab1 ?? activeTab1) === 2 ? "opacity-100" : "opacity-0 group-hover:opacity-60"
+                      }`}
+                    />
+                    <CalendarIcon className="relative z-10 h-5 w-5 text-blue-300" />
+                    <span className="relative z-10">{t2("tabs.consultingSessions.title")}</span>
                   </button>
 
                   <button
+                    onClick={() => {
+                      setActiveTab1(3);
+                      setSelectedTab1((prev) => (prev === 3 ? null : 3));
+                    }}
                     onMouseEnter={() => {
                       setHoveredTab1(3);
                       setIsHovering1(true);
@@ -189,10 +217,20 @@ export default function Features() {
                       setHoveredTab1(null);
                       setIsHovering1(false);
                     }}
-                    className={`flex items-center gap-2 text-start text-sm font-medium text-slate-50 rounded border bg-slate-800/25 w-full px-3 py-2 transition duration-150 ease-in-out hover:opacity-100 border-slate-700 ${hoveredTab1 === 3 || (hoveredTab1 === null && activeTab1 === 3) ? 'opacity-100' : 'opacity-70'} min-h-[60px]`}
+                    className={`group relative overflow-hidden flex items-center gap-2 text-start text-sm font-medium text-slate-50 rounded-lg border w-full px-3 py-2 transition duration-200 ease-in-out min-h-[60px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-400/60 ${
+                      (hoveredTab1 ?? selectedTab1 ?? activeTab1) === 3
+                        ? "opacity-100 border-blue-400/50 ring-1 ring-blue-400/30 bg-slate-800/35"
+                        : "opacity-70 border-slate-700 bg-slate-800/25 hover:opacity-100 hover:border-slate-500"
+                    }`}
                   >
-                    <StarIcon className="h-5 w-5 text-blue-300" />
-                    <span>{t2("tabs.expertRatings.title")}</span>
+                    <span
+                      aria-hidden="true"
+                      className={`absolute inset-0 rounded-[inherit] bg-gradient-to-r from-blue-500/20 via-blue-500/10 to-transparent transition-opacity duration-200 ${
+                        (hoveredTab1 ?? selectedTab1 ?? activeTab1) === 3 ? "opacity-100" : "opacity-0 group-hover:opacity-60"
+                      }`}
+                    />
+                    <StarIcon className="relative z-10 h-5 w-5 text-blue-300" />
+                    <span className="relative z-10">{t2("tabs.expertRatings.title")}</span>
                   </button>
                 </div>
               </div>
@@ -227,7 +265,15 @@ export default function Features() {
                 </p>
                 <div className="mt-8 max-w-md space-y-2">
                   <button
-                    className={`flex items-center gap-2 text-start text-sm font-medium text-slate-50 rounded border bg-slate-800/25 w-full px-3 py-2 transition duration-150 ease-in-out hover:opacity-100 border-slate-700 ${hoveredTab2 === 1 || (hoveredTab2 === null && activeTab2 === 1) ? 'opacity-100' : 'opacity-70'} min-h-[60px]`}
+                    onClick={() => {
+                      setActiveTab2(1);
+                      setSelectedTab2((prev) => (prev === 1 ? null : 1));
+                    }}
+                    className={`group relative overflow-hidden flex items-center gap-2 text-start text-sm font-medium text-slate-50 rounded-lg border w-full px-3 py-2 transition duration-200 ease-in-out min-h-[60px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-400/60 ${
+                      (hoveredTab2 ?? selectedTab2 ?? activeTab2) === 1
+                        ? "opacity-100 border-blue-400/50 ring-1 ring-blue-400/30 bg-slate-800/35"
+                        : "opacity-70 border-slate-700 bg-slate-800/25 hover:opacity-100 hover:border-slate-500"
+                    }`}
                     onMouseEnter={() => {
                       setHoveredTab2(1);
                       setIsHovering2(true);
@@ -237,11 +283,25 @@ export default function Features() {
                       setIsHovering2(false);
                     }}
                   >
-                    <MagnifyingGlassCircleIcon className="w-5 h-5 flex-shrink-0 text-blue-300" />
-                    <span>{t("tabs.preciseResults.title")}</span>
+                    <span
+                      aria-hidden="true"
+                      className={`absolute inset-0 rounded-[inherit] bg-gradient-to-r from-blue-500/20 via-blue-500/10 to-transparent transition-opacity duration-200 ${
+                        (hoveredTab2 ?? selectedTab2 ?? activeTab2) === 1 ? "opacity-100" : "opacity-0 group-hover:opacity-60"
+                      }`}
+                    />
+                    <MagnifyingGlassCircleIcon className="relative z-10 w-5 h-5 flex-shrink-0 text-blue-300" />
+                    <span className="relative z-10">{t("tabs.preciseResults.title")}</span>
                   </button>
                   <button
-                    className={`flex items-center gap-2 text-start text-sm font-medium text-slate-50 rounded border bg-slate-800/25 w-full px-3 py-2 transition duration-150 ease-in-out hover:opacity-100 border-slate-700 ${hoveredTab2 === 2 || (hoveredTab2 === null && activeTab2 === 2) ? 'opacity-100' : 'opacity-70'} min-h-[60px]`}
+                    onClick={() => {
+                      setActiveTab2(2);
+                      setSelectedTab2((prev) => (prev === 2 ? null : 2));
+                    }}
+                    className={`group relative overflow-hidden flex items-center gap-2 text-start text-sm font-medium text-slate-50 rounded-lg border w-full px-3 py-2 transition duration-200 ease-in-out min-h-[60px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-400/60 ${
+                      (hoveredTab2 ?? selectedTab2 ?? activeTab2) === 2
+                        ? "opacity-100 border-blue-400/50 ring-1 ring-blue-400/30 bg-slate-800/35"
+                        : "opacity-70 border-slate-700 bg-slate-800/25 hover:opacity-100 hover:border-slate-500"
+                    }`}
                     onMouseEnter={() => {
                       setHoveredTab2(2);
                       setIsHovering2(true);
@@ -251,11 +311,25 @@ export default function Features() {
                       setIsHovering2(false);
                     }}
                   >
-                    <GlobeAltIcon className="w-5 h-5 flex-shrink-0 text-blue-300" />
-                    <span>{t("tabs.variableData.title")}</span>
+                    <span
+                      aria-hidden="true"
+                      className={`absolute inset-0 rounded-[inherit] bg-gradient-to-r from-blue-500/20 via-blue-500/10 to-transparent transition-opacity duration-200 ${
+                        (hoveredTab2 ?? selectedTab2 ?? activeTab2) === 2 ? "opacity-100" : "opacity-0 group-hover:opacity-60"
+                      }`}
+                    />
+                    <GlobeAltIcon className="relative z-10 w-5 h-5 flex-shrink-0 text-blue-300" />
+                    <span className="relative z-10">{t("tabs.variableData.title")}</span>
                   </button>
                   <button
-                    className={`flex items-center gap-2 text-start text-sm font-medium text-slate-50 rounded border bg-slate-800/25 w-full px-3 py-2 transition duration-150 ease-in-out hover:opacity-100 border-slate-700 ${hoveredTab2 === 3 || (hoveredTab2 === null && activeTab2 === 3) ? 'opacity-100' : 'opacity-70'} min-h-[60px]`}
+                    onClick={() => {
+                      setActiveTab2(3);
+                      setSelectedTab2((prev) => (prev === 3 ? null : 3));
+                    }}
+                    className={`group relative overflow-hidden flex items-center gap-2 text-start text-sm font-medium text-slate-50 rounded-lg border w-full px-3 py-2 transition duration-200 ease-in-out min-h-[60px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-400/60 ${
+                      (hoveredTab2 ?? selectedTab2 ?? activeTab2) === 3
+                        ? "opacity-100 border-blue-400/50 ring-1 ring-blue-400/30 bg-slate-800/35"
+                        : "opacity-70 border-slate-700 bg-slate-800/25 hover:opacity-100 hover:border-slate-500"
+                    }`}
                     onMouseEnter={() => {
                       setHoveredTab2(3);
                       setIsHovering2(true);
@@ -265,8 +339,14 @@ export default function Features() {
                       setIsHovering2(false);
                     }}
                   >
-                    <RocketLaunchIcon className="w-5 h-5 flex-shrink-0 text-blue-300" />
-                    <span>{t("tabs.fasterDecisions.title")}</span>
+                    <span
+                      aria-hidden="true"
+                      className={`absolute inset-0 rounded-[inherit] bg-gradient-to-r from-blue-500/20 via-blue-500/10 to-transparent transition-opacity duration-200 ${
+                        (hoveredTab2 ?? selectedTab2 ?? activeTab2) === 3 ? "opacity-100" : "opacity-0 group-hover:opacity-60"
+                      }`}
+                    />
+                    <RocketLaunchIcon className="relative z-10 w-5 h-5 flex-shrink-0 text-blue-300" />
+                    <span className="relative z-10">{t("tabs.fasterDecisions.title")}</span>
                   </button>
                 </div>
               </div>
@@ -276,7 +356,7 @@ export default function Features() {
                 <figure className="rounded-3xl p-px mb-8">
                 <div className="relative flex items-center justify-center" style={{ width: '100%', height: '500px', overflow: 'hidden' }}>
                     <Image
-                      className={`w-full rounded-[inherit] transition-all duration-700 ease-in-out absolute inset-0 my-auto ${hoveredTab2 === 1 || (hoveredTab2 === null && activeTab2 === 1) ? 'opacity-100' : 'opacity-0'}`}
+                      className={`w-full rounded-[inherit] transition-all duration-700 ease-in-out absolute inset-0 my-auto ${(hoveredTab2 ?? selectedTab2 ?? activeTab2) === 1 ? 'opacity-100' : 'opacity-0'}`}
                       src={'https://res.cloudinary.com/dsiku9ipv/image/upload/v1747832518/Group_13495_kf7osl.png'}
                         width={500}
                       height={500}
@@ -304,7 +384,7 @@ export default function Features() {
                   />
                 </figure> */}
                     <Image
-                      className={`w-full rounded-[inherit] transition-all duration-700 ease-in-out absolute inset-0 ${hoveredTab2 === 2 || (hoveredTab2 === null && activeTab2 === 2) ? 'opacity-100' : 'opacity-0'}`}
+                      className={`w-full rounded-[inherit] transition-all duration-700 ease-in-out absolute inset-0 ${(hoveredTab2 ?? selectedTab2 ?? activeTab2) === 2 ? 'opacity-100' : 'opacity-0'}`}
                       src={'https://res.cloudinary.com/dsiku9ipv/image/upload/v1748025536/New_Project_11_xenv7c.png'}
                       width={500}
                       height={500}
@@ -312,7 +392,7 @@ export default function Features() {
                       style={{ objectFit: 'cover' }}
                     />
                     <Image
-                      className={`w-full rounded-[inherit] transition-all duration-700 ease-in-out absolute inset-0 ${hoveredTab2 === 3 || (hoveredTab2 === null && activeTab2 === 3) ? 'opacity-100' : 'opacity-0'}`}
+                      className={`w-full rounded-[inherit] transition-all duration-700 ease-in-out absolute inset-0 ${(hoveredTab2 ?? selectedTab2 ?? activeTab2) === 3 ? 'opacity-100' : 'opacity-0'}`}
                       src={'https://res.cloudinary.com/dsiku9ipv/image/upload/v1748087334/Group_13447_3_zjyfju.png'}
                       width={500}
                       height={500}
@@ -352,7 +432,15 @@ export default function Features() {
                 </p>
                 <div className="mt-8 max-w-md space-y-2">
                 <button
-                    className={`flex items-center gap-2 text-start text-sm font-medium text-slate-50 rounded border bg-slate-800/25 w-full px-3 py-2 transition duration-150 ease-in-out hover:opacity-100 border-slate-700 ${hoveredTab3 === 1 || (hoveredTab3 === null && activeTab3 === 1) ? 'opacity-100' : 'opacity-70'} min-h-[60px]`}
+                    onClick={() => {
+                      setActiveTab3(1);
+                      setSelectedTab3((prev) => (prev === 1 ? null : 1));
+                    }}
+                    className={`group relative overflow-hidden flex items-center gap-2 text-start text-sm font-medium text-slate-50 rounded-lg border w-full px-3 py-2 transition duration-200 ease-in-out min-h-[60px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-400/60 ${
+                      (hoveredTab3 ?? selectedTab3 ?? activeTab3) === 1
+                        ? "opacity-100 border-blue-400/50 ring-1 ring-blue-400/30 bg-slate-800/35"
+                        : "opacity-70 border-slate-700 bg-slate-800/25 hover:opacity-100 hover:border-slate-500"
+                    }`}
                     onMouseEnter={() => {
                       setHoveredTab3(1);
                       setIsHovering3(true);
@@ -362,11 +450,25 @@ export default function Features() {
                       setIsHovering3(false);
                     }}
                   >
-                    <DocumentArrowDownIcon className="w-5 h-5 flex-shrink-0 text-blue-300" />
-                    <span>{t3("tabs.no-monthly-subscription.title")}</span>
+                    <span
+                      aria-hidden="true"
+                      className={`absolute inset-0 rounded-[inherit] bg-gradient-to-r from-blue-500/20 via-blue-500/10 to-transparent transition-opacity duration-200 ${
+                        (hoveredTab3 ?? selectedTab3 ?? activeTab3) === 1 ? "opacity-100" : "opacity-0 group-hover:opacity-60"
+                      }`}
+                    />
+                    <DocumentArrowDownIcon className="relative z-10 w-5 h-5 flex-shrink-0 text-blue-300" />
+                    <span className="relative z-10">{t3("tabs.no-monthly-subscription.title")}</span>
                   </button>
                   <button
-                    className={`flex items-center gap-2 text-start text-sm font-medium text-slate-50 rounded border bg-slate-800/25 w-full px-3 py-2 transition duration-150 ease-in-out hover:opacity-100 border-slate-700 ${hoveredTab3 === 2 || (hoveredTab3 === null && activeTab3 === 2) ? 'opacity-100' : 'opacity-70'} min-h-[60px]`}
+                    onClick={() => {
+                      setActiveTab3(2);
+                      setSelectedTab3((prev) => (prev === 2 ? null : 2));
+                    }}
+                    className={`group relative overflow-hidden flex items-center gap-2 text-start text-sm font-medium text-slate-50 rounded-lg border w-full px-3 py-2 transition duration-200 ease-in-out min-h-[60px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-400/60 ${
+                      (hoveredTab3 ?? selectedTab3 ?? activeTab3) === 2
+                        ? "opacity-100 border-blue-400/50 ring-1 ring-blue-400/30 bg-slate-800/35"
+                        : "opacity-70 border-slate-700 bg-slate-800/25 hover:opacity-100 hover:border-slate-500"
+                    }`}
                     onMouseEnter={() => {
                       setHoveredTab3(2);
                       setIsHovering3(true);
@@ -376,11 +478,25 @@ export default function Features() {
                       setIsHovering3(false);
                     }}
                   >
-                    <CurrencyDollarIcon className="w-5 h-5 flex-shrink-0 text-blue-300" />
-                    <span>{t3("tabs.payAsYouGo.title")}</span>
+                    <span
+                      aria-hidden="true"
+                      className={`absolute inset-0 rounded-[inherit] bg-gradient-to-r from-blue-500/20 via-blue-500/10 to-transparent transition-opacity duration-200 ${
+                        (hoveredTab3 ?? selectedTab3 ?? activeTab3) === 2 ? "opacity-100" : "opacity-0 group-hover:opacity-60"
+                      }`}
+                    />
+                    <CurrencyDollarIcon className="relative z-10 w-5 h-5 flex-shrink-0 text-blue-300" />
+                    <span className="relative z-10">{t3("tabs.payAsYouGo.title")}</span>
                   </button>
                   <button
-                    className={`flex items-center gap-2 text-start text-sm font-medium text-slate-50 rounded border bg-slate-800/25 w-full px-3 py-2 transition duration-150 ease-in-out hover:opacity-100 border-slate-700 ${hoveredTab3 === 3 || (hoveredTab3 === null && activeTab3 === 3) ? 'opacity-100' : 'opacity-70'} min-h-[60px]`}
+                    onClick={() => {
+                      setActiveTab3(3);
+                      setSelectedTab3((prev) => (prev === 3 ? null : 3));
+                    }}
+                    className={`group relative overflow-hidden flex items-center gap-2 text-start text-sm font-medium text-slate-50 rounded-lg border w-full px-3 py-2 transition duration-200 ease-in-out min-h-[60px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-400/60 ${
+                      (hoveredTab3 ?? selectedTab3 ?? activeTab3) === 3
+                        ? "opacity-100 border-blue-400/50 ring-1 ring-blue-400/30 bg-slate-800/35"
+                        : "opacity-70 border-slate-700 bg-slate-800/25 hover:opacity-100 hover:border-slate-500"
+                    }`}
                     onMouseEnter={() => {
                       setHoveredTab3(3);
                       setIsHovering3(true);
@@ -390,8 +506,14 @@ export default function Features() {
                       setIsHovering3(false);
                     }}
                   >
-                    <ShoppingBagIcon className="w-5 h-5 flex-shrink-0 text-blue-300" />
-                    <span>{t3("tabs.purchaseSpecific.title")}</span>
+                    <span
+                      aria-hidden="true"
+                      className={`absolute inset-0 rounded-[inherit] bg-gradient-to-r from-blue-500/20 via-blue-500/10 to-transparent transition-opacity duration-200 ${
+                        (hoveredTab3 ?? selectedTab3 ?? activeTab3) === 3 ? "opacity-100" : "opacity-0 group-hover:opacity-60"
+                      }`}
+                    />
+                    <ShoppingBagIcon className="relative z-10 w-5 h-5 flex-shrink-0 text-blue-300" />
+                    <span className="relative z-10">{t3("tabs.purchaseSpecific.title")}</span>
                   </button>
                 </div>
               </div>

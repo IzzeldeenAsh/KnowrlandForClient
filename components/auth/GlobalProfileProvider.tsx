@@ -10,6 +10,7 @@ interface ProfileContextType {
   user: User | null;
   roles: string[];
   isLoading: boolean;
+  isAuthResolved: boolean;
   refreshProfile: () => Promise<void>;
 }
 
@@ -17,6 +18,7 @@ const ProfileContext = createContext<ProfileContextType>({
   user: null,
   roles: [],
   isLoading: false,
+  isAuthResolved: false,
   refreshProfile: async () => {},
 });
 
@@ -43,6 +45,12 @@ export function GlobalProfileProvider({ children }: { children: React.ReactNode 
   const [user, setUser] = useState<User | null>(globalProfileCache.user);
   const [roles, setRoles] = useState<string[]>(globalProfileCache.roles);
   const [isLoading, setIsLoading] = useState(false);
+  // If there's clearly no token, we already know the user is logged out.
+  // If there is a token, we keep auth unresolved until we fetch/confirm the profile.
+  const [isAuthResolved, setIsAuthResolved] = useState(() => {
+    if (typeof window === 'undefined') return false;
+    return !getAuthToken();
+  });
   const pathname = usePathname();
   const locale = useLocale();
 
@@ -121,71 +129,76 @@ export function GlobalProfileProvider({ children }: { children: React.ReactNode 
   };
 
   const refreshProfile = async (forceRefresh = false) => {
-    const token = getAuthToken();
-    const now = Date.now();
-    
-    // Return cached data if still valid and not forced refresh
-    if (!forceRefresh && globalProfileCache.user && (now - globalProfileCache.lastFetchTime) < CACHE_DURATION) {
-      setUser(globalProfileCache.user);
-      setRoles(globalProfileCache.roles);
-      return;
-    }
+    try {
+      const token = getAuthToken();
+      const now = Date.now();
+      
+      // Return cached data if still valid and not forced refresh
+      if (!forceRefresh && globalProfileCache.user && (now - globalProfileCache.lastFetchTime) < CACHE_DURATION) {
+        setUser(globalProfileCache.user);
+        setRoles(globalProfileCache.roles);
+        return;
+      }
 
-    if (!token) {
-      globalProfileCache.user = null;
-      globalProfileCache.roles = [];
-      setUser(null);
-      setRoles([]);
-      return;
-    }
+      if (!token) {
+        globalProfileCache.user = null;
+        globalProfileCache.roles = [];
+        setUser(null);
+        setRoles([]);
+        return;
+      }
 
-    // If already fetching, return the pending promise
-    if (globalProfileCache.pendingPromise) {
+      // If already fetching, return the pending promise
+      if (globalProfileCache.pendingPromise) {
+        try {
+          const result = await globalProfileCache.pendingPromise;
+          setUser(result.user);
+          setRoles(result.roles);
+        } catch (error) {
+        }
+        return;
+      }
+
+      // Start new fetch
+      setIsLoading(true);
+      globalProfileCache.isLoading = true;
+      globalProfileCache.pendingPromise = fetchProfileWithRetry(token);
+
       try {
         const result = await globalProfileCache.pendingPromise;
         setUser(result.user);
         setRoles(result.roles);
       } catch (error) {
-      }
-      return;
-    }
-
-    // Start new fetch
-    setIsLoading(true);
-    globalProfileCache.isLoading = true;
-    globalProfileCache.pendingPromise = fetchProfileWithRetry(token);
-
-    try {
-      const result = await globalProfileCache.pendingPromise;
-      setUser(result.user);
-      setRoles(result.roles);
-    } catch (error) {
-      
-      // Check if we have cached user data to fall back to
-      const existingUser = localStorage.getItem("user");
-      if (existingUser && !(error instanceof Error && error.message.includes('Auth failed'))) {
-        const cachedUserData = JSON.parse(existingUser);
-        globalProfileCache.user = cachedUserData;
-        setUser(cachedUserData);
-        setRoles(globalProfileCache.roles);
-      } else {
-        // Only clear auth data on actual auth failures
-        if (error instanceof Error && error.message.includes('Auth failed')) {
-          localStorage.removeItem('token');
-          localStorage.removeItem('user');
-          document.cookie = 'token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
-          
-          globalProfileCache.user = null;
-          globalProfileCache.roles = [];
-          globalProfileCache.lastFetchTime = 0;
-          setUser(null);
-          setRoles([]);
+        
+        // Check if we have cached user data to fall back to
+        const existingUser = localStorage.getItem("user");
+        if (existingUser && !(error instanceof Error && error.message.includes('Auth failed'))) {
+          const cachedUserData = JSON.parse(existingUser);
+          globalProfileCache.user = cachedUserData;
+          setUser(cachedUserData);
+          setRoles(globalProfileCache.roles);
+        } else {
+          // Only clear auth data on actual auth failures
+          if (error instanceof Error && error.message.includes('Auth failed')) {
+            localStorage.removeItem('token');
+            localStorage.removeItem('user');
+            document.cookie = 'token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
+            
+            globalProfileCache.user = null;
+            globalProfileCache.roles = [];
+            globalProfileCache.lastFetchTime = 0;
+            setUser(null);
+            setRoles([]);
+          }
         }
+      } finally {
+        globalProfileCache.isLoading = false;
+        globalProfileCache.pendingPromise = null;
+        setIsLoading(false);
       }
     } finally {
-      globalProfileCache.isLoading = false;
-      globalProfileCache.pendingPromise = null;
-      setIsLoading(false);
+      // Mark auth state as resolved after the first check (token/no-token/cached/fetch)
+      setIsAuthResolved(true);
     }
   };
 
@@ -227,6 +240,7 @@ export function GlobalProfileProvider({ children }: { children: React.ReactNode 
       user, 
       roles, 
       isLoading, 
+      isAuthResolved,
       refreshProfile: () => refreshProfile(true) 
     }}>
       {children}

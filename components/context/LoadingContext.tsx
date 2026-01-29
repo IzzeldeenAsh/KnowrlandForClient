@@ -59,6 +59,10 @@ export function LoadingProvider({ children }: { children: React.ReactNode }) {
 
     // For client-side navigation, we need to listen for click events on links
     const handleLinkClick = (e: MouseEvent) => {
+      // If some component intentionally prevented navigation (e.g. query-only UI state),
+      // don't start the global fullscreen loader.
+      if (e.defaultPrevented) return;
+
       const target = e.target as HTMLElement;
       const link = target.closest('a');
       
@@ -68,9 +72,14 @@ export function LoadingProvider({ children }: { children: React.ReactNode }) {
           !link.download && 
           !link.rel?.includes('external') &&
           link.origin === window.location.origin) {
+        // If the click only changes query/hash on the same pathname, avoid global loader.
+        // (Example: switching tabs with ?tab=... should not block the entire page.)
+        const destinationUrl = new URL(link.href);
+        if (destinationUrl.pathname === window.location.pathname) return;
+
         // Avoid showing the GLOBAL fullscreen loader for in-section navigation
         // (these routes have their own local content loader so the sidebar stays visible)
-        const destinationPathname = new URL(link.href).pathname;
+        const destinationPathname = destinationUrl.pathname;
         const isDestinationAboutInsighta = destinationPathname.includes('/resources/first-steps/about-insighta');
         if (isAboutInsightaSection && isDestinationAboutInsighta) return;
 

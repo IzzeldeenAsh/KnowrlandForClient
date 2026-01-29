@@ -17,6 +17,7 @@ import './text-glow.css'
 import NotificationBell from './header/components/NotificationBell'
 import { useUserProfile } from '@/components/ui/header/hooks/useUserProfile';
 import {  stopNotificationPolling } from '@/services/notifications.service';
+import { getAuthToken } from '@/lib/authToken'
 
 interface Industry {
   id: number;
@@ -132,7 +133,11 @@ const { isLoading: isAppLoading, setIsLoading: setAppLoading } = useLoading();
   const currentLocale = pathname.split('/')[1] || 'en';
   
   // Use the centralized user profile hook
-  const { user, roles, isLoading, handleSignOut } = useUserProfile();
+  const { user, roles, isLoading, isAuthResolved, handleSignOut } = useUserProfile();
+
+  // Used only to decide which skeleton shape to show while auth is resolving
+  const hasToken = typeof window !== 'undefined' && !!getAuthToken();
+  const shouldShowAuthSkeleton = !isAuthResolved;
   
   // Always use dark style with white text, as requested
   const textColorClass = ' hover:text-white transition-all duration-300 ease-in-out px-3 py-2 rounded-md hover:bg-slate-700/50';
@@ -579,8 +584,14 @@ const { isLoading: isAppLoading, setIsLoading: setAppLoading } = useLoading();
               {user ? <NotificationBell /> : ''}
             </li>
             
-            {isLoading ? (
-              <div className="w-10 h-10 bg-white animate-pulse rounded-full overflow-hidden border border-gray-200"></div>
+            {shouldShowAuthSkeleton ? (
+              <li className="flex items-center">
+                {hasToken ? (
+                  <div className="w-10 h-10 bg-white/80 animate-pulse rounded-full overflow-hidden border border-white/20"></div>
+                ) : (
+                  <div className="h-9 w-24 bg-white/20 animate-pulse rounded-full overflow-hidden border border-white/10"></div>
+                )}
+              </li>
             ) : user ? (
               <li>
                 <UserProfile isHome={true} />
