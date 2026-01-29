@@ -95,6 +95,41 @@
   justify-content: space-between;
 }
 
+.darkSectionWithBottomMeta {
+  /* Reserve space for the absolute bottom meta row (rating/downloads). */
+  padding-bottom: 60px;
+}
+
+.bottomMetaRow {
+  position: absolute;
+  left: 16px;
+  right: 16px;
+  bottom: 16px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.bottomMetaRowRtl {
+  flex-direction: row-reverse;
+}
+
+.bottomMetaRowBoth {
+  justify-content: space-between;
+}
+
+.bottomMetaRowSingle {
+  justify-content: flex-start;
+}
+
+.bottomMetaItem {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  white-space: nowrap;
+  min-width: 0;
+}
+
 .whiteSection {
   background-color: white;
   padding: 20px;

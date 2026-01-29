@@ -357,6 +357,11 @@ export default function SearchResultsGrid({
               const shouldShowPaid = paidStatus === 'paid';
               const shouldShowPricing = shouldShowFree || shouldShowPartial || (shouldShowPaid && hasPrice) || (!paidStatus && hasPrice);
               const coverageText = formatCoverageRange(item.cover_start, item.cover_end);
+              const reviewValue = item.review ? parseFloat(item.review) : 0;
+              const showReview = item.review && reviewValue >= 1;
+              const showDownloads =
+                item.total_downloads !== undefined && item.total_downloads > 0;
+              const showBottomMeta = !!showReview || showDownloads;
 
               return (
                 <Card
@@ -380,7 +385,11 @@ export default function SearchResultsGrid({
                     }}
                   >
                  
-              <div className={`${cardStyles.darkSection} relative`}>
+              <div
+                className={`${cardStyles.darkSection} ${
+                  showBottomMeta ? cardStyles.darkSectionWithBottomMeta : ""
+                } relative`}
+              >
                 <div>
                   <div className="flex items-center mb-3">
                     {item.type === "report" && <ReportIcon width={20} height={20} />}
@@ -416,21 +425,48 @@ export default function SearchResultsGrid({
                 )}
                 </div>
                 
-                {item.review && parseInt(item.review) >= 1 && (
-                  <div className="flex items-center mt-auto gap-1">
-                    <Rating value={parseInt(item.review)} fractions={2} readOnly size="sm" />
-                    <Text size="xs" fw={500} className="mx-2 text-sky-500">{parseInt(item.review).toFixed(1)}</Text>
-                  </div>
-                )}
-                
-                {item.total_downloads !== undefined && item.total_downloads > 0 && (
-                  <div className="absolute bottom-4 left-4 flex items-center gap-1">
-                    <div className="flex items-center justify-center w-6 h-6 bg-white bg-opacity-20 rounded-full">
-                      <ArrowDownTrayIcon className="w-3 h-3 text-white" />
-                    </div>
-                    <Text size="xs" className="text-white font-medium">
-                       {item.total_downloads.toLocaleString()} {item.total_downloads === 1 ? translations.download : translations.downloads}
-                    </Text>
+                {showBottomMeta && (
+                  <div
+                    className={`${cardStyles.bottomMetaRow} ${
+                      isRTL ? cardStyles.bottomMetaRowRtl : ""
+                    } ${
+                      showReview && showDownloads
+                        ? cardStyles.bottomMetaRowBoth
+                        : cardStyles.bottomMetaRowSingle
+                    }`}
+                  >
+                    {showDownloads && (
+                      <div className={cardStyles.bottomMetaItem}>
+                        <span className="flex items-center justify-center w-6 h-6 bg-white bg-opacity-20 rounded-full">
+                          <ArrowDownTrayIcon className="w-3 h-3 text-white" />
+                        </span>
+                        <Text size="xs" className="text-white font-medium">
+                          {item.total_downloads!.toLocaleString()}{" "}
+                          {item.total_downloads === 1
+                            ? translations.download
+                            : translations.downloads}
+                        </Text>
+                      </div>
+                    )}
+
+                    {showReview && (
+                      <div className={cardStyles.bottomMetaItem}>
+                        <Rating
+                          value={reviewValue}
+                          fractions={2}
+                          readOnly
+                          size="sm"
+                        />
+                        <Text
+                          size="xs"
+                          fw={500}
+                          className="text-sky-500"
+                          style={{ whiteSpace: "nowrap" }}
+                        >
+                          {reviewValue.toFixed(1)}
+                        </Text>
+                      </div>
+                    )}
                   </div>
                 )}
                
