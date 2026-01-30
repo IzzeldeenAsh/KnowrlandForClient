@@ -12,6 +12,7 @@ import AuthModal from './AuthModal'
 import { useGlobalProfile } from '@/components/auth/GlobalProfileProvider'
 import { useRouter } from 'next/navigation'
 import { getAuthToken } from '@/lib/authToken'
+import { isFirstWordArabic } from '@/app/utils/textUtils';
 
 // Define interfaces for minimal typing, you can expand these as needed
 interface Document {
@@ -223,7 +224,10 @@ export default function Overview({ knowledge, knowledgeSlug }: OverviewProps) {
               .map((doc) => (
               <div key={doc.id} id={`doc-card-${doc.id}`} className={`${styles.documentCard} ${styles.expandable} ${styles.cardHover}`}>
                 <div 
-                  className={`${styles.documentHeader} ${styles.focusVisible}`}
+                  className={`
+                    ${styles.documentHeader} 
+                    ${styles.focusVisible}
+                    `}
                   onClick={() => {
                     const element = document.getElementById(`doc-content-${doc.id}`);
                     const card = document.getElementById(`doc-card-${doc.id}`);
@@ -257,8 +261,8 @@ export default function Overview({ knowledge, knowledgeSlug }: OverviewProps) {
                       height={40}
                     />
                   </div>
-                  <div className="flex-grow">
-                    <h5 className="text-sm text-gray-900 font-semibold">
+                  <div className="flex-grow  ">
+                    <h5 className={`text-sm text-gray-900 font-semibold ${isFirstWordArabic(doc.file_name) ? 'text-right' : 'text-left'}`}>
                       {doc.file_name}
                     </h5>
                     <small className="text-xs text-gray-400 ">
@@ -311,9 +315,10 @@ export default function Overview({ knowledge, knowledgeSlug }: OverviewProps) {
                 </div>
                 <div id={`doc-content-${doc.id}`} className={styles.documentContent}>
                   {doc.description && (
-                    <div className={styles.description}>
-                      <h6>{translations.description}</h6>
-                      <p dangerouslySetInnerHTML={{ __html: ensureImageAlts(doc.description || '') }}></p>
+                    <div className={`${styles.description} ${isFirstWordArabic(doc.description) ? 'text-right' : 'text-left'}`}>
+                      <h6 >{translations.description}</h6>
+                      <p dangerouslySetInnerHTML={{ __html: ensureImageAlts(doc.description || '') }}/>
+
                     </div>
                   )}
                   {doc.table_of_content && Array.isArray(doc.table_of_content) && doc.table_of_content.length > 0 && (

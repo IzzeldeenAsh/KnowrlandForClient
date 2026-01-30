@@ -1040,8 +1040,18 @@ export default function CheckoutPage() {
                       </div>
 
                       <div className="flex-1 min-w-0">
-                        <Text size="sm" fw={500} truncate>
-                          {doc.file_name}
+                        <Text
+                          size="sm"
+                          fw={500}
+                          style={{
+                            wordBreak: "break-all",
+                            whiteSpace: "pre-line",
+                            overflowWrap: "break-word",
+                          }}
+                        >
+                          <span style={{ wordBreak: "break-all", overflowWrap: "break-word", whiteSpace: "pre-line" }}>
+                            {doc.file_name}
+                          </span>
                         </Text>
                         <Text size="xs" c="dimmed">
                           {(doc.file_size / 1024).toFixed(2)} KB

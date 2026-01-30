@@ -162,6 +162,15 @@
   cursor: pointer;
   position: relative;
   gap: 1rem;
+
+}
+
+@media (max-width: 576px) {
+  .documentHeader {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: .8rem;
+  }
 }
 
 .documentHeader:hover {

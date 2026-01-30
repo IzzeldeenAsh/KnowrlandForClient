@@ -219,8 +219,13 @@ export default function Hero() {
             <div className="flex justify-center mb-6" data-aos="fade-down" data-aos-delay="100">
               <Image src={LogoIcon} width={80} height={80} alt="Logo" priority />
             </div>
-            <h2 className="h2 max-w-3xl mx-auto bg-clip-text text-transparent bg-gradient-to-r from-slate-200/60 via-slate-200 to-slate-200/60 pb-5 leading-[1.5]" data-aos="fade-down">{t('title')}</h2>
-            <p className="text-lg text-slate-300 mb-8" data-aos="fade-down" data-aos-delay="200">
+            <h2 className="
+            h2
+            text-2xl 
+             lg:text-5xl 
+             
+             max-w-3xl mx-auto bg-clip-text text-transparent bg-gradient-to-r from-slate-200/60 via-slate-200 to-slate-200/60 pb-5 leading-[1.5]" data-aos="fade-down">{t('title')}</h2>
+            <p className=" text-sm sm:text-lg text-slate-300 mb-8" data-aos="fade-down" data-aos-delay="200">
               {t('description')}
             </p>
             <div className="max-w-4xl mx-auto w-full pb-4" data-aos="fade-down" data-aos-delay="300">
