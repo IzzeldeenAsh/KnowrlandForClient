@@ -90,6 +90,11 @@ export default function GuestDownloadPage() {
       <Paper withBorder radius="md" p="lg">
         <Stack gap={20} flex={1} align="center" justify="center">
           <Title order={2}>{isRTL ? " إعادة تنزيل المعرفة "  : "Re-download Insight"}</Title>
+          <Text c="dimmed" size="sm" ta="center" maw={520}>
+            {isRTL
+              ? "هذا الرابط مخصص لإعادة تنزيل المعرفة، وهو صالح لمدة 24 ساعة فقط من وقت الشراء. يرجى تنزيل ملفك قبل انتهاء صلاحية الرابط."
+              : "This link is for re-downloading your Insight and is valid for 24 hours from the time of purchase. Please download your file before the link expires."}
+          </Text>
           <svg width="107" height="110" viewBox="0 0 107 110" fill="none" xmlns="http://www.w3.org/2000/svg">
 <path d="M0 103.148V29.8705C0 26.322 2.87668 23.4453 6.42521 23.4453H30.433C32.1171 23.4453 33.7554 23.9942 35.0996 25.0089L42.4353 30.5462C43.7795 31.5608 45.4177 32.1097 47.1019 32.1097H100.509C104.058 32.1097 106.934 34.9864 106.934 38.5349V103.149C106.934 106.933 103.867 110 100.083 110H6.85187C3.06768 110 0 106.933 0 103.148Z" fill="url(#paint0_linear_222_1109)"/>
 <path d="M88.9661 104.378H17.9539C13.039 104.378 9.05469 100.394 9.05469 95.4786V8.89924C9.05469 3.98432 13.039 0 17.9539 0H88.9661C93.881 0 97.8653 3.98432 97.8653 8.89924V95.4786C97.8653 100.394 93.881 104.378 88.9661 104.378Z" fill="white"/>
