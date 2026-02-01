@@ -186,7 +186,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   } catch (error) {
     const isRTL = locale === 'ar';
     const baseUrl =  'https://insightabusiness.com';
-    const defaultSocialImage = 'https://res.cloudinary.com/dsiku9ipv/image/upload/v1761746492/drilldown_1_cjpvli.jpg';
+    const defaultSocialImage = 'https://res.cloudinary.com/dsiku9ipv/image/upload/v1769923661/drilldown_1_cjpvli_jprtoi.jpg';
     const pageUrl = `${baseUrl}/${locale}/knowledge/${type}/${slug}`;
 
     let metadataBase: URL | undefined;

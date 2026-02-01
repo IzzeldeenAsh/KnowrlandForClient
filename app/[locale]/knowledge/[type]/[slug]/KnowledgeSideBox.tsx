@@ -188,7 +188,7 @@ const KnowledgeSideBox = ({
     
     if (!isUserLoggedIn()) {
       setAuthModalGuestCheckoutUrl(null);
-      setAuthModalDisableGuestCheckout(false);
+      setAuthModalDisableGuestCheckout(true);
       setAuthModalOpened(true);
       return;
     }
