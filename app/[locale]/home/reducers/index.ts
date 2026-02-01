@@ -115,7 +115,7 @@ export function filterReducer(state: FilterState, action: FilterAction): FilterS
       return { ...state, industry: action.payload };
     
     case 'SET_ISIC_CODE':
-      // Clear HS code when ISIC code changes
+      // Clear Products when ISIC code changes
       return { 
         ...state, 
         isicCode: action.payload,

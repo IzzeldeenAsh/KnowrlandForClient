@@ -256,7 +256,7 @@ const SearchBar: React.FC<SearchBarProps> = ({
     }
   }, [isicCodeFilter, isicLeafNodes, locale]);
 
-  // Fetch all HS codes once (independent of ISIC)
+  // Fetch all Products once (independent of ISIC)
   useEffect(() => {
     const fetchAllHs = async () => {
       try {
@@ -268,17 +268,17 @@ const SearchBar: React.FC<SearchBarProps> = ({
             'X-Timezone': Intl.DateTimeFormat().resolvedOptions().timeZone,
           },
         });
-        if (!resp.ok) throw new Error('Failed to fetch HS codes');
+        if (!resp.ok) throw new Error('Failed to fetch Products');
         const data = await resp.json();
         const list: HSCode[] = data?.data || [];
         setHsCodes(list);
         setFilteredHsCodes(list);
         
-        // Restore pending HS code after list loads
+        // Restore pending Products after list loads
         if (pendingHsCode && !hasRestoredHsCode && list.length > 0) {
           const found = list.find(c => c.code === pendingHsCode);
           if (found) {
-            console.log('[SearchBar] Restoring pending HS code:', found.code);
+            console.log('[SearchBar] Restoring pending Products:', found.code);
             setSelectedHs({ id: found.id, code: found.code, label: locale === 'ar' ? found.names.ar : found.names.en });
             if (setHsCodeFilter) {
               setHsCodeFilter(found.code);
@@ -318,7 +318,7 @@ const SearchBar: React.FC<SearchBarProps> = ({
       return;
     }
     
-    // Skip if we're waiting to restore a pending HS code
+    // Skip if we're waiting to restore a pending Products
     if (pendingHsCode && !hasRestoredHsCode) {
       return;
     }
@@ -329,7 +329,7 @@ const SearchBar: React.FC<SearchBarProps> = ({
     }
   }, [hsCodeFilter, hsCodes, locale, pendingHsCode, hasRestoredHsCode]);
 
-  // Note: ISIC/HS codes are now supported for both knowledge and insighter search types
+  // Note: ISIC/Products are now supported for both knowledge and insighter search types
   // No need to clear them when switching between search types
 
   // ISIC search filter
@@ -386,7 +386,7 @@ const SearchBar: React.FC<SearchBarProps> = ({
 
   const handleSelectHs = useCallback((code: HSCode) => {
     setSelectedHs({ id: code.id, code: code.code, label: locale === 'ar' ? code.names.ar : code.names.en });
-    // Use HS code string for URL/state
+    // Use Products string for URL/state
     if (setHsCodeFilter) {
       setHsCodeFilter(code.code);
     }
@@ -671,6 +671,39 @@ const SearchBar: React.FC<SearchBarProps> = ({
             className={`${styles.searchBar} flex items-center bg-white border border-[#299af8] rounded-[6px] w-full px-3 py-2 gap-2`}
             style={{ fontSize: '16px' }}
           >
+            <button 
+              type="button"
+              className={`${isRtl ? 'mr-2' : 'ml-2'} bg-[#299af8] text-white p-2 rounded-[4px] flex items-center justify-center hover:bg-[#2185d6] transition-colors duration-150`}
+              onClick={async (e) => {
+                e.preventDefault();
+                hideSuggestions();
+                setSuggestionSelected(true);
+                setInputFocused(false);
+                
+                if (onSearch) {
+                  onSearch(searchQuery.trim());
+                } else {
+                  // Fallback: navigate preserving existing filters
+                  try {
+                    const params = new URLSearchParams(searchParams.toString());
+                    if (searchQuery.trim().length > 0) {
+                      params.set('keyword', searchQuery.trim());
+                    } else {
+                      params.delete('keyword');
+                    }
+                    params.set('search_type', searchType);
+                    params.delete('page');
+                    const nextUrl = `/${locale}/home?${params.toString()}`;
+                    router.push(nextUrl, { scroll: false });
+                  } catch {
+                    onSubmit(e as any);
+                  }
+                }
+              }}
+              aria-label={isRtl ? 'ابحث' : 'Search'}
+            >
+              <IconSearch size={18} />
+            </button>
             <input
               ref={searchInputRef}
               type="text"
@@ -710,7 +743,11 @@ const SearchBar: React.FC<SearchBarProps> = ({
                 </svg>
               </div>
             )}
-            
+            <div
+              aria-hidden="true"
+              className={`h-6 w-px bg-gray-200 mx-2 `}
+              style={{ alignSelf: 'center' }}
+            />
             {/* Filter chips inline on md+ screens */}
             <div className="hidden md:flex items-center gap-2">
               <button
@@ -765,11 +802,11 @@ const SearchBar: React.FC<SearchBarProps> = ({
                   }
                 }}
                 className={`${filterChipBaseClasses} ${isHsDisabled ? filterChipDisabledClasses : selectedHs ? filterChipActiveClasses : filterChipInactiveClasses} ${isRtl ? 'flex-row-reverse' : ''}`}
-                aria-label={isRtl ? 'اختر رمز HS' : 'Select HS code'}
+                aria-label={isRtl ? 'اختر رمز المنتج' : 'Select Product'}
               >
                 {renderHsIcon(!!selectedHs && !isHsDisabled)}
                 <span className="font-medium text-gray-900">
-                 {locale === 'ar' ? ' رمز HS' : 'HS code'}
+                 {locale === 'ar' ? ' رمز المنتج' : 'Products'}
                 </span>
                 {selectedHs && !isHsDisabled && (
                   <span className={`font-mono text-[11px] bg-gray-100 px-1.5 py-0.5 rounded ${isRtl ? 'mr-2' : 'ml-2'}`}>
@@ -795,39 +832,7 @@ const SearchBar: React.FC<SearchBarProps> = ({
               {/* Accuracy filter moved below the search field */}
             </div>
             
-            <button 
-              type="button"
-              className={`${isRtl ? 'mr-2' : 'ml-2'} bg-[#299af8] text-white p-2 rounded-[4px] flex items-center justify-center hover:bg-[#2185d6] transition-colors duration-150`}
-              onClick={async (e) => {
-                e.preventDefault();
-                hideSuggestions();
-                setSuggestionSelected(true);
-                setInputFocused(false);
-                
-                if (onSearch) {
-                  onSearch(searchQuery.trim());
-                } else {
-                  // Fallback: navigate preserving existing filters
-                  try {
-                    const params = new URLSearchParams(searchParams.toString());
-                    if (searchQuery.trim().length > 0) {
-                      params.set('keyword', searchQuery.trim());
-                    } else {
-                      params.delete('keyword');
-                    }
-                    params.set('search_type', searchType);
-                    params.delete('page');
-                    const nextUrl = `/${locale}/home?${params.toString()}`;
-                    router.push(nextUrl, { scroll: false });
-                  } catch {
-                    onSubmit(e as any);
-                  }
-                }
-              }}
-              aria-label={isRtl ? 'ابحث' : 'Search'}
-            >
-              <IconSearch size={18} />
-            </button>
+            
         </div>
         {/* Accuracy control under the search field */}
         <div className={`mt-2 flex ${isRtl ? 'justify-end' : 'justify-end'}`}>
@@ -942,11 +947,11 @@ const SearchBar: React.FC<SearchBarProps> = ({
               }
             }}
             className={`${filterChipBaseClasses} ${isHsDisabled ? filterChipDisabledClasses : selectedHs ? filterChipActiveClasses : filterChipInactiveClasses} ${isRtl ? 'flex-row-reverse' : ''}`}
-            aria-label={isRtl ? 'اختر رمز HS' : 'Select HS code'}
+            aria-label={isRtl ? 'اختر رمز المنتج' : 'Select Product'}
           >
             {renderHsIcon(!!selectedHs && !isHsDisabled)}
             <span className="font-medium text-gray-900">
-             {locale === 'ar' ? ' رمز HS' : 'HS code'}
+             {locale === 'ar' ? ' رمز المنتج' : 'Products'}
             </span>
             {selectedHs && !isHsDisabled && (
               <span className={`font-mono text-[11px] bg-gray-100 px-1.5 py-0.5 rounded ${isRtl ? 'mr-2' : 'ml-2'}`}>
@@ -1067,9 +1072,9 @@ const SearchBar: React.FC<SearchBarProps> = ({
             {selectedHs && (
               <div
                 className={`flex items-center gap-1 px-2 py-1 rounded-full border bg-blue-50 border-blue-200 text-blue-700 ${isRtl ? 'flex-row-reverse' : ''}`}
-                aria-label={isRtl ? 'تفاصيل رمز HS المحدد' : 'Selected HS details'}
+                aria-label={isRtl ? 'تفاصيل رمز المنتج المحدد' : 'Selected HS details'}
               >
-                <span className="font-medium">{isRtl ? 'رمز HS:' : 'HS Code:'}</span>
+                <span className="font-medium">{isRtl ? 'رمز المنتج:' : 'Products:'}</span>
                 <span className="line-clamp-1 truncate max-w-[260px]">{selectedHs.label}</span>
                 <button
                   type="button"
@@ -1128,14 +1133,14 @@ const SearchBar: React.FC<SearchBarProps> = ({
         <Modal
           opened={isHsModalOpen}
           onClose={() => setIsHsModalOpen(false)}
-          title={locale === 'ar' ? 'اختر رمز HS' : 'Select HS Code'}
+          title={locale === 'ar' ? 'اختر رمز المنتج' : 'Select Product'}
           size="lg"
           overlayProps={{ backgroundOpacity: 0.55, blur: 3 }}
         >
           <div className="space-y-4">
             <input
               type="text"
-              placeholder={locale === 'ar' ? 'ابحث عن رمز HS...' : 'Search HS codes...'}
+              placeholder={locale === 'ar' ? 'ابحث عن رمز المنتج...' : 'Search Products...'}
               value={hsSearch}
               onChange={(e) => setHsSearch(e.target.value)}
               className={`w-full px-3 py-2 mt-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent`}
@@ -1171,7 +1176,7 @@ const SearchBar: React.FC<SearchBarProps> = ({
                           {others.length > 0 && (
                             <>
                               <div className="text-sm font-semibold text-gray-700 px-1 mt-2">
-                                {locale === 'ar' ? 'أكواد HS كل' : 'All HS code'}
+                                {locale === 'ar' ? 'أكواد HS كل' : 'All Products'}
                               </div>
                               {others.map((code) => (
                                 <button
@@ -1187,7 +1192,7 @@ const SearchBar: React.FC<SearchBarProps> = ({
                           )}
                           {related.length === 0 && others.length === 0 && (
                             <div className="flex flex-col items-center justify-center py-8 text-center text-gray-500 text-sm">
-                              {locale === 'ar' ? 'لا توجد رموز HS متاحة' : 'No HS codes available'}
+                              {locale === 'ar' ? 'لا توجد رموز HS متاحة' : 'No Products available'}
                             </div>
                           )}
                         </>
@@ -1208,7 +1213,7 @@ const SearchBar: React.FC<SearchBarProps> = ({
                     ))}
                     {filteredHsCodes.length === 0 && (
                       <div className="flex flex-col items-center justify-center py-8 text-center text-gray-500 text-sm">
-                        {locale === 'ar' ? 'لا توجد رموز HS متاحة' : 'No HS codes available'}
+                        {locale === 'ar' ? 'لا توجد رموز HS متاحة' : 'No Products available'}
                       </div>
                     )}
                   </>

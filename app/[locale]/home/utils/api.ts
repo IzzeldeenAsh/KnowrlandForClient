@@ -139,7 +139,7 @@ export async function fetchStatisticsPerType(
       url.searchParams.append('tag', tagFilter);
     }
     
-    // Add HS code parameter
+    // Add Products parameter
     if (hsCodeFilter !== null) {
       url.searchParams.append('hs_code', hsCodeFilter);
     }
@@ -306,7 +306,7 @@ export async function fetchSearchResults(
       url.searchParams.append('isic_code', isicCodeFilter);
     }
     
-    // Add HS code parameter for the API
+    // Add Products parameter for the API
     if (hsCodeFilter !== null) {
       url.searchParams.append('hs_code', hsCodeFilter);
     }

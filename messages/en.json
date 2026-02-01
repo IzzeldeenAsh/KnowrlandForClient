@@ -182,7 +182,7 @@
                 "alt": "Features Illustration"
             },
             "variableData": {
-                "title": "International Database Structure (ISIC, HS Code)"
+                "title": "International Database Structure (ISIC, Products)"
             },
             "fasterDecisions": {
                 "title": "AI-Powered Assistance"
@@ -289,8 +289,8 @@
         "searchEconomicBlocksPlaceHolder": "Choose Economic Blocks",
         "searchISIC": "ISIC Code",
         "searchISICPlaceHolder": "Choose ISIC Code",
-        "searchHSCode": "HS Code",
-        "searchHSCodePlaceHolder": "Choose HS Code",
+        "searchHSCode": "Products",
+        "searchHSCodePlaceHolder": "Choose Products",
         "searchTags": "Tags",
         "exploreInsight": "Explore Our Insight Database",
         "filterByCategory": "Filter your search by category",
@@ -368,7 +368,7 @@
         "whatOffer2": "Expert Consultation & Inquiries",
         "whatOffer2P": " – Users can connect directly with insight experts for additional insights related to a particular uploaded file. They can also book consultation sessions with experts for deeper discussions and personalized guidance.",
         "whatOffer3": "AI-Powered Search & Data Structuring",
-        "whatOffer3P": " – Insighta features an advanced AI-supported search engine that enhances discoverability and accessibility of insights, making it easier for users to find relevant information. Our data is structured based on international standards such as ISIC and HS Codes, ensuring seamless integration into global business frameworks.",
+        "whatOffer3P": " – Insighta features an advanced AI-supported search engine that enhances discoverability and accessibility of insights, making it easier for users to find relevant information. Our data is structured based on international standards such as ISIC and Products, ensuring seamless integration into global business frameworks.",
         "whatOffer4": "Monetization for Experts",
         "whatOffer4P": " – Subject matter experts, consultants, and analysts can publish and sell their data, report and statistics, earning revenue from their knowledge contributions.",
          "whatOffer5": "Company & Expert Collaboration",

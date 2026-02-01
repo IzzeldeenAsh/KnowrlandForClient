@@ -26,6 +26,8 @@ export default function Footer() {
                   {isRTL ? 'جميع الحقوق محفوظة   ' : 'All Rights Reserved.'}
                   <br />
                     &copy; 2025 insightabusiness.com 
+                    <br/>
+                    v 1.1.1
                   </div>
               </div>
               {/* Social links */}

@@ -25,6 +25,8 @@ export default function Footer({ border = false }: { border?: boolean }) {
             <div className="text-sm text-gray-600">
               &copy; Insightabusiness.com - All rights reserved.
             </div>
+            <br/>
+            v1.1.1
             {/* Social links */}
             <div className="mt-4 pt-20">
               <ul className="flex space-x-4">

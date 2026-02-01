@@ -711,6 +711,9 @@ export default function SearchResultsGrid({
           </div>
         </div>
       )}
+
+
+      
           {/* Auth Modal */}
     <AuthModal
       opened={authModalOpened}

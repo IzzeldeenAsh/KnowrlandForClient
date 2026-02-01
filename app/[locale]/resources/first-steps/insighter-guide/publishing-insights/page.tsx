@@ -88,7 +88,7 @@ export default async function PublishingInsightsGuidePage({
             <li>{t('Industry', 'القطاع')}</li>
             <li>{t('Target market (economic block / region / country)', 'السوق المستهدف (كتلة اقتصادية / منطقة / دولة)')}</li>
             <li>{t('Tags', 'الوسوم')}</li>
-            <li>{t('ISIC / HS codes (if applicable)', 'رموز ISIC / HS (إن وُجدت)')}</li>
+            <li>{t('ISIC / Products (if applicable)', 'رموز ISIC / HS (إن وُجدت)')}</li>
           </ul>
         </li>
         <li>{t('Wait for AI-generated summary to appear', 'انتظر توليد ملخص الذكاء الاصطناعي')}</li>
