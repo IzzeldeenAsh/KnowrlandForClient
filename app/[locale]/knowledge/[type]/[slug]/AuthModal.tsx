@@ -44,6 +44,7 @@ const AuthModal: React.FC<AuthModalProps> = ({
 
   const translations = {
     title: isRTL ? 'الشراء' : 'Buy Now',
+    titleDisableGuestCheckout: isRTL ? 'التسجيل' : 'Login/Signup',
     message: isRTL
       ? 'سجّل دخولك أو أنشئ حساباً للاستفادة من مزايا إضافية وتجربة أفضل.'
       : 'Log in or create an account to unlock extra benefits and a better experience.',
@@ -81,7 +82,11 @@ const AuthModal: React.FC<AuthModalProps> = ({
     <Modal
       opened={opened}
       onClose={onClose}
-      title={<Text size="lg" fw={600}>{translations.title}</Text>}
+      title={
+        disableGuestCheckout ?
+      <Text size="lg" fw={600}>{translations.titleDisableGuestCheckout}</Text> :
+      <Text size="lg" fw={600}>{translations.title}</Text>
+    }
       centered
       size="lg"
       padding="lg"
