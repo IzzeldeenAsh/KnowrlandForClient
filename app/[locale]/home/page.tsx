@@ -187,7 +187,7 @@ export default function HomePage() {
   // Flag to track if component has initialized with URL params
   const [initialized, setInitialized] = useState(false);
   
-  // Global loading states for ISIC/HS codes
+  // Global loading states for ISIC/Products
   const [isLoadingIsic, setIsLoadingIsic] = useState(false);
   const [isLoadingHs, setIsLoadingHs] = useState(false);
   const [isDataLoaded, setIsDataLoaded] = useState(false);
@@ -313,7 +313,7 @@ export default function HomePage() {
         null, // Reset industry filter
         null, // Reset tag filter
         null, // Reset price filter
-        null, // Reset HS code filter
+        null, // Reset Products filter
         'all', // Reset accuracy filter
         'all', // Reset role filter
         null, // Reset range start filter
@@ -534,7 +534,7 @@ export default function HomePage() {
         null, // Always reset industry when switching types
         null, // Always reset tag when switching types
         null, // Always reset price when switching types
-        null, // Always reset HS code when switching types
+        null, // Always reset Products when switching types
         'all', // Always reset accuracy to 'all' when switching types
         'all', // Always reset role to 'all' when switching types
         null, // Always reset range start when switching types
@@ -688,7 +688,7 @@ export default function HomePage() {
     setCurrentPage(1);
   }, [updateUrlWithFilters]);
   
-  // Custom setter for HS code filter that triggers search
+  // Custom setter for Products filter that triggers search
   const handleHsCodeFilterChange = useCallback((value: string | null) => {
     setHsCodeFilter(value);
     console.log('[handleHsCodeFilterChange] value:', value);
@@ -1649,7 +1649,7 @@ export default function HomePage() {
                searchType={searchType}
                setSearchType={handleSearchTypeChange}
                locale={locale}
-               placeholder={locale === 'ar' ? 'ابحث في المنشورات أو عن الخبراء (انسايتر) لمختلف القطاعات' : 'Write or Search by ISIC,HS Codes...'}
+               placeholder={locale === 'ar' ? 'ابحث في الرؤى والتقارير والبيانات' : 'Search for statistics, reports, data ...'}
                onSubmit={handleSubmit}
                onSearch={executeSearch}
               onQueryChange={handleQueryChange}

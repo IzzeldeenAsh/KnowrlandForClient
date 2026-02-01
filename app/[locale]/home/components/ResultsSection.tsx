@@ -12,7 +12,7 @@ import type { KnowledgeItem } from '../../topic/[id]/[slug]/KnowledgeGrid';
 import type { SearchResultItem } from '../SearchResultsGrid';
 import TestSearchResults from './TestSearchResults'; // Import the test component
 import styles from '../../profile/[uuid]/profile.module.css';
-
+import { Text } from '@mantine/core';
 // Dynamically import components with no SSR to avoid hydration issues
 const KnowledgeGrid = dynamic(
   () => import('../../topic/[id]/[slug]/KnowledgeGrid'),
@@ -324,11 +324,23 @@ const ResultsSection: React.FC<ResultsSectionProps> = ({
                   withControls
                   boundaries={1}
                 />
+
               </div>
             )}
           </>
         )}
       </Suspense>
+      <footer className="mt-10 border-t border-gray-200 bg-white/60 py-6">
+        <div className="flex flex-col sm:flex-row items-center justify-center gap-2 text-center">
+          <Image src="/images/smallLogo.png" alt="Logo" width={20 } height={20} />
+          <Text size="xs" c="dimmed" dir="ltr" lang="en">
+        © 2025 insightabusiness.com
+          </Text>
+          <Text size="xs" c="dimmed" dir="ltr" lang="en" className="whitespace-nowrap">
+            v1.1.1
+          </Text>
+        </div>
+      </footer>
     </div>
   );
 };

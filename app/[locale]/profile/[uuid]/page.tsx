@@ -1205,7 +1205,7 @@ function ProfilePageContent() {
                       </div>
                     )}
                     {isCompanyInsighter && profileData.company?.logo && (
-                      <div className="absolute -bottom-3 -right-3 w-14 h-14 rounded-full overflow-hidden shadow-sm bg-white dark:bg-slate-700 z-10 border-4 border-white bg-white">
+                      <div className="absolute top-[100px] -right-3 w-14 h-14 rounded-full overflow-hidden shadow-sm bg-white dark:bg-slate-700 z-10 border-4 border-white bg-white">
                         <Link href={`${profileData.company?.uuid}`}>
                           <Image
                             src={profileData.company.logo}
@@ -1218,7 +1218,7 @@ function ProfilePageContent() {
                       </div>
                     )}
                     {isCompany && enterpriseType === "insighter" && (
-                      <div className="absolute -bottom-3 -right-3 w-14 h-14 rounded-full border-4 border-white bg-white dark:bg-slate-700 z-10">
+                      <div className="absolute top-[100px] -right-3 w-14 h-14 rounded-full border-4 border-white bg-white dark:bg-slate-700 z-10">
                         {profileData.profile_photo_url ? (
                           <Image
                             src={profileData.profile_photo_url}

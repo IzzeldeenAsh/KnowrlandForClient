@@ -463,7 +463,7 @@ const FilterBox: React.FC<FilterBoxProps> = React.memo(({
     ]);
   }, [locale, fetchWithLoading]);
 
-  // HS codes fetching moved to SearchBar. Avoid duplicate calls here.
+  // Products fetching moved to SearchBar. Avoid duplicate calls here.
 
   // Initialize selected codes based on prop values
   useEffect(() => {
@@ -773,7 +773,7 @@ const FilterBox: React.FC<FilterBoxProps> = React.memo(({
             </svg>
           </div>
           <p className="text-gray-500 text-sm">
-            {locale === 'ar' ? 'لا توجد رموز HS متاحة لرمز ISIC المحدد' : 'No HS codes available for the selected ISIC code'}
+            {locale === 'ar' ? 'لا توجد رموز HS متاحة لرمز ISIC المحدد' : 'No Products available for the selected ISIC code'}
           </p>
         </div>
       );
@@ -1815,7 +1815,7 @@ const FilterBox: React.FC<FilterBoxProps> = React.memo(({
       <Modal
         opened={isHsCodeModalOpen}
         onClose={() => !isDisabled && setIsHsCodeModalOpen(false)}
-        title={locale === 'ar' ? 'اختر رمز HS' : 'Select HS Code'}
+        title={locale === 'ar' ? 'اختر رمز المنتج' : 'Select Product'}
         size="lg"
         overlayProps={{ backgroundOpacity: 0.55, blur: 3 }}
         zIndex={4000}
@@ -1823,7 +1823,7 @@ const FilterBox: React.FC<FilterBoxProps> = React.memo(({
         <div className="space-y-4">
           <input
             type="text"
-            placeholder={locale === 'ar' ? 'ابحث عن رمز HS...' : 'Search HS codes...'}
+            placeholder={locale === 'ar' ? 'ابحث عن رمز المنتج...' : 'Search Products...'}
             value={hsCodeSearchTerm}
             onChange={(e) => setHsCodeSearchTerm(e.target.value)}
             className={`w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent mt-2 ${
