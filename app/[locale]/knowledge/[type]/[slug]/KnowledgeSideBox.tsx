@@ -295,7 +295,7 @@ const KnowledgeSideBox = ({
     documents: isRTL ? 'المستندات' : 'Documents',
     documentsLanguage: isRTL ? 'لغة المستندات' : 'Documents Language',
     isicCode: isRTL ? 'رمز ISIC' : 'ISIC Code',
-    hsCode: isRTL ? 'رمز المنتج' : 'Products',
+    hsCode: isRTL ? 'رمز المنتج (HS Code)' : 'Product (HS Code)',
     economicBloc: isRTL ? 'الكتلة الاقتصادية' : 'Economic Block',
     region: isRTL ? 'المنطقة' : 'Region',
     country: isRTL ? 'الدولة' : 'Country',
