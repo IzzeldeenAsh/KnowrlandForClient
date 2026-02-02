@@ -257,8 +257,8 @@ function KnowledgeCard({ item, locale, isRTL }: KnowledgeCardProps) {
                     <Avatar
                       src={item.insighter.profile_photo_url}
                       radius="xl"
-                      size="sm"
-                      className="absolute bottom-0 right-0 translate-x-1/3 rounded-full translate-y-1/3 z-10 avatar-top-position"
+                      size="xs"
+                      className="absolute bottom-[-3px] right-0 translate-x-1/3 rounded-full translate-y-1/3 z-10 avatar-top-position"
                       alt={item.insighter.name}
                       style={{
                         boxShadow: "0 0 0 2px white",
@@ -271,8 +271,8 @@ function KnowledgeCard({ item, locale, isRTL }: KnowledgeCardProps) {
                     <Avatar
                       src={item.insighter.profile_photo_url}
                       radius="xl"
-                      size="sm"
-                      className="absolute bottom-0 right-0 translate-x-1/3 rounded-full translate-y-1/3 z-10 avatar-top-position"
+                      size="xs"
+                      className="absolute bottom-[-3px] right-0 translate-x-1/3 rounded-full translate-y-1/3 z-10 avatar-top-position"
                       alt={item.insighter.name}
                       style={{
                         boxShadow: "0 0 0 2px white",

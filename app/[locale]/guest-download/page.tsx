@@ -3,8 +3,9 @@
 import React, { useCallback, useMemo, useState } from "react";
 import { useParams, useSearchParams } from "next/navigation";
 import type { ReadonlyURLSearchParams } from "next/navigation";
-import { Button, Container, Group, Paper, Stack, Text, Title } from "@mantine/core";
+import { Anchor, Button, Center, Container, Group, Modal, Paper, Stack, Text, ThemeIcon, Title } from "@mantine/core";
 import { useToast } from "@/components/toast/ToastContext";
+import { IconClockExclamation } from "@tabler/icons-react";
 
 function getQueryParamTrimmed(searchParams: ReadonlyURLSearchParams, key: string): string {
   const direct = searchParams.get(key);
@@ -20,6 +21,33 @@ function getQueryParamTrimmed(searchParams: ReadonlyURLSearchParams, key: string
   return "";
 }
 
+type ApiErrorShape = {
+  type?: string;
+  message?: string;
+  errors?: Record<string, unknown>;
+};
+
+async function safeReadJson(response: Response): Promise<unknown> {
+  const ct = response.headers.get("content-type") || "";
+  if (!ct.toLowerCase().includes("application/json")) return null;
+  try {
+    return await response.json();
+  } catch {
+    return null;
+  }
+}
+
+function isInvalidPermission422(response: Response, body: unknown): boolean {
+  if (response.status !== 422) return false;
+  if (!body || typeof body !== "object") return false;
+  const b = body as ApiErrorShape;
+  if (typeof b.message === "string" && b.message.toLowerCase().includes("invalid permission")) return true;
+  const msg = (b.errors as any)?.message;
+  if (Array.isArray(msg) && msg.some((m) => typeof m === "string" && m.toLowerCase().includes("invalid permission")))
+    return true;
+  return false;
+}
+
 export default function GuestDownloadPage() {
   const params = useParams();
   const locale = params.locale as string;
@@ -31,6 +59,7 @@ export default function GuestDownloadPage() {
   const tokenFromUrl = useMemo(() => getQueryParamTrimmed(searchParams, "token"), [searchParams]);
 
   const [isDownloading, setIsDownloading] = useState(false);
+  const [isExpiredModalOpen, setIsExpiredModalOpen] = useState(false);
 
   const triggerGuestDownload = useCallback(async () => {
     setIsDownloading(true);
@@ -57,7 +86,14 @@ export default function GuestDownloadPage() {
       );
 
       if (!response.ok) {
-        throw new Error(`Download failed: ${response.status}`);
+        const body = await safeReadJson(response);
+        if (isInvalidPermission422(response, body)) {
+          setIsExpiredModalOpen(true);
+          return;
+        }
+        const apiMessage =
+          body && typeof body === "object" && typeof (body as any).message === "string" ? (body as any).message : "";
+        throw new Error(apiMessage || `Download failed: ${response.status}`);
       }
 
       const blob = await response.blob();
@@ -87,6 +123,58 @@ export default function GuestDownloadPage() {
 
   return (
     <Container size="sm" py={48}>
+      <Modal
+        opened={isExpiredModalOpen}
+        onClose={() => setIsExpiredModalOpen(false)}
+        centered
+        withCloseButton
+        title={isRTL ? "انتهت صلاحية الرابط" : "Link expired"}
+      >
+        <Stack gap={10}>
+          <Center>
+            <ThemeIcon color="orange" variant="light" size={56} radius="xl">
+              <IconClockExclamation size={30} />
+            </ThemeIcon>
+          </Center>
+          <Text size="sm" c="dimmed">
+            {isRTL
+              ? "لقد تجاوزت المدة المسموح بها لإعادة التنزيل (24 ساعة من وقت الشراء)، لذلك انتهت صلاحية هذا الرابط."
+              : "You’ve passed the allowed re-download window (24 hours from purchase), so this link has expired."}
+          </Text>
+          <Text size="sm" c="dimmed">
+            {isRTL ? (
+              <>
+                إذا كنت بحاجة إلى مساعدة،{" "}
+                <Anchor href="https://insightabusiness.com/en/contact" target="_blank" rel="noopener noreferrer">
+                  تواصل مع الدعم
+                </Anchor>{" "}
+                وارفق رقم الطلب.
+              </>
+            ) : (
+              <>
+                If you need help, please{" "}
+                <Anchor href="https://insightabusiness.com/en/contact" target="_blank" rel="noopener noreferrer">
+                  contact support
+                </Anchor>{" "}
+                and include your order number.
+              </>
+            )}
+          </Text>
+          {orderUuid ? (
+            <Text size="sm">
+              <strong>{isRTL ? "رقم الطلب:" : "Order:"}</strong> {orderUuid}
+            </Text>
+          ) : null}
+          <Group justify="flex-end" mt={6}>
+            <Button
+              className="bg-gradient-to-r from-blue-500 to-teal-400 hover:from-blue-600 hover:to-teal-500 transition-all"
+              onClick={() => setIsExpiredModalOpen(false)}
+            >
+              {isRTL ? "حسنًا" : "OK"}
+            </Button>
+          </Group>
+        </Stack>
+      </Modal>
       <Paper withBorder radius="md" p="lg">
         <Stack gap={20} flex={1} align="center" justify="center">
           <Title order={2}>{isRTL ? " إعادة تنزيل المعرفة "  : "Re-download Insight"}</Title>

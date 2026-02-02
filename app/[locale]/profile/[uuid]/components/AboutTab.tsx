@@ -244,6 +244,12 @@ export default function AboutTab({
 
               {/* Contact Information */}
               <div className="flex flex-col gap-4">
+              <div className="bg-white dark:bg-slate-800 p-4 rounded-xl shadow-sm">
+                  <p className="text-sm text-gray-500 dark:text-gray-400 mb-2">
+                    {t("socialMedia")}
+                  </p>
+                  {renderSocialRow(profileData.social)}
+                </div>
                 {/* Location/Country */}
                 {profileData.country && (
                   <div className="bg-white dark:bg-slate-800 p-4 rounded-xl shadow-sm">
@@ -285,12 +291,7 @@ export default function AboutTab({
                   </div>
                 )}
                 {/* Social Media */}
-                <div className="bg-white dark:bg-slate-800 p-4 rounded-xl shadow-sm">
-                  <p className="text-sm text-gray-500 dark:text-gray-400 mb-2">
-                    {t("socialMedia")}
-                  </p>
-                  {renderSocialRow(profileData.social)}
-                </div>
+                
               </div>
             </div>
           </div>

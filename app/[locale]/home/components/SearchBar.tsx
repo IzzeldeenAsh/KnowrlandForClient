@@ -755,7 +755,7 @@ const SearchBar: React.FC<SearchBarProps> = ({
                 disabled={isLoadingIsic}
                 onClick={() => !isLoadingIsic && setIsIsicModalOpen(true)}
                 className={`${filterChipBaseClasses} ${isLoadingIsic ? filterChipDisabledClasses : selectedIsic ? filterChipActiveClasses : filterChipInactiveClasses} ${isRtl ? 'flex-row-reverse' : ''}`}
-                aria-label={isRtl ? 'اختر رمز ISIC' : 'Select ISIC code'}
+                aria-label={isRtl ? 'اختر رمز ISIC (الصناعة)' : 'Select ISIC code (Industry)'}
               >
                 <span
                   className={`flex items-center justify-center w-6 h-6 rounded-full border ${selectedIsic ? 'bg-blue-100 border-blue-200 text-blue-700' : 'bg-blue-50 border-blue-100 text-[#299af8]'}`}
@@ -770,7 +770,7 @@ const SearchBar: React.FC<SearchBarProps> = ({
                   )}
                 </span>
                 <span className="font-medium text-gray-900">
-                 {locale === 'ar' ? ' رمز ISIC' : 'ISIC code'}
+                 {locale === 'ar' ? '  رمز ISIC (الصناعة)' : 'ISIC code (Industry)'}
                 </span>
                 {selectedIsic && (
                   <span className={`font-mono text-[11px] bg-gray-100 px-1.5 py-0.5 rounded ${isRtl ? 'mr-2' : 'ml-2'}`}>
@@ -802,11 +802,11 @@ const SearchBar: React.FC<SearchBarProps> = ({
                   }
                 }}
                 className={`${filterChipBaseClasses} ${isHsDisabled ? filterChipDisabledClasses : selectedHs ? filterChipActiveClasses : filterChipInactiveClasses} ${isRtl ? 'flex-row-reverse' : ''}`}
-                aria-label={isRtl ? 'اختر رمز المنتج' : 'Select Product'}
+                aria-label={isRtl ? 'اختر رمز المنتج (HS Code)' : 'Select Product (HS Code)'}
               >
                 {renderHsIcon(!!selectedHs && !isHsDisabled)}
                 <span className="font-medium text-gray-900">
-                 {locale === 'ar' ? ' رمز المنتج' : 'Products'}
+                 {locale === 'ar' ? '  رمز المنتج (HS Code)' : 'Products (HS Code)'}
                 </span>
                 {selectedHs && !isHsDisabled && (
                   <span className={`font-mono text-[11px] bg-gray-100 px-1.5 py-0.5 rounded ${isRtl ? 'mr-2' : 'ml-2'}`}>
@@ -900,7 +900,7 @@ const SearchBar: React.FC<SearchBarProps> = ({
             disabled={isLoadingIsic}
             onClick={() => !isLoadingIsic && setIsIsicModalOpen(true)}
             className={`${filterChipBaseClasses} ${isLoadingIsic ? filterChipDisabledClasses : selectedIsic ? filterChipActiveClasses : filterChipInactiveClasses} ${isRtl ? 'flex-row-reverse' : ''}`}
-            aria-label={isRtl ? 'اختر رمز ISIC' : 'Select ISIC code'}
+            aria-label={isRtl ? 'اختر رمز ISIC (الصناعة)' : 'Select ISIC code (Industry)'}
           >
             <span
               className={`flex items-center justify-center w-6 h-6 rounded-full border ${selectedIsic ? 'bg-blue-100 border-blue-200 text-blue-700' : 'bg-blue-50 border-blue-100 text-[#299af8]'}`}
@@ -947,11 +947,11 @@ const SearchBar: React.FC<SearchBarProps> = ({
               }
             }}
             className={`${filterChipBaseClasses} ${isHsDisabled ? filterChipDisabledClasses : selectedHs ? filterChipActiveClasses : filterChipInactiveClasses} ${isRtl ? 'flex-row-reverse' : ''}`}
-            aria-label={isRtl ? 'اختر رمز المنتج' : 'Select Product'}
+            aria-label={isRtl ? 'اختر رمز المنتج (HS Code)' : 'Select Product (HS Code)'}
           >
             {renderHsIcon(!!selectedHs && !isHsDisabled)}
             <span className="font-medium text-gray-900">
-             {locale === 'ar' ? ' رمز المنتج' : 'Products'}
+             {locale === 'ar' ? ' رمز المنتج (HS Code)' : 'Products (HS Code)'}
             </span>
             {selectedHs && !isHsDisabled && (
               <span className={`font-mono text-[11px] bg-gray-100 px-1.5 py-0.5 rounded ${isRtl ? 'mr-2' : 'ml-2'}`}>
@@ -1074,7 +1074,7 @@ const SearchBar: React.FC<SearchBarProps> = ({
                 className={`flex items-center gap-1 px-2 py-1 rounded-full border bg-blue-50 border-blue-200 text-blue-700 ${isRtl ? 'flex-row-reverse' : ''}`}
                 aria-label={isRtl ? 'تفاصيل رمز المنتج المحدد' : 'Selected HS details'}
               >
-                <span className="font-medium">{isRtl ? 'رمز المنتج:' : 'Products:'}</span>
+                <span className="font-medium">{isRtl ? 'رمز المنتج (HS Code):' : 'Products (HS Code):'}</span>
                 <span className="line-clamp-1 truncate max-w-[260px]">{selectedHs.label}</span>
                 <button
                   type="button"
@@ -1133,7 +1133,7 @@ const SearchBar: React.FC<SearchBarProps> = ({
         <Modal
           opened={isHsModalOpen}
           onClose={() => setIsHsModalOpen(false)}
-          title={locale === 'ar' ? 'اختر رمز المنتج' : 'Select Product'}
+          title={locale === 'ar' ? 'اختر رمز المنتج (HS Code)' : 'Select Product (HS Code)'}
           size="lg"
           overlayProps={{ backgroundOpacity: 0.55, blur: 3 }}
         >
