@@ -2,7 +2,6 @@
 
 import React, { useState, useEffect, useCallback, useRef } from 'react'
 import { useParams, useSearchParams, useRouter } from 'next/navigation';
-import { useTranslations } from 'next-intl'
 import { useToast } from '@/components/toast/ToastContext';
 import PageIllustration from "@/components/page-illustration";
 import type { KnowledgeItem } from '../topic/[id]/[slug]/KnowledgeGrid';

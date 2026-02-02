@@ -74,6 +74,8 @@ const ResultsSection: React.FC<ResultsSectionProps> = ({
   const t4 = useTranslations('Features4');
   const isRtl = locale === 'ar';
   const searchParams = useSearchParams();
+  const keywordFromUrl = (searchParams.get('keyword') || '').trim();
+  const hasKeyword = ((searchQuery || '').trim() || keywordFromUrl).length > 0;
   
   // Get current page directly from URL - this is the source of truth!
   const urlCurrentPage = searchParams.get('page') ? parseInt(searchParams.get('page')!) : 1;
@@ -117,8 +119,15 @@ const ResultsSection: React.FC<ResultsSectionProps> = ({
     <div className="px-10">
     <Group justify="space-between" align="center" mb="md">
         <div className="flex items-center gap-2">
+          
           {searchType === 'knowledge' && selectedCategory !== undefined && onCategoryChange && getCategoryCount && (
-            <div className="flex flex-wrap items-center gap-2">
+            <div className="flex flex-col gap-2">
+              {keywordFromUrl.length > 0 && (
+                <div className="text-sm font-light text-gray-800">
+                  {isRtl ? 'نتائج البحث:' : 'Search Results:'}
+                </div>
+              )}
+              <div className="flex flex-wrap items-center gap-2">
               {(() => {
                 const categories = [
                   { name: 'all', label: 'All', arLabel: 'الكل', filterClass: styles.filterAllActive, iconClass: styles.iconData },
@@ -226,7 +235,9 @@ const ResultsSection: React.FC<ResultsSectionProps> = ({
                 };
                 return categories.map((cat) => {
                   const isActive = selectedCategory === cat.name;
-                  const count = cat.name === 'all' ? getCategoryCount('all') : getCategoryCount(cat.name);
+                  const count = hasKeyword
+                    ? (cat.name === 'all' ? getCategoryCount('all') : getCategoryCount(cat.name))
+                    : 0;
                   return (
                     <button
                       key={cat.name}
@@ -240,7 +251,7 @@ const ResultsSection: React.FC<ResultsSectionProps> = ({
                         <span className={`${isRtl ? 'me-2' : 'ml-2'} font-medium text-xs`}>
                         {isRtl ? cat.arLabel : cat.label}
                       </span>
-                        {cat.name !== 'all' && (
+                        {hasKeyword && cat.name !== 'all' && (
                           <span className={`${styles.countBadge} ${isRtl ? 'me-0' : 'ml-2'}`}>
                             {count > 999 ? '999+' : count}
                           </span>
@@ -250,6 +261,7 @@ const ResultsSection: React.FC<ResultsSectionProps> = ({
                   );
                 });
               })()}
+              </div>
             </div>
           )}
         </div>

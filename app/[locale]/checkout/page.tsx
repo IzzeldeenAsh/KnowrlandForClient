@@ -990,7 +990,7 @@ export default function CheckoutPage() {
             {/* Selected Documents Section */}
                   <div>
                   <div className="border border-[#E2E8F0] rounded-lg p-4 mb-6" style={{ background: 'rgba(255, 255, 255, 0.7)', backdropFilter: 'blur(10px)', WebkitBackdropFilter: 'blur(10px)' }}>
-              <Text size="lg" fw={600} mb="xs">
+              <Text size="lg" fw={600} mb="xs" style={{ overflowWrap: 'break-word' }}>
                 {knowledge.title}
               </Text>
               {/* {isGuest && hasFreeDocsInCart && (

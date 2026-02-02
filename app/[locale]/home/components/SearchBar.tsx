@@ -535,11 +535,12 @@ const SearchBar: React.FC<SearchBarProps> = ({
   const searchTypeChipActiveClasses = 'bg-[#299af8] border-[#299af8] text-white shadow-md';
   const searchTypeChipInactiveClasses = 'bg-blue-50 border-blue-100 text-blue-600 hover:bg-blue-100';
   const searchTypeChipDisabledClasses = 'bg-gray-100 border-gray-200 text-gray-400 cursor-not-allowed opacity-70';
-  const filterChipBaseClasses =
-    'flex items-center gap-2 px-3 py-1.5 rounded-full border text-xs font-medium transition-all duration-200 shadow-sm';
-  const filterChipActiveClasses = 'bg-blue-50 border-blue-200 text-blue-700 hover:bg-blue-100';
-  const filterChipInactiveClasses = 'bg-white border-gray-200 text-gray-700 hover:border-[#299af8] hover:text-[#299af8]';
-  const filterChipDisabledClasses = 'bg-gray-100 border-gray-200 text-gray-400 cursor-not-allowed';
+  // Filter chips (ISIC/HS) style — match screenshot pill layout
+  const filterPillBaseClasses =
+    'group flex items-center gap-3 rounded-full border bg-white px-3 py-1 transition-colors';
+  const filterPillActiveClasses = 'border-[#D7E9FF]';
+  const filterPillInactiveClasses = 'border-gray-200 hover:border-[#299af8]/50';
+  const filterPillDisabledClasses = 'border-gray-200 bg-gray-50 text-gray-400 cursor-not-allowed opacity-80';
 
   const typeLabels = {
     knowledge: isRtl ? 'المنشورات' : 'By Insight',
@@ -599,20 +600,62 @@ const SearchBar: React.FC<SearchBarProps> = ({
                     </span>
   );
 
-  const renderHsIcon = (isActive: boolean) => (
-    <span
-      className={`flex items-center justify-center w-6 h-6 rounded-full border ${
-        isActive ? 'bg-blue-100 border-blue-200 text-blue-700' : 'bg-blue-50 border-blue-100 text-[#299af8]'
-      }`}
-    >
-      <svg xmlns="http://www.w3.org/2000/svg" className="w-3.5 h-3.5" viewBox="0 0 64 64" fill="none">
-        <g transform="matrix(0.99,0,0,0.99,0.32,0.3)" stroke="none" fill="currentColor">
-          <path d="m49.5 34c-.82842712 0-1.5.67157288-1.5 1.5v13c0 .82842712.67157288 1.5 1.5 1.5s1.5-.67157288 1.5-1.5v-13c0-.82842712-.67157288-1.5-1.5-1.5zm-6 0c-.82842712 0-1.5.67157288-1.5 1.5v13c0 .82842712.67157288 1.5 1.5 1.5s1.5-.67157288 1.5-1.5v-13c0-.82842712-.67157288-1.5-1.5-1.5zm-6 0c-.82842712 0-1.5.67157288-1.5 1.5v13c0 .82842712.67157288 1.5 1.5 1.5s1.5-.67157288 1.5-1.5v-13c0-.82842712-.67157288-1.5-1.5-1.5zm-6 0c-.82842712 0-1.5.67157288-1.5 1.5v13c0 .82842712.67157288 1.5 1.5 1.5s1.5-.67157288 1.5-1.5v-13c0-.82842712-.67157288-1.5-1.5-1.5z" />
-          <path d="m32 3c-.82842712 0-1.5.67157288-1.5 1.5v2.8007812c-1.2649826.52060382-2.2043206 1.6749789-2.4335938 3.0566406l-14.742188 16.642578h-6.8242188c-1.3590542 0-2.5 1.1409458-2.5 2.5v25c0 1.3590542 1.1409458 2.5 2.5 2.5h51c1.3590542 0 2.5-1.1409458 2.5-2.5v-25c0-1.3590542-1.1409361-2.5000073-2.5-2.5h-28c-.82842712 0-1.5.67157288-1.5 1.5s.67157288 1.5 1.5 1.5h27.5v24h-33v-24.5c0-1.3590542-1.1409458-2.5-2.5-2.5h-4.1679688l11.761719-13.279297c.73236176.78125202 1.7636799 1.2792969 2.90625 1.2792969 1.1727683 0 2.2019554-.53489178 2.9160156-1.359375l9.125 9.765625c.56539461.60477567 1.51386.63711965 2.1191406.0722656.60606614-.56559238.63843164-1.5155634.0722656-2.1210937l-10.396484-11.123047c-.26624623-1.3120561-1.1427571-2.4088386-2.3359375-2.9199219v-2.8144531c0-.82842712-.67157288-1.5-1.5-1.5zm-17 27h5c.554 0 1 .446 1 1v22c0 .554-.446 1-1 1h-5c-.554 0-1-.446-1-1v-22c0-.554.446-1 1-1z" />
-                            </g>
-                          </svg>
-                    </span>
-  );
+  const renderFilterPill = (opts: {
+    title: string;
+    subtitle: string;
+    ariaLabel: string;
+    icon: React.ReactNode;
+    disabled?: boolean;
+    active?: boolean;
+    onClick: () => void;
+    onClear?: () => void;
+  }) => {
+    const disabled = !!opts.disabled;
+    const active = !!opts.active;
+
+    return (
+      <button
+        type="button"
+        disabled={disabled}
+        aria-disabled={disabled}
+        aria-label={opts.ariaLabel}
+        onClick={() => {
+          if (!disabled) opts.onClick();
+        }}
+        className={`${filterPillBaseClasses} ${
+          disabled ? filterPillDisabledClasses : active ? filterPillActiveClasses : filterPillInactiveClasses
+        } ${isRtl ? 'flex-row-reverse' : ''}`}
+      >
+        <span
+          className={`flex items-center justify-center w-8 h-8 rounded-full border ${
+            disabled ? 'bg-gray-100 border-gray-200 text-gray-400' : 'bg-[#EFF8FF] border-[#D7E9FF] text-[#299AF8]'
+          }`}
+        >
+          {opts.icon}
+        </span>
+
+        <span className={`flex flex-col leading-tight ${isRtl ? 'items-end' : 'items-start'}`}>
+          <span className="text-xs font-medium text-gray-900">{opts.title}</span>
+          <span className="text-[10px] font-light text-[#299AF8]">{opts.subtitle}</span>
+        </span>
+
+        {opts.onClear && (
+          <span
+            className={`text-gray-400 hover:text-red-500 transition-colors ${isRtl ? 'ml-0 mr-auto' : 'ml-auto'}`}
+            role="button"
+            aria-label={isRtl ? 'مسح' : 'Clear'}
+            onClick={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              opts.onClear?.();
+            }}
+          >
+            <IconX size={16} />
+          </span>
+        )}
+      </button>
+    );
+  };
   
   return (
     <form onSubmit={(e) => {
@@ -750,84 +793,46 @@ const SearchBar: React.FC<SearchBarProps> = ({
             />
             {/* Filter chips inline on md+ screens */}
             <div className="hidden md:flex items-center gap-2">
-              <button
-                type="button"
-                disabled={isLoadingIsic}
-                onClick={() => !isLoadingIsic && setIsIsicModalOpen(true)}
-                className={`${filterChipBaseClasses} ${isLoadingIsic ? filterChipDisabledClasses : selectedIsic ? filterChipActiveClasses : filterChipInactiveClasses} ${isRtl ? 'flex-row-reverse' : ''}`}
-                aria-label={isRtl ? 'اختر رمز ISIC (الصناعة)' : 'Select ISIC code (Industry)'}
-              >
-                <span
-                  className={`flex items-center justify-center w-6 h-6 rounded-full border ${selectedIsic ? 'bg-blue-100 border-blue-200 text-blue-700' : 'bg-blue-50 border-blue-100 text-[#299af8]'}`}
-                >
-                  {isLoadingIsic ? (
-                    <svg className="animate-spin h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                    </svg>
-                  ) : (
-                    <IconBuildingBank className="w-[14px] h-[14px]" />
-                  )}
-                </span>
-                <span className="font-medium text-gray-900">
-                 {locale === 'ar' ? '  رمز ISIC (الصناعة)' : 'ISIC code (Industry)'}
-                </span>
-                {selectedIsic && (
-                  <span className={`font-mono text-[11px] bg-gray-100 px-1.5 py-0.5 rounded ${isRtl ? 'mr-2' : 'ml-2'}`}>
-                    {selectedIsic.code}
-                  </span>
-                )}
-                {selectedIsic && (
-                  <span
-                    className={`text-gray-400 hover:text-red-500 transition-colors ${isRtl ? 'mr-1' : 'ml-1'}`}
-                    role="button"
-                    aria-label={isRtl ? 'مسح اختيار ISIC' : 'Clear ISIC'}
-                    onClick={(e) => {
-                      e.preventDefault();
-                      e.stopPropagation();
-                      clearIsicSelection();
-                    }}
-                  >
-                    <IconX size={14} />
-                  </span>
-                )}
-              </button>
+              {renderFilterPill({
+                title: locale === 'ar' ? 'الصناعة' : 'Industry',
+                subtitle: selectedIsic ? selectedIsic.code : (locale === 'ar' ? 'رمز ISIC' : 'ISIC code'),
+                ariaLabel: isRtl ? 'اختر الصناعة (ISIC)' : 'Select Industry (ISIC code)',
+                disabled: isLoadingIsic,
+                active: !!selectedIsic,
+                icon: isLoadingIsic ? (
+                  <svg className="animate-spin h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                  </svg>
+                ) : (
+                  <IconBuildingBank className="w-[18px] h-[18px]" />
+                ),
+                onClick: () => setIsIsicModalOpen(true),
+                onClear: selectedIsic ? () => clearIsicSelection() : undefined,
+              })}
 
-              <button
-                type="button"
-                disabled={isHsDisabled}
-                onClick={() => {
-                  if (!isHsDisabled) {
-                    setIsHsModalOpen(true);
-                  }
-                }}
-                className={`${filterChipBaseClasses} ${isHsDisabled ? filterChipDisabledClasses : selectedHs ? filterChipActiveClasses : filterChipInactiveClasses} ${isRtl ? 'flex-row-reverse' : ''}`}
-                aria-label={isRtl ? 'اختر رمز المنتج (HS Code)' : 'Select Product (HS Code)'}
-              >
-                {renderHsIcon(!!selectedHs && !isHsDisabled)}
-                <span className="font-medium text-gray-900">
-                 {locale === 'ar' ? '  رمز المنتج (HS Code)' : 'Products (HS Code)'}
-                </span>
-                {selectedHs && !isHsDisabled && (
-                  <span className={`font-mono text-[11px] bg-gray-100 px-1.5 py-0.5 rounded ${isRtl ? 'mr-2' : 'ml-2'}`}>
-                    {selectedHs.code}
-                  </span>
-                )}
-                {selectedHs && !isHsDisabled && (
-                  <span
-                    className={`text-gray-400 hover:text-red-500 transition-colors ${isRtl ? 'mr-1' : 'ml-1'}`}
-                    role="button"
-                    aria-label={isRtl ? 'مسح اختيار HS' : 'Clear HS'}
-                    onClick={(e) => {
-                      e.preventDefault();
-                      e.stopPropagation();
-                      clearHsSelection();
-                    }}
-                  >
-                    <IconX size={14} />
-                  </span>
-                )}
-              </button>
+              {renderFilterPill({
+                title: locale === 'ar' ? 'المنتجات' : 'Products',
+                subtitle: selectedHs ? selectedHs.code : (locale === 'ar' ? 'رمز HS' : 'HS code'),
+                ariaLabel: isRtl ? 'اختر رمز المنتج (HS Code)' : 'Select Product (HS Code)',
+                disabled: isHsDisabled,
+                active: !!selectedHs && !isHsDisabled,
+                icon: isHsDisabled ? (
+                  <svg className="animate-spin h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                  </svg>
+                ) : (
+                  <svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5" viewBox="0 0 64 64" fill="none">
+                    <g transform="matrix(0.99,0,0,0.99,0.32,0.3)" stroke="none" fill="currentColor">
+                      <path d="m49.5 34c-.82842712 0-1.5.67157288-1.5 1.5v13c0 .82842712.67157288 1.5 1.5 1.5s1.5-.67157288 1.5-1.5v-13c0-.82842712-.67157288-1.5-1.5-1.5zm-6 0c-.82842712 0-1.5.67157288-1.5 1.5v13c0 .82842712.67157288 1.5 1.5 1.5s1.5-.67157288 1.5-1.5v-13c0-.82842712-.67157288-1.5-1.5-1.5zm-6 0c-.82842712 0-1.5.67157288-1.5 1.5v13c0 .82842712.67157288 1.5 1.5 1.5s1.5-.67157288 1.5-1.5v-13c0-.82842712-.67157288-1.5-1.5-1.5zm-6 0c-.82842712 0-1.5.67157288-1.5 1.5v13c0 .82842712.67157288 1.5 1.5 1.5s1.5-.67157288 1.5-1.5v-13c0-.82842712-.67157288-1.5-1.5-1.5z" />
+                      <path d="m32 3c-.82842712 0-1.5.67157288-1.5 1.5v2.8007812c-1.2649826.52060382-2.2043206 1.6749789-2.4335938 3.0566406l-14.742188 16.642578h-6.8242188c-1.3590542 0-2.5 1.1409458-2.5 2.5v25c0 1.3590542 1.1409458 2.5 2.5 2.5h51c1.3590542 0 2.5-1.1409458 2.5-2.5v-25c0-1.3590542-1.1409361-2.5000073-2.5-2.5h-28c-.82842712 0-1.5.67157288-1.5 1.5s.67157288 1.5 1.5 1.5h27.5v24h-33v-24.5c0-1.3590542-1.1409458-2.5-2.5-2.5h-4.1679688l11.761719-13.279297c.73236176.78125202 1.7636799 1.2792969 2.90625 1.2792969 1.1727683 0 2.2019554-.53489178 2.9160156-1.359375l9.125 9.765625c.56539461.60477567 1.51386.63711965 2.1191406.0722656.60606614-.56559238.63843164-1.5155634.0722656-2.1210937l-10.396484-11.123047c-.26624623-1.3120561-1.1427571-2.4088386-2.3359375-2.9199219v-2.8144531c0-.82842712-.67157288-1.5-1.5-1.5zm-17 27h5c.554 0 1 .446 1 1v22c0 .554-.446 1-1 1h-5c-.554 0-1-.446-1-1v-22c0-.554.446-1 1-1z" />
+                    </g>
+                  </svg>
+                ),
+                onClick: () => setIsHsModalOpen(true),
+                onClear: selectedHs ? () => clearHsSelection() : undefined,
+              })}
               
               {/* Accuracy filter moved below the search field */}
             </div>
@@ -895,157 +900,119 @@ const SearchBar: React.FC<SearchBarProps> = ({
         </div>
         {/* Filter chips below the input on small screens */}
         <div className={`mt-2 md:hidden flex flex-wrap gap-2 ${isRtl ? 'justify-end' : 'justify-start'}`}>
-          <button
-            type="button"
-            disabled={isLoadingIsic}
-            onClick={() => !isLoadingIsic && setIsIsicModalOpen(true)}
-            className={`${filterChipBaseClasses} ${isLoadingIsic ? filterChipDisabledClasses : selectedIsic ? filterChipActiveClasses : filterChipInactiveClasses} ${isRtl ? 'flex-row-reverse' : ''}`}
-            aria-label={isRtl ? 'اختر رمز ISIC (الصناعة)' : 'Select ISIC code (Industry)'}
-          >
-            <span
-              className={`flex items-center justify-center w-6 h-6 rounded-full border ${selectedIsic ? 'bg-blue-100 border-blue-200 text-blue-700' : 'bg-blue-50 border-blue-100 text-[#299af8]'}`}
-            >
-              {isLoadingIsic ? (
-                <svg className="animate-spin h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                </svg>
-              ) : (
-                <IconBuildingBank className="w-[14px] h-[14px]" />
-              )}
-            </span>
-            <span className="font-medium text-gray-900">
-             {locale === 'ar' ? ' رمز ISIC' : 'ISIC code'}
-            </span>
-            {selectedIsic && (
-              <span className={`font-mono text-[11px] bg-gray-100 px-1.5 py-0.5 rounded ${isRtl ? 'mr-2' : 'ml-2'}`}>
-                {selectedIsic.code}
-              </span>
-            )}
-            {selectedIsic && (
-              <span
-                className={`text-gray-400 hover:text-red-500 transition-colors ${isRtl ? 'mr-1' : 'ml-1'}`}
-                role="button"
-                aria-label={isRtl ? 'مسح اختيار ISIC' : 'Clear ISIC'}
-                onClick={(e) => {
-                  e.preventDefault();
-                  e.stopPropagation();
-                  clearIsicSelection();
-                }}
-              >
-                <IconX size={14} />
-              </span>
-            )}
-          </button>
+          {renderFilterPill({
+            title: locale === 'ar' ? 'الصناعة' : 'Industry',
+            subtitle: selectedIsic ? selectedIsic.code : (locale === 'ar' ? 'رمز ISIC' : 'ISIC code'),
+            ariaLabel: isRtl ? 'اختر الصناعة (ISIC)' : 'Select Industry (ISIC code)',
+            disabled: isLoadingIsic,
+            active: !!selectedIsic,
+            icon: isLoadingIsic ? (
+              <svg className="animate-spin h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+              </svg>
+            ) : (
+              <IconBuildingBank className="w-[18px] h-[18px]" />
+            ),
+            onClick: () => setIsIsicModalOpen(true),
+            onClear: selectedIsic ? () => clearIsicSelection() : undefined,
+          })}
 
-          <button
-            type="button"
-            disabled={isHsDisabled}
-            onClick={() => {
-              if (!isHsDisabled) {
-                setIsHsModalOpen(true);
-              }
-            }}
-            className={`${filterChipBaseClasses} ${isHsDisabled ? filterChipDisabledClasses : selectedHs ? filterChipActiveClasses : filterChipInactiveClasses} ${isRtl ? 'flex-row-reverse' : ''}`}
-            aria-label={isRtl ? 'اختر رمز المنتج (HS Code)' : 'Select Product (HS Code)'}
-          >
-            {renderHsIcon(!!selectedHs && !isHsDisabled)}
-            <span className="font-medium text-gray-900">
-             {locale === 'ar' ? ' رمز المنتج (HS Code)' : 'Products (HS Code)'}
-            </span>
-            {selectedHs && !isHsDisabled && (
-              <span className={`font-mono text-[11px] bg-gray-100 px-1.5 py-0.5 rounded ${isRtl ? 'mr-2' : 'ml-2'}`}>
-                {selectedHs.code}
-              </span>
-            )}
-            {selectedHs && !isHsDisabled && (
-              <span
-                className={`text-gray-400 hover:text-red-500 transition-colors ${isRtl ? 'mr-1' : 'ml-1'}`}
-                role="button"
-                aria-label={isRtl ? 'مسح اختيار HS' : 'Clear HS'}
-                onClick={(e) => {
-                  e.preventDefault();
-                  e.stopPropagation();
-                  clearHsSelection();
-                }}
-              >
-                <IconX size={14} />
-              </span>
-            )}
-          </button>
+          {renderFilterPill({
+            title: locale === 'ar' ? 'المنتجات' : 'Products',
+            subtitle: selectedHs ? selectedHs.code : (locale === 'ar' ? 'رمز HS' : 'HS code'),
+            ariaLabel: isRtl ? 'اختر رمز المنتج (HS Code)' : 'Select Product (HS Code)',
+            disabled: isHsDisabled,
+            active: !!selectedHs && !isHsDisabled,
+            icon: isHsDisabled ? (
+              <svg className="animate-spin h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+              </svg>
+            ) : (
+              <svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5" viewBox="0 0 64 64" fill="none">
+                <g transform="matrix(0.99,0,0,0.99,0.32,0.3)" stroke="none" fill="currentColor">
+                  <path d="m49.5 34c-.82842712 0-1.5.67157288-1.5 1.5v13c0 .82842712.67157288 1.5 1.5 1.5s1.5-.67157288 1.5-1.5v-13c0-.82842712-.67157288-1.5-1.5-1.5zm-6 0c-.82842712 0-1.5.67157288-1.5 1.5v13c0 .82842712.67157288 1.5 1.5 1.5s1.5-.67157288 1.5-1.5v-13c0-.82842712-.67157288-1.5-1.5-1.5zm-6 0c-.82842712 0-1.5.67157288-1.5 1.5v13c0 .82842712.67157288 1.5 1.5 1.5s1.5-.67157288 1.5-1.5v-13c0-.82842712-.67157288-1.5-1.5-1.5zm-6 0c-.82842712 0-1.5.67157288-1.5 1.5v13c0 .82842712.67157288 1.5 1.5 1.5s1.5-.67157288 1.5-1.5v-13c0-.82842712-.67157288-1.5-1.5-1.5z" />
+                  <path d="m32 3c-.82842712 0-1.5.67157288-1.5 1.5v2.8007812c-1.2649826.52060382-2.2043206 1.6749789-2.4335938 3.0566406l-14.742188 16.642578h-6.8242188c-1.3590542 0-2.5 1.1409458-2.5 2.5v25c0 1.3590542 1.1409458 2.5 2.5 2.5h51c1.3590542 0 2.5-1.1409458 2.5-2.5v-25c0-1.3590542-1.1409361-2.5000073-2.5-2.5h-28c-.82842712 0-1.5.67157288-1.5 1.5s.67157288 1.5 1.5 1.5h27.5v24h-33v-24.5c0-1.3590542-1.1409458-2.5-2.5-2.5h-4.1679688l11.761719-13.279297c.73236176.78125202 1.7636799 1.2792969 2.90625 1.2792969 1.1727683 0 2.2019554-.53489178 2.9160156-1.359375l9.125 9.765625c.56539461.60477567 1.51386.63711965 2.1191406.0722656.60606614-.56559238.63843164-1.5155634.0722656-2.1210937l-10.396484-11.123047c-.26624623-1.3120561-1.1427571-2.4088386-2.3359375-2.9199219v-2.8144531c0-.82842712-.67157288-1.5-1.5-1.5zm-17 27h5c.554 0 1 .446 1 1v22c0 .554-.446 1-1 1h-5c-.554 0-1-.446-1-1v-22c0-.554.446-1 1-1z" />
+                </g>
+              </svg>
+            ),
+            onClick: () => setIsHsModalOpen(true),
+            onClear: selectedHs ? () => clearHsSelection() : undefined,
+          })}
           
           {/* Accuracy chip removed on mobile; control placed under search field */}
         </div>
         
-        {shouldShowSuggestions && isMounted &&
-          createPortal(
-            <div
-              ref={suggestionsRef}
-              style={{
-                position: 'fixed',
-                top: dropdownRect.top,
-                left: dropdownRect.left,
-                width: dropdownRect.width,
-                zIndex: 10000,
-              }}
-              className="mt-0 bg-white border border-gray-200 rounded-md shadow-lg max-h-60 overflow-y-auto custom-scrollbar"
-              onMouseEnter={() => setMouseInSuggestions(true)}
-              onMouseLeave={() => setMouseInSuggestions(false)}
-            >
-              {suggestions.map((suggestion, index) => (
-                <div
-                  key={index}
-                  className={`px-4 py-2 cursor-pointer hover:bg-blue-50 ${activeSuggestionIndex === index ? 'bg-blue-50' : ''}`}
-                  onClick={() => handleSuggestionSelect(suggestion)}
-                  onMouseEnter={() => setActiveSuggestionIndex(index)}
-                  dir={isRtl ? 'rtl' : 'ltr'}
-                >
-                  <div className="flex items-center">
-                    <svg
-                      className={`w-5 h-5 text-gray-400 ${isRtl ? 'ml-2' : 'mr-2'}`}
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                      xmlns="http://www.w3.org/2000/svg"
-                    >
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                    </svg>
-                    <span className="text-gray-800">
-                      {searchQuery && suggestion.toLowerCase().includes(searchQuery.toLowerCase()) ? (
-                        <>
-                          {(() => {
-                            const lowerSuggestion = suggestion.toLowerCase();
-                            const lowerSearchTerm = searchQuery.toLowerCase();
-                            const matchIndex = lowerSuggestion.indexOf(lowerSearchTerm);
-                            
-                            if (matchIndex >= 0) {
-                              const beforeMatch = suggestion.substring(0, matchIndex);
-                              const match = suggestion.substring(matchIndex, matchIndex + searchQuery.length);
-                              const afterMatch = suggestion.substring(matchIndex + searchQuery.length);
-                              
-                              return (
-                                <>
-                                  {beforeMatch}
-                                  <strong className="font-bold">{match}</strong>
-                                  {afterMatch}
-                                </>
-                              );
-                            }
-                            
-                            return suggestion;
-                          })()}
-                        </>
-                      ) : (
-                        suggestion
-                      )}
-                    </span>
+        {shouldShowSuggestions && isMounted
+          ? (createPortal(
+              <div
+                ref={suggestionsRef}
+                style={{
+                  position: 'fixed',
+                  top: dropdownRect.top,
+                  left: dropdownRect.left,
+                  width: dropdownRect.width,
+                  zIndex: 10000,
+                }}
+                className="mt-0 bg-white border border-gray-200 rounded-md shadow-lg max-h-60 overflow-y-auto custom-scrollbar"
+                onMouseEnter={() => setMouseInSuggestions(true)}
+                onMouseLeave={() => setMouseInSuggestions(false)}
+              >
+                {suggestions.map((suggestion, index) => (
+                  <div
+                    key={index}
+                    className={`px-4 py-2 cursor-pointer hover:bg-blue-50 ${activeSuggestionIndex === index ? 'bg-blue-50' : ''}`}
+                    onClick={() => handleSuggestionSelect(suggestion)}
+                    onMouseEnter={() => setActiveSuggestionIndex(index)}
+                    dir={isRtl ? 'rtl' : 'ltr'}
+                  >
+                    <div className="flex items-center">
+                      <svg
+                        className={`w-5 h-5 text-gray-400 ${isRtl ? 'ml-2' : 'mr-2'}`}
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                        xmlns="http://www.w3.org/2000/svg"
+                      >
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                      </svg>
+                      <span className="text-gray-800">
+                        {searchQuery && suggestion.toLowerCase().includes(searchQuery.toLowerCase()) ? (
+                          <>
+                            {(() => {
+                              const lowerSuggestion = suggestion.toLowerCase();
+                              const lowerSearchTerm = searchQuery.toLowerCase();
+                              const matchIndex = lowerSuggestion.indexOf(lowerSearchTerm);
+
+                              if (matchIndex >= 0) {
+                                const beforeMatch = suggestion.substring(0, matchIndex);
+                                const match = suggestion.substring(matchIndex, matchIndex + searchQuery.length);
+                                const afterMatch = suggestion.substring(matchIndex + searchQuery.length);
+
+                                return (
+                                  <>
+                                    {beforeMatch}
+                                    <strong className="font-bold">{match}</strong>
+                                    {afterMatch}
+                                  </>
+                                );
+                              }
+
+                              return suggestion;
+                            })()}
+                          </>
+                        ) : (
+                          suggestion
+                        )}
+                      </span>
+                    </div>
                   </div>
-                </div>
-              ))}
-            </div>,
-            document.body
-          )
-        }
+                ))}
+              </div>,
+              document.body
+            ) as any)
+          : null}
         {/* Selected ISIC/HS details under the search bar */}
         {(selectedIsic || selectedHs) && (
           <div className={`mt-2 flex flex-wrap gap-2 items-start ${isRtl ? 'justify-start' : 'justify-start'} text-xs`}>
