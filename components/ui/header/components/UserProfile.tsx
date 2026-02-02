@@ -10,24 +10,9 @@ const getInitials = (firstName: string, lastName: string) => {
   return `${firstName[0]}${lastName[0]}`.toUpperCase();
 };
 
-// Helper function to get the Angular app URL based on current domain
-const getAngularAppUrl = (): string => {
-  if (typeof window === 'undefined') return 'https://app.insightabusiness.com';
-  
-  const hostname = window.location.hostname;
-  const protocol = window.location.protocol;
-  
-  // Production domains
-  if (hostname.includes('foresighta.co')) {
-    return `${protocol}//app.insightabusiness.com`;
-  }
-  if (hostname.includes('insightabusiness.com')) {
-    return `${protocol}//app.insightabusiness.com`;
-  }
-  
-  // Local development
-  return 'https://app.insightabusiness.com';
-};
+// IMPORTANT: must be deterministic on BOTH SSR + first client render (hydration).
+const ANGULAR_APP_URL: string =
+  process.env.NEXT_PUBLIC_ANGULAR_APP_URL || "https://app.insightabusiness.com";
 
 interface MenuPosition {
   top: number;
@@ -51,8 +36,9 @@ export function UserProfile({ isHome }: { isHome: boolean }) {
     right: null,
   });
   
-  // Get the Angular app URL dynamically
-  const angularAppUrl = getAngularAppUrl();
+  // Client-only values must be read after mount to avoid hydration mismatch.
+  const [hasToken, setHasToken] = useState<boolean>(false);
+  const [returnUrl, setReturnUrl] = useState<string>("");
 
   // Calculate and update menu position whenever it opens
   useEffect(() => {
@@ -127,8 +113,11 @@ export function UserProfile({ isHome }: { isHome: boolean }) {
     };
   }, [menuOpen]);
 
-  // Only show loading state if we have a token (potential user)  
-  const hasToken = !!getAuthToken();
+  useEffect(() => {
+    setHasToken(!!getAuthToken());
+    setReturnUrl(window.location.href);
+  }, [pathname]);
+
   const isClient$ = () => {
     return roles.includes("client") && 
       !roles.includes("insighter") && 
@@ -152,7 +141,7 @@ export function UserProfile({ isHome }: { isHome: boolean }) {
     return (
       <>
         <Link
-          href={`${angularAppUrl}/auth/login?returnUrl=${encodeURIComponent(typeof window !== 'undefined' ? window.location.href : '')}`}
+          href={`${ANGULAR_APP_URL}/auth/login?returnUrl=${encodeURIComponent(returnUrl)}`}
           className="btn-sm bg-gray-800 text-gray-200 shadow hover:bg-gray-900"
         >
           {t("login")}
@@ -327,7 +316,7 @@ export function UserProfile({ isHome }: { isHome: boolean }) {
               roles.includes("company-insighter")) && (
             <>
               <Link
-                href={`${angularAppUrl}/app/add-knowledge/stepper`}
+                href={`${ANGULAR_APP_URL}/app/add-knowledge/stepper`}
                 className="block px-4 py-2.5 text-sm font-medium text-sky-600 hover:bg-indigo-50 hover:text-sky-700"
                 onClick={() => setMenuOpen(false)}
                 style={{fontSize: '13px'}}
@@ -335,7 +324,7 @@ export function UserProfile({ isHome }: { isHome: boolean }) {
                 {t("addInsight")}
               </Link>
                <Link
-               href={`${angularAppUrl}/app/insighter-dashboard/my-knowledge/general`}
+               href={`${ANGULAR_APP_URL}/app/insighter-dashboard/my-knowledge/general`}
                className="block px-4 py-2.5  font-semibold text-slate-900 hover:bg-indigo-50 hover:text-sky-700"
                onClick={() => setMenuOpen(false)}
                style={{fontSize: '13px'}}
@@ -347,7 +336,7 @@ export function UserProfile({ isHome }: { isHome: boolean }) {
 
             {(roles.includes('company') && (
               <Link
-                href={`${angularAppUrl}/app/insighter-dashboard/my-company-settings`}
+                href={`${ANGULAR_APP_URL}/app/insighter-dashboard/my-company-settings`}
                 className="block px-4 py-2.5  font-semibold text-slate-900 hover:bg-indigo-50 hover:text-sky-700"
                 onClick={() => setMenuOpen(false)}
                 style={{fontSize: '13px'}}
@@ -367,7 +356,7 @@ export function UserProfile({ isHome }: { isHome: boolean }) {
           
             {/* Show dashboard for all users */}
             <Link
-              href={`${angularAppUrl}/app/insighter-dashboard/my-dashboard`}
+              href={`${ANGULAR_APP_URL}/app/insighter-dashboard/my-dashboard`}
               className="block px-4 py-2.5 font-semibold text-slate-900 hover:bg-indigo-50 hover:text-sky-700"
               onClick={() => setMenuOpen(false)}
               style={{fontSize: '13px'}}
@@ -384,7 +373,7 @@ export function UserProfile({ isHome }: { isHome: boolean }) {
             </Link> */}
             {/* Hide requests, received meetings and account settings for client-only role */}
             <Link
-              href={`${angularAppUrl}/app/profile/overview`}
+              href={`${ANGULAR_APP_URL}/app/profile/overview`}
               className="block px-4 py-3  font-semibold text-slate-900 hover:bg-indigo-50 hover:text-sky-700"
               style={{fontSize: '13px'}}
               onClick={() => setMenuOpen(false)}
@@ -410,7 +399,7 @@ export function UserProfile({ isHome }: { isHome: boolean }) {
                   {t("ReceivedMeetings")}
                 </Link> */}
                 <Link
-                  href={`${angularAppUrl}/app/insighter-dashboard/account-settings/general-settings`}
+                  href={`${ANGULAR_APP_URL}/app/insighter-dashboard/account-settings/general-settings`}
                   className="block px-4 py-2.5 font-semibold text-slate-900 hover:bg-indigo-50 hover:text-sky-700"
                   onClick={() => setMenuOpen(false)}
                   style={{fontSize: '13px'}}
@@ -438,7 +427,7 @@ export function UserProfile({ isHome }: { isHome: boolean }) {
               !roles.includes("company-insighter") && (
                 <>
                 <Link
-                  href={`${angularAppUrl}/app/insighter-register/vertical`}
+                  href={`${ANGULAR_APP_URL}/app/insighter-register/vertical`}
                   className="block px-4 py-2.5  font-semibold bg-clip-text text-transparent bg-gradient-to-r from-blue-500 to-teal-400"
                   onClick={() => setMenuOpen(false)}
                   style={{fontSize: '13px'}}

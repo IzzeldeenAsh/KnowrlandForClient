@@ -52,12 +52,13 @@ export function GlobalProfileProvider({ children }: { children: React.ReactNode 
   const [user, setUser] = useState<User | null>(globalProfileCache.user);
   const [roles, setRoles] = useState<string[]>(globalProfileCache.roles);
   const [isLoading, setIsLoading] = useState(false);
-  // If there's clearly no token, we already know the user is logged out.
-  // If there is a token, we keep auth unresolved until we fetch/confirm the profile.
-  const [isAuthResolved, setIsAuthResolved] = useState(() => {
-    if (typeof window === 'undefined') return false;
-    return !getAuthToken();
-  });
+  /**
+   * IMPORTANT (SSR hydration):
+   * `getAuthToken()` depends on browser APIs (cookie/localStorage), so it must NOT
+   * influence the initial render output. Keep `isAuthResolved` deterministic on
+   * server + first client render, then resolve it after mount in `refreshProfile()`.
+   */
+  const [isAuthResolved, setIsAuthResolved] = useState(false);
   const pathname = usePathname();
   const locale = useLocale();
 

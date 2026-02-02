@@ -1,6 +1,6 @@
 'use client';
 import { useState, useEffect } from 'react';
-import { useParams } from 'next/navigation';
+import { useLocale } from 'next-intl';
 
 export interface PopularKnowledgeItem {
   slug: string;
@@ -34,36 +34,77 @@ interface PopularKnowledgeResponse {
   data: PopularKnowledgeItem[];
 }
 
+const POPULAR_URL =
+  'https://api.insightabusiness.com/api/platform/industries/knowledge/popular';
+
+// Dedupe + cache per locale (prevents double GET in production if mounted twice)
+const popularCache = new Map<string, PopularKnowledgeItem[]>();
+const popularInFlight = new Map<string, Promise<PopularKnowledgeItem[]>>();
+
+function normalizeLocale(locale: string | undefined): 'ar' | 'en' {
+  return locale === 'ar' ? 'ar' : 'en';
+}
+
+async function fetchPopularKnowledge(locale: 'ar' | 'en') {
+  const res = await fetch(POPULAR_URL, {
+    headers: {
+      Accept: 'application/json',
+      'Accept-Language': locale,
+      'X-Timezone': Intl.DateTimeFormat().resolvedOptions().timeZone,
+    },
+  });
+
+  if (!res.ok) {
+    throw new Error('Network response was not ok');
+  }
+
+  const json: PopularKnowledgeResponse = await res.json();
+  return json.data.slice(0, 5);
+}
+
 export function usePopularKnowledge() {
   const [data, setData] = useState<PopularKnowledgeItem[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<any>(null);
-  const params = useParams();
-  const locale = params.locale as string || 'en';
+  const locale = normalizeLocale(useLocale());
 
   useEffect(() => {
-    fetch(`https://api.insightabusiness.com/api/platform/industries/knowledge/popular`, {
-      headers: {
-        "Content-Type": "application/json",
-        "Accept": "application/json",
-        "Accept-Language": locale,
-        "X-Timezone": Intl.DateTimeFormat().resolvedOptions().timeZone,
-      },
-    })
-      .then((res) => {
-        if (!res.ok) {
-          throw new Error('Network response was not ok');
-        }
-        return res.json();
-      })
-      .then((json: PopularKnowledgeResponse) => {
-        setData(json.data.slice(0, 5)); // Only take first 5 items
+    let cancelled = false;
+
+    // Serve from cache immediately when possible
+    const cached = popularCache.get(locale);
+    if (cached) {
+      setData(cached);
+      setIsLoading(false);
+      setError(null);
+      return;
+    }
+
+    setIsLoading(true);
+    setError(null);
+
+    const existing = popularInFlight.get(locale);
+    const p = existing ?? fetchPopularKnowledge(locale);
+    if (!existing) popularInFlight.set(locale, p);
+
+    p.then((items) => {
+      popularCache.set(locale, items);
+      popularInFlight.delete(locale);
+      if (!cancelled) {
+        setData(items);
         setIsLoading(false);
-      })
-      .catch((err) => {
+      }
+    }).catch((err) => {
+      popularInFlight.delete(locale);
+      if (!cancelled) {
         setError(err);
         setIsLoading(false);
-      });
+      }
+    });
+
+    return () => {
+      cancelled = true;
+    };
   }, [locale]);
 
   return { data, isLoading, error };

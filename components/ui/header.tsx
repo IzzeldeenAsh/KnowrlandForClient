@@ -78,6 +78,7 @@ async function fetchIndustriesFromAPI(locale: string): Promise<Industry[]> {
   try {
     const res = await fetch("https://api.insightabusiness.com/api/platform/industries/menu", {
       method: "POST",
+      next: { revalidate: 3600 },
       headers: {
         "Content-Type": "application/json",
         Accept: "application/json",

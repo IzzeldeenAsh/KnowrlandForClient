@@ -672,9 +672,8 @@ const SearchBar: React.FC<SearchBarProps> = ({
             const isActive = searchType === type;
             const isLocked = type === 'insighter';
             return (
-              <div className="flex flex-col">
+              <div key={type} className="flex flex-col">
                          <button
-                key={type}
                         type="button"
                 disabled={isLocked}
                 aria-disabled={isLocked}
@@ -961,7 +960,7 @@ const SearchBar: React.FC<SearchBarProps> = ({
               >
                 {suggestions.map((suggestion, index) => (
                   <div
-                    key={index}
+                    key={`${suggestion}-${index}`}
                     className={`px-4 py-2 cursor-pointer hover:bg-blue-50 ${activeSuggestionIndex === index ? 'bg-blue-50' : ''}`}
                     onClick={() => handleSuggestionSelect(suggestion)}
                     onMouseEnter={() => setActiveSuggestionIndex(index)}

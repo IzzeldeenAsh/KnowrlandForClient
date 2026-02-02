@@ -603,15 +603,15 @@ export default function SearchResultsList({
                               </Link>
                           )}
 
-                          <Link href={`/${currentLocale}/profile/${item.insighter.company?.uuid}`}>
                           {isCompanyInsighter && (
-                            item.insighter.company
-                              ? (<Link href={`/${currentLocale}/profile/${item.insighter?.uuid}?entity=insighter`}>
+                            item.insighter.company ? (
+                              <Link href={`/${currentLocale}/profile/${item.insighter?.uuid}?entity=insighter`}>
                                 {translations.by} {item.insighter.name.toLowerCase()}
-                                </Link>)
-                              : translations.company
+                              </Link>
+                            ) : (
+                              <span>{translations.company}</span>
+                            )
                           )}
-                          </Link>
                         </Text>
                     </div>
                   </div>

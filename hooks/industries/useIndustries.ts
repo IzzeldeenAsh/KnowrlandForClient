@@ -17,6 +17,7 @@ const INDUSTRIES_CACHE_DURATION_MS = 60 * 60 * 1000; // 1 hour
 async function fetchIndustriesFromAPI(locale: string): Promise<Industry[]> {
   const res = await fetch('https://api.insightabusiness.com/api/platform/industries/menu', {
     method: 'POST',
+    next: { revalidate: 3600 },
     headers: {
       'Content-Type': 'application/json',
       Accept: 'application/json',
