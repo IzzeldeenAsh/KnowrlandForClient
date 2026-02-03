@@ -175,7 +175,7 @@ export function HelpCenterLinksGroup({
       ) : (
         <Link href={link || '#'} style={{ textDecoration: 'none' }} onClick={handleLinkClick}>
           <UnstyledButton className={`${classes.control} ${isActive ? classes.controlActive : ''}`}>
-            <Text fw={500} className={isActive ? classes.textActive : classes.text}>
+            <Text className={isActive ? classes.textActive : classes.text}>
               {label}
             </Text>
           </UnstyledButton>

@@ -46,41 +46,85 @@ export default async function WhoCanBecomeAnPage({ params }: { params: Promise<{
 
   return (
     <div className="relative min-h-screen" dir={isRTL ? 'rtl' : 'ltr'}>
-      <div className="relative overflow-hidden pt-5 pb-16">
-        <div className="relative z-10 mx-auto max-w-7xl px-4 sm:px-6">
-          <nav className={`mb-6 md:mb-8 text-xs md:text-sm ${isRTL ? 'text-right' : 'text-left'}`} aria-label="Breadcrumb">
-            <ol
-              dir={isRTL ? 'rtl' : 'ltr'}
-              className={`flex items-center gap-2 text-gray-500 flex-wrap ${isRTL ? 'flex-row-reverse' : ''}`}
-            >
-              <li>
-                <a href={`/${locale}/resources/first-steps`} className="hover:text-gray-900 transition-colors">
-                  {locale === 'ar' ? 'الخطوات الأولى' : 'First Steps'}
-                </a>
-              </li>
-              <li>
-                <span className="text-gray-400">/</span>
-              </li>
-              <li>
-                <a href={`/${locale}/resources/first-steps/about-insighta`} className="hover:text-gray-900 transition-colors">
-                  {locale === 'ar' ? 'حول إنسايتا' : 'About Insighta'}
-                </a>
-              </li>
-            </ol>
-          </nav>
+      <div className="relative overflow-hidden pb-16">
+        {/* Breadcrumbs + Hero Title Section (with bg + overlay) */}
+        <div className="relative overflow-hidden px-4 sm:px-12 py-8 md:py-24 mb-6 md:mb-8">
+          <div
+            className="absolute inset-0 bg-center bg-cover"
+            style={{
+              backgroundImage:
+                "url('https://res.cloudinary.com/dsiku9ipv/image/upload/v1770102117/pattern_lj3gmd.png')",
+              transform: isRTL ? 'scaleX(-1)' : 'none',
+              transformOrigin: 'center',
+              backgroundPositionX: isRTL ? '1%' : '1%',
+              backgroundSize: isRTL ? '95% 100%' : '100% 95%',
+            }}
+            aria-hidden="true"
+          />
+          {/* Brighter/less dark overlay */}
+          <div className="absolute inset-0 bg-gradient-to-b from-white/30 via-white/20 to-white/20" aria-hidden="true" />
 
-          <div className="text-center mb-12 md:mb-16">
-            <div className={`flex flex-col align-center justify-center gap-2 ${isRTL ? 'text-right' : 'text-left'}`} style={{lineHeight: '1.3'}}>
-              <h1 className="text-3xl sm:text-4xl md:text-5xl font-extrabold tracking-tight text-gray-900">
-                {isRTL ? 'من يمكنه أن ينضم كـ إنسايتر ( خبير)' : 'Who Can Become an Insighter'}
-              </h1>
-              <h2 className={`text-3xl sm:text-4xl md:text-5xl font-extrabold bg-clip-text text-transparent ${isRTL ? 'bg-gradient-to-l from-blue-500 to-teal-400' : 'bg-gradient-to-r from-blue-500 to-teal-400'}`}>
-                {isRTL ? 'ابدأ رحلتك' : 'Start Your Journey'}
-              </h2>
+          <div className="relative z-10 px-4 sm:px-12">
+            {/* Breadcrumbs */}
+            <nav className={`mb-6 text-xs md:text-sm ${isRTL ? 'text-right' : 'text-left'}`} aria-label="Breadcrumb">
+              <ol className="flex items-center gap-2 text-gray-700/80 flex-wrap">
+                <li>
+                  <a href={`/${locale}/resources/first-steps`} className="hover:text-gray-900 transition-colors">
+                    {locale === 'ar' ? 'الخطوات الأولى' : 'First Steps'}
+                  </a>
+                </li>
+                <li>
+                  <span className="text-gray-400">/</span>
+                </li>
+                <li>
+                  <a href={`/${locale}/resources/first-steps/about-insighta`} className="hover:text-gray-900 transition-colors">
+                    {locale === 'ar' ? 'حول إنسايتا' : 'About Insighta'}
+                  </a>
+                </li>
+                <li>
+                  <span className="text-gray-400">/</span>
+                </li>
+                <li>
+                  <a href={`/${locale}/resources/first-steps/about-insighta/account-types`} className="hover:text-gray-900 transition-colors">
+                    {locale === 'ar' ? 'أنواع الحسابات' : 'Account types'}
+                  </a>
+                </li>
+                <li>
+                  <span className="text-gray-400">/</span>
+                </li>
+                <li>
+                  <a href={`/${locale}/resources/first-steps/about-insighta/account-types/insighter-account`} className="hover:text-gray-900 transition-colors">
+                    {locale === 'ar' ? 'حساب الإنسايتر' : 'Insighter account'}
+                  </a>
+                </li>
+                <li>
+                  <span className="text-gray-400">/</span>
+                </li>
+                <li className="text-[#013175] font-bold" aria-current="page">
+                  {isRTL ? 'من يمكنه أن ينضم كـ إنسايتر ( خبير)' : 'Who Can Become an Insighter'}
+                </li>
+              </ol>
+            </nav>
+
+            {/* Hero Title Section */}
+            <div className="text-center ">
+              <div
+                className={`flex flex-col align-center justify-center gap-2 ${isRTL ? 'text-right' : 'text-left'} text-left`}
+                style={{ lineHeight: '1.3' }}
+              >
+                <h1 className="text-3xl sm:text-4xl md:text-5xl font-extrabold tracking-tight text-[#013175]">
+                  {isRTL ? 'من يمكنه أن ينضم كـ إنسايتر ( خبير)' : 'Who Can Become an Insighter'}
+                </h1>
+                <h2 className="text-3xl sm:text-4xl md:text-4xl font-medium text-[#7D7D7D]">
+                  {isRTL ? 'ابدأ رحلتك' : 'Start Your Journey'}
+                </h2>
+              </div>
             </div>
           </div>
+        </div>
 
-          <div className={` max-w-4xl space-y-6 md:space-y-8 ${isRTL ? 'text-right' : 'text-left'}`}>
+        <div className="relative z-10 mx-auto max-w-7xl px-4 sm:px-6">
+          <div className={`max-w-5xl px-8 sm:px-16 space-y-6 md:space-y-8 ${isRTL ? 'text-right' : 'text-left'}`}>
             <p className="text-lg md:text-xl text-gray-700 leading-relaxed mb-8">
               {isRTL ? (
                 <>

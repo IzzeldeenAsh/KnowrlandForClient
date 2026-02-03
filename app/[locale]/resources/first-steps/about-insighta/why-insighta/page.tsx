@@ -21,17 +21,19 @@ export default async function WhyInsightaPage({ params }: { params: Promise<{ lo
   const t = (en: string, ar: string) => (isRTL ? ar : en)
 
   return (
-    <div className="relative min-h-screen">
+    <div className="relative min-h-screen" dir={isRTL ? 'rtl' : 'ltr'}>
       <div className="relative overflow-hidden pb-16">
         {/* Breadcrumbs + Hero Title Section (with bg + overlay) */}
-        <div className="relative overflow-hidden px-4 sm:px-12 py-8 md:py-20 mb-6 md:mb-8">
+        <div className="relative overflow-hidden px-4 sm:px-12 py-8 md:py-24 mb-6 md:mb-8">
           <div
             className="absolute inset-0 bg-center bg-cover"
             style={{
               backgroundImage:
-                "url('https://images.unsplash.com/photo-1490093158370-1a6be674437b?q=80&w=1914&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D')",
+                "url('https://res.cloudinary.com/dsiku9ipv/image/upload/v1770102117/pattern_lj3gmd.png')",
               transform: isRTL ? 'scaleX(-1)' : 'none',
               transformOrigin: 'center',
+              backgroundPositionX: isRTL ? '1%' : '1%',
+              backgroundSize: isRTL ? '95% 100%' : '100% 95%',
             }}
             aria-hidden="true"
           />
@@ -58,7 +60,7 @@ export default async function WhyInsightaPage({ params }: { params: Promise<{ lo
                 <li>
                   <span className="text-gray-400">/</span>
                 </li>
-                <li className="text-gray-900 font-bold" aria-current="page">
+                <li className="text-[#013175] font-bold" aria-current="page">
                   {locale === 'ar' ? 'لماذا إنسايتا' : 'Why Insighta'}
                 </li>
               </ol>
@@ -70,13 +72,11 @@ export default async function WhyInsightaPage({ params }: { params: Promise<{ lo
                 className={`flex flex-col align-center justify-center gap-2 ${isRTL ? 'text-right' : 'text-left'} text-left`}
                 style={{ lineHeight: '1.3' }}
               >
-                <h1 className="text-3xl sm:text-4xl md:text-5xl font-extrabold tracking-tight text-black">
+                <h1 className="text-3xl sm:text-4xl md:text-5xl font-extrabold tracking-tight text-[#013175]">
                   {t('Why Insighta', 'لماذا إنسايتا؟')}
                 </h1>
                 <h2
-                  className={`text-3xl sm:text-4xl md:text-5xl font-extrabold bg-clip-text text-transparent ${
-                    isRTL ? 'bg-gradient-to-l from-blue-800 to-teal-600' : 'bg-gradient-to-r from-blue-500 to-teal-400'
-                  }`}
+                  className="text-3xl sm:text-4xl md:text-4xl font-medium text-[#7D7D7D]"
                 >
                   {t('The Best Choice', 'الخيار الأفضل')}
                 </h2>

@@ -278,9 +278,14 @@ export function UserProfile({ isHome }: { isHome: boolean }) {
                   )}
                   {(
                     roles.includes("company-insighter")) && (
+                   <>
                     <span className="bg-[#EFF8FF] text-[#299AF8]  text-xs font-semibold px-1.5 rounded-sm dark:bg-yellow-900 dark:text-yellow-300 whitespace-nowrap">
-                     {user.company?.legal_name + " " + t("insighter")}
+                    <span className="bg-[#EFF8FF] text-[#299AF8]  text-xs font-semibold px-1.5 rounded-sm dark:bg-yellow-900 dark:text-yellow-300 whitespace-nowrap">
+                     {t("insighter")} {isRtl ? "في" : "at"} { " "+user.company?.legal_name}
                     </span>
+                    
+                    </span>
+                   </>
                   )}
                    {(roles.includes("company") &&
                     !roles.includes("company-insighter")) && (

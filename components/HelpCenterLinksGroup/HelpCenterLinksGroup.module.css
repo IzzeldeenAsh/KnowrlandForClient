@@ -52,17 +52,17 @@
 
 .text {
   color: #374151;
-  font-size: 15px;
-  line-height: 1.6;
+  font-size: 14px;
+  line-height: .7;
   font-weight: 500;
   transition: color 200ms ease;
 }
 
 .textActive {
   color: #2563eb;
-  font-size: 15px;
+  font-size: 14px;
   line-height: 1.6;
-  font-weight: 600;
+  font-weight: 800;
 }
 
 .chevronContainer {

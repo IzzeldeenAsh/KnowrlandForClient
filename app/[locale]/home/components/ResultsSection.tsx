@@ -1,6 +1,6 @@
 'use client'
 
-import React, { Suspense } from 'react';
+import React, { Suspense, memo, useEffect, useMemo, useRef } from 'react';
 import { Title, Group, Pagination } from '@mantine/core';
 import Image from 'next/image';
 import { useTranslations } from 'next-intl';
@@ -79,6 +79,24 @@ const ResultsSection: React.FC<ResultsSectionProps> = ({
   
   // Get current page directly from URL - this is the source of truth!
   const urlCurrentPage = searchParams.get('page') ? parseInt(searchParams.get('page')!) : 1;
+
+  // We are inside a scrollable container on `/home` (not the window).
+  // So we scroll THIS section into view to ensure the new page starts from the top.
+  const resultsTopRef = useRef<HTMLDivElement | null>(null);
+  const scrollResultsToTop = useMemo(() => {
+    return () => {
+      // Scroll the nearest scroll container (the content column) to the top of results.
+      resultsTopRef.current?.scrollIntoView({ behavior: 'auto', block: 'start' });
+      // Fallback for layouts where window is the scroller.
+      window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
+    };
+  }, []);
+
+  useEffect(() => {
+    // Whenever the page changes, jump back to the top of results.
+    scrollResultsToTop();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [currentPage]);
   
   // Loading state component with a nice spinner
   const LoadingSpinner = () => (
@@ -116,6 +134,7 @@ const ResultsSection: React.FC<ResultsSectionProps> = ({
   
   return (
     <div dir={isRtl ? 'rtl' : 'ltr'}>
+    <div ref={resultsTopRef} />
     <div className="px-10">
     <Group justify="space-between" align="center" mb="md">
         <div className="flex items-center gap-2">
@@ -322,16 +341,13 @@ const ResultsSection: React.FC<ResultsSectionProps> = ({
                   total={totalPages} 
                   value={urlCurrentPage}
                   onChange={(page) => {
-                    // Simply call the pagination handler - it will update URL which will update our display
+                    // Scroll to top of results (inner scroll container)
+                    scrollResultsToTop();
+                    
+                    // Then call the pagination handler to update URL and fetch new data
                     if (onPageChange) {
                       onPageChange(page);
                     }
-                    
-                    // Scroll back to top of results for better UX
-                    window.scrollTo({
-                      top: 0,
-                      behavior: 'smooth'
-                    });
                   }}
                   withControls
                   boundaries={1}
@@ -357,4 +373,17 @@ const ResultsSection: React.FC<ResultsSectionProps> = ({
   );
 };
 
-export default ResultsSection;
+// Memoize to prevent unnecessary re-renders when parent state changes
+export default memo(ResultsSection, (prevProps, nextProps) => {
+  // Only re-render if these key props change
+  return (
+    prevProps.searchResults === nextProps.searchResults &&
+    prevProps.loading === nextProps.loading &&
+    prevProps.currentPage === nextProps.currentPage &&
+    prevProps.totalPages === nextProps.totalPages &&
+    prevProps.totalItems === nextProps.totalItems &&
+    prevProps.viewMode === nextProps.viewMode &&
+    prevProps.selectedCategory === nextProps.selectedCategory &&
+    prevProps.searchType === nextProps.searchType
+  );
+});

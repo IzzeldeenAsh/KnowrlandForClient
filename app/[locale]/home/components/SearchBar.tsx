@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useRef, useEffect, useState, memo, useCallback } from 'react';
+import React, { useRef, useEffect, useState, memo, useCallback, useMemo, useDeferredValue } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { IconSearch, IconX, IconBuildingBank, IconWorldSearch, IconLock } from '@tabler/icons-react';
 import { useSuggestions, useClickAway } from '../utils/hooks';
@@ -8,6 +8,166 @@ import styles from '../utils/custom-search-engine-styles.module.css';
 import { Modal, Loader, Popover } from '@mantine/core';
 import { getApiUrl } from '@/app/config';
 import { createPortal } from 'react-dom';
+
+// Arabic search normalization (hamza/diacritics tolerant)
+const ARABIC_DIACRITICS_AND_TATWEEL_RE = /[\u0640\u064B-\u065F\u0670\u06D6-\u06ED]/g;
+
+function normalizeSearchText(input: string): string {
+  if (!input) return '';
+  // Lowercasing is harmless for Arabic and helpful for Latin.
+  let s = input.toLowerCase().trim();
+  // Remove Arabic diacritics (tashkeel) + tatweel.
+  s = s.replace(ARABIC_DIACRITICS_AND_TATWEEL_RE, '');
+  // Normalize common hamza/alif variants.
+  s = s.replace(/[إأآٱ]/g, 'ا');
+  s = s.replace(/[ؤ]/g, 'و');
+  s = s.replace(/[ئ]/g, 'ي');
+  // Drop standalone hamza.
+  s = s.replace(/[ء]/g, '');
+  // Normalize alif-maqsura to ya.
+  s = s.replace(/[ى]/g, 'ي');
+  // Collapse whitespace.
+  s = s.replace(/\s+/g, ' ');
+  return s;
+}
+
+function escapeRegExpLiteral(s: string): string {
+  return s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
+
+function buildArabicFuzzyRegex(rawNeedle: string): RegExp | null {
+  const needle = normalizeSearchText(rawNeedle);
+  if (!needle) return null;
+
+  // Allow diacritics/tatweel between characters.
+  const gap = '[\\u0640\\u064B-\\u065F\\u0670\\u06D6-\\u06ED]*';
+
+  let pattern = '';
+  for (const ch of needle) {
+    if (ch === ' ') {
+      pattern += '\\s+';
+      continue;
+    }
+
+    // Hamza-tolerant groups.
+    if (ch === 'ا') pattern += '[اأإآٱ]';
+    else if (ch === 'و') pattern += '[وؤ]';
+    else if (ch === 'ي') pattern += '[يىئ]';
+    else pattern += escapeRegExpLiteral(ch);
+
+    pattern += gap;
+  }
+
+  try {
+    return new RegExp(pattern, 'i');
+  } catch {
+    return null;
+  }
+}
+
+function arabicFuzzyMatch(haystack: string, needle: string): { index: number; length: number } | null {
+  if (!haystack) return null;
+  const re = buildArabicFuzzyRegex(needle);
+  if (!re) return null;
+  const m = re.exec(haystack);
+  if (!m || typeof m.index !== 'number') return null;
+  return { index: m.index, length: m[0]?.length ?? 0 };
+}
+
+type ISICNode = {
+  key: number;
+  code: string;
+  label?: string;
+  names?: { en: string; ar: string };
+  children: ISICNode[];
+};
+
+type HSCode = {
+  id: number;
+  code: string;
+  isic_code_id: number;
+  names: { en: string; ar: string };
+};
+
+const IsicLeafNodesList = memo(function IsicLeafNodesList(props: {
+  nodes: ISICNode[];
+  locale: string;
+  onSelect: (node: ISICNode) => void;
+}) {
+  const { nodes, locale, onSelect } = props;
+  return (
+    <>
+      {nodes.map((node) => (
+        <button
+          key={node.key}
+          className={`py-2 px-3 rounded-md text-sm flex text-start items-start w-full transition-colors hover:bg-gray-100 border border-gray-200`}
+          onClick={() => onSelect(node)}
+        >
+          <span className={`font-mono text-xs bg-gray-100 px-1.5 py-0.5 rounded ${locale === 'ar' ? 'ml-2' : 'mr-2'}`}>{node.code}</span>
+          <span className="flex-1">{locale === 'ar' ? (node.names?.ar || node.code) : (node.names?.en || node.code)}</span>
+        </button>
+      ))}
+    </>
+  );
+});
+
+const HsCodesList = memo(function HsCodesList(props: {
+  codes: HSCode[];
+  locale: string;
+  onSelect: (code: HSCode) => void;
+}) {
+  const { codes, locale, onSelect } = props;
+  return (
+    <>
+      {codes.map((code) => (
+        <button
+          key={code.id}
+          className={`py-2 px-3 rounded-md text-sm flex text-start items-start w-full transition-colors hover:bg-gray-100 border border-gray-200`}
+          onClick={() => onSelect(code)}
+        >
+          <span className={`font-mono text-xs bg-gray-100 px-1.5 py-0.5 rounded ${locale === 'ar' ? 'ml-2' : 'mr-2'}`}>{code.code}</span>
+          <span className="flex-1">{locale === 'ar' ? code.names.ar : code.names.en}</span>
+        </button>
+      ))}
+    </>
+  );
+});
+
+const HsBucketsList = memo(function HsBucketsList(props: {
+  related: HSCode[];
+  others: HSCode[];
+  locale: string;
+  onSelect: (code: HSCode) => void;
+}) {
+  const { related, others, locale, onSelect } = props;
+  return (
+    <>
+      {related.length > 0 && (
+        <>
+          <div className="text-sm font-semibold text-blue-500 px-1">
+            {locale === 'ar' ? 'ذات صلة' : 'Related'}
+          </div>
+          <HsCodesList codes={related} locale={locale} onSelect={onSelect} />
+        </>
+      )}
+
+      {others.length > 0 && (
+        <>
+          <div className="text-sm font-semibold text-gray-700 px-1 mt-2">
+            {locale === 'ar' ? 'أكواد HS كل' : 'All Products'}
+          </div>
+          <HsCodesList codes={others} locale={locale} onSelect={onSelect} />
+        </>
+      )}
+
+      {related.length === 0 && others.length === 0 && (
+        <div className="flex flex-col items-center justify-center py-8 text-center text-gray-500 text-sm">
+          {locale === 'ar' ? 'لا توجد رموز HS متاحة' : 'No Products available'}
+        </div>
+      )}
+    </>
+  );
+});
 
 interface SearchBarProps {
   searchQuery: string;
@@ -74,20 +234,6 @@ const SearchBar: React.FC<SearchBarProps> = ({
   const [isAccuracyOpen, setIsAccuracyOpen] = useState(false);
 
   // ISIC/HS data state
-  type ISICNode = {
-    key: number;
-    code: string;
-    label?: string;
-    names?: { en: string; ar: string };
-    children: ISICNode[];
-  };
-  type HSCode = {
-    id: number;
-    code: string;
-    isic_code_id: number;
-    names: { en: string; ar: string };
-  };
-
   const [isicTree, setIsicTree] = useState<ISICNode[]>([]);
   const [isicLeafNodes, setIsicLeafNodes] = useState<ISICNode[]>([]);
   const [filteredIsicLeafNodes, setFilteredIsicLeafNodes] = useState<ISICNode[]>([]);
@@ -124,6 +270,10 @@ const SearchBar: React.FC<SearchBarProps> = ({
     allowSuggestions
   } = useSuggestions(searchQuery, locale);
   
+  // Defer expensive filtering work so typing stays responsive
+  const deferredIsicSearch = useDeferredValue(isicSearch);
+  const deferredHsSearch = useDeferredValue(hsSearch);
+
   // Handle clicking outside the suggestions dropdown
   const suggestionsRef = useClickAway(() => {
     hideSuggestions();
@@ -278,7 +428,6 @@ const SearchBar: React.FC<SearchBarProps> = ({
         if (pendingHsCode && !hasRestoredHsCode && list.length > 0) {
           const found = list.find(c => c.code === pendingHsCode);
           if (found) {
-            console.log('[SearchBar] Restoring pending Products:', found.code);
             setSelectedHs({ id: found.id, code: found.code, label: locale === 'ar' ? found.names.ar : found.names.en });
             if (setHsCodeFilter) {
               setHsCodeFilter(found.code);
@@ -332,37 +481,64 @@ const SearchBar: React.FC<SearchBarProps> = ({
   // Note: ISIC/Products are now supported for both knowledge and insighter search types
   // No need to clear them when switching between search types
 
+  // Build lightweight search indexes (normalized text cached once per dataset)
+  const isicSearchIndex = useMemo(() => {
+    return isicLeafNodes.map((n) => ({
+      node: n,
+      normCode: normalizeSearchText(n.code),
+      normEn: normalizeSearchText(n.names?.en || ''),
+      normAr: normalizeSearchText(n.names?.ar || ''),
+    }));
+  }, [isicLeafNodes]);
+
+  const hsSearchIndex = useMemo(() => {
+    return hsCodes.map((c) => ({
+      code: c,
+      normCode: normalizeSearchText(c.code),
+      normEn: normalizeSearchText(c.names.en),
+      normAr: normalizeSearchText(c.names.ar),
+    }));
+  }, [hsCodes]);
+
   // ISIC search filter
   useEffect(() => {
-    if (!isicSearch.trim()) {
+    if (!deferredIsicSearch.trim()) {
       setFilteredIsicLeafNodes(isicLeafNodes);
       return;
     }
-    const q = isicSearch.toLowerCase();
+    const q = normalizeSearchText(deferredIsicSearch);
     setFilteredIsicLeafNodes(
-      isicLeafNodes.filter(n =>
-        n.code.toLowerCase().includes(q) ||
-        (n.names?.en?.toLowerCase().includes(q) ?? false) ||
-        (n.names?.ar?.toLowerCase().includes(q) ?? false)
-      )
+      isicSearchIndex
+        .filter((x) => x.normCode.includes(q) || x.normEn.includes(q) || x.normAr.includes(q))
+        .map((x) => x.node)
     );
-  }, [isicSearch, isicLeafNodes]);
+  }, [deferredIsicSearch, isicLeafNodes, isicSearchIndex]);
 
   // HS search filter
   useEffect(() => {
-    if (!hsSearch.trim()) {
+    if (!deferredHsSearch.trim()) {
       setFilteredHsCodes(hsCodes);
       return;
     }
-    const q = hsSearch.toLowerCase();
+    const q = normalizeSearchText(deferredHsSearch);
     setFilteredHsCodes(
-      hsCodes.filter(c =>
-        c.code.toLowerCase().includes(q) ||
-        c.names.en.toLowerCase().includes(q) ||
-        c.names.ar.toLowerCase().includes(q)
-      )
+      hsSearchIndex
+        .filter((x) => x.normCode.includes(q) || x.normEn.includes(q) || x.normAr.includes(q))
+        .map((x) => x.code)
     );
-  }, [hsSearch, hsCodes]);
+  }, [deferredHsSearch, hsCodes, hsSearchIndex]);
+
+  // Avoid recalculating "related vs others" lists on every render
+  const hsModalBuckets = useMemo(() => {
+    if (!selectedIsic) return null;
+    const related: HSCode[] = [];
+    const others: HSCode[] = [];
+    for (const c of filteredHsCodes) {
+      if (c.isic_code_id === selectedIsic.id) related.push(c);
+      else others.push(c);
+    }
+    return { related, others };
+  }, [filteredHsCodes, selectedIsic]);
 
   const handleSelectIsic = useCallback((node: ISICNode) => {
     if (node.children && node.children.length > 0) return;
@@ -372,13 +548,11 @@ const SearchBar: React.FC<SearchBarProps> = ({
     
     // Update URL: set isic_code, do not clear hs_code, reset page
     try {
-      console.log('[SearchBar] handleSelectIsic -> node:', { id: node.key, code: node.code });
       const params = new URLSearchParams(searchParams.toString());
       params.set('isic_code', node.code);
       params.delete('page');
       params.set('search_type', searchType);
       const nextUrl = `/${locale}/home?${params.toString()}`;
-      console.log('[SearchBar] handleSelectIsic -> push URL:', nextUrl);
       router.push(nextUrl, { scroll: false });
     } catch {}
     setIsIsicModalOpen(false);
@@ -392,13 +566,11 @@ const SearchBar: React.FC<SearchBarProps> = ({
     }
     // Update URL: set hs_code, reset page
     try {
-      console.log('[SearchBar] handleSelectHs -> code:', { id: code.id, code: code.code });
       const params = new URLSearchParams(searchParams.toString());
       params.set('hs_code', code.code);
       params.delete('page');
       params.set('search_type', searchType);
       const nextUrl = `/${locale}/home?${params.toString()}`;
-      console.log('[SearchBar] handleSelectHs -> push URL:', nextUrl);
       router.push(nextUrl, { scroll: false });
     } catch {}
     setIsHsModalOpen(false);
@@ -413,7 +585,6 @@ const SearchBar: React.FC<SearchBarProps> = ({
       params.delete('page');
       params.set('search_type', searchType);
       const nextUrl = `/${locale}/home?${params.toString()}`;
-      console.log('[SearchBar] clear ISIC -> push URL:', nextUrl);
       router.push(nextUrl, { scroll: false });
     } catch {}
   }, [locale, router, searchParams, searchType, setIsicCodeFilter]);
@@ -427,7 +598,6 @@ const SearchBar: React.FC<SearchBarProps> = ({
       params.delete('page');
       params.set('search_type', searchType);
       const nextUrl = `/${locale}/home?${params.toString()}`;
-      console.log('[SearchBar] clear HS -> push URL:', nextUrl);
       router.push(nextUrl, { scroll: false });
     } catch {}
   }, [locale, router, searchParams, searchType, setHsCodeFilter]);
@@ -793,9 +963,9 @@ const SearchBar: React.FC<SearchBarProps> = ({
             {/* Filter chips inline on md+ screens */}
             <div className="hidden md:flex items-center gap-2">
               {renderFilterPill({
-                title: locale === 'ar' ? 'الصناعة' : 'Industry',
+                title: locale === 'ar' ? 'القطاع' : 'Industry',
                 subtitle: selectedIsic ? selectedIsic.code : (locale === 'ar' ? 'رمز ISIC' : 'ISIC code'),
-                ariaLabel: isRtl ? 'اختر الصناعة (ISIC)' : 'Select Industry (ISIC code)',
+                ariaLabel: isRtl ? 'اختر القطاع (ISIC)' : 'Select Industry (ISIC code)',
                 disabled: isLoadingIsic,
                 active: !!selectedIsic,
                 icon: isLoadingIsic ? (
@@ -811,7 +981,7 @@ const SearchBar: React.FC<SearchBarProps> = ({
               })}
 
               {renderFilterPill({
-                title: locale === 'ar' ? 'المنتجات' : 'Products',
+                title: locale === 'ar' ? 'المنتج' : 'Products',
                 subtitle: selectedHs ? selectedHs.code : (locale === 'ar' ? 'رمز HS' : 'HS code'),
                 ariaLabel: isRtl ? 'اختر رمز المنتج (HS Code)' : 'Select Product (HS Code)',
                 disabled: isHsDisabled,
@@ -902,7 +1072,7 @@ const SearchBar: React.FC<SearchBarProps> = ({
           {renderFilterPill({
             title: locale === 'ar' ? 'الصناعة' : 'Industry',
             subtitle: selectedIsic ? selectedIsic.code : (locale === 'ar' ? 'رمز ISIC' : 'ISIC code'),
-            ariaLabel: isRtl ? 'اختر الصناعة (ISIC)' : 'Select Industry (ISIC code)',
+            ariaLabel: isRtl ? 'اختر القطاع (ISIC)' : 'Select Industry (ISIC code)',
             disabled: isLoadingIsic,
             active: !!selectedIsic,
             icon: isLoadingIsic ? (
@@ -918,7 +1088,7 @@ const SearchBar: React.FC<SearchBarProps> = ({
           })}
 
           {renderFilterPill({
-            title: locale === 'ar' ? 'المنتجات' : 'Products',
+            title: locale === 'ar' ? 'المنتج' : 'Products',
             subtitle: selectedHs ? selectedHs.code : (locale === 'ar' ? 'رمز HS' : 'HS code'),
             ariaLabel: isRtl ? 'اختر رمز المنتج (HS Code)' : 'Select Product (HS Code)',
             disabled: isHsDisabled,
@@ -977,33 +1147,20 @@ const SearchBar: React.FC<SearchBarProps> = ({
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                       </svg>
                       <span className="text-gray-800">
-                        {searchQuery && suggestion.toLowerCase().includes(searchQuery.toLowerCase()) ? (
-                          <>
-                            {(() => {
-                              const lowerSuggestion = suggestion.toLowerCase();
-                              const lowerSearchTerm = searchQuery.toLowerCase();
-                              const matchIndex = lowerSuggestion.indexOf(lowerSearchTerm);
-
-                              if (matchIndex >= 0) {
-                                const beforeMatch = suggestion.substring(0, matchIndex);
-                                const match = suggestion.substring(matchIndex, matchIndex + searchQuery.length);
-                                const afterMatch = suggestion.substring(matchIndex + searchQuery.length);
-
-                                return (
-                                  <>
-                                    {beforeMatch}
-                                    <strong className="font-bold">{match}</strong>
-                                    {afterMatch}
-                                  </>
-                                );
-                              }
-
-                              return suggestion;
-                            })()}
-                          </>
-                        ) : (
-                          suggestion
-                        )}
+                        {(() => {
+                          const match = searchQuery ? arabicFuzzyMatch(suggestion, searchQuery) : null;
+                          if (!match || match.length <= 0) return suggestion;
+                          const beforeMatch = suggestion.substring(0, match.index);
+                          const matchedText = suggestion.substring(match.index, match.index + match.length);
+                          const afterMatch = suggestion.substring(match.index + match.length);
+                          return (
+                            <>
+                              {beforeMatch}
+                              <strong className="font-bold">{matchedText}</strong>
+                              {afterMatch}
+                            </>
+                          );
+                        })()}
                       </span>
                     </div>
                   </div>
@@ -1065,32 +1222,24 @@ const SearchBar: React.FC<SearchBarProps> = ({
         <Modal
           opened={isIsicModalOpen}
           onClose={() => setIsIsicModalOpen(false)}
-          title={locale === 'ar' ? 'اختر رمز ISIC' : 'Select ISIC Code'}
+          title={locale === 'ar' ? 'ابحث عن التقارير والبيانات والرؤى حسب القطاع' : 'Search data, reports, and insights by industry'}
           size="lg"
           overlayProps={{ backgroundOpacity: 0.55, blur: 3 }}
         >
           <div className="space-y-4">
             <input
               type="text"
-              placeholder={locale === 'ar' ? 'ابحث عن رمز ISIC...' : 'Search ISIC codes...'}
+              placeholder={locale === 'ar' ? ' ابحث هنا' : ' search here'}
               value={isicSearch}
               onChange={(e) => setIsicSearch(e.target.value)}
               className={`w-full px-3 py-2 mt-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent`}
+              dir={isRtl ? 'rtl' : 'ltr'}
             />
             {isLoadingIsic ? (
               <div className="flex justify-center py-8"><Loader size="md" /></div>
             ) : (
               <div className="grid grid-cols-1 gap-2 max-h-[60vh] overflow-y-auto pr-2">
-                {filteredIsicLeafNodes.map((node) => (
-                  <button
-                    key={node.key}
-                    className={`py-2 px-3 rounded-md text-sm flex text-start items-start w-full transition-colors hover:bg-gray-100 border border-gray-200`}
-                    onClick={() => handleSelectIsic(node)}
-                  >
-                    <span className={`font-mono text-xs bg-gray-100 px-1.5 py-0.5 rounded ${locale === 'ar' ? 'ml-2' : 'mr-2'}`}>{node.code}</span>
-                    <span className="flex-1">{locale === 'ar' ? (node.names?.ar || node.code) : (node.names?.en || node.code)}</span>
-                  </button>
-                ))}
+                <IsicLeafNodesList nodes={filteredIsicLeafNodes} locale={locale} onSelect={handleSelectIsic} />
               </div>
             )}
           </div>
@@ -1099,7 +1248,7 @@ const SearchBar: React.FC<SearchBarProps> = ({
         <Modal
           opened={isHsModalOpen}
           onClose={() => setIsHsModalOpen(false)}
-          title={locale === 'ar' ? 'اختر رمز المنتج (HS Code)' : 'Select Product (HS Code)'}
+          title={locale === 'ar' ? 'ابحث عن التقارير والبيانات والرؤى حسب المنتج' : 'Search data, reports, and insights by product'}
           size="lg"
           overlayProps={{ backgroundOpacity: 0.55, blur: 3 }}
         >
@@ -1110,6 +1259,7 @@ const SearchBar: React.FC<SearchBarProps> = ({
               value={hsSearch}
               onChange={(e) => setHsSearch(e.target.value)}
               className={`w-full px-3 py-2 mt-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent`}
+              dir={isRtl ? 'rtl' : 'ltr'}
             />
             {isLoadingHs ? (
               <div className="flex justify-center py-8"><Loader size="md" /></div>
@@ -1117,66 +1267,18 @@ const SearchBar: React.FC<SearchBarProps> = ({
               <div className="grid grid-cols-1 gap-2 max-h-[60vh] overflow-y-auto pr-2">
                 {selectedIsic ? (
                   <>
-                    {(() => {
-                      const related = filteredHsCodes.filter(c => c.isic_code_id === selectedIsic.id);
-                      const others = filteredHsCodes.filter(c => c.isic_code_id !== selectedIsic.id);
-                      return (
-                        <>
-                          {related.length > 0 && (
-                            <>
-                              <div className="text-sm font-semibold text-blue-500 px-1">
-                                {locale === 'ar' ? 'ذات صلة' : 'Related'}
-                              </div>
-                              {related.map((code) => (
-                                <button
-                                  key={code.id}
-                                  className={`py-2 px-3 rounded-md text-sm flex text-start items-start w-full transition-colors hover:bg-gray-100 border border-gray-200`}
-                                  onClick={() => handleSelectHs(code)}
-                                >
-                                  <span className={`font-mono text-xs bg-gray-100 px-1.5 py-0.5 rounded ${locale === 'ar' ? 'ml-2' : 'mr-2'}`}>{code.code}</span>
-                                  <span className="flex-1">{locale === 'ar' ? code.names.ar : code.names.en}</span>
-                                </button>
-                              ))}
-                            </>
-                          )}
-                          {others.length > 0 && (
-                            <>
-                              <div className="text-sm font-semibold text-gray-700 px-1 mt-2">
-                                {locale === 'ar' ? 'أكواد HS كل' : 'All Products'}
-                              </div>
-                              {others.map((code) => (
-                                <button
-                                  key={code.id}
-                                  className={`py-2 px-3 rounded-md text-sm flex text-start items-start w-full transition-colors hover:bg-gray-100 border border-gray-200`}
-                                  onClick={() => handleSelectHs(code)}
-                                >
-                                  <span className={`font-mono text-xs bg-gray-100 px-1.5 py-0.5 rounded ${locale === 'ar' ? 'ml-2' : 'mr-2'}`}>{code.code}</span>
-                                  <span className="flex-1">{locale === 'ar' ? code.names.ar : code.names.en}</span>
-                                </button>
-                              ))}
-                            </>
-                          )}
-                          {related.length === 0 && others.length === 0 && (
-                            <div className="flex flex-col items-center justify-center py-8 text-center text-gray-500 text-sm">
-                              {locale === 'ar' ? 'لا توجد رموز HS متاحة' : 'No Products available'}
-                            </div>
-                          )}
-                        </>
-                      );
-                    })()}
+                    {hsModalBuckets && (
+                      <HsBucketsList
+                        related={hsModalBuckets.related}
+                        others={hsModalBuckets.others}
+                        locale={locale}
+                        onSelect={handleSelectHs}
+                      />
+                    )}
                   </>
                 ) : (
                   <>
-                    {filteredHsCodes.map((code) => (
-                      <button
-                        key={code.id}
-                        className={`py-2 px-3 rounded-md text-sm flex text-start items-start w-full transition-colors hover:bg-gray-100 border border-gray-200`}
-                        onClick={() => handleSelectHs(code)}
-                      >
-                        <span className={`font-mono text-xs bg-gray-100 px-1.5 py-0.5 rounded ${locale === 'ar' ? 'ml-2' : 'mr-2'}`}>{code.code}</span>
-                        <span className="flex-1">{locale === 'ar' ? code.names.ar : code.names.en}</span>
-                      </button>
-                    ))}
+                    <HsCodesList codes={filteredHsCodes} locale={locale} onSelect={handleSelectHs} />
                     {filteredHsCodes.length === 0 && (
                       <div className="flex flex-col items-center justify-center py-8 text-center text-gray-500 text-sm">
                         {locale === 'ar' ? 'لا توجد رموز HS متاحة' : 'No Products available'}

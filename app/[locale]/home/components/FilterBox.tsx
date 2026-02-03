@@ -1,12 +1,68 @@
 'use client'
 
-import React, { useState, useEffect, useCallback, useRef, useMemo } from 'react';
-import { Modal, Chip, Combobox, Input, InputBase, useCombobox, Drawer } from '@mantine/core';
+import React, { useState, useEffect, useCallback, useRef, useMemo, useDeferredValue, memo } from 'react';
+import { Modal, Chip, Drawer } from '@mantine/core';
 import { useMediaQuery } from '@mantine/hooks';
 import { IconCode, IconBuildingFactory, IconBuildingBank, IconWorld, IconLanguage, IconCoin, IconSearch, IconX, IconCalendarEvent } from '@tabler/icons-react';
 import CustomYearPicker from './CustomYearPicker';
 
 import { getApiUrl } from '@/app/config';
+
+// Arabic search normalization (hamza/diacritics tolerant) + whitespace normalization
+const ARABIC_DIACRITICS_AND_TATWEEL_RE = /[\u0640\u064B-\u065F\u0670\u06D6-\u06ED]/g;
+function normalizeSearchText(input: string): string {
+  if (!input) return '';
+  let s = input.toLowerCase().trim();
+  s = s.replace(ARABIC_DIACRITICS_AND_TATWEEL_RE, '');
+  s = s.replace(/[إأآٱ]/g, 'ا');
+  s = s.replace(/[ؤ]/g, 'و');
+  s = s.replace(/[ئ]/g, 'ي');
+  s = s.replace(/[ء]/g, '');
+  s = s.replace(/[ى]/g, 'ي');
+  s = s.replace(/\s+/g, ' ');
+  return s;
+}
+
+type SelectOption = { value: string; label: string };
+
+const OptionsButtonsList = memo(function OptionsButtonsList(props: {
+  options: SelectOption[];
+  locale: string;
+  selectedValue: string | null;
+  isDisabled: boolean;
+  onSelect: (value: string) => void;
+}) {
+  const { options, locale, selectedValue, isDisabled, onSelect } = props;
+  if (options.length === 0) {
+    return (
+      <div className="flex flex-col items-center justify-center py-8 text-center text-gray-500 text-sm">
+        {locale === 'ar' ? 'لا توجد نتائج' : 'Nothing found'}
+      </div>
+    );
+  }
+  return (
+    <div className="grid grid-cols-1 gap-2 max-h-[60vh] overflow-y-auto pr-2">
+      {options.map((option) => {
+        const isSelected = selectedValue === option.value;
+        return (
+          <button
+            key={option.value}
+            type="button"
+            disabled={isDisabled}
+            onClick={() => !isDisabled && onSelect(option.value)}
+            className={`py-2 px-3 rounded-md text-sm flex items-start text-start w-full transition-colors ${
+              isSelected
+                ? 'bg-blue-50 border-blue-200 text-blue-800 font-medium'
+                : 'hover:bg-gray-100 border border-gray-200'
+            } ${isDisabled ? 'opacity-50 cursor-not-allowed' : ''}`}
+          >
+            <span className="flex-1">{option.label}</span>
+          </button>
+        );
+      })}
+    </div>
+  );
+});
 
 interface Region {
   id: number;
@@ -73,6 +129,60 @@ interface IndustryNode {
   label: string;
   children: IndustryNode[];
 }
+
+type IndustryGroup = { parentKey: number; parentLabel: string; children: IndustryNode[] };
+
+const IndustryGroupsList = memo(function IndustryGroupsList(props: {
+  groups: IndustryGroup[];
+  locale: string;
+  isDisabled: boolean;
+  selectedIndustryId: number | null;
+  onSelectIndustry: (node: IndustryNode) => void;
+  onSelectAll: () => void;
+}) {
+  const { groups, locale, isDisabled, selectedIndustryId, onSelectIndustry, onSelectAll } = props;
+  return (
+    <div className="grid grid-cols-1 gap-2 max-h-[60vh] overflow-y-auto pr-2">
+      {/* All option */}
+      <button
+        className={`py-2 px-3 rounded-md text-sm flex items-start text-start w-full transition-colors ${
+          !selectedIndustryId
+            ? 'bg-blue-50 border-blue-200 text-blue-800 font-medium'
+            : 'hover:bg-gray-100 border border-gray-200'
+        } ${isDisabled ? 'opacity-50 cursor-not-allowed' : ''}`}
+        onClick={() => !isDisabled && onSelectAll()}
+        disabled={isDisabled}
+      >
+        <span className="flex-1 font-medium">{locale === 'ar' ? 'الكل' : 'All'}</span>
+      </button>
+
+      {groups.map((group) => (
+        <div key={group.parentKey} className="mt-2">
+          <div className="text-blue-600 font-semibold text-xs mb-1 px-1 cursor-default select-none">
+            {group.parentLabel}
+          </div>
+          {group.children.map((node) => {
+            const isSelected = selectedIndustryId === node.key;
+            return (
+              <button
+                key={node.key}
+                className={`py-2 px-3 mb-2 rounded-md text-sm flex items-start text-start w-full transition-colors ${
+                  isSelected
+                    ? 'bg-blue-50 border-blue-200 text-blue-800 font-medium'
+                    : 'hover:bg-gray-100 border border-gray-200'
+                } ${isDisabled ? 'opacity-50 cursor-not-allowed' : ''}`}
+                onClick={() => !isDisabled && onSelectIndustry(node)}
+                disabled={isDisabled}
+              >
+                <span className="flex-1">{node.label}</span>
+              </button>
+            );
+          })}
+        </div>
+      ))}
+    </div>
+  );
+});
 
 interface YearRange {
   startYear: number | null;
@@ -190,11 +300,11 @@ const FilterBox: React.FC<FilterBoxProps> = React.memo(({
   const [isHsCodeModalOpen, setIsHsCodeModalOpen] = useState(false);
   const [isIndustryModalOpen, setIsIndustryModalOpen] = useState(false);
   const [isYearPickerModalOpen, setIsYearPickerModalOpen] = useState(false);
+  const [isTagModalOpen, setIsTagModalOpen] = useState(false);
+  const [isEconomicBlocModalOpen, setIsEconomicBlocModalOpen] = useState(false);
+  const [isRegionModalOpen, setIsRegionModalOpen] = useState(false);
+  const [isCountryModalOpen, setIsCountryModalOpen] = useState(false);
 
-  // Debug log for modal state
-  useEffect(() => {
-    console.log('Year picker modal state changed:', isYearPickerModalOpen);
-  }, [isYearPickerModalOpen]);
 
   // Selection States
   const [selectedIsicCode, setSelectedIsicCode] = useState<{
@@ -226,6 +336,9 @@ const FilterBox: React.FC<FilterBoxProps> = React.memo(({
   const [priceCollapsed, setPriceCollapsed] = useState(true);
   const [languageCollapsed, setLanguageCollapsed] = useState(true);
   const [industryCollapsed, setIndustryCollapsed] = useState(true);
+
+  // Defer heavy filtering so typing stays instant
+  const deferredIndustrySearchTerm = useDeferredValue(industrySearchTerm);
   const [targetMarketCollapsed, setTargetMarketCollapsed] = useState(true);
   const [tagsCollapsed, setTagsCollapsed] = useState(true);
   const [yearOfStudyCollapsed, setYearOfStudyCollapsed] = useState(true);
@@ -252,11 +365,17 @@ const FilterBox: React.FC<FilterBoxProps> = React.memo(({
     }
   }, [rangeStartFilter, rangeEndFilter]);
 
-  // Combobox Search States
+  // Modal search states (instead of combobox search — prevents focus loss)
   const [economicBlocSearch, setEconomicBlocSearch] = useState('');
   const [regionSearch, setRegionSearch] = useState('');
   const [countrySearch, setCountrySearch] = useState('');
   const [tagSearch, setTagSearch] = useState('');
+
+  // Defer modal filtering so typing stays instant
+  const deferredEconomicBlocSearch = useDeferredValue(economicBlocSearch);
+  const deferredRegionSearch = useDeferredValue(regionSearch);
+  const deferredCountrySearch = useDeferredValue(countrySearch);
+  const deferredTagSearch = useDeferredValue(tagSearch);
 
   // Detect if we're in a loading state from parent component
   // This assumes the parent passes some loading indication
@@ -264,92 +383,8 @@ const FilterBox: React.FC<FilterBoxProps> = React.memo(({
 
 
 
-  // Combobox stores
-  const economicBlocCombobox = useCombobox({
-    onDropdownClose: () => {
-      economicBlocCombobox.resetSelectedOption();
-      economicBlocCombobox.focusTarget();
-      setEconomicBlocSearch('');
-    },
-    onDropdownOpen: () => {
-      economicBlocCombobox.focusSearchInput();
-    },
-  });
-
-  const regionCombobox = useCombobox({
-    onDropdownClose: () => {
-      regionCombobox.resetSelectedOption();
-      regionCombobox.focusTarget();
-      setRegionSearch('');
-    },
-    onDropdownOpen: () => {
-      regionCombobox.focusSearchInput();
-    },
-  });
-
-  const countryCombobox = useCombobox({
-    onDropdownClose: () => {
-      countryCombobox.resetSelectedOption();
-      countryCombobox.focusTarget();
-      setCountrySearch('');
-    },
-    onDropdownOpen: () => {
-      countryCombobox.focusSearchInput();
-    },
-  });
-
-  const tagCombobox = useCombobox({
-    onDropdownClose: () => {
-      tagCombobox.resetSelectedOption();
-      tagCombobox.focusTarget();
-      setTagSearch('');
-    },
-    onDropdownOpen: () => {
-      tagCombobox.focusSearchInput();
-    },
-  });
-
-  // Wrapper functions to maintain focus after state updates
-  const handleEconomicBlocSearchChange = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
-    const value = event.currentTarget.value;
-    setEconomicBlocSearch(value);
-    // Maintain focus after state update using the combobox's focus method
-    if (economicBlocCombobox.dropdownOpened) {
-      setTimeout(() => {
-        economicBlocCombobox.focusSearchInput();
-      }, 0);
-    }
-  }, [economicBlocCombobox]);
-
-  const handleRegionSearchChange = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
-    const value = event.currentTarget.value;
-    setRegionSearch(value);
-    if (regionCombobox.dropdownOpened) {
-      setTimeout(() => {
-        regionCombobox.focusSearchInput();
-      }, 0);
-    }
-  }, [regionCombobox]);
-
-  const handleCountrySearchChange = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
-    const value = event.currentTarget.value;
-    setCountrySearch(value);
-    if (countryCombobox.dropdownOpened) {
-      setTimeout(() => {
-        countryCombobox.focusSearchInput();
-      }, 0);
-    }
-  }, [countryCombobox]);
-
-  const handleTagSearchChange = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
-    const value = event.currentTarget.value;
-    setTagSearch(value);
-    if (tagCombobox.dropdownOpened) {
-      setTimeout(() => {
-        tagCombobox.focusSearchInput();
-      }, 0);
-    }
-  }, [tagCombobox]);
+  // Note: we intentionally removed Combobox search inputs for these filters.
+  // They caused focus loss on each keystroke due to internal remount/blur behavior.
 
   // Update collapsed states when search type or screen size changes
   useEffect(() => {
@@ -526,25 +561,41 @@ const FilterBox: React.FC<FilterBoxProps> = React.memo(({
   };
 
   // Convert data to select options
-  const countryOptions = countries.map(country => ({
-    value: country.id.toString(),
-    label: `${getCountryFlagEmoji(country.iso2)} ${locale === 'ar' && country.names?.ar ? country.names.ar : country.name}`
-  }));
+  const countryOptions = useMemo<SelectOption[]>(
+    () =>
+      countries.map((country) => ({
+        value: country.id.toString(),
+        label: `${getCountryFlagEmoji(country.iso2)} ${locale === 'ar' && country.names?.ar ? country.names.ar : country.name}`,
+      })),
+    [countries, locale]
+  );
 
-  const regionOptions = regions.map((region: Region) => ({
-    value: region.id.toString(),
-    label: region.name
-  }));
+  const regionOptions = useMemo<SelectOption[]>(
+    () =>
+      regions.map((region: Region) => ({
+        value: region.id.toString(),
+        label: region.name,
+      })),
+    [regions]
+  );
 
-  const economicBlocOptions = economicBlocs.map((bloc: EconomicBloc) => ({
-    value: bloc.id.toString(),
-    label: bloc.name
-  }));
+  const economicBlocOptions = useMemo<SelectOption[]>(
+    () =>
+      economicBlocs.map((bloc: EconomicBloc) => ({
+        value: bloc.id.toString(),
+        label: bloc.name,
+      })),
+    [economicBlocs]
+  );
 
-  const tagOptions = tags.map((t: TagItem) => ({
-    value: t.id.toString(),
-    label: t.name
-  }));
+  const tagOptions = useMemo<SelectOption[]>(
+    () =>
+      tags.map((t: TagItem) => ({
+        value: t.id.toString(),
+        label: t.name,
+      })),
+    [tags]
+  );
 
   // Helper functions for selected values
   const getSelectedEconomicBlocLabel = () => {
@@ -576,22 +627,48 @@ const FilterBox: React.FC<FilterBoxProps> = React.memo(({
     return selected ? `${getCountryFlagEmoji(selected.iso2)} ${locale === 'ar' && selected.names?.ar ? selected.names.ar : selected.name}` : null;
   };
 
-  // Filter options based on search
-  const filteredEconomicBlocOptions = economicBlocOptions.filter(option =>
-    option.label.toLowerCase().includes(economicBlocSearch.toLowerCase().trim())
+  // Build lightweight search indexes once per options list
+  const economicBlocOptionsIndex = useMemo(
+    () => economicBlocOptions.map((o) => ({ option: o, norm: normalizeSearchText(o.label) })),
+    [economicBlocOptions]
+  );
+  const regionOptionsIndex = useMemo(
+    () => regionOptions.map((o) => ({ option: o, norm: normalizeSearchText(o.label) })),
+    [regionOptions]
+  );
+  const countryOptionsIndex = useMemo(
+    () => countryOptions.map((o) => ({ option: o, norm: normalizeSearchText(o.label) })),
+    [countryOptions]
+  );
+  const tagOptionsIndex = useMemo(
+    () => tagOptions.map((o) => ({ option: o, norm: normalizeSearchText(o.label) })),
+    [tagOptions]
   );
 
-  const filteredRegionOptions = regionOptions.filter(option =>
-    option.label.toLowerCase().includes(regionSearch.toLowerCase().trim())
-  );
+  // Filter options based on DEFERRED search so typing stays responsive
+  const filteredEconomicBlocOptions = useMemo(() => {
+    const q = normalizeSearchText(deferredEconomicBlocSearch);
+    if (!q) return economicBlocOptions;
+    return economicBlocOptionsIndex.filter((x) => x.norm.includes(q)).map((x) => x.option);
+  }, [deferredEconomicBlocSearch, economicBlocOptions, economicBlocOptionsIndex]);
 
-  const filteredCountryOptions = countryOptions.filter(option =>
-    option.label.toLowerCase().includes(countrySearch.toLowerCase().trim())
-  );
+  const filteredRegionOptions = useMemo(() => {
+    const q = normalizeSearchText(deferredRegionSearch);
+    if (!q) return regionOptions;
+    return regionOptionsIndex.filter((x) => x.norm.includes(q)).map((x) => x.option);
+  }, [deferredRegionSearch, regionOptions, regionOptionsIndex]);
 
-  const filteredTagOptions = tagOptions.filter(option =>
-    option.label.toLowerCase().includes(tagSearch.toLowerCase().trim())
-  );
+  const filteredCountryOptions = useMemo(() => {
+    const q = normalizeSearchText(deferredCountrySearch);
+    if (!q) return countryOptions;
+    return countryOptionsIndex.filter((x) => x.norm.includes(q)).map((x) => x.option);
+  }, [deferredCountrySearch, countryOptions, countryOptionsIndex]);
+
+  const filteredTagOptions = useMemo(() => {
+    const q = normalizeSearchText(deferredTagSearch);
+    if (!q) return tagOptions;
+    return tagOptionsIndex.filter((x) => x.norm.includes(q)).map((x) => x.option);
+  }, [deferredTagSearch, tagOptions, tagOptionsIndex]);
 
   // Leaf node helpers
   const isLeafNode = (node: ISICCode): boolean => {
@@ -668,13 +745,18 @@ const FilterBox: React.FC<FilterBoxProps> = React.memo(({
       return;
     }
 
-    const searchTermLower = industrySearchTerm.toLowerCase();
-    const filtered = industryLeafNodes.filter(node => {
-      return node.label.toLowerCase().includes(searchTermLower);
-    });
+    // NOTE: use deferred value so UI input stays responsive
+    // and normalize Arabic to be hamza/diacritics tolerant.
+    const q = normalizeSearchText(deferredIndustrySearchTerm);
+    if (!q) {
+      setFilteredIndustryLeafNodes(industryLeafNodes);
+      return;
+    }
+
+    const filtered = industryLeafNodes.filter((node) => normalizeSearchText(node.label).includes(q));
 
     setFilteredIndustryLeafNodes(filtered);
-  }, [industrySearchTerm, industryLeafNodes]);
+  }, [deferredIndustrySearchTerm, industryLeafNodes]);
 
   useEffect(() => {
     if (!hsCodeSearchTerm.trim()) {
@@ -695,37 +777,38 @@ const FilterBox: React.FC<FilterBoxProps> = React.memo(({
   }, [hsCodeSearchTerm, hsCodes]);
 
   // Group industry leaf nodes by their parent label (top-level parent)
-  const groupedIndustryLeaves = useMemo(() => {
-    // Build a quick lookup for filtered leaf keys
-    const filteredKeys = new Set(filteredIndustryLeafNodes.map((n) => n.key));
-    type Group = { parentKey: number; parentLabel: string; children: IndustryNode[] };
-    const groups: Group[] = [];
-
-    // Collect leaf descendants of a parent that are included in the filtered list
-    const collectLeaves = (node: IndustryNode, acc: IndustryNode[]) => {
+  // Precompute all leaf groups once (tree traversal only when industries change)
+  const allIndustryLeafGroups = useMemo<IndustryGroup[]>(() => {
+    const collectAllLeaves = (node: IndustryNode, acc: IndustryNode[]) => {
       if (node.children.length === 0) {
-        if (filteredKeys.has(node.key)) acc.push(node);
+        acc.push(node);
         return;
       }
-      for (const child of node.children) {
-        collectLeaves(child, acc);
-      }
+      for (const child of node.children) collectAllLeaves(child, acc);
     };
 
+    const groups: IndustryGroup[] = [];
     for (const parent of industries) {
       const leaves: IndustryNode[] = [];
-      collectLeaves(parent, leaves);
+      collectAllLeaves(parent, leaves);
       if (leaves.length > 0) {
-        groups.push({
-          parentKey: parent.key,
-          parentLabel: parent.label,
-          children: leaves,
-        });
+        groups.push({ parentKey: parent.key, parentLabel: parent.label, children: leaves });
       }
     }
-
     return groups;
-  }, [industries, filteredIndustryLeafNodes]);
+  }, [industries]);
+
+  // Filter visible groups cheaply based on filtered leaf keys
+  const groupedIndustryLeaves = useMemo<IndustryGroup[]>(() => {
+    const filteredKeys = new Set(filteredIndustryLeafNodes.map((n) => n.key));
+    return allIndustryLeafGroups
+      .map((g) => ({
+        parentKey: g.parentKey,
+        parentLabel: g.parentLabel,
+        children: g.children.filter((n) => filteredKeys.has(n.key)),
+      }))
+      .filter((g) => g.children.length > 0);
+  }, [allIndustryLeafGroups, filteredIndustryLeafNodes]);
 
   // Render functions
   const renderLeafNodes = () => {
@@ -811,53 +894,18 @@ const FilterBox: React.FC<FilterBoxProps> = React.memo(({
     }
 
     return (
-      <div className="grid grid-cols-1 gap-2 max-h-[60vh] overflow-y-auto pr-2">
-        {/* All option */}
-        <button
-          className={`py-2 px-3 rounded-md text-sm flex items-start text-start w-full transition-colors ${
-            !selectedIndustry
-              ? 'bg-blue-50 border-blue-200 text-blue-800 font-medium'
-              : 'hover:bg-gray-100 border border-gray-200'
-          } ${isDisabled ? 'opacity-50 cursor-not-allowed' : ''}`}
-          onClick={() => {
-            if (!isDisabled) {
-              setSelectedIndustry(null);
-              if (setIndustryFilter) {
-                setIndustryFilter(null);
-              }
-              setIsIndustryModalOpen(false);
-            }
-          }}
-          disabled={isDisabled}
-        >
-          <span className="flex-1 font-medium">{locale === 'ar' ? 'الكل' : 'All'}</span>
-        </button>
-
-        {groupedIndustryLeaves.map((group) => (
-          <div key={group.parentKey} className="mt-2">
-            <div className="text-blue-600 font-semibold text-xs mb-1 px-1 cursor-default select-none">
-              {group.parentLabel}
-            </div>
-            {group.children.map((node) => {
-              const isSelected = selectedIndustry?.id === node.key;
-              return (
-                <button
-                  key={node.key}
-                  className={`py-2 px-3 mb-2 rounded-md text-sm flex items-start text-start w-full transition-colors ${
-                    isSelected
-                      ? 'bg-blue-50 border-blue-200 text-blue-800 font-medium'
-                      : 'hover:bg-gray-100 border border-gray-200'
-                  } ${isDisabled ? 'opacity-50 cursor-not-allowed' : ''}`}
-                  onClick={() => !isDisabled && handleSelectIndustry(node)}
-                  disabled={isDisabled}
-                >
-                  <span className="flex-1">{node.label}</span>
-                </button>
-              );
-            })}
-          </div>
-        ))}
-      </div>
+      <IndustryGroupsList
+        groups={groupedIndustryLeaves}
+        locale={locale}
+        isDisabled={isDisabled}
+        selectedIndustryId={selectedIndustry?.id ?? null}
+        onSelectIndustry={handleSelectIndustry}
+        onSelectAll={() => {
+          setSelectedIndustry(null);
+          setIndustryFilter?.(null);
+          setIsIndustryModalOpen(false);
+        }}
+      />
     );
   };
 
@@ -1280,8 +1328,6 @@ const FilterBox: React.FC<FilterBoxProps> = React.memo(({
                   <div className="flex flex-col gap-2">
                     <div
                       onClick={() => {
-                        console.log('Year picker clicked, isDisabled:', isDisabled);
-                        console.log('Opening year picker modal');
                         setIsYearPickerModalOpen(true);
                       }}
                       className={`border border-gray-200 bg-white py-2 px-3 rounded text-sm cursor-pointer flex justify-between items-center hover:border-blue-400 transition-colors ${
@@ -1394,80 +1440,35 @@ const FilterBox: React.FC<FilterBoxProps> = React.memo(({
               <div className="px-4 py-3 bg-white">
                 <LoadingOverlay isLoading={isDisabled}>
                   <div className="flex flex-col gap-2">
-                    <Combobox
-                      store={tagCombobox}
-                      withinPortal={false}
-                      onOptionSubmit={(val) => {
-                        if (!isDisabled) {
-                          // Find the tag by ID and use its name as the filter value
-                          const selectedTag = tags.find(t => t.id.toString() === val);
-                          if (selectedTag && setTagFilter) {
-                            setTagFilter(selectedTag.name);
-                          }
-                          tagCombobox.closeDropdown();
-                        }
-                      }}
+                    <button
+                      type="button"
                       disabled={isDisabled}
+                      onClick={() => !isDisabled && setIsTagModalOpen(true)}
+                      className={`w-full flex items-center justify-between rounded-md border border-gray-300 px-3 py-2 text-sm transition-colors hover:border-blue-400 ${
+                        isDisabled ? 'opacity-50 cursor-not-allowed' : ''
+                      }`}
                     >
-                      <Combobox.Target>
-                        <InputBase
-                          component="button"
-                          type="button"
-                          pointer
-                          rightSection={
-                            <div className="flex items-center gap-1">
-                              {tagFilter && !isDisabled && (
-                                <button
-                                  aria-label="Clear tag"
-                                  className="text-gray-400 hover:text-red-500"
-                                  onMouseDown={(e) => { e.preventDefault(); e.stopPropagation(); }}
-                                  onClick={(e) => {
-                                    e.preventDefault();
-                                    e.stopPropagation();
-                                    setTagFilter && setTagFilter(null);
-                                  }}
-                                >
-                                  <IconX size={14} />
-                                </button>
-                              )}
-                              <Combobox.Chevron />
-                            </div>
-                          }
-                          onClick={() => !isDisabled && tagCombobox.toggleDropdown()}
-                          className={`text-sm font-semibold hover:border-blue-400 transition-colors ${
-                            isDisabled ? 'opacity-50 cursor-not-allowed' : ''
-                          }`}
-                          disabled={isDisabled}
-                        >
-                          {getSelectedTagLabel() ? (
-                            <span className="text-gray-800 font-medium truncate block pr-8">
-                              {getSelectedTagLabel()}
-                            </span>
-                          ) : (
-                            <span className="text-gray-800 font-semibold">{locale === 'ar' ? 'الكل' : 'All'}</span>
-                          )}
-                        </InputBase>
-                      </Combobox.Target>
-                      <Combobox.Dropdown>
-                        <Combobox.Search
-                          value={tagSearch}
-                          onChange={handleTagSearchChange}
-                          placeholder={locale === 'ar' ? 'ابحث في الوسوم' : 'Search tags'}
-                          disabled={isDisabled}
-                        />
-                        <Combobox.Options className="max-h-40 overflow-y-auto">
-                          {filteredTagOptions.length > 0 ? (
-                            filteredTagOptions.map((option) => (
-                              <Combobox.Option value={option.value} key={option.value}>
-                                {option.label}
-                              </Combobox.Option>
-                            ))
-                          ) : (
-                            <Combobox.Empty>{locale === 'ar' ? 'لا توجد نتائج' : 'Nothing found'}</Combobox.Empty>
-                          )}
-                        </Combobox.Options>
-                      </Combobox.Dropdown>
-                    </Combobox>
+                      <span className="text-gray-800 font-medium truncate">
+                        {getSelectedTagLabel() ? getSelectedTagLabel() : (locale === 'ar' ? 'الكل' : 'All')}
+                      </span>
+                      <span className="flex items-center gap-2">
+                        {tagFilter && !isDisabled && (
+                          <span
+                            role="button"
+                            aria-label="Clear tag"
+                            className="text-gray-400 hover:text-red-500"
+                            onClick={(e) => {
+                              e.preventDefault();
+                              e.stopPropagation();
+                              setTagFilter?.(null);
+                            }}
+                          >
+                            <IconX size={14} />
+                          </span>
+                        )}
+                        <span className="text-gray-400">{locale === 'ar' ? 'اختر' : 'Select'}</span>
+                      </span>
+                    </button>
                   </div>
                 </LoadingOverlay>
               </div>
@@ -1501,227 +1502,104 @@ const FilterBox: React.FC<FilterBoxProps> = React.memo(({
                 {searchType !== 'insighter' && (
                   <div className="flex flex-col gap-2 mb-4">
                     <span className="text-xs font-semibold text-gray-700">{locale === 'ar' ? 'المنطقة الاقتصادية' : 'By Economic Block'}</span>
-                    <Combobox
-                      store={economicBlocCombobox}
-                      withinPortal={false}
-                      onOptionSubmit={(val) => {
-                        if (!isDisabled) {
-                          if (setEconomicBlocFilter) setEconomicBlocFilter(parseInt(val));
-                          if (setRegionFilter) setRegionFilter(null);
-                          if (setCountryFilter) setCountryFilter(null);
-                          economicBlocCombobox.closeDropdown();
-                        }
-                      }}
+                    <button
+                      type="button"
                       disabled={isDisabled}
+                      onClick={() => !isDisabled && setIsEconomicBlocModalOpen(true)}
+                      className={`w-full flex items-center justify-between rounded-md border border-gray-300 px-3 py-2 text-sm transition-colors hover:border-blue-400 ${
+                        isDisabled ? 'opacity-50 cursor-not-allowed' : ''
+                      }`}
                     >
-                      <Combobox.Target>
-                        <InputBase
-                          component="button"
-                          type="button"
-                          pointer
-                          rightSection={
-                            <div className="flex items-center gap-1">
-                              {economicBlocFilter && !isDisabled && (
-                                <button
-                                  aria-label="Clear economic bloc"
-                                  className="text-gray-400 hover:text-red-500"
-                                  onMouseDown={(e) => { e.preventDefault(); e.stopPropagation(); }}
-                                  onClick={(e) => {
-                                    e.preventDefault();
-                                    e.stopPropagation();
-                                    setEconomicBlocFilter && setEconomicBlocFilter(null);
-                                  }}
-                                >
-                                  <IconX size={14} />
-                                </button>
-                              )}
-                              <Combobox.Chevron />
-                            </div>
-                          }
-                          onClick={() => !isDisabled && economicBlocCombobox.toggleDropdown()}
-                          className={`text-sm font-semibold hover:border-blue-400 transition-colors ${
-                            isDisabled ? 'opacity-50 cursor-not-allowed' : ''
-                          }`}
-                          disabled={isDisabled}
-                        >
-                          {getSelectedEconomicBlocLabel() ? (
-                            getSelectedEconomicBlocLabel()
-                          ) : (
-                            <span className="text-gray-800 font-semibold">{locale === 'ar' ? 'الكل' : 'All'}</span>
-                          )}
-                        </InputBase>
-                      </Combobox.Target>
-                      <Combobox.Dropdown>
-                        <Combobox.Search
-                          value={economicBlocSearch}
-                          onChange={handleEconomicBlocSearchChange}
-                          placeholder={locale === 'ar' ? 'البحث في الكتل الاقتصادية' : 'Search economic blocs'}
-                          disabled={isDisabled}
-                        />
-                        <Combobox.Options>
-                          {filteredEconomicBlocOptions.length > 0 ? (
-                            filteredEconomicBlocOptions.map((option) => (
-                              <Combobox.Option value={option.value} key={option.value}>
-                                {option.label}
-                              </Combobox.Option>
-                            ))
-                          ) : (
-                            <Combobox.Empty>{locale === 'ar' ? 'لا توجد نتائج' : 'Nothing found'}</Combobox.Empty>
-                          )}
-                        </Combobox.Options>
-                      </Combobox.Dropdown>
-                    </Combobox>
+                      <span className="text-gray-800 font-medium truncate">
+                        {getSelectedEconomicBlocLabel() ? getSelectedEconomicBlocLabel() : (locale === 'ar' ? 'الكل' : 'All')}
+                      </span>
+                      <span className="flex items-center gap-2">
+                        {economicBlocFilter && !isDisabled && (
+                          <span
+                            role="button"
+                            aria-label="Clear economic bloc"
+                            className="text-gray-400 hover:text-red-500"
+                            onClick={(e) => {
+                              e.preventDefault();
+                              e.stopPropagation();
+                              setEconomicBlocFilter?.(null);
+                            }}
+                          >
+                            <IconX size={14} />
+                          </span>
+                        )}
+                        <span className="text-gray-400">{locale === 'ar' ? 'اختر' : 'Select'}</span>
+                      </span>
+                    </button>
                   </div>
                 )}
 
                 {/* Region */}
                 <div className="flex flex-col gap-2 mb-4">
                   <span className="text-xs font-semibold text-gray-700">{locale === 'ar' ? 'اختر المنطقة الجغرافية' : 'Or By Region'}</span>
-                  <Combobox
-                    store={regionCombobox}
-                    withinPortal={false}
-                    onOptionSubmit={(val) => {
-                      if (!isDisabled) {
-                        if (setRegionFilter) setRegionFilter(parseInt(val));
-                        if (setEconomicBlocFilter) setEconomicBlocFilter(null);
-                        if (setCountryFilter) setCountryFilter(null);
-                        regionCombobox.closeDropdown();
-                      }
-                    }}
+                  <button
+                    type="button"
                     disabled={isDisabled}
+                    onClick={() => !isDisabled && setIsRegionModalOpen(true)}
+                    className={`w-full flex items-center justify-between rounded-md border border-gray-300 px-3 py-2 text-sm transition-colors hover:border-blue-400 ${
+                      isDisabled ? 'opacity-50 cursor-not-allowed' : ''
+                    }`}
                   >
-                    <Combobox.Target>
-                      <InputBase
-                        component="button"
-                        type="button"
-                        pointer
-                        rightSection={
-                          <div className="flex items-center gap-1">
-                            {regionFilter && !isDisabled && (
-                              <button
-                                aria-label="Clear region"
-                                className="text-gray-400 hover:text-red-500"
-                                onMouseDown={(e) => { e.preventDefault(); e.stopPropagation(); }}
-                                onClick={(e) => {
-                                  e.preventDefault();
-                                  e.stopPropagation();
-                                  setRegionFilter && setRegionFilter(null);
-                                }}
-                              >
-                                <IconX size={14} />
-                              </button>
-                            )}
-                            <Combobox.Chevron />
-                          </div>
-                        }
-                        onClick={() => !isDisabled && regionCombobox.toggleDropdown()}
-                        className={`text-sm font-semibold hover:border-blue-400 transition-colors ${
-                          isDisabled ? 'opacity-50 cursor-not-allowed' : ''
-                        }`}
-                        disabled={isDisabled}
-                      >
-                        {getSelectedRegionLabel() ? (
-                          getSelectedRegionLabel()
-                        ) : (
-                          <span className="text-gray-800 font-semibold">{locale === 'ar' ? 'الكل' : 'All'}</span>
-                        )}
-                      </InputBase>
-                    </Combobox.Target>
-                    <Combobox.Dropdown>
-                      <Combobox.Search
-                        value={regionSearch}
-                        onChange={handleRegionSearchChange}
-                        placeholder={locale === 'ar' ? 'البحث في المناطق' : 'Search regions'}
-                        disabled={isDisabled}
-                      />
-                      <Combobox.Options>
-                        {filteredRegionOptions.length > 0 ? (
-                          filteredRegionOptions.map((option) => (
-                            <Combobox.Option value={option.value} key={option.value}>
-                              {option.label}
-                            </Combobox.Option>
-                          ))
-                        ) : (
-                          <Combobox.Empty>{locale === 'ar' ? 'لا توجد نتائج' : 'Nothing found'}</Combobox.Empty>
-                        )}
-                      </Combobox.Options>
-                    </Combobox.Dropdown>
-                  </Combobox>
+                    <span className="text-gray-800 font-medium truncate">
+                      {getSelectedRegionLabel() ? getSelectedRegionLabel() : (locale === 'ar' ? 'الكل' : 'All')}
+                    </span>
+                    <span className="flex items-center gap-2">
+                      {regionFilter && !isDisabled && (
+                        <span
+                          role="button"
+                          aria-label="Clear region"
+                          className="text-gray-400 hover:text-red-500"
+                          onClick={(e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            setRegionFilter?.(null);
+                          }}
+                        >
+                          <IconX size={14} />
+                        </span>
+                      )}
+                      <span className="text-gray-400">{locale === 'ar' ? 'اختر' : 'Select'}</span>
+                    </span>
+                  </button>
                 </div>
 
                 {/* Country */}
                 <div className="flex flex-col gap-2 mb-4">
                   <span className="text-xs font-semibold text-gray-700">{locale === 'ar' ? 'الدولة' : 'Or By Country'}</span>
-                  <Combobox
-                    store={countryCombobox}
-                    withinPortal={false}
-                    onOptionSubmit={(val) => {
-                      if (!isDisabled) {
-                        if (setCountryFilter) setCountryFilter(parseInt(val));
-                        if (setEconomicBlocFilter) setEconomicBlocFilter(null);
-                        if (setRegionFilter) setRegionFilter(null);
-                        countryCombobox.closeDropdown();
-                      }
-                    }}
+                  <button
+                    type="button"
                     disabled={isDisabled}
+                    onClick={() => !isDisabled && setIsCountryModalOpen(true)}
+                    className={`w-full flex items-center justify-between rounded-md border border-gray-300 px-3 py-2 text-sm transition-colors hover:border-blue-400 ${
+                      isDisabled ? 'opacity-50 cursor-not-allowed' : ''
+                    }`}
                   >
-                    <Combobox.Target>
-                      <InputBase
-                        component="button"
-                        type="button"
-                        pointer
-                        rightSection={
-                          <div className="flex items-center gap-1">
-                            {countryFilter && !isDisabled && (
-                              <button
-                                aria-label="Clear country"
-                                className="text-gray-400 hover:text-red-500"
-                                onMouseDown={(e) => { e.preventDefault(); e.stopPropagation(); }}
-                                onClick={(e) => {
-                                  e.preventDefault();
-                                  e.stopPropagation();
-                                  setCountryFilter && setCountryFilter(null);
-                                }}
-                              >
-                                <IconX size={14} />
-                              </button>
-                            )}
-                            <Combobox.Chevron />
-                          </div>
-                        }
-                        onClick={() => !isDisabled && countryCombobox.toggleDropdown()}
-                        className={`text-sm font-semibold hover:border-blue-400 transition-colors ${
-                          isDisabled ? 'opacity-50 cursor-not-allowed' : ''
-                        }`}
-                        disabled={isDisabled}
-                      >
-                        {getSelectedCountryLabel() ? (
-                          getSelectedCountryLabel()
-                        ) : (
-                          <span className="text-gray-800 font-semibold">{locale === 'ar' ? 'الكل' : 'All'}</span>
-                        )}
-                      </InputBase>
-                    </Combobox.Target>
-                    <Combobox.Dropdown>
-                      <Combobox.Search
-                        value={countrySearch}
-                        onChange={handleCountrySearchChange}
-                        placeholder={locale === 'ar' ? 'البحث في البلدان' : 'Search countries'}
-                        disabled={isDisabled}
-                      />
-                      <Combobox.Options className="max-h-60 overflow-y-auto">
-                        {filteredCountryOptions.length > 0 ? (
-                          filteredCountryOptions.map((option) => (
-                            <Combobox.Option value={option.value} key={option.value}>
-                              {option.label}
-                            </Combobox.Option>
-                          ))
-                        ) : (
-                          <Combobox.Empty>{locale === 'ar' ? 'لا توجد نتائج' : 'Nothing found'}</Combobox.Empty>
-                        )}
-                      </Combobox.Options>
-                    </Combobox.Dropdown>
-                  </Combobox>
+                    <span className="text-gray-800 font-medium truncate">
+                      {getSelectedCountryLabel() ? getSelectedCountryLabel() : (locale === 'ar' ? 'الكل' : 'All')}
+                    </span>
+                    <span className="flex items-center gap-2">
+                      {countryFilter && !isDisabled && (
+                        <span
+                          role="button"
+                          aria-label="Clear country"
+                          className="text-gray-400 hover:text-red-500"
+                          onClick={(e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            setCountryFilter?.(null);
+                          }}
+                        >
+                          <IconX size={14} />
+                        </span>
+                      )}
+                      <span className="text-gray-400">{locale === 'ar' ? 'اختر' : 'Select'}</span>
+                    </span>
+                  </button>
                 </div>
               </LoadingOverlay>
             </div>
@@ -1861,7 +1739,6 @@ const FilterBox: React.FC<FilterBoxProps> = React.memo(({
       <Modal
         opened={isYearPickerModalOpen}
         onClose={() => {
-          console.log('Closing year picker modal');
           setIsYearPickerModalOpen(false);
         }}
         title={locale === 'ar' ? 'اختر النطاق الزمني للبيانات' : 'Select Data Coverage Period'}
@@ -1885,6 +1762,219 @@ const FilterBox: React.FC<FilterBoxProps> = React.memo(({
             }}
             disabled={isDisabled}
             inline
+          />
+        </div>
+      </Modal>
+
+      {/* Tags Modal */}
+      <Modal
+        opened={isTagModalOpen}
+        onClose={() => !isDisabled && setIsTagModalOpen(false)}
+        title={locale === 'ar' ? 'اختر الوسم' : 'Select Tag'}
+        size="lg"
+        overlayProps={{ backgroundOpacity: 0.55, blur: 3 }}
+        zIndex={4000}
+      >
+        <div className="space-y-4">
+          <input
+            type="text"
+            placeholder={locale === 'ar' ? 'ابحث في الوسوم...' : 'Search tags...'}
+            value={tagSearch}
+            onChange={(e) => setTagSearch(e.target.value)}
+            autoFocus
+            className={`w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent mt-2 ${
+              isDisabled ? 'opacity-50 cursor-not-allowed' : ''
+            }`}
+            disabled={isDisabled}
+          />
+          <div className="space-y-2">
+            <button
+              type="button"
+              disabled={isDisabled}
+              onClick={() => {
+                if (isDisabled) return;
+                setTagFilter?.(null);
+                setIsTagModalOpen(false);
+              }}
+              className={`py-2 px-3 rounded-md text-sm flex items-start text-start w-full transition-colors ${
+                !tagFilter
+                  ? 'bg-blue-50 border-blue-200 text-blue-800 font-medium'
+                  : 'hover:bg-gray-100 border border-gray-200'
+              } ${isDisabled ? 'opacity-50 cursor-not-allowed' : ''}`}
+            >
+              <span className="flex-1 font-medium">{locale === 'ar' ? 'الكل' : 'All'}</span>
+            </button>
+            <OptionsButtonsList
+              options={filteredTagOptions}
+              locale={locale}
+              selectedValue={tagFilter ? (tags.find((t) => t.name === tagFilter)?.id?.toString() ?? null) : null}
+              isDisabled={isDisabled}
+              onSelect={(val) => {
+                if (isDisabled) return;
+                const selected = tags.find((t) => t.id.toString() === val);
+                if (selected) setTagFilter?.(selected.name);
+                setIsTagModalOpen(false);
+              }}
+            />
+          </div>
+        </div>
+      </Modal>
+
+      {/* Economic Bloc Modal */}
+      <Modal
+        opened={isEconomicBlocModalOpen}
+        onClose={() => !isDisabled && setIsEconomicBlocModalOpen(false)}
+        title={locale === 'ar' ? 'اختر المنطقة الاقتصادية' : 'Select Economic Block'}
+        size="lg"
+        overlayProps={{ backgroundOpacity: 0.55, blur: 3 }}
+        zIndex={4000}
+      >
+        <div className="space-y-4">
+          <input
+            type="text"
+            placeholder={locale === 'ar' ? 'البحث في الكتل الاقتصادية...' : 'Search economic blocs...'}
+            value={economicBlocSearch}
+            onChange={(e) => setEconomicBlocSearch(e.target.value)}
+            autoFocus
+            className={`w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent mt-2 ${
+              isDisabled ? 'opacity-50 cursor-not-allowed' : ''
+            }`}
+            disabled={isDisabled}
+          />
+          <button
+            type="button"
+            disabled={isDisabled}
+            onClick={() => {
+              if (isDisabled) return;
+              setEconomicBlocFilter?.(null);
+              setIsEconomicBlocModalOpen(false);
+            }}
+            className={`py-2 px-3 rounded-md text-sm flex items-start text-start w-full transition-colors ${
+              !economicBlocFilter
+                ? 'bg-blue-50 border-blue-200 text-blue-800 font-medium'
+                : 'hover:bg-gray-100 border border-gray-200'
+            } ${isDisabled ? 'opacity-50 cursor-not-allowed' : ''}`}
+          >
+            <span className="flex-1 font-medium">{locale === 'ar' ? 'الكل' : 'All'}</span>
+          </button>
+          <OptionsButtonsList
+            options={filteredEconomicBlocOptions}
+            locale={locale}
+            selectedValue={economicBlocFilter ? economicBlocFilter.toString() : null}
+            isDisabled={isDisabled}
+            onSelect={(val) => {
+              if (isDisabled) return;
+              setEconomicBlocFilter?.(parseInt(val));
+              setRegionFilter?.(null);
+              setCountryFilter?.(null);
+              setIsEconomicBlocModalOpen(false);
+            }}
+          />
+        </div>
+      </Modal>
+
+      {/* Region Modal */}
+      <Modal
+        opened={isRegionModalOpen}
+        onClose={() => !isDisabled && setIsRegionModalOpen(false)}
+        title={locale === 'ar' ? 'اختر المنطقة الجغرافية' : 'Select Region'}
+        size="lg"
+        overlayProps={{ backgroundOpacity: 0.55, blur: 3 }}
+        zIndex={4000}
+      >
+        <div className="space-y-4">
+          <input
+            type="text"
+            placeholder={locale === 'ar' ? 'البحث في المناطق...' : 'Search regions...'}
+            value={regionSearch}
+            onChange={(e) => setRegionSearch(e.target.value)}
+            autoFocus
+            className={`w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent mt-2 ${
+              isDisabled ? 'opacity-50 cursor-not-allowed' : ''
+            }`}
+            disabled={isDisabled}
+          />
+          <button
+            type="button"
+            disabled={isDisabled}
+            onClick={() => {
+              if (isDisabled) return;
+              setRegionFilter?.(null);
+              setIsRegionModalOpen(false);
+            }}
+            className={`py-2 px-3 rounded-md text-sm flex items-start text-start w-full transition-colors ${
+              !regionFilter
+                ? 'bg-blue-50 border-blue-200 text-blue-800 font-medium'
+                : 'hover:bg-gray-100 border border-gray-200'
+            } ${isDisabled ? 'opacity-50 cursor-not-allowed' : ''}`}
+          >
+            <span className="flex-1 font-medium">{locale === 'ar' ? 'الكل' : 'All'}</span>
+          </button>
+          <OptionsButtonsList
+            options={filteredRegionOptions}
+            locale={locale}
+            selectedValue={regionFilter ? regionFilter.toString() : null}
+            isDisabled={isDisabled}
+            onSelect={(val) => {
+              if (isDisabled) return;
+              setRegionFilter?.(parseInt(val));
+              setEconomicBlocFilter?.(null);
+              setCountryFilter?.(null);
+              setIsRegionModalOpen(false);
+            }}
+          />
+        </div>
+      </Modal>
+
+      {/* Country Modal */}
+      <Modal
+        opened={isCountryModalOpen}
+        onClose={() => !isDisabled && setIsCountryModalOpen(false)}
+        title={locale === 'ar' ? 'اختر الدولة' : 'Select Country'}
+        size="lg"
+        overlayProps={{ backgroundOpacity: 0.55, blur: 3 }}
+        zIndex={4000}
+      >
+        <div className="space-y-4">
+          <input
+            type="text"
+            placeholder={locale === 'ar' ? 'البحث في البلدان...' : 'Search countries...'}
+            value={countrySearch}
+            onChange={(e) => setCountrySearch(e.target.value)}
+            autoFocus
+            className={`w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent mt-2 ${
+              isDisabled ? 'opacity-50 cursor-not-allowed' : ''
+            }`}
+            disabled={isDisabled}
+          />
+          <button
+            type="button"
+            disabled={isDisabled}
+            onClick={() => {
+              if (isDisabled) return;
+              setCountryFilter?.(null);
+              setIsCountryModalOpen(false);
+            }}
+            className={`py-2 px-3 rounded-md text-sm flex items-start text-start w-full transition-colors ${
+              !countryFilter
+                ? 'bg-blue-50 border-blue-200 text-blue-800 font-medium'
+                : 'hover:bg-gray-100 border border-gray-200'
+            } ${isDisabled ? 'opacity-50 cursor-not-allowed' : ''}`}
+          >
+            <span className="flex-1 font-medium">{locale === 'ar' ? 'الكل' : 'All'}</span>
+          </button>
+          <OptionsButtonsList
+            options={filteredCountryOptions}
+            locale={locale}
+            selectedValue={countryFilter ? countryFilter.toString() : null}
+            isDisabled={isDisabled}
+            onSelect={(val) => {
+              if (isDisabled) return;
+              setCountryFilter?.(parseInt(val));
+              setEconomicBlocFilter?.(null);
+              setRegionFilter?.(null);
+              setIsCountryModalOpen(false);
+            }}
           />
         </div>
       </Modal>

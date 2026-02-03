@@ -430,30 +430,6 @@ export default function HomePage() {
     }
     
     const nextUrl = `/${locale}/home?${urlParams.toString()}`;
-    try {
-      console.log('[updateUrlWithFilters] applying params:', {
-        query,
-        type,
-        language,
-        country,
-        region,
-        economicBloc,
-        tag,
-        industry,
-        isicCode,
-        hsCode,
-        paid,
-        rangeStart,
-        rangeEnd,
-        coverStart,
-        coverEnd,
-        category,
-        accuracy,
-        role,
-        page
-      });
-      console.log('[updateUrlWithFilters] next URL:', nextUrl);
-    } catch {}
     // Update URL without refreshing the page
     router.push(nextUrl, { scroll: false });
   }, [locale, router, searchType, searchQuery, currentPage, languageFilter, countryFilter, regionFilter, economicBlocFilter, tagFilter, industryFilter, isicCodeFilter, hsCodeFilter, priceFilter, selectedCategory, accuracyFilter, roleFilter, rangeStartFilter, rangeEndFilter, yearOfStudyFilter, initialized]);
@@ -690,7 +666,6 @@ export default function HomePage() {
   // Custom setter for Products filter that triggers search
   const handleHsCodeFilterChange = useCallback((value: string | null) => {
     setHsCodeFilter(value);
-    console.log('[handleHsCodeFilterChange] value:', value);
     updateUrlWithFilters({ hs_code: value });
     setCurrentPage(1);
   }, [updateUrlWithFilters]);
@@ -1485,7 +1460,7 @@ export default function HomePage() {
       } finally {
         setLoading(false);
       }
-    }, 150); // Reduced debounce delay to 150ms for faster response
+    }, 300); // Optimized debounce delay for better performance
     
     // Cleanup function to clear the timer
     return () => {

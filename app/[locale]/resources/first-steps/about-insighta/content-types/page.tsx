@@ -113,14 +113,16 @@ export default async function ContentTypesPage({ params }: { params: Promise<{ l
       {/* Hero Section - same structure as "what-is-insighta" */}
       <div className="relative overflow-hidden pb-16">
         {/* Breadcrumbs + Hero Title Section (with bg + overlay) */}
-        <div className="relative overflow-hidden px-4 sm:px-12 py-8 md:py-20 mb-6 md:mb-8">
+        <div className="relative overflow-hidden px-4 sm:px-12 py-8 md:py-24 mb-6 md:mb-8">
           <div
             className="absolute inset-0 bg-center bg-cover"
             style={{
               backgroundImage:
-                "url('https://res.cloudinary.com/dsiku9ipv/image/upload/v1769511246/Group_13553_2_swpcdf.webp')",
-              transform: isRTL ? 'scaleX(-1)' : 'none',
-              transformOrigin: 'center',
+                  "url('https://res.cloudinary.com/dsiku9ipv/image/upload/v1770102117/pattern_lj3gmd.png')",
+                transform: isRTL ? 'scaleX(-1)' : 'none',
+                transformOrigin: 'center',
+                backgroundPositionX: isRTL ? '1%' : '1%',
+                backgroundSize: isRTL ? '95% 100%' : '100% 95%',
             }}
             aria-hidden="true"
           />
@@ -147,7 +149,7 @@ export default async function ContentTypesPage({ params }: { params: Promise<{ l
                 <li>
                   <span className="text-gray-400">/</span>
                 </li>
-                <li className="text-gray-900 font-bold" aria-current="page">
+                <li className="text-[#013175] font-bold" aria-current="page">
                   {locale === 'ar' ? 'أنواع المحتوى المتاح' : 'Types of Content Available'}
                 </li>
               </ol>
@@ -159,16 +161,14 @@ export default async function ContentTypesPage({ params }: { params: Promise<{ l
                 className={`flex flex-col align-center justify-center gap-2 ${isRTL ? 'text-right' : 'text-left'} text-left`}
                 style={{ lineHeight: '1.3' }}
               >
-                <h1 className="text-3xl sm:text-4xl md:text-5xl font-extrabold tracking-tight text-black">
+                <h1 className="text-3xl sm:text-4xl md:text-5xl font-extrabold tracking-tight text-[#013175]">
                   {locale === 'ar' ? 'أنواع المحتوى المتاح' : 'Types of Content Available'}
                 </h1>
                 <h2
-                  className={`text-3xl sm:text-4xl md:text-5xl font-extrabold bg-clip-text text-transparent ${
-                    isRTL ? 'bg-gradient-to-l from-blue-800 to-teal-600' : 'bg-gradient-to-r from-blue-500 to-teal-400'
-                  }`}
-                >
-                  {locale === 'ar' ? 'محتوى متنوع' : 'Diverse Content'}
-                </h2>
+                  className={`text-3xl sm:text-4xl md:text-4xl font-medium text-[#7D7D7D] `}
+                  >
+                    {locale === 'ar' ? 'محتوى متنوع' : 'Diverse Content'}
+                  </h2>
               </div>
             </div>
           </div>

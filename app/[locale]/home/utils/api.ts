@@ -191,7 +191,7 @@ export async function fetchStatisticsPerType(
     
     const response = await fetch(url.toString(), {
       headers,
-      cache: 'no-store'
+      next: { revalidate: 30 } // Cache for 30 seconds for better performance
     });
     
     // Handle 422 validation errors specifically
@@ -366,12 +366,9 @@ export async function fetchSearchResults(
       headers.Authorization = `Bearer ${token}`;
     }
     
-    try {
-      console.log('[fetchSearchResults] URL:', url.toString());
-    } catch {}
     const response = await fetch(url.toString(), {
       headers,
-      cache: 'no-store'
+      next: { revalidate: 30 } // Cache for 30 seconds for better performance
     });
     
     // Handle 422 validation errors specifically
