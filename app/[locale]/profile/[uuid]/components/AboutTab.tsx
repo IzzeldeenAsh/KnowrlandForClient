@@ -75,6 +75,15 @@ export default function AboutTab({
     return `https://${trimmed}`;
   };
 
+  const formatSocialUrl = (url: string) => {
+    if (!url) return "";
+    const trimmed = url.trim();
+    if (trimmed.startsWith("http://") || trimmed.startsWith("https://")) {
+      return trimmed;
+    }
+    return `https://${trimmed}`;
+  };
+
   const handleCopyWebsite = async (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
@@ -194,7 +203,7 @@ export default function AboutTab({
           return (
             <a
               key={p.key}
-              href={s!.link}
+              href={formatSocialUrl(s!.link)}
               target="_blank"
               rel="noopener noreferrer"
               {...commonProps}
@@ -211,7 +220,7 @@ export default function AboutTab({
     <div className="py-8 px-6 md:px-10">
       <div className="prose max-w-none dark:prose-invert">
         {/* Bio Section - first (only shown for non-company profiles with bio) */}
-        {!isCompany && profileData.bio && (
+        {enterpriseType === "insighter" && profileData.bio && (
           <div
             className="bg-gray-50 dark:bg-slate-700/30 p-6 rounded-xl mb-10"
             data-aos="fade-up"
@@ -602,25 +611,7 @@ export default function AboutTab({
             )}
         </div>
 
-        {/* Show only Social Media when there's no bio but social media exists */}
-        {!isCompany &&
-          !profileData.bio &&
-          profileData.social &&
-          profileData.social.length > 0 && (
-            <div
-              className="bg-gray-50 dark:bg-slate-700/30 p-6 rounded-xl mb-10 mt-10"
-              data-aos="fade-up"
-            >
-              <div className="grid grid-cols-1 gap-6">
-                <div className="bg-white dark:bg-slate-800 p-4 rounded-xl shadow-sm">
-                  <h3 className="text-xl font-semibold mb-4">
-                    {t("socialMedia")}
-                  </h3>
-                  {renderSocialRow(profileData.social)}
-                </div>
-              </div>
-            </div>
-          )}
+       
       </div>
     </div>
   );
