@@ -1294,20 +1294,4 @@ const SearchBar: React.FC<SearchBarProps> = ({
   );
 };
 
-export default memo(SearchBar, (prevProps, nextProps) => {
-  // Custom comparison function to optimize re-renders
-  return (
-    prevProps.searchQuery === nextProps.searchQuery &&
-    prevProps.searchType === nextProps.searchType &&
-    prevProps.locale === nextProps.locale &&
-    prevProps.placeholder === nextProps.placeholder &&
-    prevProps.isicCodeFilter === nextProps.isicCodeFilter &&
-    prevProps.hsCodeFilter === nextProps.hsCodeFilter &&
-    prevProps.accuracyFilter === nextProps.accuracyFilter
-  );
-});
-
-// ISIC Modal and HS Modal rendering
-// Keep modals outside memo compare; they rely on internal state
-// We'll extend the component by appending modal JSX via prototype hacking is not possible here,
-// so include them inside the component return above would be cleaner. Add them just after the suggestions dropdown.
+export default SearchBar;

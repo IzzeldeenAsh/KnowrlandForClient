@@ -1864,9 +1864,8 @@ const FilterBox: React.FC<FilterBoxProps> = React.memo(({
             isDisabled={isDisabled}
             onSelect={(val) => {
               if (isDisabled) return;
+              // Parent handler now clears the mutually exclusive filters (region, country)
               setEconomicBlocFilter?.(parseInt(val));
-              setRegionFilter?.(null);
-              setCountryFilter?.(null);
               setIsEconomicBlocModalOpen(false);
             }}
           />
@@ -1917,9 +1916,8 @@ const FilterBox: React.FC<FilterBoxProps> = React.memo(({
             isDisabled={isDisabled}
             onSelect={(val) => {
               if (isDisabled) return;
+              // Parent handler now clears the mutually exclusive filters (economic_bloc, country)
               setRegionFilter?.(parseInt(val));
-              setEconomicBlocFilter?.(null);
-              setCountryFilter?.(null);
               setIsRegionModalOpen(false);
             }}
           />
@@ -1970,9 +1968,8 @@ const FilterBox: React.FC<FilterBoxProps> = React.memo(({
             isDisabled={isDisabled}
             onSelect={(val) => {
               if (isDisabled) return;
+              // Parent handler now clears the mutually exclusive filters (economic_bloc, region)
               setCountryFilter?.(parseInt(val));
-              setEconomicBlocFilter?.(null);
-              setRegionFilter?.(null);
               setIsCountryModalOpen(false);
             }}
           />
@@ -2001,24 +1998,6 @@ const FilterBox: React.FC<FilterBoxProps> = React.memo(({
   }
 
   return FilterContent();
-}, (prevProps, nextProps) => {
-  // Custom comparison function to prevent unnecessary re-renders
-  // Only re-render if props that actually affect the component have changed
-  const propsToCompare: (keyof FilterBoxProps)[] = [
-    'locale', 'searchType', 'languageFilter', 'countryFilter', 'regionFilter',
-    'economicBlocFilter', 'tagFilter', 'isicCodeFilter', 'hsCodeFilter', 'industryFilter',
-    'priceFilter', 'rangeStartFilter', 'rangeEndFilter', 'accuracyFilter',
-    'roleFilter', 'isDrawerOpen', 'forceDrawerMode', 'yearOfStudyFilter'
-  ];
-
-  // Compare only the important props, ignore function references unless they're actually different
-  for (const prop of propsToCompare) {
-    if (prevProps[prop] !== nextProps[prop]) {
-      return false; // Props changed, should re-render
-    }
-  }
-
-  return true; // Props are the same, don't re-render
 });
 
 FilterBox.displayName = 'FilterBox';
