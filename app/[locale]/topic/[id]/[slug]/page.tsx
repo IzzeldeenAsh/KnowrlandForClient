@@ -162,7 +162,7 @@ export default async function TopicPage({ params }: Props) {
           <section className="max-w-container relative mx-auto mt-10 w-full px-4 sm:px-6 lg:px-8 pb-12">
             <div className="max-w-6xl mx-auto">
               <h2 className={`text-xl font-bold text-transparent ${isRTL ? 'bg-gradient-to-l from-blue-400 to-teal-500' : 'bg-gradient-to-r from-blue-500 to-teal-400'} bg-clip-text mb-8`}>
-                {messages?.topic?.knowledge || (locale === 'ar' ? 'الرؤى' : 'Insights')}
+                {messages?.topic?.knowledge || (locale === 'ar' ? 'المستندات' : 'Insights')}
               </h2>
               <KnowledgeGrid knowledge={topic.knowledge} topicName={topic.name} showHeader={false} />
             </div>

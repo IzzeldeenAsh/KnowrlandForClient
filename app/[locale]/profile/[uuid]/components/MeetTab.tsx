@@ -1564,12 +1564,12 @@ export default function MeetTab({
               {locale.startsWith('ar') ? 'تهانينا!' : 'Congratulations!'}
             </h1>
             <h2 className="text-xl font-semibold text-gray-800 dark:text-gray-200 mb-3">
-              {locale.startsWith('ar') ? 'تم حجز الاجتماع بنجاح!' : 'Meeting Booked Successfully!'}
+              {locale.startsWith('ar') ? 'تم حجز الجلسة الاستشارية بنجاح!' : 'Session Booked Successfully!'}
             </h2>
             <p className="text-gray-600 dark:text-gray-400 mb-8">
               {locale.startsWith('ar')
-                ? 'تم حجز الاجتماع بنجاح وانتظر الموافقة عليه من الإنسايتر.'
-                : 'Your meeting has been successfully booked and is waiting for Insighter\'s approval.'}
+                ? 'تم حجز الجلسة الاستشارية بنجاح وانتظر الموافقة عليه من الإنسايتر.'
+                : 'Your session has been successfully booked and is waiting for Insighter\'s approval.'}
             </p>
 
 
@@ -1581,7 +1581,7 @@ export default function MeetTab({
                 window.location.href = "https://app.insightabusiness.com/app/insighter-dashboard/my-meetings?tab=my-meetings";
               }}
             >
-              {locale.startsWith('ar') ? 'اذهب إلى الاجتماعات' : 'Go to Meetings'}
+              {locale.startsWith('ar') ? 'اذهب إلى الجلسات الاستشارية' : 'Go to Sessions'}
             </Button>
           </div>
         </Modal>

@@ -246,8 +246,8 @@ export default function KnowledgeGrid({
   
   // Localized strings
   const translations = {
-    knowledge: isRTL ? "الرؤى" : "Insights",
-    exploreInsights: isRTL ? `استكشف الرؤى ضمن ${topicName}` : `Explore insights within ${topicName}`,
+    knowledge: isRTL ? "المستندات" : "Insights",
+    exploreInsights: isRTL ? `استكشف المستندات ضمن ${topicName}` : `Explore insights within ${topicName}`,
     noItems: isRTL ? "لا توجد عناصر معرفية متاحة بعد" : "No knowledge items available yet",
     posted: isRTL ? "نُشر" : "Posted",
     free: isRTL ? "مجاني" : "Free",

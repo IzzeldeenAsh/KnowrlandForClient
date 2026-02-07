@@ -1772,7 +1772,7 @@ function ProfilePageContent() {
                               >
                                 <button className="w-full bg-white text-xs text-gray-900 border border-gray-300 px-6 py-2 rounded-md font-medium hover:bg-blue-50 transition-all duration-300">
                                   {locale === "ar"
-                                    ? "عرض الرؤى المنشورة"
+                                    ? "عرض المستندات المنشورة"
                                     : "View Published Insights"}
                                 </button>
                               </Link>

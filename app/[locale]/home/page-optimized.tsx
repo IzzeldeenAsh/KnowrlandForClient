@@ -397,7 +397,7 @@ export default function HomePageOptimized() {
                         name="statistic" 
                         label="Statistics" 
                       locale={locale} 
-                      arLabel="الرؤى" 
+                      arLabel="المستندات" 
                       isSelected={filterState.category === 'insight'} 
                       onClick={() => handleCategorySelect('insight')} 
                       count={categoryCounts['insight']}
