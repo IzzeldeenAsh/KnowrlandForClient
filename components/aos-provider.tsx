@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react'
 import AOS from 'aos'
 import 'aos/dist/aos.css'
 
-// Global flag to prevent multiple AOS initializations
+// Globa dl flag to prevent multiple AOS initializations
 let aosInitialized = false
 
 // Safe AOS utility function that can be used by components
