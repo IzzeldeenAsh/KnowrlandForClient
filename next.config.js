@@ -11,6 +11,8 @@ const nextConfig = {
     ],
   },
   reactStrictMode: false,
+  // Avoid Next inferring a higher "workspace root" (multiple lockfiles)
+  outputFileTracingRoot: __dirname,
   async headers() {
     return [
       {

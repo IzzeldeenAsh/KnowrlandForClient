@@ -1,4 +1,5 @@
 import type { NextConfig } from 'next';
+import path from 'path';
 const createNextIntlPlugin = require('next-intl/plugin');
 
 const withNextIntl = createNextIntlPlugin();
@@ -13,6 +14,8 @@ const nextConfig: NextConfig = {
   reactStrictMode: false,
   // Add these settings for better dynamic route handling
   output: 'standalone',
+  // Avoid Next inferring a higher "workspace root" (multiple lockfiles)
+  outputFileTracingRoot: path.join(__dirname),
   // This helps with dynamic routes in production
   async headers() {
     return [
