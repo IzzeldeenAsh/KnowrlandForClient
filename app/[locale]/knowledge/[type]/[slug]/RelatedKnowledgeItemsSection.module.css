@@ -38,9 +38,9 @@
 }
 
 /* Swiper navigation uses these custom classes (so Swiper's default "lock" CSS won't hide our arrows) */
-:global(.knoldg-swiper-nav-disabled),
-:global(.knoldg-swiper-nav-locked),
-:global(.knoldg-swiper-nav-hidden) {
+.relatedItemsCarousel :global(.knoldg-swiper-nav-disabled),
+.relatedItemsCarousel :global(.knoldg-swiper-nav-locked),
+.relatedItemsCarousel :global(.knoldg-swiper-nav-hidden) {
   opacity: 0.4;
   pointer-events: none;
 }
