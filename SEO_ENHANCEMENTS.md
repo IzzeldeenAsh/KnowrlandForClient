@@ -12,7 +12,7 @@ This document outlines the SEO improvements implemented for the Insighta Busines
   - Includes industry-by-type pages
   - Supports hreflang tags for multilingual content
   - Sets appropriate priorities and change frequencies
-  - Accessible at: `http://insightabusiness.com/sitemap.xml`
+  - Accessible at: `http://foresighta.co/sitemap.xml`
 
 ### 2. Robots.txt (`app/robots.ts`)
 - **Purpose**: Controls search engine crawler access
@@ -20,14 +20,14 @@ This document outlines the SEO improvements implemented for the Insighta Busines
   - Allows all public pages
   - Blocks private/user-specific routes (API, checkout, payment, profile, etc.)
   - References the sitemap location
-  - Accessible at: `http://insightabusiness.com/robots.txt`
+  - Accessible at: `http://foresighta.co/robots.txt`
 
 ### 3. Web App Manifest (`app/manifest.ts`)
 - **Purpose**: Provides metadata for PWA support and better mobile experience
 - **Features**:
   - Defines app name, description, and icons
   - Sets theme colors and display mode
-  - Accessible at: `http://insightabusiness.com/manifest.json`
+  - Accessible at: `http://foresighta.co/manifest.json`
 
 ### 4. Enhanced Metadata (`app/[locale]/layout.tsx`)
 - **Purpose**: Improves SEO with comprehensive metadata
@@ -91,9 +91,9 @@ This document outlines the SEO improvements implemented for the Insighta Busines
 To verify the sitemap is working:
 1. Build the project: `npm run build`
 2. Start the server: `npm run start`
-3. Visit: `https://insightabusiness.com/sitemap.xml`
-4. Check robots.txt: `https://insightabusiness.com/robots.txt`
-5. Check manifest: `https://insightabusiness.com/manifest.json`
+3. Visit: `https://foresighta.co/sitemap.xml`
+4. Check robots.txt: `https://foresighta.co/robots.txt`
+5. Check manifest: `https://foresighta.co/manifest.json`
 
 ## Search Engine Submission
 
@@ -102,7 +102,7 @@ After deployment, submit your sitemap to:
 - **Bing Webmaster Tools**: https://www.bing.com/webmasters
 - **Yandex Webmaster**: https://webmaster.yandex.com
 
-Submit the sitemap URL: `http://insightabusiness.com/sitemap.xml`
+Submit the sitemap URL: `http://foresighta.co/sitemap.xml`
 
 ## Notes
 

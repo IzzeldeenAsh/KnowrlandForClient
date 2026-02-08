@@ -135,7 +135,7 @@ All structured data generation is centralized in `utils/seo.ts`:
 ### Base URL Configuration
 All schemas use the base URL from environment variable:
 ```typescript
-const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'http://insightabusiness.com';
+const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'http://foresighta.co';
 ```
 
 ### Multilingual Support

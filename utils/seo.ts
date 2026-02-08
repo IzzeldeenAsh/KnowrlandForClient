@@ -49,7 +49,7 @@ export function generateKnowledgeMetadata(
   slug: string
 ): Metadata {
   const isRTL = locale === 'ar';
-  const baseUrl = 'https://insightabusiness.com';
+  const baseUrl = 'https://foresighta.co';
   const defaultSocialImage = 'https://res.cloudinary.com/dsiku9ipv/image/upload/v1761651021/drilldown_l7cdf2.jpg';
   let metadataBase: URL | undefined;
 
@@ -57,7 +57,7 @@ export function generateKnowledgeMetadata(
     metadataBase = new URL(baseUrl);
   } catch (error) {
     console.error('Invalid base URL provided, falling back to default.', error);
-    metadataBase = new URL('https://insightabusiness.com');
+    metadataBase = new URL('https://foresighta.co');
   }
 
   const currentUrl = `${baseUrl}/${locale}/knowledge/${type}/${slug}`;
@@ -262,7 +262,7 @@ export function generateKnowledgeMetadata(
 }
 
 export function generateStructuredData(knowledge: KnowledgeMetadata, locale: string, type: string, slug: string) {
-  const baseUrl = 'https://insightabusiness.com';
+  const baseUrl = 'https://foresighta.co';
   const currentUrl = `${baseUrl}/${locale}/knowledge/${type}/${slug}`;
   
   const avgRating = knowledge.review && knowledge.review.length > 0
@@ -596,7 +596,7 @@ export function generateStructuredData(knowledge: KnowledgeMetadata, locale: str
 
 // Organization and WebSite Schema for Home Page
 export function generateOrganizationSchema(locale: string) {
-  const baseUrl = 'https://insightabusiness.com';
+  const baseUrl = 'https://foresighta.co';
   
   return {
     "@context": "https://schema.org",
@@ -624,7 +624,7 @@ export function generateOrganizationSchema(locale: string) {
 
 // WebSite Schema with SearchAction
 export function generateWebSiteSchema(locale: string) {
-  const baseUrl = 'https://insightabusiness.com';
+  const baseUrl = 'https://foresighta.co';
   
   return {
     "@context": "https://schema.org",
@@ -672,7 +672,7 @@ export function generateIndustryStructuredData(
   breadcrumbItems: Array<{ label: string; url: string }>,
   locale: string
 ) {
-  const baseUrl = 'https://insightabusiness.com';
+  const baseUrl = 'https://foresighta.co';
   const currentUrl = `${baseUrl}/${locale}/industry/${industry.id}/${industry.slug}`;
   
   // ItemList Schema for sub-industries
@@ -753,7 +753,7 @@ export function generateProfileStructuredData(
   profile: ProfileData,
   locale: string
 ) {
-  const baseUrl = 'https://insightabusiness.com';
+  const baseUrl = 'https://foresighta.co';
   const profileUrl = `${baseUrl}/${locale}/profile/${profile.uuid}`;
   
   // If it's a company profile
@@ -832,7 +832,7 @@ export function generateTopicStructuredData(
   locale: string,
   type: 'topic' | 'sub-industry'
 ) {
-  const baseUrl = 'https://insightabusiness.com';
+  const baseUrl = 'https://foresighta.co';
   const currentUrl = `${baseUrl}/${locale}/${type === 'topic' ? 'topic' : 'sub-industry'}/${topic.id}/${topic.slug}`;
   
   // BreadcrumbList Schema

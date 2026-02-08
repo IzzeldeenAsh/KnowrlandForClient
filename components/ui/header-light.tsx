@@ -20,7 +20,7 @@ export default function Header() {
   // Function to switch locale and store in cookie
   const switchLocale = (locale: string) => {
     // Set the language preference in a cookie - expires in 1 year
-    document.cookie = `preferred_language=${locale}; max-age=${60 * 60 * 24 * 365}; path=/; Domain=.insightabusiness.com;`;
+    document.cookie = `preferred_language=${locale}; max-age=${60 * 60 * 24 * 365}; path=/; Domain=.foresighta.co;`;
     
     // Get the current path without locale prefix
     const currentPath = pathname.split('/').slice(2).join('/');

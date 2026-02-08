@@ -39,7 +39,7 @@ export function useUserProfile() {
         if (isLocalhost) {
           document.cookie = `${name}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;`;
         } else {
-          document.cookie = `${name}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/; Domain=.insightabusiness.com; Secure; SameSite=None;`;
+          document.cookie = `${name}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/; Domain=.foresighta.co; Secure; SameSite=None;`;
         }
       };
       
@@ -58,7 +58,7 @@ export function useUserProfile() {
     const timestamp = new Date().getTime();
     
     // Perform a coordinated logout by redirecting to the Angular app's logout endpoint
-    window.location.href = `https://app.insightabusiness.com/auth/logout?redirect_uri=${encodeURIComponent(`https://insightabusiness.com/${locale}?t=${timestamp}`)}`;    
+    window.location.href = `https://app.foresighta.co/auth/logout?redirect_uri=${encodeURIComponent(`https://foresighta.co/${locale}?t=${timestamp}`)}`;    
   };
 
   return { user, roles, isLoading, isAuthResolved, handleSignOut };

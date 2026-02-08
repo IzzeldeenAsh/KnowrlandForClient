@@ -41,7 +41,7 @@ npm run lint         # Run Next.js ESLint
 - All components must support RTL/LTR layout switching
 
 **2. API Integration:**
-- Base API URL: `https://api.insightabusiness.com`
+- Base API URL: `https://api.foresighta.co`
 - Uses Axios with interceptors for token management
 - Authentication via localStorage token + cookie fallback
 - Standard headers include locale, timezone, and bearer token
@@ -134,7 +134,7 @@ app/[locale]/                    # Internationalized routes
 
 **Cookie Management:**
 - Development: SameSite=Lax for localhost
-- Production: SameSite=None, Secure, Domain=.insightabusiness.com
+- Production: SameSite=None, Secure, Domain=.foresighta.co
 
 **Common API Endpoints:**
 - Knowledge operations: `/api/platform/knowledge/*`

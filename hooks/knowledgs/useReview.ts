@@ -25,7 +25,7 @@ export function useReview(knowledgeSlug: string): UseReviewReturn {
         throw new Error("You must be signed in to submit a review.");
       }
       const response = await fetch(
-        `https://api.insightabusiness.com/api/account/review/knowledge/${knowledgeSlug}`,
+        `https://api.foresighta.co/api/account/review/knowledge/${knowledgeSlug}`,
         {
           method: "POST",
           headers: {
