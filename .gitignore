@@ -12,3 +12,5 @@ yarn-error.log
 # Local env (never commit secrets)
 .env.local
 .env.*.local
+
+.npm-cache
