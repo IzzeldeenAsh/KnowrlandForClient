@@ -2,9 +2,11 @@
 
 import { useEffect, useId, useMemo } from 'react'
 import Link from 'next/link'
-import { Badge, Rating, Text } from '@mantine/core'
+import { useRouter } from 'next/navigation'
+import { Avatar, Badge, Rating, Text } from '@mantine/core'
 import { formatDistanceToNow } from 'date-fns'
 import { arSA, enUS } from 'date-fns/locale'
+import { useTranslations } from 'next-intl'
 
 /* Swiper v11+ */
 import Swiper, { Autoplay, Navigation } from 'swiper'
@@ -31,6 +33,18 @@ export type RelatedKnowledgeSummaryItem = {
   paid_status?: 'free' | 'partial_paid' | 'paid' | string
   review_summary?: { count?: number; average?: number }
   total_downloads?: number
+  insighter?: {
+    uuid: string
+    name: string
+    profile_photo_url: string | null
+    roles?: string[]
+    company?: {
+      uuid: string
+      legal_name: string
+      logo: string
+      verified?: boolean
+    }
+  }
 }
 
 type Props = {
@@ -67,6 +81,15 @@ function formatPublishedDate(dateString: string, locale: string) {
   return formatDistanceToNow(utcDate, { addSuffix: true, locale: selectedLocale })
 }
 
+function getInitials(name: string) {
+  if (!name) return ''
+  return name
+    .split(' ')
+    .map((w) => w[0])
+    .join('')
+    .toUpperCase()
+}
+
 function TypeIcon({ type }: { type: string }) {
   const t = (type || '').toLowerCase()
   if (t === 'data') return <DataIcon width={18} height={18} />
@@ -83,6 +106,8 @@ export default function RelatedKnowledgeSummarySection({
   items,
   backgroundImageUrl = 'https://res.cloudinary.com/dsiku9ipv/image/upload/v1770277460/photo-1707209856575-a80b9dff5524_rkowxg.png',
 }: Props) {
+  const router = useRouter()
+  const t = useTranslations()
   const reactId = useId()
   const uid = useMemo(() => reactId.replace(/[:]/g, ''), [reactId])
 
@@ -119,14 +144,18 @@ export default function RelatedKnowledgeSummarySection({
   }, [items, carouselClass, nextClass, prevClass])
 
   const copy = {
-    title: isRTL ? 'استكشف كنوز المعرفة المشابهة' : 'Discover More Insights Gems',
+    title: isRTL ? 'استكشف كنوز المعرفة المشابهة' : 'Discover Top Valuable Insights',
     subtitle: isRTL
-      ? 'اكتشف محتوى مشابهًا قد يهمك—من نفس الصناعة أو المواضيع القريبة.'
-      : 'Explore similar content you might like—based on nearby industries and topics.',
+      ? 'اكتشف أفضل الرؤى المقدمة من نفس الصناعة أو المواضيع القريبة.'
+      : 'Explore top valuable insights—based on nearby industries and topics.',
     posted: isRTL ? 'نُشر' : 'Posted',
     free: isRTL ? 'مجاني' : 'Free',
     paid: isRTL ? 'مدفوع' : 'Paid',
+    freeDocs: isRTL ? "مستندات مجانية" : "Free docs",
     partial: isRTL ? 'مدفوع جزئي' : 'Partial paid',
+    by: isRTL ? 'من قبل' : 'By',
+    company: isRTL ? 'الشركة' : 'Company',
+    insighter: isRTL ? 'إنسايتر' : 'Insighter',
     previous: isRTL ? 'السابق' : 'Previous',
     next: isRTL ? 'التالي' : 'Next',
   }
@@ -210,7 +239,7 @@ export default function RelatedKnowledgeSummarySection({
                         className="flex flex-col h-full"
                       >
                         <div
-                          className="shrink-0 p-6 min-h-[190px] bg-cover bg-center bg-no-repeat"
+                          className="shrink-0 p-6 min-h-[200px] bg-cover bg-center bg-no-repeat"
                           style={{
                             backgroundImage:
                               'linear-gradient(to right bottom, rgba(30, 41, 59, 0.35), rgba(15, 23, 42, 0.6)), url("https://res.cloudinary.com/dsiku9ipv/image/upload/v1766389693/Image_shared-item_cards-preview_image_component__image_2_1_tfd8ig.webp")',
@@ -219,7 +248,7 @@ export default function RelatedKnowledgeSummarySection({
                           <div className="flex items-center gap-2">
                             <TypeIcon type={item.type} />
                             <Badge className="capitalize bg-blue-500 text-white" variant="filled">
-                              {item.type}
+                              {t(`typeLabel.${(item.type || '').toLowerCase()}`, { defaultValue: item.type })}
                             </Badge>
                           </div>
 
@@ -255,7 +284,109 @@ export default function RelatedKnowledgeSummarySection({
                             </Text>
                           )}
 
-                          <div className="mt-auto pt-3 border-t border-slate-100 flex items-center justify-between gap-3">
+                          {item.insighter?.name && (() => {
+                            const ins = item.insighter
+                            const roles = Array.isArray(ins.roles) ? ins.roles : []
+                            const isCompany = roles.includes('company') || roles.includes('company-insighter')
+
+                            const companyHref = ins.company?.uuid ? `/${locale}/profile/${ins.company.uuid}` : undefined
+                            const insighterHref = ins.uuid ? `/${locale}/profile/${ins.uuid}?entity=insighter` : undefined
+
+                            const primaryHref = isCompany ? companyHref : insighterHref
+                            const primaryAvatarSrc =
+                              isCompany && ins.company?.logo ? ins.company.logo : ins.profile_photo_url
+                            const primaryTitle = isCompany ? (ins.company?.legal_name || copy.company) : ins.name.toLowerCase()
+
+                            return (
+                              <div className="mt-4 flex items-center justify-between gap-3">
+                                <div
+                                  role="button"
+                                  tabIndex={0}
+                                  onClick={(e) => {
+                                    e.preventDefault()
+                                    e.stopPropagation()
+                                    if (primaryHref) router.push(primaryHref)
+                                  }}
+                                  onKeyDown={(e) => {
+                                    if (e.key === 'Enter' || e.key === ' ') {
+                                      e.preventDefault()
+                                      e.stopPropagation()
+                                      if (primaryHref) router.push(primaryHref)
+                                    }
+                                  }}
+                                  className="flex items-center min-w-0 hover:opacity-95 transition text-start"
+                                >
+                                  <div className="relative">
+                                    <Avatar src={primaryAvatarSrc} radius="xl" alt={primaryTitle} size="md">
+                                      {!primaryAvatarSrc && getInitials(ins.name)}
+                                    </Avatar>
+
+                                    {isCompany && ins.profile_photo_url && (
+                                      <span
+                                        role="button"
+                                        tabIndex={0}
+                                        onClick={(e) => {
+                                          e.preventDefault()
+                                          e.stopPropagation()
+                                          if (insighterHref) router.push(insighterHref)
+                                        }}
+                                        onKeyDown={(e) => {
+                                          if (e.key === 'Enter' || e.key === ' ') {
+                                            e.preventDefault()
+                                            e.stopPropagation()
+                                            if (insighterHref) router.push(insighterHref)
+                                          }
+                                        }}
+                                        className="absolute bottom-0 right-0 translate-x-1/3 translate-y-1/3 z-10"
+                                        aria-label={copy.insighter}
+                                      >
+                                        <Avatar
+                                          src={ins.profile_photo_url}
+                                          radius="xl"
+                                          size="xs"
+                                          alt={ins.name}
+                                          style={{ boxShadow: '0 0 0 2px white' }}
+                                        />
+                                      </span>
+                                    )}
+                                  </div>
+
+                                  <div className="ms-3 min-w-0">
+                                    <Text fw={700} size="sm" className="capitalize truncate">
+                                      {primaryTitle}
+                                    </Text>
+                                    <Text c="dimmed" size="xs" className="capitalize truncate">
+                                      {!isCompany ? (
+                                        copy.insighter
+                                      ) : (
+                                        <span
+                                          role="link"
+                                          tabIndex={0}
+                                          onClick={(e) => {
+                                            e.preventDefault()
+                                            e.stopPropagation()
+                                            if (insighterHref) router.push(insighterHref)
+                                          }}
+                                          onKeyDown={(e) => {
+                                            if (e.key === 'Enter' || e.key === ' ') {
+                                              e.preventDefault()
+                                              e.stopPropagation()
+                                              if (insighterHref) router.push(insighterHref)
+                                            }
+                                          }}
+                                          className="hover:opacity-90"
+                                        >
+                                          {copy.by} {ins.name.toLowerCase()}
+                                        </span>
+                                      )}
+                                    </Text>
+                                  </div>
+                                </div>
+                              </div>
+                            )
+                          })()}
+
+                          <div className="pt-2 mt-5 border-t border-slate-100 flex items-center justify-between gap-3">
                             <div className="min-w-0">
                               {item.published_at ? (
                                 <Text c="dimmed" size="xs" className="truncate">
@@ -268,9 +399,17 @@ export default function RelatedKnowledgeSummarySection({
 
                             <div className="flex items-center gap-2 shrink-0">
                               {isPartial && (
-                                <Badge color="yellow" variant="light" size="sm" style={{ fontWeight: 600 }}>
-                                  {copy.partial}
-                                </Badge>
+                                 <div className="flex items-center gap-2">
+                                 <Text size="xs" c="dimmed" className="whitespace-nowrap">
+                     {copy.freeDocs} +
+                  </Text>
+                               <Badge color="yellow" variant="light" style={{ fontWeight: 700 }}>
+                                <span dir="ltr" lang="en">
+                                  {formattedPrice} 
+                                </span> 
+                              </Badge>
+                           
+                             </div>
                               )}
                               {isFree && !isPartial && (
                                 <Badge color="green" variant="light" size="sm" style={{ fontWeight: 600 }}>

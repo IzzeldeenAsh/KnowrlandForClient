@@ -2,10 +2,12 @@
 
 import { useEffect, useId, useMemo, useRef, useState } from 'react'
 import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 import { Avatar, Badge, Rating, Text } from '@mantine/core'
 import { ArrowDownTrayIcon, FolderOpenIcon, UserCircleIcon } from '@heroicons/react/24/outline'
 import { formatDistanceToNow } from 'date-fns'
 import { arSA, enUS } from 'date-fns/locale'
+import { useTranslations } from 'next-intl'
 
 /* Swiper v8 */
 import Swiper, { Autoplay, EffectCoverflow } from 'swiper'
@@ -174,6 +176,8 @@ export default function RelatedKnowledgeItemsSection({
   insighterName,
   breadcrumbLabels,
 }: Props) {
+  const router = useRouter()
+  const t = useTranslations()
   const reactId = useId()
   const uid = useMemo(() => reactId.replace(/[:]/g, ''), [reactId])
 
@@ -296,6 +300,9 @@ export default function RelatedKnowledgeItemsSection({
     free: isRTL ? 'مجاني' : 'Free',
     partial: isRTL ? 'مدفوع جزئي' : 'Partial paid',
     freeDocs: isRTL ? "مستندات مجانية" : "Free docs",
+    by: isRTL ? 'من قبل' : 'By',
+    company: isRTL ? 'الشركة' : 'Company',
+    insighter: isRTL ? 'إنسايتر' : 'Insighter',
     downloads: isRTL ? 'تحميل' : 'Downloads',
     download: isRTL ? 'تحميل' : 'Download',
   }
@@ -392,6 +399,7 @@ export default function RelatedKnowledgeItemsSection({
                     const isFree = paidStatus === 'free' || (!paidStatus && isNumericPrice && numericPrice === 0)
                     const isPartial = paidStatus === 'partial_paid'
                     const isPaid = paidStatus === 'paid' || (!paidStatus && normalizedPrice !== '' && numericPrice > 0)
+                    const showPrice = isPartial || (isFree && !isPartial) || (isPaid && normalizedPrice !== '')
 
                     const desc = truncateWords(stripHtml(String(item.description ?? '')), 26)
                     const ratingCount = Number(item.review_summary?.count ?? 0)
@@ -416,8 +424,8 @@ export default function RelatedKnowledgeItemsSection({
                               <div>
                                 <div className="flex items-center mb-3">
                                   <TypeIcon type={item.type} />
-                                  <Badge c="#67b5f6" w="fit-content" className="capitalize ml-2" variant="light">
-                                    {item.type}
+                                  <Badge className=" mx-2 capitalize bg-blue-500 text-white" variant="filled">
+                                    {t(`typeLabel.${(item.type || '').toLowerCase()}`, { defaultValue: item.type })}
                                   </Badge>
                                 </div>
 
@@ -468,64 +476,123 @@ export default function RelatedKnowledgeItemsSection({
 
                             <div className={cardStyles.whiteSection + ' flex flex-col h-full'}>
                               {/* Insighter */}
-                              <div className="flex items-center justify-between pb-4">
-                                {item.insighter?.name ? (
-                                  <Link
-                                    href={`/${locale}/profile/${item.insighter.uuid}?entity=insighter`}
-                                    className="flex items-center min-w-0 hover:opacity-95 transition"
-                                  >
-                                    <div className="relative">
-                                      <Avatar
-                                        src={item.insighter.profile_photo_url}
-                                        radius="xl"
-                                        alt={item.insighter.name}
-                                        size="md"
-                                        className={`${cardStyles.avatar} avatar-top-position`}
+                              <div className="flex items-center pb-4">
+                                {item.insighter?.name ? (() => {
+                                  const ins = item.insighter
+                                  const roles = Array.isArray(ins.roles) ? ins.roles : []
+                                  const isCompany =
+                                    roles.includes('company') || roles.includes('company-insighter')
+
+                                  const companyHref = ins.company?.uuid
+                                    ? `/${locale}/profile/${ins.company.uuid}`
+                                    : undefined
+                                  const insighterHref = ins.uuid
+                                    ? `/${locale}/profile/${ins.uuid}?entity=insighter`
+                                    : undefined
+
+                                  const primaryHref = isCompany ? companyHref : insighterHref
+                                  const primaryAvatarSrc =
+                                    isCompany && ins.company?.logo ? ins.company.logo : ins.profile_photo_url
+                                  const primaryTitle = isCompany
+                                    ? (ins.company?.legal_name || copy.company)
+                                    : ins.name.toLowerCase()
+
+                                  return (
+                                    <div className="flex items-center min-w-0">
+                                      <div
+                                        role="button"
+                                        tabIndex={0}
+                                        onClick={(e) => {
+                                          e.preventDefault()
+                                          e.stopPropagation()
+                                          if (primaryHref) router.push(primaryHref)
+                                        }}
+                                        onKeyDown={(e) => {
+                                          if (e.key === 'Enter' || e.key === ' ') {
+                                            e.preventDefault()
+                                            e.stopPropagation()
+                                            if (primaryHref) router.push(primaryHref)
+                                          }
+                                        }}
+                                        className="flex items-center min-w-0 hover:opacity-95 transition text-start"
                                       >
-                                        {!item.insighter.profile_photo_url && getInitials(item.insighter.name)}
-                                      </Avatar>
+                                        <div className="relative">
+                                          <Avatar
+                                            src={primaryAvatarSrc}
+                                            radius="xl"
+                                            alt={primaryTitle}
+                                            size="md"
+                                            className={`${cardStyles.avatar} avatar-top-position`}
+                                          >
+                                            {!primaryAvatarSrc && getInitials(ins.name)}
+                                          </Avatar>
+
+                                          {isCompany && ins.profile_photo_url && (
+                                            <span
+                                              role="button"
+                                              tabIndex={0}
+                                              onClick={(e) => {
+                                                e.preventDefault()
+                                                e.stopPropagation()
+                                                if (insighterHref) router.push(insighterHref)
+                                              }}
+                                              onKeyDown={(e) => {
+                                                if (e.key === 'Enter' || e.key === ' ') {
+                                                  e.preventDefault()
+                                                  e.stopPropagation()
+                                                  if (insighterHref) router.push(insighterHref)
+                                                }
+                                              }}
+                                              className="absolute bottom-0 right-0 translate-x-1/3 translate-y-1/3 z-10"
+                                              aria-label={copy.insighter}
+                                            >
+                                              <Avatar
+                                                src={ins.profile_photo_url}
+                                                radius="xl"
+                                                size="xs"
+                                                className="rounded-full avatar-top-position"
+                                                alt={ins.name}
+                                                style={{ boxShadow: '0 0 0 2px white' }}
+                                              />
+                                            </span>
+                                          )}
+                                        </div>
+                                        <div className="ms-3 min-w-0">
+                                          <Text fw={700} size="sm" className="capitalize truncate">
+                                            {primaryTitle}
+                                          </Text>
+                                          <Text c="dimmed" size="xs" className="capitalize truncate">
+                                            {!isCompany ? (
+                                              copy.insighter
+                                            ) : (
+                                              <span
+                                                role="link"
+                                                tabIndex={0}
+                                                onClick={(e) => {
+                                                  e.preventDefault()
+                                                  e.stopPropagation()
+                                                  if (insighterHref) router.push(insighterHref)
+                                                }}
+                                                onKeyDown={(e) => {
+                                                  if (e.key === 'Enter' || e.key === ' ') {
+                                                    e.preventDefault()
+                                                    e.stopPropagation()
+                                                    if (insighterHref) router.push(insighterHref)
+                                                  }
+                                                }}
+                                                className="hover:opacity-90"
+                                              >
+                                                {copy.by} {ins.name.toLowerCase()}
+                                              </span>
+                                            )}
+                                          </Text>
+                                        </div>
+                                      </div>
                                     </div>
-                                    <div className="ms-3 min-w-0">
-                                      <Text fw={700} size="sm" className="capitalize truncate">
-                                        {item.insighter.name.toLowerCase()}
-                                      </Text>
-                                      <Text c="dimmed" size="xs" className="capitalize truncate">
-                                        {isRTL ? 'إنسايتر' : 'Insighter'}
-                                      </Text>
-                                    </div>
-                                  </Link>
-                                ) : (
+                                  )
+                                })() : (
                                   <div />
                                 )}
-
-                                {/* Pricing badge */}
-                                <div className="flex items-center gap-2">
-                                  {isPartial && (
-                                   <div className="flex items-center gap-2">
-                                       <Text size="xs" c="dimmed" className="whitespace-nowrap">
-                           {copy.freeDocs} +
-                        </Text>
-                                     <Badge color="yellow" variant="light" className={cardStyles.priceBadge} style={{ fontWeight: 700 }}>
-                                      <span dir="ltr" lang="en">
-                                        {formattedPrice} 
-                                      </span> 
-                                    </Badge>
-                                 
-                                   </div>
-                                  )}
-                                  {isFree && !isPartial && (
-                                    <Badge color="green" variant="light" className={cardStyles.priceBadge} style={{ fontWeight: 700 }}>
-                                      {copy.free}
-                                    </Badge>
-                                  )}
-                                  {isPaid && normalizedPrice !== '' && (
-                                    <Badge color="yellow" variant="light" className={cardStyles.priceBadge}>
-                                      <span dir="ltr" lang="en">
-                                        {formattedPrice}
-                                      </span>
-                                    </Badge>
-                                  )}
-                                </div>
                               </div>
 
                               {/* Description */}
@@ -536,11 +603,62 @@ export default function RelatedKnowledgeItemsSection({
                               )} */}
 
                               {/* Published */}
-                              {item.published_at && (
+                              {(item.published_at || showPrice) && (
                                 <div className="mt-4 pt-3 border-t border-slate-100">
-                                  <Text c="dimmed" size="xs">
-                                    {copy.posted} {formatPublishedDate(item.published_at, locale)}
-                                  </Text>
+                                  <div
+                                    className={[
+                                      'flex items-center gap-3',
+                                      isRTL ? 'flex-row-reverse' : '',
+                                      item.published_at ? 'justify-between' : (isRTL ? 'justify-start' : 'justify-end'),
+                                    ].join(' ')}
+                                  >
+                                    {item.published_at ? (
+                                      <Text c="dimmed" size="xs">
+                                        {copy.posted} {formatPublishedDate(item.published_at, locale)}
+                                      </Text>
+                                    ) : (
+                                      <span />
+                                    )}
+
+                                    {showPrice && (
+                                      <div className="flex items-center gap-2 shrink-0">
+                                        {isPartial && (
+                                          <div className="flex items-center gap-2">
+                                            <Text size="xs" c="dimmed" className="whitespace-nowrap">
+                                              {copy.freeDocs} +
+                                            </Text>
+                                            <Badge
+                                              color="yellow"
+                                              variant="light"
+                                              className={cardStyles.priceBadge}
+                                              style={{ fontWeight: 700 }}
+                                            >
+                                              <span dir="ltr" lang="en">
+                                                {formattedPrice}
+                                              </span>
+                                            </Badge>
+                                          </div>
+                                        )}
+                                        {isFree && !isPartial && (
+                                          <Badge
+                                            color="green"
+                                            variant="light"
+                                            className={cardStyles.priceBadge}
+                                            style={{ fontWeight: 700 }}
+                                          >
+                                            {copy.free}
+                                          </Badge>
+                                        )}
+                                        {isPaid && normalizedPrice !== '' && (
+                                          <Badge color="yellow" variant="light" className={cardStyles.priceBadge}>
+                                            <span dir="ltr" lang="en">
+                                              {formattedPrice}
+                                            </span>
+                                          </Badge>
+                                        )}
+                                      </div>
+                                    )}
+                                  </div>
                                 </div>
                               )}
                             </div>
