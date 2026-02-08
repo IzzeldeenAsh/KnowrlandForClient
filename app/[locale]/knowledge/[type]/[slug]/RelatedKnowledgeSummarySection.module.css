@@ -1,0 +1,13 @@
+.summaryCarousel :global(.swiper-wrapper) {
+  align-items: stretch;
+}
+
+.summaryCarousel :global(.swiper-slide) {
+  height: auto;
+  display: flex;
+}
+
+.summaryCarousel :global(.swiper-slide) > * {
+  height: 100%;
+}
+

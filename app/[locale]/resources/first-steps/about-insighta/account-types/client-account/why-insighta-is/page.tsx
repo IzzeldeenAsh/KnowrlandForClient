@@ -40,10 +40,10 @@ export default async function WhyInsightaIsPage({ params }: { params: Promise<{ 
 
           <div className="relative z-10 px-4 sm:px-12">
             {/* Breadcrumbs */}
-            <nav className={`mb-6 text-xs md:text-sm ${isRTL ? 'text-right' : 'text-left'}`} aria-label="Breadcrumb">
+            <nav className={`mb-6 text-xs md:text-sm ps-6 md:ps-0 ${isRTL ? 'text-right' : 'text-left'}`} aria-label="Breadcrumb">
               <ol className="flex items-center gap-2 text-gray-700/80 flex-wrap">
                 <li>
-                  <a href={`/${locale}/resources/first-steps`} className="hover:text-gray-900 transition-colors">
+                  <a href={`/${locale}/resources/first-steps`} className="hover:text-[#013175] transition-colors">
                     {locale === 'ar' ? 'الخطوات الأولى' : 'First Steps'}
                   </a>
                 </li>
@@ -51,7 +51,7 @@ export default async function WhyInsightaIsPage({ params }: { params: Promise<{ 
                   <span className="text-gray-400">/</span>
                 </li>
                 <li>
-                  <a href={`/${locale}/resources/first-steps/about-insighta`} className="hover:text-gray-900 transition-colors">
+                  <a href={`/${locale}/resources/first-steps/about-insighta`} className="hover:text-[#013175] transition-colors">
                     {locale === 'ar' ? 'حول إنسايتا' : 'About Insighta'}
                   </a>
                 </li>
@@ -59,7 +59,7 @@ export default async function WhyInsightaIsPage({ params }: { params: Promise<{ 
                   <span className="text-gray-400">/</span>
                 </li>
                 <li>
-                  <a href={`/${locale}/resources/first-steps/about-insighta/account-types`} className="hover:text-gray-900 transition-colors">
+                  <a href={`/${locale}/resources/first-steps/about-insighta/account-types`} className="hover:text-[#013175] transition-colors">
                     {locale === 'ar' ? 'أنواع الحسابات' : 'Account types'}
                   </a>
                 </li>
@@ -67,7 +67,7 @@ export default async function WhyInsightaIsPage({ params }: { params: Promise<{ 
                   <span className="text-gray-400">/</span>
                 </li>
                 <li>
-                  <a href={`/${locale}/resources/first-steps/about-insighta/account-types/client-account`} className="hover:text-gray-900 transition-colors">
+                  <a href={`/${locale}/resources/first-steps/about-insighta/account-types/client-account`} className="hover:text-[#013175] transition-colors">
                     {locale === 'ar' ? 'حساب العميل' : 'Client account'}
                   </a>
                 </li>
@@ -116,7 +116,7 @@ export default async function WhyInsightaIsPage({ params }: { params: Promise<{ 
             </p>
 
             {locale === 'ar' && (
-              <h3 className="text-xl md:text-2xl font-bold text-gray-900 mb-6">
+              <h3 className="text-xl md:text-2xl font-bold text-[#013175] mb-6">
                 تحديات نموذج السوق التقليدي (Black Box Model):
               </h3>
             )}
@@ -124,7 +124,7 @@ export default async function WhyInsightaIsPage({ params }: { params: Promise<{ 
             <ul className={`space-y-6 ${isRTL ? 'text-right' : 'text-left'}`}>
               <li className="flex items-start gap-4 group">
                 <div className="flex-shrink-0 w-2 h-2 rounded-full bg-gradient-to-r from-blue-500 to-teal-400 mt-2.5"></div>
-                <p className="text-lg md:text-xl text-gray-700 leading-relaxed group-hover:text-gray-900 transition-colors">
+                <p className="text-lg md:text-xl text-gray-700 leading-relaxed group-hover:text-[#013175] transition-colors">
                   {locale === 'ar' ? (
                     <>
                       انعدام <strong>الشفافية المنهجية</strong>
@@ -139,7 +139,7 @@ export default async function WhyInsightaIsPage({ params }: { params: Promise<{ 
               
               <li className="flex items-start gap-4 group">
                 <div className="flex-shrink-0 w-2 h-2 rounded-full bg-gradient-to-r from-blue-500 to-teal-400 mt-2.5"></div>
-                <p className="text-lg md:text-xl text-gray-700 leading-relaxed group-hover:text-gray-900 transition-colors">
+                <p className="text-lg md:text-xl text-gray-700 leading-relaxed group-hover:text-[#013175] transition-colors">
                   {locale === 'ar' ? (
                     <>
                       التقارير تُنتج <strong>داخلياً</strong> دون الإفصاح عن <strong>المصادر</strong> أو{' '}
@@ -156,7 +156,7 @@ export default async function WhyInsightaIsPage({ params }: { params: Promise<{ 
               
               <li className="flex items-start gap-4 group">
                 <div className="flex-shrink-0 w-2 h-2 rounded-full bg-gradient-to-r from-blue-500 to-teal-400 mt-2.5"></div>
-                <p className="text-lg md:text-xl text-gray-700 leading-relaxed group-hover:text-gray-900 transition-colors">
+                <p className="text-lg md:text-xl text-gray-700 leading-relaxed group-hover:text-[#013175] transition-colors">
                   {locale === 'ar' ? (
                     <>
                       <strong>الالتزام المالي</strong> يسبق الاطلاع على المحتوى
@@ -171,7 +171,7 @@ export default async function WhyInsightaIsPage({ params }: { params: Promise<{ 
               
               <li className="flex items-start gap-4 group">
                 <div className="flex-shrink-0 w-2 h-2 rounded-full bg-gradient-to-r from-blue-500 to-teal-400 mt-2.5"></div>
-                <p className="text-lg md:text-xl text-gray-700 leading-relaxed group-hover:text-gray-900 transition-colors">
+                <p className="text-lg md:text-xl text-gray-700 leading-relaxed group-hover:text-[#013175] transition-colors">
                   {locale === 'ar' ? (
                     <>
                       غياب <strong>المساءلة</strong> عن دقة وجودة المحتوى
@@ -186,7 +186,7 @@ export default async function WhyInsightaIsPage({ params }: { params: Promise<{ 
               
               <li className="flex items-start gap-4 group">
                 <div className="flex-shrink-0 w-2 h-2 rounded-full bg-gradient-to-r from-blue-500 to-teal-400 mt-2.5"></div>
-                <p className="text-lg md:text-xl text-gray-700 leading-relaxed group-hover:text-gray-900 transition-colors">
+                <p className="text-lg md:text-xl text-gray-700 leading-relaxed group-hover:text-[#013175] transition-colors">
                   {locale === 'ar' ? (
                     <>
                       استحالة <strong>التواصل المباشر</strong> مع معدّي التقارير
@@ -201,7 +201,7 @@ export default async function WhyInsightaIsPage({ params }: { params: Promise<{ 
               
               <li className="flex items-start gap-4 group">
                 <div className="flex-shrink-0 w-2 h-2 rounded-full bg-gradient-to-r from-blue-500 to-teal-400 mt-2.5"></div>
-                <p className="text-lg md:text-xl text-gray-700 leading-relaxed group-hover:text-gray-900 transition-colors">
+                <p className="text-lg md:text-xl text-gray-700 leading-relaxed group-hover:text-[#013175] transition-colors">
                   {locale === 'ar' ? (
                     <>
                       جميع المخرجات تُنسب للمنصة كـ <strong>علامة بيضاء</strong> (White Label)

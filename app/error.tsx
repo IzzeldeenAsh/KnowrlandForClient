@@ -3,7 +3,6 @@
 import { useEffect } from 'react';
 import Link from 'next/link';
 import { MantineProvider, Button } from '@mantine/core';
-import Footer from '@/components/ui/footer';
 
 export default function GlobalError({
   error,
@@ -60,8 +59,6 @@ export default function GlobalError({
             </div>
           </div>
         </div>
-        
-        <Footer />
       </div>
     </MantineProvider>
   );

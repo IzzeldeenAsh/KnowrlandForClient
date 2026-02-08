@@ -24,14 +24,27 @@ export default async function WhatIsInsightaPage({ params }: { params: Promise<{
       <div className="relative overflow-hidden pb-16">
            {/* Breadcrumbs + Hero Title Section (with bg + overlay) */}
            <div className="relative overflow-hidden px-4 sm:px-12 py-8 md:py-24 mb-6 md:mb-8">
+            {/* Background pattern (SSR-safe, responsive) */}
             <div
-              className="absolute inset-0 bg-center bg-cover"
+              className="absolute inset-0 bg-center bg-cover sm:hidden"
+              style={{
+                backgroundImage:
+                  "url('https://res.cloudinary.com/dsiku9ipv/image/upload/v1770102117/pattern_lj3gmd.png')",
+                transform: isRTL ? 'scaleX(-1)' : 'none',
+                transformOrigin: 'center',
+                backgroundPositionX: '1%',
+                backgroundSize: isRTL ? '95% 100%' : '100% 95%',
+              }}
+              aria-hidden="true"
+            />
+            <div
+              className="absolute inset-0 bg-center bg-cover hidden sm:block"
               style={{
                 backgroundImage:
                   "url('https://res.cloudinary.com/dsiku9ipv/image/upload/v1770103627/patternfore-1_qeawih.png')",
                 transform: isRTL ? 'scaleX(-1)' : 'none',
                 transformOrigin: 'center',
-                backgroundPositionX: isRTL ? '1%' : '1%',
+                backgroundPositionX: '1%',
                 backgroundSize: isRTL ? '95% 100%' : '100% 95%',
               }}
               aria-hidden="true"
@@ -45,7 +58,7 @@ export default async function WhatIsInsightaPage({ params }: { params: Promise<{
             <div className="relative z-10 px-4 sm:px-12">
               {/* Breadcrumbs */}
               <nav
-                className={`mb-6 text-xs md:text-sm ${isRTL ? 'text-right' : 'text-left'}`}
+                className={`mb-6 ps-6 md:ps-0 text-xs md:text-sm ${isRTL ? 'text-right' : 'text-left'}`}
                 aria-label="Breadcrumb"
               >
                 <ol className="flex items-center gap-2 text-gray-700/80 flex-wrap">

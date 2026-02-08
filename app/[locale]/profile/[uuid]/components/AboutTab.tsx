@@ -539,19 +539,23 @@ export default function AboutTab({
               <h3 className="text-xl font-semibold mb-4 text-gray-800 dark:text-white flex items-center">
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
-                  className={`h-5 w-5 ${
-                    isRTL ? "ml-2" : "mr-2"
-                  } text-blue-500`}
-                  fill="none"
+                  width="24"
+                  height="24"
                   viewBox="0 0 24 24"
+                  fill="none"
                   stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  className={`icon icon-tabler icons-tabler-outline icon-tabler-building-factory text-yellow-500 fs-5 ${
+                    isRTL ? "ml-2" : "mr-2"
+                  }`}
                 >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"
-                  />
+                  <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+                  <path d="M4 21c1.147 -4.02 1.983 -8.027 2 -12h6c.017 3.973 .853 7.98 2 12"></path>
+                  <path d="M12.5 13h4.5c.025 2.612 .894 5.296 2 8"></path>
+                  <path d="M9 5a2.4 2.4 0 0 1 2 -1a2.4 2.4 0 0 1 2 1a2.4 2.4 0 0 0 2 1a2.4 2.4 0 0 0 2 -1a2.4 2.4 0 0 1 2 -1a2.4 2.4 0 0 1 2 1"></path>
+                  <path d="M3 21l19 0"></path>
                 </svg>
                 {t("industries")}
               </h3>

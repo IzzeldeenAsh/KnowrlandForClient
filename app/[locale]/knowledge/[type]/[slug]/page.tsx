@@ -20,6 +20,8 @@ import { publicBaseUrl } from '@/app/config';
 import Link from 'next/link';
 import { Rating, Text } from "@mantine/core";
 import LanguageMismatchNotifier from './LanguageMismatchNotifier';
+import RelatedKnowledgeSummarySection, { type RelatedKnowledgeSummaryItem } from './RelatedKnowledgeSummarySection';
+import RelatedKnowledgeItemsSection, { type RelatedKnowledgeItems } from './RelatedKnowledgeItemsSection';
 
 interface KnowledgeDetails {
   id: number;
@@ -81,6 +83,11 @@ interface KnowledgeDetails {
       };
     };
   }>;
+
+  related_knowledge?: {
+    summary?: RelatedKnowledgeSummaryItem[];
+    items?: RelatedKnowledgeItems;
+  };
 }
 
 interface Props {
@@ -265,6 +272,30 @@ export default async function KnowledgePage({ params }: Props) {
   }
   
   const knowledge = response.data;
+
+  const relatedSummary: RelatedKnowledgeSummaryItem[] = Array.isArray(knowledge?.related_knowledge?.summary)
+    ? knowledge.related_knowledge.summary
+    : [];
+
+  const relatedItems: RelatedKnowledgeItems = (() => {
+    const raw = knowledge?.related_knowledge?.items as unknown;
+    const obj = raw && typeof raw === 'object' ? (raw as Record<string, unknown>) : {};
+
+    const asArray = <T,>(v: unknown): T[] => (Array.isArray(v) ? (v as T[]) : []);
+
+    return {
+      industry: asArray(obj?.industry),
+      topic: asArray(obj?.topic),
+      product: asArray(obj?.product),
+      insighter: asArray(obj?.insighter),
+    };
+  })();
+
+  const hasRelatedItems =
+    (relatedItems.industry?.length ?? 0) > 0 ||
+    (relatedItems.topic?.length ?? 0) > 0 ||
+    (relatedItems.product?.length ?? 0) > 0 ||
+    (relatedItems.insighter?.length ?? 0) > 0;
   
   // Validate required knowledge properties
   if (!knowledge || !knowledge.insighter) {
@@ -555,6 +586,24 @@ export default async function KnowledgePage({ params }: Props) {
             </aside>
         </article>
       </main>
+
+   
+
+      {/* Related knowledge (Summary) */}
+      {relatedSummary.length > 0 && (
+        <RelatedKnowledgeSummarySection locale={locale} isRTL={isRTL} items={relatedSummary} />
+      )}
+
+         {/* Related knowledge (Items) */}
+         {hasRelatedItems && (
+        <RelatedKnowledgeItemsSection
+          locale={locale}
+          isRTL={isRTL}
+          items={relatedItems}
+          insighterName={knowledge.insighter?.name}
+          breadcrumbLabels={breadcrumbData.map((item) => item.label)}
+        />
+      )}
 
       <Footer />
     </div>

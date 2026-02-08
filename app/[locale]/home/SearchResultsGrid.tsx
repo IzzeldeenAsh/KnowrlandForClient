@@ -106,6 +106,7 @@ interface SearchResultsGridProps {
   locale?: string;
   viewMode: 'grid' | 'list';
   filtersVisible?: boolean;
+  isLoading?: boolean;
 }
 function getInitials(name: string) {
   if (!name) return '';
@@ -189,6 +190,7 @@ function SearchResultsGridComponent({
   locale,
   viewMode,
   filtersVisible = true,
+  isLoading = false,
 }: SearchResultsGridProps) {
   const params = useParams();
   const currentLocale = locale || params.locale || "en";
@@ -303,6 +305,90 @@ function SearchResultsGridComponent({
 
   };
 
+  const gridClassName = `grid sm:grid-cols-2 ${filtersVisible ? 'xl:grid-cols-3' : 'xl:grid-cols-4'} 3xl:grid-cols-4 gap-4 max-w-10xl 2xl:max-w-none 2xl:mx-8 mx-auto`;
+
+  const KnowledgeCardSkeleton = () => (
+    <div className="bg-white rounded-lg border border-gray-200 h-full overflow-hidden animate-pulse">
+      {/* Dark section skeleton */}
+      <div className="bg-gray-200 p-6">
+        <div className="flex items-center gap-2 mb-3">
+          <div className="w-5 h-5 bg-gray-300 rounded" />
+          <div className="h-5 bg-gray-300 rounded w-20" />
+        </div>
+        <div className="h-6 bg-gray-300 rounded w-full mb-2" />
+        <div className="h-4 bg-gray-300 rounded w-3/4" />
+      </div>
+
+      {/* White section skeleton */}
+      <div className="p-6">
+        <div className="flex justify-between items-center pb-4">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 bg-gray-200 rounded-full" />
+            <div>
+              <div className="h-4 bg-gray-200 rounded w-28 mb-2" />
+              <div className="h-3 bg-gray-200 rounded w-20" />
+            </div>
+          </div>
+          <div className="w-5 h-5 bg-gray-200 rounded" />
+        </div>
+
+        <div className="flex justify-between items-center pt-2 mt-6 border-t border-gray-100">
+          <div className="h-3 bg-gray-200 rounded w-28" />
+          <div className="h-5 bg-gray-200 rounded w-16" />
+        </div>
+      </div>
+    </div>
+  );
+
+  const SearchResultsSkeleton = () => {
+    const skeletonCount = filtersVisible ? 9 : 12;
+
+    if (viewMode === 'list') {
+      return (
+        <div className="max-w-10xl 2xl:max-w-none 2xl:mx-8 mx-auto px-10" dir={isRTL ? "rtl" : "ltr"}>
+          <div className="space-y-3">
+            {[...Array(8)].map((_, i) => (
+              <div
+                key={`list-skeleton-${i}`}
+                className="bg-white rounded-lg border border-gray-200 p-4 animate-pulse"
+              >
+                <div className="flex items-start justify-between gap-4">
+                  <div className="flex-1">
+                    <div className="h-4 bg-gray-200 rounded w-24 mb-3" />
+                    <div className="h-5 bg-gray-200 rounded w-3/4 mb-2" />
+                    <div className="h-4 bg-gray-200 rounded w-full mb-2" />
+                    <div className="h-4 bg-gray-200 rounded w-2/3" />
+                  </div>
+                  <div className="w-10 h-10 bg-gray-200 rounded-full" />
+                </div>
+                <div className="mt-4 pt-3 border-t border-gray-100 flex items-center justify-between">
+                  <div className="h-3 bg-gray-200 rounded w-28" />
+                  <div className="h-5 bg-gray-200 rounded w-16" />
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      );
+    }
+
+    return (
+      <div className="max-w-10xl 2xl:max-w-none 2xl:mx-8 mx-auto px-10" dir={isRTL ? "rtl" : "ltr"}>
+        <div className="mb-6">
+          <div className={gridClassName}>
+            {[...Array(skeletonCount)].map((_, i) => (
+              <KnowledgeCardSkeleton key={`grid-skeleton-${i}`} />
+            ))}
+          </div>
+        </div>
+      </div>
+    );
+  };
+
+  if (isLoading) {
+    return <SearchResultsSkeleton />;
+  }
+
   if (results.length === 0) {
     return (
       <div className="text-center py-12 flex flex-col items-center">
@@ -336,7 +422,7 @@ function SearchResultsGridComponent({
       {knowledgeItems.length > 0 && (
         <div className="mb-6">
           <div
-            className={`grid sm:grid-cols-2 ${filtersVisible ? 'xl:grid-cols-3' : 'xl:grid-cols-4'} 3xl:grid-cols-4 gap-4 max-w-10xl 2xl:max-w-none 2xl:mx-8 mx-auto`}
+            className={gridClassName}
           >
             {knowledgeItems.map((item, index) => {
               const normalizedPrice = String(item.price ?? "").trim();
@@ -593,7 +679,7 @@ function SearchResultsGridComponent({
                     {item.searchable_type === 'knowledge'  && (
                       <div className="relative">
                         {loadingStates[item.searchable_id] ? (
-                          <div className="w-5 h-5 border-2 border-gray-400 border-t-transparent rounded-full animate-spin" />
+                          <div className="w-5 h-5 bg-gray-200 rounded animate-pulse" />
                         ) : (
                           (item.searchable_id in readLaterStates ? readLaterStates[item.searchable_id] : item.is_read_later) ? (
                             <BookmarkSelectedIcon 

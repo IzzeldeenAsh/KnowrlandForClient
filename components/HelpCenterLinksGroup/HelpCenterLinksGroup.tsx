@@ -49,7 +49,7 @@ function NestedLinkItem({ item, initiallyOpened, onLinkClick }: NestedLinkItemPr
 
   if (hasNestedLinks) {
     return (
-      <Box style={{ marginLeft: rem(16) }}>
+      <Box style={{ marginInlineStart: rem(16) }}>
         <UnstyledButton
           onClick={() => setItemOpened((o) => !o)}
           className={`${classes.control} ${isItemActive ? classes.controlActive : ''}`}
@@ -73,7 +73,7 @@ function NestedLinkItem({ item, initiallyOpened, onLinkClick }: NestedLinkItemPr
           </Box>
         </UnstyledButton>
         <Collapse in={itemOpened}>
-          <Box style={{ marginLeft: rem(16) }}>
+          <Box style={{ marginInlineStart: rem(16) }}>
             {item.links!.map((nestedLink) => (
               <Link
                 className={`${classes.link} ${pathname === nestedLink.link ? classes.linkActive : ''}`}

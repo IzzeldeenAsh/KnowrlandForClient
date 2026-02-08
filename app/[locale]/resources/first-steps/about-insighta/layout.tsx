@@ -86,37 +86,50 @@ export default function AboutInsightaLayout({
           </svg>
         </div>
         {/* Mobile Menu Button */}
-        <div className="lg:hidden fixed top-20 left-4 z-50 bg-white border border-gray-200 rounded-lg p-2 shadow-md">
-          <button
-            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-            className="p-2 text-gray-700 hover:text-gray-900 transition-colors"
-            aria-label="Toggle menu"
-          >
-            {isMobileMenuOpen ? (
-              <IconX size={24} />
+        {isMobileMenuOpen ? (
+             
+              <div className="d-none">
+              <button
+                onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+                className="text-gray-700 hover:text-gray-900 transition-colors"
+                aria-label="Toggle menu"
+              >
+                 <IconX size={16} />
+              </button>
+            </div>
             ) : (
-              <IconMenu2 size={24} />
+                 
+              <div className="lg:hidden absolute top-[24px] left-4 z-[70] bg-white border border-gray-200 rounded-lg  flex items-center justify-center h-8 w-8 shadow-md">
+              <button
+                onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+                className="text-gray-700 hover:text-gray-900 transition-colors"
+                aria-label="Toggle menu"
+              >
+                <IconMenu2 size={16} />
+              </button>
+            </div>
+             
             )}
-          </button>
-        </div>
+       
 
+     
         {/* Mobile Header Spacer */}
-        <div className="lg:hidden h-24" />
+        <div className="lg:hidden lg:h-24" />
 
         {/* Mobile Overlay */}
         {isMobileMenuOpen && isMobile && (
           <div
-            className="fixed inset-0 bg-black bg-opacity-50 z-40 lg:hidden"
+            className="fixed inset-0 bg-black bg-opacity-50 z-[55] lg:hidden"
             onClick={() => setIsMobileMenuOpen(false)}
           />
         )}
 
-        <div className="relative z-10 flex min-h-screen w-full justify-center pt-0 lg:pt-0">
+        <div className="relative flex min-h-screen w-full justify-center pt-0 lg:pt-0">
           <div className="flex w-full  min-h-screen ">
             {/* Sidebar Navigation */}
             <div
               className={`
-                fixed lg:static inset-y-0 left-0 z-40 w-72 md:w-80 lg:w-[340px]
+                fixed lg:static inset-y-0 left-0 z-[60] md:z-[20] w-72 md:w-80 lg:w-[340px]
                 bg-white lg:bg-transparent
                 transform transition-transform duration-300 ease-in-out
                 lg:transform-none
@@ -124,7 +137,7 @@ export default function AboutInsightaLayout({
                 lg:flex-shrink-0 
                 overflow-y-auto
                 shadow-xl lg:shadow-none
-                pt-20 lg:pt-0
+                md:pt-20 lg:pt-0
               `}
             >
               <AboutInsightaNavbar onLinkClick={() => setIsMobileMenuOpen(false)} />
