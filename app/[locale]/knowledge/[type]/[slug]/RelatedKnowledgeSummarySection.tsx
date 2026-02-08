@@ -58,12 +58,15 @@ function stripHtml(html: string) {
   return (html || '').replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim()
 }
 
-function truncateWords(text: string, wordLimit: number = 26) {
+function truncateWords(
+  text: string,
+  wordLimit: number = 26
+): { text: string; truncated: boolean } {
   const t = (text || '').trim()
-  if (!t) return ''
+  if (!t) return { text: '', truncated: false }
   const words = t.split(/\s+/)
-  if (words.length <= wordLimit) return t
-  return `${words.slice(0, wordLimit).join(' ')}...`
+  if (words.length <= wordLimit) return { text: t, truncated: false }
+  return { text: words.slice(0, wordLimit).join(' '), truncated: true }
 }
 
 function formatPublishedDate(dateString: string, locale: string) {
@@ -144,7 +147,7 @@ export default function RelatedKnowledgeSummarySection({
   }, [items, carouselClass, nextClass, prevClass])
 
   const copy = {
-    title: isRTL ? 'استكشف كنوز المعرفة المشابهة' : 'Discover Top Valuable Insights',
+    title: isRTL ? 'استكشف كنوز المعرفة المشابهة' : 'Discover Top Related Insights',
     subtitle: isRTL
       ? 'اكتشف أفضل الرؤى المقدمة من نفس الصناعة أو المواضيع القريبة.'
       : 'Explore top valuable insights—based on nearby industries and topics.',
@@ -165,6 +168,7 @@ export default function RelatedKnowledgeSummarySection({
       className="relative overflow-hidden mt-10 sm:mt-14 w-full bg-cover bg-center bg-no-repeat"
       style={{
         backgroundImage: `url("${backgroundImageUrl}")`,
+        borderTop: '1px solid #9be0eb61',
       }}
     >
       {/* Glow blurred bulbs */}
@@ -227,19 +231,32 @@ export default function RelatedKnowledgeSummarySection({
                 const isPartial = paidStatus === 'partial_paid'
                 const isPaid = paidStatus === 'paid' || (!paidStatus && normalizedPrice !== '' && numericPrice > 0)
 
-                const desc = truncateWords(stripHtml(item.description || ''), 30)
+                const rawDesc = stripHtml(item.description || '')
+                const { text: descText, truncated: descTruncated } = truncateWords(rawDesc, 30)
+                const desc =
+                  descTruncated && descText ? `${descText}...` : descText
                 const ratingCount = Number(item.review_summary?.count ?? 0)
                 const ratingAvg = Number(item.review_summary?.average ?? 0)
 
+                const ins = item.insighter
+                const roles = Array.isArray(ins?.roles) ? ins.roles : []
+                const isCompany = roles.includes('company') || roles.includes('company-insighter')
+                const companyHref = ins?.company?.uuid ? `/${locale}/profile/${ins.company.uuid}` : undefined
+                const insighterHref = ins?.uuid ? `/${locale}/profile/${ins.uuid}?entity=insighter` : undefined
+                const primaryHref = isCompany ? companyHref : insighterHref
+                const primaryAvatarSrc =
+                  isCompany && ins?.company?.logo ? ins.company.logo : ins?.profile_photo_url
+                const primaryTitle = isCompany ? (ins?.company?.legal_name || copy.company) : (ins?.name ?? '').toLowerCase()
+
                 return (
                   <div key={`${item.type}-${item.slug}-${index}`} className="swiper-slide h-auto">
-                    <div className="h-full flex flex-col rounded-2xl overflow-hidden border border-slate-200 bg-white">
+                    <div className={`h-full ${styles.cardInner} rounded-2xl overflow-hidden border border-slate-200 bg-white`}>
                       <Link
                         href={`/${locale}/knowledge/${item.type}/${item.slug}`}
                         className="flex flex-col h-full"
                       >
                         <div
-                          className="shrink-0 p-6 min-h-[200px] bg-cover bg-center bg-no-repeat"
+                          className="shrink-0 p-5 h-[170px] flex flex-col bg-cover bg-center bg-no-repeat"
                           style={{
                             backgroundImage:
                               'linear-gradient(to right bottom, rgba(30, 41, 59, 0.35), rgba(15, 23, 42, 0.6)), url("https://res.cloudinary.com/dsiku9ipv/image/upload/v1766389693/Image_shared-item_cards-preview_image_component__image_2_1_tfd8ig.webp")',
@@ -253,11 +270,11 @@ export default function RelatedKnowledgeSummarySection({
                           </div>
 
                           <Text
-                            style={{wordBreak:'break-word', paddingTop: '20px'}}
+                            style={{ wordBreak: 'break-word', paddingTop: '20px' }}
                             fw={700}
                             c="white"
                             size="lg"
-                            className={` ${isFirstWordArabic(item.title) ? 'text-right' : 'text-left'}`}
+                            className={`flex-1 min-h-0 ${isFirstWordArabic(item.title) ? 'text-right' : 'text-left'}`}
                             lineClamp={3}
                             dir={isFirstWordArabic(item.title) ? 'rtl' : 'ltr'}
                           >
@@ -265,7 +282,7 @@ export default function RelatedKnowledgeSummarySection({
                           </Text>
 
                           {ratingCount >= 1 && ratingAvg > 0 && (
-                            <div className="flex items-center gap-1 mt-4">
+                            <div className="flex items-center gap-1 mt-2 shrink-0">
                               <Rating value={ratingAvg} fractions={2} readOnly size="sm" />
                               <Text size="xs" fw={600} className="mx-1 text-sky-300">
                                 {ratingAvg.toFixed(1)}
@@ -277,28 +294,23 @@ export default function RelatedKnowledgeSummarySection({
                           )}
                         </div>
 
-                        <div className="p-5 flex flex-col flex-1 min-h-[180px]">
-                          {desc && (
-                            <Text size="sm" className={`text-slate-700 ${isFirstWordArabic(desc) ? 'text-right' : 'text-left'}`} lineClamp={3}>
-                              {desc}
-                            </Text>
-                          )}
+                        <div className={`p-4 ${styles.cardContent}`}>
+                          <div className={`${styles.cardBody}`}>
+                            {desc && (
+                              <Text
+                                size="sm"
+                                className={`text-slate-700 ${isFirstWordArabic(desc) ? 'text-right' : 'text-left'}`}
+                                dir={isFirstWordArabic(desc) ? 'rtl' : 'ltr'}
+                                lineClamp={3}
+                              >
+                                {desc}
+                              </Text>
+                            )}
+                          </div>
 
-                          {item.insighter?.name && (() => {
-                            const ins = item.insighter
-                            const roles = Array.isArray(ins.roles) ? ins.roles : []
-                            const isCompany = roles.includes('company') || roles.includes('company-insighter')
-
-                            const companyHref = ins.company?.uuid ? `/${locale}/profile/${ins.company.uuid}` : undefined
-                            const insighterHref = ins.uuid ? `/${locale}/profile/${ins.uuid}?entity=insighter` : undefined
-
-                            const primaryHref = isCompany ? companyHref : insighterHref
-                            const primaryAvatarSrc =
-                              isCompany && ins.company?.logo ? ins.company.logo : ins.profile_photo_url
-                            const primaryTitle = isCompany ? (ins.company?.legal_name || copy.company) : ins.name.toLowerCase()
-
-                            return (
-                              <div className="mt-4 flex items-center justify-between gap-3">
+                          <div className={`${styles.cardFooter}  pb-2 flex flex-col gap-2`}>
+                            {ins?.name ? (
+                              <div className="min-w-0 flex items-center gap-3">
                                 <div
                                   role="button"
                                   tabIndex={0}
@@ -316,7 +328,7 @@ export default function RelatedKnowledgeSummarySection({
                                   }}
                                   className="flex items-center min-w-0 hover:opacity-95 transition text-start"
                                 >
-                                  <div className="relative">
+                                  <div className="relative flex-shrink-0">
                                     <Avatar src={primaryAvatarSrc} radius="xl" alt={primaryTitle} size="md">
                                       {!primaryAvatarSrc && getInitials(ins.name)}
                                     </Avatar>
@@ -383,51 +395,49 @@ export default function RelatedKnowledgeSummarySection({
                                   </div>
                                 </div>
                               </div>
-                            )
-                          })()}
+                            ) : null}
 
-                          <div className="pt-2 mt-5 border-t border-slate-100 flex items-center justify-between gap-3">
-                            <div className="min-w-0">
-                              {item.published_at ? (
-                                <Text c="dimmed" size="xs" className="truncate">
-                                  {copy.posted} {formatPublishedDate(item.published_at, locale)}
-                                </Text>
-                              ) : (
-                                <span />
-                              )}
-                            </div>
-
-                            <div className="flex items-center gap-2 shrink-0">
-                              {isPartial && (
-                                 <div className="flex items-center gap-2">
-                                 <Text size="xs" c="dimmed" className="whitespace-nowrap">
-                     {copy.freeDocs} +
-                  </Text>
-                               <Badge color="yellow" variant="light" style={{ fontWeight: 700 }}>
-                                <span dir="ltr" lang="en">
-                                  {formattedPrice} 
-                                </span> 
-                              </Badge>
-                           
-                             </div>
-                              )}
-                              {isFree && !isPartial && (
-                                <Badge color="green" variant="light" size="sm" style={{ fontWeight: 600 }}>
-                                  {copy.free}
-                                </Badge>
-                              )}
-                              {isPaid && normalizedPrice !== '' && (
-                                <Badge color="yellow" variant="light" size="sm" style={{ fontWeight: 700 }}>
-                                  <span dir="ltr" lang="en">
-                                    {formattedPrice}
-                                  </span>
-                                </Badge>
-                              )}
-                              {!isFree && !isPaid && normalizedPrice === '' && (
-                                <Badge color="gray" variant="light" size="sm">
-                                  {copy.paid}
-                                </Badge>
-                              )}
+                            <div className="flex items-center justify-between pt-2 gap-2 flex-wrap border-t border-slate-100">
+                              <div className="min-w-0">
+                                {item.published_at ? (
+                                  <Text c="dimmed" size="xs" className="truncate whitespace-nowrap">
+                                    {copy.posted} {formatPublishedDate(item.published_at, locale)}
+                                  </Text>
+                                ) : (
+                                  <span />
+                                )}
+                              </div>
+                              <div className="flex items-center gap-2 shrink-0 flex-wrap justify-end">
+                                {isPartial && (
+                                  <div className="flex items-center gap-2">
+                                    <Text size="xs" c="dimmed" className="whitespace-nowrap">
+                                      {copy.freeDocs} +
+                                    </Text>
+                                    <Badge color="yellow" variant="light" style={{ fontWeight: 700 }}>
+                                      <span dir="ltr" lang="en">
+                                        {formattedPrice}
+                                      </span>
+                                    </Badge>
+                                  </div>
+                                )}
+                                {isFree && !isPartial && (
+                                  <Badge color="green" variant="light" size="sm" style={{ fontWeight: 600 }}>
+                                    {copy.free}
+                                  </Badge>
+                                )}
+                                {isPaid && normalizedPrice !== '' && (
+                                  <Badge color="yellow" variant="light" size="sm" style={{ fontWeight: 700 }}>
+                                    <span dir="ltr" lang="en">
+                                      {formattedPrice}
+                                    </span>
+                                  </Badge>
+                                )}
+                                {!isFree && !isPaid && normalizedPrice === '' && (
+                                  <Badge color="gray" variant="light" size="sm">
+                                    {copy.paid}
+                                  </Badge>
+                                )}
+                              </div>
                             </div>
                           </div>
                         </div>

@@ -377,7 +377,13 @@ export default function RelatedKnowledgeItemsSection({
               className={`${prevClass} flex-shrink-0 z-30 w-10 h-10 sm:w-12 sm:h-12 flex items-center justify-center group rounded-full border border-gray-200 bg-white hover:bg-gray-50 transition`}
               aria-label={copy.previous}
               type="button"
-              onClick={() => swiperRef.current?.slidePrev()}
+              onClick={() => {
+                const s = swiperRef.current
+                if (!s) return
+                // In Swiper RTL mode, "prev/next" are effectively mirrored.
+                if (s.rtlTranslate) s.slideNext()
+                else s.slidePrev()
+              }}
             >
               <svg className="w-4 h-4 fill-cyan-500 group-hover:fill-slate-900 transition" viewBox="0 0 16 16">
                 <path d="M6.7 14.7l1.4-1.4L3.8 9H16V7H3.8l4.3-4.3-1.4-1.4L0 8z" />
@@ -675,7 +681,13 @@ export default function RelatedKnowledgeItemsSection({
               className={`${nextClass} flex-shrink-0 z-30 w-10 h-10 sm:w-12 sm:h-12 flex items-center justify-center group rounded-full border border-gray-200 bg-white hover:bg-gray-50 transition`}
               aria-label={copy.next}
               type="button"
-              onClick={() => swiperRef.current?.slideNext()}
+              onClick={() => {
+                const s = swiperRef.current
+                if (!s) return
+                // In Swiper RTL mode, "prev/next" are effectively mirrored.
+                if (s.rtlTranslate) s.slidePrev()
+                else s.slideNext()
+              }}
             >
               <svg className="w-4 h-4 fill-cyan-500 group-hover:fill-slate-900 transition" viewBox="0 0 16 16">
                 <path d="M9.3 14.7l-1.4-1.4L12.2 9H0V7h12.2L7.9 2.7l1.4-1.4L16 8z" />

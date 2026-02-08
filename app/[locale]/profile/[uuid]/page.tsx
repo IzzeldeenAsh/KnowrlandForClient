@@ -475,6 +475,7 @@ function ProfilePageContent() {
             "Content-Type": "application/json",
             Accept: "application/json",
             "Accept-Language": locale,
+            "X-Timezone": Intl.DateTimeFormat().resolvedOptions().timeZone,
           },
         });
 
