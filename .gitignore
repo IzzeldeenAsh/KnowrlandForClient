@@ -1,3 +1,14 @@
 node_modules
 .next
 .claude
+
+# macOS
+.DS_Store
+**/.DS_Store
+
+# Logs
+yarn-error.log
+
+# Local env (never commit secrets)
+.env.local
+.env.*.local
