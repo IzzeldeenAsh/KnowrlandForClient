@@ -3,6 +3,9 @@ import Pusher, { Channel } from 'pusher-js'
 
 let pusher: Pusher | null = null
 let lastChannelName: string | null = null
+let lastToken: string | null = null
+let lastLocale: string | null = null
+let didBindDebugHandlers = false
 
 type PusherOpts = {
   key: string
@@ -11,9 +14,11 @@ type PusherOpts = {
 }
 
 function getConfig(): PusherOpts {
-  const key = '41745ad5e299f4af9e36 ';
-  const cluster =  'eu';
-  const authEndpoint = 'https://api.insightabusiness.com/broadcasting/auth';
+  const key = (process.env.NEXT_PUBLIC_PUSHER_KEY ?? '41745ad5e299f4af9e36').trim()
+  const cluster = (process.env.NEXT_PUBLIC_PUSHER_CLUSTER ?? 'eu').trim()
+  const authEndpoint = (
+   'https://api.insightabusiness.com/broadcasting/auth'
+  ).trim()
   if (!key || !authEndpoint) {
     console.error('[Pusher] Missing env: NEXT_PUBLIC_PUSHER_KEY or NEXT_PUBLIC_PUSHER_AUTH_ENDPOINT')
   }
@@ -21,10 +26,22 @@ function getConfig(): PusherOpts {
 }
 
 export function getPusher(token: string, currentLocale: string): Pusher {
-  if (pusher) return pusher
+  if (pusher) {
+    // If auth context changed, we must recreate the client to avoid auth mismatch on private channels.
+    if (lastToken !== token || lastLocale !== currentLocale) {
+      console.warn('[Pusher] Auth context changed; reconnecting Pusher client', {
+        locale: { from: lastLocale, to: currentLocale },
+        tokenChanged: lastToken ? lastToken !== token : true,
+      })
+      disconnectPusher()
+    } else {
+      return pusher
+    }
+  }
   const cfg = getConfig()
 
-  // Helpful debug (sanitized)
+  lastToken = token
+  lastLocale = currentLocale
 
   pusher = new Pusher(cfg.key, {
     cluster: cfg.cluster,
@@ -42,20 +59,50 @@ export function getPusher(token: string, currentLocale: string): Pusher {
     // logToConsole: true, // enable only while debugging
   })
 
-  pusher.connection.bind('state_change', (states: any) => {
-    console.log('[Pusher] State change', states);
-  })
-  pusher.connection.bind('connected', () => {
-    console.log('[Pusher] Connected');
-  })
-  pusher.connection.bind('failed', () => {
-    console.log('[Pusher] Connection failed');
-  })
-  pusher.connection.bind('error', (err: any) => {
-    if (err?.error?.data?.code === 4100) {
-      console.warn('[Pusher] Connection limit reached')
+  if (!didBindDebugHandlers) {
+    didBindDebugHandlers = true
+    // console.log('[Pusher] Initializing client', {
+    //   cluster: cfg.cluster,
+    //   authEndpoint: cfg.authEndpoint,
+    //   keySuffix: cfg.key.slice(-6),
+    //   locale: currentLocale,
+    //   tokenPrefix: token ? `${token.slice(0, 10)}…` : '(empty)',
+    // })
+
+    pusher.connection.bind('state_change', (states: any) => {
+   //   console.log('[Pusher] Connection state_change', states)
+    })
+    pusher.connection.bind('connecting', () => {
+   //   console.log('[Pusher] Connection connecting')
+    })
+    pusher.connection.bind('connected', () => {
+      //   console.log('[Pusher] Connection connected', {
+      //   socketId: (pusher as any)?.connection?.socket_id,
+      // })
+    })
+    pusher.connection.bind('disconnected', () => {
+    //  console.log('[Pusher] Connection disconnected')
+    })
+    pusher.connection.bind('unavailable', () => {
+    //  console.warn('[Pusher] Connection unavailable')
+    })
+    pusher.connection.bind('failed', () => {
+     // console.error('[Pusher] Connection failed')
+    })
+    pusher.connection.bind('error', (err: any) => {
+      console.error('[Pusher] Connection error', err)
+      if (err?.error?.data?.code === 4100) {
+        console.warn('[Pusher] Connection limit reached (4100)')
+      }
+    })
+
+    // Log *everything* that reaches the client (including internal pusher:* events).
+    if (typeof (pusher as any).bind_global === 'function') {
+      ;(pusher as any).bind_global((eventName: string, data: any) => {
+     //   console.log('[Pusher] Global event', eventName, data)
+      })
     }
-  })
+  }
 
   return pusher
 }
@@ -63,8 +110,28 @@ export function getPusher(token: string, currentLocale: string): Pusher {
 export function subscribePrivateUser(userId: number, token: string, currentLocale: string): Channel {
   const client = getPusher(token, currentLocale)
   const channelName = `private-user.${userId}`
+  if (lastChannelName && lastChannelName !== channelName) {
+   // console.log('[Pusher] Unsubscribing previous channel', { from: lastChannelName, to: channelName })
+    client.unsubscribe(lastChannelName)
+  }
   lastChannelName = channelName
+
+  const state = (client as any)?.connection?.state
+  if (state === 'disconnected' || state === 'failed') {
+    console.warn('[Pusher] Client not connected; calling connect()', { state })
+    client.connect()
+  }
+
+  //console.log('[Pusher] Subscribing', { channelName })
   const channel = client.subscribe(channelName)
+
+  channel.bind('pusher:subscription_succeeded', () => {
+   // console.log('[Pusher] Subscription succeeded', { channelName })
+  })
+  channel.bind('pusher:subscription_error', (status: any) => {
+  //  console.error('[Pusher] Subscription error', { channelName, status })
+  })
+
   const events = [
     'account.activated',
     'account.deactivated',
@@ -87,7 +154,7 @@ export function subscribePrivateUser(userId: number, token: string, currentLocal
   events.forEach((evt) => {
     channel.bind(evt, (data: any) => {
       // eslint-disable-next-line no-console
-      console.log('[Pusher] Event:', evt, data)
+   //   console.log('[Pusher] Channel event', { channelName, evt, data })
     })
   })
   return channel
@@ -106,20 +173,25 @@ export function unsubscribePrivateUser(userId: number) {
 }
 
 export function bindGlobal(handler: (eventName: string, data: any) => void) {
-  if (pusher && (pusher as any).bind_global) {
+  if (pusher && typeof (pusher as any).bind_global === 'function') {
     ;(pusher as any).bind_global(handler)
   }
 }
 
 export function unbindGlobal(handler: (eventName: string, data: any) => void) {
-  if (pusher && (pusher as any).unbind_global) {
+  if (pusher && typeof (pusher as any).unbind_global === 'function') {
     ;(pusher as any).unbind_global(handler)
   }
 }
 
 export function disconnectPusher() {
   if (pusher) {
+  //  console.log('[Pusher] Disconnecting client', { lastChannelName })
     pusher.disconnect()
     pusher = null
+    lastChannelName = null
+    lastToken = null
+    lastLocale = null
+    didBindDebugHandlers = false
   }
 }
