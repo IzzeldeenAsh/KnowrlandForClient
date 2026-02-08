@@ -13,7 +13,7 @@ const ContentTabs: React.FC<ContentTabsProps> = ({ activeTab, setActiveTab, loca
     { id: 'all', labelEn: 'All', labelAr: 'الكل' },
     { id: 'data', labelEn: 'Data', labelAr: 'البيانات' },
     { id: 'report', labelEn: 'Reports', labelAr: 'التقارير' },
-    { id: 'insight', labelEn: 'Insights', labelAr: 'الرؤى' },
+    { id: 'insight', labelEn: 'Insights', labelAr: 'المستندات' },
     { id: 'manual', labelEn: 'Manuals', labelAr: 'الأدلة' },
     { id: 'course', labelEn: 'Courses', labelAr: 'الدورات' },
   ];

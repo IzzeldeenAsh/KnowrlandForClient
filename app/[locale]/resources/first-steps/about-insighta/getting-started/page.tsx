@@ -145,8 +145,8 @@ export default async function GettingStartedPage({ params }: { params: Promise<{
                       </div>
                       <div className="text-gray-600">
                         {locale === 'ar'
-                          ? 'تعرّف على كيفية نشر وبيع المعرفة وإدارة الطلبات والاجتماعات.'
-                          : 'Learn how to publish, sell, and manage orders and meetings.'}
+                          ? 'تعرّف على كيفية نشر وبيع المعرفة وإدارة الطلبات والجلسات الاستشارية.'
+                          : 'Learn how to publish, sell, and manage orders and sessions.'}
                       </div>
                     </div>
                   </div>

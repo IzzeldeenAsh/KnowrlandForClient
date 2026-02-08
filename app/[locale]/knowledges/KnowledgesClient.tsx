@@ -118,7 +118,7 @@ export default function KnowledgesClient() {
     selectIndustry: isRTL ? 'حدد صناعة' : 'Select an industry',
     selectSubIndustry: isRTL ? 'حدد صناعة فرعية' : 'Select a sub-industry',
     selectTopic: isRTL ? 'حدد موضوعًا' : 'Select a topic',
-    knowledgeType: isRTL ? 'نوع الرؤى' : 'Insights Type',
+    knowledgeType: isRTL ? 'نوع المستندات' : 'Insights Type',
     selectType: isRTL ? 'حدد النوع' : 'Select type',
     data: isRTL ? 'بيانات' : 'Data',
     insight: isRTL ? 'رؤى' : 'Insight',
