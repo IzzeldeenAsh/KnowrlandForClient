@@ -380,6 +380,7 @@ export default function RelatedKnowledgeItemsSection({
               onClick={() => {
                 const s = swiperRef.current
                 if (!s) return
+                //up test script
                 // In Swiper RTL mode, "prev/next" are effectively mirrored.
                 if (s.rtlTranslate) s.slideNext()
                 else s.slidePrev()
