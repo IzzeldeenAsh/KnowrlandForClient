@@ -98,15 +98,39 @@ const ResultsSection: React.FC<ResultsSectionProps> = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentPage]);
   
-  // Loading state component with a nice spinner
-  const LoadingSpinner = () => (
-    <div className="flex flex-col items-center justify-center py-16">
-      <div className="relative">
-        <div className="w-16 h-16 border-4 border-blue-200 border-t-blue-600 rounded-full animate-spin"></div>
+  // Lightweight skeleton fallback (used only while the code-split component loads)
+  const SkeletonFallback = () => (
+    <div className="max-w-10xl 2xl:max-w-none 2xl:mx-8 mx-auto px-10" dir={isRtl ? 'rtl' : 'ltr'}>
+      <div className={`grid sm:grid-cols-2 ${filtersVisible ? 'xl:grid-cols-3' : 'xl:grid-cols-4'} 3xl:grid-cols-4 gap-4 max-w-10xl 2xl:max-w-none 2xl:mx-8 mx-auto`}>
+        {[...Array(filtersVisible ? 9 : 12)].map((_, i) => (
+          <div key={`results-fallback-skel-${i}`} className="bg-white rounded-lg border border-gray-200 h-full overflow-hidden animate-pulse">
+            <div className="bg-gray-200 p-6">
+              <div className="flex items-center gap-2 mb-3">
+                <div className="w-5 h-5 bg-gray-300 rounded" />
+                <div className="h-5 bg-gray-300 rounded w-20" />
+              </div>
+              <div className="h-6 bg-gray-300 rounded w-full mb-2" />
+              <div className="h-4 bg-gray-300 rounded w-3/4" />
+            </div>
+            <div className="p-6">
+              <div className="flex justify-between items-center pb-4">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 bg-gray-200 rounded-full" />
+                  <div>
+                    <div className="h-4 bg-gray-200 rounded w-28 mb-2" />
+                    <div className="h-3 bg-gray-200 rounded w-20" />
+                  </div>
+                </div>
+                <div className="w-5 h-5 bg-gray-200 rounded" />
+              </div>
+              <div className="flex justify-between items-center pt-2 mt-6 border-t border-gray-100">
+                <div className="h-3 bg-gray-200 rounded w-28" />
+                <div className="h-5 bg-gray-200 rounded w-16" />
+              </div>
+            </div>
+          </div>
+        ))}
       </div>
-      <p className="mt-4 text-gray-600 font-medium">
-        {locale === 'ar' ? 'جارٍ التحميل...' : 'Loading...'}
-      </p>
     </div>
   );
   
@@ -289,9 +313,17 @@ const ResultsSection: React.FC<ResultsSectionProps> = ({
     </div>
       <div className="border-b border-gray-300 mb-4"/>
       
-      <Suspense fallback={<LoadingSpinner />}>
+      <Suspense fallback={<SkeletonFallback />}>
         {loading ? (
-          <LoadingSpinner />
+          <SearchResultsGrid
+            key={`search-results-loading-${searchType}-${totalItems}-${currentPage}`}
+            results={searchResults}
+            colNumbers={3}
+            locale={locale}
+            viewMode={viewMode}
+            filtersVisible={filtersVisible}
+            isLoading
+          />
         ) : (
           <>
             {/* Show results if we have them */}
@@ -328,14 +360,8 @@ const ResultsSection: React.FC<ResultsSectionProps> = ({
             )}
             
             {/* Pagination - only show when we have results and not loading */}
-            {!loading && totalItems > 0 && (
+            {totalItems > 0 && (
               <div className="flex flex-col items-center mt-8 mb-8">
-                {/* <div className="text-sm text-gray-600 mb-2">
-                  {locale === 'ar' ? 
-                    `عرض ${(urlCurrentPage - 1) * 30 + 1} - ${Math.min(urlCurrentPage * 30, totalItems)} من ${totalItems}` : 
-                    `Showing ${(urlCurrentPage - 1) * 30 + 1} - ${Math.min(urlCurrentPage * 30, totalItems)} of ${totalItems}`
-                  }
-                </div> */}
                 <Pagination 
                   key={`pagination-${totalPages}-${totalItems}`}
                   total={totalPages} 

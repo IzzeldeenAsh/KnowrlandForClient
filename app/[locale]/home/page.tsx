@@ -557,43 +557,73 @@ export default function HomePage() {
   }, [updateUrlWithFilters]);
   
   // Custom setter for country filter that triggers search
+  // Country, Region, and Economic Bloc are mutually exclusive - selecting one clears the others
   const handleCountryFilterChange = useCallback((value: number | null) => {
-    // Update the country filter state
+    // Update the country filter state and clear mutually exclusive filters
     setCountryFilter(value);
-    // Update URL with new filter
-    updateUrlWithFilters({ country: value });
+    if (value !== null) {
+      // Clear the other target market filters when selecting a country
+      setRegionFilter(null);
+      setEconomicBlocFilter(null);
+    }
+    // Update URL with new filter - explicitly clear the others
+    updateUrlWithFilters({ 
+      country: value, 
+      region: value !== null ? null : regionFilter,
+      economic_bloc: value !== null ? null : economicBlocFilter
+    });
     
     // Reset to page 1 when filter changes
     setCurrentPage(1);
     
     // The main search effect will be triggered by the state change
-  }, [updateUrlWithFilters]);
+  }, [updateUrlWithFilters, regionFilter, economicBlocFilter]);
   
   // Custom setter for region filter that triggers search
+  // Country, Region, and Economic Bloc are mutually exclusive - selecting one clears the others
   const handleRegionFilterChange = useCallback((value: number | null) => {
-    // Update the region filter state
+    // Update the region filter state and clear mutually exclusive filters
     setRegionFilter(value);
-    // Update URL with new filter
-    updateUrlWithFilters({ region: value });
+    if (value !== null) {
+      // Clear the other target market filters when selecting a region
+      setCountryFilter(null);
+      setEconomicBlocFilter(null);
+    }
+    // Update URL with new filter - explicitly clear the others
+    updateUrlWithFilters({ 
+      region: value,
+      country: value !== null ? null : countryFilter,
+      economic_bloc: value !== null ? null : economicBlocFilter
+    });
     
     // Reset to page 1 when filter changes
     setCurrentPage(1);
     
     // The main search effect will be triggered by the state change
-  }, [updateUrlWithFilters]);
+  }, [updateUrlWithFilters, countryFilter, economicBlocFilter]);
   
   // Custom setter for economic bloc filter that triggers search
+  // Country, Region, and Economic Bloc are mutually exclusive - selecting one clears the others
   const handleEconomicBlocFilterChange = useCallback((value: number | null) => {
-    // Update the economic bloc filter state
+    // Update the economic bloc filter state and clear mutually exclusive filters
     setEconomicBlocFilter(value);
-    // Update URL with new filter
-    updateUrlWithFilters({ economic_bloc: value });
+    if (value !== null) {
+      // Clear the other target market filters when selecting an economic bloc
+      setCountryFilter(null);
+      setRegionFilter(null);
+    }
+    // Update URL with new filter - explicitly clear the others
+    updateUrlWithFilters({ 
+      economic_bloc: value,
+      country: value !== null ? null : countryFilter,
+      region: value !== null ? null : regionFilter
+    });
     
     // Reset to page 1 when filter changes
     setCurrentPage(1);
     
     // The main search effect will be triggered by the state change
-  }, [updateUrlWithFilters]);
+  }, [updateUrlWithFilters, countryFilter, regionFilter]);
   
   // Custom setter for price filter that triggers search
   const handlePriceFilterChange = useCallback((value: string | null) => {

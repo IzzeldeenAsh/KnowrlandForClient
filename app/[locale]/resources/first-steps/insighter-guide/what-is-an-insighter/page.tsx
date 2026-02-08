@@ -58,7 +58,7 @@ export default async function WhatIsAnInsighterPage({
 
           <div className="relative z-10 px-4 sm:px-12">
             {/* Breadcrumbs */}
-            <nav className={`mb-6 text-xs md:text-sm ${isRTL ? 'text-right' : 'text-left'}`} aria-label="Breadcrumb">
+            <nav className={`mb-6 text-xs md:text-sm ps-6 md:ps-0 ${isRTL ? 'text-right' : 'text-left'}`} aria-label="Breadcrumb">
               <ol className="flex items-center gap-2 text-gray-700/80 flex-wrap">
                 <li>
                   <a

@@ -72,7 +72,7 @@ export default function MobileMenu({ isHomePage = true }: MobileMenuProps) {
   })
 
   return (
-    <div className="md:hidden flex items-center ml-4">
+    <div className="lg:hidden flex items-center ml-4">
       {/* Hamburger button */}
       <button
         ref={trigger}

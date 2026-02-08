@@ -97,20 +97,22 @@ export default function Footer() {
             </ul>
           </div>
             {/* 3rd block */}
-            {/* <div className="sm:col-span-6 md:col-span-3 lg:col-span-2 text-center sm:text-left">
-            <h6 className="text-sm text-slate-50 font-medium mb-2 text-start">First Steps</h6>
-            <ul className="text-sm space-y-2 text-start">
-              <li>
-                <a className="text-slate-400 hover:text-slate-200 transition duration-150 ease-in-out" href={`/${locale}/resources/first-steps/about-insighta`}>{t('firstSteps.aboutInsighta')}</a>
-              </li>
-              <li>
-              <a className="text-slate-400 hover:text-slate-200 transition duration-150 ease-in-out" href={`/${locale}/resources/first-steps/insighter-guide/what-is-an-insighter`}>{t('firstSteps.insighterGuide')}</a>
-              </li>
-              <li>
-                <a className="text-slate-400 hover:text-slate-200 transition duration-150 ease-in-out" href={`/${locale}/resources/first-steps/client-guide`}>{t('firstSteps.clientGuide')}</a>
-              </li>
-            </ul>
-          </div> */}
+            {
+          //   <div className="sm:col-span-6 md:col-span-3 lg:col-span-2 text-center sm:text-left">
+          //   <h6 className="text-sm text-slate-50 font-medium mb-2 text-start">First Steps</h6>
+          //   <ul className="text-sm space-y-2 text-start">
+          //     <li>
+          //       <a className="text-slate-400 hover:text-slate-200 transition duration-150 ease-in-out" href={`/${locale}/resources/first-steps/about-insighta`}>{t('firstSteps.aboutInsighta')}</a>
+          //     </li>
+          //     <li>
+          //     <a className="text-slate-400 hover:text-slate-200 transition duration-150 ease-in-out" href={`/${locale}/resources/first-steps/insighter-guide/what-is-an-insighter`}>{t('firstSteps.insighterGuide')}</a>
+          //     </li>
+          //     <li>
+          //       <a className="text-slate-400 hover:text-slate-200 transition duration-150 ease-in-out" href={`/${locale}/resources/first-steps/client-guide`}>{t('firstSteps.clientGuide')}</a>
+          //     </li>
+          //   </ul>
+          // </div> 
+          }
           
           {/* 4th block - Resources */}
           {/* <div className="sm:col-span-6 md:col-span-3 lg:col-span-2 text-center sm:text-left">

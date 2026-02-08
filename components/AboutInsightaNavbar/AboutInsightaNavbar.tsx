@@ -179,7 +179,7 @@ export function AboutInsightaNavbar({ onLinkClick }: AboutInsightaNavbarProps) {
   const searchPlaceholder = isRtl ? 'البحث في القائمة...' : 'Search menu...';
 
   return (
-    <Box className={classes.navbar} component="nav">
+    <Box className={classes.navbar} component="nav" dir={isRtl ? 'rtl' : 'ltr'}>
       <Box className={classes.searchContainer}>
         <TextInput
           placeholder={searchPlaceholder}
