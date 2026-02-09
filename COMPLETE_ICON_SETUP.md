@@ -106,7 +106,7 @@ After deployment, verify:
 ```bash
 npm run build
 npm run start
-# Visit https://foresighta.co
+# Visit https://insightabusiness.com
 ```
 
 Check:
@@ -119,12 +119,12 @@ Check:
 
 Test these URLs directly:
 ```
-✅ https://foresighta.co/manifest.webmanifest
-✅ https://foresighta.co/favicon.ico
-✅ https://foresighta.co/icon.png
-✅ https://foresighta.co/apple-touch-icon.png
-✅ https://foresighta.co/icons-192.png
-✅ https://foresighta.co/icons-512.png
+✅ https://insightabusiness.com/manifest.webmanifest
+✅ https://insightabusiness.com/favicon.ico
+✅ https://insightabusiness.com/icon.png
+✅ https://insightabusiness.com/apple-touch-icon.png
+✅ https://insightabusiness.com/icons-192.png
+✅ https://insightabusiness.com/icons-512.png
 ```
 
 ### PWA Testing
@@ -194,11 +194,11 @@ Enter your URL and verify favicon appears in preview
 2. **Verify deployment:**
    ```bash
    # Check manifest loads
-   curl https://foresighta.co/manifest.webmanifest
+   curl https://insightabusiness.com/manifest.webmanifest
    
    # Check icons load
-   curl -I https://foresighta.co/favicon.ico
-   curl -I https://foresighta.co/icons-192.png
+   curl -I https://insightabusiness.com/favicon.ico
+   curl -I https://insightabusiness.com/icons-192.png
    ```
 
 3. **Request Google re-indexing:**

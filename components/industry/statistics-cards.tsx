@@ -139,7 +139,7 @@ export default function StatisticsCards({ type, id, entityName }: StatisticsCard
   return (
     <div className="flex flex-col w-full">
       {entityName && (
-        <span className="inline-block px-5 py-1 text-xs font-semibold text-blue-500 bg-blue-100 rounded-md mb-2 uppercase w-fit">
+        <span className="inline-block py-1 text-sm font-semibold text-blue-500 rounded-md mb-2 capitalize w-fit">
           {
           t.rich(getMessageKey(), {
               industry: () => <span className="font-extrabold underline">{entityName}</span>,

@@ -101,7 +101,7 @@ const ResultsSection: React.FC<ResultsSectionProps> = ({
   // Lightweight skeleton fallback (used only while the code-split component loads)
   const SkeletonFallback = () => (
     <div className="max-w-10xl 2xl:max-w-none 2xl:mx-8 mx-auto px-10" dir={isRtl ? 'rtl' : 'ltr'}>
-      <div className={`grid sm:grid-cols-2 ${filtersVisible ? 'xl:grid-cols-3' : 'xl:grid-cols-4'} 3xl:grid-cols-4 gap-4 max-w-10xl 2xl:max-w-none 2xl:mx-8 mx-auto`}>
+      <div className={`grid sm:grid-cols-2 ${filtersVisible ? 'xl:grid-cols-3' : 'xl:grid-cols-4'} gap-4 max-w-10xl 2xl:max-w-none 2xl:mx-8 mx-auto`}>
         {[...Array(filtersVisible ? 9 : 12)].map((_, i) => (
           <div key={`results-fallback-skel-${i}`} className="bg-white rounded-lg border border-gray-200 h-full overflow-hidden animate-pulse">
             <div className="bg-gray-200 p-6">
@@ -294,7 +294,7 @@ const ResultsSection: React.FC<ResultsSectionProps> = ({
                         <span className={`${isRtl ? 'me-2' : 'ml-2'} font-medium text-xs`}>
                         {isRtl ? cat.arLabel : cat.label}
                       </span>
-                        {hasKeyword && cat.name !== 'all' && (
+                        {hasKeyword && (
                           <span className={`${styles.countBadge} ${isRtl ? 'me-0' : 'ml-2'}`}>
                             {count > 999 ? '999+' : count}
                           </span>
@@ -388,7 +388,7 @@ const ResultsSection: React.FC<ResultsSectionProps> = ({
         <div className="flex flex-col sm:flex-row items-center justify-center gap-2 text-center">
           <Image src="/images/smallLogo.png" alt="Logo" width={20 } height={20} />
           <Text size="xs" c="dimmed" dir="ltr" lang="en">
-        © 2025 insightabusiness.com
+        © 2026insightabusiness.com
           </Text>
           <Text size="xs" c="dimmed" dir="ltr" lang="en" className="whitespace-nowrap">
             v1.1.1
@@ -410,6 +410,7 @@ export default memo(ResultsSection, (prevProps, nextProps) => {
     prevProps.totalItems === nextProps.totalItems &&
     prevProps.viewMode === nextProps.viewMode &&
     prevProps.selectedCategory === nextProps.selectedCategory &&
-    prevProps.searchType === nextProps.searchType
+    prevProps.searchType === nextProps.searchType &&
+    prevProps.filtersVisible === nextProps.filtersVisible
   );
 });

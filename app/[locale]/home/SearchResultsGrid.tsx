@@ -238,7 +238,7 @@ function SearchResultsGridComponent({
 
       const method = currentState ? 'DELETE' : 'POST';
       const slug = item.url.split('/').pop();
-      const url = `https://api.foresighta.co/api/account/favorite/knowledge/${slug}`;
+      const url = `https://api.insightabusiness.com/api/account/favorite/knowledge/${slug}`;
 
       const response = await axios({
         method,
@@ -305,7 +305,7 @@ function SearchResultsGridComponent({
 
   };
 
-  const gridClassName = `grid sm:grid-cols-2 ${filtersVisible ? 'xl:grid-cols-3' : 'xl:grid-cols-4'} 3xl:grid-cols-4 gap-4 max-w-10xl 2xl:max-w-none 2xl:mx-8 mx-auto`;
+  const gridClassName = `grid sm:grid-cols-2 ${filtersVisible ? 'xl:grid-cols-3' : 'xl:grid-cols-4'} gap-4 max-w-10xl 2xl:max-w-none 2xl:mx-8 mx-auto`;
 
   const KnowledgeCardSkeleton = () => (
     <div className="bg-white rounded-lg border border-gray-200 h-full overflow-hidden animate-pulse">

@@ -33,15 +33,14 @@ async function fetchTopicData(id: string, slug: string, locale: string = 'en') {
       "Accept": "application/json",
       "Accept-Language": locale,
       "X-Timezone": Intl.DateTimeFormat().resolvedOptions().timeZone,
-    },
-    next: { revalidate: 3600 }
+    }
   })
 
   if (!response.ok) {
     throw new Error(`Failed to fetch topic details: ${response.status}`)
   }
-
   const data = await response.json()
+  console.log('topic data', data);
   return data
 }
 

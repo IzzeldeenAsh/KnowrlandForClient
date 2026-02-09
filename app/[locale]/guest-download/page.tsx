@@ -73,7 +73,7 @@ export default function GuestDownloadPage() {
       if (tokenFromUrl) localStorage.setItem("guest-token", tokenFromUrl);
 
       const response = await fetch(
-        `https://api.foresighta.co/api/platform/guest/order/knowledge/download/${orderUuid}`,
+        `https://api.insightabusiness.com/api/platform/guest/order/knowledge/download/${orderUuid}`,
         {
           method: "POST",
           headers: {
@@ -145,7 +145,7 @@ export default function GuestDownloadPage() {
             {isRTL ? (
               <>
                 إذا كنت بحاجة إلى مساعدة،{" "}
-                <Anchor href="https://foresighta.co/en/contact" target="_blank" rel="noopener noreferrer">
+                <Anchor href="https://insightabusiness.com/en/contact" target="_blank" rel="noopener noreferrer">
                   تواصل مع الدعم
                 </Anchor>{" "}
                 وارفق رقم الطلب.
@@ -153,7 +153,7 @@ export default function GuestDownloadPage() {
             ) : (
               <>
                 If you need help, please{" "}
-                <Anchor href="https://foresighta.co/en/contact" target="_blank" rel="noopener noreferrer">
+                <Anchor href="https://insightabusiness.com/en/contact" target="_blank" rel="noopener noreferrer">
                   contact support
                 </Anchor>{" "}
                 and include your order number.

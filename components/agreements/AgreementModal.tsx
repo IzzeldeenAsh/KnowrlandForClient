@@ -97,7 +97,7 @@ const AgreementModal: React.FC<AgreementModalProps> = ({
       setError(null);
       setCanAccept(false);
       try {
-        const res = await fetch(`https://api.foresighta.co/api/common/setting/guideline/type/last/${computedAgreementType}`, {
+        const res = await fetch(`https://api.insightabusiness.com/api/common/setting/guideline/type/last/${computedAgreementType}`, {
           headers: {
             Accept: 'application/json',
             'Accept-Language': (locale as string) || 'en',
@@ -207,7 +207,7 @@ const AgreementModal: React.FC<AgreementModalProps> = ({
     setError(null);
     try {
       const token = getAuthToken();
-      const res = await fetch(`https://api.foresighta.co/api/account/agreement/accept/${finalUuid}`, {
+      const res = await fetch(`https://api.insightabusiness.com/api/account/agreement/accept/${finalUuid}`, {
         method: 'PUT',
         headers: {
           Accept: 'application/json',

@@ -11,6 +11,7 @@ import Cta from '@/components/cta'
 import Features from '@/components/features'
 import FloatingPublishButton from '@/components/floating-publish-button'
 import { generateOrganizationSchema, generateWebSiteSchema } from '@/utils/seo'
+import DraftSavedToast from './DraftSavedToast'
 
 type HomeProps = {
   params: Promise<{ locale: string }>
@@ -32,6 +33,7 @@ export default async function Home({ params }: HomeProps) {
           __html: JSON.stringify([organizationSchema, webSiteSchema])
         }}
       />
+      <DraftSavedToast locale={locale} />
       <Hero />
       <TestimonialsCarousel />
       <Features/>

@@ -33,8 +33,7 @@ async function fetchSubIndustryData(id: string, slug: string, locale: string = '
       "Accept-Language": locale,
       "X-Timezone": Intl.DateTimeFormat().resolvedOptions().timeZone,
     },
-    body: JSON.stringify({ top_knowledge: 10 }),
-    next: { revalidate: 3600 }
+    body: JSON.stringify({ top_knowledge: 10 })
   })
 
   if (!response.ok) {
@@ -51,6 +50,8 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
   try {
     const { data } = await fetchSubIndustryData(id, slug, locale)
+
+    console.log('sub-industry data', data);
     
     return {
       title: `${data.name} Sub-Industry Analysis | Insighta`,

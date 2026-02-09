@@ -2,16 +2,15 @@ import Footer from '@/components/ui/footer'
 import Breadcrumb from '@/components/ui/breadcrumb'
 import Image from 'next/image'
 import { Metadata } from 'next'
-import IndustryIcon from "@/components/icons/industry-icon";
 import Link from 'next/link'
 import { fetchBreadcrumb } from '@/utils/breadcrumb'
 import StatisticsCards from '@/components/industry/statistics-cards'
 import SubIndustryCard from '@/components/industry/sub-industry-card'
 import Stripes from "@/public/images/stripes-dark.svg";
 import { getMessages } from '@/utils/get-messages'
-import { getApiUrl } from '@/app/config'
-import { IndustryDetails, IndustryChild } from '@/hooks/industries/types'
+import { IndustryChild } from '@/hooks/industries/types'
 import { generateIndustryStructuredData } from '@/utils/seo'
+import { fetchIndustryDetails, getIndustryMetadata } from './industry.server'
 
 interface Params {
   id: string;
@@ -23,50 +22,11 @@ interface Props {
   params: Promise<Params>;
 }
 
-async function fetchIndustryData(id: string, slug: string, locale: string = 'en') {
-  const apiUrl = getApiUrl(`/api/platform/industries/${id}/${slug}`)
-  
-  const response = await fetch(apiUrl, {
-    method: 'POST',
-    headers: {
-      "Content-Type": "application/json",
-      "Accept": "application/json",
-      "Accept-Language": locale,
-      "X-Timezone": Intl.DateTimeFormat().resolvedOptions().timeZone,
-    },
-    body: JSON.stringify({ top_topic: 2 }),
-    next: { revalidate: 3600 }
-  })
-
-  if (!response.ok) {
-    throw new Error(`Failed to fetch industry details: ${response.status}`)
-  }
-
-  const data = await response.json();
-  return data
-}
-
 // Generate metadata for SEO
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
  const { id, slug, locale = 'en' } = await params
 
-  try {
-    const { data } = await fetchIndustryData(id, slug, locale)
-    
-    return {
-      title: `${data.name} Industry Analysis | Insighta`,
-      description: `Detailed analysis and insights about ${data.name} industry, including ${data.children.map((child: IndustryChild) => child.name).join(', ')}`,
-      openGraph: {
-        title: `${data.name} Industry Analysis | Insighta`,
-        description: `Detailed analysis and insights about ${data.name} industry, including ${data.children.map((child: IndustryChild) => child.name).join(', ')}`,
-      }
-    }
-  } catch (error) {
-    return {
-      title: 'Industry Analysis | Insighta',
-      description: 'Detailed industry analysis and insights'
-    }
-  }
+  return getIndustryMetadata(id, slug, locale)
 }
 
 export default async function IndustryPage({ params }: Props) {
@@ -77,7 +37,8 @@ export default async function IndustryPage({ params }: Props) {
   const messages = await getMessages(locale);
 
   try {
-    const { data: industry } = await fetchIndustryData(id, slug, locale)
+    const { data: industry } = await fetchIndustryDetails(id, slug, locale)
+    console.log('industry data', industry);
     const breadcrumbItems = await fetchBreadcrumb('industry', parseInt(id), locale)
     
     // Generate structured data
@@ -105,7 +66,7 @@ export default async function IndustryPage({ params }: Props) {
           ].filter(Boolean))
         }}
       />
-      <div className="relative z-10 max-w-6xl relative mx-auto  w-full ">
+      <div className="relative z-10 max-w-6xl mx-auto w-full">
       <div
         className="pointer-events-none absolute z-10 -translate-x-1/2 transform hidden md:block"
         style={{ left: '28%' }}

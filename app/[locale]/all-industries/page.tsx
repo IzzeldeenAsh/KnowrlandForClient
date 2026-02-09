@@ -20,6 +20,8 @@ export default function AllIndustries() {
     topSubIndustry: 3 
   });
 
+  console.log('industries data', industries);
+
   const breadcrumbItems = [
     { label: t('Header.navigation.industries') || 'Industries', href: `/${locale}/all-industries` }
   ]

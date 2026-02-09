@@ -90,7 +90,7 @@ export default function DataLicensingAgreement() {
         </div>
         <p className="text-sm text-slate-400 mt-8 pt-6 border-t border-slate-700">
           {t('lastUpdatedLicensing')}
-          {/* : March 26, 2025 */}
+          {/* : March 26, 2026 */}
         </p>
       </div>
       <Footer/>
