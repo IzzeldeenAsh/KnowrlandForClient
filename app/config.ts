@@ -8,18 +8,18 @@ const isDevelopment = FORCE_DEVELOPMENT || process.env.NODE_ENV === 'development
 
 // API and App URLs based on environment
 export const apiBaseUrl = isDevelopment 
-  ? 'https://api.insightabusiness.com' 
-  : 'https://api.insightabusiness.com';
+  ? 'https://api.foresighta.co' 
+  : 'https://api.foresighta.co';
 
 // Public-facing base URL for this Next.js app (used for canonical, sitemap, robots)
 // Prefer NEXT_PUBLIC_BASE_URL if provided; otherwise fall back to sensible defaults
 export const publicBaseUrl: string =
-  process.env.NEXT_PUBLIC_BASE_URL || 'https://insightabusiness.com';
+  process.env.NEXT_PUBLIC_BASE_URL || 'https://foresighta.co';
 
 // (Unused at the moment) App URL helper for legacy clients; keep for compatibility
 export const appBaseUrl = isDevelopment 
-  ? 'https://insightabusiness.com' 
-  : 'https://insightabusiness.com';
+  ? 'https://foresighta.co' 
+  : 'https://foresighta.co';
 
 // Function to get full API URL with path
 export const getApiUrl = (path: string): string => {

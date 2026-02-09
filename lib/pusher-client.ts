@@ -17,7 +17,7 @@ function getConfig(): PusherOpts {
   const key = (process.env.NEXT_PUBLIC_PUSHER_KEY ?? '81566bb993a074e07d41').trim()
   const cluster = (process.env.NEXT_PUBLIC_PUSHER_CLUSTER ?? 'eu').trim()
   const authEndpoint = (
-   'https://api.insightabusiness.com/broadcasting/auth'
+   'https://api.foresighta.co/broadcasting/auth'
   ).trim()
   if (!key || !authEndpoint) {
     console.error('[Pusher] Missing env: NEXT_PUBLIC_PUSHER_KEY or NEXT_PUBLIC_PUSHER_AUTH_ENDPOINT')

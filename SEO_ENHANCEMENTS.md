@@ -91,9 +91,9 @@ This document outlines the SEO improvements implemented for the Insighta Busines
 To verify the sitemap is working:
 1. Build the project: `npm run build`
 2. Start the server: `npm run start`
-3. Visit: `https://insightabusiness.com/sitemap.xml`
-4. Check robots.txt: `https://insightabusiness.com/robots.txt`
-5. Check manifest: `https://insightabusiness.com/manifest.json`
+3. Visit: `https://foresighta.co/sitemap.xml`
+4. Check robots.txt: `https://foresighta.co/robots.txt`
+5. Check manifest: `https://foresighta.co/manifest.json`
 
 ## Search Engine Submission
 

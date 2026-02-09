@@ -132,12 +132,12 @@ After deployment, test with these tools:
 
 **Test URLs (after deployment):**
 ```
-https://insightabusiness.com/manifest.webmanifest
-https://insightabusiness.com/favicon.ico
-https://insightabusiness.com/icon.png
-https://insightabusiness.com/apple-touch-icon.png
-https://insightabusiness.com/icons-192.png
-https://insightabusiness.com/icons-512.png
+https://foresighta.co/manifest.webmanifest
+https://foresighta.co/favicon.ico
+https://foresighta.co/icon.png
+https://foresighta.co/apple-touch-icon.png
+https://foresighta.co/icons-192.png
+https://foresighta.co/icons-512.png
 ```
 
 **Visual Testing:**

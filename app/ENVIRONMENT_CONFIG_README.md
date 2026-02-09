@@ -6,8 +6,8 @@ This document explains how to use the new environment configuration to handle di
 
 The configuration is centralized in `/app/config.ts` and provides:
 
-- `apiBaseUrl`: In development, uses `https://api.insightabusiness.com`; in production, uses `https://api.insightabusiness.com`
-- `appBaseUrl`: In development, uses `https://app.insightabusiness.com`; in production, uses `https://app.insightabusiness.com`
+- `apiBaseUrl`: In development, uses `https://api.foresighta.co`; in production, uses `https://api.foresighta.co`
+- `appBaseUrl`: In development, uses `https://app.foresighta.co`; in production, uses `https://app.foresighta.co`
 
 ## Helper Functions
 
@@ -22,7 +22,7 @@ The configuration file provides two helper functions:
 
 Replace hardcoded API URLs like:
 ```typescript
-const response = await fetch('https://api.insightabusiness.com/api/platform/industries', {...});
+const response = await fetch('https://api.foresighta.co/api/platform/industries', {...});
 ```
 
 With:
@@ -36,7 +36,7 @@ const response = await fetch(getApiUrl('/api/platform/industries'), {...});
 
 Replace hardcoded app URLs like:
 ```typescript
-window.location.href = 'https://app.insightabusiness.com/auth/login';
+window.location.href = 'https://app.foresighta.co/auth/login';
 ```
 
 With:
@@ -49,12 +49,12 @@ window.location.href = getAppUrl('/auth/login');
 ## Important Notes
 
 1. When using the helper functions, remove the base URL and start the path with a slash:
-   - ❌ `getApiUrl('https://api.insightabusiness.com/api/platform/industries')` 
+   - ❌ `getApiUrl('https://api.foresighta.co/api/platform/industries')` 
    - ✅ `getApiUrl('/api/platform/industries')`
 
 2. The environment is automatically detected based on Node.js' `process.env.NODE_ENV`.
 
-3. When running in development, APIs will use `https://api.insightabusiness.com` and app redirects will use `https://app.insightabusiness.com`.
+3. When running in development, APIs will use `https://api.foresighta.co` and app redirects will use `https://app.foresighta.co`.
 
 ## Files That Need to Be Updated
 
@@ -85,9 +85,9 @@ const isDevelopment = process.env.NODE_ENV === 'development';
 
 ### API and App URLs based on environment
 export const apiBaseUrl = isDevelopment 
-  ? 'https://api.insightabusiness.com' 
-  : 'https://api.insightabusiness.com';
+  ? 'https://api.foresighta.co' 
+  : 'https://api.foresighta.co';
 
 export const appBaseUrl = isDevelopment 
-  ? 'https://app.insightabusiness.com' 
-  : 'https://app.insightabusiness.com'; 
+  ? 'https://app.foresighta.co' 
+  : 'https://app.foresighta.co'; 

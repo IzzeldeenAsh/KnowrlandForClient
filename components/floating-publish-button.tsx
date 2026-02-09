@@ -20,7 +20,7 @@ export default function FloatingPublishButton() {
 
   return (
     <Link
-      href="https://app.insightabusiness.com/app/insighter-register/vertical"
+      href="https://app.foresighta.co/app/insighter-register/vertical"
       className="fixed bottom-6 left-6 z-50 bg-sky-600 hover:bg-sky-700 text-white font-semibold py-3 px-6 rounded-full shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 active:scale-95"
       style={{
         boxShadow: '0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)',

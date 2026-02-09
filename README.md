@@ -12,11 +12,11 @@ yarn dev
 pnpm dev
 ```
 
-Open [https://insightabusiness.com](https://insightabusiness.com) with your browser to see the result.
+Open [https://foresighta.co](https://foresighta.co) with your browser to see the result.
 
 You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
 
-[API routes](https://nextjs.org/docs/api-routes/introduction) can be accessed on [https://insightabusiness.com/api/hello](https://insightabusiness.com/api/hello). This endpoint can be edited in `pages/api/hello.ts`.
+[API routes](https://nextjs.org/docs/api-routes/introduction) can be accessed on [https://foresighta.co/api/hello](https://foresighta.co/api/hello). This endpoint can be edited in `pages/api/hello.ts`.
 
 The `pages/api` directory is mapped to `/api/*`. Files in this directory are treated as [API routes](https://nextjs.org/docs/api-routes/introduction) instead of React pages.
 

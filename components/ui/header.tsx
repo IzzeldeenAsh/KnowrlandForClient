@@ -46,8 +46,8 @@ const INDUSTRIES_CACHE_DURATION = 300000; // 5 minutes cache for industries
 const ANGULAR_APP_URL: string =
   process.env.NEXT_PUBLIC_ANGULAR_APP_URL ||
   (process.env.NODE_ENV === 'development'
-    ? 'https://app.insightabusiness.com'
-    : 'https://app.insightabusiness.com');
+    ? 'https://app.foresighta.co'
+    : 'https://app.foresighta.co');
 
 async function getIndustries(locale: string = 'en', forceRefresh: boolean = false): Promise<Industry[]> {
   const now = Date.now();
@@ -76,7 +76,7 @@ async function getIndustries(locale: string = 'en', forceRefresh: boolean = fals
 
 async function fetchIndustriesFromAPI(locale: string): Promise<Industry[]> {
   try {
-    const res = await fetch("https://api.insightabusiness.com/api/platform/industries/menu", {
+    const res = await fetch("https://api.foresighta.co/api/platform/industries/menu", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
