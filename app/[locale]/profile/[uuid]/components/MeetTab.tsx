@@ -408,7 +408,7 @@ export default function MeetTab({
       const token = getAuthToken();
       if (!token) return;
 
-      const response = await fetch("https://api.foresighta.co/api/account/wallet/balance", {
+      const response = await fetch("https://api.insightabusiness.com/api/account/wallet/balance", {
         headers: {
           "Content-Type": "application/json",
           Accept: "application/json",
@@ -492,7 +492,7 @@ export default function MeetTab({
       const token = getAuthToken();
 
       const response = await fetch(
-        "https://api.foresighta.co/api/account/meeting/client/check-duplicate-time",
+        "https://api.insightabusiness.com/api/account/meeting/client/check-duplicate-time",
         {
           method: "POST",
           headers: {
@@ -533,7 +533,7 @@ export default function MeetTab({
     const checkStatus = async (): Promise<boolean> => {
       try {
         const response = await fetch(
-          `https://api.foresighta.co/api/account/order/meeting/${orderUuid}`,
+          `https://api.insightabusiness.com/api/account/order/meeting/${orderUuid}`,
           {
             headers: {
               "Content-Type": "application/json",
@@ -651,7 +651,7 @@ export default function MeetTab({
       }
 
       const response = await fetch(
-        `https://api.foresighta.co/api/account/order/meeting/checkout/${uuid}`,
+        `https://api.insightabusiness.com/api/account/order/meeting/checkout/${uuid}`,
         {
           method: "POST",
           headers: {
@@ -736,7 +736,7 @@ export default function MeetTab({
       setIsFinalVerifying(true);
       const token = getAuthToken();
       const response = await fetch(
-        `https://api.foresighta.co/api/account/order/meeting/check-payment-succeeded/${orderUuid}`,
+        `https://api.insightabusiness.com/api/account/order/meeting/check-payment-succeeded/${orderUuid}`,
         {
           method: "POST",
           headers: {
@@ -751,7 +751,7 @@ export default function MeetTab({
         // After backend confirmation, re-fetch order to verify status is paid
         try {
           const verifyResp = await fetch(
-            `https://api.foresighta.co/api/account/order/meeting/${orderUuid}`,
+            `https://api.insightabusiness.com/api/account/order/meeting/${orderUuid}`,
             {
               headers: {
                 "Content-Type": "application/json",

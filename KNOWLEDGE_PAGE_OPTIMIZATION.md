@@ -72,7 +72,7 @@ NEXT_PUBLIC_BASE_URL=https://foresighta.co
 NEXT_PUBLIC_DASHBOARD_URL=https://app.foresighta.co
 
 # API Configuration
-NEXT_PUBLIC_API_URL=https://api.foresighta.co
+NEXT_PUBLIC_API_URL=https://api.insightabusiness.com
 
 # Social Media
 NEXT_PUBLIC_TWITTER_HANDLE=@KNOLDG

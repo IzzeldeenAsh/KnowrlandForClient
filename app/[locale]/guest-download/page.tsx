@@ -73,7 +73,7 @@ export default function GuestDownloadPage() {
       if (tokenFromUrl) localStorage.setItem("guest-token", tokenFromUrl);
 
       const response = await fetch(
-        `https://api.foresighta.co/api/platform/guest/order/knowledge/download/${orderUuid}`,
+        `https://api.insightabusiness.com/api/platform/guest/order/knowledge/download/${orderUuid}`,
         {
           method: "POST",
           headers: {

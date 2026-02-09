@@ -118,7 +118,7 @@ function PaymentForm({ orderUuid, amount, title, locale, isRTL, isGuest, orderDe
     }
 
     const response = await fetch(
-      `https://api.foresighta.co/api/platform/guest/order/knowledge/download/${orderUuid}`,
+      `https://api.insightabusiness.com/api/platform/guest/order/knowledge/download/${orderUuid}`,
       {
         method: "POST",
         headers: {
@@ -158,7 +158,7 @@ function PaymentForm({ orderUuid, amount, title, locale, isRTL, isGuest, orderDe
       setIsFetchingDownloadIds(true);
       const token = getAuthToken();
       const response = await fetch(
-        `https://api.foresighta.co/api/account/order/knowledge/${uuid}`,
+        `https://api.insightabusiness.com/api/account/order/knowledge/${uuid}`,
         {
           headers: {
             "Content-Type": "application/json",
@@ -250,7 +250,7 @@ function PaymentForm({ orderUuid, amount, title, locale, isRTL, isGuest, orderDe
           if (!guestToken) return false;
 
           const response = await fetch(
-            `https://api.foresighta.co/api/platform/guest/order/knowledge/check-payment-succeeded/${orderUuid}`,
+            `https://api.insightabusiness.com/api/platform/guest/order/knowledge/check-payment-succeeded/${orderUuid}`,
             {
               method: "POST",
               headers: {
@@ -270,7 +270,7 @@ function PaymentForm({ orderUuid, amount, title, locale, isRTL, isGuest, orderDe
 
         const token = getAuthToken();
         const response = await fetch(
-          `https://api.foresighta.co/api/account/order/knowledge/${orderUuid}`,
+          `https://api.insightabusiness.com/api/account/order/knowledge/${orderUuid}`,
           {
             headers: {
               "Content-Type": "application/json",
@@ -393,7 +393,7 @@ function PaymentForm({ orderUuid, amount, title, locale, isRTL, isGuest, orderDe
           return;
         }
         const response = await fetch(
-          `https://api.foresighta.co/api/platform/guest/order/knowledge/check-payment-succeeded/${orderUuid}`,
+          `https://api.insightabusiness.com/api/platform/guest/order/knowledge/check-payment-succeeded/${orderUuid}`,
           {
             method: "POST",
             headers: {
@@ -424,7 +424,7 @@ function PaymentForm({ orderUuid, amount, title, locale, isRTL, isGuest, orderDe
 
       const token = getAuthToken();
       const response = await fetch(
-        `https://api.foresighta.co/api/account/order/knowledge/check-payment-succeeded/${orderUuid}`,
+        `https://api.insightabusiness.com/api/account/order/knowledge/check-payment-succeeded/${orderUuid}`,
         {
           method: "POST",
           headers: {
@@ -805,7 +805,7 @@ export default function StripePaymentPage() {
       try {
         const token = getAuthToken();
         const response = await fetch(
-          `https://api.foresighta.co/api/account/order/knowledge/${orderUuid}`,
+          `https://api.insightabusiness.com/api/account/order/knowledge/${orderUuid}`,
           {
             headers: {
               "Content-Type": "application/json",
