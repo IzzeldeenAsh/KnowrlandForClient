@@ -46,8 +46,8 @@ const INDUSTRIES_CACHE_DURATION = 300000; // 5 minutes cache for industries
 const ANGULAR_APP_URL: string =
   process.env.NEXT_PUBLIC_ANGULAR_APP_URL ||
   (process.env.NODE_ENV === 'development'
-    ? 'https://app.foresighta.co'
-    : 'https://app.foresighta.co');
+    ? 'https://app.insightabusiness.com'
+    : 'https://app.insightabusiness.com');
 
 async function getIndustries(locale: string = 'en', forceRefresh: boolean = false): Promise<Industry[]> {
   const now = Date.now();
@@ -243,10 +243,10 @@ const { isLoading: isAppLoading, setIsLoading: setAppLoading } = useLoading();
     
     // Check for production domains
     if (hostname.includes('insightabusiness.com')) {
-      return '.foresighta.co';
+      return '.insightabusiness.com';
     }
     if (hostname.includes('foresighta.co')) {
-      return '.foresighta.co';
+      return '.insightabusiness.com';
     }
     
     // Local development - no domain needed

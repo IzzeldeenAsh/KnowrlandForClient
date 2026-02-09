@@ -584,14 +584,14 @@ function PaymentForm({ orderUuid, amount, title, locale, isRTL, isGuest, orderDe
                 if (orderDetails?.knowledge_download_id) {
                   const uuidsParam = `?uuids=${orderDetails.knowledge_download_id}`;
                   console.log('Redirecting with UUID:', uuidsParam); // Debug log
-                  window.location.href = `https://app.foresighta.co/app/insighter-dashboard/my-downloads${uuidsParam}`;
+                  window.location.href = `https://app.insightabusiness.com/app/insighter-dashboard/my-downloads${uuidsParam}`;
                 } else {
                   console.log('No UUID available, falling back to search'); // Debug log
                   // Fallback to title search if no UUID available
                   const searchTitle = orderDetails?.orderable?.knowledge?.[0]?.title || "";
                   const searchParam = searchTitle ? `?search=${encodeURIComponent(searchTitle)}` : "";
                   console.log('Redirecting with search:', searchParam); // Debug log
-                  window.location.href = `https://app.foresighta.co/app/insighter-dashboard/my-downloads${searchParam}`;
+                  window.location.href = `https://app.insightabusiness.com/app/insighter-dashboard/my-downloads${searchParam}`;
                 }
               }}
             >
@@ -611,7 +611,7 @@ function PaymentForm({ orderUuid, amount, title, locale, isRTL, isGuest, orderDe
              <Text size="md" ta="start">
                {translations.guestSupportNotePrefix}
                <a
-                 href="https://foresighta.co/en/contact"
+                 href="https://insightabusiness.com/en/contact"
                  target="_blank"
                  rel="noopener noreferrer"
                  className="text-blue-600 hover:text-blue-700 underline underline-offset-2"

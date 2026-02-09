@@ -27,7 +27,7 @@ export default function LanguageMismatchNotifier({
     const isProduction = typeof window !== 'undefined' && window.location.hostname.includes('insightabusiness.com');
     const clearVariations = [
       `${cookieName}=; Path=/; Max-Age=-1`,
-      `${cookieName}=; Domain=.foresighta.co; Path=/; Max-Age=-1; Secure; SameSite=None`,
+      `${cookieName}=; Domain=.insightabusiness.com; Path=/; Max-Age=-1; Secure; SameSite=None`,
       `${cookieName}=; Path=/; Max-Age=-1; ${isProduction ? 'Secure; SameSite=None' : 'SameSite=Lax'}`
     ];
     clearVariations.forEach(variation => {
@@ -53,7 +53,7 @@ export default function LanguageMismatchNotifier({
       ];
 
       if (isProduction) {
-        cookieParts.push(`Domain=.foresighta.co`);
+        cookieParts.push(`Domain=.insightabusiness.com`);
         cookieParts.push(`Secure`);
       }
 

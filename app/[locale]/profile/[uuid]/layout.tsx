@@ -128,7 +128,7 @@ export async function generateMetadata(
     : `${profileName} - Profile | ${platformText}`;
 
   // Construct the profile URL
-  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://foresighta.co';
+  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://insightabusiness.com';
   const profileUrl = `${baseUrl}/${locale}/profile/${uuid}`;
   const absoluteProfileImage = profileImage
     ? (profileImage.startsWith('http')

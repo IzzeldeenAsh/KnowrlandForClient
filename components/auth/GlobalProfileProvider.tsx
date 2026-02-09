@@ -76,7 +76,7 @@ export function GlobalProfileProvider({ children }: { children: React.ReactNode 
     // Clear cookie variants (different Path/Domain combinations).
     // Note: Domain must match original cookie to be removed; we attempt common variants.
     const pathsToClear = ['/', '/en', '/ar'];
-    const domainsToClear = [undefined, '.foresighta.co'];
+    const domainsToClear = [undefined, '.insightabusiness.com'];
 
     for (const path of pathsToClear) {
       // No domain (localhost / default)

@@ -12,7 +12,7 @@ const getInitials = (firstName: string, lastName: string) => {
 
 // IMPORTANT: must be deterministic on BOTH SSR + first client render (hydration).
 const ANGULAR_APP_URL: string =
-  process.env.NEXT_PUBLIC_ANGULAR_APP_URL || "https://app.foresighta.co";
+  process.env.NEXT_PUBLIC_ANGULAR_APP_URL || "https://app.insightabusiness.com";
 
 interface MenuPosition {
   top: number;
@@ -351,7 +351,7 @@ export function UserProfile({ isHome }: { isHome: boolean }) {
             ))}
               </div>
            {!isClient$() && (  <Link 
-              href={`https://foresighta.co/en/profile/${user.uuid}?entity=insighter`}
+              href={`https://insightabusiness.com/en/profile/${user.uuid}?entity=insighter`}
               className="block px-4 py-2.5  font-semibold text-slate-900 hover:bg-indigo-50 hover:text-sky-700"
               style={{fontSize: '13px'}}
               onClick={() => setMenuOpen(false)}
@@ -369,7 +369,7 @@ export function UserProfile({ isHome }: { isHome: boolean }) {
               {t("dashboard")}
             </Link>
             {/* <Link
-            href="https://app.foresighta.co/app/insighter-dashboard/my-consulting-schedule"
+            href="https://app.insightabusiness.com/app/insighter-dashboard/my-consulting-schedule"
             className="block px-4 py-2.5 font-semibold text-slate-900 hover:bg-indigo-50 hover:text-sky-700"
             onClick={() => setMenuOpen(false)}
             style={{fontSize: '13px'}}
@@ -388,7 +388,7 @@ export function UserProfile({ isHome }: { isHome: boolean }) {
             {!isClient$() && (
               <>
                 {/* <Link
-                  href="https://app.foresighta.co/app/insighter-dashboard/my-requests"
+                  href="https://app.insightabusiness.com/app/insighter-dashboard/my-requests"
                   className="block px-4 py-2.5 font-semibold text-slate-900 hover:bg-indigo-50 hover:text-sky-700"
                   onClick={() => setMenuOpen(false)}
                   style={{fontSize: '13px'}}
@@ -396,7 +396,7 @@ export function UserProfile({ isHome }: { isHome: boolean }) {
                   {t("myRequests")}
                 </Link> */}
                 {/* <Link
-                  href="https://app.foresighta.co/app/insighter-dashboard/my-meetings/received"
+                  href="https://app.insightabusiness.com/app/insighter-dashboard/my-meetings/received"
                   className="block px-4 py-2.5 font-semibold text-slate-900 hover:bg-indigo-50 hover:text-sky-700"
                   onClick={() => setMenuOpen(false)}
                   style={{fontSize: '13px'}}
@@ -418,7 +418,7 @@ export function UserProfile({ isHome }: { isHome: boolean }) {
             {/* Show company settings only for company role */}
             {/* {roles.includes('company') && 
               <Link
-                href="https://app.foresighta.co/app/insighter-dashboard/my-company-settings"
+                href="https://app.insightabusiness.com/app/insighter-dashboard/my-company-settings"
                 className="block px-4 py-2.5 font-semibold text-slate-900 hover:bg-indigo-50 hover:text-sky-700"
                 onClick={() => setMenuOpen(false)}
                 style={{fontSize: '13px'}}

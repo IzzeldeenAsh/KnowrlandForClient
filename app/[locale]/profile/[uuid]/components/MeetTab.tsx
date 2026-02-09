@@ -1146,7 +1146,7 @@ export default function MeetTab({
                       className="h-12 sm:h-14 text-base sm:text-lg bg-blue-600 hover:bg-blue-700"
                       onClick={() => {
                         if (!authRedirectUrl) return;
-                        const loginUrl = `https://app.foresighta.co/auth/login?returnUrl=${encodeURIComponent(
+                        const loginUrl = `https://app.insightabusiness.com/auth/login?returnUrl=${encodeURIComponent(
                           authRedirectUrl
                         )}`;
                         window.location.href = loginUrl;
@@ -1163,7 +1163,7 @@ export default function MeetTab({
                       className="h-12 sm:h-14 text-base sm:text-lg border-blue-600 text-blue-700 hover:bg-blue-50"
                       onClick={() => {
                         if (!authRedirectUrl) return;
-                        const signupUrl = `https://app.foresighta.co/auth/sign-up?returnUrl=${encodeURIComponent(
+                        const signupUrl = `https://app.insightabusiness.com/auth/sign-up?returnUrl=${encodeURIComponent(
                           authRedirectUrl
                         )}`;
                         window.location.href = signupUrl;
@@ -1578,7 +1578,7 @@ export default function MeetTab({
               className="bg-gradient-to-r from-blue-500 to-teal-400 hover:from-blue-600 hover:to-teal-500 transition-all"
               onClick={() => {
                 // Redirect to meetings dashboard
-                window.location.href = "https://app.foresighta.co/app/insighter-dashboard/my-meetings?tab=my-meetings";
+                window.location.href = "https://app.insightabusiness.com/app/insighter-dashboard/my-meetings?tab=my-meetings";
               }}
             >
               {locale.startsWith('ar') ? 'اذهب إلى الجلسات الاستشارية' : 'Go to Sessions'}

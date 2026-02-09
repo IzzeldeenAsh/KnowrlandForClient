@@ -14,12 +14,12 @@ export const apiBaseUrl = isDevelopment
 // Public-facing base URL for this Next.js app (used for canonical, sitemap, robots)
 // Prefer NEXT_PUBLIC_BASE_URL if provided; otherwise fall back to sensible defaults
 export const publicBaseUrl: string =
-  process.env.NEXT_PUBLIC_BASE_URL || 'https://foresighta.co';
+  process.env.NEXT_PUBLIC_BASE_URL || 'https://insightabusiness.com';
 
 // (Unused at the moment) App URL helper for legacy clients; keep for compatibility
 export const appBaseUrl = isDevelopment 
-  ? 'https://foresighta.co' 
-  : 'https://foresighta.co';
+  ? 'https://insightabusiness.com' 
+  : 'https://insightabusiness.com';
 
 // Function to get full API URL with path
 export const getApiUrl = (path: string): string => {

@@ -192,7 +192,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     return metadata;
   } catch (error) {
     const isRTL = locale === 'ar';
-    const baseUrl =  'https://foresighta.co';
+    const baseUrl =  'https://insightabusiness.com';
     const defaultSocialImage = 'https://res.cloudinary.com/dsiku9ipv/image/upload/v1769923661/drilldown_1_cjpvli_jprtoi.jpg';
     const pageUrl = `${baseUrl}/${locale}/knowledge/${type}/${slug}`;
 
@@ -200,7 +200,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     try {
       metadataBase = new URL(baseUrl);
     } catch {
-      metadataBase = new URL('https://foresighta.co');
+      metadataBase = new URL('https://insightabusiness.com');
     }
 
     const title = isRTL ? "الرؤى غير موجودة | Insighta" : "Insights Not Found |Insighta";
