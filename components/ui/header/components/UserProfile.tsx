@@ -141,7 +141,7 @@ export function UserProfile({ isHome }: { isHome: boolean }) {
     return (
       <>
         <Link
-          href={`${ANGULAR_APP_URL}/auth/login?returnUrl=${encodeURIComponent(returnUrl)}`}
+          href={`https://app.insightabusiness.com/auth/login?returnUrl=${encodeURIComponent(returnUrl)}`}
           className="btn-sm bg-gray-800 text-gray-200 shadow hover:bg-gray-900"
         >
           {t("login")}
@@ -321,7 +321,7 @@ export function UserProfile({ isHome }: { isHome: boolean }) {
               roles.includes("company-insighter")) && (
             <>
               <Link
-                href={`${ANGULAR_APP_URL}/app/add-knowledge/stepper`}
+                href={`https://app.insightabusiness.com/app/add-knowledge/stepper`}
                 className="block px-4 py-2.5 text-sm font-medium text-sky-600 hover:bg-indigo-50 hover:text-sky-700"
                 onClick={() => setMenuOpen(false)}
                 style={{fontSize: '13px'}}
@@ -329,7 +329,7 @@ export function UserProfile({ isHome }: { isHome: boolean }) {
                 {t("addInsight")}
               </Link>
                <Link
-               href={`${ANGULAR_APP_URL}/app/insighter-dashboard/my-knowledge/general`}
+               href={`https://app.insightabusiness.com/app/insighter-dashboard/my-knowledge/general`}
                className="block px-4 py-2.5  font-semibold text-slate-900 hover:bg-indigo-50 hover:text-sky-700"
                onClick={() => setMenuOpen(false)}
                style={{fontSize: '13px'}}
@@ -341,7 +341,7 @@ export function UserProfile({ isHome }: { isHome: boolean }) {
 
             {(roles.includes('company') && (
               <Link
-                href={`${ANGULAR_APP_URL}/app/insighter-dashboard/my-company-settings`}
+                href={`https://app.insightabusiness.com/app/insighter-dashboard/my-company-settings`}
                 className="block px-4 py-2.5  font-semibold text-slate-900 hover:bg-indigo-50 hover:text-sky-700"
                 onClick={() => setMenuOpen(false)}
                 style={{fontSize: '13px'}}
@@ -361,7 +361,7 @@ export function UserProfile({ isHome }: { isHome: boolean }) {
           
             {/* Show dashboard for all users */}
             <Link
-              href={`${ANGULAR_APP_URL}/app/insighter-dashboard/my-dashboard`}
+              href={`https://app.insightabusiness.com/app/insighter-dashboard/my-dashboard`}
               className="block px-4 py-2.5 font-semibold text-slate-900 hover:bg-indigo-50 hover:text-sky-700"
               onClick={() => setMenuOpen(false)}
               style={{fontSize: '13px'}}
@@ -378,7 +378,7 @@ export function UserProfile({ isHome }: { isHome: boolean }) {
             </Link> */}
             {/* Hide requests, received meetings and account settings for client-only role */}
             <Link
-              href={`${ANGULAR_APP_URL}/app/profile/overview`}
+              href={`https://app.insightabusiness.com/app/profile/overview`}
               className="block px-4 py-3  font-semibold text-slate-900 hover:bg-indigo-50 hover:text-sky-700"
               style={{fontSize: '13px'}}
               onClick={() => setMenuOpen(false)}
@@ -404,7 +404,7 @@ export function UserProfile({ isHome }: { isHome: boolean }) {
                   {t("ReceivedMeetings")}
                 </Link> */}
                 <Link
-                  href={`${ANGULAR_APP_URL}/app/insighter-dashboard/account-settings/general-settings`}
+                  href={`https://app.insightabusiness.com/app/insighter-dashboard/account-settings/general-settings`}
                   className="block px-4 py-2.5 font-semibold text-slate-900 hover:bg-indigo-50 hover:text-sky-700"
                   onClick={() => setMenuOpen(false)}
                   style={{fontSize: '13px'}}
@@ -432,7 +432,7 @@ export function UserProfile({ isHome }: { isHome: boolean }) {
               !roles.includes("company-insighter") && (
                 <>
                 <Link
-                  href={`${ANGULAR_APP_URL}/app/insighter-register/vertical`}
+                  href={`https://app.insightabusiness.com/app/insighter-register/vertical`}
                   className="block px-4 py-2.5  font-semibold bg-clip-text text-transparent bg-gradient-to-r from-blue-500 to-teal-400"
                   onClick={() => setMenuOpen(false)}
                   style={{fontSize: '13px'}}
