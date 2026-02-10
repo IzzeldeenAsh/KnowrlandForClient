@@ -39,7 +39,6 @@ export default async function Home({ params }: HomeProps) {
       <Features/>
       <Cta />
       <Features02 />
-      <FloatingPublishButton />
      </>
   )
 }

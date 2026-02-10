@@ -3,7 +3,6 @@
 import { useState, useRef, useEffect } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { useRouter } from '@/i18n/routing'
 import { IconLanguage } from '@tabler/icons-react'
 import { useTranslations } from 'next-intl'
 import { useLoading } from '@/components/context/LoadingContext'
@@ -17,7 +16,6 @@ export default function MobileMenu({ isHomePage = true }: MobileMenuProps) {
   const { setIsLoading } = useLoading();
   const t = useTranslations('Header');
   const pathname = usePathname();
-  const router = useRouter();
   const isRtl = pathname.startsWith('/ar');
   const currentLocale = pathname.split('/')[1];
 
@@ -30,21 +28,86 @@ export default function MobileMenu({ isHomePage = true }: MobileMenuProps) {
   // Dark border color for dividers
   const borderColorClass = "border-slate-700/50";
 
+  // Helper function to get the base domain for cookies
+  const getCookieDomain = (): string | null => {
+    if (typeof window === 'undefined') return null;
+    const hostname = window.location.hostname;
+    if (hostname.includes('insightabusiness.com') || hostname.includes('foresighta.co')) {
+      return '.insightabusiness.com';
+    }
+    return null; // localhost
+  };
+
+  const isProduction = (): boolean => {
+    if (typeof window === 'undefined') return false;
+    const hostname = window.location.hostname;
+    return hostname.includes('insightabusiness.com') || hostname.includes('foresighta.co');
+  };
+
+  // Helper function to clear duplicate cookies (handles both Angular SameSite=None and Next.js SameSite=Lax)
+  const clearDuplicateCookies = (cookieName: string) => {
+    const cookieDomain = getCookieDomain();
+    const prod = isProduction();
+    const clearVariations = [
+      `${cookieName}=; Path=/; Max-Age=-1`,
+    ];
+    if (cookieDomain) {
+      clearVariations.push(
+        `${cookieName}=; Domain=${cookieDomain}; Path=/; Max-Age=-1; Secure; SameSite=None`,
+        `${cookieName}=; Domain=${cookieDomain}; Path=/; Max-Age=-1; Secure; SameSite=Lax`
+      );
+    }
+    clearVariations.push(
+      `${cookieName}=; Path=/; Max-Age=-1; ${prod ? 'Secure; SameSite=None' : 'SameSite=Lax'}`
+    );
+    clearVariations.forEach(v => { document.cookie = v; });
+  };
+
   // Function to switch locale
   const switchLocale = (locale: string) => {
     // Set loading state before switching locale
     setIsLoading(true);
-    
-    // Set the language preference in a cookie - expires in 1 year
-    document.cookie = `preferred_language=${locale}; max-age=${60 * 60 * 24 * 365}; path=/; Domain=.insightabusiness.com;`;
-    
+
+    // Clear any existing duplicate cookies first
+    clearDuplicateCookies('preferred_language');
+    clearDuplicateCookies('NEXT_LOCALE');
+
+    const cookieDomain = getCookieDomain();
+    const prod = isProduction();
+    const expirationDate = new Date();
+    expirationDate.setFullYear(expirationDate.getFullYear() + 1);
+
+    // Set preferred_language cookie (shared with Angular app)
+    const cookieParts = [
+      `preferred_language=${locale}`,
+      `Path=/`,
+      `Expires=${expirationDate.toUTCString()}`,
+      `Max-Age=${60 * 60 * 24 * 365}`,
+      `SameSite=Lax`
+    ];
+    if (cookieDomain) cookieParts.push(`Domain=${cookieDomain}`);
+    if (prod) cookieParts.push(`Secure`);
+    document.cookie = cookieParts.join('; ');
+
+    // Also set NEXT_LOCALE for next-intl middleware consistency
+    const nextLocaleParts = [
+      `NEXT_LOCALE=${locale}`,
+      `Path=/`,
+      `Expires=${expirationDate.toUTCString()}`,
+      `Max-Age=${60 * 60 * 24 * 365}`,
+      `SameSite=Lax`
+    ];
+    if (prod) nextLocaleParts.push(`Secure`);
+    document.cookie = nextLocaleParts.join('; ');
+
     // Get the current path without locale prefix
     const currentPath = pathname.split('/').slice(2).join('/');
-    
-    // Navigate to the same route with the new locale
-    // If we're on the home page (or empty path), just use '/'
+    const currentSearch = typeof window !== 'undefined' ? window.location.search : '';
     const newPath = currentPath ? `/${currentPath}` : '/';
-    router.push(newPath, { locale });
+    const fullUrl = `/${locale}${newPath}${currentSearch}`;
+
+    // Force full page reload to ensure proper re-render with new locale
+    window.location.href = fullUrl;
   };
 
   const trigger = useRef<HTMLButtonElement>(null)

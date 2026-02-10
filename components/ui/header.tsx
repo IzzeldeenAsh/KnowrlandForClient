@@ -294,53 +294,68 @@ const { isLoading: isAppLoading, setIsLoading: setAppLoading } = useLoading();
     // Set loading state before switching locale
     setAppLoading(true);
 
-    // Clear any existing duplicate cookies first
+    // Clear any existing duplicate cookies first (both preferred_language and NEXT_LOCALE)
+    // This handles cookies set by Angular (SameSite=None) and Next.js (SameSite=Lax)
     clearDuplicateCookies('preferred_language');
+    clearDuplicateCookies('NEXT_LOCALE');
 
-    // Wait a moment for cookie clearing to take effect
-    setTimeout(() => {
-      // Enhanced cookie setting for better browser compatibility (especially Safari/Firefox)
-      const cookieDomain = getCookieDomain();
-      const prod = isProduction();
-      const expirationDate = new Date();
-      expirationDate.setFullYear(expirationDate.getFullYear() + 1); // 1 year from now
+    // Cookie operations via document.cookie are synchronous - no timeout needed
+    const cookieDomain = getCookieDomain();
+    const prod = isProduction();
+    const expirationDate = new Date();
+    expirationDate.setFullYear(expirationDate.getFullYear() + 1); // 1 year from now
 
-      const cookieParts = [
-        `preferred_language=${locale}`,
-        `Path=/`,                       // send on all paths
-        `Expires=${expirationDate.toUTCString()}`, // Use Expires for better Safari/Firefox compatibility
-        `Max-Age=${60 * 60 * 24 * 365}`,// one year (keeping both for compatibility)
-        `SameSite=Lax`                  // prevent CSRF, still send on top-level nav
-      ];
+    const cookieParts = [
+      `preferred_language=${locale}`,
+      `Path=/`,                       // send on all paths
+      `Expires=${expirationDate.toUTCString()}`, // Use Expires for better Safari/Firefox compatibility
+      `Max-Age=${60 * 60 * 24 * 365}`,// one year (keeping both for compatibility)
+      `SameSite=Lax`                  // same-site subdomains; matches Angular CookieService
+    ];
 
-      if (cookieDomain) {
-        cookieParts.push(`Domain=${cookieDomain}`); // leading dot = include subdomains
-      }
-      
-      if (prod) {
-        cookieParts.push(`Secure`);                // HTTPS only in production
-      }
+    if (cookieDomain) {
+      cookieParts.push(`Domain=${cookieDomain}`); // leading dot = include subdomains
+    }
+    
+    if (prod) {
+      cookieParts.push(`Secure`);                // HTTPS only in production
+    }
 
-      // Set single, clean cookie
-      document.cookie = cookieParts.join('; ');
+    // Set the preferred_language cookie (shared with Angular app)
+    document.cookie = cookieParts.join('; ');
 
-      // Get the current path without locale prefix
-      const currentPath = pathname.split('/').slice(2).join('/');
+    // Also set NEXT_LOCALE for next-intl middleware consistency
+    // This cookie is host-only (no domain) since it's only for the Next.js app
+    const nextLocaleParts = [
+      `NEXT_LOCALE=${locale}`,
+      `Path=/`,
+      `Expires=${expirationDate.toUTCString()}`,
+      `Max-Age=${60 * 60 * 24 * 365}`,
+      `SameSite=Lax`
+    ];
 
-      // Get current query parameters
-      const currentSearch = typeof window !== 'undefined' ? window.location.search : '';
+    if (prod) {
+      nextLocaleParts.push(`Secure`);
+    }
 
-      // Navigate to the same route with the new locale
-      // If we're on the home page (or empty path), just use '/'
-      const newPath = currentPath ? `/${currentPath}` : '/';
+    document.cookie = nextLocaleParts.join('; ');
 
-      // Preserve query parameters when switching locale
-      const fullUrl = `/${locale}${newPath}${currentSearch}`;
+    // Get the current path without locale prefix
+    const currentPath = pathname.split('/').slice(2).join('/');
 
-      // Force a complete page reload to prevent client-side errors
-      // This ensures all components are properly re-rendered with the new locale
-      window.location.href = fullUrl;
-    }, 100); // Small delay to ensure cookie clearing
+    // Get current query parameters
+    const currentSearch = typeof window !== 'undefined' ? window.location.search : '';
+
+    // Navigate to the same route with the new locale
+    // If we're on the home page (or empty path), just use '/'
+    const newPath = currentPath ? `/${currentPath}` : '/';
+
+    // Preserve query parameters when switching locale
+    const fullUrl = `/${locale}${newPath}${currentSearch}`;
+
+    // Force a complete page reload to prevent client-side errors
+    // This ensures all components are properly re-rendered with the new locale
+    window.location.href = fullUrl;
   };
 
   // Hide header on callback routes to avoid visual flicker/loaders during auth

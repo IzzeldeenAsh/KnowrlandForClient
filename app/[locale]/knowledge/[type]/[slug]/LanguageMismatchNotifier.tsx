@@ -22,13 +22,14 @@ export default function LanguageMismatchNotifier({
   const [animationState, setAnimationState] = useState('hidden'); // 'hidden', 'entering', 'visible', 'exiting'
   const [targetLanguage, setTargetLanguage] = useState('');
 
-  // Helper to clear duplicate cookies similar to header.tsx
+  // Helper to clear duplicate cookies (handles both Angular SameSite=None and Next.js SameSite=Lax)
   const clearDuplicateCookies = (cookieName: string) => {
-    const isProduction = typeof window !== 'undefined' && window.location.hostname.includes('insightabusiness.com');
+    const prod = typeof window !== 'undefined' && (window.location.hostname.includes('insightabusiness.com') || window.location.hostname.includes('foresighta.co'));
     const clearVariations = [
       `${cookieName}=; Path=/; Max-Age=-1`,
       `${cookieName}=; Domain=.insightabusiness.com; Path=/; Max-Age=-1; Secure; SameSite=None`,
-      `${cookieName}=; Path=/; Max-Age=-1; ${isProduction ? 'Secure; SameSite=None' : 'SameSite=Lax'}`
+      `${cookieName}=; Domain=.insightabusiness.com; Path=/; Max-Age=-1; Secure; SameSite=Lax`,
+      `${cookieName}=; Path=/; Max-Age=-1; ${prod ? 'Secure; SameSite=None' : 'SameSite=Lax'}`
     ];
     clearVariations.forEach(variation => {
       document.cookie = variation;
@@ -38,37 +39,47 @@ export default function LanguageMismatchNotifier({
   const switchLocale = (locale: 'en' | 'ar') => {
     // Clear any existing duplicate cookies first
     clearDuplicateCookies('preferred_language');
+    clearDuplicateCookies('NEXT_LOCALE');
 
-    setTimeout(() => {
-      const isProduction = typeof window !== 'undefined' && window.location.hostname.includes('insightabusiness.com');
-      const expirationDate = new Date();
-      expirationDate.setFullYear(expirationDate.getFullYear() + 1);
+    // Cookie operations are synchronous - no timeout needed
+    const prod = typeof window !== 'undefined' && (window.location.hostname.includes('insightabusiness.com') || window.location.hostname.includes('foresighta.co'));
+    const expirationDate = new Date();
+    expirationDate.setFullYear(expirationDate.getFullYear() + 1);
 
-      const cookieParts = [
-        `preferred_language=${locale}`,
-        `Path=/`,
-        `Expires=${expirationDate.toUTCString()}`,
-        `Max-Age=${60 * 60 * 24 * 365}`,
-        `SameSite=Lax`
-      ];
+    // Set preferred_language cookie (shared with Angular app)
+    const cookieParts = [
+      `preferred_language=${locale}`,
+      `Path=/`,
+      `Expires=${expirationDate.toUTCString()}`,
+      `Max-Age=${60 * 60 * 24 * 365}`,
+      `SameSite=Lax`
+    ];
+    if (prod) {
+      cookieParts.push(`Domain=.insightabusiness.com`);
+      cookieParts.push(`Secure`);
+    }
+    document.cookie = cookieParts.join('; ');
 
-      if (isProduction) {
-        cookieParts.push(`Domain=.insightabusiness.com`);
-        cookieParts.push(`Secure`);
-      }
+    // Also set NEXT_LOCALE for next-intl middleware consistency
+    const nextLocaleParts = [
+      `NEXT_LOCALE=${locale}`,
+      `Path=/`,
+      `Expires=${expirationDate.toUTCString()}`,
+      `Max-Age=${60 * 60 * 24 * 365}`,
+      `SameSite=Lax`
+    ];
+    if (prod) nextLocaleParts.push(`Secure`);
+    document.cookie = nextLocaleParts.join('; ');
 
-      document.cookie = cookieParts.join('; ');
+    // Compute current path without locale prefix
+    const segments = (pathname || '/').split('/').filter(Boolean);
+    const currentPath = segments.slice(1).join('/'); // drop existing locale segment
+    const newPath = currentPath ? `/${currentPath}` : '/';
+    const currentSearch = typeof window !== 'undefined' ? window.location.search : '';
 
-      // Compute current path without locale prefix
-      const segments = (pathname || '/').split('/').filter(Boolean);
-      const currentPath = segments.slice(1).join('/'); // drop existing locale segment
-      const newPath = currentPath ? `/${currentPath}` : '/';
-      const currentSearch = typeof window !== 'undefined' ? window.location.search : '';
-
-      // Navigate to same route with new locale
-      const fullUrl = `/${locale}${newPath}${currentSearch}`;
-      window.location.href = fullUrl;
-    }, 100);
+    // Navigate to same route with new locale
+    const fullUrl = `/${locale}${newPath}${currentSearch}`;
+    window.location.href = fullUrl;
   };
 
   useEffect(() => {
