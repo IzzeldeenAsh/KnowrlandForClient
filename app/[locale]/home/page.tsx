@@ -1544,7 +1544,7 @@ export default function HomePage() {
               {/* Content (Hero + Controls + Results) */}
               <div ref={contentScrollRef} className="flex-1 h-full overflow-y-auto">
                 {/* Filters toggle - sticky toolbar (desktop) */}
-                <div className={`sticky top-0 z-20   ${locale === 'ar' ? 'pr-1' : 'pl-1'}`}>
+                <div className={`sticky top-0 z-20   ${locale === 'ar' ? 'pr-1 ' : 'pl-1 left-[-100px]'}`}>
                   <div className={`flex ${locale === 'ar' ? 'justify-start' : 'justify-start'}`}>
                     <button
                       onClick={() => {
@@ -1554,7 +1554,8 @@ export default function HomePage() {
                           setFiltersVisible(!filtersVisible);
                         }
                       }}
-                      className="my-2 inline-flex items-center gap-2 px-2 py-1.5 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 hover:text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 shadow-sm"
+                      className={`my-2 inline-flex items-center gap-2 px-2 py-1.5 text-sm font-medium text-gray-700 bg-gray-50 border border-gray-200 rounded-lg hover:bg-gray-50 hover:text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 shadow-sm relative`} 
+                      style={{ width: '43px', paddingInlineStart: '11px', ...( filtersVisible && !isTabletOrMobile ? (locale === 'ar'  ? { right: '-24px', top: '8px' } : { left: '-24px', top: '8px' }) : { left: '0', top: '0' }) }}
                     >
                       {filtersVisible && !isTabletOrMobile ? (
                         <>

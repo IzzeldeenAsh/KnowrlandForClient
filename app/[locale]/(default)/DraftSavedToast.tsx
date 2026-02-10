@@ -21,7 +21,7 @@ export default function DraftSavedToast({ locale }: { locale: string }) {
 
     firedRef.current = true
 
-    const message = locale === 'ar' ? 'تم حفظ المعرفة كمسودة' : 'InsightSaved as Draft'
+    const message = locale === 'ar' ? 'تم حفظ المعرفة كمسودة' : 'Insight Saved as Draft.'
     toast.info(message, '')
 
     // Remove the query param so it won't re-fire on refresh/back

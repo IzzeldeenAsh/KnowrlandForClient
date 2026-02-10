@@ -568,7 +568,7 @@ const { isLoading: isAppLoading, setIsLoading: setAppLoading } = useLoading();
             </li>
             
             {/* Become an Insighter button - only for client role */}
-            { !roles.includes('insighter') && !roles.includes('company') && !roles.includes('company-insighter') && (
+            { !shouldShowAuthSkeleton  && !roles.includes('insighter') && !roles.includes('company') && !roles.includes('company-insighter') && (
               <li className="mx-1 md:mx-2 hidden lg:block">
                 <Link 
                   href={`https://app.insightabusiness.com/app/insighter-register/vertical`}
