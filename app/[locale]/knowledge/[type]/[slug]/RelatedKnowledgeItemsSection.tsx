@@ -110,11 +110,22 @@ function TypeIcon({ type }: { type: string }) {
 /** Icons for filter box categories */
 function CategoryFilterIcon({ categoryKey, isActive }: { categoryKey: RelatedItemsKey; isActive: boolean }) {
   const size = 24
-  const iconClass = `w-6 h-6 shrink-0`
+  const iconClass = `w-6 h-6 shrink-0 ${isActive ? 'opacity-100' : 'opacity-80'}`
   switch (categoryKey) {
     case 'industry':
       return (
-        <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="#F6C000" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" className={iconClass}>
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          width={size}
+          height={size}
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke={isActive ? '#F6C000' : '#D6B55A'}
+          strokeWidth={2}
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          className={iconClass}
+        >
           <path stroke="none" d="M0 0h24v24H0z" fill="none" />
           <path d="M4 21c1.147 -4.02 1.983 -8.027 2 -12h6c.017 3.973 .853 7.98 2 12" />
           <path d="M12.5 13h4.5c.025 2.612 .894 5.296 2 8" />
@@ -124,7 +135,12 @@ function CategoryFilterIcon({ categoryKey, isActive }: { categoryKey: RelatedIte
       )
     case 'product':
       return (
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none" className={`${iconClass} text-blue-500`}>
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          viewBox="0 0 64 64"
+          fill="none"
+          className={`${iconClass} ${isActive ? 'text-blue-500' : 'text-blue-300'}`}
+        >
         <g transform="matrix(0.99,0,0,0.99,0.32,0.3)" stroke="none" fill="currentColor">
           <path d="m49.5 34c-.82842712 0-1.5.67157288-1.5 1.5v13c0 .82842712.67157288 1.5 1.5 1.5s1.5-.67157288 1.5-1.5v-13c0-.82842712-.67157288-1.5-1.5-1.5zm-6 0c-.82842712 0-1.5.67157288-1.5 1.5v13c0 .82842712.67157288 1.5 1.5 1.5s1.5-.67157288 1.5-1.5v-13c0-.82842712-.67157288-1.5-1.5-1.5zm-6 0c-.82842712 0-1.5.67157288-1.5 1.5v13c0 .82842712.67157288 1.5 1.5 1.5s1.5-.67157288 1.5-1.5v-13c0-.82842712-.67157288-1.5-1.5-1.5zm-6 0c-.82842712 0-1.5.67157288-1.5 1.5v13c0 .82842712.67157288 1.5 1.5 1.5s1.5-.67157288 1.5-1.5v-13c0-.82842712-.67157288-1.5-1.5-1.5z" />
           <path d="m32 3c-.82842712 0-1.5.67157288-1.5 1.5v2.8007812c-1.2649826.52060382-2.2043206 1.6749789-2.4335938 3.0566406l-14.742188 16.642578h-6.8242188c-1.3590542 0-2.5 1.1409458-2.5 2.5v25c0 1.3590542 1.1409458 2.5 2.5 2.5h51c1.3590542 0 2.5-1.1409458 2.5-2.5v-25c0-1.3590542-1.1409361-2.5000073-2.5-2.5h-28c-.82842712 0-1.5.67157288-1.5 1.5s.67157288 1.5 1.5 1.5h27.5v24h-33v-24.5c0-1.3590542-1.1409458-2.5-2.5-2.5h-4.1679688l11.761719-13.279297c.73236176.78125202 1.7636799 1.2792969 2.90625 1.2792969 1.1727683 0 2.2019554-.53489178 2.9160156-1.359375l9.125 9.765625c.56539461.60477567 1.51386.63711965 2.1191406.0722656.60606614-.56559238.63843164-1.5155634.0722656-2.1210937l-10.396484-11.123047c-.26624623-1.3120561-1.1427571-2.4088386-2.3359375-2.9199219v-2.8144531c0-.82842712-.67157288-1.5-1.5-1.5zm-17 27h5c.554 0 1 .446 1 1v22c0 .554-.446 1-1 1h-5c-.554 0-1-.446-1-1v-22c0-.554.446-1 1-1z" />
@@ -132,9 +148,9 @@ function CategoryFilterIcon({ categoryKey, isActive }: { categoryKey: RelatedIte
       </svg>
       )
     case 'topic':
-      return <FolderOpenIcon color="#ff3f55" className={iconClass} />
+      return <FolderOpenIcon className={`${iconClass} ${isActive ? 'text-rose-500' : 'text-rose-300'}`} />
     case 'insighter':
-      return <UserCircleIcon color="#1bbb36" className={iconClass} />
+      return <UserCircleIcon className={`${iconClass} ${isActive ? 'text-green-600' : 'text-green-400'}`} />
     default:
       return null
   }
@@ -181,7 +197,7 @@ export default function RelatedKnowledgeItemsSection({
   const reactId = useId()
   const uid = useMemo(() => reactId.replace(/[:]/g, ''), [reactId])
 
-  const available = useMemo(() => {
+  const categories = useMemo(() => {
     const industry = Array.isArray(items?.industry) ? items.industry : []
     const topic = Array.isArray(items?.topic) ? items.topic : []
     const product = Array.isArray(items?.product) ? items.product : []
@@ -215,18 +231,37 @@ export default function RelatedKnowledgeItemsSection({
     }
 
     const order: Array<keyof typeof t> = ['industry', 'topic', 'product', 'insighter']
-    return order.map((k) => t[k]).filter((x) => (x.list?.length ?? 0) > 0)
+    return order.map((k) => t[k])
   }, [items, isRTL])
 
-  const [activeKey, setActiveKey] = useState<RelatedItemsKey>((available[0]?.key ?? 'industry') as RelatedItemsKey)
+  const nonEmptyCategories = useMemo(() => categories.filter((x) => (x.list?.length ?? 0) > 0), [categories])
+
+  const categoriesForBoxes = useMemo(() => {
+    return categories
+      .map((c, idx) => ({ c, idx, disabled: (c.list?.length ?? 0) === 0 }))
+      .sort((a, b) => {
+        if (a.disabled !== b.disabled) return a.disabled ? 1 : -1
+        return a.idx - b.idx
+      })
+      .map((x) => x.c)
+  }, [categories])
+
+  const [activeKey, setActiveKey] = useState<RelatedItemsKey>(
+    (nonEmptyCategories[0]?.key ?? 'industry') as RelatedItemsKey
+  )
 
   useEffect(() => {
-    if (!available.length) return
-    const stillExists = available.some((x) => x.key === activeKey)
-    if (!stillExists) setActiveKey(available[0].key)
-  }, [available, activeKey])
+    // If active category becomes empty, jump to the first non-empty category.
+    if (!categories.length) return
+    const activeCat = categories.find((x) => x.key === activeKey)
+    const isActiveEmpty = !activeCat || (activeCat.list?.length ?? 0) === 0
+    if (isActiveEmpty && nonEmptyCategories.length) setActiveKey(nonEmptyCategories[0].key)
+  }, [categories, nonEmptyCategories, activeKey])
 
-  const active = useMemo(() => available.find((x) => x.key === activeKey) ?? available[0], [available, activeKey])
+  const active = useMemo(
+    () => categories.find((x) => x.key === activeKey) ?? nonEmptyCategories[0] ?? categories[0],
+    [categories, nonEmptyCategories, activeKey]
+  )
   const activeItems = active?.list ?? []
 
   const carouselClass = `Knoldg-related-items-carousel-${uid}`
@@ -285,10 +320,10 @@ export default function RelatedKnowledgeItemsSection({
     return () => cancelAnimationFrame(raf)
   }, [activeKey])
 
-  const singleCategoryMode = available.length === 1
+  const singleCategoryMode = nonEmptyCategories.length === 1
   const subtitle =
     singleCategoryMode
-      ? getSingleCategorySubtitle(available[0].key, isRTL, insighterName, breadcrumbLabels)
+      ? getSingleCategorySubtitle(nonEmptyCategories[0].key, isRTL, insighterName, breadcrumbLabels)
       : (isRTL ? 'اختر القسم لاستكشاف المحتوى المشابه.' : 'Pick a section to explore similar content.')
 
   const copy = {
@@ -307,7 +342,7 @@ export default function RelatedKnowledgeItemsSection({
     download: isRTL ? 'تحميل' : 'Download',
   }
 
-  if (!available.length) return null
+  if (!nonEmptyCategories.length) return null
 
   return (
     <section  className="relative overflow-hidden mt-10 sm:mt-14 w-full bg-cover bg-center bg-no-repeat" style={{
@@ -325,26 +360,35 @@ export default function RelatedKnowledgeItemsSection({
           <p className="mt-2 text-sm sm:text-base text-gray-500 max-w-3xl mx-auto">{copy.subtitle}</p>
         </div>
 
-        {/* Filter boxes — hidden when only one category is available */}
-        {!singleCategoryMode && (
+        {/* Filter boxes — always shown; empty categories are disabled */}
         <div
           className={`mt-7 sm:mt-10 flex flex-wrap justify-center gap-3 sm:gap-4 ${isRTL ? 'flex-row-reverse' : ''}`}
         >
-          {available.map((c) => {
+          {categoriesForBoxes.map((c) => {
             const isActive = c.key === activeKey
+            const isDisabled = (c.list?.length ?? 0) === 0
             return (
               <button
                 key={c.key}
                 type="button"
-                onClick={() => setActiveKey(c.key)}
+                disabled={isDisabled}
+                onClick={() => {
+                  if (isDisabled) return
+                  setActiveKey(c.key)
+                }}
                 className={[
-                  'text-start rounded-lg border   px-4 py-4 sm:px-5 sm:py-5 transition shrink-0',
+                  'text-start rounded-lg border px-4 py-4 sm:px-5 sm:py-5 transition shrink-0',
                   'w-full min-w-[140px] max-w-[280px] sm:w-auto sm:min-w-[220px] sm:max-w-[260px]',
-                  isActive ? 'border-blue-300  bg-white/80' : 'border-gray-200 hover:border-gray-300 bg-white/40',
+                  isDisabled
+                    ? 'border-gray-200 bg-white/30 opacity-55 cursor-not-allowed'
+                    : isActive
+                      ? 'border-blue-300 bg-white/80'
+                      : 'border-gray-200 hover:border-gray-300 bg-white/40',
                 ].join(' ')}
+                aria-disabled={isDisabled}
               >
                 <div className="flex items-start justify-between gap-3">
-                  <CategoryFilterIcon categoryKey={c.key} isActive={isActive} />
+                  <CategoryFilterIcon categoryKey={c.key} isActive={isActive && !isDisabled} />
                   <div className="min-w-0">
                     <div className="text-sm font-semibold text-gray-900 truncate">{c.title}</div>
                     <div className="mt-1 text-xs text-gray-500 truncate">{c.desc}</div>
@@ -352,7 +396,11 @@ export default function RelatedKnowledgeItemsSection({
                   <span
                     className={[
                       'shrink-0 inline-flex items-center justify-center rounded-md px-2 py-1 text-xs font-bold',
-                      isActive ? 'bg-blue-100 text-blue-600' : 'bg-gray-100 text-gray-600',
+                      isDisabled
+                        ? 'bg-gray-100 text-gray-400'
+                        : isActive
+                          ? 'bg-blue-100 text-blue-600'
+                          : 'bg-gray-100 text-gray-600',
                     ].join(' ')}
                     aria-label={`${c.title} count`}
                   >
@@ -363,7 +411,6 @@ export default function RelatedKnowledgeItemsSection({
             )
           })}
         </div>
-        )}
 
         {/* Slider */}
         <div

@@ -22,10 +22,10 @@ const getAngularAppUrl = (): string => {
 
   // Production domains
   if (hostname.includes('foresighta.co')) {
-    return `${protocol}//app.insightabusiness.com`;
+    return `$https://app.insightabusiness.com`;
   }
   if (hostname.includes('insightabusiness.com')) {
-    return `${protocol}//app.insightabusiness.com`;
+    return `https://app.insightabusiness.com`;
   }
 
   // Local development
