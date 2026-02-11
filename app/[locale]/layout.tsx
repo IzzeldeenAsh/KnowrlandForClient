@@ -47,7 +47,7 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
     metadataBase: new URL(baseUrl),
     applicationName: isArabic ? 'إنسايتا' : 'Insighta',
     title: {
-      default: isArabic ? 'إنسايتا - شراء وبيع المستندات' : 'Insighta - Buy & Sell Insights',
+      default: isArabic ? 'إنسايتا - شراء وبيع الرؤى' : 'Insighta - Buy & Sell Insights',
       template: isArabic ? '%s | إنسايتا' : '%s | Insighta',
     },
     description: isArabic 

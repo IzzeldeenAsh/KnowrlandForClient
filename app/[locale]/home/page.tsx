@@ -105,33 +105,6 @@ export default function HomePage() {
   const [isFilterDrawerOpen, setIsFilterDrawerOpen] = useState(false);
   const [isTabletOrMobile, setIsTabletOrMobile] = useState(false);
   const contentScrollRef = useRef<HTMLDivElement | null>(null);
-  const mainRef = useRef<HTMLElement | null>(null);
-
-  // Disable outer page scroll and dynamically set main height to fill remaining viewport
-  useEffect(() => {
-    const html = document.documentElement;
-    const body = document.body;
-    html.style.overflow = 'hidden';
-    body.style.overflow = 'hidden';
-
-    const updateHeight = () => {
-      if (mainRef.current) {
-        const top = mainRef.current.getBoundingClientRect().top;
-        mainRef.current.style.height = `calc(100dvh - ${Math.max(0, top)}px)`;
-      }
-    };
-
-    updateHeight();
-    // Re-measure after layout settles and on resize
-    requestAnimationFrame(updateHeight);
-    window.addEventListener('resize', updateHeight);
-
-    return () => {
-      html.style.overflow = '';
-      body.style.overflow = '';
-      window.removeEventListener('resize', updateHeight);
-    };
-  }, []);
 
   // Handle responsive behavior
   useEffect(() => {
@@ -149,6 +122,56 @@ export default function HomePage() {
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
+  // Sync outer page scroll when inner scroll hits top/bottom.
+  // Requirement: outer should jump immediately to the same edge.
+  useEffect(() => {
+    const el = contentScrollRef.current;
+    if (!el) return;
+
+    let lastScrollTop = el.scrollTop;
+    let lastEdge: 'none' | 'top' | 'bottom' = 'none';
+
+    const getDocMaxScrollTop = () => {
+      const doc = document.documentElement;
+      const body = document.body;
+      return Math.max(
+        0,
+        (doc?.scrollHeight ?? 0) - (window.innerHeight || doc?.clientHeight || 0),
+        (body?.scrollHeight ?? 0) - (window.innerHeight || body?.clientHeight || 0)
+      );
+    };
+
+    const onInnerScroll = () => {
+      // If the element isn't actually scrollable, don't interfere.
+      if (el.scrollHeight <= el.clientHeight) return;
+
+      const EPS = 1;
+      const st = el.scrollTop;
+      const direction: 'up' | 'down' | 'none' =
+        st > lastScrollTop ? 'down' : st < lastScrollTop ? 'up' : 'none';
+
+      const atTop = st <= EPS;
+      const atBottom = st + el.clientHeight >= el.scrollHeight - EPS;
+
+      // Only trigger when we ENTER an edge (avoid spamming).
+      if (direction === 'down' && atBottom && lastEdge !== 'bottom') {
+        lastEdge = 'bottom';
+        window.scrollTo({ top: getDocMaxScrollTop(), left: 0, behavior: 'auto' });
+      } else if (direction === 'up' && atTop && lastEdge !== 'top') {
+        lastEdge = 'top';
+        window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
+      } else if (!atTop && !atBottom) {
+        lastEdge = 'none';
+      }
+
+      lastScrollTop = st;
+    };
+
+    el.addEventListener('scroll', onInnerScroll, { passive: true });
+    return () => {
+      el.removeEventListener('scroll', onInnerScroll as EventListener);
+    };
+  }, []);
   
   // Add state for statistics
   const [statistics, setStatistics] = useState<StatisticsItem[]>([]);
@@ -1479,18 +1502,18 @@ export default function HomePage() {
   }, [locale, languageFilter, countryFilter, regionFilter, economicBlocFilter, tagFilter, activeTab, searchType, initialized, toast, selectedCategory, industryFilter, isicCodeFilter, hsCodeFilter, priceFilter, accuracyFilter, roleFilter, rangeStartFilter, rangeEndFilter, yearOfStudyFilter, fetchStatisticsIfNeeded]);
 
   return (
-   <main ref={mainRef} className='flex flex-col bg-gray-50 overflow-hidden'>
+   <main className='min-h-screen flex flex-col bg-gray-50'>
      <style dangerouslySetInnerHTML={{ __html: customScrollbarStyle }} />
      
      {/* Global Loading Overlay */}
   
-     <section className="relative flex-1 overflow-hidden">
+     <section className="relative flex-1">
       <PageIllustration />
       {/* Main content area with left sidebar */}
-      <div className="flex flex-col relative z-3 h-full">
-        <div className="w-full h-full">
-          <div className="max-w-8xl 2xl:max-w-none h-full">
-            <div className="flex gap-0 items-start h-full">
+      <div className="flex flex-col relative z-3 pt-0 pb-0">
+        <div className="w-full">
+          <div className="max-w-8xl 2xl:max-w-none">
+            <div className="flex gap-0 items-start">
               {/* Sidebar (FilterBox) */}
               <aside 
                 className={`hidden lg:block lg:flex-shrink-0 transition-all duration-300 ease-in-out ${
@@ -1499,7 +1522,7 @@ export default function HomePage() {
                     : 'overflow-hidden lg:w-0 opacity-0 max-h-0'
                 }`}
               >
-                <div className={`sticky top-0 h-full overflow-y-auto bg-[#f9fafb] transition-transform duration-300 ease-in-out ${
+                <div className={`sticky top-0 h-[100vh] overflow-y-auto bg-[#f9fafb] transition-transform duration-300 ease-in-out ${
                   filtersVisible ? 'transform translate-x-0' : 'transform -translate-x-full lg:translate-x-0'
                 }`}>
                   <FilterBox
@@ -1542,9 +1565,9 @@ export default function HomePage() {
               </aside>
 
               {/* Content (Hero + Controls + Results) */}
-              <div ref={contentScrollRef} className="flex-1 h-full overflow-y-auto">
+              <div ref={contentScrollRef} className="flex-1 h-[100vh] overflow-y-auto">
                 {/* Filters toggle - sticky toolbar (desktop) */}
-                <div className={`sticky top-0 z-20   ${locale === 'ar' ? 'pr-1 ' : 'pl-1 left-[-100px]'}`}>
+                <div className={`${!filtersVisible ? 'sticky top-0 z-20 bg-white/80 backdrop-blur border-b' : ''} ${locale === 'ar' ? 'pr-3' : 'pl-3'}`}>
                   <div className={`flex ${locale === 'ar' ? 'justify-start' : 'justify-start'}`}>
                     <button
                       onClick={() => {
@@ -1554,8 +1577,7 @@ export default function HomePage() {
                           setFiltersVisible(!filtersVisible);
                         }
                       }}
-                      className={`my-2 inline-flex items-center gap-2 px-2 py-1.5 text-sm font-medium text-gray-700 bg-gray-50 border border-gray-200 rounded-lg hover:bg-gray-50 hover:text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 shadow-sm relative`} 
-                      style={{ width: '43px', paddingInlineStart: '11px', ...( filtersVisible && !isTabletOrMobile ? (locale === 'ar'  ? { right: '-24px', top: '8px' } : { left: '-24px', top: '8px' }) : { left: '0', top: '0' }) }}
+                      className="my-2 inline-flex items-center gap-2 px-3 py-1.5 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 hover:text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 shadow-sm"
                     >
                       {filtersVisible && !isTabletOrMobile ? (
                         <>
