@@ -117,13 +117,13 @@ export default async function IndustryPage({ params }: Props) {
         <section className="max-w-container relative mx-auto mt-10 w-full px-4 sm:px-6 lg:px-8 pb-32">
           <div className="max-w-6xl mx-auto">
             <h2 className={`text-xl font-bold text-transparent ${isRTL ? 'bg-gradient-to-l from-blue-400 to-teal-500' : 'bg-gradient-to-r from-blue-500 to-teal-400'} bg-clip-text mb-8`}>
-              {messages?.industry?.subIndustries || (locale === 'ar' ? 'الصناعات الفرعية' : 'Sub Industries')}
+              {messages?.industry?.subIndustries || (locale === 'ar' ? 'المجالات الفرعية' : 'Sub Industries')}
             </h2>
             
             <div 
               className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4 max-w-7xl mx-auto"
               role="list"
-              aria-label={messages?.industry?.subIndustries || (locale === 'ar' ? 'الصناعات الفرعية' : 'Sub Industries')}
+              aria-label={messages?.industry?.subIndustries || (locale === 'ar' ? 'المجالات الفرعية' : 'Sub Industries')}
             >
               {industry.children.map((child: IndustryChild) => {
                 const isDisabled = child.weight === 0;

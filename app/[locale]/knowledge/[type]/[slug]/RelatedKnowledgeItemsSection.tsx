@@ -327,7 +327,7 @@ export default function RelatedKnowledgeItemsSection({
       : (isRTL ? 'اختر القسم لاستكشاف المحتوى المشابه.' : 'Pick a section to explore similar content.')
 
   const copy = {
-    title: isRTL ? 'مواضيع ذات صلة' : 'Related items',
+    title: isRTL ? 'قد يعجبك أيضًا' : 'Other useful insights',
     subtitle,
     previous: isRTL ? 'السابق' : 'Previous',
     next: isRTL ? 'التالي' : 'Next',
@@ -357,7 +357,7 @@ export default function RelatedKnowledgeItemsSection({
           >
             {copy.title}
           </h2>
-          <p className="mt-2 text-sm sm:text-base text-gray-500 max-w-3xl mx-auto">{copy.subtitle}</p>
+          {/* <p className="mt-2 text-sm sm:text-base text-gray-500 max-w-3xl mx-auto">{copy.subtitle}</p> */}
         </div>
 
         {/* Filter boxes — always shown; empty categories are disabled */}

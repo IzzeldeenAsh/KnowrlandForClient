@@ -140,14 +140,16 @@ export default function StatisticsCards({ type, id, entityName }: StatisticsCard
     <div className="flex flex-col w-full">
       {entityName && (
         <span className="inline-block py-1 text-sm font-semibold text-blue-500 rounded-md mb-2 capitalize w-fit">
-          {
-          t.rich(getMessageKey(), {
+          {type === 'topic' ? (
+            locale === 'ar' ? 'المستندات المتاحة' : 'Available Insights'
+          ) : (
+            t.rich(getMessageKey(), {
               industry: () => <span className="font-extrabold underline">{entityName}</span>,
               subIndustry: () => <span className="font-extrabold underline">{entityName}</span>,
               topic: () => <span className="font-extrabold underline">{entityName}</span>,
             })
-        }
-    </span>
+          )}
+        </span>
       )}
       
       <div className={`grid grid-cols-2  md:grid-cols-3 gap-4 ${styles.statsContainer}`} dir={isRTL ? 'rtl' : 'ltr'}>

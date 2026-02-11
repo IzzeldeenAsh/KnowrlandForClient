@@ -147,7 +147,7 @@ export default function RelatedKnowledgeSummarySection({
   }, [items, carouselClass, nextClass, prevClass])
 
   const copy = {
-    title: isRTL ? 'استكشف كنوز المعرفة المشابهة' : 'Discover Top Related Insights',
+    title: isRTL ? 'مستندات ذات علاقة' : 'Related Insights',
     subtitle: isRTL
       ? 'اكتشف أفضل الرؤى المقدمة من نفس الصناعة أو المواضيع القريبة.'
       : 'Explore top valuable insights—based on nearby industries and topics.',
@@ -201,7 +201,7 @@ export default function RelatedKnowledgeSummarySection({
           >
             {copy.title}
           </h2>
-          <p className="mt-2 text-sm sm:text-base text-gray-500 max-w-3xl mx-auto">{copy.subtitle}</p>
+          {/* <p className="mt-2 text-sm sm:text-base text-gray-500 max-w-3xl mx-auto">{copy.subtitle}</p> */}
         </div>
 
         <div className={`mt-10 flex items-center gap-3 sm:gap-4 ${isRTL ? 'flex-row-reverse' : ''}`}>

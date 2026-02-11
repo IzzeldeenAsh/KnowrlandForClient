@@ -728,13 +728,13 @@
                 "contactUsSuccessSubtext": "We will get back to you as soon as possible"
         },
     "dataNotAvailable": "No Insight Available Yet",
-    "industryInsight": "Explore by insight type",
+    "industryInsight": "Available Insight types",
     "subIndustry": "Sub Industry",
-    "industryInsights": "Explore by insight type",
-    "subIndustryInsights": "Explore by insight type",
+    "industryInsights": "Available Insight types",
+    "subIndustryInsights": "Available Insight types",
     "insightItems": "Insights:",
     "noInsightItems": "No insight items available yet",
-    "topicInsights": "Explore by insight type",
+    "topicInsights": "Available Insight types",
     "topicLabel": "Topic",
     "Notifications": {
         "TITLE": "Notifications",
