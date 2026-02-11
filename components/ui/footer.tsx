@@ -25,7 +25,7 @@ export default function Footer() {
                 <div className="text-sm sm:text-start text-center text-slate-300" >
                   {isRTL ? 'جميع الحقوق محفوظة   ' : 'All Rights Reserved.'}
                   <br />
-                    &copy; 2026insightabusiness.com 
+                    &copy; 2026 insightabusiness.com 
                     <br/>
                     v 1.1.1
                   </div>

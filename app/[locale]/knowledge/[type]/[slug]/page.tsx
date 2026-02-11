@@ -519,15 +519,19 @@ export default async function KnowledgePage({ params }: Props) {
               )}
               <div className="flex flex-col ps-4 sm:ps-8 mt-2 sm:mt-0">
                 <span className="text-gray-500 text-sm">{translations.published}</span>
-                <span className="text-sm font-bold text-gray-700">
+                <span className="text-sm font-bold text-gray-700" style={{direction: isRTL ? 'ltr' : 'ltr'}}>
                   {knowledge.published_at === null
                     ? "N/A"
                     : (() => {
                         const date = new Date(knowledge.published_at);
-                        // Format as "02 Jan 2024"
+                        // Always format as "09 Jan 2026"
                         const day = date.getDate().toString().padStart(2, '0');
-                        const month = date.toLocaleString(isRTL ? 'en-US' : locale || 'en', { month: 'short' });
+                        // Use en-US for LTR, use 'en-GB' for RTL (so the order is dd MMM yyyy for RTL)
+                        const effectiveLocale = isRTL ? 'en-GB' : (locale || 'en-US');
+                        const month = date
+                          .toLocaleString(effectiveLocale, { month: "short" });
                         const year = date.getFullYear();
+                        // For RTL locales, swap the order: always day month year
                         return `${day} ${month} ${year}`;
                       })()}
                 </span>
