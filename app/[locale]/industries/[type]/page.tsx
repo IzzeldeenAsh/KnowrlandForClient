@@ -185,7 +185,7 @@ export default function IndustriesByTypePage({ params }: Props) {
                           </div>
                         </Link>
                         <Text size="xs" color="gray" fw={500}>
-                          {locale === 'ar' ? ":الصناعات الفرعية" : "Sub-industries:"}
+                          {locale === 'ar' ? ":المجالات الفرعية" : "Sub-industries:"}
                           </Text>
                         {industry.children && industry.children.length > 0 ? (
                           <ul className="space-y-1">

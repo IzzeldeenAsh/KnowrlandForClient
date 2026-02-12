@@ -139,13 +139,13 @@
     },
     "Header": {
         "navigation": {
-            "industries": "المجالات",
-            "reports": "التقارير",
-            "data": "البيانات",
-            "insights": "الرؤى",
-            "manuals": "الأدلة",
-            "statistics": "الإحصائيات",
-            "courses": "الدورات"
+            "industries": "مجالات",
+            "reports": "تقرير",
+            "data": "بيانات",
+            "insights": "مستند",
+            "manuals": "دليل",
+            "statistics": "إحصائيات",
+            "courses": "دورات"
         },
         "industriesDropdown": {
             "featuredTitle": "أبرز المجالات",
@@ -316,7 +316,7 @@
     "Footer": {
         "copyright": "جميع الحقوق محفوظة © 2026 Insightabusiness.com",
         "insight": {
-            "title": "الرؤى",
+            "title": "المستندات",
             "insights": "إحصائيات",
             "reports": "التقارير", 
             "data": "البيانات",
@@ -472,7 +472,7 @@
         "noKnowledgeItems": "لا يوجد منشورات حالياً",
         "filterByType": "تصفية حسب النوع",
         "all": "الكل",
-        "insights": "الرؤى",
+        "insights": "المستندات",
         "reports": "التقارير",
         "paymentSuccessful":"تم الدفع بنجاح",
         "paymentOptions":"خيارات الدفع",
@@ -533,7 +533,7 @@
     "industries": "المجالات",
     "reports": "التقارير",
     "data": "البيانات",
-    "insights": "الرؤى",
+    "insights": "المستندات",
     "manuals": "الأدلة",
     "courses": "الدورات",
     "byIndustry": "حسب القطاع",
@@ -702,12 +702,11 @@
         },
         "dataNotAvailable": "البيانات غير متوفرة",
         "subIndustry": "الصناعة الفرعية",
-        "industryInsights":"استكشف الرؤى حسب النوع",
+        "industryInsights":"المستندات المتاحة حسب النوع",
         "noInsightItems": "لا توجد عناصر معرفية متاحة بعد",
-        "subIndustryInsights": "استكشف الرؤى حسب النوع",
-        "topicInsights": "استكشف الرؤى حسب الموضوع",
-        "insightItems": "الرؤى:",
-        "topicKnowledge": "أنواع الرؤى المتوفرة في <topic></topic>",
+        "subIndustryInsights": "المستندات المتاحة حسب النوع",
+        "insightItems": "المستندات:",
+        "topicKnowledge": "أنواع المستندات المتوفرة في <topic></topic>",
         "topicLabel": "الموضوع",
         "Notifications": {
             "TITLE": "الإشعارات",

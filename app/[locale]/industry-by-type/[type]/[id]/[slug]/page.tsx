@@ -136,7 +136,7 @@ export default function IndustryByTypePage({ params }: Props) {
           ) : (
             <div>
             <h2 className={`text-xl font-bold text-transparent ${isRtl ? 'bg-gradient-to-l from-blue-400 to-teal-500' : 'bg-gradient-to-r from-blue-500 to-teal-400'} bg-clip-text mb-8`}>
-              {locale === 'ar' ? 'الصناعات الفرعية' : 'Sub-industries:'}
+              {locale === 'ar' ? 'المجالات الفرعية' : 'Sub-industries:'}
             </h2>
               <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
                 {industry?.children?.map((subIndustry: SubIndustry) => (

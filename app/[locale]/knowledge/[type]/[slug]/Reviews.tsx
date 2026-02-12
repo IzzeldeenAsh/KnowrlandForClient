@@ -136,7 +136,7 @@ export default function Reviews({ knowledgeSlug, reviews, is_review, is_owner, h
     deleteSuccess: isRTL ? 'تم حذف المراجعة بنجاح!' : 'Review deleted successfully!',
     deleteError: isRTL ? 'حدث خطأ في حذف المراجعة. يرجى المحاولة مرة أخرى.' : 'Error deleting review. Please try again.',
     confirmDelete: isRTL ? 'هل أنت متأكد أنك تريد حذف هذه المراجعة؟' : 'Are you sure you want to delete this review?',
-    purchaseRequired: isRTL ? 'لترك مراجعة، يجب شراء مستند واحد على الأقل.' : 'To leave a review, you must purchase at least one document.'
+    purchaseRequired: isRTL ? 'لتقييم المحتوى، يجب شراء مستند واحد على الأقل.' : 'To leave a review, you must purchase at least one document.'
   };
 
   // Retrieve the token from localStorage
