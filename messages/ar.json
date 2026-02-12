@@ -705,6 +705,7 @@
         "industryInsights":"استكشف الرؤى حسب النوع",
         "noInsightItems": "لا توجد عناصر معرفية متاحة بعد",
         "subIndustryInsights": "استكشف الرؤى حسب النوع",
+        "topicInsights": "استكشف الرؤى حسب الموضوع",
         "insightItems": "الرؤى:",
         "topicKnowledge": "أنواع الرؤى المتوفرة في <topic></topic>",
         "topicLabel": "الموضوع",

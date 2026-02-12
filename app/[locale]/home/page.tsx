@@ -104,6 +104,7 @@ export default function HomePage() {
   const [filtersVisible, setFiltersVisible] = useState(true);
   const [isFilterDrawerOpen, setIsFilterDrawerOpen] = useState(false);
   const [isTabletOrMobile, setIsTabletOrMobile] = useState(false);
+  const mainRef = useRef<HTMLElement | null>(null);
   const contentScrollRef = useRef<HTMLDivElement | null>(null);
 
   // Handle responsive behavior
@@ -120,6 +121,42 @@ export default function HomePage() {
     
     // Cleanup
     return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
+  // This page uses its own scroll containers; keep the outer document at viewport height.
+  useEffect(() => {
+    const mainEl = mainRef.current;
+    const layoutWrapper = mainEl?.parentElement;
+    if (!layoutWrapper) return;
+
+    const previousMinHeight = layoutWrapper.style.minHeight;
+    const previousHeight = layoutWrapper.style.height;
+    let headerResizeObserver: ResizeObserver | null = null;
+
+    const applyLayoutHeight = () => {
+      const headerContainer = document.querySelector('header')?.parentElement as HTMLElement | null;
+      const headerHeight = headerContainer?.getBoundingClientRect().height ?? 0;
+      layoutWrapper.style.minHeight = '0px';
+      layoutWrapper.style.height = `calc(100dvh - ${Math.max(0, Math.round(headerHeight))}px)`;
+    };
+
+    applyLayoutHeight();
+    window.addEventListener('resize', applyLayoutHeight);
+
+    if (typeof ResizeObserver !== 'undefined') {
+      const headerContainer = document.querySelector('header')?.parentElement as HTMLElement | null;
+      if (headerContainer) {
+        headerResizeObserver = new ResizeObserver(applyLayoutHeight);
+        headerResizeObserver.observe(headerContainer);
+      }
+    }
+
+    return () => {
+      window.removeEventListener('resize', applyLayoutHeight);
+      headerResizeObserver?.disconnect();
+      layoutWrapper.style.minHeight = previousMinHeight;
+      layoutWrapper.style.height = previousHeight;
+    };
   }, []);
 
   // Sync outer page scroll when inner scroll hits top/bottom.
@@ -1502,18 +1539,18 @@ export default function HomePage() {
   }, [locale, languageFilter, countryFilter, regionFilter, economicBlocFilter, tagFilter, activeTab, searchType, initialized, toast, selectedCategory, industryFilter, isicCodeFilter, hsCodeFilter, priceFilter, accuracyFilter, roleFilter, rangeStartFilter, rangeEndFilter, yearOfStudyFilter, fetchStatisticsIfNeeded]);
 
   return (
-   <main className='min-h-screen flex flex-col bg-gray-50'>
+   <main ref={mainRef} className='h-full min-h-0 flex flex-col bg-gray-50'>
      <style dangerouslySetInnerHTML={{ __html: customScrollbarStyle }} />
      
      {/* Global Loading Overlay */}
   
-     <section className="relative flex-1">
+     <section className="relative flex-1 min-h-0">
       <PageIllustration />
       {/* Main content area with left sidebar */}
-      <div className="flex flex-col relative z-3 pt-0 pb-0">
-        <div className="w-full">
-          <div className="max-w-8xl 2xl:max-w-none">
-            <div className="flex gap-0 items-start">
+      <div className="flex h-full min-h-0 flex-col relative z-3 pt-0 pb-0">
+        <div className="w-full h-full min-h-0">
+          <div className="max-w-8xl 2xl:max-w-none h-full min-h-0">
+            <div className="flex gap-0 items-start h-full min-h-0">
               {/* Sidebar (FilterBox) */}
               <aside 
                 className={`hidden lg:block lg:flex-shrink-0 transition-all duration-300 ease-in-out ${
@@ -1522,7 +1559,7 @@ export default function HomePage() {
                     : 'overflow-hidden lg:w-0 opacity-0 max-h-0'
                 }`}
               >
-                <div className={`sticky top-0 h-[100vh] overflow-y-auto bg-[#f9fafb] transition-transform duration-300 ease-in-out ${
+                <div className={`sticky top-0 h-full overflow-y-auto bg-[#f9fafb] transition-transform duration-300 ease-in-out ${
                   filtersVisible ? 'transform translate-x-0' : 'transform -translate-x-full lg:translate-x-0'
                 }`}>
                   <FilterBox
@@ -1565,7 +1602,7 @@ export default function HomePage() {
               </aside>
 
               {/* Content (Hero + Controls + Results) */}
-              <div ref={contentScrollRef} className="flex-1 h-[100vh] overflow-y-auto">
+              <div ref={contentScrollRef} className="flex-1 h-full min-h-0 overflow-y-auto">
                 {/* Filters toggle - sticky toolbar (desktop) */}
                 <div className={`${!filtersVisible ? 'sticky top-0 z-20 bg-white/80 backdrop-blur border-b' : ''} ${locale === 'ar' ? 'pr-3' : 'pl-3'}`}>
                   <div className={`flex ${locale === 'ar' ? 'justify-start' : 'justify-start'}`}>

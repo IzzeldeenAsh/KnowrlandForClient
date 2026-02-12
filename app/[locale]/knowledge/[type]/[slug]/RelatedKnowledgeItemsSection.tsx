@@ -419,9 +419,13 @@ export default function RelatedKnowledgeItemsSection({
             revealOn ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4',
           ].join(' ')}
         >
-          <div className={`flex items-center gap-3 sm:gap-4 ${isRTL ? 'flex-row-reverse' : ''}`}>
+          <div
+            className={`flex flex-wrap sm:flex-nowrap items-center justify-center sm:justify-start gap-3 sm:gap-4 ${
+              isRTL ? 'sm:flex-row-reverse' : ''
+            }`}
+          >
             <button
-              className={`${prevClass} flex-shrink-0 z-30 w-10 h-10 sm:w-12 sm:h-12 flex items-center justify-center group rounded-full border border-gray-200 bg-white hover:bg-gray-50 transition`}
+              className={`${prevClass} order-2 sm:order-1 flex-shrink-0 z-30 w-10 h-10 sm:w-12 sm:h-12 flex items-center justify-center group rounded-full border border-gray-200 bg-white hover:bg-gray-50 transition`}
               aria-label={copy.previous}
               type="button"
               onClick={() => {
@@ -438,7 +442,7 @@ export default function RelatedKnowledgeItemsSection({
               </svg>
             </button>
 
-            <div className="relative flex-1 min-w-0">
+            <div className="relative order-1 basis-full sm:order-2 sm:basis-auto flex-1 min-w-0">
               <div className={`${styles.relatedItemsCarousel} ${carouselClass} swiper`}>
                 <div className="swiper-wrapper">
                   {activeItems.map((item, index) => {
@@ -466,7 +470,7 @@ export default function RelatedKnowledgeItemsSection({
                     return (
                       <div
                         key={`${activeKey}-${item.type}-${item.slug}-${index}`}
-                        className="swiper-slide !w-[300px] sm:!w-[340px] md:!w-[380px] h-auto"
+                        className="swiper-slide !w-full sm:!w-[340px] md:!w-[380px] h-auto"
                       >
                         <div className="slideInner h-full rounded-md overflow-hidden border border-gray-200 bg-white">
                           <Link href={`/${locale}/knowledge/${item.type}/${item.slug}`} className="block h-full">
@@ -726,7 +730,7 @@ export default function RelatedKnowledgeItemsSection({
             </div>
 
             <button
-              className={`${nextClass} flex-shrink-0 z-30 w-10 h-10 sm:w-12 sm:h-12 flex items-center justify-center group rounded-full border border-gray-200 bg-white hover:bg-gray-50 transition`}
+              className={`${nextClass} order-3 sm:order-3 flex-shrink-0 z-30 w-10 h-10 sm:w-12 sm:h-12 flex items-center justify-center group rounded-full border border-gray-200 bg-white hover:bg-gray-50 transition`}
               aria-label={copy.next}
               type="button"
               onClick={() => {
@@ -747,4 +751,3 @@ export default function RelatedKnowledgeItemsSection({
     </section>
   )
 }
-

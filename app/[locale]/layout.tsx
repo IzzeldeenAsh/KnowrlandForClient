@@ -199,7 +199,7 @@ export default async function RootLayout({
                     <ClientLogoutHandler />
                     <Header />
                     <div
-                      className="flex flex-col min-h-screen overflow-hidden supports-[overflow:clip]:overflow-clip"
+                      className="flex flex-col min-h-screen  overflow-hidden supports-[overflow:clip]:overflow-clip"
                       style={{ paddingBottom: 'var(--auth-banner-offset, 0px)' }}
                     >
                       {children}
