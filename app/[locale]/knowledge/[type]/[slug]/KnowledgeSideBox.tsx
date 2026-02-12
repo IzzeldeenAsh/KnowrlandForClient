@@ -294,7 +294,7 @@ const KnowledgeSideBox = ({
   const translations = {
     documents: isRTL ? 'المستندات' : 'Documents',
     documentsLanguage: isRTL ? 'لغة المستندات' : 'Documents Language',
-    isicCode: isRTL ? 'رمز ISIC' : 'ISIC Code',
+    isicCode: isRTL ? 'الرمز الصناعي (ISIC)' : 'Industrial Code (ISIC)',
     hsCode: isRTL ? 'رمز المنتج (HS Code)' : 'Product (HS Code)',
     economicBloc: isRTL ? 'الكتلة الاقتصادية' : 'Economic Block',
     region: isRTL ? 'المنطقة' : 'Region',

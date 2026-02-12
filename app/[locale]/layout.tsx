@@ -47,7 +47,7 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
     metadataBase: new URL(baseUrl),
     applicationName: isArabic ? 'إنسايتا' : 'Insighta',
     title: {
-      default: isArabic ? 'إنسايتا - شراء وبيع المستندات' : 'Insighta - Buy & Sell Insights',
+      default: isArabic ? 'إنسايتا - شراء وبيع الرؤى' : 'Insighta - Buy & Sell Insights',
       template: isArabic ? '%s | إنسايتا' : '%s | Insighta',
     },
     description: isArabic 
@@ -199,7 +199,7 @@ export default async function RootLayout({
                     <ClientLogoutHandler />
                     <Header />
                     <div
-                      className="flex flex-col min-h-screen overflow-hidden supports-[overflow:clip]:overflow-clip"
+                      className="flex flex-col min-h-screen  overflow-hidden supports-[overflow:clip]:overflow-clip"
                       style={{ paddingBottom: 'var(--auth-banner-offset, 0px)' }}
                     >
                       {children}

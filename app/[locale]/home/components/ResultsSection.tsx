@@ -388,7 +388,7 @@ const ResultsSection: React.FC<ResultsSectionProps> = ({
         <div className="flex flex-col sm:flex-row items-center justify-center gap-2 text-center">
           <Image src="/images/smallLogo.png" alt="Logo" width={20 } height={20} />
           <Text size="xs" c="dimmed" dir="ltr" lang="en">
-        © 2026insightabusiness.com
+        © 2026 Insightabusiness.com
           </Text>
           <Text size="xs" c="dimmed" dir="ltr" lang="en" className="whitespace-nowrap">
             v1.1.1

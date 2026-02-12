@@ -37,6 +37,19 @@
   box-shadow: 0 14px 36px rgba(2, 132, 199, 0.15);
 }
 
+@media (max-width: 639px) {
+  .relatedItemsCarousel :global(.swiper-wrapper) {
+    padding: 8px 0 16px;
+  }
+
+  .relatedItemsCarousel :global(.slideInner),
+  .relatedItemsCarousel :global(.swiper-slide-prev) :global(.slideInner),
+  .relatedItemsCarousel :global(.swiper-slide-next) :global(.slideInner),
+  .relatedItemsCarousel :global(.swiper-slide-active) :global(.slideInner) {
+    transform: scale(1);
+  }
+}
+
 /* Swiper navigation uses these custom classes (so Swiper's default "lock" CSS won't hide our arrows) */
 .relatedItemsCarousel :global(.knoldg-swiper-nav-disabled),
 .relatedItemsCarousel :global(.knoldg-swiper-nav-locked),
@@ -54,4 +67,3 @@
     transition: none;
   }
 }
-
