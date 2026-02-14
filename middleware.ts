@@ -1,8 +1,8 @@
 import createMiddleware from 'next-intl/middleware';
-import { routing } from './i18n/routing';
+import {routing} from './i18n/routing';
 import { NextRequest, NextResponse } from 'next/server';
 
-// 1. Custom middleware to handle cookie-based locale detection
+// Custom middleware to handle cookie-based locale detection
 function customMiddleware(request: NextRequest) {
   // Enforce canonical host: redirect www. to apex domain
   const host = request.headers.get('host') || '';
@@ -19,7 +19,12 @@ function customMiddleware(request: NextRequest) {
   const pathname = request.nextUrl.pathname;
   const search = request.nextUrl.search;
 
-  // Normalize callback URLs
+  // Normalize callback URLs that embed the JWT in the path to use a query param instead.
+  // This avoids proxy/CDN issues with long/dotted path segments and is more interoperable.
+  // Examples handled:
+  // - /en/callback/<JWT>[?returnUrl=...]
+  // - /ar/callback/<JWT>/
+  // - /callback/<JWT>
   const callbackWithTokenMatch = pathname.match(/^\/(en|ar)?\/?callback\/([^/?#]+)\/?$/);
   if (callbackWithTokenMatch) {
     const localeFromPath = callbackWithTokenMatch[1] || (preferredLanguage && ['en','ar'].includes(preferredLanguage) ? preferredLanguage : 'en');
@@ -27,6 +32,8 @@ function customMiddleware(request: NextRequest) {
     // Basic sanity check: looks like a JWT
     if (rawToken.includes('.')) {
       const url = new URL(`/${localeFromPath}/callback`, request.url);
+      // Preserve existing query params (e.g., returnUrl)
+      // and move the path token into ?token=
       url.search = search; // start with existing params
       const params = new URLSearchParams(url.search);
       params.set('token', rawToken);
@@ -42,12 +49,13 @@ function customMiddleware(request: NextRequest) {
   
   // If no locale in pathname and user has a preferred language cookie
   if (!pathnameHasLocale && preferredLanguage && routing.locales.includes(preferredLanguage as any)) {
+    // Redirect to the preferred language
     const url = new URL(`/${preferredLanguage}${pathname}`, request.url);
-    url.search = request.nextUrl.search;
+    url.search = request.nextUrl.search; // Preserve query parameters
     return NextResponse.redirect(url);
   }
   
-  // If accessing root without locale
+  // If accessing root without locale, redirect to preferred language or default
   if (pathname === '/') {
     const locale = preferredLanguage && routing.locales.includes(preferredLanguage as any) 
       ? preferredLanguage 
@@ -59,16 +67,24 @@ function customMiddleware(request: NextRequest) {
   return null; // Continue to next-intl middleware
 }
 
-// 2. Setup next-intl middleware
 const intlMiddleware = createMiddleware({
+  // A list of all locales that are supporteds
   locales: ['en', 'ar'],
+ 
+  // Used when no locale matches
   defaultLocale: 'en',
+  
+  // Configure locale detection - enable it to respect cookies and browser preferences
   localeDetection: true,
+  
+  // Custom locale prefix strategy
   localePrefix: 'always'
 });
 
-// 3. Main Export
 export default function middleware(request: NextRequest) {
+  // Never run i18n/cookie middleware for Next.js internals or static assets.
+  // This prevents 500s for requests like /favicon.ico or /en/favicon.ico when
+  // the app is configured with locale prefixes.
   const pathname = request.nextUrl.pathname;
   const isNextInternal =
     pathname.startsWith('/_next') ||
@@ -78,40 +94,28 @@ export default function middleware(request: NextRequest) {
     pathname === '/favicon.ico' ||
     pathname === '/robots.txt' ||
     pathname === '/sitemap.xml' ||
-    /\.[a-z0-9]+$/i.test(pathname);
+    /\.[a-z0-9]+$/i.test(pathname); // any file extension (png, ico, css, js, etc.)
 
   if (isNextInternal || isStaticAsset) {
     return NextResponse.next();
   }
 
-  // First try custom logic
+  // First try custom cookie-based logic
   const customResponse = customMiddleware(request);
   if (customResponse) {
-    // >> إصلاح المشكلة هنا: إضافة الهيدر للرد الخاص بالـ Custom Middleware <<
-    customResponse.headers.set(
-      'Content-Security-Policy', 
-      "connect-src 'self' https://api.foresighta.co;"
-    );
     return customResponse;
   }
   
   // Fall back to next-intl middleware
-  const response = intlMiddleware(request);
-
-  // >> إصلاح المشكلة هنا: إضافة الهيدر للرد النهائي <<
-  // هذا السطر يسمح للمتصفح بالاتصال بـ api.foresighta.co
-  response.headers.set(
-    'Content-Security-Policy', 
-    "connect-src 'self' https://api.foresighta.co;"
-  );
-
-  return response;
+  return intlMiddleware(request);
 }
 
 export const config = {
+  // Match internationalized pathnames
   matcher: [
     '/', 
     '/(ar|en)/:path*',
+    // Ensure bare callback without locale gets handled and redirected to preferred language
     '/callback'
   ]
 };
