@@ -12,6 +12,7 @@ import styles from './sub-industry-by-type.module.css';
 import IndustryIcon from "@/components/icons/industry-icon";
 import { safeAOSInit } from '@/components/aos-provider';
 import Stripes from "@/public/images/stripes-dark.svg";
+import { useTranslations } from 'next-intl';
 interface Topic {
   id: number;
   name: string;
@@ -38,10 +39,6 @@ interface Props {
   }>;
 }
 
-function capitalizeFirstLetter(string: string) {
-  return string.charAt(0).toUpperCase() + string.slice(1);
-}
-
 function isArabicFirstWord(text: string): boolean {
   if (!text) return false;
   const firstWord = text.trim().split(/\s+/)[0] || '';
@@ -60,6 +57,7 @@ export default function SubIndustryByTypePage({ params }: Props) {
   const slug = resolvedParams.slug;
   const locale = resolvedParams.locale || 'en';
   const isRtl = locale === 'ar';
+  const t = useTranslations();
 
   useEffect(() => {
     safeAOSInit({
@@ -125,7 +123,7 @@ export default function SubIndustryByTypePage({ params }: Props) {
           <div className={styles.headerContent}>
             <div data-aos="fade-down">
               <span className={styles.typeLabel}>
-                {capitalizeFirstLetter(type)}
+                {t(`typeLabel.${type}`)}
               </span>
               <h3  className={` text-transparent font-extrabold text-3xl ${isRtl ? 'bg-gradient-to-l from-blue-400 to-teal-500' : 'bg-gradient-to-r from-blue-500 to-teal-400'} bg-clip-text`}>
                 {subIndustry?.name || 'Loading...'}

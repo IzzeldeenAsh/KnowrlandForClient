@@ -14,6 +14,7 @@ export default function Header() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const pathname = usePathname();
   const t = useTranslations('Header');
+  const shouldHideHeader = pathname.includes('/dashboard') || pathname.includes('/callback');
   
   // Helper function to get the base domain for cookies
   const getCookieDomain = (): string | null => {
@@ -96,6 +97,7 @@ export default function Header() {
   
   // Close mobile menu when screen size changes to desktop
   useEffect(() => {
+    if (shouldHideHeader) return;
     const handleResize = () => {
       if (window.innerWidth >= 768 && isMobileMenuOpen) {
         setIsMobileMenuOpen(false);
@@ -104,10 +106,11 @@ export default function Header() {
 
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
-  }, [isMobileMenuOpen]);
+  }, [isMobileMenuOpen, shouldHideHeader]);
 
   // Get preferred language from cookie and set it if needed
   useEffect(() => {
+    if (shouldHideHeader) return;
     // Helper function to get cookie value
     const getCookie = (name: string) => {
       const value = `; ${document.cookie}`;
@@ -124,10 +127,11 @@ export default function Header() {
       // Automatically switch to preferred language
       switchLocale(preferredLanguage);
     }
-  }, [pathname]);
+  }, [pathname, shouldHideHeader]);
 
   // Close mobile menu when clicking outside
   useEffect(() => {
+    if (shouldHideHeader) return;
     const handleClickOutside = (event: MouseEvent) => {
       const sidebar = document.getElementById('mobile-sidebar');
       const toggleButton = document.getElementById('mobile-menu-toggle');
@@ -143,10 +147,11 @@ export default function Header() {
 
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, [isMobileMenuOpen]);
+  }, [isMobileMenuOpen, shouldHideHeader]);
 
   // Prevent scrolling when mobile menu is open
   useEffect(() => {
+    if (shouldHideHeader) return;
     if (isMobileMenuOpen) {
       document.body.style.overflow = 'hidden';
     } else {
@@ -156,7 +161,11 @@ export default function Header() {
     return () => {
       document.body.style.overflow = 'auto';
     };
-  }, [isMobileMenuOpen]);
+  }, [isMobileMenuOpen, shouldHideHeader]);
+
+  if (shouldHideHeader) {
+    return null;
+  }
 
   return (
     <header className="fixed top-0 z-30 w-full">

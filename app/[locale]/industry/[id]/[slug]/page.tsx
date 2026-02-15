@@ -31,24 +31,52 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
 export default async function IndustryPage({ params }: Props) {
   const { id, slug, locale = 'en' } = await params
+  const industryId = Number.parseInt(id, 10)
   const isRTL = locale === 'ar';
   
   // Get translations
   const messages = await getMessages(locale);
 
   try {
-    const { data: industry } = await fetchIndustryDetails(id, slug, locale)
-    console.log('industry data', industry);
-    const breadcrumbItems = await fetchBreadcrumb('industry', parseInt(id), locale)
+    if (Number.isNaN(industryId)) {
+      throw new Error(`Invalid industry id: ${id}`)
+    }
+
+    const { data } = await fetchIndustryDetails(industryId, slug, locale)
+    const safeChildren = Array.isArray(data?.children)
+      ? data.children.filter((child: unknown): child is IndustryChild => {
+          return !!child && typeof child === 'object' && 'id' in child && 'slug' in child
+        })
+      : []
+    const industryName = data?.name || (locale === 'ar' ? 'المجال' : 'Industry')
+    const industry = {
+      ...data,
+      name: industryName,
+      children: safeChildren
+    }
+
+    const rawBreadcrumbItems = await fetchBreadcrumb('industry', industryId, locale).catch(() => [])
+    const breadcrumbItems = Array.isArray(rawBreadcrumbItems)
+      ? rawBreadcrumbItems.filter((item: unknown): item is { label: string; url: string } => {
+          return (
+            !!item &&
+            typeof item === 'object' &&
+            'label' in item &&
+            'url' in item &&
+            typeof item.label === 'string' &&
+            typeof item.url === 'string'
+          )
+        })
+      : []
     
     // Generate structured data
     const structuredData = generateIndustryStructuredData(
-      {
-        id: parseInt(id),
-        name: industry.name,
-        slug: slug,
-        children: industry.children
-      },
+        {
+          id: industryId,
+          name: industryName,
+          slug: slug,
+          children: industry.children
+        },
       breadcrumbItems.map(item => ({ label: item.label, url: item.url })),
       locale
     )
@@ -108,7 +136,7 @@ export default async function IndustryPage({ params }: Props) {
                       </div>
                     </div>
                     <aside className="flex-shrink-0">
-                      <StatisticsCards type="industry" id={parseInt(id)} entityName={industry.name} />
+                      <StatisticsCards type="industry" id={industryId} entityName={industry.name} />
                     </aside>
                   </div>
                 </div>
@@ -152,6 +180,22 @@ export default async function IndustryPage({ params }: Props) {
       </>
     )
   } catch (error) {
-    throw error
+    console.error('Industry page render error:', error)
+
+    return (
+      <>
+        <main className="min-h-screen bg-gray-50" dir={isRTL ? 'rtl' : 'ltr'}>
+          <section className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+            <h1 className="text-2xl font-bold text-gray-900 mb-3">
+              {locale === 'ar' ? 'تعذر تحميل بيانات المجال' : 'Unable to load industry details'}
+            </h1>
+            <p className="text-gray-600">
+              {messages?.dataNotAvailable || (locale === 'ar' ? 'البيانات غير متوفرة' : 'Data is not available')}
+            </p>
+          </section>
+        </main>
+        <Footer />
+      </>
+    )
   }
 }
