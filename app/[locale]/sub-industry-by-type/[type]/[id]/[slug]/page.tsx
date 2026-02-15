@@ -13,6 +13,7 @@ import IndustryIcon from "@/components/icons/industry-icon";
 import { safeAOSInit } from '@/components/aos-provider';
 import Stripes from "@/public/images/stripes-dark.svg";
 import { useTranslations } from 'next-intl';
+
 interface Topic {
   id: number;
   name: string;
