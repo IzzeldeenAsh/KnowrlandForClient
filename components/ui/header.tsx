@@ -358,8 +358,9 @@ const { isLoading: isAppLoading, setIsLoading: setAppLoading } = useLoading();
     window.location.href = fullUrl;
   };
 
-  // Hide header on callback routes to avoid visual flicker/loaders during auth
-  if (pathname.includes('/callback')) {
+  // Hide header on callback routes to avoid visual flicker/loaders during auth.
+  // Hide on dashboard routes because the dashboard renders its own AppShell header/sidebar.
+  if (pathname.includes('/callback') || pathname.includes('/dashboard')) {
     return null;
   }
 

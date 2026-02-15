@@ -16,6 +16,7 @@ interface ToastContextType {
   error: (message: string, title?: string, delay?: number) => void;
   warning: (message: string, title?: string, delay?: number) => void;
   info: (message: string, title?: string, delay?: number) => void;
+  handleServerSuccess: (payload: any, fallbackMessage?: string) => void;
   handleServerErrors: (error: any) => void;
 }
 
@@ -108,60 +109,70 @@ export const ToastProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     showToast(message, 'info', title, delay);
   }, [showToast]);
 
+  const handleServerSuccess = useCallback(
+    (payload: any, fallbackMessage: string = 'Success') => {
+      const normalizedPayload = payload && typeof payload === 'object' ? payload : null;
+      const type = normalizedPayload?.type === 'warning' ? 'warning' : 'success';
+      const show = type === 'warning' ? warning : success;
+      const messageCandidate =
+        typeof normalizedPayload?.message === 'string' && normalizedPayload.message.trim()
+          ? normalizedPayload.message.trim()
+          : fallbackMessage;
+      show(messageCandidate, '', 6000);
+    },
+    [success, warning]
+  );
+
   // Function to handle server errors similar to Angular service
   const handleServerErrors = useCallback((err: any) => {
-    // Consolidate all error messages into a single message
-    let errorMessage = '';
+    const payload =
+      err?.error && typeof err.error === 'object'
+        ? err.error
+        : err?.response?.data && typeof err.response.data === 'object'
+          ? err.response.data
+          : err && typeof err === 'object'
+            ? err
+            : null;
 
-    const extractErrors = (serverErrors: any): string[] => {
-      if (!serverErrors || typeof serverErrors !== 'object') return [];
-      const allMessages: string[] = [];
-      for (const key in serverErrors) {
-        if (!Object.prototype.hasOwnProperty.call(serverErrors, key)) continue;
-        const messages = serverErrors[key];
-        if (Array.isArray(messages)) {
-          allMessages.push(...messages.filter((m) => typeof m === 'string'));
-        } else if (typeof messages === 'string') {
-          allMessages.push(messages);
-        }
+    const type = typeof payload?.type === 'string' ? payload.type : undefined;
+    const show = type === 'warning' ? warning : error;
+
+    const errorsBag = payload?.errors;
+    if (errorsBag && typeof errorsBag === 'object') {
+      for (const key in errorsBag as Record<string, unknown>) {
+        if (!Object.prototype.hasOwnProperty.call(errorsBag, key)) continue;
+        const entry = (errorsBag as Record<string, unknown>)[key];
+        const messages = Array.isArray(entry) ? entry : entry ? [entry] : [];
+        const normalized = messages
+          .map((message) => (typeof message === 'string' ? message.trim() : ''))
+          .filter(Boolean);
+        if (!normalized.length) continue;
+        show(normalized.join(', '), '', 10000);
       }
-      return allMessages;
-    };
-    
-    if (err.error && err.error.errors) {
-      // Handle Angular-style error responses
-      const allMessages = extractErrors(err.error.errors);
-      errorMessage = allMessages.join('. ');
-    } else if (err.response && err.response.data && err.response.data.errors) {
-      // Handle axios/fetch style error responses
-      const allMessages = extractErrors(err.response.data.errors);
-      errorMessage = allMessages.join('. ');
-    } else if (err && err.errors) {
-      // Handle plain API error shape: { message, errors: { field: string[] } }
-      const allMessages = extractErrors(err.errors);
-      errorMessage = allMessages.join('. ') || err.message || '';
-    } else if (err.response && err.response.data && err.response.data.message) {
-      // Handle single error message
-      errorMessage = err.response.data.message;
-    } else if (err.message) {
-      // Handle simple error object with message
-      errorMessage = err.message;
-    } else {
-      // Default error message
-      errorMessage = 'An unexpected error occurred.';
+      return;
     }
-    
-    // Show a single toast with all error messages
-    if (errorMessage) {
-      error(errorMessage, '', 10000);
+
+    const messageCandidate =
+      typeof payload?.message === 'string' && payload.message.trim()
+        ? payload.message.trim()
+        : typeof err?.message === 'string' && err.message.trim()
+          ? err.message.trim()
+          : '';
+
+    if (type === 'warning') {
+      show(messageCandidate || 'An unexpected warning occurred.', '', 10000);
+      return;
     }
-  }, [error]);
+
+    show(messageCandidate || 'An unexpected error occurred.', '', 10000);
+  }, [error, warning]);
 
   const contextValue = {
     success,
     error,
     warning,
     info,
+    handleServerSuccess,
     handleServerErrors
   };
 

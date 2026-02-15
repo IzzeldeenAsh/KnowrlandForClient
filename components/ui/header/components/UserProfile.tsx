@@ -10,6 +10,12 @@ const getInitials = (firstName: string, lastName: string) => {
   return `${firstName[0]}${lastName[0]}`.toUpperCase();
 };
 
+type KnowledgeStatusStatistic = { status: string; count: number };
+type KnowledgeStatusStatisticsResponse = { data?: KnowledgeStatusStatistic[] };
+
+const API_BASE_URL: string =
+  process.env.NEXT_PUBLIC_API_URL || "https://api.insightabusiness.com";
+
 // IMPORTANT: must be deterministic on BOTH SSR + first client render (hydration).
 const ANGULAR_APP_URL: string =
   process.env.NEXT_PUBLIC_ANGULAR_APP_URL || "https://app.insightabusiness.com";
@@ -25,6 +31,10 @@ export function UserProfile({ isHome }: { isHome: boolean }) {
   const { user, roles, isLoading, isAuthResolved, handleSignOut } = useUserProfile();
   const pathname = usePathname();
   const isRtl = pathname.startsWith("/ar");
+  const canHaveDrafts =
+    roles.includes("insighter") ||
+    roles.includes("company") ||
+    roles.includes("company-insighter");
   const [menuOpen, setMenuOpen] = useState(false);
   const [dashboardOpen, setDashboardOpen] = useState(false);
   const [settingsOpen, setSettingsOpen] = useState(false);
@@ -39,6 +49,7 @@ export function UserProfile({ isHome }: { isHome: boolean }) {
   // Client-only values must be read after mount to avoid hydration mismatch.
   const [hasToken, setHasToken] = useState<boolean>(false);
   const [returnUrl, setReturnUrl] = useState<string>("");
+  const [unpublishedDraftCount, setUnpublishedDraftCount] = useState<number>(0);
 
   // Calculate and update menu position whenever it opens
   useEffect(() => {
@@ -117,6 +128,59 @@ export function UserProfile({ isHome }: { isHome: boolean }) {
     setHasToken(!!getAuthToken());
     setReturnUrl(window.location.href);
   }, [pathname]);
+
+  useEffect(() => {
+    let ignore = false;
+
+    async function loadDraftCount() {
+      if (!menuOpen) return;
+
+      if (!canHaveDrafts) {
+        setUnpublishedDraftCount(0);
+        return;
+      }
+
+      const token = getAuthToken();
+      if (!token) {
+        setUnpublishedDraftCount(0);
+        return;
+      }
+
+      try {
+        const res = await fetch(
+          `${API_BASE_URL}/api/insighter/library/knowledge/status/statistics`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+              Accept: "application/json",
+              "Content-Type": "application/json",
+              "Accept-Language": isRtl ? "ar" : "en",
+              "X-Timezone": Intl.DateTimeFormat().resolvedOptions().timeZone,
+            },
+            cache: "no-store",
+          }
+        );
+
+        if (!res.ok) {
+          if (!ignore) setUnpublishedDraftCount(0);
+          return;
+        }
+
+        const data = (await res.json()) as KnowledgeStatusStatisticsResponse;
+        const count =
+          data?.data?.find((s) => s.status === "unpublished")?.count ?? 0;
+
+        if (!ignore) setUnpublishedDraftCount(count);
+      } catch {
+        if (!ignore) setUnpublishedDraftCount(0);
+      }
+    }
+
+    loadDraftCount();
+    return () => {
+      ignore = true;
+    };
+  }, [menuOpen, canHaveDrafts, isRtl]);
 
   const isClient$ = () => {
     return roles.includes("client") && 
@@ -330,11 +394,16 @@ export function UserProfile({ isHome }: { isHome: boolean }) {
               </Link>
                <Link
                href={`https://app.insightabusiness.com/app/insighter-dashboard/my-knowledge/general`}
-               className="block px-4 py-2.5  font-semibold text-slate-900 hover:bg-indigo-50 hover:text-sky-700"
+               className="flex items-center justify-between px-4 py-2.5 font-semibold text-slate-900 hover:bg-indigo-50 hover:text-sky-700"
                onClick={() => setMenuOpen(false)}
                style={{fontSize: '13px'}}
              >
-               {t("insightBase")}
+               <span>{t("insightBase")}</span>
+               {unpublishedDraftCount > 0 && (
+                 <span className="bg-[#FFEEF3] text-[#f8275a] text-[11px] font-bold px-2 py-0.5  border border-[#f8275a] rounded-[0.425rem]">
+                   {unpublishedDraftCount} {isRtl ? "محفوظ" : "Draft"}
+                 </span>
+               )}
              </Link>
              </>
             )}

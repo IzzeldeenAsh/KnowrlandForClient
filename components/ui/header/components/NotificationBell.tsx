@@ -1,5 +1,5 @@
 'use client'
-import { useEffect, useState } from 'react'
+import { useEffect, useState, type ReactNode } from 'react'
 import type React from 'react'
 import { createPortal } from 'react-dom'
 import { useParams, usePathname } from 'next/navigation'
@@ -34,7 +34,11 @@ const NotificationIcon = () => (
   </svg>
 )
 
-export default function NotificationBell() {
+type NotificationBellProps = {
+  parent?: 'client' | 'app';
+};
+
+export default function NotificationBell({ parent = 'client' }: NotificationBellProps) {
   const { user } = useUserProfile()
   const token = getAuthToken()
  const params = useParams();
@@ -201,24 +205,9 @@ export default function NotificationBell() {
     // Close the dropdown
     setIsOpen(false)
   }
-  
-  return (
-    <div className="relative notification-item">
-      <button
-        className="flex items-center text-gray-400 justify-center w-8 h-8 rounded-full hover:bg-gray-100 focus:outline-none transition-all duration-200 notification-toggle hover:shadow "
-        onClick={toggleNotifications}
-        aria-label="Notifications"
-      >
-        <NotificationIcon />
-        <span
-          className={`absolute -top-1 ${isRTL ? '-left-1' : '-right-1'} flex items-center justify-center w-5 h-5 text-xs font-bold text-white rounded-full shadow-sm ${notificationCount > 0 ? 'bg-red-600' : 'bg-transparent'}`}
-        >
-          {notificationCount > 0 ? notificationCount : ''}
-        </span>
-      </button>
-      
-      {/* Notification Drawer via Portal to avoid parent stacking contexts */}
-      {mounted && createPortal(
+
+  const drawerPortal: ReactNode = mounted
+    ? (createPortal(
         <div
           className={`fixed inset-0 z-[1000] ${isOpen ? '' : 'pointer-events-none'}`}
           aria-hidden={!isOpen}
@@ -236,7 +225,7 @@ export default function NotificationBell() {
             onClick={e => e.stopPropagation()}
           >
             <NotificationsInner 
-              parent="client"
+              parent={parent}
               onNotificationClick={handleNotificationClick} 
               notifications={notifications}
               onClickOutside={closeNotifications}
@@ -244,7 +233,26 @@ export default function NotificationBell() {
           </div>
         </div>,
         document.body
-      )}
+      ) as unknown as ReactNode)
+    : null
+  
+  return (
+    <div className="relative notification-item">
+      <button
+        className="flex items-center text-gray-400 justify-center w-8 h-8 rounded-full hover:bg-gray-100 focus:outline-none transition-all duration-200 notification-toggle hover:shadow "
+        onClick={toggleNotifications}
+        aria-label="Notifications"
+      >
+        <NotificationIcon />
+        <span
+          className={`absolute -top-1 ${isRTL ? '-left-1' : '-right-1'} flex items-center justify-center w-5 h-5 text-xs font-bold text-white rounded-full shadow-sm ${notificationCount > 0 ? 'bg-red-600' : 'bg-transparent'}`}
+        >
+          {notificationCount > 0 ? notificationCount : ''}
+        </span>
+      </button>
+      
+      {/* Notification Drawer via Portal to avoid parent stacking contexts */}
+      {drawerPortal}
     </div>
   )
 } 
