@@ -12,6 +12,7 @@ interface ProfileContextType {
   isLoading: boolean;
   isAuthResolved: boolean;
   refreshProfile: () => Promise<void>;
+  signOut: () => void;
 }
 
 const ProfileContext = createContext<ProfileContextType>({
@@ -20,6 +21,7 @@ const ProfileContext = createContext<ProfileContextType>({
   isLoading: false,
   isAuthResolved: false,
   refreshProfile: async () => {},
+  signOut: () => {},
 });
 
 export const useGlobalProfile = () => useContext(ProfileContext);
@@ -47,6 +49,7 @@ let globalProfileCache: {
 };
 
 const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes cache
+const ANGULAR_APP_URL = process.env.NEXT_PUBLIC_ANGULAR_APP_URL || 'https://app.insightabusiness.com';
 
 export function GlobalProfileProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(globalProfileCache.user);
@@ -62,13 +65,15 @@ export function GlobalProfileProvider({ children }: { children: React.ReactNode 
   const pathname = usePathname();
   const locale = useLocale();
 
-  const clearAuthTokenEverywhere = () => {
+  const clearAuthDataEverywhere = () => {
     if (typeof window === 'undefined') return;
 
     try {
       localStorage.removeItem('token');
       localStorage.removeItem('user');
       localStorage.removeItem('foresighta-creds');
+      localStorage.removeItem('currentUser');
+      localStorage.removeItem('authToken');
     } catch {
       // ignore storage failures (private mode, etc.)
     }
@@ -77,17 +82,30 @@ export function GlobalProfileProvider({ children }: { children: React.ReactNode 
     // Note: Domain must match original cookie to be removed; we attempt common variants.
     const pathsToClear = ['/', '/en', '/ar'];
     const domainsToClear = [undefined, '.insightabusiness.com'];
+    const cookieNames = ['token', 'auth_token', 'auth_user', 'auth_return_url'];
 
     for (const path of pathsToClear) {
-      // No domain (localhost / default)
-      document.cookie = `token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=${path};`;
+      for (const cookieName of cookieNames) {
+        // No domain (localhost / default)
+        document.cookie = `${cookieName}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=${path};`;
 
-      // Common production domain cookie
-      for (const domain of domainsToClear) {
-        if (!domain) continue;
-        document.cookie = `token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=${path}; Domain=${domain};`;
+        // Common production domain cookie
+        for (const domain of domainsToClear) {
+          if (!domain) continue;
+          document.cookie = `${cookieName}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=${path}; Domain=${domain};`;
+        }
       }
     }
+  };
+
+  const resetProfileState = () => {
+    globalProfileCache.user = null;
+    globalProfileCache.roles = [];
+    globalProfileCache.lastFetchTime = 0;
+    globalProfileCache.pendingPromise = null;
+    globalProfileCache.isLoading = false;
+    setUser(null);
+    setRoles([]);
   };
 
   // Fetch profile with retry logic
@@ -95,13 +113,14 @@ export function GlobalProfileProvider({ children }: { children: React.ReactNode 
     for (let attempt = 1; attempt <= maxRetries; attempt++) {
       try {
         
-        const response = await fetch("https://api.insightabusiness.com/api/account/profile", {
+        const response = await fetch('https://api.insightabusiness.com/api/account/profile', {
+          method: 'GET',
           headers: {
             'Authorization': `Bearer ${token}`,
-            "Content-Type": "application/json",
-            "Accept": "application/json",
-            "Accept-Language": locale,
-            "X-Timezone": Intl.DateTimeFormat().resolvedOptions().timeZone,
+            'Content-Type': 'application/json',
+            'Accept': 'application/json',
+            'Accept-Language': locale,
+            'X-Timezone': Intl.DateTimeFormat().resolvedOptions().timeZone,
           },
         });
 
@@ -137,20 +156,21 @@ export function GlobalProfileProvider({ children }: { children: React.ReactNode 
 
     
 
-        // Check if user is admin before caching
-        if (data.data.roles && data.data.roles.includes('admin')) {
-          // Still return the data but don't cache it
-          return { user: userData, roles: data.data.roles };
+        const rolesFromApi: string[] = Array.isArray(data.data.roles) ? data.data.roles : [];
+
+        // Cache the profile for ALL roles (including admin) to avoid refetch loops.
+        // Role-based redirects should be handled by RoleGuard; caching here is about
+        // preventing repeated `/api/account/profile` calls (e.g., every 5s).
+        globalProfileCache.user = userData;
+        globalProfileCache.roles = rolesFromApi;
+        globalProfileCache.lastFetchTime = Date.now();
+
+        // Persist only for non-admin users (admin users are typically redirected to Angular).
+        if (!rolesFromApi.includes('admin')) {
+          localStorage.setItem('user', JSON.stringify(userData));
         }
 
-        // Update cache only for non-admin users
-        globalProfileCache.user = userData;
-        globalProfileCache.roles = data.data.roles;
-        globalProfileCache.lastFetchTime = Date.now();
-        
-        localStorage.setItem("user", JSON.stringify(userData));
-        
-        return { user: userData, roles: data.data.roles };
+        return { user: userData, roles: rolesFromApi };
       } catch (error) {
         
         if ((error instanceof Error && error.message.includes('Auth failed')) || attempt === maxRetries) {
@@ -222,7 +242,7 @@ export function GlobalProfileProvider({ children }: { children: React.ReactNode 
       } catch (error) {
         
         // Check if we have cached user data to fall back to
-        const existingUser = localStorage.getItem("user");
+        const existingUser = localStorage.getItem('user');
         if (existingUser && !(error instanceof Error && error.message.includes('Auth failed'))) {
           const cachedUserData = JSON.parse(existingUser);
           globalProfileCache.user = cachedUserData;
@@ -234,13 +254,9 @@ export function GlobalProfileProvider({ children }: { children: React.ReactNode 
             // Block further attempts for this same token until it changes.
             globalProfileCache.authFailedToken = token;
 
-            clearAuthTokenEverywhere();
+            clearAuthDataEverywhere();
             
-            globalProfileCache.user = null;
-            globalProfileCache.roles = [];
-            globalProfileCache.lastFetchTime = 0;
-            setUser(null);
-            setRoles([]);
+            resetProfileState();
           }
         }
       } finally {
@@ -252,6 +268,17 @@ export function GlobalProfileProvider({ children }: { children: React.ReactNode 
       // Mark auth state as resolved after the first check (token/no-token/cached/fetch)
       setIsAuthResolved(true);
     }
+  };
+
+  const signOut = () => {
+    clearAuthDataEverywhere();
+    globalProfileCache.authFailedToken = null;
+    resetProfileState();
+    setIsAuthResolved(true);
+
+    const timestamp = Date.now();
+    const redirectUri = `${window.location.origin}/${locale}?t=${timestamp}`;
+    window.location.href = `${ANGULAR_APP_URL}/auth/logout?redirect_uri=${encodeURIComponent(redirectUri)}`;
   };
 
   useEffect(() => {
@@ -301,7 +328,8 @@ export function GlobalProfileProvider({ children }: { children: React.ReactNode 
       roles, 
       isLoading, 
       isAuthResolved,
-      refreshProfile: () => refreshProfile(true) 
+      refreshProfile: () => refreshProfile(true),
+      signOut,
     }}>
       {children}
     </ProfileContext.Provider>

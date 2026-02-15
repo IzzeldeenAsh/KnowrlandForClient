@@ -10,6 +10,7 @@ const ADMIN_REDIRECT_URL = 'https://app.insightabusiness.com/admin-dashboard/adm
 const ADMIN_ALLOWED_PATHS = [
   '/callback', // Allow callback for authentication flow
   '/signout',  // Allow signout
+  '/dashboard', // Allow Next.js dashboard pages
 ];
 
 export default function RoleGuard({ children }: { children: React.ReactNode }) {

@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import Image from "next/image";
 import Illustration from "@/public/images/glow-top-blue.svg";
 import { UserGroupIcon, 
@@ -18,6 +18,9 @@ export default function Features() {
   const t = useTranslations("Features");
   const t2 = useTranslations("Features2");
   const t3 = useTranslations("Features3");
+
+  const locale = useLocale();
+  const isRTL = locale === "ar";
 
   // States to track which tab is being hovered for each section
   const [hoveredTab1, setHoveredTab1] = useState<number | null>(null);
@@ -99,7 +102,7 @@ export default function Features() {
                       <div className="absolute inset-0 bg-gradient-to-br from-blue-500/10 rounded-lg to-transparent rounded-[inherit]" />
                       <Image
                         className={`rounded-[inherit] transition-all duration-700 ease-in-out absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 max-w-full max-h-full ${(hoveredTab1 ?? selectedTab1 ?? activeTab1) === 1 ? 'opacity-100' : 'opacity-0'}`}
-                        src={'/images/ask-screenshot.png'}
+                        src={ isRTL ? '/images/Sh-2.png' : '/images/Sh-1.png'}
                         width={700}
                         height={700}
                         alt="Feature 2 - Image 1"
@@ -109,8 +112,8 @@ export default function Features() {
                       <div className="absolute inset-0  rounded-[inherit]" />
                     </div>
                     <Image
-                      className={`w-full h-full rounded-[inherit] transition-all duration-700 ease-in-out absolute ${(hoveredTab1 ?? selectedTab1 ?? activeTab1) === 2 ? 'opacity-100' : 'opacity-0'}`}
-                      src={'/images/book-meeting.png'}
+                      className={`w-full h-full rounded-lg transition-all duration-700 ease-in-out absolute ${(hoveredTab1 ?? selectedTab1 ?? activeTab1) === 2 ? 'opacity-100' : 'opacity-0'}`}
+                      src={isRTL ? '/images/Sh-4.png' : '/images/Sh-3.png'}
                       width={500}
                       height={500}
                       alt="Feature 2 - Image 2"
@@ -118,7 +121,7 @@ export default function Features() {
                     />
                     <Image
                       className={`w-full h-full rounded-[inherit] transition-all duration-700 ease-in-out absolute ${(hoveredTab1 ?? selectedTab1 ?? activeTab1) === 3 ? 'opacity-100' : 'opacity-0'}`}
-                      src={'/images/rating.png'}
+                      src={isRTL ? '/images/Sh-6.png' : '/images/Sh-5.png'}
                       width={500}
                       height={500}
                       alt="Feature 2 - Image 3"
@@ -391,9 +394,10 @@ export default function Features() {
                       alt="Feature 1 - Image 2"
                       style={{ objectFit: 'cover' }}
                     />
+                    
                     <Image
                       className={`w-full rounded-[inherit] transition-all duration-700 ease-in-out absolute inset-0 ${(hoveredTab2 ?? selectedTab2 ?? activeTab2) === 3 ? 'opacity-100' : 'opacity-0'}`}
-                      src={'https://res.cloudinary.com/dsiku9ipv/image/upload/v1748087334/Group_13447_3_zjyfju.png'}
+                      src={isRTL ? '/images/Sh-7.png' : 'https://res.cloudinary.com/dsiku9ipv/image/upload/v1747832518/Group_13495_kf7osl.png'}
                       width={500}
                       height={500}
                       alt="Feature 1 - Image 3"

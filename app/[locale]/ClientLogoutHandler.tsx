@@ -39,7 +39,8 @@ export default function ClientLogoutHandler() {
     const isPublicRoute = pathname.includes('/home') || 
                          pathname === '/' || 
                          pathname.includes('/callback') ||
-                         pathname.includes('/signout');
+                         pathname.includes('/signout') ||
+                         pathname.includes('/dashboard');
 
     if (isPublicRoute) {
       return;

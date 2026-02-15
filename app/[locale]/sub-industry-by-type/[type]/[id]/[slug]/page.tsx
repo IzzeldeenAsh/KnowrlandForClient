@@ -40,10 +40,6 @@ interface Props {
   }>;
 }
 
-function capitalizeFirstLetter(string: string) {
-  return string.charAt(0).toUpperCase() + string.slice(1);
-}
-
 function isArabicFirstWord(text: string): boolean {
   if (!text) return false;
   const firstWord = text.trim().split(/\s+/)[0] || '';
