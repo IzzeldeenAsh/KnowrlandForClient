@@ -1,10 +1,18 @@
 import {
   IconBuildingSkyscraper,
   IconClipboardList,
+  IconFileText,
   IconMessages,
+  IconMessageCircle,
+  IconTag,
   IconWorld,
   IconUserCheck,
   IconUsersGroup,
+  IconCurrencyDollar,
+  IconChartLine,
+  IconShoppingCart,
+  IconArrowsExchange,
+  IconWallet,
 } from '@tabler/icons-react';
 import type { ReactNode } from 'react';
 
@@ -106,7 +114,60 @@ export function getDashboardNav(locale: string): DashboardNavGroup[] {
           icon: <IconWorld size={16} />,
           iconColor: '#eab308',
         },
+        {
+          label: 'Tags',
+          href: `${prefix}/content/tags`,
+          icon: <IconTag size={16} />,
+          iconColor: '#14b8a6',
+        },
+        {
+          label: 'Topics',
+          href: `${prefix}/content/topics`,
+          icon: <IconMessageCircle size={16} />,
+          iconColor: '#6366f1',
+        },
+        {
+          label: 'Guidelines',
+          href: `${prefix}/content/guidelines`,
+          icon: <IconFileText size={16} />,
+          iconColor: '#0ea5e9',
+        },
       ],
     },
+    {
+      id: 'financial',
+      label: 'Finance',
+      icon: <IconCurrencyDollar size={16} />,
+      items: [
+        {
+          label: 'Admin Sales',
+          href: `${prefix}/finance/admin-sales`,
+          icon: <IconChartLine size={16} />,
+          exact: true,
+          iconColor: '#2563eb',
+        },
+        {
+          label: 'Orders',
+          href: `${prefix}/finance/orders`,
+          icon: <IconShoppingCart size={16} />,
+          exact: true,
+          iconColor: '#0ea5e9',
+        },
+        {
+          label: 'Transactions',
+          href: `${prefix}/finance/transactions`,
+          icon: <IconArrowsExchange size={16} />,
+          exact: true,
+          iconColor: '#10b981',
+        },
+        {
+          label: 'Insighters Wallets',
+          href: `${prefix}/finance/insighters-wallets`,
+          icon: <IconWallet size={16} />,
+          exact: true,
+          iconColor: '#a855f7',
+        },
+      ],
+    }
   ];
 }

@@ -179,22 +179,23 @@ export const ToastProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   return (
     <ToastContext.Provider value={contextValue}>
       {children}
-      {portalContainer &&
-        createPortal(
-          <>
-            {toasts.map((toast) => (
-              <Toast
-                key={toast.id}
-                message={toast.message}
-                title={toast.title}
-                type={toast.type}
-                delay={toast.delay}
-                onClose={() => removeToast(toast.id)}
-              />
-            ))}
-          </>,
-          portalContainer
-        )}
+      {portalContainer
+        ? (createPortal(
+            <>
+              {toasts.map((toast) => (
+                <Toast
+                  key={toast.id}
+                  message={toast.message}
+                  title={toast.title}
+                  type={toast.type}
+                  delay={toast.delay}
+                  onClose={() => removeToast(toast.id)}
+                />
+              ))}
+            </>,
+            portalContainer
+          ) as unknown as React.ReactNode)
+        : null}
     </ToastContext.Provider>
   );
 };

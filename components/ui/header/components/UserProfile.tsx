@@ -394,14 +394,14 @@ export function UserProfile({ isHome }: { isHome: boolean }) {
               </Link>
                <Link
                href={`https://app.insightabusiness.com/app/insighter-dashboard/my-knowledge/general`}
-               className="flex items-center justify-between px-4 py-2.5 font-semibold text-slate-900 hover:bg-indigo-50 hover:text-sky-700"
+               className="flex items-center gap-2 px-4 py-2.5 font-semibold text-slate-900 hover:bg-indigo-50 hover:text-sky-700"
                onClick={() => setMenuOpen(false)}
                style={{fontSize: '13px'}}
              >
                <span>{t("insightBase")}</span>
                {unpublishedDraftCount > 0 && (
-                 <span className="bg-[#FFEEF3] text-[#f8275a] text-[11px] font-bold px-2 py-0.5  border border-[#f8275a] rounded-[0.425rem]">
-                   {unpublishedDraftCount} {isRtl ? "محفوظ" : "Draft"}
+                 <span className="bg-[#FFEEF3] text-[#ff6f55] text-[11px] font-bold px-2 py-0.5  rounded-[0.425rem]">
+                   {unpublishedDraftCount} {isRtl ? "محفوظ" : "Draft"} - {isRtl ? "أكمل الان!" : "Complete Now!"}
                  </span>
                )}
              </Link>

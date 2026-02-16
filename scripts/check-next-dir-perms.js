@@ -9,14 +9,15 @@
 const fs = require('fs');
 const path = require('path');
 
-const nextDir = path.join(process.cwd(), '.next');
+const distDirName = process.env.NEXT_DIST_DIR || '.next';
+const nextDir = path.join(process.cwd(), distDirName);
 
 function formatFixCommand() {
   // Keep it simple and copy/paste-friendly for macOS (your environment).
   return [
     'cd ' + JSON.stringify(process.cwd()),
-    'sudo chown -R $(whoami):staff .next',
-    'rm -rf .next',
+    `sudo chown -R $(whoami):staff ${distDirName}`,
+    `rm -rf ${distDirName}`,
     'npm run dev',
   ].join('\n');
 }
@@ -36,7 +37,7 @@ try {
   }
 
   if (st.uid !== uid) {
-    console.error('\n❌ `.next` is not owned by the current user.');
+    console.error(`\n❌ \`${distDirName}\` is not owned by the current user.`);
     console.error('This will cause Next.js to throw EACCES and return 500s for some routes/assets.\n');
     console.error('Fix (run once):\n');
     console.error(formatFixCommand());
@@ -48,7 +49,7 @@ try {
   fs.accessSync(nextDir, fs.constants.W_OK);
   process.exit(0);
 } catch (err) {
-  console.error('\n❌ `.next` permissions check failed:\n', err);
+  console.error(`\n❌ \`${distDirName}\` permissions check failed:\n`, err);
   console.error('\nIf you see EACCES / Operation not permitted, run:\n');
   console.error(formatFixCommand());
   process.exit(1);

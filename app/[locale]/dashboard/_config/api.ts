@@ -4,11 +4,12 @@ export type ApiErrorPayload = {
   errors?: Record<string, unknown>;
 };
 
-export function buildAuthHeaders(token: string) {
+export function buildAuthHeaders(token: string, locale: string = 'en') {
   return {
     Accept: 'application/json',
     'Content-Type': 'application/json',
-    'Accept-Language': 'en',
+    'Accept-Language': locale || 'en',
+    'X-Timezone': Intl.DateTimeFormat().resolvedOptions().timeZone,
     Authorization: `Bearer ${token}`,
   };
 }
@@ -46,4 +47,3 @@ export async function parseApiError(response: Response): Promise<ApiErrorPayload
 
   return { status, message: `Request failed (${status})` };
 }
-
