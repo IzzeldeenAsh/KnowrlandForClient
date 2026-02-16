@@ -14,7 +14,7 @@ type KnowledgeStatusStatistic = { status: string; count: number };
 type KnowledgeStatusStatisticsResponse = { data?: KnowledgeStatusStatistic[] };
 
 const API_BASE_URL: string =
-  process.env.NEXT_PUBLIC_API_URL || "https://api.foresighta.co";
+  process.env.NEXT_PUBLIC_API_URL || "https://api.insightabusiness.com";
 
 // IMPORTANT: must be deterministic on BOTH SSR + first client render (hydration).
 const ANGULAR_APP_URL: string =
@@ -148,7 +148,7 @@ export function UserProfile({ isHome }: { isHome: boolean }) {
 
       try {
         const res = await fetch(
-          `${API_BASE_URL}/api/insighter/library/knowledge/status/statistics`,
+          `https://api.insightabusiness.com/api/insighter/library/knowledge/status/statistics`,
           {
             headers: {
               Authorization: `Bearer ${token}`,
