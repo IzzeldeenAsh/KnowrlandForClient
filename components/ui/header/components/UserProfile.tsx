@@ -14,7 +14,7 @@ type KnowledgeStatusStatistic = { status: string; count: number };
 type KnowledgeStatusStatisticsResponse = { data?: KnowledgeStatusStatistic[] };
 
 const API_BASE_URL: string =
-  process.env.NEXT_PUBLIC_API_URL || "https://api.insightabusiness.com";
+  process.env.NEXT_PUBLIC_API_URL || "https://api.foresighta.co";
 
 // IMPORTANT: must be deterministic on BOTH SSR + first client render (hydration).
 const ANGULAR_APP_URL: string =
