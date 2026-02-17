@@ -451,7 +451,7 @@ export default async function KnowledgePage({ params }: Props) {
                       </Link>
                     </span>
                   </span>
-                  <div className="flex flex-col ps-4 sm:ps-8">
+                  <div className="flex flex-col ps-4 sm:ps-8 mt-2 sm:mt-0">
                     <span className="text-gray-500 text-sm">{translations.publishedBy}</span>
                     <div className="flex items-center gap-2">
                       <div className="relative w-[18px] h-[18px] sm:w-[20px] sm:h-[20px]">

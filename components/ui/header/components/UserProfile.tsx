@@ -36,10 +36,12 @@ export function UserProfile({ isHome }: { isHome: boolean }) {
     roles.includes("company") ||
     roles.includes("company-insighter");
   const [menuOpen, setMenuOpen] = useState(false);
+  const [menuMounted, setMenuMounted] = useState(false);
   const [dashboardOpen, setDashboardOpen] = useState(false);
   const [settingsOpen, setSettingsOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
   const profileRef = useRef<HTMLDivElement>(null);
+  const openRafIdRef = useRef<number | null>(null);
   const [menuPosition, setMenuPosition] = useState<MenuPosition>({
     top: 0,
     left: null,
@@ -50,6 +52,42 @@ export function UserProfile({ isHome }: { isHome: boolean }) {
   const [hasToken, setHasToken] = useState<boolean>(false);
   const [returnUrl, setReturnUrl] = useState<string>("");
   const [unpublishedDraftCount, setUnpublishedDraftCount] = useState<number>(0);
+
+  const openMenu = () => {
+    setMenuMounted(true);
+    if (openRafIdRef.current !== null) {
+      window.cancelAnimationFrame(openRafIdRef.current);
+    }
+    openRafIdRef.current = window.requestAnimationFrame(() => {
+      setMenuOpen(true);
+    });
+  };
+
+  const closeMenu = () => {
+    if (openRafIdRef.current !== null) {
+      window.cancelAnimationFrame(openRafIdRef.current);
+      openRafIdRef.current = null;
+    }
+    setMenuOpen(false);
+    setDashboardOpen(false);
+    setSettingsOpen(false);
+  };
+
+  // Keep the menu mounted briefly to allow a fade-out animation on close.
+  useEffect(() => {
+    if (menuOpen) {
+      setMenuMounted(true);
+      return;
+    }
+
+    const timeout = window.setTimeout(() => {
+      setMenuMounted(false);
+    }, 160);
+
+    return () => {
+      window.clearTimeout(timeout);
+    };
+  }, [menuOpen]);
 
   // Calculate and update menu position whenever it opens
   useEffect(() => {
@@ -95,9 +133,7 @@ export function UserProfile({ isHome }: { isHome: boolean }) {
         profileRef.current &&
         !profileRef.current.contains(event.target as Node)
       ) {
-        setMenuOpen(false);
-        setDashboardOpen(false);
-        setSettingsOpen(false);
+        closeMenu();
       }
     }
 
@@ -111,7 +147,7 @@ export function UserProfile({ isHome }: { isHome: boolean }) {
   useEffect(() => {
     function handleEscKey(event: KeyboardEvent) {
       if (event.key === "Escape") {
-        setMenuOpen(false);
+        closeMenu();
       }
     }
 
@@ -219,7 +255,7 @@ export function UserProfile({ isHome }: { isHome: boolean }) {
       <div className="relative" ref={profileRef}>
         <div
           className="flex items-center cursor-pointer"
-          onClick={() => setMenuOpen(!menuOpen)}
+          onClick={() => (menuOpen ? closeMenu() : openMenu())}
         >
           {/* {roles.includes('company') && user.company?.logo ? (
             <div className="w-8 h-8 md:w-10 md:h-10 rounded-full overflow-hidden">
@@ -268,10 +304,16 @@ export function UserProfile({ isHome }: { isHome: boolean }) {
         </div>
       </div>
 
-      {menuOpen && (
+      {menuMounted && (
         <div
           ref={menuRef}
-          className="fixed bg-white rounded-lg shadow-xl py-3 z-[9999] w-[300px] max-h-[80vh] overflow-y-auto"
+          className={[
+            "fixed bg-white rounded-lg shadow-xl py-3 z-[9999] w-[300px] max-h-[80vh] overflow-y-auto",
+            "transition-all duration-150 ease-out motion-reduce:transition-none",
+            menuOpen
+              ? "opacity-100 translate-y-0 scale-100"
+              : "opacity-0 -translate-y-2 scale-[0.98] pointer-events-none",
+          ].join(" ")}
           style={{
             top: `${menuPosition.top}px`,
             left:
