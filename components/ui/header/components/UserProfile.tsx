@@ -442,7 +442,7 @@ export function UserProfile({ isHome }: { isHome: boolean }) {
              >
                <span>{t("insightBase")}</span>
                {unpublishedDraftCount > 0 && (
-                 <span className="bg-[#FFEEF3] text-[#ff6f55] text-[11px] font-bold px-2 py-0.5  rounded-[0.425rem]">
+                 <span className="bg-[#fff8dd] text-[#e8af13] text-[11px] font-bold px-2 py-0.5  rounded-[0.425rem]">
                    {unpublishedDraftCount} {isRtl ? "محفوظ" : "Draft"} - {isRtl ? "أكمل الان!" : "Complete Now!"}
                  </span>
                )}
