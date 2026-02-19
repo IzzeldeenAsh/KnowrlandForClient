@@ -62,6 +62,19 @@ export function getDashboardNav(locale: string): DashboardNavGroup[] {
           icon: <IconBuildingSkyscraper size={16} />,
           iconColor: '#22c55e',
         },
+        {
+          label: 'Staff',
+          href: `${prefix}/users/staff`,
+          icon: <IconUsersGroup size={16} />,
+          iconColor: '#0ea5e9',
+        },
+        {
+          label: 'Roles & Permissions',
+          href: `${prefix}/users/roles-permissions`,
+          icon: <IconFileText size={16} />,
+          exact: true,
+          iconColor: '#6366f1',
+        },
       ],
     },
     {
