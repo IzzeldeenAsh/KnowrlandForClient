@@ -215,7 +215,10 @@ function KnowledgeCard({ item, locale, isRTL }: KnowledgeCardProps) {
                 className="text-white mb-3"
                 lineClamp={3}
                 size='lg'
-                style={{ textAlign: item.language?.toLowerCase() === 'arabic' ? 'right' : 'left' }}
+                style={{
+                  textAlign: item.language?.toLowerCase() === 'arabic' ? 'right' : 'left',
+                  overflowWrap: 'break-word',
+                }}
               >
                 {item.title}
               </Text>

@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
 import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
+import { IconArrowLeft, IconAt, IconBrandWhatsapp, IconBuildingBank, IconMail, IconPrinter, IconUser } from '@tabler/icons-react';
 import { getAuthToken } from '@/lib/authToken';
 import { useToast } from '@/components/toast/ToastContext';
 import { buildAuthHeaders, parseApiError } from '../../../../../_config/api';
@@ -10,9 +11,9 @@ import SendEmailModal from './SendEmailModal';
 import type { TransferFormRecord, TransferFormResponse } from './types';
 
 const SECONDARY_BUTTON_CLASS =
-  'h-8 rounded-md border border-slate-200 bg-white px-4 text-xs font-medium text-slate-700 shadow-sm hover:bg-slate-50 disabled:opacity-50 disabled:hover:bg-white';
+  'inline-flex h-8 items-center justify-center gap-2 rounded-md border border-slate-200 bg-white px-4 text-xs font-medium leading-none text-slate-700 shadow-sm hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:bg-white';
 const PRIMARY_BUTTON_CLASS =
-  'h-8 rounded-md border border-blue-600 bg-blue-600 px-4 text-xs font-medium text-white shadow-sm hover:bg-blue-700 disabled:opacity-50';
+  'inline-flex h-8 items-center justify-center gap-2 rounded-md border border-blue-600 bg-blue-600 px-4 text-xs font-medium leading-none text-white shadow-sm hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50';
 
 function normalizeText(value: unknown): string {
   return typeof value === 'string' ? value.trim() : '';
@@ -31,30 +32,33 @@ function formatPhone(code: string | null, phone: string | null): string {
   return c ? `+${c}` : p;
 }
 
-function InfoRow({
-  label,
-  value,
-  icon,
-}: {
-  label: string;
-  value: string;
-  icon: ReactNode;
-}) {
+function DetailsRow({ label, value }: { label: string; value: string }) {
   return (
-    <div className="flex items-start gap-3 rounded-md border border-slate-200 bg-white px-3 py-2">
-      <div className="mt-0.5 text-slate-400">{icon}</div>
-      <div className="min-w-0 flex-1">
-        <div className="text-[11px] font-semibold text-slate-500">{label}</div>
-        <div className="mt-0.5 truncate text-xs font-semibold text-slate-900">{value || '-'}</div>
-      </div>
+    <div className="grid grid-cols-1 gap-1 py-4 sm:grid-cols-[200px,1fr] sm:gap-6">
+      <div className="text-sm font-extrabold text-slate-900">{label}</div>
+      <div className="break-words text-sm font-semibold text-slate-900">{value || '-'}</div>
     </div>
   );
 }
 
-function getFlagSrc(flag: string | null | undefined): string | null {
-  const f = normalizeText(flag);
-  if (!f) return null;
-  return `/images/flags/${f}.svg`;
+function DetailsSection({
+  title,
+  icon,
+  children,
+}: {
+  title: string;
+  icon: ReactNode;
+  children: ReactNode;
+}) {
+  return (
+    <section className="overflow-hidden rounded-2xl border border-slate-200 bg-white">
+      <div className="flex items-center gap-2 bg-blue-50 px-6 py-5 text-lg font-extrabold text-blue-600">
+        <span className="text-slate-900/80">{icon}</span>
+        <span>{title}</span>
+      </div>
+      <div className="divide-y divide-slate-100 px-6">{children}</div>
+    </section>
+  );
 }
 
 function generateWhatsappMessage(form: TransferFormRecord): string {
@@ -89,59 +93,194 @@ function renderPrintHtml(form: TransferFormRecord): string {
       .replaceAll('"', '&quot;')
       .replaceAll("'", '&#039;');
 
-  const line = (label: string, value: string) =>
-    `<div style="display:flex; gap:12px; padding:6px 0; border-bottom:1px solid #eef2f7;"><div style="width:190px; color:#64748b; font-weight:600; font-size:12px;">${escape(
-      label,
-    )}</div><div style="flex:1; color:#0f172a; font-weight:600; font-size:12px;">${escape(value || '-')}</div></div>`;
+  const kv = (label: string, value: string) =>
+    `<div class="kv-row"><div class="kv-label">${escape(label)}</div><div class="kv-value">${escape(value || '-')}</div></div>`;
 
-  const card = (title: string, body: string) =>
-    `<div style="border:1px solid #e2e8f0; border-radius:10px; padding:14px; margin-top:12px;"><div style="font-size:14px; font-weight:800; color:#0f172a; margin-bottom:10px;">${escape(
+  const section = (title: string, icon: string, body: string) =>
+    `<section class="card"><div class="card-header"><span class="card-icon" aria-hidden="true">${icon}</span><div class="card-title">${escape(
       title,
-    )}</div>${body}</div>`;
+    )}</div></div><div class="card-body">${body}</div></section>`;
 
-  const beneficiary =
-    line('Name', form.user_name) +
-    line('Email', form.user_email) +
-    line('Dues', formatCurrency(form.user_balance)) +
-    line('Account Name', form.account_name || '-') +
-    line('Country of Residence', form.account_country?.name || '-') +
-    line('Billing Address', form.account_address || '-') +
-    line('Phone Number', formatPhone(form.account_phone_code, form.account_phone));
+  const date = new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
 
-  const bank =
-    line('Bank Name', form.bank_name || '-') +
-    line('Bank Country', form.bank_country?.name || '-') +
-    line('Bank Address', form.bank_address || '-') +
-    line('IBAN Number', form.bank_iban || '-') +
-    line('SWIFT Code', form.bank_swift_code || '-') +
-    line('Status', form.status || '-');
+  const beneficiaryBody =
+    kv('Account Name', form.account_name || '-') +
+    kv('Country of Residence', form.account_country?.name || '-') +
+    (normalizeText(form.account_address) ? kv('Billing Address', form.account_address || '-') : '') +
+    kv('Phone Number', formatPhone(form.account_phone_code, form.account_phone));
 
-  const now = new Date().toLocaleString();
+  const bankBody =
+    kv('Bank Name', form.bank_name || '-') +
+    kv('Bank Country', form.bank_country?.name || '-') +
+    (normalizeText(form.bank_address) ? kv('Bank Address', form.bank_address || '-') : '') +
+    kv('IBAN Number', form.bank_iban || '-') +
+    kv('SWIFT Code', form.bank_swift_code || '-');
 
   return `<!doctype html>
 <html>
   <head>
     <meta charset="utf-8" />
-    <title>Transfer Form</title>
+    <title>Payout Details</title>
     <style>
+      @page { size: A4; margin: 0; }
       * { box-sizing: border-box; }
-      body { font-family: Inter, -apple-system, system-ui, Arial; margin: 0; padding: 22px; color: #0f172a; }
-      .header { display:flex; justify-content:space-between; align-items:flex-start; gap: 16px; }
-      .title { font-size: 18px; font-weight: 900; }
-      .muted { color: #64748b; font-size: 12px; font-weight: 600; margin-top: 6px; }
-      @media print { body { padding: 0; } }
+      html, body { height: 100%; }
+      body {
+        margin: 0;
+        font-family: Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, Arial, "Noto Sans", "Liberation Sans", sans-serif;
+        color: #0f172a;
+        background: #f8fafc;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+      }
+
+      a, a:visited { color: inherit !important; text-decoration: none !important; }
+      a[href]:after { content: "" !important; }
+
+      .page {
+        width: 210mm;
+        min-height: 297mm;
+        margin: 12mm auto;
+        background: #ffffff;
+        border: 1px solid #e2e8f0;
+        border-radius: 14px;
+        padding: 18mm 16mm;
+        box-shadow: 0 16px 48px rgba(15, 23, 42, 0.08);
+      }
+
+      .header { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; }
+      .brand { display: flex; align-items: center; gap: 14px; min-width: 0; }
+      .logo { width: 44px; height: 44px; object-fit: contain; }
+      .heading { min-width: 0; }
+      .title { font-size: 28px; font-weight: 900; letter-spacing: -0.02em; margin: 0; }
+      .subtitle { font-size: 14px; font-weight: 600; color: #475569; margin-top: 6px; }
+      .date { font-size: 14px; font-weight: 700; color: #0f172a; white-space: nowrap; }
+      .rule { height: 1px; background: #e2e8f0; margin: 16px 0 18px; }
+
+      .top {
+        display: grid;
+        grid-template-columns: 1fr 220px;
+        gap: 22px;
+        align-items: start;
+      }
+      .identity { min-width: 0; }
+      .name-line { display: flex; flex-wrap: wrap; align-items: baseline; gap: 10px; }
+      .name { font-size: 26px; font-weight: 900; letter-spacing: -0.02em; margin: 0; }
+      .role { font-size: 14px; font-weight: 700; color: #16a34a; }
+      .email { margin-top: 10px; display: flex; align-items: center; gap: 10px; font-size: 14px; font-weight: 700; color: #0f172a; }
+      .email-icon { width: 18px; height: 18px; color: #0f172a; opacity: 0.75; }
+
+      .dues {
+        border: 1px solid #e2e8f0;
+        border-radius: 12px;
+        padding: 18px 16px;
+        background: #ffffff;
+      }
+      .dues-amount { font-size: 32px; font-weight: 900; letter-spacing: -0.02em; margin: 0; }
+      .dues-label { margin-top: 10px; font-size: 14px; font-weight: 700; color: #0f172a; opacity: 0.9; }
+
+      .card {
+        border: 1px solid #e2e8f0;
+        border-radius: 14px;
+        overflow: hidden;
+        margin-top: 18px;
+        break-inside: avoid;
+      }
+      .card-header {
+        padding: 18px 18px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        color: #2563eb;
+        font-weight: 900;
+        font-size: 18px;
+        background: #eff6ff;
+      }
+      .card-icon { width: 22px; height: 22px; display: inline-flex; }
+      .card-title { line-height: 1.1; }
+      .card-body { border-top: 1px solid #e2e8f0; padding: 18px; }
+
+      .kv-row {
+        display: grid;
+        grid-template-columns: 190px 1fr;
+        gap: 18px;
+        padding: 14px 0;
+      }
+      .kv-row + .kv-row { border-top: 1px solid #eef2f7; }
+      .kv-label { font-size: 16px; font-weight: 800; color: #0f172a; }
+      .kv-value {
+        font-size: 16px;
+        font-weight: 600;
+        color: #0f172a;
+        word-break: break-word;
+      }
+
+      @media print {
+        body { background: #ffffff; }
+        .page {
+          width: auto;
+          min-height: auto;
+          margin: 0;
+          padding: 18mm 16mm;
+          border: 0;
+          border-radius: 0;
+          box-shadow: none;
+        }
+      }
+
+      @media (max-width: 720px) {
+        .page { width: auto; min-height: auto; margin: 0; border-radius: 0; padding: 18px 16px; }
+        .top { grid-template-columns: 1fr; }
+      }
     </style>
   </head>
   <body>
-    <div class="header">
-      <div>
-        <div class="title">Transfer Form</div>
-        <div class="muted">Generated: ${escape(now)}</div>
+	    <div class="page">
+	      <div class="header">
+	        <div class="brand">
+	          <img class="logo" alt="Insighta" src="https://app.insightabusiness.com/assets/media/logos/custom-2.svg" />
+	          <div class="heading">
+	            <h1 class="title">Payout Details</h1>
+	            <div class="subtitle">Beneficiary &amp; Bank Information</div>
+	          </div>
+	        </div>
+        <div class="date">Date: ${escape(date)}</div>
       </div>
-      <div class="muted">Insighta Admin</div>
+
+      <div class="rule"></div>
+
+      <div class="top">
+        <div class="identity">
+          <div class="name-line">
+            <p class="name">${escape(form.user_name || '-')}</p>
+            <span class="role">Insighter</span>
+          </div>
+          <div class="email">
+            <svg class="email-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+              <path d="M4 6h16v12H4z" />
+              <path d="M4 7l8 6 8-6" />
+            </svg>
+            <span>${escape(form.user_email || '-')}</span>
+          </div>
+        </div>
+
+        <div class="dues">
+          <p class="dues-amount">${escape(formatCurrency(form.user_balance))}</p>
+          <div class="dues-label">Dues</div>
+        </div>
+      </div>
+
+      ${section(
+        'Beneficiary Information',
+        `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>`,
+        beneficiaryBody,
+      )}
+      ${section(
+        'Bank Information',
+        `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M3 10h18"></path><path d="M4 10V7l8-4 8 4v3"></path><path d="M6 10v10"></path><path d="M10 10v10"></path><path d="M14 10v10"></path><path d="M18 10v10"></path><path d="M4 20h16"></path></svg>`,
+        bankBody,
+      )}
     </div>
-    ${card('Beneficiary Information', beneficiary)}
-    ${card('Bank Information', bank)}
     <script>
       window.onload = () => { window.print(); setTimeout(() => window.close(), 200); };
     </script>
@@ -211,6 +350,15 @@ export default function TransferFormTab({ insighterId }: { insighterId: string }
   }, [fetchForm]);
 
   const defaultEmail = useMemo(() => normalizeText(form?.user_email) || '', [form?.user_email]);
+  const formattedDate = useMemo(
+    () =>
+      new Date().toLocaleDateString(locale === 'ar' ? 'ar' : 'en-US', {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric',
+      }),
+    [locale],
+  );
 
   const onPrint = () => {
     if (!form) return;
@@ -256,9 +404,6 @@ export default function TransferFormTab({ insighterId }: { insighterId: string }
     }
   };
 
-  const accountFlag = getFlagSrc(form?.account_country?.flag);
-  const bankFlag = getFlagSrc(form?.bank_country?.flag);
-
   return (
     <div className="mt-4">
       <div className="rounded-md border border-slate-200 bg-white p-4 shadow-sm">
@@ -270,18 +415,19 @@ export default function TransferFormTab({ insighterId }: { insighterId: string }
 
           <div className="flex flex-wrap items-center gap-2">
             <Link href={backHref} className={SECONDARY_BUTTON_CLASS}>
+              <IconArrowLeft size={14} />
               Back
             </Link>
-            <button type="button" onClick={fetchForm} className={SECONDARY_BUTTON_CLASS}>
-              Refresh
-            </button>
             <button type="button" onClick={onPrint} className={SECONDARY_BUTTON_CLASS} disabled={!form}>
+              <IconPrinter size={14} />
               Print
             </button>
             <button type="button" onClick={onShareWhatsapp} className={SECONDARY_BUTTON_CLASS} disabled={!form}>
+              <IconBrandWhatsapp size={14} />
               Share WhatsApp
             </button>
             <button type="button" onClick={() => setEmailModalOpen(true)} className={PRIMARY_BUTTON_CLASS} disabled={!form}>
+              <IconMail size={14} />
               Send to Email
             </button>
           </div>
@@ -296,168 +442,61 @@ export default function TransferFormTab({ insighterId }: { insighterId: string }
         ) : !form ? (
           <div className="py-10 text-center text-xs text-slate-500">No transfer form found.</div>
         ) : (
-          <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
-            <div className="rounded-md border border-slate-200 bg-white p-4">
-              <div className="flex items-center justify-between gap-3">
-                <div className="flex items-center gap-2 text-sm font-semibold text-slate-900">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="h-4 w-4 text-slate-500" aria-hidden="true">
-                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
-                    <circle cx="12" cy="7" r="4" />
-                  </svg>
-                  Beneficiary Information
+          <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8">
+            <div className="flex items-start justify-between gap-6">
+              <div className="flex min-w-0 items-start gap-4">
+                <img
+                  src="https://app.insightabusiness.com/assets/media/logos/custom-2.svg"
+                  alt="Insighta"
+                  className="h-11 w-11 shrink-0"
+                />
+                <div className="min-w-0">
+                  <div className="text-3xl font-black tracking-tight text-slate-900">Payout Details</div>
+                  <div className="mt-1 text-sm font-semibold text-slate-600">Beneficiary &amp; Bank Information</div>
                 </div>
-                <span className="rounded-full bg-slate-50 px-2 py-0.5 text-[10px] font-semibold text-slate-700 ring-1 ring-slate-200">
-                  {normalizeText(form.status) ? normalizeText(form.status) : 'unknown'}
-                </span>
+              </div>
+              <div className="shrink-0 text-sm font-semibold text-slate-900">Date: {formattedDate}</div>
+            </div>
+
+            <div className="mt-6 h-px bg-slate-200" />
+
+            <div className="mt-6 grid grid-cols-1 gap-6 lg:grid-cols-[1fr,240px] lg:items-start">
+              <div className="min-w-0">
+                <div className="flex flex-wrap items-baseline gap-3">
+                  <div className="text-3xl font-black tracking-tight text-slate-900">{form.user_name || '-'}</div>
+                  <div className="text-sm font-bold text-green-600">Insighter</div>
+                  <span className="rounded-full bg-slate-50 px-2 py-0.5 text-[11px] font-semibold text-slate-700 ring-1 ring-slate-200">
+                    {normalizeText(form.status) ? normalizeText(form.status) : 'unknown'}
+                  </span>
+                </div>
+
+                <div className="mt-3 flex items-center gap-2 text-sm font-semibold text-slate-900">
+                  <IconAt size={18} className="text-slate-900/70" />
+                  <span className="break-all">{form.user_email || '-'}</span>
+                </div>
               </div>
 
-              <div className="mt-4 grid grid-cols-1 gap-2">
-                <InfoRow
-                  label="Name"
-                  value={form.user_name}
-                  icon={
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="h-4 w-4" aria-hidden="true">
-                      <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
-                      <circle cx="12" cy="7" r="4" />
-                    </svg>
-                  }
-                />
-                <InfoRow
-                  label="Email"
-                  value={form.user_email}
-                  icon={
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="h-4 w-4" aria-hidden="true">
-                      <path d="M4 4h16v16H4z" opacity="0" />
-                      <path d="M4 6h16v12H4z" />
-                      <path d="M4 7l8 6 8-6" />
-                    </svg>
-                  }
-                />
-                <InfoRow
-                  label="Dues"
-                  value={formatCurrency(form.user_balance)}
-                  icon={
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="h-4 w-4" aria-hidden="true">
-                      <path d="M12 1v22" />
-                      <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7H14a3.5 3.5 0 0 1 0 7H6" />
-                    </svg>
-                  }
-                />
-                <InfoRow
-                  label="Account Name"
-                  value={form.account_name || '-'}
-                  icon={
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="h-4 w-4" aria-hidden="true">
-                      <path d="M16 21v-2a4 4 0 0 0-4-4H6" />
-                      <circle cx="8" cy="7" r="4" />
-                      <path d="M20 8v6" />
-                      <path d="M23 11h-6" />
-                    </svg>
-                  }
-                />
-                <InfoRow
-                  label="Country of Residence"
-                  value={form.account_country?.name || '-'}
-                  icon={
-                    accountFlag ? (
-                      <img src={accountFlag} alt={form.account_country?.name ?? 'flag'} className="h-4 w-4 rounded-sm" />
-                    ) : (
-                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="h-4 w-4" aria-hidden="true">
-                        <path d="M4 22V4" />
-                        <path d="M4 4h12l-1 4 1 4H4" />
-                      </svg>
-                    )
-                  }
-                />
-                <InfoRow
-                  label="Phone"
-                  value={formatPhone(form.account_phone_code, form.account_phone)}
-                  icon={
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="h-4 w-4" aria-hidden="true">
-                      <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.86 19.86 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6A19.86 19.86 0 0 1 2.11 4.18 2 2 0 0 1 4.09 2h3a2 2 0 0 1 2 1.72c.12.81.3 1.6.54 2.36a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.72-1.72a2 2 0 0 1 2.11-.45c.76.24 1.55.42 2.36.54A2 2 0 0 1 22 16.92z" />
-                    </svg>
-                  }
-                />
+              <div className="rounded-2xl border border-slate-200 bg-white p-6">
+                <div className="text-4xl font-black tracking-tight text-slate-900">{formatCurrency(form.user_balance)}</div>
+                <div className="mt-2 text-sm font-bold text-slate-900/90">Dues</div>
               </div>
             </div>
 
-            <div className="rounded-md border border-slate-200 bg-white p-4">
-              <div className="flex items-center gap-2 text-sm font-semibold text-slate-900">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="h-4 w-4 text-slate-500" aria-hidden="true">
-                  <path d="M3 10h18" />
-                  <path d="M4 10V7l8-4 8 4v3" />
-                  <path d="M6 10v10" />
-                  <path d="M10 10v10" />
-                  <path d="M14 10v10" />
-                  <path d="M18 10v10" />
-                  <path d="M4 20h16" />
-                </svg>
-                Bank Information
-              </div>
+            <div className="mt-6 space-y-6">
+              <DetailsSection title="Beneficiary Information" icon={<IconUser size={20} />}>
+                <DetailsRow label="Account Name" value={form.account_name || '-'} />
+                <DetailsRow label="Country of Residence" value={form.account_country?.name || '-'} />
+                {normalizeText(form.account_address) ? <DetailsRow label="Billing Address" value={form.account_address || '-'} /> : null}
+                <DetailsRow label="Phone Number" value={formatPhone(form.account_phone_code, form.account_phone)} />
+              </DetailsSection>
 
-              <div className="mt-4 grid grid-cols-1 gap-2">
-                <InfoRow
-                  label="Bank Name"
-                  value={form.bank_name || '-'}
-                  icon={
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="h-4 w-4" aria-hidden="true">
-                      <path d="M3 10h18" />
-                      <path d="M4 10V7l8-4 8 4v3" />
-                      <path d="M6 10v10" />
-                      <path d="M10 10v10" />
-                      <path d="M14 10v10" />
-                      <path d="M18 10v10" />
-                      <path d="M4 20h16" />
-                    </svg>
-                  }
-                />
-                <InfoRow
-                  label="Bank Country"
-                  value={form.bank_country?.name || '-'}
-                  icon={
-                    bankFlag ? (
-                      <img src={bankFlag} alt={form.bank_country?.name ?? 'flag'} className="h-4 w-4 rounded-sm" />
-                    ) : (
-                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="h-4 w-4" aria-hidden="true">
-                        <path d="M4 22V4" />
-                        <path d="M4 4h12l-1 4 1 4H4" />
-                      </svg>
-                    )
-                  }
-                />
-                <InfoRow
-                  label="Bank Address"
-                  value={form.bank_address || '-'}
-                  icon={
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="h-4 w-4" aria-hidden="true">
-                      <path d="M21 10c0 7-9 13-9 13S3 17 3 10a9 9 0 0 1 18 0z" />
-                      <circle cx="12" cy="10" r="3" />
-                    </svg>
-                  }
-                />
-                <InfoRow
-                  label="IBAN"
-                  value={form.bank_iban || '-'}
-                  icon={
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="h-4 w-4" aria-hidden="true">
-                      <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
-                      <path d="M14 2v6h6" />
-                      <path d="M8 13h8" />
-                      <path d="M8 17h8" />
-                    </svg>
-                  }
-                />
-                <InfoRow
-                  label="SWIFT"
-                  value={form.bank_swift_code || '-'}
-                  icon={
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="h-4 w-4" aria-hidden="true">
-                      <path d="M12 20h9" />
-                      <path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z" />
-                    </svg>
-                  }
-                />
-              </div>
+              <DetailsSection title="Bank Information" icon={<IconBuildingBank size={20} />}>
+                <DetailsRow label="Bank Name" value={form.bank_name || '-'} />
+                <DetailsRow label="Bank Country" value={form.bank_country?.name || '-'} />
+                {normalizeText(form.bank_address) ? <DetailsRow label="Bank Address" value={form.bank_address || '-'} /> : null}
+                <DetailsRow label="IBAN Number" value={form.bank_iban || '-'} />
+                <DetailsRow label="SWIFT Code" value={form.bank_swift_code || '-'} />
+              </DetailsSection>
             </div>
           </div>
         )}
