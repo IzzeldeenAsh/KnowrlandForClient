@@ -15,7 +15,7 @@ type CompanyRecord = {
   country: string | null;
   status: string;
   verified: boolean;
-  profilePhotoUrl: string | null;
+  logoUrl: string | null;
   companyName: string | null;
 };
 
@@ -198,6 +198,8 @@ function normalizeCompanies(payload: unknown): CompanyRecord[] {
         company?: {
           legal_name?: string;
           status?: string;
+          logo?: string | null;
+          logo_url?: string | null;
         } | Array<unknown>;
         insighter_status?: string;
         client_status?: string;
@@ -224,6 +226,13 @@ function normalizeCompanies(payload: unknown): CompanyRecord[] {
           ? companyObject.legal_name
           : null;
 
+      const resolvedLogoUrl =
+        typeof companyObject?.logo === 'string' && companyObject.logo.trim()
+          ? companyObject.logo
+          : typeof companyObject?.logo_url === 'string' && companyObject.logo_url.trim()
+            ? companyObject.logo_url
+            : null;
+
       return {
         id: numericId,
         name: typeof row.name === 'string' && row.name.trim() ? row.name : 'Unknown',
@@ -231,10 +240,7 @@ function normalizeCompanies(payload: unknown): CompanyRecord[] {
         country: typeof row.country === 'string' && row.country.trim() ? row.country : null,
         status: resolvedStatus,
         verified: Boolean(row.verified),
-        profilePhotoUrl:
-          typeof row.profile_photo_url === 'string' && row.profile_photo_url.trim()
-            ? row.profile_photo_url
-            : null,
+        logoUrl: resolvedLogoUrl,
         companyName: resolvedCompanyName,
       } satisfies CompanyRecord;
     })
@@ -570,7 +576,7 @@ export default function CompaniesTab() {
           <table className="min-w-full text-left text-xs">
             <thead className="bg-slate-50 text-slate-500">
               <tr>
-                <th className="px-3 py-2 font-semibold">Profile</th>
+                <th className="px-3 py-2 font-semibold">Logo</th>
                 <th className="px-3 py-2 font-semibold">Name</th>
                 <th className="px-3 py-2 font-semibold">Email</th>
                 <th className="px-3 py-2 font-semibold">Country</th>
@@ -609,24 +615,25 @@ export default function CompaniesTab() {
                   const normalizedStatus = company.status.toLowerCase();
                   const isActive = normalizedStatus === 'active';
                   const isInactive = normalizedStatus === 'inactive';
+                  const displayName = company.companyName ?? company.name;
 
                   return (
                     <tr key={company.id} className="text-slate-700">
                       <td className="px-3 py-2">
-                        {company.profilePhotoUrl ? (
+                        {company.logoUrl ? (
                           <img
-                            src={company.profilePhotoUrl}
-                            alt={company.name}
-                            className="h-7 w-7 rounded-full object-cover"
+                            src={company.logoUrl}
+                            alt={`${displayName} logo`}
+                            className="h-7 w-7 rounded-md bg-white object-contain ring-1 ring-slate-200"
                             loading="lazy"
                           />
                         ) : (
-                          <span className="inline-flex h-7 w-7 items-center justify-center rounded-full bg-blue-50 text-[10px] font-semibold text-blue-700 ring-1 ring-blue-200">
-                            {getInitials(company.name)}
+                          <span className="inline-flex h-7 w-7 items-center justify-center rounded-md bg-blue-50 text-[10px] font-semibold text-blue-700 ring-1 ring-blue-200">
+                            {getInitials(displayName)}
                           </span>
                         )}
                       </td>
-                      <td className="px-3 py-2 font-semibold">{company.companyName ?? company.name}</td>
+                      <td className="px-3 py-2 font-semibold">{displayName}</td>
                       <td className="px-3 py-2">{company.email}</td>
                       <td className="px-3 py-2">{company.country ?? '-'}</td>
                       <td className="px-3 py-2">

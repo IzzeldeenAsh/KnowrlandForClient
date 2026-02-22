@@ -5,11 +5,16 @@ import AuthBanner from './auth-banner';
 import { usePathname } from 'next/navigation';
 
 export default function ConditionalAuthBanner() {
-  const { user, isLoading } = useUserProfile();
+  const { user, isLoading, isAuthResolved } = useUserProfile();
   const pathname = usePathname();
   
   // Hide on callback routes to keep a clean full-screen loader
   if (pathname.includes('/callback')) {
+    return null;
+  }
+
+  // Avoid flashing the banner during initial auth resolution (e.g. right after login redirect)
+  if (!isAuthResolved) {
     return null;
   }
 
