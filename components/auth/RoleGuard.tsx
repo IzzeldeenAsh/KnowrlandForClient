@@ -26,8 +26,8 @@ export default function RoleGuard({ children }: { children: React.ReactNode }) {
 
     // Check if user has admin role
     const isAdmin = roles.includes('admin');
-    
-    if (isAdmin) {
+    const isStaff = roles.includes('staff');
+    if (isAdmin || isStaff) {
       // Check if current path is allowed for admins
       const isAllowedPath = ADMIN_ALLOWED_PATHS.some(path => 
         pathname.includes(path)
@@ -65,7 +65,7 @@ export default function RoleGuard({ children }: { children: React.ReactNode }) {
   }
 
   // If user is admin and not on allowed path, show loading while redirecting
-  if (user && roles.includes('admin') && !ADMIN_ALLOWED_PATHS.some(path => pathname.includes(path))) {
+  if (user && (roles.includes('admin') || roles.includes('staff')) && !ADMIN_ALLOWED_PATHS.some(path => pathname.includes(path))) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">

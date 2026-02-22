@@ -166,7 +166,7 @@ export function GlobalProfileProvider({ children }: { children: React.ReactNode 
         globalProfileCache.lastFetchTime = Date.now();
 
         // Persist only for non-admin users (admin users are typically redirected to Angular).
-        if (!rolesFromApi.includes('admin')) {
+        if (!rolesFromApi.includes('admin') && !rolesFromApi.includes('staff')) {
           localStorage.setItem('user', JSON.stringify(userData));
         }
 
