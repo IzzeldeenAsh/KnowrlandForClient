@@ -154,7 +154,7 @@ export default function ConsultingFieldsTab() {
     setError('');
 
     try {
-      const response = await fetch('https://api.insightabusiness.com/api/common/setting/consulting-field/tree/list', {
+      const response = await fetch('https://api.foresighta.co/api/common/setting/consulting-field/tree/list', {
         method: 'GET',
         cache: 'no-store',
         signal,
@@ -261,8 +261,8 @@ export default function ConsultingFieldsTab() {
 
       const url =
         modalMode === 'create'
-          ? 'https://api.insightabusiness.com/api/admin/setting/consulting-field'
-          : `https://api.insightabusiness.com/api/admin/setting/consulting-field/${selectedKey ?? ''}`;
+          ? 'https://api.foresighta.co/api/admin/setting/consulting-field'
+          : `https://api.foresighta.co/api/admin/setting/consulting-field/${selectedKey ?? ''}`;
 
       const response = await fetch(url, {
         method: modalMode === 'create' ? 'POST' : 'PUT',
@@ -307,7 +307,7 @@ export default function ConsultingFieldsTab() {
         return;
       }
 
-      const response = await fetch(`https://api.insightabusiness.com/api/admin/setting/consulting-field/${key}`, {
+      const response = await fetch(`https://api.foresighta.co/api/admin/setting/consulting-field/${key}`, {
         method: 'DELETE',
         cache: 'no-store',
         headers: buildAuthHeaders(token),

@@ -11,6 +11,8 @@ export interface User {
   first_name: string;
   last_name: string;
   email: string;
+  whatsapp_country_code?: string | null;
+  whatsapp_number?: string | null;
   company?: {
     logo: string;
     legal_name?: string;

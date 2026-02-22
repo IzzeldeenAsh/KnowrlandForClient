@@ -67,7 +67,7 @@ export default function RegionsTab() {
         return;
       }
 
-      const response = await fetch('https://api.insightabusiness.com/api/admin/setting/region', {
+      const response = await fetch('https://api.foresighta.co/api/admin/setting/region', {
         method: 'GET',
         cache: 'no-store',
         signal,
@@ -151,8 +151,8 @@ export default function RegionsTab() {
 
       const url =
         modalMode === 'create'
-          ? 'https://api.insightabusiness.com/api/admin/setting/region'
-          : `https://api.insightabusiness.com/api/admin/setting/region/${selectedRegion?.id ?? ''}`;
+          ? 'https://api.foresighta.co/api/admin/setting/region'
+          : `https://api.foresighta.co/api/admin/setting/region/${selectedRegion?.id ?? ''}`;
 
       const response = await fetch(url, {
         method: modalMode === 'create' ? 'POST' : 'PUT',
@@ -198,7 +198,7 @@ export default function RegionsTab() {
         return;
       }
 
-      const response = await fetch(`https://api.insightabusiness.com/api/admin/setting/region/${region.id}`, {
+      const response = await fetch(`https://api.foresighta.co/api/admin/setting/region/${region.id}`, {
         method: 'DELETE',
         cache: 'no-store',
         headers: buildAuthHeaders(token),

@@ -47,6 +47,15 @@ export default function AuthCallback() {
   }
   
   const locale = (params.locale as string) || 'en';
+  const shouldPromptAddChannels = searchParams.get('promptAddChannels') === '1';
+  const storePromptPendingFlag = () => {
+    if (!shouldPromptAddChannels) return;
+    try {
+      localStorage.setItem('postSignupPrompt:addChannels:pending', '1');
+    } catch {
+      // ignore
+    }
+  };
 
   useEffect(() => {
     const fetchProfile = async () => {
@@ -129,7 +138,7 @@ export default function AuthCallback() {
         // Show error for a moment before redirecting to login
         setTimeout(() => {
           console.log('[token-callback] Redirecting to login due to error');
-          window.location.href = 'https://app.insightabusiness.com/auth/login';
+          window.location.href = 'http://localhost:4200/auth/login';
         }, 2000);
       }
     };
@@ -138,7 +147,7 @@ export default function AuthCallback() {
       fetchProfile();
     } else {
       console.error('No token found in URL parameters');
-      window.location.href = 'https://app.insightabusiness.com/auth/login';
+      window.location.href = 'http://localhost:4200/auth/login';
     }
   }, [token, locale]);
 
@@ -227,7 +236,7 @@ export default function AuthCallback() {
       const userTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
       console.log('[TIMEZONE] Setting timezone:', userTimezone);
       
-      const timezoneResponse = await fetch('https://api.insightabusiness.com/api/account/timezone/set', {
+      const timezoneResponse = await fetch('https://api.foresighta.co/api/account/timezone/set', {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${authToken}`,
@@ -257,7 +266,7 @@ export default function AuthCallback() {
       try {
         console.log(`[token-callback] Profile fetch attempt ${attempt}/${maxRetries}`);
         
-        const response = await fetch('https://api.insightabusiness.com/api/account/profile', {
+        const response = await fetch('https://api.foresighta.co/api/account/profile', {
           headers: {
             'Authorization': `Bearer ${authToken}`,
             "Content-Type": "application/json",
@@ -310,7 +319,7 @@ export default function AuthCallback() {
 
   const checkLatestAgreement = async (authToken: string, lang: string): Promise<boolean> => {
     try {
-      const res = await fetch('https://api.insightabusiness.com/api/account/agreement/check', {
+      const res = await fetch('https://api.foresighta.co/api/account/agreement/check', {
         headers: {
           'Authorization': `Bearer ${authToken}`,
           'Accept': 'application/json',
@@ -327,10 +336,11 @@ export default function AuthCallback() {
 
   // Helper function to handle redirects
   const handleRedirect = (userData: any) => {
+    storePromptPendingFlag();
     // Check if user has admin role
     if (userData.roles && userData.roles.includes('admin')) {
       console.log('[token-callback] Admin user detected, redirecting to admin dashboard');
-      window.location.href = 'https://app.insightabusiness.com/admin-dashboard/admin/dashboard/main-dashboard/requests';
+      window.location.href = 'http://localhost:4200/admin-dashboard/admin/dashboard/main-dashboard/requests';
       return;
     }
 
@@ -390,7 +400,7 @@ export default function AuthCallback() {
       if (isAngularRoute(finalReturnUrl)) {
         console.log('[token-callback] Detected Angular route, redirecting to Angular app');
         const angularPath = finalReturnUrl.startsWith('/app/') ? finalReturnUrl : `/app${finalReturnUrl}`;
-        window.location.href = `https://app.insightabusiness.com${angularPath}`;
+        window.location.href = `http://localhost:4200${angularPath}`;
       } else {
         // Handle Next.js routes
         console.log('[token-callback] Detected Next.js route, redirecting within app');
@@ -409,9 +419,15 @@ export default function AuthCallback() {
          userData.roles.includes('company-insighter'))) {
       // Redirect to insighter dashboard
       console.log('[token-callback] Redirecting to Angular insighter dashboard');
-      window.location.href = `https://app.insightabusiness.com/app/insighter-dashboard/my-dashboard`;
+      window.location.href = `http://localhost:4200/app/insighter-dashboard/my-dashboard`;
     } else {
-      // Redirect to home page using current locale
+      // Normal client flow: send to Next.js landing page. If prompted, include query param to open onboarding modal.
+      if (shouldPromptAddChannels) {
+        router.push(`/${locale}/home?promptAddChannels=1`);
+        return;
+      }
+
+      // Default: redirect to app home page
       router.push(`/${locale}/home`);
     }
   };

@@ -49,7 +49,7 @@ let globalProfileCache: {
 };
 
 const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes cache
-const ANGULAR_APP_URL = process.env.NEXT_PUBLIC_ANGULAR_APP_URL || 'https://app.insightabusiness.com';
+const ANGULAR_APP_URL = process.env.NEXT_PUBLIC_ANGULAR_APP_URL || 'http://localhost:4200';
 
 export function GlobalProfileProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(globalProfileCache.user);
@@ -113,7 +113,7 @@ export function GlobalProfileProvider({ children }: { children: React.ReactNode 
     for (let attempt = 1; attempt <= maxRetries; attempt++) {
       try {
         
-        const response = await fetch('https://api.insightabusiness.com/api/account/profile', {
+        const response = await fetch('https://api.foresighta.co/api/account/profile', {
           method: 'GET',
           headers: {
             'Authorization': `Bearer ${token}`,
@@ -152,6 +152,8 @@ export function GlobalProfileProvider({ children }: { children: React.ReactNode 
           company: data.data.company,
           country: data.data.country,
           country_id: data.data.country_id,
+          whatsapp_country_code: data.data.whatsapp_country_code ?? null,
+          whatsapp_number: data.data.whatsapp_number ?? null,
         };
 
     

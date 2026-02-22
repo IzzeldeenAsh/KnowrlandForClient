@@ -136,7 +136,7 @@ export default function InsightersWalletsTab() {
           return;
         }
 
-        const url = new URL('https://api.insightabusiness.com/api/admin/fund/insighter');
+        const url = new URL('https://api.foresighta.co/api/admin/fund/insighter');
         url.searchParams.set('page', String(page));
         url.searchParams.set('per_time', selectedPeriod);
         url.searchParams.set('balance_status', selectedBalanceStatus);

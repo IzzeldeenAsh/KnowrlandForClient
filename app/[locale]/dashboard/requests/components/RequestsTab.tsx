@@ -120,7 +120,7 @@ export default function RequestsTab() {
           return;
         }
 
-        const url = new URL('https://api.insightabusiness.com/api/admin/request');
+        const url = new URL('https://api.foresighta.co/api/admin/request');
         url.searchParams.set('page', String(page));
         url.searchParams.set('per_page', String(perPageValue));
 
@@ -160,7 +160,7 @@ export default function RequestsTab() {
 
   const fetchVerificationQuestions = useCallback(async (signal?: AbortSignal) => {
     try {
-      const response = await fetch('https://api.insightabusiness.com/api/common/setting/verification-question/list', {
+      const response = await fetch('https://api.foresighta.co/api/common/setting/verification-question/list', {
         method: 'GET',
         cache: 'no-store',
         signal,
@@ -271,7 +271,7 @@ export default function RequestsTab() {
       try {
         setIsSubmitting(true);
         const response = await fetch(
-          `https://api.insightabusiness.com/api/admin/request/verification/question/${request.id}`,
+          `https://api.foresighta.co/api/admin/request/verification/question/${request.id}`,
           {
             method: 'GET',
             cache: 'no-store',
@@ -315,7 +315,7 @@ export default function RequestsTab() {
       }
 
       const response = await fetch(
-        `https://api.insightabusiness.com/api/admin/request/action/company/verified/question/${requestId}`,
+        `https://api.foresighta.co/api/admin/request/action/company/verified/question/${requestId}`,
         {
           method: 'POST',
           cache: 'no-store',
@@ -363,15 +363,15 @@ export default function RequestsTab() {
 
       let url = '';
       if (typeKey === 'activate_company') {
-        url = `https://api.insightabusiness.com/api/admin/request/action/company/activate/${requestId}`;
+        url = `https://api.foresighta.co/api/admin/request/action/company/activate/${requestId}`;
       } else if (typeKey === 'deactivate_company') {
-        url = `https://api.insightabusiness.com/api/admin/request/action/company/deactivate/${requestId}`;
+        url = `https://api.foresighta.co/api/admin/request/action/company/deactivate/${requestId}`;
       } else if (typeKey === 'verified_company') {
-        url = `https://api.insightabusiness.com/api/admin/request/action/company/verified/${requestId}`;
+        url = `https://api.foresighta.co/api/admin/request/action/company/verified/${requestId}`;
       } else if (typeKey === 'deactivate_delete_company' || typeKey === 'deactivate_delete_insighter') {
-        url = `https://api.insightabusiness.com/api/admin/request/action/company/deactivate-delete/${requestId}`;
+        url = `https://api.foresighta.co/api/admin/request/action/company/deactivate-delete/${requestId}`;
       } else if (modalKind === 'deactivate_delete') {
-        url = `https://api.insightabusiness.com/api/admin/request/action/company/deactivate-delete/${requestId}`;
+        url = `https://api.foresighta.co/api/admin/request/action/company/deactivate-delete/${requestId}`;
       }
 
       if (!url) {

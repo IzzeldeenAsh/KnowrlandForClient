@@ -120,7 +120,7 @@ export default function TagsTab() {
 
   const fetchIndustries = useCallback(async (signal?: AbortSignal) => {
     try {
-      const response = await fetch('https://api.insightabusiness.com/api/common/setting/industry/list', {
+      const response = await fetch('https://api.foresighta.co/api/common/setting/industry/list', {
         method: 'GET',
         cache: 'no-store',
         signal,
@@ -151,7 +151,7 @@ export default function TagsTab() {
           return;
         }
 
-        const url = new URL('https://api.insightabusiness.com/api/admin/setting/tag');
+        const url = new URL('https://api.foresighta.co/api/admin/setting/tag');
         url.searchParams.set('page', String(page));
         if (keyword.trim()) url.searchParams.set('keyword', keyword.trim());
         if (statusFilter.trim()) url.searchParams.set('status', statusFilter.trim());
@@ -251,8 +251,8 @@ export default function TagsTab() {
 
       const url =
         modalMode === 'create'
-          ? 'https://api.insightabusiness.com/api/admin/setting/tag'
-          : `https://api.insightabusiness.com/api/admin/setting/tag/${selectedTag?.id ?? ''}`;
+          ? 'https://api.foresighta.co/api/admin/setting/tag'
+          : `https://api.foresighta.co/api/admin/setting/tag/${selectedTag?.id ?? ''}`;
 
       const response = await fetch(url, {
         method: modalMode === 'create' ? 'POST' : 'PUT',
@@ -298,7 +298,7 @@ export default function TagsTab() {
         return;
       }
 
-      const response = await fetch(`https://api.insightabusiness.com/api/admin/setting/tag/${tag.id}`, {
+      const response = await fetch(`https://api.foresighta.co/api/admin/setting/tag/${tag.id}`, {
         method: 'DELETE',
         cache: 'no-store',
         headers: buildAuthHeaders(token),

@@ -48,7 +48,7 @@ export default function GuidelinesTab() {
       setIsLoading(true);
       setError('');
       try {
-        const response = await fetch('https://api.insightabusiness.com/api/common/setting/guideline/type', {
+        const response = await fetch('https://api.foresighta.co/api/common/setting/guideline/type', {
           method: 'GET',
           cache: 'no-store',
           signal: controller.signal,

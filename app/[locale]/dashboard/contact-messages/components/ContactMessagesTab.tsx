@@ -96,7 +96,7 @@ export default function ContactMessagesTab() {
           return;
         }
 
-        const url = new URL('https://api.insightabusiness.com/api/admin/setting/contact-us');
+        const url = new URL('https://api.foresighta.co/api/admin/setting/contact-us');
         url.searchParams.set('page', String(page));
 
         const response = await fetch(url.toString(), {
@@ -187,7 +187,7 @@ export default function ContactMessagesTab() {
         return;
       }
 
-      const response = await fetch(`https://api.insightabusiness.com/api/admin/setting/contact-us/${id}`, {
+      const response = await fetch(`https://api.foresighta.co/api/admin/setting/contact-us/${id}`, {
         method: 'PUT',
         cache: 'no-store',
         headers: buildAuthHeaders(token),
