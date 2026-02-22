@@ -18,7 +18,11 @@ export function useRoleCheck() {
   };
 
   const isAdmin = (): boolean => {
-    return hasRole('admin');
+    return hasAnyRole(['admin', 'staff']);
+  };
+
+  const isStaff = (): boolean => {
+    return hasRole('staff');
   };
 
   const isInsighter = (): boolean => {
@@ -37,6 +41,7 @@ export function useRoleCheck() {
     hasAnyRole,
     hasAllRoles,
     isAdmin,
+    isStaff,
     isInsighter,
     isCompany,
   };

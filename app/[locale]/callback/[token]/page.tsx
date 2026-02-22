@@ -338,7 +338,7 @@ export default function AuthCallback() {
   const handleRedirect = (userData: any) => {
     storePromptPendingFlag();
     // Check if user has admin role
-    if (userData.roles && userData.roles.includes('admin')) {
+    if (userData.roles && (userData.roles.includes('admin') || userData.roles.includes('staff'))) {
       console.log('[token-callback] Admin user detected, redirecting to admin dashboard');
       window.location.href = 'https://app.insightabusiness.com/admin-dashboard/admin/dashboard/main-dashboard/requests';
       return;
