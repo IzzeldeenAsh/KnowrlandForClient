@@ -15,21 +15,21 @@ interface AuthModalProps {
 
 // Helper function to get the Angular app URL based on current domain
 const getAngularAppUrl = (): string => {
-  if (typeof window === 'undefined') return 'http://localhost:4200';
+  if (typeof window === 'undefined') return 'https://app.insightabusiness.com';
 
   const hostname = window.location.hostname;
   const protocol = window.location.protocol;
 
   // Production domains
   if (hostname.includes('foresighta.co')) {
-    return `$http://localhost:4200`;
+    return `$https://app.insightabusiness.com`;
   }
   if (hostname.includes('insightabusiness.com')) {
-    return `http://localhost:4200`;
+    return `https://app.insightabusiness.com`;
   }
 
   // Local development
-  return 'http://localhost:4200';
+  return 'https://app.insightabusiness.com';
 };
 
 const AuthModal: React.FC<AuthModalProps> = ({

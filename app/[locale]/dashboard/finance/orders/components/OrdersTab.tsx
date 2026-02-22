@@ -146,7 +146,7 @@ export default function OrdersTab() {
           return;
         }
 
-        const url = new URL('https://api.foresighta.co/api/admin/order/knowledge');
+        const url = new URL('https://api.insightabusiness.com/api/admin/order/knowledge');
         url.searchParams.set('page', String(page));
         url.searchParams.set('per_page', String(perPageValue));
 

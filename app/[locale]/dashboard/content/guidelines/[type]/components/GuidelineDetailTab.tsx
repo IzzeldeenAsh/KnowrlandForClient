@@ -349,19 +349,19 @@ export default function GuidelineDetailTab() {
 
       try {
         const [typesRes, currentRes, lastRes] = await Promise.all([
-          fetch('https://api.foresighta.co/api/common/setting/guideline/type', {
+          fetch('https://api.insightabusiness.com/api/common/setting/guideline/type', {
             method: 'GET',
             cache: 'no-store',
             signal,
             headers: { Accept: 'application/json', 'Accept-Language': 'en' },
           }),
-          fetch(`https://api.foresighta.co/api/common/setting/guideline/type/current/${encodeURIComponent(type)}`, {
+          fetch(`https://api.insightabusiness.com/api/common/setting/guideline/type/current/${encodeURIComponent(type)}`, {
             method: 'GET',
             cache: 'no-store',
             signal,
             headers: { Accept: 'application/json', 'Accept-Language': 'en' },
           }),
-          fetch(`https://api.foresighta.co/api/common/setting/guideline/type/last/${encodeURIComponent(type)}`, {
+          fetch(`https://api.insightabusiness.com/api/common/setting/guideline/type/last/${encodeURIComponent(type)}`, {
             method: 'GET',
             cache: 'no-store',
             signal,
@@ -459,7 +459,7 @@ export default function GuidelineDetailTab() {
         'X-Timezone': Intl.DateTimeFormat().resolvedOptions().timeZone,
       } as Record<string, string>;
 
-      const response = await fetch('https://api.foresighta.co/api/admin/setting/guideline', {
+      const response = await fetch('https://api.insightabusiness.com/api/admin/setting/guideline', {
         method: 'POST',
         cache: 'no-store',
         headers,

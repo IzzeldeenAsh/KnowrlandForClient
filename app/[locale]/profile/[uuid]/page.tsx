@@ -302,7 +302,7 @@ function ProfilePageContent() {
         if (entityType === "insighter") {
           // Try insighter API first
           let response = await fetch(
-            `https://api.foresighta.co/api/platform/insighter/profile/${uuid}`,
+            `https://api.insightabusiness.com/api/platform/insighter/profile/${uuid}`,
             {
               headers: {
                 "Content-Type": "application/json",
@@ -318,7 +318,7 @@ function ProfilePageContent() {
           } else {
             // Fall back to company API if insighter fails
             response = await fetch(
-              `https://api.foresighta.co/api/platform/company/profile/${uuid}`,
+              `https://api.insightabusiness.com/api/platform/company/profile/${uuid}`,
               {
                 headers: {
                   "Content-Type": "application/json",
@@ -370,7 +370,7 @@ function ProfilePageContent() {
         } else {
           // Default behavior: try company API first
           let response = await fetch(
-            `https://api.foresighta.co/api/platform/company/profile/${uuid}`,
+            `https://api.insightabusiness.com/api/platform/company/profile/${uuid}`,
             {
               headers: {
                 "Content-Type": "application/json",
@@ -419,7 +419,7 @@ function ProfilePageContent() {
           } else {
             // Try insighter API if company API fails
             response = await fetch(
-              `https://api.foresighta.co/api/platform/insighter/profile/${uuid}`,
+              `https://api.insightabusiness.com/api/platform/insighter/profile/${uuid}`,
               {
                 headers: {
                   "Content-Type": "application/json",
@@ -463,8 +463,8 @@ function ProfilePageContent() {
         // Now fetch the filtered data
         let url =
           entityType === "insighter"
-            ? `https://api.foresighta.co/api/platform/insighter/knowledge/${uuid}?page=${knowledgePage}&per_page=12`
-            : `https://api.foresighta.co/api/platform/company/knowledge/${uuid}?page=${knowledgePage}&per_page=12`;
+            ? `https://api.insightabusiness.com/api/platform/insighter/knowledge/${uuid}?page=${knowledgePage}&per_page=12`
+            : `https://api.insightabusiness.com/api/platform/company/knowledge/${uuid}?page=${knowledgePage}&per_page=12`;
 
         if (selectedType) {
           url += `&type=${selectedType}`;
@@ -513,7 +513,7 @@ function ProfilePageContent() {
 
       try {
         const response = await fetch(
-          `https://api.foresighta.co/api/platform/company/knowledge/${uuid}?page=1&per_page=1`,
+          `https://api.insightabusiness.com/api/platform/company/knowledge/${uuid}?page=1&per_page=1`,
           {
             headers: {
               "Content-Type": "application/json",
@@ -548,7 +548,7 @@ function ProfilePageContent() {
       }
       try {
         const response = await fetch(
-          `https://api.foresighta.co/api/platform/insighter/profile/statistics/${uuid}`,
+          `https://api.insightabusiness.com/api/platform/insighter/profile/statistics/${uuid}`,
           {
             headers: {
               "Content-Type": "application/json",
@@ -592,7 +592,7 @@ function ProfilePageContent() {
       // Verify token is valid by making an API call
       try {
         const response = await fetch(
-          "https://api.foresighta.co/api/account/profile",
+          "https://api.insightabusiness.com/api/account/profile",
           {
             headers: {
               "Content-Type": "application/json",
@@ -683,7 +683,7 @@ function ProfilePageContent() {
       endDate.setFullYear(tomorrow.getFullYear() + 1);
       const endDateStr = endDate.toISOString().split("T")[0]; // YYYY-MM-DD format
       const response = await axios.post(
-        `https://api.foresighta.co/api/platform/insighter/meeting/available/hours/${uuid}`,
+        `https://api.insightabusiness.com/api/platform/insighter/meeting/available/hours/${uuid}`,
         {
           start_date: startDate,
           end_date: endDateStr,

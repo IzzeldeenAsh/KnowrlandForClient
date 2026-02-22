@@ -45,7 +45,7 @@ async function fetchPackageData(slug: string, locale: string = 'en') {
   const token = tokenCookie?.value;
   
   const response = await fetch(
-    `https://api.foresighta.co/api/platform/industries/package/${slug}`,
+    `https://api.insightabusiness.com/api/platform/industries/package/${slug}`,
     {
       method: "GET",
       headers: {

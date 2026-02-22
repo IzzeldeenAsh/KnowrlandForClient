@@ -168,12 +168,12 @@ function getActionLabel(action: CompanyAction): string {
 
 function getEndpoint(action: CompanyAction, id: number): string {
   if (action === 'activate') {
-    return `https://api.foresighta.co/api/admin/account/company/activate/${id}`;
+    return `https://api.insightabusiness.com/api/admin/account/company/activate/${id}`;
   }
   if (action === 'deactivate') {
-    return `https://api.foresighta.co/api/admin/account/company/deactivate/${id}`;
+    return `https://api.insightabusiness.com/api/admin/account/company/deactivate/${id}`;
   }
-  return `https://api.foresighta.co/api/admin/account/company/deactivate-delete/${id}`;
+  return `https://api.insightabusiness.com/api/admin/account/company/deactivate-delete/${id}`;
 }
 
 function normalizeCompanies(payload: unknown): CompanyRecord[] {
@@ -281,7 +281,7 @@ export default function CompaniesTab() {
         return;
       }
 
-      const response = await fetch('https://api.foresighta.co/api/admin/account/company/list', {
+      const response = await fetch('https://api.insightabusiness.com/api/admin/account/company/list', {
         method: 'GET',
         cache: 'no-store',
         signal,

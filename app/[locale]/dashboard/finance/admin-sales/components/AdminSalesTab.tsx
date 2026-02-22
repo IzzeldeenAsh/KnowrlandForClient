@@ -505,7 +505,7 @@ export default function AdminSalesTab() {
         return;
       }
 
-      const response = await fetch('https://api.foresighta.co/api/admin/dashboard/sales/revenue/statistics', {
+      const response = await fetch('https://api.insightabusiness.com/api/admin/dashboard/sales/revenue/statistics', {
         method: 'GET',
         cache: 'no-store',
         signal,
@@ -532,7 +532,7 @@ export default function AdminSalesTab() {
       }
 
       const response = await fetch(
-        `https://api.foresighta.co/api/admin/dashboard/sales/revenue/period/statistics?per_time=${period}`,
+        `https://api.insightabusiness.com/api/admin/dashboard/sales/revenue/period/statistics?per_time=${period}`,
         {
           method: 'GET',
           cache: 'no-store',

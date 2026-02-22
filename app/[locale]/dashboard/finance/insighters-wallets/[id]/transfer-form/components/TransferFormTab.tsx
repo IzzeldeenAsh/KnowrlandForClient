@@ -249,7 +249,7 @@ function renderPrintHtml(form: TransferFormRecord): string {
 	    <div class="page">
 	      <div class="header">
 	        <div class="brand">
-	          <img class="logo" alt="Insighta" src="http://localhost:4200/assets/media/logos/custom-2.svg" />
+	          <img class="logo" alt="Insighta" src="https://app.insightabusiness.com/assets/media/logos/custom-2.svg" />
 	          <div class="heading">
 	            <h1 class="title">Payout Details</h1>
 	            <div class="subtitle">Beneficiary &amp; Bank Information</div>
@@ -336,7 +336,7 @@ export default function TransferFormTab({ insighterId }: { insighterId: string }
         return;
       }
 
-      const response = await fetch(`https://api.foresighta.co/api/admin/fund/insighter/payment/manual/${insighterId}`, {
+      const response = await fetch(`https://api.insightabusiness.com/api/admin/fund/insighter/payment/manual/${insighterId}`, {
         method: 'GET',
         cache: 'no-store',
         signal: controller.signal,
@@ -406,7 +406,7 @@ export default function TransferFormTab({ insighterId }: { insighterId: string }
         return;
       }
 
-      const response = await fetch(`https://api.foresighta.co/api/admin/fund/insighter/send/transfer-form-email/${insighterId}`, {
+      const response = await fetch(`https://api.insightabusiness.com/api/admin/fund/insighter/send/transfer-form-email/${insighterId}`, {
         method: 'POST',
         cache: 'no-store',
         headers: buildAuthHeaders(token),
@@ -454,7 +454,7 @@ export default function TransferFormTab({ insighterId }: { insighterId: string }
         'X-Timezone': Intl.DateTimeFormat().resolvedOptions().timeZone,
       } as Record<string, string>;
 
-      const response = await fetch(`https://api.foresighta.co/api/admin/fund/insighter/wired-transfer/store/${insighterId}`, {
+      const response = await fetch(`https://api.insightabusiness.com/api/admin/fund/insighter/wired-transfer/store/${insighterId}`, {
         method: 'POST',
         cache: 'no-store',
         headers,
@@ -563,7 +563,7 @@ export default function TransferFormTab({ insighterId }: { insighterId: string }
               <div className="flex items-start justify-between gap-6">
                 <div className="flex min-w-0 items-start gap-4">
                   <img
-                    src="http://localhost:4200/assets/media/logos/custom-2.svg"
+                    src="https://app.insightabusiness.com/assets/media/logos/custom-2.svg"
                     alt="Insighta"
                     className="h-11 w-11 shrink-0"
                   />

@@ -108,7 +108,7 @@ export default function CountriesTab() {
     setError('');
 
     try {
-      const response = await fetch('https://api.foresighta.co/api/common/setting/country/list', {
+      const response = await fetch('https://api.insightabusiness.com/api/common/setting/country/list', {
         method: 'GET',
         cache: 'no-store',
         signal,
@@ -150,7 +150,7 @@ export default function CountriesTab() {
         return;
       }
 
-      const response = await fetch('https://api.foresighta.co/api/admin/setting/region', {
+      const response = await fetch('https://api.insightabusiness.com/api/admin/setting/region', {
         method: 'GET',
         cache: 'no-store',
         signal,
@@ -266,8 +266,8 @@ export default function CountriesTab() {
 
       const url =
         modalMode === 'create'
-          ? 'https://api.foresighta.co/api/admin/setting/country'
-          : `https://api.foresighta.co/api/admin/setting/country/${selectedCountry?.id ?? ''}`;
+          ? 'https://api.insightabusiness.com/api/admin/setting/country'
+          : `https://api.insightabusiness.com/api/admin/setting/country/${selectedCountry?.id ?? ''}`;
 
       const response = await fetch(url, {
         method: modalMode === 'create' ? 'POST' : 'PUT',
@@ -312,7 +312,7 @@ export default function CountriesTab() {
         return;
       }
 
-      const response = await fetch(`https://api.foresighta.co/api/admin/setting/country/${country.id}`, {
+      const response = await fetch(`https://api.insightabusiness.com/api/admin/setting/country/${country.id}`, {
         method: 'DELETE',
         cache: 'no-store',
         headers: buildAuthHeaders(token),

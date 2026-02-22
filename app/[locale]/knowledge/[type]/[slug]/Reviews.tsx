@@ -206,7 +206,7 @@ export default function Reviews({ knowledgeSlug, reviews, is_review, is_owner, h
       }
       
       const response = await fetch(
-        `https://api.foresighta.co/api/platform/industries/knowledge/${knowledgeSlug}`,
+        `https://api.insightabusiness.com/api/platform/industries/knowledge/${knowledgeSlug}`,
         {
           method: "GET",
           headers,
@@ -275,7 +275,7 @@ export default function Reviews({ knowledgeSlug, reviews, is_review, is_owner, h
       
       // Make the API call directly
       const response = await fetch(
-        `https://api.foresighta.co/api/account/review/knowledge/${knowledgeSlug}`,
+        `https://api.insightabusiness.com/api/account/review/knowledge/${knowledgeSlug}`,
         {
           method: "POST",
           headers: {
@@ -354,7 +354,7 @@ export default function Reviews({ knowledgeSlug, reviews, is_review, is_owner, h
 
     try {
       const response = await fetch(
-        `https://api.foresighta.co/api/account/review/knowledge/${reviewId}`,
+        `https://api.insightabusiness.com/api/account/review/knowledge/${reviewId}`,
         {
           method: 'DELETE',
           headers: {

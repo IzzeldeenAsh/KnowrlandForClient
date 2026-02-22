@@ -31,7 +31,7 @@ export default function NotificationChannelsPromptModal({ locale }: Notification
   const angularBaseUrl =
     process.env.NEXT_PUBLIC_ANGULAR_APP_URL ||
     process.env.NEXT_PUBLIC_DASHBOARD_URL ||
-    'http://localhost:4200';
+    'https://app.insightabusiness.com';
   const settingsUrl = `${angularBaseUrl}/app/insighter-dashboard/account-settings/notification-settings`;
 
   const t = useMemo(() => {

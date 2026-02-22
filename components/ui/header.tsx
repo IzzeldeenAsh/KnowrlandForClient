@@ -46,8 +46,8 @@ const INDUSTRIES_CACHE_DURATION = 300000; // 5 minutes cache for industries
 const ANGULAR_APP_URL: string =
   process.env.NEXT_PUBLIC_ANGULAR_APP_URL ||
   (process.env.NODE_ENV === 'development'
-    ? 'http://localhost:4200'
-    : 'http://localhost:4200');
+    ? 'https://app.insightabusiness.com'
+    : 'https://app.insightabusiness.com');
 
 async function getIndustries(locale: string = 'en', forceRefresh: boolean = false): Promise<Industry[]> {
   const now = Date.now();
@@ -76,7 +76,7 @@ async function getIndustries(locale: string = 'en', forceRefresh: boolean = fals
 
 async function fetchIndustriesFromAPI(locale: string): Promise<Industry[]> {
   try {
-    const res = await fetch("https://api.foresighta.co/api/platform/industries/menu", {
+    const res = await fetch("https://api.insightabusiness.com/api/platform/industries/menu", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -572,7 +572,7 @@ const { isLoading: isAppLoading, setIsLoading: setAppLoading } = useLoading();
             { !shouldShowAuthSkeleton  && !roles.includes('insighter') && !roles.includes('company') && !roles.includes('company-insighter') && (
               <li className="mx-1 md:mx-2 hidden lg:block">
                 <Link 
-                  href={`http://localhost:4200/app/insighter-register/vertical`}
+                  href={`https://app.insightabusiness.com/app/insighter-register/vertical`}
                   className="font-medium text-sm text-white px-2 md:px-3 py-2 rounded-md bg-gradient-to-r from-blue-500 to-cyan-500 hover:from-blue-600 hover:to-cyan-600 transition-all duration-300 ease-in-out whitespace-nowrap"
                 >
                   {t('becomeInsighter')}
@@ -614,7 +614,7 @@ const { isLoading: isAppLoading, setIsLoading: setAppLoading } = useLoading();
             ) : (
               <li>
                 <Link className="btn-sm text-slate-300 hover:text-white [background:linear-gradient(theme(colors.slate.900),_theme(colors.slate.900))_padding-box,_conic-gradient(theme(colors.slate.400),_theme(colors.slate.700)_25%,_theme(colors.slate.700)_75%,_theme(colors.slate.400)_100%)_border-box] before:bg-slate-800/30 hover:scale-105 active:scale-95 transition-all duration-150 ease-in-out group relative before:absolute before:inset-0 before:rounded-full before:pointer-events-none" 
-                href={`http://localhost:4200/auth/login?returnUrl=${encodeURIComponent(returnUrl)}`}>
+                href={`https://app.insightabusiness.com/auth/login?returnUrl=${encodeURIComponent(returnUrl)}`}>
                   <span className="relative inline-flex items-center">
                     {t('auth.login')} <span className="tracking-normal text-blue-500 group-hover:translate-x-1 transition-transform duration-150 ease-in-out ml-1">&gt;</span>
                   </span>
