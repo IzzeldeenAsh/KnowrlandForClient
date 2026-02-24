@@ -47,6 +47,15 @@ export default function AuthCallback() {
   }
   
   const locale = (params.locale as string) || 'en';
+  const shouldPromptAddChannels = searchParams.get('promptAddChannels') === '1';
+  const storePromptPendingFlag = () => {
+    if (!shouldPromptAddChannels) return;
+    try {
+      localStorage.setItem('postSignupPrompt:addChannels:pending', '1');
+    } catch {
+      // ignore
+    }
+  };
 
   useEffect(() => {
     const fetchProfile = async () => {
@@ -327,6 +336,7 @@ export default function AuthCallback() {
 
   // Helper function to handle redirects
   const handleRedirect = (userData: any) => {
+    storePromptPendingFlag();
     // Check if user has admin role
     if (userData.roles && (userData.roles.includes('admin') || userData.roles.includes('staff'))) {
       console.log('[token-callback] Admin user detected, redirecting to admin dashboard');
@@ -411,7 +421,13 @@ export default function AuthCallback() {
       console.log('[token-callback] Redirecting to Angular insighter dashboard');
       window.location.href = `https://app.insightabusiness.com/app/insighter-dashboard/my-dashboard`;
     } else {
-      // Redirect to home page using current locale
+      // Normal client flow: send to Next.js landing page. If prompted, include query param to open onboarding modal.
+      if (shouldPromptAddChannels) {
+        router.push(`/${locale}/home?promptAddChannels=1`);
+        return;
+      }
+
+      // Default: redirect to app home page
       router.push(`/${locale}/home`);
     }
   };

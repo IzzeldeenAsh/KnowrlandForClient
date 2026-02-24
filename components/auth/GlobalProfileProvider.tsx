@@ -152,6 +152,8 @@ export function GlobalProfileProvider({ children }: { children: React.ReactNode 
           company: data.data.company,
           country: data.data.country,
           country_id: data.data.country_id,
+          whatsapp_country_code: data.data.whatsapp_country_code ?? null,
+          whatsapp_number: data.data.whatsapp_number ?? null,
         };
 
     

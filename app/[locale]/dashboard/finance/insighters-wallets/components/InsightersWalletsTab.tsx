@@ -28,7 +28,7 @@ function SearchIcon() {
 
 const INPUT_WITH_ICON_CLASS =
   'h-8 w-full rounded-md border border-slate-200 bg-white pl-9 pr-3 text-xs text-slate-700 shadow-sm outline-none focus:border-blue-400 focus:border-[1px]';
-const INPUT_CLASS =
+const SELECT_CLASS =
   'h-8 w-full rounded-md border border-slate-200 bg-white px-3 text-xs text-slate-700 shadow-sm outline-none focus:border-blue-400 focus:border-[1px]';
 const SECONDARY_BUTTON_CLASS =
   'h-8 rounded-md border border-slate-200 bg-white px-4 text-xs font-medium text-slate-700 shadow-sm hover:bg-slate-50 disabled:opacity-50 disabled:hover:bg-white';
@@ -218,64 +218,83 @@ export default function InsightersWalletsTab() {
   return (
     <div className="mt-4">
       <div className="rounded-md border border-slate-200 bg-white p-4 shadow-sm">
-        <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
           <div className="flex flex-col">
             <h2 className="text-md font-semibold text-slate-900">Insighters Wallets</h2>
             <p className="text-xs font-light text-slate-500 ps-1">Monitor insighter balances and payouts.</p>
           </div>
 
-          <div className="flex flex-wrap items-center gap-2">
-            {(['weekly', 'monthly', 'yearly'] as Period[]).map((p) => (
-              <button
-                key={p}
-                type="button"
-                onClick={() => setPeriod(p)}
-                className={[
-                  'h-8 rounded-md border px-3 text-xs font-medium shadow-sm',
-                  period === p ? 'border-blue-600 bg-blue-600 text-white' : 'border-slate-200 bg-white text-slate-700 hover:bg-slate-50',
-                ].join(' ')}
-              >
-                {toTitle(p)}
-              </button>
-            ))}
+          <div className="flex items-center justify-start sm:justify-end">
+            <div className="inline-flex overflow-hidden rounded-md border border-slate-200 bg-white shadow-sm">
+              {(['weekly', 'monthly', 'yearly'] as Period[]).map((p, index) => (
+                <button
+                  key={p}
+                  type="button"
+                  onClick={() => setPeriod(p)}
+                  className={[
+                    'h-8 px-4 text-xs font-medium transition-colors',
+                    index !== 0 ? 'border-l border-slate-200' : '',
+                    period === p ? 'bg-blue-600 text-white' : 'text-slate-700 hover:bg-slate-50',
+                  ].join(' ')}
+                  aria-pressed={period === p}
+                >
+                  {toTitle(p)}
+                </button>
+              ))}
+            </div>
           </div>
         </div>
 
-        <div className="mt-4 flex flex-col gap-2 lg:flex-row lg:items-center">
-          <div className="relative flex-1">
-            <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-slate-400">
-              <SearchIcon />
-            </span>
-            <input
-              type="search"
-              value={searchInput}
-              onChange={(event) => setSearchInput(event.target.value)}
-              onKeyDown={onSearchKeyDown}
-              placeholder="Search (current page)..."
-              className={INPUT_WITH_ICON_CLASS}
-            />
-          </div>
+        <div className="mt-4 border-t border-slate-100 pt-4">
+          <div className="grid grid-cols-1 gap-3 lg:grid-cols-12 lg:items-end">
+            <div className="lg:col-span-7">
+              <label htmlFor="insighters-wallets-search" className="sr-only">
+                Search
+              </label>
+              <div className="relative">
+                <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-slate-400">
+                  <SearchIcon />
+                </span>
+                <input
+                  id="insighters-wallets-search"
+                  type="search"
+                  value={searchInput}
+                  onChange={(event) => setSearchInput(event.target.value)}
+                  onKeyDown={onSearchKeyDown}
+                  placeholder="Search by name, email, company, country..."
+                  className={INPUT_WITH_ICON_CLASS}
+                />
+              </div>
+            </div>
 
-          <div className="flex flex-wrap items-center gap-2">
-            <select
-              value={balanceStatus}
-              onChange={(event) => setBalanceStatus(event.target.value as BalanceStatus)}
-              className={INPUT_CLASS}
-              aria-label="Balance status"
-            >
-              <option value="positive">Positive</option>
-              <option value="negative">Negative</option>
-              <option value="zero">Zero</option>
-            </select>
+            <div className="lg:col-span-3">
+              <div className="flex items-center justify-between gap-2">
+                <label htmlFor="insighters-wallets-balance-status" className="text-[11px] font-medium text-slate-500">
+                  Balance status
+                </label>
+               
+              </div>
+              <select
+                id="insighters-wallets-balance-status"
+                value={balanceStatus}
+                onChange={(event) => setBalanceStatus(event.target.value as BalanceStatus)}
+                className={SELECT_CLASS}
+              >
+                <option value="positive">Positive</option>
+                <option value="negative">Negative</option>
+                <option value="zero">Zero</option>
+              </select>
+            </div>
 
-            <label className="flex h-8 items-center gap-2 rounded-md border border-slate-200 bg-white px-3 text-xs font-medium text-slate-700 shadow-sm">
-              <input type="checkbox" checked={overdue} onChange={(e) => setOverdue(e.target.checked)} className="h-3.5 w-3.5" />
-              Overdue Wired (+60 days)
-            </label>
-
-            <span className={`inline-flex h-8 items-center rounded-full px-3 text-[11px] font-semibold ${getBalanceStatusBadgeClass(balanceStatus)}`}>
-              {toTitle(balanceStatus)}
-            </span>
+            <div className="lg:col-span-2">
+              <label
+                className="mt-1 flex h-8 items-center gap-2 rounded-md border border-slate-200 bg-white px-3 text-xs font-medium text-slate-700 shadow-sm"
+                title="Overdue wired transfers (+60 days)"
+              >
+                <input type="checkbox" checked={overdue} onChange={(e) => setOverdue(e.target.checked)} className="h-3.5 w-3.5" />
+                Overdue wired (+60d)
+              </label>
+            </div>
           </div>
         </div>
       </div>
@@ -283,9 +302,7 @@ export default function InsightersWalletsTab() {
       <div className="mt-4 rounded-md border border-slate-200 bg-white p-4 shadow-sm">
         <div className="flex items-center justify-between gap-2">
           <div className="text-xs text-slate-500">total: {meta.total}</div>
-          <button type="button" onClick={() => refresh(meta.current_page)} className={SECONDARY_BUTTON_CLASS}>
-            Refresh
-          </button>
+         
         </div>
 
         <div className="mt-3 overflow-x-auto rounded-md border border-slate-200 bg-white shadow-sm">

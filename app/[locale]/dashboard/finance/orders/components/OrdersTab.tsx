@@ -212,6 +212,9 @@ export default function OrdersTab() {
         order.payment?.method,
         order.fulfillment_staus,
         order.currency,
+        order.user?.name,
+        order.user?.email,
+        order.user?.type,
       ]
         .map((v) => String(v ?? ''))
         .join(' ')
@@ -274,11 +277,11 @@ export default function OrdersTab() {
         <table className="min-w-[1200px] w-full border-collapse text-xs text-slate-700">
           <thead className="bg-slate-50 text-[11px] font-semibold uppercase text-slate-500">
             <tr>
-              <th className="w-[140px] border-b border-slate-200 px-3 py-2 text-left">Order No</th>
-              <th className="w-[170px] border-b border-slate-200 px-3 py-2 text-left">Date</th>
-              <th className="w-[170px] border-b border-slate-200 px-3 py-2 text-left">Service</th>
+              <th className="w-[180px] border-b border-slate-200 px-3 py-2 text-left">Order No</th>
+              <th className="w-[160px] border-b border-slate-200 px-3 py-2 text-left">Date</th>
+              <th className="w-[160px] border-b border-slate-200 px-3 py-2 text-left">Service</th>
               <th className="w-[140px] border-b border-slate-200 px-3 py-2 text-left">Amount</th>
-              <th className="w-[150px] border-b border-slate-200 px-3 py-2 text-left">Payment Status</th>
+              <th className="w-[130px] border-b border-slate-200 px-3 py-2 text-left">Payment Status</th>
               <th className="w-[170px] border-b border-slate-200 px-3 py-2 text-left">Payment Method</th>
               <th className="w-[170px] border-b border-slate-200 px-3 py-2 text-left">Fulfillment</th>
               <th className="w-[160px] border-b border-slate-200 px-3 py-2 text-left">Invoice No</th>
@@ -308,10 +311,18 @@ export default function OrdersTab() {
               filteredOrders.map((order) => {
                 const paymentStatus = normalizeText(order.status) || 'unknown';
                 const fulfillment = normalizeText(order.fulfillment_staus) || 'unknown';
+                const userType = normalizeText(order.user?.type);
                 return (
                   <tr key={order.uuid} className="odd:bg-white even:bg-slate-50/50">
                     <td className="border-b border-slate-100 px-3 py-2 font-semibold text-slate-900">
-                      {normalizeText(order.order_no) || '-'}
+                      <div className="flex flex-wrap items-center gap-1">
+                        <span>{normalizeText(order.order_no) || '-'}</span>
+                        {userType ? (
+                          <span className="rounded-full bg-purple-50 px-2 py-0.5 text-[10px] font-semibold text-purple-700 ring-1 ring-purple-200">
+                            {toTitle(userType)}
+                          </span>
+                        ) : null}
+                      </div>
                     </td>
                     <td className="border-b border-slate-100 px-3 py-2">{formatDate(order.date)}</td>
                     <td className="border-b border-slate-100 px-3 py-2">

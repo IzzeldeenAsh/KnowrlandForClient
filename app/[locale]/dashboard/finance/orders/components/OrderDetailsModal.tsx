@@ -74,6 +74,7 @@ export default function OrderDetailsModal({
 
   const status = normalizeText(order.status) || 'unknown';
   const fulfillmentStatus = normalizeText(order.fulfillment_staus) || 'unknown';
+  const customerType = normalizeText(order.user?.type);
 
   return (
     <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-slate-900/40 px-4 py-8">
@@ -169,6 +170,46 @@ export default function OrderDetailsModal({
               </div>
             </div>
           </div>
+
+          {order.user ? (
+            <div className="mt-4 rounded-md border border-slate-200 bg-white p-4 shadow-sm">
+              <div className={SECTION_TITLE_CLASS}>Customer Information</div>
+              <div className="mt-3 flex items-center gap-3">
+                {order.user.profile_photo_url ? (
+                  <img
+                    src={order.user.profile_photo_url}
+                    alt={order.user.name}
+                    className="h-10 w-10 rounded-full object-cover"
+                    style={{ objectPosition: 'top' }}
+                  />
+                ) : (
+                  <div className="flex h-10 w-10 items-center justify-center rounded-full bg-slate-100 text-sm font-semibold text-slate-600">
+                    {order.user.name?.charAt(0) ?? 'U'}
+                  </div>
+                )}
+
+                <div className="min-w-0">
+                  <div className="truncate text-sm font-semibold text-slate-900">{normalizeText(order.user.name) || '-'}</div>
+                  <div className="truncate text-xs text-slate-500">{normalizeText(order.user.email) || '-'}</div>
+                  <div className="mt-1 flex flex-wrap gap-1">
+                    {customerType ? (
+                      <span className="rounded-full bg-purple-50 px-2 py-0.5 text-[10px] font-semibold text-purple-700 ring-1 ring-purple-200">
+                        {toTitle(customerType)}
+                      </span>
+                    ) : null}
+                    {order.user.roles?.map((role) => (
+                      <span
+                        key={role}
+                        className="rounded-full bg-slate-50 px-2 py-0.5 text-[10px] font-semibold text-slate-700 ring-1 ring-slate-200"
+                      >
+                        {role}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </div>
+          ) : null}
 
           <div className="mt-4 rounded-md border border-slate-200 bg-white p-4 shadow-sm">
             <div className={SECTION_TITLE_CLASS}>Order Items</div>
@@ -267,4 +308,3 @@ export default function OrderDetailsModal({
     </div>
   );
 }
-

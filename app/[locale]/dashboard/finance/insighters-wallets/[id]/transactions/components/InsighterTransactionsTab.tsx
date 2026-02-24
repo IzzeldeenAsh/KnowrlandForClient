@@ -29,8 +29,6 @@ function SearchIcon() {
 
 const INPUT_WITH_ICON_CLASS =
   'h-8 w-full rounded-md border border-slate-200 bg-white pl-9 pr-3 text-xs text-slate-700 shadow-sm outline-none focus:border-blue-400 focus:border-[1px]';
-const INPUT_CLASS =
-  'h-8 w-full rounded-md border border-slate-200 bg-white px-3 text-xs text-slate-700 shadow-sm outline-none focus:border-blue-400 focus:border-[1px]';
 const SECONDARY_BUTTON_CLASS =
   'h-8 rounded-md border border-slate-200 bg-white px-4 text-xs font-medium text-slate-700 shadow-sm hover:bg-slate-50 disabled:opacity-50 disabled:hover:bg-white';
 const ROW_ACTION_BUTTON_CLASS =
@@ -211,52 +209,66 @@ export default function InsighterTransactionsTab({ insighterId }: { insighterId:
   return (
     <div className="mt-4">
       <div className="rounded-md border border-slate-200 bg-white p-4 shadow-sm">
-        <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
           <div className="min-w-0">
             <div className="text-md font-semibold text-slate-900">Insighter Transactions</div>
-            <div className="mt-0.5 text-xs text-slate-500">Insighter ID: {insighterId}</div>
+            <div className="mt-0.5 text-xs text-slate-500">
+              Insighter ID: <span className="font-mono text-[11px] text-slate-600">{insighterId}</span>
+            </div>
           </div>
 
-          <div className="flex flex-wrap items-center gap-2">
+          <div className="flex flex-wrap items-center gap-2 sm:justify-end">
             <Link href={backHref} className={SECONDARY_BUTTON_CLASS}>
               Back
             </Link>
-            {(['weekly', 'monthly', 'yearly'] as Period[]).map((p) => (
-              <button
-                key={p}
-                type="button"
-                onClick={() => setPeriod(p)}
-                className={[
-                  'h-8 rounded-md border px-3 text-xs font-medium shadow-sm',
-                  period === p ? 'border-blue-600 bg-blue-600 text-white' : 'border-slate-200 bg-white text-slate-700 hover:bg-slate-50',
-                ].join(' ')}
-              >
-                {toTitle(p)}
-              </button>
-            ))}
+            <div className="inline-flex overflow-hidden rounded-md border border-slate-200 bg-white shadow-sm">
+              {(['weekly', 'monthly', 'yearly'] as Period[]).map((p, index) => (
+                <button
+                  key={p}
+                  type="button"
+                  onClick={() => setPeriod(p)}
+                  className={[
+                    'h-8 px-4 text-xs font-medium transition-colors',
+                    index !== 0 ? 'border-l border-slate-200' : '',
+                    period === p ? 'bg-blue-600 text-white' : 'text-slate-700 hover:bg-slate-50',
+                  ].join(' ')}
+                  aria-pressed={period === p}
+                >
+                  {toTitle(p)}
+                </button>
+              ))}
+            </div>
           </div>
         </div>
 
-        <div className="mt-4 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-          <div className="relative flex-1 sm:max-w-[520px]">
-            <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-slate-400">
-              <SearchIcon />
-            </span>
-            <input
-              type="search"
-              value={searchInput}
-              onChange={(event) => setSearchInput(event.target.value)}
-              onKeyDown={onSearchKeyDown}
-              placeholder="Search (current page)..."
-              className={INPUT_WITH_ICON_CLASS}
-            />
-          </div>
+        <div className="mt-4 border-t border-slate-100 pt-4">
+          <div className="grid grid-cols-1 gap-3 lg:grid-cols-12 lg:items-end">
+            <div className="lg:col-span-8">
+              <label htmlFor="insighter-transactions-search" className="sr-only">
+                Search
+              </label>
+              <div className="relative">
+                <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-slate-400">
+                  <SearchIcon />
+                </span>
+                <input
+                  id="insighter-transactions-search"
+                  type="search"
+                  value={searchInput}
+                  onChange={(event) => setSearchInput(event.target.value)}
+                  onKeyDown={onSearchKeyDown}
+                  placeholder="Search by order, user, invoice, type..."
+                  className={INPUT_WITH_ICON_CLASS}
+                />
+              </div>
+            </div>
 
-          <div className="flex items-center gap-2">
-            <button type="button" onClick={() => refresh(meta.current_page)} className={SECONDARY_BUTTON_CLASS}>
-              Refresh
-            </button>
-            <div className="text-xs text-slate-500">total: {meta.total}</div>
+            <div className="flex items-center justify-between gap-2 lg:col-span-4 lg:justify-end">
+              <div className="text-xs text-slate-500">total: {meta.total}</div>
+              <button type="button" onClick={() => refresh(meta.current_page)} className={SECONDARY_BUTTON_CLASS}>
+                Refresh
+              </button>
+            </div>
           </div>
         </div>
       </div>

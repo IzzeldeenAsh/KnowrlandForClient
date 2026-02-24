@@ -25,3 +25,46 @@ export type TransferFormResponse = {
   data: TransferFormRecord[];
 };
 
+export type PaginationMeta = {
+  current_page: number;
+  last_page: number;
+  per_page?: number;
+  total?: number;
+  from?: number;
+  to?: number;
+};
+
+export type WiredTransferReceiptListItem = {
+  id: number;
+  receipt_no: string;
+  receipt_date: string;
+  handel_by?: string | null;
+  handled_by?: string | null;
+  amount: string | number;
+  note?: string | null;
+};
+
+export type WiredTransferReceiptListResponse = {
+  data?: WiredTransferReceiptListItem[];
+  links?: {
+    first?: string | null;
+    last?: string | null;
+    prev?: string | null;
+    next?: string | null;
+  };
+  meta?: PaginationMeta;
+};
+
+export type WiredTransferReceiptDetails = {
+  receipt_no: string;
+  receipt_date: string;
+  handel_by?: string | null;
+  handled_by?: string | null;
+  amount: string | number;
+  note?: string | null;
+  receipt_file?: string | null;
+};
+
+export type WiredTransferReceiptDetailsResponse = {
+  data?: WiredTransferReceiptDetails | null;
+};

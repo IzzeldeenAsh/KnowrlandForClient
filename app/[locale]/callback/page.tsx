@@ -46,6 +46,15 @@ export default function QueryParamAuthCallback() {
   
   const returnUrl = searchParams.get('returnUrl');
   const locale = params.locale as string || 'en';
+  const shouldPromptAddChannels = searchParams.get('promptAddChannels') === '1';
+  const storePromptPendingFlag = () => {
+    if (!shouldPromptAddChannels) return;
+    try {
+      localStorage.setItem('postSignupPrompt:addChannels:pending', '1');
+    } catch {
+      // ignore
+    }
+  };
 
   // If still no token, try to get it from cookie
   if (!token) {
@@ -270,6 +279,7 @@ export default function QueryParamAuthCallback() {
 
   // Helper function to handle redirects
   const handleRedirect = (userData: any) => {
+    storePromptPendingFlag();
     console.log('[callback] Handling redirect for user:', userData.email);
     console.log('[callback] User roles:', userData.roles);
     console.log('[callback] Return URL from params:', returnUrl);
@@ -381,7 +391,12 @@ export default function QueryParamAuthCallback() {
       console.log('[callback] Redirecting to Angular insighter dashboard');
       window.location.href = `https://app.insightabusiness.com/app/insighter-dashboard/my-dashboard`;
     } else {
-      // Redirect to home page using current locale
+      // Redirect to home page using current locale (optionally open post-signup prompt)
+      if (shouldPromptAddChannels) {
+        router.push(`/${preferredLanguage}/home?promptAddChannels=1`);
+        return;
+      }
+
       console.log('[callback] Redirecting to home page:', `/${preferredLanguage}/home`);
       router.push(`/${preferredLanguage}/home`);
     }

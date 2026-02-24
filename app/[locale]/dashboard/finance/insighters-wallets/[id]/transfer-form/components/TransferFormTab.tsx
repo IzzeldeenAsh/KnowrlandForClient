@@ -3,10 +3,21 @@
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
 import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
-import { IconArrowLeft, IconAt, IconBrandWhatsapp, IconBuildingBank, IconMail, IconPrinter, IconUser } from '@tabler/icons-react';
+import {
+  IconArrowLeft,
+  IconAt,
+  IconBrandWhatsapp,
+  IconBuildingBank,
+  IconFileText,
+  IconMail,
+  IconPrinter,
+  IconUser,
+} from '@tabler/icons-react';
 import { getAuthToken } from '@/lib/authToken';
 import { useToast } from '@/components/toast/ToastContext';
 import { buildAuthHeaders, parseApiError } from '../../../../../_config/api';
+import ReceiptsListTab from './ReceiptsListTab';
+import RecordReceiptModal, { type ReceiptFormValues } from './RecordReceiptModal';
 import SendEmailModal from './SendEmailModal';
 import type { TransferFormRecord, TransferFormResponse } from './types';
 
@@ -298,8 +309,15 @@ export default function TransferFormTab({ insighterId }: { insighterId: string }
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState('');
 
+  const [activeTab, setActiveTab] = useState<'form' | 'receipts'>('form');
+  const [receiptsRefreshKey, setReceiptsRefreshKey] = useState(0);
+
   const [emailModalOpen, setEmailModalOpen] = useState(false);
   const [sendingEmail, setSendingEmail] = useState(false);
+
+  const [receiptModalOpen, setReceiptModalOpen] = useState(false);
+  const [savingReceipt, setSavingReceipt] = useState(false);
+  const [receiptError, setReceiptError] = useState('');
 
   const currentAbort = useRef<AbortController | null>(null);
 
@@ -404,6 +422,65 @@ export default function TransferFormTab({ insighterId }: { insighterId: string }
     }
   };
 
+  const onSaveReceipt = async (values: ReceiptFormValues) => {
+    setReceiptError('');
+
+    const receiptNo = values.receiptNo.trim();
+    const receiptDate = values.receiptDate.trim();
+    const amount = values.amount.trim();
+    const file = values.receiptFile;
+
+    if (!receiptNo || !receiptDate || !amount || !file) return;
+
+    setSavingReceipt(true);
+    try {
+      const token = getAuthToken();
+      if (!token) {
+        setReceiptError('Missing auth token. Please sign in again.');
+        setSavingReceipt(false);
+        return;
+      }
+
+      const formData = new FormData();
+      formData.append('receipt_no', receiptNo);
+      formData.append('receipt_date', receiptDate);
+      formData.append('amount', amount);
+      formData.append('receipt', file);
+
+      const headers = {
+        Accept: 'application/json',
+        'Accept-Language': locale || 'en',
+        Authorization: buildAuthHeaders(token, locale).Authorization,
+        'X-Timezone': Intl.DateTimeFormat().resolvedOptions().timeZone,
+      } as Record<string, string>;
+
+      const response = await fetch(`https://api.insightabusiness.com/api/admin/fund/insighter/wired-transfer/store/${insighterId}`, {
+        method: 'POST',
+        cache: 'no-store',
+        headers,
+        body: formData,
+      });
+
+      if (!response.ok) throw await parseApiError(response);
+
+      success('Receipt recorded successfully', 'Success', 6000);
+      setReceiptModalOpen(false);
+      setReceiptsRefreshKey((prev) => prev + 1);
+      void fetchForm();
+    } catch (requestError) {
+      handleServerErrors(requestError);
+      const message =
+        requestError && typeof requestError === 'object' && 'message' in requestError
+          ? String((requestError as { message?: unknown }).message ?? 'Unable to record receipt right now.')
+          : requestError instanceof Error
+            ? requestError.message
+            : 'Unable to record receipt right now.';
+      setReceiptError(message);
+    } finally {
+      setSavingReceipt(false);
+    }
+  };
+
   return (
     <div className="mt-4">
       <div className="rounded-md border border-slate-200 bg-white p-4 shadow-sm">
@@ -426,6 +503,18 @@ export default function TransferFormTab({ insighterId }: { insighterId: string }
               <IconBrandWhatsapp size={14} />
               Share WhatsApp
             </button>
+            <button
+              type="button"
+              onClick={() => {
+                setReceiptError('');
+                setReceiptModalOpen(true);
+              }}
+              className={SECONDARY_BUTTON_CLASS}
+              disabled={!form}
+            >
+              <IconFileText size={14} />
+              Record Receipt
+            </button>
             <button type="button" onClick={() => setEmailModalOpen(true)} className={PRIMARY_BUTTON_CLASS} disabled={!form}>
               <IconMail size={14} />
               Send to Email
@@ -434,73 +523,108 @@ export default function TransferFormTab({ insighterId }: { insighterId: string }
         </div>
       </div>
 
-      <div className="mt-4 rounded-md border border-slate-200 bg-white p-4 shadow-sm">
-        {isLoading ? (
-          <div className="py-10 text-center text-xs text-slate-500">Loading...</div>
-        ) : error ? (
-          <div className="py-10 text-center text-xs text-red-600">{error}</div>
-        ) : !form ? (
-          <div className="py-10 text-center text-xs text-slate-500">No transfer form found.</div>
-        ) : (
-          <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8">
-            <div className="flex items-start justify-between gap-6">
-              <div className="flex min-w-0 items-start gap-4">
-                <img
-                  src="https://app.insightabusiness.com/assets/media/logos/custom-2.svg"
-                  alt="Insighta"
-                  className="h-11 w-11 shrink-0"
-                />
-                <div className="min-w-0">
-                  <div className="text-3xl font-black tracking-tight text-slate-900">Payout Details</div>
-                  <div className="mt-1 text-sm font-semibold text-slate-600">Beneficiary &amp; Bank Information</div>
-                </div>
-              </div>
-              <div className="shrink-0 text-sm font-semibold text-slate-900">Date: {formattedDate}</div>
-            </div>
-
-            <div className="mt-6 h-px bg-slate-200" />
-
-            <div className="mt-6 grid grid-cols-1 gap-6 lg:grid-cols-[1fr,240px] lg:items-start">
-              <div className="min-w-0">
-                <div className="flex flex-wrap items-baseline gap-3">
-                  <div className="text-3xl font-black tracking-tight text-slate-900">{form.user_name || '-'}</div>
-                  <div className="text-sm font-bold text-green-600">Insighter</div>
-                  <span className="rounded-full bg-slate-50 px-2 py-0.5 text-[11px] font-semibold text-slate-700 ring-1 ring-slate-200">
-                    {normalizeText(form.status) ? normalizeText(form.status) : 'unknown'}
-                  </span>
-                </div>
-
-                <div className="mt-3 flex items-center gap-2 text-sm font-semibold text-slate-900">
-                  <IconAt size={18} className="text-slate-900/70" />
-                  <span className="break-all">{form.user_email || '-'}</span>
-                </div>
-              </div>
-
-              <div className="rounded-2xl border border-slate-200 bg-white p-6">
-                <div className="text-4xl font-black tracking-tight text-slate-900">{formatCurrency(form.user_balance)}</div>
-                <div className="mt-2 text-sm font-bold text-slate-900/90">Dues</div>
-              </div>
-            </div>
-
-            <div className="mt-6 space-y-6">
-              <DetailsSection title="Beneficiary Information" icon={<IconUser size={20} />}>
-                <DetailsRow label="Account Name" value={form.account_name || '-'} />
-                <DetailsRow label="Country of Residence" value={form.account_country?.name || '-'} />
-                {normalizeText(form.account_address) ? <DetailsRow label="Billing Address" value={form.account_address || '-'} /> : null}
-                <DetailsRow label="Phone Number" value={formatPhone(form.account_phone_code, form.account_phone)} />
-              </DetailsSection>
-
-              <DetailsSection title="Bank Information" icon={<IconBuildingBank size={20} />}>
-                <DetailsRow label="Bank Name" value={form.bank_name || '-'} />
-                <DetailsRow label="Bank Country" value={form.bank_country?.name || '-'} />
-                {normalizeText(form.bank_address) ? <DetailsRow label="Bank Address" value={form.bank_address || '-'} /> : null}
-                <DetailsRow label="IBAN Number" value={form.bank_iban || '-'} />
-                <DetailsRow label="SWIFT Code" value={form.bank_swift_code || '-'} />
-              </DetailsSection>
-            </div>
-          </div>
-        )}
+      <div className="mt-4 flex flex-wrap gap-2 border-b border-slate-200 pb-2">
+        <button
+          type="button"
+          onClick={() => setActiveTab('form')}
+          className={[
+            'inline-flex h-8 items-center rounded-md border px-3 text-xs font-medium shadow-sm',
+            activeTab === 'form'
+              ? 'border-blue-600 bg-blue-600 text-white'
+              : 'border-slate-200 bg-white text-slate-700 hover:bg-slate-50',
+          ].join(' ')}
+        >
+          Transfer Form
+        </button>
+        <button
+          type="button"
+          onClick={() => setActiveTab('receipts')}
+          className={[
+            'inline-flex h-8 items-center rounded-md border px-3 text-xs font-medium shadow-sm',
+            activeTab === 'receipts'
+              ? 'border-blue-600 bg-blue-600 text-white'
+              : 'border-slate-200 bg-white text-slate-700 hover:bg-slate-50',
+          ].join(' ')}
+        >
+          Reciepts List
+        </button>
       </div>
+
+      {activeTab === 'form' ? (
+        <div className="mt-4 rounded-md border border-slate-200 bg-white p-4 shadow-sm">
+          {isLoading ? (
+            <div className="py-10 text-center text-xs text-slate-500">Loading...</div>
+          ) : error ? (
+            <div className="py-10 text-center text-xs text-red-600">{error}</div>
+          ) : !form ? (
+            <div className="py-10 text-center text-xs text-slate-500">No transfer form found.</div>
+          ) : (
+            <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8">
+              <div className="flex items-start justify-between gap-6">
+                <div className="flex min-w-0 items-start gap-4">
+                  <img
+                    src="https://app.insightabusiness.com/assets/media/logos/custom-2.svg"
+                    alt="Insighta"
+                    className="h-11 w-11 shrink-0"
+                  />
+                  <div className="min-w-0">
+                    <div className="text-3xl font-black tracking-tight text-slate-900">Payout Details</div>
+                    <div className="mt-1 text-sm font-semibold text-slate-600">Beneficiary &amp; Bank Information</div>
+                  </div>
+                </div>
+                <div className="shrink-0 text-sm font-semibold text-slate-900">Date: {formattedDate}</div>
+              </div>
+
+              <div className="mt-6 h-px bg-slate-200" />
+
+              <div className="mt-6 grid grid-cols-1 gap-6 lg:grid-cols-[1fr,240px] lg:items-start">
+                <div className="min-w-0">
+                  <div className="flex flex-wrap items-baseline gap-3">
+                    <div className="text-3xl font-black tracking-tight text-slate-900">{form.user_name || '-'}</div>
+                    <div className="text-sm font-bold text-green-600">Insighter</div>
+                    <span className="rounded-full bg-slate-50 px-2 py-0.5 text-[11px] font-semibold text-slate-700 ring-1 ring-slate-200">
+                      {normalizeText(form.status) ? normalizeText(form.status) : 'unknown'}
+                    </span>
+                  </div>
+
+                  <div className="mt-3 flex items-center gap-2 text-sm font-semibold text-slate-900">
+                    <IconAt size={18} className="text-slate-900/70" />
+                    <span className="break-all">{form.user_email || '-'}</span>
+                  </div>
+                </div>
+
+                <div className="rounded-2xl border border-slate-200 bg-white p-6">
+                  <div className="text-4xl font-black tracking-tight text-slate-900">
+                    {formatCurrency(form.user_balance)}
+                  </div>
+                  <div className="mt-2 text-sm font-bold text-slate-900/90">Dues</div>
+                </div>
+              </div>
+
+              <div className="mt-6 space-y-6">
+                <DetailsSection title="Beneficiary Information" icon={<IconUser size={20} />}>
+                  <DetailsRow label="Account Name" value={form.account_name || '-'} />
+                  <DetailsRow label="Country of Residence" value={form.account_country?.name || '-'} />
+                  {normalizeText(form.account_address) ? (
+                    <DetailsRow label="Billing Address" value={form.account_address || '-'} />
+                  ) : null}
+                  <DetailsRow label="Phone Number" value={formatPhone(form.account_phone_code, form.account_phone)} />
+                </DetailsSection>
+
+                <DetailsSection title="Bank Information" icon={<IconBuildingBank size={20} />}>
+                  <DetailsRow label="Bank Name" value={form.bank_name || '-'} />
+                  <DetailsRow label="Bank Country" value={form.bank_country?.name || '-'} />
+                  {normalizeText(form.bank_address) ? <DetailsRow label="Bank Address" value={form.bank_address || '-'} /> : null}
+                  <DetailsRow label="IBAN Number" value={form.bank_iban || '-'} />
+                  <DetailsRow label="SWIFT Code" value={form.bank_swift_code || '-'} />
+                </DetailsSection>
+              </div>
+            </div>
+          )}
+        </div>
+      ) : (
+        <ReceiptsListTab insighterId={insighterId} locale={locale} refreshKey={receiptsRefreshKey} />
+      )}
 
       <SendEmailModal
         isOpen={emailModalOpen}
@@ -508,6 +632,14 @@ export default function TransferFormTab({ insighterId }: { insighterId: string }
         isSending={sendingEmail}
         onClose={() => setEmailModalOpen(false)}
         onSend={onSendEmail}
+      />
+
+      <RecordReceiptModal
+        isOpen={receiptModalOpen}
+        isSaving={savingReceipt}
+        error={receiptError}
+        onClose={() => setReceiptModalOpen(false)}
+        onSave={onSaveReceipt}
       />
     </div>
   );

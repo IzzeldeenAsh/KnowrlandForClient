@@ -599,6 +599,7 @@ export default function TransactionsTab() {
         tx.order?.service,
         tx.order?.user?.name,
         tx.order?.user?.email,
+        tx.order?.user?.type,
         tx.insighter?.name,
       ]
         .map((v) => String(v ?? ''))
@@ -718,11 +719,7 @@ export default function TransactionsTab() {
               />
             </div>
 
-            <select value={perPage} onChange={(e) => setPerPage(Number(e.target.value))} className={INPUT_CLASS}>
-              <option value={10}>10 / page</option>
-              <option value={25}>25 / page</option>
-              <option value={50}>50 / page</option>
-            </select>
+          
           </div>
         </div>
 
@@ -731,12 +728,12 @@ export default function TransactionsTab() {
             <thead className="bg-slate-50 text-[11px] font-semibold uppercase text-slate-500">
               <tr>
                 <th className="w-[190px] border-b border-slate-200 px-3 py-2 text-left">Service</th>
-                <th className="w-[160px] border-b border-slate-200 px-3 py-2 text-left">Order</th>
+                <th className="w-[180px] border-b border-slate-200 px-3 py-2 text-left">Order</th>
                 <th className="w-[180px] border-b border-slate-200 px-3 py-2 text-left">Date</th>
                 <th className="w-[140px] border-b border-slate-200 px-3 py-2 text-left">Transaction</th>
                 <th className="w-[200px] border-b border-slate-200 px-3 py-2 text-left">Order Service</th>
                 <th className="w-[200px] border-b border-slate-200 px-3 py-2 text-left">Amount</th>
-                <th className="w-[120px] border-b border-slate-200 px-3 py-2 text-right">Details</th>
+                <th className="w-[100px] border-b border-slate-200 px-3 py-2 text-right">Details</th>
               </tr>
             </thead>
             <tbody>
@@ -764,6 +761,7 @@ export default function TransactionsTab() {
                   const net = Number.parseFloat(normalizeText(tx.net_amount) || '0');
                   const serviceLabel = getTransactionTypeLabel(tx.type);
                   const typeKey = normalizeText(tx.type_key) || normalizeText(tx.type);
+                  const userType = normalizeText(tx.order?.user?.type);
                   return (
                     <tr key={`${tx.date}-${idx}`} className="odd:bg-white even:bg-slate-50/50">
                       <td className="border-b border-slate-100 px-3 py-2">
@@ -773,7 +771,20 @@ export default function TransactionsTab() {
                         </div>
                       </td>
                       <td className="border-b border-slate-100 px-3 py-2">
-                        {tx.order?.order_no ? <span className="font-semibold text-blue-700">#{tx.order.order_no}</span> : <span className="text-slate-500">N/A</span>}
+                        <div className="flex flex-col gap-1">
+                          <div className="flex flex-wrap items-center gap-1">
+                            {tx.order?.order_no ? (
+                              <span className="font-semibold text-blue-700">#{tx.order.order_no}</span>
+                            ) : (
+                              <span className="text-slate-500">N/A</span>
+                            )}
+                            {userType ? (
+                              <span className="rounded-full bg-purple-50 px-2 py-0.5 text-[10px] font-semibold text-purple-700 ring-1 ring-purple-200">
+                                {toTitle(userType)}
+                              </span>
+                            ) : null}
+                          </div>
+                        </div>
                       </td>
                       <td className="border-b border-slate-100 px-3 py-2">{formatDate(tx.date)}</td>
                       <td className="border-b border-slate-100 px-3 py-2">

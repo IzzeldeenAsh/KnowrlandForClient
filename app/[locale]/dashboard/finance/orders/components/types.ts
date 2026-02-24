@@ -30,6 +30,16 @@ export type FulfillmentUser = {
   profile_photo_url: string | null;
 };
 
+export type CustomerUser = {
+  name: string;
+  email: string;
+  first_name?: string;
+  last_name?: string;
+  type?: string;
+  profile_photo_url?: string | null;
+  roles?: string[];
+};
+
 export type FulfillmentAttempt = {
   user: FulfillmentUser;
   step: string;
@@ -41,6 +51,7 @@ export type FulfillmentAttempt = {
 
 export type OrderRecord = {
   uuid: string;
+  user?: CustomerUser;
   amount: number;
   service: string;
   currency: string;
@@ -65,4 +76,3 @@ export type OrdersResponse = {
   data: OrderRecord[];
   meta: OrderMeta;
 };
-

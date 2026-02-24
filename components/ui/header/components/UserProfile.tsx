@@ -31,6 +31,11 @@ export function UserProfile({ isHome }: { isHome: boolean }) {
   const { user, roles, isLoading, isAuthResolved, handleSignOut } = useUserProfile();
   const pathname = usePathname();
   const isRtl = pathname.startsWith("/ar");
+  const isWhatsAppMissing = String(user?.whatsapp_number ?? "").trim().length === 0;
+  const promoCardSrc = isRtl
+    ? "https://res.cloudinary.com/dsiku9ipv/image/upload/v1771682845/promo-ar-card_nwfawc.png"
+    : "https://res.cloudinary.com/dsiku9ipv/image/upload/v1771682838/promo-en-card_cgilcv.png";
+  const promoCardAlt = isRtl ? "أضف رقم واتساب" : "Add WhatsApp number";
   const canHaveDrafts =
     roles.includes("insighter") ||
     roles.includes("company") ||
@@ -560,6 +565,22 @@ export function UserProfile({ isHome }: { isHome: boolean }) {
               )}
              
             <div className="border-t border-slate-100">
+              {isWhatsAppMissing && (
+                <Link
+                  href={`https://app.insightabusiness.com/app/insighter-dashboard/account-settings/notification-settings`}
+                  className="block px-4 pt-3 pb-2"
+                  onClick={() => setMenuOpen(false)}
+                >
+                  <Image
+                    src={promoCardSrc}
+                    alt={promoCardAlt}
+                    width={800}
+                    height={300}
+                    quality={100}
+                    className="w-full h-auto rounded-md"
+                  />
+                </Link>
+              )}
               
               <button
                 onClick={() => {
