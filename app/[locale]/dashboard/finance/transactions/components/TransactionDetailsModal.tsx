@@ -89,6 +89,7 @@ export default function TransactionDetailsModal({
   const typeLabel = getTransactionTypeLabel(normalizeText(transaction.type));
   const fee = Number.parseFloat(normalizeText(transaction.provider_fee) || '0');
   const net = Number.parseFloat(normalizeText(transaction.net_amount) || '0');
+  const customerType = normalizeText(transaction.order?.user?.type);
 
   return (
     <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-slate-900/40 px-4 py-8">
@@ -198,6 +199,11 @@ export default function TransactionDetailsModal({
                   <div className="truncate text-sm font-semibold text-slate-900">{transaction.order.user.name}</div>
                   <div className="truncate text-xs text-slate-500">{transaction.order.user.email}</div>
                   <div className="mt-1 flex flex-wrap gap-1">
+                    {customerType ? (
+                      <span className="rounded-full bg-purple-50 px-2 py-0.5 text-[10px] font-semibold text-purple-700 ring-1 ring-purple-200">
+                        {toTitle(customerType)}
+                      </span>
+                    ) : null}
                     {transaction.order.user.roles?.map((role) => (
                       <span
                         key={role}
@@ -331,4 +337,3 @@ export default function TransactionDetailsModal({
     </div>
   );
 }
-
