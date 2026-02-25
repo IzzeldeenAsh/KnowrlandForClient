@@ -360,7 +360,7 @@ export default function Features() {
                 <div className="relative flex items-center justify-center" style={{ width: '100%', height: '500px', overflow: 'hidden' }}>
                     <Image
                       className={`w-full rounded-[inherit] transition-all duration-700 ease-in-out absolute inset-0 my-auto ${(hoveredTab2 ?? selectedTab2 ?? activeTab2) === 1 ? 'opacity-100' : 'opacity-0'}`}
-                      src={'https://res.cloudinary.com/dsiku9ipv/image/upload/v1747832518/Group_13495_kf7osl.png'}
+                      src={locale === 'ar' ? 'https://res.cloudinary.com/dsiku9ipv/image/upload/v1772010010/Group_13568_qf2shg.png' : 'https://res.cloudinary.com/dsiku9ipv/image/upload/v1772010010/Group_13566_n7e7p4.png'}
                         width={500}
                       height={500}
                       alt="Feature 1 - Image 1"
@@ -388,7 +388,7 @@ export default function Features() {
                 </figure> */}
                     <Image
                       className={`w-full rounded-[inherit] transition-all duration-700 ease-in-out absolute inset-0 ${(hoveredTab2 ?? selectedTab2 ?? activeTab2) === 2 ? 'opacity-100' : 'opacity-0'}`}
-                      src={'https://res.cloudinary.com/dsiku9ipv/image/upload/v1748025536/New_Project_11_xenv7c.png'}
+                      src={locale === 'ar' ? 'https://res.cloudinary.com/dsiku9ipv/image/upload/v1772011099/Group_13570_x4x0dv.png' : 'https://res.cloudinary.com/dsiku9ipv/image/upload/v1772011112/Group_13571_laoslk.png'}
                       width={500}
                       height={500}
                       alt="Feature 1 - Image 2"
@@ -397,7 +397,7 @@ export default function Features() {
                     
                     <Image
                       className={`w-full rounded-[inherit] transition-all duration-700 ease-in-out absolute inset-0 ${(hoveredTab2 ?? selectedTab2 ?? activeTab2) === 3 ? 'opacity-100' : 'opacity-0'}`}
-                      src={isRTL ? '/images/Sh-7.png' : 'https://res.cloudinary.com/dsiku9ipv/image/upload/v1747832518/Group_13495_kf7osl.png'}
+                      src={isRTL ? '/images/Sh-7.png' : 'https://res.cloudinary.com/dsiku9ipv/image/upload/v1748086835/Group_13447_1_ypvuj8.png'}
                       width={500}
                       height={500}
                       alt="Feature 1 - Image 3"
@@ -530,7 +530,7 @@ export default function Features() {
                 <figure className=" rounded-3xl p-px mb-8 overflow-hidden mt-10 w-[800px]  mx-auto">
                   <Image
                     className="w-full rounded-[inherit]"
-                    src="https://res.cloudinary.com/dsiku9ipv/image/upload/v1748087733/Group_13523_1_nk8pqq.png"
+                    src={locale === 'ar' ? 'https://res.cloudinary.com/dsiku9ipv/image/upload/v1772013233/Group_13523_1_qoxiri.png' : 'https://res.cloudinary.com/dsiku9ipv/image/upload/v1772013233/Group_13523_1_qoxiri.png'}
                     width={800}
                     height={800}
                     alt="Pay for what you need"

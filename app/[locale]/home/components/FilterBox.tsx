@@ -1107,7 +1107,14 @@ const FilterBox: React.FC<FilterBoxProps> = React.memo(({
 
   // Filter content component
   const FilterContent = () => (
-    <div className={`${shouldUseDrawer ? '' : 'bg-gray-50  border border-gray-200  w-full max-w-xs min-w-[350px] h-[100vh]'}`} dir={locale === 'ar' ? 'rtl' : 'ltr'}>
+    <div
+      className={`${
+        shouldUseDrawer
+          ? ''
+          : 'bg-gray-50 border border-gray-200 w-full max-w-xs min-w-[350px] h-[100vh] flex flex-col overflow-hidden'
+      }`}
+      dir={locale === 'ar' ? 'rtl' : 'ltr'}
+    >
       {/* Top Bar */}
       <div className="flex items-center justify-between px-4 pt-4 pb-2 border-b border-gray-200">
         <h2 className="text-base font-semibold text-gray-800">{locale === 'ar' ? 'الفلاتر' : 'Filters'}</h2>
@@ -1122,7 +1129,7 @@ const FilterBox: React.FC<FilterBoxProps> = React.memo(({
         </div>
       </div>
 
-      <div className="p-4 space-y-3">
+      <div className={`${shouldUseDrawer ? 'p-4 space-y-3' : 'flex-1 overflow-y-auto p-4 space-y-3 pb-32'}`}>
         {/* Price Types Section */}
         {searchType !== 'insighter' && (
           <div className="rounded-lg border border-gray-200 overflow-hidden bg-white" data-debug={`Price section visible for ${searchType}`}>
