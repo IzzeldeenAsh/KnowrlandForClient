@@ -8,6 +8,15 @@ export default function ConditionalAuthBanner() {
   const { user, isLoading, isAuthResolved } = useUserProfile();
   const pathname = usePathname();
   
+  // Hide on Home page (it has its own UX and layout)
+  const pathSegments = pathname.split('/').filter(Boolean);
+  const isHomePage =
+    (pathSegments.length === 1 && pathSegments[0] === 'home') ||
+    (pathSegments.length === 2 && pathSegments[1] === 'home');
+  if (isHomePage) {
+    return null;
+  }
+
   // Hide on callback routes to keep a clean full-screen loader
   if (pathname.includes('/callback')) {
     return null;
