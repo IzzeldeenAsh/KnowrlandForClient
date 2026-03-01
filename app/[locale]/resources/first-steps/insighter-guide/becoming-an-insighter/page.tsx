@@ -1,3 +1,5 @@
+import { InsighterGuideHero } from '../_components/InsighterGuideHero'
+
 export default async function BecomingAnInsighterGuidePage({
   params,
 }: {
@@ -5,9 +7,9 @@ export default async function BecomingAnInsighterGuidePage({
 }) {
   const resolvedParams = await params
   const locale = resolvedParams.locale
-  const isRTL = locale === 'ar'
+  const isRTL = locale === 'ar' || locale.startsWith('ar-')
   const listPad = isRTL ? 'pr-6' : 'pl-6'
-  const t = (en: string, ar: string) => (locale === 'ar' ? ar : en)
+  const t = (en: string, ar: string) => (isRTL ? ar : en)
 
   const startFrom = [
     t('Home page → Become an Insighter', 'الصفحة الرئيسية → كن خبيرًا (Become an Insighter)'),
@@ -21,66 +23,52 @@ export default async function BecomingAnInsighterGuidePage({
   ]
 
   return (
-    <div
-      className={`mx-auto max-w-5xl px-4 sm:px-6 py-10 ${isRTL ? 'text-right' : 'text-left'}`}
-      dir={isRTL ? 'rtl' : 'ltr'}
-    >
-      <nav className={`mb-6 text-xs md:text-sm ps-6 md:ps-0 ${isRTL ? 'text-right' : 'text-left'}`} aria-label="Breadcrumb">
-        <ol className="flex items-center gap-2 text-gray-700/80 flex-wrap">
-          <li>
-            <a
-              href={`/${locale}/resources/first-steps`}
-              className="hover:text-gray-900 transition-colors"
-            >
-              {t('First Steps', 'الخطوات الأولى')}
-            </a>
-          </li>
-          <li>
-            <span className="text-gray-400">/</span>
-          </li>
-          <li>
-            <a
-              href={`/${locale}/resources/first-steps/insighter-guide`}
-              className="hover:text-gray-900 transition-colors"
-            >
-              {t('Insighter Guide', 'دليل الخبير')}
-            </a>
-          </li>
-          <li>
-            <span className="text-gray-400">/</span>
-          </li>
-          <li className="text-gray-900 font-bold" aria-current="page">
-            {t('Becoming an Insighter', 'كيف تصبح خبيرًا')}
-          </li>
-        </ol>
-      </nav>
+    <div className="relative min-h-screen" dir={isRTL ? 'rtl' : 'ltr'}>
+      <div className="relative overflow-hidden pb-16">
+        {/* Breadcrumbs + Hero Title Section (with bg + overlay) */}
+        <InsighterGuideHero
+          isRTL={isRTL}
+          breadcrumbs={[
+            { label: t('First Steps', 'الخطوات الأولى'), href: `/${locale}/resources/first-steps` },
+            { label: t('Insighter Guide', 'دليل الخبير'), href: `/${locale}/resources/first-steps/insighter-guide` },
+            { label: t('Becoming an Insighter', 'كيف تصبح خبيرًا') },
+          ]}
+          title={t('Becoming an Insighter', 'كيف تصبح خبيرًا على Insighta؟')}
+          subtitle={t('Start Your Journey', 'ابدأ رحلتك')}
+        />
 
-      <h1 className="text-2xl md:text-3xl font-bold text-gray-900">
-        {t('Becoming an Insighter', 'كيف تصبح خبيرًا على Insighta؟')}
-      </h1>
+        <div className="relative z-10 mx-auto max-w-7xl px-4 sm:px-6">
+          <div className={`max-w-5xl px-8 sm:px-16 ${isRTL ? 'text-right' : 'text-left'}`}>
+            <h2 className="mt-8 text-lg md:text-xl font-semibold text-gray-900">
+              {t('How to Become an Insighter', 'طرق الترقية إلى خبير')}
+            </h2>
+            <p className="mt-3 text-gray-700">
+              {t('You can start the Insighter registration from:', 'يمكنك بدء التسجيل كخبير من أي من الطرق التالية:')}
+            </p>
+            <ul className={`mt-3 space-y-2 list-disc ${listPad} text-gray-700`}>
+              {startFrom.map((item) => (
+                <li key={item}>{item}</li>
+              ))}
+            </ul>
 
-      <h2 className="mt-8 text-lg md:text-xl font-semibold text-gray-900">
-        {t('How to Become an Insighter', 'طرق الترقية إلى خبير')}
-      </h2>
-      <p className="mt-3 text-gray-700">{t('You can start the Insighter registration from:', 'يمكنك بدء التسجيل كخبير من أي من الطرق التالية:')}</p>
-      <ul className={`mt-3 space-y-2 list-disc ${listPad} text-gray-700`}>
-        {startFrom.map((item) => (
-          <li key={item}>{item}</li>
-        ))}
-      </ul>
+            <h2 className="mt-10 text-lg md:text-xl font-semibold text-gray-900">
+              {t('Choose Your Insighter Type', 'اختيار نوع حساب الخبير')}
+            </h2>
+            <p className="mt-3 text-gray-700">
+              {t('During registration, choose one of the following:', 'أثناء التسجيل، اختر أحد الخيارين:')}
+            </p>
+            <ul className={`mt-3 space-y-2 list-disc ${listPad} text-gray-700`}>
+              {types.map((item) => (
+                <li key={item}>{item}</li>
+              ))}
+            </ul>
 
-      <h2 className="mt-10 text-lg md:text-xl font-semibold text-gray-900">
-        {t('Choose Your Insighter Type', 'اختيار نوع حساب الخبير')}
-      </h2>
-      <p className="mt-3 text-gray-700">{t('During registration, choose one of the following:', 'أثناء التسجيل، اختر أحد الخيارين:')}</p>
-      <ul className={`mt-3 space-y-2 list-disc ${listPad} text-gray-700`}>
-        {types.map((item) => (
-          <li key={item}>{item}</li>
-        ))}
-      </ul>
-
-      <p className="mt-6 text-gray-700">{t('Once completed, your Insighter Dashboard becomes available.', 'بعد الإكمال، ستصبح لوحة تحكم الخبير متاحة لك.')}</p>
+            <p className="mt-6 text-gray-700">
+              {t('Once completed, your Insighter Dashboard becomes available.', 'بعد الإكمال، ستصبح لوحة تحكم الخبير متاحة لك.')}
+            </p>
+          </div>
+        </div>
+      </div>
     </div>
   )
 }
-

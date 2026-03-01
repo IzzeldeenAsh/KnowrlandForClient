@@ -95,11 +95,10 @@ export default async function GettingStartedPage({ params }: { params: Promise<{
             </p>
 
             <div className="mt-6 grid gap-4 md:gap-6 md:grid-cols-2">
-              <a
+              {/* <a
                 href={`/${locale}/resources/first-steps/client-guide/what-is-insighta`}
                 className="group relative overflow-hidden rounded-md border border-gray-200 bg-white p-6 transition hover:border-gray-300 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
               >
-                {/* subtle glow */}
                 <div className="pointer-events-none absolute inset-0 opacity-0 transition group-hover:opacity-100">
                   <div className="absolute -top-20 -left-20 h-56 w-56 rounded-full bg-blue-500/10 blur-3xl" />
                   <div className="absolute -bottom-24 -right-24 h-64 w-64 rounded-full bg-purple-500/10 blur-3xl" />
@@ -124,7 +123,7 @@ export default async function GettingStartedPage({ params }: { params: Promise<{
                     {isRTL ? '←' : '→'}
                   </div>
                 </div>
-              </a>
+              </a> */}
 
               <a
                 href={`/${locale}/resources/first-steps/insighter-guide`}

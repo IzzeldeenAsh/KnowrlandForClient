@@ -530,7 +530,7 @@ export default function Features() {
                 <figure className=" rounded-3xl p-px mb-8 overflow-hidden mt-10 w-[800px]  mx-auto">
                   <Image
                     className="w-full rounded-[inherit]"
-                    src={locale === 'ar' ? 'https://res.cloudinary.com/dsiku9ipv/image/upload/v1772013233/Group_13523_1_qoxiri.png' : 'https://res.cloudinary.com/dsiku9ipv/image/upload/v1772013233/Group_13523_1_qoxiri.png'}
+                    src={locale === 'ar' ? 'https://res.cloudinary.com/dsiku9ipv/image/upload/v1772275373/Group_13572_a1y4o3.png' : 'https://res.cloudinary.com/dsiku9ipv/image/upload/v1772013233/Group_13523_1_qoxiri.png'}
                     width={800}
                     height={800}
                     alt="Pay for what you need"

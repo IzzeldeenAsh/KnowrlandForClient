@@ -1,4 +1,5 @@
 import type { Metadata } from 'next'
+import { InsighterGuideHero } from '../_components/InsighterGuideHero'
 
 export async function generateMetadata({
   params,
@@ -7,7 +8,7 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const resolvedParams = await params
   const locale = resolvedParams.locale
-  const isArabic = locale === 'ar'
+  const isArabic = locale === 'ar' || locale.startsWith('ar-')
 
   return {
     title: isArabic ? 'ما هو دور الخبير | إنسايتا' : 'What is an Insighter | Insighta',
@@ -24,9 +25,9 @@ export default async function WhatIsAnInsighterPage({
 }) {
   const resolvedParams = await params
   const locale = resolvedParams.locale
-  const isRTL = locale === 'ar'
+  const isRTL = locale === 'ar' || locale.startsWith('ar-')
   const listPad = isRTL ? 'pr-6' : 'pl-6'
-  const t = (en: string, ar: string) => (locale === 'ar' ? ar : en)
+  const t = (en: string, ar: string) => (isRTL ? ar : en)
 
   const capabilities = [
     t('Upload and sell documents (Insights)', 'رفع وبيع مستندات احترافية (Insights)'),
@@ -39,78 +40,20 @@ export default async function WhatIsAnInsighterPage({
 
   return (
     <div className="relative min-h-screen" dir={isRTL ? 'rtl' : 'ltr'}>
-      {/* Hero Section - same style as "What is Insighta" */}
       <div className="relative overflow-hidden pb-16">
         {/* Breadcrumbs + Hero Title Section (with bg + overlay) */}
-        <div className="relative overflow-hidden px-4 sm:px-12 py-8 md:py-24 mb-6 md:mb-8">
-          <div
-            className="absolute inset-0 bg-center bg-cover"
-            style={{
-              backgroundImage:
-                "url('https://images.unsplash.com/photo-1517816743773-6e0fd518b4a6?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D')",
-              transform: isRTL ? 'scaleX(-1)' : 'none',
-              transformOrigin: 'center',
-            }}
-            aria-hidden="true"
-          />
-          {/* Brighter/less dark overlay */}
-          <div className="absolute inset-0 bg-gradient-to-b from-white/30 via-white/20 to-white/20" aria-hidden="true" />
-
-          <div className="relative z-10 px-4 sm:px-12">
-            {/* Breadcrumbs */}
-            <nav className={`mb-6 text-xs md:text-sm ps-6 md:ps-0 ${isRTL ? 'text-right' : 'text-left'}`} aria-label="Breadcrumb">
-              <ol className="flex items-center gap-2 text-gray-700/80 flex-wrap">
-                <li>
-                  <a
-                    href={`/${locale}/resources/first-steps`}
-                    className="hover:text-gray-900 transition-colors"
-                  >
-                    {t('First Steps', 'الخطوات الأولى')}
-                  </a>
-                </li>
-                <li>
-                  <span className="text-gray-400">/</span>
-                </li>
-                <li>
-                  <a
-                    href={`/${locale}/resources/first-steps/insighter-guide`}
-                    className="hover:text-gray-900 transition-colors"
-                  >
-                    {t('Insighter Guide', 'دليل الخبير')}
-                  </a>
-                </li>
-                <li>
-                  <span className="text-gray-400">/</span>
-                </li>
-                <li className="text-gray-900 font-bold" aria-current="page">
-                  {t('What is an Insighter', 'ما هو دور الخبير')}
-                </li>
-              </ol>
-            </nav>
-
-            {/* Hero Title Section */}
-            <div className="text-center">
-              <div
-                className={`flex flex-col align-center justify-center gap-2 ${isRTL ? 'text-right' : 'text-left'} text-left`}
-                style={{ lineHeight: '1.3' }}
-              >
-                <h1 className="text-3xl sm:text-4xl md:text-5xl font-extrabold tracking-tight text-black">
-                  {t('What is an Insighter?', 'ما هو دور الخبير (Insighter)؟')}
-                </h1>
-                <h2
-                  className={`text-3xl sm:text-4xl md:text-5xl font-extrabold bg-clip-text text-transparent ${
-                    isRTL ? 'bg-gradient-to-l from-blue-800 to-teal-600' : 'bg-gradient-to-r from-blue-500 to-teal-400'
-                  }`}
-                >
-                  {t('Knowledge Creator & Consultant', 'منشئ معرفة ومستشار')}
-                </h2>
-              </div>
-            </div>
-          </div>
-        </div>
+        <InsighterGuideHero
+          isRTL={isRTL}
+          breadcrumbs={[
+            { label: t('First Steps', 'الخطوات الأولى'), href: `/${locale}/resources/first-steps` },
+            { label: t('Insighter Guide', 'دليل الخبير'), href: `/${locale}/resources/first-steps/insighter-guide` },
+            { label: t('What is an Insighter', 'ما هو دور الخبير') },
+          ]}
+          title={t('What is an Insighter?', 'ما هو دور الخبير (Insighter)؟')}
+          subtitle={t('Start Your Journey', 'ابدأ رحلتك')}
+        />
 
         <div className="relative z-10 mx-auto max-w-7xl px-4 sm:px-6">
-          {/* Main Content */}
           <div className={`max-w-5xl px-8 sm:px-16 space-y-6 md:space-y-8 ${isRTL ? 'text-right' : 'text-left'}`}>
             <p className="text-gray-700 text-base md:text-lg lg:text-xl leading-relaxed">
               {t(
@@ -120,9 +63,7 @@ export default async function WhatIsAnInsighterPage({
             </p>
 
             <div>
-              <h2 className="text-lg md:text-xl font-semibold text-gray-900">
-                {t('As an Insighter, you can:', 'بصفتك خبيرًا، يمكنك:')}
-              </h2>
+              <h2 className="text-lg md:text-xl font-semibold text-gray-900">{t('As an Insighter, you can:', 'بصفتك خبيرًا، يمكنك:')}</h2>
               <ul className={`mt-3 space-y-2 list-disc ${listPad} text-gray-700 text-base md:text-lg`}>
                 {capabilities.map((item) => (
                   <li key={item}>{item}</li>
@@ -139,4 +80,3 @@ export default async function WhatIsAnInsighterPage({
     </div>
   )
 }
-
