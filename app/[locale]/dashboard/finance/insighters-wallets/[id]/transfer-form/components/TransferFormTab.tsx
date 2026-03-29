@@ -138,7 +138,7 @@ function renderPrintHtml(form: TransferFormRecord): string {
       html, body { height: 100%; }
       body {
         margin: 0;
-        font-family: Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, Arial, "Noto Sans", "Liberation Sans", sans-serif;
+        font-family: Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, Arial, "Open Sans", "Liberation Sans", sans-serif;
         color: #0f172a;
         background: #f8fafc;
         -webkit-print-color-adjust: exact;

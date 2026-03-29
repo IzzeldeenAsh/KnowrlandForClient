@@ -4,7 +4,7 @@ import React, { Suspense, memo, useEffect, useMemo, useRef } from 'react';
 import { Title, Group, Pagination } from '@mantine/core';
 import Image from 'next/image';
 import { useTranslations } from 'next-intl';
-import { useSearchParams } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import dynamic from 'next/dynamic';
 import ViewModeToggle from './ViewModeToggle';
 import LoadingState from './LoadingState';
@@ -73,6 +73,7 @@ const ResultsSection: React.FC<ResultsSectionProps> = ({
 }) => {
   const t4 = useTranslations('Features4');
   const isRtl = locale === 'ar';
+  const router = useRouter();
   const searchParams = useSearchParams();
   const keywordFromUrl = (searchParams.get('keyword') || '').trim();
   const hasKeyword = ((searchQuery || '').trim() || keywordFromUrl).length > 0;
@@ -137,22 +138,44 @@ const ResultsSection: React.FC<ResultsSectionProps> = ({
   // Empty state component 
   const EmptyState = () => (
     <div className="flex flex-col items-center justify-center py-16">
-      <Image
-        src="/images/Search-Not-Found.svg"
+    
+     
+      <div className="mt-8 w-full max-w-xl rounded-2xl border border-blue-100 bg-gradient-to-r from-blue-50 to-indigo-50 px-6 py-5 shadow-sm">
+        <div className="flex justify-center">
+        <Image
+        src="https://res.cloudinary.com/dsiku9ipv/image/upload/v1774427007/Artboard_1_rvtktk.png"
         alt="No search results found"
-        width={350}
-        height={350}
+        width={200}
+        height={200}
         className="mb-4"
       />
-      <h3 className="text-lg font-medium text-gray-900 mb-2">
-        {locale === 'ar' ? 'لم يتم العثور على نتائج' : 'No results found'}
-      </h3>
-      <p className="text-gray-500 text-center max-w-md">
-        {locale === 'ar' ? 
-          'حاول تعديل البحث أو تغيير الفلاتر للعثور على المزيد من النتائج.' : 
-          'Try adjusting your search or changing the filters to find more results.'
-        }
-      </p>
+     
+        </div>
+        <p className="text-base font-semibold text-gray-900 text-center">
+        
+          {locale === 'ar'
+            ? 'يبدو أننا لا نملك ما كنت تبحث عنه'
+            : "it seems we still don't have what you searched about"}
+        </p>
+        <p className="mt-1 text-sm text-gray-700 text-center">
+          {locale === 'ar'
+            ? 'اطلب رؤية من الخبراء المختصين.'
+            : 'Request your custom insight from our Insighters (Experts).'}
+        </p>
+        <div className="mt-4 flex justify-center">
+          <button
+            type="button"
+            onClick={() => router.push(`/${locale}/project`)}
+            className="inline-flex items-center justify-center gap-2 rounded-xl bg-[#1c64f2] px-6 py-3 text-sm font-semibold text-white shadow-sm hover:bg-[#1a56db] focus:outline-none focus:ring-2 focus:ring-[#1c64f2] focus:ring-offset-2"
+          >
+            {locale === 'ar' ? 'ابدأ مشروعاً' : 'Start a Project'}
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+              <path d="M5 12H19" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+              <path d="M12 5L19 12L12 19" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+            </svg>
+          </button>
+        </div>
+      </div>
     </div>
   );
   

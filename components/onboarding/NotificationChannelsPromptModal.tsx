@@ -17,7 +17,7 @@ const PENDING_KEY = 'postSignupPrompt:addChannels:pending';
 const PROMPT_IMAGE_URL_AR =
   'https://res.cloudinary.com/dsiku9ipv/image/upload/v1771674434/whatsapp_arabic_wl2vnp.png';
 const PROMPT_IMAGE_URL_EN =
-  'https://res.cloudinary.com/dsiku9ipv/image/upload/v1771671938/418842237_70d13ee0-5e30-4521-8a99-057840ea5113_actgrf.png';
+  'https://res.cloudinary.com/dsiku9ipv/image/upload/v1774703126/418842237_70d13ee0-5e30-4521-8a99-057840ea5113_cmhjeq.webp';
 
 export default function NotificationChannelsPromptModal({ locale }: NotificationChannelsPromptModalProps) {
   const router = useRouter();

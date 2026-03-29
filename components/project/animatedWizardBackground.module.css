@@ -1,0 +1,159 @@
+.root {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+  isolation: isolate;
+  contain: paint;
+}
+
+/* Base background (static) */
+.base {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(1200px 700px at 50% 15%, rgba(255, 255, 255, 1), rgba(240, 247, 255, 1) 55%, rgba(255, 255, 255, 1) 100%),
+    linear-gradient(180deg, rgba(255, 255, 255, 1), rgba(248, 251, 255, 1));
+}
+
+/* Big blurred animated gradient "wash" (from scratch) */
+.wash {
+  position: absolute;
+  inset: -45%;
+  background-image:
+    radial-gradient(closest-side at 12% 22%, rgba(28, 124, 187, 0.9), transparent 62%),
+    radial-gradient(closest-side at 88% 18%, rgba(99, 102, 241, 0.78), transparent 62%),
+    radial-gradient(closest-side at 68% 88%, rgba(20, 186, 106, 0.72), transparent 62%),
+    radial-gradient(closest-side at 18% 86%, rgba(34, 211, 238, 0.76), transparent 62%),
+    radial-gradient(closest-side at 55% 55%, rgba(236, 72, 153, 0.5), transparent 62%);
+  background-size: 220% 220%;
+  filter: blur(34px) saturate(2.6) contrast(1.12);
+  opacity: 0.85;
+  mix-blend-mode: multiply;
+  transform: translate3d(0, 0, 0) scale(1.1);
+  animation: washMove 2s ease-in-out infinite alternate;
+  will-change: transform;
+  backface-visibility: hidden;
+}
+
+.washTwo {
+  position: absolute;
+  inset: -50%;
+  background-image:
+    radial-gradient(closest-side at 22% 35%, rgba(59, 130, 246, 0.8), transparent 62%),
+    radial-gradient(closest-side at 72% 30%, rgba(168, 85, 247, 0.74), transparent 62%),
+    radial-gradient(closest-side at 50% 85%, rgba(14, 165, 233, 0.74), transparent 62%);
+  background-size: 240% 240%;
+  filter: blur(40px) saturate(2.7) contrast(1.1);
+  opacity: 0.8;
+  mix-blend-mode: multiply;
+  transform: translate3d(0, 0, 0) scale(1.08);
+  animation: washMoveTwo 1.8s ease-in-out infinite alternate;
+  will-change: transform;
+  backface-visibility: hidden;
+}
+
+.blob {
+  position: absolute;
+  width: 72vmax;
+  height: 72vmax;
+  border-radius: 9999px;
+  filter: blur(86px) saturate(2.6);
+  opacity: 0.55;
+  mix-blend-mode: multiply;
+  transform: translate3d(0, 0, 0);
+  will-change: transform;
+  backface-visibility: hidden;
+}
+
+.blobOne {
+  top: -30vmax;
+  left: -20vmax;
+  background: radial-gradient(circle at 30% 30%, rgba(28, 124, 187, 1), transparent 60%);
+  animation: blobOne 9s ease-in-out infinite alternate;
+}
+
+.blobTwo {
+  bottom: -32vmax;
+  right: -22vmax;
+  background: radial-gradient(circle at 30% 30%, rgba(20, 186, 106, 1), transparent 60%);
+  animation: blobTwo 10s ease-in-out infinite alternate;
+}
+
+.blobThree {
+  top: 18%;
+  right: -18vmax;
+  background: radial-gradient(circle at 30% 30%, rgba(99, 102, 241, 0.95), transparent 60%);
+  animation: blobThree 11s ease-in-out infinite alternate;
+}
+
+.blobFour {
+  bottom: -28vmax;
+  left: 15%;
+  background: radial-gradient(circle at 30% 30%, rgba(236, 72, 153, 0.9), transparent 60%);
+  animation: blobFour 12s ease-in-out infinite alternate;
+}
+
+/* Keeps the center readable while still showing motion */
+.centerFade {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(760px 460px at 50% 38%, rgba(255, 255, 255, 0.92), rgba(255, 255, 255, 0.62) 62%, rgba(255, 255, 255, 0.16) 100%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.55), rgba(255, 255, 255, 0.35));
+  backface-visibility: hidden;
+}
+
+@keyframes washMove {
+  0% {
+    transform: translate3d(-10%, -7%, 0) scale(1.2) rotate(-3deg);
+  }
+  100% {
+    transform: translate3d(10%, 7%, 0) scale(1.28) rotate(3deg);
+  }
+}
+
+@keyframes washMoveTwo {
+  0% {
+    transform: translate3d(9%, -9%, 0) scale(1.18) rotate(2deg);
+  }
+  100% {
+    transform: translate3d(-9%, 9%, 0) scale(1.26) rotate(-2deg);
+  }
+}
+
+@keyframes blobOne {
+  0% {
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+  100% {
+    transform: translate3d(30vmin, 18vmin, 0) scale(1.25);
+  }
+}
+
+@keyframes blobTwo {
+  0% {
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+  100% {
+    transform: translate3d(-34vmin, -22vmin, 0) scale(1.28);
+  }
+}
+
+@keyframes blobThree {
+  0% {
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+  100% {
+    transform: translate3d(-22vmin, 26vmin, 0) scale(1.22);
+  }
+}
+
+@keyframes blobFour {
+  0% {
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+  100% {
+    transform: translate3d(30vmin, -18vmin, 0) scale(1.26);
+  }
+}

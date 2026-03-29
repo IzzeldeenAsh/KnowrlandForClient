@@ -2,7 +2,7 @@
 import Link from 'next/link'
 import Logo from './logo'
 import MobileMenu from './mobile-menu'
-import { useEffect, useState } from 'react'
+import { useEffect, useLayoutEffect, useRef, useState } from 'react'
 import {IconChevronDown, IconLanguage, IconSearch } from '@tabler/icons-react'
 import { HoverCard, Group, Text, Anchor, Divider, SimpleGrid, Button, TextInput } from '@mantine/core'
 import { UserProfile } from './header/components/UserProfile'
@@ -112,15 +112,25 @@ async function fetchIndustriesFromAPI(locale: string): Promise<Industry[]> {
 
 export default function Header() {
   const t = useTranslations('Header');
+  const headerShellRef = useRef<HTMLDivElement | null>(null);
   const [industries, setIndustries] = useState<Industry[]>(industriesCache.data);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [isScrolled, setIsScrolled] = useState(false);
-const { isLoading: isAppLoading, setIsLoading: setAppLoading } = useLoading();
+  const { isLoading: isAppLoading, setIsLoading: setAppLoading } = useLoading();
   const pathname = usePathname();
   const router = useRouter();
+  const ctaCycleTimerRef = useRef<number | null>(null);
+  const ctaSwapTimerRef = useRef<number | null>(null);
   const currentLocale = pathname.split('/')[1] || 'en';
+  const isArabicLocale = currentLocale === 'ar';
+  const animatedCtaWords = isArabicLocale ? ['كإنسايتر', 'كخبير'] : ['Insighter', 'Expert'];
+  const [animatedCtaWordIndex, setAnimatedCtaWordIndex] = useState(0);
+  const [isCtaWordVisible, setIsCtaWordVisible] = useState(true);
   const [returnUrl, setReturnUrl] = useState<string>('');
+  const ctaPrefix = isArabicLocale ? 'سجّل' : 'Become an';
+  const currentCtaWord = animatedCtaWords[animatedCtaWordIndex];
+  const ctaAccessibleLabel = isArabicLocale ? `سجّل ${currentCtaWord}` : `Become an ${currentCtaWord}`;
   
   // Use the centralized user profile hook
   const { user, roles, isLoading, isAuthResolved, handleSignOut } = useUserProfile();
@@ -135,19 +145,20 @@ const { isLoading: isAppLoading, setIsLoading: setAppLoading } = useLoading();
   const menuTextColorClass =  'text-white hover:text-gray-100 transition-all duration-300 ease-in-out px-3 py-2 rounded-md hover:bg-[#3B8AEF]/20';
   const searchInputStyles = {
     input: {
-      backgroundColor: isScrolled ? 'rgb(255, 255, 255)' : 'rgba(255, 255, 255, 0.1)',
-      border: isScrolled ? '1px solid rgba(255, 255, 255, 0.18)' : '1px solid rgba(255, 255, 255, 0.2)',
+      // Keep the search input dark even when scrolled to avoid a "white block" look.
+      backgroundColor: isScrolled ? 'rgba(15, 22, 41, 0.55)' : 'rgba(255, 255, 255, 0.1)',
+      border: isScrolled ? '1px solid rgba(255, 255, 255, 0.16)' : '1px solid rgba(255, 255, 255, 0.2)',
       color: 'white',
       direction: currentLocale === 'ar' ? 'rtl' : 'ltr',
       '&::placeholder': {
-        color: isScrolled ? 'rgba(255, 255, 255, 0.75)' : 'rgba(255, 255, 255, 0.6)',
+        color: isScrolled ? 'rgba(255, 255, 255, 0.65)' : 'rgba(255, 255, 255, 0.6)',
       },
       '&:focus': {
         borderColor: '#3B8AEF',
-        backgroundColor: isScrolled ? 'rgba(0, 0, 0, 0.45)' : 'rgba(255, 255, 255, 0.15)',
+        backgroundColor: isScrolled ? 'rgba(15, 22, 41, 0.7)' : 'rgba(255, 255, 255, 0.15)',
       },
       '&:hover': {
-        backgroundColor: isScrolled ? 'rgba(0, 0, 0, 0.4)' : 'rgba(255, 255, 255, 0.12)',
+        backgroundColor: isScrolled ? 'rgba(15, 22, 41, 0.65)' : 'rgba(255, 255, 255, 0.12)',
       },
     },
     section: {
@@ -173,6 +184,69 @@ const { isLoading: isAppLoading, setIsLoading: setAppLoading } = useLoading();
     setHasToken(!!getAuthToken());
     setReturnUrl(window.location.href);
   }, [pathname]);
+
+  useEffect(() => {
+    setAnimatedCtaWordIndex(0);
+    setIsCtaWordVisible(true);
+
+    if (typeof window === 'undefined' || window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      return;
+    }
+
+    const clearCtaTimers = () => {
+      if (ctaCycleTimerRef.current !== null) {
+        window.clearTimeout(ctaCycleTimerRef.current);
+        ctaCycleTimerRef.current = null;
+      }
+
+      if (ctaSwapTimerRef.current !== null) {
+        window.clearTimeout(ctaSwapTimerRef.current);
+        ctaSwapTimerRef.current = null;
+      }
+    };
+
+    const runCycle = () => {
+      setIsCtaWordVisible(false);
+
+      ctaSwapTimerRef.current = window.setTimeout(() => {
+        setAnimatedCtaWordIndex((prev) => (prev + 1) % animatedCtaWords.length);
+        setIsCtaWordVisible(true);
+      }, 300);
+
+      ctaCycleTimerRef.current = window.setTimeout(runCycle, 3000);
+    };
+
+    clearCtaTimers();
+    ctaCycleTimerRef.current = window.setTimeout(runCycle, 3000);
+
+    return () => {
+      clearCtaTimers();
+    };
+  }, [currentLocale, animatedCtaWords.length]);
+
+  useLayoutEffect(() => {
+    const update = () => {
+      const height = headerShellRef.current?.getBoundingClientRect().height || 0;
+      document.documentElement.style.setProperty(
+        '--app-header-height',
+        `${Math.ceil(height)}px`
+      );
+    };
+
+    update();
+
+    let resizeObserver: ResizeObserver | null = null;
+    if (typeof ResizeObserver !== 'undefined' && headerShellRef.current) {
+      resizeObserver = new ResizeObserver(update);
+      resizeObserver.observe(headerShellRef.current);
+    }
+
+    window.addEventListener('resize', update);
+    return () => {
+      window.removeEventListener('resize', update);
+      resizeObserver?.disconnect();
+    };
+  }, []);
 
   // Handle search input submission
   const handleSearchSubmit = (e: React.FormEvent) => {
@@ -366,7 +440,7 @@ const { isLoading: isAppLoading, setIsLoading: setAppLoading } = useLoading();
 
   return (
     <>
-      <div className="sticky top-0 z-50">
+      <div ref={headerShellRef} className="sticky top-0 z-50">
         {/* Beta Warning Bar */}
         <div className="w-full bg-gradient-to-r from-blue-500 to-cyan-500 text-white py-2 px-4 text-center text-xs md:text-lg font-medium relative z-40">
           <span>{t('beta.notice')}</span>
@@ -376,7 +450,7 @@ const { isLoading: isAppLoading, setIsLoading: setAppLoading } = useLoading();
           className={[
             'relative w-full z-30 transition-all duration-300',
             isScrolled
-              ? 'bg-[#0F1629]/20 backdrop-blur-sm border-b border-white/10 shadow-[0_12px_40px_rgba(0,0,0,0.15)]'
+              ? 'bg-[#0F1629]/95 backdrop-blur-md border-b border-white/10 shadow-[0_12px_40px_rgba(0,0,0,0.15)]'
               : 'bg-[#0F1629]'
           ].join(' ')}
         >
@@ -573,9 +647,22 @@ const { isLoading: isAppLoading, setIsLoading: setAppLoading } = useLoading();
               <li className="mx-1 md:mx-2 hidden lg:block">
                 <Link 
                   href={`https://app.insightabusiness.com/app/insighter-register/vertical`}
+                  aria-label={ctaAccessibleLabel}
                   className="font-medium text-sm text-white px-2 md:px-3 py-2 rounded-md bg-gradient-to-r from-blue-500 to-cyan-500 hover:from-blue-600 hover:to-cyan-600 transition-all duration-300 ease-in-out whitespace-nowrap"
                 >
-                  {t('becomeInsighter')}
+                  <span
+                    aria-hidden="true"
+                    dir={isArabicLocale ? 'rtl' : 'ltr'}
+                    className="inline-flex items-center"
+                  >
+                    <span style={{paddingInlineStart:'10px'}}>{ctaPrefix}</span>
+                    <span
+                      className={`insighter-word-slot ${isArabicLocale ? 'min-w-[5.5ch]' : 'min-w-[9ch]'}`}
+                    >
+                      <span className={`insighter-word ${isCtaWordVisible ? 'is-visible' : 'is-hidden'}`}>{currentCtaWord}</span>
+                    </span>
+                  </span>
+                  <span className="sr-only">{ctaAccessibleLabel}</span>
                 </Link>
               </li>
             )}

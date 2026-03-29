@@ -23,10 +23,53 @@
   width: 3px;
   background: linear-gradient(to bottom, #3B8AEF, #1C2F67);
   opacity: 0;
-  transition: all 0.3s ease-in-out;
+  transition: all 0.1s ease-in-out;
 }
 
 .industry-nav:hover::before {
   opacity: 1;
   left: 0;
+}
+
+.insighter-word-slot {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  height: 1.8em;
+  overflow: hidden;
+  padding-inline-start: 3px;
+  width: fit-content !important;
+}
+
+.insighter-word {
+  display: block;
+  text-align: center;
+  white-space: nowrap;
+  transition:
+    transform 0.3s cubic-bezier(0.33, 1, 0.36, 1),
+    opacity 0.3s ease,
+    filter 0.3s ease;
+  will-change: transform, opacity, filter;
+  text-shadow: 0 0 14px rgba(255, 255, 255, 0.18);
+  opacity: 1;
+  transform: translateY(0) scale(1);
+  filter: blur(0);
+}
+
+.insighter-word.is-hidden {
+  opacity: 0;
+  transform: translateY(-24%) scale(0.985);
+  filter: blur(6px);
+}
+
+.insighter-word.is-visible {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+  filter: blur(0);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .insighter-word {
+    transition: none;
+  }
 }

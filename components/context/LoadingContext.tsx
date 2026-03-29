@@ -100,7 +100,8 @@ export function LoadingProvider({ children }: { children: React.ReactNode }) {
 
   // Show loader either during initial load, during navigation, or when manually triggered
   const isCallbackRoute = pathname.includes('/callback');
-  const showLoader = !isCallbackRoute && (isLoading || isNavigating || isManualLoading);
+  const isProjectRoute = pathname.includes('/project');
+  const showLoader = !isCallbackRoute && !isProjectRoute && (isLoading || isNavigating || isManualLoading);
 
   return (
     <LoadingContext.Provider value={{ 

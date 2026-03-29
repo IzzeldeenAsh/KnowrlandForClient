@@ -10,6 +10,11 @@
 /* We're loading the keenicons CSS directly through a style tag in the layout */
 @import 'tailwindcss/utilities';
 
+/* Default header height to avoid layout jump before ResizeObserver runs */
+:root {
+  --app-header-height: 80px;
+}
+
 /* Additional Tailwind directives: https://tailwindcss.com/docs/functions-and-directives/#responsive */
 @layer utilities {
     .rtl {
