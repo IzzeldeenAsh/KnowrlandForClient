@@ -102,13 +102,21 @@ export default function ProjectIntro({ locale }: ProjectIntroProps) {
             <br />
             {copy.line2}
           </p>
-          <div className="mt-10 flex items-center justify-center">
+          {/* <div className="mt-10 flex items-center justify-center">
             <Link
               href={ctaHref}
               className="btn text-white bg-[#1C7CBB] hover:bg-opacity-90 active:bg-opacity-100 px-7 py-3 rounded-full shadow-[0_18px_50px_rgba(28,124,187,0.35)]"
             >
               {ctaLabel}
             </Link>
+          </div> */}
+          <div className="mt-10 flex items-center justify-center">
+            <div
+            
+              className="btn text-white bg-[#1C7CBB] hover:bg-opacity-90 active:bg-opacity-100 px-7 py-3 rounded-full shadow-[0_18px_50px_rgba(28,124,187,0.35)]"
+            >
+              {locale=='ar' ? 'قريبا' : 'Coming Soon'}
+            </div>
           </div>
         </div>
       </>

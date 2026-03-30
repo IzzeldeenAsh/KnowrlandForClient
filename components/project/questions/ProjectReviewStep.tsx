@@ -5,7 +5,6 @@ import { useEffect, useMemo, useState } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import {
-  CheckBadgeIcon,
   ClipboardDocumentListIcon,
   DocumentTextIcon,
   GlobeAltIcon,
@@ -32,18 +31,30 @@ import { projectWizardStorage, type WizardLocale } from '../wizardStorage'
 
 type Country = {
   id: number
-  name?: string
+  name?: string | { en?: string; ar?: string }
   names?: { en?: string; ar?: string }
 }
 
 type Region = {
   id: number
-  name: string
+  name?: string | { en?: string; ar?: string }
+  names?: { en?: string; ar?: string }
 }
 
 type EconomicBloc = {
   id: number
-  name: string
+  name?: string | { en?: string; ar?: string }
+  names?: { en?: string; ar?: string }
+}
+
+type LocalizedName = {
+  en?: string
+  ar?: string
+}
+
+type DisplayNameValue = {
+  name?: string | LocalizedName | null
+  names?: LocalizedName | null
 }
 
 type RequestService = {
@@ -52,16 +63,35 @@ type RequestService = {
   slug?: string
 }
 
+type ProjectRequestComponent = Record<string, unknown>
+
 type ProjectRequestData = {
   id: number
   uuid?: string
   title?: string | null
+  type?: string | null
   service?: RequestService | null
+  service_prompt?: string | null
+  phase?: string | null
+  business_type?: string | null
+  insighter_preferred_type?: string | null
+  insighter_origin?: {
+    id: number
+    name?: string | LocalizedName | null
+    names?: LocalizedName | null
+  } | null
+  insighter_min_years_experience?: number | string | null
+  insighter_max_years_experience?: number | string | null
+  company_min_team_size?: number | string | null
+  company_max_team_size?: number | string | null
+  description?: string | null
+  components?: ProjectRequestComponent[] | null
 }
 
 type ReviewRow = {
   label: string
   value: string[]
+  fileTypes?: string[]
   variant?: 'default' | 'chips'
 }
 
@@ -108,6 +138,25 @@ const sectionIcons = [
     className: 'bg-violet-50 text-violet-500',
   },
 ]
+
+const fileTypeIconMap: Record<string, string> = {
+  pdf: '/file-icons/pdf.svg',
+  doc: '/file-icons/doc.svg',
+  docx: '/file-icons/docx.svg',
+  xls: '/file-icons/xls.svg',
+  xlsx: '/file-icons/xlsx.svg',
+  ppt: '/file-icons/ppt.svg',
+  pptx: '/file-icons/pptx.svg',
+  csv: '/file-icons/csv.svg',
+  txt: '/file-icons/txt.svg',
+  zip: '/file-icons/zip.svg',
+  rar: '/file-icons/zip.svg',
+  jpg: '/file-icons/jpg.svg',
+  jpeg: '/file-icons/jpg.svg',
+  mp3: '/file-icons/mp3.svg',
+  mp4: '/file-icons/mp4.svg',
+  pub: '/file-icons/pub.svg',
+}
 
 function readStorageValue(locale: WizardLocale, key: string): string {
   if (typeof window === 'undefined') return ''
@@ -164,6 +213,17 @@ function formatRange(min: string, max: string, locale: WizardLocale): string {
   return locale === 'ar' ? 'غير محدد' : 'Not specified'
 }
 
+function normalizeValue(value: unknown): string {
+  return String(value || '')
+    .trim()
+    .toLowerCase()
+}
+
+function stringifyValue(value: unknown): string {
+  if (value === null || value === undefined) return ''
+  return String(value).trim()
+}
+
 function humanizeSlug(slug: string): string {
   return slug
     .split('-')
@@ -171,12 +231,178 @@ function humanizeSlug(slug: string): string {
     .join(' ')
 }
 
-function getDisplayName(
-  locale: WizardLocale,
-  value: { name?: string; names?: { en?: string; ar?: string } }
-) {
-  if (locale === 'ar') return value.names?.ar || value.name || ''
-  return value.names?.en || value.name || ''
+function getDisplayName(locale: WizardLocale, value: DisplayNameValue) {
+  const localizedName =
+    value.names ||
+    (value.name && typeof value.name === 'object' ? (value.name as LocalizedName) : null)
+  const plainName = typeof value.name === 'string' ? value.name : ''
+
+  if (locale === 'ar') {
+    return localizedName?.ar || plainName || localizedName?.en || ''
+  }
+
+  return localizedName?.en || plainName || localizedName?.ar || ''
+}
+
+function getFileIconByExtension(extension: string): string {
+  return fileTypeIconMap[normalizeValue(extension)] || fileTypeIconMap.txt
+}
+
+function formatProjectPhase(locale: WizardLocale, value: string): string {
+  const normalized = normalizeValue(value)
+
+  if (
+    normalized === 'idea stage' ||
+    normalized === 'idea' ||
+    normalized === 'idea_stage' ||
+    normalized === 'مرحلة الفكرة'
+  ) {
+    return locale === 'ar' ? 'مرحلة الفكرة' : 'Idea stage'
+  }
+
+  if (normalized === 'expansion' || normalized === 'التوسع') {
+    return locale === 'ar' ? 'التوسع' : 'Expansion'
+  }
+
+  if (normalized === 'implementation' || normalized === 'التنفيذ') {
+    return locale === 'ar' ? 'التنفيذ' : 'Implementation'
+  }
+
+  return stringifyValue(value)
+}
+
+function formatBusinessType(locale: WizardLocale, value: string): string {
+  const normalized = normalizeValue(value)
+  const labels: Record<string, { en: string; ar: string }> = {
+    entrepreneur: { en: 'Entrepreneur', ar: 'رائد أعمال' },
+    'رائد أعمال': { en: 'Entrepreneur', ar: 'رائد أعمال' },
+    startup: { en: 'Startup', ar: 'شركة ناشئة' },
+    'شركة ناشئة': { en: 'Startup', ar: 'شركة ناشئة' },
+    sme: { en: 'SME', ar: 'شركة صغيرة/متوسطة' },
+    'شركة صغيرة/متوسطة': { en: 'SME', ar: 'شركة صغيرة/متوسطة' },
+    company: { en: 'Company', ar: 'شركة' },
+    'شركة': { en: 'Company', ar: 'شركة' },
+    organization: { en: 'Organization', ar: 'منظمة' },
+    'منظمة': { en: 'Organization', ar: 'منظمة' },
+    government: { en: 'Government', ar: 'حكومة' },
+    'حكومة': { en: 'Government', ar: 'حكومة' },
+  }
+
+  const match = labels[normalized]
+  if (!match) return stringifyValue(value)
+  return locale === 'ar' ? match.ar : match.en
+}
+
+function formatPreferredInsighterType(locale: WizardLocale, value: string): string {
+  const normalized = normalizeValue(value)
+
+  if (normalized === 'individual' || normalized === 'فرد') {
+    return locale === 'ar' ? 'فرد' : 'Individual'
+  }
+
+  if (normalized === 'company' || normalized === 'شركة') {
+    return locale === 'ar' ? 'شركة' : 'Company'
+  }
+
+  if (
+    normalized === 'either' ||
+    normalized === 'any' ||
+    normalized === 'كلاهما' ||
+    normalized === 'أيهما' ||
+    normalized === 'لا مانع'
+  ) {
+    return locale === 'ar' ? 'كلاهما' : 'Any'
+  }
+
+  return stringifyValue(value)
+}
+
+function normalizeProjectComponents(
+  components: ProjectRequestComponent[] | null | undefined
+): ServiceComponentsPayload {
+  if (!Array.isArray(components)) return { components: {} }
+
+  return {
+    components: components.reduce<Record<string, unknown>>((acc, item) => {
+      if (!item || typeof item !== 'object') return acc
+
+      for (const [slug, value] of Object.entries(item)) {
+        acc[slug] = value
+      }
+
+      return acc
+    }, {}),
+  }
+}
+
+function getTargetMarketLabels(locale: WizardLocale, value: unknown): string[] {
+  if (!value || typeof value !== 'object') return []
+
+  const raw = value as Record<string, unknown>
+  const objects = Array.isArray(raw.objects) ? raw.objects : []
+
+  return objects
+    .map((item) => {
+      if (!item || typeof item !== 'object') return stringifyValue(item)
+      return getDisplayName(locale, item as DisplayNameValue)
+    })
+    .filter(Boolean)
+}
+
+function getReportTypes(value: unknown): string[] {
+  if (Array.isArray(value)) {
+    return value.map((item) => stringifyValue(item).toLowerCase()).filter(Boolean)
+  }
+
+  const singleValue = stringifyValue(value).toLowerCase()
+  return singleValue ? [singleValue] : []
+}
+
+function getDataSourceValues(locale: WizardLocale, value: unknown): string[] {
+  const fallback = [locale === 'ar' ? 'لا يهم' : "Doesn't matter"]
+  const normalizedValue = normalizeValue(value)
+
+  if (
+    normalizedValue === 'primary_and_secondary_data' ||
+    normalizedValue === 'both' ||
+    normalizedValue === 'primary_secondary'
+  ) {
+    return [locale === 'ar' ? 'بيانات أولية وثانوية' : 'Primary and secondary data']
+  }
+
+  if (normalizedValue === 'primary_data') {
+    return [locale === 'ar' ? 'بيانات أولية' : 'Primary data']
+  }
+
+  if (normalizedValue === 'secondary_data') {
+    return [locale === 'ar' ? 'بيانات ثانوية' : 'Secondary data']
+  }
+
+  if (!value || typeof value !== 'object') return fallback
+
+  const raw = value as Record<string, unknown>
+  const primary =
+    raw.primary_data && typeof raw.primary_data === 'object'
+      ? Number((raw.primary_data as Record<string, unknown>).required)
+      : 0
+  const secondary =
+    raw.secondary_data && typeof raw.secondary_data === 'object'
+      ? Number((raw.secondary_data as Record<string, unknown>).required)
+      : 0
+
+  if (primary > 0 && secondary > 0) {
+    return [locale === 'ar' ? 'بيانات أولية وثانوية' : 'Primary and secondary data']
+  }
+
+  if (primary > 0) {
+    return [locale === 'ar' ? 'بيانات أولية' : 'Primary data']
+  }
+
+  if (secondary > 0) {
+    return [locale === 'ar' ? 'بيانات ثانوية' : 'Secondary data']
+  }
+
+  return fallback
 }
 
 async function fetchList<T>(path: string, locale: WizardLocale): Promise<T[]> {
@@ -268,13 +494,21 @@ function getDeliverableWayLabel(locale: WizardLocale, value: string): string {
   }
 
   const match = labels[value]
-  if (!match) return value
+  if (!match) return stringifyValue(value)
   return locale === 'ar' ? match.ar : match.en
 }
 
 function resolveDeliverableWay(value: unknown): { key: string; address: string } {
   const raw = value && typeof value === 'object' ? (value as Record<string, unknown>) : {}
   const way = raw.way && typeof raw.way === 'object' ? (raw.way as Record<string, unknown>) : {}
+
+  const selected = stringifyValue(way.selected)
+  if (selected) {
+    return {
+      key: selected,
+      address: stringifyValue(way.address),
+    }
+  }
 
   const onPlatform =
     way.on_platform && typeof way.on_platform === 'object'
@@ -330,6 +564,8 @@ function buildServiceComponentSections(params: {
 
         const firstDraftWay = resolveDeliverableWay(firstDraft)
         const finalVersionWay = resolveDeliverableWay(finalVersion)
+        const firstDraftReportTypes = getReportTypes(firstDraft.report_type)
+        const finalVersionReportTypes = getReportTypes(finalVersion.report_type)
 
         return {
           title: getComponentTitle(locale, slug),
@@ -338,63 +574,49 @@ function buildServiceComponentSections(params: {
               label: locale === 'ar' ? 'المسودة الأولى' : 'First draft',
               value: [
                 `${locale === 'ar' ? 'التاريخ' : 'Date'}: ${String(firstDraft.date || '').trim() || (locale === 'ar' ? 'غير محدد' : 'Not specified')}`,
-                `${locale === 'ar' ? 'الصيغ' : 'Formats'}: ${(Array.isArray(firstDraft.report_type) ? firstDraft.report_type : []).map((item) => String(item || '').toUpperCase()).join(', ') || (locale === 'ar' ? 'غير محدد' : 'Not specified')}`,
                 `${locale === 'ar' ? 'طريقة التسليم' : 'Delivery mode'}: ${getDeliverableWayLabel(locale, firstDraftWay.key)}`,
+                ...(firstDraftReportTypes.length === 0
+                  ? [
+                      `${locale === 'ar' ? 'الصيغ' : 'Formats'}: ${locale === 'ar' ? 'غير محدد' : 'Not specified'}`,
+                    ]
+                  : []),
                 ...(firstDraftWay.address
                   ? [
                       `${locale === 'ar' ? 'العنوان' : 'Address'}: ${firstDraftWay.address}`,
                     ]
                   : []),
               ],
+              fileTypes: firstDraftReportTypes,
             },
             {
               label: locale === 'ar' ? 'النسخة النهائية' : 'Final version',
               value: [
                 `${locale === 'ar' ? 'التاريخ' : 'Date'}: ${String(finalVersion.date || '').trim() || (locale === 'ar' ? 'غير محدد' : 'Not specified')}`,
-                `${locale === 'ar' ? 'الصيغ' : 'Formats'}: ${(Array.isArray(finalVersion.report_type) ? finalVersion.report_type : []).map((item) => String(item || '').toUpperCase()).join(', ') || (locale === 'ar' ? 'غير محدد' : 'Not specified')}`,
                 `${locale === 'ar' ? 'طريقة التسليم' : 'Delivery mode'}: ${getDeliverableWayLabel(locale, finalVersionWay.key)}`,
+                ...(finalVersionReportTypes.length === 0
+                  ? [
+                      `${locale === 'ar' ? 'الصيغ' : 'Formats'}: ${locale === 'ar' ? 'غير محدد' : 'Not specified'}`,
+                    ]
+                  : []),
                 ...(finalVersionWay.address
                   ? [
                       `${locale === 'ar' ? 'العنوان' : 'Address'}: ${finalVersionWay.address}`,
                     ]
                   : []),
               ],
+              fileTypes: finalVersionReportTypes,
             },
           ],
         }
       }
 
       if (slug === 'data-sources-expected') {
-        const raw =
-          payloadValue && typeof payloadValue === 'object'
-            ? (payloadValue as Record<string, unknown>)
-            : {}
-        const primary =
-          raw.primary_data && typeof raw.primary_data === 'object'
-            ? Number((raw.primary_data as Record<string, unknown>).required)
-            : 0
-        const secondary =
-          raw.secondary_data && typeof raw.secondary_data === 'object'
-            ? Number((raw.secondary_data as Record<string, unknown>).required)
-            : 0
-
-        let values: string[] = []
-        if (primary > 0 && secondary > 0) {
-          values = [locale === 'ar' ? 'بيانات أولية وثانوية' : 'Primary and secondary data']
-        } else if (primary > 0) {
-          values = [locale === 'ar' ? 'بيانات أولية' : 'Primary data']
-        } else if (secondary > 0) {
-          values = [locale === 'ar' ? 'بيانات ثانوية' : 'Secondary data']
-        } else {
-          values = [locale === 'ar' ? 'لا يهم' : "Doesn't matter"]
-        }
-
         return {
           title: getComponentTitle(locale, slug),
           rows: [
             {
               label: locale === 'ar' ? 'الاختيار' : 'Selection',
-              value: values,
+              value: getDataSourceValues(locale, payloadValue),
             },
           ],
         }
@@ -404,9 +626,16 @@ function buildServiceComponentSections(params: {
         locale,
         projectWizardStorage.serviceComponentAnswerKey(locale, slug)
       )
-      const values = parseStringArray(rawAnswer).map((item) =>
-        slug.includes('deliverable-type') ? item.toUpperCase() : item
-      )
+      const payloadValues = Array.isArray(payloadValue)
+        ? payloadValue.map((item) => stringifyValue(item)).filter(Boolean)
+        : payloadValue !== null &&
+            payloadValue !== undefined &&
+            typeof payloadValue !== 'object'
+          ? [stringifyValue(payloadValue)].filter(Boolean)
+          : []
+      const values = (
+        payloadValues.length > 0 ? payloadValues : parseStringArray(rawAnswer)
+      ).map((item) => (slug.includes('deliverable-type') ? item.toUpperCase() : item))
 
       if (values.length === 0) return null
 
@@ -438,7 +667,6 @@ function SectionBlock({
 }) {
   const sectionIcon = sectionIcons[toneIndex % sectionIcons.length]
   const Icon = sectionIcon.icon
-  const filledRows = rows.filter((row) => row.value.length > 0).length
 
   return (
     <section className="border-t border-slate-200 pt-6 first:border-t-0 first:pt-0">
@@ -463,34 +691,64 @@ function SectionBlock({
           >
             <div className="mb-2 text-xs font-semibold text-slate-500">{row.label}</div>
 
-            {row.value.length > 0 ? (
-              <ul className="space-y-2">
-                {row.variant === 'chips' ? (
-                  <li className="flex items-start gap-3 text-sm leading-6 text-slate-800">
-                    <span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-sky-600" />
-                    <div className="flex flex-wrap gap-2">
-                      {row.value.map((item, itemIndex) => (
-                        <span
+            {row.value.length > 0 || (row.fileTypes?.length ?? 0) > 0 ? (
+              <div className="space-y-3">
+                {row.value.length > 0 ? (
+                  <ul className="space-y-2">
+                    {row.variant === 'chips' ? (
+                      <li className="flex items-start gap-3 text-sm leading-6 text-slate-800">
+                        <span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-sky-600" />
+                        <div className="flex flex-wrap gap-2">
+                          {row.value.map((item, itemIndex) => (
+                            <span
+                              key={`${row.label}-${itemIndex}-${item}`}
+                              className="inline-flex rounded-full bg-sky-50 px-3 py-1 text-xs font-medium text-sky-700"
+                            >
+                              {item}
+                            </span>
+                          ))}
+                        </div>
+                      </li>
+                    ) : (
+                      row.value.map((item, itemIndex) => (
+                        <li
                           key={`${row.label}-${itemIndex}-${item}`}
-                          className="inline-flex rounded-full bg-sky-50 px-3 py-1 text-xs font-medium text-sky-700"
+                          className="flex items-start gap-3 text-sm leading-6 text-slate-800"
                         >
-                          {item}
-                        </span>
-                      ))}
+                          <span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-sky-600" />
+                          <span>{item}</span>
+                        </li>
+                      ))
+                    )}
+                  </ul>
+                ) : null}
+
+                {row.fileTypes && row.fileTypes.length > 0 ? (
+                  <div>
+                    <div className="mb-2 text-xs font-semibold text-slate-500">
+                      {isRTL ? 'الصيغ' : 'Formats'}
                     </div>
-                  </li>
-                ) : (
-                  row.value.map((item, itemIndex) => (
-                    <li
-                      key={`${row.label}-${itemIndex}-${item}`}
-                      className="flex items-start gap-3 text-sm leading-6 text-slate-800"
-                    >
-                      <span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-sky-600" />
-                      <span>{item}</span>
-                    </li>
-                  ))
-                )}
-              </ul>
+                    <ul className="space-y-2">
+                      {row.fileTypes.map((fileType, itemIndex) => (
+                        <li
+                          key={`${row.label}-file-${itemIndex}-${fileType}`}
+                          className="flex items-center gap-3 text-sm leading-6 text-slate-800"
+                        >
+                          <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-sky-600" />
+                          <Image
+                            src={getFileIconByExtension(fileType)}
+                            alt={fileType.toUpperCase()}
+                            width={18}
+                            height={18}
+                            className="h-[18px] w-[18px]"
+                          />
+                          <span>{fileType.toUpperCase()}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                ) : null}
+              </div>
             ) : (
               <div className="text-sm text-slate-400">{emptyText}</div>
             )}
@@ -633,13 +891,14 @@ export default function ProjectReviewStep({
       }
 
       const service = requestData?.service || null
-      const serviceName =
-        service?.name || (isRTL ? 'غير محدد' : 'Not specified')
+      const serviceName = service?.name || (isRTL ? 'غير محدد' : 'Not specified')
       const projectTitle = String(requestData?.title || '').trim()
       const headerTitle = projectTitle || (isRTL ? 'ملخص المشروع' : 'Project Summary')
 
       const originLabel =
-        originType === 'country'
+        requestData?.insighter_origin
+          ? getDisplayName(locale, requestData.insighter_origin)
+          : originType === 'country'
           ? countries.find((item) => String(item.id) === originId)
             ? getDisplayName(
                 locale,
@@ -647,7 +906,10 @@ export default function ProjectReviewStep({
               )
             : originId || (isRTL ? 'غير محدد' : 'Not specified')
           : originType === 'region'
-            ? regions.find((item) => String(item.id) === originId)?.name ||
+            ? getDisplayName(
+                locale,
+                (regions.find((item) => String(item.id) === originId) as Region) || {}
+              ) ||
               originId ||
               (isRTL ? 'غير محدد' : 'Not specified')
             : isRTL
@@ -661,58 +923,105 @@ export default function ProjectReviewStep({
               return match ? getDisplayName(locale, match) : `#${id}`
             })
           : targetMode === 'economic'
-            ? blocIds.map((id) => blocs.find((item) => item.id === id)?.name || `#${id}`)
+            ? blocIds.map((id) => {
+                const match = blocs.find((item) => item.id === id)
+                return match ? getDisplayName(locale, match) : `#${id}`
+              })
             : targetMode === 'worldwide'
               ? [locale === 'ar' ? 'عالميًا' : 'Worldwide']
               : regionIds.map(
-                  (id) => regions.find((item) => item.id === id)?.name || `#${id}`
+                  (id) =>
+                    getDisplayName(
+                      locale,
+                      (regions.find((item) => item.id === id) as Region) || {}
+                    ) || `#${id}`
                 )
 
       const descriptionState = readProjectDescriptionState(locale)
       const addonsState = readProjectAddonsState(locale)
       const scopeSnapshot = readProjectScopeSnapshot(locale)
-      const serviceComponentsPayload = readServiceComponentsPayload(locale)
+      const storedServiceComponentsPayload = readServiceComponentsPayload(locale)
+      const apiServiceComponentsPayload = normalizeProjectComponents(requestData?.components)
+      const serviceComponentsPayload: ServiceComponentsPayload = {
+        components: {
+          ...(storedServiceComponentsPayload.components || {}),
+          ...(apiServiceComponentsPayload.components || {}),
+        },
+      }
+      const serviceComponentSlugs = Array.from(
+        new Set([
+          ...readServiceComponentSlugs(locale),
+          ...Object.keys(serviceComponentsPayload.components || {}),
+        ])
+      )
+      const apiTargetMarket = getTargetMarketLabels(
+        locale,
+        serviceComponentsPayload.components?.['target-market']
+      )
       const serviceComponentSections = buildServiceComponentSections({
         locale,
-        slugs: readServiceComponentSlugs(locale),
+        slugs: serviceComponentSlugs,
         payload: serviceComponentsPayload,
       })
 
+      const projectTypeValue = projectTypeLabel(
+        locale,
+        stringifyValue(requestData?.type) || rawProjectType || null
+      )
+      const projectStatusValue = formatProjectPhase(
+        locale,
+        stringifyValue(requestData?.phase) || projectStatus
+      )
+      const businessTypeValue = formatBusinessType(
+        locale,
+        stringifyValue(requestData?.business_type) || whoAreYou
+      )
+      const preferredInsighterTypeValue = formatPreferredInsighterType(
+        locale,
+        stringifyValue(requestData?.insighter_preferred_type) || preferredInsighterType
+      )
+      const insighterMinYearsExperience =
+        stringifyValue(requestData?.insighter_min_years_experience) ||
+        readStorageValue(locale, projectWizardStorage.insighterMinYearsExperienceKey(locale))
+      const insighterMaxYearsExperience =
+        stringifyValue(requestData?.insighter_max_years_experience) ||
+        readStorageValue(locale, projectWizardStorage.insighterMaxYearsExperienceKey(locale))
+      const companyMinTeamSize =
+        stringifyValue(requestData?.company_min_team_size) ||
+        readStorageValue(locale, projectWizardStorage.companyMinTeamSizeKey(locale))
+      const companyMaxTeamSize =
+        stringifyValue(requestData?.company_max_team_size) ||
+        readStorageValue(locale, projectWizardStorage.companyMaxTeamSizeKey(locale))
+
       const nextReview: ReviewData = {
         title: headerTitle,
-        projectType:
-          projectTypeLabel(locale, rawProjectType) ||
-          (isRTL ? 'غير محدد' : 'Not specified'),
+        projectType: projectTypeValue || (isRTL ? 'غير محدد' : 'Not specified'),
         deliverablesLanguage:
           deliverablesLanguage || (isRTL ? 'غير محدد' : 'Not specified'),
         service: serviceName,
-        projectStatus: projectStatus || (isRTL ? 'غير محدد' : 'Not specified'),
-        whoAreYou: whoAreYou || (isRTL ? 'غير محدد' : 'Not specified'),
+        projectStatus: projectStatusValue || (isRTL ? 'غير محدد' : 'Not specified'),
+        whoAreYou: businessTypeValue || (isRTL ? 'غير محدد' : 'Not specified'),
         preferredInsighterType:
-          preferredInsighterType || (isRTL ? 'غير محدد' : 'Not specified'),
+          preferredInsighterTypeValue || (isRTL ? 'غير محدد' : 'Not specified'),
         origin: originLabel,
         experienceRange: formatRange(
-          readStorageValue(
-            locale,
-            projectWizardStorage.insighterMinYearsExperienceKey(locale)
-          ),
-          readStorageValue(
-            locale,
-            projectWizardStorage.insighterMaxYearsExperienceKey(locale)
-          ),
+          insighterMinYearsExperience,
+          insighterMaxYearsExperience,
           locale
         ),
         teamSizeRange: formatRange(
-          readStorageValue(locale, projectWizardStorage.companyMinTeamSizeKey(locale)),
-          readStorageValue(locale, projectWizardStorage.companyMaxTeamSizeKey(locale)),
+          companyMinTeamSize,
+          companyMaxTeamSize,
           locale
         ),
         targetMarket:
-          targetMarket.length > 0
+          apiTargetMarket.length > 0
+            ? apiTargetMarket
+            : targetMarket.length > 0
             ? targetMarket
             : [isRTL ? 'غير محدد' : 'Not specified'],
-        servicePrompt: servicePrompt.trim(),
-        description: descriptionState.description,
+        servicePrompt: stringifyValue(requestData?.service_prompt) || servicePrompt.trim(),
+        description: stringifyValue(requestData?.description) || descriptionState.description,
         descriptionFiles: descriptionState.files,
         scopeSnapshot,
         kickoffMeeting: addonsState.kickoffMeeting.enabled,
