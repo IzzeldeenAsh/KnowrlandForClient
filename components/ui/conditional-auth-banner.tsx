@@ -17,6 +17,13 @@ export default function ConditionalAuthBanner() {
     return null;
   }
 
+  // Hide on Project routes (full-screen focused flow)
+  const isProjectRoute =
+    pathSegments[0] === 'project' || pathSegments[1] === 'project';
+  if (isProjectRoute) {
+    return null;
+  }
+
   // Hide on callback routes to keep a clean full-screen loader
   if (pathname.includes('/callback')) {
     return null;

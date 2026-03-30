@@ -7,6 +7,7 @@ import FullScreenLoader from '@/components/ui/FullScreenLoader';
 import { useLocale } from 'next-intl';
 import AgreementModal from '@/components/agreements/AgreementModal';
 import { getAuthToken, getTokenFromCookie } from '@/lib/authToken';
+import { getAngularAppOrigin, isAngularRouteUrl, toAngularAppUrl } from '@/lib/authRedirect';
 interface ProfileResponse {
   data: {
     id: number;
@@ -138,7 +139,7 @@ export default function AuthCallback() {
         // Show error for a moment before redirecting to login
         setTimeout(() => {
           console.log('[token-callback] Redirecting to login due to error');
-          window.location.href = 'https://app.insightabusiness.com/auth/login';
+          window.location.href = `${getAngularAppOrigin()}/auth/login`;
         }, 2000);
       }
     };
@@ -147,7 +148,7 @@ export default function AuthCallback() {
       fetchProfile();
     } else {
       console.error('No token found in URL parameters');
-      window.location.href = 'https://app.insightabusiness.com/auth/login';
+      window.location.href = `${getAngularAppOrigin()}/auth/login`;
     }
   }, [token, locale]);
 
@@ -340,7 +341,7 @@ export default function AuthCallback() {
     // Check if user has admin role
     if (userData.roles && (userData.roles.includes('admin') || userData.roles.includes('staff'))) {
       console.log('[token-callback] Admin user detected, redirecting to admin dashboard');
-      window.location.href = 'https://app.insightabusiness.com/admin-dashboard/admin/dashboard/main-dashboard/requests';
+      window.location.href = `${getAngularAppOrigin()}/admin-dashboard/admin/dashboard/main-dashboard/requests`;
       return;
     }
 
@@ -397,10 +398,9 @@ export default function AuthCallback() {
       console.log('[token-callback] Redirecting to returnUrl:', finalReturnUrl);
 
       // Check if this is an Angular route that should go to the Angular app
-      if (isAngularRoute(finalReturnUrl)) {
+      if (isAngularRouteUrl(finalReturnUrl)) {
         console.log('[token-callback] Detected Angular route, redirecting to Angular app');
-        const angularPath = finalReturnUrl.startsWith('/app/') ? finalReturnUrl : `/app${finalReturnUrl}`;
-        window.location.href = `https://app.insightabusiness.com${angularPath}`;
+        window.location.href = toAngularAppUrl(finalReturnUrl);
       } else {
         // Handle Next.js routes
         console.log('[token-callback] Detected Next.js route, redirecting within app');
@@ -419,7 +419,7 @@ export default function AuthCallback() {
          userData.roles.includes('company-insighter'))) {
       // Redirect to insighter dashboard
       console.log('[token-callback] Redirecting to Angular insighter dashboard');
-      window.location.href = `https://app.insightabusiness.com/app/insighter-dashboard/my-dashboard`;
+      window.location.href = `${getAngularAppOrigin()}/app/insighter-dashboard/my-dashboard`;
     } else {
       // Normal client flow: send to Next.js landing page. If prompted, include query param to open onboarding modal.
       if (shouldPromptAddChannels) {
@@ -431,23 +431,6 @@ export default function AuthCallback() {
       router.push(`/${locale}/home`);
     }
   };
-
-  // Helper function to check if route is Angular route
-  const isAngularRoute = (url: string): boolean => {
-    const angularRoutes = [
-      '/app/',
-      '/profile/',
-      '/insighter-dashboard/',
-      '/knowledge-detail/',
-      '/my-knowledge-base/',
-      '/add-knowledge/',
-      '/edit-knowledge/',
-      '/review-insighter-knowledge/'
-    ];
-    
-    return angularRoutes.some(route => url.startsWith(route));
-  };
-
   // Helper function to clear return URL cookie
   const clearReturnUrlCookie = () => {
     const isLocalhost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';

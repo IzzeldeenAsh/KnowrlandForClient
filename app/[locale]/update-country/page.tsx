@@ -6,6 +6,7 @@ import { useTranslations } from 'next-intl';
 import { useCountries, Country } from '@/app/lib/useCountries';
 import { useGlobalProfile } from '@/components/auth/GlobalProfileProvider';
 import { getAuthToken } from '@/lib/authToken';
+import { isAngularRouteUrl, toAngularAppUrl } from '@/lib/authRedirect';
 
 export default function UpdateCountryPage() {
   const [selectedCountry, setSelectedCountry] = useState<Country | null>(null);
@@ -105,9 +106,8 @@ export default function UpdateCountryPage() {
       console.log('[UpdateCountry] Redirecting to return URL:', redirectUrl);
 
       // Check if it's an Angular route
-      if (isAngularRoute(redirectUrl)) {
-        const angularPath = redirectUrl.startsWith('/app/') ? redirectUrl : `/app${redirectUrl}`;
-        window.location.href = `https://app.insightabusiness.com${angularPath}`;
+      if (isAngularRouteUrl(redirectUrl)) {
+        window.location.href = toAngularAppUrl(redirectUrl);
       } else {
         // Handle relative URLs by ensuring they start with the locale
         let finalUrl = redirectUrl;
@@ -149,23 +149,6 @@ export default function UpdateCountryPage() {
       document.cookie = `${name}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/; Domain=.insightabusiness.com; Secure; SameSite=None;`;
     }
   };
-
-  // Helper function to check if route is Angular route
-  const isAngularRoute = (url: string): boolean => {
-    const angularRoutes = [
-      '/app/',
-      '/profile/',
-      '/insighter-dashboard/',
-      '/knowledge-detail/',
-      '/my-knowledge-base/',
-      '/add-knowledge/',
-      '/edit-knowledge/',
-      '/review-insighter-knowledge/'
-    ];
-
-    return angularRoutes.some(route => url.startsWith(route));
-  };
-
   // Get localized country name
   const getLocalizedCountryName = (country: Country): string => {
     return country.names[locale as 'en' | 'ar'] || country.name;

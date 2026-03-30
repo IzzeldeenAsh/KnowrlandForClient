@@ -6,7 +6,7 @@ import Illustration from '@/public/images/glow-bottom-blue.svg'
 import LogoIcon from '@/public/images/SVG/Logo-icon-white.svg'
 import { useTranslations } from 'next-intl'
 import { usePathname, useRouter } from 'next/navigation'
-import { useState, useEffect, useCallback, useRef } from 'react'
+import { useState, useEffect, useRef } from 'react'
 
 // Deboundce hook
 function useDebounce<T>(value: T, delay: number): T {
@@ -86,6 +86,7 @@ export default function Hero() {
 
   const searchInputRef = useRef<HTMLInputElement>(null);
   const suggestionsRef = useRef<HTMLDivElement>(null);
+  const projectButtonRef = useRef<HTMLAnchorElement>(null);
 
 
   // Close suggestions when clicking outside
@@ -195,6 +196,25 @@ export default function Hero() {
 
     // Navigate to home page
     router.push(`/${currentLocale}/home?${params.toString()}`);
+  };
+
+  const updateProjectGlowPosition = (x: string, y: string) => {
+    if (!projectButtonRef.current) return;
+
+    projectButtonRef.current.style.setProperty('--glow-x', x);
+    projectButtonRef.current.style.setProperty('--glow-y', y);
+  };
+
+  const handleProjectButtonMove = (e: React.MouseEvent<HTMLAnchorElement>) => {
+    const bounds = e.currentTarget.getBoundingClientRect();
+    const x = `${((e.clientX - bounds.left) / bounds.width) * 100}%`;
+    const y = `${((e.clientY - bounds.top) / bounds.height) * 100}%`;
+
+    updateProjectGlowPosition(x, y);
+  };
+
+  const handleProjectButtonLeave = () => {
+    updateProjectGlowPosition('86%', '50%');
   };
 
   return (
@@ -369,6 +389,116 @@ export default function Hero() {
                     )}
                   </div>
                 </form>
+
+                {/* Divider "or" line */}
+                {/* <div className="mt-4 flex items-center gap-3 text-sm text-slate-400 italic">
+                  <span className="flex-1 h-px bg-slate-600/40" />
+                  <span>{currentLocale === 'en' ? 'or' : 'أو'}</span>
+                  <span className="flex-1 h-px bg-slate-600/40" />
+                </div> */}
+
+              {/* Start a Project button */}
+              {/* <div className="mt-3 flex justify-center">
+                <a
+                  ref={projectButtonRef}
+                  onMouseMove={handleProjectButtonMove}
+                  onMouseLeave={handleProjectButtonLeave}
+                  href={`/${currentLocale}/project`}
+                  className="
+                    group relative isolate flex h-[46px] w-full max-w-[230px]
+                    items-center justify-center overflow-hidden rounded-full
+                    border border-white/70 px-4 text-[10px] font-semibold uppercase
+                    transition-all duration-300 ease-out
+                    hover:-translate-y-1 hover:scale-[1.015]
+                    active:scale-[0.985]
+                    sm:h-[52px] sm:max-w-[260px] sm:px-6 sm:text-[13px]
+                  "
+                  style={
+                    {
+                      ['--glow-x' as string]: '86%',
+                      ['--glow-y' as string]: '50%',
+                      background:
+                        'linear-gradient(180deg, rgba(250,252,255,0.98) 0%, rgba(237,243,255,0.98) 52%, rgba(228,236,251,0.98) 100%)',
+                      boxShadow:
+                        'inset 0 1px 0 rgba(255,255,255,0.95), inset 0 -1px 0 rgba(148,163,184,0.22), 0 14px 34px rgba(73,102,174,0.18), 0 4px 10px rgba(59,130,246,0.12)',
+                    } as React.CSSProperties
+                  }
+                >
+                  <span
+                    className="pointer-events-none absolute inset-0 rounded-full opacity-100 transition-[background] duration-100 ease-out"
+                    style={{
+                      background:
+                        'radial-gradient(circle at var(--glow-x) var(--glow-y), rgba(255,255,255,1) 0%, rgba(232,242,255,0.98) 12%, rgba(186,221,255,0.86) 24%, rgba(122,177,255,0.38) 40%, rgba(122,177,255,0.12) 52%, rgba(122,177,255,0) 64%)',
+                    }}
+                  />
+
+                  <span
+                    className="pointer-events-none absolute -inset-[6px] -z-10 rounded-full blur-2xl opacity-80 transition-all duration-300 group-hover:opacity-100"
+                    style={{
+                      background:
+                        'radial-gradient(circle at var(--glow-x) var(--glow-y), rgba(168,216,255,0.75) 0%, rgba(109,163,255,0.42) 28%, rgba(99,102,241,0.18) 48%, rgba(99,102,241,0) 66%)',
+                    }}
+                  />
+
+                  <span
+                    className="pointer-events-none absolute inset-[1px] rounded-full opacity-80"
+                    style={{
+                      background:
+                        'linear-gradient(180deg, rgba(255,255,255,0.58) 0%, rgba(255,255,255,0.18) 36%, rgba(255,255,255,0.04) 100%)',
+                    }}
+                  />
+
+                  <span className="pointer-events-none absolute inset-0 rounded-full overflow-hidden">
+                    <span
+                      className="
+                        absolute left-[-35%] top-0 h-full w-[36%]
+                        skew-x-[-22deg] bg-white/45 blur-md
+                        transition-transform duration-700 ease-out
+                        group-hover:translate-x-[420%]
+                      "
+                    />
+                  </span>
+
+                  <span className="pointer-events-none absolute inset-0 rounded-full ring-1 ring-inset ring-white/50" />
+
+                  <span className="relative z-10 inline-flex items-center gap-2">
+                    <span
+                      className="
+                        bg-[linear-gradient(90deg,#1e3a8a_0%,#2563eb_28%,#0ea5e9_55%,#1d4ed8_78%,#1e293b_100%)]
+                        bg-[length:200%_100%]
+                        bg-clip-text text-transparent
+                        transition-all duration-300
+                        group-hover:bg-[position:100%_0]
+                      "
+                    >
+                      {currentLocale === 'en' ? 'START A PROJECT' : 'ابدأ مشروعك'}
+                    </span>
+
+                    <span
+                      className={`
+                        inline-flex text-[#31518d] transition-all duration-300 ease-out
+                        group-hover:translate-x-1 group-hover:scale-110
+                        ${currentLocale === 'ar' ? 'rotate-180' : ''}
+                      `}
+                    >
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        strokeWidth={2.3}
+                        stroke="currentColor"
+                        className="h-3.5 w-3.5 sm:h-4 sm:w-4"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          d="M5 12h14m0 0-5-5m5 5-5 5"
+                        />
+                      </svg>
+                    </span>
+                  </span>
+                </a>
+              </div> */}
               </div>
             </div>
           </div>

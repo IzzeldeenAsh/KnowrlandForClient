@@ -484,6 +484,14 @@ export function UserProfile({ isHome }: { isHome: boolean }) {
             >
               {t("dashboard")}
             </Link>
+            <Link
+              href={`https://app.insightabusiness.com/app/insighter-dashboard/my-downloads`}
+              className="block px-4 py-2.5 font-semibold text-slate-900 hover:bg-indigo-50 hover:text-sky-700"
+              onClick={() => setMenuOpen(false)}
+              style={{fontSize: '13px'}}
+            >
+              {isRtl ? "التحميلات" : "My Downloads"}
+            </Link>
             {/* <Link
             href="https://app.insightabusiness.com/app/insighter-dashboard/my-consulting-schedule"
             className="block px-4 py-2.5 font-semibold text-slate-900 hover:bg-indigo-50 hover:text-sky-700"

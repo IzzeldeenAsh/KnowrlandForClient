@@ -7,6 +7,7 @@ import FullScreenLoader from '@/components/ui/FullScreenLoader';
 import { useLocale } from 'next-intl';
 import AgreementModal from '@/components/agreements/AgreementModal';
 import { getAuthToken, getTokenFromCookie } from '@/lib/authToken';
+import { getAngularAppOrigin, isAngularRouteUrl, toAngularAppUrl } from '@/lib/authRedirect';
 interface ProfileResponse {
   data: {
     id: number;
@@ -145,7 +146,7 @@ export default function QueryParamAuthCallback() {
         // Show error for a moment before redirecting to login
         setTimeout(() => {
           console.log('[callback] Redirecting to login due to error');
-          window.location.href = 'https://app.insightabusiness.com/auth/login';
+          window.location.href = `${getAngularAppOrigin(returnUrl)}/auth/login`;
         }, 2000);
       }
     };
@@ -155,7 +156,7 @@ export default function QueryParamAuthCallback() {
     } else {
       console.error('[callback] No token found in URL parameters or cookies');
       // Redirect to login if no token
-      window.location.href = 'https://app.insightabusiness.com/auth/login';
+      window.location.href = `${getAngularAppOrigin(returnUrl)}/auth/login`;
     }
   }, [token, locale, returnUrl]);
 
@@ -286,6 +287,7 @@ export default function QueryParamAuthCallback() {
     const preferredLanguage = getCookie('preferred_language') || locale;
     const normalizeNextUrlToLocale = (url: string | null, targetLocale: string): string | null => {
       if (!url) return url;
+      if (isAngularRouteUrl(url)) return url;
       try {
         const u = new URL(url, window.location.origin);
         // Consider localhost:3000 and production Next.js host as internal
@@ -308,7 +310,7 @@ export default function QueryParamAuthCallback() {
     // Check if user has admin role
     if (userData.roles && (userData.roles.includes('admin') || userData.roles.includes('staff'))) {
       console.log('[callback] Admin user detected, redirecting to admin dashboard');
-      window.location.href = 'https://app.insightabusiness.com/admin-dashboard/admin/dashboard/main-dashboard/requests';
+      window.location.href = `${getAngularAppOrigin()}/admin-dashboard/admin/dashboard/main-dashboard/requests`;
       return;
     }
 
@@ -365,10 +367,9 @@ export default function QueryParamAuthCallback() {
       console.log('[callback] Redirecting to returnUrl:', finalReturnUrl);
 
       // Check if this is an Angular route that should go to the Angular app
-      if (isAngularRoute(finalReturnUrl)) {
+      if (isAngularRouteUrl(finalReturnUrl)) {
         console.log('[callback] Detected Angular route, redirecting to Angular app');
-        const angularPath = finalReturnUrl.startsWith('/app/') ? finalReturnUrl : `/app${finalReturnUrl}`;
-        const redirectUrl = `https://app.insightabusiness.com${angularPath}`;
+        const redirectUrl = toAngularAppUrl(finalReturnUrl);
         console.log('[callback] Final Angular redirect URL:', redirectUrl);
         window.location.href = redirectUrl;
       } else {
@@ -389,7 +390,7 @@ export default function QueryParamAuthCallback() {
          userData.roles.includes('company-insighter'))) {
       // Redirect to insighter dashboard
       console.log('[callback] Redirecting to Angular insighter dashboard');
-      window.location.href = `https://app.insightabusiness.com/app/insighter-dashboard/my-dashboard`;
+      window.location.href = `${getAngularAppOrigin()}/app/insighter-dashboard/my-dashboard`;
     } else {
       // Redirect to home page using current locale (optionally open post-signup prompt)
       if (shouldPromptAddChannels) {
@@ -401,23 +402,6 @@ export default function QueryParamAuthCallback() {
       router.push(`/${preferredLanguage}/home`);
     }
   };
-
-  // Helper function to check if route is Angular route
-  const isAngularRoute = (url: string): boolean => {
-    const angularRoutes = [
-      '/app/',
-      '/profile/',
-      '/insighter-dashboard/',
-      '/knowledge-detail/',
-      '/my-knowledge-base/',
-      '/add-knowledge/',
-      '/edit-knowledge/',
-      '/review-insighter-knowledge/'
-    ];
-    
-    return angularRoutes.some(route => url.startsWith(route));
-  };
-
   // Helper function to clear return URL cookie
   const clearReturnUrlCookie = () => {
     const isLocalhost = window.location.hostname === 'localhost' || 

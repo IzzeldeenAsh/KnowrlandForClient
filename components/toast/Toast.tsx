@@ -180,7 +180,8 @@ const Toast: React.FC<ToastProps> = ({
           fontSize: '14px',
           color: styles.textColor,
           lineHeight: '1.3',
-          opacity: 0.9
+          opacity: 0.9,
+          whiteSpace: 'pre-line'
         }}>
           {message || getTypeMessage()}
         </div>
