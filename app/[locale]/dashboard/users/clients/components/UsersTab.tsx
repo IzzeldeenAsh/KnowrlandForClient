@@ -1,5 +1,7 @@
 'use client';
 
+import { Tooltip } from '@mantine/core';
+import { IconBrandWhatsapp } from '@tabler/icons-react';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { getAuthToken } from '@/lib/authToken';
 import { useToast } from '@/components/toast/ToastContext';
@@ -35,6 +37,37 @@ function SearchIcon() {
       <line x1="21" y1="21" x2="16.65" y2="16.65" />
     </svg>
   );
+}
+
+function normalizePhonePart(value: string | null | undefined): string {
+  return typeof value === 'string' ? value.replace(/[^\d]/g, '') : '';
+}
+
+function buildWhatsappUrl(countryCode: string | null, phoneNumber: string | null): string | null {
+  const normalizedCountryCode = normalizePhonePart(countryCode);
+  const normalizedPhoneNumber = normalizePhonePart(phoneNumber);
+  const combinedNumber = `${normalizedCountryCode}${normalizedPhoneNumber}`;
+
+  return combinedNumber ? `https://web.whatsapp.com/send?phone=${combinedNumber}` : null;
+}
+
+function formatWhatsappNumber(countryCode: string | null, phoneNumber: string | null): string | null {
+  const normalizedCountryCode = normalizePhonePart(countryCode);
+  const normalizedPhoneNumber = normalizePhonePart(phoneNumber);
+
+  if (!normalizedCountryCode && !normalizedPhoneNumber) {
+    return null;
+  }
+
+  if (normalizedCountryCode && normalizedPhoneNumber) {
+    return `+${normalizedCountryCode} ${normalizedPhoneNumber}`;
+  }
+
+  if (normalizedCountryCode) {
+    return `+${normalizedCountryCode}`;
+  }
+
+  return normalizedPhoneNumber;
 }
 
 const INPUT_CLASS =
@@ -158,6 +191,8 @@ function normalizeClients(payload: unknown): ClientRecord[] {
         id?: number | string;
         name?: string;
         email?: string;
+        whatsapp_country_code?: string | null;
+        whatsapp_number?: string | null;
         country?: string | null;
         status?: string;
         verified?: boolean | number | string;
@@ -172,6 +207,14 @@ function normalizeClients(payload: unknown): ClientRecord[] {
         id: numericId,
         name: typeof row.name === 'string' && row.name.trim() ? row.name : 'Unknown',
         email: typeof row.email === 'string' && row.email.trim() ? row.email : '-',
+        whatsappCountryCode:
+          typeof row.whatsapp_country_code === 'string' && row.whatsapp_country_code.trim()
+            ? row.whatsapp_country_code
+            : null,
+        whatsappNumber:
+          typeof row.whatsapp_number === 'string' && row.whatsapp_number.trim()
+            ? row.whatsapp_number
+            : null,
         country: typeof row.country === 'string' && row.country.trim() ? row.country : null,
         status: typeof row.status === 'string' && row.status.trim() ? row.status : 'unknown',
         verified: Boolean(row.verified),
@@ -263,7 +306,7 @@ export default function UsersTab() {
     }
 
     return clients.filter((client) => {
-      const combined = `${client.name} ${client.email} ${client.country ?? ''}`.toLowerCase();
+      const combined = `${client.name} ${client.email} ${client.whatsappCountryCode ?? ''} ${client.whatsappNumber ?? ''} ${client.country ?? ''}`.toLowerCase();
       return combined.includes(normalizedQuery);
     });
   }, [clients, searchInput]);
@@ -512,7 +555,7 @@ export default function UsersTab() {
             <thead className="bg-slate-50 text-slate-500">
               <tr>
                 <th className="px-3 py-2 font-semibold">Name</th>
-                <th className="px-3 py-2 font-semibold">Email</th>
+                <th className="px-3 py-2 font-semibold">Contact</th>
                 <th className="px-3 py-2 font-semibold">Country</th>
                 <th className="px-3 py-2 font-semibold">Status</th>
                 <th className="px-3 py-2 font-semibold">Verified</th>
@@ -546,45 +589,86 @@ export default function UsersTab() {
 
               {!isLoading &&
                 !error &&
-                filteredClients.map((client) => (
-                  <tr key={client.id} className="text-slate-700">
-                    <td className="px-3 py-2 font-semibold">{client.name}</td>
-                    <td className="px-3 py-2">{client.email}</td>
-                    <td className="px-3 py-2">{client.country ?? '-'}</td>
-                    <td className="px-3 py-2">
-                      <span
-                        className={`inline-flex items-center rounded-md px-2 py-0.5 text-[10px] font-semibold capitalize ${getStatusBadgeClass(
-                          client.status
-                        )}`}
-                      >
-                        {client.status}
-                      </span>
-                    </td>
-                    <td className="px-3 py-2">
-                      <span
-                        className={`inline-flex items-center rounded-md px-2 py-0.5 text-[10px] font-semibold ${
-                          client.verified
-                            ? 'bg-blue-50 text-blue-700 ring-1 ring-blue-300'
-                            : 'bg-slate-100 text-slate-700 ring-1 ring-slate-300'
-                        }`}
-                      >
-                        {client.verified ? 'Yes' : 'No'}
-                      </span>
-                    </td>
-                    <td className="px-3 py-2">
-                      <div className="flex flex-wrap items-center gap-2">
-                       
-                        <button
-                          type="button"
-                          onClick={() => openActionModal(client, 'delete')}
-                          className={`${ROW_ACTION_BUTTON_CLASS} border-red-300 text-red-700 hover:bg-red-50`}
+                filteredClients.map((client) => {
+                  const whatsappUrl = buildWhatsappUrl(
+                    client.whatsappCountryCode,
+                    client.whatsappNumber
+                  );
+                  const whatsappTooltip = formatWhatsappNumber(
+                    client.whatsappCountryCode,
+                    client.whatsappNumber
+                  );
+
+                  return (
+                    <tr key={client.id} className="text-slate-700">
+                      <td className="px-3 py-2 font-semibold">{client.name}</td>
+                      <td className="px-3 py-2">
+                        <div className="flex flex-wrap items-center gap-2">
+                          {client.email !== '-' ? (
+                            <a
+                              href={`mailto:${client.email}`}
+                              className="break-all text-blue-600 underline-offset-2 hover:underline"
+                            >
+                              {client.email}
+                            </a>
+                          ) : (
+                            <span className="text-slate-400">-</span>
+                          )}
+                          {whatsappUrl ? (
+                            <Tooltip
+                              label={whatsappTooltip ? `WhatsApp: ${whatsappTooltip}` : 'Open WhatsApp'}
+                              withArrow
+                              position="top"
+                              openDelay={100}
+                            >
+                              <a
+                                href={whatsappUrl}
+                                target="_blank"
+                                rel="noreferrer"
+                                className="inline-flex h-7 w-7 items-center justify-center rounded-full bg-emerald-50 text-emerald-600 ring-1 ring-emerald-200 transition hover:bg-emerald-100"
+                                aria-label={`Open WhatsApp chat with ${client.name}`}
+                              >
+                                <IconBrandWhatsapp size={15} />
+                              </a>
+                            </Tooltip>
+                          ) : null}
+                        </div>
+                      </td>
+                      <td className="px-3 py-2">{client.country ?? '-'}</td>
+                      <td className="px-3 py-2">
+                        <span
+                          className={`inline-flex items-center rounded-md px-2 py-0.5 text-[10px] font-semibold capitalize ${getStatusBadgeClass(
+                            client.status
+                          )}`}
                         >
-                          Delete
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
-                ))}
+                          {client.status}
+                        </span>
+                      </td>
+                      <td className="px-3 py-2">
+                        <span
+                          className={`inline-flex items-center rounded-md px-2 py-0.5 text-[10px] font-semibold ${
+                            client.verified
+                              ? 'bg-blue-50 text-blue-700 ring-1 ring-blue-300'
+                              : 'bg-slate-100 text-slate-700 ring-1 ring-slate-300'
+                          }`}
+                        >
+                          {client.verified ? 'Yes' : 'No'}
+                        </span>
+                      </td>
+                      <td className="px-3 py-2">
+                        <div className="flex flex-wrap items-center gap-2">
+                          <button
+                            type="button"
+                            onClick={() => openActionModal(client, 'delete')}
+                            className={`${ROW_ACTION_BUTTON_CLASS} border-red-300 text-red-700 hover:bg-red-50`}
+                          >
+                            Delete
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  );
+                })}
             </tbody>
           </table>
         </div>
