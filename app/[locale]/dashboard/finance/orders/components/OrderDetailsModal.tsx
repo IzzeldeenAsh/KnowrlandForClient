@@ -40,8 +40,9 @@ function toTitle(value: string): string {
 function getStatusBadgeClass(status: string): string {
   const normalized = normalizeText(status).toLowerCase();
   if (normalized === 'paid') return 'bg-emerald-50 text-emerald-700 ring-1 ring-emerald-200';
-  if (normalized === 'pending') return 'bg-amber-50 text-amber-700 ring-1 ring-amber-200';
+  if (normalized === 'pending' || normalized === 'awaiting_charge') return 'bg-amber-50 text-amber-700 ring-1 ring-amber-200';
   if (normalized === 'failed') return 'bg-red-50 text-red-700 ring-1 ring-red-200';
+  if (normalized === 'cancelled') return 'bg-slate-200 text-slate-700 ring-1 ring-slate-300';
   return 'bg-slate-100 text-slate-700 ring-1 ring-slate-200';
 }
 
@@ -75,6 +76,13 @@ export default function OrderDetailsModal({
   const status = normalizeText(order.status) || 'unknown';
   const fulfillmentStatus = normalizeText(order.fulfillment_staus) || 'unknown';
   const customerType = normalizeText(order.user?.type);
+  const orderItems = order.orderable ?? order.order_data;
+  const meetingBooking = orderItems?.meeting_booking;
+  const knowledgeItems = Array.isArray(orderItems?.knowledge) ? orderItems.knowledge : [];
+  const knowledgeDocuments = Array.isArray(orderItems?.knowledge_documents) ? orderItems.knowledge_documents.flat() : [];
+  const paymentConfirmedAt =
+    order.payment?.payment_intent_confirmed_at ?? order.payment?.charge_succeeded_at ?? order.payment?.confirmed_at;
+  const hasOrderItems = Boolean(meetingBooking) || knowledgeItems.length > 0 || knowledgeDocuments.length > 0;
 
   return (
     <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-slate-900/40 px-4 py-8">
@@ -137,10 +145,10 @@ export default function OrderDetailsModal({
                     <div className={`${VALUE_CLASS} mt-1`}>{normalizeText(order.payment.provider) || '-'}</div>
                   </div>
                 ) : null}
-                {order.payment?.confirmed_at ? (
+                {paymentConfirmedAt ? (
                   <div>
                     <div className={LABEL_CLASS}>Confirmed</div>
-                    <div className={`${VALUE_CLASS} mt-1`}>{formatDate(order.payment.confirmed_at)}</div>
+                    <div className={`${VALUE_CLASS} mt-1`}>{formatDate(paymentConfirmedAt)}</div>
                   </div>
                 ) : null}
               </div>
@@ -160,7 +168,7 @@ export default function OrderDetailsModal({
                   <div className={`${VALUE_CLASS} mt-1`}>{toTitle(order.service)}</div>
                 </div>
                 <div>
-                  <div className={LABEL_CLASS}>Payment Status</div>
+                  <div className={LABEL_CLASS}>Order Status</div>
                   <div className={`${VALUE_CLASS} mt-1`}>
                     <span className={`inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-semibold ${getStatusBadgeClass(status)}`}>
                       {toTitle(status)}
@@ -215,11 +223,55 @@ export default function OrderDetailsModal({
             <div className={SECTION_TITLE_CLASS}>Order Items</div>
 
             <div className="mt-3 space-y-4">
-              {Array.isArray(order.order_data?.knowledge) && order.order_data.knowledge.length > 0 ? (
+              {meetingBooking ? (
+                <div>
+                  <div className="text-xs font-semibold text-slate-700">Meeting Booking</div>
+                  <div className="mt-2 rounded-md border border-slate-200 bg-slate-50 p-3">
+                    <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
+                      <div>
+                        <div className={LABEL_CLASS}>Date</div>
+                        <div className={`${VALUE_CLASS} mt-1`}>{formatDate(meetingBooking.date)}</div>
+                      </div>
+                      <div>
+                        <div className={LABEL_CLASS}>Time</div>
+                        <div className={`${VALUE_CLASS} mt-1`}>
+                          {normalizeText(meetingBooking.start_time) || '-'} - {normalizeText(meetingBooking.end_time) || '-'}
+                        </div>
+                      </div>
+                      <div>
+                        <div className={LABEL_CLASS}>Status</div>
+                        <div className="mt-1">
+                          <span
+                            className={`inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-semibold ${getFulfillmentBadgeClass(
+                              normalizeText(meetingBooking.status) || 'unknown',
+                            )}`}
+                          >
+                            {toTitle(normalizeText(meetingBooking.status_name) || normalizeText(meetingBooking.status) || 'unknown')}
+                          </span>
+                        </div>
+                      </div>
+                      <div>
+                        <div className={LABEL_CLASS}>Title</div>
+                        <div className={`${VALUE_CLASS} mt-1`}>{normalizeText(meetingBooking.title) || '-'}</div>
+                      </div>
+                    </div>
+                    {normalizeText(meetingBooking.description) ? (
+                      <div className="mt-3">
+                        <div className={LABEL_CLASS}>Description</div>
+                        <div className={`${VALUE_CLASS} mt-1 whitespace-pre-wrap text-slate-700`}>
+                          {normalizeText(meetingBooking.description)}
+                        </div>
+                      </div>
+                    ) : null}
+                  </div>
+                </div>
+              ) : null}
+
+              {knowledgeItems.length > 0 ? (
                 <div>
                   <div className="text-xs font-semibold text-slate-700">Knowledge Products</div>
                   <div className="mt-2 space-y-2">
-                    {order.order_data.knowledge.map((item, idx) => (
+                    {knowledgeItems.map((item, idx) => (
                       <div key={`${item.type}-${idx}`} className="rounded-md border border-slate-200 bg-slate-50 px-3 py-2">
                         <div className="flex flex-wrap items-center gap-2">
                           <span className="rounded-full bg-blue-50 px-2 py-0.5 text-[10px] font-semibold text-blue-700 ring-1 ring-blue-200">
@@ -231,15 +283,13 @@ export default function OrderDetailsModal({
                     ))}
                   </div>
                 </div>
-              ) : (
-                <div className="text-xs text-slate-500">No knowledge products.</div>
-              )}
+              ) : null}
 
-              {Array.isArray(order.order_data?.knowledge_documents) && order.order_data.knowledge_documents.length > 0 ? (
+              {knowledgeDocuments.length > 0 ? (
                 <div>
                   <div className="text-xs font-semibold text-slate-700">Documents</div>
                   <div className="mt-2 grid grid-cols-1 gap-2 sm:grid-cols-2">
-                    {order.order_data.knowledge_documents.flat().map((doc, idx) => (
+                    {knowledgeDocuments.map((doc, idx) => (
                       <div key={`${doc.file_name}-${idx}`} className="flex items-start justify-between gap-3 rounded-md border border-slate-200 bg-white px-3 py-2">
                         <div className="min-w-0">
                           <div className="truncate text-xs font-medium text-slate-900">
@@ -252,9 +302,9 @@ export default function OrderDetailsModal({
                     ))}
                   </div>
                 </div>
-              ) : (
-                <div className="text-xs text-slate-500">No documents.</div>
-              )}
+              ) : null}
+
+              {!hasOrderItems ? <div className="text-xs text-slate-500">No order items.</div> : null}
             </div>
           </div>
 

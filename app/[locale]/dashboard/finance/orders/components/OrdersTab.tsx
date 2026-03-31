@@ -27,12 +27,30 @@ function SearchIcon() {
 
 const INPUT_WITH_ICON_CLASS =
   'h-8 w-full rounded-md border border-slate-200 bg-white pl-9 pr-3 text-xs text-slate-700 shadow-sm outline-none focus:border-blue-400 focus:border-[1px]';
-const INPUT_CLASS =
-  'h-8 w-full rounded-md border border-slate-200 bg-white px-3 text-xs text-slate-700 shadow-sm outline-none focus:border-blue-400 focus:border-[1px]';
 const SECONDARY_BUTTON_CLASS =
-  'h-8 rounded-md border border-slate-200 bg-white px-4 text-xs font-medium text-slate-700 shadow-sm hover:bg-slate-50';
+  'h-8 rounded-md border border-slate-200 bg-white px-4 text-xs font-medium text-slate-700 shadow-sm hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-60';
 const ROW_ACTION_BUTTON_CLASS =
   'rounded-md border border-slate-200 bg-white px-2 py-1 text-[10px] font-medium text-slate-700 shadow-sm hover:bg-slate-50';
+const TAB_BUTTON_CLASS =
+  'inline-flex items-center justify-center rounded-md border px-4 py-2 text-xs font-medium shadow-sm transition-colors';
+const SELECT_CLASS =
+  'h-8 rounded-md border border-slate-200 bg-white px-3 text-xs text-slate-700 shadow-sm outline-none focus:border-blue-400 focus:border-[1px]';
+
+type OrderTabKey = 'knowledge' | 'meetings';
+type CompletionFilter = 'all' | 'complete' | 'incomplete';
+
+const ORDER_TAB_CONFIG: Array<{ key: OrderTabKey; label: string; endpoint: string }> = [
+  { key: 'knowledge', label: 'Knowledge', endpoint: 'https://api.insightabusiness.com/api/admin/order/knowledge' },
+  { key: 'meetings', label: 'Meetings', endpoint: 'https://api.insightabusiness.com/api/admin/order/meeting' },
+];
+
+const COMPLETION_FILTER_OPTIONS: Array<{ value: CompletionFilter; label: string }> = [
+  { value: 'all', label: 'All' },
+  { value: 'complete', label: 'Complete' },
+  { value: 'incomplete', label: 'Incomplete' },
+];
+
+const DEFAULT_META: OrderMeta = { current_page: 1, last_page: 1, per_page: 10, total: 0 };
 
 function normalizeText(value: unknown): string {
   return typeof value === 'string' ? value.trim() : '';
@@ -50,8 +68,9 @@ function toTitle(value: string): string {
 function getStatusBadgeClass(status: string): string {
   const normalized = normalizeText(status).toLowerCase();
   if (normalized === 'paid') return 'bg-emerald-50 text-emerald-700 ring-1 ring-emerald-200';
-  if (normalized === 'pending') return 'bg-amber-50 text-amber-700 ring-1 ring-amber-200';
+  if (normalized === 'pending' || normalized === 'awaiting_charge') return 'bg-amber-50 text-amber-700 ring-1 ring-amber-200';
   if (normalized === 'failed') return 'bg-red-50 text-red-700 ring-1 ring-red-200';
+  if (normalized === 'cancelled') return 'bg-slate-200 text-slate-700 ring-1 ring-slate-300';
   return 'bg-slate-100 text-slate-700 ring-1 ring-slate-200';
 }
 
@@ -108,13 +127,15 @@ function getPaginationWindow(currentPage: number, lastPage: number, maxVisiblePa
 export default function OrdersTab() {
   const { handleServerErrors } = useToast();
 
+  const [activeTab, setActiveTab] = useState<OrderTabKey>('knowledge');
   const [orders, setOrders] = useState<OrderRecord[]>([]);
-  const [meta, setMeta] = useState<OrderMeta>({ current_page: 1, last_page: 1, per_page: 10, total: 0 });
+  const [meta, setMeta] = useState<OrderMeta>(DEFAULT_META);
 
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [error, setError] = useState<string>('');
 
   const [perPage, setPerPage] = useState<number>(10);
+  const [completionFilter, setCompletionFilter] = useState<CompletionFilter>('complete');
   const [searchInput, setSearchInput] = useState<string>('');
   const [searchQuery, setSearchQuery] = useState<string>('');
 
@@ -123,6 +144,10 @@ export default function OrdersTab() {
 
   const searchTimer = useRef<number | null>(null);
   const currentRequestAbort = useRef<AbortController | null>(null);
+  const activeTabConfig = useMemo(
+    () => ORDER_TAB_CONFIG.find((tab) => tab.key === activeTab) ?? ORDER_TAB_CONFIG[0],
+    [activeTab],
+  );
 
   useEffect(() => {
     if (searchTimer.current) window.clearTimeout(searchTimer.current);
@@ -133,7 +158,13 @@ export default function OrdersTab() {
   }, [searchInput]);
 
   const fetchOrders = useCallback(
-    async (page = 1, perPageValue = perPage, signal?: AbortSignal) => {
+    async (
+      tab: OrderTabKey,
+      page = 1,
+      perPageValue = perPage,
+      statusFilter: CompletionFilter = completionFilter,
+      signal?: AbortSignal,
+    ) => {
       setIsLoading(true);
       setError('');
 
@@ -141,14 +172,16 @@ export default function OrdersTab() {
         const token = getAuthToken();
         if (!token) {
           setOrders([]);
-          setMeta({ current_page: 1, last_page: 1, per_page: perPageValue, total: 0 });
+          setMeta({ ...DEFAULT_META, per_page: perPageValue });
           setError('Missing auth token. Please sign in again.');
           return;
         }
 
-        const url = new URL('https://api.insightabusiness.com/api/admin/order/knowledge');
+        const endpoint = ORDER_TAB_CONFIG.find((item) => item.key === tab)?.endpoint ?? ORDER_TAB_CONFIG[0].endpoint;
+        const url = new URL(endpoint);
         url.searchParams.set('page', String(page));
         url.searchParams.set('per_page', String(perPageValue));
+        url.searchParams.set('status', statusFilter);
 
         const response = await fetch(url.toString(), {
           method: 'GET',
@@ -177,25 +210,25 @@ export default function OrdersTab() {
               : 'Unable to load orders right now.';
         setError(message);
         setOrders([]);
-        setMeta({ current_page: 1, last_page: 1, per_page: perPageValue, total: 0 });
+        setMeta({ ...DEFAULT_META, per_page: perPageValue });
       } finally {
         setIsLoading(false);
       }
     },
-    [handleServerErrors, perPage],
+    [completionFilter, handleServerErrors, perPage],
   );
 
-  const refresh = (page: number, perPageValue: number) => {
+  const refresh = useCallback((tab: OrderTabKey, page: number, perPageValue: number, statusFilter: CompletionFilter) => {
     currentRequestAbort.current?.abort();
     const controller = new AbortController();
     currentRequestAbort.current = controller;
-    void fetchOrders(page, perPageValue, controller.signal);
-  };
+    void fetchOrders(tab, page, perPageValue, statusFilter, controller.signal);
+  }, [fetchOrders]);
 
   useEffect(() => {
-    refresh(1, perPage);
+    refresh(activeTab, 1, perPage, completionFilter);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [perPage]);
+  }, [activeTab, completionFilter, perPage]);
 
   const filteredOrders = useMemo(() => {
     const q = searchQuery.trim().toLowerCase();
@@ -226,7 +259,7 @@ export default function OrdersTab() {
   const pages = useMemo(() => getPaginationWindow(meta.current_page, meta.last_page, 5), [meta.current_page, meta.last_page]);
 
   const onPageChange = (page: number) => {
-    refresh(page, perPage);
+    refresh(activeTab, page, perPage, completionFilter);
   };
 
   const onSearchKeyDown = (event: KeyboardEvent<HTMLInputElement>) => {
@@ -246,16 +279,59 @@ export default function OrdersTab() {
     setSelectedOrder(null);
   };
 
+  const handleTabChange = (tab: OrderTabKey) => {
+    if (tab === activeTab) return;
+    currentRequestAbort.current?.abort();
+    closeDetails();
+    setOrders([]);
+    setMeta({ ...DEFAULT_META, per_page: perPage });
+    setError('');
+    setActiveTab(tab);
+  };
+
+  const handleCompletionFilterChange = (value: CompletionFilter) => {
+    if (value === completionFilter) return;
+    currentRequestAbort.current?.abort();
+    closeDetails();
+    setOrders([]);
+    setMeta({ ...DEFAULT_META, per_page: perPage });
+    setError('');
+    setCompletionFilter(value);
+  };
+
   return (
     <div className="mt-4">
-      <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-        <div className="flex flex-col">
+      <div className="flex flex-col gap-3 xl:flex-row xl:items-center xl:justify-between">
+        <div className="min-w-0">
           <h2 className="text-md font-semibold text-slate-900">Orders</h2>
-          <p className="text-xs font-light text-slate-500 ps-1">total orders: {meta.total}</p>
+          <p className="text-xs font-light text-slate-500 ps-1">
+            Total {activeTabConfig.label.toLowerCase()} orders: {meta.total}
+          </p>
         </div>
 
-        <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-end sm:flex-1 sm:pl-4">
-          <div className="relative flex-1 sm:max-w-[520px]">
+        <div className="flex w-full flex-col gap-2 md:flex-row md:items-center md:justify-end xl:max-w-[980px]">
+          <div className="inline-flex items-center gap-2 rounded-md border border-slate-200 bg-slate-50 p-1">
+            {ORDER_TAB_CONFIG.map((tab) => {
+              const isActive = tab.key === activeTab;
+              return (
+                <button
+                  key={tab.key}
+                  type="button"
+                  onClick={() => handleTabChange(tab.key)}
+                  className={[
+                    TAB_BUTTON_CLASS,
+                    isActive
+                      ? 'border-blue-600 bg-blue-600 text-white'
+                      : 'border-transparent bg-white text-slate-700 hover:bg-slate-100',
+                  ].join(' ')}
+                >
+                  {tab.label}
+                </button>
+              );
+            })}
+          </div>
+
+          <div className="relative min-w-0 flex-1 md:max-w-[460px]">
             <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-slate-400">
               <SearchIcon />
             </span>
@@ -264,57 +340,69 @@ export default function OrdersTab() {
               value={searchInput}
               onChange={(event) => setSearchInput(event.target.value)}
               onKeyDown={onSearchKeyDown}
-              placeholder="Search orders (current page)..."
+              placeholder={`Search ${activeTabConfig.label.toLowerCase()} orders (current page)...`}
               className={INPUT_WITH_ICON_CLASS}
             />
           </div>
 
-         
+          <select
+            value={completionFilter}
+            onChange={(event) => handleCompletionFilterChange(event.target.value as CompletionFilter)}
+            className={`${SELECT_CLASS} w-full md:w-[120px]`}
+            aria-label="Filter orders by completion"
+          >
+            {COMPLETION_FILTER_OPTIONS.map((option) => (
+              <option key={option.value} value={option.value}>
+                {option.label}
+              </option>
+            ))}
+          </select>
         </div>
       </div>
 
-      <div className="mt-4 overflow-x-auto rounded-md border border-slate-200 bg-white shadow-sm">
-        <table className="min-w-[1200px] w-full border-collapse text-xs text-slate-700">
-          <thead className="bg-slate-50 text-[11px] font-semibold uppercase text-slate-500">
+      <div className="mt-4 overflow-hidden rounded-md border border-slate-200 bg-white shadow-sm">
+        <div className="overflow-x-auto">
+        <table className="min-w-[930px] w-full border-collapse text-xs text-slate-700">
+          <thead className="bg-slate-50/90 text-[11px] font-semibold uppercase tracking-wide text-slate-500">
             <tr>
-              <th className="w-[180px] border-b border-slate-200 px-3 py-2 text-left">Order No</th>
-              <th className="w-[160px] border-b border-slate-200 px-3 py-2 text-left">Date</th>
-              <th className="w-[160px] border-b border-slate-200 px-3 py-2 text-left">Service</th>
-              <th className="w-[140px] border-b border-slate-200 px-3 py-2 text-left">Amount</th>
-              <th className="w-[130px] border-b border-slate-200 px-3 py-2 text-left">Payment Status</th>
-              <th className="w-[170px] border-b border-slate-200 px-3 py-2 text-left">Payment Method</th>
-              <th className="w-[170px] border-b border-slate-200 px-3 py-2 text-left">Fulfillment</th>
-              <th className="w-[160px] border-b border-slate-200 px-3 py-2 text-left">Invoice No</th>
-              <th className="w-[120px] border-b border-slate-200 px-3 py-2 text-right">Actions</th>
+              <th className="w-[190px] whitespace-nowrap border-b border-slate-200 px-3 py-2.5 text-left">Order No</th>
+              <th className="w-[180px] whitespace-nowrap border-b border-slate-200 px-3 py-2.5 text-left">Date</th>
+              <th className="w-[140px] whitespace-nowrap border-b border-slate-200 px-3 py-2.5 text-left">Amount</th>
+              <th className="w-[150px] whitespace-nowrap border-b border-slate-200 px-3 py-2.5 text-left">Order Status</th>
+              <th className="w-[150px] whitespace-nowrap border-b border-slate-200 px-3 py-2.5 text-left">Payment Status</th>
+              <th className="w-[180px] whitespace-nowrap border-b border-slate-200 px-3 py-2.5 text-left">Payment Method</th>
+              <th className="w-[170px] whitespace-nowrap border-b border-slate-200 px-3 py-2.5 text-left">Fulfillment</th>
+              <th className="w-[120px] whitespace-nowrap border-b border-slate-200 px-3 py-2.5 text-right">Actions</th>
             </tr>
           </thead>
           <tbody>
             {isLoading ? (
               <tr>
-                <td colSpan={9} className="px-3 py-6 text-center text-xs text-slate-500">
+                <td colSpan={8} className="px-4 py-10 text-center text-sm text-slate-500">
                   Loading...
                 </td>
               </tr>
             ) : error ? (
               <tr>
-                <td colSpan={9} className="px-3 py-6 text-center text-xs text-red-600">
+                <td colSpan={8} className="px-4 py-10 text-center text-sm text-red-600">
                   {error}
                 </td>
               </tr>
             ) : filteredOrders.length === 0 ? (
               <tr>
-                <td colSpan={9} className="px-3 py-6 text-center text-xs text-slate-500">
+                <td colSpan={8} className="px-4 py-10 text-center text-sm text-slate-500">
                   No orders found.
                 </td>
               </tr>
             ) : (
               filteredOrders.map((order) => {
-                const paymentStatus = normalizeText(order.status) || 'unknown';
+                const orderStatus = normalizeText(order.status) || 'unknown';
+                const paymentStatus = normalizeText(order.payment?.status) || 'unknown';
                 const fulfillment = normalizeText(order.fulfillment_staus) || 'unknown';
                 const userType = normalizeText(order.user?.type);
                 return (
-                  <tr key={order.uuid} className="odd:bg-white even:bg-slate-50/50">
-                    <td className="border-b border-slate-100 px-3 py-2 font-semibold text-slate-900">
+                  <tr key={order.uuid} className="odd:bg-white even:bg-slate-50/40 hover:bg-blue-50/30">
+                    <td className="border-b border-slate-100 px-3 py-2.5 font-semibold text-slate-900">
                       <div className="flex flex-wrap items-center gap-1">
                         <span>{normalizeText(order.order_no) || '-'}</span>
                         {userType ? (
@@ -324,30 +412,31 @@ export default function OrdersTab() {
                         ) : null}
                       </div>
                     </td>
-                    <td className="border-b border-slate-100 px-3 py-2">{formatDate(order.date)}</td>
-                    <td className="border-b border-slate-100 px-3 py-2">
-                      <span className="rounded-full bg-blue-50 px-2 py-0.5 text-[10px] font-semibold text-blue-700 ring-1 ring-blue-200">
-                        {toTitle(order.service)}
+                    <td className="whitespace-nowrap border-b border-slate-100 px-3 py-2.5 text-slate-600">{formatDate(order.date)}</td>
+                    <td className="whitespace-nowrap border-b border-slate-100 px-3 py-2.5 font-semibold text-slate-900">
+                      {formatCurrency(order.amount, order.currency)}
+                    </td>
+                    <td className="border-b border-slate-100 px-3 py-2.5">
+                      <span className={`inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-semibold ${getStatusBadgeClass(orderStatus)}`}>
+                        {toTitle(orderStatus)}
                       </span>
                     </td>
-                    <td className="border-b border-slate-100 px-3 py-2">{formatCurrency(order.amount, order.currency)}</td>
-                    <td className="border-b border-slate-100 px-3 py-2">
+                    <td className="border-b border-slate-100 px-3 py-2.5">
                       <span className={`inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-semibold ${getStatusBadgeClass(paymentStatus)}`}>
                         {toTitle(paymentStatus)}
                       </span>
                     </td>
-                    <td className="border-b border-slate-100 px-3 py-2">
+                    <td className="border-b border-slate-100 px-3 py-2.5">
                       <span className="rounded-full bg-slate-50 px-2 py-0.5 text-[10px] font-semibold text-slate-700 ring-1 ring-slate-200">
                         {getPaymentMethodLabel(order.payment?.method ?? '')}
                       </span>
                     </td>
-                    <td className="border-b border-slate-100 px-3 py-2">
+                    <td className="border-b border-slate-100 px-3 py-2.5">
                       <span className={`inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-semibold ${getFulfillmentBadgeClass(fulfillment)}`}>
                         {toTitle(fulfillment)}
                       </span>
                     </td>
-                    <td className="border-b border-slate-100 px-3 py-2">{normalizeText(order.invoice_no) || '-'}</td>
-                    <td className="border-b border-slate-100 px-3 py-2">
+                    <td className="border-b border-slate-100 px-3 py-2.5">
                       <div className="flex items-center justify-end">
                         <button type="button" onClick={() => openDetails(order)} className={ROW_ACTION_BUTTON_CLASS}>
                           View
@@ -360,6 +449,7 @@ export default function OrdersTab() {
             )}
           </tbody>
         </table>
+        </div>
       </div>
 
       <div className="mt-3 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
@@ -367,7 +457,7 @@ export default function OrdersTab() {
           Page {meta.current_page} of {meta.last_page}
         </div>
 
-        <div className="flex items-center gap-2">
+        <div className="flex flex-wrap items-center gap-2">
           <button
             type="button"
             onClick={() => onPageChange(Math.max(1, meta.current_page - 1))}

@@ -1,5 +1,7 @@
 'use client';
 
+import { Tooltip } from '@mantine/core';
+import { IconBrandWhatsapp } from '@tabler/icons-react';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { getAuthToken } from '@/lib/authToken';
 import { useToast } from '@/components/toast/ToastContext';
@@ -12,6 +14,8 @@ type CompanyRecord = {
   id: number;
   name: string;
   email: string;
+  whatsappCountryCode: string | null;
+  whatsappNumber: string | null;
   country: string | null;
   status: string;
   verified: boolean;
@@ -47,6 +51,37 @@ function SearchIcon() {
       <line x1="21" y1="21" x2="16.65" y2="16.65" />
     </svg>
   );
+}
+
+function normalizePhonePart(value: string | null | undefined): string {
+  return typeof value === 'string' ? value.replace(/[^\d]/g, '') : '';
+}
+
+function buildWhatsappUrl(countryCode: string | null, phoneNumber: string | null): string | null {
+  const normalizedCountryCode = normalizePhonePart(countryCode);
+  const normalizedPhoneNumber = normalizePhonePart(phoneNumber);
+  const combinedNumber = `${normalizedCountryCode}${normalizedPhoneNumber}`;
+
+  return combinedNumber ? `https://web.whatsapp.com/send?phone=${combinedNumber}` : null;
+}
+
+function formatWhatsappNumber(countryCode: string | null, phoneNumber: string | null): string | null {
+  const normalizedCountryCode = normalizePhonePart(countryCode);
+  const normalizedPhoneNumber = normalizePhonePart(phoneNumber);
+
+  if (!normalizedCountryCode && !normalizedPhoneNumber) {
+    return null;
+  }
+
+  if (normalizedCountryCode && normalizedPhoneNumber) {
+    return `+${normalizedCountryCode} ${normalizedPhoneNumber}`;
+  }
+
+  if (normalizedCountryCode) {
+    return `+${normalizedCountryCode}`;
+  }
+
+  return normalizedPhoneNumber;
 }
 
 const INPUT_CLASS =
@@ -192,6 +227,8 @@ function normalizeCompanies(payload: unknown): CompanyRecord[] {
         id?: number | string;
         name?: string;
         email?: string;
+        whatsapp_country_code?: string | null;
+        whatsapp_number?: string | null;
         country?: string | null;
         profile_photo_url?: string | null;
         verified?: boolean | number | string;
@@ -237,6 +274,14 @@ function normalizeCompanies(payload: unknown): CompanyRecord[] {
         id: numericId,
         name: typeof row.name === 'string' && row.name.trim() ? row.name : 'Unknown',
         email: typeof row.email === 'string' && row.email.trim() ? row.email : '-',
+        whatsappCountryCode:
+          typeof row.whatsapp_country_code === 'string' && row.whatsapp_country_code.trim()
+            ? row.whatsapp_country_code
+            : null,
+        whatsappNumber:
+          typeof row.whatsapp_number === 'string' && row.whatsapp_number.trim()
+            ? row.whatsapp_number
+            : null,
         country: typeof row.country === 'string' && row.country.trim() ? row.country : null,
         status: resolvedStatus,
         verified: Boolean(row.verified),
@@ -331,7 +376,7 @@ export default function CompaniesTab() {
     }
 
     return companies.filter((company) => {
-      const combined = `${company.name} ${company.email} ${company.country ?? ''} ${company.companyName ?? ''}`.toLowerCase();
+      const combined = `${company.name} ${company.email} ${company.whatsappCountryCode ?? ''} ${company.whatsappNumber ?? ''} ${company.country ?? ''} ${company.companyName ?? ''}`.toLowerCase();
       return combined.includes(normalizedQuery);
     });
   }, [companies, searchInput]);
@@ -578,7 +623,7 @@ export default function CompaniesTab() {
               <tr>
                 <th className="px-3 py-2 font-semibold">Logo</th>
                 <th className="px-3 py-2 font-semibold">Name</th>
-                <th className="px-3 py-2 font-semibold">Email</th>
+                <th className="px-3 py-2 font-semibold">Contact</th>
                 <th className="px-3 py-2 font-semibold">Country</th>
                 <th className="px-3 py-2 font-semibold">Status</th>
                 <th className="px-3 py-2 font-semibold">Actions</th>
@@ -616,6 +661,14 @@ export default function CompaniesTab() {
                   const isActive = normalizedStatus === 'active';
                   const isInactive = normalizedStatus === 'inactive';
                   const displayName = company.companyName ?? company.name;
+                  const whatsappUrl = buildWhatsappUrl(
+                    company.whatsappCountryCode,
+                    company.whatsappNumber
+                  );
+                  const whatsappTooltip = formatWhatsappNumber(
+                    company.whatsappCountryCode,
+                    company.whatsappNumber
+                  );
 
                   return (
                     <tr key={company.id} className="text-slate-700">
@@ -634,7 +687,38 @@ export default function CompaniesTab() {
                         )}
                       </td>
                       <td className="px-3 py-2 font-semibold">{displayName}</td>
-                      <td className="px-3 py-2">{company.email}</td>
+                      <td className="px-3 py-2">
+                        <div className="flex flex-wrap items-center gap-2">
+                          {company.email !== '-' ? (
+                            <a
+                              href={`mailto:${company.email}`}
+                              className="break-all text-blue-600 underline-offset-2 hover:underline"
+                            >
+                              {company.email}
+                            </a>
+                          ) : (
+                            <span className="text-slate-400">-</span>
+                          )}
+                          {whatsappUrl ? (
+                            <Tooltip
+                              label={whatsappTooltip ? `WhatsApp: ${whatsappTooltip}` : 'Open WhatsApp'}
+                              withArrow
+                              position="top"
+                              openDelay={100}
+                            >
+                              <a
+                                href={whatsappUrl}
+                                target="_blank"
+                                rel="noreferrer"
+                                className="inline-flex h-7 w-7 items-center justify-center rounded-full bg-emerald-50 text-emerald-600 ring-1 ring-emerald-200 transition hover:bg-emerald-100"
+                                aria-label={`Open WhatsApp chat with ${displayName}`}
+                              >
+                                <IconBrandWhatsapp size={15} />
+                              </a>
+                            </Tooltip>
+                          ) : null}
+                        </div>
+                      </td>
                       <td className="px-3 py-2">{company.country ?? '-'}</td>
                       <td className="px-3 py-2">
                         <span

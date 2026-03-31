@@ -1,5 +1,7 @@
 'use client';
 
+import { Tooltip } from '@mantine/core';
+import { IconBrandWhatsapp } from '@tabler/icons-react';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { getAuthToken } from '@/lib/authToken';
 import { useToast } from '@/components/toast/ToastContext';
@@ -12,6 +14,8 @@ type InsighterRecord = {
   id: number;
   name: string;
   email: string;
+  whatsappCountryCode: string | null;
+  whatsappNumber: string | null;
   country: string | null;
   status: string;
   verified: boolean;
@@ -46,6 +50,37 @@ function SearchIcon() {
       <line x1="21" y1="21" x2="16.65" y2="16.65" />
     </svg>
   );
+}
+
+function normalizePhonePart(value: string | null | undefined): string {
+  return typeof value === 'string' ? value.replace(/[^\d]/g, '') : '';
+}
+
+function buildWhatsappUrl(countryCode: string | null, phoneNumber: string | null): string | null {
+  const normalizedCountryCode = normalizePhonePart(countryCode);
+  const normalizedPhoneNumber = normalizePhonePart(phoneNumber);
+  const combinedNumber = `${normalizedCountryCode}${normalizedPhoneNumber}`;
+
+  return combinedNumber ? `https://web.whatsapp.com/send?phone=${combinedNumber}` : null;
+}
+
+function formatWhatsappNumber(countryCode: string | null, phoneNumber: string | null): string | null {
+  const normalizedCountryCode = normalizePhonePart(countryCode);
+  const normalizedPhoneNumber = normalizePhonePart(phoneNumber);
+
+  if (!normalizedCountryCode && !normalizedPhoneNumber) {
+    return null;
+  }
+
+  if (normalizedCountryCode && normalizedPhoneNumber) {
+    return `+${normalizedCountryCode} ${normalizedPhoneNumber}`;
+  }
+
+  if (normalizedCountryCode) {
+    return `+${normalizedCountryCode}`;
+  }
+
+  return normalizedPhoneNumber;
 }
 
 const INPUT_CLASS =
@@ -191,6 +226,8 @@ function normalizeInsighters(payload: unknown): InsighterRecord[] {
         id?: number | string;
         name?: string;
         email?: string;
+        whatsapp_country_code?: string | null;
+        whatsapp_number?: string | null;
         country?: string | null;
         insighter_status?: string;
         verified?: boolean | number | string;
@@ -206,6 +243,14 @@ function normalizeInsighters(payload: unknown): InsighterRecord[] {
         id: numericId,
         name: typeof row.name === 'string' && row.name.trim() ? row.name : 'Unknown',
         email: typeof row.email === 'string' && row.email.trim() ? row.email : '-',
+        whatsappCountryCode:
+          typeof row.whatsapp_country_code === 'string' && row.whatsapp_country_code.trim()
+            ? row.whatsapp_country_code
+            : null,
+        whatsappNumber:
+          typeof row.whatsapp_number === 'string' && row.whatsapp_number.trim()
+            ? row.whatsapp_number
+            : null,
         country: typeof row.country === 'string' && row.country.trim() ? row.country : null,
         status:
           typeof row.insighter_status === 'string' && row.insighter_status.trim()
@@ -305,7 +350,7 @@ export default function InsightersTab() {
     }
 
     return insighters.filter((insighter) => {
-      const combined = `${insighter.name} ${insighter.email} ${insighter.country ?? ''}`.toLowerCase();
+      const combined = `${insighter.name} ${insighter.email} ${insighter.whatsappCountryCode ?? ''} ${insighter.whatsappNumber ?? ''} ${insighter.country ?? ''}`.toLowerCase();
       return combined.includes(normalizedQuery);
     });
   }, [insighters, searchInput]);
@@ -552,7 +597,7 @@ export default function InsightersTab() {
               <tr>
                 <th className="px-3 py-2 font-semibold">Profile</th>
                 <th className="px-3 py-2 font-semibold">Name</th>
-                <th className="px-3 py-2 font-semibold">Email</th>
+                <th className="px-3 py-2 font-semibold">Contact</th>
                 <th className="px-3 py-2 font-semibold">Country</th>
                 <th className="px-3 py-2 font-semibold">Status</th>
                 <th className="px-3 py-2 font-semibold">Actions</th>
@@ -588,6 +633,14 @@ export default function InsightersTab() {
                 filteredInsighters.map((insighter) => {
                   const isActive = insighter.status.toLowerCase() === 'active';
                   const isInactive = insighter.status.toLowerCase() === 'inactive';
+                  const whatsappUrl = buildWhatsappUrl(
+                    insighter.whatsappCountryCode,
+                    insighter.whatsappNumber
+                  );
+                  const whatsappTooltip = formatWhatsappNumber(
+                    insighter.whatsappCountryCode,
+                    insighter.whatsappNumber
+                  );
 
                   return (
                     <tr key={insighter.id} className="text-slate-700">
@@ -606,7 +659,38 @@ export default function InsightersTab() {
                         )}
                       </td>
                       <td className="px-3 py-2 font-semibold">{insighter.name}</td>
-                      <td className="px-3 py-2">{insighter.email}</td>
+                      <td className="px-3 py-2">
+                        <div className="flex flex-wrap items-center gap-2">
+                          {insighter.email !== '-' ? (
+                            <a
+                              href={`mailto:${insighter.email}`}
+                              className="break-all text-blue-600 underline-offset-2 hover:underline"
+                            >
+                              {insighter.email}
+                            </a>
+                          ) : (
+                            <span className="text-slate-400">-</span>
+                          )}
+                          {whatsappUrl ? (
+                            <Tooltip
+                              label={whatsappTooltip ? `WhatsApp: ${whatsappTooltip}` : 'Open WhatsApp'}
+                              withArrow
+                              position="top"
+                              openDelay={100}
+                            >
+                              <a
+                                href={whatsappUrl}
+                                target="_blank"
+                                rel="noreferrer"
+                                className="inline-flex h-7 w-7 items-center justify-center rounded-full bg-emerald-50 text-emerald-600 ring-1 ring-emerald-200 transition hover:bg-emerald-100"
+                                aria-label={`Open WhatsApp chat with ${insighter.name}`}
+                              >
+                                <IconBrandWhatsapp size={15} />
+                              </a>
+                            </Tooltip>
+                          ) : null}
+                        </div>
+                      </td>
                       <td className="px-3 py-2">{insighter.country ?? '-'}</td>
                       <td className="px-3 py-2">
                         <span
