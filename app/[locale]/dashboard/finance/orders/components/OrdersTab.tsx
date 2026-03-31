@@ -1,6 +1,6 @@
 'use client';
 
-import { KeyboardEvent, useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { KeyboardEvent, useCallback, useEffect, useRef, useState } from 'react';
 import { getAuthToken } from '@/lib/authToken';
 import { useToast } from '@/components/toast/ToastContext';
 import { buildAuthHeaders, parseApiError } from '../../../_config/api';
@@ -144,10 +144,7 @@ export default function OrdersTab() {
 
   const searchTimer = useRef<number | null>(null);
   const currentRequestAbort = useRef<AbortController | null>(null);
-  const activeTabConfig = useMemo(
-    () => ORDER_TAB_CONFIG.find((tab) => tab.key === activeTab) ?? ORDER_TAB_CONFIG[0],
-    [activeTab],
-  );
+  const activeTabConfig = ORDER_TAB_CONFIG.find((tab) => tab.key === activeTab) ?? ORDER_TAB_CONFIG[0];
 
   useEffect(() => {
     if (searchTimer.current) window.clearTimeout(searchTimer.current);
@@ -182,6 +179,9 @@ export default function OrdersTab() {
         url.searchParams.set('page', String(page));
         url.searchParams.set('per_page', String(perPageValue));
         url.searchParams.set('status', statusFilter);
+        if (searchQuery) {
+          url.searchParams.set('search', searchQuery);
+        }
 
         const response = await fetch(url.toString(), {
           method: 'GET',
@@ -215,7 +215,7 @@ export default function OrdersTab() {
         setIsLoading(false);
       }
     },
-    [completionFilter, handleServerErrors, perPage],
+    [completionFilter, handleServerErrors, perPage, searchQuery],
   );
 
   const refresh = useCallback((tab: OrderTabKey, page: number, perPageValue: number, statusFilter: CompletionFilter) => {
@@ -228,35 +228,9 @@ export default function OrdersTab() {
   useEffect(() => {
     refresh(activeTab, 1, perPage, completionFilter);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [activeTab, completionFilter, perPage]);
+  }, [activeTab, completionFilter, perPage, searchQuery]);
 
-  const filteredOrders = useMemo(() => {
-    const q = searchQuery.trim().toLowerCase();
-    if (!q) return orders;
-
-    return orders.filter((order) => {
-      const combined = [
-        order.order_no,
-        order.invoice_no,
-        order.uuid,
-        order.service,
-        order.status,
-        order.payment?.status,
-        order.payment?.method,
-        order.fulfillment_staus,
-        order.currency,
-        order.user?.name,
-        order.user?.email,
-        order.user?.type,
-      ]
-        .map((v) => String(v ?? ''))
-        .join(' ')
-        .toLowerCase();
-      return combined.includes(q);
-    });
-  }, [orders, searchQuery]);
-
-  const pages = useMemo(() => getPaginationWindow(meta.current_page, meta.last_page, 5), [meta.current_page, meta.last_page]);
+  const pages = getPaginationWindow(meta.current_page, meta.last_page, 5);
 
   const onPageChange = (page: number) => {
     refresh(activeTab, page, perPage, completionFilter);
@@ -388,14 +362,14 @@ export default function OrdersTab() {
                   {error}
                 </td>
               </tr>
-            ) : filteredOrders.length === 0 ? (
+            ) : orders.length === 0 ? (
               <tr>
                 <td colSpan={8} className="px-4 py-10 text-center text-sm text-slate-500">
                   No orders found.
                 </td>
               </tr>
             ) : (
-              filteredOrders.map((order) => {
+              orders.map((order) => {
                 const orderStatus = normalizeText(order.status) || 'unknown';
                 const paymentStatus = normalizeText(order.payment?.status) || 'unknown';
                 const fulfillment = normalizeText(order.fulfillment_staus) || 'unknown';
