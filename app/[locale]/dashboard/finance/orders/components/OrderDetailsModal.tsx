@@ -62,6 +62,20 @@ function getPaymentMethodLabel(method: string): string {
   return normalizeText(method) || '-';
 }
 
+function getUserTypeBadgeClass(type: string): string {
+  const normalized = normalizeText(type).toLowerCase();
+  if (normalized === 'client') return 'bg-emerald-50 text-emerald-700 ring-1 ring-emerald-200';
+  if (normalized === 'user') return 'bg-purple-50 text-purple-700 ring-1 ring-purple-200';
+  if (normalized === 'guest') return 'bg-amber-50 text-amber-700 ring-1 ring-amber-200';
+  return 'bg-slate-100 text-slate-700 ring-1 ring-slate-200';
+}
+
+function getRoleBadgeClass(role: string): string {
+  const normalized = normalizeText(role).toLowerCase();
+  if (normalized === 'client') return 'bg-emerald-50 text-emerald-700 ring-1 ring-emerald-200';
+  return 'bg-slate-50 text-slate-700 ring-1 ring-slate-200';
+}
+
 export default function OrderDetailsModal({
   isOpen,
   order,
@@ -201,14 +215,14 @@ export default function OrderDetailsModal({
                   <div className="truncate text-xs text-slate-500">{normalizeText(order.user.email) || '-'}</div>
                   <div className="mt-1 flex flex-wrap gap-1">
                     {customerType ? (
-                      <span className="rounded-full bg-purple-50 px-2 py-0.5 text-[10px] font-semibold text-purple-700 ring-1 ring-purple-200">
+                      <span className={`rounded-full px-2 py-0.5 text-[10px] font-semibold ${getUserTypeBadgeClass(customerType)}`}>
                         {toTitle(customerType)}
                       </span>
                     ) : null}
                     {order.user.roles?.map((role) => (
                       <span
                         key={role}
-                        className="rounded-full bg-slate-50 px-2 py-0.5 text-[10px] font-semibold text-slate-700 ring-1 ring-slate-200"
+                        className={`rounded-full px-2 py-0.5 text-[10px] font-semibold ${getRoleBadgeClass(role)}`}
                       >
                         {role}
                       </span>
@@ -269,7 +283,7 @@ export default function OrderDetailsModal({
 
               {knowledgeItems.length > 0 ? (
                 <div>
-                  <div className="text-xs font-semibold text-slate-700">Knowledge Products</div>
+                  <div className="text-xs font-semibold text-slate-700">Insight Products</div>
                   <div className="mt-2 space-y-2">
                     {knowledgeItems.map((item, idx) => (
                       <div key={`${item.type}-${idx}`} className="rounded-md border border-slate-200 bg-slate-50 px-3 py-2">

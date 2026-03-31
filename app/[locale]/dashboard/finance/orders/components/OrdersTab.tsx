@@ -40,7 +40,7 @@ type OrderTabKey = 'knowledge' | 'meetings';
 type CompletionFilter = 'all' | 'complete' | 'incomplete';
 
 const ORDER_TAB_CONFIG: Array<{ key: OrderTabKey; label: string; endpoint: string }> = [
-  { key: 'knowledge', label: 'Knowledge', endpoint: 'https://api.insightabusiness.com/api/admin/order/knowledge' },
+  { key: 'knowledge', label: 'Insight', endpoint: 'https://api.insightabusiness.com/api/admin/order/knowledge' },
   { key: 'meetings', label: 'Meetings', endpoint: 'https://api.insightabusiness.com/api/admin/order/meeting' },
 ];
 
@@ -88,6 +88,14 @@ function getPaymentMethodLabel(method: string): string {
   if (normalized === 'provider') return 'Payment Provider';
   if (normalized === 'manual') return 'Wallet Payment';
   return normalizeText(method) || '-';
+}
+
+function getUserTypeBadgeClass(type: string): string {
+  const normalized = normalizeText(type).toLowerCase();
+  if (normalized === 'client') return 'bg-emerald-50 text-emerald-700 ring-1 ring-emerald-200';
+  if (normalized === 'user') return 'bg-purple-50 text-purple-700 ring-1 ring-purple-200';
+  if (normalized === 'guest') return 'bg-amber-50 text-amber-700 ring-1 ring-amber-200';
+  return 'bg-slate-100 text-slate-700 ring-1 ring-slate-200';
 }
 
 function formatCurrency(amount: number, currency: string): string {
@@ -314,7 +322,7 @@ export default function OrdersTab() {
               value={searchInput}
               onChange={(event) => setSearchInput(event.target.value)}
               onKeyDown={onSearchKeyDown}
-              placeholder={`Search ${activeTabConfig.label.toLowerCase()} orders (current page)...`}
+              placeholder={`Search ${activeTabConfig.label.toLowerCase()} orders...`}
               className={INPUT_WITH_ICON_CLASS}
             />
           </div>
@@ -380,7 +388,7 @@ export default function OrdersTab() {
                       <div className="flex flex-wrap items-center gap-1">
                         <span>{normalizeText(order.order_no) || '-'}</span>
                         {userType ? (
-                          <span className="rounded-full bg-purple-50 px-2 py-0.5 text-[10px] font-semibold text-purple-700 ring-1 ring-purple-200">
+                          <span className={`rounded-full px-2 py-0.5 text-[10px] font-semibold ${getUserTypeBadgeClass(userType)}`}>
                             {toTitle(userType)}
                           </span>
                         ) : null}
