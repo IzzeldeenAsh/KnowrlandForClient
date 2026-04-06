@@ -1030,21 +1030,23 @@ export default function CheckoutPage() {
                   >
                     {translations.goToDownloads}
                   </Button>
-                  <div className="mt-3">
-                    <a
-                      href="#"
-                      onClick={async (event) => {
-                        event.preventDefault();
-                        await handleRedownload();
-                      }}
-                      className={`text-sm text-blue-600 underline underline-offset-2 hover:text-blue-700 ${isFetchingDownloadIds ? "pointer-events-none opacity-60" : ""}`}
-                      aria-disabled={isFetchingDownloadIds}
-                    >
-                      {isFetchingDownloadIds
-                        ? (isRTL ? "جاري التحميل..." : "Downloading...")
-                        : translations.redownload}
-                    </a>
-                  </div>
+                  {!isFree && (
+                    <div className="mt-3">
+                      <a
+                        href="#"
+                        onClick={async (event) => {
+                          event.preventDefault();
+                          await handleRedownload();
+                        }}
+                        className={`text-sm text-blue-600 underline underline-offset-2 hover:text-blue-700 ${isFetchingDownloadIds ? "pointer-events-none opacity-60" : ""}`}
+                        aria-disabled={isFetchingDownloadIds}
+                      >
+                        {isFetchingDownloadIds
+                          ? (isRTL ? "جاري التحميل..." : "Downloading...")
+                          : translations.redownload}
+                      </a>
+                    </div>
+                  )}
                 </>
               )}
             </div>
