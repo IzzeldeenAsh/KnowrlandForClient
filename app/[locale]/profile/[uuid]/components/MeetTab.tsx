@@ -936,12 +936,11 @@ export default function MeetTab({
                           disabled={!isActive}
                           className={`
                             h-10 w-10 mx-auto rounded-full text-sm font-medium transition-colors
-                            ${
-                              isActive
-                                ? isSelected
-                                  ? "bg-blue-500 text-white"
-                                  : "bg-blue-50 text-blue-600 hover:bg-blue-100"
-                                : "text-gray-300 cursor-not-allowed"
+                            ${isActive
+                              ? isSelected
+                                ? "bg-blue-500 text-white"
+                                : "bg-blue-50 text-blue-600 hover:bg-blue-100"
+                              : "text-gray-300 cursor-not-allowed"
                             }
                           `}
                         >
@@ -961,13 +960,13 @@ export default function MeetTab({
                     <h3 className="text-lg font-semibold mb-2">
                       {locale.startsWith('ar')
                         ? `الجلسات المتاحة في ${getDayName('en-US', new Date(selectedDate))}, ${new Date(selectedDate).toLocaleDateString('en-US', {
-                            month: 'long',
-                            day: 'numeric'
-                          })}`
+                          month: 'long',
+                          day: 'numeric'
+                        })}`
                         : `Available sessions on ${getDayName('en-US', new Date(selectedDate))}, ${new Date(selectedDate).toLocaleDateString('en-US', {
-                            month: 'long',
-                            day: 'numeric'
-                          })}`}
+                          month: 'long',
+                          day: 'numeric'
+                        })}`}
                     </h3>
                     <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">
                       {locale.startsWith('ar')
@@ -977,7 +976,7 @@ export default function MeetTab({
 
                     <div className="space-y-3 mb-6">
                       {getMeetingTimesForDate(selectedDate).length >
-                      0 ? (
+                        0 ? (
                         getMeetingTimesForDate(selectedDate).map(
                           (time, index) => {
                             const isSelected =
@@ -991,11 +990,10 @@ export default function MeetTab({
                                 onClick={() => handleTimeClick(time)}
                                 className={`
                                 w-full p-3 rounded-lg border text-left transition-colors
-                                ${
-                                  isSelected
+                                ${isSelected
                                     ? "border-blue-500 bg-blue-50 text-blue-700"
                                     : "border-gray-200 hover:border-blue-300 hover:bg-blue-50"
-                                }
+                                  }
                               `}
                               >
                                 <div className="flex justify-between items-center">
@@ -1013,11 +1011,10 @@ export default function MeetTab({
                                     })}
                                   </span>
                                   <span
-                                    className={`text-sm font-bold ${
-                                      isFree
-                                        ? "text-green-600"
-                                        : "text-gray-600"
-                                    }`}
+                                    className={`text-sm font-bold ${isFree
+                                      ? "text-green-600"
+                                      : "text-gray-600"
+                                      }`}
                                   >
                                     {isFree ? "Free" : `$${rate}`}
                                   </span>
@@ -1040,10 +1037,9 @@ export default function MeetTab({
                         disabled={!selectedMeetingTime}
                         className={`
                           w-full py-3 px-6 rounded-lg font-medium transition-colors
-                          ${
-                            selectedMeetingTime
-                              ? "bg-blue-500 text-white hover:bg-blue-600"
-                              : "bg-gray-200 text-gray-400 cursor-not-allowed"
+                          ${selectedMeetingTime
+                            ? "bg-blue-500 text-white hover:bg-blue-600"
+                            : "bg-gray-200 text-gray-400 cursor-not-allowed"
                           }
                         `}
                       >
@@ -1051,7 +1047,7 @@ export default function MeetTab({
                       </button>
                     )}
 
-                   
+
                   </>
                 ) : (
                   <div className="text-center py-12">
@@ -1059,9 +1055,9 @@ export default function MeetTab({
                       size={48}
                       className="text-gray-300 mx-auto mb-4"
                     />
-                      <p className="text-gray-500">
-                        {locale.startsWith('ar') ? "اختر تاريخ الجلسة ليتم عرض الأوقات المتاحة" : 'Please select a date to view available times'}
-                      </p>
+                    <p className="text-gray-500">
+                      {locale.startsWith('ar') ? "اختر تاريخ الجلسة ليتم عرض الأوقات المتاحة" : 'Please select a date to view available times'}
+                    </p>
                   </div>
                 )}
               </div>
@@ -1077,7 +1073,7 @@ export default function MeetTab({
               closeBookingModal();
             }
           }}
-          
+
           size="lg"
           centered
         >
@@ -1105,11 +1101,10 @@ export default function MeetTab({
                       {t("sessionRate")}
                     </span>
                     <span
-                      className={`font-bold ${
-                        parseFloat(selectedMeetingTime.rate) === 0
-                          ? "text-green-600"
-                          : "text-blue-600"
-                      }`}
+                      className={`font-bold ${parseFloat(selectedMeetingTime.rate) === 0
+                        ? "text-green-600"
+                        : "text-blue-600"
+                        }`}
                     >
                       {parseFloat(selectedMeetingTime.rate) === 0
                         ? "Free"
@@ -1195,11 +1190,10 @@ export default function MeetTab({
                       {t("minimum3Characters")}
                     </span>
                     <span
-                      className={`text-xs ${
-                        meetingTitle.length > 50
-                          ? "text-red-500"
-                          : "text-gray-500"
-                      }`}
+                      className={`text-xs ${meetingTitle.length > 50
+                        ? "text-red-500"
+                        : "text-gray-500"
+                        }`}
                     >
                       {meetingTitle.length}/50
                     </span>
@@ -1220,11 +1214,10 @@ export default function MeetTab({
                       {t("optional")}
                     </span>
                     <span
-                      className={`text-xs ${
-                        meetingDescription.length > 100
-                          ? "text-red-500"
-                          : "text-gray-500"
-                      }`}
+                      className={`text-xs ${meetingDescription.length > 100
+                        ? "text-red-500"
+                        : "text-gray-500"
+                        }`}
                     >
                       {meetingDescription.length}/100
                     </span>
@@ -1241,15 +1234,13 @@ export default function MeetTab({
                       {/* Insighta Wallet Option (requires authentication + non-client-only) */}
                       {isAuthenticated && !isClientOnlyUser && (
                         <div
-                          className={`border rounded-lg p-4 cursor-pointer transition-all min-h-[72px] ${
-                            paymentMethod === "manual"
-                              ? "border-blue-500 bg-blue-50 dark:bg-blue-900/20"
-                              : "border-gray-200 dark:border-slate-600 hover:border-gray-300 dark:hover:border-slate-500"
-                          } ${
-                            walletBalance < parseFloat(selectedMeetingTime.rate)
+                          className={`border rounded-lg p-4 cursor-pointer transition-all min-h-[72px] ${paymentMethod === "manual"
+                            ? "border-blue-500 bg-blue-50 dark:bg-blue-900/20"
+                            : "border-gray-200 dark:border-slate-600 hover:border-gray-300 dark:hover:border-slate-500"
+                            } ${walletBalance < parseFloat(selectedMeetingTime.rate)
                               ? "opacity-50 cursor-not-allowed"
                               : ""
-                          }`}
+                            }`}
                           onClick={() => {
                             if (walletBalance >= parseFloat(selectedMeetingTime.rate)) {
                               setPaymentMethod("manual")
@@ -1305,11 +1296,10 @@ export default function MeetTab({
 
                       {/* Stripe Provider Option */}
                       <div
-                        className={`border rounded-lg p-4 cursor-pointer transition-all min-h-[72px] ${
-                          paymentMethod === "provider"
-                            ? "border-blue-500 bg-blue-50 dark:bg-blue-900/20"
-                            : "border-gray-200 dark:border-slate-600 hover:border-gray-300 dark:hover:border-slate-500"
-                        }`}
+                        className={`border rounded-lg p-4 cursor-pointer transition-all min-h-[72px] ${paymentMethod === "provider"
+                          ? "border-blue-500 bg-blue-50 dark:bg-blue-900/20"
+                          : "border-gray-200 dark:border-slate-600 hover:border-gray-300 dark:hover:border-slate-500"
+                          }`}
                         onClick={() => setPaymentMethod("provider")}
                       >
                         <div className="flex items-center pt-2 justify-center gap-4 h-full">

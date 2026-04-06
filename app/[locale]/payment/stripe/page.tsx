@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback, useRef } from "react";
 import { useSearchParams, useParams, useRouter } from "next/navigation";
 import { loadStripe } from "@stripe/stripe-js";
 import Image from "next/image";
@@ -8,6 +8,7 @@ import Image from "next/image";
 import { Container, Text, Button, Paper, Group, Stack, Badge, Progress } from "@mantine/core";
 import { IconCreditCard, IconCheck, IconLock, IconInfoCircle } from "@tabler/icons-react";
 import PageIllustration from "@/components/page-illustration";
+import { downloadAccountKnowledge } from "@/lib/knowledgeDownload";
 import { Elements, PaymentElement, useElements, useStripe } from "@stripe/react-stripe-js";
 import styles from "./payment.module.css";
 
@@ -96,6 +97,8 @@ function PaymentForm({ orderUuid, amount, title, locale, isRTL, isGuest, orderDe
   const [isRetrying, setIsRetrying] = useState(false);
   const [stripeAccepted, setStripeAccepted] = useState(false);
   const [pollAttemptsEnded, setPollAttemptsEnded] = useState(false);
+  const orderDetailsRef = useRef(orderDetails);
+  const hasTriggeredAccountDownloadRef = useRef(false);
 
   // Get auth token from cookies
   const getAuthToken = () => {
@@ -110,6 +113,10 @@ function PaymentForm({ orderUuid, amount, title, locale, isRTL, isGuest, orderDe
     if (typeof window === "undefined") return null;
     return localStorage.getItem("guest-token");
   };
+
+  useEffect(() => {
+    orderDetailsRef.current = orderDetails;
+  }, [orderDetails]);
 
   const triggerGuestDownload = useCallback(async () => {
     const guestToken = getGuestToken();
@@ -185,6 +192,77 @@ function PaymentForm({ orderUuid, amount, title, locale, isRTL, isGuest, orderDe
     return null;
   }, [isGuest, locale]);
 
+  const triggerAccountDownload = useCallback(async (knowledgeDownloadId?: string | null) => {
+    if (!knowledgeDownloadId) return false;
+
+    setIsFetchingDownloadIds(true);
+    try {
+      await downloadAccountKnowledge(knowledgeDownloadId, {
+        token: getAuthToken(),
+        locale,
+        filename: orderDetailsRef.current?.orderable?.knowledge?.[0]?.title || title || "knowledge",
+      });
+      return true;
+    } catch (error) {
+      console.error("Error downloading purchased knowledge:", error);
+      return false;
+    } finally {
+      setIsFetchingDownloadIds(false);
+    }
+  }, [locale, title]);
+
+  const waitForKnowledgeDownloadId = useCallback(async () => {
+    const maxAttempts = 8;
+    const retryDelay = 1000;
+
+    for (let attempt = 0; attempt < maxAttempts; attempt++) {
+      const currentDownloadId = orderDetailsRef.current?.knowledge_download_id;
+      if (currentDownloadId) return currentDownloadId;
+
+      const updatedOrderDetails = await fetchUpdatedOrderDetails(orderUuid, setOrderDetails);
+      const updatedDownloadId =
+        updatedOrderDetails?.knowledge_download_id ||
+        orderDetailsRef.current?.knowledge_download_id;
+
+      if (updatedDownloadId) return updatedDownloadId;
+
+      if (attempt < maxAttempts - 1) {
+        await new Promise((resolve) => setTimeout(resolve, retryDelay));
+      }
+    }
+
+    return "";
+  }, [fetchUpdatedOrderDetails, orderUuid, setOrderDetails]);
+
+  const redirectToDownloads = useCallback(async () => {
+    let knowledgeDownloadId = orderDetails?.knowledge_download_id;
+
+    if (!knowledgeDownloadId) {
+      const updatedOrderDetails = await fetchUpdatedOrderDetails(orderUuid, setOrderDetails);
+      knowledgeDownloadId = updatedOrderDetails?.knowledge_download_id;
+    }
+
+    if (knowledgeDownloadId) {
+      window.location.href = `https://app.insightabusiness.com/app/insighter-dashboard/my-downloads?uuids=${knowledgeDownloadId}`;
+      return;
+    }
+
+    const searchTitle = orderDetails?.orderable?.knowledge?.[0]?.title || "";
+    const searchParam = searchTitle ? `?search=${encodeURIComponent(searchTitle)}` : "";
+    window.location.href = `https://app.insightabusiness.com/app/insighter-dashboard/my-downloads${searchParam}`;
+  }, [fetchUpdatedOrderDetails, orderDetails, orderUuid, setOrderDetails]);
+
+  const handleRedownload = useCallback(async () => {
+    const knowledgeDownloadId = await waitForKnowledgeDownloadId();
+
+    if (knowledgeDownloadId) {
+      await triggerAccountDownload(knowledgeDownloadId);
+      return;
+    }
+
+    await redirectToDownloads();
+  }, [redirectToDownloads, triggerAccountDownload, waitForKnowledgeDownloadId]);
+
   // Translations
   const translations = {
     paymentTitle: isRTL ? "إتمام الدفع" : "Complete Payment",
@@ -218,24 +296,24 @@ function PaymentForm({ orderUuid, amount, title, locale, isRTL, isGuest, orderDe
   const docsToRender =
     apiDocs.length > 0
       ? apiDocs.map((d, idx) => ({
-          key: `api-${idx}-${d.file_name}`,
-          file_name: d.file_name,
-          file_extension: d.file_extension,
-          price: d.price,
-        }))
+        key: `api-${idx}-${d.file_name}`,
+        file_name: d.file_name,
+        file_extension: d.file_extension,
+        price: d.price,
+      }))
       : fallbackDocs.map((d) => ({
-          key: `cached-${d.id}-${d.file_name}`,
-          file_name: d.file_name,
-          file_extension: d.file_extension,
-          price: d.price,
-        }));
+        key: `cached-${d.id}-${d.file_name}`,
+        file_name: d.file_name,
+        file_extension: d.file_extension,
+        price: d.price,
+      }));
 
   // Poll order status
   const pollOrderStatus = useCallback(async () => {
     let attempts = 0;
     const maxAttempts = 18; // ~2 minutes with progressive delays
     setPollAttemptsEnded(false);
-    
+
     // Progressive delay calculation
     const getPollingDelay = (attempt: number): number => {
       if (attempt < 5) return 4000;    // 4 seconds for first 5 attempts
@@ -298,7 +376,7 @@ function PaymentForm({ orderUuid, amount, title, locale, isRTL, isGuest, orderDe
 
     while (attempts < maxAttempts) {
       const isPaid = await checkStatus();
-      
+
       if (isPaid) {
         if (isGuest) {
           try {
@@ -335,6 +413,9 @@ function PaymentForm({ orderUuid, amount, title, locale, isRTL, isGuest, orderDe
     setShowInlineError(false);
     setStripeAccepted(false);
     setPollAttemptsEnded(false);
+    hasTriggeredAccountDownloadRef.current = false;
+    setDownloadProgress(0);
+    setShowDocumentsAdded(false);
 
     try {
       // Confirm the payment
@@ -350,11 +431,11 @@ function PaymentForm({ orderUuid, amount, title, locale, isRTL, isGuest, orderDe
         // For validation errors (like missing card info), show inline error
         // For other errors, show full error UI
         if (result.error.type === 'validation_error' ||
-            result.error.type === 'card_error' ||
-            result.error.code === 'payment_intent_unexpected_state' ||
-            result.error.message?.includes('already succeeded') ||
-            result.error.message?.includes('incomplete') ||
-            result.error.message?.includes('card number')) {
+          result.error.type === 'card_error' ||
+          result.error.code === 'payment_intent_unexpected_state' ||
+          result.error.message?.includes('already succeeded') ||
+          result.error.message?.includes('incomplete') ||
+          result.error.message?.includes('card number')) {
           setErrorMessage(result.error.message || "Payment failed");
           setShowInlineError(true);
           setPaymentStatus("idle"); // Keep form visible
@@ -492,7 +573,12 @@ function PaymentForm({ orderUuid, amount, title, locale, isRTL, isGuest, orderDe
               // Recall the API to get updated knowledge_download_id after documents are processed
               if (!isGuest) {
                 console.log('Documents processed, fetching updated order details...'); // Debug log
-                await fetchUpdatedOrderDetails(orderUuid, setOrderDetails);
+                const knowledgeDownloadId = await waitForKnowledgeDownloadId();
+
+                if (knowledgeDownloadId && !hasTriggeredAccountDownloadRef.current) {
+                  hasTriggeredAccountDownloadRef.current = true;
+                  await triggerAccountDownload(knowledgeDownloadId);
+                }
               }
             }, 300);
             return 100;
@@ -503,7 +589,7 @@ function PaymentForm({ orderUuid, amount, title, locale, isRTL, isGuest, orderDe
 
       return () => clearInterval(timer);
     }
-  }, [paymentStatus, orderUuid, fetchUpdatedOrderDetails, isGuest, setOrderDetails]);
+  }, [paymentStatus, orderUuid, fetchUpdatedOrderDetails, isGuest, setOrderDetails, triggerAccountDownload, waitForKnowledgeDownloadId]);
 
   // Success UI
   if (paymentStatus === "success") {
@@ -515,12 +601,12 @@ function PaymentForm({ orderUuid, amount, title, locale, isRTL, isGuest, orderDe
             <div className="absolute inset-0 bg-gradient-to-br from-green-400 to-emerald-500 rounded-full opacity-20"></div>
             <div className="absolute inset-0 bg-gradient-to-br from-green-500 to-emerald-600 rounded-full flex items-center justify-center">
               <svg className="w-12 h-12" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path 
+                <path
                   className={styles.checkmarkPath}
-                  d="M5 13l4 4L19 7" 
-                  stroke="white" 
-                  strokeWidth="3" 
-                  strokeLinecap="round" 
+                  d="M5 13l4 4L19 7"
+                  stroke="white"
+                  strokeWidth="3"
+                  strokeLinecap="round"
                   strokeLinejoin="round"
                 />
               </svg>
@@ -538,16 +624,16 @@ function PaymentForm({ orderUuid, amount, title, locale, isRTL, isGuest, orderDe
         <p className={`text-gray-600 mb-8 ${styles.successDescription}`}>
           {translations.accessGranted}
         </p>
-        
+
         {/* Progress section (non-guest only) */}
         {!isGuest && (
           <div className={`mb-8 ${styles.progressSection}`}>
             {!showDocumentsAdded ? (
               <div className="space-y-4">
                 <Text size="sm" c="dimmed" fw={500}>{translations.preparingDownloads}</Text>
-                <Progress 
-                  value={downloadProgress} 
-                  size="xl" 
+                <Progress
+                  value={downloadProgress}
+                  size="xl"
                   radius="xl"
                   color="teal"
                   striped
@@ -572,55 +658,56 @@ function PaymentForm({ orderUuid, amount, title, locale, isRTL, isGuest, orderDe
             <Button
               size="md"
               className={`bg-gradient-to-r from-blue-500 to-teal-400 hover:from-blue-600 hover:to-teal-500 transition-all ${styles.downloadButton}`}
-              loading={isFetchingDownloadIds}
-              disabled={isFetchingDownloadIds}
-              onClick={() => {
+              onClick={async () => {
                 if (isGuest) {
                   triggerGuestDownload().catch((e) => console.error(e));
                   return;
                 }
-                console.log('Download button clicked. Order details:', orderDetails); // Debug log
-                // Use knowledge_download_id if available, otherwise fall back to title search
-                if (orderDetails?.knowledge_download_id) {
-                  const uuidsParam = `?uuids=${orderDetails.knowledge_download_id}`;
-                  console.log('Redirecting with UUID:', uuidsParam); // Debug log
-                  window.location.href = `https://app.insightabusiness.com/app/insighter-dashboard/my-downloads${uuidsParam}`;
-                } else {
-                  console.log('No UUID available, falling back to search'); // Debug log
-                  // Fallback to title search if no UUID available
-                  const searchTitle = orderDetails?.orderable?.knowledge?.[0]?.title || "";
-                  const searchParam = searchTitle ? `?search=${encodeURIComponent(searchTitle)}` : "";
-                  console.log('Redirecting with search:', searchParam); // Debug log
-                  window.location.href = `https://app.insightabusiness.com/app/insighter-dashboard/my-downloads${searchParam}`;
-                }
+                await redirectToDownloads();
               }}
             >
-              {isFetchingDownloadIds
-                ? (isRTL ? "جاري التحديث..." : "Updating...")
-                : (isGuest ? translations.redownload : translations.goToDownloads)}
+              {isGuest ? translations.redownload : translations.goToDownloads}
             </Button>
+
+            {!isGuest && (
+              <div className="mt-3">
+                <a
+                  href="#"
+                  onClick={async (event) => {
+                    event.preventDefault();
+                    await handleRedownload();
+                  }}
+                  className={`text-sm text-blue-600 underline underline-offset-2 hover:text-blue-700 ${isFetchingDownloadIds ? "pointer-events-none opacity-60" : ""}`}
+                  aria-disabled={isFetchingDownloadIds}
+                >
+                  {isFetchingDownloadIds
+                    ? (isRTL ? "جاري التحميل..." : "Downloading...")
+                    : translations.redownload}
+                </a>
+              </div>
+            )}
 
             {isGuest && (
               <div className="mt-10 border border-blue-200 bg-blue-50 flex flex-col sm:flex-row items-start gap-3 rounded-md p-4 sm:p-5 w-full min-w-0">
-               <IconInfoCircle size={32} className="text-blue-600 ms-2 flex-shrink-0" />
-              <div className="min-w-0">
-              <Text size="md" ta="start">
-               
-               {translations.guestLinkNote}
-             </Text>
-             <Text size="md" ta="start">
-               {translations.guestSupportNotePrefix}
-               <a
-                 href="https://insightabusiness.com/en/contact"
-                 target="_blank"
-                 rel="noopener noreferrer"
-                 className="text-blue-600 hover:text-blue-700 underline underline-offset-2"
-               >
-                 {translations.contactUs}
-               </a>
-               .
-             </Text>
-             </div>
+                <IconInfoCircle size={32} className="text-blue-600 ms-2 flex-shrink-0" />
+                <div className="min-w-0">
+                  <Text size="md" ta="start">
+
+                    {translations.guestLinkNote}
+                  </Text>
+                  <Text size="md" ta="start">
+                    {translations.guestSupportNotePrefix}
+                    <a
+                      href="https://insightabusiness.com/en/contact"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-blue-600 hover:text-blue-700 underline underline-offset-2"
+                    >
+                      {translations.contactUs}
+                    </a>
+                    .
+                  </Text>
+                </div>
               </div>
             )}
           </div>
@@ -658,8 +745,8 @@ function PaymentForm({ orderUuid, amount, title, locale, isRTL, isGuest, orderDe
           {isRTL ? "إتمام الدفع" : "Complete Your Payment"}
         </h1>
         <p className="text-gray-600">
-          {isRTL 
-            ? "أدخل معلومات الدفع الخاصة بك لإكمال الطلب" 
+          {isRTL
+            ? "أدخل معلومات الدفع الخاصة بك لإكمال الطلب"
             : "Enter your payment details to complete the order"}
         </p>
       </div>
@@ -667,104 +754,104 @@ function PaymentForm({ orderUuid, amount, title, locale, isRTL, isGuest, orderDe
       <form onSubmit={handleSubmit} className="space-y-6">
         {/* Two column layout for larger screens */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Order Summary - Left Column */}
-        <Paper radius="md" className="border border-gray-200 h-fit p-4 sm:p-6 lg:min-h-[407px]">
-          <Text size="lg" fw={600} mb="md">
-            {translations.orderSummary}
-          </Text>
-          <Stack gap="sm">
-            <Group justify="space-between">
-              <Text>{orderTitle}</Text>
-            </Group>
-            
-            {/* Display ordered files (API first; localStorage fallback) */}
-            {docsToRender.length > 0 ? (
-              <div className="mt-2">
-                <div className="flex flex-col gap-3">
-                  {docsToRender.map((doc) => (
-                    <div
-                      key={doc.key}
-                      className="flex flex-wrap items-center gap-3 bg-gray-50 border border-gray-100 rounded-md px-4 py-3 min-w-0"
-                    >
-                      <Image
-                        src={getFileIconByExtension(doc.file_extension)}
-                        alt={`${doc.file_extension.toUpperCase()} file`}
-                        width={20}
-                        height={20}
-                      />
-                      <Text size="xs" c="dimmed" className="min-w-0 flex-1" truncate>
-                        {doc.file_name}
-                      </Text>
-                      <Badge size="xs" color="blue" variant="light" className="bg-blue-100">
-                        ${doc.price}
-                      </Badge>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            ) : null}
-            
-            <Group justify="space-between" className="mt-3">
-              <Text fw={600}>Total</Text>
-              <Badge size="lg" color="blue" variant="filled">
-                ${amount}
-              </Badge>
-            </Group>
-          </Stack>
-        </Paper>
+          {/* Order Summary - Left Column */}
+          <Paper radius="md" className="border border-gray-200 h-fit p-4 sm:p-6 lg:min-h-[407px]">
+            <Text size="lg" fw={600} mb="md">
+              {translations.orderSummary}
+            </Text>
+            <Stack gap="sm">
+              <Group justify="space-between">
+                <Text>{orderTitle}</Text>
+              </Group>
 
-        {/* Payment Element - Right Column */}
-        <div className="space-y-6">
-          <Paper radius="md" className="border border-gray-200 p-4 sm:p-6">
-            <PaymentElement
-              options={{
-                layout: "tabs",
-                fields: {
-                  billingDetails: {
-                    address: {
-                      country: "auto",
-                    },
-                  },
-                },
-              }}
-            />
+              {/* Display ordered files (API first; localStorage fallback) */}
+              {docsToRender.length > 0 ? (
+                <div className="mt-2">
+                  <div className="flex flex-col gap-3">
+                    {docsToRender.map((doc) => (
+                      <div
+                        key={doc.key}
+                        className="flex flex-wrap items-center gap-3 bg-gray-50 border border-gray-100 rounded-md px-4 py-3 min-w-0"
+                      >
+                        <Image
+                          src={getFileIconByExtension(doc.file_extension)}
+                          alt={`${doc.file_extension.toUpperCase()} file`}
+                          width={20}
+                          height={20}
+                        />
+                        <Text size="xs" c="dimmed" className="min-w-0 flex-1" truncate>
+                          {doc.file_name}
+                        </Text>
+                        <Badge size="xs" color="blue" variant="light" className="bg-blue-100">
+                          ${doc.price}
+                        </Badge>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              ) : null}
+
+              <Group justify="space-between" className="mt-3">
+                <Text fw={600}>Total</Text>
+                <Badge size="lg" color="blue" variant="filled">
+                  ${amount}
+                </Badge>
+              </Group>
+            </Stack>
           </Paper>
 
-          {/* Security Note */}
-          <div className="flex items-center justify-center gap-2 text-sm text-gray-500">
-            <IconLock size={16} />
-            <Text size="sm" c="dimmed">
-              {translations.securityNote}
-            </Text>
-          </div>
+          {/* Payment Element - Right Column */}
+          <div className="space-y-6">
+            <Paper radius="md" className="border border-gray-200 p-4 sm:p-6">
+              <PaymentElement
+                options={{
+                  layout: "tabs",
+                  fields: {
+                    billingDetails: {
+                      address: {
+                        country: "auto",
+                      },
+                    },
+                  },
+                }}
+              />
+            </Paper>
 
-          {/* Inline Error Message */}
-          {showInlineError && errorMessage && (
-            <div className="bg-red-50 border border-red-200 rounded-md p-3 mb-2">
-              <Text size="sm" c="red" className="text-center">
-                {errorMessage}
+            {/* Security Note */}
+            <div className="flex items-center justify-center gap-2 text-sm text-gray-500">
+              <IconLock size={16} />
+              <Text size="sm" c="dimmed">
+                {translations.securityNote}
               </Text>
             </div>
-          )}
 
-          {/* Submit Button */}
-          <Button
-            type="submit"
-            size="lg"
-            fullWidth
-            loading={isProcessing || paymentStatus === "polling"}
-            disabled={!stripe || !elements || isProcessing || paymentStatus === "polling"}
-            className="bg-gradient-to-r from-blue-500 to-teal-400 hover:opacity-90"
-            leftSection={paymentStatus !== "polling" && <IconCreditCard size={20} />}
-          >
-            {paymentStatus === "processing" 
-              ? translations.processing 
-              : paymentStatus === "polling"
-              ? translations.verifyingPayment
-              : `${translations.payNow} $${amount}`}
-          </Button>
+            {/* Inline Error Message */}
+            {showInlineError && errorMessage && (
+              <div className="bg-red-50 border border-red-200 rounded-md p-3 mb-2">
+                <Text size="sm" c="red" className="text-center">
+                  {errorMessage}
+                </Text>
+              </div>
+            )}
+
+            {/* Submit Button */}
+            <Button
+              type="submit"
+              size="lg"
+              fullWidth
+              loading={isProcessing || paymentStatus === "polling"}
+              disabled={!stripe || !elements || isProcessing || paymentStatus === "polling"}
+              className="bg-gradient-to-r from-blue-500 to-teal-400 hover:opacity-90"
+              leftSection={paymentStatus !== "polling" && <IconCreditCard size={20} />}
+            >
+              {paymentStatus === "processing"
+                ? translations.processing
+                : paymentStatus === "polling"
+                  ? translations.verifyingPayment
+                  : `${translations.payNow} $${amount}`}
+            </Button>
+          </div>
         </div>
-      </div>
       </form>
     </div>
   );
@@ -782,7 +869,7 @@ export default function StripePaymentPage() {
   const amount = searchParams.get("amount") || "0";
   const title = searchParams.get("title") || "";
   const isGuest = searchParams.get("guest") === "1";
-  
+
   const [orderDetails, setOrderDetails] = useState<OrderDetails | null>(null);
   const [guestSummary, setGuestSummary] = useState<GuestOrderSummary | null>(null);
   const [storedSummary, setStoredSummary] = useState<StoredOrderSummary | null>(null);
@@ -801,7 +888,7 @@ export default function StripePaymentPage() {
     const fetchOrderDetails = async () => {
       if (!orderUuid) return;
       if (isGuest) return;
-      
+
       try {
         const token = getAuthToken();
         const response = await fetch(
@@ -891,12 +978,12 @@ export default function StripePaymentPage() {
   return (
     <>
       <PageIllustration middle={false} />
-      
+
       <div className="min-h-screen relative z-1" dir={isRTL ? "rtl" : "ltr"}>
         <Container size="lg" className="py-8 sm:py-12 px-4">
           <div className="max-w-5xl mx-auto">
             <Elements stripe={stripePromise} options={options}>
-              <PaymentForm 
+              <PaymentForm
                 orderUuid={orderUuid}
                 amount={amount}
                 title={title}

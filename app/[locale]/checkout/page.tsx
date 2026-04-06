@@ -20,6 +20,7 @@ import { useToast } from "@/components/toast/ToastContext";
 import PageIllustration from "@/components/page-illustration";
 import CountryGuard from "@/components/auth/CountryGuard";
 import { getAuthToken } from "@/lib/authToken";
+import { downloadAccountKnowledge } from "@/lib/knowledgeDownload";
 import {
   VisaIcon,
   MasterCardIcon,
@@ -123,9 +124,20 @@ export default function CheckoutPage() {
   const [knowledgeDownloadId, setKnowledgeDownloadId] = useState<string>('');
   const [orderUuid, setOrderUuid] = useState<string>("");
   const [isFetchingDownloadIds, setIsFetchingDownloadIds] = useState(false);
+  const hasTriggeredAccountDownloadRef = useRef(false);
+  const knowledgeDownloadIdRef = useRef(knowledgeDownloadId);
+  const orderUuidRef = useRef(orderUuid);
 
   const authToken = getAuthToken();
   const isGuest = !authToken;
+
+  useEffect(() => {
+    knowledgeDownloadIdRef.current = knowledgeDownloadId;
+  }, [knowledgeDownloadId]);
+
+  useEffect(() => {
+    orderUuidRef.current = orderUuid;
+  }, [orderUuid]);
 
   // Guest checkout fields
   const [guestEmail, setGuestEmail] = useState("");
@@ -429,6 +441,7 @@ export default function CheckoutPage() {
       ? "تم إكمال طلبك بنجاح. يمكنك الآن تنزيل المستندات المشتراة."
       : "Your order has been completed successfully. You can now download your purchased documents.",
     goToDownloads: isRTL ? "الذهاب إلى التنزيلات" : "Go to Downloads",
+    redownload: isRTL ? "إعادة التحميل" : "Redownload",
     congratulations: isRTL ? "تهانينا!" : "Congratulations!",
     paymentComplete: isRTL ? (isFree ? "تم إكمال الطلب بنجاح" : "تمت معالجة دفعتك بنجاح") : (isFree ? "Your order has been completed successfully" : "Your payment has been processed successfully"),
     accessGranted: isRTL ? (isFree ? "يمكنك الآن الوصول إلى جميع المستندات" : "يمكنك الآن الوصول إلى جميع المستندات المشتراة") : (isFree ? "You now have access to all your documents" : "You now have access to all your purchased documents"),
@@ -526,6 +539,83 @@ export default function CheckoutPage() {
     return null;
   };
 
+  const triggerAccountDownload = async (downloadId: string) => {
+    if (!downloadId) return false;
+
+    setIsFetchingDownloadIds(true);
+    try {
+      await downloadAccountKnowledge(downloadId, {
+        token: getAuthToken(),
+        locale,
+        filename: knowledge?.title || "knowledge",
+      });
+      return true;
+    } catch (error) {
+      console.error("Error downloading purchased knowledge:", error);
+      toast.error(
+        error instanceof Error ? error.message : translations.orderError,
+        translations.orderError
+      );
+      return false;
+    } finally {
+      setIsFetchingDownloadIds(false);
+    }
+  };
+
+  const waitForKnowledgeDownloadId = async () => {
+    const maxAttempts = 8;
+    const retryDelay = 1000;
+
+    for (let attempt = 0; attempt < maxAttempts; attempt++) {
+      const currentDownloadId = knowledgeDownloadIdRef.current;
+      if (currentDownloadId) return currentDownloadId;
+
+      const currentOrderUuid = orderUuidRef.current;
+      if (!currentOrderUuid) return "";
+
+      const updatedOrderDetails = await fetchUpdatedOrderDetails(currentOrderUuid);
+      const updatedDownloadId =
+        updatedOrderDetails?.knowledge_download_id || knowledgeDownloadIdRef.current;
+
+      if (updatedDownloadId) return updatedDownloadId;
+
+      if (attempt < maxAttempts - 1) {
+        await new Promise((resolve) => setTimeout(resolve, retryDelay));
+      }
+    }
+
+    return "";
+  };
+
+  const redirectToDownloads = async () => {
+    let downloadId = knowledgeDownloadId;
+
+    if (!downloadId && orderUuid) {
+      const updatedOrderDetails = await fetchUpdatedOrderDetails(orderUuid);
+      downloadId = updatedOrderDetails?.knowledge_download_id || "";
+    }
+
+    if (downloadId) {
+      window.location.href = `https://app.insightabusiness.com/app/insighter-dashboard/my-downloads?uuids=${downloadId}`;
+      return;
+    }
+
+    const searchTitle = knowledge?.title || "";
+    const searchParam = searchTitle ? `?search=${encodeURIComponent(searchTitle)}` : "";
+    window.location.href = `https://app.insightabusiness.com/app/insighter-dashboard/my-downloads${searchParam}`;
+  };
+
+  const handleRedownload = async () => {
+    const downloadId = await waitForKnowledgeDownloadId();
+
+    if (downloadId) {
+      await triggerAccountDownload(downloadId);
+      return;
+    }
+
+    await redirectToDownloads();
+  };
+
   // Handle document selection toggle
   const handleDocumentToggle = (documentId: number) => {
     setSelectedDocuments((prev) =>
@@ -551,9 +641,12 @@ export default function CheckoutPage() {
             setTimeout(async () => {
               setShowDocumentsAdded(true);
               // Recall the API to get updated knowledge_download_id after documents are processed
-              if (orderUuid) {
-                console.log('Documents processed, fetching updated order details...'); // Debug log
-                await fetchUpdatedOrderDetails(orderUuid);
+              console.log('Documents processed, fetching updated order details...'); // Debug log
+              const downloadId = await waitForKnowledgeDownloadId();
+
+              if (downloadId && !hasTriggeredAccountDownloadRef.current) {
+                hasTriggeredAccountDownloadRef.current = true;
+                await triggerAccountDownload(downloadId);
               }
             }, 300);
             return 100;
@@ -579,6 +672,9 @@ export default function CheckoutPage() {
       return;
     }
 
+    hasTriggeredAccountDownloadRef.current = false;
+    setDownloadProgress(0);
+    setShowDocumentsAdded(false);
     setIsCheckingOut(true);
     try {
       const token = getAuthToken();
@@ -750,13 +846,16 @@ export default function CheckoutPage() {
       const responseData = data.data || data;
 
       // Store the order UUID for later use
-      if (responseData.uuid) {
-        setOrderUuid(responseData.uuid);
+      const checkoutOrderUuid = responseData.uuid || responseData.order_uuid;
+      if (checkoutOrderUuid) {
+        setOrderUuid(checkoutOrderUuid);
+        orderUuidRef.current = checkoutOrderUuid;
       }
 
       // Extract knowledge_download_id if available (now directly in responseData)
       if (responseData.knowledge_download_id) {
         setKnowledgeDownloadId(responseData.knowledge_download_id);
+        knowledgeDownloadIdRef.current = responseData.knowledge_download_id;
       }
 
       // Handle Stripe payment
@@ -923,32 +1022,30 @@ export default function CheckoutPage() {
               </div>
 
               {showDocumentsAdded && (
-                <Button
-                  size="md"
-                  className={`bg-gradient-to-r from-blue-500 to-teal-400 hover:from-blue-600 hover:to-teal-500 transition-all ${styles.downloadButton}`}
-                  loading={isFetchingDownloadIds}
-                  disabled={isFetchingDownloadIds}
-                  onClick={() => {
-                    console.log('Download button clicked. Insight download ID:', knowledgeDownloadId); // Debug log
-                    // Use UUID if available, otherwise fall back to title search
-                    if (knowledgeDownloadId) {
-                      const uuidsParam = `?uuids=${knowledgeDownloadId}`;
-                      console.log('Redirecting with UUID:', uuidsParam); // Debug log
-                      window.location.href = `https://app.insightabusiness.com/app/insighter-dashboard/my-downloads${uuidsParam}`;
-                    } else {
-                      console.log('No UUID available, falling back to search'); // Debug log
-                      // Fallback to title search if no UUID available
-                      const searchTitle = knowledge?.title || "";
-                      const searchParam = searchTitle ? `?search=${encodeURIComponent(searchTitle)}` : "";
-                      console.log('Redirecting with search:', searchParam); // Debug log
-                      window.location.href = `https://app.insightabusiness.com/app/insighter-dashboard/my-downloads${searchParam}`;
-                    }
-                  }}
-                >
-                  {isFetchingDownloadIds
-                    ? (isRTL ? "جاري التحديث..." : "Updating...")
-                    : translations.goToDownloads}
-                </Button>
+                <>
+                  <Button
+                    size="md"
+                    className={`bg-gradient-to-r from-blue-500 to-teal-400 hover:from-blue-600 hover:to-teal-500 transition-all ${styles.downloadButton}`}
+                    onClick={redirectToDownloads}
+                  >
+                    {translations.goToDownloads}
+                  </Button>
+                  <div className="mt-3">
+                    <a
+                      href="#"
+                      onClick={async (event) => {
+                        event.preventDefault();
+                        await handleRedownload();
+                      }}
+                      className={`text-sm text-blue-600 underline underline-offset-2 hover:text-blue-700 ${isFetchingDownloadIds ? "pointer-events-none opacity-60" : ""}`}
+                      aria-disabled={isFetchingDownloadIds}
+                    >
+                      {isFetchingDownloadIds
+                        ? (isRTL ? "جاري التحميل..." : "Downloading...")
+                        : translations.redownload}
+                    </a>
+                  </div>
+                </>
               )}
             </div>
           </Container>

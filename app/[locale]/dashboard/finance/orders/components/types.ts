@@ -48,6 +48,13 @@ export type FulfillmentUser = {
   profile_photo_url: string | null;
 };
 
+export type CompanyInfo = {
+  uuid: string;
+  legal_name: string;
+  logo?: string | null;
+  verified?: boolean;
+};
+
 export type CustomerUser = {
   name: string;
   email: string;
@@ -57,12 +64,7 @@ export type CustomerUser = {
   uuid?: string;
   profile_photo_url?: string | null;
   roles?: string[];
-  company?: {
-    uuid: string;
-    legal_name: string;
-    logo?: string | null;
-    verified?: boolean;
-  } | null;
+  company?: CompanyInfo | null;
 };
 
 export type FulfillmentAttempt = {
@@ -77,6 +79,7 @@ export type FulfillmentAttempt = {
 export type OrderRecord = {
   uuid: string;
   user?: CustomerUser;
+  insighter?: (CustomerUser & { id?: number }) | null;
   amount: number;
   service: string;
   service_name?: string;

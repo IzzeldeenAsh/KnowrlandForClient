@@ -90,6 +90,12 @@ export default function OrderDetailsModal({
   const status = normalizeText(order.status) || 'unknown';
   const fulfillmentStatus = normalizeText(order.fulfillment_staus) || 'unknown';
   const customerType = normalizeText(order.user?.type);
+  const insighterType = normalizeText(order.insighter?.type);
+  const insighterCompany = order.insighter?.company;
+  const insighterPersonName = normalizeText(order.insighter?.name);
+  const insighterAvatar = normalizeText(insighterCompany?.logo) || normalizeText(order.insighter?.profile_photo_url);
+  const insighterDisplayName = normalizeText(insighterCompany?.legal_name) || insighterPersonName || '-';
+  const insighterUuid = normalizeText(order.insighter?.uuid);
   const orderItems = order.orderable ?? order.order_data;
   const meetingBooking = orderItems?.meeting_booking;
   const knowledgeItems = Array.isArray(orderItems?.knowledge) ? orderItems.knowledge : [];
@@ -192,6 +198,67 @@ export default function OrderDetailsModal({
               </div>
             </div>
           </div>
+
+          {order.insighter ? (
+            <div className="mt-4 rounded-md border border-slate-200 bg-white p-4 shadow-sm">
+              <div className={SECTION_TITLE_CLASS}>Insighter Information</div>
+              <div className="mt-3 flex flex-col gap-3 lg:flex-row lg:items-start lg:justify-between">
+                <div className="flex items-center gap-3">
+                  {insighterAvatar ? (
+                    <img
+                      src={insighterAvatar}
+                      alt={insighterDisplayName}
+                      className="h-10 w-10 rounded-full object-cover"
+                      style={{ objectPosition: 'top' }}
+                    />
+                  ) : (
+                    <div className="flex h-10 w-10 items-center justify-center rounded-full bg-slate-100 text-sm font-semibold text-slate-600">
+                      {(insighterDisplayName !== '-' ? insighterDisplayName.charAt(0) : '') || 'I'}
+                    </div>
+                  )}
+
+                  <div className="min-w-0">
+                    <div className="truncate text-sm font-semibold text-slate-900">{insighterDisplayName}</div>
+                    <div className="truncate text-xs text-slate-500">{normalizeText(order.insighter.email) || '-'}</div>
+                    <div className="mt-1 flex flex-wrap gap-1">
+                      {insighterType ? (
+                        <span className={`rounded-full px-2 py-0.5 text-[10px] font-semibold ${getUserTypeBadgeClass(insighterType)}`}>
+                          {toTitle(insighterType)}
+                        </span>
+                      ) : null}
+                      {order.insighter.roles?.map((role) => (
+                        <span
+                          key={role}
+                          className={`rounded-full px-2 py-0.5 text-[10px] font-semibold ${getRoleBadgeClass(role)}`}
+                        >
+                          {role}
+                        </span>
+                      ))}
+                    </div>
+                    {insighterCompany && insighterPersonName && insighterPersonName !== insighterDisplayName ? (
+                      <div className="mt-2 text-[11px] text-slate-500">By {insighterPersonName}</div>
+                    ) : null}
+                    {insighterUuid ? (
+                      <div className="mt-1 break-all text-[11px] text-slate-400">UUID: {insighterUuid}</div>
+                    ) : null}
+                  </div>
+                </div>
+
+                {insighterCompany ? (
+                  <div className="min-w-[220px] rounded-md border border-slate-200 bg-slate-50 px-3 py-2">
+                    <div className="text-[11px] font-semibold uppercase tracking-wide text-slate-500">Company</div>
+                    <div className="mt-1 text-xs font-semibold text-slate-900">{normalizeText(insighterCompany.legal_name) || '-'}</div>
+                    <div className="mt-1 text-[11px] text-slate-500">
+                      {insighterCompany.verified ? 'Verified company' : 'Unverified company'}
+                    </div>
+                    {normalizeText(insighterCompany.uuid) ? (
+                      <div className="mt-1 break-all text-[11px] text-slate-400">UUID: {normalizeText(insighterCompany.uuid)}</div>
+                    ) : null}
+                  </div>
+                ) : null}
+              </div>
+            </div>
+          ) : null}
 
           {order.user ? (
             <div className="mt-4 rounded-md border border-slate-200 bg-white p-4 shadow-sm">
