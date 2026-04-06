@@ -760,8 +760,10 @@ function PaymentForm({ orderUuid, amount, title, locale, isRTL, isGuest, orderDe
               {translations.orderSummary}
             </Text>
             <Stack gap="sm">
-              <Group justify="space-between">
-                <Text>{orderTitle}</Text>
+              <Group justify="space-between" className="min-w-0">
+                <Text className="min-w-0 w-full whitespace-normal break-words">
+                  {orderTitle}
+                </Text>
               </Group>
 
               {/* Display ordered files (API first; localStorage fallback) */}

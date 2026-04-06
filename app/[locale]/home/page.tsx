@@ -666,10 +666,20 @@ export default function HomePage() {
   
   // Custom setter for price filter that triggers search
   const handlePriceFilterChange = useCallback((value: string | null) => {
+    const shouldClearRangeFilters = value === 'false';
+
     // Update the price filter state
     setPriceFilter(value);
+    if (shouldClearRangeFilters) {
+      setRangeStartFilter(null);
+      setRangeEndFilter(null);
+    }
+
     // Update URL with new filter
-    updateUrlWithFilters({ paid: value });
+    updateUrlWithFilters({
+      paid: value,
+      ...(shouldClearRangeFilters ? { range_start: null, range_end: null } : {}),
+    });
 
     // Reset to page 1 when filter changes
     setCurrentPage(1);

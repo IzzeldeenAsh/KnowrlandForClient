@@ -986,15 +986,30 @@ const FilterBox: React.FC<FilterBoxProps> = React.memo(({
     }
   };
 
+  const clearRangePriceInputs = useCallback(() => {
+    tempRangeStartRef.current = '';
+    tempRangeEndRef.current = '';
+
+    if (rangeStartInputRef.current) {
+      rangeStartInputRef.current.value = '';
+    }
+    if (rangeEndInputRef.current) {
+      rangeEndInputRef.current.value = '';
+    }
+
+    setRangeError('');
+  }, []);
+
   // Filter handlers
   const handlePriceFilterChange = (value: string | null) => {
     if (setPriceFilter) {
       setPriceFilter(value);
     }
 
-    // Reset range filters when Free is selected
+    // Reset range input UI when Free is selected. The parent clears the applied
+    // range filters atomically with the price URL update to avoid stale state.
     if (value === 'false') { // 'false' means Free
-      handleRangePriceClear();
+      clearRangePriceInputs();
     }
   };
 
@@ -1054,20 +1069,7 @@ const FilterBox: React.FC<FilterBoxProps> = React.memo(({
   }, [locale, setRangeStartFilter, setRangeEndFilter, applyRangeFilters]);
 
   const handleRangePriceClear = useCallback(() => {
-    // Clear ref values
-    tempRangeStartRef.current = '';
-    tempRangeEndRef.current = '';
-
-    // Clear input fields
-    if (rangeStartInputRef.current) {
-      rangeStartInputRef.current.value = '';
-    }
-    if (rangeEndInputRef.current) {
-      rangeEndInputRef.current.value = '';
-    }
-
-    // Clear error state
-    setRangeError('');
+    clearRangePriceInputs();
 
     // Clear applied filters
     if (setRangeStartFilter) {
@@ -1076,7 +1078,7 @@ const FilterBox: React.FC<FilterBoxProps> = React.memo(({
     if (setRangeEndFilter) {
       setRangeEndFilter(null);
     }
-  }, [setRangeStartFilter, setRangeEndFilter]);
+  }, [clearRangePriceInputs, setRangeStartFilter, setRangeEndFilter]);
 
   // Input change handlers using refs to avoid re-renders
   const handleRangeStartChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
