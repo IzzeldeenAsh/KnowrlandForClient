@@ -31,8 +31,8 @@ export default function InsighterExperienceQuestion({
       minStorageKey={projectWizardStorage.insighterMinYearsExperienceKey(locale)}
       maxStorageKey={projectWizardStorage.insighterMaxYearsExperienceKey(locale)}
       sliderMin={0}
-      sliderMax={30}
-      sliderMarks={[0, 5, 10, 15, 20, 30]}
+      sliderMax={40}
+      sliderMarks={[0, 5, 10, 15, 20, 25, 30, 35, 40]}
       emptyErrorText={
         isRTL
           ? 'أدخل قيمة واحدة على الأقل أو استخدم التخطي.'
