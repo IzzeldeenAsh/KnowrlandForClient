@@ -53,7 +53,7 @@ export function UserProfile({ isHome }: { isHome: boolean }) {
     left: null,
     right: null,
   });
-  
+
   // Client-only values must be read after mount to avoid hydration mismatch.
   const [hasToken, setHasToken] = useState<boolean>(false);
   const [returnUrl, setReturnUrl] = useState<string>("");
@@ -225,12 +225,12 @@ export function UserProfile({ isHome }: { isHome: boolean }) {
   }, [menuOpen, canHaveDrafts, isRtl]);
 
   const isClient$ = () => {
-    return roles.includes("client") && 
-      !roles.includes("insighter") && 
-      !roles.includes("company") && 
+    return roles.includes("client") &&
+      !roles.includes("insighter") &&
+      !roles.includes("company") &&
       !roles.includes("company-insighter");
   };
-  
+
   if (!isAuthResolved) {
     return hasToken ? (
       <div className="w-10 h-10 bg-white animate-pulse rounded-full overflow-hidden border border-gray-200"></div>
@@ -291,7 +291,7 @@ export function UserProfile({ isHome }: { isHome: boolean }) {
             </div>
           )} */}
 
-{  user.profile_photo_url ? (
+          {user.profile_photo_url ? (
             <div className="w-8 h-8 md:w-10 md:h-10 rounded-full overflow-hidden">
               <Image
                 src={user.profile_photo_url}
@@ -358,7 +358,7 @@ export function UserProfile({ isHome }: { isHome: boolean }) {
                 </div>
               )} */}
               {
-                 user.profile_photo_url ? (
+                user.profile_photo_url ? (
                   <div className="w-10 h-10 rounded-lg overflow-hidden flex-shrink-0">
                     <Image
                       src={user.profile_photo_url}
@@ -380,37 +380,37 @@ export function UserProfile({ isHome }: { isHome: boolean }) {
                   <p className="text-sm font-bold text-gray-900 truncate">
                     {user.first_name} {user.last_name}
                   </p>
-                 
+
                 </div>
-               <div className="flex flex-wrap gap-1">
-               {roles.includes("insighter") && (
+                <div className="flex flex-wrap gap-1">
+                  {roles.includes("insighter") && (
                     <span className="bg-[#DFFEE9] text-[#1BC653] text-xs font-bold px-1.5 rounded-sm dark:bg-blue-900 dark:text-blue-300 whitespace-nowrap">
                       {t("insighter")}
                     </span>
                   )}
                   {(
                     roles.includes("company-insighter")) && (
-                   <>
-                    <span className="bg-[#EFF8FF] text-[#299AF8]  text-xs font-semibold px-1.5 rounded-sm dark:bg-yellow-900 dark:text-yellow-300 whitespace-nowrap">
-                    <span className="bg-[#EFF8FF] text-[#299AF8]  text-xs font-semibold px-1.5 rounded-sm dark:bg-yellow-900 dark:text-yellow-300 whitespace-nowrap">
-                     {t("insighter")} {isRtl ? "في" : "at"} { " "+user.company?.legal_name}
-                    </span>
-                    
-                    </span>
-                   </>
-                  )}
-                   {(roles.includes("company") &&
+                      <>
+                        <span className="bg-[#EFF8FF] text-[#299AF8]  text-xs font-semibold px-1.5 rounded-sm dark:bg-yellow-900 dark:text-yellow-300 whitespace-nowrap">
+                          <span className="bg-[#EFF8FF] text-[#299AF8]  text-xs font-semibold px-1.5 rounded-sm dark:bg-yellow-900 dark:text-yellow-300 whitespace-nowrap">
+                            {t("insighter")} {isRtl ? "في" : "at"} {" " + user.company?.legal_name}
+                          </span>
+
+                        </span>
+                      </>
+                    )}
+                  {(roles.includes("company") &&
                     !roles.includes("company-insighter")) && (
-                   <div className="flex gap-1 pt-1">
-                    
-                    <span className="bg-[#EFF8FF] text-[#299AF8]  text-xs font-semibold px-1.5 rounded-sm dark:bg-yellow-900 dark:text-yellow-300 whitespace-nowrap">
-                     {user.company?.legal_name}
-                    </span>
-                    <span className="bg-[#EFF8FF] text-[#299AF8]  text-xs font-semibold px-1.5 rounded-sm dark:bg-yellow-900 dark:text-yellow-300 whitespace-nowrap">
-                     {t("manager")}
-                      </span>
-                   </div>
-                  )}
+                      <div className="flex gap-1 pt-1">
+
+                        <span className="bg-[#EFF8FF] text-[#299AF8]  text-xs font-semibold px-1.5 rounded-sm dark:bg-yellow-900 dark:text-yellow-300 whitespace-nowrap">
+                          {user.company?.legal_name}
+                        </span>
+                        <span className="bg-[#EFF8FF] text-[#299AF8]  text-xs font-semibold px-1.5 rounded-sm dark:bg-yellow-900 dark:text-yellow-300 whitespace-nowrap">
+                          {t("manager")}
+                        </span>
+                      </div>
+                    )}
                   {roles.includes("client") &&
                     !roles.some((role) =>
                       ["insighter", "company", "company-insighter"].includes(
@@ -421,67 +421,67 @@ export function UserProfile({ isHome }: { isHome: boolean }) {
                         {t("client")}
                       </span>
                     )}
-               </div>
+                </div>
               </div>
             </div>
           </div>
 
           <div className="py-2 px-3">
-          <div className={roles.includes("insighter") || roles.includes("company") || roles.includes("company-insighter") ? "border-b border-slate-100" : ""}>
+            <div className={roles.includes("insighter") || roles.includes("company") || roles.includes("company-insighter") ? "border-b border-slate-100" : ""}>
               {(roles.includes("insighter") ||
-              roles.includes("company") ||
-              roles.includes("company-insighter")) && (
-            <>
-              <Link
-                href={`https://app.insightabusiness.com/app/add-knowledge/stepper`}
-                className="block px-4 py-2.5 text-sm font-medium text-sky-600 hover:bg-indigo-50 hover:text-sky-700"
-                onClick={() => setMenuOpen(false)}
-                style={{fontSize: '13px'}}
-              >
-                {t("addInsight")}
-              </Link>
-               <Link
-               href={`https://app.insightabusiness.com/app/insighter-dashboard/my-knowledge/general`}
-               className="flex items-center gap-2 px-4 py-2.5 font-semibold text-slate-900 hover:bg-indigo-50 hover:text-sky-700"
-               onClick={() => setMenuOpen(false)}
-               style={{fontSize: '13px'}}
-             >
-               <span>{t("insightBase")}</span>
-               {unpublishedDraftCount > 0 && (
-                 <span className="bg-[#fff8dd] text-[#e8af13] text-[11px] font-bold px-2 py-0.5  rounded-[0.425rem]">
-                   {unpublishedDraftCount} {isRtl ? "محفوظ" : "Draft"} - {isRtl ? "أكمل الان!" : "Complete Now!"}
-                 </span>
-               )}
-             </Link>
-             </>
-            )}
+                roles.includes("company") ||
+                roles.includes("company-insighter")) && (
+                  <>
+                    <Link
+                      href={`https://app.insightabusiness.com/app/add-knowledge/stepper`}
+                      className="block px-4 py-2.5 text-sm font-medium text-sky-600 hover:bg-indigo-50 hover:text-sky-700"
+                      onClick={() => setMenuOpen(false)}
+                      style={{ fontSize: '13px' }}
+                    >
+                      {t("addInsight")}
+                    </Link>
+                    <Link
+                      href={`https://app.insightabusiness.com/app/insighter-dashboard/my-knowledge/general`}
+                      className="flex items-center gap-2 px-4 py-2.5 font-semibold text-slate-900 hover:bg-indigo-50 hover:text-sky-700"
+                      onClick={() => setMenuOpen(false)}
+                      style={{ fontSize: '13px' }}
+                    >
+                      <span>{t("insightBase")}</span>
+                      {unpublishedDraftCount > 0 && (
+                        <span className="bg-[#fff8dd] text-[#e8af13] text-[11px] font-bold px-2 py-0.5  rounded-[0.425rem]">
+                          {unpublishedDraftCount} {isRtl ? "محفوظ" : "Draft"} - {isRtl ? "أكمل الان!" : "Complete Now!"}
+                        </span>
+                      )}
+                    </Link>
+                  </>
+                )}
 
-            {(roles.includes('company') && (
-              <Link
-                href={`https://app.insightabusiness.com/app/insighter-dashboard/my-company-settings`}
-                className="block px-4 py-2.5  font-semibold text-slate-900 hover:bg-indigo-50 hover:text-sky-700"
-                onClick={() => setMenuOpen(false)}
-                style={{fontSize: '13px'}}
-              >
-                {t("myCompany")}
-              </Link>
-            ))}
-              </div>
-           {!isClient$() && (  <Link 
+              {(roles.includes('company') && (
+                <Link
+                  href={`https://app.insightabusiness.com/app/insighter-dashboard/my-company-settings`}
+                  className="block px-4 py-2.5  font-semibold text-slate-900 hover:bg-indigo-50 hover:text-sky-700"
+                  onClick={() => setMenuOpen(false)}
+                  style={{ fontSize: '13px' }}
+                >
+                  {t("myCompany")}
+                </Link>
+              ))}
+            </div>
+            {!isClient$() && (<Link
               href={`https://insightabusiness.com/en/profile/${user.uuid}?entity=insighter`}
               className="block px-4 py-2.5  font-semibold text-slate-900 hover:bg-indigo-50 hover:text-sky-700"
-              style={{fontSize: '13px'}}
+              style={{ fontSize: '13px' }}
               onClick={() => setMenuOpen(false)}
             >
               {t("myInsighterPage")}
             </Link>)}
-          
+
             {/* Show dashboard for all users */}
             <Link
               href={`https://app.insightabusiness.com/app/insighter-dashboard/my-dashboard`}
               className="block px-4 py-2.5 font-semibold text-slate-900 hover:bg-indigo-50 hover:text-sky-700"
               onClick={() => setMenuOpen(false)}
-              style={{fontSize: '13px'}}
+              style={{ fontSize: '13px' }}
             >
               {t("dashboard")}
             </Link>
@@ -489,7 +489,7 @@ export function UserProfile({ isHome }: { isHome: boolean }) {
               href={`https://app.insightabusiness.com/app/insighter-dashboard/my-downloads`}
               className="block px-4 py-2.5 font-semibold text-slate-900 hover:bg-indigo-50 hover:text-sky-700"
               onClick={() => setMenuOpen(false)}
-              style={{fontSize: '13px'}}
+              style={{ fontSize: '13px' }}
             >
               {isRtl ? "التحميلات" : "My Downloads"}
             </Link>
@@ -504,20 +504,20 @@ export function UserProfile({ isHome }: { isHome: boolean }) {
             <Link
               href={`/${localeFromPath}/profile/settings`}
               className="block px-4 py-3  font-semibold text-slate-900 hover:bg-indigo-50 hover:text-sky-700"
-              style={{fontSize: '13px'}}
+              style={{ fontSize: '13px' }}
               onClick={() => setMenuOpen(false)}
             >
               {t("myProfile")}
             </Link>
             <Link
-              href={`/${localeFromPath}/profile/settings`}
+              href={`https://app.insightabusiness.com/app/insighter-dashboard/account-settings/general-settings`}
               className="block px-4 py-2.5 font-semibold text-slate-900 hover:bg-indigo-50 hover:text-sky-700"
               onClick={() => setMenuOpen(false)}
-              style={{fontSize: '13px'}}
+              style={{ fontSize: '13px' }}
             >
               {t("settings")}
             </Link>
-            
+
             {/* Show company settings only for company role */}
             {/* {roles.includes('company') && 
               <Link
@@ -534,23 +534,23 @@ export function UserProfile({ isHome }: { isHome: boolean }) {
               !roles.includes("company") &&
               !roles.includes("company-insighter") && (
                 <>
-                <Link
-                  href={`https://app.insightabusiness.com/app/insighter-register/vertical`}
-                  className="block px-4 py-2.5  font-semibold bg-clip-text text-transparent bg-gradient-to-r from-blue-500 to-teal-400"
-                  onClick={() => setMenuOpen(false)}
-                  style={{fontSize: '13px'}}
-                >
-                  {t("becomeInsighter")}
-                </Link>
-                <p
-                  className="block px-4 pt-1 text-gray-500 pb-2"
-                  style={{ fontSize: '12px', lineHeight: '1.4' }}
-                >
-                  {t("becomeInsighterDescription")}
-                </p>
-               </>
+                  <Link
+                    href={`https://app.insightabusiness.com/app/insighter-register/vertical`}
+                    className="block px-4 py-2.5  font-semibold bg-clip-text text-transparent bg-gradient-to-r from-blue-500 to-teal-400"
+                    onClick={() => setMenuOpen(false)}
+                    style={{ fontSize: '13px' }}
+                  >
+                    {t("becomeInsighter")}
+                  </Link>
+                  <p
+                    className="block px-4 pt-1 text-gray-500 pb-2"
+                    style={{ fontSize: '12px', lineHeight: '1.4' }}
+                  >
+                    {t("becomeInsighterDescription")}
+                  </p>
+                </>
               )}
-             
+
             <div className="border-t border-slate-100">
               {isWhatsAppMissing && (
                 <Link
@@ -568,14 +568,14 @@ export function UserProfile({ isHome }: { isHome: boolean }) {
                   />
                 </Link>
               )}
-              
+
               <button
                 onClick={() => {
                   setMenuOpen(false);
                   handleSignOut();
                 }}
                 className="block w-full text-left px-4 py-2.5  font-semibold text-slate-900 hover:bg-indigo-50 hover:text-sky-700"
-                style={{fontSize: '13px'}}
+                style={{ fontSize: '13px' }}
               >
                 {t("signOut")}
               </button>

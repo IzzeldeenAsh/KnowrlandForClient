@@ -67,6 +67,7 @@ type EditableField =
   | 'company_about'
   | 'company_expertise'
   | 'company_industries'
+  | 'company_logo'
   | SocialKey;
 
 type SocialKey = 'linkedin' | 'facebook' | 'x' | 'instagram' | 'youtube' | 'tiktok';
@@ -659,6 +660,7 @@ export default function ProfileSettingsClient({
   const [certificateToDelete, setCertificateToDelete] = useState<ProfileCertification | null>(null);
   const [certificateDeletingId, setCertificateDeletingId] = useState<number | null>(null);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
+  const logoInputRef = useRef<HTMLInputElement | null>(null);
   const committingFieldRef = useRef<EditableField | null>(null);
   const profileSettingsHref = `/${locale}/profile/settings`;
   const certificatesSettingsHref = `${profileSettingsHref}/certificates`;
@@ -1066,6 +1068,49 @@ export default function ProfileSettingsClient({
       toast.success(isRtl ? 'تم تحديث الصورة الشخصية.' : 'Profile photo updated.');
     } catch (error) {
       toast.error(error instanceof Error ? error.message : isRtl ? 'تعذر تحديث الصورة.' : 'Unable to update photo.');
+    } finally {
+      setSavingField(null);
+    }
+  }
+
+  async function handleLogoSelected(event: ChangeEvent<HTMLInputElement>) {
+    const file = event.target.files?.[0];
+    event.target.value = '';
+    if (!file) return;
+
+    if (!['image/png', 'image/jpeg'].includes(file.type)) {
+      toast.error(isRtl ? 'يرجى اختيار صورة PNG أو JPEG.' : 'Please choose a PNG or JPEG image.');
+      return;
+    }
+
+    const token = getAuthToken();
+    if (!token) {
+      toast.error(isRtl ? 'يرجى تسجيل الدخول مرة أخرى.' : 'Please sign in again.');
+      return;
+    }
+
+    const formData = new FormData();
+    formData.append('logo', file);
+    setSavingField('company_logo');
+
+    try {
+      const response = await fetch(getApiUrl('/api/account/profile/company/logo'), {
+        method: 'POST',
+        headers: {
+          Accept: 'application/json',
+          'Accept-Language': locale,
+          'X-Timezone': Intl.DateTimeFormat().resolvedOptions().timeZone,
+          Authorization: `Bearer ${token}`,
+        },
+        body: formData,
+      });
+
+      if (!response.ok) throw await parseError(response);
+
+      await refreshProfile();
+      toast.success(isRtl ? 'تم تحديث شعار الشركة.' : 'Company logo updated.');
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : isRtl ? 'تعذر تحديث الشعار.' : 'Unable to update logo.');
     } finally {
       setSavingField(null);
     }
@@ -1720,6 +1765,42 @@ export default function ProfileSettingsClient({
                   </div>
 
                   <div className="divide-y divide-slate-100">
+                    <ProfileRow
+                      label={isRtl ? 'الشعار' : 'Logo'}
+                      value={
+                        <div className="flex items-center gap-4">
+                          <div className="relative h-24 w-24 shrink-0 overflow-hidden rounded-full border-2 border-blue-400 bg-slate-100">
+                            {user.company?.logo ? (
+                              <img src={user.company.logo} alt={companyForm.legal_name || 'Company logo'} className="h-full w-full object-contain" />
+                            ) : (
+                              <div className="flex h-full w-full items-center justify-center text-sm font-bold text-blue-600">
+                                <IconBriefcase size={28} stroke={1.5} />
+                              </div>
+                            )}
+                            <button
+                              type="button"
+                              onClick={() => logoInputRef.current?.click()}
+                              className="absolute inset-x-0 bottom-0 flex h-6 items-center justify-center bg-slate-950/55 text-white"
+                              aria-label={isRtl ? 'تغيير الشعار' : 'Change logo'}
+                            >
+                              <IconCamera size={16} />
+                            </button>
+                          </div>
+                          <span className="text-slate-500">150x150px JPEG, PNG Image</span>
+
+                          <input
+                            ref={logoInputRef}
+                            type="file"
+                            accept="image/png,image/jpeg"
+                            className="hidden"
+                            onChange={handleLogoSelected}
+                          />
+                        </div>
+                      }
+                      isSaving={savingField === 'company_logo'}
+                      onEdit={() => logoInputRef.current?.click()}
+                    />
+
                     <ProfileRow
                       label={isRtl ? 'الاسم القانوني للشركة' : 'Company Legal Name'}
                       value={companyForm.legal_name || '-'}
