@@ -36,13 +36,19 @@ interface Company {
   social?: Social[];
 }
 
+interface CountryValue {
+  id?: number;
+  name?: string | { en?: string; ar?: string };
+  flag?: string;
+}
+
 interface ProfileData {
   industries?: Industry[];
   consulting_field?: ConsultingField[];
   certifications?: Certification[];
   bio?: string | null;
   social?: Social[];
-  country?: string;
+  country?: string | CountryValue | null;
   company?: Company;
 }
 
@@ -65,6 +71,14 @@ export default function AboutTab({
 }: AboutTabProps) {
   const t = useTranslations("ProfilePage");
   const [copied, setCopied] = useState(false);
+  const countryName =
+    typeof profileData.country === "string"
+      ? profileData.country
+      : typeof profileData.country?.name === "string"
+        ? profileData.country.name
+        : locale === "ar"
+          ? profileData.country?.name?.ar || profileData.country?.name?.en || ""
+          : profileData.country?.name?.en || profileData.country?.name?.ar || "";
 
   const formatWebsiteUrl = (url: string) => {
     if (!url) return "";
@@ -260,7 +274,7 @@ export default function AboutTab({
                   {renderSocialRow(profileData.social)}
                 </div>
                 {/* Location/Country */}
-                {profileData.country && (
+                {countryName && (
                   <div className="bg-white dark:bg-slate-800 p-4 rounded-xl shadow-sm">
                     <div className="flex items-start">
                       <div className="py-5">
@@ -293,7 +307,7 @@ export default function AboutTab({
                           {t("address")}
                         </p>
                         <p className="font-medium">
-                          {profileData.country}
+                          {countryName}
                         </p>
                       </div>
                     </div>
@@ -425,7 +439,7 @@ export default function AboutTab({
                 </div>
 
                 {/* Company Address */}
-                {isCompany && (profileData.company?.address || profileData.country) && (
+                {isCompany && (profileData.company?.address || countryName) && (
                   <div className="bg-white dark:bg-slate-800 p-4 rounded-xl shadow-sm">
                     <div className="flex items-center">
                       <svg
@@ -456,8 +470,8 @@ export default function AboutTab({
                         </p>
                         <p className="font-medium">
                           {profileData.company?.address}
-                          {profileData.company?.address && profileData.country && ", "}
-                          {profileData.country}
+                          {profileData.company?.address && countryName && ", "}
+                          {countryName}
                         </p>
                       </div>
                     </div>

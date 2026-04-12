@@ -177,23 +177,22 @@ function Section({
   const headerTone =
     stage === 'first_draft'
       ? {
-          bg: 'bg-sky-50/80',
-          ring: 'ring-sky-200/70',
-          icon: 'text-sky-700',
-        }
+        bg: 'bg-sky-50/80',
+        ring: 'ring-sky-200/70',
+        icon: 'text-sky-700',
+      }
       : {
-          bg: 'bg-violet-50/80',
-          ring: 'ring-violet-200/70',
-          icon: 'text-violet-700',
-        }
+        bg: 'bg-violet-50/80',
+        ring: 'ring-violet-200/70',
+        icon: 'text-violet-700',
+      }
 
   const HeaderIcon = stage === 'first_draft' ? IconPresentation : IconFileText
 
   const optionCardClass = (selected: boolean) =>
-    `rounded-2xl border px-4 py-3 transition-colors ${
-      selected
-        ? 'border-slate-200/80 bg-white/80 shadow-sm'
-        : 'border-white/35 bg-white/55 hover:bg-white/70'
+    `rounded-2xl border px-4 py-3 transition-colors ${selected
+      ? 'border-slate-200/80 bg-white/80 shadow-sm'
+      : 'border-white/35 bg-white/55 hover:bg-white/70'
     }`
 
   const selectWay = (way: DeliverableWay) =>
@@ -281,11 +280,10 @@ function Section({
                         : [...value.reportTypes, reportType.value],
                     })
                   }
-                  className={`rounded-full border px-3 py-1.5 text-xs font-semibold transition-colors ${
-                    checked
+                  className={`rounded-full border px-3 py-1.5 text-xs font-semibold transition-colors ${checked
                       ? 'border-blue-300 bg-blue-50 text-blue-700'
                       : 'border-slate-200 bg-white/80 text-slate-700 hover:bg-white'
-                  }`}
+                    }`}
                 >
                   {reportType.label}
                 </button>
@@ -312,19 +310,17 @@ function Section({
                 <IconFileText className="h-5 w-5" stroke={1.6} />
               </span>
               <span
-                className={`inline-flex h-5 w-5 items-center justify-center rounded-full border ${
-                  value.deliverableWay === 'on_platform'
+                className={`inline-flex h-5 w-5 items-center justify-center rounded-full border ${value.deliverableWay === 'on_platform'
                     ? 'border-blue-600'
                     : 'border-slate-300'
-                } bg-white/80`}
+                  } bg-white/80`}
                 aria-hidden="true"
               >
                 <span
-                  className={`h-2.5 w-2.5 rounded-full ${
-                    value.deliverableWay === 'on_platform'
+                  className={`h-2.5 w-2.5 rounded-full ${value.deliverableWay === 'on_platform'
                       ? 'bg-blue-600'
                       : 'bg-transparent'
-                  }`}
+                    }`}
                 />
               </span>
               <div className={optionTextClass}>
@@ -351,19 +347,17 @@ function Section({
                 <IconUsers className="h-5 w-5" stroke={1.6} />
               </span>
               <span
-                className={`inline-flex h-5 w-5 items-center justify-center rounded-full border ${
-                  value.deliverableWay === 'session'
+                className={`inline-flex h-5 w-5 items-center justify-center rounded-full border ${value.deliverableWay === 'session'
                     ? 'border-blue-600'
                     : 'border-slate-300'
-                } bg-white/80`}
+                  } bg-white/80`}
                 aria-hidden="true"
               >
                 <span
-                  className={`h-2.5 w-2.5 rounded-full ${
-                    value.deliverableWay === 'session'
+                  className={`h-2.5 w-2.5 rounded-full ${value.deliverableWay === 'session'
                       ? 'bg-blue-600'
                       : 'bg-transparent'
-                  }`}
+                    }`}
                 />
               </span>
               <div className={optionTextClass}>
@@ -388,19 +382,17 @@ function Section({
                   <IconMapPin className="h-5 w-5" stroke={1.6} />
                 </span>
                 <span
-                  className={`inline-flex h-5 w-5 items-center justify-center rounded-full border ${
-                    value.deliverableWay === 'physical_workshop'
+                  className={`inline-flex h-5 w-5 items-center justify-center rounded-full border ${value.deliverableWay === 'physical_workshop'
                       ? 'border-blue-600'
                       : 'border-slate-300'
-                  } bg-white/80`}
+                    } bg-white/80`}
                   aria-hidden="true"
                 >
                   <span
-                    className={`h-2.5 w-2.5 rounded-full ${
-                      value.deliverableWay === 'physical_workshop'
+                    className={`h-2.5 w-2.5 rounded-full ${value.deliverableWay === 'physical_workshop'
                         ? 'bg-blue-600'
                         : 'bg-transparent'
-                    }`}
+                      }`}
                   />
                 </span>
                 <div className={optionTextClass}>
@@ -535,13 +527,12 @@ export default function DeliverableStageQuestion({ locale }: { locale: WizardLoc
       />
 
       <div
-        className={`mt-2 text-start transition-all duration-700 ${
-          entered
+        className={`mt-2 text-start transition-all duration-700 ${entered
             ? 'opacity-100 translate-x-0'
             : isRTL
               ? 'opacity-0 translate-x-4'
               : 'opacity-0 -translate-x-4'
-        }`}
+          }`}
       >
         {isEnglish ? (
           <style>{`
@@ -565,7 +556,7 @@ export default function DeliverableStageQuestion({ locale }: { locale: WizardLoc
         <div className="mt-4 text-sm font-semibold text-rose-700">{error}</div>
       ) : null}
 
-      <div className="mt-6 grid grid-cols-1 lg:grid-cols-2 gap-4 lg:gap-6 items-start pb-[100px] md:pb-0">
+      <div className="mt-6 grid grid-cols-1 lg:grid-cols-2 gap-4 lg:gap-6 items-start pb-[100px] lg:pb-0">
         <Section
           locale={locale}
           stage="first_draft"
@@ -582,9 +573,9 @@ export default function DeliverableStageQuestion({ locale }: { locale: WizardLoc
         />
       </div>
 
-      <div className="fixed bottom-0 left-0 right-0 sm:static border-t border-slate-200/70 bg-white/80 backdrop-blur-md lg:bottom-10 lg:border-t-0 lg:bg-transparent lg:backdrop-blur-0">
-        <div className="mx-auto w-full max-w-6xl px-4 sm:px-0 pt-4 pb-[calc(env(safe-area-inset-bottom)+1rem)]">
-          <div className="mt-2 md:mt-8 flex items-center justify-between gap-3">
+      <div className="fixed bottom-0 left-0 right-0 lg:static border-t border-slate-200/70 bg-white/80 backdrop-blur-md lg:bottom-10 lg:border-t-0 lg:bg-transparent lg:backdrop-blur-0">
+        <div className="mx-auto w-full max-w-6xl px-4 lg:px-0 pt-4 pb-[calc(env(safe-area-inset-bottom)+1rem)]">
+          <div className="mt-2 lg:mt-8 flex items-center justify-between gap-3">
             <Link
               href={nav.backHref}
               className="btn-sm text-slate-700 bg-white/80 hover:bg-white border border-slate-200"
@@ -596,11 +587,10 @@ export default function DeliverableStageQuestion({ locale }: { locale: WizardLoc
               type="button"
               onClick={onContinue}
               disabled={!canContinue}
-              className={`btn-sm px-6 py-2 rounded-full ${
-                canContinue
+              className={`btn-sm px-6 py-2 rounded-full ${canContinue
                   ? 'text-white bg-[#1C7CBB] hover:bg-opacity-90'
                   : 'text-slate-500 bg-slate-200 cursor-not-allowed'
-              }`}
+                }`}
             >
               {submitting ? (isRTL ? 'جاري الحفظ…' : 'Saving…') : isRTL ? 'متابعة' : 'Continue'}
             </button>

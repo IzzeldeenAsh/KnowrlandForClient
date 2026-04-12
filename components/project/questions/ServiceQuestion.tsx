@@ -107,7 +107,7 @@ export default function ServiceQuestion({ locale }: { locale: WizardLocale }) {
       )
       setServicePrompt(
         window.sessionStorage.getItem(projectWizardStorage.servicePromptKey(locale)) ||
-          ''
+        ''
       )
     } catch {
       // ignore
@@ -409,13 +409,12 @@ export default function ServiceQuestion({ locale }: { locale: WizardLocale }) {
       />
 
       <div
-        className={`mt-2 text-start transition-all duration-700 ${
-          entered
-            ? 'opacity-100 translate-x-0'
-            : isRTL
-              ? 'opacity-0 translate-x-4'
-              : 'opacity-0 -translate-x-4'
-        }`}
+        className={`mt-2 text-start transition-all duration-700 ${entered
+          ? 'opacity-100 translate-x-0'
+          : isRTL
+            ? 'opacity-0 translate-x-4'
+            : 'opacity-0 -translate-x-4'
+          }`}
       >
         {isEnglish ? (
           <style>{`
@@ -427,14 +426,14 @@ export default function ServiceQuestion({ locale }: { locale: WizardLocale }) {
         <h2
           id="service-question-title"
           className="text-2xl sm:text-3xl font-medium tracking-tight text-slate-900"
-          dangerouslySetInnerHTML={{ __html: title }}/>
+          dangerouslySetInnerHTML={{ __html: title }} />
       </div>
 
       {error ? (
         <div className="mt-4 text-sm font-semibold text-rose-700">{error}</div>
       ) : null}
 
-<div className="mt-6 sm:mt-10 pb-[100px] sm:pb-0" role="radiogroup" aria-label={title}>
+      <div className="mt-6 sm:mt-10 pb-[100px] lg:pb-0" role="radiogroup" aria-label={title}>
         {loading ? (
           <div className="text-sm font-semibold text-slate-600">
             {isRTL ? 'جاري التحميل…' : 'Loading…'}
@@ -463,31 +462,30 @@ export default function ServiceQuestion({ locale }: { locale: WizardLocale }) {
         )}
       </div>
 
-      <div className=" fixed bottom-0 left-0 right-0 sm:static 
+      <div className=" fixed bottom-0 left-0 right-0 lg:static 
        border-t border-slate-200/70 bg-white/80 backdrop-blur-md lg:bottom-10 lg:border-t-0 lg:bg-transparent lg:backdrop-blur-0">
-      <div className="mx-auto w-full max-w-6xl px-4 sm:px-0 pt-4 pb-[calc(env(safe-area-inset-bottom)+1rem)]">
-      <div className="sm:mt-8 flex items-center justify-between gap-3">
-        <Link
-          href={`/${locale}/project/wizard/deliverables-language`}
-          className="btn-sm text-slate-700 bg-white/80 hover:bg-white border border-slate-200"
-        >
-          {isRTL ? 'رجوع' : 'Back'}
-        </Link>
+        <div className="mx-auto w-full max-w-6xl px-4 lg:px-0 pt-4 pb-[calc(env(safe-area-inset-bottom)+1rem)]">
+          <div className="lg:mt-8 flex items-center justify-between gap-3">
+            <Link
+              href={`/${locale}/project/wizard/deliverables-language`}
+              className="btn-sm text-slate-700 bg-white/80 hover:bg-white border border-slate-200"
+            >
+              {isRTL ? 'رجوع' : 'Back'}
+            </Link>
 
-        <button
-          type="button"
-          onClick={onContinue}
-          disabled={!canContinue || submitting}
-          className={`btn-sm px-6 py-2 rounded-full ${
-            canContinue && !submitting
-              ? 'text-white bg-[#1C7CBB] hover:bg-opacity-90'
-              : 'text-slate-500 bg-slate-200 cursor-not-allowed'
-          }`}
-        >
-          {submitting ? (isRTL ? 'جاري المتابعة…' : 'Continuing…') : isRTL ? 'متابعة' : 'Continue'}
-        </button>
-      </div>
-      </div>
+            <button
+              type="button"
+              onClick={onContinue}
+              disabled={!canContinue || submitting}
+              className={`btn-sm px-6 py-2 rounded-full ${canContinue && !submitting
+                ? 'text-white bg-[#1C7CBB] hover:bg-opacity-90'
+                : 'text-slate-500 bg-slate-200 cursor-not-allowed'
+                }`}
+            >
+              {submitting ? (isRTL ? 'جاري المتابعة…' : 'Continuing…') : isRTL ? 'متابعة' : 'Continue'}
+            </button>
+          </div>
+        </div>
       </div>
     </div>
   )

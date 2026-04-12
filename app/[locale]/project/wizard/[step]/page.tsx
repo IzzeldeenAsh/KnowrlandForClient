@@ -12,6 +12,7 @@ import ProjectDescriptionQuestion from '@/components/project/questions/ProjectDe
 import ProjectAddonsIntroStep from '@/components/project/questions/ProjectAddonsIntroStep'
 import KickoffMeetingQuestion from '@/components/project/questions/KickoffMeetingQuestion'
 import ProjectReviewStep from '@/components/project/questions/ProjectReviewStep'
+import ProjectMatchesStep from '@/components/project/questions/ProjectMatchesStep'
 import DeliverablesLanguageQuestion from '@/components/project/questions/DeliverablesLanguageQuestion'
 import TargetMarketQuestion from '@/components/project/questions/TargetMarketQuestion'
 import ServiceQuestion from '@/components/project/questions/ServiceQuestion'
@@ -238,6 +239,16 @@ export default async function ProjectWizardStepPage({ params }: PageProps) {
       <ProjectWizardShell align="top">
         <div className="w-full pt-2 sm:pt-4">
           <ProjectReviewStep locale={locale} />
+        </div>
+      </ProjectWizardShell>
+    )
+  }
+
+  if (step === 'project-matches') {
+    return (
+      <ProjectWizardShell align="top">
+        <div className="w-full pt-2 sm:pt-4">
+          <ProjectMatchesStep locale={locale} />
         </div>
       </ProjectWizardShell>
     )

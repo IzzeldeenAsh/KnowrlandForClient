@@ -31,6 +31,7 @@ export function UserProfile({ isHome }: { isHome: boolean }) {
   const { user, roles, isLoading, isAuthResolved, handleSignOut } = useUserProfile();
   const pathname = usePathname();
   const isRtl = pathname.startsWith("/ar");
+  const localeFromPath = isRtl ? "ar" : "en";
   const isWhatsAppMissing = String(user?.whatsapp_number ?? "").trim().length === 0;
   const promoCardSrc = isRtl
     ? "https://res.cloudinary.com/dsiku9ipv/image/upload/v1771682845/promo-ar-card_nwfawc.png"
@@ -500,44 +501,22 @@ export function UserProfile({ isHome }: { isHome: boolean }) {
             >
               {t("myConsultingSchedule")}
             </Link> */}
-            {/* Hide requests, received meetings and account settings for client-only role */}
             <Link
-              href={`https://app.insightabusiness.com/app/profile/overview`}
+              href={`/${localeFromPath}/profile/settings`}
               className="block px-4 py-3  font-semibold text-slate-900 hover:bg-indigo-50 hover:text-sky-700"
               style={{fontSize: '13px'}}
               onClick={() => setMenuOpen(false)}
             >
               {t("myProfile")}
             </Link>
-            {!isClient$() && (
-              <>
-                {/* <Link
-                  href="https://app.insightabusiness.com/app/insighter-dashboard/my-requests"
-                  className="block px-4 py-2.5 font-semibold text-slate-900 hover:bg-indigo-50 hover:text-sky-700"
-                  onClick={() => setMenuOpen(false)}
-                  style={{fontSize: '13px'}}
-                >
-                  {t("myRequests")}
-                </Link> */}
-                {/* <Link
-                  href="https://app.insightabusiness.com/app/insighter-dashboard/my-meetings/received"
-                  className="block px-4 py-2.5 font-semibold text-slate-900 hover:bg-indigo-50 hover:text-sky-700"
-                  onClick={() => setMenuOpen(false)}
-                  style={{fontSize: '13px'}}
-                >
-                  {t("ReceivedMeetings")}
-                </Link> */}
-                <Link
-                  href={`https://app.insightabusiness.com/app/insighter-dashboard/account-settings/general-settings`}
-                  className="block px-4 py-2.5 font-semibold text-slate-900 hover:bg-indigo-50 hover:text-sky-700"
-                  onClick={() => setMenuOpen(false)}
-                  style={{fontSize: '13px'}}
-                >
-                  {t("settings")}
-                </Link>
-              
-              </>
-            )}
+            <Link
+              href={`/${localeFromPath}/profile/settings`}
+              className="block px-4 py-2.5 font-semibold text-slate-900 hover:bg-indigo-50 hover:text-sky-700"
+              onClick={() => setMenuOpen(false)}
+              style={{fontSize: '13px'}}
+            >
+              {t("settings")}
+            </Link>
             
             {/* Show company settings only for company role */}
             {/* {roles.includes('company') && 

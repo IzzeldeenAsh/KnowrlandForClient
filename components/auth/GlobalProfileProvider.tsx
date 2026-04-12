@@ -140,25 +140,27 @@ export function GlobalProfileProvider({ children }: { children: React.ReactNode 
         }
 
         const data = await response.json();
-        
+        const profile = (data?.data ?? {}) as Partial<User>;
+
         const userData: User = {
-          id: data.data.id,
-          uuid: data.data.uuid,
-          name: data.data.name,
-          email: data.data.email,
-          profile_photo_url: data.data.profile_photo_url,
-          first_name: data.data.first_name,
-          last_name: data.data.last_name,
-          company: data.data.company,
-          country: data.data.country,
-          country_id: data.data.country_id,
-          whatsapp_country_code: data.data.whatsapp_country_code ?? null,
-          whatsapp_number: data.data.whatsapp_number ?? null,
+          ...profile,
+          id: Number(profile.id),
+          uuid: profile.uuid,
+          name: profile.name ?? '',
+          email: profile.email ?? '',
+          profile_photo_url: profile.profile_photo_url ?? null,
+          first_name: profile.first_name ?? '',
+          last_name: profile.last_name ?? '',
+          company: profile.company,
+          country: profile.country,
+          country_id: profile.country_id,
+          whatsapp_country_code: profile.whatsapp_country_code ?? null,
+          whatsapp_number: profile.whatsapp_number ?? null,
         };
 
     
 
-        const rolesFromApi: string[] = Array.isArray(data.data.roles) ? data.data.roles : [];
+        const rolesFromApi: string[] = Array.isArray(profile.roles) ? profile.roles : [];
 
         // Cache the profile for ALL roles (including admin) to avoid refetch loops.
         // Role-based redirects should be handled by RoleGuard; caching here is about

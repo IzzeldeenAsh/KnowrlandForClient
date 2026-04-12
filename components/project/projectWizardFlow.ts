@@ -17,6 +17,7 @@ export const projectWizardStepIds = {
   addonsIntro: 'addons-intro',
   kickoffMeeting: 'kickoff-meeting',
   projectReview: 'project-review',
+  projectMatches: 'project-matches',
 } as const
 
 export type ProjectWizardStepId = string
@@ -115,5 +116,6 @@ export function getProjectWizardStepOrder(locale: WizardLocale): string[] {
     projectWizardStepIds.addonsIntro,
     ...(skipKickoffMeeting ? [] : [projectWizardStepIds.kickoffMeeting]),
     projectWizardStepIds.projectReview,
+    projectWizardStepIds.projectMatches,
   ]
 }

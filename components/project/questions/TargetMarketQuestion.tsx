@@ -356,13 +356,12 @@ export default function TargetMarketQuestion({ locale }: { locale: WizardLocale 
       />
 
       <div
-        className={`mt-2 text-start transition-all duration-700 ${
-          entered
+        className={`mt-2 text-start transition-all duration-700 ${entered
             ? 'opacity-100 translate-x-0'
             : isRTL
               ? 'opacity-0 translate-x-4'
               : 'opacity-0 -translate-x-4'
-        }`}
+          }`}
       >
         {isEnglish ? (
           <style>{`
@@ -390,30 +389,26 @@ export default function TargetMarketQuestion({ locale }: { locale: WizardLocale 
                 role="radio"
                 aria-checked={isSelected}
                 onClick={() => void onSelectMode(opt.id)}
-                className={`h-full min-h-[88px] rounded-2xl border px-5 py-4 text-start shadow-sm backdrop-blur-md transition-all duration-700 ${
-                  isSelected
+                className={`h-full min-h-[88px] rounded-2xl border px-5 py-4 text-start shadow-sm backdrop-blur-md transition-all duration-700 ${isSelected
                     ? 'border-blue-300 bg-white/60'
                     : 'border-white/30 bg-white/35 hover:bg-white/45'
-                } ${
-                  entered
+                  } ${entered
                     ? 'opacity-100 translate-x-0'
                     : isRTL
                       ? 'opacity-0 translate-x-4'
                       : 'opacity-0 -translate-x-4'
-                }`}
+                  }`}
                 style={{ transitionDelay: `${110 + index * 60}ms` }}
               >
                 <div className="flex items-center gap-4">
                   <span
-                    className={`inline-flex h-5 w-5 shrink-0 items-center justify-center rounded-full border ${
-                      isSelected ? 'border-blue-600' : 'border-slate-300'
-                    } bg-white/80`}
+                    className={`inline-flex h-5 w-5 shrink-0 items-center justify-center rounded-full border ${isSelected ? 'border-blue-600' : 'border-slate-300'
+                      } bg-white/80`}
                     aria-hidden="true"
                   >
                     <span
-                      className={`h-2.5 w-2.5 rounded-full ${
-                        isSelected ? 'bg-blue-600' : 'bg-transparent'
-                      }`}
+                      className={`h-2.5 w-2.5 rounded-full ${isSelected ? 'bg-blue-600' : 'bg-transparent'
+                        }`}
                     />
                   </span>
                   <span className="text-base sm:text-lg font-bold text-slate-900">
@@ -431,13 +426,12 @@ export default function TargetMarketQuestion({ locale }: { locale: WizardLocale 
 
         {mode === 'country' ? (
           <div
-            className={`mt-4 transition-all duration-700 pb-[100px] sm:pb-0 ${
-              entered
+            className={`mt-4 transition-all duration-700 pb-[100px] lg:pb-0 ${entered
                 ? 'opacity-100 translate-x-0'
                 : isRTL
                   ? 'opacity-0 translate-x-4'
                   : 'opacity-0 -translate-x-4'
-            }`}
+              }`}
             style={{ transitionDelay: '420ms' }}
           >
             <div className="rounded-3xl border border-white/30 bg-white/45 p-4 shadow-sm backdrop-blur-md">
@@ -474,22 +468,19 @@ export default function TargetMarketQuestion({ locale }: { locale: WizardLocale 
                                 : [...prev, c.id]
                             )
                           }
-                          className={`flex items-center gap-3 rounded-2xl border px-3 py-3 text-start transition-colors ${
-                            isSelected
+                          className={`flex items-center gap-3 rounded-2xl border px-3 py-3 text-start transition-colors ${isSelected
                               ? 'border-blue-300 bg-white/75'
                               : 'border-white/30 bg-white/40 hover:bg-white/55'
-                          }`}
+                            }`}
                         >
                           <span
-                            className={`inline-flex h-5 w-5 shrink-0 items-center justify-center rounded-full border ${
-                              isSelected ? 'border-blue-600' : 'border-slate-300'
-                            } bg-white/80`}
+                            className={`inline-flex h-5 w-5 shrink-0 items-center justify-center rounded-full border ${isSelected ? 'border-blue-600' : 'border-slate-300'
+                              } bg-white/80`}
                             aria-hidden="true"
                           >
                             <span
-                              className={`h-2.5 w-2.5 rounded-full ${
-                                isSelected ? 'bg-blue-600' : 'bg-transparent'
-                              }`}
+                              className={`h-2.5 w-2.5 rounded-full ${isSelected ? 'bg-blue-600' : 'bg-transparent'
+                                }`}
                             />
                           </span>
 
@@ -499,7 +490,7 @@ export default function TargetMarketQuestion({ locale }: { locale: WizardLocale 
                               alt=""
                               className="h-4 w-4 object-contain opacity-90"
                               onError={(e) => {
-                                ;(e.currentTarget as HTMLImageElement).style.display =
+                                ; (e.currentTarget as HTMLImageElement).style.display =
                                   'none'
                               }}
                             />
@@ -520,13 +511,12 @@ export default function TargetMarketQuestion({ locale }: { locale: WizardLocale 
 
         {mode === 'regions' ? (
           <div
-            className={`mt-4 transition-all duration-700  ${
-              entered
+            className={`mt-4 transition-all duration-700  ${entered
                 ? 'opacity-100 translate-x-0'
                 : isRTL
                   ? 'opacity-0 translate-x-4'
                   : 'opacity-0 -translate-x-4'
-            }`}
+              }`}
             style={{ transitionDelay: '420ms' }}
           >
             <div className="rounded-2xl border border-white/30 bg-white/35 backdrop-blur-md shadow-sm p-4 pb-[150px] sm:pb-4">
@@ -550,22 +540,19 @@ export default function TargetMarketQuestion({ locale }: { locale: WizardLocale 
                               : [...prev, r.id]
                           )
                         }
-                        className={`flex items-center gap-3 rounded-xl border px-3 py-2 text-start transition-colors ${
-                          isSelected
+                        className={`flex items-center gap-3 rounded-xl border px-3 py-2 text-start transition-colors ${isSelected
                             ? 'border-blue-300 bg-white/70'
                             : 'border-white/30 bg-white/35 hover:bg-white/45'
-                        }`}
+                          }`}
                       >
                         <span
-                          className={`inline-flex h-5 w-5 shrink-0 items-center justify-center rounded-md border ${
-                            isSelected ? 'border-blue-600' : 'border-slate-300'
-                          } bg-white/80`}
+                          className={`inline-flex h-5 w-5 shrink-0 items-center justify-center rounded-md border ${isSelected ? 'border-blue-600' : 'border-slate-300'
+                            } bg-white/80`}
                           aria-hidden="true"
                         >
                           <span
-                            className={`h-2.5 w-2.5 rounded-sm ${
-                              isSelected ? 'bg-blue-600' : 'bg-transparent'
-                            }`}
+                            className={`h-2.5 w-2.5 rounded-sm ${isSelected ? 'bg-blue-600' : 'bg-transparent'
+                              }`}
                           />
                         </span>
 
@@ -583,13 +570,12 @@ export default function TargetMarketQuestion({ locale }: { locale: WizardLocale 
 
         {mode === 'economic' ? (
           <div
-            className={`mt-4 transition-all pb-[100px] sm:pb-0 duration-700 ${
-              entered
+            className={`mt-4 transition-all pb-[100px] sm:pb-0 duration-700 ${entered
                 ? 'opacity-100 translate-x-0'
                 : isRTL
                   ? 'opacity-0 translate-x-4'
                   : 'opacity-0 -translate-x-4'
-            }`}
+              }`}
             style={{ transitionDelay: '420ms' }}
           >
             <div className="rounded-2xl border border-white/30 bg-white/35 backdrop-blur-md shadow-sm p-4 pb-[100px] sm:pb-4">
@@ -613,22 +599,19 @@ export default function TargetMarketQuestion({ locale }: { locale: WizardLocale 
                               : [...prev, b.id]
                           )
                         }
-                        className={`flex items-center gap-3 rounded-xl border px-3 py-2 text-start transition-colors ${
-                          isSelected
+                        className={`flex items-center gap-3 rounded-xl border px-3 py-2 text-start transition-colors ${isSelected
                             ? 'border-blue-300 bg-white/70'
                             : 'border-white/30 bg-white/35 hover:bg-white/45'
-                        }`}
+                          }`}
                       >
                         <span
-                          className={`inline-flex h-5 w-5 shrink-0 items-center justify-center rounded-md border ${
-                            isSelected ? 'border-blue-600' : 'border-slate-300'
-                          } bg-white/80`}
+                          className={`inline-flex h-5 w-5 shrink-0 items-center justify-center rounded-md border ${isSelected ? 'border-blue-600' : 'border-slate-300'
+                            } bg-white/80`}
                           aria-hidden="true"
                         >
                           <span
-                            className={`h-2.5 w-2.5 rounded-sm ${
-                              isSelected ? 'bg-blue-600' : 'bg-transparent'
-                            }`}
+                            className={`h-2.5 w-2.5 rounded-sm ${isSelected ? 'bg-blue-600' : 'bg-transparent'
+                              }`}
                           />
                         </span>
 
@@ -644,30 +627,29 @@ export default function TargetMarketQuestion({ locale }: { locale: WizardLocale 
           </div>
         ) : null}
       </div>
-     <div className="fixed bottom-0 left-0 right-0 sm:static border-t border-slate-200/70 bg-white/80 backdrop-blur-md lg:bottom-10 lg:border-t-0 lg:bg-transparent lg:backdrop-blur-0">
-        <div className="mx-auto w-full max-w-6xl px-4 sm:px-0 pt-4 pb-[calc(env(safe-area-inset-bottom)+1rem)]">
-          <div className="mt-2 sm:mt-8 flex items-center justify-between gap-3">
-        <Link
-          href={nav.backHref}
-          className="btn-sm text-slate-700 bg-white/80 hover:bg-white border border-slate-200"
-        >
-          {isRTL ? 'رجوع' : 'Back'}
-        </Link>
+      <div className="fixed bottom-0 left-0 right-0 lg:static border-t border-slate-200/70 bg-white/80 backdrop-blur-md lg:bottom-10 lg:border-t-0 lg:bg-transparent lg:backdrop-blur-0">
+        <div className="mx-auto w-full max-w-6xl px-4 lg:px-0 pt-4 pb-[calc(env(safe-area-inset-bottom)+1rem)]">
+          <div className="mt-2 lg:mt-8 flex items-center justify-between gap-3">
+            <Link
+              href={nav.backHref}
+              className="btn-sm text-slate-700 bg-white/80 hover:bg-white border border-slate-200"
+            >
+              {isRTL ? 'رجوع' : 'Back'}
+            </Link>
 
-        <button
-          type="button"
-          onClick={onContinue}
-          disabled={!canContinue || submitting}
-          className={`btn-sm px-6 py-2 rounded-full ${
-            canContinue && !submitting
-              ? 'text-white bg-[#1C7CBB] hover:bg-opacity-90'
-              : 'text-slate-500 bg-slate-200 cursor-not-allowed'
-          }`}
-        >
-          {submitting ? (isRTL ? 'جاري الحفظ…' : 'Saving…') : isRTL ? 'متابعة' : 'Continue'}
-        </button>
-      </div>
-      </div>
+            <button
+              type="button"
+              onClick={onContinue}
+              disabled={!canContinue || submitting}
+              className={`btn-sm px-6 py-2 rounded-full ${canContinue && !submitting
+                  ? 'text-white bg-[#1C7CBB] hover:bg-opacity-90'
+                  : 'text-slate-500 bg-slate-200 cursor-not-allowed'
+                }`}
+            >
+              {submitting ? (isRTL ? 'جاري الحفظ…' : 'Saving…') : isRTL ? 'متابعة' : 'Continue'}
+            </button>
+          </div>
+        </div>
       </div>
     </div>
   )

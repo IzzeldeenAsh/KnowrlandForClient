@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect } from 'react'
+import Image from 'next/image'
 import Link from 'next/link'
 import { useAuth } from '@/hooks/useAuth'
 import ProjectWizardShell from './ProjectWizardShell'
@@ -13,11 +14,7 @@ type ProjectIntroProps = {
 export default function ProjectIntro({ locale }: ProjectIntroProps) {
   const isRTL = locale === 'ar'
   const { isLoggedIn, isLoading } = useAuth()
-  const introImages = [
-    'https://res.cloudinary.com/dsiku9ipv/image/upload/v1773915290/proj-1_kpb7uw.png',
-    'https://res.cloudinary.com/dsiku9ipv/image/upload/v1773916371/proj-2_klllvo.png',
-    'https://res.cloudinary.com/dsiku9ipv/image/upload/v1773916492/proj-3_tyojug.png',
-  ]
+
 
   useEffect(() => {
     clearProjectWizardStorage(locale)
@@ -25,19 +22,19 @@ export default function ProjectIntro({ locale }: ProjectIntroProps) {
 
   const copy = isRTL
     ? {
-        title: 'ابدأ مشروعك ',
-        eyebrow: 'اطلب خدمة مخصصة',
-        line1: 'ابدأ مشروعك مع خبراء متخصصين',
-        line2: 'لتمكين عملك من النجاح',
-        cta: 'ابدأ',
-      }
+      title: 'ابدأ مشروعك ',
+      eyebrow: 'اطلب خدمة مخصصة',
+      line1: 'ابدأ مشروعك مع خبراء متخصصين',
+      line2: 'لتمكين عملك من النجاح',
+      cta: 'ابدأ',
+    }
     : {
-        title: 'Start a project',
-        eyebrow: 'Request a Custom Service',
-        line1: 'Start your project with subject matter experts',
-        line2: 'that lead your business to success',
-        cta: 'Start',
-      }
+      title: 'Start a project',
+      eyebrow: 'Request a Custom Service',
+      line1: 'Start your project with subject matter experts',
+      line2: 'that lead your business to success',
+      cta: 'Start',
+    }
 
   const loginUrl = 'https://app.insightabusiness.com/auth/login?returnUrl=http:%2F%2Flocalhost:3000%2Fen%2Fproject'
   const shouldShowLoginCta = !isLoading && !isLoggedIn
@@ -47,7 +44,7 @@ export default function ProjectIntro({ locale }: ProjectIntroProps) {
   return (
     <ProjectWizardShell align="center">
       <>
-        <div aria-hidden className="hidden md:block pointer-events-none absolute inset-x-0 -bottom-10 z-0">
+        {/* <div aria-hidden className="hidden md:block pointer-events-none absolute inset-x-0 -bottom-10 z-0">
           <div className="relative h-[720px] sm:h-[390px] lg:h-[430px]">
             <svg
               className="absolute inset-0 h-full w-full"
@@ -67,25 +64,26 @@ export default function ProjectIntro({ locale }: ProjectIntroProps) {
               />
             </svg>
 
-            <div className="hidden md:flex absolute inset-x-0 bottom-20 flex-col items-center justify-center gap-5 px-4 sm:flex-row sm:items-end sm:gap-6">
-              {introImages.map((image, index) => (
-                <img
-                  key={image}
-                  src={image}
-                  alt=""
-                  loading="lazy"
-                  decoding="async"
-                  className={`w-[280px] max-w-[92vw] opacity-95 drop-shadow-[0_22px_44px_rgba(2,132,199,0.2)] sm:w-[230px] lg:w-[250px] ${
-                    index === 1 ? 'sm:-translate-y-2' : ''
-                  }`}
-                />
-              ))}
-            </div>
+
+          </div>
+        </div> */}
+
+        <div aria-hidden className="pointer-events-none absolute inset-x-0 bottom-0 z-10 hidden lg:block">
+          <div className="mx-auto w-full max-w-2xl px-8">
+            <Image
+              src="https://res.cloudinary.com/dsiku9ipv/image/upload/v1775661658/Artboard_1_qjuru0.png"
+              alt=""
+              width={1602}
+              height={718}
+              priority
+              sizes="(min-width: 1280px) 672px, calc(100vw - 64px)"
+              style={{ width: '100%', height: 'auto' }}
+            />
           </div>
         </div>
 
         <div
-          className="relative z-10 max-w-2xl pt-12 pb-[100px] text-center sm:pt-16 sm:pb-[300px] lg:pt-20 "
+          className="relative z-20 max-w-2xl pt-12 pb-[100px] text-center sm:pt-16 sm:pb-[300px] lg:pt-20 lg:pb-[360px]"
           dir={isRTL ? 'rtl' : 'ltr'}
           lang={isRTL ? 'ar' : 'en'}
         >
@@ -112,10 +110,10 @@ export default function ProjectIntro({ locale }: ProjectIntroProps) {
           </div> */}
           <div className="mt-10 flex items-center justify-center">
             <div
-            
+
               className="btn text-white bg-[#1C7CBB] hover:bg-opacity-90 active:bg-opacity-100 px-7 py-3 rounded-full shadow-[0_18px_50px_rgba(28,124,187,0.35)]"
             >
-              {locale=='ar' ? 'قريبا' : 'Coming Soon'}
+              {locale == 'ar' ? 'قريبا' : 'Coming Soon'}
             </div>
           </div>
         </div>

@@ -139,6 +139,7 @@ const sectionIcons = [
   },
 ]
 
+
 const fileTypeIconMap: Record<string, string> = {
   pdf: '/file-icons/pdf.svg',
   doc: '/file-icons/doc.svg',
@@ -577,13 +578,13 @@ function buildServiceComponentSections(params: {
                 `${locale === 'ar' ? 'طريقة التسليم' : 'Delivery mode'}: ${getDeliverableWayLabel(locale, firstDraftWay.key)}`,
                 ...(firstDraftReportTypes.length === 0
                   ? [
-                      `${locale === 'ar' ? 'الصيغ' : 'Formats'}: ${locale === 'ar' ? 'غير محدد' : 'Not specified'}`,
-                    ]
+                    `${locale === 'ar' ? 'الصيغ' : 'Formats'}: ${locale === 'ar' ? 'غير محدد' : 'Not specified'}`,
+                  ]
                   : []),
                 ...(firstDraftWay.address
                   ? [
-                      `${locale === 'ar' ? 'العنوان' : 'Address'}: ${firstDraftWay.address}`,
-                    ]
+                    `${locale === 'ar' ? 'العنوان' : 'Address'}: ${firstDraftWay.address}`,
+                  ]
                   : []),
               ],
               fileTypes: firstDraftReportTypes,
@@ -595,13 +596,13 @@ function buildServiceComponentSections(params: {
                 `${locale === 'ar' ? 'طريقة التسليم' : 'Delivery mode'}: ${getDeliverableWayLabel(locale, finalVersionWay.key)}`,
                 ...(finalVersionReportTypes.length === 0
                   ? [
-                      `${locale === 'ar' ? 'الصيغ' : 'Formats'}: ${locale === 'ar' ? 'غير محدد' : 'Not specified'}`,
-                    ]
+                    `${locale === 'ar' ? 'الصيغ' : 'Formats'}: ${locale === 'ar' ? 'غير محدد' : 'Not specified'}`,
+                  ]
                   : []),
                 ...(finalVersionWay.address
                   ? [
-                      `${locale === 'ar' ? 'العنوان' : 'Address'}: ${finalVersionWay.address}`,
-                    ]
+                    `${locale === 'ar' ? 'العنوان' : 'Address'}: ${finalVersionWay.address}`,
+                  ]
                   : []),
               ],
               fileTypes: finalVersionReportTypes,
@@ -629,8 +630,8 @@ function buildServiceComponentSections(params: {
       const payloadValues = Array.isArray(payloadValue)
         ? payloadValue.map((item) => stringifyValue(item)).filter(Boolean)
         : payloadValue !== null &&
-            payloadValue !== undefined &&
-            typeof payloadValue !== 'object'
+          payloadValue !== undefined &&
+          typeof payloadValue !== 'object'
           ? [stringifyValue(payloadValue)].filter(Boolean)
           : []
       const values = (
@@ -899,43 +900,43 @@ export default function ProjectReviewStep({
         requestData?.insighter_origin
           ? getDisplayName(locale, requestData.insighter_origin)
           : originType === 'country'
-          ? countries.find((item) => String(item.id) === originId)
-            ? getDisplayName(
+            ? countries.find((item) => String(item.id) === originId)
+              ? getDisplayName(
                 locale,
                 countries.find((item) => String(item.id) === originId) as Country
               )
-            : originId || (isRTL ? 'غير محدد' : 'Not specified')
-          : originType === 'region'
-            ? getDisplayName(
+              : originId || (isRTL ? 'غير محدد' : 'Not specified')
+            : originType === 'region'
+              ? getDisplayName(
                 locale,
                 (regions.find((item) => String(item.id) === originId) as Region) || {}
               ) ||
               originId ||
               (isRTL ? 'غير محدد' : 'Not specified')
-            : isRTL
-              ? 'غير محدد'
-              : 'Not specified'
+              : isRTL
+                ? 'غير محدد'
+                : 'Not specified'
 
       const targetMarket =
         targetMode === 'country'
           ? countryIds.map((id) => {
-              const match = countries.find((item) => item.id === id)
-              return match ? getDisplayName(locale, match) : `#${id}`
-            })
+            const match = countries.find((item) => item.id === id)
+            return match ? getDisplayName(locale, match) : `#${id}`
+          })
           : targetMode === 'economic'
             ? blocIds.map((id) => {
-                const match = blocs.find((item) => item.id === id)
-                return match ? getDisplayName(locale, match) : `#${id}`
-              })
+              const match = blocs.find((item) => item.id === id)
+              return match ? getDisplayName(locale, match) : `#${id}`
+            })
             : targetMode === 'worldwide'
               ? [locale === 'ar' ? 'عالميًا' : 'Worldwide']
               : regionIds.map(
-                  (id) =>
-                    getDisplayName(
-                      locale,
-                      (regions.find((item) => item.id === id) as Region) || {}
-                    ) || `#${id}`
-                )
+                (id) =>
+                  getDisplayName(
+                    locale,
+                    (regions.find((item) => item.id === id) as Region) || {}
+                  ) || `#${id}`
+              )
 
       const descriptionState = readProjectDescriptionState(locale)
       const addonsState = readProjectAddonsState(locale)
@@ -1018,8 +1019,8 @@ export default function ProjectReviewStep({
           apiTargetMarket.length > 0
             ? apiTargetMarket
             : targetMarket.length > 0
-            ? targetMarket
-            : [isRTL ? 'غير محدد' : 'Not specified'],
+              ? targetMarket
+              : [isRTL ? 'غير محدد' : 'Not specified'],
         servicePrompt: stringifyValue(requestData?.service_prompt) || servicePrompt.trim(),
         description: stringifyValue(requestData?.description) || descriptionState.description,
         descriptionFiles: descriptionState.files,
@@ -1158,7 +1159,6 @@ export default function ProjectReviewStep({
                   </div>
 
                   <div className="min-w-0">
-                  
                     <h1 className="mt-2 text-3xl font-semibold text-slate-950 sm:text-4xl">
                       {review.title}
                     </h1>
@@ -1177,8 +1177,6 @@ export default function ProjectReviewStep({
                   </span>
                 </div>
               </div>
-
-             
             </div>
 
             <div className="mt-8 space-y-6">
@@ -1241,10 +1239,12 @@ export default function ProjectReviewStep({
 
             <button
               type="button"
-              onClick={() => router.push(`/${locale}/project`)}
+              onClick={() =>
+                nav.nextHref ? router.push(nav.nextHref) : router.push(`/${locale}/project`)
+              }
               className="btn-sm rounded-full bg-[#1C7CBB] px-6 py-2 text-white hover:bg-opacity-90"
             >
-              {isRTL ? 'إنهاء' : 'Finish'}
+              {isRTL ? 'متابعة' : 'Continue'}
             </button>
           </div>
         </div>

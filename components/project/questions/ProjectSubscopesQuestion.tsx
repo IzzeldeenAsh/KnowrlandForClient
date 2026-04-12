@@ -161,20 +161,20 @@ function coerceScopeParents(input: unknown): ScopeParent[] {
       const childrenRaw = raw?.children
       const children: ScopeChild[] = Array.isArray(childrenRaw)
         ? childrenRaw
-            .map((c: any, childIndex: number) => {
-              const childName =
-                typeof c === 'string' || typeof c === 'number'
-                  ? String(c).trim()
-                  : String(c?.name ?? c?.title ?? c?.label ?? '').trim()
-              return {
-                id: coerceNumericIdOrHash(
-                  c?.id,
-                  `${name}:${childName || String(childIndex)}`
-                ),
-                name: childName,
-              }
-            })
-            .filter((c: ScopeChild) => Number.isFinite(c.id) && Boolean(c.name?.trim()))
+          .map((c: any, childIndex: number) => {
+            const childName =
+              typeof c === 'string' || typeof c === 'number'
+                ? String(c).trim()
+                : String(c?.name ?? c?.title ?? c?.label ?? '').trim()
+            return {
+              id: coerceNumericIdOrHash(
+                c?.id,
+                `${name}:${childName || String(childIndex)}`
+              ),
+              name: childName,
+            }
+          })
+          .filter((c: ScopeChild) => Number.isFinite(c.id) && Boolean(c.name?.trim()))
         : []
 
       if (!Number.isFinite(id) || !name) return null
@@ -258,9 +258,9 @@ async function syncScopes(params: {
     formData.append(`scopes[${i}][name]`, scope.name)
     scope.subscopes.forEach((subscope, j) => {
       formData.append(`scopes[${i}][subscopes][${j}][name]`, subscope.name)
-      ;(subscope.files || []).forEach((file, k) => {
-        formData.append(`scopes[${i}][subscopes][${j}][file][${k}]`, file)
-      })
+        ; (subscope.files || []).forEach((file, k) => {
+          formData.append(`scopes[${i}][subscopes][${j}][file][${k}]`, file)
+        })
     })
   })
 
@@ -868,13 +868,12 @@ export default function ProjectSubscopesQuestion({ locale }: { locale: WizardLoc
       />
 
       <div
-        className={`mt-2 text-start transition-all duration-700 ${
-          entered
+        className={`mt-2 text-start transition-all duration-700 ${entered
             ? 'opacity-100 translate-x-0'
             : isRTL
               ? 'opacity-0 translate-x-4'
               : 'opacity-0 -translate-x-4'
-        }`}
+          }`}
       >
         {isEnglish ? (
           <style>{`
@@ -898,72 +897,68 @@ export default function ProjectSubscopesQuestion({ locale }: { locale: WizardLoc
         <div className="mt-4 text-sm font-semibold text-rose-700">{error}</div>
       ) : null}
 
-      <div className="mt-6 space-y-8 pb-[150px] sm:pb-0">
+      <div className="mt-6 space-y-8 pb-[150px] lg:pb-0">
         {loading ? (
           <div className="text-sm font-semibold text-slate-600">
             {isRTL ? 'جاري التحميل…' : 'Loading…'}
           </div>
-	        ) : (
-	          <div className="grid grid-cols-1 items-stretch gap-6 lg:grid-cols-2">
-	            {selectedParents.map((parent) => {
-	              const scopeKey = parentScopeKey(parent.id)
-	              const children = parent.children || []
-	              const customSubscopes = manualSubscopesByScope[scopeKey] || []
-	              const totalSubscopesCount = children.length + customSubscopes.length
-	              const otherOpen = customSubscopes.length > 0
+        ) : (
+          <div className="grid grid-cols-1 items-stretch gap-6 lg:grid-cols-2">
+            {selectedParents.map((parent) => {
+              const scopeKey = parentScopeKey(parent.id)
+              const children = parent.children || []
+              const customSubscopes = manualSubscopesByScope[scopeKey] || []
+              const totalSubscopesCount = children.length + customSubscopes.length
+              const otherOpen = customSubscopes.length > 0
 
-	              return (
-	                <div
-	                  key={parent.id}
-	                  className="h-full rounded-2xl border border-white/30 bg-white/40 backdrop-blur-md shadow-sm"
-	                >
-	                  <div className="flex h-full flex-col gap-4 p-5 sm:p-6">
+              return (
+                <div
+                  key={parent.id}
+                  className="h-full rounded-2xl border border-white/30 bg-white/40 backdrop-blur-md shadow-sm"
+                >
+                  <div className="flex h-full flex-col gap-4 p-5 sm:p-6">
                     <div
-                      className={`bg-gradient-to-r from-sky-600 via-cyan-500 to-emerald-500 bg-clip-text text-xl font-semibold text-transparent sm:text-2xl ${
-                        isRTL ? 'text-right' : 'text-left'
-                      }`}
+                      className={`bg-gradient-to-r from-sky-600 via-cyan-500 to-emerald-500 bg-clip-text text-xl font-semibold text-transparent sm:text-2xl ${isRTL ? 'text-right' : 'text-left'
+                        }`}
                     >
                       {parent.name}
                     </div>
 
-	                    {children.length === 0 ? (
-	                      <div
-                          className={`text-sm font-medium text-slate-500 ${
-                            isRTL ? 'text-right' : 'text-left'
+                    {children.length === 0 ? (
+                      <div
+                        className={`text-sm font-medium text-slate-500 ${isRTL ? 'text-right' : 'text-left'
                           }`}
-                        >
-	                        {isRTL
-	                          ? ' لا توجد نطاقات فرعية مقترحة. يمكنك إضافة نطاقات فرعية أخرى أو تركها فارغة.'
-	                          : 'No suggested subscopes. You can add other subscopes or leave it empty.'}
-	                      </div>
-	                    ) : (
-	                      <div className="space-y-2">
-	                        {children.map((child, childIndex) => {
-	                          const checked = isChildSelected(parent.id, child.id)
-	                          const key = `${parent.id}:${child.id}`
-	                          const attachments = attachmentsByKey[key] || []
-	                          const isLastOverall =
-	                            childIndex === children.length - 1 && customSubscopes.length === 0
-	                          const showDivider = totalSubscopesCount > 1 && !isLastOverall
-	                          return (
-	                            <div
-	                              key={child.id}
-	                              className={`space-y-2 ${showDivider ? 'border-b border-gray-300 pb-5' : ''}`}
+                      >
+                        {isRTL
+                          ? ' لا توجد نطاقات فرعية مقترحة. يمكنك إضافة نطاقات فرعية أخرى أو تركها فارغة.'
+                          : 'No suggested subscopes. You can add other subscopes or leave it empty.'}
+                      </div>
+                    ) : (
+                      <div className="space-y-2">
+                        {children.map((child, childIndex) => {
+                          const checked = isChildSelected(parent.id, child.id)
+                          const key = `${parent.id}:${child.id}`
+                          const attachments = attachmentsByKey[key] || []
+                          const isLastOverall =
+                            childIndex === children.length - 1 && customSubscopes.length === 0
+                          const showDivider = totalSubscopesCount > 1 && !isLastOverall
+                          return (
+                            <div
+                              key={child.id}
+                              className={`space-y-2 ${showDivider ? 'border-b border-gray-300 pb-5' : ''}`}
                             >
                               <div className="flex items-start justify-between gap-3">
                                 <button
                                   type="button"
                                   onClick={() => toggleChild(parent.id, child.id)}
-                                  className={`flex flex-1 items-center gap-3 py-1.5 ${
-                                    isRTL ? 'text-right' : 'text-left'
-                                  }`}
+                                  className={`flex flex-1 items-center gap-3 py-1.5 ${isRTL ? 'text-right' : 'text-left'
+                                    }`}
                                 >
                                   <span
-                                    className={`inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-md border ${
-                                      checked
+                                    className={`inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-md border ${checked
                                         ? 'border-blue-600 bg-blue-600'
                                         : 'border-slate-300 bg-white'
-                                    }`}
+                                      }`}
                                     aria-hidden="true"
                                   >
                                     {checked ? (
@@ -971,9 +966,8 @@ export default function ProjectSubscopesQuestion({ locale }: { locale: WizardLoc
                                     ) : null}
                                   </span>
                                   <span
-                                    className={`text-sm sm:text-base font-medium text-slate-800 ${
-                                      isRTL ? 'text-right' : 'text-left'
-                                    }`}
+                                    className={`text-sm sm:text-base font-medium text-slate-800 ${isRTL ? 'text-right' : 'text-left'
+                                      }`}
                                   >
                                     {child.name}
                                   </span>
@@ -983,9 +977,8 @@ export default function ProjectSubscopesQuestion({ locale }: { locale: WizardLoc
                                   <button
                                     type="button"
                                     onClick={() => openFilePicker(parent.id, child.id)}
-                                    className={`btn-sm text-xs px-4 py-2 rounded-full text-muted border border-[#dfdfdf] bg-[#ffffff] hover:bg-opacity-90 inline-flex items-center gap-2 ${
-                                      isRTL ? 'flex-row-reverse' : ''
-                                    }`}
+                                    className={`btn-sm text-xs px-4 py-2 rounded-full text-muted border border-[#dfdfdf] bg-[#ffffff] hover:bg-opacity-90 inline-flex items-center gap-2 ${isRTL ? 'flex-row-reverse' : ''
+                                      }`}
                                   >
                                     <IconPaperclip size={18} stroke={1.8} />
                                     {isRTL ? 'إضافة مرفق' : 'Add attachment'}
@@ -995,9 +988,8 @@ export default function ProjectSubscopesQuestion({ locale }: { locale: WizardLoc
 
                               {checked && attachments.length > 0 ? (
                                 <div
-                                  className={`grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-2 ${
-                                    isRTL ? 'pr-10' : 'pl-10'
-                                  }`}
+                                  className={`grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-2 ${isRTL ? 'pr-10' : 'pl-10'
+                                    }`}
                                 >
                                   {attachments.map((file, idx) => (
                                     <AttachmentTile
@@ -1015,31 +1007,30 @@ export default function ProjectSubscopesQuestion({ locale }: { locale: WizardLoc
                       </div>
                     )}
 
-	                    {otherOpen ? (
-	                      <div >
-	                      
-	                        <div className="space-y-2">
-	                          {customSubscopes.map((sub, subIndex) => {
-	                            const key = `${scopeKey}:${sub.id}`
-	                            const attachments = attachmentsByKey[key] || []
-	                            const hasName = Boolean(String(sub.name || '').trim())
-	                            const isLastOverall = subIndex === customSubscopes.length - 1
-	                            const showDivider = totalSubscopesCount > 1 && !isLastOverall
-	                            return (
-	                              <div
-	                                key={sub.id}
-	                                className={`space-y-2 ${showDivider ? 'border-b border-gray-300 pb-5' : ''}`}
-	                              >
-	                                <div className="flex items-start justify-between gap-3">
+                    {otherOpen ? (
+                      <div >
+
+                        <div className="space-y-2">
+                          {customSubscopes.map((sub, subIndex) => {
+                            const key = `${scopeKey}:${sub.id}`
+                            const attachments = attachmentsByKey[key] || []
+                            const hasName = Boolean(String(sub.name || '').trim())
+                            const isLastOverall = subIndex === customSubscopes.length - 1
+                            const showDivider = totalSubscopesCount > 1 && !isLastOverall
+                            return (
+                              <div
+                                key={sub.id}
+                                className={`space-y-2 ${showDivider ? 'border-b border-gray-300 pb-5' : ''}`}
+                              >
+                                <div className="flex items-start justify-between gap-3">
                                   <input
                                     value={sub.name}
                                     onChange={(e) =>
                                       updateManualSubscopeName(scopeKey, sub.id, e.target.value)
                                     }
                                     placeholder={isRTL ? 'اسم النطاق الفرعي…' : 'Subscope name…'}
-                                    className={`w-full rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-semibold text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-200 ${
-                                      isRTL ? 'text-right' : 'text-left'
-                                    }`}
+                                    className={`w-full rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-semibold text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-200 ${isRTL ? 'text-right' : 'text-left'
+                                      }`}
                                   />
 
                                   <div className="flex items-center gap-2">
@@ -1047,9 +1038,8 @@ export default function ProjectSubscopesQuestion({ locale }: { locale: WizardLoc
                                       type="button"
                                       onClick={() => openFilePickerKey(key)}
                                       disabled={!hasName}
-                                      className={`btn-sm text-xs px-4 py-2 rounded-full text-muted border border-[#dfdfdf] bg-[#ffffff] hover:bg-opacity-90 inline-flex items-center gap-2 ${
-                                        isRTL ? 'flex-row-reverse' : ''
-                                      } ${hasName ? '' : 'opacity-50 cursor-not-allowed'}`}
+                                      className={`btn-sm text-xs px-4 py-2 rounded-full text-muted border border-[#dfdfdf] bg-[#ffffff] hover:bg-opacity-90 inline-flex items-center gap-2 ${isRTL ? 'flex-row-reverse' : ''
+                                        } ${hasName ? '' : 'opacity-50 cursor-not-allowed'}`}
                                     >
                                       <IconPaperclip size={18} stroke={1.8} />
                                       {isRTL ? 'إضافة مرفق' : 'Add attachment'}
@@ -1086,20 +1076,19 @@ export default function ProjectSubscopesQuestion({ locale }: { locale: WizardLoc
                       </div>
                     ) : null}
 
-	                    <div
-                        className={`${isRTL ? 'pr-10 text-right' : 'pl-10 text-left'} mt-auto`}
-                      >
-	                      <button
-	                        type="button"
+                    <div
+                      className={`${isRTL ? 'pr-10 text-right' : 'pl-10 text-left'} mt-auto`}
+                    >
+                      <button
+                        type="button"
                         onClick={() => {
                           addManualSubscope(
                             scopeKey,
                             (parent.children || []).length === 0 ? parent.name : ''
                           )
                         }}
-                        className={`inline-flex items-center gap-2 font-semibold text-blue-600 hover:text-blue-700 ${
-                          isRTL ? 'flex-row-reverse' : ''
-                        }`}
+                        className={`inline-flex items-center gap-2 font-semibold text-blue-600 hover:text-blue-700 ${isRTL ? 'flex-row-reverse' : ''
+                          }`}
                       >
                         <IconPlus size={18} stroke={2.2} />
                         {isRTL ? 'إضافة نطاق فرعي' : 'Add subscope'}
@@ -1110,46 +1099,44 @@ export default function ProjectSubscopesQuestion({ locale }: { locale: WizardLoc
               )
             })}
 
-	            {manualScopes.map((scope) => {
-	              const scopeKey = manualScopeKey(scope.id)
-	              const subscopes = manualSubscopesByScope[scopeKey] || []
-	              return (
+            {manualScopes.map((scope) => {
+              const scopeKey = manualScopeKey(scope.id)
+              const subscopes = manualSubscopesByScope[scopeKey] || []
+              return (
                 <div
                   key={scope.id}
                   className="h-full rounded-2xl border border-white/30 bg-white/40 backdrop-blur-md shadow-sm"
                 >
                   <div className="flex h-full flex-col gap-4 p-5 sm:p-6">
                     <div
-                      className={`bg-gradient-to-r from-sky-600 via-cyan-500 to-emerald-500 bg-clip-text text-xl font-semibold text-transparent sm:text-2xl ${
-                        isRTL ? 'text-right' : 'text-left'
-                      }`}
+                      className={`bg-gradient-to-r from-sky-600 via-cyan-500 to-emerald-500 bg-clip-text text-xl font-semibold text-transparent sm:text-2xl ${isRTL ? 'text-right' : 'text-left'
+                        }`}
                     >
                       {scope.name}
                     </div>
 
-	                    {subscopes.length > 0 ? (
-	                      <div className="space-y-2">
-	                        {subscopes.map((sub, subIndex) => {
-	                          const key = `${scopeKey}:${sub.id}`
-	                          const attachments = attachmentsByKey[key] || []
-	                          const hasName = Boolean(String(sub.name || '').trim())
-	                          const showDivider =
-	                            subscopes.length > 1 && subIndex !== subscopes.length - 1
-	                          return (
-	                            <div
-	                              key={sub.id}
-	                              className={`space-y-2 ${showDivider ? 'border-b border-gray-300 pb-5' : ''}`}
-	                            >
-	                              <div className="flex items-start justify-between gap-3">
+                    {subscopes.length > 0 ? (
+                      <div className="space-y-2">
+                        {subscopes.map((sub, subIndex) => {
+                          const key = `${scopeKey}:${sub.id}`
+                          const attachments = attachmentsByKey[key] || []
+                          const hasName = Boolean(String(sub.name || '').trim())
+                          const showDivider =
+                            subscopes.length > 1 && subIndex !== subscopes.length - 1
+                          return (
+                            <div
+                              key={sub.id}
+                              className={`space-y-2 ${showDivider ? 'border-b border-gray-300 pb-5' : ''}`}
+                            >
+                              <div className="flex items-start justify-between gap-3">
                                 <input
                                   value={sub.name}
                                   onChange={(e) =>
                                     updateManualSubscopeName(scopeKey, sub.id, e.target.value)
                                   }
                                   placeholder={isRTL ? 'اسم النطاق الفرعي…' : 'Subscope name…'}
-                                  className={`w-full rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-semibold text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-200 ${
-                                    isRTL ? 'text-right' : 'text-left'
-                                  }`}
+                                  className={`w-full rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-semibold text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-200 ${isRTL ? 'text-right' : 'text-left'
+                                    }`}
                                 />
 
                                 <div className="flex items-center gap-2">
@@ -1157,9 +1144,8 @@ export default function ProjectSubscopesQuestion({ locale }: { locale: WizardLoc
                                     type="button"
                                     onClick={() => openFilePickerKey(key)}
                                     disabled={!hasName}
-                                    className={`btn-sm text-xs px-4 py-2 rounded-full text-muted border border-[#dfdfdf] bg-[#ffffff] hover:bg-opacity-90 inline-flex items-center gap-2 ${
-                                      isRTL ? 'flex-row-reverse' : ''
-                                    } ${hasName ? '' : 'opacity-50 cursor-not-allowed'}`}
+                                    className={`btn-sm text-xs px-4 py-2 rounded-full text-muted border border-[#dfdfdf] bg-[#ffffff] hover:bg-opacity-90 inline-flex items-center gap-2 ${isRTL ? 'flex-row-reverse' : ''
+                                      } ${hasName ? '' : 'opacity-50 cursor-not-allowed'}`}
                                   >
                                     <IconPaperclip size={18} stroke={1.8} />
                                     {isRTL ? 'إضافة مرفق' : 'Add attachment'}
@@ -1201,9 +1187,8 @@ export default function ProjectSubscopesQuestion({ locale }: { locale: WizardLoc
                       <button
                         type="button"
                         onClick={() => addManualSubscope(scopeKey)}
-                        className={`inline-flex items-center gap-2 font-semibold text-blue-600 hover:text-blue-700 ${
-                          isRTL ? 'flex-row-reverse' : ''
-                        }`}
+                        className={`inline-flex items-center gap-2 font-semibold text-blue-600 hover:text-blue-700 ${isRTL ? 'flex-row-reverse' : ''
+                          }`}
                       >
                         <IconPlus size={18} stroke={2.2} />
                         {isRTL ? 'إضافة نطاق فرعي' : 'Add subscope'}
@@ -1226,9 +1211,9 @@ export default function ProjectSubscopesQuestion({ locale }: { locale: WizardLoc
         onChange={(e) => onFilesPicked(e.target.files)}
       />
 
-      <div className="fixed bottom-0 left-0 right-0 sm:static border-t border-slate-200/70 bg-white/80 backdrop-blur-md lg:bottom-10 lg:border-t-0 lg:bg-transparent lg:backdrop-blur-0">
-        <div className="mx-auto w-full  px-4 sm:px-0 pt-4 pb-[calc(env(safe-area-inset-bottom)+1rem)]">
-          <div className="mt-2 sm:mt-8 flex items-center justify-between gap-3">
+      <div className="fixed bottom-0 left-0 right-0 lg:static border-t border-slate-200/70 bg-white/80 backdrop-blur-md lg:bottom-10 lg:border-t-0 lg:bg-transparent lg:backdrop-blur-0">
+        <div className="mx-auto w-full  px-4 lg:px-0 pt-4 pb-[calc(env(safe-area-inset-bottom)+1rem)]">
+          <div className="mt-2 lg:mt-8 flex items-center justify-between gap-3">
             <Link
               href={`/${locale}/project/wizard/project-scope`}
               className="btn-sm text-slate-700 bg-white/80 hover:bg-white border border-slate-200"
@@ -1240,11 +1225,10 @@ export default function ProjectSubscopesQuestion({ locale }: { locale: WizardLoc
               type="button"
               onClick={onContinue}
               disabled={!canContinue}
-              className={`btn-sm px-6 py-2 rounded-full ${
-                canContinue
+              className={`btn-sm px-6 py-2 rounded-full ${canContinue
                   ? 'text-white bg-[#1C7CBB] hover:bg-opacity-90'
                   : 'text-slate-500 bg-slate-200 cursor-not-allowed'
-              }`}
+                }`}
             >
               {submitting ? (isRTL ? 'جاري المتابعة…' : 'Continuing…') : isRTL ? 'متابعة' : 'Continue'}
             </button>

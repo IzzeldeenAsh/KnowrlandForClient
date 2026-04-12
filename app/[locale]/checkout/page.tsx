@@ -442,6 +442,7 @@ export default function CheckoutPage() {
       : "Your order has been completed successfully. You can now download your purchased documents.",
     goToDownloads: isRTL ? "الذهاب إلى التنزيلات" : "Go to Downloads",
     redownload: isRTL ? "إعادة التحميل" : "Redownload",
+    downloadStarted: isRTL ? "بدأ التحميل بالفعل، لبدء التحميل مجددًا انقر:" : "Your download already started. To start it again click:",
     congratulations: isRTL ? "تهانينا!" : "Congratulations!",
     paymentComplete: isRTL ? (isFree ? "تم إكمال الطلب بنجاح" : "تمت معالجة دفعتك بنجاح") : (isFree ? "Your order has been completed successfully" : "Your payment has been processed successfully"),
     accessGranted: isRTL ? (isFree ? "يمكنك الآن الوصول إلى جميع المستندات" : "يمكنك الآن الوصول إلى جميع المستندات المشتراة") : (isFree ? "You now have access to all your documents" : "You now have access to all your purchased documents"),
@@ -1030,23 +1031,22 @@ export default function CheckoutPage() {
                   >
                     {translations.goToDownloads}
                   </Button>
-                  {!isFree && (
-                    <div className="mt-3">
-                      <a
-                        href="#"
-                        onClick={async (event) => {
-                          event.preventDefault();
-                          await handleRedownload();
-                        }}
-                        className={`text-sm text-blue-600 underline underline-offset-2 hover:text-blue-700 ${isFetchingDownloadIds ? "pointer-events-none opacity-60" : ""}`}
-                        aria-disabled={isFetchingDownloadIds}
-                      >
-                        {isFetchingDownloadIds
-                          ? (isRTL ? "جاري التحميل..." : "Downloading...")
-                          : translations.redownload}
-                      </a>
-                    </div>
-                  )}
+                  <div className="mt-3">
+                    <span className="text-sm text-gray-500">{translations.downloadStarted} </span>
+                    <a
+                      href="#"
+                      onClick={async (event) => {
+                        event.preventDefault();
+                        await handleRedownload();
+                      }}
+                      className={`text-sm text-blue-600 underline underline-offset-2 hover:text-blue-700 ${isFetchingDownloadIds ? "pointer-events-none opacity-60" : ""}`}
+                      aria-disabled={isFetchingDownloadIds}
+                    >
+                      {isFetchingDownloadIds
+                        ? (isRTL ? "جاري التحميل..." : "Downloading...")
+                        : translations.redownload}
+                    </a>
+                  </div>
                 </>
               )}
             </div>

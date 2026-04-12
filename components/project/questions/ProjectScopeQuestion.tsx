@@ -104,8 +104,8 @@ function AiGeneratingScopesLoader({
             style={{
               color: 'rgba(15, 23, 42, 0.18)',
               backgroundImage:
-              'linear-gradient(90deg, rgba(30,64,175,0.55) 0%, rgba(30,64,175,0.55) 35%, rgba(37,99,235,1) 50%, rgba(30,64,175,0.55) 65%, rgba(30,64,175,0.55) 100%)',
-            backgroundSize: '200% auto',
+                'linear-gradient(90deg, rgba(30,64,175,0.55) 0%, rgba(30,64,175,0.55) 35%, rgba(37,99,235,1) 50%, rgba(30,64,175,0.55) 65%, rgba(30,64,175,0.55) 100%)',
+              backgroundSize: '200% auto',
               WebkitBackgroundClip: 'text',
               WebkitTextFillColor: 'transparent',
               animation: 'ai-scope-shimmer 2s linear infinite',
@@ -139,9 +139,8 @@ function AiScopePromptComposer({
   return (
     <div >
       <div
-        className={`flex items-center gap-2 text-[11px] font-bold uppercase  text-sky-700 ${
-          isRTL ? 'flex-row-reverse' : ''
-        }`}
+        className={`flex items-center gap-2 text-[11px] font-bold uppercase  text-sky-700 ${isRTL ? 'flex-row-reverse' : ''
+          }`}
       >
         <span className="inline-flex h-8 w-8 items-center justify-center rounded-2xl border border-sky-200/80 bg-white/80 text-sky-700 shadow-sm">
           <IconSparkles size={16} stroke={1.9} />
@@ -170,9 +169,8 @@ function AiScopePromptComposer({
         />
 
         <div
-          className={`flex items-center justify-between gap-3 border-t border-slate-200/70 px-4 py-3 ${
-            isRTL ? 'flex-row-reverse' : ''
-          }`}
+          className={`flex items-center justify-between gap-3 border-t border-slate-200/70 px-4 py-3 ${isRTL ? 'flex-row-reverse' : ''
+            }`}
         >
           <div className="text-xs font-semibold text-slate-500">
             {isRTL
@@ -202,11 +200,10 @@ function AiScopePromptComposer({
                   ? 'توليد النطاقات'
                   : 'Generate scopes'
             }
-            className={`inline-flex h-11 w-11 items-center justify-center rounded-full transition ${
-              canSend
+            className={`inline-flex h-11 w-11 items-center justify-center rounded-full transition ${canSend
                 ? 'bg-[#1C7CBB] text-white shadow-lg shadow-sky-500/20 hover:bg-[#176799]'
                 : 'bg-slate-200 text-slate-500'
-            }`}
+              }`}
           >
             <IconArrowUp size={20} stroke={2.2} />
           </button>
@@ -263,20 +260,20 @@ function coerceScopeParents(input: unknown): ScopeParent[] {
       const childrenRaw = raw?.children
       const children: ScopeChild[] = Array.isArray(childrenRaw)
         ? childrenRaw
-            .map((c: any, childIndex: number) => {
-              const childName =
-                typeof c === 'string' || typeof c === 'number'
-                  ? String(c).trim()
-                  : String(c?.name ?? c?.title ?? c?.label ?? '').trim()
-              return {
-                id: coerceNumericIdOrHash(
-                  c?.id,
-                  `${name}:${childName || String(childIndex)}`
-                ),
-                name: childName,
-              }
-            })
-            .filter((c: ScopeChild) => Number.isFinite(c.id) && Boolean(c.name?.trim()))
+          .map((c: any, childIndex: number) => {
+            const childName =
+              typeof c === 'string' || typeof c === 'number'
+                ? String(c).trim()
+                : String(c?.name ?? c?.title ?? c?.label ?? '').trim()
+            return {
+              id: coerceNumericIdOrHash(
+                c?.id,
+                `${name}:${childName || String(childIndex)}`
+              ),
+              name: childName,
+            }
+          })
+          .filter((c: ScopeChild) => Number.isFinite(c.id) && Boolean(c.name?.trim()))
         : []
 
       if (!Number.isFinite(id) || !name) return null
@@ -893,13 +890,12 @@ export default function ProjectScopeQuestion({ locale }: { locale: WizardLocale 
       />
 
       <div
-        className={`mt-2 text-start transition-all duration-700 ${
-          entered
+        className={`mt-2 text-start transition-all duration-700 ${entered
             ? 'translate-x-0 opacity-100'
             : isRTL
               ? 'translate-x-4 opacity-0'
               : '-translate-x-4 opacity-0'
-        }`}
+          }`}
       >
         {isEnglish ? (
           <style>{`
@@ -918,9 +914,9 @@ export default function ProjectScopeQuestion({ locale }: { locale: WizardLocale 
 
       {error ? <div className="mt-4 text-sm font-semibold text-rose-700">{error}</div> : null}
 
-    
 
-      <div className="mt-6 sm:mt-10 pb-[100px] sm:pb-0">
+
+      <div className="mt-6 sm:mt-10 pb-[100px] pg:pb-0">
         {loading ? (
           isOtherFlow && aiMode === 'polling' ? (
             <AiGeneratingScopesLoader
@@ -945,17 +941,15 @@ export default function ProjectScopeQuestion({ locale }: { locale: WizardLocale 
                 return (
                   <label
                     key={scope.id}
-                    className={`flex min-h-[72px] cursor-pointer items-center gap-3 rounded-2xl border px-5 py-4 text-start shadow-sm backdrop-blur-md transition-all duration-300 ${
-                      checked
+                    className={`flex min-h-[72px] cursor-pointer items-center gap-3 rounded-2xl border px-5 py-4 text-start shadow-sm backdrop-blur-md transition-all duration-300 ${checked
                         ? 'border-blue-300 bg-white/70'
                         : 'border-white/30 bg-white/40 hover:bg-white/55'
-                    } ${
-                      entered
+                      } ${entered
                         ? 'translate-x-0 opacity-100'
                         : isRTL
                           ? 'translate-x-4 opacity-0'
                           : '-translate-x-4 opacity-0'
-                    }`}
+                      }`}
                     style={{ transitionDelay: `${110 + index * 45}ms` }}
                   >
                     <input
@@ -972,17 +966,15 @@ export default function ProjectScopeQuestion({ locale }: { locale: WizardLocale 
               })}
 
               <label
-                className={`flex min-h-[72px] cursor-pointer items-center justify-between gap-3 rounded-2xl border px-5 py-4 text-start shadow-sm backdrop-blur-md transition-all duration-300 ${
-                  showOtherEditor
+                className={`flex min-h-[72px] cursor-pointer items-center justify-between gap-3 rounded-2xl border px-5 py-4 text-start shadow-sm backdrop-blur-md transition-all duration-300 ${showOtherEditor
                     ? 'border-blue-300 bg-white/70'
                     : 'border-white/30 bg-white/40 hover:bg-white/55'
-                } ${
-                  entered
+                  } ${entered
                     ? 'translate-x-0 opacity-100'
                     : isRTL
                       ? 'translate-x-4 opacity-0'
                       : '-translate-x-4 opacity-0'
-                }`}
+                  }`}
                 style={{ transitionDelay: `${110 + availableScopes.length * 45}ms` }}
               >
                 <div className={`flex items-center gap-3 ${isRTL ? 'flex-row-reverse' : ''}`}>
@@ -1019,9 +1011,8 @@ export default function ProjectScopeQuestion({ locale }: { locale: WizardLocale 
                   {manualScopes.map((scope) => (
                     <div key={scope.id}>
                       <div
-                        className={`flex items-center justify-between gap-3 ${
-                          isRTL ? 'flex-row-reverse' : ''
-                        }`}
+                        className={`flex items-center justify-between gap-3 ${isRTL ? 'flex-row-reverse' : ''
+                          }`}
                       >
                         <div className="flex-1">
                           <input
@@ -1081,9 +1072,9 @@ export default function ProjectScopeQuestion({ locale }: { locale: WizardLocale 
           />
         </div>
       ) : null}
-      <div className="fixed bottom-0 left-0 right-0 sm:static border-t border-slate-200/70 bg-white/80 backdrop-blur-md lg:border-t-0 lg:bg-transparent lg:backdrop-blur-0">
-        <div className="mx-auto w-full max-w-6xl px-4 pb-[calc(env(safe-area-inset-bottom)+1rem)] sm:px-0">
-          <div className="mt-4 sm:mt-8 flex items-center justify-between gap-3">
+      <div className="fixed bottom-0 left-0 right-0 lg:static border-t border-slate-200/70 bg-white/80 backdrop-blur-md lg:border-t-0 lg:bg-transparent lg:backdrop-blur-0">
+        <div className="mx-auto w-full max-w-6xl px-4 pb-[calc(env(safe-area-inset-bottom)+1rem)] lg:px-0">
+          <div className="mt-4 lg:mt-8 flex items-center justify-between gap-3">
             <Link
               href={`/${locale}/project/wizard/service`}
               className="btn-sm border border-slate-200 bg-white/80 text-slate-700 hover:bg-white"
@@ -1095,11 +1086,10 @@ export default function ProjectScopeQuestion({ locale }: { locale: WizardLocale 
               type="button"
               onClick={onContinue}
               disabled={!canContinue}
-              className={`btn-sm rounded-full px-6 py-2 ${
-                canContinue
+              className={`btn-sm rounded-full px-6 py-2 ${canContinue
                   ? 'bg-[#1C7CBB] text-white hover:bg-opacity-90'
                   : 'cursor-not-allowed bg-slate-200 text-slate-500'
-              }`}
+                }`}
             >
               {isRTL ? 'متابعة' : 'Continue'}
             </button>

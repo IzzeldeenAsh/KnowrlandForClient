@@ -179,17 +179,15 @@ export default function DataSourcesExpectedQuestion({ locale }: { locale: Wizard
     <button
       type="button"
       onClick={onClick}
-      className={`w-full flex items-center justify-between gap-3 rounded-2xl border px-4 py-3 text-start transition-colors ${
-        checked
+      className={`w-full flex items-center justify-between gap-3 rounded-2xl border px-4 py-3 text-start transition-colors ${checked
           ? 'border-blue-300 bg-white/70'
           : 'border-white/30 bg-white/40 hover:bg-white/55'
-      }`}
+        }`}
     >
       <span className="text-sm sm:text-base font-semibold text-slate-900">{label}</span>
       <span
-        className={`inline-flex h-5 w-5 shrink-0 items-center justify-center rounded-md border ${
-          checked ? 'border-blue-600' : 'border-slate-300'
-        } bg-white/80`}
+        className={`inline-flex h-5 w-5 shrink-0 items-center justify-center rounded-md border ${checked ? 'border-blue-600' : 'border-slate-300'
+          } bg-white/80`}
         aria-hidden="true"
       >
         <span className={`h-2.5 w-2.5 rounded-sm ${checked ? 'bg-blue-600' : 'bg-transparent'}`} />
@@ -206,13 +204,12 @@ export default function DataSourcesExpectedQuestion({ locale }: { locale: Wizard
       />
 
       <div
-        className={`mt-2 text-start transition-all duration-700 ${
-          entered
+        className={`mt-2 text-start transition-all duration-700 ${entered
             ? 'opacity-100 translate-x-0'
             : isRTL
               ? 'opacity-0 translate-x-4'
               : 'opacity-0 -translate-x-4'
-        }`}
+          }`}
       >
         {isEnglish ? (
           <style>{`
@@ -259,9 +256,9 @@ export default function DataSourcesExpectedQuestion({ locale }: { locale: Wizard
         />
       </div>
 
-        <div className="fixed bottom-0 left-0 right-0 sm:static border-t border-slate-200/70 bg-white/80 backdrop-blur-md lg:bottom-10 lg:border-t-0 lg:bg-transparent lg:backdrop-blur-0">
-        <div className="mx-auto w-full max-w-6xl px-4 sm:px-0 pt-4 pb-[calc(env(safe-area-inset-bottom)+1rem)]">
-          <div className="mt-2 sm:mt-8 flex items-center justify-between gap-3">
+      <div className="fixed bottom-0 left-0 right-0 lg:static border-t border-slate-200/70 bg-white/80 backdrop-blur-md lg:bottom-10 lg:border-t-0 lg:bg-transparent lg:backdrop-blur-0">
+        <div className="mx-auto w-full max-w-6xl px-4 lg:px-0 pt-4 pb-[calc(env(safe-area-inset-bottom)+1rem)]">
+          <div className="mt-2 lg:mt-8 flex items-center justify-between gap-3">
             <Link
               href={nav.backHref}
               className="btn-sm text-slate-700 bg-white/80 hover:bg-white border border-slate-200"
@@ -273,11 +270,10 @@ export default function DataSourcesExpectedQuestion({ locale }: { locale: Wizard
               type="button"
               onClick={onContinue}
               disabled={!canContinue}
-              className={`btn-sm px-6 py-2 rounded-full ${
-                canContinue
+              className={`btn-sm px-6 py-2 rounded-full ${canContinue
                   ? 'text-white bg-[#1C7CBB] hover:bg-opacity-90'
                   : 'text-slate-500 bg-slate-200 cursor-not-allowed'
-              }`}
+                }`}
             >
               {submitting ? (isRTL ? 'جاري الحفظ…' : 'Saving…') : isRTL ? 'متابعة' : 'Continue'}
             </button>

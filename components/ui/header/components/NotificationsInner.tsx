@@ -563,9 +563,9 @@ export default function NotificationsInner({
       } else if (notification.sub_type.startsWith('insighter_meeting_reminder')) {
         url = 'https://app.insightabusiness.com/app/insighter-dashboard/my-meetings?tab=client'
       }else if (notification.sub_type ==='activate_insighter') {
-        url = 'https://app.insightabusiness.com/app/profile/overview'
+        url = `/${currentLanguage}/profile/settings`
       }else if (notification.sub_type ==='deactivate_insighter') {
-        url = 'https://app.insightabusiness.com/app/profile/overview'
+        url = `/${currentLanguage}/profile/settings`
       }
 
       // Mark-as-read BEFORE redirect to avoid request being cancelled by navigation

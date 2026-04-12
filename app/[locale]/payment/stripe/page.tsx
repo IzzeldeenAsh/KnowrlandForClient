@@ -275,6 +275,7 @@ function PaymentForm({ orderUuid, amount, title, locale, isRTL, isGuest, orderDe
     goToDownloads: isRTL ? "الذهاب إلى التنزيلات" : "Go to Downloads",
     downloadNow: isRTL ? "تحميل الآن" : "Download",
     redownload: isRTL ? "إعادة التحميل" : "Redownload",
+    downloadStarted: isRTL ? "بدأ التحميل بالفعل، لبدء التحميل مجددًا انقر:" : "Your download already started. To start it again click:",
     paymentFailed: isRTL ? "فشل الدفع" : "Payment Failed",
     tryAgain: isRTL ? "حاول مرة أخرى" : "Try Again",
     preparingDownloads: isRTL ? "جاري تجهيز التنزيلات..." : "Preparing your downloads...",
@@ -671,6 +672,7 @@ function PaymentForm({ orderUuid, amount, title, locale, isRTL, isGuest, orderDe
 
             {!isGuest && (
               <div className="mt-3">
+                <span className="text-sm text-gray-500">{translations.downloadStarted} </span>
                 <a
                   href="#"
                   onClick={async (event) => {

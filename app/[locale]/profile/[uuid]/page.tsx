@@ -96,6 +96,12 @@ interface CompanyInsighterCountry {
   flag: string;
 }
 
+interface ProfileCountry {
+  id?: number;
+  name?: string | { en?: string; ar?: string };
+  flag?: string;
+}
+
 interface CompanyInsighter {
   id: number;
   uuid: string;
@@ -124,7 +130,7 @@ interface ProfileData {
   first_name: string;
   last_name: string;
   email: string;
-  country: string;
+  country: string | ProfileCountry;
   country_flag?: string;
   country_code?: string;
   roles: string[];
@@ -203,6 +209,14 @@ function ProfilePageContent() {
       .map((p) => (Array.from(p)[0] ?? ""))
       .join("")
       .toUpperCase();
+  };
+
+  const getCountryDisplayName = (country: ProfileData["country"]) => {
+    if (typeof country === "string") return country;
+    if (typeof country?.name === "string") return country.name;
+    return locale === "ar"
+      ? country?.name?.ar || country?.name?.en || ""
+      : country?.name?.en || country?.name?.ar || "";
   };
 
   const [profileData, setProfileData] = useState<ProfileData | null>(null);
@@ -1377,7 +1391,7 @@ function ProfilePageContent() {
                               {profileData?.country_flag ? (
                                 <Image
                                   src={`/images/flags/${profileData.country_flag}.svg`}
-                                  alt={profileData.country}
+                                  alt={getCountryDisplayName(profileData.country)}
                                   width={15}
                                   height={15}
                                   className="object-contain"
@@ -1386,7 +1400,7 @@ function ProfilePageContent() {
                                 <span
                                   className="text-xl"
                                   role="img"
-                                  aria-label={profileData.country}
+                                  aria-label={getCountryDisplayName(profileData.country)}
                                 >
                                   {countryCodeToFlagEmoji(
                                     profileData.country_code
