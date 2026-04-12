@@ -82,6 +82,7 @@ export default function Overview({ knowledge, knowledgeSlug }: OverviewProps) {
   const [authModalOpened, setAuthModalOpened] = useState(false);
   const [authModalGuestCheckoutUrl, setAuthModalGuestCheckoutUrl] = useState<string | null>(null);
   const [authModalDisableGuestCheckout, setAuthModalDisableGuestCheckout] = useState(false);
+  const [authModalLoginReturnUrl, setAuthModalLoginReturnUrl] = useState<string | null>(null);
 
   // Check if the current user is the owner of this knowledge
   const isOwner = user && knowledge.insighter?.uuid && user.uuid === knowledge.insighter.uuid;
@@ -123,6 +124,12 @@ export default function Overview({ knowledge, knowledgeSlug }: OverviewProps) {
       if (!isLoggedIn) {
         setAuthModalGuestCheckoutUrl(null);
         setAuthModalDisableGuestCheckout(true);
+        // After login, redirect directly to checkout
+        const loginCheckoutParams = new URLSearchParams({
+          slug: knowledgeSlug,
+          documents: documentId.toString(),
+        });
+        setAuthModalLoginReturnUrl(`/${locale}/checkout?${loginCheckoutParams.toString()}`);
         setAuthModalOpened(true);
         return;
       }
@@ -145,6 +152,12 @@ export default function Overview({ knowledge, knowledgeSlug }: OverviewProps) {
       });
       setAuthModalGuestCheckoutUrl(`/${locale}/checkout?${queryParams.toString()}`);
       setAuthModalDisableGuestCheckout(false);
+      // After login, redirect directly to checkout
+      const loginCheckoutParams = new URLSearchParams({
+        slug: knowledgeSlug,
+        documents: documentId.toString(),
+      });
+      setAuthModalLoginReturnUrl(`/${locale}/checkout?${loginCheckoutParams.toString()}`);
       setAuthModalOpened(true);
       return;
     }
@@ -430,10 +443,12 @@ export default function Overview({ knowledge, knowledgeSlug }: OverviewProps) {
           setAuthModalOpened(false);
           setAuthModalGuestCheckoutUrl(null);
           setAuthModalDisableGuestCheckout(false);
+          setAuthModalLoginReturnUrl(null);
         }}
         locale={locale as string}
         guestCheckoutUrl={authModalGuestCheckoutUrl}
         disableGuestCheckout={authModalDisableGuestCheckout}
+        loginReturnUrl={authModalLoginReturnUrl}
       />
     </div>
   )

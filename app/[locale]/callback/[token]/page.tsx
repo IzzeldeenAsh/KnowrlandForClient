@@ -114,9 +114,11 @@ export default function AuthCallback() {
         }
         
         console.log('[token-callback] Authentication verification successful');
-        
-        // Refresh the global profile state
-        await refreshProfile();
+
+        // Note: GlobalProfileProvider will pick up the token and fetch profile
+        // on the next page load, so we skip refreshProfile() here to avoid
+        // a duplicate /api/account/profile call.
+
         // Check agreement only for insighter/company roles
         if (response.data.roles && (response.data.roles.includes('insighter') || response.data.roles.includes('company') || response.data.roles.includes('company-insighter'))) {
           const accepted = await checkLatestAgreement(token, locale);
@@ -288,7 +290,12 @@ export default function AuthCallback() {
           if (response.status === 401 || response.status === 403) {
             throw new Error(`Authentication failed: ${response.status} ${response.statusText}`);
           }
-          
+
+          // For rate limiting, don't retry — it makes things worse
+          if (response.status === 429) {
+            throw new Error(`Rate limited: ${response.status} ${response.statusText}`);
+          }
+
           // For other errors, retry if not the last attempt
           if (attempt < maxRetries) {
             const delay = Math.pow(2, attempt - 1) * 1000; // Exponential backoff
@@ -296,19 +303,19 @@ export default function AuthCallback() {
             await new Promise(resolve => setTimeout(resolve, delay));
             continue;
           }
-          
+
           throw new Error(`Failed to fetch profile: ${response.status} ${response.statusText}`);
         }
 
         return await response.json();
       } catch (error) {
         console.error(`[token-callback] Attempt ${attempt} failed:`, error);
-        
-        // If it's an auth error or the last attempt, re-throw
-        if ((error instanceof Error && error.message.includes('Authentication failed')) || attempt === maxRetries) {
+
+        // If it's an auth/rate-limit error or the last attempt, re-throw
+        if ((error instanceof Error && (error.message.includes('Authentication failed') || error.message.includes('Rate limited'))) || attempt === maxRetries) {
           throw error;
         }
-        
+
         // Otherwise, continue to next attempt
         const delay = Math.pow(2, attempt - 1) * 1000;
         await new Promise(resolve => setTimeout(resolve, delay));

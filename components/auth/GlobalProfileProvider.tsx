@@ -129,13 +129,18 @@ export function GlobalProfileProvider({ children }: { children: React.ReactNode 
             // Mark as an auth failure; callers will clear token + stop refetch loops.
             throw new Error(`Auth failed: ${response.status}`);
           }
-          
+
+          if (response.status === 429) {
+            // Rate limited — do NOT retry, it will only make things worse.
+            throw new Error(`Rate limited: ${response.status}`);
+          }
+
           if (attempt < maxRetries) {
             const delay = Math.pow(2, attempt - 1) * 1000;
             await new Promise(resolve => setTimeout(resolve, delay));
             continue;
           }
-          
+
           throw new Error(`Failed to fetch profile: ${response.status}`);
         }
 
@@ -176,11 +181,11 @@ export function GlobalProfileProvider({ children }: { children: React.ReactNode 
 
         return { user: userData, roles: rolesFromApi };
       } catch (error) {
-        
-        if ((error instanceof Error && error.message.includes('Auth failed')) || attempt === maxRetries) {
+
+        if ((error instanceof Error && (error.message.includes('Auth failed') || error.message.includes('Rate limited'))) || attempt === maxRetries) {
           throw error;
         }
-        
+
         const delay = Math.pow(2, attempt - 1) * 1000;
         await new Promise(resolve => setTimeout(resolve, delay));
       }

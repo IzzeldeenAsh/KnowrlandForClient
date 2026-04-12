@@ -1408,7 +1408,7 @@ function ProfilePageContent() {
                                 </span>
                               ) : null}
                               <span className="text-sm text-gray-600 dark:text-gray-400 font-medium">
-                                {profileData?.country}
+                                {getCountryDisplayName(profileData?.country ?? "")}
                               </span>
                             </>
                           )}

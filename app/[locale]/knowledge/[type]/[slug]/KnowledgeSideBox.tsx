@@ -105,6 +105,7 @@ const KnowledgeSideBox = ({
   const [authModalOpened, setAuthModalOpened] = useState(false);
   const [authModalGuestCheckoutUrl, setAuthModalGuestCheckoutUrl] = useState<string | null>(null);
   const [authModalDisableGuestCheckout, setAuthModalDisableGuestCheckout] = useState(false);
+  const [authModalLoginReturnUrl, setAuthModalLoginReturnUrl] = useState<string | null>(null);
 
   // Read Later state
   const [isReadLater, setIsReadLater] = useState(is_read_later || false);
@@ -161,6 +162,12 @@ const KnowledgeSideBox = ({
       });
       setAuthModalGuestCheckoutUrl(`/${currentLocale}/checkout?${queryParams.toString()}`);
       setAuthModalDisableGuestCheckout(isFree || areAllDocumentsFree);
+      // After login, redirect directly to checkout instead of back to knowledge page
+      const loginCheckoutParams = new URLSearchParams({
+        slug: knowledgeSlug || '',
+        documents: allDocumentIds.join(','),
+      });
+      setAuthModalLoginReturnUrl(`/${currentLocale}/checkout?${loginCheckoutParams.toString()}`);
       setAuthModalOpened(true);
       return;
     }
@@ -189,6 +196,7 @@ const KnowledgeSideBox = ({
     if (!isUserLoggedIn()) {
       setAuthModalGuestCheckoutUrl(null);
       setAuthModalDisableGuestCheckout(true);
+      setAuthModalLoginReturnUrl(null); // Return to current page after login
       setAuthModalOpened(true);
       return;
     }
@@ -1199,10 +1207,12 @@ const KnowledgeSideBox = ({
           setAuthModalOpened(false);
           setAuthModalGuestCheckoutUrl(null);
           setAuthModalDisableGuestCheckout(false);
+          setAuthModalLoginReturnUrl(null);
         }}
         locale={currentLocale}
         guestCheckoutUrl={authModalGuestCheckoutUrl}
         disableGuestCheckout={authModalDisableGuestCheckout}
+        loginReturnUrl={authModalLoginReturnUrl}
       />
   </div>
   );

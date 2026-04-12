@@ -11,6 +11,8 @@ interface AuthModalProps {
   locale?: string | string[];
   guestCheckoutUrl?: string | null;
   disableGuestCheckout?: boolean;
+  /** URL to redirect to after login/signup. Defaults to current page URL. */
+  loginReturnUrl?: string | null;
 }
 
 // Helper function to get the Angular app URL based on current domain
@@ -38,6 +40,7 @@ const AuthModal: React.FC<AuthModalProps> = ({
   locale,
   guestCheckoutUrl = null,
   disableGuestCheckout = false,
+  loginReturnUrl = null,
 }) => {
   const isRTL = locale === 'ar';
   const angularAppUrl = getAngularAppUrl();
@@ -64,13 +67,17 @@ const AuthModal: React.FC<AuthModalProps> = ({
   };
 
   const handleSignUp = () => {
-    const currentUrl = window.location.href;
-    window.location.href = `${angularAppUrl}/auth/sign-up?returnUrl=${encodeURIComponent(currentUrl)}`;
+    const returnUrl = loginReturnUrl
+      ? `${window.location.origin}${loginReturnUrl}`
+      : window.location.href;
+    window.location.href = `${angularAppUrl}/auth/sign-up?returnUrl=${encodeURIComponent(returnUrl)}`;
   };
 
   const handleLogIn = () => {
-    const currentUrl = window.location.href;
-    window.location.href = `${angularAppUrl}/auth/login?returnUrl=${encodeURIComponent(currentUrl)}`;
+    const returnUrl = loginReturnUrl
+      ? `${window.location.origin}${loginReturnUrl}`
+      : window.location.href;
+    window.location.href = `${angularAppUrl}/auth/login?returnUrl=${encodeURIComponent(returnUrl)}`;
   };
 
   const handleBuyAsGuest = () => {
