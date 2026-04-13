@@ -50,11 +50,10 @@ const OptionsButtonsList = memo(function OptionsButtonsList(props: {
             type="button"
             disabled={isDisabled}
             onClick={() => !isDisabled && onSelect(option.value)}
-            className={`py-2 px-3 rounded-md text-sm flex items-start text-start w-full transition-colors ${
-              isSelected
-                ? 'bg-blue-50 border-blue-200 text-blue-800 font-medium'
-                : 'hover:bg-gray-100 border border-gray-200'
-            } ${isDisabled ? 'opacity-50 cursor-not-allowed' : ''}`}
+            className={`py-2 px-3 rounded-md text-sm flex items-start text-start w-full transition-colors ${isSelected
+              ? 'bg-blue-50 border-blue-200 text-blue-800 font-medium'
+              : 'hover:bg-gray-100 border border-gray-200'
+              } ${isDisabled ? 'opacity-50 cursor-not-allowed' : ''}`}
           >
             <span className="flex-1">{option.label}</span>
           </button>
@@ -145,11 +144,10 @@ const IndustryGroupsList = memo(function IndustryGroupsList(props: {
     <div className="grid grid-cols-1 gap-2 max-h-[60vh] overflow-y-auto pr-2">
       {/* All option */}
       <button
-        className={`py-2 px-3 rounded-md text-sm flex items-start text-start w-full transition-colors ${
-          !selectedIndustryId
-            ? 'bg-blue-50 border-blue-200 text-blue-800 font-medium'
-            : 'hover:bg-gray-100 border border-gray-200'
-        } ${isDisabled ? 'opacity-50 cursor-not-allowed' : ''}`}
+        className={`py-2 px-3 rounded-md text-sm flex items-start text-start w-full transition-colors ${!selectedIndustryId
+          ? 'bg-blue-50 border-blue-200 text-blue-800 font-medium'
+          : 'hover:bg-gray-100 border border-gray-200'
+          } ${isDisabled ? 'opacity-50 cursor-not-allowed' : ''}`}
         onClick={() => !isDisabled && onSelectAll()}
         disabled={isDisabled}
       >
@@ -166,11 +164,10 @@ const IndustryGroupsList = memo(function IndustryGroupsList(props: {
             return (
               <button
                 key={node.key}
-                className={`py-2 px-3 mb-2 rounded-md text-sm flex items-start text-start w-full transition-colors ${
-                  isSelected
-                    ? 'bg-blue-50 border-blue-200 text-blue-800 font-medium'
-                    : 'hover:bg-gray-100 border border-gray-200'
-                } ${isDisabled ? 'opacity-50 cursor-not-allowed' : ''}`}
+                className={`py-2 px-3 mb-2 rounded-md text-sm flex items-start text-start w-full transition-colors ${isSelected
+                  ? 'bg-blue-50 border-blue-200 text-blue-800 font-medium'
+                  : 'hover:bg-gray-100 border border-gray-200'
+                  } ${isDisabled ? 'opacity-50 cursor-not-allowed' : ''}`}
                 onClick={() => !isDisabled && onSelectIndustry(node)}
                 disabled={isDisabled}
               >
@@ -228,7 +225,7 @@ interface FilterBoxProps {
   forceDrawerMode?: boolean;
 }
 
-const noop = () => {};
+const noop = () => { };
 
 const FilterBox: React.FC<FilterBoxProps> = React.memo(({
   locale,
@@ -238,11 +235,11 @@ const FilterBox: React.FC<FilterBoxProps> = React.memo(({
   countryFilter,
   setCountryFilter,
   regionFilter = null,
-  setRegionFilter = () => {},
+  setRegionFilter = () => { },
   economicBlocFilter = null,
-  setEconomicBlocFilter = () => {},
+  setEconomicBlocFilter = () => { },
   tagFilter = null,
-  setTagFilter = () => {},
+  setTagFilter = () => { },
   isicCodeFilter = null,
   setIsicCodeFilter = noop,
   hsCodeFilter = null,
@@ -262,10 +259,10 @@ const FilterBox: React.FC<FilterBoxProps> = React.memo(({
   setRoleFilter = noop,
   yearOfStudyFilter = null,
   setYearOfStudyFilter = noop,
-  resetFilters = async () => {},
+  resetFilters = async () => { },
   // Drawer props
   isDrawerOpen = false,
-  setIsDrawerOpen = () => {},
+  setIsDrawerOpen = () => { },
   forceDrawerMode = false
 }) => {
   // Debug logs removed to prevent console spam during typing
@@ -825,11 +822,10 @@ const FilterBox: React.FC<FilterBoxProps> = React.memo(({
           return (
             <button
               key={node.key}
-              className={`py-2 px-3 rounded-md text-sm flex text-start items-start w-full transition-colors ${
-                isSelected
-                  ? 'bg-blue-50 border-blue-200 text-blue-800 font-medium'
-                  : 'hover:bg-gray-100 border border-gray-200'
-              } ${isDisabled ? 'opacity-50 cursor-not-allowed' : ''}`}
+              className={`py-2 px-3 rounded-md text-sm flex text-start items-start w-full transition-colors ${isSelected
+                ? 'bg-blue-50 border-blue-200 text-blue-800 font-medium'
+                : 'hover:bg-gray-100 border border-gray-200'
+                } ${isDisabled ? 'opacity-50 cursor-not-allowed' : ''}`}
               onClick={() => !isDisabled && handleSelectIsicCode(node)}
               disabled={isDisabled}
             >
@@ -871,11 +867,10 @@ const FilterBox: React.FC<FilterBoxProps> = React.memo(({
           return (
             <button
               key={code.id}
-              className={`py-2 px-3 rounded-md text-sm flex items-start text-start w-full transition-colors ${
-                isSelected
-                  ? 'bg-blue-50 border-blue-200 text-blue-800 font-medium'
-                  : 'hover:bg-gray-100 border border-gray-200'
-              } ${isDisabled ? 'opacity-50 cursor-not-allowed' : ''}`}
+              className={`py-2 px-3 rounded-md text-sm flex items-start text-start w-full transition-colors ${isSelected
+                ? 'bg-blue-50 border-blue-200 text-blue-800 font-medium'
+                : 'hover:bg-gray-100 border border-gray-200'
+                } ${isDisabled ? 'opacity-50 cursor-not-allowed' : ''}`}
               onClick={() => !isDisabled && handleSelectHsCode(code)}
               disabled={isDisabled}
             >
@@ -1046,7 +1041,7 @@ const FilterBox: React.FC<FilterBoxProps> = React.memo(({
 
     // Validate numbers
     if ((startValue && (isNaN(start!) || start! < 0)) ||
-        (endValue && (isNaN(end!) || end! < 0))) {
+      (endValue && (isNaN(end!) || end! < 0))) {
       setRangeError(locale === 'ar' ? 'يرجى إدخال أرقام صحيحة وموجبة' : 'Please enter valid positive numbers');
       return;
     }
@@ -1110,37 +1105,37 @@ const FilterBox: React.FC<FilterBoxProps> = React.memo(({
   // Filter content component
   const FilterContent = () => (
     <div
-      className={`${
-        shouldUseDrawer
-          ? ''
-          : 'bg-gray-50 border border-gray-200 w-full max-w-xs min-w-[350px] h-[100vh] flex flex-col overflow-hidden'
-      }`}
+      className={`${shouldUseDrawer
+        ? ''
+        : ' w-full max-w-xs min-w-[340px] h-[100vh] flex flex-col overflow-hidden'
+        }`}
       dir={locale === 'ar' ? 'rtl' : 'ltr'}
     >
       {/* Top Bar */}
-      <div className="flex items-center justify-between px-4 pt-4 pb-2 border-b border-gray-200">
+      <div className="flex items-center justify-between ps-4 pt-4 pb-2 ">
         <h2 className="text-base font-semibold text-gray-800">{locale === 'ar' ? 'الفلاتر' : 'Filters'}</h2>
-        <div className="flex items-center gap-3 text-xs font-medium">
-          <button
-            className={`text-blue-500 hover:underline transition-colors ${isDisabled ? 'opacity-50 cursor-not-allowed' : ''}`}
-            onClick={handleResetFilters}
-            disabled={isDisabled}
-          >
-            {locale === 'ar' ? 'مسح' : 'Clear'}
-          </button>
-        </div>
+        <button
+          className={`inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-full border transition-colors ${isDisabled
+            ? 'opacity-50 cursor-not-allowed border-gray-200 text-gray-400 bg-gray-50'
+            : 'border-gray-300 text-gray-600 bg-white hover:bg-gray-100 hover:text-gray-900'
+            }`}
+          onClick={handleResetFilters}
+          disabled={isDisabled}
+        >
+          <IconX size={14} />
+          {locale === 'ar' ? 'مسح الكل' : 'Clear all'}
+        </button>
       </div>
 
-      <div className={`${shouldUseDrawer ? 'p-4 space-y-3' : 'flex-1 overflow-y-auto p-4 space-y-3 pb-32'}`}>
+      <div className={`${shouldUseDrawer ? 'p-4 space-y-3' : 'flex-1 overflow-y-auto py-4 ps-4 space-y-3 pb-32 hide-scrollbar'}`} style={!shouldUseDrawer ? { scrollbarWidth: 'none' } as React.CSSProperties : undefined}>
         {/* Price Types Section */}
         {searchType !== 'insighter' && (
           <div className="rounded-lg border border-gray-200 overflow-hidden bg-white" data-debug={`Price section visible for ${searchType}`}>
             <button
               onClick={() => !isDisabled && setPriceCollapsed(!priceCollapsed)}
               disabled={isDisabled}
-              className={`w-full flex items-center justify-between px-4 py-3 text-left bg-white hover:bg-gray-50 focus:outline-none transition-colors ${
-                isDisabled ? 'opacity-50 cursor-not-allowed' : ''
-              }`}
+              className={`w-full flex items-center justify-between px-4 py-3 text-left bg-white hover:bg-gray-50 focus:outline-none transition-colors ${isDisabled ? 'opacity-50 cursor-not-allowed' : ''
+                }`}
             >
               <span className="flex items-center gap-2 text-blue-500 font-semibold">
                 <IconCoin size={20} className="p-0.5 rounded-full" />
@@ -1190,65 +1185,61 @@ const FilterBox: React.FC<FilterBoxProps> = React.memo(({
                     {/* Range Price Filter - Hidden when Free is selected */}
                     {priceFilter !== 'false' && (
                       <div className="border-t pt-3">
-                      {/* <span className="text-xs font-semibold text-gray-700 mb-2 block">
+                        {/* <span className="text-xs font-semibold text-gray-700 mb-2 block">
                         {locale === 'ar' ? 'أو حسب النطاق السعري' : 'Or by price range'}
                       </span> */}
-                      <div className="flex items-center gap-2 mb-2">
-                        <input
-                          ref={rangeStartInputRef}
-                          type="number"
-                          placeholder={locale === 'ar' ? 'الحد الأدنى' : 'Min price'}
-                          defaultValue={rangeStartFilter || ''}
-                          onChange={handleRangeStartChange}
-                          className={`w-[100px] px-2 py-1 text-xs border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-transparent ${
-                            rangeStartFilter ? 'bg-blue-50 border-blue-300' : ''
-                          } ${isDisabled ? 'opacity-50 cursor-not-allowed' : ''}`}
-                          disabled={isDisabled}
-                          min="0"
-                          step="0.01"
-                        />
-                        <input
-                          ref={rangeEndInputRef}
-                          type="number"
-                          placeholder={locale === 'ar' ? 'الحد الأقصى' : 'Max price'}
-                          defaultValue={rangeEndFilter || ''}
-                          onChange={handleRangeEndChange}
-                          className={`w-[100px] px-2 py-1 text-xs border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-transparent ${
-                            rangeEndFilter ? 'bg-blue-50 border-blue-300' : ''
-                          } ${isDisabled ? 'opacity-50 cursor-not-allowed' : ''}`}
-                          disabled={isDisabled}
-                          min="0"
-                          step="0.01"
-                        />
-                     <button
-                          onClick={handleRangePriceSearch}
-                          disabled={isDisabled}
-                          className={`p-1 text-blue-500 hover:text-blue-700 hover:bg-blue-50 rounded transition-colors ${
-                            isDisabled ? 'opacity-50 cursor-not-allowed' : ''
-                          }`}
-                          title={locale === 'ar' ? 'بحث' : 'Search'}
-                        >
-                          <IconSearch size={16} />
-                        </button>
-                        <button
-                          onClick={handleRangePriceClear}
-                          disabled={isDisabled}
-                          className={`p-1 text-gray-500 hover:text-red-500 hover:bg-red-50 rounded transition-colors ${
-                            isDisabled ? 'opacity-50 cursor-not-allowed' : ''
-                          }`}
-                          title={locale === 'ar' ? 'مسح' : 'Clear'}
-                        >
-                          <IconX size={16} />
-                        </button>
-                      </div>
-                      {rangeError && (
-                        <p className="text-xs text-red-500 mt-1">{rangeError}</p>
-                      )}
-                      {appliedRangeDisplay && (
-                        <p className="text-xs text-gray-600 mt-1">
-                          {appliedRangeDisplay}
-                        </p>
-                      )}
+                        <div className="flex items-center gap-2 mb-2">
+                          <input
+                            ref={rangeStartInputRef}
+                            type="number"
+                            placeholder={locale === 'ar' ? 'الحد الأدنى' : 'Min price'}
+                            defaultValue={rangeStartFilter || ''}
+                            onChange={handleRangeStartChange}
+                            className={`w-[100px] px-2 py-1 text-xs border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-transparent ${rangeStartFilter ? 'bg-blue-50 border-blue-300' : ''
+                              } ${isDisabled ? 'opacity-50 cursor-not-allowed' : ''}`}
+                            disabled={isDisabled}
+                            min="0"
+                            step="0.01"
+                          />
+                          <input
+                            ref={rangeEndInputRef}
+                            type="number"
+                            placeholder={locale === 'ar' ? 'الحد الأقصى' : 'Max price'}
+                            defaultValue={rangeEndFilter || ''}
+                            onChange={handleRangeEndChange}
+                            className={`w-[100px] px-2 py-1 text-xs border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-transparent ${rangeEndFilter ? 'bg-blue-50 border-blue-300' : ''
+                              } ${isDisabled ? 'opacity-50 cursor-not-allowed' : ''}`}
+                            disabled={isDisabled}
+                            min="0"
+                            step="0.01"
+                          />
+                          <button
+                            onClick={handleRangePriceSearch}
+                            disabled={isDisabled}
+                            className={`p-1 text-blue-500 hover:text-blue-700 hover:bg-blue-50 rounded transition-colors ${isDisabled ? 'opacity-50 cursor-not-allowed' : ''
+                              }`}
+                            title={locale === 'ar' ? 'بحث' : 'Search'}
+                          >
+                            <IconSearch size={16} />
+                          </button>
+                          <button
+                            onClick={handleRangePriceClear}
+                            disabled={isDisabled}
+                            className={`p-1 text-gray-500 hover:text-red-500 hover:bg-red-50 rounded transition-colors ${isDisabled ? 'opacity-50 cursor-not-allowed' : ''
+                              }`}
+                            title={locale === 'ar' ? 'مسح' : 'Clear'}
+                          >
+                            <IconX size={16} />
+                          </button>
+                        </div>
+                        {rangeError && (
+                          <p className="text-xs text-red-500 mt-1">{rangeError}</p>
+                        )}
+                        {appliedRangeDisplay && (
+                          <p className="text-xs text-gray-600 mt-1">
+                            {appliedRangeDisplay}
+                          </p>
+                        )}
                       </div>
                     )}
                   </div>
@@ -1264,9 +1255,8 @@ const FilterBox: React.FC<FilterBoxProps> = React.memo(({
             <button
               onClick={() => !isDisabled && setLanguageCollapsed(!languageCollapsed)}
               disabled={isDisabled}
-              className={`w-full flex items-center justify-between px-4 py-3 text-left bg-white hover:bg-gray-50 focus:outline-none transition-colors ${
-                isDisabled ? 'opacity-50 cursor-not-allowed' : ''
-              }`}
+              className={`w-full flex items-center justify-between px-4 py-3 text-left bg-white hover:bg-gray-50 focus:outline-none transition-colors ${isDisabled ? 'opacity-50 cursor-not-allowed' : ''
+                }`}
             >
               <span className="flex items-center gap-2 text-blue-500 font-semibold">
                 <IconLanguage size={20} className="p-0.5 rounded-full" />
@@ -1319,9 +1309,8 @@ const FilterBox: React.FC<FilterBoxProps> = React.memo(({
             <button
               onClick={() => !isDisabled && setYearOfStudyCollapsed(!yearOfStudyCollapsed)}
               disabled={isDisabled}
-              className={`w-full flex items-center justify-between px-4 py-3 text-left bg-white hover:bg-gray-50 focus:outline-none transition-colors ${
-                isDisabled ? 'opacity-50 cursor-not-allowed' : ''
-              }`}
+              className={`w-full flex items-center justify-between px-4 py-3 text-left bg-white hover:bg-gray-50 focus:outline-none transition-colors ${isDisabled ? 'opacity-50 cursor-not-allowed' : ''
+                }`}
             >
               <span className="flex items-center gap-2 text-blue-500 font-semibold">
                 <IconCalendarEvent size={20} className="p-0.5 rounded-full" />
@@ -1339,9 +1328,8 @@ const FilterBox: React.FC<FilterBoxProps> = React.memo(({
                       onClick={() => {
                         setIsYearPickerModalOpen(true);
                       }}
-                      className={`border border-gray-200 bg-white py-2 px-3 rounded text-sm cursor-pointer flex justify-between items-center hover:border-blue-400 transition-colors ${
-                        isDisabled ? 'opacity-50 cursor-not-allowed' : ''
-                      }`}
+                      className={`border border-gray-200 bg-white py-2 px-3 rounded text-sm cursor-pointer flex justify-between items-center hover:border-blue-400 transition-colors ${isDisabled ? 'opacity-50 cursor-not-allowed' : ''
+                        }`}
                     >
                       {yearOfStudyFilter && (yearOfStudyFilter.startYear || yearOfStudyFilter.endYear) ? (
                         <span className="truncate text-gray-800 font-medium">
@@ -1380,9 +1368,8 @@ const FilterBox: React.FC<FilterBoxProps> = React.memo(({
           <button
             onClick={() => !isDisabled && setIndustryCollapsed(!industryCollapsed)}
             disabled={isDisabled}
-            className={`w-full flex items-center justify-between px-4 py-3 text-left bg-white hover:bg-gray-50 focus:outline-none transition-colors ${
-              isDisabled ? 'opacity-50 cursor-not-allowed' : ''
-            }`}
+            className={`w-full flex items-center justify-between px-4 py-3 text-left bg-white hover:bg-gray-50 focus:outline-none transition-colors ${isDisabled ? 'opacity-50 cursor-not-allowed' : ''
+              }`}
           >
             <span className="flex items-center gap-2 text-blue-500 font-semibold">
               <IconBuildingFactory size={20} className="p-0.5 rounded-full" />
@@ -1401,9 +1388,8 @@ const FilterBox: React.FC<FilterBoxProps> = React.memo(({
                 <div className="flex flex-col gap-2 mb-4">
                   <div
                     onClick={() => !isDisabled && setIsIndustryModalOpen(true)}
-                    className={`border border-gray-200 bg-white py-2 px-3 rounded text-sm cursor-pointer flex justify-between items-center hover:border-blue-400 transition-colors ${
-                      isDisabled ? 'opacity-50 cursor-not-allowed' : ''
-                    }`}
+                    className={`border border-gray-200 bg-white py-2 px-3 rounded text-sm cursor-pointer flex justify-between items-center hover:border-blue-400 transition-colors ${isDisabled ? 'opacity-50 cursor-not-allowed' : ''
+                      }`}
                   >
                     {selectedIndustry ? (
                       <span className="truncate text-gray-800 font-semibold">{selectedIndustry.label.length > 30 ? `${selectedIndustry.label.substring(0, 30)}...` : selectedIndustry.label}</span>
@@ -1431,9 +1417,8 @@ const FilterBox: React.FC<FilterBoxProps> = React.memo(({
             <button
               onClick={() => !isDisabled && setTagsCollapsed(!tagsCollapsed)}
               disabled={isDisabled}
-              className={`w-full flex items-center justify-between px-4 py-3 text-left bg-white hover:bg-gray-50 focus:outline-none transition-colors ${
-                isDisabled ? 'opacity-50 cursor-not-allowed' : ''
-              }`}
+              className={`w-full flex items-center justify-between px-4 py-3 text-left bg-white hover:bg-gray-50 focus:outline-none transition-colors ${isDisabled ? 'opacity-50 cursor-not-allowed' : ''
+                }`}
             >
               <span className="flex items-center gap-2 text-blue-500 font-semibold">
                 <IconCode size={20} className="p-0.5 rounded-full" />
@@ -1453,9 +1438,8 @@ const FilterBox: React.FC<FilterBoxProps> = React.memo(({
                       type="button"
                       disabled={isDisabled}
                       onClick={() => !isDisabled && setIsTagModalOpen(true)}
-                      className={`w-full flex items-center justify-between rounded-md border border-gray-300 px-3 py-2 text-sm transition-colors hover:border-blue-400 ${
-                        isDisabled ? 'opacity-50 cursor-not-allowed' : ''
-                      }`}
+                      className={`w-full flex items-center justify-between rounded-md border border-gray-300 px-3 py-2 text-sm transition-colors hover:border-blue-400 ${isDisabled ? 'opacity-50 cursor-not-allowed' : ''
+                        }`}
                     >
                       <span className="text-gray-800 font-medium truncate">
                         {getSelectedTagLabel() ? getSelectedTagLabel() : (locale === 'ar' ? 'الكل' : 'All')}
@@ -1490,9 +1474,8 @@ const FilterBox: React.FC<FilterBoxProps> = React.memo(({
           <button
             onClick={() => !isDisabled && setTargetMarketCollapsed(!targetMarketCollapsed)}
             disabled={isDisabled}
-            className={`w-full flex items-center justify-between px-4 py-3 text-left bg-white hover:bg-gray-50 focus:outline-none transition-colors ${
-              isDisabled ? 'opacity-50 cursor-not-allowed' : ''
-            }`}
+            className={`w-full flex items-center justify-between px-4 py-3 text-left bg-white hover:bg-gray-50 focus:outline-none transition-colors ${isDisabled ? 'opacity-50 cursor-not-allowed' : ''
+              }`}
           >
             <span className="flex items-center gap-2 text-blue-500 font-semibold">
               <IconWorld size={20} className="p-0.5 rounded-full" />
@@ -1515,9 +1498,8 @@ const FilterBox: React.FC<FilterBoxProps> = React.memo(({
                       type="button"
                       disabled={isDisabled}
                       onClick={() => !isDisabled && setIsEconomicBlocModalOpen(true)}
-                      className={`w-full flex items-center justify-between rounded-md border border-gray-300 px-3 py-2 text-sm transition-colors hover:border-blue-400 ${
-                        isDisabled ? 'opacity-50 cursor-not-allowed' : ''
-                      }`}
+                      className={`w-full flex items-center justify-between rounded-md border border-gray-300 px-3 py-2 text-sm transition-colors hover:border-blue-400 ${isDisabled ? 'opacity-50 cursor-not-allowed' : ''
+                        }`}
                     >
                       <span className="text-gray-800 font-medium truncate">
                         {getSelectedEconomicBlocLabel() ? getSelectedEconomicBlocLabel() : (locale === 'ar' ? 'الكل' : 'All')}
@@ -1550,9 +1532,8 @@ const FilterBox: React.FC<FilterBoxProps> = React.memo(({
                     type="button"
                     disabled={isDisabled}
                     onClick={() => !isDisabled && setIsRegionModalOpen(true)}
-                    className={`w-full flex items-center justify-between rounded-md border border-gray-300 px-3 py-2 text-sm transition-colors hover:border-blue-400 ${
-                      isDisabled ? 'opacity-50 cursor-not-allowed' : ''
-                    }`}
+                    className={`w-full flex items-center justify-between rounded-md border border-gray-300 px-3 py-2 text-sm transition-colors hover:border-blue-400 ${isDisabled ? 'opacity-50 cursor-not-allowed' : ''
+                      }`}
                   >
                     <span className="text-gray-800 font-medium truncate">
                       {getSelectedRegionLabel() ? getSelectedRegionLabel() : (locale === 'ar' ? 'الكل' : 'All')}
@@ -1584,9 +1565,8 @@ const FilterBox: React.FC<FilterBoxProps> = React.memo(({
                     type="button"
                     disabled={isDisabled}
                     onClick={() => !isDisabled && setIsCountryModalOpen(true)}
-                    className={`w-full flex items-center justify-between rounded-md border border-gray-300 px-3 py-2 text-sm transition-colors hover:border-blue-400 ${
-                      isDisabled ? 'opacity-50 cursor-not-allowed' : ''
-                    }`}
+                    className={`w-full flex items-center justify-between rounded-md border border-gray-300 px-3 py-2 text-sm transition-colors hover:border-blue-400 ${isDisabled ? 'opacity-50 cursor-not-allowed' : ''
+                      }`}
                   >
                     <span className="text-gray-800 font-medium truncate">
                       {getSelectedCountryLabel() ? getSelectedCountryLabel() : (locale === 'ar' ? 'الكل' : 'All')}
@@ -1615,16 +1595,15 @@ const FilterBox: React.FC<FilterBoxProps> = React.memo(({
           )}
         </div>
 
-      
+
         {/* Role Section - Only for insighter */}
         {searchType === 'insighter' && (
           <div className="rounded-lg border border-gray-200 overflow-hidden bg-white" data-debug={`Role section visible for ${searchType}`}>
             <button
               onClick={() => !isDisabled && setRoleCollapsed(!roleCollapsed)}
               disabled={isDisabled}
-              className={`w-full flex items-center justify-between px-4 py-3 text-left bg-white hover:bg-gray-50 focus:outline-none transition-colors ${
-                isDisabled ? 'opacity-50 cursor-not-allowed' : ''
-              }`}
+              className={`w-full flex items-center justify-between px-4 py-3 text-left bg-white hover:bg-gray-50 focus:outline-none transition-colors ${isDisabled ? 'opacity-50 cursor-not-allowed' : ''
+                }`}
             >
               <span className="flex items-center gap-2 text-blue-500 font-semibold">
                 <IconBuildingBank size={20} className="p-0.5 rounded-full" />
@@ -1690,9 +1669,8 @@ const FilterBox: React.FC<FilterBoxProps> = React.memo(({
             placeholder={locale === 'ar' ? 'ابحث عن رمز ISIC...' : 'Search ISIC codes...'}
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className={`w-full px-3 py-2 mt-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-              isDisabled ? 'opacity-50 cursor-not-allowed' : ''
-            }`}
+            className={`w-full px-3 py-2 mt-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent ${isDisabled ? 'opacity-50 cursor-not-allowed' : ''
+              }`}
             disabled={isDisabled}
           />
           {renderLeafNodes()}
@@ -1713,9 +1691,8 @@ const FilterBox: React.FC<FilterBoxProps> = React.memo(({
             placeholder={locale === 'ar' ? 'ابحث عن رمز المنتج...' : 'Search Products...'}
             value={hsCodeSearchTerm}
             onChange={(e) => setHsCodeSearchTerm(e.target.value)}
-            className={`w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent mt-2 ${
-              isDisabled ? 'opacity-50 cursor-not-allowed' : ''
-            }`}
+            className={`w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent mt-2 ${isDisabled ? 'opacity-50 cursor-not-allowed' : ''
+              }`}
             disabled={isDisabled}
           />
           {renderHsCodes()}
@@ -1736,9 +1713,8 @@ const FilterBox: React.FC<FilterBoxProps> = React.memo(({
             placeholder={locale === 'ar' ? 'ابحث عن المجال...' : 'Search industries...'}
             value={industrySearchTerm}
             onChange={(e) => setIndustrySearchTerm(e.target.value)}
-            className={`w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent mt-2 ${
-              isDisabled ? 'opacity-50 cursor-not-allowed' : ''
-            }`}
+            className={`w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent mt-2 ${isDisabled ? 'opacity-50 cursor-not-allowed' : ''
+              }`}
             disabled={isDisabled}
           />
           {renderIndustryLeafNodes()}
@@ -1791,9 +1767,8 @@ const FilterBox: React.FC<FilterBoxProps> = React.memo(({
             value={tagSearch}
             onChange={(e) => setTagSearch(e.target.value)}
             autoFocus
-            className={`w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent mt-2 ${
-              isDisabled ? 'opacity-50 cursor-not-allowed' : ''
-            }`}
+            className={`w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent mt-2 ${isDisabled ? 'opacity-50 cursor-not-allowed' : ''
+              }`}
             disabled={isDisabled}
           />
           <div className="space-y-2">
@@ -1805,11 +1780,10 @@ const FilterBox: React.FC<FilterBoxProps> = React.memo(({
                 setTagFilter?.(null);
                 setIsTagModalOpen(false);
               }}
-              className={`py-2 px-3 rounded-md text-sm flex items-start text-start w-full transition-colors ${
-                !tagFilter
-                  ? 'bg-blue-50 border-blue-200 text-blue-800 font-medium'
-                  : 'hover:bg-gray-100 border border-gray-200'
-              } ${isDisabled ? 'opacity-50 cursor-not-allowed' : ''}`}
+              className={`py-2 px-3 rounded-md text-sm flex items-start text-start w-full transition-colors ${!tagFilter
+                ? 'bg-blue-50 border-blue-200 text-blue-800 font-medium'
+                : 'hover:bg-gray-100 border border-gray-200'
+                } ${isDisabled ? 'opacity-50 cursor-not-allowed' : ''}`}
             >
               <span className="flex-1 font-medium">{locale === 'ar' ? 'الكل' : 'All'}</span>
             </button>
@@ -1845,9 +1819,8 @@ const FilterBox: React.FC<FilterBoxProps> = React.memo(({
             value={economicBlocSearch}
             onChange={(e) => setEconomicBlocSearch(e.target.value)}
             autoFocus
-            className={`w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent mt-2 ${
-              isDisabled ? 'opacity-50 cursor-not-allowed' : ''
-            }`}
+            className={`w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent mt-2 ${isDisabled ? 'opacity-50 cursor-not-allowed' : ''
+              }`}
             disabled={isDisabled}
           />
           <button
@@ -1858,11 +1831,10 @@ const FilterBox: React.FC<FilterBoxProps> = React.memo(({
               setEconomicBlocFilter?.(null);
               setIsEconomicBlocModalOpen(false);
             }}
-            className={`py-2 px-3 rounded-md text-sm flex items-start text-start w-full transition-colors ${
-              !economicBlocFilter
-                ? 'bg-blue-50 border-blue-200 text-blue-800 font-medium'
-                : 'hover:bg-gray-100 border border-gray-200'
-            } ${isDisabled ? 'opacity-50 cursor-not-allowed' : ''}`}
+            className={`py-2 px-3 rounded-md text-sm flex items-start text-start w-full transition-colors ${!economicBlocFilter
+              ? 'bg-blue-50 border-blue-200 text-blue-800 font-medium'
+              : 'hover:bg-gray-100 border border-gray-200'
+              } ${isDisabled ? 'opacity-50 cursor-not-allowed' : ''}`}
           >
             <span className="flex-1 font-medium">{locale === 'ar' ? 'الكل' : 'All'}</span>
           </button>
@@ -1897,9 +1869,8 @@ const FilterBox: React.FC<FilterBoxProps> = React.memo(({
             value={regionSearch}
             onChange={(e) => setRegionSearch(e.target.value)}
             autoFocus
-            className={`w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent mt-2 ${
-              isDisabled ? 'opacity-50 cursor-not-allowed' : ''
-            }`}
+            className={`w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent mt-2 ${isDisabled ? 'opacity-50 cursor-not-allowed' : ''
+              }`}
             disabled={isDisabled}
           />
           <button
@@ -1910,11 +1881,10 @@ const FilterBox: React.FC<FilterBoxProps> = React.memo(({
               setRegionFilter?.(null);
               setIsRegionModalOpen(false);
             }}
-            className={`py-2 px-3 rounded-md text-sm flex items-start text-start w-full transition-colors ${
-              !regionFilter
-                ? 'bg-blue-50 border-blue-200 text-blue-800 font-medium'
-                : 'hover:bg-gray-100 border border-gray-200'
-            } ${isDisabled ? 'opacity-50 cursor-not-allowed' : ''}`}
+            className={`py-2 px-3 rounded-md text-sm flex items-start text-start w-full transition-colors ${!regionFilter
+              ? 'bg-blue-50 border-blue-200 text-blue-800 font-medium'
+              : 'hover:bg-gray-100 border border-gray-200'
+              } ${isDisabled ? 'opacity-50 cursor-not-allowed' : ''}`}
           >
             <span className="flex-1 font-medium">{locale === 'ar' ? 'الكل' : 'All'}</span>
           </button>
@@ -1949,9 +1919,8 @@ const FilterBox: React.FC<FilterBoxProps> = React.memo(({
             value={countrySearch}
             onChange={(e) => setCountrySearch(e.target.value)}
             autoFocus
-            className={`w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent mt-2 ${
-              isDisabled ? 'opacity-50 cursor-not-allowed' : ''
-            }`}
+            className={`w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent mt-2 ${isDisabled ? 'opacity-50 cursor-not-allowed' : ''
+              }`}
             disabled={isDisabled}
           />
           <button
@@ -1962,11 +1931,10 @@ const FilterBox: React.FC<FilterBoxProps> = React.memo(({
               setCountryFilter?.(null);
               setIsCountryModalOpen(false);
             }}
-            className={`py-2 px-3 rounded-md text-sm flex items-start text-start w-full transition-colors ${
-              !countryFilter
-                ? 'bg-blue-50 border-blue-200 text-blue-800 font-medium'
-                : 'hover:bg-gray-100 border border-gray-200'
-            } ${isDisabled ? 'opacity-50 cursor-not-allowed' : ''}`}
+            className={`py-2 px-3 rounded-md text-sm flex items-start text-start w-full transition-colors ${!countryFilter
+              ? 'bg-blue-50 border-blue-200 text-blue-800 font-medium'
+              : 'hover:bg-gray-100 border border-gray-200'
+              } ${isDisabled ? 'opacity-50 cursor-not-allowed' : ''}`}
           >
             <span className="flex-1 font-medium">{locale === 'ar' ? 'الكل' : 'All'}</span>
           </button>

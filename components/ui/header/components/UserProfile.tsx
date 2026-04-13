@@ -426,6 +426,45 @@ export function UserProfile({ isHome }: { isHome: boolean }) {
             </div>
           </div>
 
+          {/* Dashboard — prominent top item */}
+          <div className="px-3 pt-3 pb-3 border-b border-slate-100">
+            <Link
+              href={`https://app.insightabusiness.com/app/insighter-dashboard/my-dashboard`}
+              className="flex items-center gap-2.5 px-1 py-1 rounded-lg border border-indigo-50 bg-gradient-to-r from-white to-indigo-50 text-indigo-700 font-semibold hover:to-indigo-100 transition-colors"
+              onClick={() => setMenuOpen(false)}
+              style={{ fontSize: '13px' }}
+            >
+              <svg width="33" height="33" viewBox="0 0 33 33" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <g filter="url(#filter0_d_667_189)">
+                  <rect x="3.75" y="2.43994" width="25" height="25" rx="6.25" fill="white" shape-rendering="crispEdges" />
+                  <path d="M9.375 21.8149V19.9399H11.875V21.8149" fill="#FFC657" />
+                  <path d="M9.375 19.9399V18.0649H11.875V19.9399" fill="#FFE0A6" />
+                  <path d="M13.125 21.8149V18.3774H15.625V21.8149" fill="#1072FF" />
+                  <path d="M13.125 18.3774V14.9399H15.625V18.3774" fill="#CBE1FF" />
+                  <path d="M20.625 21.8149V15.5649H23.125V21.8149" fill="#1072FF" />
+                  <path d="M20.625 15.5649V9.31494H23.125V15.5649" fill="#CBE1FF" />
+                  <path d="M16.875 21.8149V17.1274H19.375V21.8149" fill="#FFC657" />
+                  <path d="M16.875 17.1274V12.4399H19.375V17.1274" fill="#FFE0A6" />
+                </g>
+                <defs>
+                  <filter id="filter0_d_667_189" x="0" y="-5.8651e-05" width="32.5" height="32.5" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+                    <feFlood flood-opacity="0" result="BackgroundImageFix" />
+                    <feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" result="hardAlpha" />
+                    <feOffset dy="1.31" />
+                    <feGaussianBlur stdDeviation="1.875" />
+                    <feComposite in2="hardAlpha" operator="out" />
+                    <feColorMatrix type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.12 0" />
+                    <feBlend mode="normal" in2="BackgroundImageFix" result="effect1_dropShadow_667_189" />
+                    <feBlend mode="normal" in="SourceGraphic" in2="effect1_dropShadow_667_189" result="shape" />
+                  </filter>
+                </defs>
+              </svg>
+
+
+              {t("dashboard")}
+            </Link>
+          </div>
+
           <div className="py-2 px-3">
             <div className={roles.includes("insighter") || roles.includes("company") || roles.includes("company-insighter") ? "border-b border-slate-100" : ""}>
               {(roles.includes("insighter") ||
@@ -475,16 +514,6 @@ export function UserProfile({ isHome }: { isHome: boolean }) {
             >
               {t("myInsighterPage")}
             </Link>)}
-
-            {/* Show dashboard for all users */}
-            <Link
-              href={`https://app.insightabusiness.com/app/insighter-dashboard/my-dashboard`}
-              className="block px-4 py-2.5 font-semibold text-slate-900 hover:bg-indigo-50 hover:text-sky-700"
-              onClick={() => setMenuOpen(false)}
-              style={{ fontSize: '13px' }}
-            >
-              {t("dashboard")}
-            </Link>
             <Link
               href={`https://app.insightabusiness.com/app/insighter-dashboard/my-downloads`}
               className="block px-4 py-2.5 font-semibold text-slate-900 hover:bg-indigo-50 hover:text-sky-700"

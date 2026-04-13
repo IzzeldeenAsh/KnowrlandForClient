@@ -259,7 +259,7 @@ async function fetchMatchedInsighters(
   }
 
   const res = await fetch(
-    getApiUrl(`/api/account/project/request/insighter/match/${projectUuid}`),
+    getApiUrl(`/api/account/project/request/match/insighter/${projectUuid}`),
     {
       method: 'GET',
       headers: {

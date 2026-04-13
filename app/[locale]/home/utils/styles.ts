@@ -13,4 +13,7 @@ export const customScrollbarStyle = `
   .custom-scrollbar:hover::-webkit-scrollbar-thumb {
     background-color: rgba(156, 163, 175, 0.5);
   }
+  .hide-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
 `;

@@ -238,6 +238,12 @@ function htmlToPlainTextWithBreaks(html: string | null): string {
     .replace(/<\s*br\s*\/?>/gi, '\n')
     .replace(/<\/\s*(p|div|h[1-6]|li|ul|ol)\s*>/gi, '\n');
   text = text.replace(/<[^>]+>/g, '');
+  text = text.replace(/&nbsp;/gi, ' ');
+  text = text.replace(/&amp;/gi, '&');
+  text = text.replace(/&lt;/gi, '<');
+  text = text.replace(/&gt;/gi, '>');
+  text = text.replace(/&quot;/gi, '"');
+  text = text.replace(/&#39;/gi, "'");
   text = text.replace(/\n{3,}/g, '\n\n').trim();
   return text;
 }

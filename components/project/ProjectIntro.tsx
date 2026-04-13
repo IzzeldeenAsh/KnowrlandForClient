@@ -68,7 +68,7 @@ export default function ProjectIntro({ locale }: ProjectIntroProps) {
           </div>
         </div> */}
 
-        <div aria-hidden className="pointer-events-none absolute inset-x-0 bottom-0 z-10 hidden lg:block">
+        {/* <div aria-hidden className="pointer-events-none absolute inset-x-0 bottom-0 z-10 hidden lg:block">
           <div className="mx-auto w-full max-w-2xl px-8">
             <Image
               src="https://res.cloudinary.com/dsiku9ipv/image/upload/v1775661658/Artboard_1_qjuru0.png"
@@ -80,10 +80,10 @@ export default function ProjectIntro({ locale }: ProjectIntroProps) {
               style={{ width: '100%', height: 'auto' }}
             />
           </div>
-        </div>
+        </div> */}
 
         <div
-          className="relative z-20 max-w-2xl pt-12 pb-[100px] text-center sm:pt-16 sm:pb-[300px] lg:pt-20 lg:pb-[360px]"
+          className="relative z-20 max-w-2xl pt-12 pb-[100px] text-center sm:pt-16 sm:pb-[300px] lg:pt-32 lg:pb-[360px]"
           dir={isRTL ? 'rtl' : 'ltr'}
           lang={isRTL ? 'ar' : 'en'}
         >

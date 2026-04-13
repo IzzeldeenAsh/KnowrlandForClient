@@ -9,6 +9,8 @@ import InsighterOriginQuestion from '@/components/project/questions/InsighterOri
 import InsighterExperienceQuestion from '@/components/project/questions/InsighterExperienceQuestion'
 import CompanyTeamSizeQuestion from '@/components/project/questions/CompanyTeamSizeQuestion'
 import ProjectDescriptionQuestion from '@/components/project/questions/ProjectDescriptionQuestion'
+import DeadlineOfferQuestion from '@/components/project/questions/DeadlineOfferQuestion'
+import ProjectDeadlineQuestion from '@/components/project/questions/ProjectDeadlineQuestion'
 import ProjectAddonsIntroStep from '@/components/project/questions/ProjectAddonsIntroStep'
 import KickoffMeetingQuestion from '@/components/project/questions/KickoffMeetingQuestion'
 import ProjectReviewStep from '@/components/project/questions/ProjectReviewStep'
@@ -209,6 +211,26 @@ export default async function ProjectWizardStepPage({ params }: PageProps) {
       <ProjectWizardShell align="top">
         <div className="w-full pt-2 sm:pt-4">
           <ProjectDescriptionQuestion locale={locale} />
+        </div>
+      </ProjectWizardShell>
+    )
+  }
+
+  if (step === 'deadline-offer') {
+    return (
+      <ProjectWizardShell align="top">
+        <div className="w-full pt-2 sm:pt-4">
+          <DeadlineOfferQuestion locale={locale} />
+        </div>
+      </ProjectWizardShell>
+    )
+  }
+
+  if (step === 'project-deadline') {
+    return (
+      <ProjectWizardShell align="top">
+        <div className="w-full pt-2 sm:pt-4">
+          <ProjectDeadlineQuestion locale={locale} />
         </div>
       </ProjectWizardShell>
     )

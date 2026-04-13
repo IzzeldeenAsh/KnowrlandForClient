@@ -22,8 +22,18 @@ interface Props {
   }>;
 }
 
-function capitalizeFirstLetter(string: string) {
-  return string.charAt(0).toUpperCase() + string.slice(1);
+const typeLabelsAr: Record<IndustryType, string> = {
+  data: 'بيانات',
+  manual: 'دليل',
+  report: 'تقرير',
+  insight: 'رؤية',
+  course: 'دورة',
+  statistic: 'إحصائية',
+};
+
+function getTypeLabel(type: IndustryType, locale: string) {
+  if (locale === 'ar') return typeLabelsAr[type];
+  return type.charAt(0).toUpperCase() + type.slice(1);
 }
 
 export default function TopicByTypePage({ params }: Props) {
@@ -78,7 +88,7 @@ export default function TopicByTypePage({ params }: Props) {
           <div className={styles.headerContent}>
             <div data-aos="fade-down">
               <span className={styles.typeLabel}>
-                {capitalizeFirstLetter(type)}
+                {getTypeLabel(type, locale)}
               </span>
               <h3  className={` text-transparent font-extrabold text-3xl ${isRTL ? 'bg-gradient-to-l from-blue-400 to-teal-500' : 'bg-gradient-to-r from-blue-500 to-teal-400'} bg-clip-text`}>
                 {subIndustry?.name || 'Loading...'}

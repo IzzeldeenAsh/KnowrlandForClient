@@ -1379,7 +1379,7 @@ export default function ProfileSettingsClient({
   return (
     <main className="min-h-screen bg-[#f6f8fb] px-4 py-5 sm:px-5 lg:px-6">
       <div className="mx-auto max-w-7xl">
-        <div className="mb-4 flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
+        <div className="mb-10 flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
           <div>
             <div className="flex flex-wrap items-center gap-2 text-xs font-medium text-slate-500">
               <Link href={`/${locale}`} className="hover:text-blue-600">
@@ -1388,7 +1388,7 @@ export default function ProfileSettingsClient({
               <IconChevronRight size={14} className={isRtl ? 'rotate-180' : ''} />
               <span>{isRtl ? 'إعدادات الملف الشخصي' : 'Profile settings'}</span>
             </div>
-            <h1 className="mt-1.5 text-2xl font-semibold tracking-tight text-slate-950">
+            <h1 className="mt-8 text-2xl font-semibold tracking-tight text-slate-950">
               {pageTitle}
             </h1>
             <p className="mt-1 text-sm text-slate-500">{pageDescription}</p>
@@ -1648,7 +1648,7 @@ export default function ProfileSettingsClient({
                         isSaving={savingField === 'industries'}
                         onEdit={() => setTreeModal('industries')}
                       />
-                      <ProfileRow
+                      {/* <ProfileRow
                         label={isRtl ? 'سنوات الخبرة' : 'Years of Experience'}
                         value={form.experience ? `${form.experience} ${isRtl ? 'سنة' : 'years'}` : '-'}
                         isEditing={editingField === 'experience'}
@@ -1672,7 +1672,7 @@ export default function ProfileSettingsClient({
                         <p className="mt-2 text-xs text-slate-400">
                           {isRtl ? `الحد الأقصى ${MAX_EXPERIENCE_YEARS} سنة.` : `Maximum ${MAX_EXPERIENCE_YEARS} years allowed.`}
                         </p>
-                      </ProfileRow>
+                      </ProfileRow> */}
                       <ProfileRow
                         label={isRtl ? 'نبذة' : 'Bio'}
                         value={form.bio || '-'}

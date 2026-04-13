@@ -14,7 +14,7 @@ import SearchBar from './components/SearchBar';
 import ResultsSection from './components/ResultsSection';
 import InsightersResultsSection from './components/InsightersResultsSection';
 import FilterBox from './components/FilterBox';
- 
+
 
 // Import utils
 import { fetchSearchResults, fetchStatisticsPerType } from './utils/api';
@@ -66,11 +66,11 @@ export default function HomePage() {
     startYear: initialCoverStart ? parseInt(initialCoverStart) : null,
     endYear: initialCoverEnd ? parseInt(initialCoverEnd) : null,
   } : null;
-  
+
   const [searchQuery, setSearchQuery] = useState(initialQuery);
   const [searchType, setSearchType] = useState<'knowledge' | 'insighter'>(initialType);
   const [activeTab] = useState<string | null>('all');
-  
+
   // Keep searchType synchronized with URL
   useEffect(() => {
     const urlSearchType = searchParams.get('search_type') as 'knowledge' | 'insighter';
@@ -83,7 +83,7 @@ export default function HomePage() {
   const [searchResults, setSearchResults] = useState<SearchResultItem[]>([]);
   const [loading, setLoading] = useState(false);
   const [currentPage, setCurrentPage] = useState(initialPage);
-  
+
   const [totalPages, setTotalPages] = useState(1);
   const [totalItems, setTotalItems] = useState(0);
   const [languageFilter, setLanguageFilter] = useState<'all' | 'arabic' | 'english'>(initialLanguage);
@@ -101,29 +101,12 @@ export default function HomePage() {
   const [accuracyFilter, setAccuracyFilter] = useState<'any' | 'all'>(initialAccuracy);
   const [roleFilter, setRoleFilter] = useState<'all' | 'company' | 'individual'>(initialRole);
   const [yearOfStudyFilter, setYearOfStudyFilter] = useState<YearRange | null>(initialYearOfStudy);
-  
+
   // Add state for filter visibility and drawer
   const [filtersVisible, setFiltersVisible] = useState(true);
   const [isFilterDrawerOpen, setIsFilterDrawerOpen] = useState(false);
-  const [isTabletOrMobile, setIsTabletOrMobile] = useState(false);
   const mainRef = useRef<HTMLElement | null>(null);
   const contentScrollRef = useRef<HTMLDivElement | null>(null);
-
-  // Handle responsive behavior
-  useEffect(() => {
-    const handleResize = () => {
-      setIsTabletOrMobile(window.innerWidth <= 1024);
-    };
-    
-    // Initial check
-    handleResize();
-    
-    // Add event listener
-    window.addEventListener('resize', handleResize);
-    
-    // Cleanup
-    return () => window.removeEventListener('resize', handleResize);
-  }, []);
 
   // This page uses its own scroll containers; keep the outer document at viewport height.
   useEffect(() => {
@@ -211,26 +194,26 @@ export default function HomePage() {
       el.removeEventListener('scroll', onInnerScroll as EventListener);
     };
   }, []);
-  
+
   // Add state for statistics
   const [statistics, setStatistics] = useState<StatisticsItem[]>([]);
-  
+
   const params = useParams();
   const locale = params.locale as string || 'en';
   const isRTL = locale === 'ar';
-  
+
   // Access the toast context
   const toast = useToast();
-  
+
   // Flag to track if component has initialized with URL params
   const [initialized, setInitialized] = useState(false);
-  
+
   // Global loading states for ISIC/Products
   const [isLoadingIsic, setIsLoadingIsic] = useState(false);
   const [isLoadingHs, setIsLoadingHs] = useState(false);
   const [isDataLoaded, setIsDataLoaded] = useState(false);
   const [hasCompletedInitialLoad, setHasCompletedInitialLoad] = useState(false);
-  
+
 
   // Mark initial load as complete when everything is ready
   useEffect(() => {
@@ -238,7 +221,7 @@ export default function HomePage() {
       setHasCompletedInitialLoad(true);
     }
   }, [initialized, loading, searchType, isDataLoaded, isLoadingIsic, isLoadingHs, isicCodeFilter]);
-  
+
   // Helper function to fetch statistics when search type is knowledge
   const fetchStatisticsIfNeeded = useCallback(async (
     searchQuery: string,
@@ -274,33 +257,33 @@ export default function HomePage() {
       setStatistics([]);
     }
   }, [locale, languageFilter, countryFilter, regionFilter, economicBlocFilter,
-      isicCodeFilter, tagFilter, industryFilter, priceFilter, hsCodeFilter, accuracyFilter, roleFilter, rangeStartFilter, rangeEndFilter, yearOfStudyFilter, toast]);
-  
+    isicCodeFilter, tagFilter, industryFilter, priceFilter, hsCodeFilter, accuracyFilter, roleFilter, rangeStartFilter, rangeEndFilter, yearOfStudyFilter, toast]);
+
   // Helper function to get count for a specific category type from statistics
   const getCategoryCount = useCallback((categoryType: string) => {
     if (categoryType === 'all') {
       // For 'all', sum up all counts
       return statistics.reduce((total, stat) => total + stat.count, 0);
     }
-    
+
     // Find the specific category in statistics
     const stat = statistics.find(s => s.type === categoryType);
     return stat ? stat.count : 0;
   }, [statistics]);
-  
+
   // Function to reset all filters to default values
   const resetFilters = useCallback(async () => {
     // Set flag to prevent other effects from interfering
     isFilterResetInProgressRef.current = true;
-    
+
     // Set loading immediately to show user that action is being performed
     setLoading(true);
-    
+
     // Clear existing results immediately to prevent showing stale data
     setSearchResults([]);
     setKnowledgeItems([]);
     setStatistics([]);
-    
+
     // Reset all filter states
     setLanguageFilter('all');
     setCountryFilter(null);
@@ -318,22 +301,22 @@ export default function HomePage() {
     setAccuracyFilter('all');
     setRoleFilter('all');
     setCurrentPage(1);
-    
+
     // Keep only search_type and keyword in URL
     const urlParams = new URLSearchParams();
     if (searchQuery && searchQuery.trim() !== '') urlParams.set('keyword', searchQuery);
     urlParams.set('search_type', searchType);
-    
+
     // Update URL with only search parameters
     router.push(`/${locale}/home?${urlParams.toString()}`, { scroll: false });
-    
+
     // Explicitly trigger search with reset parameters
     try {
       const handleError = (errorMessage: string) => {
         toast.error(errorMessage, 'Validation Error');
       };
-      
-      
+
+
       const response = await fetchSearchResults(
         searchQuery.trim(),
         searchType,
@@ -357,11 +340,11 @@ export default function HomePage() {
         null, // Reset range start filter
         null // Reset range end filter
       );
-      
+
       setSearchResults(response.data || []);
       setTotalPages(response.meta?.last_page || 1);
       setTotalItems(response.meta?.total || 0);
-      
+
       // Fetch statistics if search type is knowledge
       if (searchType === 'knowledge') {
         await fetchStatisticsIfNeeded(searchQuery.trim(), searchType);
@@ -381,9 +364,9 @@ export default function HomePage() {
       }, 500); // Wait a bit to ensure no race conditions
     }
   }, [searchQuery, searchType, locale, router, activeTab, toast, fetchStatisticsIfNeeded]);
-  
 
-  
+
+
   // Helper function to update URL with all current filter parameters
   const updateUrlWithFilters = useCallback((params: {
     query?: string,
@@ -418,7 +401,7 @@ export default function HomePage() {
     }
     // Build URL parameters
     const urlParams = new URLSearchParams();
-    
+
     // Get the values to use - prioritize new values from params over current state
     const query = params.query !== undefined ? params.query : searchQuery;
     const type = params.type || searchType;
@@ -439,12 +422,12 @@ export default function HomePage() {
     const accuracy = params.accuracy !== undefined ? params.accuracy : accuracyFilter;
     const role = params.role !== undefined ? params.role : roleFilter;
     const page = params.page !== undefined ? params.page : currentPage;
-    
+
     // Add only non-default/non-empty parameters to the URL
     // Required parameters
     if (query && query.trim() !== '') urlParams.set('keyword', query);
     urlParams.set('search_type', type); // Always include search type
-    
+
     // Optional parameters - only add if not default values
     if (language && language !== 'all') urlParams.set('language', language);
     if (country !== null) urlParams.set('country', country.toString());
@@ -467,7 +450,7 @@ export default function HomePage() {
       urlParams.set('page', page.toString());
       urlParams.set('per_page', '30');
     }
-    
+
     const nextUrl = `/${locale}/home?${urlParams.toString()}`;
     // Update URL without refreshing the page
     router.push(nextUrl, { scroll: false });
@@ -475,29 +458,29 @@ export default function HomePage() {
 
   // Handler for search type changes
   const handleSearchTypeChange = useCallback(async (type: 'knowledge' | 'insighter') => {
-    
+
     // Set flag to prevent main search effect from interfering
     isSearchTypeChangingRef.current = true;
-    
+
     // Set loading immediately to show loading state during transition
     setLoading(true);
-    
+
     // Clear existing results immediately to prevent showing old data
     setSearchResults([]);
     setKnowledgeItems([]);
     setStatistics([]);
-    
+
     // Batch all state updates together using React's automatic batching
     // This ensures they all take effect in the same render cycle
     React.startTransition(() => {
       // Update search type state FIRST
       setSearchType(type);
-      
+
       // Reset to page 1 when changing search type
       setCurrentPage(1);
       setTotalPages(1);
       setTotalItems(0);
-      
+
       // Reset ALL filters when switching search types
       setLanguageFilter('all');
       setCountryFilter(null);
@@ -515,22 +498,22 @@ export default function HomePage() {
       setAccuracyFilter('all');
       setRoleFilter('all');
     });
-    
+
     // Build URL parameters for the new search type with reset filters (only keyword + search_type)
     const urlParams = new URLSearchParams();
     if (searchQuery && searchQuery.trim() !== '') urlParams.set('keyword', searchQuery);
     urlParams.set('search_type', type);
-    
+
     // Update URL with clean parameters for the new search type
     router.push(`/${locale}/home?${urlParams.toString()}`, { scroll: false });
-    
+
     // Perform the search immediately with the new search type and explicitly reset filters
     try {
       const handleError = (errorMessage: string) => {
         toast.error(errorMessage, 'Validation Error');
       };
-      
-      
+
+
       const response = await fetchSearchResults(
         searchQuery.trim(),
         type, // Use the new search type directly
@@ -556,13 +539,13 @@ export default function HomePage() {
         null, // Always reset cover_start when switching types
         null  // Always reset cover_end when switching types
       );
-      
-      
+
+
       // Update results with the correct search type data
       setSearchResults(response.data || []);
       setTotalPages(response.meta?.last_page || 1);
       setTotalItems(response.meta?.total || 0);
-      
+
       // Fetch statistics if search type is knowledge
       if (type === 'knowledge') {
         await fetchStatisticsIfNeeded(searchQuery.trim(), type);
@@ -588,13 +571,13 @@ export default function HomePage() {
     setLanguageFilter(value);
     // Update URL with new filter
     updateUrlWithFilters({ language: value });
-    
+
     // Reset to page 1 when filter changes
     setCurrentPage(1);
-    
+
     // The main search effect will be triggered by the state change
   }, [updateUrlWithFilters]);
-  
+
   // Custom setter for country filter that triggers search
   // Country, Region, and Economic Bloc are mutually exclusive - selecting one clears the others
   const handleCountryFilterChange = useCallback((value: number | null) => {
@@ -606,18 +589,18 @@ export default function HomePage() {
       setEconomicBlocFilter(null);
     }
     // Update URL with new filter - explicitly clear the others
-    updateUrlWithFilters({ 
-      country: value, 
+    updateUrlWithFilters({
+      country: value,
       region: value !== null ? null : regionFilter,
       economic_bloc: value !== null ? null : economicBlocFilter
     });
-    
+
     // Reset to page 1 when filter changes
     setCurrentPage(1);
-    
+
     // The main search effect will be triggered by the state change
   }, [updateUrlWithFilters, regionFilter, economicBlocFilter]);
-  
+
   // Custom setter for region filter that triggers search
   // Country, Region, and Economic Bloc are mutually exclusive - selecting one clears the others
   const handleRegionFilterChange = useCallback((value: number | null) => {
@@ -629,18 +612,18 @@ export default function HomePage() {
       setEconomicBlocFilter(null);
     }
     // Update URL with new filter - explicitly clear the others
-    updateUrlWithFilters({ 
+    updateUrlWithFilters({
       region: value,
       country: value !== null ? null : countryFilter,
       economic_bloc: value !== null ? null : economicBlocFilter
     });
-    
+
     // Reset to page 1 when filter changes
     setCurrentPage(1);
-    
+
     // The main search effect will be triggered by the state change
   }, [updateUrlWithFilters, countryFilter, economicBlocFilter]);
-  
+
   // Custom setter for economic bloc filter that triggers search
   // Country, Region, and Economic Bloc are mutually exclusive - selecting one clears the others
   const handleEconomicBlocFilterChange = useCallback((value: number | null) => {
@@ -652,18 +635,18 @@ export default function HomePage() {
       setRegionFilter(null);
     }
     // Update URL with new filter - explicitly clear the others
-    updateUrlWithFilters({ 
+    updateUrlWithFilters({
       economic_bloc: value,
       country: value !== null ? null : countryFilter,
       region: value !== null ? null : regionFilter
     });
-    
+
     // Reset to page 1 when filter changes
     setCurrentPage(1);
-    
+
     // The main search effect will be triggered by the state change
   }, [updateUrlWithFilters, countryFilter, regionFilter]);
-  
+
   // Custom setter for price filter that triggers search
   const handlePriceFilterChange = useCallback((value: string | null) => {
     const shouldClearRangeFilters = value === 'false';
@@ -712,7 +695,7 @@ export default function HomePage() {
 
     // The main search effect will be triggered by the state change
   }, [updateUrlWithFilters]);
-  
+
   // Apply both range filters together to avoid race conditions
   const handleApplyRangeFilters = useCallback((start: string | null, end: string | null) => {
     setRangeStartFilter(start);
@@ -721,44 +704,44 @@ export default function HomePage() {
     // Reset to page 1 when filter changes
     setCurrentPage(1);
   }, [updateUrlWithFilters]);
-  
+
   // Custom setter for industry filter that triggers search
   const handleIndustryFilterChange = useCallback((value: number | null) => {
     // Update the industry filter state
     setIndustryFilter(value);
     // Update URL with new filter
     updateUrlWithFilters({ industry: value });
-    
+
     // Reset to page 1 when filter changes
     setCurrentPage(1);
-    
+
     // The main search effect will be triggered by the state change
   }, [updateUrlWithFilters]);
-  
+
   // Custom setter for ISIC code filter that triggers search
   const handleIsicCodeFilterChange = useCallback((value: string | null) => {
     setIsicCodeFilter(value);
     updateUrlWithFilters({ isic_code: value });
     setCurrentPage(1);
   }, [updateUrlWithFilters]);
-  
+
   // Custom setter for Products filter that triggers search
   const handleHsCodeFilterChange = useCallback((value: string | null) => {
     setHsCodeFilter(value);
     updateUrlWithFilters({ hs_code: value });
     setCurrentPage(1);
   }, [updateUrlWithFilters]);
-  
+
   // Custom setter for accuracy filter that triggers search
   const handleAccuracyFilterChange = useCallback((value: 'any' | 'all') => {
     // Update the accuracy filter state
     setAccuracyFilter(value);
     // Update URL with new filter
     updateUrlWithFilters({ accuracy: value });
-    
+
     // Reset to page 1 when filter changes
     setCurrentPage(1);
-    
+
     // The main search effect will be triggered by the state change
   }, [updateUrlWithFilters]);
 
@@ -818,13 +801,13 @@ export default function HomePage() {
     // Only run this effect once on initial mount
 
     if (initialized) return;
-      const query = searchParams.get('keyword');
+    const query = searchParams.get('keyword');
     const type = searchParams.get('search_type') as 'knowledge' | 'insighter';
     const accuracy = searchParams.get('accuracy');
     const language = searchParams.get('language');
     const country = searchParams.get('country');
     const categoryType = searchParams.get('type');
-    
+
     // Read ALL filter parameters directly from URL to avoid state synchronization issues
     const urlRegion = searchParams.get('region') ? parseInt(searchParams.get('region')!) : null;
     const urlEconomicBloc = searchParams.get('economic_bloc') ? parseInt(searchParams.get('economic_bloc')!) : null;
@@ -839,27 +822,27 @@ export default function HomePage() {
     const urlRangeEnd = searchParams.get('range_end') || null;
     const urlAccuracy = (searchParams.get('accuracy') as 'any' | 'all') || 'all';
     const urlRole = (searchParams.get('role') as 'all' | 'company' | 'individual') || 'all';
-    
-    
+
+
     // Set loading to true immediately if we have any search parameters
-    const hasSearchParams = query || type || language || country || categoryType || accuracy || 
-                           urlIndustry || urlRegion || urlEconomicBloc || urlIsicCode || urlHsCode || urlRole;
+    const hasSearchParams = query || type || language || country || categoryType || accuracy ||
+      urlIndustry || urlRegion || urlEconomicBloc || urlIsicCode || urlHsCode || urlRole;
     if (hasSearchParams) {
       setLoading(true);
     }
-    
+
     // Trigger search if we have query parameters OR other search parameters that should show results
     const shouldTriggerSearch = query || type || accuracy || language || country || categoryType ||
-                               urlIndustry || urlRegion || urlEconomicBloc || urlIsicCode || urlHsCode || urlRole;
-    
+      urlIndustry || urlRegion || urlEconomicBloc || urlIsicCode || urlHsCode || urlRole;
+
     if (shouldTriggerSearch) {
-      
+
       const triggerSearch = async () => {
         try {
           const handleError = (errorMessage: string) => {
             toast.error(errorMessage, 'Validation Error');
           };
-          
+
           // Use URL parameters directly to avoid state synchronization issues
           const response = await fetchSearchResults(
             query?.trim() || '', // Use empty string if no query - backend should return all results
@@ -874,29 +857,29 @@ export default function HomePage() {
             urlIsicCode,
             categoryType || 'all',
             30, // perPage
-          handleError, // onError callback
-          urlIndustry, // Use URL value directly
-          urlTag,
-          urlPriceFilter,
-          urlHsCode,
-          urlAccuracy,
-          urlRole,
-          urlRangeStart,
-          urlRangeEnd
-        );
-          
+            handleError, // onError callback
+            urlIndustry, // Use URL value directly
+            urlTag,
+            urlPriceFilter,
+            urlHsCode,
+            urlAccuracy,
+            urlRole,
+            urlRangeStart,
+            urlRangeEnd
+          );
+
           setSearchResults(response.data || []);
           setTotalPages(response.meta?.last_page || 1);
           setTotalItems(response.meta?.total || 0);
-          
+
           // Update the search query and type state to match URL parameters
           setSearchQuery(query || '');
           if (type) setSearchType(type);
           setPriceFilter(urlPriceFilter);
-          
+
           // Update the previous search query reference to avoid duplicate searches
           prevSearchQueryRef.current = query || '';
-          
+
           // Fetch statistics if search type is knowledge using URL parameters directly
           if ((type || 'knowledge') === 'knowledge') {
             try {
@@ -934,51 +917,51 @@ export default function HomePage() {
           setLoading(false);
         }
       };
-      
+
       triggerSearch();
     } else if (hasSearchParams) {
       // If we have other search parameters but no query, still set loading off after a brief moment
       setTimeout(() => setLoading(false), 100);
     }
-    
+
     // Set initialized after handling initial URL parameters
     setInitialized(true);
   }, [searchParams, locale, currentPage, activeTab, initialized]);
-  
+
   // Listen for changes in URL params after initial mount
   useEffect(() => {
     // Skip the first render since we handle it in the mount effect above
     if (!initialized) {
       return;
     }
-    
+
     // Skip if a page change is in progress to prevent interference
     if (isPageChangeInProgressRef.current) {
       return;
     }
-    
+
     // Skip if a search type change is in progress to prevent interference
     if (isSearchTypeChangingRef.current) {
       return;
     }
-    
+
     // Skip if a filter reset is in progress to prevent interference
     if (isFilterResetInProgressRef.current) {
       return;
     }
-    
+
     // Skip if pagination flags are active
     if (skipNextSearchEffectRef.current) {
       return;
     }
-    
+
     // CRITICAL: Skip if only the page parameter changed (pagination request)
     // Check if this is only a page parameter change
     const currentUrlParams = new URLSearchParams(window.location.search);
     // Ignore internal onboarding prompt flag so it doesn't get stripped by URL sync logic
     currentUrlParams.delete(PROMPT_ADD_CHANNELS_KEY);
     const expectedUrlParams = new URLSearchParams();
-    
+
     // Build expected URL params based on current state
     if (searchQuery && searchQuery.trim() !== '') expectedUrlParams.set('keyword', searchQuery);
     expectedUrlParams.set('search_type', searchType);
@@ -995,18 +978,18 @@ export default function HomePage() {
     if (accuracyFilter && accuracyFilter !== 'all') expectedUrlParams.set('accuracy', accuracyFilter);
     if (roleFilter && roleFilter !== 'all') expectedUrlParams.set('role', roleFilter);
     if (currentPage && currentPage > 1) expectedUrlParams.set('page', currentPage.toString());
-    
+
     // Compare URLs without page parameter
     const currentWithoutPage = new URLSearchParams(currentUrlParams);
     const expectedWithoutPage = new URLSearchParams(expectedUrlParams);
     currentWithoutPage.delete('page');
     expectedWithoutPage.delete('page');
-    
+
     // If only page parameter is different, skip this effect (let pagination handle it)
     if (currentWithoutPage.toString() === expectedWithoutPage.toString()) {
       return;
     }
-    
+
     // For subsequent URL changes - use a batch update approach to avoid race conditions
     const urlQuery = searchParams.get('keyword');
     const urlType = searchParams.get('search_type') as 'knowledge' | 'insighter' || 'knowledge';
@@ -1027,7 +1010,7 @@ export default function HomePage() {
     const urlCoverEnd = searchParams.get('cover_end');
     const urlRole = searchParams.get('role') as 'all' | 'company' | 'individual' || 'all';
     const urlPage = searchParams.get('page') ? parseInt(searchParams.get('page')!) : 1;
-    
+
     // Batch all state updates to avoid multiple re-renders and race conditions
     const updateStates = () => {
       // Handle search query and type updates
@@ -1036,46 +1019,46 @@ export default function HomePage() {
         // Reset the empty query flag to ensure search runs with the new query
         emptyQueryCalledRef.current = false;
       }
-      
+
       if (urlType && urlType !== searchType) {
         setSearchType(urlType);
       }
-      
+
       // Handle language filter
       if (urlLanguage && urlLanguage !== languageFilter) {
         setLanguageFilter(urlLanguage);
       } else if (!urlLanguage && languageFilter !== 'all') {
         setLanguageFilter('all');
       }
-      
+
       // Handle numeric filters
       if (urlCountry !== countryFilter) {
         setCountryFilter(urlCountry);
       }
-      
+
       if (urlRegion !== regionFilter) {
         setRegionFilter(urlRegion);
       }
-      
+
       if (urlEconomicBloc !== economicBlocFilter) {
         setEconomicBlocFilter(urlEconomicBloc);
       }
-      
+
       if (urlIndustry !== industryFilter) {
         setIndustryFilter(urlIndustry);
       }
       if (urlTag !== tagFilter) {
         setTagFilter(urlTag);
       }
-      
+
       if (urlIsicCode !== isicCodeFilter) {
         setIsicCodeFilter(urlIsicCode);
       }
-      
+
       if (urlHsCode !== hsCodeFilter) {
         setHsCodeFilter(urlHsCode);
       }
-      
+
       if (urlPriceFilter !== priceFilter) {
         setPriceFilter(urlPriceFilter);
       }
@@ -1104,30 +1087,30 @@ export default function HomePage() {
       } else if (!urlCategory && selectedCategory !== 'all') {
         setSelectedCategory('all');
       }
-      
+
       // Handle accuracy parameter
       if (urlAccuracy && urlAccuracy !== accuracyFilter) {
         setAccuracyFilter(urlAccuracy);
       } else if (!urlAccuracy && accuracyFilter !== 'all') {
         setAccuracyFilter('all');
       }
-      
+
       // Handle role parameter
       if (urlRole && urlRole !== roleFilter) {
         setRoleFilter(urlRole);
       }
-      
-          // Handle page parameter - CRITICAL for pagination
-    // ONLY update page if we're not in the middle of a pagination operation
-    if (urlPage !== currentPage && !isPageChangeInProgressRef.current && !skipNextSearchEffectRef.current) {
-      setCurrentPage(urlPage);
-    } else if (isPageChangeInProgressRef.current || skipNextSearchEffectRef.current) {
-    }
+
+      // Handle page parameter - CRITICAL for pagination
+      // ONLY update page if we're not in the middle of a pagination operation
+      if (urlPage !== currentPage && !isPageChangeInProgressRef.current && !skipNextSearchEffectRef.current) {
+        setCurrentPage(urlPage);
+      } else if (isPageChangeInProgressRef.current || skipNextSearchEffectRef.current) {
+      }
     };
-    
+
     updateStates();
   }, [searchParams, initialized]);
-  
+
 
   // Ref to track URL update timeout
   const urlUpdateTimeoutRef = useRef<NodeJS.Timeout | null>(null);
@@ -1153,27 +1136,27 @@ export default function HomePage() {
   // Dedicated search function for explicit user actions (Enter, button click, suggestion selection)
   const executeSearch = useCallback(async (queryToSearch?: string) => {
     const query = queryToSearch || searchQuery.trim();
-    
+
     // Update the search query state if a specific query was provided (from suggestion selection)
     if (queryToSearch && queryToSearch !== searchQuery) {
       setSearchQuery(queryToSearch);
     }
-    
+
     // Update URL with search parameters
     updateUrlWithFilters({ query: query, type: searchType });
-    
+
     // Update the search params ref to track this search
     searchParamsRef.current.searchQuery = query;
     prevSearchQueryRef.current = query;
-    
+
     setLoading(true);
-    
+
     try {
       const handleError = (errorMessage: string) => {
         toast.error(errorMessage, 'Validation Error');
       };
-      
-      
+
+
       const response = await fetchSearchResults(
         query,
         searchType,
@@ -1207,7 +1190,7 @@ export default function HomePage() {
       setTotalPages(response.meta?.last_page || 1);
       setTotalItems(response.meta?.total || 0);
       setCurrentPage(1); // Reset to page 1 for new searches
-      
+
       // Fetch statistics if search type is knowledge
       await fetchStatisticsIfNeeded(query, searchType);
     } catch (error) {
@@ -1250,10 +1233,10 @@ export default function HomePage() {
     rangeEndFilter,
     yearOfStudyFilter
   });
-  
+
   // Track previous search query to avoid redundant API calls
   const prevSearchQueryRef = useRef(searchQuery);
-  
+
   // Track when a direct page change is in progress to prevent other effects from interfering
   const isPageChangeInProgressRef = useRef(false);
 
@@ -1262,24 +1245,24 @@ export default function HomePage() {
 
   // Track if we should skip the next search effect run (to prevent overriding pagination)
   const skipNextSearchEffectRef = useRef(false);
-  
+
   // Flag to prevent main search effect from running during search type changes
   const isSearchTypeChangingRef = useRef(false);
-  
+
   // Flag to prevent main search effect from running during filter reset
   const isFilterResetInProgressRef = useRef(false);
 
   // COMPLETELY NEW SIMPLE PAGINATION SYSTEM
   const handlePageChange = useCallback(async (newPage: number) => {
-    
+
     // Step 1: Set flags to prevent any other effects from interfering
     isPageChangeInProgressRef.current = true;
     skipNextSearchEffectRef.current = true;
-    
+
     // Step 2: Update current page state immediately (this will make UI show correct active page)
     setCurrentPage(newPage);
     setLoading(true);
-    
+
     // Step 3: Build and update URL with new page
     const params = new URLSearchParams();
     if (searchQuery?.trim()) params.set('keyword', searchQuery.trim());
@@ -1298,12 +1281,12 @@ export default function HomePage() {
     if (roleFilter !== 'all') params.set('role', roleFilter);
     params.set('page', newPage.toString());
     params.set('per_page', '30');
-    
+
     const newUrl = `/${locale}/home?${params.toString()}`;
-    
+
     // Update URL without triggering navigation
     window.history.pushState({}, '', newUrl);
-    
+
     // Step 4: Make API call with new page
     try {
       const response = await fetchSearchResults(
@@ -1332,19 +1315,19 @@ export default function HomePage() {
         yearOfStudyFilter?.endYear?.toString() || null
       );
 
-      
+
       // Step 5: Update results
       setSearchResults(response.data || []);
       setTotalPages(response.meta?.last_page || 1);
       setTotalItems(response.meta?.total || 0);
-      
-      
+
+
     } catch (error) {
       console.error('📄 Pagination error:', error);
       toast.error('Failed to load page', 'Error');
     } finally {
       setLoading(false);
-      
+
       // Step 6: Reset flags after a longer delay to prevent interference
       setTimeout(() => {
         isPageChangeInProgressRef.current = false;
@@ -1356,7 +1339,7 @@ export default function HomePage() {
   // Track the last time an API call was made to prevent too many calls
   const lastApiCallTimeRef = useRef<number>(0);
   const MIN_API_CALL_INTERVAL = 500; // milliseconds
-  
+
   // Add a debounce timer ref for search effect
   const searchEffectTimerRef = useRef<NodeJS.Timeout | null>(null);
 
@@ -1367,7 +1350,7 @@ export default function HomePage() {
     if (!initialized) {
       return;
     }
-    
+
     // Skip if a search type change is in progress to prevent interference
     if (isSearchTypeChangingRef.current) {
       return;
@@ -1388,13 +1371,13 @@ export default function HomePage() {
       return; // Don't reset the flag here - let pagination handle it
     }
 
-    
+
     // If this effect runs due to a change in search parameters (not pagination),
     // we should reset the lastDirectPageRef to ensure proper page handling
     if (!isPageChangeInProgressRef.current) {
       lastDirectPageRef.current = null;
     }
-    
+
     // Update the reference values (EXCLUDING searchQuery - we don't want to auto-search on typing)
     const params = searchParamsRef.current;
     const paramsChanged =
@@ -1416,11 +1399,11 @@ export default function HomePage() {
       params.rangeStartFilter !== rangeStartFilter ||
       params.rangeEndFilter !== rangeEndFilter ||
       JSON.stringify(params.yearOfStudyFilter) !== JSON.stringify(yearOfStudyFilter);
-    
+
     // Log parameter changes for debugging (but don't include searchQuery)
     if (paramsChanged) {
     }
-    
+
     // Update reference (but keep the searchQuery as is - don't update it here)
     searchParamsRef.current = {
       locale,
@@ -1444,55 +1427,55 @@ export default function HomePage() {
       rangeEndFilter,
       yearOfStudyFilter
     };
-    
+
     // If nothing changed, don't fetch
     if (!paramsChanged) {
       return;
     }
-    
+
     // SET LOADING TO TRUE IMMEDIATELY when parameters change
     setLoading(true);
-    
+
     // Clear existing results immediately to prevent flickering
     setSearchResults([]);
     setKnowledgeItems([]);
-    
+
     // Clear any existing timer
     if (searchEffectTimerRef.current) {
       clearTimeout(searchEffectTimerRef.current);
     }
-    
+
     // Debounce only the API call, not the loading state
     searchEffectTimerRef.current = setTimeout(async () => {
       // Check if enough time has passed since the last API call
       const currentTime = Date.now();
       const timeSinceLastCall = currentTime - lastApiCallTimeRef.current;
-      
+
       if (timeSinceLastCall < MIN_API_CALL_INTERVAL) {
         // Still turn off loading even if we skip the API call
         setLoading(false);
         return;
       }
-      
+
       // Update the last API call time
       lastApiCallTimeRef.current = currentTime;
-      
+
       // Loading is already true from above, no need to set it again
-      
-      try {        
+
+      try {
         const handleError = (errorMessage: string) => {
           toast.error(errorMessage, 'Validation Error');
         };
-        
+
         // Use the current searchQuery state for the API call
         const keyword = searchQuery.trim();
         const search_type = searchType;
-        
+
         // Important: Use page 1 for NON-PAGE filter changes, but respect current page for pagination
         // This resets pagination when filters change but preserves it for page-only changes
         const pageToRequest = lastDirectPageRef.current || currentPage || 1;
-        
-        
+
+
         const response = await fetchSearchResults(
           keyword,
           search_type,
@@ -1522,259 +1505,236 @@ export default function HomePage() {
         setSearchResults(response.data || []);
         setTotalPages(response.meta?.last_page || 1);
         setTotalItems(response.meta?.total || 0);
-        
+
         // Only reset pagination to page 1 when filter parameters have changed (not for pagination requests)
         if (!lastDirectPageRef.current) {
           setCurrentPage(1);
         } else {
         }
-        
+
         // Fetch statistics if search type is knowledge
         await fetchStatisticsIfNeeded(keyword, search_type);
       } catch (error) {
         console.error('API request failed:', error);
         setKnowledgeItems([]);
         setSearchResults([]);
-        
+
         // Show a generic error message for other types of errors
         toast.error('Failed to fetch search results. Please try again later.', 'Error');
       } finally {
         setLoading(false);
       }
     }, 300); // Optimized debounce delay for better performance
-    
+
     // Cleanup function to clear the timer
     return () => {
       if (searchEffectTimerRef.current) {
         clearTimeout(searchEffectTimerRef.current);
       }
     };
-  // REMOVED searchQuery from dependencies - only trigger on filter changes, not query changes
+    // REMOVED searchQuery from dependencies - only trigger on filter changes, not query changes
   }, [locale, languageFilter, countryFilter, regionFilter, economicBlocFilter, tagFilter, activeTab, searchType, initialized, toast, selectedCategory, industryFilter, isicCodeFilter, hsCodeFilter, priceFilter, accuracyFilter, roleFilter, rangeStartFilter, rangeEndFilter, yearOfStudyFilter, fetchStatisticsIfNeeded]);
 
   return (
-   <main ref={mainRef} className='h-full min-h-0 flex flex-col bg-gray-50'>
-     <style dangerouslySetInnerHTML={{ __html: customScrollbarStyle }} />
-     <NotificationChannelsPromptModal locale={locale} />
-     
-     {/* Global Loading Overlay */}
-  
-     <section className="relative flex-1 min-h-0">
-      <PageIllustration />
-      {/* Main content area with left sidebar */}
-      <div className="flex h-full min-h-0 flex-col relative z-3 pt-0 pb-0">
-        <div className="w-full h-full min-h-0">
-          <div className="max-w-8xl 2xl:max-w-none h-full min-h-0">
-            <div className="flex gap-0 items-start h-full min-h-0">
-              {/* Sidebar (FilterBox) */}
-              <aside 
-                className={`hidden lg:block lg:flex-shrink-0 transition-all duration-300 ease-in-out ${
-                  filtersVisible 
-                    ? 'overflow-visible lg:w-90 opacity-100' 
-                    : 'overflow-hidden lg:w-0 opacity-0 max-h-0'
-                }`}
-              >
-                <div className={`sticky top-0 h-full overflow-y-auto bg-[#f9fafb] transition-transform duration-300 ease-in-out ${
-                  filtersVisible ? 'transform translate-x-0' : 'transform -translate-x-full lg:translate-x-0'
-                }`}>
-                  <FilterBox
-                    locale={locale}
-                    searchType={searchType}
-                    languageFilter={languageFilter}
-                    setLanguageFilter={handleLanguageFilterChange}
-                    countryFilter={countryFilter}
-                    setCountryFilter={handleCountryFilterChange}
-                    regionFilter={regionFilter}
-                    setRegionFilter={handleRegionFilterChange}
-                    economicBlocFilter={economicBlocFilter}
-                    setEconomicBlocFilter={handleEconomicBlocFilterChange}
-                    tagFilter={tagFilter}
-                    setTagFilter={handleTagFilterChange}
-                    isicCodeFilter={isicCodeFilter}
-                    setIsicCodeFilter={handleIsicCodeFilterChange}
-                    industryFilter={industryFilter}
-                    setIndustryFilter={handleIndustryFilterChange}
-                    hsCodeFilter={hsCodeFilter}
-                    setHsCodeFilter={handleHsCodeFilterChange}
-                    priceFilter={priceFilter}
-                    setPriceFilter={handlePriceFilterChange}
-                    rangeStartFilter={rangeStartFilter}
-                    setRangeStartFilter={handleRangeStartFilterChange}
-                    rangeEndFilter={rangeEndFilter}
-                    setRangeEndFilter={handleRangeEndFilterChange}
-                    applyRangeFilters={handleApplyRangeFilters}
-                    accuracyFilter={accuracyFilter}
-                    setAccuracyFilter={handleAccuracyFilterChange}
-                    roleFilter={roleFilter}
-                    setRoleFilter={handleRoleFilterChange}
-                    yearOfStudyFilter={yearOfStudyFilter}
-                    setYearOfStudyFilter={handleYearOfStudyFilterChange}
-                    resetFilters={resetFilters}
-                    isDrawerOpen={isFilterDrawerOpen}
-                    setIsDrawerOpen={setIsFilterDrawerOpen}
-                  />
-                </div>
-              </aside>
+    <main ref={mainRef} className='h-full min-h-0 flex flex-col bg-gray-50'>
+      <style dangerouslySetInnerHTML={{ __html: customScrollbarStyle }} />
+      <NotificationChannelsPromptModal locale={locale} />
 
-              {/* Content (Hero + Controls + Results) */}
-              <div ref={contentScrollRef} className="flex-1 h-full min-h-0 overflow-y-auto">
-                {/* Filters toggle - sticky toolbar (desktop) */}
-                <div className={`${!filtersVisible ? 'sticky top-0 z-20 bg-white/80 backdrop-blur border-b' : ''} ${locale === 'ar' ? 'pr-3' : 'pl-3'}`}>
-                  <div className={`flex ${locale === 'ar' ? 'justify-start' : 'justify-start'}`}>
+      {/* Global Loading Overlay */}
+
+      <section className="relative flex-1 min-h-0">
+        <PageIllustration />
+        {/* Main content area with left sidebar */}
+        <div className="flex h-full min-h-0 flex-col relative z-3 pt-0 pb-0">
+          <div className="w-full h-full min-h-0">
+            <div className="max-w-8xl 2xl:max-w-none h-full min-h-0">
+              <div className="flex gap-0 items-start h-full min-h-0">
+                {/* Sidebar (FilterBox) + Reddit-style collapse bar */}
+                <div className="hidden lg:flex lg:flex-shrink-0 h-full min-h-0 relative">
+                  {/* Filter panel */}
+                  <aside
+                    className={`transition-all duration-300 ease-in-out overflow-hidden ${filtersVisible
+                        ? 'w-90 opacity-100'
+                        : 'w-0 opacity-0'
+                      }`}
+                  >
+                    <div className="sticky top-0 h-full overflow-y-auto  w-90 hide-scrollbar" style={{ scrollbarWidth: 'none' } as React.CSSProperties}>
+                      <FilterBox
+                        locale={locale}
+                        searchType={searchType}
+                        languageFilter={languageFilter}
+                        setLanguageFilter={handleLanguageFilterChange}
+                        countryFilter={countryFilter}
+                        setCountryFilter={handleCountryFilterChange}
+                        regionFilter={regionFilter}
+                        setRegionFilter={handleRegionFilterChange}
+                        economicBlocFilter={economicBlocFilter}
+                        setEconomicBlocFilter={handleEconomicBlocFilterChange}
+                        tagFilter={tagFilter}
+                        setTagFilter={handleTagFilterChange}
+                        isicCodeFilter={isicCodeFilter}
+                        setIsicCodeFilter={handleIsicCodeFilterChange}
+                        industryFilter={industryFilter}
+                        setIndustryFilter={handleIndustryFilterChange}
+                        hsCodeFilter={hsCodeFilter}
+                        setHsCodeFilter={handleHsCodeFilterChange}
+                        priceFilter={priceFilter}
+                        setPriceFilter={handlePriceFilterChange}
+                        rangeStartFilter={rangeStartFilter}
+                        setRangeStartFilter={handleRangeStartFilterChange}
+                        rangeEndFilter={rangeEndFilter}
+                        setRangeEndFilter={handleRangeEndFilterChange}
+                        applyRangeFilters={handleApplyRangeFilters}
+                        accuracyFilter={accuracyFilter}
+                        setAccuracyFilter={handleAccuracyFilterChange}
+                        roleFilter={roleFilter}
+                        setRoleFilter={handleRoleFilterChange}
+                        yearOfStudyFilter={yearOfStudyFilter}
+                        setYearOfStudyFilter={handleYearOfStudyFilterChange}
+                        resetFilters={resetFilters}
+                        isDrawerOpen={isFilterDrawerOpen}
+                        setIsDrawerOpen={setIsFilterDrawerOpen}
+                      />
+                    </div>
+                  </aside>
+
+                  {/* Sidebar edge divider with circular toggle button */}
+                  <div className="sticky top-0 h-screen flex items-center justify-center z-10 w-12 flex-shrink-0">
+                    {/* Vertical line */}
+                    <div className="absolute top-0 bottom-0 left-1/2 -translate-x-1/2 w-px bg-gray-200" />
+                    {/* Circular hamburger button */}
                     <button
-                      onClick={() => {
-                        if (isTabletOrMobile) {
-                          setIsFilterDrawerOpen(true);
-                        } else {
-                          setFiltersVisible(!filtersVisible);
-                        }
-                      }}
-                      className="my-2 inline-flex items-center gap-2 px-3 py-1.5 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 hover:text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 shadow-sm"
+                      onClick={() => setFiltersVisible(!filtersVisible)}
+                      className="relative flex items-center justify-center w-9 h-9 rounded-full border border-gray-300 bg-white hover:bg-gray-50 transition-colors duration-150 cursor-pointer"
+                      aria-label={filtersVisible ? (locale === 'ar' ? 'إخفاء الفلاتر' : 'Hide filters') : (locale === 'ar' ? 'إظهار الفلاتر' : 'Show filters')}
                     >
-                      {filtersVisible && !isTabletOrMobile ? (
-                        <>
-                          <svg fill="none" height="20" viewBox="0 0 24 24" width="20" xmlns="http://www.w3.org/2000/svg"><g clipRule="evenodd" fillRule="evenodd"><path d="m11 20v-16h2v16z" fill="#90caea"/><g fill="#3747d6"><path d="m16.9142 12 2.7929-2.79289-1.4142-1.41422-3.5 3.50001c-.3905.3905-.3905 1.0237 0 1.4142l3.5 3.5 1.4142-1.4142z"/><path d="m7.0858 12-2.79289-2.79289 1.41421-1.41422 3.5 3.50001c.39053.3905.39053 1.0237 0 1.4142l-3.5 3.5-1.41421-1.4142z"/></g></g></svg>
-                        </>
-                      ) : (
-                        <>
-                          <svg width="22" height="22" viewBox="0 0 25 25" fill="none" xmlns="http://www.w3.org/2000/svg">
-<path d="M4.44336 5.9082H14.6973V7.37305H4.44336V5.9082Z" fill="#4DC4FF"/>
-<path d="M16.1621 5.9082H20.5566V7.37305H16.1621V5.9082Z" fill="#4DA6FF"/>
-<path d="M4.44336 11.7676H8.83789V13.2324H4.44336V11.7676Z" fill="#4DC4FF"/>
-<path d="M10.3027 11.7676H20.5566V13.2324H10.3027V11.7676Z" fill="#4DC4FF"/>
-<path d="M9.57031 14.6973C8.35869 14.6973 7.37305 13.7116 7.37305 12.5C7.37305 11.2884 8.35869 10.3027 9.57031 10.3027C10.7819 10.3027 11.7676 11.2884 11.7676 12.5C11.7676 13.7116 10.7819 14.6973 9.57031 14.6973Z" fill="#5A77B3"/>
-<path d="M4.44336 17.627H14.6973V19.0918H4.44336V17.627Z" fill="#4DC4FF"/>
-<path d="M16.1621 17.627H20.5566V19.0918H16.1621V17.627Z" fill="#4DA6FF"/>
-<path d="M12.5 17.627H14.6973V19.0918H12.5V17.627Z" fill="#4DA6FF"/>
-<path d="M12.5 11.7676H20.5566V13.2324H12.5V11.7676Z" fill="#4DA6FF"/>
-<path d="M12.5 5.9082H14.6973V7.37305H12.5V5.9082Z" fill="#4DA6FF"/>
-<path d="M15.4297 8.83789C14.2181 8.83789 13.2324 7.85225 13.2324 6.64062C13.2324 5.429 14.2181 4.44336 15.4297 4.44336C16.6413 4.44336 17.627 5.429 17.627 6.64062C17.627 7.85225 16.6413 8.83789 15.4297 8.83789Z" fill="#4D5B99"/>
-<path d="M15.4297 20.5566C14.2181 20.5566 13.2324 19.571 13.2324 18.3594C13.2324 17.1478 14.2181 16.1621 15.4297 16.1621C16.6413 16.1621 17.627 17.1478 17.627 18.3594C17.627 19.571 16.6413 20.5566 15.4297 20.5566Z" fill="#4D5B99"/>
-                            </svg>
-
-                        </>
-                      )}
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M4 6h16M4 12h16M4 18h16" stroke="#374151" strokeWidth="2" strokeLinecap="round" />
+                      </svg>
                     </button>
                   </div>
                 </div>
 
-                {/* Mobile floating Filters button */}
-                <button
-                  onClick={() => setIsFilterDrawerOpen(true)}
-                  className={`lg:hidden fixed bottom-4 ${locale === 'ar' ? 'left-4' : 'right-4'} z-30 inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-full shadow-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500`}
-                  aria-label={locale === 'ar' ? 'فتح الفلاتر' : 'Open filters'}
-                >
-                  <svg width="20" height="20" viewBox="0 0 25 25" fill="none" xmlns="http://www.w3.org/2000/svg">
-<path d="M4.44336 5.9082H14.6973V7.37305H4.44336V5.9082Z" fill="#ffffff"/>
-<path d="M16.1621 5.9082H20.5566V7.37305H16.1621V5.9082Z" fill="#ffffff"/>
-<path d="M4.44336 11.7676H8.83789V13.2324H4.44336V11.7676Z" fill="#ffffff"/>
-<path d="M10.3027 11.7676H20.5566V13.2324H10.3027V11.7676Z" fill="#ffffff"/>
-                  </svg>
-                  {locale === 'ar' ? 'الفلاتر' : 'Filters'}
-                </button>
+                {/* Content (Hero + Controls + Results) */}
+                <div ref={contentScrollRef} className="flex-1 h-full min-h-0 overflow-y-auto">
 
-                {/* Hero Banner Section (inside content column) */}
-  <div className="relative overflow-hidden pt-5 pb-16">
-       <div className="absolute inset-0 z-0">
-         <svg className="absolute right-0 top-0 h-full w-1/2 translate-x-1/3 transform text-white opacity-10" fill="none" viewBox="0 0 400 400">
-           <defs>
-             <pattern id="91c570bc-8fb3-48a2-a478-944f3c995113" x="0" y="0" width="20" height="20" patternUnits="userSpaceOnUse">
-               <rect x="0" y="0" width="4" height="4" className="text-gray-100" fill="currentColor" />
-             </pattern>
-           </defs>
-           <rect width="400" height="400" fill="url(#91c570bc-8fb3-48a2-a478-944f3c995113)" />
-         </svg>
-       </div>
-       
-       <div className="relative z-10 mx-auto max-w-7xl px-4 sm:px-6">
-         <div className="text-center">
-       <div className="flex  flex-col align-center justify-center gap-2" style={{lineHeight: '1.3'}}>
-         <h1 className="text-3xl sm:text-4xl md:text-4xl font-extrabold tracking-tight text-gray-900 text-center ">
-           {locale === 'ar' ? 'ابحث في التقارير والبيانات والرؤى' : 'Search data, reports, and insights'}
-         </h1>
-         <h1 className={`text-3xl sm:text-4xl md:text-4xl font-extrabold bg-clip-text text-transparent ${isRTL ? 'bg-gradient-to-l from-blue-400 to-teal-500' : 'bg-gradient-to-r from-blue-500 to-teal-400'} text-center`} >
-           {locale === 'ar' ? 'ابدأ الآن' : 'Start exploring now'}
-         </h1>
-       </div>
-           
-           {/* Search Bar Prominent Placement */}
-           <div className="mx-auto mt-8  ">
-             <SearchBar
-               searchQuery={searchQuery}
-               setSearchQuery={setSearchQuery}
-               searchType={searchType}
-               setSearchType={handleSearchTypeChange}
-               locale={locale}
-               placeholder={locale === 'ar' ? 'ابحث في الرؤى والتقارير والبيانات' : 'Search for statistics, reports, data ...'}
-               onSubmit={handleSubmit}
-               onSearch={executeSearch}
-              onQueryChange={handleQueryChange}
-              isicCodeFilter={isicCodeFilter}
-              setIsicCodeFilter={handleIsicCodeFilterChange}
-              hsCodeFilter={hsCodeFilter}
-              setHsCodeFilter={handleHsCodeFilterChange}
-                accuracyFilter={accuracyFilter}
-                setAccuracyFilter={handleAccuracyFilterChange}
-              onIsicLoadingChange={setIsLoadingIsic}
-              onHsLoadingChange={setIsLoadingHs}
-              onDataLoadedChange={setIsDataLoaded}
-             />
-           </div>
-            
-            </div>
+                  {/* Mobile floating Filters button */}
+                  <button
+                    onClick={() => setIsFilterDrawerOpen(true)}
+                    className={`lg:hidden fixed bottom-4 ${locale === 'ar' ? 'left-4' : 'right-4'} z-30 inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-full shadow-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500`}
+                    aria-label={locale === 'ar' ? 'فتح الفلاتر' : 'Open filters'}
+                  >
+                    <svg width="20" height="20" viewBox="0 0 25 25" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <path d="M4.44336 5.9082H14.6973V7.37305H4.44336V5.9082Z" fill="#ffffff" />
+                      <path d="M16.1621 5.9082H20.5566V7.37305H16.1621V5.9082Z" fill="#ffffff" />
+                      <path d="M4.44336 11.7676H8.83789V13.2324H4.44336V11.7676Z" fill="#ffffff" />
+                      <path d="M10.3027 11.7676H20.5566V13.2324H10.3027V11.7676Z" fill="#ffffff" />
+                    </svg>
+                    {locale === 'ar' ? 'الفلاتر' : 'Filters'}
+                  </button>
+
+                  {/* Hero Banner Section (inside content column) */}
+                  <div className="relative overflow-hidden pt-5 pb-16">
+                    <div className="absolute inset-0 z-0">
+                      <svg className="absolute right-0 top-0 h-full w-1/2 translate-x-1/3 transform text-white opacity-10" fill="none" viewBox="0 0 400 400">
+                        <defs>
+                          <pattern id="91c570bc-8fb3-48a2-a478-944f3c995113" x="0" y="0" width="20" height="20" patternUnits="userSpaceOnUse">
+                            <rect x="0" y="0" width="4" height="4" className="text-gray-100" fill="currentColor" />
+                          </pattern>
+                        </defs>
+                        <rect width="400" height="400" fill="url(#91c570bc-8fb3-48a2-a478-944f3c995113)" />
+                      </svg>
+                    </div>
+
+                    <div className="relative z-10 mx-auto max-w-7xl px-4 sm:px-6">
+                      <div className="text-center">
+                        <div className="flex  flex-col align-center justify-center gap-2" style={{ lineHeight: '1.3' }}>
+                          <h1 className="text-3xl sm:text-4xl md:text-4xl font-extrabold tracking-tight text-gray-900 text-center ">
+                            {locale === 'ar' ? 'ابحث في التقارير والبيانات والرؤى' : 'Search data, reports, and insights'}
+                          </h1>
+                          <h1 className={`text-3xl sm:text-4xl md:text-4xl font-extrabold bg-clip-text text-transparent ${isRTL ? 'bg-gradient-to-l from-blue-400 to-teal-500' : 'bg-gradient-to-r from-blue-500 to-teal-400'} text-center`} >
+                            {locale === 'ar' ? 'ابدأ الآن' : 'Start exploring now'}
+                          </h1>
+                        </div>
+
+                        {/* Search Bar Prominent Placement */}
+                        <div className="mx-auto mt-8  ">
+                          <SearchBar
+                            searchQuery={searchQuery}
+                            setSearchQuery={setSearchQuery}
+                            searchType={searchType}
+                            setSearchType={handleSearchTypeChange}
+                            locale={locale}
+                            placeholder={locale === 'ar' ? 'ابحث في الرؤى والتقارير والبيانات' : 'Search for statistics, reports, data ...'}
+                            onSubmit={handleSubmit}
+                            onSearch={executeSearch}
+                            onQueryChange={handleQueryChange}
+                            isicCodeFilter={isicCodeFilter}
+                            setIsicCodeFilter={handleIsicCodeFilterChange}
+                            hsCodeFilter={hsCodeFilter}
+                            setHsCodeFilter={handleHsCodeFilterChange}
+                            accuracyFilter={accuracyFilter}
+                            setAccuracyFilter={handleAccuracyFilterChange}
+                            onIsicLoadingChange={setIsLoadingIsic}
+                            onHsLoadingChange={setIsLoadingHs}
+                            onDataLoadedChange={setIsDataLoaded}
+                          />
+                        </div>
+
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Results section */}
+                  {(() => {
+                    return searchType === 'insighter' ? (
+                      <InsightersResultsSection
+                        key={`insighter-section-${searchType}-${totalItems}`}
+                        searchQuery={searchQuery}
+                        searchResults={searchResults}
+                        loading={loading}
+                        currentPage={currentPage}
+                        totalItems={totalItems}
+                        setCurrentPage={setCurrentPage}
+                        totalPages={totalPages}
+                        locale={locale}
+                        onPageChange={handlePageChange}
+                        filtersVisible={filtersVisible}
+                      />
+                    ) : (
+                      <ResultsSection
+                        key={`results-section-${searchType}-${totalItems}`}
+                        searchQuery={searchQuery}
+                        searchResults={searchResults}
+                        knowledgeItems={knowledgeItems}
+                        loading={loading}
+                        currentPage={currentPage}
+                        setCurrentPage={setCurrentPage}
+                        totalPages={totalPages}
+                        totalItems={totalItems}
+                        viewMode={viewMode}
+                        setViewMode={setViewMode}
+                        locale={locale}
+                        onPageChange={handlePageChange}
+                        searchType={searchType}
+                        filtersVisible={filtersVisible}
+                        selectedCategory={selectedCategory || 'all'}
+                        onCategoryChange={(category: string) => {
+                          if (selectedCategory === category) return;
+                          setSelectedCategory(category);
+                          updateUrlWithFilters({ category });
+                          setCurrentPage(1);
+                        }}
+                        getCategoryCount={getCategoryCount}
+                      />
+                    );
+                  })()}
                 </div>
-              </div>
-
-                {/* Results section */}
-                {(() => {
-                  return searchType === 'insighter' ? (
-                    <InsightersResultsSection
-                      key={`insighter-section-${searchType}-${totalItems}`}
-                      searchQuery={searchQuery}
-                      searchResults={searchResults}
-                      loading={loading}
-                      currentPage={currentPage}
-                      totalItems={totalItems}
-                      setCurrentPage={setCurrentPage}
-                      totalPages={totalPages}
-                      locale={locale}
-                      onPageChange={handlePageChange}
-                      filtersVisible={filtersVisible}
-                    />
-                  ) : (
-                    <ResultsSection
-                key={`results-section-${searchType}-${totalItems}`}
-                searchQuery={searchQuery}
-                searchResults={searchResults}
-                knowledgeItems={knowledgeItems}
-                loading={loading}
-                currentPage={currentPage}
-                setCurrentPage={setCurrentPage}
-                totalPages={totalPages}
-                totalItems={totalItems}
-                viewMode={viewMode}
-                setViewMode={setViewMode}
-                locale={locale}
-                onPageChange={handlePageChange}
-                searchType={searchType}
-                filtersVisible={filtersVisible}
-                selectedCategory={selectedCategory || 'all'}
-                onCategoryChange={(category: string) => {
-                  if (selectedCategory === category) return;
-                  setSelectedCategory(category);
-                  updateUrlWithFilters({ category });
-                  setCurrentPage(1);
-                }}
-                getCategoryCount={getCategoryCount}
-              />
-                  );
-                })()}
               </div>
             </div>
           </div>
         </div>
-      </div>
       </section>
-   </main>
+    </main>
   )
 }
