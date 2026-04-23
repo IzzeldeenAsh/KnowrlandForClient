@@ -4,6 +4,7 @@ import AOSProvider from "@/components/aos-provider";
 import { Almarai } from 'next/font/google';
 import { MantineProvider, createTheme } from '@mantine/core';
 import '@mantine/core/styles.css';
+import '@mantine/tiptap/styles.css';
 import {NextIntlClientProvider} from 'next-intl';
 import {getMessages} from 'next-intl/server';
 import {notFound} from 'next/navigation';

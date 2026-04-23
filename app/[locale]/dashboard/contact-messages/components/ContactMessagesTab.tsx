@@ -6,6 +6,8 @@ import { useToast } from '@/components/toast/ToastContext';
 import { buildAuthHeaders, parseApiError } from '../../_config/api';
 import ContactMessageModal, { ContactMessage } from './ContactMessageModal';
 
+type SubmitAction = 'read' | 'reply' | null;
+
 type Meta = {
   current_page: number;
   last_page: number;
@@ -59,7 +61,7 @@ function getPaginationWindow(currentPage: number, lastPage: number, maxVisiblePa
 
   const half = Math.floor(maxVisiblePages / 2);
   let start = Math.max(1, safeCurrent - half);
-  let end = Math.min(safeLast, start + maxVisiblePages - 1);
+  const end = Math.min(safeLast, start + maxVisiblePages - 1);
   if (end - start + 1 < maxVisiblePages) {
     start = Math.max(1, end - maxVisiblePages + 1);
   }
@@ -80,11 +82,29 @@ export default function ContactMessagesTab() {
   const [modalOpen, setModalOpen] = useState<boolean>(false);
   const [selectedMessage, setSelectedMessage] = useState<ContactMessage | null>(null);
   const [submitError, setSubmitError] = useState<string>('');
-  const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
+  const [submitAction, setSubmitAction] = useState<SubmitAction>(null);
+
+  const updateMessageState = useCallback((id: number, updater: (message: ContactMessage) => ContactMessage) => {
+    setMessages((prev) => prev.map((message) => (message.id === id ? updater(message) : message)));
+    setSelectedMessage((prev) => (prev && prev.id === id ? updater(prev) : prev));
+  }, []);
+
+  const formatApiTimestamp = (value: Date): string => {
+    const pad = (segment: number) => String(segment).padStart(2, '0');
+
+    return `${value.getFullYear()}-${pad(value.getMonth() + 1)}-${pad(value.getDate())} ${pad(value.getHours())}:${pad(
+      value.getMinutes(),
+    )}:${pad(value.getSeconds())}`;
+  };
 
   const fetchMessages = useCallback(
-    async (page = 1, signal?: AbortSignal) => {
-      setIsLoading(true);
+    async (page = 1, options?: { signal?: AbortSignal; silent?: boolean }) => {
+      const signal = options?.signal;
+      const silent = options?.silent ?? false;
+
+      if (!silent) {
+        setIsLoading(true);
+      }
       setError('');
 
       try {
@@ -111,8 +131,13 @@ export default function ContactMessagesTab() {
         }
 
         const payload = (await response.json()) as PaginatedResponse<ContactMessage>;
-        setMessages(Array.isArray(payload.data) ? payload.data : []);
+        const nextMessages = Array.isArray(payload.data) ? payload.data : [];
+        setMessages(nextMessages);
         setMeta(payload.meta ?? { current_page: page, last_page: 1, per_page: 10, total: 0 });
+        setSelectedMessage((prev) => {
+          if (!prev) return prev;
+          return nextMessages.find((message) => message.id === prev.id) ?? prev;
+        });
       } catch (requestError) {
         if (requestError instanceof DOMException && requestError.name === 'AbortError') {
           return;
@@ -125,9 +150,13 @@ export default function ContactMessagesTab() {
               ? requestError.message
               : 'Unable to load messages right now.';
         setError(message);
-        setMessages([]);
+        if (!silent) {
+          setMessages([]);
+        }
       } finally {
-        setIsLoading(false);
+        if (!silent) {
+          setIsLoading(false);
+        }
       }
     },
     [handleServerErrors],
@@ -135,7 +164,7 @@ export default function ContactMessagesTab() {
 
   useEffect(() => {
     const controller = new AbortController();
-    void fetchMessages(1, controller.signal);
+    void fetchMessages(1, { signal: controller.signal });
     return () => controller.abort();
   }, [fetchMessages]);
 
@@ -145,7 +174,7 @@ export default function ContactMessagesTab() {
     return messages.filter((message) => {
       const combined = `${message.first_name ?? ''} ${message.last_name ?? ''} ${message.email ?? ''} ${message.phone ?? ''} ${
         message.status ?? ''
-      } ${message.created_at ?? ''}`.toLowerCase();
+      } ${message.created_at ?? ''} ${message.message ?? ''} ${message.reply_message ?? ''}`.toLowerCase();
       return combined.includes(query);
     });
   }, [messages, searchQuery]);
@@ -164,7 +193,7 @@ export default function ContactMessagesTab() {
   const openMessage = (message: ContactMessage) => {
     setSelectedMessage(message);
     setSubmitError('');
-    setIsSubmitting(false);
+    setSubmitAction(null);
     setModalOpen(true);
   };
 
@@ -172,18 +201,17 @@ export default function ContactMessagesTab() {
     setModalOpen(false);
     setSelectedMessage(null);
     setSubmitError('');
-    setIsSubmitting(false);
+    setSubmitAction(null);
   };
 
   const markAsRead = async (id: number) => {
     setSubmitError('');
-    setIsSubmitting(true);
+    setSubmitAction('read');
 
     try {
       const token = getAuthToken();
       if (!token) {
         setSubmitError('Missing auth token. Please sign in again.');
-        setIsSubmitting(false);
         return;
       }
 
@@ -198,10 +226,8 @@ export default function ContactMessagesTab() {
         throw await parseApiError(response);
       }
 
-      setMessages((prev) => prev.map((msg) => (msg.id === id ? { ...msg, status: 'read' } : msg)));
-      setSelectedMessage((prev) => (prev && prev.id === id ? { ...prev, status: 'read' } : prev));
+      updateMessageState(id, (message) => ({ ...message, status: 'read' }));
       success('Message marked as read.', '', 4000);
-      setIsSubmitting(false);
     } catch (requestError) {
       handleServerErrors(requestError);
       const message =
@@ -211,7 +237,52 @@ export default function ContactMessagesTab() {
             ? requestError.message
             : 'Unable to update message right now.';
       setSubmitError(message);
-      setIsSubmitting(false);
+    } finally {
+      setSubmitAction(null);
+    }
+  };
+
+  const replyToMessage = async (id: number, replyMessage: string) => {
+    setSubmitError('');
+    setSubmitAction('reply');
+
+    try {
+      const token = getAuthToken();
+      if (!token) {
+        setSubmitError('Missing auth token. Please sign in again.');
+        return;
+      }
+
+      const response = await fetch(`https://api.insightabusiness.com/api/admin/setting/contact-us/reply/${id}`, {
+        method: 'POST',
+        cache: 'no-store',
+        headers: buildAuthHeaders(token),
+        body: JSON.stringify({ reply_message: replyMessage }),
+      });
+
+      if (!response.ok) {
+        throw await parseApiError(response);
+      }
+
+      updateMessageState(id, (message) => ({
+        ...message,
+        status: 'read',
+        reply_at: formatApiTimestamp(new Date()),
+        reply_message: replyMessage,
+      }));
+      success('Reply sent successfully.', '', 4000);
+      void fetchMessages(meta.current_page, { silent: true });
+    } catch (requestError) {
+      handleServerErrors(requestError);
+      const message =
+        requestError && typeof requestError === 'object' && 'message' in requestError
+          ? String((requestError as { message?: unknown }).message ?? 'Unable to send reply right now.')
+          : requestError instanceof Error
+            ? requestError.message
+            : 'Unable to send reply right now.';
+      setSubmitError(message);
+    } finally {
+      setSubmitAction(null);
     }
   };
 
@@ -277,6 +348,7 @@ export default function ContactMessagesTab() {
                     `${normalizeText(message.first_name)} ${normalizeText(message.last_name)}`.trim() || 'Unknown';
                   const statusText = normalizeText(message.status) || '-';
                   const statusKey = statusText.toLowerCase() || 'unknown';
+                  const hasReply = normalizeText(message.reply_message).length > 0;
 
                   return (
                     <tr key={message.id} className="hover:bg-slate-50/60">
@@ -294,7 +366,7 @@ export default function ContactMessagesTab() {
                       </td>
                       <td className="px-4 py-3 text-right">
                         <button type="button" className={ROW_ACTION_BUTTON_CLASS} onClick={() => openMessage(message)}>
-                          View
+                          {hasReply ? 'View' : 'Reply'}
                         </button>
                       </td>
                     </tr>
@@ -350,13 +422,13 @@ export default function ContactMessagesTab() {
         <ContactMessageModal
           isOpen={modalOpen}
           message={selectedMessage}
-          isSubmitting={isSubmitting}
+          submitAction={submitAction}
           submitError={submitError}
           onClose={closeModal}
           onMarkAsRead={(id) => void markAsRead(id)}
+          onReply={(id, replyMessage) => void replyToMessage(id, replyMessage)}
         />
       ) : null}
     </div>
   );
 }
-
