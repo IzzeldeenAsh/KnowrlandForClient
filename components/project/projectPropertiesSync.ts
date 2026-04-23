@@ -145,7 +145,7 @@ export async function syncProjectProperties(locale: WizardLocale) {
   const payload = buildProjectPropertiesPayload(locale)
 
   const res = await fetch(
-    getApiUrl(`/api/account/project/request/properties/sync/${projectUuid}`),
+    getApiUrl(`/api/account/project/definition/properties/sync/${projectUuid}`),
     {
       method: 'POST',
       headers: {

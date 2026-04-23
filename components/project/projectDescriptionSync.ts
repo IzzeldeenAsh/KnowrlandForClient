@@ -42,7 +42,7 @@ export async function syncProjectDescription(params: {
   })
 
   const res = await fetch(
-    getApiUrl(`/api/account/project/request/description/sync/${projectUuid}`),
+    getApiUrl(`/api/account/project/definition/description/sync/${projectUuid}`),
     {
       method: 'POST',
       headers: {

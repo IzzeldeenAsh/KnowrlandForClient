@@ -265,7 +265,7 @@ async function syncScopes(params: {
   })
 
   const res = await fetch(
-    getApiUrl(`/api/account/project/request/scope/sync/${params.projectUuid}`),
+    getApiUrl(`/api/account/project/definition/scope/sync/${params.projectUuid}`),
     {
       method: 'POST',
       headers: {

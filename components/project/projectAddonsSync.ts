@@ -32,7 +32,7 @@ export async function syncProjectAddons(params: { locale: WizardLocale }) {
   const formData = buildProjectAddonsFormData(params.locale)
 
   const res = await fetch(
-    getApiUrl(`/api/account/project/request/addon/sync/${projectUuid}`),
+    getApiUrl(`/api/account/project/definition/addon/sync/${projectUuid}`),
     {
       method: 'POST',
       headers: {

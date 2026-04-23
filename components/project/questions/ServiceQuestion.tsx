@@ -286,7 +286,7 @@ export default function ServiceQuestion({ locale }: { locale: WizardLocale }) {
       const prompt = payload.isOtherSelected ? payload.servicePrompt.trim() : ''
       const apiServiceId = payload.serviceId
 
-      const initRes = await fetch(getApiUrl('/api/account/project/request/initiate'), {
+      const initRes = await fetch(getApiUrl('/api/account/project/definition/initiate'), {
         method: 'POST',
         headers,
         body: JSON.stringify({

@@ -17,7 +17,7 @@ export async function syncServiceComponents(locale: WizardLocale) {
   const payload = readServiceComponentsPayload(locale)
 
   const res = await fetch(
-    getApiUrl(`/api/account/project/request/component/sync/${projectUuid}`),
+    getApiUrl(`/api/account/project/definition/component/sync/${projectUuid}`),
     {
       method: 'POST',
       headers: {

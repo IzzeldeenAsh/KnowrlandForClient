@@ -79,7 +79,7 @@ export interface KnowledgeItem {
   slug: string;
   type: string;
   title: string;
-  description: string;
+  description?: string;
   total_price?: string;
   price?: string; // Price as string from API
   published_at: string;
@@ -88,11 +88,11 @@ export interface KnowledgeItem {
     count: number;
     average: number;
   };
-  insighter: {
+  insighter?: {
     uuid?: string;
     name: string;
     profile_photo_url: string | null;
-    roles: string[];
+    roles?: string[];
     company?: {
       uuid: string;
       legal_name: string;
@@ -304,6 +304,10 @@ export default function KnowledgeGrid({
           const showDownloads =
             item.total_downloads !== undefined && item.total_downloads > 0;
           const showBottomMeta = showReview || showDownloads;
+          const insighterRoles = item.insighter?.roles ?? [];
+          const isCompanyProfile =
+            insighterRoles.includes("company") || insighterRoles.includes("company-insighter");
+          const isInsighterProfile = insighterRoles.includes("insighter");
 
           return (
             <Card
@@ -422,12 +426,12 @@ export default function KnowledgeGrid({
                       <div className="relative">
                    <div className="object-cover object-top">
                    <Link 
-                     href={item.insighter.roles.includes("company") || item.insighter.roles.includes("company-insighter") ? 
+                     href={isCompanyProfile ? 
                        `/${currentLocale}/profile/${item.insighter.company?.uuid}` : 
                        `/${currentLocale}/profile/${item.insighter.uuid || item.insighter.name}?entity=insighter`}
                    >
                      <Avatar
-                       src={(item.insighter.roles.includes("company") || item.insighter.roles.includes("company-insighter")) && item.insighter.company?.logo ? 
+                       src={isCompanyProfile && item.insighter.company?.logo ? 
                          item.insighter.company.logo : 
                          item.insighter.profile_photo_url}
                        radius="xl"
@@ -435,14 +439,14 @@ export default function KnowledgeGrid({
                        size="md"
                        className={`${cardStyles.avatar} avatar-top-position`}
                      >
-                       {!((item.insighter.roles.includes("company") || item.insighter.roles.includes("company-insighter")) && item.insighter.company?.logo) && 
+                       {!(isCompanyProfile && item.insighter.company?.logo) && 
                        !item.insighter.profile_photo_url &&
                          getInitials(item.insighter.name)}
                      </Avatar>
                    </Link>
                    </div>
                         
-                        {item.insighter.roles.includes("company-insighter") && item.insighter.profile_photo_url && (
+                        {insighterRoles.includes("company-insighter") && item.insighter.profile_photo_url && (
                           <Link href={`/${currentLocale}/profile/${item.insighter.uuid || item.insighter.name}?entity=insighter`}>
                           <Avatar
                             src={item.insighter.profile_photo_url}
@@ -457,7 +461,7 @@ export default function KnowledgeGrid({
                           />
                           </Link>
                         )}
-                         {item.insighter.roles.includes("company") && item.insighter.profile_photo_url && (
+                         {insighterRoles.includes("company") && item.insighter.profile_photo_url && (
                           <Link href={`/${currentLocale}/profile/${item.insighter.uuid || item.insighter.name}?entity=insighter`}>
                           <Avatar
                             src={item.insighter.profile_photo_url}
@@ -477,11 +481,11 @@ export default function KnowledgeGrid({
                       <div className="ms-3">
                         <Text fw={600} size="sm" className="capitalize">
                           <Link href={`/${currentLocale}/profile/${item.insighter.uuid || item.insighter.name}?entity=insighter`}>
-                          {item.insighter.roles.includes("insighter") && item.insighter.name.toLowerCase()}
+                          {isInsighterProfile && item.insighter.name.toLowerCase()}
                           </Link>
 
                         <Link href={`/${currentLocale}/profile/${item.insighter.company?.uuid}`}>
-                          {item.insighter.roles.includes("company") && (
+                          {insighterRoles.includes("company") && (
                             item.insighter.company
                               ? isRTL
                                 ? ` ${item.insighter.company.legal_name}`
@@ -491,7 +495,7 @@ export default function KnowledgeGrid({
                           </Link>
 
                           <Link href={`/${currentLocale}/profile/${item.insighter.company?.uuid}`}>
-                          {item.insighter.roles.includes("company-insighter") && (
+                          {insighterRoles.includes("company-insighter") && (
                             item.insighter.company
                               ? isRTL
                                 ? ` ${item.insighter.company.legal_name}`
@@ -503,11 +507,11 @@ export default function KnowledgeGrid({
 
                         <Text c="dimmed" size="xs" className="capitalize">
                           <Link href={`/${currentLocale}/profile/${item.insighter.uuid || item.insighter.name}?entity=insighter`}>
-                          {item.insighter.roles.includes("insighter") && translations.insighter}
+                          {isInsighterProfile && translations.insighter}
                           </Link>
 
                          
-                          {item.insighter.roles.includes("company") && (
+                          {insighterRoles.includes("company") && (
                             item.insighter.company
                               ? (<Link href={`/${currentLocale}/profile/${item.insighter.uuid || item.insighter.name}?entity=insighter`}>
                                 {translations.by} {item.insighter.name.toLowerCase()}
@@ -517,7 +521,7 @@ export default function KnowledgeGrid({
                               </Link>
                           )}
 
-                          {item.insighter.roles.includes("company-insighter") && (
+                          {insighterRoles.includes("company-insighter") && (
                             item.insighter.company ? (
                               <Link href={`/${currentLocale}/profile/${item.insighter.uuid || item.insighter.name}?entity=insighter`}>
                                 {translations.by} {item.insighter.name.toLowerCase()}

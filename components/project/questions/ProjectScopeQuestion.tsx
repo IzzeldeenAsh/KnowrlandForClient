@@ -767,7 +767,7 @@ export default function ProjectScopeQuestion({ locale }: { locale: WizardLocale 
         'X-Timezone': Intl.DateTimeFormat().resolvedOptions().timeZone,
       }
 
-      const initRes = await fetch(getApiUrl('/api/account/project/request/initiate'), {
+      const initRes = await fetch(getApiUrl('/api/account/project/definition/initiate'), {
         method: 'POST',
         headers,
         body: JSON.stringify({

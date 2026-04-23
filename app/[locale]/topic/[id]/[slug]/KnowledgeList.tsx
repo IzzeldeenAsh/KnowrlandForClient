@@ -25,7 +25,7 @@ export interface KnowledgeItem {
   slug: string;
   type: string;
   title: string;
-  description: string;
+  description?: string;
   total_price?: string;
   price?: string; // Price as string from API
   published_at: string;
@@ -34,11 +34,11 @@ export interface KnowledgeItem {
     count: number;
     average: number;
   };
-  insighter: {
+  insighter?: {
     uuid?: string;
     name: string;
     profile_photo_url: string | null;
-    roles: string[];
+    roles?: string[];
     company?: {
       uuid: string;
       legal_name: string;
@@ -127,7 +127,13 @@ export default function KnowledgeList({
       )}
 
       <div className="space-y-4 max-w-7xl mx-auto">
-        {knowledge.map((item: KnowledgeItem) => (
+        {knowledge.map((item: KnowledgeItem) => {
+          const insighterRoles = item.insighter?.roles ?? [];
+          const isCompanyProfile =
+            insighterRoles.includes("company") || insighterRoles.includes("company-insighter");
+          const isInsighterProfile = insighterRoles.includes("insighter");
+
+          return (
           <Card
             key={`${item.type}-${item.slug}`}
             withBorder={false}
@@ -220,12 +226,12 @@ export default function KnowledgeList({
                 </div>
               </div>
               
-              {showInsighter && (
+              {showInsighter && item.insighter && (
                 <div className={styles.insighterColumn}>
                   <div className="flex items-center">
                     <div className="relative">
                       <Avatar
-                        src={(item.insighter.roles.includes("company") || item.insighter.roles.includes("company-insighter")) && item.insighter.company?.logo ? 
+                        src={isCompanyProfile && item.insighter.company?.logo ? 
                             item.insighter.company.logo : 
                             item.insighter.profile_photo_url}
                         radius="xl"
@@ -233,12 +239,12 @@ export default function KnowledgeList({
                         size="md"
                         className={styles.avatar}
                       >
-                        {!((item.insighter.roles.includes("company") || item.insighter.roles.includes("company-insighter")) && item.insighter.company?.logo) && 
+                        {!(isCompanyProfile && item.insighter.company?.logo) && 
                         !item.insighter.profile_photo_url &&
                           getInitials(item.insighter.name)}
                       </Avatar>
                       
-                      {item.insighter.roles.includes("company-insighter") && item.insighter.profile_photo_url && (
+                      {insighterRoles.includes("company-insighter") && item.insighter.profile_photo_url && (
                         <Avatar
                           src={item.insighter.profile_photo_url}
                           radius="xl"
@@ -251,7 +257,7 @@ export default function KnowledgeList({
                           }}
                         />
                       )}
-                       {item.insighter.roles.includes("company") && item.insighter.profile_photo_url && (
+                       {insighterRoles.includes("company") && item.insighter.profile_photo_url && (
                         <Avatar
                           src={item.insighter.profile_photo_url}
                           radius="xl"
@@ -268,9 +274,9 @@ export default function KnowledgeList({
 
                     <div className="ms-3">
                       <Text fw={600} size="sm" className="capitalize">
-                        {item.insighter.roles.includes("insighter") && item.insighter.name.toLowerCase()}
+                        {isInsighterProfile && item.insighter.name.toLowerCase()}
 
-                        {item.insighter.roles.includes("company") && (
+                        {insighterRoles.includes("company") && (
                           item.insighter.company
                             ? isRTL
                               ? `${translations.company} ${item.insighter.company.legal_name}`
@@ -278,7 +284,7 @@ export default function KnowledgeList({
                             : translations.company
                         )}
 
-                        {item.insighter.roles.includes("company-insighter") && (
+                        {insighterRoles.includes("company-insighter") && (
                           item.insighter.company
                             ? isRTL
                               ? `${translations.company} ${item.insighter.company.legal_name}`
@@ -288,15 +294,15 @@ export default function KnowledgeList({
                       </Text>
 
                       <Text c="dimmed" size="xs" className="capitalize">
-                        {item.insighter.roles.includes("insighter") && translations.insighter}
+                        {isInsighterProfile && translations.insighter}
 
-                        {item.insighter.roles.includes("company") && (
+                        {insighterRoles.includes("company") && (
                           item.insighter.company
                             ? `${translations.by} ${item.insighter.name.toLowerCase()}`
                             : translations.company
                         )}
 
-                        {item.insighter.roles.includes("company-insighter") && (
+                        {insighterRoles.includes("company-insighter") && (
                           item.insighter.company
                             ? `${translations.by} ${item.insighter.name.toLowerCase()}`
                             : translations.company
@@ -321,7 +327,7 @@ export default function KnowledgeList({
               )}
             </Link>
           </Card>
-        ))}
+        )})}
         {knowledge.length === 0 && (
           <div className="flex flex-col items-center justify-center py-12 px-4">
           
