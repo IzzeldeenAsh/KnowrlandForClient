@@ -4,9 +4,9 @@ import { useEffect, useMemo, useState } from 'react'
 import Link from 'next/link'
 import {
   IconCheck,
-  IconFileText,
   IconPaperclip,
   IconTrash,
+  IconUpload,
 } from '@tabler/icons-react'
 import ProjectSelectedTypeHeader from '../ProjectSelectedTypeHeader'
 import {
@@ -160,7 +160,7 @@ export default function ProjectDescriptionQuestion({
     ? 'أضف ملاحظاتك بحرية، وارفِق أي ملفات تساعدنا على فهم السياق بشكل أدق.'
     : 'Add any context, preferences, constraints, links, or notes, and attach supporting files if they help.'
 
-  const totalAttachmentCount = savedFiles.length + newFiles.length
+  const [isDragging, setIsDragging] = useState(false)
   const canContinue = !submitting
 
   const mergedFiles = useMemo(
@@ -230,10 +230,10 @@ export default function ProjectDescriptionQuestion({
 
         <div
           className={`mt-2 text-start transition-all duration-700 ${entered
-              ? 'opacity-100 translate-x-0'
-              : isRTL
-                ? 'opacity-0 translate-x-4'
-                : 'opacity-0 -translate-x-4'
+            ? 'opacity-100 translate-x-0'
+            : isRTL
+              ? 'opacity-0 translate-x-4'
+              : 'opacity-0 -translate-x-4'
             }`}
         >
           {isEnglish ? (
@@ -273,32 +273,46 @@ export default function ProjectDescriptionQuestion({
             </label>
           </div>
 
-          <div className="rounded-[32px] border border-[#e9dcc8] bg-[linear-gradient(180deg,rgba(255,252,247,0.98),rgba(250,244,234,0.92))] p-5 shadow-[0_30px_90px_-50px_rgba(148,92,28,0.45)] sm:p-7">
-            <div className="flex items-start justify-between gap-4">
+          <div className="rounded-2xl border border-slate-200 bg-white p-5 sm:p-6">
+            {/* Header */}
+            <div className="flex items-center gap-3 mb-5">
+              <div className="flex h-10 w-10 items-center justify-center rounded-full bg-slate-100">
+                <IconPaperclip size={20} stroke={1.8} className="text-slate-500" />
+              </div>
               <div>
-                <div className="text-sm font-semibold uppercase  text-[#9a6b27]">
+                <div className="text-sm font-semibold text-slate-900">
                   {isRTL ? 'الملفات الداعمة' : 'Supporting files'}
                 </div>
-                <p className="mt-2 text-sm leading-6 text-slate-600">
+                <p className="text-xs text-slate-400 mt-0.5">
                   {isRTL
-                    ? 'ارفع مستندات، صورًا، أو ملفات مرجعية تساعدنا على استيعاب الطلب.'
-                    : 'Upload documents, screenshots, or reference files that clarify the request.'}
+                    ? 'PDF, JPG, PNG, DOC, XLSX, CSV, TXT, PPT, ODT • حتى 2 MB لكل ملف'
+                    : 'PDF, JPG, PNG, DOC, XLSX, CSV, TXT, PPT, ODT • up to 2 MB each'}
                 </p>
-                <p className="mt-2 text-xs font-semibold uppercase  text-[#9a6b27]/80">
-                  {isRTL
-                    ? 'PDF, JPG, JPEG, PNG, DOC, DOCX, XLS, XLSX, CSV, TXT, PPT, PPTX, ODT • حتى 2 MB لكل ملف'
-                    : 'PDF, JPG, JPEG, PNG, DOC, DOCX, XLS, XLSX, CSV, TXT, PPT, PPTX, ODT • up to 2 MB each'}
-                </p>
-              </div>
-
-              <div className="inline-flex h-12 w-12 items-center justify-center rounded-2xl border border-[#edd6b4] bg-white/80 text-[#9a6b27]">
-                <IconPaperclip size={22} stroke={1.8} />
               </div>
             </div>
 
-            <label className="mt-6 inline-flex w-full cursor-pointer items-center justify-center gap-3 rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm font-semibold text-slate-700 transition-colors hover:bg-slate-50">
-              <IconFileText size={18} stroke={1.8} />
-              <span>{isRTL ? 'اختيار ملفات' : 'Choose files'}</span>
+            {/* Drop zone */}
+            <label
+              className={`flex flex-col items-center justify-center gap-2 w-full rounded-xl border-2 border-dashed p-8 text-center cursor-pointer transition-colors duration-200 ${isDragging
+                  ? 'border-sky-400 bg-sky-50'
+                  : 'border-slate-200 hover:border-slate-300 hover:bg-slate-50'
+                }`}
+              onDragEnter={(e) => { e.preventDefault(); e.stopPropagation(); setIsDragging(true) }}
+              onDragLeave={(e) => { e.preventDefault(); e.stopPropagation(); setIsDragging(false) }}
+              onDragOver={(e) => { e.preventDefault(); e.stopPropagation() }}
+              onDrop={(e) => {
+                e.preventDefault()
+                e.stopPropagation()
+                setIsDragging(false)
+                const dropped = Array.from(e.dataTransfer.files)
+                if (dropped.length === 0) return
+                const validation = validateProjectDescriptionFiles(locale, dropped)
+                if (validation.validFiles.length > 0) {
+                  setNewFiles((current) => [...current, ...validation.validFiles])
+                }
+                setError(validation.errorMessage)
+              }}
+            >
               <input
                 type="file"
                 multiple
@@ -308,63 +322,60 @@ export default function ProjectDescriptionQuestion({
                   const nextFiles = Array.from(event.target.files || [])
                   if (nextFiles.length === 0) return
                   const validation = validateProjectDescriptionFiles(locale, nextFiles)
-
                   if (validation.validFiles.length > 0) {
                     setNewFiles((current) => [...current, ...validation.validFiles])
                   }
-
                   setError(validation.errorMessage)
                   event.target.value = ''
                 }}
               />
+              <IconUpload size={30} stroke={1.5} className="text-slate-400" />
+              <span className="text-sm font-semibold text-slate-700">
+                {isRTL ? 'اسحب الملفات هنا أو اضغط للاختيار' : 'Drag & drop files here, or click to browse'}
+              </span>
+              <span className="text-xs text-slate-400">
+                {isRTL ? 'حتى 2 MB لكل ملف' : 'Up to 2 MB per file'}
+              </span>
             </label>
 
-            <div className="mt-5 flex items-center justify-between gap-3 rounded-2xl bg-white/65 px-4 py-3">
-              <div className="text-sm font-semibold text-slate-700">
-                {isRTL ? 'إجمالي الملفات' : 'Total attachments'}
-              </div>
-              <div className="text-lg font-black text-slate-900">
-                {totalAttachmentCount}
-              </div>
-            </div>
-
-            {mergedFiles.length > 0 ? (
-              <div className="mt-4 grid gap-5 lg:grid-cols-3">
+            {/* File list */}
+            {mergedFiles.length > 0 && (
+              <ul className="mt-4 space-y-2">
                 {savedFiles.map((file, index) => (
-                  <div
+                  <li
                     key={`saved-${file.name}-${index}`}
-                    className="flex items-center justify-between gap-3 rounded-2xl border border-white/40 bg-white/80 px-4 py-3"
+                    className="flex items-center justify-between gap-3 rounded-xl bg-slate-50 px-4 py-3"
                   >
-                    <div className="min-w-0">
-                      <div className="truncate text-sm font-semibold text-slate-900">
-                        {file.name}
+                    <div className="flex items-center gap-3 min-w-0">
+                      <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border border-slate-200 bg-white text-[10px] font-bold uppercase text-slate-500">
+                        {file.name.split('.').pop()?.slice(0, 3) || 'FILE'}
                       </div>
-                      <div className="text-xs font-semibold text-slate-500">
-                        {formatBytes(file.size)}
+                      <div className="min-w-0">
+                        <div className="truncate text-sm font-medium text-slate-900">{file.name}</div>
+                        <div className="text-xs text-slate-500">{formatBytes(file.size)}</div>
                       </div>
                     </div>
-
-                    <div className="inline-flex items-center gap-1 rounded-full bg-emerald-50 px-2.5 py-1 text-[11px] font-bold uppercase  text-emerald-700">
-                      <IconCheck size={12} stroke={2.2} />
+                    <div className="inline-flex shrink-0 items-center gap-1 text-[11px] font-bold text-emerald-600">
+                      <IconCheck size={13} stroke={2.5} />
                       <span>{isRTL ? 'مرفق' : 'Attached'}</span>
                     </div>
-                  </div>
+                  </li>
                 ))}
 
                 {newFiles.map((file, index) => (
-                  <div
+                  <li
                     key={`new-${file.name}-${index}`}
-                    className="flex items-center justify-between gap-3 rounded-2xl border border-white/40 bg-white/80 px-4 py-3"
+                    className="flex items-center justify-between gap-3 rounded-xl bg-slate-50 px-4 py-3"
                   >
-                    <div className="min-w-0">
-                      <div className="truncate text-sm font-semibold text-slate-900">
-                        {file.name}
+                    <div className="flex items-center gap-3 min-w-0">
+                      <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border border-slate-200 bg-white text-[10px] font-bold uppercase text-slate-500">
+                        {file.name.split('.').pop()?.slice(0, 3) || 'FILE'}
                       </div>
-                      <div className="text-xs font-semibold text-slate-500">
-                        {formatBytes(file.size)}
+                      <div className="min-w-0">
+                        <div className="truncate text-sm font-medium text-slate-900">{file.name}</div>
+                        <div className="text-xs text-slate-500">{formatBytes(file.size)}</div>
                       </div>
                     </div>
-
                     <button
                       type="button"
                       onClick={() =>
@@ -372,16 +383,14 @@ export default function ProjectDescriptionQuestion({
                           current.filter((_, fileIndex) => fileIndex !== index)
                         )
                       }
-                      className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-slate-200 bg-white text-slate-700 hover:bg-slate-50"
+                      className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-slate-200 bg-white text-slate-500 hover:bg-slate-100"
                       aria-label={isRTL ? 'إزالة الملف' : 'Remove file'}
                     >
-                      <IconTrash size={16} stroke={1.9} />
+                      <IconTrash size={15} stroke={1.9} />
                     </button>
-                  </div>
+                  </li>
                 ))}
-              </div>
-            ) : (
-              <div></div>
+              </ul>
             )}
           </div>
         </div>
@@ -394,7 +403,7 @@ export default function ProjectDescriptionQuestion({
       </div>
 
       <div className="fixed bottom-0 left-0 right-0 lg:static border-t rounded-lg border-slate-200/70 bg-white/80 backdrop-blur-md lg:border-t-0 lg:bg-transparent lg:backdrop-blur-0">
-        <div className="mx-auto px-4 lg:px-0 w-full max-w-4xl pt-4 pb-[calc(env(safe-area-inset-bottom)+1rem)]">
+        <div className="mx-auto px-4 lg:px-0 w-full pt-4 pb-[calc(env(safe-area-inset-bottom)+1rem)]">
           <div className=" lg:mt-8 flex  items-center justify-between gap-3">
             <Link
               href={nav.backHref}
@@ -408,8 +417,8 @@ export default function ProjectDescriptionQuestion({
               onClick={() => void onContinue()}
               disabled={!canContinue}
               className={`btn-sm px-6 py-2 rounded-full ${canContinue
-                  ? 'text-white bg-[#1C7CBB] hover:bg-opacity-90'
-                  : 'text-slate-500 bg-slate-200 cursor-not-allowed'
+                ? 'text-white bg-[#1C7CBB] hover:bg-opacity-90'
+                : 'text-slate-500 bg-slate-200 cursor-not-allowed'
                 }`}
             >
               {submitting

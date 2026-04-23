@@ -2,12 +2,14 @@ import Footer from '@/components/ui/footer'
 import Breadcrumb from '@/components/ui/breadcrumb'
 import Image from 'next/image'
 import { Metadata } from 'next'
+import { redirect } from 'next/navigation'
 import { fetchBreadcrumb } from '@/utils/breadcrumb'
 import KnowledgeGrid from './KnowledgeGrid'
 import StatisticsCards from '@/components/industry/statistics-cards'
 import Stripes from "@/public/images/stripes-dark.svg";
 import { getMessages } from '@/utils/get-messages'
 import { getApiUrl } from '@/app/config'
+import { postJsonWithRetry } from '@/app/lib/server-api'
 import { TopicDetails } from '@/hooks/industries/types'
 import { generateTopicStructuredData } from '@/utils/seo'
 
@@ -25,23 +27,8 @@ interface Props {
 
 async function fetchTopicData(id: string, slug: string, locale: string = 'en') {
   const apiUrl = getApiUrl(`/api/platform/industries/topics/${id}/${slug}`)
-  
-  const response = await fetch(apiUrl, {
-    method: 'POST',
-    headers: {
-      "Content-Type": "application/json",
-      "Accept": "application/json",
-      "Accept-Language": locale,
-      "X-Timezone": Intl.DateTimeFormat().resolvedOptions().timeZone,
-    }
-  })
 
-  if (!response.ok) {
-    throw new Error(`Failed to fetch topic details: ${response.status}`)
-  }
-  const data = await response.json()
-  console.log('topic data', data);
-  return data
+  return postJsonWithRetry<{ data: TopicDetails }>(apiUrl, { locale })
 }
 
 // Generate metadata for SEO
@@ -76,7 +63,10 @@ export default async function TopicPage({ params }: Props) {
 
   try {
     const { data: topic } = await fetchTopicData(id, slug, locale)
-    const breadcrumbData = await fetchBreadcrumb('topic', parseInt(id), locale)
+    if (topic.slug && topic.slug !== slug) {
+      redirect(`/${locale}/topic/${id}/${topic.slug}`)
+    }
+    const breadcrumbData = await fetchBreadcrumb('topic', parseInt(id), locale).catch(() => [])
     const breadcrumbItems = breadcrumbData.map(item => ({
       label: item.label,
       href: item.url

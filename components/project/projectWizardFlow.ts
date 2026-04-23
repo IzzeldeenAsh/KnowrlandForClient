@@ -58,18 +58,6 @@ export function readServiceComponentSlugs(locale: WizardLocale): string[] {
   }
 }
 
-function readScopeHasChildren(locale: WizardLocale): boolean {
-  if (typeof window === 'undefined') return false
-  try {
-    const raw = window.sessionStorage.getItem(
-      projectWizardStorage.serviceScopeHasChildrenKey(locale)
-    )
-    return raw === '1' || raw === 'true'
-  } catch {
-    return false
-  }
-}
-
 function readPreferredInsighterType(
   locale: WizardLocale
 ): 'Individual' | 'Company' | 'Either' | null {

@@ -18,11 +18,11 @@ type ProjectPropertiesNumericRangeQuestionProps = {
   subtitle?: string
   minLabel: string
   maxLabel: string
-  minPlaceholder: string
-  maxPlaceholder: string
+  minPlaceholder?: string
+  maxPlaceholder?: string
   minStorageKey: string
   maxStorageKey: string
-  emptyErrorText: string
+  emptyErrorText?: string
   invalidRangeText: string
   saveErrorText: string
   sliderMin: number
@@ -53,7 +53,6 @@ export default function ProjectPropertiesNumericRangeQuestion({
   locale,
   title,
   titleId,
-  subtitle,
   minLabel,
   maxLabel,
   minStorageKey,

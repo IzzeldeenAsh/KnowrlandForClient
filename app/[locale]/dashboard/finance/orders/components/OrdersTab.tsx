@@ -143,7 +143,7 @@ export default function OrdersTab() {
   const [error, setError] = useState<string>('');
 
   const [perPage, setPerPage] = useState<number>(10);
-  const [completionFilter, setCompletionFilter] = useState<CompletionFilter>('complete');
+  const [completionFilter, setCompletionFilter] = useState<CompletionFilter>('all');
   const [searchInput, setSearchInput] = useState<string>('');
   const [searchQuery, setSearchQuery] = useState<string>('');
 

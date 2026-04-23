@@ -94,9 +94,9 @@ export default function ProjectAddonsIntroStep({
       className="w-full max-w-6xl mx-auto min-h-full flex flex-col"
       dir={isRTL ? 'rtl' : 'ltr'}
     >
-      <div className="flex-1 flex items-center justify-center pb-28">
+      <div className="flex-1 flex items-center justify-center pb-2">
         <div
-         
+
         >
           <div className="mx-auto max-w-4xl text-center">
 
@@ -127,14 +127,13 @@ export default function ProjectAddonsIntroStep({
               {stacked.map((line) => (
                 <div key={line}>{line}</div>
               ))}
-             
+
             </div>
-    <div
-              className={`mx-auto mt-10 w-full max-w-3xl transition-all duration-700 ease-out ${
-                entered
-                  ? 'translate-y-0 opacity-100'
-                  : 'translate-y-6 opacity-0'
-              }`}
+            <div
+              className={`mx-auto mt-10 w-full max-w-3xl transition-all duration-700 ease-out ${entered
+                ? 'translate-y-0 opacity-100'
+                : 'translate-y-6 opacity-0'
+                }`}
             >
               <div className="overflow-hidden ">
                 <img
@@ -155,7 +154,7 @@ export default function ProjectAddonsIntroStep({
               {body}
             </p>
 
-         
+
             {error ? (
               <div className="mx-auto mt-6 max-w-3xl text-sm font-semibold text-rose-700">
                 {error}
@@ -165,9 +164,9 @@ export default function ProjectAddonsIntroStep({
         </div>
       </div>
 
-      <div className="fixed left-0 right-0 z-20 bottom-0 border-t border-slate-200/70 bg-white/80 backdrop-blur-md lg:bottom-10 lg:border-t-0 lg:bg-transparent lg:backdrop-blur-0">
-        <div className="mx-auto w-full max-w-6xl px-4 sm:px-6 lg:px-8 pt-4 pb-[calc(env(safe-area-inset-bottom)+1rem)]">
-          <div className="flex items-center justify-between gap-3">
+      <div className="fixed bottom-0 left-0 right-0 lg:static border-t rounded-lg border-slate-200/70 bg-white/80 backdrop-blur-md lg:border-t-0 lg:bg-transparent lg:backdrop-blur-0">
+        <div className="mx-auto px-4 lg:px-0 w-full pt-4 pb-[calc(env(safe-area-inset-bottom)+1rem)]">
+          <div className=" lg:mt-8 flex  items-center justify-between gap-3">
             <Link
               href={nav.backHref}
               className="btn-sm text-slate-700 bg-white/80 hover:bg-white border border-slate-200"
@@ -180,11 +179,10 @@ export default function ProjectAddonsIntroStep({
                 type="button"
                 onClick={() => void skipKickoffQuestion()}
                 disabled={skipping}
-                className={`btn-sm rounded-full border px-6 py-2 ${
-                  skipping
-                    ? 'cursor-not-allowed border-slate-200 bg-slate-100 text-slate-500'
-                    : 'border-slate-300 bg-white text-slate-700 hover:bg-slate-50'
-                }`}
+                className={`btn-sm rounded-full border px-6 py-2 ${skipping
+                  ? 'cursor-not-allowed border-slate-200 bg-slate-100 text-slate-500'
+                  : 'border-slate-300 bg-white text-slate-700 hover:bg-slate-50'
+                  }`}
               >
                 {skipping
                   ? isRTL
@@ -199,11 +197,10 @@ export default function ProjectAddonsIntroStep({
                 type="button"
                 onClick={goToKickoffQuestion}
                 disabled={skipping}
-                className={`btn-sm rounded-full px-6 py-2 ${
-                  skipping
-                    ? 'cursor-not-allowed bg-slate-200 text-slate-500'
-                    : 'bg-[#1C7CBB] text-white hover:bg-opacity-90'
-                }`}
+                className={`btn-sm rounded-full px-6 py-2 ${skipping
+                  ? 'cursor-not-allowed bg-slate-200 text-slate-500'
+                  : 'bg-[#1C7CBB] text-white hover:bg-opacity-90'
+                  }`}
               >
                 {isRTL ? 'عرض الإضافة' : 'Show the add-on'}
               </button>

@@ -3,12 +3,14 @@ import Breadcrumb from '@/components/ui/breadcrumb'
 import Image from 'next/image'
 import { Metadata } from 'next'
 import Link from 'next/link'
+import { redirect } from 'next/navigation'
 import { fetchBreadcrumb } from '@/utils/breadcrumb'
 import StatisticsCards from '@/components/industry/statistics-cards'
 import TopicCard from '@/components/industry/topic-card'
 import Stripes from "@/public/images/stripes-dark.svg";
 import { getMessages } from '@/utils/get-messages'
 import { getApiUrl } from '@/app/config'
+import { postJsonWithRetry } from '@/app/lib/server-api'
 import { SubIndustryDetails, TopicWithKnowledge } from '@/hooks/industries/types'
 import { generateTopicStructuredData } from '@/utils/seo'
 
@@ -24,24 +26,11 @@ interface Props {
 
 async function fetchSubIndustryData(id: string, slug: string, locale: string = 'en') {
   const apiUrl = getApiUrl(`/api/platform/industries/sub/${id}/${slug}`)
-  
-  const response = await fetch(apiUrl, {
-    method: 'POST',
-    headers: {
-      "Content-Type": "application/json",
-      "Accept": "application/json",
-      "Accept-Language": locale,
-      "X-Timezone": Intl.DateTimeFormat().resolvedOptions().timeZone,
-    },
-    body: JSON.stringify({ top_knowledge: 10 })
+
+  return postJsonWithRetry<{ data: SubIndustryDetails }>(apiUrl, {
+    locale,
+    body: { top_knowledge: 10 },
   })
-
-  if (!response.ok) {
-    throw new Error(`Failed to fetch sub-industry details: ${response.status}`)
-  }
-
-  const data = await response.json();
-  return data
 }
 
 // Generate metadata for SEO
@@ -78,7 +67,10 @@ export default async function SubIndustryPage({ params }: Props) {
 
   try {
     const { data: subIndustry } = await fetchSubIndustryData(id, slug, locale)
-    const breadcrumbData = await fetchBreadcrumb('sub-industry', parseInt(id), locale)
+    if (subIndustry.slug && subIndustry.slug !== slug) {
+      redirect(`/${locale}/sub-industry/${id}/${subIndustry.slug}`)
+    }
+    const breadcrumbData = await fetchBreadcrumb('sub-industry', parseInt(id), locale).catch(() => [])
     const breadcrumbItems = breadcrumbData.map(item => ({
       label: item.label,
       href: item.url

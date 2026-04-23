@@ -4,6 +4,7 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { useEffect, useMemo, useState } from 'react'
 import { CheckBadgeIcon } from '@heroicons/react/24/solid'
+import { ChevronDownIcon } from '@heroicons/react/24/outline'
 import { getApiUrl } from '@/app/config'
 import { getAuthToken } from '@/lib/authToken'
 import {
@@ -45,11 +46,14 @@ type MatchInsighter = {
   company?: MatchCompany | null
 }
 
+type MatchCriteria = Record<string, boolean | undefined>
+
 type MatchedInsighter = {
   insighter: MatchInsighter
   match_score: number
   is_match_all?: boolean
   status?: string | null
+  matches?: MatchCriteria
 }
 
 type MatchApiResponse = {
@@ -588,6 +592,60 @@ function MatchScoreDonut({ score, isRTL }: { score: number; isRTL: boolean }) {
   )
 }
 
+const MATCH_CRITERIA_LABELS: Record<string, { en: string; ar: string }> = {
+  ORIGIN_MATCH: { en: 'Origin', ar: 'البلد' },
+  INDUSTRY_MATCH: { en: 'Industry', ar: 'القطاع' },
+  EXPERIENCE_MATCH: { en: 'Experience', ar: 'الخبرة' },
+  TEAM_SIZE_MATCH: { en: 'Team size', ar: 'حجم الفريق' },
+  INSIGHTER_TYPE_MATCH: { en: 'Insighter type', ar: 'نوع الخبير' },
+}
+
+function MatchCriteriaPanel({
+  matches,
+  isRTL,
+}: {
+  matches: MatchCriteria
+  isRTL: boolean
+}) {
+  const entries = Object.entries(matches).filter(([, value]) => value !== undefined)
+  if (entries.length === 0) return null
+
+  return (
+    <div className={`flex flex-wrap gap-2 ${isRTL ? 'flex-row-reverse' : ''}`}>
+      {entries.map(([key, matched]) => {
+        const label = MATCH_CRITERIA_LABELS[key]
+          ? isRTL
+            ? MATCH_CRITERIA_LABELS[key].ar
+            : MATCH_CRITERIA_LABELS[key].en
+          : key.replace(/_MATCH$/, '').replace(/_/g, ' ').toLowerCase().replace(/\b\w/g, (c) => c.toUpperCase())
+
+        return (
+          <div
+            key={key}
+            className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-[11px] font-semibold ${matched
+              ? 'bg-emerald-50 text-emerald-700 ring-1 ring-emerald-200'
+              : 'bg-slate-100 text-slate-500 ring-1 ring-slate-200'
+              }`}
+          >
+            {matched ? (
+              <svg className="h-3 w-3 shrink-0" viewBox="0 0 12 12" fill="none">
+                <circle cx="6" cy="6" r="6" fill="#22c55e" fillOpacity="0.2" />
+                <path d="M3.5 6l1.75 1.75L8.5 4.5" stroke="#16a34a" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+              </svg>
+            ) : (
+              <svg className="h-3 w-3 shrink-0" viewBox="0 0 12 12" fill="none">
+                <circle cx="6" cy="6" r="6" fill="#94a3b8" fillOpacity="0.2" />
+                <path d="M4 4l4 4M8 4l-4 4" stroke="#94a3b8" strokeWidth="1.5" strokeLinecap="round" />
+              </svg>
+            )}
+            {label}
+          </div>
+        )
+      })}
+    </div>
+  )
+}
+
 function MatchedInsighterCard({
   match,
   locale,
@@ -601,6 +659,8 @@ function MatchedInsighterCard({
   selected: boolean
   onToggleSelected: () => void
 }) {
+  const [isExpanded, setIsExpanded] = useState(false)
+
   const isCompany = isCompanyLikeInsighter(match.insighter.roles)
   const companyName = stringifyValue(match.insighter.company?.legal_name)
   const companyUuid = stringifyValue(match.insighter.company?.uuid)
@@ -612,6 +672,7 @@ function MatchedInsighterCard({
   const insighterHref = getInsighterProfileHref(locale, match.insighter.uuid)
   const companyHref = companyUuid ? getCompanyProfileHref(locale, companyUuid) : ''
   const showVerifiedBadge = Boolean(match.insighter.company?.verified)
+  const hasMatches = match.matches && Object.keys(match.matches).length > 0
 
   return (
     <article
@@ -721,10 +782,37 @@ function MatchedInsighterCard({
               </div>
             </div>
 
-            <MatchScoreDonut score={match.match_score} isRTL={isRTL} />
+            {/* Score + expand button column */}
+            <div className="flex shrink-0 flex-col items-center gap-2">
+              <MatchScoreDonut score={match.match_score} isRTL={isRTL} />
+              {hasMatches ? (
+                <button
+                  type="button"
+                  onClick={(e) => { e.stopPropagation(); setIsExpanded((v) => !v) }}
+                  aria-expanded={isExpanded}
+                  aria-label={isRTL ? 'عرض تفاصيل التطابق' : 'Show match details'}
+                  className="inline-flex items-center gap-1 rounded-full border border-slate-200 bg-white/80 px-2.5 py-1 text-[10px] font-semibold text-slate-500 transition-colors hover:border-slate-300 hover:text-slate-700"
+                >
+                  <ChevronDownIcon
+                    className={`h-3 w-3 transition-transform duration-200 ${isExpanded ? 'rotate-180' : ''}`}
+                  />
+                  {isRTL ? 'التفاصيل' : 'Details'}
+                </button>
+              ) : null}
+            </div>
           </div>
         </div>
       </div>
+
+      {/* Expanded match criteria panel */}
+      {hasMatches && isExpanded ? (
+        <div className={`border-t border-slate-100/70 px-4 py-3 sm:px-5 ${isRTL ? 'text-right' : ''}`}>
+          <p className="mb-2.5 text-[10px] font-semibold uppercase tracking-wide text-slate-400">
+            {isRTL ? 'معايير التطابق' : 'Match criteria'}
+          </p>
+          <MatchCriteriaPanel matches={match.matches!} isRTL={isRTL} />
+        </div>
+      ) : null}
     </article>
   )
 }
@@ -940,7 +1028,7 @@ export default function ProjectMatchesStep({
             >
               {stepTitle}
             </h2>
-            <p className="mt-2 max-w-2xl text-sm text-slate-500">
+            <p className="mt-2 max-w-2xl text-sm text-slate-500 pb-12">
               {stepDescription}
             </p>
           </div>

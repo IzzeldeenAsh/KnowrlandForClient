@@ -3,6 +3,7 @@ import Breadcrumb from '@/components/ui/breadcrumb'
 import Image from 'next/image'
 import { Metadata } from 'next'
 import Link from 'next/link'
+import { redirect } from 'next/navigation'
 import { fetchBreadcrumb } from '@/utils/breadcrumb'
 import StatisticsCards from '@/components/industry/statistics-cards'
 import SubIndustryCard from '@/components/industry/sub-industry-card'
@@ -53,6 +54,10 @@ export default async function IndustryPage({ params }: Props) {
       ...data,
       name: industryName,
       children: safeChildren
+    }
+
+    if (industry.slug && industry.slug !== slug) {
+      redirect(`/${locale}/industry/${industryId}/${industry.slug}`)
     }
 
     const rawBreadcrumbItems = await fetchBreadcrumb('industry', industryId, locale).catch(() => [])

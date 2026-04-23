@@ -134,13 +134,12 @@ export default function DeadlineOfferQuestion({
         />
 
         <div
-          className={`mt-2 text-start transition-all duration-700 ${
-            entered
+          className={`mt-2 text-start transition-all duration-700 ${entered
               ? 'opacity-100 translate-x-0'
               : isRTL
                 ? 'opacity-0 translate-x-4'
                 : 'opacity-0 -translate-x-4'
-          }`}
+            }`}
         >
           {isEnglish ? (
             <style>{`
@@ -165,13 +164,12 @@ export default function DeadlineOfferQuestion({
         </div>
 
         <div
-          className={`mt-8 transition-all duration-700 ${
-            entered
+          className={`mt-8 transition-all duration-700 ${entered
               ? 'opacity-100 translate-x-0'
               : isRTL
                 ? 'opacity-0 translate-x-4'
                 : 'opacity-0 -translate-x-4'
-          }`}
+            }`}
           style={{ transitionDelay: '160ms' }}
         >
           <div className="max-w-sm">
@@ -202,9 +200,9 @@ export default function DeadlineOfferQuestion({
         </div>
       </div>
 
-      <div className="border-t border-slate-200/70 bg-white/80 backdrop-blur-md lg:bottom-10 lg:border-t-0 lg:bg-transparent lg:backdrop-blur-0">
-        <div className="mx-auto w-full max-w-6xl px-4 sm:px-0 pt-4 pb-[calc(env(safe-area-inset-bottom)+1rem)]">
-          <div className="flex items-center justify-between gap-3">
+      <div className="fixed bottom-0 left-0 right-0 lg:static border-t rounded-lg border-slate-200/70 bg-white/80 backdrop-blur-md lg:border-t-0 lg:bg-transparent lg:backdrop-blur-0">
+        <div className="mx-auto px-4 lg:px-0 w-full max-w-4xl pt-4 pb-[calc(env(safe-area-inset-bottom)+1rem)]">
+          <div className=" lg:mt-8 flex  items-center justify-between gap-3">
             <Link
               href={nav.backHref}
               className="btn-sm text-slate-700 bg-white/80 hover:bg-white border border-slate-200"
@@ -226,11 +224,10 @@ export default function DeadlineOfferQuestion({
                 type="button"
                 onClick={() => void onContinue()}
                 disabled={submitting || isPastDate}
-                className={`btn-sm px-6 py-2 rounded-full ${
-                  !submitting && !isPastDate
+                className={`btn-sm px-6 py-2 rounded-full ${!submitting && !isPastDate
                     ? 'text-white bg-[#1C7CBB] hover:bg-opacity-90'
                     : 'text-slate-500 bg-slate-200 cursor-not-allowed'
-                }`}
+                  }`}
               >
                 {submitting
                   ? isRTL

@@ -121,7 +121,7 @@ export default function ServiceQuestion({ locale }: { locale: WizardLocale }) {
       setLoading(true)
       try {
         const res = await fetch(
-          'https://api.insightabusiness.com/api/common/setting/service',
+          getApiUrl('/api/common/setting/service'),
           {
             method: 'GET',
             headers: {

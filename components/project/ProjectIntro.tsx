@@ -4,6 +4,8 @@ import { useEffect } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
 import { useAuth } from '@/hooks/useAuth'
+import { getAngularAppOrigin } from '@/lib/authRedirect'
+import { publicBaseUrl } from '@/app/config'
 import ProjectWizardShell from './ProjectWizardShell'
 import { clearProjectWizardStorage } from './wizardStorage'
 
@@ -36,7 +38,8 @@ export default function ProjectIntro({ locale }: ProjectIntroProps) {
       cta: 'Start',
     }
 
-  const loginUrl = 'https://app.insightabusiness.com/auth/login?returnUrl=http:%2F%2Flocalhost:3000%2Fen%2Fproject'
+  const returnUrl = encodeURIComponent(`${publicBaseUrl}/${locale}/project`)
+  const loginUrl = `${getAngularAppOrigin()}/auth/login?returnUrl=${returnUrl}`
   const shouldShowLoginCta = !isLoading && !isLoggedIn
   const ctaHref = shouldShowLoginCta ? loginUrl : `/${locale}/project/wizard/project-type`
   const ctaLabel = shouldShowLoginCta ? 'Login to Start' : copy.cta

@@ -2,6 +2,7 @@ import 'server-only'
 import type { Metadata } from 'next'
 import { getApiUrl } from '@/app/config'
 import type { IndustryChild, IndustryDetails } from '@/hooks/industries/types'
+import { postJsonWithRetry } from '@/app/lib/server-api'
 
 export type IndustryDetailsApiResponse = {
   data: IndustryDetails
@@ -9,7 +10,46 @@ export type IndustryDetailsApiResponse = {
 
 type FetchIndustryDetailsOptions = {
   topTopic?: number
-  revalidateSeconds?: number
+  topSubIndustry?: number
+}
+
+type IndustryListApiResponse = {
+  data: IndustryDetails[]
+}
+
+async function fetchIndustryDetailsBySlug(
+  id: string | number,
+  slug: string,
+  locale: string,
+  topTopic: number
+): Promise<IndustryDetailsApiResponse> {
+  const apiUrl = getApiUrl(`/api/platform/industries/${id}/${slug}`)
+
+  return postJsonWithRetry<IndustryDetailsApiResponse>(apiUrl, {
+    locale,
+    body: { top_topic: topTopic },
+  })
+}
+
+async function fetchIndustryDetailsById(
+  id: string | number,
+  locale: string,
+  topSubIndustry: number
+): Promise<IndustryDetailsApiResponse> {
+  const apiUrl = getApiUrl('/api/platform/industries')
+  const response = await postJsonWithRetry<IndustryListApiResponse>(apiUrl, {
+    locale,
+    body: { top_sub_industry: topSubIndustry },
+  })
+
+  const numericId = typeof id === 'number' ? id : Number.parseInt(id, 10)
+  const industry = response.data?.find((item) => item.id === numericId)
+
+  if (!industry) {
+    throw new Error(`Industry ${id} not found`)
+  }
+
+  return { data: industry }
 }
 
 export async function fetchIndustryDetails(
@@ -18,27 +58,20 @@ export async function fetchIndustryDetails(
   locale: string = 'en',
   options: FetchIndustryDetailsOptions = {}
 ): Promise<IndustryDetailsApiResponse> {
-  const { topTopic = 2, revalidateSeconds = 3600 } = options
+  const { topTopic = 2, topSubIndustry = 20 } = options
 
-  const apiUrl = getApiUrl(`/api/platform/industries/${id}/${slug}`)
+  try {
+    return await fetchIndustryDetailsBySlug(id, slug, locale, topTopic)
+  } catch (error) {
+    console.warn('Industry slug fetch failed, falling back to ID lookup:', {
+      id,
+      slug,
+      locale,
+      error: error instanceof Error ? error.message : error,
+    })
 
-  const response = await fetch(apiUrl, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      Accept: 'application/json',
-      'Accept-Language': locale,
-      'X-Timezone': Intl.DateTimeFormat().resolvedOptions().timeZone,
-    },
-    body: JSON.stringify({ top_topic: topTopic })
-  })
-
-  if (!response.ok) {
-    throw new Error(`Failed to fetch industry details: ${response.status}`)
+    return fetchIndustryDetailsById(id, locale, topSubIndustry)
   }
-
-
-  return response.json()
 }
 
 export function buildIndustryMetadata(industry: IndustryDetails): Metadata {
@@ -76,4 +109,3 @@ export async function getIndustryMetadata(
     }
   }
 }
-
