@@ -78,7 +78,6 @@ export type ProjectPropertiesPayload = {
   insighter_max_years_experience: string
   company_min_team_size: string
   company_max_team_size: string
-  deadline_offer: string
   deadline: string
 }
 
@@ -128,7 +127,6 @@ export function buildProjectPropertiesPayload(
       preferredInsighterType === 'company'
         ? readStorageValue(locale, projectWizardStorage.companyMaxTeamSizeKey(locale)).trim()
         : '',
-    deadline_offer: readStorageValue(locale, projectWizardStorage.deadlineOfferKey(locale)).trim(),
     deadline: readStorageValue(locale, projectWizardStorage.deadlineKey(locale)).trim(),
   }
 }

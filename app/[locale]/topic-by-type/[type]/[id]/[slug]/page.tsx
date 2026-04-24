@@ -9,7 +9,7 @@ import { use, useEffect } from 'react';
 import styles from './topic-by-type.module.css';
 import { safeAOSInit } from '@/components/aos-provider';
 import { useTopicsByType } from '@/hooks/industries/useTopicsByType';
-import KnowledgeGrid from '../../../../topic/[id]/[slug]/KnowledgeGrid';
+import KnowledgeGrid from '@/app/[locale]/topic/[id]/[slug]/KnowledgeGrid';
 
 const validTypes: IndustryType[] = ['report', 'insight', 'data', 'manual', 'course', 'statistic'];
 

@@ -2,6 +2,7 @@
 import { useState, useEffect } from 'react';
 import { IndustryType } from './types';
 import { useLocale } from 'next-intl';
+import { getApiUrl } from '@/app/config';
 interface StatisticItem {
   type: IndustryType;
   count: number;
@@ -19,7 +20,7 @@ export function useTopicStatistic(topicId: number) {
     const fetchStatistics = async () => {
       try {
         setIsLoading(true);
-        const response = await fetch(`https://api.insightabusiness.com/api/platform/industries/statistic/topic/${topicId}`, {
+        const response = await fetch(getApiUrl(`/api/platform/industries/statistic/topic/${topicId}`), {
           headers: {
             "Content-Type": "application/json",
             "Accept": "application/json",

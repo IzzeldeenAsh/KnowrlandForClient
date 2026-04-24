@@ -2,6 +2,7 @@
 import { useState, useEffect } from 'react';
 import { IndustryType } from './types';
 import { useLocale } from 'next-intl';
+import { getApiUrl } from '@/app/config';
 interface StatisticItem {
   type: IndustryType;
   count: number;
@@ -20,7 +21,7 @@ export function useSubIndustryStatistic(subIndustryId: number) {
     const fetchStatistics = async () => {
       try {
         setIsLoading(true);
-        const response = await fetch(`https://api.insightabusiness.com/api/platform/industries/statistic/industry/sub/${subIndustryId}`, {
+        const response = await fetch(getApiUrl(`/api/platform/industries/statistic/industry/sub/${subIndustryId}`), {
           headers: {
             "Content-Type": "application/json",
             "Accept": "application/json",

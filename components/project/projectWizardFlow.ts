@@ -102,12 +102,12 @@ export function getProjectWizardStepOrder(locale: WizardLocale): string[] {
     projectWizardStepIds.preferredInsighterType,
     projectWizardStepIds.insighterOrigin,
     ...postOriginSteps,
-    projectWizardStepIds.deadlineOffer,
     projectWizardStepIds.projectDeadline,
     projectWizardStepIds.projectDescription,
     projectWizardStepIds.addonsIntro,
     ...(skipKickoffMeeting ? [] : [projectWizardStepIds.kickoffMeeting]),
     projectWizardStepIds.projectReview,
     projectWizardStepIds.projectMatches,
+    projectWizardStepIds.deadlineOffer,
   ]
 }

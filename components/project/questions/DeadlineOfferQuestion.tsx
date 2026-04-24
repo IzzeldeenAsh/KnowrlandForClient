@@ -4,7 +4,10 @@ import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { getProjectApiErrorMessage } from '@/components/project/projectApiError'
-import { syncProjectProperties } from '@/components/project/projectPropertiesSync'
+import {
+  readStoredSelectedMatchIds,
+  submitProjectProposal,
+} from '@/components/project/projectProposalSubmit'
 import { useProjectStepErrorToast } from '@/components/project/useProjectStepErrorToast'
 import ProjectSelectedTypeHeader from '../ProjectSelectedTypeHeader'
 import { useProjectWizardNavigation } from '../useProjectWizardNavigation'
@@ -32,6 +35,7 @@ export default function DeadlineOfferQuestion({
   const [entered, setEntered] = useState(false)
   const [projectType, setProjectType] = useState<string | null>(null)
   const [dateValue, setDateValue] = useState('')
+  const [selectedMatchesCount, setSelectedMatchesCount] = useState(0)
   const [submitting, setSubmitting] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
@@ -53,28 +57,33 @@ export default function DeadlineOfferQuestion({
       )
       const stored = window.sessionStorage.getItem(storageKey)
       if (stored) setDateValue(stored)
+      setSelectedMatchesCount(readStoredSelectedMatchIds(locale).length)
     } catch {
       // ignore
     }
   }, [locale, storageKey])
 
-  const finishSync = async () => {
+  const submitProposal = async () => {
     setSubmitting(true)
     setError(null)
 
     try {
-      await syncProjectProperties(locale)
-      if (nav.nextHref) {
-        nav.goNext()
-        return
-      }
+      await submitProjectProposal(locale)
       router.push(`/${locale}/project`)
     } catch (err) {
+      const message =
+        err instanceof Error && err.message === 'no_matches'
+          ? isRTL
+            ? 'يرجى اختيار خبير واحد على الأقل قبل إرسال الطلب.'
+            : 'Please select at least one matched insighter before submitting.'
+          : getProjectApiErrorMessage(
+              err,
+              isRTL ? 'تعذر إرسال الطلب.' : 'Failed to submit project proposal.'
+            )
+
+      setSelectedMatchesCount(readStoredSelectedMatchIds(locale).length)
       setError(
-        getProjectApiErrorMessage(
-          err,
-          isRTL ? 'تعذر حفظ خصائص المشروع.' : 'Failed to save project properties.'
-        )
+        message
       )
     } finally {
       setSubmitting(false)
@@ -99,7 +108,7 @@ export default function DeadlineOfferQuestion({
       // ignore
     }
 
-    await finishSync()
+    await submitProposal()
   }
 
   const onSkip = async () => {
@@ -111,7 +120,7 @@ export default function DeadlineOfferQuestion({
       // ignore
     }
 
-    await finishSync()
+    await submitProposal()
   }
 
   const validationError = isPastDate
@@ -161,6 +170,13 @@ export default function DeadlineOfferQuestion({
               ? 'إذا لم يتم التعاقد قبل هذا التاريخ، سيتم إزالة العرض تلقائيًا.'
               : 'If no contract is made by this date, the offer will be automatically removed.'}
           </p>
+          {selectedMatchesCount > 0 ? (
+            <p className="mt-2 text-sm text-slate-500">
+              {isRTL
+                ? `سيتم إرسال ${selectedMatchesCount} من الخبراء/الجهات المختارة مع هذا العرض.`
+                : `${selectedMatchesCount} selected match${selectedMatchesCount === 1 ? '' : 'es'} will be submitted with this offer.`}
+            </p>
+          ) : null}
         </div>
 
         <div
@@ -231,11 +247,11 @@ export default function DeadlineOfferQuestion({
               >
                 {submitting
                   ? isRTL
-                    ? 'جاري الحفظ...'
-                    : 'Saving...'
+                    ? 'جاري الإرسال...'
+                    : 'Submitting...'
                   : isRTL
-                    ? 'متابعة'
-                    : 'Continue'}
+                    ? 'إرسال الطلب'
+                    : 'Submit proposal'}
               </button>
             </div>
           </div>

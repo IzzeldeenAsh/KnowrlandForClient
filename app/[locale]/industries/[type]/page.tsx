@@ -1,62 +1,49 @@
 'use client';
 
 import { useIndustriesByType, IndustryType, Industry } from '@/hooks/industries';
-import { Container, Text, Skeleton } from '@mantine/core';
+import { Text, Skeleton } from '@mantine/core';
 import Footer from '@/components/ui/footer';
 import Link from 'next/link';
 import Image from 'next/image';
 import { notFound, useParams } from 'next/navigation';
-import { use, useEffect, useRef } from 'react';
+import { useEffect, useRef } from 'react';
 import styles from './industries.module.css';
 import IndustryIcon from "@/components/icons/industry-icon";
 import { safeAOSInit } from '@/components/aos-provider';
 import Stripes from "@/public/images/stripes-dark.svg";
 import EmptyStateIllustration from './47718912_9169251.svg';
-
-interface Topic {
-  id: number;
-  name: string;
-  slug: string;
-}
-
+import { useMessages } from '@/hooks/useMessages';
 
 const validTypes: IndustryType[] = ['report', 'insight', 'data', 'manual', 'course', 'statistic'];
 
-interface Props {
-  params: Promise<{
-    type: string;
-  }>;
-}
+const translationKeys: { [key in IndustryType]: string } = {
+  report: 'reports',
+  insight: 'insights',
+  data: 'data',
+  manual: 'manuals',
+  course: 'courses',
+  statistic: 'statistics',
+};
+
+const arabicFallbackLabels: { [key in IndustryType]: string } = {
+  report: 'تقارير',
+  insight: 'رؤى',
+  data: 'بيانات',
+  manual: 'أدلة',
+  course: 'دورات',
+  statistic: 'إحصائيات',
+};
 
 function capitalizeFirstLetter(string: string) {
   return string.charAt(0).toUpperCase() + string.slice(1);
 }
 
-export default function IndustriesByTypePage({ params }: Props) {
-  const resolvedParams = use(params);
-  const type = resolvedParams.type as IndustryType;
+export default function IndustriesByTypePage() {
   const routeParams = useParams();
-  const locale = routeParams.locale as string || 'en';
+  const type = routeParams.type as IndustryType;
+  const locale = (routeParams.locale as string) || 'en';
   const isRTL = locale === 'ar';
-  const messages = require(`@/messages/${locale}.json`);
-
-  const translationKeys: { [key in IndustryType]: string } = {
-    report: 'reports',
-    insight: 'insights',
-    data: 'data',
-    manual: 'manuals',
-    course: 'courses',
-    statistic: 'statistics',
-  };
-
-  const arabicFallbackLabels: { [key in IndustryType]: string } = {
-    report: 'تقارير',
-    insight: 'رؤى',
-    data: 'بيانات',
-    manual: 'أدلة',
-    course: 'دورات',
-    statistic: 'إحصائيات',
-  };
+  const { messages } = useMessages();
 
   useEffect(() => {
     safeAOSInit({
@@ -102,9 +89,9 @@ export default function IndustriesByTypePage({ params }: Props) {
   if (error) {
     return (
       <div className="flex flex-col min-h-screen bg-white dark:bg-slate-900">
-        <Container className={styles.container}>
+        <div className="flex-1 flex items-center justify-center px-4">
           <Text color="red">{error}</Text>
-        </Container>
+        </div>
         <Footer />
       </div>
     );

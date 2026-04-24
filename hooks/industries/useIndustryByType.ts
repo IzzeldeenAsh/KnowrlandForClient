@@ -187,24 +187,6 @@ export function useIndustryByType({ type, id, slug, topTopic = 2 }: UseIndustryB
     loadIndustry();
   }, [type, id, slug, topTopic, locale, cacheKey]);
 
-     // Sync with cache updates from other components
-   useEffect(() => {
-     const checkCacheUpdates = () => {
-       const cacheEntry = industryByTypeCache[cacheKey];
-       if (cacheEntry) {
-         if (cacheEntry.data !== data) {
-           setData(cacheEntry.data);
-         }
-         if (cacheEntry.error !== error) {
-           setError(cacheEntry.error);
-         }
-       }
-     };
-
-     const interval = setInterval(checkCacheUpdates, 1000);
-     return () => clearInterval(interval);
-   }, [cacheKey, data, error]);
-
   return {
     industry: data?.data,
     isLoading,

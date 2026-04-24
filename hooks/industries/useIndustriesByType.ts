@@ -2,6 +2,7 @@
 import { useState, useEffect } from 'react';
 import { Industry, IndustryType } from './types';
 import { useLocale } from 'next-intl';
+import { getApiUrl } from '@/app/config';
 
 interface UseIndustriesByTypeProps {
   type: IndustryType;
@@ -20,7 +21,7 @@ export function useIndustriesByType({ type, topSubIndustry = 2 }: UseIndustriesB
         setIsLoading(true);
         setError(null);
         
-        const res = await fetch(`https://api.insightabusiness.com/api/platform/industries/type/${type}`, {
+        const res = await fetch(getApiUrl(`/api/platform/industries/type/${type}`), {
           method: "POST",
           headers: {
             "Content-Type": "application/json",

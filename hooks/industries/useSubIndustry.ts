@@ -2,6 +2,7 @@
 import { useState, useEffect } from 'react';
 import { Industry, IndustryType } from './types';
 import { useLocale } from 'next-intl';
+import { getApiUrl } from '@/app/config';
 
 interface UseSubIndustryProps {
   type: IndustryType;
@@ -43,7 +44,7 @@ async function fetchSubIndustryFromAPI(
   locale: string
 ): Promise<SubIndustryResponse> {
   const response = await fetch(
-    `https://api.insightabusiness.com/api/platform/industries/type/sub/${type}/${id}/${slug}`,
+    getApiUrl(`/api/platform/industries/type/sub/${type}/${id}/${slug}`),
     {
       method: 'POST',
       headers: {
@@ -165,24 +166,6 @@ export function useSubIndustry({ type, id, slug, topTopic = 2 }: UseSubIndustryP
 
     loadSubIndustry();
   }, [type, id, slug, topTopic, locale, cacheKey]);
-
-  // Sync with cache updates from other components
-  useEffect(() => {
-    const checkCacheUpdates = () => {
-      const cacheEntry = subIndustryCache[cacheKey];
-      if (cacheEntry) {
-        if (cacheEntry.data !== data) {
-          setData(cacheEntry.data);
-        }
-        if (cacheEntry.error !== error) {
-          setError(cacheEntry.error);
-        }
-      }
-    };
-
-    const interval = setInterval(checkCacheUpdates, 1000);
-    return () => clearInterval(interval);
-  }, [cacheKey, data, error]);
 
   return {
     subIndustry: data?.data,

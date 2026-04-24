@@ -11,6 +11,10 @@ import {
   assertProjectApiResponse,
   getProjectApiErrorMessage,
 } from '@/components/project/projectApiError'
+import {
+  readStoredSelectedMatchIds,
+  writeStoredSelectedMatchIds,
+} from '@/components/project/projectProposalSubmit'
 import { readStoredProjectRequestUuid } from '@/components/project/projectRequestUuid'
 import { useProjectStepErrorToast } from '../useProjectStepErrorToast'
 import { useProjectWizardNavigation } from '../useProjectWizardNavigation'
@@ -869,6 +873,7 @@ export default function ProjectMatchesStep({
 
     setProjectUuid(nextProjectUuid || null)
     setPreferredMatchType(preferredType)
+    setSelectedMatchIds(readStoredSelectedMatchIds(locale))
     setIsInitialized(true)
   }, [locale])
 
@@ -890,6 +895,7 @@ export default function ProjectMatchesStep({
       setMatchPhase('empty')
       setMatchedInsighters([])
       setSelectedMatchIds([])
+      writeStoredSelectedMatchIds(locale, [])
       return
     }
 
@@ -899,7 +905,6 @@ export default function ProjectMatchesStep({
     setError(null)
     setMatchPhase('loader')
     setMatchedInsighters([])
-    setSelectedMatchIds([])
     setLoaderActiveIndex(0)
 
     const timeout = window.setTimeout(() => {
@@ -918,6 +923,11 @@ export default function ProjectMatchesStep({
           )
 
           setMatchedInsighters(filteredMatches)
+          setSelectedMatchIds((currentIds) =>
+            currentIds.filter((id) =>
+              filteredMatches.some((match) => match.insighter.uuid === id)
+            )
+          )
           setMatchPhase(filteredMatches.length > 0 ? 'ready' : 'empty')
         } catch (fetchError) {
           if (cancelled) return
@@ -952,7 +962,10 @@ export default function ProjectMatchesStep({
   }
 
   const handleSubmitSelectedMatches = () => {
-    console.log('Selected matched insighters:', selectedMatches)
+    if (!canSubmitMatches) return
+
+    writeStoredSelectedMatchIds(locale, selectedMatchIds)
+    nav.goNext()
   }
 
   const canSubmitMatches = matchPhase === 'ready' && selectedMatches.length > 0
@@ -1115,8 +1128,8 @@ export default function ProjectMatchesStep({
                   ? 'جاري البحث...'
                   : 'Searching...'
                 : isRTL
-                  ? 'إرسال المختارات'
-                  : 'Submit selection'}
+                  ? 'متابعة'
+                  : 'Continue'}
             </button>
           </div>
         </div>

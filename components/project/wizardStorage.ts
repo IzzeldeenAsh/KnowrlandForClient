@@ -107,6 +107,9 @@ export const projectWizardStorage = {
   deadlineOfferKey(locale: WizardLocale) {
     return `project:wizard:${locale}:deadlineOffer`
   },
+  selectedMatchIdsKey(locale: WizardLocale) {
+    return `project:wizard:${locale}:selectedMatchIds`
+  },
   deadlineKey(locale: WizardLocale) {
     return `project:wizard:${locale}:deadline`
   },

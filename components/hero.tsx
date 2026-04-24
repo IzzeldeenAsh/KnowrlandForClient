@@ -75,7 +75,7 @@ export default function Hero() {
   const t = useTranslations('Hero');
   const router = useRouter();
   const pathname = usePathname();
-  const currentLocale = pathname.split('/')[1];
+  const currentLocale = pathname?.split('/')[1];
   const [searchInput, setSearchInput] = useState('');
   const [suggestions, setSuggestions] = useState<string[]>([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
@@ -398,7 +398,7 @@ export default function Hero() {
                 </div> */}
 
                 {/* Start a Project button */}
-                {/* <div className="mt-3 flex justify-center">
+           {/* <div className="mt-3 flex justify-center">
                   <a
                     ref={projectButtonRef}
                     onMouseMove={handleProjectButtonMove}
@@ -498,7 +498,7 @@ export default function Hero() {
                       </span>
                     </span>
                   </a>
-                </div> */}
+                </div>  */}
               </div>
             </div>
           </div>

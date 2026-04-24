@@ -2,6 +2,7 @@
 import { useState, useEffect } from 'react';
 import { IndustryType } from './types';
 import { useLocale } from 'next-intl';
+import { getApiUrl } from '@/app/config';
 
 interface Chapter {
   chapter: {
@@ -108,7 +109,7 @@ async function fetchTopicsByTypeFromAPI(
   locale: string
 ): Promise<TopicsByTypeResponse> {
   const response = await fetch(
-    `https://api.insightabusiness.com/api/platform/industries/type/topics/${type}/${id}/${slug}`,
+    getApiUrl(`/api/platform/industries/type/topics/${type}/${id}/${slug}`),
     {
       method: 'POST',
       headers: {
@@ -229,24 +230,6 @@ export function useTopicsByType({ type, id, slug, topKnowledge = 10 }: UseTopics
 
     loadTopics();
   }, [type, id, slug, topKnowledge, locale, cacheKey]);
-
-  // Sync with cache updates from other components
-  useEffect(() => {
-    const checkCacheUpdates = () => {
-      const cacheEntry = topicsByTypeCache[cacheKey];
-      if (cacheEntry) {
-        if (cacheEntry.data !== data) {
-          setData(cacheEntry.data);
-        }
-        if (cacheEntry.error !== error) {
-          setError(cacheEntry.error);
-        }
-      }
-    };
-
-    const interval = setInterval(checkCacheUpdates, 1000);
-    return () => clearInterval(interval);
-  }, [cacheKey, data, error]);
 
   return {
     subIndustry: data?.data,
