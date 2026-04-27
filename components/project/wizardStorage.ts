@@ -110,6 +110,9 @@ export const projectWizardStorage = {
   selectedMatchIdsKey(locale: WizardLocale) {
     return `project:wizard:${locale}:selectedMatchIds`
   },
+  proposalMatchUuidKey(locale: WizardLocale) {
+    return `project:wizard:${locale}:proposalMatchUuid`
+  },
   deadlineKey(locale: WizardLocale) {
     return `project:wizard:${locale}:deadline`
   },

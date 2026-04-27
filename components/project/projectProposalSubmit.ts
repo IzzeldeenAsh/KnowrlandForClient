@@ -1,7 +1,7 @@
 import { getApiUrl } from '@/app/config'
 import { getAuthToken } from '@/lib/authToken'
 import { assertProjectApiResponse } from './projectApiError'
-import { readStoredProjectRequestUuid } from './projectRequestUuid'
+import { readStoredProposalMatchUuid } from './projectProposalMatchUuid'
 import { projectWizardStorage, type WizardLocale } from './wizardStorage'
 
 function readStorageValue(locale: WizardLocale, key: string): string {
@@ -65,8 +65,8 @@ export async function submitProjectProposal(locale: WizardLocale) {
   const token = getAuthToken()
   if (!token) throw new Error('no_token')
 
-  const projectUuid = readStoredProjectRequestUuid(locale)
-  if (!projectUuid) throw new Error('no_project_uuid')
+  const proposalMatchUuid = readStoredProposalMatchUuid(locale)
+  if (!proposalMatchUuid) throw new Error('no_match_request_uuid')
 
   const matches = readStoredSelectedMatchIds(locale)
   if (matches.length === 0) throw new Error('no_matches')
@@ -75,20 +75,23 @@ export async function submitProjectProposal(locale: WizardLocale) {
     readStorageValue(locale, projectWizardStorage.deadlineOfferKey(locale))
   )
 
-  const res = await fetch(getApiUrl(`/api/account/project/proposal/submit/${projectUuid}`), {
-    method: 'POST',
-    headers: {
-      Authorization: `Bearer ${token}`,
-      Accept: 'application/json',
-      'Content-Type': 'application/json',
-      'Accept-Language': locale === 'ar' ? 'ar' : 'en',
-      'X-Timezone': Intl.DateTimeFormat().resolvedOptions().timeZone,
-    },
-    body: JSON.stringify({
-      deadline_offer: deadlineOffer,
-      matches,
-    }),
-  })
+  const res = await fetch(
+    getApiUrl(`/api/account/project/proposal/submit/${proposalMatchUuid}`),
+    {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${token}`,
+        Accept: 'application/json',
+        'Content-Type': 'application/json',
+        'Accept-Language': locale === 'ar' ? 'ar' : 'en',
+        'X-Timezone': Intl.DateTimeFormat().resolvedOptions().timeZone,
+      },
+      body: JSON.stringify({
+        deadline_offer: deadlineOffer,
+        matches,
+      }),
+    }
+  )
 
   await assertProjectApiResponse(res, 'Failed to submit project proposal.')
 }

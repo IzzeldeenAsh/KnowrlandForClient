@@ -15,6 +15,7 @@ import ProjectAddonsIntroStep from '@/components/project/questions/ProjectAddons
 import KickoffMeetingQuestion from '@/components/project/questions/KickoffMeetingQuestion'
 import ProjectReviewStep from '@/components/project/questions/ProjectReviewStep'
 import ProjectMatchesStep from '@/components/project/questions/ProjectMatchesStep'
+import ProjectSubmissionSuccessStep from '@/components/project/questions/ProjectSubmissionSuccessStep'
 import DeliverablesLanguageQuestion from '@/components/project/questions/DeliverablesLanguageQuestion'
 import TargetMarketQuestion from '@/components/project/questions/TargetMarketQuestion'
 import ServiceQuestion from '@/components/project/questions/ServiceQuestion'
@@ -272,6 +273,14 @@ export default async function ProjectWizardStepPage({ params }: PageProps) {
         <div className="w-full pt-2 sm:pt-4">
           <ProjectMatchesStep locale={locale} />
         </div>
+      </ProjectWizardShell>
+    )
+  }
+
+  if (step === 'submission-success') {
+    return (
+      <ProjectWizardShell align="center">
+        <ProjectSubmissionSuccessStep locale={locale} />
       </ProjectWizardShell>
     )
   }

@@ -15,6 +15,10 @@ import {
   readStoredSelectedMatchIds,
   writeStoredSelectedMatchIds,
 } from '@/components/project/projectProposalSubmit'
+import {
+  clearStoredProposalMatchUuid,
+  writeStoredProposalMatchUuid,
+} from '@/components/project/projectProposalMatchUuid'
 import { readStoredProjectRequestUuid } from '@/components/project/projectRequestUuid'
 import { useProjectStepErrorToast } from '../useProjectStepErrorToast'
 import { useProjectWizardNavigation } from '../useProjectWizardNavigation'
@@ -53,15 +57,29 @@ type MatchInsighter = {
 type MatchCriteria = Record<string, boolean | undefined>
 
 type MatchedInsighter = {
+  uuid: string
   insighter: MatchInsighter
   match_score: number
-  is_match_all?: boolean
+  is_match_all_properties?: boolean
   status?: string | null
   matches?: MatchCriteria
 }
 
 type MatchApiResponse = {
-  data?: MatchedInsighter[]
+  data?:
+  | MatchedInsighter[]
+  | {
+    uuid?: string
+    status?: string | null
+    deadline_offer?: string | null
+    total_matches?: number
+    matches?: MatchedInsighter[]
+  }
+}
+
+type MatchFetchResult = {
+  proposalMatchUuid: string
+  matches: MatchedInsighter[]
 }
 
 type LoaderMatchCard = {
@@ -256,7 +274,7 @@ async function fetchMatchedInsighters(
   locale: WizardLocale,
   projectUuid: string,
   signal?: AbortSignal
-): Promise<MatchedInsighter[]> {
+): Promise<MatchFetchResult> {
   const token = getAuthToken()
   if (!token) {
     throw new Error(
@@ -284,7 +302,25 @@ async function fetchMatchedInsighters(
   await assertProjectApiResponse(res)
 
   const json = (await res.json()) as MatchApiResponse
-  return Array.isArray(json.data) ? json.data : []
+
+  if (Array.isArray(json.data)) {
+    return {
+      proposalMatchUuid: '',
+      matches: json.data,
+    }
+  }
+
+  if (json.data && Array.isArray(json.data.matches)) {
+    return {
+      proposalMatchUuid: stringifyValue(json.data.uuid),
+      matches: json.data.matches,
+    }
+  }
+
+  return {
+    proposalMatchUuid: '',
+    matches: [],
+  }
 }
 
 function normalizePreferredInsighterTypeSelection(
@@ -687,7 +723,7 @@ function MatchedInsighterCard({
     >
       <div className="p-4 sm:p-5">
         <div className={`flex items-start gap-3 ${isRTL ? 'flex-row-reverse text-right' : ''}`}>
-          <div className="flex self-center">
+          <div className="flex self-start pt-1">
             <input
               type="checkbox"
               checked={selected}
@@ -775,7 +811,7 @@ function MatchedInsighterCard({
                   target="_blank"
                   rel="noopener noreferrer"
                   onClick={(event) => event.stopPropagation()}
-                  className="mt-2.5 inline-flex items-center gap-1.5 rounded-full border border-slate-200 bg-white px-3 py-1 text-[11px] font-medium text-slate-600 transition-colors hover:border-[#1C7CBB] hover:text-[#1C7CBB]"
+                  className="mt-2.5 hidden items-center gap-1.5 rounded-full border border-slate-200 bg-white px-3 py-1 text-[11px] font-medium text-slate-600 transition-colors hover:border-[#1C7CBB] hover:text-[#1C7CBB] sm:inline-flex"
                 >
                   {isRTL ? 'عرض الملف الشخصي' : 'View profile'}
                   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor" className="h-3 w-3">
@@ -787,7 +823,7 @@ function MatchedInsighterCard({
             </div>
 
             {/* Score + expand button column */}
-            <div className="flex shrink-0 flex-col items-center gap-2">
+            <div className="hidden shrink-0 flex-col items-center gap-2 sm:flex">
               <MatchScoreDonut score={match.match_score} isRTL={isRTL} />
               {hasMatches ? (
                 <button
@@ -804,6 +840,48 @@ function MatchedInsighterCard({
                 </button>
               ) : null}
             </div>
+          </div>
+        </div>
+
+        <div
+          className={`mt-4 flex items-center justify-between gap-3 sm:hidden ${isRTL ? 'flex-row-reverse' : ''}`}
+        >
+          <div className={`flex min-w-0 flex-1 flex-wrap gap-2 ${isRTL ? 'justify-end' : ''}`}>
+            <Link
+              href={insighterHref}
+              target="_blank"
+              rel="noopener noreferrer"
+              onClick={(event) => event.stopPropagation()}
+              className="inline-flex min-h-9 items-center justify-center gap-1.5 rounded-full border border-slate-200 bg-white px-3.5 py-2 text-xs font-medium text-slate-600 transition-colors hover:border-[#1C7CBB] hover:text-[#1C7CBB]"
+            >
+              {isRTL ? 'عرض الملف الشخصي' : 'View profile'}
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor" className="h-3.5 w-3.5">
+                <path fillRule="evenodd" d="M8.914 6.025a.75.75 0 0 1 1.06 0 3.5 3.5 0 0 1 0 4.95l-2 2a3.5 3.5 0 0 1-5.396-4.402.75.75 0 0 1 1.251.827 2 2 0 0 0 3.085 2.514l2-2a2 2 0 0 0 0-2.828.75.75 0 0 1 0-1.06Z" clipRule="evenodd" />
+                <path fillRule="evenodd" d="M7.086 9.975a.75.75 0 0 1-1.06 0 3.5 3.5 0 0 1 0-4.95l2-2a3.5 3.5 0 0 1 5.396 4.402.75.75 0 0 1-1.251-.827 2 2 0 0 0-3.085-2.514l-2 2a2 2 0 0 0 0 2.828.75.75 0 0 1 0 1.06Z" clipRule="evenodd" />
+              </svg>
+            </Link>
+
+            {hasMatches ? (
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.stopPropagation()
+                  setIsExpanded((v) => !v)
+                }}
+                aria-expanded={isExpanded}
+                aria-label={isRTL ? 'عرض تفاصيل التطابق' : 'Show match details'}
+                className="inline-flex min-h-9 items-center gap-1 rounded-full border border-slate-200 bg-white/80 px-3.5 py-2 text-xs font-semibold text-slate-500 transition-colors hover:border-slate-300 hover:text-slate-700"
+              >
+                <ChevronDownIcon
+                  className={`h-3.5 w-3.5 transition-transform duration-200 ${isExpanded ? 'rotate-180' : ''}`}
+                />
+                {isRTL ? 'التفاصيل' : 'Details'}
+              </button>
+            ) : null}
+          </div>
+
+          <div className="shrink-0">
+            <MatchScoreDonut score={match.match_score} isRTL={isRTL} />
           </div>
         </div>
       </div>
@@ -860,8 +938,7 @@ export default function ProjectMatchesStep({
   }, [preferredMatchType])
 
   const selectedMatches = useMemo(
-    () =>
-      matchedInsighters.filter((match) => selectedMatchIds.includes(match.insighter.uuid)),
+    () => matchedInsighters.filter((match) => selectedMatchIds.includes(match.uuid)),
     [matchedInsighters, selectedMatchIds]
   )
 
@@ -895,6 +972,7 @@ export default function ProjectMatchesStep({
       setMatchPhase('empty')
       setMatchedInsighters([])
       setSelectedMatchIds([])
+      clearStoredProposalMatchUuid(locale)
       writeStoredSelectedMatchIds(locale, [])
       return
     }
@@ -906,6 +984,7 @@ export default function ProjectMatchesStep({
     setMatchPhase('loader')
     setMatchedInsighters([])
     setLoaderActiveIndex(0)
+    clearStoredProposalMatchUuid(locale)
 
     const timeout = window.setTimeout(() => {
       const loadMatches = async () => {
@@ -914,8 +993,16 @@ export default function ProjectMatchesStep({
         setMatchPhase('fetching')
 
         try {
-          const matches = await fetchMatchedInsighters(locale, projectUuid, controller.signal)
+          const { matches, proposalMatchUuid } = await fetchMatchedInsighters(
+            locale,
+            projectUuid,
+            controller.signal
+          )
           if (cancelled) return
+
+          if (proposalMatchUuid) {
+            writeStoredProposalMatchUuid(locale, proposalMatchUuid)
+          }
 
           const filteredMatches = filterMatchedInsightersByPreferredType(
             matches,
@@ -923,11 +1010,25 @@ export default function ProjectMatchesStep({
           )
 
           setMatchedInsighters(filteredMatches)
-          setSelectedMatchIds((currentIds) =>
-            currentIds.filter((id) =>
-              filteredMatches.some((match) => match.insighter.uuid === id)
+          setSelectedMatchIds((currentIds) => {
+            const nextIds = Array.from(
+              new Set(
+                currentIds.flatMap((id) => {
+                  const matchedByUuid = filteredMatches.find((match) => match.uuid === id)
+                  if (matchedByUuid) return matchedByUuid.uuid
+
+                  // Preserve selections stored before the switch to match UUIDs.
+                  const matchedByInsighterUuid = filteredMatches.find(
+                    (match) => match.insighter.uuid === id
+                  )
+                  return matchedByInsighterUuid ? matchedByInsighterUuid.uuid : []
+                })
+              )
             )
-          )
+
+            writeStoredSelectedMatchIds(locale, nextIds)
+            return nextIds
+          })
           setMatchPhase(filteredMatches.length > 0 ? 'ready' : 'empty')
         } catch (fetchError) {
           if (cancelled) return
@@ -953,11 +1054,11 @@ export default function ProjectMatchesStep({
     }
   }, [isInitialized, isRTL, locale, preferredMatchType, projectUuid])
 
-  const toggleSelectedMatch = (insighterUuid: string) => {
+  const toggleSelectedMatch = (matchUuid: string) => {
     setSelectedMatchIds((currentIds) =>
-      currentIds.includes(insighterUuid)
-        ? currentIds.filter((id) => id !== insighterUuid)
-        : [...currentIds, insighterUuid]
+      currentIds.includes(matchUuid)
+        ? currentIds.filter((id) => id !== matchUuid)
+        : [...currentIds, matchUuid]
     )
   }
 
@@ -1061,12 +1162,12 @@ export default function ProjectMatchesStep({
               <div className="space-y-4 max-w-4xl m-auto">
                 {matchedInsighters.map((match) => (
                   <MatchedInsighterCard
-                    key={match.insighter.uuid}
+                    key={match.uuid}
                     match={match}
                     locale={locale}
                     isRTL={isRTL}
-                    selected={selectedMatchIds.includes(match.insighter.uuid)}
-                    onToggleSelected={() => toggleSelectedMatch(match.insighter.uuid)}
+                    selected={selectedMatchIds.includes(match.uuid)}
+                    onToggleSelected={() => toggleSelectedMatch(match.uuid)}
                   />
                 ))}
               </div>

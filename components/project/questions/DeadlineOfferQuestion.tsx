@@ -9,6 +9,7 @@ import {
   submitProjectProposal,
 } from '@/components/project/projectProposalSubmit'
 import { useProjectStepErrorToast } from '@/components/project/useProjectStepErrorToast'
+import { projectWizardStepIds } from '../projectWizardFlow'
 import ProjectSelectedTypeHeader from '../ProjectSelectedTypeHeader'
 import { useProjectWizardNavigation } from '../useProjectWizardNavigation'
 import { projectWizardStorage, type WizardLocale } from '../wizardStorage'
@@ -19,6 +20,28 @@ function todayString(): string {
   const mm = String(d.getMonth() + 1).padStart(2, '0')
   const dd = String(d.getDate()).padStart(2, '0')
   return `${yyyy}-${mm}-${dd}`
+}
+
+function normalizeProjectType(value: string | null): string | null {
+  if (!value) return null
+  if (value === 'urgent' || value === 'urgent_request') return 'urgent_request'
+  return value
+}
+
+function futureDateString(daysFromNow: number): string {
+  const date = new Date()
+  date.setDate(date.getDate() + daysFromNow)
+
+  const yyyy = date.getFullYear()
+  const mm = String(date.getMonth() + 1).padStart(2, '0')
+  const dd = String(date.getDate()).padStart(2, '0')
+  return `${yyyy}-${mm}-${dd}`
+}
+
+function defaultOfferExpiryDate(projectType: string | null): string {
+  return normalizeProjectType(projectType) === 'urgent_request'
+    ? futureDateString(1)
+    : futureDateString(7)
 }
 
 export default function DeadlineOfferQuestion({
@@ -52,11 +75,12 @@ export default function DeadlineOfferQuestion({
 
   useEffect(() => {
     try {
-      setProjectType(
-        window.sessionStorage.getItem(projectWizardStorage.projectTypeKey(locale))
+      const storedProjectType = window.sessionStorage.getItem(
+        projectWizardStorage.projectTypeKey(locale)
       )
+      setProjectType(storedProjectType)
       const stored = window.sessionStorage.getItem(storageKey)
-      if (stored) setDateValue(stored)
+      setDateValue(stored || defaultOfferExpiryDate(storedProjectType))
       setSelectedMatchesCount(readStoredSelectedMatchIds(locale).length)
     } catch {
       // ignore
@@ -69,13 +93,17 @@ export default function DeadlineOfferQuestion({
 
     try {
       await submitProjectProposal(locale)
-      router.push(`/${locale}/project`)
+      router.push(nav.hrefFor(projectWizardStepIds.projectSubmissionSuccess))
     } catch (err) {
       const message =
         err instanceof Error && err.message === 'no_matches'
           ? isRTL
             ? 'يرجى اختيار خبير واحد على الأقل قبل إرسال الطلب.'
             : 'Please select at least one matched insighter before submitting.'
+          : err instanceof Error && err.message === 'no_match_request_uuid'
+            ? isRTL
+              ? 'تعذر العثور على بيانات المطابقة الخاصة بالإرسال. أعد تحميل نتائج المطابقة ثم حاول مرة أخرى.'
+              : 'The proposal match identifier is missing. Reload the match results and try again.'
           : getProjectApiErrorMessage(
               err,
               isRTL ? 'تعذر إرسال الطلب.' : 'Failed to submit project proposal.'

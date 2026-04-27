@@ -20,6 +20,7 @@ export const projectWizardStepIds = {
   kickoffMeeting: 'kickoff-meeting',
   projectReview: 'project-review',
   projectMatches: 'project-matches',
+  projectSubmissionSuccess: 'submission-success',
 } as const
 
 export type ProjectWizardStepId = string

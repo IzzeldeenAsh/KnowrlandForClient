@@ -429,7 +429,7 @@ async function fetchProjectRequest(
   const token = getAuthToken()
   if (!token) return null
 
-  const res = await fetch(getApiUrl(`/api/account/project/request/${projectUuid}`), {
+  const res = await fetch(getApiUrl(`/api/account/project/show/${projectUuid}`), {
     method: 'GET',
     headers: {
       Authorization: `Bearer ${token}`,
