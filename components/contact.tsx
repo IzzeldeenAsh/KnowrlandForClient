@@ -43,7 +43,7 @@ export default function ContactContent() {
     setErrors({});
     setGeneralError('');
     setSuccess(false);
-    
+
     try {
       const response = await fetch('https://api.insightabusiness.com/api/common/content/contact-us', {
         method: 'POST',
@@ -54,9 +54,9 @@ export default function ContactContent() {
         },
         body: JSON.stringify(formData)
       });
-      
+
       const data = await response.json();
-      
+
       if (!response.ok) {
         if (data.errors) {
           setErrors(data.errors);
@@ -95,11 +95,11 @@ export default function ContactContent() {
 
         {/* Title */}
         <div className="max-w-3xl mx-auto text-center pb-12">
-            <h1
-                className="text-3xl md:text-4xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-slate-200/60 via-slate-200 to-slate-200/60 leading-relaxed"
-            >
-                {t('contactUsTitle')}
-            </h1>
+          <h1
+            className="text-3xl md:text-4xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-slate-200/60 via-slate-200 to-slate-200/60 leading-relaxed"
+          >
+            {t('contactUsTitle')}
+          </h1>
         </div>
 
         <Particles className="absolute inset-0 h-96 -z-10" quantity={8} />

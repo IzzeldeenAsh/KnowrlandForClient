@@ -278,7 +278,7 @@ function ProfilePageContent() {
   const entityParam = searchParams.get("entity");
   const activeTab = searchParams.get("tab") || "knowledge";
   const isViewingInsighterEntity = (enterpriseType ?? entityParam) === "insighter";
-  
+
   // Ref to prevent duplicate API calls
   const fetchingProfileRef = useRef(false);
 
@@ -306,9 +306,9 @@ function ProfilePageContent() {
       if (fetchingProfileRef.current) {
         return;
       }
-      
+
       fetchingProfileRef.current = true;
-      
+
       try {
         const entityType = entityParam;
         setEnterpriseType(entityType);
@@ -595,7 +595,7 @@ function ProfilePageContent() {
     const checkAuth = async () => {
       // Get token from cookies
       const token = typeof window !== "undefined" ? getAuthToken() : null;
-      
+
       // If no token, user is not authenticated
       if (!token) {
         setIsAuthenticated(false);
@@ -739,13 +739,13 @@ function ProfilePageContent() {
     // Update URL with tab parameter
     if (typeof window !== "undefined") {
       const currentParams = new URLSearchParams(window.location.search);
-      
+
       if (value) {
         currentParams.set("tab", value);
       } else {
         currentParams.delete("tab");
       }
-      
+
       const qs = currentParams.toString();
       const newUrl = qs
         ? `${window.location.pathname}?${qs}`
@@ -940,9 +940,8 @@ function ProfilePageContent() {
       label: "all",
       icon: (isActive: boolean) => (
         <svg
-          className={`${styles.icon} ${styles.iconData} ${
-            isActive ? styles.iconActive : ""
-          }`}
+          className={`${styles.icon} ${styles.iconData} ${isActive ? styles.iconActive : ""
+            }`}
           width="15"
           height="15"
           viewBox="0 0 24 24"
@@ -970,9 +969,8 @@ function ProfilePageContent() {
       label: "data",
       icon: (isActive: boolean) => (
         <svg
-          className={`${styles.icon} ${styles.iconData} ${
-            isActive ? styles.iconActive : ""
-          }`}
+          className={`${styles.icon} ${styles.iconData} ${isActive ? styles.iconActive : ""
+            }`}
           width="15"
           height="15"
           viewBox="0 0 30 34"
@@ -1004,9 +1002,8 @@ function ProfilePageContent() {
       label: "statistics",
       icon: (isActive: boolean) => (
         <svg
-          className={`${styles.icon} ${styles.iconInsight} ${
-            isActive ? styles.iconActive : ""
-          }`}
+          className={`${styles.icon} ${styles.iconInsight} ${isActive ? styles.iconActive : ""
+            }`}
           width="15"
           height="15"
           viewBox="0 0 42 42"
@@ -1026,9 +1023,8 @@ function ProfilePageContent() {
       label: "report",
       icon: (isActive: boolean) => (
         <svg
-          className={`${styles.icon} ${styles.iconReport} ${
-            isActive ? styles.iconActive : ""
-          }`}
+          className={`${styles.icon} ${styles.iconReport} ${isActive ? styles.iconActive : ""
+            }`}
           width="15"
           height="15"
           viewBox="0 0 50 50"
@@ -1060,9 +1056,8 @@ function ProfilePageContent() {
       label: "manual",
       icon: (isActive: boolean) => (
         <svg
-          className={`${styles.icon} ${styles.iconManual} ${
-            isActive ? styles.iconActive : ""
-          }`}
+          className={`${styles.icon} ${styles.iconManual} ${isActive ? styles.iconActive : ""
+            }`}
           width="15"
           height="15"
           viewBox="0 0 50 50"
@@ -1094,9 +1089,8 @@ function ProfilePageContent() {
       label: "course",
       icon: (isActive: boolean) => (
         <svg
-          className={`${styles.icon} ${styles.iconCourse} ${
-            isActive ? styles.iconActive : ""
-          }`}
+          className={`${styles.icon} ${styles.iconCourse} ${isActive ? styles.iconActive : ""
+            }`}
           width="15"
           height="15"
           viewBox="0 0 39 36"
@@ -1125,747 +1119,741 @@ function ProfilePageContent() {
   return (
     <CountryGuard>
       <div className="flex flex-col min-h-screen bg-gradient-to-b from-gray-50 to-white dark:from-slate-950 dark:to-slate-900">
-      {/* Toast for displaying API errors */}
-      {showToast && (
-        <div className="fixed top-6 right-6 z-50">
-          <Toast
-            message={toastProps.message}
-            type={toastProps.type}
-            title={toastProps.title}
-            onClose={() => setShowToast(false)}
-          />
+        {/* Toast for displaying API errors */}
+        {showToast && (
+          <div className="fixed top-6 right-6 z-50">
+            <Toast
+              message={toastProps.message}
+              type={toastProps.type}
+              title={toastProps.title}
+              onClose={() => setShowToast(false)}
+            />
+          </div>
+        )}
+        {/* Decorative elements */}
+        <div className="relative z-0 w-full overflow-hidden">
+          <div
+            className="pointer-events-none absolute z-10 -translate-x-1/2 transform hidden md:block"
+            style={{ left: "28%", top: "5%" }}
+            aria-hidden="true"
+          >
+            <Image
+              className="max-w-none opacity-30 dark:opacity-20"
+              src={Stripes}
+              width={768}
+              height={768}
+              style={{ width: "auto", height: "auto" }}
+              alt="Stripes"
+              priority
+            />
+          </div>
+          <div className="absolute top-0 right-0 w-1/3 h-96 bg-gradient-radial from-blue-100/40 to-transparent dark:from-blue-900/10 rounded-full blur-3xl -translate-y-1/4 translate-x-1/4"></div>
+          <div className="absolute bottom-0 left-0 w-1/4 h-64 bg-gradient-radial from-pink-100/30 to-transparent dark:from-pink-900/10 rounded-full blur-3xl translate-y-1/4 -translate-x-1/4"></div>
         </div>
-      )}
-      {/* Decorative elements */}
-      <div className="relative z-0 w-full overflow-hidden">
-        <div
-          className="pointer-events-none absolute z-10 -translate-x-1/2 transform hidden md:block"
-          style={{ left: "28%", top: "5%" }}
-          aria-hidden="true"
-        >
-          <Image
-            className="max-w-none opacity-30 dark:opacity-20"
-            src={Stripes}
-            width={768}
-            height={768}
-            style={{ width: "auto", height: "auto" }}
-            alt="Stripes"
-            priority
-          />
-        </div>
-        <div className="absolute top-0 right-0 w-1/3 h-96 bg-gradient-radial from-blue-100/40 to-transparent dark:from-blue-900/10 rounded-full blur-3xl -translate-y-1/4 translate-x-1/4"></div>
-        <div className="absolute bottom-0 left-0 w-1/4 h-64 bg-gradient-radial from-pink-100/30 to-transparent dark:from-pink-900/10 rounded-full blur-3xl translate-y-1/4 -translate-x-1/4"></div>
-      </div>
 
-      {loading ? (
-        <div className="flex justify-center items-center min-h-[60vh]">
-          <div className="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-blue-500"></div>
-        </div>
-      ) : profileData ? (
-        <div className="w-full z-10" data-aos="fade-up">
-          {/* Profile Header - Card Style */}
-          <div className="bg-white dark:bg-slate-800 overflow-hidden mb-4 pb-10">
-            {/* Banner */}
-            <div className="h-[100px] dark:from-blue-700 dark:to-indigo-800 relative">
-              <div
-                className="pointer-events-none absolute z-10 -translate-x-1/2 transform hidden md:block"
-                style={{ left: "28%" }}
-                aria-hidden="true"
-              >
-                <Image
-                  className="max-w-none opacity-50"
-                  src={Stripes}
-                  width={768}
-                  height={768}
-                  style={{ width: "auto", height: "auto" }}
-                  alt="Stripes"
-                  priority
-                />
+        {loading ? (
+          <div className="flex justify-center items-center min-h-[60vh]">
+            <div className="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-blue-500"></div>
+          </div>
+        ) : profileData ? (
+          <div className="w-full z-10" data-aos="fade-up">
+            {/* Profile Header - Card Style */}
+            <div className="bg-white dark:bg-slate-800 overflow-hidden mb-4 pb-10">
+              {/* Banner */}
+              <div className="h-[100px] dark:from-blue-700 dark:to-indigo-800 relative">
+                <div
+                  className="pointer-events-none absolute z-10 -translate-x-1/2 transform hidden md:block"
+                  style={{ left: "28%" }}
+                  aria-hidden="true"
+                >
+                  <Image
+                    className="max-w-none opacity-50"
+                    src={Stripes}
+                    width={768}
+                    height={768}
+                    style={{ width: "auto", height: "auto" }}
+                    alt="Stripes"
+                    priority
+                  />
+                </div>
               </div>
-            </div>
 
-            {/* Profile Container */}
-            <div className="max-w-6xl z-20 mx-auto px-4 sm:px-6 relative -mt-16">
-              {/* Profile Layout - Image, Info, Stats */}
-              <div className="flex flex-col md:flex-row gap-6  items-center md:items-start">
-                {/* Profile Image */}
-                <div className="flex-shrink-0">
-                  <div className="w-32 h-32 rounded-full  border border-blue-500 relative">
-                    {isCompany && profileData.company?.logo ? (
-                      <Link href={`${profileData.company?.uuid}`}>
-                        <Image
-                          src={profileData.company.logo}
-                          alt={
-                            profileData.company?.legal_name || profileData.name
-                          }
-                          width={400}
-                          height={400}
-                          className="w-full h-full rounded-full   object-cover"
-                        />
-                      </Link>
-                    ) : profileData.profile_photo_url ? (
-                      <Image
-                        src={profileData.profile_photo_url}
-                        alt={profileData.name}
-                        width={400}
-                        height={400}
-                        className="w-full h-full rounded-full object-cover object-top"
-                      />
-                    ) : (
-                      <div className="w-full h-full bg-gray-100 dark:bg-slate-700 flex items-center justify-center rounded-full">
-                        <span className="text-4xl font-bold text-gray-400 dark:text-slate-400">
-                          {profileData.first_name?.charAt(0) || ""}
-                          {profileData.last_name?.charAt(0) || ""}
-                        </span>
-                      </div>
-                    )}
-                    {isCompanyInsighter && profileData.company?.logo && (
-                      <div className="absolute top-[100px] -right-3 w-14 h-14 rounded-full overflow-hidden shadow-sm bg-white dark:bg-slate-700 z-10 border-4 border-white bg-white">
+              {/* Profile Container */}
+              <div className="max-w-6xl z-20 mx-auto px-4 sm:px-6 relative -mt-16">
+                {/* Profile Layout - Image, Info, Stats */}
+                <div className="flex flex-col md:flex-row gap-6  items-center md:items-start">
+                  {/* Profile Image */}
+                  <div className="flex-shrink-0">
+                    <div className="w-32 h-32 rounded-full  border border-blue-500 relative">
+                      {isCompany && profileData.company?.logo ? (
                         <Link href={`${profileData.company?.uuid}`}>
                           <Image
                             src={profileData.company.logo}
-                            alt={profileData.company.legal_name}
-                            width={80}
-                            height={80}
-                            className="w-full h-full object-cover"
+                            alt={
+                              profileData.company?.legal_name || profileData.name
+                            }
+                            width={400}
+                            height={400}
+                            className="w-full h-full rounded-full   object-cover"
                           />
                         </Link>
-                      </div>
-                    )}
-                    {isCompany && enterpriseType === "insighter" && (
-                      <div className="absolute top-[100px] -right-3 w-14 h-14 rounded-full border-4 border-white bg-white dark:bg-slate-700 z-10">
-                        {profileData.profile_photo_url ? (
-                          <Image
-                            src={profileData.profile_photo_url}
-                            alt={profileData.name}
-                            width={80}
-                            height={80}
-                            className="w-full h-full object-cover border-3 border-white rounded-full object-top"
-                          />
-                        ) : (
-                          <div className="w-full h-full bg-gray-100 dark:bg-slate-700 flex items-center justify-center rounded-full">
-                            <span className="text-sm font-bold text-gray-400 dark:text-slate-400">
-                              {profileData.first_name?.charAt(0) || ""}
-                              {profileData.last_name?.charAt(0) || ""}
-                            </span>
-                          </div>
-                        )}
-                      </div>
-                    )}
-                  </div>
-                </div>
-
-                {/* Profile Info */}
-                <div className="flex-1">
-                  <div className="flex flex-col md:flex-row h-full justify-between items-center">
-                    <div>
-                      {/* Name and Badges */}
-                      <div className="flex flex-wrap items-center gap-2 mb-1 capitalize">
-                      {/* {isRTL && <IconRosetteDiscountCheckFilled className="w-5 h-5 text-blue-500" />} */}
-                        {enterpriseType === "insighter" && (
-                          <div>
-                            <h1 className="text-2xl font-bold">
-                              {profileData.first_name.toLowerCase() || ""}{" "}
-                              {profileData.last_name.toLowerCase() || ""}
-                            </h1>
-                          </div>
-                        )}
-                        {enterpriseType !== "insighter" && (
-                          <h1 className="text-2xl font-bold">
-                            {profileData.company?.legal_name || ""}
-                          </h1>
-                        )}
-                     <IconRosetteDiscountCheckFilled className="w-5 h-5 text-blue-500" />
-                    
-                        {isCompany && enterpriseType === "insighter" && (
-                          <span
-                            className={`bg-[#EFF8FF] text-[#299AF8] font-bold text-xs px-2 py-0.5 rounded-full inline-flex items-center ${
-                              locale === "ar" ? "flex-row-reverse" : ""
-                            }`}
-                            dir={locale === "ar" ? "rtl" : "ltr"}
-                          >
-                            {userProfileT("company")}
+                      ) : profileData.profile_photo_url ? (
+                        <Image
+                          src={profileData.profile_photo_url}
+                          alt={profileData.name}
+                          width={400}
+                          height={400}
+                          className="w-full h-full rounded-full object-cover object-top"
+                        />
+                      ) : (
+                        <div className="w-full h-full bg-gray-100 dark:bg-slate-700 flex items-center justify-center rounded-full">
+                          <span className="text-4xl font-bold text-gray-400 dark:text-slate-400">
+                            {profileData.first_name?.charAt(0) || ""}
+                            {profileData.last_name?.charAt(0) || ""}
                           </span>
-                        )}
-                        {isInsighter && (
-                          <span className="bg-green-100  text-[#1BC653] font-bold uppercase text-xs px-2 py-0.5 rounded-full inline-flex items-center">
-                            {userProfileT("insighter")}
-                          </span>
-                        )}
-                        {isCompanyInsighter && (
-                          <span
-                            className={`bg-[#EFF8FF] text-[#299AF8] font-bold text-xs px-2 py-0.5 rounded-full inline-flex items-center ${
-                              locale === "ar" ? "flex-row-reverse" : ""
-                            }`}
-                            dir={locale === "ar" ? "rtl" : "ltr"}
-                          >
-                            {userProfileT("company")}
-                          </span>
-                        )}
-                        
-                      </div>
-                      {isCompany && enterpriseType === "insighter" && profileData.company?.legal_name && (
-                        <div className="text-blue-500 mb-2 text-sm font-semibold text-center md:text-start">
-                          {locale === "ar" ? "مدير في " : "Manager at "}
-                          <Link
-                            href={`${profileData.company?.uuid}`}
-                            className="underline underline-offset-2 hover:opacity-80"
-                          >
-                            {profileData.company.legal_name}
+                        </div>
+                      )}
+                      {isCompanyInsighter && profileData.company?.logo && (
+                        <div className="absolute top-[100px] -right-3 w-14 h-14 rounded-full overflow-hidden shadow-sm bg-white dark:bg-slate-700 z-10 border-4 border-white bg-white">
+                          <Link href={`${profileData.company?.uuid}`}>
+                            <Image
+                              src={profileData.company.logo}
+                              alt={profileData.company.legal_name}
+                              width={80}
+                              height={80}
+                              className="w-full h-full object-cover"
+                            />
                           </Link>
                         </div>
                       )}
-                      {isCompanyInsighter && profileData.company?.legal_name && (
-                        <div className="text-blue-500 mb-2 text-sm font-semibold text-center md:text-start">
-                          <Link
-                            href={`${profileData.company?.uuid}`}
-                            className="underline underline-offset-2 hover:opacity-80"
-                          >
-                            {profileData.company.legal_name}
-                          </Link>
-                        </div>
-                      )}
-
-           
-
-                      {/* Country with Flag */}
-                      {(profileData?.country ||
-                        (!enterpriseType &&
-                          profileData?.company?.manager_country)) && (
-                        <div className="mb-3 flex items-center justify-center md:justify-start gap-2">
-                          {/* Company manager country when viewing company profile */}
-                          {!enterpriseType &&
-                          profileData?.company?.manager_country ? (
-                            <>
-                              {profileData.company.manager_country.flag ? (
-                                <Image
-                                  src={`/images/flags/${profileData.company.manager_country.flag}.svg`}
-                                  alt={
-                                    isRTL
-                                      ? profileData.company.manager_country.name
-                                          .ar ||
-                                        profileData.company.manager_country
-                                          .name.en
-                                      : profileData.company.manager_country.name
-                                          .en ||
-                                        profileData.company.manager_country
-                                          .name.ar
-                                  }
-                                  width={15}
-                                  height={15}
-                                  className="object-contain"
-                                />
-                              ) : profileData.company.manager_country.iso2 ? (
-                                <span
-                                  className="text-xl"
-                                  role="img"
-                                  aria-label={
-                                    isRTL
-                                      ? profileData.company.manager_country.name
-                                          .ar ||
-                                        profileData.company.manager_country
-                                          .name.en
-                                      : profileData.company.manager_country.name
-                                          .en ||
-                                        profileData.company.manager_country
-                                          .name.ar
-                                  }
-                                >
-                                  {countryCodeToFlagEmoji(
-                                    profileData.company.manager_country.iso2
-                                  )}
-                                </span>
-                              ) : null}
-                              <span className="text-sm text-gray-600 dark:text-gray-400 font-medium">
-                                {isRTL
-                                  ? profileData.company.manager_country.name
-                                      .ar ||
-                                    profileData.company.manager_country.name.en
-                                  : profileData.company.manager_country.name
-                                      .en ||
-                                    profileData.company.manager_country.name.ar}
-                              </span>
-                            </>
+                      {isCompany && enterpriseType === "insighter" && (
+                        <div className="absolute top-[100px] -right-3 w-14 h-14 rounded-full border-4 border-white bg-white dark:bg-slate-700 z-10">
+                          {profileData.profile_photo_url ? (
+                            <Image
+                              src={profileData.profile_photo_url}
+                              alt={profileData.name}
+                              width={80}
+                              height={80}
+                              className="w-full h-full object-cover border-3 border-white rounded-full object-top"
+                            />
                           ) : (
-                            <>
-                              {profileData?.country_flag ? (
-                                <Image
-                                  src={`/images/flags/${profileData.country_flag}.svg`}
-                                  alt={getCountryDisplayName(profileData.country)}
-                                  width={15}
-                                  height={15}
-                                  className="object-contain"
-                                />
-                              ) : profileData?.country_code ? (
-                                <span
-                                  className="text-xl"
-                                  role="img"
-                                  aria-label={getCountryDisplayName(profileData.country)}
-                                >
-                                  {countryCodeToFlagEmoji(
-                                    profileData.country_code
-                                  )}
-                                </span>
-                              ) : null}
-                              <span className="text-sm text-gray-600 dark:text-gray-400 font-medium">
-                                {getCountryDisplayName(profileData?.country ?? "")}
+                            <div className="w-full h-full bg-gray-100 dark:bg-slate-700 flex items-center justify-center rounded-full">
+                              <span className="text-sm font-bold text-gray-400 dark:text-slate-400">
+                                {profileData.first_name?.charAt(0) || ""}
+                                {profileData.last_name?.charAt(0) || ""}
                               </span>
-                            </>
+                            </div>
                           )}
                         </div>
                       )}
+                    </div>
+                  </div>
 
-                      {/* Company Insighters (Avatar Group) */}
-                      {isCompany &&
-                        !enterpriseType &&
-                        profileData?.insighter_company &&
-                        profileData.insighter_company.length > 0 && (
-                          <div className="mb-4 flex items-center justify-center md:justify-start">
-                            <Avatar.Group spacing="sm">
-                              {profileData.insighter_company
-                                .slice(0, 3)
-                                .map((insighter) => {
-                                  const isOwner = Boolean(insighter.owner);
-                                  const initials = insighter.name
-                                    .split(" ")
-                                    .filter(Boolean)
-                                    .slice(0, 2)
-                                    .map((part) => part.charAt(0).toUpperCase())
-                                    .join("");
+                  {/* Profile Info */}
+                  <div className="flex-1">
+                    <div className="flex flex-col md:flex-row h-full justify-between items-center">
+                      <div>
+                        {/* Name and Badges */}
+                        <div className="flex flex-wrap items-center gap-2 mb-1 capitalize">
+                          {/* {isRTL && <IconRosetteDiscountCheckFilled className="w-5 h-5 text-blue-500" />} */}
+                          {enterpriseType === "insighter" && (
+                            <div>
+                              <h1 className="text-2xl font-bold">
+                                {profileData.first_name.toLowerCase() || ""}{" "}
+                                {profileData.last_name.toLowerCase() || ""}
+                              </h1>
+                            </div>
+                          )}
+                          {enterpriseType !== "insighter" && (
+                            <h1 className="text-2xl font-bold">
+                              {profileData.company?.legal_name || ""}
+                            </h1>
+                          )}
+                          <IconRosetteDiscountCheckFilled className="w-5 h-5 text-blue-500" />
 
-                                  return (
-                                    <Tooltip
-                                      key={insighter.id}
-                                      label={
-                                        isOwner
-                                          ? `${insighter.name} • ${
-                                              locale === "ar" ? "المدير" : "Manager"
-                                            }`
-                                          : insighter.name
-                                      }
-                                      withArrow
-                                      position="top"
-                                    >
-                                      <Link
-                                        href={`/${locale}/profile/${insighter.uuid}?entity=insighter`}
-                                        className="block"
-                                      >
-                                        <div
-                                         
-                                        >
-                                          <Avatar
-                                            src={insighter.profile_photo_url || undefined}
-                                            radius="xl"
-                                            size="md"
-                                            color="blue"
-                                          >
-                                            {!insighter.profile_photo_url
-                                              ? initials
-                                              : null}
-                                          </Avatar>
-                                        </div>
-                                      </Link>
-                                    </Tooltip>
-                                  );
-                                })}
-                              {profileData.insighter_company.length > 3 && (
-                                <Link
-                                  href={`/${locale}/profile/${uuid}?${(() => {
-                                    // Preserve any existing params (e.g. entity), only switch the tab.
-                                    const params = new URLSearchParams(
-                                      searchParams.toString()
-                                    );
-                                    params.set("tab", "company-insighters");
-                                    return params.toString();
-                                  })()}`}
-                                  className="block"
-                                  prefetch={false}
-                                  onClick={(e) => {
-                                    // Avoid full navigation (can get stuck in loading);
-                                    // behave like a tab switch and still update the URL.
-                                    e.preventDefault();
-                                    handleTabChange("company-insighters");
-                                  }}
-                                >
-                                  <Avatar
-                                    radius="xl"
-                                    size="md"
-                                    color="gray"
-                                  >
-                                    +
-                                    {profileData.insighter_company.length - 3}
-                                  </Avatar>
-                                </Link>
-                              )}
-                            </Avatar.Group>
+                          {isCompany && enterpriseType === "insighter" && (
+                            <span
+                              className={`bg-[#EFF8FF] text-[#299AF8] font-bold text-xs px-2 py-0.5 rounded-full inline-flex items-center ${locale === "ar" ? "flex-row-reverse" : ""
+                                }`}
+                              dir={locale === "ar" ? "rtl" : "ltr"}
+                            >
+                              {userProfileT("company")}
+                            </span>
+                          )}
+                          {isInsighter && (
+                            <span className="bg-green-100  text-[#1BC653] font-bold uppercase text-xs px-2 py-0.5 rounded-full inline-flex items-center">
+                              {userProfileT("insighter")}
+                            </span>
+                          )}
+                          {isCompanyInsighter && (
+                            <span
+                              className={`bg-[#EFF8FF] text-[#299AF8] font-bold text-xs px-2 py-0.5 rounded-full inline-flex items-center ${locale === "ar" ? "flex-row-reverse" : ""
+                                }`}
+                              dir={locale === "ar" ? "rtl" : "ltr"}
+                            >
+                              {userProfileT("company")}
+                            </span>
+                          )}
+
+                        </div>
+                        {isCompany && enterpriseType === "insighter" && profileData.company?.legal_name && (
+                          <div className="text-blue-500 mb-2 text-sm font-semibold text-center md:text-start">
+                            {locale === "ar" ? "مدير في " : "Manager at "}
+                            <Link
+                              href={`${profileData.company?.uuid}`}
+                              className="underline underline-offset-2 hover:opacity-80"
+                            >
+                              {profileData.company.legal_name}
+                            </Link>
+                          </div>
+                        )}
+                        {isCompanyInsighter && profileData.company?.legal_name && (
+                          <div className="text-blue-500 mb-2 text-sm font-semibold text-center md:text-start">
+                            <Link
+                              href={`${profileData.company?.uuid}`}
+                              className="underline underline-offset-2 hover:opacity-80"
+                            >
+                              {profileData.company.legal_name}
+                            </Link>
                           </div>
                         )}
 
-                      {/* Action Buttons */}
-                      <div className="flex flex-wrap gap-3 mb-4 justify-center md:justify-start">
-                        <ProfileShare
-                          profileData={profileData}
-                          enterpriseType={enterpriseType}
-                          locale={locale}
-                        />
-                      </div>
-                    </div>
 
-                    {/* Stats Section */}
-                    <div className={`flex justify-center gap-4 mt-5`}>
-                      <div className="text-start bg-gradient-to-br from-white to-emerald-50 dark:from-slate-700 dark:to-slate-600 p-3 rounded-lg hover:shadow-md transition-all duration-300 transform hover:-translate-y-1 border border-gray-100 dark:border-slate-600 group">
-                        <div className="flex items-center mb-2">
-                          <div className="p-1.5 bg-emerald-100 dark:bg-emerald-900/30 rounded-full me-2 group-hover:scale-110 transition-transform">
-                            <IconFileReport
-                              size={18}
-                              className="text-emerald-500 dark:text-emerald-400"
-                              stroke={2}
-                            />
-                          </div>
-                          <span
-                            className="text-xs font-medium text-emerald-600 dark:text-emerald-300"
-                            dangerouslySetInnerHTML={{
-                              __html: t("publishedInsight"),
-                            }}
+
+                        {/* Country with Flag */}
+                        {(profileData?.country ||
+                          (!enterpriseType &&
+                            profileData?.company?.manager_country)) && (
+                            <div className="mb-3 flex items-center justify-center md:justify-start gap-2">
+                              {/* Company manager country when viewing company profile */}
+                              {!enterpriseType &&
+                                profileData?.company?.manager_country ? (
+                                <>
+                                  {profileData.company.manager_country.flag ? (
+                                    <Image
+                                      src={`/images/flags/${profileData.company.manager_country.flag}.svg`}
+                                      alt={
+                                        isRTL
+                                          ? profileData.company.manager_country.name
+                                            .ar ||
+                                          profileData.company.manager_country
+                                            .name.en
+                                          : profileData.company.manager_country.name
+                                            .en ||
+                                          profileData.company.manager_country
+                                            .name.ar
+                                      }
+                                      width={15}
+                                      height={15}
+                                      className="object-contain"
+                                    />
+                                  ) : profileData.company.manager_country.iso2 ? (
+                                    <span
+                                      className="text-xl"
+                                      role="img"
+                                      aria-label={
+                                        isRTL
+                                          ? profileData.company.manager_country.name
+                                            .ar ||
+                                          profileData.company.manager_country
+                                            .name.en
+                                          : profileData.company.manager_country.name
+                                            .en ||
+                                          profileData.company.manager_country
+                                            .name.ar
+                                      }
+                                    >
+                                      {countryCodeToFlagEmoji(
+                                        profileData.company.manager_country.iso2
+                                      )}
+                                    </span>
+                                  ) : null}
+                                  <span className="text-sm text-gray-600 dark:text-gray-400 font-medium">
+                                    {isRTL
+                                      ? profileData.company.manager_country.name
+                                        .ar ||
+                                      profileData.company.manager_country.name.en
+                                      : profileData.company.manager_country.name
+                                        .en ||
+                                      profileData.company.manager_country.name.ar}
+                                  </span>
+                                </>
+                              ) : (
+                                <>
+                                  {profileData?.country_flag ? (
+                                    <Image
+                                      src={`/images/flags/${profileData.country_flag}.svg`}
+                                      alt={getCountryDisplayName(profileData.country)}
+                                      width={15}
+                                      height={15}
+                                      className="object-contain"
+                                    />
+                                  ) : profileData?.country_code ? (
+                                    <span
+                                      className="text-xl"
+                                      role="img"
+                                      aria-label={getCountryDisplayName(profileData.country)}
+                                    >
+                                      {countryCodeToFlagEmoji(
+                                        profileData.country_code
+                                      )}
+                                    </span>
+                                  ) : null}
+                                  <span className="text-sm text-gray-600 dark:text-gray-400 font-medium">
+                                    {getCountryDisplayName(profileData?.country ?? "")}
+                                  </span>
+                                </>
+                              )}
+                            </div>
+                          )}
+
+                        {/* Company Insighters (Avatar Group) */}
+                        {isCompany &&
+                          !enterpriseType &&
+                          profileData?.insighter_company &&
+                          profileData.insighter_company.length > 0 && (
+                            <div className="mb-4 flex items-center justify-center md:justify-start">
+                              <Avatar.Group spacing="sm">
+                                {profileData.insighter_company
+                                  .slice(0, 3)
+                                  .map((insighter) => {
+                                    const isOwner = Boolean(insighter.owner);
+                                    const initials = insighter.name
+                                      .split(" ")
+                                      .filter(Boolean)
+                                      .slice(0, 2)
+                                      .map((part) => part.charAt(0).toUpperCase())
+                                      .join("");
+
+                                    return (
+                                      <Tooltip
+                                        key={insighter.id}
+                                        label={
+                                          isOwner
+                                            ? `${insighter.name} • ${locale === "ar" ? "المدير" : "Manager"
+                                            }`
+                                            : insighter.name
+                                        }
+                                        withArrow
+                                        position="top"
+                                      >
+                                        <Link
+                                          href={`/${locale}/profile/${insighter.uuid}?entity=insighter`}
+                                          className="block"
+                                        >
+                                          <div
+
+                                          >
+                                            <Avatar
+                                              src={insighter.profile_photo_url || undefined}
+                                              radius="xl"
+                                              size="md"
+                                              color="blue"
+                                            >
+                                              {!insighter.profile_photo_url
+                                                ? initials
+                                                : null}
+                                            </Avatar>
+                                          </div>
+                                        </Link>
+                                      </Tooltip>
+                                    );
+                                  })}
+                                {profileData.insighter_company.length > 3 && (
+                                  <Link
+                                    href={`/${locale}/profile/${uuid}?${(() => {
+                                      // Preserve any existing params (e.g. entity), only switch the tab.
+                                      const params = new URLSearchParams(
+                                        searchParams.toString()
+                                      );
+                                      params.set("tab", "company-insighters");
+                                      return params.toString();
+                                    })()}`}
+                                    className="block"
+                                    prefetch={false}
+                                    onClick={(e) => {
+                                      // Avoid full navigation (can get stuck in loading);
+                                      // behave like a tab switch and still update the URL.
+                                      e.preventDefault();
+                                      handleTabChange("company-insighters");
+                                    }}
+                                  >
+                                    <Avatar
+                                      radius="xl"
+                                      size="md"
+                                      color="gray"
+                                    >
+                                      +
+                                      {profileData.insighter_company.length - 3}
+                                    </Avatar>
+                                  </Link>
+                                )}
+                              </Avatar.Group>
+                            </div>
+                          )}
+
+                        {/* Action Buttons */}
+                        <div className="flex flex-wrap gap-3 mb-4 justify-center md:justify-start">
+                          <ProfileShare
+                            profileData={profileData}
+                            enterpriseType={enterpriseType}
+                            locale={locale}
                           />
                         </div>
-                        <p className="bg-clip-text text-transparent bg-gradient-to-r from-emerald-600 to-teal-500 font-bold text-4xl">
-                          {isViewingInsighterEntity
-                            ? (insighterStatistics?.total_published ??
-                              knowledgeData?.meta.total ??
-                              0)
-                            : (allKnowledgeTotal ?? knowledgeData?.meta.total ?? 0)}
-                        </p>
                       </div>
-                      {isViewingInsighterEntity && (
-                        <div className="text-start bg-gradient-to-br from-white to-blue-50 dark:from-slate-700 dark:to-slate-600 p-3 rounded-lg hover:shadow-md transition-all duration-300 transform hover:-translate-y-1 border border-gray-100 dark:border-slate-600 group">
+
+                      {/* Stats Section */}
+                      <div className={`flex justify-center gap-4 mt-5`}>
+                        <div className="text-start bg-gradient-to-br from-white to-emerald-50 dark:from-slate-700 dark:to-slate-600 p-3 rounded-lg hover:shadow-md transition-all duration-300 transform hover:-translate-y-1 border border-gray-100 dark:border-slate-600 group">
                           <div className="flex items-center mb-2">
-                            <div className="p-1.5 bg-blue-100 dark:bg-blue-900/30 rounded-full me-2 group-hover:scale-110 transition-transform">
-                              <IconBrandHipchat
+                            <div className="p-1.5 bg-emerald-100 dark:bg-emerald-900/30 rounded-full me-2 group-hover:scale-110 transition-transform">
+                              <IconFileReport
                                 size={18}
-                                className="text-blue-500 dark:text-blue-400"
+                                className="text-emerald-500 dark:text-emerald-400"
                                 stroke={2}
                               />
                             </div>
                             <span
-                              className="text-xs font-medium text-transparent bg-clip-text bg-gradient-to-r from-blue-500 to-teal-500"
+                              className="text-xs font-medium text-emerald-600 dark:text-emerald-300"
                               dangerouslySetInnerHTML={{
-                                __html: t("consultingSessions"),
+                                __html: t("publishedInsight"),
                               }}
                             />
                           </div>
-                          <p className="bg-clip-text text-transparent bg-gradient-to-r from-blue-500 to-teal-500 font-bold text-4xl">
-                            {insighterStatistics?.total_meeting ?? 0}
+                          <p className="bg-clip-text text-transparent bg-gradient-to-r from-emerald-600 to-teal-500 font-bold text-4xl">
+                            {isViewingInsighterEntity
+                              ? (insighterStatistics?.total_published ??
+                                knowledgeData?.meta.total ??
+                                0)
+                              : (allKnowledgeTotal ?? knowledgeData?.meta.total ?? 0)}
                           </p>
                         </div>
-                      )}
+                        {isViewingInsighterEntity && (
+                          <div className="text-start bg-gradient-to-br from-white to-blue-50 dark:from-slate-700 dark:to-slate-600 p-3 rounded-lg hover:shadow-md transition-all duration-300 transform hover:-translate-y-1 border border-gray-100 dark:border-slate-600 group">
+                            <div className="flex items-center mb-2">
+                              <div className="p-1.5 bg-blue-100 dark:bg-blue-900/30 rounded-full me-2 group-hover:scale-110 transition-transform">
+                                <IconBrandHipchat
+                                  size={18}
+                                  className="text-blue-500 dark:text-blue-400"
+                                  stroke={2}
+                                />
+                              </div>
+                              <span
+                                className="text-xs font-medium text-transparent bg-clip-text bg-gradient-to-r from-blue-500 to-teal-500"
+                                dangerouslySetInnerHTML={{
+                                  __html: t("consultingSessions"),
+                                }}
+                              />
+                            </div>
+                            <p className="bg-clip-text text-transparent bg-gradient-to-r from-blue-500 to-teal-500 font-bold text-4xl">
+                              {insighterStatistics?.total_meeting ?? 0}
+                            </p>
+                          </div>
+                        )}
+                      </div>
                     </div>
                   </div>
                 </div>
               </div>
             </div>
-          </div>
 
-          {/* Tabs with enhanced styling */}
-          <div
-            className="bg-white max-w-6xl mx-auto dark:bg-slate-800 rounded-xl shadow-lg overflow-hidden"
-            data-aos="fade-up"
-            data-aos-delay="100"
-          >
-            {/* Get the tab parameter from the search params, default to 'knowledge' if not provided */}
-            <Tabs
-              value={activeTab}
-              onChange={handleTabChange}
-              styles={{
-                tab: {
-                  "&[dataActive]": {
-                    borderColor: "#3b82f6",
-                    color: "#3b82f6",
-                    fontWeight: "bold",
-                  },
-                  "&:hover": {
-                    backgroundColor: "#f8fafc",
-                    borderColor: "#e2e8f0",
-                  },
-                },
-              }}
+            {/* Tabs with enhanced styling */}
+            <div
+              className="bg-white max-w-6xl mx-auto dark:bg-slate-800 rounded-xl shadow-lg overflow-hidden"
+              data-aos="fade-up"
+              data-aos-delay="100"
             >
-              <Tabs.List className="border-b border-gray-200 dark:border-slate-700 bg-gray-50 dark:bg-slate-800/80">
-                <Tabs.Tab
-                  value="knowledge"
-                  className="text-base font-medium px-8 py-4 transition"
-                >
-                  {t("posts")}
-                </Tabs.Tab>
-                <Tabs.Tab
-                  value="about"
-                  className="text-base font-medium px-8 py-4 transition"
-                >
-                  {
-                    isCompanyInsighter
-                      ? t("aboutMe")
-                      : isCompany && !enterpriseType
-                        ? t("aboutCompany")
-                        : isCompany && enterpriseType
-                          ? t("aboutManager")
-                          : enterpriseType === "insighter"
-                            ? t("aboutMe")
-                            : null
-                  }
-                </Tabs.Tab>
-                {/* Company Insighters tab - only for company profiles with insighters */}
-                {isCompany &&
-                  !enterpriseType &&
-                  profileData.insighter_company &&
-                  profileData.insighter_company.length > 0 && (
-                    <Tabs.Tab
-                      value="company-insighters"
-                      className="text-base font-medium px-8 py-4 transition"
-                    >
-                      {locale === "ar" ? "خبراء الشركة" : "Company Insighters"}
-                    </Tabs.Tab>
-                  )}
-                {/* Show Meet tab for insighters */}
-                {(isInsighter || isCompanyInsighter || isCompany) &&
-                  enterpriseType === "insighter" && (
-                    <Tabs.Tab
-                      value="meet"
-                      className={`text-base font-medium px-8 py-4 transition ${styles.shinyGradientText}`}
-                    >
-                      {t("meet")} {profileData?.first_name || ""}
-                    </Tabs.Tab>
-                  )}
-              </Tabs.List>
-
-              <div className="relative">
-                {tabNavigating && (
-                  <div className="absolute inset-0 z-20 flex items-center justify-center bg-white/70 dark:bg-slate-800/70 backdrop-blur-sm">
-                    <div className="flex items-center gap-3">
-                      <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-blue-500" />
-                      <span className="text-sm font-medium text-gray-600 dark:text-gray-300">
-                        {locale === "ar" ? "جارٍ التحميل..." : "Loading..."}
-                      </span>
-                    </div>
-                  </div>
-                )}
-
-                <Tabs.Panel value="knowledge">
-                  <KnowledgeTab
-                    locale={locale}
-                    isRTL={isRTL}
-                    knowledgeData={knowledgeData}
-                    loadingKnowledge={loadingKnowledge}
-                    knowledgeTypes={knowledgeTypes}
-                    selectedType={selectedType}
-                    profileData={profileData}
-                    handleTypeChange={handleTypeChange}
-                    handlePageChange={handlePageChange}
-                    formatKnowledgeItems={formatKnowledgeItems}
-                  />
-                </Tabs.Panel>
-
-                <Tabs.Panel value="about">
-                  <AboutTab
-                    locale={locale}
-                    isRTL={isRTL}
-                    profileData={profileData}
-                    isCompany={isCompany || false}
-                    getSocialIcon={getSocialIcon}
-                    enterpriseType={enterpriseType}
-                  />
-                </Tabs.Panel>
-
-                {/* Company Insighters Tab Panel */}
-                <Tabs.Panel value="company-insighters">
+              {/* Get the tab parameter from the search params, default to 'knowledge' if not provided */}
+              <Tabs
+                value={activeTab}
+                onChange={handleTabChange}
+                styles={{
+                  tab: {
+                    "&[dataActive]": {
+                      borderColor: "#3b82f6",
+                      color: "#3b82f6",
+                      fontWeight: "bold",
+                    },
+                    "&:hover": {
+                      backgroundColor: "#f8fafc",
+                      borderColor: "#e2e8f0",
+                    },
+                  },
+                }}
+              >
+                <Tabs.List className="border-b border-gray-200 dark:border-slate-700 bg-gray-50 dark:bg-slate-800/80">
+                  <Tabs.Tab
+                    value="knowledge"
+                    className="text-base font-medium px-8 py-4 transition"
+                  >
+                    {t("posts")}
+                  </Tabs.Tab>
+                  <Tabs.Tab
+                    value="about"
+                    className="text-base font-medium px-8 py-4 transition"
+                  >
+                    {
+                      isCompanyInsighter
+                        ? t("aboutMe")
+                        : isCompany && !enterpriseType
+                          ? t("aboutCompany")
+                          : isCompany && enterpriseType
+                            ? t("aboutManager")
+                            : enterpriseType === "insighter"
+                              ? t("aboutMe")
+                              : null
+                    }
+                  </Tabs.Tab>
+                  {/* Company Insighters tab - only for company profiles with insighters */}
                   {isCompany &&
-                  !enterpriseType &&
-                  profileData.insighter_company &&
-                  profileData.insighter_company.length > 0 ? (
-                    <div className="p-6 sm:p-8">
-                      <div className="mb-4 flex justify-between items-center">
-                        <span className="text-sm text-gray-500">
-                          {profileData.insighter_company.length}{" "}
-                          {locale === "ar" ? "خبراء" : "insighters"}
+                    !enterpriseType &&
+                    profileData.insighter_company &&
+                    profileData.insighter_company.length > 0 && (
+                      <Tabs.Tab
+                        value="company-insighters"
+                        className="text-base font-medium px-8 py-4 transition"
+                      >
+                        {locale === "ar" ? "خبراء الشركة" : "Company Insighters"}
+                      </Tabs.Tab>
+                    )}
+                  {/* Show Meet tab for insighters */}
+                  {(isInsighter || isCompanyInsighter || isCompany) &&
+                    enterpriseType === "insighter" && (
+                      <Tabs.Tab
+                        value="meet"
+                        className={`text-base font-medium px-8 py-4 transition ${styles.shinyGradientText}`}
+                      >
+                        {t("meet")} {profileData?.first_name || ""}
+                      </Tabs.Tab>
+                    )}
+                </Tabs.List>
+
+                <div className="relative">
+                  {tabNavigating && (
+                    <div className="absolute inset-0 z-20 flex items-center justify-center bg-white/70 dark:bg-slate-800/70 backdrop-blur-sm">
+                      <div className="flex items-center gap-3">
+                        <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-blue-500" />
+                        <span className="text-sm font-medium text-gray-600 dark:text-gray-300">
+                          {locale === "ar" ? "جارٍ التحميل..." : "Loading..."}
                         </span>
                       </div>
-                      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                        {profileData.insighter_company.map((insighter) => (
-                          (() => {
-                            const isOwner = Boolean(insighter.owner);
-                            const managerLabel =
-                              locale === "ar" ? "المدير" : "Manager";
+                    </div>
+                  )}
 
-                            return (
-                          <Link
-                            key={insighter.uuid}
-                            href={`/${locale}/profile/${insighter.uuid}?entity=insighter`}
-                            className={`flex flex-col justify-between gap-4 bg-white rounded-lg border overflow-hidden duration-300 p-5 hover:-translate-y-1 hover:shadow-md ${
-                              isOwner
-                                ? "border-blue-200 ring-1 ring-blue-100"
-                                : "border-gray-200"
-                            }`}
-                            style={{
-                              backgroundImage:
-                                "url('https://res.cloudinary.com/dsiku9ipv/image/upload/v1746774672/Artboard_2_qzimiu.png')",
-                              backgroundSize: "cover",
-                              backgroundPosition: "center",
-                            }}
-                          >
-                            <div className="flex flex-col justify-center items-center gap-4">
-                              <div
-                                className={`relative w-16 h-16 rounded-full border overflow-hidden bg-blue-50 flex items-center justify-center ${
-                                  isOwner
-                                    ? "border-blue-500 ring-2 ring-blue-200"
-                                    : "border-blue-500"
-                                }`}
-                              >
-                                {insighter.profile_photo_url ? (
-                                  <Image
-                                    src={insighter.profile_photo_url}
-                                    alt={insighter.name}
-                                    fill
-                                    className="object-cover rounded-full object-top"
-                                  />
-                                ) : (
-                                  <span className="text-xl font-semibold text-blue-600">
-                                    {getInitials(insighter.name)}
-                                  </span>
-                                )}
-                              
-                              </div>
-                              <div className="flex-1 min-w-0">
-                                <div className="flex flex-col items-center gap-2">
-                                      <div className="flex items-center gap-2">
-                                      <p className="font-semibold text-gray-900 truncate">
+                  <Tabs.Panel value="knowledge">
+                    <KnowledgeTab
+                      locale={locale}
+                      isRTL={isRTL}
+                      knowledgeData={knowledgeData}
+                      loadingKnowledge={loadingKnowledge}
+                      knowledgeTypes={knowledgeTypes}
+                      selectedType={selectedType}
+                      profileData={profileData}
+                      handleTypeChange={handleTypeChange}
+                      handlePageChange={handlePageChange}
+                      formatKnowledgeItems={formatKnowledgeItems}
+                    />
+                  </Tabs.Panel>
+
+                  <Tabs.Panel value="about">
+                    <AboutTab
+                      locale={locale}
+                      isRTL={isRTL}
+                      profileData={profileData}
+                      isCompany={isCompany || false}
+                      getSocialIcon={getSocialIcon}
+                      enterpriseType={enterpriseType}
+                    />
+                  </Tabs.Panel>
+
+                  {/* Company Insighters Tab Panel */}
+                  <Tabs.Panel value="company-insighters">
+                    {isCompany &&
+                      !enterpriseType &&
+                      profileData.insighter_company &&
+                      profileData.insighter_company.length > 0 ? (
+                      <div className="p-6 sm:p-8">
+                        <div className="mb-4 flex justify-between items-center">
+                          <span className="text-sm text-gray-500">
+                            {profileData.insighter_company.length}{" "}
+                            {locale === "ar" ? "خبراء" : "insighters"}
+                          </span>
+                        </div>
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                          {profileData.insighter_company.map((insighter) => (
+                            (() => {
+                              const isOwner = Boolean(insighter.owner);
+                              const managerLabel =
+                                locale === "ar" ? "المدير" : "Manager";
+
+                              return (
+                                <Link
+                                  key={insighter.uuid}
+                                  href={`/${locale}/profile/${insighter.uuid}?entity=insighter`}
+                                  className={`flex flex-col justify-between gap-4 bg-white rounded-lg border overflow-hidden duration-300 p-5 hover:-translate-y-1 hover:shadow-md ${isOwner
+                                      ? "border-blue-200 ring-1 ring-blue-100"
+                                      : "border-gray-200"
+                                    }`}
+                                  style={{
+                                    backgroundImage:
+                                      "url('https://res.cloudinary.com/dsiku9ipv/image/upload/v1746774672/Artboard_2_qzimiu.png')",
+                                    backgroundSize: "cover",
+                                    backgroundPosition: "center",
+                                  }}
+                                >
+                                  <div className="flex flex-col justify-center items-center gap-4">
+                                    <div
+                                      className={`relative w-16 h-16 rounded-full border overflow-hidden bg-blue-50 flex items-center justify-center ${isOwner
+                                          ? "border-blue-500 ring-2 ring-blue-200"
+                                          : "border-blue-500"
+                                        }`}
+                                    >
+                                      {insighter.profile_photo_url ? (
+                                        <Image
+                                          src={insighter.profile_photo_url}
+                                          alt={insighter.name}
+                                          fill
+                                          className="object-cover rounded-full object-top"
+                                        />
+                                      ) : (
+                                        <span className="text-xl font-semibold text-blue-600">
+                                          {getInitials(insighter.name)}
+                                        </span>
+                                      )}
+
+                                    </div>
+                                    <div className="flex-1 min-w-0">
+                                      <div className="flex flex-col items-center gap-2">
+                                        <div className="flex items-center gap-2">
+                                          <p className="font-semibold text-gray-900 truncate">
                                             {insighter.name}
                                           </p>
                                           <IconRosetteDiscountCheckFilled className="w-4 h-4 text-blue-500 flex-shrink-0" />
-                                      </div>
-                                          {isOwner && (
-                                            <span
-                                              className={`inline-flex items-center rounded-full border mb-2 border-amber-200 bg-amber-50 text-amber-800 text-[11px] font-semibold px-2 py-0.5 ${
-                                                locale === "ar" ? "flex-row-reverse" : ""
+                                        </div>
+                                        {isOwner && (
+                                          <span
+                                            className={`inline-flex items-center rounded-full border mb-2 border-amber-200 bg-amber-50 text-amber-800 text-[11px] font-semibold px-2 py-0.5 ${locale === "ar" ? "flex-row-reverse" : ""
                                               }`}
-                                              dir={locale === "ar" ? "rtl" : "ltr"}
-                                            >
-                                              {managerLabel}
-                                            </span>
+                                            dir={locale === "ar" ? "rtl" : "ltr"}
+                                          >
+                                            {managerLabel}
+                                          </span>
+                                        )}
+                                      </div>
+                                      {insighter.country && (
+                                        <div className="mt-1 justify-center flex items-center gap-2 text-xs text-gray-600">
+                                          {insighter.country.flag && (
+                                            <Image
+                                              src={`/images/flags/${insighter.country.flag}.svg`}
+                                              alt={insighter.country.name}
+                                              width={14}
+                                              height={14}
+                                              className="object-contain"
+                                            />
                                           )}
-                                </div>
-                                {insighter.country && (
-                                  <div className="mt-1 justify-center flex items-center gap-2 text-xs text-gray-600">
-                                    {insighter.country.flag && (
-                                      <Image
-                                        src={`/images/flags/${insighter.country.flag}.svg`}
-                                        alt={insighter.country.name}
-                                        width={14}
-                                        height={14}
-                                        className="object-contain"
-                                      />
-                                    )}
-                                    <span className="truncate">
-                                      {insighter.country.name}
-                                    </span>
+                                          <span className="truncate">
+                                            {insighter.country.name}
+                                          </span>
+                                        </div>
+                                      )}
+                                    </div>
                                   </div>
-                                )}
-                              </div>
-                            </div>
-                            <div className="flex flex-col  gap-2 w-full">
-                              <Link
-                                href={`/${locale}/profile/${insighter.uuid}?entity=insighter&tab=meet`}
-                                onClick={(e) => e.stopPropagation()}
-                                className="flex-1"
-                              >
-                                <button className="w-full bg-gradient-to-r from-blue-500 to-teal-400 text-xs text-white px-6 py-2 rounded-md font-medium hover:shadow-lg transition-all duration-300">
-                                  {locale === "ar" ? "حجز مقابلة" : "Meet"}
-                                </button>
-                              </Link>
-                              <Link
-                                href={`/${locale}/profile/${insighter.uuid}?entity=insighter`}
-                                onClick={(e) => e.stopPropagation()}
-                                className="flex-1"
-                              >
-                                <button className="w-full bg-white text-xs text-gray-900 border border-gray-300 px-6 py-2 rounded-md font-medium hover:bg-blue-50 transition-all duration-300">
-                                  {locale === "ar"
-                                    ? "عرض المستندات المنشورة"
-                                    : "View Published Insights"}
-                                </button>
-                              </Link>
-                            </div>
-                          </Link>
-                            );
-                          })()
-                        ))}
+                                  <div className="flex flex-col  gap-2 w-full">
+                                    <Link
+                                      href={`/${locale}/profile/${insighter.uuid}?entity=insighter&tab=meet`}
+                                      onClick={(e) => e.stopPropagation()}
+                                      className="flex-1"
+                                    >
+                                      <button className="w-full bg-gradient-to-r from-blue-500 to-teal-400 text-xs text-white px-6 py-2 rounded-md font-medium hover:shadow-lg transition-all duration-300">
+                                        {locale === "ar" ? "حجز مقابلة" : "Meet"}
+                                      </button>
+                                    </Link>
+                                    <Link
+                                      href={`/${locale}/profile/${insighter.uuid}?entity=insighter`}
+                                      onClick={(e) => e.stopPropagation()}
+                                      className="flex-1"
+                                    >
+                                      <button className="w-full bg-white text-xs text-gray-900 border border-gray-300 px-6 py-2 rounded-md font-medium hover:bg-blue-50 transition-all duration-300">
+                                        {locale === "ar"
+                                          ? "عرض المستندات المنشورة"
+                                          : "View Published Insights"}
+                                      </button>
+                                    </Link>
+                                  </div>
+                                </Link>
+                              );
+                            })()
+                          ))}
+                        </div>
                       </div>
-                    </div>
-                  ) : (
-                    <div className="py-10 text-center text-gray-500">
-                      {locale === "ar"
-                        ? "لا يوجد خبراء للشركة حتى الآن"
-                        : "No company insighters available yet."}
-                    </div>
-                  )}
-                </Tabs.Panel>
+                    ) : (
+                      <div className="py-10 text-center text-gray-500">
+                        {locale === "ar"
+                          ? "لا يوجد خبراء للشركة حتى الآن"
+                          : "No company insighters available yet."}
+                      </div>
+                    )}
+                  </Tabs.Panel>
 
-                {/* Meet Tab Panel with Booking Calendar */}
-                <Tabs.Panel value="meet">
-                  <MeetTab
-                    locale={locale}
-                    isRTL={isRTL}
-                    profileData={profileData}
-                    isAuthenticated={isAuthenticated}
-                    loadingMeetings={loadingMeetings}
-                    meetingAvailability={meetingAvailability}
-                    currentMonth={currentMonth}
-                    selectedDate={selectedDate}
-                    selectedMeetingTime={selectedMeetingTime}
-                    uuid={uuid}
-                    isOwnProfile={isOwnProfile}
-                    handlePreviousMonth={handlePreviousMonth}
-                    handleNextMonth={handleNextMonth}
-                    handleDateClick={handleDateClick}
-                    handleTimeClick={handleTimeClick}
-                    fetchMeetingAvailability={fetchMeetingAvailability}
-                    isDateActive={isDateActive}
-                    getMeetingTimesForDate={getMeetingTimesForDate}
-                    getMonthName={getMonthName}
-                    getShortWeekdayNames={getShortWeekdayNames}
-                    getDaysInMonth={getDaysInMonth}
-                    getFirstDayOfMonth={getFirstDayOfMonth}
-                    formatDateString={formatDateString}
-                    getDayName={getDayName}
-                  />
-                </Tabs.Panel>
-              </div>
-            </Tabs>
+                  {/* Meet Tab Panel with Booking Calendar */}
+                  <Tabs.Panel value="meet">
+                    <MeetTab
+                      locale={locale}
+                      isRTL={isRTL}
+                      profileData={profileData}
+                      isAuthenticated={isAuthenticated}
+                      loadingMeetings={loadingMeetings}
+                      meetingAvailability={meetingAvailability}
+                      currentMonth={currentMonth}
+                      selectedDate={selectedDate}
+                      selectedMeetingTime={selectedMeetingTime}
+                      uuid={uuid}
+                      isOwnProfile={isOwnProfile}
+                      handlePreviousMonth={handlePreviousMonth}
+                      handleNextMonth={handleNextMonth}
+                      handleDateClick={handleDateClick}
+                      handleTimeClick={handleTimeClick}
+                      fetchMeetingAvailability={fetchMeetingAvailability}
+                      isDateActive={isDateActive}
+                      getMeetingTimesForDate={getMeetingTimesForDate}
+                      getMonthName={getMonthName}
+                      getShortWeekdayNames={getShortWeekdayNames}
+                      getDaysInMonth={getDaysInMonth}
+                      getFirstDayOfMonth={getFirstDayOfMonth}
+                      formatDateString={formatDateString}
+                      getDayName={getDayName}
+                    />
+                  </Tabs.Panel>
+                </div>
+              </Tabs>
 
-          </div>
-        </div>
-      ) : (
-        <div className="flex justify-center items-center min-h-[60vh]">
-          <div className="text-center">
-            <div className="bg-white dark:bg-slate-800 p-6 rounded-full mb-4 shadow-md inline-block">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                className="h-12 w-12 text-gray-400"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M12 4.354v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"
-                />
-              </svg>
             </div>
-            <p className="text-xl text-gray-600 dark:text-gray-300">
-              {t("profileNotFound")}
-            </p>
           </div>
-        </div>
-      )}
+        ) : (
+          <div className="flex justify-center items-center min-h-[60vh]">
+            <div className="text-center">
+              <div className="bg-white dark:bg-slate-800 p-6 rounded-full mb-4 shadow-md inline-block">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="h-12 w-12 text-gray-400"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M12 4.354v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"
+                  />
+                </svg>
+              </div>
+              <p className="text-xl text-gray-600 dark:text-gray-300">
+                {t("profileNotFound")}
+              </p>
+            </div>
+          </div>
+        )}
 
         <div className="flex-grow"></div>
         <Footer />

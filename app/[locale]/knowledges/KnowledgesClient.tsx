@@ -81,7 +81,7 @@ async function fetchKnowledgeItems({ taxonomy, id, type, page, locale }: FetchKn
     headers: {
       "Content-Type": "application/json",
       "Accept": "application/json",
-      "Accept-Language": locale,"X-Timezone": Intl.DateTimeFormat().resolvedOptions().timeZone,
+      "Accept-Language": locale, "X-Timezone": Intl.DateTimeFormat().resolvedOptions().timeZone,
     },
   });
 
@@ -98,7 +98,7 @@ export default function KnowledgesClient() {
   const params = useParams();
   const locale = params.locale as string || 'en';
   const isRTL = locale === 'ar';
-  
+
   // Translations
   const translations = {
     loading: isRTL ? 'جاري تحميل عناصر المعرفة...' : 'Loading knowledge items...',
@@ -127,7 +127,7 @@ export default function KnowledgesClient() {
     report: isRTL ? 'تقارير' : 'Report',
     filteredResults: isRTL ? 'نتائج الفلاتر' : 'Filtered Results',
     knowledge: isRTL ? 'رؤى' : 'Insights'
-  };  
+  };
 
   // Get filter values from URL query parameters
   const taxonomyParam = searchParams.get('taxonomy') || 'industry';
@@ -143,11 +143,11 @@ export default function KnowledgesClient() {
   const [page, setPage] = useState<number>(pageParam);
   const [entityName, setEntityName] = useState<string>(entityNameParam);
   const [view, setView] = useState<'grid' | 'list'>('grid');
-  
+
   // State for data
   const [knowledgeItems, setKnowledgeItems] = useState<KnowledgeItem[]>([]);
   const [pagination, setPagination] = useState<PaginationMeta | null>(null);
-  const [breadcrumbItems, setBreadcrumbItems] = useState<{label: string, href: string}[]>([]);
+  const [breadcrumbItems, setBreadcrumbItems] = useState<{ label: string, href: string }[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -181,7 +181,7 @@ export default function KnowledgesClient() {
             headers: {
               "Content-Type": "application/json",
               "Accept": "application/json",
-              "Accept-Language": locale,"X-Timezone": Intl.DateTimeFormat().resolvedOptions().timeZone,
+              "Accept-Language": locale, "X-Timezone": Intl.DateTimeFormat().resolvedOptions().timeZone,
             },
           });
           if (!response.ok) {
@@ -208,7 +208,7 @@ export default function KnowledgesClient() {
         headers: {
           "Content-Type": "application/json",
           "Accept": "application/json",
-          "Accept-Language": locale,"X-Timezone": Intl.DateTimeFormat().resolvedOptions().timeZone,
+          "Accept-Language": locale, "X-Timezone": Intl.DateTimeFormat().resolvedOptions().timeZone,
         },
       })
         .then((res) => res.json())
@@ -355,107 +355,107 @@ export default function KnowledgesClient() {
 
   return (
     <>
-       <PageIllustration />
-       <div className="relative z-10 max-w-6xl relative mx-auto  w-full ">
-      <div
-        className="pointer-events-none absolute z-10 -translate-x-1/2 transform hidden md:block"
-        style={{ left: '28%' }}
-        aria-hidden="true"
-      >
+      <PageIllustration />
+      <div className="relative z-10 max-w-6xl relative mx-auto  w-full ">
+        <div
+          className="pointer-events-none absolute z-10 -translate-x-1/2 transform hidden md:block"
+          style={{ left: '28%' }}
+          aria-hidden="true"
+        >
+          <Image
+            className="max-w-none opacity-50"
+            src={Stripes}
+            width={768}
+            height={768}
+            style={{ width: 'auto', height: 'auto' }}
+            alt="Stripes"
+            priority
+          />
+        </div>
+      </div>
+      {/* Header Section */}
+      <div className="section-header px-4 sm:px-6 lg:px-8 py-8 relative overflow-hidden rounded-lg">
         <Image
-          className="max-w-none opacity-50"
-          src={Stripes}
-          width={768}
-          height={768}
-          style={{ width: 'auto', height: 'auto' }}
-          alt="Stripes"
+          alt="Section background"
+          src="https://res.cloudinary.com/dsiku9ipv/image/upload/v1737266454/breadcrumb-bg-2_anwto8.png"
+          fill
+          className="object-cover z-0"
           priority
         />
-      </div>
-      </div>
-       {/* Header Section */}
-       <div className="section-header px-4 sm:px-6 lg:px-8 py-8 relative overflow-hidden rounded-lg">
-          <Image
-                   alt="Section background"
-                   src="https://res.cloudinary.com/dsiku9ipv/image/upload/v1737266454/breadcrumb-bg-2_anwto8.png"
-                   fill
-                   className="object-cover z-0"
-                   priority
-                 />
-         <div className="relative z-10 max-w-6xl relative mx-auto mt-5 w-full">
-           {/* Breadcrumb */}
-           {breadcrumbItems.length > 0 && (
-             <div className="mb-8">
-               <Breadcrumb items={breadcrumbItems} makeLastItemClickable={true} />
-             </div>
-           )}
-           
-           <div className="text-start" data-aos="fade-down">
-             <h3 className={`text-md ${isRTL ? 'bg-gradient-to-l from-blue-400 to-teal-500' : 'bg-gradient-to-r from-blue-500 to-teal-400'} md:text-3xl font-extrabold text-transparent bg-clip-text mb-4 `} style={{'lineHeight': '2.2'}}>
-               {getCurrentTypeLabel()} 
-               {entityName && ` ${isRTL ? 'في' : 'in'} ${entityName}`}
-             </h3>
-           </div>
-         </div>
-       </div>
+        <div className="relative z-10 max-w-6xl relative mx-auto mt-5 w-full">
+          {/* Breadcrumb */}
+          {breadcrumbItems.length > 0 && (
+            <div className="mb-8">
+              <Breadcrumb items={breadcrumbItems} makeLastItemClickable={true} />
+            </div>
+          )}
 
-       <div className='container mx-auto px-3 sm:px-4 pb-12 sm:pb-16 md:pb-20'  style={{position: 'relative', zIndex: 1}} >
-   
-      
-   <Title order={1} mb="xl"></Title>
-   
-  
- 
-   
-   {/* Results Display */}
-   {knowledgeItems.length > 0 ? (
-     <>
-       {view === 'grid' ? (
-         <KnowledgeGrid 
-           knowledge={knowledgeItems} 
-           topicName={translations.filteredResults}
-           locale={locale}
-         />
-       ) : (
-         <KnowledgeList
-           knowledge={knowledgeItems}
-           locale={locale}
-         />
-       )}
-       
-       {/* Pagination */}
-       {pagination && pagination.last_page > 1 && (
-         <Flex justify="center" mt="xl">
-           <Pagination
-             total={pagination.last_page}
-             value={page}
-             onChange={handlePageChange}
-           />
-         </Flex>
-       )}
-     </>
-   ) : (
-     <Flex justify="center" align="center" direction="column" h={200} mt="xl">
-       <Text size="lg" mb="md">{translations.noItemsFound}</Text>
-       <Button variant="outline" onClick={() => {
-         setTaxonomy('industry');
-         setSelectedId('');
-         setSelectedType('data');
-         setPage(1);
-       }}>
-         {translations.resetFilters}
-       </Button>
-     </Flex>
-   )}
-     {/* Results Controls */}
-     <Text className='text-center w-100 d-block ' pt={20} >
-       {pagination && pagination.total > 0 
-         ? `${translations.showing} ${pagination.from}-${pagination.to} ${translations.of} ${pagination.total} ${translations.items}` 
-         : translations.noItems}
-     </Text>
-     
-  
- </div></>
+          <div className="text-start" data-aos="fade-down">
+            <h3 className={`text-md ${isRTL ? 'bg-gradient-to-l from-blue-400 to-teal-500' : 'bg-gradient-to-r from-blue-500 to-teal-400'} md:text-3xl font-extrabold text-transparent bg-clip-text mb-4 `} style={{ 'lineHeight': '2.2' }}>
+              {getCurrentTypeLabel()}
+              {entityName && ` ${isRTL ? 'في' : 'in'} ${entityName}`}
+            </h3>
+          </div>
+        </div>
+      </div>
+
+      <div className='container mx-auto px-3 sm:px-4 pb-12 sm:pb-16 md:pb-20' style={{ position: 'relative', zIndex: 1 }} >
+
+
+        <Title order={1} mb="xl"></Title>
+
+
+
+
+        {/* Results Display */}
+        {knowledgeItems.length > 0 ? (
+          <>
+            {view === 'grid' ? (
+              <KnowledgeGrid
+                knowledge={knowledgeItems}
+                topicName={translations.filteredResults}
+                locale={locale}
+              />
+            ) : (
+              <KnowledgeList
+                knowledge={knowledgeItems}
+                locale={locale}
+              />
+            )}
+
+            {/* Pagination */}
+            {pagination && pagination.last_page > 1 && (
+              <Flex justify="center" mt="xl">
+                <Pagination
+                  total={pagination.last_page}
+                  value={page}
+                  onChange={handlePageChange}
+                />
+              </Flex>
+            )}
+          </>
+        ) : (
+          <Flex justify="center" align="center" direction="column" h={200} mt="xl">
+            <Text size="lg" mb="md">{translations.noItemsFound}</Text>
+            <Button variant="outline" onClick={() => {
+              setTaxonomy('industry');
+              setSelectedId('');
+              setSelectedType('data');
+              setPage(1);
+            }}>
+              {translations.resetFilters}
+            </Button>
+          </Flex>
+        )}
+        {/* Results Controls */}
+        <Text className='text-center w-100 d-block ' pt={20} >
+          {pagination && pagination.total > 0
+            ? `${translations.showing} ${pagination.from}-${pagination.to} ${translations.of} ${pagination.total} ${translations.items}`
+            : translations.noItems}
+        </Text>
+
+
+      </div></>
 
   );
 } 

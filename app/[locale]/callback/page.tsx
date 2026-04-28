@@ -35,7 +35,7 @@ export default function QueryParamAuthCallback() {
   const [loading, setLoading] = useState(true);
   // Get token from query parameters or cookies
   let token = searchParams.get('token');
-  
+
   // If no token parameter, check if the entire query string is a token (JWT format)
   if (!token && typeof window !== 'undefined') {
     const queryString = window.location.search.substring(1);
@@ -44,7 +44,7 @@ export default function QueryParamAuthCallback() {
       console.log('[callback] Detected raw token in query string:', token.substring(0, 20) + '...');
     }
   }
-  
+
   const returnUrl = searchParams.get('returnUrl');
   const locale = params.locale as string || 'en';
   const shouldPromptAddChannels = searchParams.get('promptAddChannels') === '1';
@@ -73,7 +73,7 @@ export default function QueryParamAuthCallback() {
           throw new Error('No token provided');
         }
 
-        
+
         // Store token in cookie (primary storage) with error handling
         try {
           setTokenCookie(token);
@@ -82,22 +82,22 @@ export default function QueryParamAuthCallback() {
           console.error('[callback] Failed to set token cookie:', cookieError);
           // Continue anyway, as we can still use localStorage
         }
-        
+
         // Store token in localStorage for backward compatibility
         localStorage.setItem('token', token);
         console.log('[callback] Token stored in localStorage');
-        
+
         // Set user's timezone (don't let this block the main flow)
         setUserTimezone(token).catch(error => {
           console.error('[callback] Failed to set timezone, continuing anyway:', error);
         });
-        
+
         // Fetch profile with retry logic
         console.log('[callback] Fetching user profile...');
         const response = await fetchProfileWithRetry(token);
-        
+
         console.log('[callback] Profile fetched successfully:', response.data.email, 'Roles:', response.data.roles);
-        
+
         // Store user data in localStorage (including country_id for redirect logic)
         console.log('[callback] Storing user data in localStorage');
         const userData = {
@@ -110,17 +110,17 @@ export default function QueryParamAuthCallback() {
           country_id: response.data.country_id, // Include country_id for redirect logic
           roles: response.data.roles, // Include roles for redirect logic
         };
-        
+
         localStorage.setItem('user', JSON.stringify(userData));
-        
+
         // Verify authentication was successful
         const storedToken = getAuthToken();
         const storedUser = localStorage.getItem('user');
-        
+
         if (!storedToken || !storedUser) {
           throw new Error('Failed to verify stored authentication data');
         }
-        
+
         console.log('[callback] Authentication verification successful');
 
         // Note: GlobalProfileProvider will pick up the token and fetch profile
@@ -138,13 +138,13 @@ export default function QueryParamAuthCallback() {
           }
         }
         setTimeout(() => handleRedirect(response.data), 200);
-        
+
       } catch (error) {
         console.error('[callback] Error in authentication flow:', error);
-        
+
         // Clear any partially set auth data
         clearAuthData();
-        
+
         // Show error for a moment before redirecting to login
         setTimeout(() => {
           console.log('[callback] Redirecting to login due to error');
@@ -164,11 +164,11 @@ export default function QueryParamAuthCallback() {
 
   // Helper function to set token in cookie with improved localhost settings
   const setTokenCookie = (token: string) => {
-    const isLocalhost = window.location.hostname === 'localhost' || 
-                       window.location.hostname === '127.0.0.1' ||
-                       window.location.hostname.startsWith('localhost:') ||
-                       window.location.hostname.startsWith('127.0.0.1:');
-    
+    const isLocalhost = window.location.hostname === 'localhost' ||
+      window.location.hostname === '127.0.0.1' ||
+      window.location.hostname.startsWith('localhost:') ||
+      window.location.hostname.startsWith('127.0.0.1:');
+
     let cookieSettings;
     if (isLocalhost) {
       // For localhost development - use permissive settings
@@ -189,11 +189,11 @@ export default function QueryParamAuthCallback() {
         `Secure`
       ];
     }
-    
+
     const cookieString = cookieSettings.join('; ');
     console.log('[callback] Setting cookie:', cookieString);
     document.cookie = cookieString;
-    
+
     // Verify the cookie was set
     setTimeout(() => {
       const verification = getTokenFromCookie('token');
@@ -204,7 +204,7 @@ export default function QueryParamAuthCallback() {
   // Helper function to get cookie value
   const getCookie = (name: string): string | null => {
     if (typeof document === 'undefined') return null;
-    
+
     const cookies = document.cookie.split(';');
     for (let i = 0; i < cookies.length; i++) {
       const cookie = cookies[i].trim();
@@ -221,14 +221,14 @@ export default function QueryParamAuthCallback() {
     localStorage.removeItem('token');
     localStorage.removeItem('user');
     localStorage.removeItem('foresighta-creds');
-    
+
     // Clear token cookie
-    const isLocalhost = window.location.hostname === 'localhost' || 
-                       window.location.hostname === '127.0.0.1' ||
-                       window.location.hostname.startsWith('localhost:') ||
-                       window.location.hostname.startsWith('127.0.0.1:');
+    const isLocalhost = window.location.hostname === 'localhost' ||
+      window.location.hostname === '127.0.0.1' ||
+      window.location.hostname.startsWith('localhost:') ||
+      window.location.hostname.startsWith('127.0.0.1:');
     let cookieSettings;
-    
+
     if (isLocalhost) {
       cookieSettings = [
         'token=',
@@ -246,7 +246,7 @@ export default function QueryParamAuthCallback() {
         'Secure'
       ];
     }
-    
+
     document.cookie = cookieSettings.join('; ');
   };
 
@@ -255,7 +255,7 @@ export default function QueryParamAuthCallback() {
     try {
       const userTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
       console.log('[TIMEZONE] Setting timezone:', userTimezone);
-      
+
       const timezoneResponse = await fetch('https://api.insightabusiness.com/api/account/timezone/set', {
         method: 'POST',
         headers: {
@@ -268,7 +268,7 @@ export default function QueryParamAuthCallback() {
           timezone: userTimezone
         })
       });
-      
+
       if (!timezoneResponse.ok) {
         console.error('[TIMEZONE] Failed to set timezone:', timezoneResponse.status);
       } else {
@@ -330,9 +330,9 @@ export default function QueryParamAuthCallback() {
         redirectUrl = finalReturnUrl;
         storeCountryUpdateReturnUrl(finalReturnUrl);
       } else if (userData.roles &&
-          (userData.roles.includes('insighter') ||
-           userData.roles.includes('company') ||
-           userData.roles.includes('company-insighter'))) {
+        (userData.roles.includes('insighter') ||
+          userData.roles.includes('company') ||
+          userData.roles.includes('company-insighter'))) {
         // Store Angular dashboard as return URL
         redirectUrl = '/app/insighter-dashboard/my-dashboard';
         storeCountryUpdateReturnUrl(redirectUrl);
@@ -387,9 +387,9 @@ export default function QueryParamAuthCallback() {
         }
       }
     } else if (userData.roles &&
-        (userData.roles.includes('insighter') ||
-         userData.roles.includes('company') ||
-         userData.roles.includes('company-insighter'))) {
+      (userData.roles.includes('insighter') ||
+        userData.roles.includes('company') ||
+        userData.roles.includes('company-insighter'))) {
       // Redirect to insighter dashboard
       console.log('[callback] Redirecting to Angular insighter dashboard');
       window.location.href = `${getAngularAppOrigin()}/app/insighter-dashboard/my-dashboard`;
@@ -406,10 +406,10 @@ export default function QueryParamAuthCallback() {
   };
   // Helper function to clear return URL cookie
   const clearReturnUrlCookie = () => {
-    const isLocalhost = window.location.hostname === 'localhost' || 
-                       window.location.hostname === '127.0.0.1' ||
-                       window.location.hostname.startsWith('localhost:') ||
-                       window.location.hostname.startsWith('127.0.0.1:');
+    const isLocalhost = window.location.hostname === 'localhost' ||
+      window.location.hostname === '127.0.0.1' ||
+      window.location.hostname.startsWith('localhost:') ||
+      window.location.hostname.startsWith('127.0.0.1:');
 
     let cookieSettings;
     if (isLocalhost) {
@@ -438,10 +438,10 @@ export default function QueryParamAuthCallback() {
     localStorage.setItem('countryUpdateReturnUrl', url);
 
     // Also store in cookie for cross-domain compatibility
-    const isLocalhost = window.location.hostname === 'localhost' || 
-                       window.location.hostname === '127.0.0.1' ||
-                       window.location.hostname.startsWith('localhost:') ||
-                       window.location.hostname.startsWith('127.0.0.1:');
+    const isLocalhost = window.location.hostname === 'localhost' ||
+      window.location.hostname === '127.0.0.1' ||
+      window.location.hostname.startsWith('localhost:') ||
+      window.location.hostname.startsWith('127.0.0.1:');
 
     let cookieSettings;
     if (isLocalhost) {
@@ -471,7 +471,7 @@ export default function QueryParamAuthCallback() {
     for (let attempt = 1; attempt <= maxRetries; attempt++) {
       try {
         console.log(`[callback] Profile fetch attempt ${attempt}/${maxRetries}`);
-        
+
         const response = await fetch('https://api.insightabusiness.com/api/account/profile', {
           headers: {
             'Authorization': `Bearer ${authToken}`,
@@ -524,7 +524,7 @@ export default function QueryParamAuthCallback() {
         await new Promise(resolve => setTimeout(resolve, delay));
       }
     }
-    
+
     throw new Error('Failed to fetch profile after all retry attempts');
   };
 

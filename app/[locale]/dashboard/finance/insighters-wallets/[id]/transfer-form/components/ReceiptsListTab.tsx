@@ -211,11 +211,10 @@ export default function ReceiptsListTab({
                 key={page}
                 type="button"
                 onClick={() => void fetchReceipts(page)}
-                className={`h-7 rounded-md border px-2 text-[11px] font-medium shadow-sm ${
-                  page === meta.current_page
+                className={`h-7 rounded-md border px-2 text-[11px] font-medium shadow-sm ${page === meta.current_page
                     ? 'border-blue-600 bg-blue-600 text-white'
                     : 'border-slate-200 bg-white text-slate-700 hover:bg-slate-50'
-                }`}
+                  }`}
               >
                 {page}
               </button>

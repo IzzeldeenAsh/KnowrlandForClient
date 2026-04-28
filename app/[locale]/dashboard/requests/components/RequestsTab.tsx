@@ -203,9 +203,8 @@ export default function RequestsTab() {
 
     return requests.filter((request) => {
       const requestable = request.requestable ?? {};
-      const combined = `${requestable.legal_name ?? ''} ${requestable.name ?? ''} ${requestable.verified_email ?? ''} ${
-        requestable.email ?? ''
-      } ${request.type?.label ?? ''} ${request.final_status ?? ''} ${request.final_status_label ?? ''}`.toLowerCase();
+      const combined = `${requestable.legal_name ?? ''} ${requestable.name ?? ''} ${requestable.verified_email ?? ''} ${requestable.email ?? ''
+        } ${request.type?.label ?? ''} ${request.final_status ?? ''} ${request.final_status_label ?? ''}`.toLowerCase();
       return combined.includes(query);
     });
   }, [requests, searchQuery]);
@@ -440,7 +439,7 @@ export default function RequestsTab() {
             Search
           </button>
 
-         
+
         </div>
       </div>
 
@@ -542,11 +541,10 @@ export default function RequestsTab() {
                   key={page}
                   type="button"
                   onClick={() => void fetchRequests(page, perPage)}
-                  className={`h-7 rounded-md border px-2 text-[11px] font-medium shadow-sm ${
-                    page === meta.current_page
+                  className={`h-7 rounded-md border px-2 text-[11px] font-medium shadow-sm ${page === meta.current_page
                       ? 'border-blue-600 bg-blue-600 text-white'
                       : 'border-slate-200 bg-white text-slate-700 hover:bg-slate-50'
-                  }`}
+                    }`}
                 >
                   {page}
                 </button>

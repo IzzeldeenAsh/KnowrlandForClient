@@ -344,93 +344,93 @@ export default function OrdersTab() {
 
       <div className="mt-4 overflow-hidden rounded-md border border-slate-200 bg-white shadow-sm">
         <div className="overflow-x-auto">
-        <table className="min-w-[930px] w-full border-collapse text-xs text-slate-700">
-          <thead className="bg-slate-50/90 text-[11px] font-semibold uppercase tracking-wide text-slate-500">
-            <tr>
-              <th className="w-[190px] whitespace-nowrap border-b border-slate-200 px-3 py-2.5 text-left">Order No</th>
-              <th className="w-[180px] whitespace-nowrap border-b border-slate-200 px-3 py-2.5 text-left">Date</th>
-              <th className="w-[140px] whitespace-nowrap border-b border-slate-200 px-3 py-2.5 text-left">Amount</th>
-              <th className="w-[150px] whitespace-nowrap border-b border-slate-200 px-3 py-2.5 text-left">Order Status</th>
-              <th className="w-[150px] whitespace-nowrap border-b border-slate-200 px-3 py-2.5 text-left">Payment Status</th>
-              <th className="w-[180px] whitespace-nowrap border-b border-slate-200 px-3 py-2.5 text-left">Payment Method</th>
-              <th className="w-[170px] whitespace-nowrap border-b border-slate-200 px-3 py-2.5 text-left">Fulfillment</th>
-              <th className="w-[120px] whitespace-nowrap border-b border-slate-200 px-3 py-2.5 text-right">Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {isLoading ? (
+          <table className="min-w-[930px] w-full border-collapse text-xs text-slate-700">
+            <thead className="bg-slate-50/90 text-[11px] font-semibold uppercase tracking-wide text-slate-500">
               <tr>
-                <td colSpan={8} className="px-4 py-10 text-center text-sm text-slate-500">
-                  Loading...
-                </td>
+                <th className="w-[190px] whitespace-nowrap border-b border-slate-200 px-3 py-2.5 text-left">Order No</th>
+                <th className="w-[180px] whitespace-nowrap border-b border-slate-200 px-3 py-2.5 text-left">Date</th>
+                <th className="w-[140px] whitespace-nowrap border-b border-slate-200 px-3 py-2.5 text-left">Amount</th>
+                <th className="w-[150px] whitespace-nowrap border-b border-slate-200 px-3 py-2.5 text-left">Order Status</th>
+                <th className="w-[150px] whitespace-nowrap border-b border-slate-200 px-3 py-2.5 text-left">Payment Status</th>
+                <th className="w-[180px] whitespace-nowrap border-b border-slate-200 px-3 py-2.5 text-left">Payment Method</th>
+                <th className="w-[170px] whitespace-nowrap border-b border-slate-200 px-3 py-2.5 text-left">Fulfillment</th>
+                <th className="w-[120px] whitespace-nowrap border-b border-slate-200 px-3 py-2.5 text-right">Actions</th>
               </tr>
-            ) : error ? (
-              <tr>
-                <td colSpan={8} className="px-4 py-10 text-center text-sm text-red-600">
-                  {error}
-                </td>
-              </tr>
-            ) : orders.length === 0 ? (
-              <tr>
-                <td colSpan={8} className="px-4 py-10 text-center text-sm text-slate-500">
-                  No orders found.
-                </td>
-              </tr>
-            ) : (
-              orders.map((order) => {
-                const orderStatus = normalizeText(order.status) || 'unknown';
-                const paymentStatus = normalizeText(order.payment?.status) || 'unknown';
-                const fulfillment = normalizeText(order.fulfillment_staus) || 'unknown';
-                const userType = normalizeText(order.user?.type);
-                return (
-                  <tr key={order.uuid} className="odd:bg-white even:bg-slate-50/40 hover:bg-blue-50/30">
-                    <td className="border-b border-slate-100 px-3 py-2.5 font-semibold text-slate-900">
-                      <div className="flex flex-wrap items-center gap-1">
-                        <span>{normalizeText(order.order_no) || '-'}</span>
-                        {userType ? (
-                          <span className={`rounded-full px-2 py-0.5 text-[10px] font-semibold ${getUserTypeBadgeClass(userType)}`}>
-                            {toTitle(userType)}
-                          </span>
-                        ) : null}
-                      </div>
-                    </td>
-                    <td className="whitespace-nowrap border-b border-slate-100 px-3 py-2.5 text-slate-600">{formatDate(order.date)}</td>
-                    <td className="whitespace-nowrap border-b border-slate-100 px-3 py-2.5 font-semibold text-slate-900">
-                      {formatCurrency(order.amount, order.currency)}
-                    </td>
-                    <td className="border-b border-slate-100 px-3 py-2.5">
-                      <span className={`inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-semibold ${getStatusBadgeClass(orderStatus)}`}>
-                        {toTitle(orderStatus)}
-                      </span>
-                    </td>
-                    <td className="border-b border-slate-100 px-3 py-2.5">
-                      <span className={`inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-semibold ${getStatusBadgeClass(paymentStatus)}`}>
-                        {toTitle(paymentStatus)}
-                      </span>
-                    </td>
-                    <td className="border-b border-slate-100 px-3 py-2.5">
-                      <span className="rounded-full bg-slate-50 px-2 py-0.5 text-[10px] font-semibold text-slate-700 ring-1 ring-slate-200">
-                        {getPaymentMethodLabel(order.payment?.method ?? '')}
-                      </span>
-                    </td>
-                    <td className="border-b border-slate-100 px-3 py-2.5">
-                      <span className={`inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-semibold ${getFulfillmentBadgeClass(fulfillment)}`}>
-                        {toTitle(fulfillment)}
-                      </span>
-                    </td>
-                    <td className="border-b border-slate-100 px-3 py-2.5">
-                      <div className="flex items-center justify-end">
-                        <button type="button" onClick={() => openDetails(order)} className={ROW_ACTION_BUTTON_CLASS}>
-                          View
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
-                );
-              })
-            )}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {isLoading ? (
+                <tr>
+                  <td colSpan={8} className="px-4 py-10 text-center text-sm text-slate-500">
+                    Loading...
+                  </td>
+                </tr>
+              ) : error ? (
+                <tr>
+                  <td colSpan={8} className="px-4 py-10 text-center text-sm text-red-600">
+                    {error}
+                  </td>
+                </tr>
+              ) : orders.length === 0 ? (
+                <tr>
+                  <td colSpan={8} className="px-4 py-10 text-center text-sm text-slate-500">
+                    No orders found.
+                  </td>
+                </tr>
+              ) : (
+                orders.map((order) => {
+                  const orderStatus = normalizeText(order.status) || 'unknown';
+                  const paymentStatus = normalizeText(order.payment?.status) || 'unknown';
+                  const fulfillment = normalizeText(order.fulfillment_staus) || 'unknown';
+                  const userType = normalizeText(order.user?.type);
+                  return (
+                    <tr key={order.uuid} className="odd:bg-white even:bg-slate-50/40 hover:bg-blue-50/30">
+                      <td className="border-b border-slate-100 px-3 py-2.5 font-semibold text-slate-900">
+                        <div className="flex flex-wrap items-center gap-1">
+                          <span>{normalizeText(order.order_no) || '-'}</span>
+                          {userType ? (
+                            <span className={`rounded-full px-2 py-0.5 text-[10px] font-semibold ${getUserTypeBadgeClass(userType)}`}>
+                              {toTitle(userType)}
+                            </span>
+                          ) : null}
+                        </div>
+                      </td>
+                      <td className="whitespace-nowrap border-b border-slate-100 px-3 py-2.5 text-slate-600">{formatDate(order.date)}</td>
+                      <td className="whitespace-nowrap border-b border-slate-100 px-3 py-2.5 font-semibold text-slate-900">
+                        {formatCurrency(order.amount, order.currency)}
+                      </td>
+                      <td className="border-b border-slate-100 px-3 py-2.5">
+                        <span className={`inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-semibold ${getStatusBadgeClass(orderStatus)}`}>
+                          {toTitle(orderStatus)}
+                        </span>
+                      </td>
+                      <td className="border-b border-slate-100 px-3 py-2.5">
+                        <span className={`inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-semibold ${getStatusBadgeClass(paymentStatus)}`}>
+                          {toTitle(paymentStatus)}
+                        </span>
+                      </td>
+                      <td className="border-b border-slate-100 px-3 py-2.5">
+                        <span className="rounded-full bg-slate-50 px-2 py-0.5 text-[10px] font-semibold text-slate-700 ring-1 ring-slate-200">
+                          {getPaymentMethodLabel(order.payment?.method ?? '')}
+                        </span>
+                      </td>
+                      <td className="border-b border-slate-100 px-3 py-2.5">
+                        <span className={`inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-semibold ${getFulfillmentBadgeClass(fulfillment)}`}>
+                          {toTitle(fulfillment)}
+                        </span>
+                      </td>
+                      <td className="border-b border-slate-100 px-3 py-2.5">
+                        <div className="flex items-center justify-end">
+                          <button type="button" onClick={() => openDetails(order)} className={ROW_ACTION_BUTTON_CLASS}>
+                            View
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  );
+                })
+              )}
+            </tbody>
+          </table>
         </div>
       </div>
 

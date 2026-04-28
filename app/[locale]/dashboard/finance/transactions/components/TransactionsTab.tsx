@@ -1,6 +1,7 @@
 'use client';
 
 import { KeyboardEvent, useCallback, useEffect, useMemo, useRef, useState, type PointerEvent } from 'react';
+import writeXlsxFile from 'write-excel-file/browser';
 import { getAuthToken } from '@/lib/authToken';
 import { useToast } from '@/components/toast/ToastContext';
 import { buildAuthHeaders, parseApiError } from '../../../_config/api';
@@ -40,6 +41,23 @@ const SECONDARY_BUTTON_CLASS =
   'h-8 rounded-md border border-slate-200 bg-white px-4 text-xs font-medium text-slate-700 shadow-sm hover:bg-slate-50';
 const ROW_ACTION_BUTTON_CLASS =
   'rounded-md border border-slate-200 bg-white px-2 py-1 text-[10px] font-medium text-slate-700 shadow-sm hover:bg-slate-50';
+const EXPORT_BUTTON_CLASS =
+  'h-8 rounded-md border border-emerald-200 bg-emerald-50 px-4 text-xs font-medium text-emerald-700 shadow-sm hover:bg-emerald-100 disabled:cursor-not-allowed disabled:opacity-60';
+const EXPORT_CURRENCY_FORMAT = '[$$-409]#,##0.00';
+const EXPORT_COLUMNS = [
+  { width: 28 },
+  { width: 22 },
+  { width: 14 },
+  { width: 12 },
+  { width: 14 },
+  { width: 14 },
+  { width: 18 },
+  { width: 20 },
+  { width: 18 },
+  { width: 24 },
+  { width: 14 },
+  { width: 24 },
+];
 
 function normalizeText(value: unknown): string {
   return typeof value === 'string' ? value.trim() : '';
@@ -200,6 +218,81 @@ function buildSmoothPath(points: Array<{ x: number; y: number }>, tension = 0.4)
   }
 
   return d;
+}
+
+function normalizeMoney(value: unknown): number {
+  if (typeof value === 'number') return Number.isFinite(value) ? value : 0;
+  const parsed = Number.parseFloat(normalizeText(value));
+  return Number.isFinite(parsed) ? parsed : 0;
+}
+
+function getTransactionsFromExportPayload(payload: unknown): TransactionRecord[] {
+  if (Array.isArray(payload)) return payload as TransactionRecord[];
+  if (payload && typeof payload === 'object' && Array.isArray((payload as { data?: unknown }).data)) {
+    return (payload as { data: TransactionRecord[] }).data;
+  }
+  return [];
+}
+
+function buildExportHeaderCell(value: string) {
+  return {
+    value,
+    fontWeight: 'bold' as const,
+    backgroundColor: '#F8FAFC',
+    color: '#0F172A',
+  };
+}
+
+function buildExportCell(value: string | number) {
+  return typeof value === 'number' ? { value, type: Number } : { value };
+}
+
+function buildExportCurrencyCell(value: number) {
+  return { value, type: Number, format: EXPORT_CURRENCY_FORMAT };
+}
+
+function getLocalDateStamp(date = new Date()): string {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const day = String(date.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
+}
+
+function buildTransactionExportRows(transactions: TransactionRecord[]) {
+  const headers = [
+    'Service',
+    'Date',
+    'Transaction',
+    'Amount',
+    'Provider Fee',
+    'Net Amount',
+    'Order Number',
+    'Invoice Number',
+    'Order Service',
+    'Client Name',
+    'Client Type',
+    'Insighter Name',
+  ];
+
+  return [
+    headers.map(buildExportHeaderCell),
+    ...transactions.map((tx) =>
+      [
+        buildExportCell(getTransactionTypeLabel(tx.type)),
+        buildExportCell(formatDate(tx.date)),
+        buildExportCell(toTitle(tx.transaction)),
+        buildExportCurrencyCell(normalizeMoney(tx.amount)),
+        buildExportCurrencyCell(normalizeMoney(tx.provider_fee)),
+        buildExportCurrencyCell(normalizeMoney(tx.net_amount)),
+        buildExportCell(normalizeText(tx.order?.order_no)),
+        buildExportCell(normalizeText(tx.order?.invoice_no)),
+        buildExportCell(normalizeText(tx.order?.service)),
+        buildExportCell(normalizeText(tx.order?.user?.name)),
+        buildExportCell(normalizeText(tx.order?.user?.type)),
+        buildExportCell(normalizeText(tx.insighter?.name)),
+      ],
+    ),
+  ];
 }
 
 function MiniCurveChart({ points }: { points: ChartDataPoint[] }) {
@@ -380,14 +473,14 @@ function MiniCurveChart({ points }: { points: ChartDataPoint[] }) {
 
           {tooltip
             ? [
-                { color: '#10b981', value: tooltip.depositsValue },
-                { color: '#ef4444', value: tooltip.withdrawalsValue },
-              ].map((series) => (
-                <g key={series.color}>
-                  <circle cx={tooltip.left} cy={yForValue(series.value)} r={6} fill={series.color} opacity={0.18} />
-                  <circle cx={tooltip.left} cy={yForValue(series.value)} r={4} fill={series.color} stroke="#ffffff" strokeWidth={2} />
-                </g>
-              ))
+              { color: '#10b981', value: tooltip.depositsValue },
+              { color: '#ef4444', value: tooltip.withdrawalsValue },
+            ].map((series) => (
+              <g key={series.color}>
+                <circle cx={tooltip.left} cy={yForValue(series.value)} r={6} fill={series.color} opacity={0.18} />
+                <circle cx={tooltip.left} cy={yForValue(series.value)} r={4} fill={series.color} stroke="#ffffff" strokeWidth={2} />
+              </g>
+            ))
             : null}
         </svg>
 
@@ -427,7 +520,7 @@ function MiniCurveChart({ points }: { points: ChartDataPoint[] }) {
 type Period = 'weekly' | 'monthly' | 'yearly';
 
 export default function TransactionsTab() {
-  const { handleServerErrors } = useToast();
+  const { handleServerErrors, success, warning } = useToast();
 
   const [selectedPeriod, setSelectedPeriod] = useState<Period>('monthly');
 
@@ -435,6 +528,7 @@ export default function TransactionsTab() {
   const [meta, setMeta] = useState<TransactionMeta>({ current_page: 1, last_page: 1, per_page: 10, total: 0 });
 
   const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [isExporting, setIsExporting] = useState<boolean>(false);
   const [error, setError] = useState<string>('');
 
   const [balanceLoading, setBalanceLoading] = useState<boolean>(true);
@@ -618,6 +712,50 @@ export default function TransactionsTab() {
     void fetchTransactions(page, perPage, selectedPeriod, controller.signal);
   };
 
+  const exportTransactions = useCallback(async () => {
+    setIsExporting(true);
+
+    try {
+      const token = getAuthToken();
+      if (!token) {
+        warning('Please sign in again.', 'Warning');
+        return;
+      }
+
+      const url = new URL('https://api.insightabusiness.com/api/admin/fund/platform/transaction/list');
+      url.searchParams.set('per_time', selectedPeriod);
+
+      const response = await fetch(url.toString(), {
+        method: 'GET',
+        cache: 'no-store',
+        headers: buildAuthHeaders(token),
+      });
+
+      if (!response.ok) throw await parseApiError(response);
+
+      const payload = await response.json();
+      const exportTransactionsList = getTransactionsFromExportPayload(payload);
+
+      if (!exportTransactionsList.length) {
+        warning('No transactions available to export.', 'Warning');
+        return;
+      }
+
+      const dateString = getLocalDateStamp();
+      const fileName = `Insighta_transactions_${dateString}.xlsx`;
+      await writeXlsxFile(buildTransactionExportRows(exportTransactionsList), {
+        sheet: 'Transactions',
+        columns: EXPORT_COLUMNS,
+      }).toFile(fileName);
+
+      success('Transactions exported successfully.', 'Export Successful');
+    } catch (requestError) {
+      handleServerErrors(requestError);
+    } finally {
+      setIsExporting(false);
+    }
+  }, [handleServerErrors, selectedPeriod, success, warning]);
+
   const openDetails = (tx: TransactionRecord) => {
     setSelectedTransaction(tx);
     setDetailsOpen(true);
@@ -719,7 +857,9 @@ export default function TransactionsTab() {
               />
             </div>
 
-          
+            <button type="button" onClick={exportTransactions} disabled={isExporting} className={EXPORT_BUTTON_CLASS}>
+              {isExporting ? 'Exporting...' : 'Export Excel'}
+            </button>
           </div>
         </div>
 

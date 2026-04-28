@@ -155,12 +155,12 @@ function buildSpreadsheetMlWorkbook(
  xmlns:ss="urn:schemas-microsoft-com:office:spreadsheet"
  xmlns:html="http://www.w3.org/TR/REC-html40">
 ${safeSheets
-  .map(
-    (sheet) => `<Worksheet ss:Name="${escapeXml(sheet.name)}"><Table>${sheet.rows
-      .map(renderRow)
-      .join('')}</Table></Worksheet>`,
-  )
-  .join('')}
+      .map(
+        (sheet) => `<Worksheet ss:Name="${escapeXml(sheet.name)}"><Table>${sheet.rows
+          .map(renderRow)
+          .join('')}</Table></Worksheet>`,
+      )
+      .join('')}
 </Workbook>`;
 }
 
@@ -435,14 +435,14 @@ function RevenueChart({
 
           {tooltip
             ? [
-                { color: '#3799FF', value: tooltip.knowledge },
-                { color: '#50C878', value: tooltip.meetings },
-              ].map((series, idx) => (
-                <g key={series.color}>
-                  <circle cx={tooltip.left} cy={yForValue(series.value)} r={6} fill={series.color} opacity={0.18} />
-                  <circle cx={tooltip.left} cy={yForValue(series.value)} r={4} fill={series.color} stroke="#ffffff" strokeWidth={2} />
-                </g>
-              ))
+              { color: '#3799FF', value: tooltip.knowledge },
+              { color: '#50C878', value: tooltip.meetings },
+            ].map((series, idx) => (
+              <g key={series.color}>
+                <circle cx={tooltip.left} cy={yForValue(series.value)} r={6} fill={series.color} opacity={0.18} />
+                <circle cx={tooltip.left} cy={yForValue(series.value)} r={4} fill={series.color} stroke="#ffffff" strokeWidth={2} />
+              </g>
+            ))
             : null}
         </svg>
 

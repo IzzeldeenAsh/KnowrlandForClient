@@ -25,16 +25,16 @@ import { publicBaseUrl } from '@/app/config';
 
 
 const almarai = Almarai({
-  subsets: ['arabic', 'latin'],
+  subsets: ['arabic'],
   weight: ['300', '400', '700', '800'],
   variable: '--font-almarai',
   display: 'swap'
 });
 
 const theme = createTheme({
-  fontFamily: 'var(--font-almarai), sans-serif',
+  fontFamily: 'var(--font-almarai), Inter, sans-serif',
   fontFamilyMonospace: 'Monaco, Courier, monospace',
-  headings: { fontFamily: 'var(--font-almarai), sans-serif' },
+  headings: { fontFamily: 'var(--font-almarai), Inter, sans-serif' },
 });
 
 export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }): Promise<import('next').Metadata> {

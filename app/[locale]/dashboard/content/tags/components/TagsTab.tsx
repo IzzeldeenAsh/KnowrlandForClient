@@ -205,7 +205,7 @@ export default function TagsTab() {
     return () => controller.abort();
   }, [keyword, statusFilter, fetchTags]);
 
-    const pages = useMemo(() => getPaginationWindow(meta.current_page, meta.last_page, 5), [meta.current_page, meta.last_page]);
+  const pages = useMemo(() => getPaginationWindow(meta.current_page, meta.last_page, 5), [meta.current_page, meta.last_page]);
 
   const onPageChange = (page: number) => {
     currentRequestAbort.current?.abort();

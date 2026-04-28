@@ -11,54 +11,54 @@ export interface ErrorResponse {
 export function formatErrorMessage(errorResponse: ErrorResponse): string {
   // Start with the main error message
   let formattedMessage = errorResponse.message || 'An error occurred';
-  
+
   // Process field-specific errors if they exist
   if (errorResponse.errors) {
     // Collect all error messages
     const allErrors: string[] = [];
-    
+
     // Process each field's error messages
     Object.entries(errorResponse.errors).forEach(([field, errors]) => {
       if (Array.isArray(errors)) {
         errors.forEach(error => allErrors.push(error));
       }
     });
-    
+
     // If we have any errors, add them as a formatted list
     if (allErrors.length > 0) {
       const errorDetails = allErrors.map(err => `- ${err}`).join('\n');
       formattedMessage = `${formattedMessage}\n\nDetails:\n${errorDetails}`;
     }
   }
-  
+
   return formattedMessage;
 }
 
 // API function for autocomplete
 export async function fetchAutocomplete(
-  keyword: string, 
-  locale: string, 
+  keyword: string,
+  locale: string,
   onError?: (error: string) => void
 ): Promise<string[]> {
   // Get token from cookies (primary) or localStorage (fallback)
   const token = getAuthToken();
   const headers: HeadersInit = {
-    "Content-Type": "application/json", 
+    "Content-Type": "application/json",
     "Accept": "application/json",
     "Accept-Language": locale,
     "X-Timezone": Intl.DateTimeFormat().resolvedOptions().timeZone,
   };
   if (token) {
     headers.Authorization = `Bearer ${token}`;
-  } 
+  }
 
   if (!keyword.trim()) return [];
-  
+
   try {
     const response = await fetch(`https://api.insightabusiness.com/api/platform/search/autocomplete?keyword=${encodeURIComponent(keyword)}`, {
-     headers
+      headers
     });
-    
+
     // Handle 422 validation errors specifically
     if (response.status === 422) {
       const errorData: ErrorResponse = await response.json();
@@ -67,9 +67,9 @@ export async function fetchAutocomplete(
       }
       return [];
     }
-    
+
     if (!response.ok) throw new Error('Network response was not ok');
-    
+
     const data = await response.json();
     return data.data.searchKeywords || [];
   } catch (error: any) {
@@ -103,57 +103,57 @@ export async function fetchStatisticsPerType(
 ) {
   try {
     const url = new URL('https://api.insightabusiness.com/api/platform/search/statistics-per-type');
-    
+
     // Add base parameters
     url.searchParams.append('accuracy', accuracyFilter);
     url.searchParams.append('search_type', 'knowledge');
     url.searchParams.append('keyword', searchQuery.trim());
-    
+
     // Add language parameter
     if (languageFilter && languageFilter !== 'all') {
       url.searchParams.append('language', languageFilter);
     }
-    
+
     // Add country parameter
     if (countryFilter !== null) {
       url.searchParams.append('country', countryFilter.toString());
     }
-    
+
     // Add region parameter
     if (regionFilter !== null) {
       url.searchParams.append('region', regionFilter.toString());
     }
-    
+
     // Add economic bloc parameter
     if (economicBlocFilter !== null) {
       url.searchParams.append('economic_bloc', economicBlocFilter.toString());
     }
-    
+
     // Add ISIC code parameter
     if (isicCodeFilter !== null) {
       url.searchParams.append('isic_code', isicCodeFilter);
     }
-    
+
     // Add tag parameter
     if (tagFilter !== null) {
       url.searchParams.append('tag', tagFilter);
     }
-    
+
     // Add Products parameter
     if (hsCodeFilter !== null) {
       url.searchParams.append('hs_code', hsCodeFilter);
     }
-    
+
     // Add industry parameter
     if (industryFilter !== null) {
       url.searchParams.append('industry', industryFilter.toString());
     }
-    
+
     // Add price parameter
     if (priceFilter !== null) {
       url.searchParams.append('paid', priceFilter);
     }
-    
+
     // Add role parameter
     if (roleFilter !== null && roleFilter !== 'all') {
       url.searchParams.append('role', roleFilter);
@@ -180,7 +180,7 @@ export async function fetchStatisticsPerType(
     // Get token from cookies (primary) or localStorage (fallback)
     const token = getAuthToken();
     const headers: HeadersInit = {
-      "Content-Type": "application/json", 
+      "Content-Type": "application/json",
       "Accept": "application/json",
       "Accept-Language": locale,
       "X-Timezone": Intl.DateTimeFormat().resolvedOptions().timeZone,
@@ -188,12 +188,12 @@ export async function fetchStatisticsPerType(
     if (token) {
       headers.Authorization = `Bearer ${token}`;
     }
-    
+
     const response = await fetch(url.toString(), {
       headers,
       next: { revalidate: 30 } // Cache for 30 seconds for better performance
     });
-    
+
     // Handle 422 validation errors specifically
     if (response.status === 422) {
       const errorData: ErrorResponse = await response.json();
@@ -202,11 +202,11 @@ export async function fetchStatisticsPerType(
       }
       return { data: [] };
     }
-    
+
     if (!response.ok) {
       throw new Error('Network response was not ok');
     }
-    
+
     return await response.json();
   } catch (error) {
     console.error('Statistics API request failed:', error);
@@ -250,22 +250,22 @@ export async function fetchSearchResults(
     url.searchParams.append('accuracy', accuracyFilter);
     // Backend now returns all data when keyword is empty
     url.searchParams.append('keyword', searchQuery.trim());
-    
+
     // IMPORTANT: Always use the search_type parameter passed to the function
     // This ensures we use the exact search type that was requested
     url.searchParams.append('search_type', searchType);
-    
+
     // IMPORTANT: Always use the directly passed page parameter instead of reading from URL
     // This prevents issues with URL state being out of sync with the requested page
     url.searchParams.append('page', currentPage.toString());
     // Add per_page parameter for pagination control
     const perPageValue = perPage ? perPage.toString() : '27'; // Default to 30 if not provided
     url.searchParams.append('per_page', perPageValue);
-    
+
     // Track request type for debugging (removed in production)
     const isPaginationRequest = currentPage > 1;
 
-    
+
     // Add type parameter for category filtering (data, reports, insights, manuals, courses)
     if (categoryType && categoryType !== 'all') {
       url.searchParams.append('type', categoryType);
@@ -274,58 +274,58 @@ export async function fetchSearchResults(
     else if (activeTab && activeTab !== 'all') {
       url.searchParams.append('type', activeTab);
     }
-    
+
     // Add language parameter based on the language filter
     if (languageFilter && languageFilter !== 'all') {
       // Use the language value directly since it's already in the correct format
       url.searchParams.append('language', languageFilter);
     }
-    
+
     // Remove price filtering logic as requested
-    
+
     // Language parameter is already added above
     // No need for duplicate filters[language] parameter
-    
+
     // Add direct country parameter for the API
     if (countryFilter !== null) {
       url.searchParams.append('country', countryFilter.toString());
     }
-    
+
     // Add direct region parameter for the API
     if (regionFilter !== null) {
       url.searchParams.append('region', regionFilter.toString());
     }
-    
+
     // Add direct economic bloc parameter for the API
     if (economicBlocFilter !== null) {
       url.searchParams.append('economic_bloc', economicBlocFilter.toString());
     }
-    
+
     // Add ISIC code parameter for the API
     if (isicCodeFilter !== null) {
       url.searchParams.append('isic_code', isicCodeFilter);
     }
-    
+
     // Add Products parameter for the API
     if (hsCodeFilter !== null) {
       url.searchParams.append('hs_code', hsCodeFilter);
     }
-    
+
     // Add industry parameter for the API
     if (industryFilter !== null) {
       url.searchParams.append('industry', industryFilter.toString());
     }
-    
+
     // Add tag parameter for the API
     if (tagFilter !== null) {
       url.searchParams.append('tag', tagFilter);
     }
-    
+
     // Add price parameter for price filtering
     if (priceFilter !== null) {
       url.searchParams.append('paid', priceFilter);
     }
-    
+
     // Add role parameter for role filtering
     if (roleFilter !== null && roleFilter !== 'all') {
       url.searchParams.append('role', roleFilter);
@@ -353,11 +353,11 @@ export async function fetchSearchResults(
     // if (countryFilter !== null) {
     //   url.searchParams.append('filters[country_id]', countryFilter.toString());
     // }
-    
+
     // Get token from cookies (primary) or localStorage (fallback)
     const token = getAuthToken();
     const headers: HeadersInit = {
-      "Content-Type": "application/json", 
+      "Content-Type": "application/json",
       "Accept": "application/json",
       "Accept-Language": locale,
       "X-Timezone": Intl.DateTimeFormat().resolvedOptions().timeZone,
@@ -365,37 +365,37 @@ export async function fetchSearchResults(
     if (token) {
       headers.Authorization = `Bearer ${token}`;
     }
-    
+
     const response = await fetch(url.toString(), {
       headers,
       next: { revalidate: 30 } // Cache for 30 seconds for better performance
     });
-    
+
     // Handle 422 validation errors specifically
     if (response.status === 422) {
       const errorData: ErrorResponse = await response.json();
       if (onError) {
         onError(formatErrorMessage(errorData));
       }
-      return { 
-        data: [], 
+      return {
+        data: [],
         links: { first: null, last: null, prev: null, next: null },
         meta: { current_page: 1, from: 0, last_page: 1, per_page: perPage, to: 0, total: 0, links: [] }
       };
     }
-    
+
     if (!response.ok) {
       throw new Error('Network response was not ok');
     }
-    
+
     return await response.json();
   } catch (error) {
     console.error('API request failed:', error);
     if (onError) {
       onError('Failed to fetch search results. Please try again later.');
     }
-    return { 
-      data: [], 
+    return {
+      data: [],
       links: { first: null, last: null, prev: null, next: null },
       meta: { current_page: 1, from: 0, last_page: 1, per_page: perPage, to: 0, total: 0, links: [] }
     };

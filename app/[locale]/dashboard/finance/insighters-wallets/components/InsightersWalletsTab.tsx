@@ -272,7 +272,7 @@ export default function InsightersWalletsTab() {
                 <label htmlFor="insighters-wallets-balance-status" className="text-[11px] font-medium text-slate-500">
                   Balance status
                 </label>
-               
+
               </div>
               <select
                 id="insighters-wallets-balance-status"
@@ -302,7 +302,7 @@ export default function InsightersWalletsTab() {
       <div className="mt-4 rounded-md border border-slate-200 bg-white p-4 shadow-sm">
         <div className="flex items-center justify-between gap-2">
           <div className="text-xs text-slate-500">total: {meta.total}</div>
-         
+
         </div>
 
         <div className="mt-3 overflow-x-auto rounded-md border border-slate-200 bg-white shadow-sm">

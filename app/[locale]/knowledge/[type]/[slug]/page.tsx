@@ -103,7 +103,7 @@ async function fetchKnowledgeData(type: string, slug: string, locale: string = '
     // Get auth token from cookies for server-side requests
     const cookieStore = await cookies();
     const token = cookieStore.get('token')?.value;
-    
+
     // Prepare headers with auth token if available
     const headers: HeadersInit = {
       "Content-Type": "application/json",
@@ -111,13 +111,13 @@ async function fetchKnowledgeData(type: string, slug: string, locale: string = '
       "Accept-Language": locale,
       "X-Timezone": Intl.DateTimeFormat().resolvedOptions().timeZone,
     };
-    
+
     // Add Authorization header if token exists
     if (token) {
       headers.Authorization = `Bearer ${token}`;
     }
     // Note: localStorage cleanup is handled by AuthHandler component
-    
+
     const response = await fetch(
       `https://api.insightabusiness.com/api/platform/industries/knowledge/${slug}`,
       {
@@ -134,28 +134,28 @@ async function fetchKnowledgeData(type: string, slug: string, locale: string = '
         statusText: response.statusText,
         url: response.url,
       });
-      
+
       if (response.status === 404) {
         notFound();
       }
-      
+
       throw new Error(
         `Failed to fetch knowledge details: ${response.status} ${response.statusText}`
       );
     }
-  
+
     const data = await response.json();
-    
+
     // Validate response structure
     if (!data || typeof data !== 'object') {
       throw new Error('Invalid API response structure');
     }
-    
+
     // Ensure data property exists
     if (!data.data) {
       throw new Error('API response missing data property');
     }
-    
+
     return data;
   } catch (error) {
     console.error("Error fetching knowledge data:", error);
@@ -192,7 +192,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     return metadata;
   } catch (error) {
     const isRTL = locale === 'ar';
-    const baseUrl =  'https://insightabusiness.com';
+    const baseUrl = 'https://insightabusiness.com';
     const defaultSocialImage = 'https://res.cloudinary.com/dsiku9ipv/image/upload/v1769923661/drilldown_1_cjpvli_jprtoi.jpg';
     const pageUrl = `${baseUrl}/${locale}/knowledge/${type}/${slug}`;
 
@@ -204,7 +204,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     }
 
     const title = isRTL ? "الرؤى غير موجودة | Insighta" : "Insights Not Found |Insighta";
-    const description = isRTL 
+    const description = isRTL
       ? "لم يتم العثور على المورد المعرفي المطلوب. تحقق من الرابط أو ابحث عن محتوى آخر على منصة Insighta."
       : "The requested knowledge resource could not be found. Please check the URL or search for other content on Insighta platform.";
 
@@ -250,10 +250,10 @@ export default async function KnowledgePage({ params }: Props) {
   const resolvedParams = await params;
   const { type, slug, locale } = resolvedParams;
   const isRTL = locale === 'ar';
-  
+
   // Get translations
   const messages = await getMessages(locale);
-  
+
   // Translations
   const translations = {
     insighter: isRTL ? 'إنسايتر' : 'Insighter',
@@ -265,12 +265,12 @@ export default async function KnowledgePage({ params }: Props) {
 
   // No try/catch here - let any errors be caught by the not-found page
   const response = await fetchKnowledgeData(type, slug, locale);
-  
+
   // Validate response structure
   if (!response || !response.data) {
     notFound();
   }
-  
+
   const knowledge = response.data;
 
   const relatedSummary: RelatedKnowledgeSummaryItem[] = Array.isArray(knowledge?.related_knowledge?.summary)
@@ -296,12 +296,12 @@ export default async function KnowledgePage({ params }: Props) {
     (relatedItems.topic?.length ?? 0) > 0 ||
     (relatedItems.product?.length ?? 0) > 0 ||
     (relatedItems.insighter?.length ?? 0) > 0;
-  
+
   // Validate required knowledge properties
   if (!knowledge || !knowledge.insighter) {
     notFound();
   }
-  
+
   const breadcrumbData = await fetchBreadcrumb("knowledge", slug, locale);
   const breadcrumbItems = breadcrumbData.map((item, index) => ({
     label: index === breadcrumbData.length - 1 ? "" : item.label,
@@ -333,57 +333,57 @@ export default async function KnowledgePage({ params }: Props) {
           __html: JSON.stringify(schemas)
         }}
       />
-      
-    <div className="min-h-screen bg-gray-50 relative" dir={isRTL ? 'rtl' : 'ltr'} lang={locale === 'ar' ? 'ar' : 'en'}>
-      {/* Language mismatch notifier */}
-      {knowledge?.language && (
-        <LanguageMismatchNotifier 
-          knowledgeLanguage={knowledge.language} 
-          currentLocale={locale} 
-        />
-      )}
-      
-      {/* Background decoration */}
-      <div className="pointer-events-none absolute z-10 left-[10%] top-0 hidden md:block" aria-hidden="true">
-        <Image
-          className="max-w-none opacity-50"
-          src={Stripes}
-          width={768}
-          height={768}
-          style={{ width: 'auto', height: 'auto' }}
-          alt=""
-          aria-hidden="true"
-          priority
-        />
-      </div>
-      
-      {/* Header Section */}
-      <header className="section-header px-4 sm:px-6 lg:px-8 py-6 sm:py-8 relative overflow-hidden rounded-lg" role="banner">
-        <Image
-          alt=""
-          src="https://res.cloudinary.com/dsiku9ipv/image/upload/v1737266454/breadcrumb-bg-2_anwto8.png"
-          fill
-          className="object-cover z-0"
-          priority
-          sizes="100vw"
-          aria-hidden="true"
-        />
-        <div className="container mx-auto px-2 sm:px-4 relative z-10 mt-3 sm:mt-5">
-          {/* Breadcrumb */}
-          <div className="mb-8">
-            <Breadcrumb items={breadcrumbItems} />
-          </div>
-          
-          {/* Header */}
-          <div className={`${isRTL ? 'text-right' : 'text-start'} mb-4 w-full`}    data-aos="fade-down">
-            <div className="flex-row gap-3 sm:gap-4 flex-wrap sm:flex-nowrap sm:flex lg:max-w-80-per px-4" >
-              <div className="mb-4 mt-1 hidden sm:block">
-                
-                {knowledge.type === 'data' && <div className="bg-white p-2 sm:p-3 rounded flex items-center justify-center"><span className="hidden sm:block"><DataIcon width={40} height={40} /></span><span className="sm:hidden"><DataIcon width={30} height={30} /></span></div>}
-                {knowledge.type === 'statistic' && <div className="bg-white p-2 rounded flex items-center justify-center"><span className="hidden sm:block"><InsightIcon width={50} height={50} /></span><span className="sm:hidden"><InsightIcon width={30} height={30} /></span></div>}
-                {knowledge.type === 'manual' && <div className="bg-white p-2 rounded flex items-center justify-center"><span className="hidden sm:block"><ManualIcon width={50} height={50} /></span><span className="sm:hidden"><ManualIcon width={30} height={30} /></span></div>}
-                {knowledge.type === 'report' && <div className="bg-white p-2 rounded flex items-center justify-center"><span className="hidden sm:block"><ReportIcon width={50} height={50} /></span><span className="sm:hidden"><ReportIcon width={30} height={30} /></span></div>}
-                {knowledge.type === 'course' && <div className="bg-white p-2 rounded flex items-center justify-center"><span className="hidden sm:block"><CourseIcon width={50} height={50} /></span><span className="sm:hidden"><CourseIcon width={30} height={30} /></span></div>}
+
+      <div className="min-h-screen bg-gray-50 relative" dir={isRTL ? 'rtl' : 'ltr'} lang={locale === 'ar' ? 'ar' : 'en'}>
+        {/* Language mismatch notifier */}
+        {knowledge?.language && (
+          <LanguageMismatchNotifier
+            knowledgeLanguage={knowledge.language}
+            currentLocale={locale}
+          />
+        )}
+
+        {/* Background decoration */}
+        <div className="pointer-events-none absolute z-10 left-[10%] top-0 hidden md:block" aria-hidden="true">
+          <Image
+            className="max-w-none opacity-50"
+            src={Stripes}
+            width={768}
+            height={768}
+            style={{ width: 'auto', height: 'auto' }}
+            alt=""
+            aria-hidden="true"
+            priority
+          />
+        </div>
+
+        {/* Header Section */}
+        <header className="section-header px-4 sm:px-6 lg:px-8 py-6 sm:py-8 relative overflow-hidden rounded-lg" role="banner">
+          <Image
+            alt=""
+            src="https://res.cloudinary.com/dsiku9ipv/image/upload/v1737266454/breadcrumb-bg-2_anwto8.png"
+            fill
+            className="object-cover z-0"
+            priority
+            sizes="100vw"
+            aria-hidden="true"
+          />
+          <div className="container mx-auto px-2 sm:px-4 relative z-10 mt-3 sm:mt-5">
+            {/* Breadcrumb */}
+            <div className="mb-8">
+              <Breadcrumb items={breadcrumbItems} />
+            </div>
+
+            {/* Header */}
+            <div className={`${isRTL ? 'text-right' : 'text-start'} mb-4 w-full`} data-aos="fade-down">
+              <div className="flex-row gap-3 sm:gap-4 flex-wrap sm:flex-nowrap sm:flex lg:max-w-80-per px-4" >
+                <div className="mb-4 mt-1 hidden sm:block">
+
+                  {knowledge.type === 'data' && <div className="bg-white p-2 sm:p-3 rounded flex items-center justify-center"><span className="hidden sm:block"><DataIcon width={40} height={40} /></span><span className="sm:hidden"><DataIcon width={30} height={30} /></span></div>}
+                  {knowledge.type === 'statistic' && <div className="bg-white p-2 rounded flex items-center justify-center"><span className="hidden sm:block"><InsightIcon width={50} height={50} /></span><span className="sm:hidden"><InsightIcon width={30} height={30} /></span></div>}
+                  {knowledge.type === 'manual' && <div className="bg-white p-2 rounded flex items-center justify-center"><span className="hidden sm:block"><ManualIcon width={50} height={50} /></span><span className="sm:hidden"><ManualIcon width={30} height={30} /></span></div>}
+                  {knowledge.type === 'report' && <div className="bg-white p-2 rounded flex items-center justify-center"><span className="hidden sm:block"><ReportIcon width={50} height={50} /></span><span className="sm:hidden"><ReportIcon width={30} height={30} /></span></div>}
+                  {knowledge.type === 'course' && <div className="bg-white p-2 rounded flex items-center justify-center"><span className="hidden sm:block"><CourseIcon width={50} height={50} /></span><span className="sm:hidden"><CourseIcon width={30} height={30} /></span></div>}
                   <div className="text-[10px] font-bold text-center bg-blue-100 uppercase mt-2 text-blue-500 rounded-md">
                     {(() => {
                       const navLabels = messages?.Header?.navigation;
@@ -405,124 +405,124 @@ export default async function KnowledgePage({ params }: Props) {
                       }
                     })()}
                   </div>
-              </div>
-              <div className="flex flex-col items-start">
-                <div className="flex flex-col items-start mb-6 sm:mb-10">
-                  <h1 className={`md:max-w-3xl text-3xl md:text-4xl ${isRTL ? 'bg-gradient-to-l from-blue-400 to-teal-500' : 'bg-gradient-to-r from-blue-500 to-teal-400'} font-extrabold text-transparent bg-clip-text w-full lg:w-auto`} style={{wordBreak: 'break-word'}}>
-                    {knowledge.title}
-                  </h1>
-                  
+                </div>
+                <div className="flex flex-col items-start">
+                  <div className="flex flex-col items-start mb-6 sm:mb-10">
+                    <h1 className={`md:max-w-3xl text-3xl md:text-4xl ${isRTL ? 'bg-gradient-to-l from-blue-400 to-teal-500' : 'bg-gradient-to-r from-blue-500 to-teal-400'} font-extrabold text-transparent bg-clip-text w-full lg:w-auto`} style={{ wordBreak: 'break-word' }}>
+                      {knowledge.title}
+                    </h1>
+
+                  </div>
                 </div>
               </div>
-            </div>
-            <div className="flex flex-wrap gap-4 sm:gap-6 text-sm mt-4">
-              {
-              (knowledge.insighter?.roles?.includes('company') || knowledge.insighter?.roles?.includes('company-insighter')) ? (
-                // Company display
-                <>
-                  <div className="relative w-[40px] h-[40px] sm:w-[50px] sm:h-[50px]">
-                    <Link href={`/${locale}/profile/${knowledge.insighter.company?.uuid || knowledge.insighter.uuid}?entity=company`} className="block h-full">
-                      {knowledge.insighter.company?.logo ? (
-                        <Image
-                          src={knowledge.insighter.company.logo}
-                          alt={`${knowledge.insighter.company.legal_name || 'Company'} logo - ${knowledge.title} publisher`}
-                          fill={true}
-                          sizes="(max-width: 640px) 40px, 50px"
-                          className="rounded-full object-cover object-top"
-                        />
-                      ) : (
-                        <div className="w-full h-full rounded-full bg-blue-500 flex items-center justify-center">
-                          <span className="text-sm sm:text-lg text-white font-semibold">
-                            {(knowledge.insighter.company?.legal_name || 'C')
-                              .split(" ")
-                              .map((word: string) => word[0])
-                              .join("")
-                              .toUpperCase()}
-                          </span>
-                        </div>
-                      )}
-                    </Link>
-                  </div>
-                  <span className="flex flex-col">
-                    <span className="text-sm text-gray-500">{translations.company}</span>
-                    <span className="text-sm font-bold text-gray-700">
-                      <Link className="hover:text-blue-600" href={`/${locale}/profile/${knowledge.insighter.company?.uuid || knowledge.insighter.uuid}`}>
-                        {knowledge.insighter.company?.legal_name || knowledge.insighter.name}
-                      </Link>
-                    </span>
-                  </span>
-                  <div className="flex flex-col ps-4 sm:ps-8 mt-2 sm:mt-0">
-                    <span className="text-gray-500 text-sm">{translations.publishedBy}</span>
-                    <div className="flex items-center gap-2">
-                      <div className="relative w-[18px] h-[18px] sm:w-[20px] sm:h-[20px]">
-                        {knowledge.insighter.profile_photo_url ? (
-                          <Image
-                            src={knowledge.insighter.profile_photo_url}
-                            alt={`${knowledge.insighter.name} profile photo - ${knowledge.title} author`}
-                            fill={true}
-                            sizes="20px"
-                            className="rounded-full object-cover object-top"
-                          />
-                        ) : (
-                          <div className="w-full h-full rounded-full bg-blue-500 flex items-center justify-center">
-                            <span className="text-[6px] sm:text-[8px] text-white font-semibold">
-                              {knowledge.insighter.name
-                                .split(" ")
-                                .map((word: string) => word[0])
-                                .join("")
-                                .toUpperCase()}
-                            </span>
-                          </div>
-                        )}
+              <div className="flex flex-wrap gap-4 sm:gap-6 text-sm mt-4">
+                {
+                  (knowledge.insighter?.roles?.includes('company') || knowledge.insighter?.roles?.includes('company-insighter')) ? (
+                    // Company display
+                    <>
+                      <div className="relative w-[40px] h-[40px] sm:w-[50px] sm:h-[50px]">
+                        <Link href={`/${locale}/profile/${knowledge.insighter.company?.uuid || knowledge.insighter.uuid}?entity=company`} className="block h-full">
+                          {knowledge.insighter.company?.logo ? (
+                            <Image
+                              src={knowledge.insighter.company.logo}
+                              alt={`${knowledge.insighter.company.legal_name || 'Company'} logo - ${knowledge.title} publisher`}
+                              fill={true}
+                              sizes="(max-width: 640px) 40px, 50px"
+                              className="rounded-full object-cover object-top"
+                            />
+                          ) : (
+                            <div className="w-full h-full rounded-full bg-blue-500 flex items-center justify-center">
+                              <span className="text-sm sm:text-lg text-white font-semibold">
+                                {(knowledge.insighter.company?.legal_name || 'C')
+                                  .split(" ")
+                                  .map((word: string) => word[0])
+                                  .join("")
+                                  .toUpperCase()}
+                              </span>
+                            </div>
+                          )}
+                        </Link>
                       </div>
-                      <Link className="hover:text-blue-600 text-sm capitalize" href={`/${locale}/profile/${knowledge.insighter.uuid}?entity=insighter`}>
-                        {knowledge.insighter.name.toLowerCase()}
-                      </Link>
-                    </div>
-                  </div>
-                </>
-              ) : (
-                // Original insighter display
-                <>
-                  <div className="relative w-[40px] h-[40px] sm:w-[50px] sm:h-[50px]">
-                    <Link href={`/${locale}/profile/${knowledge.insighter.uuid}?entity=insighter`} className="block h-full">
-                      {knowledge.insighter.profile_photo_url ? (
-                        <Image
-                          src={knowledge.insighter.profile_photo_url}
-                          alt={`${knowledge.insighter.name} profile photo - ${knowledge.title} insighter`}
-                          fill={true}
-                          sizes="(max-width: 640px) 40px, 50px"
-                          className="rounded-full object-cover object-top"
-                        />
-                      ) : (
-                        <div className="w-full h-full rounded-full bg-blue-500 flex items-center justify-center">
-                          <span className="text-sm sm:text-lg text-white font-semibold">
-                            {knowledge.insighter.name
-                              .split(" ")
-                              .map((word: string) => word[0])
-                              .join("")
-                              .toUpperCase()}
-                          </span>
+                      <span className="flex flex-col">
+                        <span className="text-sm text-gray-500">{translations.company}</span>
+                        <span className="text-sm font-bold text-gray-700">
+                          <Link className="hover:text-blue-600" href={`/${locale}/profile/${knowledge.insighter.company?.uuid || knowledge.insighter.uuid}`}>
+                            {knowledge.insighter.company?.legal_name || knowledge.insighter.name}
+                          </Link>
+                        </span>
+                      </span>
+                      <div className="flex flex-col ps-4 sm:ps-8 mt-2 sm:mt-0">
+                        <span className="text-gray-500 text-sm">{translations.publishedBy}</span>
+                        <div className="flex items-center gap-2">
+                          <div className="relative w-[18px] h-[18px] sm:w-[20px] sm:h-[20px]">
+                            {knowledge.insighter.profile_photo_url ? (
+                              <Image
+                                src={knowledge.insighter.profile_photo_url}
+                                alt={`${knowledge.insighter.name} profile photo - ${knowledge.title} author`}
+                                fill={true}
+                                sizes="20px"
+                                className="rounded-full object-cover object-top"
+                              />
+                            ) : (
+                              <div className="w-full h-full rounded-full bg-blue-500 flex items-center justify-center">
+                                <span className="text-[6px] sm:text-[8px] text-white font-semibold">
+                                  {knowledge.insighter.name
+                                    .split(" ")
+                                    .map((word: string) => word[0])
+                                    .join("")
+                                    .toUpperCase()}
+                                </span>
+                              </div>
+                            )}
+                          </div>
+                          <Link className="hover:text-blue-600 text-sm capitalize" href={`/${locale}/profile/${knowledge.insighter.uuid}?entity=insighter`}>
+                            {knowledge.insighter.name.toLowerCase()}
+                          </Link>
                         </div>
-                      )}
-                    </Link>
-                  </div>
-                  <span className="flex flex-col">
-                    <span className="text-sm text-gray-500">{translations.insighter}</span>
-                    <span className="text-sm font-bold text-gray-700">
-                      <Link className="hover:text-blue-600" href={`/${locale}/profile/${knowledge.insighter.uuid}?entity=insighter`}>
-                        {knowledge.insighter.name}
-                      </Link>
-                    </span>
-                  </span>
-                </>
-              )}
-              <div className="flex flex-col ps-4 sm:ps-8 mt-2 sm:mt-0">
-                <span className="text-gray-500 text-sm">{translations.published}</span>
-                <span className="text-sm font-bold text-gray-700" style={{direction: isRTL ? 'ltr' : 'ltr'}}>
-                  {knowledge.published_at === null
-                    ? "N/A"
-                    : (() => {
+                      </div>
+                    </>
+                  ) : (
+                    // Original insighter display
+                    <>
+                      <div className="relative w-[40px] h-[40px] sm:w-[50px] sm:h-[50px]">
+                        <Link href={`/${locale}/profile/${knowledge.insighter.uuid}?entity=insighter`} className="block h-full">
+                          {knowledge.insighter.profile_photo_url ? (
+                            <Image
+                              src={knowledge.insighter.profile_photo_url}
+                              alt={`${knowledge.insighter.name} profile photo - ${knowledge.title} insighter`}
+                              fill={true}
+                              sizes="(max-width: 640px) 40px, 50px"
+                              className="rounded-full object-cover object-top"
+                            />
+                          ) : (
+                            <div className="w-full h-full rounded-full bg-blue-500 flex items-center justify-center">
+                              <span className="text-sm sm:text-lg text-white font-semibold">
+                                {knowledge.insighter.name
+                                  .split(" ")
+                                  .map((word: string) => word[0])
+                                  .join("")
+                                  .toUpperCase()}
+                              </span>
+                            </div>
+                          )}
+                        </Link>
+                      </div>
+                      <span className="flex flex-col">
+                        <span className="text-sm text-gray-500">{translations.insighter}</span>
+                        <span className="text-sm font-bold text-gray-700">
+                          <Link className="hover:text-blue-600" href={`/${locale}/profile/${knowledge.insighter.uuid}?entity=insighter`}>
+                            {knowledge.insighter.name}
+                          </Link>
+                        </span>
+                      </span>
+                    </>
+                  )}
+                <div className="flex flex-col ps-4 sm:ps-8 mt-2 sm:mt-0">
+                  <span className="text-gray-500 text-sm">{translations.published}</span>
+                  <span className="text-sm font-bold text-gray-700" style={{ direction: isRTL ? 'ltr' : 'ltr' }}>
+                    {knowledge.published_at === null
+                      ? "N/A"
+                      : (() => {
                         const date = new Date(knowledge.published_at);
                         // Always format as "09 Jan 2026"
                         const day = date.getDate().toString().padStart(2, '0');
@@ -534,45 +534,45 @@ export default async function KnowledgePage({ params }: Props) {
                         // For RTL locales, swap the order: always day month year
                         return `${day} ${month} ${year}`;
                       })()}
-                </span>
-              </div>
-              {knowledge.review && knowledge.review.length > 0 && (
-                <div className="flex flex-col ps-4 sm:ps-8 mt-2 sm:mt-0">
-                  <span className="text-gray-500 text-sm">{translations.rating}</span>
-                  <div className="flex items-center">
-                    {(() => {
-                      // Calculate average rating, capping individual ratings at 5
-                      const validRatings = knowledge.review
-                        .map((review: { rate?: number }) => Math.min(5, review.rate || 0))
-                        .filter((rate: number) => !isNaN(rate) && rate > 0);
-                      
-                      const avgRating = validRatings.length > 0
-                        ? validRatings.reduce((sum: number, rate: number) => sum + rate, 0) / validRatings.length
-                        : 0;
-                      
-                      return (
-                        <>
-                          <Rating value={avgRating} fractions={2} readOnly size="sm" />
-                          <span className="text-xs text-gray-500 ml-1">{avgRating.toFixed(1)} ({knowledge.review.length})</span>
-                        </>
-                      );
-                    })()} 
-                  </div>
+                  </span>
                 </div>
-              )}
-        
+                {knowledge.review && knowledge.review.length > 0 && (
+                  <div className="flex flex-col ps-4 sm:ps-8 mt-2 sm:mt-0">
+                    <span className="text-gray-500 text-sm">{translations.rating}</span>
+                    <div className="flex items-center">
+                      {(() => {
+                        // Calculate average rating, capping individual ratings at 5
+                        const validRatings = knowledge.review
+                          .map((review: { rate?: number }) => Math.min(5, review.rate || 0))
+                          .filter((rate: number) => !isNaN(rate) && rate > 0);
+
+                        const avgRating = validRatings.length > 0
+                          ? validRatings.reduce((sum: number, rate: number) => sum + rate, 0) / validRatings.length
+                          : 0;
+
+                        return (
+                          <>
+                            <Rating value={avgRating} fractions={2} readOnly size="sm" />
+                            <span className="text-xs text-gray-500 ml-1">{avgRating.toFixed(1)} ({knowledge.review.length})</span>
+                          </>
+                        );
+                      })()}
+                    </div>
+                  </div>
+                )}
+
+              </div>
             </div>
           </div>
-        </div>
-      </header>
-      
-      {/* Main Content */}
-      <main className="container mx-auto px-3 sm:px-4 pb-12 sm:pb-16 md:pb-20" role="main">
-        <article itemScope itemType="https://schema.org/Article" className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-8">
-          <div className="lg:col-span-2">
-            <TabsContent knowledge={knowledge} knowledgeSlug={slug} />
-          </div>
-          <aside className="lg:col-span-1">
+        </header>
+
+        {/* Main Content */}
+        <main className="container mx-auto px-3 sm:px-4 pb-12 sm:pb-16 md:pb-20" role="main">
+          <article itemScope itemType="https://schema.org/Article" className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-8">
+            <div className="lg:col-span-2">
+              <TabsContent knowledge={knowledge} knowledgeSlug={slug} />
+            </div>
+            <aside className="lg:col-span-1">
               <KnowledgeSideBox
                 total_price={knowledge.total_price}
                 documents={knowledge.documents}
@@ -593,29 +593,29 @@ export default async function KnowledgePage({ params }: Props) {
                 cover_end={knowledge.cover_end}
               />
             </aside>
-        </article>
-      </main>
+          </article>
+        </main>
 
-   
 
-      {/* Related knowledge (Summary) */}
-      {relatedSummary.length > 0 && (
-        <RelatedKnowledgeSummarySection locale={locale} isRTL={isRTL} items={relatedSummary} />
-      )}
 
-         {/* Related knowledge (Items) */}
-         {hasRelatedItems && (
-        <RelatedKnowledgeItemsSection
-          locale={locale}
-          isRTL={isRTL}
-          items={relatedItems}
-          insighterName={knowledge.insighter?.name}
-          breadcrumbLabels={breadcrumbData.map((item) => item.label)}
-        />
-      )}
+        {/* Related knowledge (Summary) */}
+        {relatedSummary.length > 0 && (
+          <RelatedKnowledgeSummarySection locale={locale} isRTL={isRTL} items={relatedSummary} />
+        )}
 
-      <Footer />
-    </div>
+        {/* Related knowledge (Items) */}
+        {hasRelatedItems && (
+          <RelatedKnowledgeItemsSection
+            locale={locale}
+            isRTL={isRTL}
+            items={relatedItems}
+            insighterName={knowledge.insighter?.name}
+            breadcrumbLabels={breadcrumbData.map((item) => item.label)}
+          />
+        )}
+
+        <Footer />
+      </div>
     </>
   );
 }

@@ -95,8 +95,8 @@ export default function UpdateCountryPage() {
   const handleRedirect = () => {
     // Check for redirect URL in search params first, then localStorage, then cookies
     const redirectUrl = searchParams.get('redirect') ||
-                       localStorage.getItem('countryUpdateReturnUrl') ||
-                       getCookie('countryUpdateReturnUrl');
+      localStorage.getItem('countryUpdateReturnUrl') ||
+      getCookie('countryUpdateReturnUrl');
 
     if (redirectUrl) {
       // Clean up stored redirect URLs

@@ -20,8 +20,8 @@ const ProfileContext = createContext<ProfileContextType>({
   roles: [],
   isLoading: false,
   isAuthResolved: false,
-  refreshProfile: async () => {},
-  signOut: () => {},
+  refreshProfile: async () => { },
+  signOut: () => { },
 });
 
 export const useGlobalProfile = () => useContext(ProfileContext);
@@ -112,7 +112,7 @@ export function GlobalProfileProvider({ children }: { children: React.ReactNode 
   const fetchProfileWithRetry = async (token: string, maxRetries = 3): Promise<{ user: User | null; roles: string[] }> => {
     for (let attempt = 1; attempt <= maxRetries; attempt++) {
       try {
-        
+
         const response = await fetch('https://api.insightabusiness.com/api/account/profile', {
           method: 'GET',
           headers: {
@@ -163,7 +163,7 @@ export function GlobalProfileProvider({ children }: { children: React.ReactNode 
           whatsapp_number: profile.whatsapp_number ?? null,
         };
 
-    
+
 
         const rolesFromApi: string[] = Array.isArray(profile.roles) ? profile.roles : [];
 
@@ -190,7 +190,7 @@ export function GlobalProfileProvider({ children }: { children: React.ReactNode 
         await new Promise(resolve => setTimeout(resolve, delay));
       }
     }
-    
+
     return { user: null, roles: [] };
   };
 
@@ -198,7 +198,7 @@ export function GlobalProfileProvider({ children }: { children: React.ReactNode 
     try {
       const token = getAuthToken();
       const now = Date.now();
-      
+
       // If we already got an auth failure for this exact token, do not re-call
       // the profile endpoint again (the interval would otherwise spam 401s).
       if (!forceRefresh && token && globalProfileCache.authFailedToken === token) {
@@ -249,7 +249,7 @@ export function GlobalProfileProvider({ children }: { children: React.ReactNode 
         setUser(result.user);
         setRoles(result.roles);
       } catch (error) {
-        
+
         // Check if we have cached user data to fall back to
         const existingUser = localStorage.getItem('user');
         if (existingUser && !(error instanceof Error && error.message.includes('Auth failed'))) {
@@ -264,7 +264,7 @@ export function GlobalProfileProvider({ children }: { children: React.ReactNode 
             globalProfileCache.authFailedToken = token;
 
             clearAuthDataEverywhere();
-            
+
             resetProfileState();
           }
         }
@@ -298,11 +298,11 @@ export function GlobalProfileProvider({ children }: { children: React.ReactNode 
 
     // Initial fetch when component mounts
     refreshProfile();
-    
+
     // Set up auth state monitoring
     const checkAuthState = () => {
       const currentToken = getAuthToken();
-      
+
       // If we had a user but token is gone, clear state
       if (globalProfileCache.user && !currentToken) {
         globalProfileCache.authFailedToken = null;
@@ -311,7 +311,7 @@ export function GlobalProfileProvider({ children }: { children: React.ReactNode 
         globalProfileCache.lastFetchTime = 0;
         setUser(null);
         setRoles([]);
-      } 
+      }
       // If we have a token but no user, fetch profile
       else if (currentToken && !globalProfileCache.user) {
         // If the current token previously failed auth, do not keep retrying.
@@ -327,15 +327,15 @@ export function GlobalProfileProvider({ children }: { children: React.ReactNode 
 
     // Check auth state every 5 seconds
     const interval = setInterval(checkAuthState, 5000);
-    
+
     return () => clearInterval(interval);
   }, [pathname]);
 
   return (
-    <ProfileContext.Provider value={{ 
-      user, 
-      roles, 
-      isLoading, 
+    <ProfileContext.Provider value={{
+      user,
+      roles,
+      isLoading,
       isAuthResolved,
       refreshProfile: () => refreshProfile(true),
       signOut,

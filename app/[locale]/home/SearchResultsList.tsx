@@ -85,11 +85,11 @@ function getInitials(name: string) {
 // Helper function to safely format date, handling both string and string[] types
 function safeFormatDate(dateInput: string | string[] | undefined, locale: string = 'en'): string {
   if (!dateInput) return '';
-  
+
   // Convert array to string if needed
   const dateString = Array.isArray(dateInput) ? dateInput[0] || '' : dateInput;
   if (!dateString) return '';
-  
+
   try {
     return formatPublishedDate(dateString, locale);
   } catch (error) {
@@ -101,7 +101,7 @@ function safeFormatDate(dateInput: string | string[] | undefined, locale: string
 // Helper function to format date for display
 function formatPublishedDate(dateString: string, locale: string = 'en') {
   if (!dateString) return '';
-  
+
   // Ensure we're working with UTC time to avoid server/client mismatches
   const date = new Date(dateString);
 
@@ -255,26 +255,26 @@ export default function SearchResultsList({
   const params = useParams();
   const currentLocale = locale || params.locale || "en";
   const isRTL = currentLocale === "ar";
-      const [authModalOpened, setAuthModalOpened] = useState(false);
+  const [authModalOpened, setAuthModalOpened] = useState(false);
   // State for tracking read later status for each item
-  const [readLaterStates, setReadLaterStates] = useState<{[key: number]: boolean}>({});
-  const [loadingStates, setLoadingStates] = useState<{[key: number]: boolean}>({});
-  const [needsToggleMap, setNeedsToggleMap] = useState<{[key: number]: boolean}>({});
-  const descRefs = React.useRef<{[key: number]: HTMLDivElement | null}>({});
-  
+  const [readLaterStates, setReadLaterStates] = useState<{ [key: number]: boolean }>({});
+  const [loadingStates, setLoadingStates] = useState<{ [key: number]: boolean }>({});
+  const [needsToggleMap, setNeedsToggleMap] = useState<{ [key: number]: boolean }>({});
+  const descRefs = React.useRef<{ [key: number]: HTMLDivElement | null }>({});
+
   // Check if user is logged in
   const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
-  
+
   React.useEffect(() => {
     setIsLoggedIn(!!getAuthToken());
   }, []);
-  
+
   // Generate a unique prefix for this render to avoid key conflicts
   const uniquePrefix = React.useMemo(() => Date.now().toString(), [results]);
 
   // Measure description overflow to decide whether to show "Read more"
   React.useEffect(() => {
-    const nextNeeds: {[key: number]: boolean} = {};
+    const nextNeeds: { [key: number]: boolean } = {};
     // Only measure knowledge items that have descriptions
     results
       .filter((i) => i.searchable_type === "knowledge" && i.description)
@@ -289,7 +289,7 @@ export default function SearchResultsList({
 
   // Handle read later toggle
   const handleReadLaterToggle = async (item: SearchResultItem, e: React.MouseEvent) => {
-    if(!isLoggedIn){
+    if (!isLoggedIn) {
       setAuthModalOpened(true);
       return;
     }
@@ -360,7 +360,7 @@ export default function SearchResultsList({
     course: isRTL ? "دورة تدريبية" : "Course",
     topic: isRTL ? "موضوع" : "Topic",
   };
-  
+
   // Localized strings
   const translations = {
     topic: isRTL ? "موضوع" : "Topic",
@@ -436,329 +436,329 @@ export default function SearchResultsList({
                   radius="md"
                   className={listStyles.listCard}
                   component="div"
-                  style={{height:'240px'}} // Fixed height for consistency
-              >
-                <div  className="block relative w-full h-full flex flex-row">
-             
-              <div className={`${listStyles.typeColumn} ${item.searchable_type === "topic" ? "bg-topic" : ""}`} style={{
-                ...(item.searchable_type === "topic" ? { backgroundImage: "url(/images/topics-bg.png)" } : {}),
-                display: 'flex',
-                flexDirection: 'column',
-                justifyContent: 'space-between'
-              }}>
-                 <Link href={`/${currentLocale}/${item.url}`}>
-                <div className="flex items-center gap-2 z-10">
-                 
-                  <div className={listStyles.iconWrapper}>
-                    {item.searchable_type === "knowledge" && item.type && (
-                      <>
-                        {item.type === "report" && <ReportIcon width={24} height={24} />}
-                        {item.type === "manual" && <ManualIcon width={24} height={24} />}
-                        {item.type === "statistic" && <InsightIcon width={24} height={24} />}
-                        {item.type === "data" && <DataIcon width={24} height={24} />}
-                        {item.type === "course" && <CourseIcon width={24} height={24} />}
-                        {!item.type && <InsightIcon width={24} height={24} />}
-                      </>
-                    )}
-                    
-                  
-                  </div>
-                  
-                  <Badge w="fit-content" className="capitalize z-10" variant="light">
-                    {item.searchable_type === "knowledge" && item.type 
-                      ? (typeof item.type === 'string' ? typeTranslations[item.type.toLowerCase()] || item.type : typeTranslations['statistic'])
-                      : item.searchable_type === "topic" ? translations.topic : translations.knowledge}
-                  </Badge>
-                 
-                </div>
-                
-                <div className={listStyles.titleSection}>
-                  <Text
-                    component="h3"
-                    style={{wordBreak:'break-word'}}
-                    className={`${listStyles.title} ${isFirstWordArabic(item.title) ? 'text-right' : 'text-left'}`}
-                    dir={isFirstWordArabic(item.title) ? 'rtl' : 'ltr'}
-                  >
-                    {item.title}
-                  </Text>
-                  {item.review && parseInt(item.review) >= 1 && (
-                    <div className="flex items-center gap-1 mt-2">
-                      <Rating value={parseInt(item.review)} fractions={2} readOnly size="sm" />
-                      <Text size="xs" fw={500} className="mx-2 text-sky-500">{parseInt(item.review).toFixed(1)}</Text>
-                    </div>
-                  )}
-                </div>
-                {coverageText && (
-                  <div className={`absolute bottom-4 ${isFirstWordArabic(item.title) ? 'right-4' : 'left-4'}`} dir={isFirstWordArabic(item.title) ? 'rtl' : 'ltr'}>
-                    <div
-                      className="text-lg font-bold leading-none text-blue-400 drop-shadow-lg"
-                    >
-                      {coverageText}
-                    </div>
-                  </div>
-                )}
-                {item.total_downloads !== undefined && item.total_downloads > 0 && (
-                  <div className="absolute bottom-4 left-4 flex items-center gap-2">
-                    <div className="flex items-center justify-center w-6 h-6 bg-white bg-opacity-20 rounded-full">
-                      <ArrowDownTrayIcon className="w-3 h-3 text-white" />
-                    </div>
-                    <Text size="xs" className="text-white font-medium">
-                      {item.total_downloads.toLocaleString()} {item.total_downloads === 1 ? translations.download : translations.downloads}
-                    </Text>
-                  </div>
-                )}
-                </Link>
-                {item.searchable_type === "knowledge" && item.insighter && (
-                  <div className="flex items-center gap-3 z-10">
-                    <div className="relative">
-                   <div className="object-cover object-top">
-                   <Link 
-                    href={isCompany || isCompanyInsighter ? 
-                      `/${currentLocale}/profile/${item.insighter.company?.uuid}` : 
-                      `/${currentLocale}/profile/${item.insighter.uuid}?entity=insighter`}
-                   >
-                     <Avatar
-                       src={(isCompany || isCompanyInsighter) && item.insighter.company?.logo ? 
-                         item.insighter.company.logo : 
-                         item.insighter.profile_photo_url}
-                       radius="xl"
-                       alt={item.insighter.name}
-                       size="md"
-                       className={`${cardStyles.avatar} avatar-top-position`}
-                     >
-                       {!((isCompany || isCompanyInsighter) && item.insighter.company?.logo) && 
-                       !item.insighter.profile_photo_url &&
-                         getInitials(item.insighter.name)}
-                     </Avatar>
-                   </Link>
-                   </div>
-                        
-                        {isCompanyInsighter && item.insighter.profile_photo_url && (
-                          <Link href={`/${currentLocale}/profile/${item.insighter.uuid}?entity=insighter`}>
-                          <Avatar
-                            src={item.insighter.profile_photo_url}
-                            radius="xl"
-                            
-                            size="xs"
-                            className={`absolute bottom-0 ${isRTL ? 'left-0 -translate-x-1/3' : 'right-0 translate-x-1/3'} rounded-full translate-y-1/3 z-10 avatar-top-position`}
-                            alt={item.insighter.name}
-                            style={{
-                              boxShadow: '0 0 0 2px white',
-                              position: 'absolute',
-                            }}
-                          />
-                          </Link>
-                        )}
-                         {isCompany && item.insighter.profile_photo_url && (
-                          <Link href={`/${currentLocale}/profile/${item.insighter.uuid}?entity=insighter`}>
-                          <Avatar
-                            src={item.insighter.profile_photo_url}
-                            radius="xl"
-                            size="xs"
-                            className="absolute bottom-0 right-0 translate-x-1/3 rounded-full translate-y-1/3 z-10 avatar-top-position"
-                            alt={item.insighter.name}
-                            style={{
-                              boxShadow: '0 0 0 2px white',
-                              position: 'absolute',
-                            }}
-                          />
-                          </Link>
-                        )}
-                      </div>
-                    
-                    <div>
-                    <Text fw={600} size="sm" className="capitalize" c="white" ps={4}>
-                          <Link href={`/${currentLocale}/profile/${item.insighter.uuid}?entity=insighter`}>
-                          {isInsighter && item.insighter.name.toLowerCase()}
-                          </Link>
+                  style={{ height: '240px' }} // Fixed height for consistency
+                >
+                  <div className="block relative w-full h-full flex flex-row">
 
-                        <Link href={`/${currentLocale}/profile/${item.insighter.company?.uuid}`}>
-                          {isCompany && (
-                            item.insighter.company
-                              ? isRTL
-                                ? ` ${item.insighter.company.legal_name}`
-                                : `${item.insighter.company.legal_name} `
-                              : translations.company
-                          )}
-                          </Link>
-
-                          <Link href={`/${currentLocale}/profile/${item.insighter.company?.uuid}`}>
-                          {isCompanyInsighter && (
-                            item.insighter.company
-                              ? isRTL
-                                ? ` ${item.insighter.company.legal_name}`
-                                : `${item.insighter.company.legal_name} `
-                              : translations.company
-                          )}
-                        </Link>
-                          </Text>
-
-                        <Text c="dimmed" size="xs" className="capitalize" ps={4}>
-                          <Link href={`/${currentLocale}/profile/${item.insighter.uuid}?entity=insighter`}>
-                          {isInsighter && translations.insighter}
-                          </Link>
-
-                         
-                          {isCompany && (
-                            item.insighter.company
-                              ? (<Link href={`/${currentLocale}/profile/${item.insighter?.uuid}?entity=insighter`}>
-                                {translations.by} {item.insighter.name.toLowerCase()}
-                                </Link>)
-                              : <Link href={`/${currentLocale}/profile/${item.insighter?.uuid}?entity=insighter`}>
-                            Company
-                              </Link>
-                          )}
-
-                          {isCompanyInsighter && (
-                            item.insighter.company ? (
-                              <Link href={`/${currentLocale}/profile/${item.insighter?.uuid}?entity=insighter`}>
-                                {translations.by} {item.insighter.name.toLowerCase()}
-                              </Link>
-                            ) : (
-                              <span>{translations.company}</span>
-                            )
-                          )}
-                        </Text>
-                    </div>
-                  </div>
-                )}
-              </div>
-            
-              {/* Only show contentColumn if there's content to display */}
-              {(item.description || (item.searchable_type === "knowledge" && (shouldShowPricing || item.published_at))) && (
-                <div className={listStyles.contentColumn} style={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-between', height: '100%' }}>
-                  {item.description && (
-                    <>
+                    <div className={`${listStyles.typeColumn} ${item.searchable_type === "topic" ? "bg-topic" : ""}`} style={{
+                      ...(item.searchable_type === "topic" ? { backgroundImage: "url(/images/topics-bg.png)" } : {}),
+                      display: 'flex',
+                      flexDirection: 'column',
+                      justifyContent: 'space-between'
+                    }}>
                       <Link href={`/${currentLocale}/${item.url}`}>
-                        <div
-                          className={`${listStyles.richDescription} ${listStyles.richDescriptionCollapsed}`}
-                          ref={(el) => { descRefs.current[item.searchable_id] = el; }}
-                          dir={isFirstWordArabic(item.title) ? "rtl" : "ltr"}
-                          style={{ whiteSpace: 'pre-line' }}
-                        >
-                          {htmlToPlainTextWithBreaks(item.description)}
+                        <div className="flex items-center gap-2 z-10">
+
+                          <div className={listStyles.iconWrapper}>
+                            {item.searchable_type === "knowledge" && item.type && (
+                              <>
+                                {item.type === "report" && <ReportIcon width={24} height={24} />}
+                                {item.type === "manual" && <ManualIcon width={24} height={24} />}
+                                {item.type === "statistic" && <InsightIcon width={24} height={24} />}
+                                {item.type === "data" && <DataIcon width={24} height={24} />}
+                                {item.type === "course" && <CourseIcon width={24} height={24} />}
+                                {!item.type && <InsightIcon width={24} height={24} />}
+                              </>
+                            )}
+
+
+                          </div>
+
+                          <Badge w="fit-content" className="capitalize z-10" variant="light">
+                            {item.searchable_type === "knowledge" && item.type
+                              ? (typeof item.type === 'string' ? typeTranslations[item.type.toLowerCase()] || item.type : typeTranslations['statistic'])
+                              : item.searchable_type === "topic" ? translations.topic : translations.knowledge}
+                          </Badge>
+
                         </div>
-                      </Link>
-                      {needsToggleMap[item.searchable_id] && (
-                        <Link
-                          href={`/${currentLocale}/${item.url}`}
-                          className={listStyles.toggleLink}
-                        >
-                          {isRTL ? "قراءة المزيد" : "Read more"}
-                        </Link>
-                      )}
-                    </>
-                  )}
-                  
-                  {item.searchable_type === "knowledge" && (
-                    <div className={listStyles.detailsSection}>
-                      <div className="flex items-center gap-3">
-                        {shouldShowPricing && (
-                          <div className="flex items-center gap-2">
-                            {shouldShowPartial && (
-                              <Text size="xs" c="dimmed" className="whitespace-nowrap">
-                                {translations.freeDocs} +
-                              </Text>
-                            )}
-                            {(shouldShowPaid || (!paidStatus && hasPrice) || (shouldShowPartial && hasPrice)) && (
-                              <Badge
-                                color="yellow"
-                                variant="light"
-                                className={listStyles.priceBadge}
-                              >
-                                {shouldShowPartial && hasPrice ? (
-                                  <span dir="ltr" lang="en" >{formattedPrice} 
-                                  </span>
-                                ) : (
-                                  <span dir="ltr" lang="en">{formattedPrice}</span>
-                                )}
-                              </Badge>
-                            )}
-                            {shouldShowPartial && !hasPrice && (
-                              <Badge
-                                color="yellow"
-                                variant="light"
-                                className={listStyles.priceBadge}
-                                style={{fontWeight: '500'}}
-                              >
-                                {translations.partial}
-                              </Badge>
-                            )}
-                            {shouldShowFree && !shouldShowPartial && !(shouldShowPaid && hasPrice) && (
-                              <Badge
-                                color="green"
-                                variant="light"
-                                className={listStyles.priceBadge}
-                              >
-                                {translations.free}
-                              </Badge>
-                            )}
+
+                        <div className={listStyles.titleSection}>
+                          <Text
+                            component="h3"
+                            style={{ wordBreak: 'break-word' }}
+                            className={`${listStyles.title} ${isFirstWordArabic(item.title) ? 'text-right' : 'text-left'}`}
+                            dir={isFirstWordArabic(item.title) ? 'rtl' : 'ltr'}
+                          >
+                            {item.title}
+                          </Text>
+                          {item.review && parseInt(item.review) >= 1 && (
+                            <div className="flex items-center gap-1 mt-2">
+                              <Rating value={parseInt(item.review)} fractions={2} readOnly size="sm" />
+                              <Text size="xs" fw={500} className="mx-2 text-sky-500">{parseInt(item.review).toFixed(1)}</Text>
+                            </div>
+                          )}
+                        </div>
+                        {coverageText && (
+                          <div className={`absolute bottom-4 ${isFirstWordArabic(item.title) ? 'right-4' : 'left-4'}`} dir={isFirstWordArabic(item.title) ? 'rtl' : 'ltr'}>
+                            <div
+                              className="text-lg font-bold leading-none text-blue-400 drop-shadow-lg"
+                            >
+                              {coverageText}
+                            </div>
                           </div>
                         )}
-                        
-                        {item.published_at && (
-                          <Text c="dimmed" size="xs" dir={currentLocale === 'ar' ? 'rtl' : 'ltr'}>
-                            {translations.posted} {safeFormatDate(item.published_at, currentLocale as string)}
-                          </Text>
-                        )}
                         {item.total_downloads !== undefined && item.total_downloads > 0 && (
-                        
-                          <div className="flex items-center gap-2">
-                              <span className='text-gray-300'>|</span>  
-                            <ArrowDownTrayIcon className="w-4 h-4 text-gray-600" />
-                            <Text size="xs" className="text-gray-700 font-medium">
+                          <div className="absolute bottom-4 left-4 flex items-center gap-2">
+                            <div className="flex items-center justify-center w-6 h-6 bg-white bg-opacity-20 rounded-full">
+                              <ArrowDownTrayIcon className="w-3 h-3 text-white" />
+                            </div>
+                            <Text size="xs" className="text-white font-medium">
                               {item.total_downloads.toLocaleString()} {item.total_downloads === 1 ? translations.download : translations.downloads}
                             </Text>
                           </div>
                         )}
-                      </div>
-                      
-                      <div className="flex gap-2">
-                       
+                      </Link>
+                      {item.searchable_type === "knowledge" && item.insighter && (
+                        <div className="flex items-center gap-3 z-10">
                           <div className="relative">
-                            {loadingStates[item.searchable_id] ? (
-                              <div className="w-5 h-5 border-2 border-gray-400 border-t-transparent rounded-full animate-spin" />
-                            ) : (
-                              (item.searchable_id in readLaterStates ? readLaterStates[item.searchable_id] : item.is_read_later) ? (
-                                <BookmarkSelectedIcon 
-                                  width={17}
-                                  height={17}
-                                  className="text-[#861536] cursor-pointer hover:text-[#861536] transition-colors"
-                                  onClick={(e) => {
-                                    e.preventDefault();
-                                    e.stopPropagation();
-                                    if (!loadingStates[item.searchable_id]) {
-                                      handleReadLaterToggle(item, e);
-                                    }
+                            <div className="object-cover object-top">
+                              <Link
+                                href={isCompany || isCompanyInsighter ?
+                                  `/${currentLocale}/profile/${item.insighter.company?.uuid}` :
+                                  `/${currentLocale}/profile/${item.insighter.uuid}?entity=insighter`}
+                              >
+                                <Avatar
+                                  src={(isCompany || isCompanyInsighter) && item.insighter.company?.logo ?
+                                    item.insighter.company.logo :
+                                    item.insighter.profile_photo_url}
+                                  radius="xl"
+                                  alt={item.insighter.name}
+                                  size="md"
+                                  className={`${cardStyles.avatar} avatar-top-position`}
+                                >
+                                  {!((isCompany || isCompanyInsighter) && item.insighter.company?.logo) &&
+                                    !item.insighter.profile_photo_url &&
+                                    getInitials(item.insighter.name)}
+                                </Avatar>
+                              </Link>
+                            </div>
+
+                            {isCompanyInsighter && item.insighter.profile_photo_url && (
+                              <Link href={`/${currentLocale}/profile/${item.insighter.uuid}?entity=insighter`}>
+                                <Avatar
+                                  src={item.insighter.profile_photo_url}
+                                  radius="xl"
+
+                                  size="xs"
+                                  className={`absolute bottom-0 ${isRTL ? 'left-0 -translate-x-1/3' : 'right-0 translate-x-1/3'} rounded-full translate-y-1/3 z-10 avatar-top-position`}
+                                  alt={item.insighter.name}
+                                  style={{
+                                    boxShadow: '0 0 0 2px white',
+                                    position: 'absolute',
                                   }}
-                                  aria-label="Remove from Read Later"
                                 />
-                              ) : (
-                                <BookmarkUnselectedIcon 
-                                  width={17}
-                                  height={17}
-                                  className="text-gray-600 cursor-pointer hover:text-gray-700 transition-colors"
-                                  onClick={(e) => {
-                                    e.preventDefault();
-                                    e.stopPropagation();
-                                    if (!loadingStates[item.searchable_id]) {
-                                      handleReadLaterToggle(item, e);
-                                    }
+                              </Link>
+                            )}
+                            {isCompany && item.insighter.profile_photo_url && (
+                              <Link href={`/${currentLocale}/profile/${item.insighter.uuid}?entity=insighter`}>
+                                <Avatar
+                                  src={item.insighter.profile_photo_url}
+                                  radius="xl"
+                                  size="xs"
+                                  className="absolute bottom-0 right-0 translate-x-1/3 rounded-full translate-y-1/3 z-10 avatar-top-position"
+                                  alt={item.insighter.name}
+                                  style={{
+                                    boxShadow: '0 0 0 2px white',
+                                    position: 'absolute',
                                   }}
-                                  aria-label="Add to Read Later"
                                 />
-                              )
+                              </Link>
                             )}
                           </div>
-                   
-                      </div>
+
+                          <div>
+                            <Text fw={600} size="sm" className="capitalize" c="white" ps={4}>
+                              <Link href={`/${currentLocale}/profile/${item.insighter.uuid}?entity=insighter`}>
+                                {isInsighter && item.insighter.name.toLowerCase()}
+                              </Link>
+
+                              <Link href={`/${currentLocale}/profile/${item.insighter.company?.uuid}`}>
+                                {isCompany && (
+                                  item.insighter.company
+                                    ? isRTL
+                                      ? ` ${item.insighter.company.legal_name}`
+                                      : `${item.insighter.company.legal_name} `
+                                    : translations.company
+                                )}
+                              </Link>
+
+                              <Link href={`/${currentLocale}/profile/${item.insighter.company?.uuid}`}>
+                                {isCompanyInsighter && (
+                                  item.insighter.company
+                                    ? isRTL
+                                      ? ` ${item.insighter.company.legal_name}`
+                                      : `${item.insighter.company.legal_name} `
+                                    : translations.company
+                                )}
+                              </Link>
+                            </Text>
+
+                            <Text c="dimmed" size="xs" className="capitalize" ps={4}>
+                              <Link href={`/${currentLocale}/profile/${item.insighter.uuid}?entity=insighter`}>
+                                {isInsighter && translations.insighter}
+                              </Link>
+
+
+                              {isCompany && (
+                                item.insighter.company
+                                  ? (<Link href={`/${currentLocale}/profile/${item.insighter?.uuid}?entity=insighter`}>
+                                    {translations.by} {item.insighter.name.toLowerCase()}
+                                  </Link>)
+                                  : <Link href={`/${currentLocale}/profile/${item.insighter?.uuid}?entity=insighter`}>
+                                    Company
+                                  </Link>
+                              )}
+
+                              {isCompanyInsighter && (
+                                item.insighter.company ? (
+                                  <Link href={`/${currentLocale}/profile/${item.insighter?.uuid}?entity=insighter`}>
+                                    {translations.by} {item.insighter.name.toLowerCase()}
+                                  </Link>
+                                ) : (
+                                  <span>{translations.company}</span>
+                                )
+                              )}
+                            </Text>
+                          </div>
+                        </div>
+                      )}
                     </div>
-                  )}
-                </div>
-              )}
-       
-            </div>
-          </Card>
+
+                    {/* Only show contentColumn if there's content to display */}
+                    {(item.description || (item.searchable_type === "knowledge" && (shouldShowPricing || item.published_at))) && (
+                      <div className={listStyles.contentColumn} style={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-between', height: '100%' }}>
+                        {item.description && (
+                          <>
+                            <Link href={`/${currentLocale}/${item.url}`}>
+                              <div
+                                className={`${listStyles.richDescription} ${listStyles.richDescriptionCollapsed}`}
+                                ref={(el) => { descRefs.current[item.searchable_id] = el; }}
+                                dir={isFirstWordArabic(item.title) ? "rtl" : "ltr"}
+                                style={{ whiteSpace: 'pre-line' }}
+                              >
+                                {htmlToPlainTextWithBreaks(item.description)}
+                              </div>
+                            </Link>
+                            {needsToggleMap[item.searchable_id] && (
+                              <Link
+                                href={`/${currentLocale}/${item.url}`}
+                                className={listStyles.toggleLink}
+                              >
+                                {isRTL ? "قراءة المزيد" : "Read more"}
+                              </Link>
+                            )}
+                          </>
+                        )}
+
+                        {item.searchable_type === "knowledge" && (
+                          <div className={listStyles.detailsSection}>
+                            <div className="flex items-center gap-3">
+                              {shouldShowPricing && (
+                                <div className="flex items-center gap-2">
+                                  {shouldShowPartial && (
+                                    <Text size="xs" c="dimmed" className="whitespace-nowrap">
+                                      {translations.freeDocs} +
+                                    </Text>
+                                  )}
+                                  {(shouldShowPaid || (!paidStatus && hasPrice) || (shouldShowPartial && hasPrice)) && (
+                                    <Badge
+                                      color="yellow"
+                                      variant="light"
+                                      className={listStyles.priceBadge}
+                                    >
+                                      {shouldShowPartial && hasPrice ? (
+                                        <span dir="ltr" lang="en" >{formattedPrice}
+                                        </span>
+                                      ) : (
+                                        <span dir="ltr" lang="en">{formattedPrice}</span>
+                                      )}
+                                    </Badge>
+                                  )}
+                                  {shouldShowPartial && !hasPrice && (
+                                    <Badge
+                                      color="yellow"
+                                      variant="light"
+                                      className={listStyles.priceBadge}
+                                      style={{ fontWeight: '500' }}
+                                    >
+                                      {translations.partial}
+                                    </Badge>
+                                  )}
+                                  {shouldShowFree && !shouldShowPartial && !(shouldShowPaid && hasPrice) && (
+                                    <Badge
+                                      color="green"
+                                      variant="light"
+                                      className={listStyles.priceBadge}
+                                    >
+                                      {translations.free}
+                                    </Badge>
+                                  )}
+                                </div>
+                              )}
+
+                              {item.published_at && (
+                                <Text c="dimmed" size="xs" dir={currentLocale === 'ar' ? 'rtl' : 'ltr'}>
+                                  {translations.posted} {safeFormatDate(item.published_at, currentLocale as string)}
+                                </Text>
+                              )}
+                              {item.total_downloads !== undefined && item.total_downloads > 0 && (
+
+                                <div className="flex items-center gap-2">
+                                  <span className='text-gray-300'>|</span>
+                                  <ArrowDownTrayIcon className="w-4 h-4 text-gray-600" />
+                                  <Text size="xs" className="text-gray-700 font-medium">
+                                    {item.total_downloads.toLocaleString()} {item.total_downloads === 1 ? translations.download : translations.downloads}
+                                  </Text>
+                                </div>
+                              )}
+                            </div>
+
+                            <div className="flex gap-2">
+
+                              <div className="relative">
+                                {loadingStates[item.searchable_id] ? (
+                                  <div className="w-5 h-5 border-2 border-gray-400 border-t-transparent rounded-full animate-spin" />
+                                ) : (
+                                  (item.searchable_id in readLaterStates ? readLaterStates[item.searchable_id] : item.is_read_later) ? (
+                                    <BookmarkSelectedIcon
+                                      width={17}
+                                      height={17}
+                                      className="text-[#861536] cursor-pointer hover:text-[#861536] transition-colors"
+                                      onClick={(e) => {
+                                        e.preventDefault();
+                                        e.stopPropagation();
+                                        if (!loadingStates[item.searchable_id]) {
+                                          handleReadLaterToggle(item, e);
+                                        }
+                                      }}
+                                      aria-label="Remove from Read Later"
+                                    />
+                                  ) : (
+                                    <BookmarkUnselectedIcon
+                                      width={17}
+                                      height={17}
+                                      className="text-gray-600 cursor-pointer hover:text-gray-700 transition-colors"
+                                      onClick={(e) => {
+                                        e.preventDefault();
+                                        e.stopPropagation();
+                                        if (!loadingStates[item.searchable_id]) {
+                                          handleReadLaterToggle(item, e);
+                                        }
+                                      }}
+                                      aria-label="Add to Read Later"
+                                    />
+                                  )
+                                )}
+                              </div>
+
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    )}
+
+                  </div>
+                </Card>
               );
             })}
           </div>
@@ -778,7 +778,7 @@ export default function SearchResultsList({
               <Link
                 key={`${uniquePrefix}-topic-${item.searchable_id}`}
                 href={`/${currentLocale}/${item.url}`}
-                  className="truncate inline-block max-w-[140px] sm:max-w-[220px] md:max-w-[280px] px-4 py-2 bg-gray-100 hover:bg-gray-200 rounded-full text-gray-700 text-xs font-medium transition-colors duration-200"
+                className="truncate inline-block max-w-[140px] sm:max-w-[220px] md:max-w-[280px] px-4 py-2 bg-gray-100 hover:bg-gray-200 rounded-full text-gray-700 text-xs font-medium transition-colors duration-200"
               >
                 {item.title}
               </Link>

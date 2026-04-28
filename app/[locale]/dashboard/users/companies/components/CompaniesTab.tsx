@@ -507,7 +507,7 @@ export default function CompaniesTab() {
           <h2 className="text-lg font-semibold text-slate-900">Companies list</h2>
         </div>
 
-       
+
       </div>
 
       <div className="mt-4 grid grid-cols-1 gap-3 lg:grid-cols-4">
@@ -603,19 +603,19 @@ export default function CompaniesTab() {
         </div>
       </div>
       <div className=" mt-8 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-end sm:flex-1 sm:pl-4">
-          <div className="relative flex-1 sm:max-w-[520px]">
-            <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-slate-400">
-              <SearchIcon />
-            </span>
-            <input
-              type="text"
-              value={searchInput}
-              onChange={(event) => setSearchInput(event.target.value)}
-              placeholder="Search companies..."
-              className={INPUT_CLASS}
-            />
-          </div>
+        <div className="relative flex-1 sm:max-w-[520px]">
+          <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-slate-400">
+            <SearchIcon />
+          </span>
+          <input
+            type="text"
+            value={searchInput}
+            onChange={(event) => setSearchInput(event.target.value)}
+            placeholder="Search companies..."
+            className={INPUT_CLASS}
+          />
         </div>
+      </div>
       <div className="mt-3 overflow-hidden rounded-md border border-slate-200">
         <div className="overflow-x-auto">
           <table className="min-w-full text-left text-xs">

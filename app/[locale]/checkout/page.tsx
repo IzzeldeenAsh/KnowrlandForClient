@@ -421,7 +421,7 @@ export default function CheckoutPage() {
     selectDocuments: isRTL ? "المستندات المحددة" : "Selected Documents",
     totalPrice: isRTL ? "السعر الإجمالي" : "Total Price",
     paymentMethod: isRTL ? "طريقة الدفع" : "Payment Method",
-   InsightaWallet: isRTL ? "محفظة إنسايتا" : "Insighta Wallet",
+    InsightaWallet: isRTL ? "محفظة إنسايتا" : "Insighta Wallet",
     stripeProvider: isRTL ? "مزود سترايب" : "Stripe Provider",
     confirmOrder: isRTL ? "تأكيد الطلب" : "Checkout",
     download: isRTL ? "تحميل" : "Download",
@@ -701,7 +701,7 @@ export default function CheckoutPage() {
             lastName: prev.lastName || !!errors.lastName,
             country: prev.country || !!errors.country,
           }));
-         
+
           return;
         }
 
@@ -741,7 +741,7 @@ export default function CheckoutPage() {
               const errorData = JSON.parse(text);
               errorMessage = errorData.message || errorMessage;
             }
-          } catch {}
+          } catch { }
           throw new Error(errorMessage);
         }
 
@@ -862,13 +862,13 @@ export default function CheckoutPage() {
       // Handle Stripe payment
       if (paymentMethod === "provider") {
         console.log('Payment method is provider, checking for client_secret...'); // Debug log
-        
+
         // Check different possible response structures
         const responseData = data.data || data;
         const { client_secret, order_uuid } = responseData;
-        
+
         console.log('Client secret:', client_secret, 'Order UUID:', order_uuid); // Debug log
-        
+
         if (client_secret && order_uuid) {
           // Store selected documents summary so Stripe page can always render order summary
           // (API order details may not include documents immediately).
@@ -899,10 +899,10 @@ export default function CheckoutPage() {
             amount: totalPrice.toFixed(2),
             title: knowledge?.title || 'Knowledge Purchase',
           });
-          
+
           const stripeUrl = `/${locale}/payment/stripe?${paymentParams.toString()}`;
           console.log('Redirecting to:', stripeUrl); // Debug log
-          
+
           router.push(stripeUrl);
           return;
         } else {
@@ -962,7 +962,7 @@ export default function CheckoutPage() {
     return (
       <>
         <PageIllustration middle={false} />
-        
+
         <div className="min-h-screen relative z-1" dir={isRTL ? "rtl" : "ltr"}>
           <Container size="sm" className="py-12">
             <div className={`max-w-md mx-auto text-center ${styles.successContainer}`}>
@@ -972,12 +972,12 @@ export default function CheckoutPage() {
                   <div className="absolute inset-0 bg-gradient-to-br from-green-400 to-emerald-500 rounded-full opacity-20"></div>
                   <div className="absolute inset-0 bg-gradient-to-br from-green-500 to-emerald-600 rounded-full flex items-center justify-center">
                     <svg className="w-12 h-12" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                      <path 
+                      <path
                         className={styles.checkmarkPath}
-                        d="M5 13l4 4L19 7" 
-                        stroke="white" 
-                        strokeWidth="3" 
-                        strokeLinecap="round" 
+                        d="M5 13l4 4L19 7"
+                        stroke="white"
+                        strokeWidth="3"
+                        strokeLinecap="round"
                         strokeLinejoin="round"
                       />
                     </svg>
@@ -995,15 +995,15 @@ export default function CheckoutPage() {
               <p className={`text-gray-600 mb-8 ${styles.successDescription}`}>
                 {translations.accessGranted}
               </p>
-              
+
               {/* Progress section */}
               <div className={`mb-8 ${styles.progressSection}`}>
                 {!showDocumentsAdded ? (
                   <div className="space-y-4">
                     <Text size="sm" c="dimmed" fw={500}>{translations.preparingDownloads}</Text>
-                    <Progress 
-                      value={downloadProgress} 
-                      size="xl" 
+                    <Progress
+                      value={downloadProgress}
+                      size="xl"
                       radius="xl"
                       color="teal"
                       striped
@@ -1059,122 +1059,121 @@ export default function CheckoutPage() {
   return (
     <CountryGuard>
       <>
-     <PageIllustration middle={false} />
+        <PageIllustration middle={false} />
 
         <div className="min-h-screen relative z-1" dir={isRTL ? "rtl" : "ltr"}>
-        {/* Simple header */}
-        <div className="px-4 sm:px-6 lg:px-8 pt-10 ">
-          <div className="max-w-8xl mx-auto">
-            <div
-              className={
-                isFree
-                  ? "mx-auto max-w-6xl text-center "
-                  : "mx-auto max-w-6xl text-start "
-              }
-            >
-              <h1 className={`text-3xl md:text-4xl font-bold text-transparent bg-clip-text ${isRTL ? 'bg-gradient-to-l from-blue-400 to-teal-500' : 'bg-gradient-to-r from-blue-500 to-teal-400'} mb-2`}>
-                {translations.checkout}
-              </h1>
-              <p className="text-gray-600">
-                {isRTL
-                  ? "أكمل عملية الشراء للوصول إلى المحتوى"
-                  : "Complete your purchase to access the content"}
-              </p>
+          {/* Simple header */}
+          <div className="px-4 sm:px-6 lg:px-8 pt-10 ">
+            <div className="max-w-8xl mx-auto">
+              <div
+                className={
+                  isFree
+                    ? "mx-auto max-w-6xl text-center "
+                    : "mx-auto max-w-6xl text-start "
+                }
+              >
+                <h1 className={`text-3xl md:text-4xl font-bold text-transparent bg-clip-text ${isRTL ? 'bg-gradient-to-l from-blue-400 to-teal-500' : 'bg-gradient-to-r from-blue-500 to-teal-400'} mb-2`}>
+                  {translations.checkout}
+                </h1>
+                <p className="text-gray-600">
+                  {isRTL
+                    ? "أكمل عملية الشراء للوصول إلى المحتوى"
+                    : "Complete your purchase to access the content"}
+                </p>
+              </div>
             </div>
           </div>
-        </div>
 
-        <div className={styles.container}>
-          <div className={isFree ? styles.singleColumn : styles.checkoutGrid}>
-            {/* Selected Documents Section */}
-                  <div>
-                  <div className="border border-[#E2E8F0] rounded-lg p-4 mb-6" style={{ background: 'rgba(255, 255, 255, 0.7)', backdropFilter: 'blur(10px)', WebkitBackdropFilter: 'blur(10px)' }}>
-              <Text size="lg" fw={600} mb="xs" style={{ overflowWrap: 'break-word' }}>
-                {knowledge.title}
-              </Text>
-              {/* {isGuest && hasFreeDocsInCart && (
+          <div className={styles.container}>
+            <div className={isFree ? styles.singleColumn : styles.checkoutGrid}>
+              {/* Selected Documents Section */}
+              <div>
+                <div className="border border-[#E2E8F0] rounded-lg p-4 mb-6" style={{ background: 'rgba(255, 255, 255, 0.7)', backdropFilter: 'blur(10px)', WebkitBackdropFilter: 'blur(10px)' }}>
+                  <Text size="lg" fw={600} mb="xs" style={{ overflowWrap: 'break-word' }}>
+                    {knowledge.title}
+                  </Text>
+                  {/* {isGuest && hasFreeDocsInCart && (
                 <div className="mb-3 rounded-md border border-amber-200 bg-amber-50 px-3 py-2">
                   <Text size="sm" c="dimmed">
                     {translations.loginRequiredForFree}
                   </Text>
                 </div>
               )} */}
-              <Stack gap="md">
-                {documentsToShow.length === 0 ? (
-                  <Text size="sm" c="dimmed" ta="center">
-                    {isRTL ? "لا توجد مستندات متاحة" : "No documents available"}
-                  </Text>
-                ) : (
-                  documentsToShow.map((doc) => (
-                  <div
-                    key={doc.id}
-                    className={`${styles.documentCard} ${
-                      selectedDocuments.includes(doc.id)
-                        ? styles.documentCardSelected
-                        : ""
-                    }`}
-                  >
-                    <Group gap="md" wrap="wrap" className={styles.documentRow}>
-                      <Checkbox
-                        checked={
-                          isGuest && parseFloat(doc.price) === 0
-                            ? false
-                            : selectedDocuments.includes(doc.id)
-                        }
-                        disabled={isGuest && parseFloat(doc.price) === 0}
-                        onChange={() => {
-                          if (isGuest && parseFloat(doc.price) === 0) return;
-                          handleDocumentToggle(doc.id);
-                        }}
-                        size="md"
-                      />
-
-                      <div className="flex-shrink-0">
-                        <Image
-                          src={getFileIconByExtension(doc.file_extension)}
-                          alt={`${doc.file_extension.toUpperCase()} file`}
-                          width={32}
-                          height={32}
-                        />
-                      </div>
-
-                      <div className="flex-1 min-w-0">
-                        <Text
-                          size="sm"
-                          fw={500}
-                          style={{
-                            wordBreak: "break-all",
-                            whiteSpace: "pre-line",
-                            overflowWrap: "break-word",
-                          }}
+                  <Stack gap="md">
+                    {documentsToShow.length === 0 ? (
+                      <Text size="sm" c="dimmed" ta="center">
+                        {isRTL ? "لا توجد مستندات متاحة" : "No documents available"}
+                      </Text>
+                    ) : (
+                      documentsToShow.map((doc) => (
+                        <div
+                          key={doc.id}
+                          className={`${styles.documentCard} ${selectedDocuments.includes(doc.id)
+                              ? styles.documentCardSelected
+                              : ""
+                            }`}
                         >
-                          <span style={{ wordBreak: "break-all", overflowWrap: "break-word", whiteSpace: "pre-line" }}>
-                            {doc.file_name}
-                          </span>
-                        </Text>
-                        <Text size="xs" c="dimmed">
-                          {(doc.file_size / 1024).toFixed(2)} KB
-                        </Text>
-                      </div>
+                          <Group gap="md" wrap="wrap" className={styles.documentRow}>
+                            <Checkbox
+                              checked={
+                                isGuest && parseFloat(doc.price) === 0
+                                  ? false
+                                  : selectedDocuments.includes(doc.id)
+                              }
+                              disabled={isGuest && parseFloat(doc.price) === 0}
+                              onChange={() => {
+                                if (isGuest && parseFloat(doc.price) === 0) return;
+                                handleDocumentToggle(doc.id);
+                              }}
+                              size="md"
+                            />
 
-                      <Badge
-                        color={parseFloat(doc.price) === 0 ? "green" : "blue"}
-                        variant="light"
-                      >
-                        {parseFloat(doc.price) === 0
-                          ? translations.free
-                          : formatCurrency(parseFloat(doc.price))}
-                      </Badge>
-                    </Group>
-                  </div>
-                  ))
-                )}
-              </Stack>
+                            <div className="flex-shrink-0">
+                              <Image
+                                src={getFileIconByExtension(doc.file_extension)}
+                                alt={`${doc.file_extension.toUpperCase()} file`}
+                                width={32}
+                                height={32}
+                              />
+                            </div>
 
-              
-            </div>
-     {/* Total Price */}
-     <div className={`mb-6 ${styles.priceCard}`}>
+                            <div className="flex-1 min-w-0">
+                              <Text
+                                size="sm"
+                                fw={500}
+                                style={{
+                                  wordBreak: "break-all",
+                                  whiteSpace: "pre-line",
+                                  overflowWrap: "break-word",
+                                }}
+                              >
+                                <span style={{ wordBreak: "break-all", overflowWrap: "break-word", whiteSpace: "pre-line" }}>
+                                  {doc.file_name}
+                                </span>
+                              </Text>
+                              <Text size="xs" c="dimmed">
+                                {(doc.file_size / 1024).toFixed(2)} KB
+                              </Text>
+                            </div>
+
+                            <Badge
+                              color={parseFloat(doc.price) === 0 ? "green" : "blue"}
+                              variant="light"
+                            >
+                              {parseFloat(doc.price) === 0
+                                ? translations.free
+                                : formatCurrency(parseFloat(doc.price))}
+                            </Badge>
+                          </Group>
+                        </div>
+                      ))
+                    )}
+                  </Stack>
+
+
+                </div>
+                {/* Total Price */}
+                <div className={`mb-6 ${styles.priceCard}`}>
                   <Group justify="space-between">
                     <Text size="lg" fw={600}>{translations.totalPrice}</Text>
                     <Badge size="lg" color="blue" variant="filled">
@@ -1183,482 +1182,472 @@ export default function CheckoutPage() {
                   </Group>
                 </div>
 
-                  </div>
-            {!isFree && (
-              <>
-                <div className={styles.rightColumn}>
-                  {/* Guest checkout details */}
-                  {isGuest && (
-                    <div
-                      className="border border-[#e2e8f0] rounded-lg p-4 mb-6 relative z-[10] overflow-visible"
-                      style={{ background: 'rgba(255, 255, 255, 0.7)', backdropFilter: 'blur(10px)', WebkitBackdropFilter: 'blur(10px)' }}
-                    >
-                      <Text className={styles.sectionTitle}>
-                        {translations.guestCheckoutTitle}
-                      </Text>
-
-                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-3">
-                        <div className="sm:col-span-2">
-                          <label
-                            className={`block text-sm font-medium mb-1 ${
-                              showGuestError("email") ? "text-red-600" : "text-gray-700"
-                            }`}
-                          >
-                            {translations.email}
-                          </label>
-                          <input
-                            value={guestEmail}
-                            onChange={(e) => setGuestEmail(e.target.value)}
-                            type="email"
-                            onBlur={() => setGuestTouched((p) => ({ ...p, email: true }))}
-                            className={`w-full rounded-md border bg-white px-3 py-2 text-sm outline-none focus:border-blue-400 ${
-                              showGuestError("email") ? "border-red-400" : "border-gray-200"
-                            }`}
-                            placeholder="name@example.com"
-                          />
-                          {showGuestError("email") && (
-                            <div className="mt-1 text-xs text-red-600">{guestErrors?.email}</div>
-                          )}
-                        </div>
-
-                        <div>
-                          <label
-                            className={`block text-sm font-medium mb-1 ${
-                              showGuestError("firstName") ? "text-red-600" : "text-gray-700"
-                            }`}
-                          >
-                            {translations.firstName}
-                          </label>
-                          <input
-                            value={guestFirstName}
-                            onChange={(e) => setGuestFirstName(e.target.value)}
-                            onBlur={() => setGuestTouched((p) => ({ ...p, firstName: true }))}
-                            className={`w-full rounded-md border bg-white px-3 py-2 text-sm outline-none focus:border-blue-400 ${
-                              showGuestError("firstName") ? "border-red-400" : "border-gray-200"
-                            }`}
-                          />
-                          {showGuestError("firstName") && (
-                            <div className="mt-1 text-xs text-red-600">{guestErrors?.firstName}</div>
-                          )}
-                        </div>
-
-                        <div>
-                          <label
-                            className={`block text-sm font-medium mb-1 ${
-                              showGuestError("lastName") ? "text-red-600" : "text-gray-700"
-                            }`}
-                          >
-                            {translations.lastName}
-                          </label>
-                          <input
-                            value={guestLastName}
-                            onChange={(e) => setGuestLastName(e.target.value)}
-                            onBlur={() => setGuestTouched((p) => ({ ...p, lastName: true }))}
-                            className={`w-full rounded-md border bg-white px-3 py-2 text-sm outline-none focus:border-blue-400 ${
-                              showGuestError("lastName") ? "border-red-400" : "border-gray-200"
-                            }`}
-                          />
-                          {showGuestError("lastName") && (
-                            <div className="mt-1 text-xs text-red-600">{guestErrors?.lastName}</div>
-                          )}
-                        </div>
-
-                        <div className="sm:col-span-2">
-                          <label
-                            className={`block text-sm font-medium mb-1 ${
-                              showGuestError("country") ? "text-red-600" : "text-gray-700"
-                            }`}
-                          >
-                            {translations.country}
-                          </label>
-                          <div className="relative" ref={countryDropdownRef}>
-                            <button
-                              type="button"
-                              onClick={() => {
-                                setCountryDropdownOpen((v) => !v);
-                                setPhoneCodeDropdownOpen(false);
-                              }}
-                              onBlur={() => setGuestTouched((p) => ({ ...p, country: true }))}
-                              className={`w-full rounded-md border bg-white px-3 py-2 text-sm flex items-center justify-between gap-2 ${
-                                showGuestError("country") ? "border-red-400" : "border-gray-200"
-                              }`}
-                            >
-                              <div className="flex items-center gap-2 min-w-0">
-                                {selectedCountry ? (
-                                  <>
-                                    <Image
-                                      src={getCountryFlagSrc(selectedCountry)}
-                                      alt={getCountryLabel(selectedCountry)}
-                                      width={18}
-                                      height={18}
-                                      className="rounded-sm"
-                                      onError={(e: any) => {
-                                        try {
-                                          e.currentTarget.src = "/images/flags/default.svg";
-                                        } catch {}
-                                      }}
-                                    />
-                                    <span className="truncate">{getCountryLabel(selectedCountry)}</span>
-                                  </>
-                                ) : (
-                                  <span className="text-gray-500">{translations.selectCountry}</span>
-                                )}
-                              </div>
-                              <span className="text-gray-400">▾</span>
-                            </button>
-                            {showGuestError("country") && (
-                              <div className="mt-1 text-xs text-red-600">{guestErrors?.country}</div>
-                            )}
-
-                            {countryDropdownOpen && (
-                              <div className="absolute z-[9999] mt-2 w-full rounded-md border border-gray-200 bg-white shadow-sm">
-                                <div className="p-2 border-b border-gray-100">
-                                  <input
-                                    value={countrySearch}
-                                    onChange={(e) => setCountrySearch(e.target.value)}
-                                    className="w-full rounded-md border border-gray-200 px-3 py-2 text-sm outline-none focus:border-blue-400"
-                                    placeholder={translations.searchCountry}
-                                  />
-                                </div>
-                                <div className="max-h-72 overflow-auto">
-                                  {countriesLoading ? (
-                                    <div className="p-3 text-sm text-gray-500">
-                                      {translations.loading}
-                                    </div>
-                                  ) : filteredCountries.length === 0 ? (
-                                    <div className="p-3 text-sm text-gray-500">
-                                      {isRTL ? "لا توجد نتائج" : "No results"}
-                                    </div>
-                                  ) : (
-                                    filteredCountries.map((c) => (
-                                      <button
-                                        key={c.id}
-                                        type="button"
-                                        onClick={() => {
-                                          setGuestCountryId(c.id);
-                                          setGuestTouched((p) => ({ ...p, country: true }));
-                                          // helpful default
-                                          if (!guestPhoneCode.trim()) {
-                                            setGuestPhoneCode(String(c.international_code || ""));
-                                          }
-                                          setCountryDropdownOpen(false);
-                                          setCountrySearch("");
-                                        }}
-                                        className="w-full px-3 py-2 text-sm hover:bg-gray-50 flex items-center gap-2 text-left"
-                                      >
-                                        <Image
-                                          src={getCountryFlagSrc(c)}
-                                          alt={getCountryLabel(c)}
-                                          width={18}
-                                          height={18}
-                                          className="rounded-sm"
-                                          onError={(e: any) => {
-                                            try {
-                                              e.currentTarget.src = "/images/flags/default.svg";
-                                            } catch {}
-                                          }}
-                                        />
-                                        <span className="flex-1 truncate">{getCountryLabel(c)}</span>
-                                        <span className="text-gray-400 text-xs">+{c.international_code}</span>
-                                      </button>
-                                    ))
-                                  )}
-                                </div>
-                              </div>
-                            )}
-                          </div>
-                        </div>
-
-                        <div>
-                          <label className="block text-sm font-medium text-gray-700 mb-1">
-                            {translations.phoneCode}
-                          </label>
-                          <div className="relative" ref={phoneCodeDropdownRef}>
-                            <button
-                              type="button"
-                              onClick={() => {
-                                setPhoneCodeDropdownOpen((v) => !v);
-                                setCountryDropdownOpen(false);
-                              }}
-                              className="w-full rounded-md border border-gray-200 bg-white px-3 py-2 text-sm flex items-center justify-between gap-2"
-                            >
-                              <div className="flex items-center gap-2 min-w-0">
-                                {selectedPhoneCountry ? (
-                                  <>
-                                    <Image
-                                      src={getCountryFlagSrc(selectedPhoneCountry)}
-                                      alt={getCountryLabel(selectedPhoneCountry)}
-                                      width={18}
-                                      height={18}
-                                      className="rounded-sm"
-                                      onError={(e: any) => {
-                                        try {
-                                          e.currentTarget.src = "/images/flags/default.svg";
-                                        } catch {}
-                                      }}
-                                    />
-                                    <span className="truncate">+{selectedPhoneCountry.international_code}</span>
-                                  </>
-                                ) : guestPhoneCode.trim() ? (
-                                  <span className="truncate">+{guestPhoneCode.trim()}</span>
-                                ) : (
-                                  <span className="text-gray-500">+---</span>
-                                )}
-                              </div>
-                              <div className="flex items-center gap-2">
-                                {!!guestPhoneCode.trim() && (
-                                  <span
-                                    role="button"
-                                    tabIndex={0}
-                                    aria-label={isRTL ? "مسح رمز الهاتف" : "Clear phone code"}
-                                    className="text-gray-400 hover:text-gray-600 select-none leading-none"
-                                    onMouseDown={(e) => {
-                                      // prevent focusing the parent button / toggling dropdown
-                                      e.preventDefault();
-                                      e.stopPropagation();
-                                    }}
-                                    onClick={(e) => {
-                                      e.preventDefault();
-                                      e.stopPropagation();
-                                      setGuestPhoneCode("");
-                                      setIsPhoneCodeManuallySet(true); // keep it empty (don't auto-fill)
-                                      setPhoneCodeDropdownOpen(false);
-                                      setPhoneCodeSearch("");
-                                    }}
-                                    onKeyDown={(e) => {
-                                      if (e.key !== "Enter" && e.key !== " ") return;
-                                      e.preventDefault();
-                                      e.stopPropagation();
-                                      setGuestPhoneCode("");
-                                      setIsPhoneCodeManuallySet(true);
-                                      setPhoneCodeDropdownOpen(false);
-                                      setPhoneCodeSearch("");
-                                    }}
-                                  >
-                                    ×
-                                  </span>
-                                )}
-                                <span className="text-gray-400">▾</span>
-                              </div>
-                            </button>
-
-                            {phoneCodeDropdownOpen && (
-                              <div className="absolute z-[9999] mt-2 w-full rounded-md border border-gray-200 bg-white shadow-sm">
-                                <div className="p-2 border-b border-gray-100">
-                                  <input
-                                    value={phoneCodeSearch}
-                                    onChange={(e) => setPhoneCodeSearch(e.target.value)}
-                                    className="w-full rounded-md border border-gray-200 px-3 py-2 text-sm outline-none focus:border-blue-400"
-                                    placeholder={translations.searchCountry}
-                                  />
-                                </div>
-                                <div className="max-h-72 overflow-auto">
-                                  {countriesLoading ? (
-                                    <div className="p-3 text-sm text-gray-500">
-                                      {translations.loading}
-                                    </div>
-                                  ) : filteredPhoneCodeCountries.length === 0 ? (
-                                    <div className="p-3 text-sm text-gray-500">
-                                      {isRTL ? "لا توجد نتائج" : "No results"}
-                                    </div>
-                                  ) : (
-                                    filteredPhoneCodeCountries.map((c) => (
-                                      <button
-                                        key={c.id}
-                                        type="button"
-                                        onClick={() => {
-                                          setGuestPhoneCode(String(c.international_code || ""));
-                                          setIsPhoneCodeManuallySet(true);
-                                          if (!guestCountryId) {
-                                            setGuestCountryId(c.id);
-                                          }
-                                          setPhoneCodeDropdownOpen(false);
-                                          setPhoneCodeSearch("");
-                                        }}
-                                        className="w-full px-3 py-2 text-sm hover:bg-gray-50 flex items-center gap-2 text-left"
-                                      >
-                                        <Image
-                                          src={getCountryFlagSrc(c)}
-                                          alt={getCountryLabel(c)}
-                                          width={18}
-                                          height={18}
-                                          className="rounded-sm"
-                                          onError={(e: any) => {
-                                            try {
-                                              e.currentTarget.src = "/images/flags/default.svg";
-                                            } catch {}
-                                          }}
-                                        />
-                                        <span className="flex-1 truncate">{getCountryLabel(c)}</span>
-                                        <span className="text-gray-400 text-xs">+{c.international_code}</span>
-                                      </button>
-                                    ))
-                                  )}
-                                </div>
-                              </div>
-                            )}
-                          </div>
-                        </div>
-
-                        <div>
-                          <label className="block text-sm font-medium text-gray-700 mb-1">
-                            {translations.phone}
-                          </label>
-                          <input
-                            value={guestPhone}
-                            onChange={(e) => setGuestPhone(e.target.value)}
-                            className="w-full rounded-md border border-gray-200 bg-white px-3 py-2 text-sm outline-none focus:border-blue-400"
-                            placeholder="790000000"
-                          />
-                        </div>
-                      </div>
-                    </div>
-                  )}
-
-                  {/* Payment Methods */}
-                  <div className="border border-[#e2e8f0] rounded-lg p-4 relative z-0" style={{ background: 'rgba(255, 255, 255, 0.7)', backdropFilter: 'blur(10px)', WebkitBackdropFilter: 'blur(10px)' }}>
-                    <Text className={styles.sectionTitle}>
-                      {translations.paymentMethod}
-                    </Text>
-
-                    <Stack gap="md">
-                      {/* Wallet Method (hidden for client-only users) */}
-                      {!isGuest && !isClientOnly && (
-                        <div>
-                          <div
-                            className={`${styles.paymentMethodCard} ${
-                              paymentMethod === "manual" ? styles.selected : ""
-                            } ${walletBalance < totalPrice ? styles.disabled : ""}`}
-                            onClick={() =>
-                              walletBalance >= totalPrice &&
-                              setPaymentMethod("manual")
-                            }
-                          >
-                            <Group gap="lg" align="center">
-                              <div className={styles.methodCheckbox}>
-                                <Checkbox
-                                  checked={paymentMethod === "manual"}
-                                  onChange={() =>
-                                    walletBalance >= totalPrice &&
-                                    setPaymentMethod("manual")
-                                  }
-                                  disabled={walletBalance < totalPrice}
-                                  size="md"
-                                />
-                              </div>
-                              <div
-                                style={{
-                                  width: 40,
-                                  height: 40,
-                                  display: "flex",
-                                  alignItems: "center",
-                                  justifyContent: "center",
-                                }}
-                              >
-                                <Image
-                                  src="/images/wallet-icon.svg"
-                                  alt="Insighta Wallet"
-                                  width={32}
-                                  height={32}
-                                />
-                              </div>
-                              <div style={{ flex: 1 }}>
-                                <Text fw={500}>{translations.InsightaWallet}</Text>
-                                <Text size="sm" fw={600} c={walletBalance < totalPrice ? "red" : "green"} mt={2}>
-                                  {isRTL ? "الرصيد المتاح: " : "Available Balance: "}
-                                  {formatCurrency(walletBalance)}
-                                </Text>
-                                {walletBalance < totalPrice && (
-                                  <Text size="xs" c="red">
-                                    {translations.insufficientBalance}
-                                  </Text>
-                                )}
-                              </div>
-                            </Group>
-                          </div>
-                        </div>
-                      )}
-
-                      {/* Stripe Method */}
+              </div>
+              {!isFree && (
+                <>
+                  <div className={styles.rightColumn}>
+                    {/* Guest checkout details */}
+                    {isGuest && (
                       <div
-                        className={`${styles.paymentMethodCard} ${
-                          paymentMethod === "provider" ? styles.selected : ""
-                        }`}
-                        onClick={() => {
-                          if (isGuest) return;
-                          setPaymentMethod("provider");
-                        }}
+                        className="border border-[#e2e8f0] rounded-lg p-4 mb-6 relative z-[10] overflow-visible"
+                        style={{ background: 'rgba(255, 255, 255, 0.7)', backdropFilter: 'blur(10px)', WebkitBackdropFilter: 'blur(10px)' }}
                       >
-                        <Group gap="lg" align="center">
-                          <div className={styles.methodCheckbox}>
-                            <Checkbox
-                              checked={paymentMethod === "provider"}
-                              onChange={() => {
-                                if (isGuest) return;
-                                setPaymentMethod("provider");
-                              }}
-                              size="md"
-                              disabled={isGuest}
+                        <Text className={styles.sectionTitle}>
+                          {translations.guestCheckoutTitle}
+                        </Text>
+
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-3">
+                          <div className="sm:col-span-2">
+                            <label
+                              className={`block text-sm font-medium mb-1 ${showGuestError("email") ? "text-red-600" : "text-gray-700"
+                                }`}
+                            >
+                              {translations.email}
+                            </label>
+                            <input
+                              value={guestEmail}
+                              onChange={(e) => setGuestEmail(e.target.value)}
+                              type="email"
+                              onBlur={() => setGuestTouched((p) => ({ ...p, email: true }))}
+                              className={`w-full rounded-md border bg-white px-3 py-2 text-sm outline-none focus:border-blue-400 ${showGuestError("email") ? "border-red-400" : "border-gray-200"
+                                }`}
+                              placeholder="name@example.com"
+                            />
+                            {showGuestError("email") && (
+                              <div className="mt-1 text-xs text-red-600">{guestErrors?.email}</div>
+                            )}
+                          </div>
+
+                          <div>
+                            <label
+                              className={`block text-sm font-medium mb-1 ${showGuestError("firstName") ? "text-red-600" : "text-gray-700"
+                                }`}
+                            >
+                              {translations.firstName}
+                            </label>
+                            <input
+                              value={guestFirstName}
+                              onChange={(e) => setGuestFirstName(e.target.value)}
+                              onBlur={() => setGuestTouched((p) => ({ ...p, firstName: true }))}
+                              className={`w-full rounded-md border bg-white px-3 py-2 text-sm outline-none focus:border-blue-400 ${showGuestError("firstName") ? "border-red-400" : "border-gray-200"
+                                }`}
+                            />
+                            {showGuestError("firstName") && (
+                              <div className="mt-1 text-xs text-red-600">{guestErrors?.firstName}</div>
+                            )}
+                          </div>
+
+                          <div>
+                            <label
+                              className={`block text-sm font-medium mb-1 ${showGuestError("lastName") ? "text-red-600" : "text-gray-700"
+                                }`}
+                            >
+                              {translations.lastName}
+                            </label>
+                            <input
+                              value={guestLastName}
+                              onChange={(e) => setGuestLastName(e.target.value)}
+                              onBlur={() => setGuestTouched((p) => ({ ...p, lastName: true }))}
+                              className={`w-full rounded-md border bg-white px-3 py-2 text-sm outline-none focus:border-blue-400 ${showGuestError("lastName") ? "border-red-400" : "border-gray-200"
+                                }`}
+                            />
+                            {showGuestError("lastName") && (
+                              <div className="mt-1 text-xs text-red-600">{guestErrors?.lastName}</div>
+                            )}
+                          </div>
+
+                          <div className="sm:col-span-2">
+                            <label
+                              className={`block text-sm font-medium mb-1 ${showGuestError("country") ? "text-red-600" : "text-gray-700"
+                                }`}
+                            >
+                              {translations.country}
+                            </label>
+                            <div className="relative" ref={countryDropdownRef}>
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  setCountryDropdownOpen((v) => !v);
+                                  setPhoneCodeDropdownOpen(false);
+                                }}
+                                onBlur={() => setGuestTouched((p) => ({ ...p, country: true }))}
+                                className={`w-full rounded-md border bg-white px-3 py-2 text-sm flex items-center justify-between gap-2 ${showGuestError("country") ? "border-red-400" : "border-gray-200"
+                                  }`}
+                              >
+                                <div className="flex items-center gap-2 min-w-0">
+                                  {selectedCountry ? (
+                                    <>
+                                      <Image
+                                        src={getCountryFlagSrc(selectedCountry)}
+                                        alt={getCountryLabel(selectedCountry)}
+                                        width={18}
+                                        height={18}
+                                        className="rounded-sm"
+                                        onError={(e: any) => {
+                                          try {
+                                            e.currentTarget.src = "/images/flags/default.svg";
+                                          } catch { }
+                                        }}
+                                      />
+                                      <span className="truncate">{getCountryLabel(selectedCountry)}</span>
+                                    </>
+                                  ) : (
+                                    <span className="text-gray-500">{translations.selectCountry}</span>
+                                  )}
+                                </div>
+                                <span className="text-gray-400">▾</span>
+                              </button>
+                              {showGuestError("country") && (
+                                <div className="mt-1 text-xs text-red-600">{guestErrors?.country}</div>
+                              )}
+
+                              {countryDropdownOpen && (
+                                <div className="absolute z-[9999] mt-2 w-full rounded-md border border-gray-200 bg-white shadow-sm">
+                                  <div className="p-2 border-b border-gray-100">
+                                    <input
+                                      value={countrySearch}
+                                      onChange={(e) => setCountrySearch(e.target.value)}
+                                      className="w-full rounded-md border border-gray-200 px-3 py-2 text-sm outline-none focus:border-blue-400"
+                                      placeholder={translations.searchCountry}
+                                    />
+                                  </div>
+                                  <div className="max-h-72 overflow-auto">
+                                    {countriesLoading ? (
+                                      <div className="p-3 text-sm text-gray-500">
+                                        {translations.loading}
+                                      </div>
+                                    ) : filteredCountries.length === 0 ? (
+                                      <div className="p-3 text-sm text-gray-500">
+                                        {isRTL ? "لا توجد نتائج" : "No results"}
+                                      </div>
+                                    ) : (
+                                      filteredCountries.map((c) => (
+                                        <button
+                                          key={c.id}
+                                          type="button"
+                                          onClick={() => {
+                                            setGuestCountryId(c.id);
+                                            setGuestTouched((p) => ({ ...p, country: true }));
+                                            // helpful default
+                                            if (!guestPhoneCode.trim()) {
+                                              setGuestPhoneCode(String(c.international_code || ""));
+                                            }
+                                            setCountryDropdownOpen(false);
+                                            setCountrySearch("");
+                                          }}
+                                          className="w-full px-3 py-2 text-sm hover:bg-gray-50 flex items-center gap-2 text-left"
+                                        >
+                                          <Image
+                                            src={getCountryFlagSrc(c)}
+                                            alt={getCountryLabel(c)}
+                                            width={18}
+                                            height={18}
+                                            className="rounded-sm"
+                                            onError={(e: any) => {
+                                              try {
+                                                e.currentTarget.src = "/images/flags/default.svg";
+                                              } catch { }
+                                            }}
+                                          />
+                                          <span className="flex-1 truncate">{getCountryLabel(c)}</span>
+                                          <span className="text-gray-400 text-xs">+{c.international_code}</span>
+                                        </button>
+                                      ))
+                                    )}
+                                  </div>
+                                </div>
+                              )}
+                            </div>
+                          </div>
+
+                          <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">
+                              {translations.phoneCode}
+                            </label>
+                            <div className="relative" ref={phoneCodeDropdownRef}>
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  setPhoneCodeDropdownOpen((v) => !v);
+                                  setCountryDropdownOpen(false);
+                                }}
+                                className="w-full rounded-md border border-gray-200 bg-white px-3 py-2 text-sm flex items-center justify-between gap-2"
+                              >
+                                <div className="flex items-center gap-2 min-w-0">
+                                  {selectedPhoneCountry ? (
+                                    <>
+                                      <Image
+                                        src={getCountryFlagSrc(selectedPhoneCountry)}
+                                        alt={getCountryLabel(selectedPhoneCountry)}
+                                        width={18}
+                                        height={18}
+                                        className="rounded-sm"
+                                        onError={(e: any) => {
+                                          try {
+                                            e.currentTarget.src = "/images/flags/default.svg";
+                                          } catch { }
+                                        }}
+                                      />
+                                      <span className="truncate">+{selectedPhoneCountry.international_code}</span>
+                                    </>
+                                  ) : guestPhoneCode.trim() ? (
+                                    <span className="truncate">+{guestPhoneCode.trim()}</span>
+                                  ) : (
+                                    <span className="text-gray-500">+---</span>
+                                  )}
+                                </div>
+                                <div className="flex items-center gap-2">
+                                  {!!guestPhoneCode.trim() && (
+                                    <span
+                                      role="button"
+                                      tabIndex={0}
+                                      aria-label={isRTL ? "مسح رمز الهاتف" : "Clear phone code"}
+                                      className="text-gray-400 hover:text-gray-600 select-none leading-none"
+                                      onMouseDown={(e) => {
+                                        // prevent focusing the parent button / toggling dropdown
+                                        e.preventDefault();
+                                        e.stopPropagation();
+                                      }}
+                                      onClick={(e) => {
+                                        e.preventDefault();
+                                        e.stopPropagation();
+                                        setGuestPhoneCode("");
+                                        setIsPhoneCodeManuallySet(true); // keep it empty (don't auto-fill)
+                                        setPhoneCodeDropdownOpen(false);
+                                        setPhoneCodeSearch("");
+                                      }}
+                                      onKeyDown={(e) => {
+                                        if (e.key !== "Enter" && e.key !== " ") return;
+                                        e.preventDefault();
+                                        e.stopPropagation();
+                                        setGuestPhoneCode("");
+                                        setIsPhoneCodeManuallySet(true);
+                                        setPhoneCodeDropdownOpen(false);
+                                        setPhoneCodeSearch("");
+                                      }}
+                                    >
+                                      ×
+                                    </span>
+                                  )}
+                                  <span className="text-gray-400">▾</span>
+                                </div>
+                              </button>
+
+                              {phoneCodeDropdownOpen && (
+                                <div className="absolute z-[9999] mt-2 w-full rounded-md border border-gray-200 bg-white shadow-sm">
+                                  <div className="p-2 border-b border-gray-100">
+                                    <input
+                                      value={phoneCodeSearch}
+                                      onChange={(e) => setPhoneCodeSearch(e.target.value)}
+                                      className="w-full rounded-md border border-gray-200 px-3 py-2 text-sm outline-none focus:border-blue-400"
+                                      placeholder={translations.searchCountry}
+                                    />
+                                  </div>
+                                  <div className="max-h-72 overflow-auto">
+                                    {countriesLoading ? (
+                                      <div className="p-3 text-sm text-gray-500">
+                                        {translations.loading}
+                                      </div>
+                                    ) : filteredPhoneCodeCountries.length === 0 ? (
+                                      <div className="p-3 text-sm text-gray-500">
+                                        {isRTL ? "لا توجد نتائج" : "No results"}
+                                      </div>
+                                    ) : (
+                                      filteredPhoneCodeCountries.map((c) => (
+                                        <button
+                                          key={c.id}
+                                          type="button"
+                                          onClick={() => {
+                                            setGuestPhoneCode(String(c.international_code || ""));
+                                            setIsPhoneCodeManuallySet(true);
+                                            if (!guestCountryId) {
+                                              setGuestCountryId(c.id);
+                                            }
+                                            setPhoneCodeDropdownOpen(false);
+                                            setPhoneCodeSearch("");
+                                          }}
+                                          className="w-full px-3 py-2 text-sm hover:bg-gray-50 flex items-center gap-2 text-left"
+                                        >
+                                          <Image
+                                            src={getCountryFlagSrc(c)}
+                                            alt={getCountryLabel(c)}
+                                            width={18}
+                                            height={18}
+                                            className="rounded-sm"
+                                            onError={(e: any) => {
+                                              try {
+                                                e.currentTarget.src = "/images/flags/default.svg";
+                                              } catch { }
+                                            }}
+                                          />
+                                          <span className="flex-1 truncate">{getCountryLabel(c)}</span>
+                                          <span className="text-gray-400 text-xs">+{c.international_code}</span>
+                                        </button>
+                                      ))
+                                    )}
+                                  </div>
+                                </div>
+                              )}
+                            </div>
+                          </div>
+
+                          <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">
+                              {translations.phone}
+                            </label>
+                            <input
+                              value={guestPhone}
+                              onChange={(e) => setGuestPhone(e.target.value)}
+                              className="w-full rounded-md border border-gray-200 bg-white px-3 py-2 text-sm outline-none focus:border-blue-400"
+                              placeholder="790000000"
                             />
                           </div>
-                          <div className={styles.paymentIconsContainer}>
-                            <div className={styles.paymentIcon}>
-                              <VisaIcon />
-                            </div>
-                            <div className={styles.paymentIcon}>
-                              <MasterCardIcon />
-                            </div>
-                            <div className={styles.paymentIcon}>
-                              <GooglePayIcon />
-                            </div>
-                            <div className={styles.paymentIcon}>
-                              <ApplePayIcon />
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Payment Methods */}
+                    <div className="border border-[#e2e8f0] rounded-lg p-4 relative z-0" style={{ background: 'rgba(255, 255, 255, 0.7)', backdropFilter: 'blur(10px)', WebkitBackdropFilter: 'blur(10px)' }}>
+                      <Text className={styles.sectionTitle}>
+                        {translations.paymentMethod}
+                      </Text>
+
+                      <Stack gap="md">
+                        {/* Wallet Method (hidden for client-only users) */}
+                        {!isGuest && !isClientOnly && (
+                          <div>
+                            <div
+                              className={`${styles.paymentMethodCard} ${paymentMethod === "manual" ? styles.selected : ""
+                                } ${walletBalance < totalPrice ? styles.disabled : ""}`}
+                              onClick={() =>
+                                walletBalance >= totalPrice &&
+                                setPaymentMethod("manual")
+                              }
+                            >
+                              <Group gap="lg" align="center">
+                                <div className={styles.methodCheckbox}>
+                                  <Checkbox
+                                    checked={paymentMethod === "manual"}
+                                    onChange={() =>
+                                      walletBalance >= totalPrice &&
+                                      setPaymentMethod("manual")
+                                    }
+                                    disabled={walletBalance < totalPrice}
+                                    size="md"
+                                  />
+                                </div>
+                                <div
+                                  style={{
+                                    width: 40,
+                                    height: 40,
+                                    display: "flex",
+                                    alignItems: "center",
+                                    justifyContent: "center",
+                                  }}
+                                >
+                                  <Image
+                                    src="/images/wallet-icon.svg"
+                                    alt="Insighta Wallet"
+                                    width={32}
+                                    height={32}
+                                  />
+                                </div>
+                                <div style={{ flex: 1 }}>
+                                  <Text fw={500}>{translations.InsightaWallet}</Text>
+                                  <Text size="sm" fw={600} c={walletBalance < totalPrice ? "red" : "green"} mt={2}>
+                                    {isRTL ? "الرصيد المتاح: " : "Available Balance: "}
+                                    {formatCurrency(walletBalance)}
+                                  </Text>
+                                  {walletBalance < totalPrice && (
+                                    <Text size="xs" c="red">
+                                      {translations.insufficientBalance}
+                                    </Text>
+                                  )}
+                                </div>
+                              </Group>
                             </div>
                           </div>
-                        </Group>
-                      </div>
-                    </Stack>
-                  </div>
+                        )}
 
-                  {/* Confirm Button */}
-                  <div className={styles.confirmButtonContainer}>
-                    <Button
-                      size="lg"
-                      onClick={handleCheckout}
-                      loading={isCheckingOut}
-                      disabled={
-                        selectedDocuments.length === 0 ||
-                        (!isFree && !paymentMethod)
-                      }
-                      className={styles.confirmButton}
-                      fullWidth
-                    >
-                      {isFree
-                        ? translations.download
-                        : translations.confirmOrder}
-                    </Button>
+                        {/* Stripe Method */}
+                        <div
+                          className={`${styles.paymentMethodCard} ${paymentMethod === "provider" ? styles.selected : ""
+                            }`}
+                          onClick={() => {
+                            if (isGuest) return;
+                            setPaymentMethod("provider");
+                          }}
+                        >
+                          <Group gap="lg" align="center">
+                            <div className={styles.methodCheckbox}>
+                              <Checkbox
+                                checked={paymentMethod === "provider"}
+                                onChange={() => {
+                                  if (isGuest) return;
+                                  setPaymentMethod("provider");
+                                }}
+                                size="md"
+                                disabled={isGuest}
+                              />
+                            </div>
+                            <div className={styles.paymentIconsContainer}>
+                              <div className={styles.paymentIcon}>
+                                <VisaIcon />
+                              </div>
+                              <div className={styles.paymentIcon}>
+                                <MasterCardIcon />
+                              </div>
+                              <div className={styles.paymentIcon}>
+                                <GooglePayIcon />
+                              </div>
+                              <div className={styles.paymentIcon}>
+                                <ApplePayIcon />
+                              </div>
+                            </div>
+                          </Group>
+                        </div>
+                      </Stack>
+                    </div>
+
+                    {/* Confirm Button */}
+                    <div className={styles.confirmButtonContainer}>
+                      <Button
+                        size="lg"
+                        onClick={handleCheckout}
+                        loading={isCheckingOut}
+                        disabled={
+                          selectedDocuments.length === 0 ||
+                          (!isFree && !paymentMethod)
+                        }
+                        className={styles.confirmButton}
+                        fullWidth
+                      >
+                        {isFree
+                          ? translations.download
+                          : translations.confirmOrder}
+                      </Button>
+                    </div>
                   </div>
+                </>
+              )}
+
+              {/* Download Button for Free Items - at bottom */}
+              {isFree && (
+                <div className={`mt-6 ${styles.freeDownloadButton}`}>
+                  <Button
+                    size="lg"
+                    onClick={handleCheckout}
+                    loading={isCheckingOut}
+                    disabled={selectedDocuments.length === 0}
+                    className={styles.confirmButton}
+                    fullWidth
+                  >
+                    {translations.download}
+                  </Button>
                 </div>
-              </>
-            )}
-
-            {/* Download Button for Free Items - at bottom */}
-            {isFree && (
-              <div className={`mt-6 ${styles.freeDownloadButton}`}>
-                <Button
-                  size="lg"
-                  onClick={handleCheckout}
-                  loading={isCheckingOut}
-                  disabled={selectedDocuments.length === 0}
-                  className={styles.confirmButton}
-                  fullWidth
-                >
-                  {translations.download}
-                </Button>
-              </div>
-            )}
+              )}
+            </div>
           </div>
-        </div>
         </div>
       </>
     </CountryGuard>

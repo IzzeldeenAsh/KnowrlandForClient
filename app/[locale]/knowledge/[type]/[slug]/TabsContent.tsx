@@ -61,15 +61,15 @@ export default function TabsContent({ knowledge, knowledgeSlug }: { knowledge: K
   const isRTL = locale === 'ar';
   const router = useRouter();
   const searchParams = useSearchParams();
-  
+
   // Track knowledge data updates
   const [knowledgeData, setKnowledgeData] = useState(knowledge);
-  
+
   // Update knowledgeData when prop changes
   useEffect(() => {
     setKnowledgeData(knowledge);
   }, [knowledge]);
-  
+
   // Check for tab query parameter on mount
   useEffect(() => {
     const tabParam = searchParams.get('tab');
@@ -127,7 +127,7 @@ export default function TabsContent({ knowledge, knowledgeSlug }: { knowledge: K
       refreshInFlightRef.current = false;
     }
   }, [knowledgeSlug, locale, router]);
-  
+
   // Translations for tab labels
   const translations = {
     overview: isRTL ? 'نظرة عامة' : 'Overview',
@@ -145,28 +145,28 @@ export default function TabsContent({ knowledge, knowledgeSlug }: { knowledge: K
   const tabs = [translations.overview, translations.reviews, translations.askInsighter];
 
   return (
-    <div className="mb-6" dir={isRTL ? 'rtl' : 'ltr' }>
+    <div className="mb-6" dir={isRTL ? 'rtl' : 'ltr'}>
       <div className="border-b border-gray-200">
-      <div className="flex flex-col justify-center ps-4 sm:ps-8 w-fit  sm:mt-0 sm:ms-auto block sm:hidden">
-           <Link
-              href={`/${locale}/profile/${knowledge.insighter.uuid}?entity=insighter&tab=meet`}
-              className="relative inline-flex shadow-none items-center gap-2 px-3 py-1.5 text-sm bg-gradient-to-r from-blue-500 to-teal-400 text-white rounded-md shadow-lg hover:from-blue-600 hover:to-teal-500 focus:outline-none focus:ring-2 focus:ring-blue-300"
-            >
-              <span className="pointer-events-none absolute inset-0 rounded-md bg-gradient-to-r from-blue-500 to-teal-400 opacity-20 animate-ping [animation-duration:2.5s]"></span>
-              <span className="relative font-semibold capitalize">
-                {locale ==='en' ? 'Meet ' + knowledge.insighter.name.toLowerCase() : 'قابل الخبير ' + knowledge.insighter.name.toLowerCase()}
-              </span>
-            </Link>
-           </div>
+        <div className="flex flex-col justify-center ps-4 sm:ps-8 w-fit  sm:mt-0 sm:ms-auto block sm:hidden">
+          <Link
+            href={`/${locale}/profile/${knowledge.insighter.uuid}?entity=insighter&tab=meet`}
+            className="relative inline-flex shadow-none items-center gap-2 px-3 py-1.5 text-sm bg-gradient-to-r from-blue-500 to-teal-400 text-white rounded-md shadow-lg hover:from-blue-600 hover:to-teal-500 focus:outline-none focus:ring-2 focus:ring-blue-300"
+          >
+            <span className="pointer-events-none absolute inset-0 rounded-md bg-gradient-to-r from-blue-500 to-teal-400 opacity-20 animate-ping [animation-duration:2.5s]"></span>
+            <span className="relative font-semibold capitalize">
+              {locale === 'en' ? 'Meet ' + knowledge.insighter.name.toLowerCase() : 'قابل الخبير ' + knowledge.insighter.name.toLowerCase()}
+            </span>
+          </Link>
+        </div>
         <nav className="-mb-px flex  knowledge-tab-nav relative" aria-label={isRTL ? 'تبويبات المحتوى' : 'Content tabs'} role="tablist">
-      
+
           {tabs.map((tab) => (
             <button
               key={tab}
               onClick={() => {
                 const tabKey = tabMapping[tab];
                 setActiveTab(tabKey);
-                
+
                 // Update URL with tab query parameter when changing tabs
                 const url = new URL(window.location.href);
                 if (tabKey === 'Ask') {
@@ -177,10 +177,10 @@ export default function TabsContent({ knowledge, knowledgeSlug }: { knowledge: K
                   // Remove tab parameter for other tabs
                   url.searchParams.delete('tab');
                 }
-                
+
                 // Update URL without refreshing the page
                 window.history.pushState({}, '', url);
-                
+
                 // If switching to Reviews tab, force a refresh to get the latest reviews
                 if (tabKey === 'Reviews') {
                   refreshData();
@@ -201,27 +201,27 @@ export default function TabsContent({ knowledge, knowledgeSlug }: { knowledge: K
               {tab}
             </button>
           ))}
-           {!knowledgeData.is_owner && (
-           <div className="flex flex-col justify-center ps-4 sm:ps-8  sm:mt-0 sm:ms-auto hidden sm:block">
-           <Link
-              href={`/${locale}/profile/${knowledge.insighter.uuid}?entity=insighter&tab=meet`}
-              className="relative inline-flex shadow-none items-center gap-2 px-3 py-1.5 text-sm bg-gradient-to-r from-blue-500 to-teal-400 text-white rounded-md shadow-lg hover:from-blue-600 hover:to-teal-500 focus:outline-none focus:ring-2 focus:ring-blue-300"
-            >
-              <span className="pointer-events-none absolute inset-0 rounded-md bg-gradient-to-r from-blue-500 to-teal-400 opacity-20 animate-ping [animation-duration:2.5s]"></span>
-              <span className="relative font-semibold capitalize">
-                {locale ==='en' ? 'Meet ' + knowledge.insighter.name.toLowerCase() : 'قابل الخبير ' + knowledge.insighter.name.toLowerCase()}
-              </span>
-            </Link>
-           </div>
-           )}
+          {!knowledgeData.is_owner && (
+            <div className="flex flex-col justify-center ps-4 sm:ps-8  sm:mt-0 sm:ms-auto hidden sm:block">
+              <Link
+                href={`/${locale}/profile/${knowledge.insighter.uuid}?entity=insighter&tab=meet`}
+                className="relative inline-flex shadow-none items-center gap-2 px-3 py-1.5 text-sm bg-gradient-to-r from-blue-500 to-teal-400 text-white rounded-md shadow-lg hover:from-blue-600 hover:to-teal-500 focus:outline-none focus:ring-2 focus:ring-blue-300"
+              >
+                <span className="pointer-events-none absolute inset-0 rounded-md bg-gradient-to-r from-blue-500 to-teal-400 opacity-20 animate-ping [animation-duration:2.5s]"></span>
+                <span className="relative font-semibold capitalize">
+                  {locale === 'en' ? 'Meet ' + knowledge.insighter.name.toLowerCase() : 'قابل الخبير ' + knowledge.insighter.name.toLowerCase()}
+                </span>
+              </Link>
+            </div>
+          )}
         </nav>
-     
-        
+
+
       </div>
       <div className="mt-6" role="tabpanel" id={`tabpanel-${activeTab}`} aria-labelledby={`tab-${activeTab}`}>
         <TabContent activeTab={activeTab} knowledge={knowledgeData} knowledgeSlug={knowledgeSlug} onRefreshData={refreshData} />
       </div>
-     
+
     </div>
   );
 }

@@ -172,9 +172,8 @@ export default function ContactMessagesTab() {
     const query = searchQuery.trim().toLowerCase();
     if (!query) return messages;
     return messages.filter((message) => {
-      const combined = `${message.first_name ?? ''} ${message.last_name ?? ''} ${message.email ?? ''} ${message.phone ?? ''} ${
-        message.status ?? ''
-      } ${message.created_at ?? ''} ${message.message ?? ''} ${message.reply_message ?? ''}`.toLowerCase();
+      const combined = `${message.first_name ?? ''} ${message.last_name ?? ''} ${message.email ?? ''} ${message.phone ?? ''} ${message.status ?? ''
+        } ${message.created_at ?? ''} ${message.message ?? ''} ${message.reply_message ?? ''}`.toLowerCase();
       return combined.includes(query);
     });
   }, [messages, searchQuery]);
@@ -396,11 +395,10 @@ export default function ContactMessagesTab() {
                   key={page}
                   type="button"
                   onClick={() => void fetchMessages(page)}
-                  className={`h-7 rounded-md border px-2 text-[11px] font-medium shadow-sm ${
-                    page === meta.current_page
+                  className={`h-7 rounded-md border px-2 text-[11px] font-medium shadow-sm ${page === meta.current_page
                       ? 'border-blue-600 bg-blue-600 text-white'
                       : 'border-slate-200 bg-white text-slate-700 hover:bg-slate-50'
-                  }`}
+                    }`}
                 >
                   {page}
                 </button>

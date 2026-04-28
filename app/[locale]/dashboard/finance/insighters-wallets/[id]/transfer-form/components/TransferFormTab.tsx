@@ -282,15 +282,15 @@ function renderPrintHtml(form: TransferFormRecord): string {
       </div>
 
       ${section(
-        'Beneficiary Information',
-        `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>`,
-        beneficiaryBody,
-      )}
+    'Beneficiary Information',
+    `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>`,
+    beneficiaryBody,
+  )}
       ${section(
-        'Bank Information',
-        `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M3 10h18"></path><path d="M4 10V7l8-4 8 4v3"></path><path d="M6 10v10"></path><path d="M10 10v10"></path><path d="M14 10v10"></path><path d="M18 10v10"></path><path d="M4 20h16"></path></svg>`,
-        bankBody,
-      )}
+    'Bank Information',
+    `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M3 10h18"></path><path d="M4 10V7l8-4 8 4v3"></path><path d="M6 10v10"></path><path d="M10 10v10"></path><path d="M14 10v10"></path><path d="M18 10v10"></path><path d="M4 20h16"></path></svg>`,
+    bankBody,
+  )}
     </div>
     <script>
       window.onload = () => { window.print(); setTimeout(() => window.close(), 200); };

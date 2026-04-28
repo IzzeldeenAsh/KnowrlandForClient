@@ -489,7 +489,7 @@ export default function CountriesTab() {
         </div>
 
         <div className="flex items-center gap-2">
-      
+
           <button
             type="button"
             onClick={() => setPage((p) => Math.max(1, p - 1))}

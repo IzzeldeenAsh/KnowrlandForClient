@@ -37,7 +37,7 @@ export default function AuthCallback() {
   const pathToken = params.token as string;
   const queryToken = searchParams.get('token');
   let token = pathToken || queryToken;
-  
+
   // Additional safety check: if no token found, check if query string is a raw token
   if (!token && typeof window !== 'undefined') {
     const queryString = window.location.search.substring(1);
@@ -46,7 +46,7 @@ export default function AuthCallback() {
       console.log('[token-callback] Detected raw token in query string as fallback');
     }
   }
-  
+
   const locale = (params.locale as string) || 'en';
   const shouldPromptAddChannels = searchParams.get('promptAddChannels') === '1';
   const storePromptPendingFlag = () => {
@@ -67,7 +67,7 @@ export default function AuthCallback() {
         }
 
         console.log('[token-callback] Processing authentication token:', token.substring(0, 20) + '...');
-        
+
         // Store token in cookie (primary storage) with better error handling
         try {
           setTokenCookie(token);
@@ -76,22 +76,22 @@ export default function AuthCallback() {
           console.error('[token-callback] Failed to set token cookie:', cookieError);
           // Continue anyway, as we can still use localStorage
         }
-        
+
         // Store token in localStorage for backward compatibility
         localStorage.setItem('token', token);
         console.log('[token-callback] Token stored in localStorage');
-        
+
         // Set user's timezone (don't let this block the main flow)
         setUserTimezone(token).catch(error => {
           console.error('[token-callback] Failed to set timezone, continuing anyway:', error);
         });
-        
+
         // Fetch profile with retry logic
         console.log('[token-callback] Fetching user profile...');
         const response = await fetchProfileWithRetry(token);
-        
+
         console.log('[token-callback] Profile fetched successfully:', response.data.email, 'Roles:', response.data.roles);
-        
+
         // Store user data in localStorage
         console.log('[token-callback] Storing user data in localStorage');
         const userData = {
@@ -102,17 +102,17 @@ export default function AuthCallback() {
           first_name: response.data.first_name,
           last_name: response.data.last_name,
         };
-        
+
         localStorage.setItem('user', JSON.stringify(userData));
-        
+
         // Verify authentication was successful
         const storedToken = getAuthToken();
         const storedUser = localStorage.getItem('user');
-        
+
         if (!storedToken || !storedUser) {
           throw new Error('Failed to verify stored authentication data');
         }
-        
+
         console.log('[token-callback] Authentication verification successful');
 
         // Note: GlobalProfileProvider will pick up the token and fetch profile
@@ -131,13 +131,13 @@ export default function AuthCallback() {
         }
         // Proceed to redirect
         setTimeout(() => handleRedirect(response.data), 200);
-        
+
       } catch (error) {
         console.error('[token-callback] Error in authentication flow:', error);
-        
+
         // Clear any partially set auth data
         clearAuthData();
-        
+
         // Show error for a moment before redirecting to login
         setTimeout(() => {
           console.log('[token-callback] Redirecting to login due to error');
@@ -157,7 +157,7 @@ export default function AuthCallback() {
   // Helper function to set token in cookie with improved localhost settings
   const setTokenCookie = (token: string) => {
     const isLocalhost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
-    
+
     let cookieSettings;
     if (isLocalhost) {
       // For localhost development - use permissive settings
@@ -177,11 +177,11 @@ export default function AuthCallback() {
         `Secure`
       ];
     }
-    
+
     const cookieString = cookieSettings.join('; ');
     console.log('[token-callback] Setting cookie:', cookieString);
     document.cookie = cookieString;
-    
+
     // Verify the cookie was set
     setTimeout(() => {
       const verification = getTokenFromCookie('token');
@@ -192,7 +192,7 @@ export default function AuthCallback() {
   // Helper function to get a cookie by name
   const getCookie = (name: string): string | null => {
     if (typeof document === 'undefined') return null;
-    
+
     const cookies = document.cookie.split(';');
     for (let i = 0; i < cookies.length; i++) {
       const cookie = cookies[i].trim();
@@ -208,11 +208,11 @@ export default function AuthCallback() {
     localStorage.removeItem('token');
     localStorage.removeItem('user');
     localStorage.removeItem('foresighta-creds');
-    
+
     // Clear token cookie
     const isLocalhost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
     let cookieSettings;
-    
+
     if (isLocalhost) {
       cookieSettings = [
         'token=',
@@ -229,7 +229,7 @@ export default function AuthCallback() {
         'Secure'
       ];
     }
-    
+
     document.cookie = cookieSettings.join('; ');
   };
 
@@ -238,7 +238,7 @@ export default function AuthCallback() {
     try {
       const userTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
       console.log('[TIMEZONE] Setting timezone:', userTimezone);
-      
+
       const timezoneResponse = await fetch('https://api.insightabusiness.com/api/account/timezone/set', {
         method: 'POST',
         headers: {
@@ -251,7 +251,7 @@ export default function AuthCallback() {
           timezone: userTimezone
         })
       });
-      
+
       if (!timezoneResponse.ok) {
         console.error('[TIMEZONE] Failed to set timezone:', timezoneResponse.status);
       } else {
@@ -268,7 +268,7 @@ export default function AuthCallback() {
     for (let attempt = 1; attempt <= maxRetries; attempt++) {
       try {
         console.log(`[token-callback] Profile fetch attempt ${attempt}/${maxRetries}`);
-        
+
         const response = await fetch('https://api.insightabusiness.com/api/account/profile', {
           headers: {
             'Authorization': `Bearer ${authToken}`,
@@ -321,7 +321,7 @@ export default function AuthCallback() {
         await new Promise(resolve => setTimeout(resolve, delay));
       }
     }
-    
+
     throw new Error('Failed to fetch profile after all retry attempts');
   };
 
@@ -367,9 +367,9 @@ export default function AuthCallback() {
         redirectUrl = finalReturnUrl;
         storeCountryUpdateReturnUrl(finalReturnUrl);
       } else if (userData.roles &&
-          (userData.roles.includes('insighter') ||
-           userData.roles.includes('company') ||
-           userData.roles.includes('company-insighter'))) {
+        (userData.roles.includes('insighter') ||
+          userData.roles.includes('company') ||
+          userData.roles.includes('company-insighter'))) {
         // Store Angular dashboard as return URL
         redirectUrl = '/app/insighter-dashboard/my-dashboard';
         storeCountryUpdateReturnUrl(redirectUrl);
@@ -421,9 +421,9 @@ export default function AuthCallback() {
         }
       }
     } else if (userData.roles &&
-        (userData.roles.includes('insighter') ||
-         userData.roles.includes('company') ||
-         userData.roles.includes('company-insighter'))) {
+      (userData.roles.includes('insighter') ||
+        userData.roles.includes('company') ||
+        userData.roles.includes('company-insighter'))) {
       // Redirect to insighter dashboard
       console.log('[token-callback] Redirecting to Angular insighter dashboard');
       window.location.href = `${getAngularAppOrigin()}/app/insighter-dashboard/my-dashboard`;

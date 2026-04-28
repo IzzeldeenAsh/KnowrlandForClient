@@ -31,7 +31,7 @@ class NotificationService {
   private isFetching: boolean = false;
   private pendingPromise: Promise<Notification[]> | null = null;
 
-  private constructor() {}
+  private constructor() { }
 
   public static getInstance(): NotificationService {
     if (!NotificationService.instance) {
@@ -43,7 +43,7 @@ class NotificationService {
   // Fetch notifications from the API with caching and deduplication
   public async getNotifications(locale: string = 'en', forceRefresh: boolean = false): Promise<Notification[]> {
     const now = Date.now();
-    
+
     // Return cached data if still valid and not forced refresh
     if (!forceRefresh && (now - this.lastFetchTime) < this.CACHE_DURATION) {
       return [...this.currentNotifications];
@@ -56,7 +56,7 @@ class NotificationService {
 
     // Create new fetch promise
     this.pendingPromise = this.fetchNotificationsFromAPI(locale);
-    
+
     try {
       const notifications = await this.pendingPromise;
       return notifications;
@@ -67,16 +67,16 @@ class NotificationService {
 
   private async fetchNotificationsFromAPI(locale: string): Promise<Notification[]> {
     this.isFetching = true;
-    
+
     try {
       const token = getAuthToken();
-      
+
       if (!token) {
         this.currentNotifications = [];
         this.notifyListeners();
         return [];
       }
-      
+
       const response = await fetch('https://api.insightabusiness.com/api/account/notification', {
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -86,7 +86,7 @@ class NotificationService {
           "X-Timezone": Intl.DateTimeFormat().resolvedOptions().timeZone,
         }
       });
-      
+
       if (!response.ok) {
         if (response.status === 401) {
           // Token expired, clear notifications
@@ -95,15 +95,15 @@ class NotificationService {
         }
         return this.currentNotifications;
       }
-      
+
       const data = await response.json();
       const notifications = data.data || [];
-      
+
       // Update cache
       this.currentNotifications = notifications;
       this.lastFetchTime = Date.now();
       this.notifyListeners();
-      
+
       return notifications;
     } catch (error) {
       console.error('Error fetching notifications:', error);
@@ -117,11 +117,11 @@ class NotificationService {
   public async markNotificationAsRead(id: string, locale: string = 'en'): Promise<boolean> {
     try {
       const token = getAuthToken();
-      
+
       if (!token) {
         return false;
       }
-      
+
       const response = await fetch(`https://api.insightabusiness.com/api/account/notification/read/${id}`, {
         method: 'PUT',
         headers: {
@@ -132,22 +132,22 @@ class NotificationService {
           "X-Timezone": Intl.DateTimeFormat().resolvedOptions().timeZone,
         }
       });
-      
+
       if (response.ok) {
         // Update local state immediately for better UX
-        this.currentNotifications = this.currentNotifications.map(notification => 
-          notification.id === id 
+        this.currentNotifications = this.currentNotifications.map(notification =>
+          notification.id === id
             ? { ...notification, read_at: new Date().toISOString() }
             : notification
         );
         this.notifyListeners();
-        
+
         // Force refresh after a short delay to get server state
         setTimeout(() => {
           this.getNotifications(locale, true);
         }, 500);
       }
-      
+
       return response.ok;
     } catch (error) {
       console.error('Error marking notification as read:', error);
@@ -159,11 +159,11 @@ class NotificationService {
   public async markAllNotificationsAsRead(locale: string = 'en'): Promise<boolean> {
     try {
       const token = getAuthToken();
-      
+
       if (!token) {
         return false;
       }
-      
+
       const response = await fetch('https://api.insightabusiness.com/api/account/notification/read', {
         method: 'PUT',
         headers: {
@@ -174,7 +174,7 @@ class NotificationService {
           "X-Timezone": Intl.DateTimeFormat().resolvedOptions().timeZone,
         }
       });
-      
+
       if (response.ok) {
         // Update local state immediately
         this.currentNotifications = this.currentNotifications.map(notification => ({
@@ -182,13 +182,13 @@ class NotificationService {
           read_at: new Date().toISOString()
         }));
         this.notifyListeners();
-        
+
         // Force refresh after a short delay
         setTimeout(() => {
           this.getNotifications(locale, true);
         }, 500);
       }
-      
+
       return response.ok;
     } catch (error) {
       console.error('Error marking all notifications as read:', error);
@@ -202,17 +202,17 @@ class NotificationService {
       console.log('Notification polling already active');
       return this.pollingInterval;
     }
-    
+
     this.isPolling = true;
-    
+
     // Initial fetch
     this.getNotifications(locale);
-    
+
     // Set up interval
     // this.pollingInterval = setInterval(() => {
     //   this.getNotifications(locale, true);
     // }, interval);
-    
+
     console.log('Notification polling started');
     return this.pollingInterval;
   }
@@ -235,10 +235,10 @@ class NotificationService {
   // Subscribe to notifications changes
   public subscribeToNotifications(callback: (notifications: Notification[]) => void): () => void {
     this.listeners.push(callback);
-    
+
     // Immediately call with current notifications
     callback([...this.currentNotifications]);
-    
+
     // Return unsubscribe function
     return () => {
       const index = this.listeners.indexOf(callback);

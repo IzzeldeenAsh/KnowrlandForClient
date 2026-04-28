@@ -43,7 +43,7 @@ async function fetchPackageData(slug: string, locale: string = 'en') {
   const cookieStore = await cookies();
   const tokenCookie = cookieStore.get("knoldg_session");
   const token = tokenCookie?.value;
-  
+
   const response = await fetch(
     `https://api.insightabusiness.com/api/platform/industries/package/${slug}`,
     {
@@ -51,28 +51,28 @@ async function fetchPackageData(slug: string, locale: string = 'en') {
       headers: {
         "Content-Type": "application/json",
         Accept: "application/json",
-        "Accept-Language": locale,"X-Timezone": Intl.DateTimeFormat().resolvedOptions().timeZone,
+        "Accept-Language": locale, "X-Timezone": Intl.DateTimeFormat().resolvedOptions().timeZone,
         ...(token && { Authorization: `Bearer ${token}` }),
       },
     }
   );
-  
+
   if (!response.ok) {
     console.error("API Error:", {
       status: response.status,
       statusText: response.statusText,
       url: response.url,
     });
-    
+
     if (response.status === 404) {
       return notFound();
     }
-    
+
     const errorText = await response.text();
     console.error("Error response:", errorText);
     throw new Error(`Failed to fetch package details: ${response.status} ${response.statusText}`);
   }
-  
+
   const data = await response.json();
   return data.data;
 }
@@ -98,14 +98,14 @@ export default async function PackagePage({ params }: Props) {
   // Await params to access its properties
   const { slug, locale = 'en' } = await params;
   const isRTL = locale === 'ar';
-  
+
   try {
     const packageData: PackageData = await fetchPackageData(slug, locale);
-  
+
     return (
       <div className={styles.container}>
-      
-  
+
+
         {/* Header Section with Background Image and Breadcrumb */}
         <div className={styles.sectionHeader}>
           <Image
@@ -118,9 +118,9 @@ export default async function PackagePage({ params }: Props) {
           <div className="relative z-10 container mx-auto px-4 mt-20 w-full">
             <div className="flex flex-col md:flex-row justify-between items-start gap-8">
               <div className="flex-1 max-w-3xl">
-              <span className="inline-block px-5 py-1 text-xs font-semibold text-blue-500 bg-blue-100 rounded-md mb-2 uppercase">
-                     Package
-                    </span>
+                <span className="inline-block px-5 py-1 text-xs font-semibold text-blue-500 bg-blue-100 rounded-md mb-2 uppercase">
+                  Package
+                </span>
                 <div className="text-start mb-4" data-aos="fade-down">
                   <h3 className={`text-md ${isRTL ? 'bg-gradient-to-l from-blue-400 to-teal-500' : 'bg-gradient-to-r from-blue-500 to-teal-400'} md:text-4xl font-extrabold text-transparent bg-clip-text`}>
                     {packageData.name} Package
@@ -134,28 +134,28 @@ export default async function PackagePage({ params }: Props) {
                   discount={packageData.discount}
                 />
               </div>
-                  {/* Desktop Side Box */}
-        <div className="hidden md:block w-80" data-aos="fade-left">
-          <PackageSideBox
-            name={packageData.name}
-            final_price={packageData.final_price}
-            discount={packageData.discount}
-          />
-        </div>
+              {/* Desktop Side Box */}
+              <div className="hidden md:block w-80" data-aos="fade-left">
+                <PackageSideBox
+                  name={packageData.name}
+                  final_price={packageData.final_price}
+                  discount={packageData.discount}
+                />
+              </div>
             </div>
           </div>
         </div>
-  
-    
-  
+
+
+
         {/* Main Content: Toggle view for included knowledge */}
         <div className="container mx-auto px-4 pt-4">
           <PackageKnowledgeDisplay
             knowledge={packageData.knowledge}
-            totalPages={1}  
+            totalPages={1}
           />
         </div>
-  
+
         <Footer />
       </div>
     );

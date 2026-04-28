@@ -206,12 +206,12 @@ export async function generateMetadata(
   };
 }
 
-export default async function ProfileLayout({ 
+export default async function ProfileLayout({
   children,
-  params 
+  params
 }: ProfileLayoutProps) {
   const { uuid, locale } = await params;
-  
+
   // Fetch profile data for structured data
   let structuredDataScript = null;
   try {
@@ -230,7 +230,7 @@ export default async function ProfileLayout({
         },
         locale
       );
-      
+
       structuredDataScript = (
         <script
           type="application/ld+json"
@@ -243,7 +243,7 @@ export default async function ProfileLayout({
   } catch (error) {
     console.error('Error generating profile structured data:', error);
   }
-  
+
   return (
     <>
       {structuredDataScript}
