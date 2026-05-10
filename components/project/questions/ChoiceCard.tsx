@@ -80,17 +80,18 @@ export default function ChoiceCard({
         ? 'gap-5 px-7 py-8'
         : 'gap-4 px-6 py-7'
 
-  const checkBadgeClassName =
+  const indicatorPos =
     size === 'sm'
-      ? `absolute top-3 ${isRTL ? 'left-3' : 'right-3'} inline-flex h-9 w-9 items-center justify-center rounded-full bg-blue-600 text-white`
+      ? `absolute top-3 ${isRTL ? 'left-3' : 'right-3'}`
       : size === 'lg'
-        ? `absolute top-5 ${isRTL ? 'left-5' : 'right-5'} inline-flex h-8 w-8 items-center justify-center rounded-full bg-blue-600 text-white `
-        : `absolute top-4 ${isRTL ? 'left-4' : 'right-4'} inline-flex h-8 w-8 items-center justify-center rounded-full bg-blue-600 text-white `
+        ? `absolute top-5 ${isRTL ? 'left-6' : 'right-6'}`
+        : `absolute top-4 ${isRTL ? 'left-6' : 'right-6'}`
 
-  const checkIconSize = size === 'sm' ? 18 : size === 'lg' ? 24 : 22
+  const indicatorSize = size === 'sm' ? 'h-5 w-5' : 'h-6 w-6'
+  const checkIconSize = size === 'sm' ? 12 : 14
   const resolvedIconSize = iconSize ?? (size === 'sm' ? 44 : size === 'lg' ? 64 : 56)
   const titleTextClassName =
-    size === 'sm' ? 'text-base' : size === 'lg' ? 'text-xl' : 'text-lg'
+    size === 'sm' ? 'text-lg' : size === 'lg' ? 'text-xl' : 'text-lg'
   const subtitleTextClassName =
     size === 'sm' ? 'text-xs' : size === 'lg' ? 'text-base' : 'text-sm'
 
@@ -138,18 +139,33 @@ export default function ChoiceCard({
       } ${className}`}
       style={{ transitionDelay: `${delayMs}ms` }}
     >
-      {checked ? (
-        <span className={checkBadgeClassName} aria-hidden="true">
-          <IconCheck size={checkIconSize} stroke={3} />
-        </span>
-      ) : null}
+      <span
+        className={`${indicatorPos} box-border inline-flex aspect-square shrink-0 items-center justify-center ${indicatorSize} border transition-colors ${
+          role === 'checkbox' ? 'rounded-md' : 'rounded-full'
+        } ${
+          checked ? 'border-blue-600 bg-blue-600' : 'border-slate-300 bg-white/80'
+        }`}
+        aria-hidden="true"
+      >
+        {checked ? (
+          role === 'checkbox' ? (
+            <IconCheck size={checkIconSize} stroke={3} className="text-white" />
+          ) : (
+            <span className="h-2 w-2 rounded-full bg-white" />
+          )
+        ) : null}
+      </span>
 
       <div
         className={`flex h-full flex-col ${contentPaddingClassName} ${contentAlign} ${contentClassName}`}
       >
         {resolvedIcon ? (
           <span
-            className="inline-flex shrink-0 items-center justify-center text-blue-600 opacity-95 [&>svg]:h-full [&>svg]:w-full"
+            className={`inline-flex shrink-0 items-center justify-center text-blue-600 opacity-95 transition-transform duration-300 ease-out [&>svg]:h-full [&>svg]:w-full ${
+              checked
+                ? 'scale-105 drop-shadow-[0_6px_18px_rgba(37,99,235,0.25)]'
+                : 'group-hover:scale-105 group-hover:-rotate-1'
+            }`}
             style={{ width: resolvedIconSize, height: resolvedIconSize }}
             aria-hidden="true"
           >
@@ -159,9 +175,7 @@ export default function ChoiceCard({
 
         <div className="space-y-1">
           <div
-            className={`${titleTextClassName} font-bold ${
-              checked ? 'text-[#2563eb]' : 'text-slate-900'
-            } ${titleClassName}`}
+            className={`${titleTextClassName} font-bold bg-gradient-to-r from-sky-600 via-cyan-500 to-cyan-500 bg-clip-text text-transparent ${titleClassName}`}
           >
             {title}
           </div>

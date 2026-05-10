@@ -13,7 +13,7 @@ import { Elements, PaymentElement, useElements, useStripe } from "@stripe/react-
 import styles from "./payment.module.css";
 
 // Initialize Stripe
-const stripePromise = loadStripe("pk_live_51RvbpYRIE7WtDi9SLKPBxKTPyTkULT1e36AZMOcmtUomKgW99akiph2PVg5mmUcPtyAjvlXwP1wy70OFvooJLpQc00CNQYKb96");
+const stripePromise = loadStripe("pk_test_51RvbpiRSMujJZykzGpYlMXB5BXcWcTKrBLcWVtvj3oM2vS9S0z1Ur8YVWPDVSoRTwIoYEDMkvnblr7VbQMCiwwx700TNlixQE6");
 
 // File icon mapping function
 const getFileIconByExtension = (extension: string) => {
@@ -70,6 +70,13 @@ interface OrderDetails {
   orderable: Suborder;
   knowledge_download_id?: string;
 }
+
+const isSuccessfulPaymentStatus = (order?: { status?: string; payment_status?: string } | null) => {
+  const status = order?.status?.toLowerCase();
+  const paymentStatus = order?.payment_status?.toLowerCase();
+
+  return status === "paid" || status === "completed" || paymentStatus === "completed";
+};
 
 interface PaymentFormProps {
   orderUuid: string;
@@ -366,7 +373,7 @@ function PaymentForm({ orderUuid, amount, title, locale, isRTL, isGuest, orderDe
         }
 
         const data = await response.json();
-        return data.data?.status === "paid";
+        return isSuccessfulPaymentStatus(data.data);
       } catch (error) {
         console.error("Error checking order status:", error);
         return false;
@@ -520,7 +527,7 @@ function PaymentForm({ orderUuid, amount, title, locale, isRTL, isGuest, orderDe
       if (response.status === 204) {
         // After backend confirmation, re-fetch order to verify status
         const updated = await fetchUpdatedOrderDetails(orderUuid, setOrderDetails);
-        if (updated?.status === "paid") {
+        if (isSuccessfulPaymentStatus(updated)) {
           setPaymentStatus("success");
         } else {
           setPaymentStatus("error");

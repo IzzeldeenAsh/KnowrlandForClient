@@ -1,8 +1,7 @@
 'use client'
 
 import Link from 'next/link'
-import { useEffect, useState } from 'react'
-import { CheckCircleIcon, SparklesIcon } from '@heroicons/react/24/solid'
+import { useEffect } from 'react'
 import { clearProjectWizardStorage, type WizardLocale } from '../wizardStorage'
 
 export default function ProjectSubmissionSuccessStep({
@@ -14,13 +13,6 @@ export default function ProjectSubmissionSuccessStep({
   const isEnglish =
     typeof locale === 'string' && locale.toLowerCase().startsWith('en')
 
-  const [entered, setEntered] = useState(false)
-
-  useEffect(() => {
-    const enterTimer = window.setTimeout(() => setEntered(true), 40)
-    return () => window.clearTimeout(enterTimer)
-  }, [])
-
   useEffect(() => {
     clearProjectWizardStorage(locale)
   }, [locale])
@@ -29,7 +21,6 @@ export default function ProjectSubmissionSuccessStep({
   const body = isRTL
     ? 'أرسلنا العرض بنجاح إلى الجهات والخبراء الذين اخترتهم. يمكنك الآن متابعة حالة المشروع من صفحة المشاريع.'
     : 'Your offer has been submitted successfully to the selected matches. You can now track the project from your projects page.'
-  const eyebrow = isRTL ? 'تم الإرسال بنجاح' : 'Submission complete'
   const primaryAction = isRTL ? 'عرض مشاريعي' : 'View my projects'
   const secondaryAction = isRTL ? 'إنشاء طلب جديد' : 'Start another request'
   const statLabel = isRTL ? 'الخطوة التالية' : 'What happens next'
@@ -71,6 +62,18 @@ export default function ProjectSubmissionSuccessStep({
         @keyframes projectSuccessRise {
           0% { transform: translate3d(0, 18px, 0) scale(0.8); opacity: 0; }
           100% { transform: translate3d(0, 0, 0) scale(1); opacity: 1; }
+        }
+
+        @keyframes projectSuccessCheckCircle {
+          0% { transform: scale(0); opacity: 0; }
+          50% { transform: scale(1.1); }
+          100% { transform: scale(1); opacity: 1; }
+        }
+
+        @keyframes projectSuccessCheckmark {
+          0% { stroke-dashoffset: 100; opacity: 0; }
+          20% { opacity: 1; }
+          100% { stroke-dashoffset: 0; opacity: 1; }
         }
       `}</style>
 
@@ -114,9 +117,31 @@ export default function ProjectSubmissionSuccessStep({
 
           
 
-            <div className="relative flex h-28 w-28 items-center justify-center rounded-full bg-[linear-gradient(145deg,#169b62,#49c98b)] text-white shadow-[0_18px_40px_rgba(22,155,98,0.35)]">
+            <div
+              className="relative flex h-28 w-28 items-center justify-center rounded-full bg-[linear-gradient(145deg,#169b62,#49c98b)] text-white shadow-[0_18px_40px_rgba(22,155,98,0.35)]"
+              style={{ animation: 'projectSuccessCheckCircle 600ms ease-out both' }}
+            >
               <div className="absolute inset-1 rounded-full border border-white/25" />
-              <CheckCircleIcon className="relative h-14 w-14" />
+              <svg
+                className="relative h-14 w-14"
+                viewBox="0 0 24 24"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+                aria-hidden="true"
+              >
+                <path
+                  d="M5 13l4 4L19 7"
+                  stroke="currentColor"
+                  strokeWidth="3"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  style={{
+                    strokeDasharray: 100,
+                    strokeDashoffset: 100,
+                    animation: 'projectSuccessCheckmark 800ms ease-out 400ms forwards',
+                  }}
+                />
+              </svg>
             </div>
           </div>
           <h1
@@ -147,7 +172,7 @@ export default function ProjectSubmissionSuccessStep({
               {primaryAction}
             </Link>
             <Link
-              href={`/${locale}/project/wizard/project-type`}
+              href={`/${locale}/project/wizard/project-type?fresh=1`}
               className="btn-sm rounded-full border border-slate-200 bg-white/90 px-6 py-3 text-center text-slate-700 transition-colors duration-200 hover:border-slate-300 hover:bg-white"
             >
               {secondaryAction}

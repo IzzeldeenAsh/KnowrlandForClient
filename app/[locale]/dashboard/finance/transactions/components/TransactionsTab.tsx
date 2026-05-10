@@ -258,6 +258,22 @@ function getLocalDateStamp(date = new Date()): string {
   return `${year}-${month}-${day}`;
 }
 
+function getCurrentYearDateRange(date = new Date()) {
+  const year = date.getFullYear();
+  return {
+    start: `${year}-01-01`,
+    end: `${year}-12-31`,
+  };
+}
+
+function isDateInputValue(value: string): boolean {
+  return /^\d{4}-\d{2}-\d{2}$/.test(value);
+}
+
+function buildDateTimeParam(value: string, edge: 'start' | 'end'): string {
+  return `${value} ${edge === 'start' ? '00:00:00' : '23:59:59'}`;
+}
+
 function buildTransactionExportRows(transactions: TransactionRecord[]) {
   const headers = [
     'Service',
@@ -541,6 +557,8 @@ export default function TransactionsTab() {
 
   const [perPage, setPerPage] = useState<number>(10);
   const [searchInput, setSearchInput] = useState<string>('');
+  const [exportStartDate, setExportStartDate] = useState<string>(() => getCurrentYearDateRange().start);
+  const [exportEndDate, setExportEndDate] = useState<string>(() => getCurrentYearDateRange().end);
 
   const [selectedTransaction, setSelectedTransaction] = useState<TransactionRecord | null>(null);
   const [detailsOpen, setDetailsOpen] = useState<boolean>(false);
@@ -722,8 +740,22 @@ export default function TransactionsTab() {
         return;
       }
 
+      const startDate = exportStartDate.trim();
+      const endDate = exportEndDate.trim();
+
+      if (!isDateInputValue(startDate) || !isDateInputValue(endDate)) {
+        warning('Please select a valid start and end date.', 'Warning');
+        return;
+      }
+
+      if (startDate > endDate) {
+        warning('Start date must be before end date.', 'Warning');
+        return;
+      }
+
       const url = new URL('https://api.insightabusiness.com/api/admin/fund/platform/transaction/list');
-      url.searchParams.set('per_time', selectedPeriod);
+      url.searchParams.set('start_date', buildDateTimeParam(startDate, 'start'));
+      url.searchParams.set('end_date', buildDateTimeParam(endDate, 'end'));
 
       const response = await fetch(url.toString(), {
         method: 'GET',
@@ -754,7 +786,7 @@ export default function TransactionsTab() {
     } finally {
       setIsExporting(false);
     }
-  }, [handleServerErrors, selectedPeriod, success, warning]);
+  }, [exportEndDate, exportStartDate, handleServerErrors, success, warning]);
 
   const openDetails = (tx: TransactionRecord) => {
     setSelectedTransaction(tx);
@@ -855,6 +887,29 @@ export default function TransactionsTab() {
                 placeholder="Search (current page)..."
                 className={INPUT_WITH_ICON_CLASS}
               />
+            </div>
+
+            <div className="grid grid-cols-1 gap-2 sm:grid-cols-[minmax(130px,160px)_minmax(130px,160px)]">
+              <label className="flex flex-col gap-1 text-[11px] font-semibold text-slate-500">
+                Start
+                <input
+                  type="date"
+                  value={exportStartDate}
+                  max={exportEndDate || undefined}
+                  onChange={(event) => setExportStartDate(event.target.value)}
+                  className={INPUT_CLASS}
+                />
+              </label>
+              <label className="flex flex-col gap-1 text-[11px] font-semibold text-slate-500">
+                End
+                <input
+                  type="date"
+                  value={exportEndDate}
+                  min={exportStartDate || undefined}
+                  onChange={(event) => setExportEndDate(event.target.value)}
+                  className={INPUT_CLASS}
+                />
+              </label>
             </div>
 
             <button type="button" onClick={exportTransactions} disabled={isExporting} className={EXPORT_BUTTON_CLASS}>

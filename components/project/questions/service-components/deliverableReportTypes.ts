@@ -8,11 +8,13 @@ export type ReportTypeOption = {
 const ALLOWED_REPORT_TYPES = ['pdf', 'docx', 'xlsx', 'pptx'] as const
 
 export function getReportTypeOptions(_locale: WizardLocale): ReportTypeOption[] {
+  const isRTL = _locale === 'ar'
+
   return [
-    { value: 'pdf', label: 'PDF' },
-    { value: 'docx', label: 'DOCX' },
-    { value: 'xlsx', label: 'XLSX' },
-    { value: 'pptx', label: 'PPTX' },
+    { value: 'pdf', label: isRTL ? 'ملف PDF' : 'PDF Report' },
+    { value: 'docx', label: isRTL ? 'مستند Word' : 'Word Document' },
+    { value: 'xlsx', label: isRTL ? 'جدول Excel' : 'Excel Sheet' },
+    { value: 'pptx', label: isRTL ? 'عرض Power Point' : 'Power Point' },
   ]
 }
 

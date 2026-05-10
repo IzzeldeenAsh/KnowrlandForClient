@@ -8,14 +8,16 @@ import {
   ClipboardDocumentListIcon,
   DocumentTextIcon,
   GlobeAltIcon,
+  PencilSquareIcon,
   SparklesIcon,
-} from '@heroicons/react/24/outline'
+} from '@heroicons/react/24/solid'
 import { getApiUrl } from '@/app/config'
 import { getAuthToken } from '@/lib/authToken'
 import {
   assertProjectApiResponse,
   getProjectApiErrorMessage,
 } from '@/components/project/projectApiError'
+import { syncProjectProperties } from '@/components/project/projectPropertiesSync'
 import { readStoredProjectRequestUuid } from '@/components/project/projectRequestUuid'
 import { readProjectAddonsState, readProjectScopeSnapshot } from '../projectAddonsState'
 import { projectTypeLabel } from '../projectLabels'
@@ -24,7 +26,7 @@ import {
   readServiceComponentsPayload,
   type ServiceComponentsPayload,
 } from '../serviceComponentsPayload'
-import { readServiceComponentSlugs } from '../projectWizardFlow'
+import { projectWizardStepIds, readServiceComponentSlugs } from '../projectWizardFlow'
 import { useProjectStepErrorToast } from '../useProjectStepErrorToast'
 import { useProjectWizardNavigation } from '../useProjectWizardNavigation'
 import { projectWizardStorage, type WizardLocale } from '../wizardStorage'
@@ -93,6 +95,7 @@ type ReviewRow = {
   value: string[]
   fileTypes?: string[]
   variant?: 'default' | 'chips'
+  editStepId?: string
 }
 
 type ReviewSection = {
@@ -112,6 +115,7 @@ type ReviewData = {
   experienceRange: string
   teamSizeRange: string
   targetMarket: string[]
+  deadline: string
   servicePrompt: string
   description: string
   descriptionFiles: Array<{ name: string; size: number; type: string }>
@@ -541,12 +545,12 @@ function buildServiceComponentSections(params: {
   locale: WizardLocale
   slugs: string[]
   payload: ServiceComponentsPayload
-}) {
+}): ReviewSection[] {
   const { locale, slugs, payload } = params
 
   return slugs
     .filter((slug) => slug !== 'target-market')
-    .map((slug) => {
+    .map<ReviewSection | null>((slug) => {
       const payloadValue = payload.components?.[slug]
 
       if (slug === 'deliverable-stage') {
@@ -567,45 +571,52 @@ function buildServiceComponentSections(params: {
         const finalVersionWay = resolveDeliverableWay(finalVersion)
         const firstDraftReportTypes = getReportTypes(firstDraft.report_type)
         const finalVersionReportTypes = getReportTypes(finalVersion.report_type)
+        const notSpecified = locale === 'ar' ? 'غير محدد' : 'Not specified'
 
         return {
           title: getComponentTitle(locale, slug),
           rows: [
             {
-              label: locale === 'ar' ? 'المسودة الأولى' : 'First draft',
-              value: [
-                `${locale === 'ar' ? 'التاريخ' : 'Date'}: ${String(firstDraft.date || '').trim() || (locale === 'ar' ? 'غير محدد' : 'Not specified')}`,
-                `${locale === 'ar' ? 'طريقة التسليم' : 'Delivery mode'}: ${getDeliverableWayLabel(locale, firstDraftWay.key)}`,
-                ...(firstDraftReportTypes.length === 0
-                  ? [
-                    `${locale === 'ar' ? 'الصيغ' : 'Formats'}: ${locale === 'ar' ? 'غير محدد' : 'Not specified'}`,
-                  ]
-                  : []),
-                ...(firstDraftWay.address
-                  ? [
-                    `${locale === 'ar' ? 'العنوان' : 'Address'}: ${firstDraftWay.address}`,
-                  ]
-                  : []),
-              ],
-              fileTypes: firstDraftReportTypes,
+              label: locale === 'ar' ? 'تاريخ المسودة الأولى' : 'First draft date',
+              value: [String(firstDraft.date || '').trim() || notSpecified],
+              editStepId: 'deliverable-first-draft-date',
             },
             {
-              label: locale === 'ar' ? 'النسخة النهائية' : 'Final version',
+              label: locale === 'ar' ? 'طريقة تسليم المسودة الأولى' : 'First draft delivery mode',
               value: [
-                `${locale === 'ar' ? 'التاريخ' : 'Date'}: ${String(finalVersion.date || '').trim() || (locale === 'ar' ? 'غير محدد' : 'Not specified')}`,
-                `${locale === 'ar' ? 'طريقة التسليم' : 'Delivery mode'}: ${getDeliverableWayLabel(locale, finalVersionWay.key)}`,
-                ...(finalVersionReportTypes.length === 0
-                  ? [
-                    `${locale === 'ar' ? 'الصيغ' : 'Formats'}: ${locale === 'ar' ? 'غير محدد' : 'Not specified'}`,
-                  ]
-                  : []),
-                ...(finalVersionWay.address
-                  ? [
-                    `${locale === 'ar' ? 'العنوان' : 'Address'}: ${finalVersionWay.address}`,
-                  ]
+                getDeliverableWayLabel(locale, firstDraftWay.key),
+                ...(firstDraftWay.address
+                  ? [`${locale === 'ar' ? 'العنوان' : 'Address'}: ${firstDraftWay.address}`]
                   : []),
               ],
+              editStepId: 'deliverable-first-draft-way',
+            },
+            {
+              label: locale === 'ar' ? 'صيغ المسودة الأولى' : 'First draft formats',
+              value: firstDraftReportTypes.length === 0 ? [notSpecified] : [],
+              fileTypes: firstDraftReportTypes,
+              editStepId: 'deliverable-first-draft-type',
+            },
+            {
+              label: locale === 'ar' ? 'تاريخ النسخة النهائية' : 'Final version date',
+              value: [String(finalVersion.date || '').trim() || notSpecified],
+              editStepId: 'deliverable-final-version-date',
+            },
+            {
+              label: locale === 'ar' ? 'طريقة تسليم النسخة النهائية' : 'Final version delivery mode',
+              value: [
+                getDeliverableWayLabel(locale, finalVersionWay.key),
+                ...(finalVersionWay.address
+                  ? [`${locale === 'ar' ? 'العنوان' : 'Address'}: ${finalVersionWay.address}`]
+                  : []),
+              ],
+              editStepId: 'deliverable-final-version-way',
+            },
+            {
+              label: locale === 'ar' ? 'صيغ النسخة النهائية' : 'Final version formats',
+              value: finalVersionReportTypes.length === 0 ? [notSpecified] : [],
               fileTypes: finalVersionReportTypes,
+              editStepId: 'deliverable-final-version-type',
             },
           ],
         }
@@ -618,6 +629,7 @@ function buildServiceComponentSections(params: {
             {
               label: locale === 'ar' ? 'الاختيار' : 'Selection',
               value: getDataSourceValues(locale, payloadValue),
+              editStepId: 'data-sources-expected',
             },
           ],
         }
@@ -646,6 +658,7 @@ function buildServiceComponentSections(params: {
           {
             label: locale === 'ar' ? 'الإجابة' : 'Answer',
             value: values,
+            editStepId: slug,
           },
         ],
       }
@@ -659,12 +672,16 @@ function SectionBlock({
   emptyText,
   toneIndex,
   isRTL,
+  editLabel,
+  editHrefFor,
 }: {
   title: string
   rows: ReviewRow[]
   emptyText: string
   toneIndex: number
   isRTL: boolean
+  editLabel: string
+  editHrefFor: (stepId: string) => string
 }) {
   const sectionIcon = sectionIcons[toneIndex % sectionIcons.length]
   const Icon = sectionIcon.icon
@@ -690,7 +707,22 @@ function SectionBlock({
             key={row.label}
             className={`min-w-0 ${rows.length === 1 ? 'sm:col-span-2 xl:col-span-3' : ''}`}
           >
-            <div className="mb-2 text-xs font-semibold text-slate-500">{row.label}</div>
+            <div className="mb-2 flex items-center gap-2">
+              <div className="text-xs font-semibold text-slate-500">{row.label}</div>
+              {row.editStepId ? (
+                <Link
+                  href={editHrefFor(row.editStepId)}
+                  title={`${editLabel}: ${row.label}`}
+                  aria-label={`${editLabel}: ${row.label}`}
+                  className="inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-full border border-slate-200 bg-white text-slate-500 transition-colors hover:border-sky-200 hover:bg-sky-50 hover:text-sky-700"
+                >
+                <svg width="17" height="17" viewBox="0 0 17 17" fill="none" xmlns="http://www.w3.org/2000/svg">
+<path fill-rule="evenodd" clip-rule="evenodd" d="M9.83073 2.62588C10.6606 1.79601 12.0061 1.79601 12.8359 2.62588L14.3741 4.16408C15.204 4.99394 15.204 6.33941 14.3741 7.16928L6.87587 14.6675C6.74303 14.8004 6.56286 14.875 6.375 14.875H2.83333C2.44213 14.875 2.125 14.5579 2.125 14.1667V10.625C2.125 10.4371 2.19963 10.257 2.33247 10.1241L9.83073 2.62588ZM11.8342 3.62761C11.5576 3.35099 11.1091 3.35099 10.8325 3.62761L10.2101 4.25001L12.75 6.78994L13.3724 6.16754C13.649 5.89092 13.649 5.44243 13.3724 5.16581L11.8342 3.62761ZM11.7483 7.79168L9.20833 5.25174L3.54167 10.9184V13.4583H6.0816L11.7483 7.79168Z" fill="#00A028"/>
+</svg>
+
+                </Link>
+              ) : null}
+            </div>
 
             {row.value.length > 0 || (row.fileTypes?.length ?? 0) > 0 ? (
               <div className="space-y-3">
@@ -726,9 +758,11 @@ function SectionBlock({
 
                 {row.fileTypes && row.fileTypes.length > 0 ? (
                   <div>
-                    <div className="mb-2 text-xs font-semibold text-slate-500">
-                      {isRTL ? 'الصيغ' : 'Formats'}
-                    </div>
+                    {row.value.length > 0 ? (
+                      <div className="mb-2 text-xs font-semibold text-slate-500">
+                        {isRTL ? 'الصيغ' : 'Formats'}
+                      </div>
+                    ) : null}
                     <ul className="space-y-2">
                       {row.fileTypes.map((fileType, itemIndex) => (
                         <li
@@ -741,7 +775,7 @@ function SectionBlock({
                             alt={fileType.toUpperCase()}
                             width={18}
                             height={18}
-                            className="h-[18px] w-[18px]"
+                            className="h-[23px] w-[18px]"
                           />
                           <span>{fileType.toUpperCase()}</span>
                         </li>
@@ -771,6 +805,7 @@ export default function ProjectReviewStep({
 
   const [review, setReview] = useState<ReviewData | null>(null)
   const [error, setError] = useState<string | null>(null)
+  const [submitting, setSubmitting] = useState(false)
 
   useProjectStepErrorToast(error, locale)
 
@@ -789,6 +824,10 @@ export default function ProjectReviewStep({
       const deliverablesLanguage = readStorageValue(
         locale,
         projectWizardStorage.deliverablesLanguageKey(locale)
+      )
+      const storedServiceLabel = readStorageValue(
+        locale,
+        projectWizardStorage.serviceLabelKey(locale)
       )
       const servicePrompt = readStorageValue(
         locale,
@@ -817,6 +856,10 @@ export default function ProjectReviewStep({
       const targetMode = readStorageValue(
         locale,
         projectWizardStorage.targetMarketModeKey(locale)
+      )
+      const projectDeadline = readStorageValue(
+        locale,
+        projectWizardStorage.deadlineKey(locale)
       )
       const countryIds = safeParseNumberArray(
         readStorageValue(locale, projectWizardStorage.targetMarketCountryIdsKey(locale))
@@ -892,30 +935,32 @@ export default function ProjectReviewStep({
       }
 
       const service = requestData?.service || null
-      const serviceName = service?.name || (isRTL ? 'غير محدد' : 'Not specified')
+      const serviceName =
+        storedServiceLabel || service?.name || (isRTL ? 'غير محدد' : 'Not specified')
       const projectTitle = String(requestData?.title || '').trim()
       const headerTitle = projectTitle || (isRTL ? 'ملخص المشروع' : 'Project Summary')
 
+      const storedOriginLabel =
+        originType === 'country'
+          ? countries.find((item) => String(item.id) === originId)
+            ? getDisplayName(
+              locale,
+              countries.find((item) => String(item.id) === originId) as Country
+            )
+            : originId
+          : originType === 'region'
+            ? getDisplayName(
+              locale,
+              (regions.find((item) => String(item.id) === originId) as Region) || {}
+            ) || originId
+            : ''
       const originLabel =
-        requestData?.insighter_origin
+        storedOriginLabel ||
+        (requestData?.insighter_origin
           ? getDisplayName(locale, requestData.insighter_origin)
-          : originType === 'country'
-            ? countries.find((item) => String(item.id) === originId)
-              ? getDisplayName(
-                locale,
-                countries.find((item) => String(item.id) === originId) as Country
-              )
-              : originId || (isRTL ? 'غير محدد' : 'Not specified')
-            : originType === 'region'
-              ? getDisplayName(
-                locale,
-                (regions.find((item) => String(item.id) === originId) as Region) || {}
-              ) ||
-              originId ||
-              (isRTL ? 'غير محدد' : 'Not specified')
-              : isRTL
-                ? 'غير محدد'
-                : 'Not specified'
+          : isRTL
+            ? 'غير محدد'
+            : 'Not specified')
 
       const targetMarket =
         targetMode === 'country'
@@ -945,8 +990,8 @@ export default function ProjectReviewStep({
       const apiServiceComponentsPayload = normalizeProjectComponents(requestData?.components)
       const serviceComponentsPayload: ServiceComponentsPayload = {
         components: {
-          ...(storedServiceComponentsPayload.components || {}),
           ...(apiServiceComponentsPayload.components || {}),
+          ...(storedServiceComponentsPayload.components || {}),
         },
       }
       const serviceComponentSlugs = Array.from(
@@ -967,32 +1012,32 @@ export default function ProjectReviewStep({
 
       const projectTypeValue = projectTypeLabel(
         locale,
-        stringifyValue(requestData?.type) || rawProjectType || null
+        rawProjectType || stringifyValue(requestData?.type) || null
       )
       const projectStatusValue = formatProjectPhase(
         locale,
-        stringifyValue(requestData?.phase) || projectStatus
+        projectStatus || stringifyValue(requestData?.phase)
       )
       const businessTypeValue = formatBusinessType(
         locale,
-        stringifyValue(requestData?.business_type) || whoAreYou
+        whoAreYou || stringifyValue(requestData?.business_type)
       )
       const preferredInsighterTypeValue = formatPreferredInsighterType(
         locale,
-        stringifyValue(requestData?.insighter_preferred_type) || preferredInsighterType
+        preferredInsighterType || stringifyValue(requestData?.insighter_preferred_type)
       )
       const insighterMinYearsExperience =
-        stringifyValue(requestData?.insighter_min_years_experience) ||
-        readStorageValue(locale, projectWizardStorage.insighterMinYearsExperienceKey(locale))
+        readStorageValue(locale, projectWizardStorage.insighterMinYearsExperienceKey(locale)) ||
+        stringifyValue(requestData?.insighter_min_years_experience)
       const insighterMaxYearsExperience =
-        stringifyValue(requestData?.insighter_max_years_experience) ||
-        readStorageValue(locale, projectWizardStorage.insighterMaxYearsExperienceKey(locale))
+        readStorageValue(locale, projectWizardStorage.insighterMaxYearsExperienceKey(locale)) ||
+        stringifyValue(requestData?.insighter_max_years_experience)
       const companyMinTeamSize =
-        stringifyValue(requestData?.company_min_team_size) ||
-        readStorageValue(locale, projectWizardStorage.companyMinTeamSizeKey(locale))
+        readStorageValue(locale, projectWizardStorage.companyMinTeamSizeKey(locale)) ||
+        stringifyValue(requestData?.company_min_team_size)
       const companyMaxTeamSize =
-        stringifyValue(requestData?.company_max_team_size) ||
-        readStorageValue(locale, projectWizardStorage.companyMaxTeamSizeKey(locale))
+        readStorageValue(locale, projectWizardStorage.companyMaxTeamSizeKey(locale)) ||
+        stringifyValue(requestData?.company_max_team_size)
 
       const nextReview: ReviewData = {
         title: headerTitle,
@@ -1016,13 +1061,14 @@ export default function ProjectReviewStep({
           locale
         ),
         targetMarket:
-          apiTargetMarket.length > 0
-            ? apiTargetMarket
-            : targetMarket.length > 0
-              ? targetMarket
+          targetMarket.length > 0
+            ? targetMarket
+            : apiTargetMarket.length > 0
+              ? apiTargetMarket
               : [isRTL ? 'غير محدد' : 'Not specified'],
-        servicePrompt: stringifyValue(requestData?.service_prompt) || servicePrompt.trim(),
-        description: stringifyValue(requestData?.description) || descriptionState.description,
+        deadline: projectDeadline,
+        servicePrompt: servicePrompt.trim() || stringifyValue(requestData?.service_prompt),
+        description: descriptionState.description || stringifyValue(requestData?.description),
         descriptionFiles: descriptionState.files,
         scopeSnapshot,
         kickoffMeeting: addonsState.kickoffMeeting.enabled,
@@ -1040,19 +1086,42 @@ export default function ProjectReviewStep({
   }, [isRTL, locale])
 
   const emptyText = isRTL ? 'غير محدد' : 'Not specified'
+  const editLabel = isRTL ? 'تعديل' : 'Edit'
 
   const overviewRows = useMemo(() => {
     if (!review) return []
 
     return [
-      { label: isRTL ? 'نوع المشروع' : 'Project type', value: [review.projectType] },
+      {
+        label: isRTL ? 'نوع المشروع' : 'Project type',
+        value: [review.projectType],
+        editStepId: projectWizardStepIds.projectType,
+      },
       {
         label: isRTL ? 'لغة المخرجات' : 'Deliverables language',
         value: [review.deliverablesLanguage],
+        editStepId: projectWizardStepIds.deliverablesLanguage,
       },
-      { label: isRTL ? 'الخدمة' : 'Service', value: [review.service] },
-      { label: isRTL ? 'مرحلة المشروع' : 'Project status', value: [review.projectStatus] },
-      { label: isRTL ? 'نوع العميل' : 'Business profile', value: [review.whoAreYou] },
+      {
+        label: isRTL ? 'الخدمة' : 'Service',
+        value: [review.service],
+        editStepId: projectWizardStepIds.service,
+      },
+      {
+        label: isRTL ? 'مرحلة المشروع' : 'Project status',
+        value: [review.projectStatus],
+        editStepId: projectWizardStepIds.projectStatus,
+      },
+      {
+        label: isRTL ? 'نوع العميل' : 'Business profile',
+        value: [review.whoAreYou],
+        editStepId: projectWizardStepIds.whoAreYou,
+      },
+      {
+        label: isRTL ? 'موعد التسليم' : 'Delivery deadline',
+        value: review.deadline ? [review.deadline] : [],
+        editStepId: projectWizardStepIds.projectDeadline,
+      },
     ]
   }, [isRTL, review])
 
@@ -1067,10 +1136,12 @@ export default function ProjectReviewStep({
             ? scope.subscopes.map((subscope) => `${scope.name}: ${subscope}`)
             : [scope.name]
         ),
+        editStepId: projectWizardStepIds.projectSubscopes,
       },
       {
         label: isRTL ? 'ملاحظة الخدمة' : 'Service note',
         value: review.servicePrompt ? [review.servicePrompt] : [],
+        editStepId: projectWizardStepIds.service,
       },
     ]
   }, [isRTL, review])
@@ -1082,6 +1153,14 @@ export default function ProjectReviewStep({
       {
         label: isRTL ? 'الوصف الإضافي' : 'Additional description',
         value: review.description ? [review.description] : [],
+        editStepId: projectWizardStepIds.projectDescription,
+      },
+      {
+        label: isRTL ? 'الملفات المرفقة' : 'Attachments',
+        value: review.descriptionFiles.map(
+          (file) => `${file.name} (${formatBytes(file.size)})`
+        ),
+        editStepId: projectWizardStepIds.projectDescription,
       },
     ]
   }, [isRTL, review])
@@ -1094,19 +1173,27 @@ export default function ProjectReviewStep({
         label: isRTL ? 'السوق المستهدف' : 'Target market',
         value: review.targetMarket,
         variant: 'chips' as const,
+        editStepId: 'target-market',
       },
       {
         label: isRTL ? 'نوع الخبير المفضل' : 'Preferred insighter type',
         value: [review.preferredInsighterType],
+        editStepId: projectWizardStepIds.preferredInsighterType,
       },
-      { label: isRTL ? 'الأصل المفضل' : 'Preferred origin', value: [review.origin] },
+      {
+        label: isRTL ? 'الأصل المفضل' : 'Preferred origin',
+        value: [review.origin],
+        editStepId: projectWizardStepIds.insighterOrigin,
+      },
       {
         label: isRTL ? 'سنوات الخبرة' : 'Experience range',
         value: review.experienceRange === emptyText ? [] : [review.experienceRange],
+        editStepId: projectWizardStepIds.insighterExperience,
       },
       {
         label: isRTL ? 'حجم فريق الشركة' : 'Company team size',
         value: review.teamSizeRange === emptyText ? [] : [review.teamSizeRange],
+        editStepId: projectWizardStepIds.companyTeamSize,
       },
       {
         label: isRTL ? 'اجتماع الانطلاقة' : 'Kickoff meeting',
@@ -1119,9 +1206,31 @@ export default function ProjectReviewStep({
               ? 'غير مطلوب'
               : 'Not requested',
         ],
+        editStepId: projectWizardStepIds.kickoffMeeting,
       },
     ]
   }, [emptyText, isRTL, review])
+
+  const onContinue = async () => {
+    if (submitting) return
+
+    setSubmitting(true)
+    setError(null)
+
+    try {
+      await syncProjectProperties(locale)
+      router.push(nav.nextHref || `/${locale}/project`)
+    } catch (err) {
+      setError(
+        getProjectApiErrorMessage(
+          err,
+          isRTL ? 'تعذر حفظ التعديلات قبل المتابعة.' : 'Failed to save edits before continuing.'
+        )
+      )
+    } finally {
+      setSubmitting(false)
+    }
+  }
 
   if (!review) {
     return (
@@ -1142,18 +1251,18 @@ export default function ProjectReviewStep({
       className="w-full max-w-6xl mx-auto min-h-full flex flex-col"
       dir={isRTL ? 'rtl' : 'ltr'}
     >
-      <div className="flex-1 overflow-auto rounded-md px-4 py-8 sm:px-6">
+      <div className="flex-1 overflow-auto rounded-md px-4 pb-32 pt-8 sm:px-6 sm:pb-8">
         <div className="mx-auto max-w-[980px] overflow-hidden rounded-[36px] border border-slate-200 bg-white">
           <div className="px-6 py-8 sm:px-10 sm:py-10 lg:px-12 lg:py-12">
             <div className="flex flex-wrap items-start justify-between gap-6 border-b border-slate-200 pb-8">
               <div className="min-w-0 flex-1">
-                <div className="flex items-center gap-4">
-                  <div className="flex h-14 w-14 items-center justify-center rounded-[20px] bg-slate-50">
+                <div className="flex items-center gap-2">
+                  <div className="flex h-20 w-20 items-center justify-center rounded-[20px]">
                     <Image
-                      src="/images/smallLogo.png"
+                      src="https://res.cloudinary.com/dsiku9ipv/image/upload/v1777619443/smallLogo_3_wnmkra.png"
                       alt="Foresighta"
                       width={34}
-                      height={34}
+                      height={34} 
                       className="h-auto w-auto"
                     />
                   </div>
@@ -1186,6 +1295,8 @@ export default function ProjectReviewStep({
                 emptyText={emptyText}
                 toneIndex={0}
                 isRTL={isRTL}
+                editLabel={editLabel}
+                editHrefFor={nav.editHrefFor}
               />
 
               <SectionBlock
@@ -1194,6 +1305,8 @@ export default function ProjectReviewStep({
                 emptyText={emptyText}
                 toneIndex={1}
                 isRTL={isRTL}
+                editLabel={editLabel}
+                editHrefFor={nav.editHrefFor}
               />
 
               <SectionBlock
@@ -1202,6 +1315,8 @@ export default function ProjectReviewStep({
                 emptyText={emptyText}
                 toneIndex={2}
                 isRTL={isRTL}
+                editLabel={editLabel}
+                editHrefFor={nav.editHrefFor}
               />
 
               {review.serviceComponentSections.map((section, index) => (
@@ -1212,6 +1327,8 @@ export default function ProjectReviewStep({
                   emptyText={emptyText}
                   toneIndex={index + 3}
                   isRTL={isRTL}
+                  editLabel={editLabel}
+                  editHrefFor={nav.editHrefFor}
                 />
               ))}
 
@@ -1221,30 +1338,35 @@ export default function ProjectReviewStep({
                 emptyText={emptyText}
                 toneIndex={review.serviceComponentSections.length + 3}
                 isRTL={isRTL}
+                editLabel={editLabel}
+                editHrefFor={nav.editHrefFor}
               />
             </div>
           </div>
         </div>
       </div>
 
-      <div>
+      <div className="fixed bottom-0 left-0 right-0 z-20 border-t border-slate-200/70 bg-white/80 backdrop-blur-md">
         <div className="mx-auto w-full max-w-6xl px-4 sm:px-6 lg:px-8 pt-4 pb-[calc(env(safe-area-inset-bottom)+1rem)]">
-          <div className="flex items-center justify-between gap-3 rounded-full px-3 py-3">
+          <div className="flex items-center justify-between gap-3">
             <Link
               href={nav.backHref}
-              className="btn-sm rounded-full border border-slate-200 bg-white px-5 text-slate-700 hover:bg-slate-50"
+              className="btn-sm rounded-full border border-slate-200 bg-white px-6 py-2 text-slate-700 hover:bg-slate-50"
             >
               {isRTL ? 'رجوع' : 'Back'}
             </Link>
 
             <button
               type="button"
-              onClick={() =>
-                nav.nextHref ? router.push(nav.nextHref) : router.push(`/${locale}/project`)
-              }
-              className="btn-sm rounded-full bg-[#1C7CBB] px-6 py-2 text-white hover:bg-opacity-90"
+              onClick={() => void onContinue()}
+              disabled={submitting}
+              className={`btn-sm rounded-full px-6 py-2 ${
+                submitting
+                  ? 'cursor-not-allowed bg-slate-200 text-slate-500'
+                  : 'bg-[#1C7CBB] text-white hover:bg-opacity-90'
+              }`}
             >
-              {isRTL ? 'متابعة' : 'Continue'}
+              {submitting ? (isRTL ? 'جاري الحفظ...' : 'Saving...') : nav.continueLabel}
             </button>
           </div>
         </div>

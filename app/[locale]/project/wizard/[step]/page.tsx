@@ -21,9 +21,12 @@ import TargetMarketQuestion from '@/components/project/questions/TargetMarketQue
 import ServiceQuestion from '@/components/project/questions/ServiceQuestion'
 import ProjectScopeQuestion from '@/components/project/questions/ProjectScopeQuestion'
 import ProjectSubscopesQuestion from '@/components/project/questions/ProjectSubscopesQuestion'
-import DeliverableStageQuestion from '@/components/project/questions/service-components/DeliverableStageQuestion'
-import DeliverableTypeFirstDraftQuestion from '@/components/project/questions/service-components/DeliverableTypeFirstDraftQuestion'
-import DeliverableTypeFinalVersionQuestion from '@/components/project/questions/service-components/DeliverableTypeFinalVersionQuestion'
+import DeliverableFirstDraftDateQuestion from '@/components/project/questions/service-components/DeliverableFirstDraftDateQuestion'
+import DeliverableFirstDraftTypeQuestion from '@/components/project/questions/service-components/DeliverableFirstDraftTypeQuestion'
+import DeliverableFirstDraftWayQuestion from '@/components/project/questions/service-components/DeliverableFirstDraftWayQuestion'
+import DeliverableFinalVersionDateQuestion from '@/components/project/questions/service-components/DeliverableFinalVersionDateQuestion'
+import DeliverableFinalVersionTypeQuestion from '@/components/project/questions/service-components/DeliverableFinalVersionTypeQuestion'
+import DeliverableFinalVersionWayQuestion from '@/components/project/questions/service-components/DeliverableFinalVersionWayQuestion'
 import DataSourcesExpectedQuestion from '@/components/project/questions/service-components/DataSourcesExpectedQuestion'
 
 type PageProps = {
@@ -40,6 +43,9 @@ export default async function ProjectWizardStepPage({ params }: PageProps) {
     '5': 'project-status',
     '6': 'target-market',
     '7': 'service',
+    'deliverable-stage': 'deliverable-first-draft-date',
+    'deliverable-type-first-draft': 'deliverable-first-draft-type',
+    'deliverable-type-final-version': 'deliverable-final-version-type',
   }
 
   const legacyTarget = legacyRedirects[step]
@@ -97,31 +103,61 @@ export default async function ProjectWizardStepPage({ params }: PageProps) {
     )
   }
 
-  if (step === 'deliverable-stage') {
+  if (step === 'deliverable-first-draft-date') {
     return (
       <ProjectWizardShell align="top">
         <div className="w-full pt-2 sm:pt-4">
-          <DeliverableStageQuestion locale={locale} />
+          <DeliverableFirstDraftDateQuestion locale={locale} />
         </div>
       </ProjectWizardShell>
     )
   }
 
-  if (step === 'deliverable-type-first-draft') {
+  if (step === 'deliverable-first-draft-type') {
     return (
       <ProjectWizardShell align="top">
         <div className="w-full pt-2 sm:pt-4">
-          <DeliverableTypeFirstDraftQuestion locale={locale} />
+          <DeliverableFirstDraftTypeQuestion locale={locale} />
         </div>
       </ProjectWizardShell>
     )
   }
 
-  if (step === 'deliverable-type-final-version') {
+  if (step === 'deliverable-first-draft-way') {
     return (
       <ProjectWizardShell align="top">
         <div className="w-full pt-2 sm:pt-4">
-          <DeliverableTypeFinalVersionQuestion locale={locale} />
+          <DeliverableFirstDraftWayQuestion locale={locale} />
+        </div>
+      </ProjectWizardShell>
+    )
+  }
+
+  if (step === 'deliverable-final-version-date') {
+    return (
+      <ProjectWizardShell align="top">
+        <div className="w-full pt-2 sm:pt-4">
+          <DeliverableFinalVersionDateQuestion locale={locale} />
+        </div>
+      </ProjectWizardShell>
+    )
+  }
+
+  if (step === 'deliverable-final-version-type') {
+    return (
+      <ProjectWizardShell align="top">
+        <div className="w-full pt-2 sm:pt-4">
+          <DeliverableFinalVersionTypeQuestion locale={locale} />
+        </div>
+      </ProjectWizardShell>
+    )
+  }
+
+  if (step === 'deliverable-final-version-way') {
+    return (
+      <ProjectWizardShell align="top">
+        <div className="w-full pt-2 sm:pt-4">
+          <DeliverableFinalVersionWayQuestion locale={locale} />
         </div>
       </ProjectWizardShell>
     )
@@ -296,20 +332,24 @@ export default async function ProjectWizardStepPage({ params }: PageProps) {
           This step is not implemented yet.
         </p>
 
-        <div className="mt-10 flex items-center justify-between gap-3">
-          <Link
-            href={`/${locale}/project`}
-            className="btn-sm text-slate-700 bg-white/80 hover:bg-white border border-slate-200"
-          >
-            Back
-          </Link>
-          <button
-            type="button"
-            className="btn-sm text-slate-500 bg-slate-200 cursor-not-allowed"
-            disabled
-          >
-            Continue
-          </button>
+        <div className="fixed bottom-0 left-0 right-0 z-20 border-t border-slate-200/70 bg-white/80 backdrop-blur-md">
+          <div className="mx-auto w-full max-w-2xl px-4 pt-4 pb-[calc(env(safe-area-inset-bottom)+1rem)]">
+            <div className="flex items-center justify-between gap-3">
+              <Link
+                href={`/${locale}/project`}
+                className="btn-sm px-6 py-2 rounded-full text-slate-700 bg-white/80 hover:bg-white border border-slate-200"
+              >
+                Back
+              </Link>
+              <button
+                type="button"
+                className="btn-sm px-6 py-2 rounded-full text-slate-500 bg-slate-200 cursor-not-allowed"
+                disabled
+              >
+                Continue
+              </button>
+            </div>
+          </div>
         </div>
       </div>
     </ProjectWizardShell>

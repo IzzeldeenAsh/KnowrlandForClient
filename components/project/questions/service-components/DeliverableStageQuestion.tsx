@@ -3,27 +3,33 @@
 import { useEffect, useMemo, useState } from 'react'
 import Link from 'next/link'
 import {
-  IconFileText,
-  IconMapPin,
-  IconPresentation,
-  IconUsers,
+  IconCalendarDue,
+  IconCloudUpload,
+  IconDeviceDesktopUp,
+  IconFileSpreadsheet,
+  IconFileTextFilled,
+  IconFileTypeDocx,
+  IconFileTypePdf,
+  IconMapPinFilled,
+  IconPresentationFilled,
 } from '@tabler/icons-react'
 import { getProjectApiErrorMessage } from '@/components/project/projectApiError'
 import ProjectSelectedTypeHeader from '@/components/project/ProjectSelectedTypeHeader'
-import { useProjectStepErrorToast } from '@/components/project/useProjectStepErrorToast'
-import type { WizardLocale } from '@/components/project/wizardStorage'
-import { projectWizardStorage } from '@/components/project/wizardStorage'
-import { useProjectWizardNavigation } from '@/components/project/useProjectWizardNavigation'
 import {
   readServiceComponentPayloadValue,
   updateServiceComponentPayload,
 } from '@/components/project/serviceComponentsPayload'
 import { syncServiceComponents } from '@/components/project/serviceComponentsSync'
+import { useProjectStepErrorToast } from '@/components/project/useProjectStepErrorToast'
+import { useProjectWizardNavigation } from '@/components/project/useProjectWizardNavigation'
+import { projectWizardStorage, type WizardLocale } from '@/components/project/wizardStorage'
 import {
   getReportTypeOptions,
   normalizeReportTypes,
 } from './deliverableReportTypes'
 
+type DeliverableStageKey = 'first_draft' | 'final_version'
+type DeliverableStepKind = 'date' | 'report_type' | 'way'
 type DeliverableWay = 'on_platform' | 'session' | 'physical_workshop'
 
 type DeliverableStageDraft = {
@@ -58,20 +64,82 @@ type LegacyDeliverableStageValue = {
   }
 }
 
+type DraftsState = Record<DeliverableStageKey, DeliverableStageDraft>
+
+type DeliverableStageQuestionProps = {
+  locale: WizardLocale
+  stage: DeliverableStageKey
+  stepKind: DeliverableStepKind
+}
+
+function toLocalIsoDate(date: Date): string {
+  const year = date.getFullYear()
+  const month = String(date.getMonth() + 1).padStart(2, '0')
+  const day = String(date.getDate()).padStart(2, '0')
+  return `${year}-${month}-${day}`
+}
+
 function todayIsoDate(): string {
   try {
-    return new Date().toISOString().slice(0, 10)
+    return toLocalIsoDate(new Date())
   } catch {
     return ''
   }
 }
 
-function defaultDraft(): DeliverableStageDraft {
+function addDaysIsoDate(days: number): string {
+  try {
+    const date = new Date()
+    date.setDate(date.getDate() + days)
+    return toLocalIsoDate(date)
+  } catch {
+    return ''
+  }
+}
+
+function addDaysToIsoDate(value: string, days: number): string {
+  if (!value) return ''
+
+  const [year, month, day] = value.split('-').map((part) => Number(part))
+  if (!year || !month || !day) return ''
+
+  try {
+    const date = new Date(year, month - 1, day)
+    date.setDate(date.getDate() + days)
+    return toLocalIsoDate(date)
+  } catch {
+    return ''
+  }
+}
+
+function normalizeProjectType(value: string | null): string | null {
+  if (!value) return null
+  if (value === 'urgent' || value === 'urgent_request') return 'urgent_request'
+  return value
+}
+
+function isUrgentProjectType(value: string | null): boolean {
+  return normalizeProjectType(value) === 'urgent_request'
+}
+
+function defaultDraft(date = addDaysIsoDate(1)): DeliverableStageDraft {
   return {
-    date: todayIsoDate(),
+    date,
     reportTypes: ['pdf'],
     deliverableWay: 'on_platform',
     physicalWorkshopAddress: '',
+  }
+}
+
+function defaultDrafts(projectType: string | null = null): DraftsState {
+  const firstDraftDate = addDaysIsoDate(1)
+  const finalVersionDate = isUrgentProjectType(projectType)
+    ? firstDraftDate
+    : addDaysToIsoDate(firstDraftDate, 7)
+
+  return {
+    first_draft: defaultDraft(firstDraftDate),
+    final_version: defaultDraft(finalVersionDate),
   }
 }
 
@@ -150,301 +218,180 @@ function payloadToDraft(
   }
 }
 
-function isDraftValid(draft: DeliverableStageDraft): boolean {
-  if (!draft.date) return false
-  if (draft.reportTypes.length === 0) return false
-  if (draft.deliverableWay === 'physical_workshop') {
-    if (!draft.physicalWorkshopAddress.trim()) return false
+function isFutureDate(date: string): boolean {
+  return Boolean(date) && date > todayIsoDate()
+}
+
+function isAfterDate(date: string, previousDate: string): boolean {
+  return Boolean(date) && Boolean(previousDate) && date > previousDate
+}
+
+function isSameOrAfterDate(date: string, previousDate: string): boolean {
+  return Boolean(date) && Boolean(previousDate) && date >= previousDate
+}
+
+function isStepValid(params: {
+  stepKind: DeliverableStepKind
+  stage: DeliverableStageKey
+  drafts: DraftsState
+  isUrgentProject: boolean
+}): boolean {
+  const { stepKind, stage, drafts, isUrgentProject } = params
+  const draft = drafts[stage]
+
+  if (stepKind === 'date') {
+    if (isUrgentProject && draft.date > addDaysIsoDate(1)) return false
+    if (stage === 'first_draft') return isFutureDate(draft.date)
+    return (
+      isFutureDate(draft.date) &&
+      (isUrgentProject
+        ? isSameOrAfterDate(draft.date, drafts.first_draft.date)
+        : isAfterDate(draft.date, drafts.first_draft.date))
+    )
   }
 
-  return true
+  if (stepKind === 'report_type') return draft.reportTypes.length > 0
+  if (draft.deliverableWay !== 'physical_workshop') return true
+  return Boolean(draft.physicalWorkshopAddress.trim())
 }
 
-function Section({
+function getDateValidationMessage(params: {
+  isRTL: boolean
+  stage: DeliverableStageKey
+  drafts: DraftsState
+  isUrgentProject: boolean
+}): string | null {
+  const { isRTL, stage, drafts, isUrgentProject } = params
+  const draft = drafts[stage]
+
+  if (isUrgentProject && draft.date > addDaysIsoDate(1)) {
+    return isRTL
+      ? 'يجب أن يكون تاريخ تسليم الطلب العاجل خلال 24 ساعة.'
+      : 'Urgent request delivery date must be within 24 hours.'
+  }
+
+  if (stage === 'first_draft') {
+    if (isFutureDate(draft.date)) return null
+    return isRTL
+      ? 'اختر تاريخاً مستقبلياً للمسودة الأولى.'
+      : 'Choose a future date for the first draft.'
+  }
+
+  if (!isFutureDate(draft.date)) {
+    return isRTL
+      ? 'اختر تاريخاً مستقبلياً للنسخة النهائية.'
+      : 'Choose a future date for the final version.'
+  }
+
+  const hasValidSequence = isUrgentProject
+    ? isSameOrAfterDate(draft.date, drafts.first_draft.date)
+    : isAfterDate(draft.date, drafts.first_draft.date)
+
+  if (!hasValidSequence) {
+    return isRTL
+      ? isUrgentProject
+        ? 'يجب أن يكون تاريخ النسخة النهائية في نفس يوم المسودة الأولى أو بعده.'
+        : 'يجب أن يكون تاريخ النسخة النهائية بعد تاريخ المسودة الأولى.'
+      : isUrgentProject
+        ? 'Final version date must be the same day as the first draft or after it.'
+        : 'Final version date must be after the first draft date.'
+  }
+
+  return null
+}
+
+function ReportTypeIcon({ value }: { value: string }) {
+  if (value === 'pdf') return <IconFileTypePdf className="h-6 w-6" stroke={1.4} />
+  if (value === 'docx') return <IconFileTypeDocx className="h-6 w-6" stroke={1.4} />
+  if (value === 'xlsx') return <IconFileSpreadsheet className="h-6 w-6" stroke={1.4} />
+  if (value === 'pptx') return <IconPresentationFilled className="h-6 w-6" />
+
+  return <IconFileTextFilled className="h-6 w-6" />
+}
+
+function reportTypeTone(value: string): string {
+  if (value === 'pdf') return 'bg-rose-50 ring-rose-200/70 text-rose-700'
+  if (value === 'docx') return 'bg-blue-50 ring-blue-200/70 text-blue-700'
+  if (value === 'xlsx') return 'bg-emerald-50 ring-emerald-200/70 text-emerald-700'
+  if (value === 'pptx') return 'bg-orange-50 ring-orange-200/70 text-orange-700'
+
+  return 'bg-slate-50 ring-slate-200/70 text-slate-700'
+}
+
+function getStepCopy(params: {
+  isRTL: boolean
+  stage: DeliverableStageKey
+  stepKind: DeliverableStepKind
+}) {
+  const { isRTL, stage, stepKind } = params
+  const stageLabel = isRTL
+    ? stage === 'first_draft'
+      ? 'المسودة الأولى'
+      : 'النسخة النهائية'
+    : stage === 'first_draft'
+      ? 'first draft'
+      : 'final version'
+
+  if (stepKind === 'date') {
+    return {
+      title: isRTL
+        ? `تاريخ ${stageLabel}`
+        : `${stage === 'first_draft' ? 'First draft' : 'Final version'} date`,
+      subtitle: isRTL
+        ? stage === 'first_draft'
+          ? 'حدد الموعد الذي تريد فيه استلام المسودة الأولى للمراجعة.'
+          : 'حدد الموعد النهائي لتسليم النسخة المعتمدة بعد الملاحظات.'
+        : stage === 'first_draft'
+          ? 'Choose when the first draft should be ready for review.'
+          : 'Choose when the final version should be delivered after revisions.',
+    }
+  }
+
+  if (stepKind === 'report_type') {
+    return {
+      title: isRTL
+        ? `نوع التقرير المطلوب (${stageLabel})`
+        : `Type of report wanted (${stageLabel})`,
+      subtitle: isRTL
+        ? stage === 'first_draft'
+          ? 'اختر صيغ الملفات التي تريد استخدامها لمراجعة المسودة الأولى.'
+          : 'اختر صيغ الملفات المطلوبة للتسليم النهائي.'
+        : stage === 'first_draft'
+          ? 'Select the file formats you want to use for reviewing the first draft.'
+          : 'Select the file formats required for the final handoff.',
+    }
+  }
+
+  return {
+    title: isRTL ? `طريقة تسليم ${stageLabel}` : `Deliverable way (${stageLabel})`,
+    subtitle: isRTL
+      ? stage === 'first_draft'
+        ? 'اختر كيف تريد مشاركة المسودة الأولى ومناقشتها.'
+        : 'اختر طريقة تسليم النسخة النهائية.'
+      : stage === 'first_draft'
+        ? 'Choose how the first draft should be shared and discussed.'
+        : 'Choose how the final version should be delivered.',
+  }
+}
+
+export default function DeliverableStageQuestion({
   locale,
   stage,
-  title,
-  value,
-  onChange,
-}: {
-  locale: WizardLocale
-  stage: 'first_draft' | 'final_version'
-  title: string
-  value: DeliverableStageDraft
-  onChange: (next: DeliverableStageDraft) => void
-}) {
-  const isRTL = locale === 'ar'
-  const headerTone =
-    stage === 'first_draft'
-      ? {
-        bg: 'bg-sky-50/80',
-        ring: 'ring-sky-200/70',
-        icon: 'text-sky-700',
-      }
-      : {
-        bg: 'bg-violet-50/80',
-        ring: 'ring-violet-200/70',
-        icon: 'text-violet-700',
-      }
-
-  const HeaderIcon = stage === 'first_draft' ? IconPresentation : IconFileText
-
-  const optionCardClass = (selected: boolean) =>
-    `rounded-2xl border px-4 py-3 transition-colors ${selected
-      ? 'border-slate-200/80 bg-white/80 shadow-sm'
-      : 'border-white/35 bg-white/55 hover:bg-white/70'
-    }`
-
-  const selectWay = (way: DeliverableWay) =>
-    onChange({
-      ...value,
-      deliverableWay: way,
-      physicalWorkshopAddress:
-        way === 'physical_workshop' ? value.physicalWorkshopAddress : '',
-    })
-
-  const reportSummaryClass = 'flex w-full items-center justify-start gap-3 text-start'
-  const optionButtonClass = 'flex w-full items-center justify-start gap-3 text-start'
-  const optionTextClass = 'text-start'
-
-  const iconBadgeBase =
-    'inline-flex h-10 w-10 items-center justify-center rounded-full ring-1'
-
-  const reportTypeOptions = getReportTypeOptions(locale)
-
-  return (
-    <div className="rounded-[10px] border border-white/30 bg-white/45 backdrop-blur-md shadow-sm px-5 py-5 sm:px-7 sm:py-6">
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-        <div className="flex items-center gap-3">
-          <span
-            className={`${iconBadgeBase} ${headerTone.bg} ${headerTone.ring} ${headerTone.icon}`}
-            aria-hidden="true"
-          >
-            <HeaderIcon className="h-5 w-5" stroke={1.6} />
-          </span>
-          <div className="text-lg font-bold text-slate-900">{title}</div>
-        </div>
-
-        <label className="block w-full sm:w-auto">
-          <div
-            className="text-xs font-bold uppercase tracking-wide text-slate-600 text-start"
-          >
-            {isRTL ? 'التاريخ' : 'Date'}
-          </div>
-          <input
-            type="date"
-            value={value.date}
-            onChange={(e) => onChange({ ...value, date: e.target.value })}
-            className="mt-2 w-full sm:w-[220px] rounded-2xl border border-slate-200 bg-white/85 px-4 py-3 text-sm font-semibold text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-200"
-          />
-        </label>
-      </div>
-
-      <div className="mt-5 space-y-3">
-        <div className="text-xs font-bold uppercase tracking-wide text-slate-600">
-          {isRTL ? 'أنواع التقرير' : 'Report types'}
-        </div>
-
-        <div className="rounded-2xl border border-slate-200/80 bg-white/80 px-4 py-4 shadow-sm">
-          <div className={reportSummaryClass}>
-            <span
-              className={`${iconBadgeBase} bg-sky-50 ring-sky-200/60 text-sky-700`}
-              aria-hidden="true"
-            >
-              <IconFileText className="h-5 w-5" stroke={1.6} />
-            </span>
-            <div className={optionTextClass}>
-              <div className="text-sm font-semibold text-slate-900">
-                {isRTL ? 'تقرير' : 'Report'}
-              </div>
-              <div className="text-xs font-medium text-slate-500">
-                {isRTL
-                  ? 'اختر الصيغ المطلوبة.'
-                  : ' Select the required formats.'}
-              </div>
-            </div>
-          </div>
-
-          <div className="mt-3 flex flex-wrap gap-2">
-            {reportTypeOptions.map((reportType) => {
-              const checked = value.reportTypes.includes(reportType.value)
-              return (
-                <button
-                  key={reportType.value}
-                  type="button"
-                  onClick={() =>
-                    onChange({
-                      ...value,
-                      reportTypes: checked
-                        ? value.reportTypes.filter((item) => item !== reportType.value)
-                        : [...value.reportTypes, reportType.value],
-                    })
-                  }
-                  className={`rounded-full border px-3 py-1.5 text-xs font-semibold transition-colors ${checked
-                      ? 'border-blue-300 bg-blue-50 text-blue-700'
-                      : 'border-slate-200 bg-white/80 text-slate-700 hover:bg-white'
-                    }`}
-                >
-                  {reportType.label}
-                </button>
-              )
-            })}
-          </div>
-        </div>
-
-        <div className="pt-1 text-xs font-bold uppercase tracking-wide text-slate-600">
-          {isRTL ? 'طريقة التسليم' : 'Deliverable way'}
-        </div>
-
-        <div className="space-y-2">
-          <div className={optionCardClass(value.deliverableWay === 'on_platform')}>
-            <button
-              type="button"
-              onClick={() => selectWay('on_platform')}
-              className={optionButtonClass}
-            >
-              <span
-                className={`${iconBadgeBase} bg-sky-50 ring-sky-200/60 text-sky-700`}
-                aria-hidden="true"
-              >
-                <IconFileText className="h-5 w-5" stroke={1.6} />
-              </span>
-              <span
-                className={`inline-flex h-5 w-5 items-center justify-center rounded-full border ${value.deliverableWay === 'on_platform'
-                    ? 'border-blue-600'
-                    : 'border-slate-300'
-                  } bg-white/80`}
-                aria-hidden="true"
-              >
-                <span
-                  className={`h-2.5 w-2.5 rounded-full ${value.deliverableWay === 'on_platform'
-                      ? 'bg-blue-600'
-                      : 'bg-transparent'
-                    }`}
-                />
-              </span>
-              <div className={optionTextClass}>
-                <div className="text-sm font-semibold text-slate-900">
-                  {isRTL ? 'على المنصة' : 'On Platform'}
-                </div>
-                <div className="text-xs font-medium text-slate-500">
-                  {isRTL ? 'تسليم التقرير فقط عبر المنصة.' : 'Report only.'}
-                </div>
-              </div>
-            </button>
-          </div>
-
-          <div className={optionCardClass(value.deliverableWay === 'session')}>
-            <button
-              type="button"
-              onClick={() => selectWay('session')}
-              className={optionButtonClass}
-            >
-              <span
-                className={`${iconBadgeBase} bg-violet-50 ring-violet-200/60 text-violet-700`}
-                aria-hidden="true"
-              >
-                <IconUsers className="h-5 w-5" stroke={1.6} />
-              </span>
-              <span
-                className={`inline-flex h-5 w-5 items-center justify-center rounded-full border ${value.deliverableWay === 'session'
-                    ? 'border-blue-600'
-                    : 'border-slate-300'
-                  } bg-white/80`}
-                aria-hidden="true"
-              >
-                <span
-                  className={`h-2.5 w-2.5 rounded-full ${value.deliverableWay === 'session'
-                      ? 'bg-blue-600'
-                      : 'bg-transparent'
-                    }`}
-                />
-              </span>
-              <div className={optionTextClass}>
-                <div className="text-sm font-semibold text-slate-900">
-                  {isRTL ? 'جلسة' : 'Session'}
-                </div>
-              </div>
-            </button>
-          </div>
-
-          <div className={optionCardClass(value.deliverableWay === 'physical_workshop')}>
-            <div className="flex flex-col gap-3">
-              <button
-                type="button"
-                onClick={() => selectWay('physical_workshop')}
-                className={optionButtonClass}
-              >
-                <span
-                  className={`${iconBadgeBase} bg-amber-50 ring-amber-200/70 text-amber-800`}
-                  aria-hidden="true"
-                >
-                  <IconMapPin className="h-5 w-5" stroke={1.6} />
-                </span>
-                <span
-                  className={`inline-flex h-5 w-5 items-center justify-center rounded-full border ${value.deliverableWay === 'physical_workshop'
-                      ? 'border-blue-600'
-                      : 'border-slate-300'
-                    } bg-white/80`}
-                  aria-hidden="true"
-                >
-                  <span
-                    className={`h-2.5 w-2.5 rounded-full ${value.deliverableWay === 'physical_workshop'
-                        ? 'bg-blue-600'
-                        : 'bg-transparent'
-                      }`}
-                  />
-                </span>
-                <div className={optionTextClass}>
-                  <div className="text-sm font-semibold text-slate-900">
-                    {isRTL ? 'ورشة عمل حضورية' : 'Physical workshop'}
-                  </div>
-                </div>
-              </button>
-
-              {value.deliverableWay === 'physical_workshop' ? (
-                <label className="block">
-                  <div className="text-xs font-bold uppercase tracking-wide text-slate-600 text-start">
-                    {isRTL ? 'العنوان' : 'Address'}
-                  </div>
-                  <input
-                    value={value.physicalWorkshopAddress}
-                    onChange={(e) =>
-                      onChange({ ...value, physicalWorkshopAddress: e.target.value })
-                    }
-                    placeholder={isRTL ? 'مثال: عمّان' : 'e.g. Amman'}
-                    className="mt-2 w-full rounded-2xl border border-slate-200 bg-white/85 px-4 py-3 text-sm font-semibold text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-200 text-start"
-                  />
-                </label>
-              ) : null}
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  )
-}
-
-export default function DeliverableStageQuestion({ locale }: { locale: WizardLocale }) {
+  stepKind,
+}: DeliverableStageQuestionProps) {
   const isRTL = locale === 'ar'
   const isEnglish =
     typeof locale === 'string' && locale.toLowerCase().startsWith('en')
-
   const nav = useProjectWizardNavigation(locale)
+  const copy = getStepCopy({ isRTL, stage, stepKind })
 
   const [entered, setEntered] = useState(false)
   const [projectType, setProjectType] = useState<string | null>(null)
+  const [drafts, setDrafts] = useState<DraftsState>(() => defaultDrafts())
   const [error, setError] = useState<string | null>(null)
   const [submitting, setSubmitting] = useState(false)
 
   useProjectStepErrorToast(error, locale)
-
-  const [firstDraft, setFirstDraft] = useState<DeliverableStageDraft>(() =>
-    defaultDraft()
-  )
-  const [finalVersion, setFinalVersion] = useState<DeliverableStageDraft>(() =>
-    defaultDraft()
-  )
 
   useEffect(() => {
     const timer = window.setTimeout(() => setEntered(true), 30)
@@ -453,43 +400,80 @@ export default function DeliverableStageQuestion({ locale }: { locale: WizardLoc
 
   useEffect(() => {
     try {
-      setProjectType(
-        window.sessionStorage.getItem(projectWizardStorage.projectTypeKey(locale))
+      const storedProjectType = window.sessionStorage.getItem(
+        projectWizardStorage.projectTypeKey(locale)
       )
+      setProjectType(storedProjectType)
+      const isUrgentProject = isUrgentProjectType(storedProjectType)
 
       const saved = readServiceComponentPayloadValue<DeliverableStagePayload>(
         locale,
         'deliverable-stage'
       )
 
-      if (saved?.first_draft) {
-        setFirstDraft((prev) => payloadToDraft(saved.first_draft, prev))
-      }
+      setDrafts((prev) => {
+        const firstDraft = payloadToDraft(saved?.first_draft, prev.first_draft)
+        const fallbackFinalDraft = defaultDraft(
+          isUrgentProject
+            ? firstDraft.date
+            : addDaysToIsoDate(firstDraft.date, 7)
+        )
 
-      if (saved?.final_version) {
-        setFinalVersion((prev) => payloadToDraft(saved.final_version, prev))
-      }
+        return {
+          first_draft: firstDraft,
+          final_version: payloadToDraft(saved?.final_version, fallbackFinalDraft),
+        }
+      })
     } catch {
       // ignore
     }
   }, [locale])
 
-  const canContinue = useMemo(() => {
-    return isDraftValid(firstDraft) && isDraftValid(finalVersion) && !submitting
-  }, [firstDraft, finalVersion, submitting])
+  const currentDraft = drafts[stage]
+  const isUrgentProject = isUrgentProjectType(projectType)
+  const canContinue =
+    isStepValid({ stepKind, stage, drafts, isUrgentProject }) && !submitting
+  const dateValidationMessage =
+    stepKind === 'date'
+      ? getDateValidationMessage({ isRTL, stage, drafts, isUrgentProject })
+      : null
+  const reportTypeOptions = useMemo(() => getReportTypeOptions(locale), [locale])
+
+  const updateCurrentDraft = (next: DeliverableStageDraft) => {
+    setDrafts((prev) => {
+      if (stage !== 'first_draft') return { ...prev, [stage]: next }
+
+      const nextFinalDate =
+        !prev.final_version.date || prev.final_version.date <= next.date
+          ? isUrgentProject
+            ? next.date
+            : addDaysToIsoDate(next.date, 7)
+          : prev.final_version.date
+
+      return {
+        ...prev,
+        first_draft: next,
+        final_version: {
+          ...prev.final_version,
+          date: nextFinalDate,
+        },
+      }
+    })
+  }
+
+  const persistPayload = (nextDrafts: DraftsState) => {
+    updateServiceComponentPayload(locale, 'deliverable-stage', {
+      first_draft: draftToPayload(nextDrafts.first_draft),
+      final_version: draftToPayload(nextDrafts.final_version),
+    } satisfies DeliverableStagePayload)
+  }
 
   const onContinue = async () => {
     if (!canContinue) return
     setError(null)
+    persistPayload(drafts)
 
-    const payload: DeliverableStagePayload = {
-      first_draft: draftToPayload(firstDraft),
-      final_version: draftToPayload(finalVersion),
-    }
-
-    updateServiceComponentPayload(locale, 'deliverable-stage', payload)
-
-    const leavingComponents = nav.nextStepId === 'project-status'
+    const leavingComponents = nav.nextStepId === 'project-status' || nav.isReviewEditMode
     if (!leavingComponents) {
       nav.goNext()
       return
@@ -513,13 +497,27 @@ export default function DeliverableStageQuestion({ locale }: { locale: WizardLoc
     }
   }
 
-  const title = isRTL ? 'مرحلة المخرجات' : 'Deliverable stage'
-  const subtitle = isRTL
-    ? 'حدد التاريخ وصيغ التقرير وطريقة التسليم للمسودة الأولى والنسخة النهائية.'
-    : 'Set the date, report formats, and deliverable way for the first draft and final version.'
+  const selectWay = (deliverableWay: DeliverableWay) => {
+    updateCurrentDraft({
+      ...currentDraft,
+      deliverableWay,
+      physicalWorkshopAddress:
+        deliverableWay === 'physical_workshop'
+          ? currentDraft.physicalWorkshopAddress
+          : '',
+    })
+  }
+
+  const optionCardClass = (selected: boolean) =>
+    `rounded-[10px] border px-4 py-3 transition-colors ${selected
+      ? 'border-blue-300 bg-blue-50/80 shadow-sm'
+      : 'border-white/35 bg-white/65 hover:bg-white/80'
+    }`
+  const iconBadgeBase =
+    'inline-flex h-12 w-12 shrink-0 items-center justify-center rounded-full ring-1'
 
   return (
-    <div className="w-full max-w-6xl mx-auto" dir={isRTL ? 'rtl' : 'ltr'}>
+    <div className="w-full max-w-5xl mx-auto" dir={isRTL ? 'rtl' : 'ltr'}>
       <ProjectSelectedTypeHeader
         locale={locale}
         entered={entered}
@@ -528,27 +526,27 @@ export default function DeliverableStageQuestion({ locale }: { locale: WizardLoc
 
       <div
         className={`mt-2 text-start transition-all duration-700 ${entered
-            ? 'opacity-100 translate-x-0'
-            : isRTL
-              ? 'opacity-0 translate-x-4'
-              : 'opacity-0 -translate-x-4'
-          }`}
+          ? 'opacity-100 translate-x-0'
+          : isRTL
+            ? 'opacity-0 translate-x-4'
+            : 'opacity-0 -translate-x-4'
+        }`}
       >
         {isEnglish ? (
           <style>{`
-            #deliverable-stage-title {
+            #deliverable-stage-question-title {
               font-family: "IBM Plex Serif", serif !important;
             }
           `}</style>
         ) : null}
         <h2
-          id="deliverable-stage-title"
+          id="deliverable-stage-question-title"
           className="text-2xl sm:text-3xl font-medium tracking-tight text-slate-900"
         >
-          {title}
+          {copy.title}
         </h2>
         <p className="mt-2 text-sm sm:text-base font-semibold text-slate-600">
-          {subtitle}
+          {copy.subtitle}
         </p>
       </div>
 
@@ -556,29 +554,235 @@ export default function DeliverableStageQuestion({ locale }: { locale: WizardLoc
         <div className="mt-4 text-sm font-semibold text-rose-700">{error}</div>
       ) : null}
 
-      <div className="mt-6 grid grid-cols-1 lg:grid-cols-2 gap-4 lg:gap-6 items-start pb-[100px] lg:pb-0">
-        <Section
-          locale={locale}
-          stage="first_draft"
-          title={isRTL ? 'المسودة الأولى' : 'First draft'}
-          value={firstDraft}
-          onChange={setFirstDraft}
-        />
-        <Section
-          locale={locale}
-          stage="final_version"
-          title={isRTL ? 'النسخة النهائية' : 'Final version'}
-          value={finalVersion}
-          onChange={setFinalVersion}
-        />
+      <div
+        className={`mt-6 rounded-[10px] border border-white/30 bg-white/45 p-5 shadow-sm backdrop-blur-md sm:p-6 ${
+          stepKind === 'report_type' ? 'pb-32 sm:pb-6' : ''
+        }`}
+      >
+        {stepKind === 'date' ? (
+          <label className="block max-w-sm">
+            <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wide text-slate-600 text-start">
+              <IconCalendarDue className="h-4 w-4 text-sky-600" stroke={2.4} aria-hidden="true" />
+              <span>{isRTL ? 'تاريخ التسليم' : 'Delivery date'}</span>
+            </div>
+            <input
+              type="date"
+              value={currentDraft.date}
+              min={
+                stage === 'first_draft'
+                  ? addDaysIsoDate(1)
+                  : isUrgentProject
+                    ? drafts.first_draft.date || addDaysIsoDate(1)
+                    : addDaysToIsoDate(drafts.first_draft.date, 1) || addDaysIsoDate(1)
+              }
+              max={isUrgentProject ? addDaysIsoDate(1) : undefined}
+              onChange={(e) =>
+                updateCurrentDraft({ ...currentDraft, date: e.target.value })
+              }
+              className="mt-2 w-full rounded-[10px] border border-slate-200 bg-white/90 px-4 py-3 text-sm font-semibold text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-200"
+            />
+            {dateValidationMessage ? (
+              <p className="mt-2 text-xs font-semibold text-rose-600">
+                {dateValidationMessage}
+              </p>
+            ) : null}
+          </label>
+        ) : null}
+
+        {stepKind === 'report_type' ? (
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            {reportTypeOptions.map((reportType) => {
+              const checked = currentDraft.reportTypes.includes(reportType.value)
+              return (
+                <button
+                  key={reportType.value}
+                  type="button"
+                  aria-pressed={checked}
+                  onClick={() =>
+                    updateCurrentDraft({
+                      ...currentDraft,
+                      reportTypes: checked
+                        ? currentDraft.reportTypes.filter((item) => item !== reportType.value)
+                        : [...currentDraft.reportTypes, reportType.value],
+                    })
+                  }
+                  className={`flex min-h-[88px] items-center gap-3 rounded-[10px] border px-4 py-3 text-start transition-colors ${checked
+                    ? 'border-blue-300 bg-blue-50/80 text-blue-800 shadow-sm'
+                    : 'border-slate-200 bg-white/80 text-slate-700 hover:bg-white'
+                  }`}
+                >
+                  <input
+                    type="checkbox"
+                    checked={checked}
+                    readOnly
+                    tabIndex={-1}
+                    className="h-5 w-5 shrink-0 rounded border-slate-300 text-[#1C7CBB] accent-[#1C7CBB]"
+                    aria-hidden="true"
+                  />
+                  <span
+                    className={`${iconBadgeBase} ${reportTypeTone(reportType.value)}`}
+                    aria-hidden="true"
+                  >
+                    <ReportTypeIcon value={reportType.value} />
+                  </span>
+                  <span className="text-sm font-bold text-slate-900">
+                    {reportType.label}
+                  </span>
+                </button>
+              )
+            })}
+          </div>
+        ) : null}
+
+        {stepKind === 'way' ? (
+          <div className="space-y-3">
+            <div className={optionCardClass(currentDraft.deliverableWay === 'on_platform')}>
+              <button
+                type="button"
+                onClick={() => selectWay('on_platform')}
+                className="flex w-full items-center justify-start gap-3 text-start"
+              >
+                <span
+                  className={`${iconBadgeBase} bg-sky-50 ring-sky-200/60 text-sky-700`}
+                  aria-hidden="true"
+                >
+                  <IconCloudUpload className="h-6 w-6" stroke={2.2} />
+                </span>
+                <span
+                  className={`inline-flex h-5 w-5 shrink-0 items-center justify-center rounded-full border ${currentDraft.deliverableWay === 'on_platform'
+                    ? 'border-blue-600'
+                    : 'border-slate-300'
+                  } bg-white/80`}
+                  aria-hidden="true"
+                >
+                  <span
+                    className={`h-2.5 w-2.5 rounded-full ${currentDraft.deliverableWay === 'on_platform'
+                      ? 'bg-blue-600'
+                      : 'bg-transparent'
+                    }`}
+                  />
+                </span>
+                <span>
+                  <span className="block text-sm font-semibold text-slate-900">
+                    {isRTL ? 'على المنصة' : 'On Platform'}
+                  </span>
+                  <span className="block text-xs font-medium text-slate-500">
+                    {isRTL
+                      ? 'يتم رفع الملفات ومشاركتها داخل المنصة.'
+                      : 'Files are uploaded and shared inside the platform.'}
+                  </span>
+                </span>
+              </button>
+            </div>
+
+            <div className={optionCardClass(currentDraft.deliverableWay === 'session')}>
+              <button
+                type="button"
+                onClick={() => selectWay('session')}
+                className="flex w-full items-center justify-start gap-3 text-start"
+              >
+                <span
+                  className={`${iconBadgeBase} bg-violet-50 ring-violet-200/60 text-violet-700`}
+                  aria-hidden="true"
+                >
+                  <IconDeviceDesktopUp className="h-6 w-6" stroke={2.2} />
+                </span>
+                <span
+                  className={`inline-flex h-5 w-5 shrink-0 items-center justify-center rounded-full border ${currentDraft.deliverableWay === 'session'
+                    ? 'border-blue-600'
+                    : 'border-slate-300'
+                  } bg-white/80`}
+                  aria-hidden="true"
+                >
+                  <span
+                    className={`h-2.5 w-2.5 rounded-full ${currentDraft.deliverableWay === 'session'
+                      ? 'bg-blue-600'
+                      : 'bg-transparent'
+                    }`}
+                  />
+                </span>
+                <span>
+                  <span className="block text-sm font-semibold text-slate-900">
+                    {isRTL ? 'جلسة' : 'Session'}
+                  </span>
+                  <span className="block text-xs font-medium text-slate-500">
+                    {isRTL
+                      ? 'تتم مراجعة المخرجات وتسليمها ضمن جلسة.'
+                      : 'Deliverables are reviewed and handed over in a session.'}
+                  </span>
+                </span>
+              </button>
+            </div>
+
+            <div className={optionCardClass(currentDraft.deliverableWay === 'physical_workshop')}>
+              <div className="flex flex-col gap-3">
+                <button
+                  type="button"
+                  onClick={() => selectWay('physical_workshop')}
+                  className="flex w-full items-center justify-start gap-3 text-start"
+                >
+                  <span
+                    className={`${iconBadgeBase} bg-amber-50 ring-amber-200/70 text-amber-800`}
+                    aria-hidden="true"
+                  >
+                    <IconMapPinFilled className="h-6 w-6" />
+                  </span>
+                  <span
+                    className={`inline-flex h-5 w-5 shrink-0 items-center justify-center rounded-full border ${currentDraft.deliverableWay === 'physical_workshop'
+                      ? 'border-blue-600'
+                      : 'border-slate-300'
+                    } bg-white/80`}
+                    aria-hidden="true"
+                  >
+                    <span
+                      className={`h-2.5 w-2.5 rounded-full ${currentDraft.deliverableWay === 'physical_workshop'
+                        ? 'bg-blue-600'
+                        : 'bg-transparent'
+                      }`}
+                    />
+                  </span>
+                  <span>
+                    <span className="block text-sm font-semibold text-slate-900">
+                      {isRTL ? 'ورشة عمل حضورية' : 'Physical workshop'}
+                    </span>
+                    <span className="block text-xs font-medium text-slate-500">
+                      {isRTL
+                        ? 'يتم التسليم والمناقشة في موقع محدد.'
+                        : 'Delivery and discussion happen at a specific location.'}
+                    </span>
+                  </span>
+                </button>
+
+                {currentDraft.deliverableWay === 'physical_workshop' ? (
+                  <label className="block">
+                    <div className="text-xs font-bold uppercase tracking-wide text-slate-600 text-start">
+                      {isRTL ? 'العنوان' : 'Address'}
+                    </div>
+                    <input
+                      value={currentDraft.physicalWorkshopAddress}
+                      onChange={(e) =>
+                        updateCurrentDraft({
+                          ...currentDraft,
+                          physicalWorkshopAddress: e.target.value,
+                        })
+                      }
+                      placeholder={isRTL ? 'مثال: عمّان' : 'e.g. Amman'}
+                      className="mt-2 w-full rounded-[10px] border border-slate-200 bg-white/85 px-4 py-3 text-sm font-semibold text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-200 text-start"
+                    />
+                  </label>
+                ) : null}
+              </div>
+            </div>
+          </div>
+        ) : null}
       </div>
 
-      <div className="fixed bottom-0 left-0 right-0 lg:static border-t border-slate-200/70 bg-white/80 backdrop-blur-md lg:bottom-10 lg:border-t-0 lg:bg-transparent lg:backdrop-blur-0">
-        <div className="mx-auto w-full max-w-6xl px-4 lg:px-0 pt-4 pb-[calc(env(safe-area-inset-bottom)+1rem)]">
-          <div className="mt-2 lg:mt-8 flex items-center justify-between gap-3">
+      <div className="fixed bottom-0 left-0 right-0 z-20 border-t border-slate-200/70 bg-white/80 backdrop-blur-md">
+        <div className="mx-auto w-full max-w-6xl px-4 sm:px-6 lg:px-8 pt-4 pb-[calc(env(safe-area-inset-bottom)+1rem)]">
+          <div className="flex items-center justify-between gap-3">
             <Link
               href={nav.backHref}
-              className="btn-sm text-slate-700 bg-white/80 hover:bg-white border border-slate-200"
+              className="btn-sm px-6 py-2 rounded-full text-slate-700 bg-white/80 hover:bg-white border border-slate-200"
             >
               {isRTL ? 'رجوع' : 'Back'}
             </Link>
@@ -588,11 +792,11 @@ export default function DeliverableStageQuestion({ locale }: { locale: WizardLoc
               onClick={onContinue}
               disabled={!canContinue}
               className={`btn-sm px-6 py-2 rounded-full ${canContinue
-                  ? 'text-white bg-[#1C7CBB] hover:bg-opacity-90'
-                  : 'text-slate-500 bg-slate-200 cursor-not-allowed'
-                }`}
+                ? 'text-white bg-[#1C7CBB] hover:bg-opacity-90'
+                : 'text-slate-500 bg-slate-200 cursor-not-allowed'
+              }`}
             >
-              {submitting ? (isRTL ? 'جاري الحفظ…' : 'Saving…') : isRTL ? 'متابعة' : 'Continue'}
+              {submitting ? (isRTL ? 'جاري الحفظ…' : 'Saving…') : nav.continueLabel}
             </button>
           </div>
         </div>

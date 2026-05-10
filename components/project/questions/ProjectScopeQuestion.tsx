@@ -2,8 +2,7 @@
 
 import { useEffect, useMemo, useRef, useState } from 'react'
 import Link from 'next/link'
-import { useRouter } from 'next/navigation'
-import { IconArrowUp, IconSparkles, IconX } from '@tabler/icons-react'
+import { IconArrowUp, IconCheck, IconPlusFilled, IconSparklesFilled, IconXboxXFilled } from '@tabler/icons-react'
 import ProjectSelectedTypeHeader from '@/components/project/ProjectSelectedTypeHeader'
 import {
   assertProjectApiResponse,
@@ -15,6 +14,7 @@ import {
   writeStoredProjectRequestUuid,
 } from '@/components/project/projectRequestUuid'
 import { useProjectStepErrorToast } from '@/components/project/useProjectStepErrorToast'
+import { useProjectWizardNavigation } from '@/components/project/useProjectWizardNavigation'
 import { getApiUrl } from '@/app/config'
 import { getAuthToken } from '@/lib/authToken'
 import { projectWizardStorage, type WizardLocale } from '@/components/project/wizardStorage'
@@ -142,8 +142,8 @@ function AiScopePromptComposer({
         className={`flex items-center gap-2 text-[11px] font-bold uppercase  text-sky-700 ${isRTL ? 'flex-row-reverse' : ''
           }`}
       >
-        <span className="inline-flex h-8 w-8 items-center justify-center rounded-2xl border border-sky-200/80 bg-white/80 text-sky-700 shadow-sm">
-          <IconSparkles size={16} stroke={1.9} />
+        <span className="inline-flex h-8 w-8 items-center justify-center rounded-2xl border border-sky-200/80 bg-gradient-to-br from-sky-50 to-cyan-100/80 text-sky-600 shadow-sm">
+          <IconSparklesFilled size={16} className="animate-pulse" />
         </span>
         <span>{isRTL ? 'مولد نطاقات الذكاء الاصطناعي' : 'AI Scope Generator'}</span>
       </div>
@@ -337,7 +337,7 @@ function toApiProjectType(value: string | null) {
 // components are fetched after scope sync (next step)
 
 export default function ProjectScopeQuestion({ locale }: { locale: WizardLocale }) {
-  const router = useRouter()
+  const nav = useProjectWizardNavigation(locale)
   const isRTL = locale === 'ar'
   const isEnglish =
     typeof locale === 'string' && locale.toLowerCase().startsWith('en')
@@ -359,7 +359,9 @@ export default function ProjectScopeQuestion({ locale }: { locale: WizardLocale 
 
   const [selectedParentIds, setSelectedParentIds] = useState<number[]>([])
   const [manualScopes, setManualScopes] = useState<ManualScope[]>([])
+  const [selectedManualScopeIds, setSelectedManualScopeIds] = useState<string[]>([])
   const [otherOpen, setOtherOpen] = useState(false)
+  const [pendingScopeName, setPendingScopeName] = useState<string | null>(null)
 
   const skipNextOtherRestoreRef = useRef(false)
 
@@ -394,11 +396,11 @@ export default function ProjectScopeQuestion({ locale }: { locale: WizardLocale 
           )
         )
       )
-      setManualScopes(
-        safeParseManualScopes(
-          window.sessionStorage.getItem(projectWizardStorage.serviceManualScopesKey(locale))
-        )
+      const storedManualScopes = safeParseManualScopes(
+        window.sessionStorage.getItem(projectWizardStorage.serviceManualScopesKey(locale))
       )
+      setManualScopes(storedManualScopes)
+      setSelectedManualScopeIds(storedManualScopes.map((scope) => scope.id))
     } catch {
       // ignore
     }
@@ -572,6 +574,11 @@ export default function ProjectScopeQuestion({ locale }: { locale: WizardLocale 
     [manualScopes]
   )
 
+  const selectedManualScopes = useMemo(() => {
+    const selected = new Set(selectedManualScopeIds)
+    return namedManualScopes.filter((scope) => selected.has(scope.id))
+  }, [namedManualScopes, selectedManualScopeIds])
+
   const hasServiceSelection = serviceId != null
   const availableScopes = scopes || []
   const scopesReady = scopes !== null && !loading
@@ -641,7 +648,7 @@ export default function ProjectScopeQuestion({ locale }: { locale: WizardLocale 
   const hasAnyChildren = selectedParents.some((s) => (s.children || []).length > 0)
 
   const canContinue =
-    (selectedParents.length > 0 || namedManualScopes.length > 0) && !loading
+    (selectedParents.length > 0 || selectedManualScopes.length > 0) && !loading
 
   const persistPrompt = (nextPrompt: string) => {
     setServicePrompt(nextPrompt)
@@ -691,6 +698,12 @@ export default function ProjectScopeQuestion({ locale }: { locale: WizardLocale 
     )
   }
 
+  const toggleManualScope = (id: string) => {
+    setSelectedManualScopeIds((prev) =>
+      prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]
+    )
+  }
+
   const persistManualScopes = (nextScopes: ManualScope[]) => {
     try {
       const cleaned = nextScopes
@@ -710,10 +723,34 @@ export default function ProjectScopeQuestion({ locale }: { locale: WizardLocale 
     }
   }
 
-  const addManualScope = () => {
-    const next = [...manualScopes, { id: createClientId('scope:'), name: '' }]
-    setManualScopes(next)
-    setOtherOpen(true)
+  const startAddScope = () => {
+    if (pendingScopeName !== null) {
+      const trimmed = pendingScopeName.trim()
+      if (trimmed) {
+        const id = createClientId('scope:')
+        const next = [...manualScopes, { id, name: trimmed }]
+        setManualScopes(next)
+        setSelectedManualScopeIds((prev) => [...prev, id])
+        persistManualScopes(next)
+      }
+    }
+    setPendingScopeName('')
+  }
+
+  const commitPendingScope = () => {
+    const trimmed = (pendingScopeName ?? '').trim()
+    if (trimmed) {
+      const id = createClientId('scope:')
+      const next = [...manualScopes, { id, name: trimmed }]
+      setManualScopes(next)
+      setSelectedManualScopeIds((prev) => [...prev, id])
+      persistManualScopes(next)
+    }
+    setPendingScopeName(null)
+  }
+
+  const cancelPendingScope = () => {
+    setPendingScopeName(null)
   }
 
   const updateManualScopeName = (id: string, name: string) => {
@@ -725,6 +762,7 @@ export default function ProjectScopeQuestion({ locale }: { locale: WizardLocale 
   }
 
   const removeManualScope = (id: string) => {
+    setSelectedManualScopeIds((prev) => prev.filter((scopeId) => scopeId !== id))
     setManualScopes((prev) => {
       const next = prev.filter((s) => s.id !== id)
       persistManualScopes(next)
@@ -855,17 +893,17 @@ export default function ProjectScopeQuestion({ locale }: { locale: WizardLocale 
         JSON.stringify(selectedParents.map((s) => s.id))
       )
 
-      persistManualScopes(manualScopes)
+      persistManualScopes(selectedManualScopes)
 
       window.sessionStorage.setItem(
         projectWizardStorage.serviceScopeHasChildrenKey(locale),
-        hasAnyChildren || namedManualScopes.length > 0 ? '1' : '0'
+        hasAnyChildren || selectedManualScopes.length > 0 ? '1' : '0'
       )
     } catch {
       // ignore
     }
 
-    router.push(`/${locale}/project/wizard/project-subscopes`)
+    nav.goNext()
   }
 
   return (
@@ -930,128 +968,135 @@ export default function ProjectScopeQuestion({ locale }: { locale: WizardLocale 
             </div>
           )
         ) : showScopePicker ? (
-          <div className="space-y-4">
-            <div
-              className="grid grid-cols-1 gap-3 sm:grid-cols-2"
-              role="group"
-              aria-label={title}
-            >
-              {availableScopes.map((scope, index) => {
-                const checked = selectedParentIds.includes(scope.id)
-                return (
-                  <label
-                    key={scope.id}
-                    className={`flex min-h-[72px] cursor-pointer items-center gap-3 rounded-2xl border px-5 py-4 text-start shadow-sm backdrop-blur-md transition-all duration-300 ${checked
-                        ? 'border-blue-300 bg-white/70'
-                        : 'border-white/30 bg-white/40 hover:bg-white/55'
-                      } ${entered
-                        ? 'translate-x-0 opacity-100'
-                        : isRTL
-                          ? 'translate-x-4 opacity-0'
-                          : '-translate-x-4 opacity-0'
-                      }`}
-                    style={{ transitionDelay: `${110 + index * 45}ms` }}
-                  >
-                    <input
-                      type="checkbox"
-                      checked={checked}
-                      onChange={() => toggleParent(scope.id)}
-                      className="h-5 w-5 shrink-0 rounded border-slate-300 text-[#1C7CBB] focus:ring-2 focus:ring-blue-200"
-                    />
-                    <span className="text-sm font-semibold text-slate-900 sm:text-base">
-                      {scope.name}
-                    </span>
-                  </label>
-                )
-              })}
-
-              <label
-                className={`flex min-h-[72px] cursor-pointer items-center justify-between gap-3 rounded-2xl border px-5 py-4 text-start shadow-sm backdrop-blur-md transition-all duration-300 ${showOtherEditor
-                    ? 'border-blue-300 bg-white/70'
-                    : 'border-white/30 bg-white/40 hover:bg-white/55'
-                  } ${entered
-                    ? 'translate-x-0 opacity-100'
-                    : isRTL
-                      ? 'translate-x-4 opacity-0'
-                      : '-translate-x-4 opacity-0'
+          <div
+            className="grid grid-cols-1 gap-3 sm:grid-cols-2"
+            role="group"
+            aria-label={title}
+          >
+            {availableScopes.map((scope, index) => {
+              const checked = selectedParentIds.includes(scope.id)
+              return (
+                <label
+                  key={scope.id}
+                  className={`flex min-h-[72px] cursor-pointer items-center gap-3 rounded-2xl border px-5 py-4 text-start shadow-sm backdrop-blur-md transition-all duration-300 ${
+                    checked
+                      ? 'border-blue-300 bg-white/70'
+                      : 'border-white/30 bg-white/40 hover:bg-white/55'
+                  } ${
+                    entered
+                      ? 'translate-x-0 opacity-100'
+                      : isRTL
+                        ? 'translate-x-4 opacity-0'
+                        : '-translate-x-4 opacity-0'
                   }`}
-                style={{ transitionDelay: `${110 + availableScopes.length * 45}ms` }}
-              >
-                <div className={`flex items-center gap-3 ${isRTL ? 'flex-row-reverse' : ''}`}>
+                  style={{ transitionDelay: `${110 + index * 45}ms` }}
+                >
                   <input
                     type="checkbox"
-                    checked={showOtherEditor}
-                    onChange={() => setOtherOpen((prev) => !prev)}
+                    checked={checked}
+                    onChange={() => toggleParent(scope.id)}
                     className="h-5 w-5 shrink-0 rounded border-slate-300 text-[#1C7CBB] focus:ring-2 focus:ring-blue-200"
                   />
                   <span className="text-sm font-semibold text-slate-900 sm:text-base">
-                    {isRTL ? 'أخرى' : 'Other'}
+                    {scope.name}
                   </span>
-                </div>
+                </label>
+              )
+            })}
 
-                <span className="text-xs font-semibold text-slate-500">
-                  {namedManualScopes.length > 0
-                    ? isRTL
-                      ? `تمت إضافة: ${namedManualScopes.length}`
-                      : `Added: ${namedManualScopes.length}`
-                    : isRTL
-                      ? 'أضف نطاقاتك الخاصة'
-                      : 'Add your own scopes'}
+            {namedManualScopes.map((scope) => {
+              const checked = selectedManualScopeIds.includes(scope.id)
+              return (
+              <div
+                key={scope.id}
+                className={`flex min-h-[72px] items-center gap-3 rounded-2xl border px-5 py-4 shadow-sm backdrop-blur-md ${
+                  checked
+                    ? 'border-blue-300 bg-white/70'
+                    : 'border-white/30 bg-white/40'
+                } ${isRTL ? 'flex-row-reverse' : ''}`}
+              >
+                <input
+                  type="checkbox"
+                  checked={checked}
+                  onChange={() => toggleManualScope(scope.id)}
+                  className="h-5 w-5 shrink-0 rounded border-slate-300 text-[#1C7CBB] focus:ring-2 focus:ring-blue-200"
+                />
+                <span className={`flex-1 text-sm font-semibold text-slate-900 ${isRTL ? 'text-right' : 'text-left'}`}>
+                  {scope.name}
                 </span>
-              </label>
-            </div>
+                <button
+                  type="button"
+                  onClick={() => removeManualScope(scope.id)}
+                  aria-label={isRTL ? 'إزالة النطاق' : 'Remove scope'}
+                  className="inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-full border border-slate-200 bg-white/80 text-slate-500 hover:bg-white hover:text-slate-700"
+                >
+                  <IconXboxXFilled size={16} />
+                </button>
+              </div>
+              )
+            })}
 
-            {showOtherEditor ? (
-              <div className="space-y-3 rounded-3xl border border-white/30 bg-white/40 p-5 shadow-sm backdrop-blur-md sm:p-6">
-                <div className="text-sm font-semibold text-slate-900">
-                  {isRTL ? 'نطاقات أخرى' : 'Other scopes'}
-                </div>
-
-                <div className="space-y-2">
-                  {manualScopes.map((scope) => (
-                    <div key={scope.id}>
-                      <div
-                        className={`flex items-center justify-between gap-3 ${isRTL ? 'flex-row-reverse' : ''
-                          }`}
-                      >
-                        <div className="flex-1">
-                          <input
-                            value={scope.name}
-                            onChange={(e) => updateManualScopeName(scope.id, e.target.value)}
-                            placeholder={isRTL ? 'اسم النطاق…' : 'Scope name…'}
-                            className="w-full rounded-xl border border-slate-200 bg-white/80 px-4 py-2.5 text-sm font-semibold text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-200"
-                          />
-                        </div>
-
-                        <button
-                          type="button"
-                          onClick={() => removeManualScope(scope.id)}
-                          aria-label={isRTL ? 'إزالة النطاق' : 'Remove scope'}
-                          title={isRTL ? 'إزالة' : 'Remove'}
-                          className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-slate-200 bg-white/80 text-slate-700 hover:bg-white"
-                        >
-                          <IconX size={16} stroke={1.8} />
-                        </button>
-                      </div>
-                    </div>
-                  ))}
-
-                  <button
-                    type="button"
-                    onClick={addManualScope}
-                    className="btn-sm border border-slate-200 bg-white/80 text-slate-700 hover:bg-white"
-                  >
-                    {manualScopes.length > 0
-                      ? isRTL
-                        ? 'إضافة نطاق آخر'
-                        : 'Add another scope'
-                      : isRTL
-                        ? 'إضافة نطاق'
-                        : 'Add scope'}
-                  </button>
-                </div>
+            {pendingScopeName !== null ? (
+              <div
+                className={`flex min-h-[72px] items-center gap-3 rounded-2xl border border-white/30 bg-white/55 px-5 py-4 shadow-sm backdrop-blur-md ${isRTL ? 'flex-row-reverse' : ''}`}
+              >
+                <span
+                  className="inline-flex h-5 w-5 shrink-0 items-center justify-center rounded-md border border-slate-300 bg-white/80"
+                  aria-hidden="true"
+                />
+                <input
+                  value={pendingScopeName}
+                  onChange={(e) => setPendingScopeName(e.target.value)}
+                  onBlur={commitPendingScope}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter') commitPendingScope()
+                    if (e.key === 'Escape') cancelPendingScope()
+                  }}
+                  placeholder={isRTL ? 'اسم النطاق…' : 'Scope name…'}
+                  className={`flex-1 border-0 bg-transparent p-0 text-sm font-semibold text-slate-900 shadow-none outline-none ring-0 placeholder:text-slate-400 focus:border-transparent focus:outline-none focus:ring-0 ${isRTL ? 'text-right' : 'text-left'}`}
+                  autoFocus
+                />
+                <button
+                  type="button"
+                  onMouseDown={(event) => event.preventDefault()}
+                  onClick={commitPendingScope}
+                  aria-label={isRTL ? 'إضافة النطاق' : 'Add scope'}
+                  className="inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-emerald-500 text-white shadow-sm hover:bg-emerald-600 active:bg-emerald-700"
+                >
+                  <IconCheck size={14} stroke={2.5} />
+                </button>
+                <button
+                  type="button"
+                  onMouseDown={(event) => event.preventDefault()}
+                  onClick={cancelPendingScope}
+                  aria-label={isRTL ? 'إلغاء' : 'Cancel'}
+                  className="inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-rose-500 text-white shadow-sm hover:bg-rose-600 active:bg-rose-700"
+                >
+                  <IconXboxXFilled size={15} />
+                </button>
               </div>
             ) : null}
+
+            <button
+              type="button"
+              onMouseDown={(event) => {
+                if (pendingScopeName !== null) event.preventDefault()
+              }}
+              onClick={startAddScope}
+              className={`flex min-h-[72px] w-full items-center justify-center gap-2 rounded-2xl border-2 border-blue-300 bg-white/40 px-5 py-4 shadow-sm backdrop-blur-md transition-all duration-200 hover:bg-blue-50/30 ${
+                entered
+                  ? 'translate-x-0 opacity-100'
+                  : isRTL
+                    ? 'translate-x-4 opacity-0'
+                    : '-translate-x-4 opacity-0'
+              }`}
+              style={{ transitionDelay: `${110 + availableScopes.length * 45}ms` }}
+            >
+              <IconPlusFilled size={18} className="shrink-0 text-blue-500" />
+              <span className="text-sm font-semibold text-blue-500 sm:text-base">
+                {isRTL ? 'إضافة نطاق' : 'Add Scope'}
+              </span>
+            </button>
           </div>
         ) : isOtherFlow ? (
           <div></div>
@@ -1072,12 +1117,12 @@ export default function ProjectScopeQuestion({ locale }: { locale: WizardLocale 
           />
         </div>
       ) : null}
-      <div className="fixed bottom-0 left-0 right-0 lg:static border-t border-slate-200/70 bg-white/80 backdrop-blur-md lg:border-t-0 lg:bg-transparent lg:backdrop-blur-0">
-        <div className="mx-auto w-full max-w-6xl px-4 pb-[calc(env(safe-area-inset-bottom)+1rem)] lg:px-0">
-          <div className="mt-4 lg:mt-8 flex items-center justify-between gap-3">
+      <div className="fixed bottom-0 left-0 right-0 z-20 border-t border-slate-200/70 bg-white/80 backdrop-blur-md">
+        <div className="mx-auto w-full max-w-6xl px-4 pt-4 pb-[calc(env(safe-area-inset-bottom)+1rem)] lg:px-0">
+          <div className="flex items-center justify-between gap-3">
             <Link
-              href={`/${locale}/project/wizard/service`}
-              className="btn-sm border border-slate-200 bg-white/80 text-slate-700 hover:bg-white"
+              href={nav.backHref}
+              className="btn-sm rounded-full px-6 py-2 border border-slate-200 bg-white/80 text-slate-700 hover:bg-white"
             >
               {isRTL ? 'رجوع' : 'Back'}
             </Link>
@@ -1091,7 +1136,7 @@ export default function ProjectScopeQuestion({ locale }: { locale: WizardLocale 
                   : 'cursor-not-allowed bg-slate-200 text-slate-500'
                 }`}
             >
-              {isRTL ? 'متابعة' : 'Continue'}
+              {nav.continueLabel}
             </button>
           </div>
         </div>

@@ -144,17 +144,17 @@ export default function TargetMarketQuestion({ locale }: { locale: WizardLocale 
   const modeOptions = useMemo(() => {
     if (isRTL) {
       return [
-        { id: 'worldwide' as const, label: 'عالميًا' },
-        { id: 'country' as const, label: 'دول' },
-        { id: 'regions' as const, label: 'مناطق' },
-        { id: 'economic' as const, label: 'تكتلات اقتصادية' },
+        { id: 'worldwide' as const, label: ' كل العالم' },
+        { id: 'country' as const, label: 'اختيار دولة' },
+        { id: 'regions' as const, label: 'اختيار منطقة' },
+        { id: 'economic' as const, label: 'اختيار تكتل اقتصادي' },
       ]
     }
     return [
-      { id: 'worldwide' as const, label: 'World Wide' },
-      { id: 'country' as const, label: 'Country' },
-      { id: 'regions' as const, label: 'Regions' },
-      { id: 'economic' as const, label: 'Economic block' },
+      { id: 'worldwide' as const, label: 'Worldwide' },
+      { id: 'country' as const, label: 'Select Country' },
+      { id: 'regions' as const, label: 'Select Region' },
+      { id: 'economic' as const, label: 'Select Economic Block' },
     ]
   }, [isRTL])
 
@@ -280,6 +280,56 @@ export default function TargetMarketQuestion({ locale }: { locale: WizardLocale 
     })
   }, [countries, countryQuery, locale])
 
+  const selectedTargetMarketItems = useMemo(() => {
+    if (mode === 'worldwide') {
+      const worldwideLabel =
+        modeOptions.find((option) => option.id === 'worldwide')?.label ||
+        (isRTL ? 'كل العالم' : 'Worldwide')
+      return [{ id: 'worldwide', label: worldwideLabel, flagSrc: null }]
+    }
+
+    if (mode === 'country') {
+      const selected = new Set(countryIds)
+      return (countries || [])
+        .filter((country) => selected.has(country.id))
+        .map((country) => ({
+          id: String(country.id),
+          label: getDisplayName(locale, country) || `#${country.id}`,
+          flagSrc: country.flag ? `/images/flags/${country.flag}.svg` : null,
+        }))
+    }
+
+    if (mode === 'regions') {
+      const selected = new Set(regionIds)
+      return (regions || [])
+        .filter((region) => selected.has(region.id))
+        .map((region) => ({
+          id: String(region.id),
+          label: region.name,
+          flagSrc: null,
+        }))
+    }
+
+    if (mode === 'economic') {
+      const selected = new Set(blocIds)
+      return (blocs || [])
+        .filter((bloc) => selected.has(bloc.id))
+        .map((bloc) => ({
+          id: String(bloc.id),
+          label: bloc.name,
+          flagSrc: null,
+        }))
+    }
+
+    return []
+  }, [blocIds, blocs, countries, countryIds, isRTL, locale, mode, modeOptions, regionIds, regions])
+
+  const removeSelectedTargetMarketItem = (id: string) => {
+    if (mode === 'country') setCountryIds((prev) => prev.filter((item) => String(item) !== id))
+    if (mode === 'regions') setRegionIds((prev) => prev.filter((item) => String(item) !== id))
+    if (mode === 'economic') setBlocIds((prev) => prev.filter((item) => String(item) !== id))
+  }
+
   const canContinue =
     mode === 'worldwide'
       ? regionIds.length > 0
@@ -325,7 +375,7 @@ export default function TargetMarketQuestion({ locale }: { locale: WizardLocale 
 
     updateServiceComponentPayload(locale, 'target-market', payload)
 
-    const leavingComponents = nav.nextStepId === 'project-status'
+    const leavingComponents = nav.nextStepId === 'project-status' || nav.isReviewEditMode
     if (!leavingComponents) {
       nav.goNext()
       return
@@ -422,6 +472,37 @@ export default function TargetMarketQuestion({ locale }: { locale: WizardLocale 
 
         {error ? (
           <div className="mt-4 text-sm font-semibold text-rose-700">{error}</div>
+        ) : null}
+
+        {selectedTargetMarketItems.length > 0 ? (
+          <div className="mt-4 rounded-2xl border border-blue-100 bg-white/60 px-4 py-3 shadow-sm backdrop-blur-md">
+            <div className="mb-2 text-xs font-bold uppercase tracking-wide text-slate-500">
+              {isRTL ? 'اختيارك' : 'Selected'}
+            </div>
+            <div className="flex flex-wrap gap-2">
+              {selectedTargetMarketItems.map((item) => (
+                <span
+                  key={item.id}
+                  className={`inline-flex items-center gap-2 rounded-full border border-blue-100 bg-white px-3 py-1.5 text-sm font-semibold text-slate-800 shadow-sm ${isRTL ? 'flex-row-reverse' : ''}`}
+                >
+                  {item.flagSrc ? (
+                    <img src={item.flagSrc} alt="" className="h-4 w-4 object-contain" />
+                  ) : null}
+                  <span>{item.label}</span>
+                  {mode !== 'worldwide' ? (
+                    <button
+                      type="button"
+                      onClick={() => removeSelectedTargetMarketItem(item.id)}
+                      aria-label={isRTL ? 'إزالة الاختيار' : 'Remove selection'}
+                      className="inline-flex h-5 w-5 items-center justify-center rounded-full text-slate-400 hover:bg-rose-50 hover:text-rose-500"
+                    >
+                      ×
+                    </button>
+                  ) : null}
+                </span>
+              ))}
+            </div>
+          </div>
         ) : null}
 
         {mode === 'country' ? (
@@ -627,12 +708,12 @@ export default function TargetMarketQuestion({ locale }: { locale: WizardLocale 
           </div>
         ) : null}
       </div>
-      <div className="fixed bottom-0 left-0 right-0 lg:static border-t rounded-lg border-slate-200/70 bg-white/80 backdrop-blur-md lg:border-t-0 lg:bg-transparent lg:backdrop-blur-0">
-        <div className="mx-auto px-4 lg:px-0 w-full pt-4 pb-[calc(env(safe-area-inset-bottom)+1rem)]">
-          <div className=" lg:mt-8 flex  items-center justify-between gap-3">
+      <div className="fixed bottom-0 left-0 right-0 z-20 border-t border-slate-200/70 bg-white/80 backdrop-blur-md">
+        <div className="mx-auto w-full max-w-6xl px-4 sm:px-6 lg:px-8 pt-4 pb-[calc(env(safe-area-inset-bottom)+1rem)]">
+          <div className="flex items-center justify-between gap-3">
             <Link
               href={nav.backHref}
-              className="btn-sm text-slate-700 bg-white/80 hover:bg-white border border-slate-200"
+              className="btn-sm px-6 py-2 rounded-full text-slate-700 bg-white/80 hover:bg-white border border-slate-200"
             >
               {isRTL ? 'رجوع' : 'Back'}
             </Link>
@@ -646,7 +727,7 @@ export default function TargetMarketQuestion({ locale }: { locale: WizardLocale 
                 : 'text-slate-500 bg-slate-200 cursor-not-allowed'
                 }`}
             >
-              {submitting ? (isRTL ? 'جاري الحفظ…' : 'Saving…') : isRTL ? 'متابعة' : 'Continue'}
+              {submitting ? (isRTL ? 'جاري الحفظ…' : 'Saving…') : nav.continueLabel}
             </button>
           </div>
         </div>

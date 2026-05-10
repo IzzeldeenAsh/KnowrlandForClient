@@ -4,8 +4,8 @@ import { useEffect, useMemo, useState } from 'react'
 import type { ReactNode } from 'react'
 import Link from 'next/link'
 import {
-  IconBulb,
-  IconDots,
+  IconBulbFilled,
+  IconDotsFilled,
   IconTool,
   IconTrendingUp,
 } from '@tabler/icons-react'
@@ -134,32 +134,32 @@ export default function ProjectStatusQuestion({ locale }: { locale: WizardLocale
       className?: string
     }) => ReactNode
   > = {
-    idea_stage: ({ size, stroke }) => (
+    idea_stage: ({ size }) => (
       <span
-        className={`${iconBadgeBase} border-amber-200/80 bg-amber-50/90 text-amber-700`}
+        className={`${iconBadgeBase} border-amber-200/80 bg-gradient-to-br from-amber-50 to-amber-100/80 text-amber-500`}
       >
-        <IconBulb size={size * 0.55} stroke={stroke} />
+        <IconBulbFilled size={size * 0.55} />
       </span>
     ),
-    expansion: ({ size, stroke }) => (
+    expansion: ({ size }) => (
       <span
-        className={`${iconBadgeBase} border-emerald-200/80 bg-emerald-50/90 text-emerald-700`}
+        className={`${iconBadgeBase} border-emerald-200/80 bg-gradient-to-br from-emerald-50 to-emerald-100/80 text-emerald-600`}
       >
-        <IconTrendingUp size={size * 0.55} stroke={stroke} />
+        <IconTrendingUp size={size * 0.55} stroke={2.6} />
       </span>
     ),
-    implementation: ({ size, stroke }) => (
+    implementation: ({ size }) => (
       <span
-        className={`${iconBadgeBase} border-sky-200/80 bg-sky-50/90 text-sky-700`}
+        className={`${iconBadgeBase} border-sky-200/80 bg-gradient-to-br from-sky-50 to-sky-100/80 text-sky-600`}
       >
-        <IconTool size={size * 0.55} stroke={stroke} />
+        <IconTool size={size * 0.55} stroke={2.4} />
       </span>
     ),
-    other: ({ size, stroke }) => (
+    other: ({ size }) => (
       <span
-        className={`${iconBadgeBase} border-slate-200/80 bg-slate-100/90 text-slate-600`}
+        className={`${iconBadgeBase} border-slate-200/80 bg-gradient-to-br from-slate-100 to-slate-200/80 text-slate-600`}
       >
-        <IconDots size={size * 0.55} stroke={stroke} />
+        <IconDotsFilled size={size * 0.55} />
       </span>
     ),
   }
@@ -255,12 +255,12 @@ export default function ProjectStatusQuestion({ locale }: { locale: WizardLocale
         </div>
       </div>
 
-      <div className="fixed left-0 right-0 z-20 bottom-0 border-t border-slate-200/70 bg-white/80 backdrop-blur-md lg:bottom-10 lg:border-t-0 lg:bg-transparent lg:backdrop-blur-0">
+      <div className="fixed left-0 right-0 z-20 bottom-0 border-t border-slate-200/70 bg-white/80 backdrop-blur-md">
         <div className="mx-auto w-full max-w-6xl px-4 sm:px-6 lg:px-8 pt-4 pb-[calc(env(safe-area-inset-bottom)+1rem)]">
           <div className="flex items-center justify-between gap-3">
             <Link
               href={nav.backHref}
-              className="btn-sm text-slate-700 bg-white/80 hover:bg-white border border-slate-200"
+              className="btn-sm px-6 py-2 rounded-full text-slate-700 bg-white/80 hover:bg-white border border-slate-200"
             >
               {isRTL ? 'رجوع' : 'Back'}
             </Link>
@@ -275,7 +275,7 @@ export default function ProjectStatusQuestion({ locale }: { locale: WizardLocale
                   : 'text-slate-500 bg-slate-200 cursor-not-allowed'
               }`}
             >
-              {isRTL ? 'متابعة' : 'Continue'}
+              {nav.continueLabel}
             </button>
           </div>
         </div>

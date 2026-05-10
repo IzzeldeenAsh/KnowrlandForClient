@@ -4,7 +4,7 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { useEffect, useMemo, useState } from 'react'
 import { CheckBadgeIcon } from '@heroicons/react/24/solid'
-import { ChevronDownIcon } from '@heroicons/react/24/outline'
+import { ChevronDownIcon } from '@heroicons/react/24/solid'
 import { getApiUrl } from '@/app/config'
 import { getAuthToken } from '@/lib/authToken'
 import {
@@ -668,14 +668,12 @@ function MatchCriteriaPanel({
               }`}
           >
             {matched ? (
-              <svg className="h-3 w-3 shrink-0" viewBox="0 0 12 12" fill="none">
-                <circle cx="6" cy="6" r="6" fill="#22c55e" fillOpacity="0.2" />
-                <path d="M3.5 6l1.75 1.75L8.5 4.5" stroke="#16a34a" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+              <svg className="h-3 w-3 shrink-0" viewBox="0 0 12 12">
+                <path d="M6 0a6 6 0 100 12A6 6 0 006 0zm-.75 8.5L3 6.25l1-1L5.25 6.5 8 3.75l1 1L5.25 8.5z" fill="#16a34a" />
               </svg>
             ) : (
-              <svg className="h-3 w-3 shrink-0" viewBox="0 0 12 12" fill="none">
-                <circle cx="6" cy="6" r="6" fill="#94a3b8" fillOpacity="0.2" />
-                <path d="M4 4l4 4M8 4l-4 4" stroke="#94a3b8" strokeWidth="1.5" strokeLinecap="round" />
+              <svg className="h-3 w-3 shrink-0" viewBox="0 0 12 12">
+                <path d="M6 0a6 6 0 100 12A6 6 0 006 0zm2.5 8.25l-.75.75L6 7.25 4.25 9 3.5 8.25 5.25 6.5 3.5 4.75 4.25 4 6 5.75 7.75 4l.75.75L6.75 6.5z" fill="#94a3b8" />
               </svg>
             )}
             {label}
@@ -721,7 +719,10 @@ function MatchedInsighterCard({
         : 'border-white/45 bg-[linear-gradient(180deg,rgba(255,255,255,0.46),rgba(255,255,255,0.3))]'
         }`}
     >
-      <div className="p-4 sm:p-5">
+      <div
+        className="cursor-pointer p-4 sm:p-5"
+        onClick={onToggleSelected}
+      >
         <div className={`flex items-start gap-3 ${isRTL ? 'flex-row-reverse text-right' : ''}`}>
           <div className="flex self-start pt-1">
             <input
@@ -1118,7 +1119,7 @@ export default function ProjectMatchesStep({
       className="w-full max-w-6xl mx-auto min-h-full flex flex-col"
       dir={isRTL ? 'rtl' : 'ltr'}
     >
-      <div className="flex-1 overflow-auto px-4 py-8 sm:px-6">
+      <div className="flex-1 overflow-auto px-4 pb-32 pt-8 sm:px-6 sm:pb-8">
         <div className="mx-auto max-w-[980px]">
           {isEnglish ? (
             <style>{`
@@ -1205,12 +1206,12 @@ export default function ProjectMatchesStep({
         </div>
       </div>
 
-      <div>
+      <div className="fixed bottom-0 left-0 right-0 z-20 border-t border-slate-200/70 bg-white/80 backdrop-blur-md">
         <div className="mx-auto w-full max-w-6xl px-4 sm:px-6 lg:px-8 pt-4 pb-[calc(env(safe-area-inset-bottom)+1rem)]">
-          <div className="flex items-center justify-between gap-3 rounded-full px-3 py-3">
+          <div className="flex items-center justify-between gap-3">
             <Link
               href={nav.backHref}
-              className="btn-sm rounded-full border border-slate-200 bg-white px-5 text-slate-700 hover:bg-slate-50"
+              className="btn-sm rounded-full border border-slate-200 bg-white px-6 py-2 text-slate-700 hover:bg-slate-50"
             >
               {isRTL ? 'رجوع' : 'Back'}
             </Link>
@@ -1219,7 +1220,7 @@ export default function ProjectMatchesStep({
               type="button"
               onClick={handleSubmitSelectedMatches}
               disabled={!canSubmitMatches}
-              className={`btn-sm rounded-full px-5 py-2 ${canSubmitMatches
+              className={`btn-sm rounded-full px-6 py-2 ${canSubmitMatches
                 ? 'bg-[#1C7CBB] text-white hover:bg-opacity-90'
                 : 'cursor-not-allowed bg-slate-200 text-slate-500'
                 }`}

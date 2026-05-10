@@ -9,9 +9,9 @@ import {
   IconBuildingCommunity,
   IconBuildingSkyscraper,
   IconBuildingStore,
-  IconDots,
+  IconDotsFilled,
   IconRocket,
-  IconUser,
+  IconUserFilled,
 } from '@tabler/icons-react'
 import ProjectSelectedTypeHeader from '../ProjectSelectedTypeHeader'
 import { projectWizardStorage, type WizardLocale } from '../wizardStorage'
@@ -138,53 +138,53 @@ export default function WhoAreYouQuestion({ locale }: { locale: WizardLocale }) 
       className?: string
     }) => ReactNode
   > = {
-    Entrepreneur: ({ size, stroke }) => (
+    Entrepreneur: ({ size }) => (
       <span
-        className={`${iconBadgeBase} border-amber-200/80 bg-amber-50/90 text-amber-700`}
+        className={`${iconBadgeBase} border-amber-200/80 bg-gradient-to-br from-amber-50 to-amber-100/80 text-amber-600`}
       >
-        <IconUser size={size * 0.58} stroke={stroke} />
+        <IconUserFilled size={size * 0.58} />
       </span>
     ),
-    Startup: ({ size, stroke }) => (
+    Startup: ({ size }) => (
       <span
-        className={`${iconBadgeBase} border-sky-200/80 bg-sky-50/90 text-sky-700`}
+        className={`${iconBadgeBase} border-sky-200/80 bg-gradient-to-br from-sky-50 to-sky-100/80 text-sky-600`}
       >
-        <IconRocket size={size * 0.58} stroke={stroke} />
+        <IconRocket size={size * 0.58} stroke={2.4} />
       </span>
     ),
-    SME: ({ size, stroke }) => (
+    SME: ({ size }) => (
       <span
-        className={`${iconBadgeBase} border-emerald-200/80 bg-emerald-50/90 text-emerald-700`}
+        className={`${iconBadgeBase} border-emerald-200/80 bg-gradient-to-br from-emerald-50 to-emerald-100/80 text-emerald-600`}
       >
-        <IconBuildingStore size={size * 0.58} stroke={stroke} />
+        <IconBuildingStore size={size * 0.58} stroke={2.4} />
       </span>
     ),
-    Company: ({ size, stroke }) => (
+    Company: ({ size }) => (
       <span
-        className={`${iconBadgeBase} border-violet-200/80 bg-violet-50/90 text-violet-700`}
+        className={`${iconBadgeBase} border-violet-200/80 bg-gradient-to-br from-violet-50 to-violet-100/80 text-violet-600`}
       >
-        <IconBuildingSkyscraper size={size * 0.58} stroke={stroke} />
+        <IconBuildingSkyscraper size={size * 0.58} stroke={2.4} />
       </span>
     ),
-    Organization: ({ size, stroke }) => (
+    Organization: ({ size }) => (
       <span
-        className={`${iconBadgeBase} border-cyan-200/80 bg-cyan-50/90 text-cyan-700`}
+        className={`${iconBadgeBase} border-cyan-200/80 bg-gradient-to-br from-cyan-50 to-cyan-100/80 text-cyan-600`}
       >
-        <IconBuildingCommunity size={size * 0.58} stroke={stroke} />
+        <IconBuildingCommunity size={size * 0.58} stroke={2.4} />
       </span>
     ),
-    Government: ({ size, stroke }) => (
+    Government: ({ size }) => (
       <span
-        className={`${iconBadgeBase} border-slate-200/80 bg-slate-100/90 text-slate-700`}
+        className={`${iconBadgeBase} border-slate-200/80 bg-gradient-to-br from-slate-100 to-slate-200/80 text-slate-700`}
       >
-        <IconBuildingBank size={size * 0.58} stroke={stroke} />
+        <IconBuildingBank size={size * 0.58} stroke={2.4} />
       </span>
     ),
-    Other: ({ size, stroke }) => (
+    Other: ({ size }) => (
       <span
-        className={`${iconBadgeBase} border-slate-200/80 bg-slate-100/90 text-slate-600`}
+        className={`${iconBadgeBase} border-slate-200/80 bg-gradient-to-br from-slate-100 to-slate-200/80 text-slate-600`}
       >
-        <IconDots size={size * 0.58} stroke={stroke} />
+        <IconDotsFilled size={size * 0.58} />
       </span>
     ),
   }
@@ -283,12 +283,12 @@ export default function WhoAreYouQuestion({ locale }: { locale: WizardLocale }) 
         </div>
       </div>
 
-      <div className="fixed left-0 right-0 z-20 bottom-0 border-t border-slate-200/70 bg-white/80 backdrop-blur-md lg:bottom-10 lg:border-t-0 lg:bg-transparent lg:backdrop-blur-0">
+      <div className="fixed left-0 right-0 z-20 bottom-0 border-t border-slate-200/70 bg-white/80 backdrop-blur-md">
         <div className="mx-auto w-full max-w-6xl px-4 sm:px-6 lg:px-8 pt-4 pb-[calc(env(safe-area-inset-bottom)+1rem)]">
           <div className="flex items-center justify-between gap-3">
             <Link
               href={nav.backHref}
-              className="btn-sm text-slate-700 bg-white/80 hover:bg-white border border-slate-200"
+              className="btn-sm px-6 py-2 rounded-full text-slate-700 bg-white/80 hover:bg-white border border-slate-200"
             >
               {isRTL ? 'رجوع' : 'Back'}
             </Link>
@@ -303,7 +303,7 @@ export default function WhoAreYouQuestion({ locale }: { locale: WizardLocale }) 
                   : 'text-slate-500 bg-slate-200 cursor-not-allowed'
               }`}
             >
-              {isRTL ? 'متابعة' : 'Continue'}
+              {nav.continueLabel}
             </button>
           </div>
         </div>

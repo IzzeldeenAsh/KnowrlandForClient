@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react'
 import type { ReactNode } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
-import { IconCalendarEvent, IconX } from '@tabler/icons-react'
+import { IconCalendarEventFilled, IconXboxXFilled } from '@tabler/icons-react'
 import { getProjectApiErrorMessage } from '../projectApiError'
 import ProjectSelectedTypeHeader from '../ProjectSelectedTypeHeader'
 import { readProjectAddonsState, updateProjectAddonsState } from '../projectAddonsState'
@@ -18,11 +18,11 @@ function renderBadgeIcon(
   Icon: ({ size, stroke }: { size?: number; stroke?: number }) => ReactNode,
   colorClassName: string
 ) {
-  return ({ size, stroke }: { size: number; stroke: number; className?: string }) => (
+  return ({ size }: { size: number; stroke: number; className?: string }) => (
     <span
       className={`inline-flex h-full w-full items-center justify-center rounded-2xl border shadow-sm ${colorClassName}`}
     >
-      <Icon size={size * 0.58} stroke={stroke} />
+      <Icon size={size * 0.58} />
     </span>
   )
 }
@@ -73,19 +73,9 @@ export default function KickoffMeetingQuestion({
     }))
   }
 
-  const onSelect = (enabled: boolean) => {
-    setSelected(enabled)
-    setError(null)
-    persistSelection(enabled)
-  }
-
-  const canContinue = selected !== null
-
-  const onContinue = async () => {
+  const continueWithValue = async (enabled: boolean) => {
     if (submitting) return
-    if (selected === null) return
-
-    persistSelection(selected)
+    persistSelection(enabled)
     setSubmitting(true)
     setError(null)
 
@@ -108,13 +98,26 @@ export default function KickoffMeetingQuestion({
     }
   }
 
+  const canContinue = selected !== null
+
+  const onContinue = async () => {
+    if (selected === null) return
+    void continueWithValue(selected)
+  }
+
+  const onSelect = (enabled: boolean) => {
+    setSelected(enabled)
+    setError(null)
+    void continueWithValue(enabled)
+  }
+
   const yesIcon = renderBadgeIcon(
-    IconCalendarEvent,
-    'border-sky-200/80 bg-sky-50/90 text-sky-700'
+    IconCalendarEventFilled,
+    'border-sky-200/80 bg-gradient-to-br from-sky-50 to-sky-100/80 text-sky-600'
   )
   const noIcon = renderBadgeIcon(
-    IconX,
-    'border-slate-200/80 bg-slate-100/90 text-slate-600'
+    IconXboxXFilled,
+    'border-slate-200/80 bg-gradient-to-br from-slate-100 to-slate-200/80 text-slate-500'
   )
 
   return (
@@ -192,12 +195,12 @@ export default function KickoffMeetingQuestion({
         </div>
       </div>
 
-      <div className="fixed left-0 right-0 z-20 bottom-0 border-t border-slate-200/70 bg-white/80 backdrop-blur-md lg:bottom-10 lg:border-t-0 lg:bg-transparent lg:backdrop-blur-0">
+      <div className="fixed left-0 right-0 z-20 bottom-0 border-t border-slate-200/70 bg-white/80 backdrop-blur-md">
         <div className="mx-auto w-full max-w-6xl px-4 sm:px-6 lg:px-8 pt-4 pb-[calc(env(safe-area-inset-bottom)+1rem)]">
           <div className="flex items-center justify-between gap-3">
             <Link
               href={nav.backHref}
-              className="btn-sm text-slate-700 bg-white/80 hover:bg-white border border-slate-200"
+              className="btn-sm px-6 py-2 rounded-full text-slate-700 bg-white/80 hover:bg-white border border-slate-200"
             >
               {isRTL ? 'رجوع' : 'Back'}
             </Link>
@@ -217,9 +220,7 @@ export default function KickoffMeetingQuestion({
                   ? 'جاري الحفظ...'
                   : 'Saving...'
                 : nav.nextHref
-                  ? isRTL
-                    ? 'متابعة'
-                    : 'Continue'
+                  ? nav.continueLabel
                   : isRTL
                     ? 'إنهاء'
                     : 'Finish'}

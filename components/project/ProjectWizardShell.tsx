@@ -12,7 +12,9 @@ export default function ProjectWizardShell({
   align = 'center',
 }: ProjectWizardShellProps) {
   const containerClassName =
-    align === 'top' ? 'w-full h-full overflow-auto' : 'w-full flex justify-center'
+    align === 'top'
+      ? 'w-full h-full box-border overflow-y-auto overscroll-contain pb-[calc(env(safe-area-inset-bottom)+7rem)]'
+      : 'w-full flex justify-center'
 
   return (
     <section className="fixed inset-0 overflow-hidden bg-white z-0">

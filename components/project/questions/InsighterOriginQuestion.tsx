@@ -4,7 +4,7 @@ import { useEffect, useMemo, useState } from 'react'
 import type { ReactNode } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
-import { IconMapPin, IconWorld } from '@tabler/icons-react'
+import { IconMapPinFilled, IconWorldFilled } from '@tabler/icons-react'
 import { getApiUrl } from '@/app/config'
 import {
   assertProjectApiResponse,
@@ -271,6 +271,28 @@ export default function InsighterOriginQuestion({
     )
   }, [countries, locale, originType, query, regions])
 
+  const selectedOrigin = useMemo(() => {
+    if (!originType || !originId) return null
+
+    if (originType === 'country') {
+      const country = (countries || []).find((item) => String(item.id) === originId)
+      if (!country) return null
+
+      return {
+        label: getDisplayName(locale, country) || `#${originId}`,
+        flagSrc: country.flag ? `/images/flags/${country.flag}.svg` : null,
+      }
+    }
+
+    const region = (regions || []).find((item) => String(item.id) === originId)
+    if (!region) return null
+
+    return {
+      label: region.name,
+      flagSrc: null,
+    }
+  }, [countries, locale, originId, originType, regions])
+
   const canContinue = Boolean(originType && originId)
 
   const iconBadgeBase =
@@ -286,18 +308,18 @@ export default function InsighterOriginQuestion({
       className?: string
     }) => ReactNode
   > = {
-    country: ({ size, stroke }) => (
+    country: ({ size }) => (
       <span
-        className={`${iconBadgeBase} border-sky-200/80 bg-sky-50/90 text-sky-700`}
+        className={`${iconBadgeBase} border-sky-200/80 bg-gradient-to-br from-sky-50 to-sky-100/80 text-sky-600`}
       >
-        <IconWorld size={size * 0.58} stroke={stroke} />
+        <IconWorldFilled size={size * 0.58} />
       </span>
     ),
-    region: ({ size, stroke }) => (
+    region: ({ size }) => (
       <span
-        className={`${iconBadgeBase} border-emerald-200/80 bg-emerald-50/90 text-emerald-700`}
+        className={`${iconBadgeBase} border-emerald-200/80 bg-gradient-to-br from-emerald-50 to-emerald-100/80 text-emerald-600`}
       >
-        <IconMapPin size={size * 0.58} stroke={stroke} />
+        <IconMapPinFilled size={size * 0.58} />
       </span>
     ),
   }
@@ -417,6 +439,32 @@ export default function InsighterOriginQuestion({
             style={{ transitionDelay: '320ms' }}
           >
             <div className="rounded-3xl border border-white/30 bg-white/45 p-4 shadow-sm backdrop-blur-md">
+              {selectedOrigin ? (
+                <div className="mb-4 rounded-2xl border border-blue-100 bg-white/70 px-4 py-3 shadow-sm">
+                  <div className="mb-2 text-xs font-bold uppercase tracking-wide text-slate-500">
+                    {isRTL ? 'اختيارك' : 'Selected'}
+                  </div>
+                  <div className="flex flex-wrap gap-2">
+                    <span
+                      className={`inline-flex items-center gap-2 rounded-full border border-blue-100 bg-white px-3 py-1.5 text-sm font-semibold text-slate-800 shadow-sm ${isRTL ? 'flex-row-reverse' : ''}`}
+                    >
+                      {selectedOrigin.flagSrc ? (
+                        <img src={selectedOrigin.flagSrc} alt="" className="h-4 w-4 object-contain" />
+                      ) : null}
+                      <span>{selectedOrigin.label}</span>
+                      <button
+                        type="button"
+                        onClick={() => setOriginId('')}
+                        aria-label={isRTL ? 'إزالة الاختيار' : 'Remove selection'}
+                        className="inline-flex h-5 w-5 items-center justify-center rounded-full text-slate-400 hover:bg-rose-50 hover:text-rose-500"
+                      >
+                        ×
+                      </button>
+                    </span>
+                  </div>
+                </div>
+              ) : null}
+
               <input
                 value={query}
                 onChange={(event) => setQuery(event.target.value)}
@@ -504,12 +552,12 @@ export default function InsighterOriginQuestion({
         ) : null}
       </div>
 
-      <div className="fixed bottom-0 left-0 right-0 lg:static border-t rounded-lg border-slate-200/70 bg-white/80 backdrop-blur-md lg:border-t-0 lg:bg-transparent lg:backdrop-blur-0">
-        <div className="mx-auto px-4 lg:px-0 w-full pt-4 pb-[calc(env(safe-area-inset-bottom)+1rem)]">
-          <div className=" lg:mt-8 flex  items-center justify-between gap-3">
+      <div className="fixed bottom-0 left-0 right-0 z-20 border-t border-slate-200/70 bg-white/80 backdrop-blur-md">
+        <div className="mx-auto w-full max-w-6xl px-4 sm:px-6 lg:px-8 pt-4 pb-[calc(env(safe-area-inset-bottom)+1rem)]">
+          <div className="flex items-center justify-between gap-3">
             <Link
               href={nav.backHref}
-              className="btn-sm text-slate-700 bg-white/80 hover:bg-white border border-slate-200"
+              className="btn-sm px-6 py-2 rounded-full text-slate-700 bg-white/80 hover:bg-white border border-slate-200"
             >
               {isRTL ? 'رجوع' : 'Back'}
             </Link>
@@ -533,7 +581,7 @@ export default function InsighterOriginQuestion({
                   : 'text-slate-500 bg-slate-200 cursor-not-allowed'
                   }`}
               >
-                {submitting ? (isRTL ? 'جاري الحفظ...' : 'Saving...') : isRTL ? 'متابعة' : 'Continue'}
+                {submitting ? (isRTL ? 'جاري الحفظ...' : 'Saving...') : nav.continueLabel}
               </button>
             </div>
           </div>

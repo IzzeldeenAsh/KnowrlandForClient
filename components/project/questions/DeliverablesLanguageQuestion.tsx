@@ -2,8 +2,8 @@
 
 import { useEffect, useMemo, useState } from 'react'
 import Link from 'next/link'
-import { useRouter } from 'next/navigation'
 import ProjectSelectedTypeHeader from '../ProjectSelectedTypeHeader'
+import { useProjectWizardNavigation } from '../useProjectWizardNavigation'
 import { projectWizardStorage, type WizardLocale } from '../wizardStorage'
 import ChoiceCard from './ChoiceCard'
 
@@ -24,7 +24,7 @@ function getOptions(locale: WizardLocale): Option[] {
 }
 
 export default function DeliverablesLanguageQuestion({ locale }: { locale: WizardLocale }) {
-  const router = useRouter()
+  const nav = useProjectWizardNavigation(locale)
   const isRTL = locale === 'ar'
   const isEnglish =
     typeof locale === 'string' && locale.toLowerCase().startsWith('en')
@@ -75,7 +75,7 @@ export default function DeliverablesLanguageQuestion({ locale }: { locale: Wizar
       // ignore
     }
     setIsAdvancing(true)
-    router.push(`/${locale}/project/wizard/service`)
+    nav.goNext()
   }
 
   const onContinue = () => {
@@ -89,7 +89,7 @@ export default function DeliverablesLanguageQuestion({ locale }: { locale: Wizar
       // ignore
     }
     setIsAdvancing(true)
-    router.push(`/${locale}/project/wizard/service`)
+    nav.goNext()
   }
 
   return (
@@ -148,12 +148,12 @@ export default function DeliverablesLanguageQuestion({ locale }: { locale: Wizar
         </div>
       </div>
 
-      <div className="fixed left-0 right-0 z-20 bottom-0 border-t border-slate-200/70 bg-white/80 backdrop-blur-md lg:bottom-10 lg:border-t-0 lg:bg-transparent lg:backdrop-blur-0">
+      <div className="fixed left-0 right-0 z-20 bottom-0 border-t border-slate-200/70 bg-white/80 backdrop-blur-md">
       <div className="mx-auto w-full max-w-6xl px-4 sm:px-6 lg:px-8 pt-4 pb-[calc(env(safe-area-inset-bottom)+1rem)]">
           <div className="flex items-center justify-between gap-3">
             <Link
-              href={`/${locale}/project/wizard/project-type`}
-              className="btn-sm text-slate-700 bg-white/80 hover:bg-white border border-slate-200"
+              href={nav.backHref}
+              className="btn-sm px-6 py-2 rounded-full text-slate-700 bg-white/80 hover:bg-white border border-slate-200"
             >
               {isRTL ? 'رجوع' : 'Back'}
             </Link>
@@ -168,7 +168,7 @@ export default function DeliverablesLanguageQuestion({ locale }: { locale: Wizar
                   : 'text-slate-500 bg-slate-200 cursor-not-allowed'
               }`}
             >
-              {isRTL ? 'متابعة' : 'Continue'}
+              {nav.continueLabel}
             </button>
           </div>
         </div>

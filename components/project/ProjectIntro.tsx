@@ -41,7 +41,9 @@ export default function ProjectIntro({ locale }: ProjectIntroProps) {
   const returnUrl = encodeURIComponent(`${publicBaseUrl}/${locale}/project`)
   const loginUrl = `${getAngularAppOrigin()}/auth/login?returnUrl=${returnUrl}`
   const shouldShowLoginCta = !isLoading && !isLoggedIn
-  const ctaHref = shouldShowLoginCta ? loginUrl : `/${locale}/project/wizard/project-type`
+  const ctaHref = shouldShowLoginCta
+    ? loginUrl
+    : `/${locale}/project/wizard/project-type?fresh=1`
   const ctaLabel = shouldShowLoginCta ? 'Login to Start' : copy.cta
 
   return (

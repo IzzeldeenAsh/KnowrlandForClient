@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
+import { IconSparklesFilled } from '@tabler/icons-react'
 import { useProjectWizardNavigation } from '../useProjectWizardNavigation'
 import { syncProjectAddons } from '../projectAddonsSync'
 import { getProjectApiErrorMessage } from '../projectApiError'
@@ -94,11 +95,9 @@ export default function ProjectAddonsIntroStep({
       className="w-full max-w-6xl mx-auto min-h-full flex flex-col"
       dir={isRTL ? 'rtl' : 'ltr'}
     >
-      <div className="flex-1 flex items-center justify-center pb-2">
-        <div
-
-        >
-          <div className="mx-auto max-w-4xl text-center">
+      <div className="flex-1 flex items-center justify-center px-4 pb-32 sm:px-6 lg:px-8">
+        <div className="w-full min-w-0 overflow-hidden">
+          <div className="mx-auto w-full max-w-4xl text-center">
 
             {isEnglish ? (
               <style>{`
@@ -114,18 +113,25 @@ export default function ProjectAddonsIntroStep({
               className="
               mt-8 
               space-y-1 
-              ps-4
-              md:ps-0
-              text-[clamp(2rem,5vw,4.2rem)] 
+              text-[clamp(2.25rem,11vw,4.2rem)] 
               md:text-[clamp(3rem,9vw,4.2rem)] 
               font-black 
               text-start
-              leading-[0.9] 
-              tracking-[-0.08em] 
+              leading-[0.95] 
+              tracking-[-0.03em] 
+              sm:tracking-[-0.08em]
               text-slate-950"
             >
-              {stacked.map((line) => (
-                <div key={line}>{line}</div>
+              {stacked.map((line, idx) => (
+                <div key={line} className="inline-flex items-center gap-3">
+                  <span>{line}</span>
+                  {idx === stacked.length - 1 ? (
+                    <IconSparklesFilled
+                      size={36}
+                      className="text-amber-400 animate-pulse drop-shadow-[0_4px_14px_rgba(251,191,36,0.5)]"
+                    />
+                  ) : null}
+                </div>
               ))}
 
             </div>
@@ -145,12 +151,12 @@ export default function ProjectAddonsIntroStep({
                   }
                   loading="lazy"
                   decoding="async"
-                  className="mx-auto h-auto w-[400px] max-w-2xl object-contain"
+                  className="mx-auto h-auto w-full max-w-[400px] object-contain"
                 />
               </div>
             </div>
 
-            <p className="mx-auto mt-8 max-w-3xl text-base font-semibold leading-8 text-slate-600 sm:text-lg">
+            <p className="mx-auto mt-8 max-w-3xl text-start text-base font-semibold leading-8 text-slate-600 sm:text-center sm:text-lg">
               {body}
             </p>
 
@@ -164,22 +170,22 @@ export default function ProjectAddonsIntroStep({
         </div>
       </div>
 
-      <div className="fixed bottom-0 left-0 right-0 lg:static border-t rounded-lg border-slate-200/70 bg-white/80 backdrop-blur-md lg:border-t-0 lg:bg-transparent lg:backdrop-blur-0">
-        <div className="mx-auto px-4 lg:px-0 w-full pt-4 pb-[calc(env(safe-area-inset-bottom)+1rem)]">
-          <div className=" lg:mt-8 flex  items-center justify-between gap-3">
+      <div className="fixed bottom-0 left-0 right-0 z-20 border-t border-slate-200/70 bg-white/80 backdrop-blur-md">
+        <div className="mx-auto w-full max-w-6xl px-4 sm:px-6 lg:px-8 pt-4 pb-[calc(env(safe-area-inset-bottom)+1rem)]">
+          <div className="grid grid-cols-[0.9fr_0.9fr_1.35fr] items-center gap-2 sm:flex sm:justify-between sm:gap-3">
             <Link
               href={nav.backHref}
-              className="btn-sm text-slate-700 bg-white/80 hover:bg-white border border-slate-200"
+              className="btn-sm justify-center rounded-full border border-slate-200 bg-white/80 px-3 py-2 text-sm text-slate-700 hover:bg-white sm:px-6 sm:text-base"
             >
               {isRTL ? 'رجوع' : 'Back'}
             </Link>
 
-            <div className="flex items-center gap-3">
+            <div className="contents sm:flex sm:items-center sm:gap-3">
               <button
                 type="button"
                 onClick={() => void skipKickoffQuestion()}
                 disabled={skipping}
-                className={`btn-sm rounded-full border px-6 py-2 ${skipping
+                className={`btn-sm justify-center rounded-full border px-3 py-2 text-sm sm:px-6 sm:text-base ${skipping
                   ? 'cursor-not-allowed border-slate-200 bg-slate-100 text-slate-500'
                   : 'border-slate-300 bg-white text-slate-700 hover:bg-slate-50'
                   }`}
@@ -197,7 +203,7 @@ export default function ProjectAddonsIntroStep({
                 type="button"
                 onClick={goToKickoffQuestion}
                 disabled={skipping}
-                className={`btn-sm rounded-full px-6 py-2 ${skipping
+                className={`btn-sm justify-center rounded-full px-3 py-2 text-sm sm:px-6 sm:text-base ${skipping
                   ? 'cursor-not-allowed bg-slate-200 text-slate-500'
                   : 'bg-[#1C7CBB] text-white hover:bg-opacity-90'
                   }`}

@@ -84,61 +84,13 @@ export default function DataSourcesExpectedQuestion({ locale }: { locale: Wizard
     return any && !submitting
   }, [both, doesntMatter, primary, secondary, submitting])
 
-  const togglePrimary = () => {
+  const continueWithPayload = async (payload: Payload) => {
+    if (submitting) return
     setError(null)
-    setDoesntMatter(false)
-    setBoth(false)
-    setPrimary((v) => !v)
-  }
-
-  const toggleSecondary = () => {
-    setError(null)
-    setDoesntMatter(false)
-    setBoth(false)
-    setSecondary((v) => !v)
-  }
-
-  const toggleBoth = () => {
-    setError(null)
-    setDoesntMatter(false)
-    setBoth((v) => {
-      const next = !v
-      if (next) {
-        setPrimary(false)
-        setSecondary(false)
-      }
-      return next
-    })
-  }
-
-  const toggleDoesntMatter = () => {
-    setError(null)
-    setDoesntMatter((v) => {
-      const next = !v
-      if (next) {
-        setPrimary(false)
-        setSecondary(false)
-        setBoth(false)
-      }
-      return next
-    })
-  }
-
-  const onContinue = async () => {
-    if (!canContinue) return
-    setError(null)
-
-    const requiredPrimary = doesntMatter ? 0 : both ? 1 : primary ? 1 : 0
-    const requiredSecondary = doesntMatter ? 0 : both ? 1 : secondary ? 1 : 0
-
-    const payload: Payload = {
-      primary_data: { required: requiredPrimary as 0 | 1 },
-      secondary_data: { required: requiredSecondary as 0 | 1 },
-    }
 
     updateServiceComponentPayload(locale, 'data-sources-expected', payload)
 
-    const leavingComponents = nav.nextStepId === 'project-status'
+    const leavingComponents = nav.nextStepId === 'project-status' || nav.isReviewEditMode
     if (!leavingComponents) {
       nav.goNext()
       return
@@ -162,10 +114,36 @@ export default function DataSourcesExpectedQuestion({ locale }: { locale: Wizard
     }
   }
 
+  const selectOption = (option: 'primary' | 'secondary' | 'both' | 'doesntMatter') => {
+    const nextPrimary = option === 'primary'
+    const nextSecondary = option === 'secondary'
+    const nextBoth = option === 'both'
+    const nextDoesntMatter = option === 'doesntMatter'
+
+    setPrimary(nextPrimary)
+    setSecondary(nextSecondary)
+    setBoth(nextBoth)
+    setDoesntMatter(nextDoesntMatter)
+
+    void continueWithPayload({
+      primary_data: { required: nextDoesntMatter ? 0 : nextBoth || nextPrimary ? 1 : 0 },
+      secondary_data: { required: nextDoesntMatter ? 0 : nextBoth || nextSecondary ? 1 : 0 },
+    })
+  }
+
+  const onContinue = async () => {
+    if (!canContinue) return
+
+    await continueWithPayload({
+      primary_data: { required: doesntMatter ? 0 : both || primary ? 1 : 0 },
+      secondary_data: { required: doesntMatter ? 0 : both || secondary ? 1 : 0 },
+    })
+  }
+
   const title = isRTL ? 'مصادر البيانات المتوقعة' : 'Expected data sources'
   const subtitle = isRTL
-    ? 'يمكنك اختيار أكثر من خيار.'
-    : 'You can select multiple options.'
+    ? 'اختر الخيار الأنسب للمتابعة.'
+    : 'Select the best option to continue.'
 
   const OptionRow = ({
     checked,
@@ -196,7 +174,7 @@ export default function DataSourcesExpectedQuestion({ locale }: { locale: Wizard
   )
 
   return (
-    <div className="w-full max-w-5xl mx-auto" dir={isRTL ? 'rtl' : 'ltr'}>
+    <div className="w-full max-w-lg mx-auto" dir={isRTL ? 'rtl' : 'ltr'}>
       <ProjectSelectedTypeHeader
         locale={locale}
         entered={entered}
@@ -237,31 +215,31 @@ export default function DataSourcesExpectedQuestion({ locale }: { locale: Wizard
         <OptionRow
           checked={primary}
           label={isRTL ? 'بيانات أولية' : 'Primary Data'}
-          onClick={togglePrimary}
+          onClick={() => selectOption('primary')}
         />
         <OptionRow
           checked={secondary}
           label={isRTL ? 'بيانات ثانوية' : 'Secondary Data'}
-          onClick={toggleSecondary}
+          onClick={() => selectOption('secondary')}
         />
         <OptionRow
           checked={both}
           label={isRTL ? 'كلاهما' : 'Both'}
-          onClick={toggleBoth}
+          onClick={() => selectOption('both')}
         />
         <OptionRow
           checked={doesntMatter}
           label={isRTL ? 'لا يهم' : "Doesn't matter"}
-          onClick={toggleDoesntMatter}
+          onClick={() => selectOption('doesntMatter')}
         />
       </div>
 
-      <div className="fixed bottom-0 left-0 right-0 lg:static border-t border-slate-200/70 bg-white/80 backdrop-blur-md lg:bottom-10 lg:border-t-0 lg:bg-transparent lg:backdrop-blur-0">
+      <div className="fixed bottom-0 left-0 right-0 z-20 border-t border-slate-200/70 bg-white/80 backdrop-blur-md">
         <div className="mx-auto w-full max-w-6xl px-4 lg:px-0 pt-4 pb-[calc(env(safe-area-inset-bottom)+1rem)]">
-          <div className="mt-2 lg:mt-8 flex items-center justify-between gap-3">
+          <div className="flex items-center justify-between gap-3">
             <Link
               href={nav.backHref}
-              className="btn-sm text-slate-700 bg-white/80 hover:bg-white border border-slate-200"
+              className="btn-sm px-6 py-2 rounded-full text-slate-700 bg-white/80 hover:bg-white border border-slate-200"
             >
               {isRTL ? 'رجوع' : 'Back'}
             </Link>
@@ -275,7 +253,7 @@ export default function DataSourcesExpectedQuestion({ locale }: { locale: Wizard
                   : 'text-slate-500 bg-slate-200 cursor-not-allowed'
                 }`}
             >
-              {submitting ? (isRTL ? 'جاري الحفظ…' : 'Saving…') : isRTL ? 'متابعة' : 'Continue'}
+              {submitting ? (isRTL ? 'جاري الحفظ…' : 'Saving…') : nav.continueLabel}
             </button>
           </div>
         </div>

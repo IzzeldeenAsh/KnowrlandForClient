@@ -66,7 +66,11 @@ export default function DeadlineOfferQuestion({
 
   const storageKey = projectWizardStorage.deadlineOfferKey(locale)
   const today = todayString()
+  const tomorrow = futureDateString(1)
+  const isUrgentProject = normalizeProjectType(projectType) === 'urgent_request'
   const isPastDate = dateValue !== '' && dateValue < today
+  const isAfterUrgentMaxDate =
+    isUrgentProject && dateValue !== '' && dateValue > tomorrow
 
   useEffect(() => {
     const timer = window.setTimeout(() => setEntered(true), 30)
@@ -119,7 +123,7 @@ export default function DeadlineOfferQuestion({
   }
 
   const onContinue = async () => {
-    if (submitting || isPastDate) return
+    if (submitting || isPastDate || isAfterUrgentMaxDate) return
 
     if (!dateValue) {
       setError(
@@ -155,7 +159,11 @@ export default function DeadlineOfferQuestion({
     ? isRTL
       ? 'لا يمكن أن يكون التاريخ في الماضي.'
       : 'Date cannot be in the past.'
-    : null
+    : isAfterUrgentMaxDate
+      ? isRTL
+        ? 'يجب أن تنتهي صلاحية عرض الطلب العاجل خلال 24 ساعة.'
+        : 'Urgent request offer must expire within 24 hours.'
+      : null
   const visibleError = validationError || error
 
   return (
@@ -199,11 +207,16 @@ export default function DeadlineOfferQuestion({
               : 'If no contract is made by this date, the offer will be automatically removed.'}
           </p>
           {selectedMatchesCount > 0 ? (
-            <p className="mt-2 text-sm text-slate-500">
-              {isRTL
-                ? `سيتم إرسال ${selectedMatchesCount} من الخبراء/الجهات المختارة مع هذا العرض.`
-                : `${selectedMatchesCount} selected match${selectedMatchesCount === 1 ? '' : 'es'} will be submitted with this offer.`}
-            </p>
+            <div className="mt-4 inline-flex max-w-full items-center gap-2 rounded-full border border-sky-100 bg-sky-50/80 px-3 py-2 text-sm font-semibold text-sky-800 shadow-sm">
+              <span className="inline-flex h-7 min-w-7 shrink-0 items-center justify-center rounded-full bg-[#1C7CBB] px-2 text-xs font-bold text-white">
+                {selectedMatchesCount}
+              </span>
+              <span className="min-w-0">
+                {isRTL
+                  ? 'من الخبراء/الجهات المختارة سيتم إرسالهم مع هذا العرض'
+                  : `selected match${selectedMatchesCount === 1 ? '' : 'es'} will be submitted with this offer`}
+              </span>
+            </div>
           ) : null}
         </div>
 
@@ -229,6 +242,7 @@ export default function DeadlineOfferQuestion({
               id="deadline-offer-input"
               type="date"
               min={today}
+              max={isUrgentProject ? tomorrow : undefined}
               value={dateValue}
               onChange={(e) => {
                 setDateValue(e.target.value)
@@ -244,12 +258,12 @@ export default function DeadlineOfferQuestion({
         </div>
       </div>
 
-      <div className="fixed bottom-0 left-0 right-0 lg:static border-t rounded-lg border-slate-200/70 bg-white/80 backdrop-blur-md lg:border-t-0 lg:bg-transparent lg:backdrop-blur-0">
+      <div className="fixed bottom-0 left-0 right-0 z-20 border-t border-slate-200/70 bg-white/80 backdrop-blur-md">
         <div className="mx-auto px-4 lg:px-0 w-full max-w-4xl pt-4 pb-[calc(env(safe-area-inset-bottom)+1rem)]">
-          <div className=" lg:mt-8 flex  items-center justify-between gap-3">
+          <div className="flex items-center justify-between gap-3">
             <Link
               href={nav.backHref}
-              className="btn-sm text-slate-700 bg-white/80 hover:bg-white border border-slate-200"
+              className="btn-sm px-6 py-2 rounded-full text-slate-700 bg-white/80 hover:bg-white border border-slate-200"
             >
               {isRTL ? 'رجوع' : 'Back'}
             </Link>
@@ -267,8 +281,8 @@ export default function DeadlineOfferQuestion({
               <button
                 type="button"
                 onClick={() => void onContinue()}
-                disabled={submitting || isPastDate}
-                className={`btn-sm px-6 py-2 rounded-full ${!submitting && !isPastDate
+                disabled={submitting || isPastDate || isAfterUrgentMaxDate}
+                className={`btn-sm px-6 py-2 rounded-full ${!submitting && !isPastDate && !isAfterUrgentMaxDate
                     ? 'text-white bg-[#1C7CBB] hover:bg-opacity-90'
                     : 'text-slate-500 bg-slate-200 cursor-not-allowed'
                   }`}

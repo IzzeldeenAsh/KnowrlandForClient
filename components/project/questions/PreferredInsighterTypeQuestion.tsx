@@ -3,10 +3,8 @@
 import { useEffect, useMemo, useState } from 'react'
 import type { ReactNode } from 'react'
 import Link from 'next/link'
-import { useRouter } from 'next/navigation'
-import { IconArrowsLeftRight, IconBuilding, IconUser } from '@tabler/icons-react'
+import { IconBuilding, IconUserFilled, IconUsersGroup } from '@tabler/icons-react'
 import ProjectSelectedTypeHeader from '../ProjectSelectedTypeHeader'
-import { projectWizardStepIds } from '../projectWizardFlow'
 import { useProjectWizardNavigation } from '../useProjectWizardNavigation'
 import { projectWizardStorage, type WizardLocale } from '../wizardStorage'
 import ChoiceCard from './ChoiceCard'
@@ -40,7 +38,6 @@ export default function PreferredInsighterTypeQuestion({
 }: {
   locale: WizardLocale
 }) {
-  const router = useRouter()
   const nav = useProjectWizardNavigation(locale)
   const isRTL = locale === 'ar'
   const isEnglish =
@@ -91,7 +88,7 @@ export default function PreferredInsighterTypeQuestion({
       // ignore
     }
 
-    router.push(`/${locale}/project/wizard/${projectWizardStepIds.insighterOrigin}`)
+    nav.goNext()
   }
 
   const onContinue = () => {
@@ -117,25 +114,25 @@ export default function PreferredInsighterTypeQuestion({
       className?: string
     }) => ReactNode
   > = {
-    Individual: ({ size, stroke }) => (
+    Individual: ({ size }) => (
       <span
-        className={`${iconBadgeBase} border-amber-200/80 bg-amber-50/90 text-amber-700`}
+        className={`${iconBadgeBase} border-amber-200/80 bg-gradient-to-br from-amber-50 to-amber-100/80 text-amber-600`}
       >
-        <IconUser size={size * 0.58} stroke={stroke} />
+        <IconUserFilled size={size * 0.58} />
       </span>
     ),
-    Company: ({ size, stroke }) => (
+    Company: ({ size }) => (
       <span
-        className={`${iconBadgeBase} border-sky-200/80 bg-sky-50/90 text-sky-700`}
+        className={`${iconBadgeBase} border-sky-200/80 bg-gradient-to-br from-sky-50 to-sky-100/80 text-sky-600`}
       >
-        <IconBuilding size={size * 0.58} stroke={stroke} />
+        <IconBuilding size={size * 0.58} stroke={2.4} />
       </span>
     ),
-    Either: ({ size, stroke }) => (
+    Either: ({ size }) => (
       <span
-        className={`${iconBadgeBase} border-emerald-200/80 bg-emerald-50/90 text-emerald-700`}
+        className={`${iconBadgeBase} border-emerald-200/80 bg-gradient-to-br from-emerald-50 to-emerald-100/80 text-emerald-600`}
       >
-        <IconArrowsLeftRight size={size * 0.58} stroke={stroke} />
+        <IconUsersGroup size={size * 0.58} stroke={2.4} />
       </span>
     ),
   }
@@ -199,12 +196,12 @@ export default function PreferredInsighterTypeQuestion({
         </div>
       </div>
 
-      <div className="fixed left-0 right-0 z-20 bottom-0 border-t border-slate-200/70 bg-white/80 backdrop-blur-md lg:bottom-10 lg:border-t-0 lg:bg-transparent lg:backdrop-blur-0">
+      <div className="fixed left-0 right-0 z-20 bottom-0 border-t border-slate-200/70 bg-white/80 backdrop-blur-md">
         <div className="mx-auto w-full max-w-6xl px-4 sm:px-6 lg:px-8 pt-4 pb-[calc(env(safe-area-inset-bottom)+1rem)]">
           <div className="flex items-center justify-between gap-3">
             <Link
               href={nav.backHref}
-              className="btn-sm text-slate-700 bg-white/80 hover:bg-white border border-slate-200"
+              className="btn-sm px-6 py-2 rounded-full text-slate-700 bg-white/80 hover:bg-white border border-slate-200"
             >
               {isRTL ? 'رجوع' : 'Back'}
             </Link>
@@ -219,7 +216,7 @@ export default function PreferredInsighterTypeQuestion({
                   : 'text-slate-500 bg-slate-200 cursor-not-allowed'
               }`}
             >
-              {isRTL ? 'متابعة' : 'Continue'}
+              {nav.continueLabel}
             </button>
           </div>
         </div>

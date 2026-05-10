@@ -3,9 +3,19 @@
 import { useEffect, useMemo, useState } from "react";
 import type { ReactNode } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { projectWizardStorage, type WizardLocale } from "../wizardStorage";
+import { useRouter, useSearchParams } from "next/navigation";
+import { useProjectWizardNavigation } from "../useProjectWizardNavigation";
+import {
+  clearProjectWizardStorage,
+  projectWizardStorage,
+  type WizardLocale,
+} from "../wizardStorage";
 import ChoiceCard from "./ChoiceCard";
+import {
+  IconBriefcaseFilled,
+  IconAffiliateFilled,
+  IconBoltFilled,
+} from "@tabler/icons-react";
 
 type ProjectTypeId = "ad_hoc" | "frame_work_agreement" | "urgent_request";
 
@@ -120,7 +130,9 @@ export default function ProjectTypeQuestion({
 }: {
   locale: WizardLocale;
 }) {
+  const nav = useProjectWizardNavigation(locale);
   const router = useRouter();
+  const searchParams = useSearchParams();
   const isRTL = locale === "ar";
   const isEnglish =
     typeof locale === "string" && locale.toLowerCase().startsWith("en");
@@ -135,6 +147,13 @@ export default function ProjectTypeQuestion({
     const timer = window.setTimeout(() => setEntered(true), 30);
     return () => window.clearTimeout(timer);
   }, []);
+
+  useEffect(() => {
+    if (searchParams?.get("fresh") !== "1") return;
+    clearProjectWizardStorage(locale);
+    setSelected(null);
+    router.replace(`/${locale}/project/wizard/project-type`, { scroll: false });
+  }, [locale, router, searchParams]);
 
   useEffect(() => {
     try {
@@ -168,13 +187,13 @@ export default function ProjectTypeQuestion({
       // ignore
     }
     setIsAdvancing(true);
-    router.push(`/${locale}/project/wizard/deliverables-language`);
+    nav.goNext();
   };
 
   const onContinue = () => {
     if (!selected || isAdvancing) return;
     setIsAdvancing(true);
-    router.push(`/${locale}/project/wizard/deliverables-language`);
+    nav.goNext();
   };
 
   const title = isRTL ? "اختر نوع مشروعك" : "Select your project type";
@@ -189,42 +208,29 @@ export default function ProjectTypeQuestion({
     ProjectTypeId,
     ({ size, stroke, className }: { size: number; stroke: number; className?: string }) => ReactNode
   > = {
-    ad_hoc: ({ size, stroke, className }) => (
-      <svg width={size} height={size} viewBox="0 0 30 30" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <circle cx="15" cy="15" r="15" fill="#52D7FF" fillOpacity="0.14" />
-        <path d="M21.4514 18.4413L21.3871 19.2642C21.2907 20.2478 21.2135 20.9999 19.4714 20.9999H11.3842C9.64208 20.9999 9.56494 20.2478 9.46851 19.2642L9.21136 16.0499C9.15994 15.5163 9.32708 15.0213 9.62922 14.642C9.63565 14.6356 9.63565 14.6356 9.64208 14.6292C9.99565 14.1985 10.5292 13.9285 11.1271 13.9285H19.7285C20.3264 13.9285 20.8535 14.1985 21.2007 14.6163C21.2071 14.6228 21.2135 14.6292 21.2135 14.6356C21.5285 15.0149 21.7021 15.5099 21.6442 16.0499" fill="#52D7FF" fillOpacity="0.14" />
-        <path d="M21.4514 18.4413L21.3871 19.2642C21.2907 20.2478 21.2135 20.9999 19.4714 20.9999H11.3842C9.64208 20.9999 9.56494 20.2478 9.46851 19.2642L9.21136 16.0499C9.15994 15.5163 9.32708 15.0213 9.62922 14.642C9.63565 14.6356 9.63565 14.6356 9.64208 14.6292C9.99565 14.1985 10.5292 13.9285 11.1271 13.9285H19.7285C20.3264 13.9285 20.8535 14.1985 21.2007 14.6163C21.2071 14.6228 21.2135 14.6292 21.2135 14.6356C21.5285 15.0149 21.7021 15.5099 21.6442 16.0499" stroke="#0064E1" strokeWidth="0.964286" strokeMiterlimit="10" strokeLinecap="round" strokeLinejoin="round" />
-        <path d="M9.96387 14.205V10.8943C9.96387 8.70854 10.5103 8.16211 12.696 8.16211H13.5124C14.3289 8.16211 14.5153 8.4064 14.8239 8.81782L15.6403 9.91068C15.846 10.1807 15.9682 10.3478 16.5146 10.3478H18.1539C20.3396 10.3478 20.886 10.8943 20.886 13.08V14.2307" fill="#52D7FF" fillOpacity="0.14" />
-        <path d="M9.96387 14.205V10.8943C9.96387 8.70854 10.5103 8.16211 12.696 8.16211H13.5124C14.3289 8.16211 14.5153 8.4064 14.8239 8.81782L15.6403 9.91068C15.846 10.1807 15.9682 10.3478 16.5146 10.3478H18.1539C20.3396 10.3478 20.886 10.8943 20.886 13.08V14.2307" stroke="#0064E1" strokeWidth="0.964286" strokeMiterlimit="10" strokeLinecap="round" strokeLinejoin="round" />
-        <path d="M13.7769 17.7856H17.0811" stroke="#0064E1" strokeWidth="0.964286" strokeMiterlimit="10" strokeLinecap="round" strokeLinejoin="round" />
-      </svg>
-
-
-
+    ad_hoc: ({ size }) => (
+      <span
+        className="relative inline-flex items-center justify-center rounded-full bg-gradient-to-br from-sky-100 to-cyan-200/60 ring-1 ring-sky-200/70 shadow-[inset_0_-2px_6px_rgba(2,132,199,0.12)]"
+        style={{ width: size, height: size }}
+      >
+        <IconBriefcaseFilled size={size * 0.55} className="text-[#0064E1]" />
+      </span>
     ),
-    frame_work_agreement: ({ size, stroke, className }) => (
-      <svg width={size} height={size} viewBox="0 0 30 30" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <circle cx="15" cy="15" r="15" fill="#FF8BF9" fillOpacity="0.13" />
-        <path d="M12.0623 12.9583C13.1094 12.9583 13.9582 12.1095 13.9582 11.0625C13.9582 10.0154 13.1094 9.16663 12.0623 9.16663C11.0153 9.16663 10.1665 10.0154 10.1665 11.0625C10.1665 12.1095 11.0153 12.9583 12.0623 12.9583Z" stroke="#B0009E" strokeWidth="0.875" strokeLinecap="round" strokeLinejoin="round" />
-        <path d="M11.9165 20.8334C12.883 20.8334 13.6665 20.0499 13.6665 19.0834C13.6665 18.1169 12.883 17.3334 11.9165 17.3334C10.95 17.3334 10.1665 18.1169 10.1665 19.0834C10.1665 20.0499 10.95 20.8334 11.9165 20.8334Z" stroke="#B0009E" strokeWidth="0.875" strokeLinecap="round" strokeLinejoin="round" />
-        <path d="M20.0835 20.8334C21.05 20.8334 21.8335 20.0499 21.8335 19.0834C21.8335 18.1169 21.05 17.3334 20.0835 17.3334C19.117 17.3334 18.3335 18.1169 18.3335 19.0834C18.3335 20.0499 19.117 20.8334 20.0835 20.8334Z" stroke="#B0009E" strokeWidth="0.875" strokeLinecap="round" strokeLinejoin="round" />
-        <g opacity="0.4">
-          <path d="M11.9165 13.25V17.3333" stroke="#B0009E" strokeWidth="0.875" strokeLinecap="round" strokeLinejoin="round" />
-          <path d="M11.9922 13.25C12.2547 14.2708 13.188 15.0292 14.2905 15.0233L16.2914 15.0175C17.8197 15.0117 19.1205 15.9917 19.5989 17.3567" stroke="#B0009E" strokeWidth="0.875" strokeLinecap="round" strokeLinejoin="round" />
-        </g>
-      </svg>
-
-
+    frame_work_agreement: ({ size }) => (
+      <span
+        className="relative inline-flex items-center justify-center rounded-full bg-gradient-to-br from-fuchsia-100 to-pink-200/60 ring-1 ring-fuchsia-200/70 shadow-[inset_0_-2px_6px_rgba(176,0,158,0.12)]"
+        style={{ width: size, height: size }}
+      >
+        <IconAffiliateFilled size={size * 0.55} className="text-[#B0009E]" />
+      </span>
     ),
-    urgent_request: ({ size, stroke, className }) => (
-      <svg width={size} height={size} viewBox="0 0 30 30" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <circle cx="15" cy="15" r="15" fill="#FFAF47" fillOpacity="0.13" />
-        <path d="M20.1043 15.2292C20.1043 18.0467 17.8177 20.3333 15.0002 20.3333C12.1827 20.3333 9.896 18.0467 9.896 15.2292C9.896 12.4117 12.1827 10.125 15.0002 10.125C17.8177 10.125 20.1043 12.4117 20.1043 15.2292Z" stroke="#E08700" strokeWidth="0.875" strokeLinecap="round" strokeLinejoin="round" />
-        <path opacity="0.8" d="M15 12.1666V15.0833" stroke="#E08700" strokeWidth="0.875" strokeLinecap="round" strokeLinejoin="round" />
-        <path opacity="0.69" d="M13.25 8.66663H16.75" stroke="#E08700" strokeWidth="0.875" strokeMiterlimit="10" strokeLinecap="round" strokeLinejoin="round" />
-      </svg>
-
-
+    urgent_request: ({ size }) => (
+      <span
+        className="relative inline-flex items-center justify-center rounded-full bg-gradient-to-br from-amber-100 to-orange-200/60 ring-1 ring-amber-200/70 shadow-[inset_0_-2px_6px_rgba(224,135,0,0.15)]"
+        style={{ width: size, height: size }}
+      >
+        <IconBoltFilled size={size * 0.55} className="text-[#E08700] animate-pulse" />
+      </span>
     ),
   };
 
@@ -305,12 +311,12 @@ export default function ProjectTypeQuestion({
         })}
       </div>
 
-      <div className="fixed bottom-0 left-0 right-0 lg:static border-t rounded-lg border-slate-200/70 bg-white/80 backdrop-blur-md lg:border-t-0 lg:bg-transparent lg:backdrop-blur-0">
+      <div className="fixed bottom-0 left-0 right-0 z-20 border-t border-slate-200/70 bg-white/80 backdrop-blur-md">
         <div className="mx-auto px-4 lg:px-0 w-full max-w-4xl pt-4 pb-[calc(env(safe-area-inset-bottom)+1rem)]">
-          <div className=" lg:mt-8 flex  items-center justify-between gap-3">
+          <div className="flex items-center justify-between gap-3">
             <Link
-              href={`/${locale}/project`}
-              className="btn-sm px-6 py-2  text-slate-700 bg-white/80 hover:bg-white border border-slate-200"
+              href={nav.backHref}
+              className="btn-sm px-6 py-2 rounded-full text-slate-700 bg-white/80 hover:bg-white border border-slate-200"
             >
               {isRTL ? "رجوع" : "Back"}
             </Link>
@@ -324,7 +330,7 @@ export default function ProjectTypeQuestion({
                 : "text-slate-500 bg-slate-200 cursor-not-allowed"
                 }`}
             >
-              {isRTL ? "متابعة" : "Continue"}
+              {nav.continueLabel}
             </button>
           </div>
         </div>

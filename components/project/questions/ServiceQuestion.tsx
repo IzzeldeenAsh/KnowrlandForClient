@@ -2,7 +2,6 @@
 
 import { useEffect, useMemo, useState } from 'react'
 import Link from 'next/link'
-import { useRouter } from 'next/navigation'
 import ChoiceCard from './ChoiceCard'
 import ProjectSelectedTypeHeader from '../ProjectSelectedTypeHeader'
 import {
@@ -18,6 +17,7 @@ import {
   getProjectApiErrorMessage,
 } from '@/components/project/projectApiError'
 import { useProjectStepErrorToast } from '@/components/project/useProjectStepErrorToast'
+import { useProjectWizardNavigation } from '@/components/project/useProjectWizardNavigation'
 
 type Service = {
   id: number
@@ -64,7 +64,7 @@ function safeParseSelectedServiceId(value: string | null): number | null {
 }
 
 export default function ServiceQuestion({ locale }: { locale: WizardLocale }) {
-  const router = useRouter()
+  const nav = useProjectWizardNavigation(locale)
   const isRTL = locale === 'ar'
   const isEnglish =
     typeof locale === 'string' && locale.toLowerCase().startsWith('en')
@@ -338,7 +338,7 @@ export default function ServiceQuestion({ locale }: { locale: WizardLocale }) {
         // ignore
       }
 
-      router.push(`/${locale}/project/wizard/project-scope`)
+      nav.goNext()
     } catch (err) {
       setError(
         getProjectApiErrorMessage(
@@ -355,7 +355,7 @@ export default function ServiceQuestion({ locale }: { locale: WizardLocale }) {
     if (!canContinue || selectedId == null || submitting) return
 
     if (isOtherSelected) {
-      router.push(`/${locale}/project/wizard/project-scope`)
+      nav.goNext()
       return
     }
 
@@ -386,7 +386,7 @@ export default function ServiceQuestion({ locale }: { locale: WizardLocale }) {
 
     if (nextIsOtherSelected) {
       resetDownstreamWizardState(true)
-      router.push(`/${locale}/project/wizard/project-scope`)
+      nav.goNext()
       return
     }
 
@@ -462,13 +462,12 @@ export default function ServiceQuestion({ locale }: { locale: WizardLocale }) {
         )}
       </div>
 
-      <div className=" fixed bottom-0 left-0 right-0 lg:static 
-       border-t border-slate-200/70 bg-white/80 backdrop-blur-md lg:bottom-10 lg:border-t-0 lg:bg-transparent lg:backdrop-blur-0">
+      <div className="fixed bottom-0 left-0 right-0 z-20 border-t border-slate-200/70 bg-white/80 backdrop-blur-md">
         <div className="mx-auto w-full max-w-6xl px-4 lg:px-0 pt-4 pb-[calc(env(safe-area-inset-bottom)+1rem)]">
-          <div className="lg:mt-8 flex items-center justify-between gap-3">
+          <div className="flex items-center justify-between gap-3">
             <Link
-              href={`/${locale}/project/wizard/deliverables-language`}
-              className="btn-sm text-slate-700 bg-white/80 hover:bg-white border border-slate-200"
+              href={nav.backHref}
+              className="btn-sm px-6 py-2 rounded-full text-slate-700 bg-white/80 hover:bg-white border border-slate-200"
             >
               {isRTL ? 'رجوع' : 'Back'}
             </Link>
@@ -482,7 +481,7 @@ export default function ServiceQuestion({ locale }: { locale: WizardLocale }) {
                 : 'text-slate-500 bg-slate-200 cursor-not-allowed'
                 }`}
             >
-              {submitting ? (isRTL ? 'جاري المتابعة…' : 'Continuing…') : isRTL ? 'متابعة' : 'Continue'}
+              {submitting ? (isRTL ? 'جاري المتابعة…' : 'Continuing…') : nav.continueLabel}
             </button>
           </div>
         </div>

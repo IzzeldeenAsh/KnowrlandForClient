@@ -25,6 +25,89 @@ export const projectWizardStepIds = {
 
 export type ProjectWizardStepId = string
 
+export const deliverableStageStepSlugs = [
+  'deliverable-first-draft-date',
+  'deliverable-first-draft-type',
+  'deliverable-first-draft-way',
+  'deliverable-final-version-date',
+  'deliverable-final-version-type',
+  'deliverable-final-version-way',
+] as const
+
+const deliverableComponentSlugs = new Set<string>([
+  'deliverable-stage',
+  'deliverable-type-first-draft',
+  'deliverable-type-final-version',
+  ...deliverableStageStepSlugs,
+])
+
+export function normalizeServiceComponentSlug(value: string): string {
+  const normalized = String(value || '')
+    .trim()
+    .toLowerCase()
+    .replace(/[_\s]+/g, '-')
+    .replace(/[^a-z0-9-]+/g, '-')
+    .replace(/-+/g, '-')
+    .replace(/^-|-$/g, '')
+
+  const aliases: Record<string, string> = {
+    'deliverables-stage': 'deliverable-stage',
+    'deliverable-stages': 'deliverable-stage',
+    'deliverables-type-first-draft': 'deliverable-type-first-draft',
+    'deliverable-types-first-draft': 'deliverable-type-first-draft',
+    'deliverables-type-final-version': 'deliverable-type-final-version',
+    'deliverable-types-final-version': 'deliverable-type-final-version',
+    'data-source-expected': 'data-sources-expected',
+    'expected-data-sources': 'data-sources-expected',
+  }
+
+  return aliases[normalized] || normalized
+}
+
+function isDeliverableComponentSlug(slug: string): boolean {
+  if (deliverableComponentSlugs.has(slug)) return true
+
+  const hasDeliverableMarker =
+    slug.includes('deliverable') ||
+    slug.includes('delivery') ||
+    slug.includes('first-draft') ||
+    slug.includes('final-version')
+
+  if (!hasDeliverableMarker) return false
+
+  return (
+    slug.includes('stage') ||
+    slug.includes('date') ||
+    slug.includes('type') ||
+    slug.includes('report') ||
+    slug.includes('way') ||
+    slug.includes('draft') ||
+    slug.includes('final')
+  )
+}
+
+export function expandServiceComponentSlugs(slugs: string[]): string[] {
+  const expanded: string[] = []
+  let addedDeliverableSteps = false
+
+  for (const rawSlug of slugs) {
+    const slug = normalizeServiceComponentSlug(rawSlug)
+    if (!slug) continue
+
+    if (isDeliverableComponentSlug(slug)) {
+      if (!addedDeliverableSteps) {
+        expanded.push(...deliverableStageStepSlugs)
+        addedDeliverableSteps = true
+      }
+      continue
+    }
+
+    expanded.push(slug)
+  }
+
+  return expanded.filter((slug, index, arr) => arr.indexOf(slug) === index)
+}
+
 export function normalizeProjectWizardStepId(step: string): string {
   if (!step) return projectWizardStepIds.projectType
 
@@ -51,9 +134,11 @@ export function readServiceComponentSlugs(locale: WizardLocale): string[] {
     if (!raw) return []
     const parsed = JSON.parse(raw) as unknown
     if (!Array.isArray(parsed)) return []
-    return parsed
-      .map((s) => (typeof s === 'string' ? s.trim() : ''))
-      .filter(Boolean)
+    return expandServiceComponentSlugs(
+      parsed
+        .map((s) => (typeof s === 'string' ? s.trim() : ''))
+        .filter(Boolean)
+    )
   } catch {
     return []
   }
