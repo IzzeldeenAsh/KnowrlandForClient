@@ -1,5 +1,5 @@
 const DEFAULT_LOCAL_ANGULAR_APP_URL =
-  process.env.NEXT_PUBLIC_ANGULAR_APP_URL || "https://app.insightabusiness.com";
+  process.env.NEXT_PUBLIC_ANGULAR_APP_URL || "http://localhost:4200";
 
 const ANGULAR_ROUTE_PREFIXES = [
   "/app/",

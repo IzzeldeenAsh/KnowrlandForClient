@@ -1,4 +1,4 @@
-const DOWNLOAD_KNOWLEDGE_URL = "https://api.insightabusiness.com/api/account/library/my-knowledge/download";
+const DOWNLOAD_KNOWLEDGE_URL = "https://api.foresighta.co/api/account/library/my-knowledge/download";
 
 interface DownloadAccountKnowledgeOptions {
   token?: string | null;

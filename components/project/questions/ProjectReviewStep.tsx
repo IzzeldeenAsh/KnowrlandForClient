@@ -96,6 +96,7 @@ type ReviewRow = {
   fileTypes?: string[]
   variant?: 'default' | 'chips'
   editStepId?: string
+  wide?: boolean
 }
 
 type ReviewSection = {
@@ -705,7 +706,13 @@ function SectionBlock({
         {rows.map((row) => (
           <article
             key={row.label}
-            className={`min-w-0 ${rows.length === 1 ? 'sm:col-span-2 xl:col-span-3' : ''}`}
+            className={`min-w-0 ${
+              rows.length === 1
+                ? 'sm:col-span-2 xl:col-span-3'
+                : row.wide
+                  ? 'sm:col-span-2 xl:col-span-2'
+                  : ''
+            }`}
           >
             <div className="mb-2 flex items-center gap-2">
               <div className="text-xs font-semibold text-slate-500">{row.label}</div>
@@ -1154,6 +1161,7 @@ export default function ProjectReviewStep({
         label: isRTL ? 'الوصف الإضافي' : 'Additional description',
         value: review.description ? [review.description] : [],
         editStepId: projectWizardStepIds.projectDescription,
+        wide: true,
       },
       {
         label: isRTL ? 'الملفات المرفقة' : 'Attachments',

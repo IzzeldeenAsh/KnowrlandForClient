@@ -132,7 +132,7 @@ function PaymentForm({ orderUuid, amount, title, locale, isRTL, isGuest, orderDe
     }
 
     const response = await fetch(
-      `https://api.insightabusiness.com/api/platform/guest/order/knowledge/download/${orderUuid}`,
+      `https://api.foresighta.co/api/platform/guest/order/knowledge/download/${orderUuid}`,
       {
         method: "POST",
         headers: {
@@ -172,7 +172,7 @@ function PaymentForm({ orderUuid, amount, title, locale, isRTL, isGuest, orderDe
       setIsFetchingDownloadIds(true);
       const token = getAuthToken();
       const response = await fetch(
-        `https://api.insightabusiness.com/api/account/order/knowledge/${uuid}`,
+        `https://api.foresighta.co/api/account/order/knowledge/${uuid}`,
         {
           headers: {
             "Content-Type": "application/json",
@@ -250,13 +250,13 @@ function PaymentForm({ orderUuid, amount, title, locale, isRTL, isGuest, orderDe
     }
 
     if (knowledgeDownloadId) {
-      window.location.href = `https://app.insightabusiness.com/app/insighter-dashboard/my-downloads?uuids=${knowledgeDownloadId}`;
+      window.location.href = `http://localhost:4200/app/insighter-dashboard/my-downloads?uuids=${knowledgeDownloadId}`;
       return;
     }
 
     const searchTitle = orderDetails?.orderable?.knowledge?.[0]?.title || "";
     const searchParam = searchTitle ? `?search=${encodeURIComponent(searchTitle)}` : "";
-    window.location.href = `https://app.insightabusiness.com/app/insighter-dashboard/my-downloads${searchParam}`;
+    window.location.href = `http://localhost:4200/app/insighter-dashboard/my-downloads${searchParam}`;
   }, [fetchUpdatedOrderDetails, orderDetails, orderUuid, setOrderDetails]);
 
   const handleRedownload = useCallback(async () => {
@@ -336,7 +336,7 @@ function PaymentForm({ orderUuid, amount, title, locale, isRTL, isGuest, orderDe
           if (!guestToken) return false;
 
           const response = await fetch(
-            `https://api.insightabusiness.com/api/platform/guest/order/knowledge/check-payment-succeeded/${orderUuid}`,
+            `https://api.foresighta.co/api/platform/guest/order/knowledge/check-payment-succeeded/${orderUuid}`,
             {
               method: "POST",
               headers: {
@@ -356,7 +356,7 @@ function PaymentForm({ orderUuid, amount, title, locale, isRTL, isGuest, orderDe
 
         const token = getAuthToken();
         const response = await fetch(
-          `https://api.insightabusiness.com/api/account/order/knowledge/${orderUuid}`,
+          `https://api.foresighta.co/api/account/order/knowledge/${orderUuid}`,
           {
             headers: {
               "Content-Type": "application/json",
@@ -482,7 +482,7 @@ function PaymentForm({ orderUuid, amount, title, locale, isRTL, isGuest, orderDe
           return;
         }
         const response = await fetch(
-          `https://api.insightabusiness.com/api/platform/guest/order/knowledge/check-payment-succeeded/${orderUuid}`,
+          `https://api.foresighta.co/api/platform/guest/order/knowledge/check-payment-succeeded/${orderUuid}`,
           {
             method: "POST",
             headers: {
@@ -513,7 +513,7 @@ function PaymentForm({ orderUuid, amount, title, locale, isRTL, isGuest, orderDe
 
       const token = getAuthToken();
       const response = await fetch(
-        `https://api.insightabusiness.com/api/account/order/knowledge/check-payment-succeeded/${orderUuid}`,
+        `https://api.foresighta.co/api/account/order/knowledge/check-payment-succeeded/${orderUuid}`,
         {
           method: "POST",
           headers: {
@@ -707,7 +707,7 @@ function PaymentForm({ orderUuid, amount, title, locale, isRTL, isGuest, orderDe
                   <Text size="md" ta="start">
                     {translations.guestSupportNotePrefix}
                     <a
-                      href="https://insightabusiness.com/en/contact"
+                      href="http://localhost:3000/en/contact"
                       target="_blank"
                       rel="noopener noreferrer"
                       className="text-blue-600 hover:text-blue-700 underline underline-offset-2"
@@ -903,7 +903,7 @@ export default function StripePaymentPage() {
       try {
         const token = getAuthToken();
         const response = await fetch(
-          `https://api.insightabusiness.com/api/account/order/knowledge/${orderUuid}`,
+          `https://api.foresighta.co/api/account/order/knowledge/${orderUuid}`,
           {
             headers: {
               "Content-Type": "application/json",
