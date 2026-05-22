@@ -10,6 +10,7 @@ import {
 } from '@/components/project/projectProposalSubmit'
 import { useProjectStepErrorToast } from '@/components/project/useProjectStepErrorToast'
 import { projectWizardStepIds } from '../projectWizardFlow'
+import InlineDateCalendar from './InlineDateCalendar'
 import ProjectSelectedTypeHeader from '../ProjectSelectedTypeHeader'
 import { useProjectWizardNavigation } from '../useProjectWizardNavigation'
 import { projectWizardStorage, type WizardLocale } from '../wizardStorage'
@@ -230,31 +231,21 @@ export default function DeadlineOfferQuestion({
           style={{ transitionDelay: '160ms' }}
         >
           <div className="max-w-sm">
-            <label
-              htmlFor="deadline-offer-input"
-              className="text-sm text-slate-700"
-            >
-              <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-white text-slate-800">
-                {isRTL ? 'تاريخ انتهاء العرض' : 'Offer expiry date'}
-              </span>
-            </label>
-            <input
-              id="deadline-offer-input"
-              type="date"
+            <InlineDateCalendar
+              value={dateValue}
               min={today}
               max={isUrgentProject ? tomorrow : undefined}
-              value={dateValue}
-              onChange={(e) => {
-                setDateValue(e.target.value)
+              onChange={(date) => {
+                setDateValue(date)
                 setError(null)
               }}
-              className="mt-3 block w-full rounded-lg border border-slate-200 bg-white px-4 py-3 text-base text-slate-900 outline-none transition-colors focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+              locale={locale}
+              label={isRTL ? 'تاريخ انتهاء العرض' : 'Offer expiry date'}
             />
+            {visibleError ? (
+              <div className="mt-3 text-sm text-rose-700">{visibleError}</div>
+            ) : null}
           </div>
-
-          {visibleError ? (
-            <div className="mt-4 text-sm text-rose-700">{visibleError}</div>
-          ) : null}
         </div>
       </div>
 

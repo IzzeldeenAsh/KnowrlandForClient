@@ -67,7 +67,7 @@ export default function EconomicBlockTab() {
         return;
       }
 
-      const response = await fetch('https://api.foresighta.co/api/admin/setting/economic-bloc', {
+      const response = await fetch('https://api.insightabusiness.com/api/admin/setting/economic-bloc', {
         method: 'GET',
         cache: 'no-store',
         signal,
@@ -151,8 +151,8 @@ export default function EconomicBlockTab() {
 
       const url =
         modalMode === 'create'
-          ? 'https://api.foresighta.co/api/admin/setting/economic-bloc'
-          : `https://api.foresighta.co/api/admin/setting/economic-bloc/${selectedBloc?.id ?? ''}`;
+          ? 'https://api.insightabusiness.com/api/admin/setting/economic-bloc'
+          : `https://api.insightabusiness.com/api/admin/setting/economic-bloc/${selectedBloc?.id ?? ''}`;
 
       const response = await fetch(url, {
         method: modalMode === 'create' ? 'POST' : 'PUT',
@@ -198,7 +198,7 @@ export default function EconomicBlockTab() {
         return;
       }
 
-      const response = await fetch(`https://api.foresighta.co/api/admin/setting/economic-bloc/${bloc.id}`, {
+      const response = await fetch(`https://api.insightabusiness.com/api/admin/setting/economic-bloc/${bloc.id}`, {
         method: 'DELETE',
         cache: 'no-store',
         headers: buildAuthHeaders(token),

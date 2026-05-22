@@ -13,7 +13,7 @@ import { Elements, PaymentElement, useElements, useStripe } from "@stripe/react-
 import styles from "./payment.module.css";
 
 // Initialize Stripe
-const stripePromise = loadStripe("pk_live_51RvbpYRIE7WtDi9SLKPBxKTPyTkULT1e36AZMOcmtUomKgW99akiph2PVg5mmUcPtyAjvlXwP1wy70OFvooJLpQc00CNQYKb96");
+const stripePromise = loadStripe("pk_test_51RpQiFL3mrWP7a0P1OYWGeFJWtgMwcWJtiEDLvn29CpYn5x8Ou77YViA1yoimlixKU5aUAeOeN5VTfoC4sMpvFVF00qq9a6BNm");
 
 // File icon mapping function
 const getFileIconByExtension = (extension: string) => {
@@ -75,7 +75,13 @@ const isSuccessfulPaymentStatus = (order?: { status?: string; payment_status?: s
   const status = order?.status?.toLowerCase();
   const paymentStatus = order?.payment_status?.toLowerCase();
 
-  return status === "paid" || status === "completed" || paymentStatus === "completed";
+  return (
+    status === "paid" ||
+    status === "completed" ||
+    status === "completed_pending_payment" ||
+    paymentStatus === "completed" ||
+    paymentStatus === "completed_pending_payment"
+  );
 };
 
 interface PaymentFormProps {
@@ -85,13 +91,28 @@ interface PaymentFormProps {
   locale: string;
   isRTL: boolean;
   isGuest: boolean;
+  service: string;
+  returnUrl: string;
   orderDetails: OrderDetails | null;
   guestSummary: GuestOrderSummary | null;
   storedSummary: StoredOrderSummary | null;
   setOrderDetails: (details: OrderDetails) => void;
 }
 
-function PaymentForm({ orderUuid, amount, title, locale, isRTL, isGuest, orderDetails, guestSummary, storedSummary, setOrderDetails }: PaymentFormProps) {
+function PaymentForm({
+  orderUuid,
+  amount,
+  title,
+  locale,
+  isRTL,
+  isGuest,
+  service,
+  returnUrl,
+  orderDetails,
+  guestSummary,
+  storedSummary,
+  setOrderDetails,
+}: PaymentFormProps) {
   const stripe = useStripe();
   const elements = useElements();
   const [isProcessing, setIsProcessing] = useState(false);
@@ -106,6 +127,8 @@ function PaymentForm({ orderUuid, amount, title, locale, isRTL, isGuest, orderDe
   const [pollAttemptsEnded, setPollAttemptsEnded] = useState(false);
   const orderDetailsRef = useRef(orderDetails);
   const hasTriggeredAccountDownloadRef = useRef(false);
+  const isProjectService = service.trim().toLowerCase() === "project";
+  const projectReturnUrl = returnUrl || "https://app.insightabusiness.com/app/insighter-dashboard/projects-created";
 
   // Get auth token from cookies
   const getAuthToken = () => {
@@ -132,7 +155,7 @@ function PaymentForm({ orderUuid, amount, title, locale, isRTL, isGuest, orderDe
     }
 
     const response = await fetch(
-      `https://api.foresighta.co/api/platform/guest/order/knowledge/download/${orderUuid}`,
+      `https://api.insightabusiness.com/api/platform/guest/order/knowledge/download/${orderUuid}`,
       {
         method: "POST",
         headers: {
@@ -172,7 +195,7 @@ function PaymentForm({ orderUuid, amount, title, locale, isRTL, isGuest, orderDe
       setIsFetchingDownloadIds(true);
       const token = getAuthToken();
       const response = await fetch(
-        `https://api.foresighta.co/api/account/order/knowledge/${uuid}`,
+        `https://api.insightabusiness.com/api/account/order/knowledge/${uuid}`,
         {
           headers: {
             "Content-Type": "application/json",
@@ -250,13 +273,13 @@ function PaymentForm({ orderUuid, amount, title, locale, isRTL, isGuest, orderDe
     }
 
     if (knowledgeDownloadId) {
-      window.location.href = `http://localhost:4200/app/insighter-dashboard/my-downloads?uuids=${knowledgeDownloadId}`;
+      window.location.href = `https://app.insightabusiness.com/app/insighter-dashboard/my-downloads?uuids=${knowledgeDownloadId}`;
       return;
     }
 
     const searchTitle = orderDetails?.orderable?.knowledge?.[0]?.title || "";
     const searchParam = searchTitle ? `?search=${encodeURIComponent(searchTitle)}` : "";
-    window.location.href = `http://localhost:4200/app/insighter-dashboard/my-downloads${searchParam}`;
+    window.location.href = `https://app.insightabusiness.com/app/insighter-dashboard/my-downloads${searchParam}`;
   }, [fetchUpdatedOrderDetails, orderDetails, orderUuid, setOrderDetails]);
 
   const handleRedownload = useCallback(async () => {
@@ -280,6 +303,7 @@ function PaymentForm({ orderUuid, amount, title, locale, isRTL, isGuest, orderDe
     paymentSuccess: isRTL ? "تم الدفع بنجاح!" : "Payment Successful!",
     redirecting: isRTL ? "جاري التوجيه إلى التنزيلات..." : "Redirecting to downloads...",
     goToDownloads: isRTL ? "الذهاب إلى التنزيلات" : "Go to Downloads",
+    backToProject: isRTL ? "العودة إلى المشروع" : "Back to project",
     downloadNow: isRTL ? "تحميل الآن" : "Download",
     redownload: isRTL ? "إعادة التحميل" : "Redownload",
     downloadStarted: isRTL ? "بدأ التحميل بالفعل، لبدء التحميل مجددًا انقر:" : "Your download already started. To start it again click:",
@@ -290,6 +314,7 @@ function PaymentForm({ orderUuid, amount, title, locale, isRTL, isGuest, orderDe
     congratulations: isRTL ? "تهانينا!" : "Congratulations!",
     paymentComplete: isRTL ? "تمت معالجة دفعتك بنجاح" : "Your payment has been processed successfully",
     accessGranted: isRTL ? "يمكنك الآن الوصول إلى جميع المستندات المشتراة" : "You now have access to all your purchased documents",
+    projectAccessGranted: isRTL ? "يمكنك الآن العودة إلى مشروعك" : "You can now return to your project",
     securityNote: isRTL ? "معلومات بطاقتك آمنة ولن يتم حفظها" : "Your card information is secure and will not be saved",
     guestLinkNote: isRTL
       ? "لقد أرسلنا لك رسالة بريد إلكتروني تحتوي على رابط التحميل. سيبقى الرابط فعالًا لمدة 24 ساعة. يُرجى تنزيل ملفك قبل انتهاء صلاحية الرابط."
@@ -336,7 +361,7 @@ function PaymentForm({ orderUuid, amount, title, locale, isRTL, isGuest, orderDe
           if (!guestToken) return false;
 
           const response = await fetch(
-            `https://api.foresighta.co/api/platform/guest/order/knowledge/check-payment-succeeded/${orderUuid}`,
+            `https://api.insightabusiness.com/api/platform/guest/order/knowledge/check-payment-succeeded/${orderUuid}`,
             {
               method: "POST",
               headers: {
@@ -356,7 +381,7 @@ function PaymentForm({ orderUuid, amount, title, locale, isRTL, isGuest, orderDe
 
         const token = getAuthToken();
         const response = await fetch(
-          `https://api.foresighta.co/api/account/order/knowledge/${orderUuid}`,
+          `https://api.insightabusiness.com/api/account/order/knowledge/${orderUuid}`,
           {
             headers: {
               "Content-Type": "application/json",
@@ -482,7 +507,7 @@ function PaymentForm({ orderUuid, amount, title, locale, isRTL, isGuest, orderDe
           return;
         }
         const response = await fetch(
-          `https://api.foresighta.co/api/platform/guest/order/knowledge/check-payment-succeeded/${orderUuid}`,
+          `https://api.insightabusiness.com/api/platform/guest/order/knowledge/check-payment-succeeded/${orderUuid}`,
           {
             method: "POST",
             headers: {
@@ -513,7 +538,7 @@ function PaymentForm({ orderUuid, amount, title, locale, isRTL, isGuest, orderDe
 
       const token = getAuthToken();
       const response = await fetch(
-        `https://api.foresighta.co/api/account/order/knowledge/check-payment-succeeded/${orderUuid}`,
+        `https://api.insightabusiness.com/api/account/order/knowledge/check-payment-succeeded/${orderUuid}`,
         {
           method: "POST",
           headers: {
@@ -559,8 +584,8 @@ function PaymentForm({ orderUuid, amount, title, locale, isRTL, isGuest, orderDe
   // Handle download progress animation when payment succeeds
   useEffect(() => {
     if (paymentStatus === "success") {
-      // Guest purchases: skip the "preparing downloads" animation and show the action button immediately
-      if (isGuest) {
+      // Guest and project purchases do not need the account download processing flow.
+      if (isGuest || isProjectService) {
         setDownloadProgress(100);
         setShowDocumentsAdded(true);
         return;
@@ -597,7 +622,7 @@ function PaymentForm({ orderUuid, amount, title, locale, isRTL, isGuest, orderDe
 
       return () => clearInterval(timer);
     }
-  }, [paymentStatus, orderUuid, fetchUpdatedOrderDetails, isGuest, setOrderDetails, triggerAccountDownload, waitForKnowledgeDownloadId]);
+  }, [paymentStatus, orderUuid, fetchUpdatedOrderDetails, isGuest, isProjectService, setOrderDetails, triggerAccountDownload, waitForKnowledgeDownloadId]);
 
   // Success UI
   if (paymentStatus === "success") {
@@ -630,11 +655,11 @@ function PaymentForm({ orderUuid, amount, title, locale, isRTL, isGuest, orderDe
           {translations.paymentComplete}
         </h2>
         <p className={`text-gray-600 mb-8 ${styles.successDescription}`}>
-          {translations.accessGranted}
+          {isProjectService ? translations.projectAccessGranted : translations.accessGranted}
         </p>
 
-        {/* Progress section (non-guest only) */}
-        {!isGuest && (
+        {/* Progress section for logged-in knowledge purchases */}
+        {!isGuest && !isProjectService && (
           <div className={`mb-8 ${styles.progressSection}`}>
             {!showDocumentsAdded ? (
               <div className="space-y-4">
@@ -671,13 +696,21 @@ function PaymentForm({ orderUuid, amount, title, locale, isRTL, isGuest, orderDe
                   triggerGuestDownload().catch((e) => console.error(e));
                   return;
                 }
+                if (isProjectService) {
+                  window.location.href = projectReturnUrl;
+                  return;
+                }
                 await redirectToDownloads();
               }}
             >
-              {isGuest ? translations.redownload : translations.goToDownloads}
+              {isProjectService
+                ? translations.backToProject
+                : isGuest
+                  ? translations.redownload
+                  : translations.goToDownloads}
             </Button>
 
-            {!isGuest && (
+            {!isGuest && !isProjectService && (
               <div className="mt-3">
                 <span className="text-sm text-gray-500">{translations.downloadStarted} </span>
                 <a
@@ -707,7 +740,7 @@ function PaymentForm({ orderUuid, amount, title, locale, isRTL, isGuest, orderDe
                   <Text size="md" ta="start">
                     {translations.guestSupportNotePrefix}
                     <a
-                      href="http://localhost:3000/en/contact"
+                      href="https://insightabusiness.com/en/contact"
                       target="_blank"
                       rel="noopener noreferrer"
                       className="text-blue-600 hover:text-blue-700 underline underline-offset-2"
@@ -870,16 +903,20 @@ function PaymentForm({ orderUuid, amount, title, locale, isRTL, isGuest, orderDe
 
 export default function StripePaymentPage() {
   const params = useParams();
-  const locale = params.locale as string;
+  const rawLocale = params?.locale;
+  const locale = Array.isArray(rawLocale) ? rawLocale[0] : rawLocale || "en";
   const isRTL = locale === "ar";
   const searchParams = useSearchParams();
   const router = useRouter();
 
-  const clientSecret = searchParams.get("client_secret") || "";
-  const orderUuid = searchParams.get("order_uuid") || "";
-  const amount = searchParams.get("amount") || "0";
-  const title = searchParams.get("title") || "";
-  const isGuest = searchParams.get("guest") === "1";
+  const clientSecret = searchParams?.get("client_secret") || "";
+  const orderUuid = searchParams?.get("order_uuid") || "";
+  const amount = searchParams?.get("amount") || "0";
+  const title = searchParams?.get("title") || "";
+  const isGuest = searchParams?.get("guest") === "1";
+  const service = searchParams?.get("service") || "";
+  const returnUrl = searchParams?.get("return_url") || "";
+  const isProjectService = service.trim().toLowerCase() === "project";
 
   const [orderDetails, setOrderDetails] = useState<OrderDetails | null>(null);
   const [guestSummary, setGuestSummary] = useState<GuestOrderSummary | null>(null);
@@ -899,11 +936,12 @@ export default function StripePaymentPage() {
     const fetchOrderDetails = async () => {
       if (!orderUuid) return;
       if (isGuest) return;
+      if (isProjectService) return;
 
       try {
         const token = getAuthToken();
         const response = await fetch(
-          `https://api.foresighta.co/api/account/order/knowledge/${orderUuid}`,
+          `https://api.insightabusiness.com/api/account/order/knowledge/${orderUuid}`,
           {
             headers: {
               "Content-Type": "application/json",
@@ -926,7 +964,7 @@ export default function StripePaymentPage() {
     };
 
     fetchOrderDetails();
-  }, [isGuest, orderUuid, locale]);
+  }, [isGuest, isProjectService, orderUuid, locale]);
 
   // Guest: load summary from localStorage
   useEffect(() => {
@@ -1001,6 +1039,8 @@ export default function StripePaymentPage() {
                 locale={locale}
                 isRTL={isRTL}
                 isGuest={isGuest}
+                service={service}
+                returnUrl={returnUrl}
                 orderDetails={orderDetails}
                 guestSummary={guestSummary}
                 storedSummary={storedSummary}

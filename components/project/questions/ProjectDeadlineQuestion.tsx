@@ -7,6 +7,7 @@ import { getProjectApiErrorMessage } from '@/components/project/projectApiError'
 import { readServiceComponentPayloadValue } from '@/components/project/serviceComponentsPayload'
 import { syncProjectProperties } from '@/components/project/projectPropertiesSync'
 import { useProjectStepErrorToast } from '@/components/project/useProjectStepErrorToast'
+import InlineDateCalendar from './InlineDateCalendar'
 import ProjectSelectedTypeHeader from '../ProjectSelectedTypeHeader'
 import { useProjectWizardNavigation } from '../useProjectWizardNavigation'
 import { projectWizardStorage, type WizardLocale } from '../wizardStorage'
@@ -223,39 +224,29 @@ export default function ProjectDeadlineQuestion({
           style={{ transitionDelay: '160ms' }}
         >
           <div className="max-w-sm">
-            <label
-              htmlFor="project-deadline-input"
-              className="text-sm text-slate-700"
-            >
-              <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-white text-slate-800">
-                {isRTL ? 'الموعد النهائي للتسليم' : 'Delivery deadline'}
-              </span>
-            </label>
-            <input
-              id="project-deadline-input"
-              type="date"
+            <InlineDateCalendar
+              value={dateValue}
               min={minimumDeadline}
               max={isUrgentProject ? tomorrow : undefined}
-              value={dateValue}
-              onChange={(e) => {
-                setDateValue(e.target.value)
+              onChange={(date) => {
+                setDateValue(date)
                 setError(null)
                 setUrgentAcknowledged(false)
               }}
-              className="mt-3 block w-full rounded-lg border border-slate-200 bg-white px-4 py-3 text-base text-slate-900 outline-none transition-colors focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+              locale={locale}
+              label={isRTL ? 'الموعد النهائي للتسليم' : 'Delivery deadline'}
             />
             {finalDraftDate ? (
-              <p className="mt-2 text-xs font-semibold text-slate-500">
+              <p className="mt-3 text-xs font-semibold text-slate-500">
                 {isRTL
                   ? `يجب أن يكون في ${finalDraftDate} أو بعده.`
                   : `Must be on or after ${finalDraftDate}.`}
               </p>
             ) : null}
+            {visibleError ? (
+              <div className="mt-3 text-sm text-rose-700">{visibleError}</div>
+            ) : null}
           </div>
-
-          {visibleError ? (
-            <div className="mt-4 text-sm text-rose-700">{visibleError}</div>
-          ) : null}
         </div>
       </div>
 

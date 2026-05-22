@@ -40,8 +40,8 @@ type OrderTabKey = 'knowledge' | 'meetings';
 type CompletionFilter = 'all' | 'complete' | 'incomplete';
 
 const ORDER_TAB_CONFIG: Array<{ key: OrderTabKey; label: string; endpoint: string }> = [
-  { key: 'knowledge', label: 'Insight', endpoint: 'https://api.foresighta.co/api/admin/order/knowledge' },
-  { key: 'meetings', label: 'Meetings', endpoint: 'https://api.foresighta.co/api/admin/order/meeting' },
+  { key: 'knowledge', label: 'Insight', endpoint: 'https://api.insightabusiness.com/api/admin/order/knowledge' },
+  { key: 'meetings', label: 'Meetings', endpoint: 'https://api.insightabusiness.com/api/admin/order/meeting' },
 ];
 
 const COMPLETION_FILTER_OPTIONS: Array<{ value: CompletionFilter; label: string }> = [

@@ -495,8 +495,8 @@ function MatchLoader({
   if (cards.length === 0) return null
 
   return (
-    <div >
-      <div className="relative mt-1 h-[400] overflow-hidden top-[-70px]" >
+    <div>
+      <div className="relative mt-1 h-[400px] overflow-hidden top-[-70px]">
         <div className="absolute inset-x-0 top-1/2 -translate-y-1/2">
           {cards.map((card, index) => {
             const isCompany = isCompanyLikeInsighter(card.insighter.roles)

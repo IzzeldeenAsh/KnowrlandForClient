@@ -3,7 +3,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import Link from 'next/link'
 import {
-  IconCalendarDue,
   IconCloudUpload,
   IconDeviceDesktopUp,
   IconFileSpreadsheet,
@@ -14,6 +13,7 @@ import {
   IconPresentationFilled,
 } from '@tabler/icons-react'
 import { getProjectApiErrorMessage } from '@/components/project/projectApiError'
+import InlineDateCalendar from '@/components/project/questions/InlineDateCalendar'
 import ProjectSelectedTypeHeader from '@/components/project/ProjectSelectedTypeHeader'
 import {
   readServiceComponentPayloadValue,
@@ -555,18 +555,13 @@ export default function DeliverableStageQuestion({
       ) : null}
 
       <div
-        className={`mt-6 rounded-[10px] border border-white/30 bg-white/45 p-5 shadow-sm backdrop-blur-md sm:p-6 ${
+        className={`mt-6 rounded-[10px] p-5  sm:p-6 ${
           stepKind === 'report_type' ? 'pb-32 sm:pb-6' : ''
         }`}
       >
         {stepKind === 'date' ? (
-          <label className="block max-w-sm">
-            <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wide text-slate-600 text-start">
-              <IconCalendarDue className="h-4 w-4 text-sky-600" stroke={2.4} aria-hidden="true" />
-              <span>{isRTL ? 'تاريخ التسليم' : 'Delivery date'}</span>
-            </div>
-            <input
-              type="date"
+          <div className="max-w-sm">
+            <InlineDateCalendar
               value={currentDraft.date}
               min={
                 stage === 'first_draft'
@@ -576,17 +571,18 @@ export default function DeliverableStageQuestion({
                     : addDaysToIsoDate(drafts.first_draft.date, 1) || addDaysIsoDate(1)
               }
               max={isUrgentProject ? addDaysIsoDate(1) : undefined}
-              onChange={(e) =>
-                updateCurrentDraft({ ...currentDraft, date: e.target.value })
+              onChange={(date) =>
+                updateCurrentDraft({ ...currentDraft, date })
               }
-              className="mt-2 w-full rounded-[10px] border border-slate-200 bg-white/90 px-4 py-3 text-sm font-semibold text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-200"
+              locale={locale}
+              label={isRTL ? 'تاريخ التسليم' : 'Delivery date'}
             />
             {dateValidationMessage ? (
               <p className="mt-2 text-xs font-semibold text-rose-600">
                 {dateValidationMessage}
               </p>
             ) : null}
-          </label>
+          </div>
         ) : null}
 
         {stepKind === 'report_type' ? (

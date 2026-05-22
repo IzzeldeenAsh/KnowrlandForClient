@@ -164,7 +164,7 @@ export default function TargetMarketQuestion({ locale }: { locale: WizardLocale 
     setLoading('countries')
     try {
       const list = await fetchList<Country>(
-        'https://api.foresighta.co/api/common/setting/country/list',
+        'https://api.insightabusiness.com/api/common/setting/country/list',
         locale
       )
       setCountries(list.filter((c) => c.status !== 'inactive'))
@@ -187,7 +187,7 @@ export default function TargetMarketQuestion({ locale }: { locale: WizardLocale 
     setLoading('regions')
     try {
       const list = await fetchList<Region>(
-        'https://api.foresighta.co/api/common/setting/region/list',
+        'https://api.insightabusiness.com/api/common/setting/region/list',
         locale
       )
       setRegions(list)
@@ -210,7 +210,7 @@ export default function TargetMarketQuestion({ locale }: { locale: WizardLocale 
     setLoading('blocs')
     try {
       const list = await fetchList<EconomicBloc>(
-        'https://api.foresighta.co/api/common/setting/economic-bloc/list',
+        'https://api.insightabusiness.com/api/common/setting/economic-bloc/list',
         locale
       )
       setBlocs(list)

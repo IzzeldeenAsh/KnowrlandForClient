@@ -579,7 +579,7 @@ export default function TransactionsTab() {
           return;
         }
 
-        const url = new URL('https://api.foresighta.co/api/admin/fund/platform/transaction');
+        const url = new URL('https://api.insightabusiness.com/api/admin/fund/platform/transaction');
         url.searchParams.set('page', String(page));
         url.searchParams.set('per_page', String(perPageValue));
         url.searchParams.set('per_time', period);
@@ -625,7 +625,7 @@ export default function TransactionsTab() {
         return;
       }
 
-      const response = await fetch('https://api.foresighta.co/api/admin/fund/platform/balance', {
+      const response = await fetch('https://api.insightabusiness.com/api/admin/fund/platform/balance', {
         method: 'GET',
         cache: 'no-store',
         signal,
@@ -657,7 +657,7 @@ export default function TransactionsTab() {
           return;
         }
 
-        const url = new URL('https://api.foresighta.co/api/admin/fund/platform/statistics');
+        const url = new URL('https://api.insightabusiness.com/api/admin/fund/platform/statistics');
         url.searchParams.set('per_time', period);
 
         const response = await fetch(url.toString(), {
@@ -753,7 +753,7 @@ export default function TransactionsTab() {
         return;
       }
 
-      const url = new URL('https://api.foresighta.co/api/admin/fund/platform/transaction/list');
+      const url = new URL('https://api.insightabusiness.com/api/admin/fund/platform/transaction/list');
       url.searchParams.set('start_date', buildDateTimeParam(startDate, 'start'));
       url.searchParams.set('end_date', buildDateTimeParam(endDate, 'end'));
 

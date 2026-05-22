@@ -34,7 +34,7 @@ npm run build
 npm run start
 ```
 
-Then visit: `http://localhost:3000` and check:
+Then visit: `https://insightabusiness.com` and check:
 - Browser tab shows favicon
 - View source shows all icon link tags
 - Check browser DevTools > Network tab for favicon requests
@@ -56,11 +56,11 @@ After deployment, view the page source of your production site:
 ### 3. Test Favicon URLs Directly
 
 Visit these URLs directly to ensure they load:
-- `http://localhost:3000/favicon.ico`
-- `http://localhost:3000/icon.png`
-- `http://localhost:3000/icons-192.png`
-- `http://localhost:3000/icons-512.png`
-- `http://localhost:3000/apple-touch-icon.png`
+- `https://insightabusiness.com/favicon.ico`
+- `https://insightabusiness.com/icon.png`
+- `https://insightabusiness.com/icons-192.png`
+- `https://insightabusiness.com/icons-512.png`
+- `https://insightabusiness.com/apple-touch-icon.png`
 
 ### 4. Google Search Console
 
@@ -81,7 +81,7 @@ After deployment:
 
 ```bash
 # After deployment, ping Google to re-crawl
-# Visit: https://www.google.com/ping?sitemap=http://localhost:3000/sitemap.xml
+# Visit: https://www.google.com/ping?sitemap=https://insightabusiness.com/sitemap.xml
 ```
 
 ## Common Issues and Solutions
