@@ -416,7 +416,7 @@ export default function Hero() {
                 </div> */}
 
                 {/* Start a Project button */}
-                {/* <div className="mt-10 flex justify-center">
+                 {/* <div className="mt-10 flex justify-center">
                   <a
                     ref={projectButtonRef}
                     onMouseMove={handleProjectButtonMove}
@@ -517,7 +517,7 @@ export default function Hero() {
                       </span>
                     </span>
                   </a>
-                </div> */}
+                </div>  */}
               </div>
             </div>
           </div>

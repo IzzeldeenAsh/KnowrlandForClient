@@ -23,7 +23,7 @@ import { getAuthToken } from "@/lib/authToken";
 
 
 // Initialize Stripe
-const stripePromise = loadStripe("pk_live_51RvbpYRIE7WtDi9SLKPBxKTPyTkULT1e36AZMOcmtUomKgW99akiph2PVg5mmUcPtyAjvlXwP1wy70OFvooJLpQc00CNQYKb96");
+const stripePromise = loadStripe("pk_test_51RpQiFL3mrWP7a0P1OYWGeFJWtgMwcWJtiEDLvn29CpYn5x8Ou77YViA1yoimlixKU5aUAeOeN5VTfoC4sMpvFVF00qq9a6BNm");
 
 interface MeetingTime {
   start_time: string;
@@ -39,7 +39,7 @@ interface MeetingAvailability {
 interface MeetTabProps {
   locale: string;
   isRTL: boolean;
-  profileData: any;
+  profileData: { first_name?: string | null } | null;
   isAuthenticated: boolean;
   loadingMeetings: boolean;
   meetingAvailability: MeetingAvailability[];
@@ -62,6 +62,21 @@ interface MeetTabProps {
   formatDateString: (year: number, month: number, day: number) => string;
   getDayName: (locale: string, date: Date) => string;
 }
+
+const isSuccessfulMeetingPaymentStatus = (
+  order?: { status?: string | null; payment_status?: string | null } | null
+) => {
+  const status = order?.status?.toLowerCase();
+  const paymentStatus = order?.payment_status?.toLowerCase();
+
+  return (
+    status === "paid" ||
+    status === "completed" ||
+    status === "completed_pending_payment" ||
+    paymentStatus === "completed" ||
+    paymentStatus === "completed_pending_payment"
+  );
+};
 
 // Stripe Payment Form Component
 interface StripePaymentFormProps {
@@ -548,7 +563,7 @@ export default function MeetTab({
         if (!response.ok) throw new Error("Failed to check payment status");
 
         const data = await response.json();
-        return data.data?.status === "paid" || data.data?.payment_status === "completed";
+        return isSuccessfulMeetingPaymentStatus(data.data);
       } catch (error) {
         console.error("Error checking payment status:", error);
         return false;
@@ -716,7 +731,7 @@ export default function MeetTab({
           throw new Error("Payment setup failed - missing payment information");
         }
       }
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error("Error booking meeting:", error);
       setBookingError(
         error instanceof Error ? error.message : "Failed to book meeting"
@@ -764,9 +779,7 @@ export default function MeetTab({
           );
           if (verifyResp.ok) {
             const verifyData = await verifyResp.json();
-            const isPaid =
-              verifyData?.data?.status === "paid" ||
-              verifyData?.data?.payment_status === "completed";
+            const isPaid = isSuccessfulMeetingPaymentStatus(verifyData?.data);
             if (isPaid) {
               setStripeErrorMessage(null);
               setShowSuccessUI(true);
