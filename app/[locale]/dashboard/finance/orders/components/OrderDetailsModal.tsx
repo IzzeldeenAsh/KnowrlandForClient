@@ -23,9 +23,14 @@ function formatCurrency(amount: number, currency: string): string {
 function formatDate(dateString: string): string {
   const value = normalizeText(dateString);
   if (!value) return '-';
+  const dateOnlyMatch = value.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+  if (dateOnlyMatch) {
+    const [, year, month, day] = dateOnlyMatch;
+    return new Date(Number(year), Number(month) - 1, Number(day)).toLocaleDateString();
+  }
   const date = new Date(value);
   if (Number.isNaN(date.getTime())) return value;
-  return date.toLocaleString();
+  return date.toLocaleDateString();
 }
 
 function toTitle(value: string): string {
