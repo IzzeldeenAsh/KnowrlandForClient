@@ -17,6 +17,11 @@ export interface Notification {
   tap?: string
   sub_type_value?: string
   category?: string
+  /**
+   * The Pusher event name captured on realtime broadcasts (e.g. 'project.match.invited').
+   * Absent on REST history; routing falls back to sub_type + role in that case.
+   */
+  event_name?: string
 }
 
 // Singleton pattern to prevent multiple instances

@@ -38,14 +38,33 @@ type NotificationBellProps = {
   parent?: 'client' | 'app';
 };
 
+// Project-related events broadcast by the Laravel backend (Pusher cluster `eu`).
+// These are routed to the Angular dashboard via routeForNotification(). See
+// utils/notificationRoute.ts for the per-event target URLs.
+const PROJECT_EVENTS = [
+  'project.proposal.offer',
+  'project.match.invited',
+  'project.client.closed',
+  'project.insighter.closed',
+  'project.client.contract',
+  'project.insighter.contract',
+  'project.review.submission',
+  'project.review.submission.reviewed',
+  'project.file.uploaded',
+  'project.service.started',
+  'order.project',
+] as const
+
 export default function NotificationBell({ parent = 'client' }: NotificationBellProps) {
-  const { user } = useUserProfile()
+  const { user, roles } = useUserProfile()
   const token = getAuthToken()
  const params = useParams();
     const currentLocale = params.locale as string;
-    
-  // Map realtime event payloads to our Notification shape
-  const mapEventToNotification = (data: any): Notification => {
+
+  // Map realtime event payloads to our Notification shape.
+  // `eventName` is the Pusher event name; capturing it makes routing reliable
+  // (some events share the same sub_type).
+  const mapEventToNotification = (data: any, eventName?: string): Notification => {
     return {
       id: data?.id ?? `evt-${Date.now()}`,
       message: data?.message ?? '',
@@ -55,11 +74,13 @@ export default function NotificationBell({ parent = 'client' }: NotificationBell
       request_id: data?.request_id ?? 0,
       param: data?.param ?? null,
       sub_type: data?.sub_type ?? 'info',
+      sub_type_value: data?.sub_type_value,
       redirect_page: !!data?.redirect_page,
       read_at: undefined,
       sub_page: data?.sub_page,
       tap: data?.tap,
       category: data?.category,
+      event_name: data?.event_name ?? eventName,
     }
   }
 
@@ -108,24 +129,30 @@ export default function NotificationBell({ parent = 'client' }: NotificationBell
       'meeting.insighter_meeting_reminder',
       'meeting.insighter_meeting_client_new',
       'requests.action',
-      'requests'
+      'requests',
+      ...PROJECT_EVENTS,
     ]
-    const handler = (data: any) => {
-      const next = mapEventToNotification(data)
-      // Insert at top; keep unread (read_at undefined) so badge increases
-      setNotifications(prev => [next, ...prev])
-    }
-    events.forEach(evt => channel.bind(evt, handler))
+    // Bind each event with a per-event closure so we can capture the event name
+    // onto the notification (needed for reliable project routing).
+    const handlers = events.map((evt) => {
+      const handler = (data: any) => {
+        const next = mapEventToNotification(data, evt)
+        // Insert at top; keep unread (read_at undefined) so badge increases
+        setNotifications(prev => (prev.some(n => n.id === next.id) ? prev : [next, ...prev]))
+      }
+      channel.bind(evt, handler)
+      return { evt, handler }
+    })
     // Fallback: also listen globally to catch any server-side event names
     const globalHandler = (eventName: string, data: any) => {
       if (eventName.startsWith('pusher:') || eventName.startsWith('pusher_internal:')) return
-      const next = mapEventToNotification(data)
+      const next = mapEventToNotification(data, eventName)
       setNotifications(prev => (prev.some(n => n.id === next.id) ? prev : [next, ...prev]))
     }
     bindGlobal(globalHandler)
     return () => {
       try {
-        events.forEach(evt => channel.unbind(evt, handler))
+        handlers.forEach(({ evt, handler }) => channel.unbind(evt, handler))
         unbindGlobal(globalHandler)
         unsubscribePrivateUser(user.id)
       } catch {}
@@ -224,9 +251,10 @@ export default function NotificationBell({ parent = 'client' }: NotificationBell
             className={`absolute top-0 bottom-0 ${isRTL ? 'left-0' : 'right-0'} w-full max-w-md sm:max-w-lg bg-white shadow-xl transition-transform duration-300 ease-out transform ${isOpen ? 'translate-x-0' : (isRTL ? '-translate-x-full' : 'translate-x-full')}`}
             onClick={e => e.stopPropagation()}
           >
-            <NotificationsInner 
+            <NotificationsInner
               parent={parent}
-              onNotificationClick={handleNotificationClick} 
+              roles={roles ?? user?.roles ?? []}
+              onNotificationClick={handleNotificationClick}
               notifications={notifications}
               onClickOutside={closeNotifications}
             />

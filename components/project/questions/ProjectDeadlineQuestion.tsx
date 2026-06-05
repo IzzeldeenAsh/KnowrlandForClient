@@ -11,6 +11,7 @@ import InlineDateCalendar from './InlineDateCalendar'
 import ProjectSelectedTypeHeader from '../ProjectSelectedTypeHeader'
 import { useProjectWizardNavigation } from '../useProjectWizardNavigation'
 import { projectWizardStorage, type WizardLocale } from '../wizardStorage'
+import UrgentDateNotice from './UrgentDateNotice'
 
 type DeliverableStagePayload = {
   final_version?: {
@@ -66,12 +67,13 @@ export default function ProjectDeadlineQuestion({
   const storageKey = projectWizardStorage.deadlineKey(locale)
   const today = todayString()
   const tomorrow = addDaysString(1)
-  const minimumDeadline = finalDraftDate || today
   const isUrgentProject = normalizeProjectType(projectType) === 'urgent_request'
+  const minimumDeadline = isUrgentProject ? tomorrow : finalDraftDate || today
   const isBeforeMinimumDate = dateValue !== '' && dateValue < minimumDeadline
   const isAfterUrgentMaxDate =
     isUrgentProject && dateValue !== '' && dateValue > tomorrow
-  const isUrgentDeadline = dateValue === tomorrow && dateValue >= minimumDeadline
+  const isUrgentDeadline =
+    !isUrgentProject && dateValue === tomorrow && dateValue >= minimumDeadline
 
   useEffect(() => {
     const timer = window.setTimeout(() => setEntered(true), 30)
@@ -153,7 +155,11 @@ export default function ProjectDeadlineQuestion({
   const validationError = !dateValue
     ? null
     : isBeforeMinimumDate
-      ? finalDraftDate
+      ? isUrgentProject
+        ? isRTL
+          ? 'هذا اليوم فقط متاح لأن الطلبات العاجلة يجب أن تكون خلال 24 ساعة.'
+          : 'Only this date is available because urgent requests are 24-hour requests.'
+        : finalDraftDate
         ? isRTL
           ? 'يجب أن يكون موعد تسليم المشروع في نفس يوم النسخة النهائية أو بعدها.'
           : 'Project deadline must be the same day as the final draft or after it.'
@@ -236,6 +242,7 @@ export default function ProjectDeadlineQuestion({
               locale={locale}
               label={isRTL ? 'الموعد النهائي للتسليم' : 'Delivery deadline'}
             />
+            {isUrgentProject ? <UrgentDateNotice locale={locale} /> : null}
             {finalDraftDate ? (
               <p className="mt-3 text-xs font-semibold text-slate-500">
                 {isRTL

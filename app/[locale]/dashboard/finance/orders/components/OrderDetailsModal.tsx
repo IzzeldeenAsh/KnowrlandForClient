@@ -1,6 +1,6 @@
 'use client';
 
-import type { OrderRecord } from './types';
+import type { FulfillmentAttempt, OrderRecord, Payment, PaymentFailureLog } from './types';
 
 const SECTION_TITLE_CLASS = 'text-sm font-semibold text-slate-900';
 const LABEL_CLASS = 'text-[11px] font-semibold text-slate-500';
@@ -81,6 +81,29 @@ function getRoleBadgeClass(role: string): string {
   return 'bg-slate-50 text-slate-700 ring-1 ring-slate-200';
 }
 
+function getOrderPayments(order: OrderRecord): Payment[] {
+  if (Array.isArray(order.payments) && order.payments.length > 0) return order.payments;
+  return order.payment ? [order.payment] : [];
+}
+
+function getPaymentConfirmedAt(payment: Payment): string | null | undefined {
+  return payment.payment_intent_confirmed_at ?? payment.charge_succeeded_at ?? payment.confirmed_at;
+}
+
+function getPaymentFailureLogs(payment: Payment): PaymentFailureLog[] {
+  return Array.isArray(payment.failure_logs) ? payment.failure_logs.filter(Boolean) : [];
+}
+
+function getFulfillmentAttempts(order: OrderRecord): FulfillmentAttempt[] {
+  if (Array.isArray(order.fulfillment_attempts) && order.fulfillment_attempts.length > 0) {
+    return order.fulfillment_attempts;
+  }
+
+  return getOrderPayments(order).flatMap((payment) =>
+    Array.isArray(payment.fulfillment_attempts) ? payment.fulfillment_attempts : [],
+  );
+}
+
 export default function OrderDetailsModal({
   isOpen,
   order,
@@ -103,11 +126,12 @@ export default function OrderDetailsModal({
   const insighterUuid = normalizeText(order.insighter?.uuid);
   const orderItems = order.orderable ?? order.order_data;
   const meetingBooking = orderItems?.meeting_booking;
+  const projectItem = orderItems?.project;
   const knowledgeItems = Array.isArray(orderItems?.knowledge) ? orderItems.knowledge : [];
   const knowledgeDocuments = Array.isArray(orderItems?.knowledge_documents) ? orderItems.knowledge_documents.flat() : [];
-  const paymentConfirmedAt =
-    order.payment?.payment_intent_confirmed_at ?? order.payment?.charge_succeeded_at ?? order.payment?.confirmed_at;
-  const hasOrderItems = Boolean(meetingBooking) || knowledgeItems.length > 0 || knowledgeDocuments.length > 0;
+  const payments = getOrderPayments(order);
+  const fulfillmentAttempts = getFulfillmentAttempts(order);
+  const hasOrderItems = Boolean(meetingBooking) || Boolean(projectItem) || knowledgeItems.length > 0 || knowledgeDocuments.length > 0;
 
   return (
     <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-slate-900/40 px-4 py-8">
@@ -150,33 +174,155 @@ export default function OrderDetailsModal({
             <div className="rounded-md border border-slate-200 bg-white p-4 shadow-sm">
               <div className="flex items-center justify-between">
                 <div className={SECTION_TITLE_CLASS}>Payment Information</div>
-                <span className={`inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-semibold ${getStatusBadgeClass(order.payment?.status ?? '')}`}>
-                  {toTitle(normalizeText(order.payment?.status) || 'unknown')}
+                <span className="rounded-full bg-slate-50 px-2 py-0.5 text-[10px] font-semibold text-slate-700 ring-1 ring-slate-200">
+                  {payments.length === 1 ? '1 Payment' : `${payments.length} Payments`}
                 </span>
               </div>
 
-              <div className="mt-3 grid grid-cols-1 gap-2 sm:grid-cols-2">
-                <div>
-                  <div className={LABEL_CLASS}>Method</div>
-                  <div className={`${VALUE_CLASS} mt-1`}>{getPaymentMethodLabel(order.payment?.method ?? '')}</div>
+              {payments.length > 0 ? (
+                <div className="mt-3 space-y-3">
+                  {payments.map((payment, idx) => {
+                    const paymentStatus = normalizeText(payment.status) || 'unknown';
+                    const paymentType = normalizeText(payment.type);
+                    const paymentConfirmedAt = getPaymentConfirmedAt(payment);
+                    const failureLogs = getPaymentFailureLogs(payment);
+
+                    return (
+                      <div key={`${payment.invoice_no ?? payment.type ?? payment.method}-${idx}`} className="rounded-md border border-slate-200 bg-slate-50 p-3">
+                        <div className="flex flex-wrap items-center justify-between gap-2">
+                          <div className="flex flex-wrap items-center gap-2">
+                            <span className="text-xs font-semibold text-slate-900">Payment {idx + 1}</span>
+                            {paymentType ? (
+                              <span className="rounded-full bg-blue-50 px-2 py-0.5 text-[10px] font-semibold text-blue-700 ring-1 ring-blue-200">
+                                {toTitle(paymentType)}
+                              </span>
+                            ) : null}
+                          </div>
+                          <span className={`inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-semibold ${getStatusBadgeClass(paymentStatus)}`}>
+                            {toTitle(paymentStatus)}
+                          </span>
+                        </div>
+
+                        <div className="mt-3 grid grid-cols-1 gap-2 sm:grid-cols-2">
+                          <div>
+                            <div className={LABEL_CLASS}>Method</div>
+                            <div className={`${VALUE_CLASS} mt-1`}>{getPaymentMethodLabel(payment.method)}</div>
+                          </div>
+                          <div>
+                            <div className={LABEL_CLASS}>Amount</div>
+                            <div className={`${VALUE_CLASS} mt-1`}>{formatCurrency(payment.amount ?? order.amount, payment.currency ?? order.currency)}</div>
+                          </div>
+                          {normalizeText(payment.invoice_no) ? (
+                            <div>
+                              <div className={LABEL_CLASS}>Invoice Number</div>
+                              <div className={`${VALUE_CLASS} mt-1`}>{normalizeText(payment.invoice_no)}</div>
+                            </div>
+                          ) : null}
+                          {payment.provider ? (
+                            <div>
+                              <div className={LABEL_CLASS}>Provider</div>
+                              <div className={`${VALUE_CLASS} mt-1`}>{normalizeText(payment.provider) || '-'}</div>
+                            </div>
+                          ) : null}
+                          {paymentConfirmedAt ? (
+                            <div>
+                              <div className={LABEL_CLASS}>Confirmed</div>
+                              <div className={`${VALUE_CLASS} mt-1`}>{formatDate(paymentConfirmedAt)}</div>
+                            </div>
+                          ) : null}
+                        </div>
+
+                        {failureLogs.length > 0 ? (
+                          <div className="mt-3 rounded-md border border-red-200 bg-white p-3">
+                            <div className="flex items-center justify-between gap-2">
+                              <div className="text-xs font-semibold text-red-700">Payment Failure Logs</div>
+                              <span className="rounded-full bg-red-50 px-2 py-0.5 text-[10px] font-semibold text-red-700 ring-1 ring-red-200">
+                                {failureLogs.length}
+                              </span>
+                            </div>
+
+                            <div className="mt-2 space-y-2">
+                              {failureLogs.map((failure, failureIdx) => {
+                                const failureMessage = normalizeText(failure.failure_message) || 'Payment failed';
+                                const failureStatus = normalizeText(failure.payment_status);
+                                const failureCode = normalizeText(failure.failure_code);
+                                const declineCode = normalizeText(failure.decline_code);
+                                const failureType = normalizeText(failure.failure_type);
+                                const occurredAt = normalizeText(failure.occurred_at);
+                                const paymentIntentId = normalizeText(failure.stripe_payment_intent_id);
+                                const chargeId = normalizeText(failure.stripe_charge_id);
+
+                                return (
+                                  <div key={`${paymentIntentId || chargeId || failureMessage}-${failureIdx}`} className="rounded border border-red-100 bg-red-50/40 p-2">
+                                    <div className="text-xs font-semibold text-red-800">{failureMessage}</div>
+                                    <div className="mt-2 grid grid-cols-1 gap-2 sm:grid-cols-2">
+                                      {occurredAt ? (
+                                        <div>
+                                          <div className={LABEL_CLASS}>Occurred</div>
+                                          <div className={`${VALUE_CLASS} mt-1`}>{formatDate(occurredAt)}</div>
+                                        </div>
+                                      ) : null}
+                                      <div>
+                                        <div className={LABEL_CLASS}>Failed Amount</div>
+                                        <div className={`${VALUE_CLASS} mt-1`}>
+                                          {formatCurrency(failure.amount ?? payment.amount ?? order.amount, failure.currency ?? payment.currency ?? order.currency)}
+                                        </div>
+                                      </div>
+                                      {failureStatus ? (
+                                        <div>
+                                          <div className={LABEL_CLASS}>Payment Status</div>
+                                          <div className={`${VALUE_CLASS} mt-1`}>{toTitle(failureStatus)}</div>
+                                        </div>
+                                      ) : null}
+                                      {normalizeText(failure.payment_method_type) ? (
+                                        <div>
+                                          <div className={LABEL_CLASS}>Method Type</div>
+                                          <div className={`${VALUE_CLASS} mt-1`}>{toTitle(normalizeText(failure.payment_method_type))}</div>
+                                        </div>
+                                      ) : null}
+                                      {failureCode || declineCode || failureType ? (
+                                        <div className="sm:col-span-2">
+                                          <div className={LABEL_CLASS}>Failure Codes</div>
+                                          <div className={`${VALUE_CLASS} mt-1`}>
+                                            {[failureType, failureCode, declineCode].filter(Boolean).map(toTitle).join(' / ')}
+                                          </div>
+                                        </div>
+                                      ) : null}
+                                      {paymentIntentId ? (
+                                        <div className="sm:col-span-2">
+                                          <div className={LABEL_CLASS}>Payment Intent</div>
+                                          <div className="mt-1 break-all text-[11px] font-medium text-slate-700">{paymentIntentId}</div>
+                                        </div>
+                                      ) : null}
+                                      {chargeId ? (
+                                        <div className="sm:col-span-2">
+                                          <div className={LABEL_CLASS}>Charge</div>
+                                          <div className="mt-1 break-all text-[11px] font-medium text-slate-700">{chargeId}</div>
+                                        </div>
+                                      ) : null}
+                                      {normalizeText(failure.stripe_event_type) ? (
+                                        <div className="sm:col-span-2">
+                                          <div className={LABEL_CLASS}>Stripe Event</div>
+                                          <div className="mt-1 break-all text-[11px] font-medium text-slate-700">
+                                            {normalizeText(failure.stripe_event_type)}
+                                            {normalizeText(failure.stripe_object_type) ? ` / ${normalizeText(failure.stripe_object_type)}` : ''}
+                                          </div>
+                                        </div>
+                                      ) : null}
+                                    </div>
+                                  </div>
+                                );
+                              })}
+                            </div>
+                          </div>
+                        ) : null}
+                      </div>
+                    );
+                  })}
                 </div>
-                <div>
-                  <div className={LABEL_CLASS}>Amount</div>
-                  <div className={`${VALUE_CLASS} mt-1`}>{formatCurrency(order.payment?.amount ?? order.amount, order.payment?.currency ?? order.currency)}</div>
-                </div>
-                {order.payment?.provider ? (
-                  <div>
-                    <div className={LABEL_CLASS}>Provider</div>
-                    <div className={`${VALUE_CLASS} mt-1`}>{normalizeText(order.payment.provider) || '-'}</div>
-                  </div>
-                ) : null}
-                {paymentConfirmedAt ? (
-                  <div>
-                    <div className={LABEL_CLASS}>Confirmed</div>
-                    <div className={`${VALUE_CLASS} mt-1`}>{formatDate(paymentConfirmedAt)}</div>
-                  </div>
-                ) : null}
-              </div>
+              ) : (
+                <div className="mt-3 text-xs text-slate-500">No payments found.</div>
+              )}
             </div>
 
             <div className="rounded-md border border-slate-200 bg-white p-4 shadow-sm">
@@ -390,16 +536,58 @@ export default function OrderDetailsModal({
                 </div>
               ) : null}
 
+              {projectItem ? (
+                <div>
+                  <div className="text-xs font-semibold text-slate-700">Project</div>
+                  <div className="mt-2 rounded-md border border-slate-200 bg-slate-50 p-3">
+                    <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
+                      <div>
+                        <div className={LABEL_CLASS}>Project No</div>
+                        <div className={`${VALUE_CLASS} mt-1`}>{normalizeText(projectItem.project_no) || '-'}</div>
+                      </div>
+                      <div>
+                        <div className={LABEL_CLASS}>Title</div>
+                        <div className={`${VALUE_CLASS} mt-1`}>{normalizeText(projectItem.title) || '-'}</div>
+                      </div>
+                      {normalizeText(projectItem.status) ? (
+                        <div>
+                          <div className={LABEL_CLASS}>Status</div>
+                          <div className="mt-1">
+                            <span className={`inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-semibold ${getStatusBadgeClass(normalizeText(projectItem.status))}`}>
+                              {toTitle(normalizeText(projectItem.status))}
+                            </span>
+                          </div>
+                        </div>
+                      ) : null}
+                      {normalizeText(projectItem.stage) ? (
+                        <div>
+                          <div className={LABEL_CLASS}>Stage</div>
+                          <div className={`${VALUE_CLASS} mt-1`}>{toTitle(normalizeText(projectItem.stage))}</div>
+                        </div>
+                      ) : null}
+                    </div>
+                    {normalizeText(projectItem.description) ? (
+                      <div className="mt-3">
+                        <div className={LABEL_CLASS}>Description</div>
+                        <div className={`${VALUE_CLASS} mt-1 whitespace-pre-wrap text-slate-700`}>
+                          {normalizeText(projectItem.description)}
+                        </div>
+                      </div>
+                    ) : null}
+                  </div>
+                </div>
+              ) : null}
+
               {!hasOrderItems ? <div className="text-xs text-slate-500">No order items.</div> : null}
             </div>
           </div>
 
-          {Array.isArray(order.fulfillment_attempts) && order.fulfillment_attempts.length > 0 ? (
+          {fulfillmentAttempts.length > 0 ? (
             <div className="mt-4 rounded-md border border-slate-200 bg-white p-4 shadow-sm">
               <div className={SECTION_TITLE_CLASS}>Fulfillment Timeline</div>
 
               <div className="mt-3 space-y-3">
-                {order.fulfillment_attempts.map((attempt, idx) => {
+                {fulfillmentAttempts.map((attempt, idx) => {
                   const attemptStatus = normalizeText(attempt.status) || 'unknown';
                   const ok = attemptStatus.toLowerCase() === 'succeeded' || attemptStatus.toLowerCase() === 'completed';
 

@@ -36,12 +36,13 @@ const TAB_BUTTON_CLASS =
 const SELECT_CLASS =
   'h-8 rounded-md border border-slate-200 bg-white px-3 text-xs text-slate-700 shadow-sm outline-none focus:border-blue-400 focus:border-[1px]';
 
-type OrderTabKey = 'knowledge' | 'meetings';
+type OrderTabKey = 'knowledge' | 'meetings' | 'projects';
 type CompletionFilter = 'all' | 'complete' | 'incomplete';
 
 const ORDER_TAB_CONFIG: Array<{ key: OrderTabKey; label: string; endpoint: string }> = [
   { key: 'knowledge', label: 'Insight', endpoint: 'https://api.insightabusiness.com/api/admin/order/knowledge' },
   { key: 'meetings', label: 'Meetings', endpoint: 'https://api.insightabusiness.com/api/admin/order/meeting' },
+  { key: 'projects', label: 'Projects', endpoint: 'https://api.insightabusiness.com/api/admin/order/project' },
 ];
 
 const COMPLETION_FILTER_OPTIONS: Array<{ value: CompletionFilter; label: string }> = [
@@ -80,14 +81,6 @@ function getFulfillmentBadgeClass(status: string): string {
   if (normalized === 'pending') return 'bg-amber-50 text-amber-700 ring-1 ring-amber-200';
   if (normalized === 'failed') return 'bg-red-50 text-red-700 ring-1 ring-red-200';
   return 'bg-slate-100 text-slate-700 ring-1 ring-slate-200';
-}
-
-function getPaymentMethodLabel(method: string): string {
-  const normalized = normalizeText(method).toLowerCase();
-  if (normalized === 'free') return 'Free';
-  if (normalized === 'provider') return 'Payment Provider';
-  if (normalized === 'manual') return 'Wallet Payment';
-  return normalizeText(method) || '-';
 }
 
 function getUserTypeBadgeClass(type: string): string {
@@ -344,15 +337,13 @@ export default function OrdersTab() {
 
       <div className="mt-4 overflow-hidden rounded-md border border-slate-200 bg-white shadow-sm">
         <div className="overflow-x-auto">
-          <table className="min-w-[930px] w-full border-collapse text-xs text-slate-700">
+          <table className="min-w-[760px] w-full border-collapse text-xs text-slate-700">
             <thead className="bg-slate-50/90 text-[11px] font-semibold uppercase tracking-wide text-slate-500">
               <tr>
                 <th className="w-[190px] whitespace-nowrap border-b border-slate-200 px-3 py-2.5 text-left">Order No</th>
                 <th className="w-[180px] whitespace-nowrap border-b border-slate-200 px-3 py-2.5 text-left">Date</th>
                 <th className="w-[140px] whitespace-nowrap border-b border-slate-200 px-3 py-2.5 text-left">Amount</th>
                 <th className="w-[150px] whitespace-nowrap border-b border-slate-200 px-3 py-2.5 text-left">Order Status</th>
-                <th className="w-[150px] whitespace-nowrap border-b border-slate-200 px-3 py-2.5 text-left">Payment Status</th>
-                <th className="w-[180px] whitespace-nowrap border-b border-slate-200 px-3 py-2.5 text-left">Payment Method</th>
                 <th className="w-[170px] whitespace-nowrap border-b border-slate-200 px-3 py-2.5 text-left">Fulfillment</th>
                 <th className="w-[120px] whitespace-nowrap border-b border-slate-200 px-3 py-2.5 text-right">Actions</th>
               </tr>
@@ -360,26 +351,25 @@ export default function OrdersTab() {
             <tbody>
               {isLoading ? (
                 <tr>
-                  <td colSpan={8} className="px-4 py-10 text-center text-sm text-slate-500">
+                  <td colSpan={6} className="px-4 py-10 text-center text-sm text-slate-500">
                     Loading...
                   </td>
                 </tr>
               ) : error ? (
                 <tr>
-                  <td colSpan={8} className="px-4 py-10 text-center text-sm text-red-600">
+                  <td colSpan={6} className="px-4 py-10 text-center text-sm text-red-600">
                     {error}
                   </td>
                 </tr>
               ) : orders.length === 0 ? (
                 <tr>
-                  <td colSpan={8} className="px-4 py-10 text-center text-sm text-slate-500">
+                  <td colSpan={6} className="px-4 py-10 text-center text-sm text-slate-500">
                     No orders found.
                   </td>
                 </tr>
               ) : (
                 orders.map((order) => {
                   const orderStatus = normalizeText(order.status) || 'unknown';
-                  const paymentStatus = normalizeText(order.payment?.status) || 'unknown';
                   const fulfillment = normalizeText(order.fulfillment_staus) || 'unknown';
                   const userType = normalizeText(order.user?.type);
                   return (
@@ -401,16 +391,6 @@ export default function OrdersTab() {
                       <td className="border-b border-slate-100 px-3 py-2.5">
                         <span className={`inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-semibold ${getStatusBadgeClass(orderStatus)}`}>
                           {toTitle(orderStatus)}
-                        </span>
-                      </td>
-                      <td className="border-b border-slate-100 px-3 py-2.5">
-                        <span className={`inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-semibold ${getStatusBadgeClass(paymentStatus)}`}>
-                          {toTitle(paymentStatus)}
-                        </span>
-                      </td>
-                      <td className="border-b border-slate-100 px-3 py-2.5">
-                        <span className="rounded-full bg-slate-50 px-2 py-0.5 text-[10px] font-semibold text-slate-700 ring-1 ring-slate-200">
-                          {getPaymentMethodLabel(order.payment?.method ?? '')}
                         </span>
                       </td>
                       <td className="border-b border-slate-100 px-3 py-2.5">

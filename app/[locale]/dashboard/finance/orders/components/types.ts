@@ -19,18 +19,30 @@ export type MeetingBooking = {
   description: string;
 };
 
+export type ProjectOrder = {
+  title?: string | null;
+  project_no?: string | null;
+  description?: string | null;
+  status?: string | null;
+  stage?: string | null;
+  service?: string | null;
+};
+
 export type Suborder = {
   knowledge?: KnowledgeItem[];
   knowledge_documents?: KnowledgeDocument[][];
   meeting_booking?: MeetingBooking;
+  project?: ProjectOrder;
 };
 
 export type Payment = {
+  type?: string | null;
   method: string;
   provider: string | null;
   amount: number;
   currency: string;
   status: string;
+  invoice_no?: string | null;
   confirmed_at?: string | null;
   provider_payment_method_type?: string | null;
   provider_card_last_number?: string | null;
@@ -39,6 +51,26 @@ export type Payment = {
   billing_address?: string | null;
   payment_intent_confirmed_at?: string | null;
   charge_succeeded_at?: string | null;
+  fulfillment_attempts?: FulfillmentAttempt[];
+  has_failures?: boolean | null;
+  latest_failure?: PaymentFailureLog | null;
+  failure_logs?: PaymentFailureLog[];
+};
+
+export type PaymentFailureLog = {
+  stripe_event_type?: string | null;
+  stripe_object_type?: string | null;
+  stripe_payment_intent_id?: string | null;
+  stripe_charge_id?: string | null;
+  amount?: number | null;
+  currency?: string | null;
+  payment_status?: string | null;
+  failure_code?: string | null;
+  decline_code?: string | null;
+  failure_type?: string | null;
+  failure_message?: string | null;
+  payment_method_type?: string | null;
+  occurred_at?: string | null;
 };
 
 export type FulfillmentUser = {
@@ -90,9 +122,10 @@ export type OrderRecord = {
   order_data?: Suborder;
   orderable?: Suborder;
   status: string;
-  payment: Payment;
+  payment?: Payment | null;
+  payments?: Payment[];
   fulfillment_staus: string;
-  fulfillment_attempts: FulfillmentAttempt[];
+  fulfillment_attempts?: FulfillmentAttempt[];
   knowledge_download_id?: string | null;
 };
 

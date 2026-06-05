@@ -8,6 +8,7 @@ import {
   readStoredSelectedMatchIds,
   submitProjectProposal,
 } from '@/components/project/projectProposalSubmit'
+import { isSpecifiedInsighterProject } from '@/components/project/specifiedInsighterProject'
 import { useProjectStepErrorToast } from '@/components/project/useProjectStepErrorToast'
 import { projectWizardStepIds } from '../projectWizardFlow'
 import InlineDateCalendar from './InlineDateCalendar'
@@ -86,7 +87,9 @@ export default function DeadlineOfferQuestion({
       setProjectType(storedProjectType)
       const stored = window.sessionStorage.getItem(storageKey)
       setDateValue(stored || defaultOfferExpiryDate(storedProjectType))
-      setSelectedMatchesCount(readStoredSelectedMatchIds(locale).length)
+      setSelectedMatchesCount(
+        isSpecifiedInsighterProject(locale) ? 1 : readStoredSelectedMatchIds(locale).length
+      )
     } catch {
       // ignore
     }
@@ -114,7 +117,9 @@ export default function DeadlineOfferQuestion({
               isRTL ? 'تعذر إرسال الطلب.' : 'Failed to submit project proposal.'
             )
 
-      setSelectedMatchesCount(readStoredSelectedMatchIds(locale).length)
+      setSelectedMatchesCount(
+        isSpecifiedInsighterProject(locale) ? 1 : readStoredSelectedMatchIds(locale).length
+      )
       setError(
         message
       )

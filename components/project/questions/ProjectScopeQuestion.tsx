@@ -13,6 +13,12 @@ import {
   readStoredProjectRequestUuid,
   writeStoredProjectRequestUuid,
 } from '@/components/project/projectRequestUuid'
+import {
+  clearStoredProposalMatchUuid,
+  extractProjectProposalMatchUuid,
+  writeStoredProposalMatchUuid,
+} from '@/components/project/projectProposalMatchUuid'
+import { readStoredSpecifiedInsighterUuid } from '@/components/project/specifiedInsighterProject'
 import { useProjectStepErrorToast } from '@/components/project/useProjectStepErrorToast'
 import { useProjectWizardNavigation } from '@/components/project/useProjectWizardNavigation'
 import { getApiUrl } from '@/app/config'
@@ -805,7 +811,14 @@ export default function ProjectScopeQuestion({ locale }: { locale: WizardLocale 
         'X-Timezone': Intl.DateTimeFormat().resolvedOptions().timeZone,
       }
 
-      const initRes = await fetch(getApiUrl('/api/account/project/definition/initiate'), {
+      const specifiedInsighterUuid = readStoredSpecifiedInsighterUuid(locale)
+      const initiatePath = specifiedInsighterUuid
+        ? `/api/account/project/definition/initiate-specific/${encodeURIComponent(
+            specifiedInsighterUuid
+          )}`
+        : '/api/account/project/definition/initiate'
+
+      const initRes = await fetch(getApiUrl(initiatePath), {
         method: 'POST',
         headers,
         body: JSON.stringify({
@@ -824,6 +837,14 @@ export default function ProjectScopeQuestion({ locale }: { locale: WizardLocale 
       const initJson = (await initRes.json()) as unknown
       const nextProjectUuid = extractProjectRequestUuid(initJson)
       if (!nextProjectUuid) throw new Error('init_bad_response')
+
+      if (specifiedInsighterUuid) {
+        const proposalMatchUuid = extractProjectProposalMatchUuid(initJson)
+        if (!proposalMatchUuid) throw new Error('init_bad_response')
+        writeStoredProposalMatchUuid(locale, proposalMatchUuid)
+      } else {
+        clearStoredProposalMatchUuid(locale)
+      }
 
       skipNextOtherRestoreRef.current = true
       setProjectUuid(nextProjectUuid)

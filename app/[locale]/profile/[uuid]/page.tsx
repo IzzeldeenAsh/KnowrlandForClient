@@ -17,6 +17,7 @@ import {
   IconBrandHipchat,
   IconCalendarTime,
   IconClock,
+  IconBriefcase,
 } from "@tabler/icons-react";
 
 import Toast from "@/components/toast/Toast";
@@ -37,6 +38,7 @@ import LinkedinSocialIcon from "@/app/components/icons/social/LinkedinSocialIcon
 import YoutubeSocialIcon from "@/app/components/icons/social/YoutubeSocialIcon";
 import XSocialIcon from "@/app/components/icons/social/XSocialIcon";
 import TiktokSocialIcon from "@/app/components/icons/social/TiktokSocialIcon";
+import { specifiedInsighterQueryParam } from "@/components/project/specifiedInsighterProject";
 
 
 
@@ -142,6 +144,7 @@ interface ProfileData {
   social: SocialLink[];
   company?: Company;
   insighter_company?: CompanyInsighter[];
+  receive_project_services_active?: boolean;
 }
 
 // Updated Knowledge interface to match API response
@@ -815,6 +818,11 @@ function ProfilePageContent() {
   const isCompany = profileData?.roles.includes("company");
   const isInsighter = profileData?.roles.includes("insighter");
   const isCompanyInsighter = profileData?.roles.includes("company-insighter");
+  const canRequestSpecifiedInsighterProject =
+    isViewingInsighterEntity &&
+    profileData?.receive_project_services_active === true;
+  const specifiedInsighterUuid = profileData?.uuid || uuid;
+  const specifiedInsighterProjectHref = `/${locale}/project/wizard/project-type?fresh=1&${specifiedInsighterQueryParam}=${encodeURIComponent(specifiedInsighterUuid)}`;
 
   // Function to handle pagination
   const handlePageChange = (page: number) => {
@@ -1581,7 +1589,7 @@ function ProfilePageContent() {
                   },
                 }}
               >
-                <Tabs.List className="border-b border-gray-200 dark:border-slate-700 bg-gray-50 dark:bg-slate-800/80">
+                <Tabs.List className="border-b border-gray-200 dark:border-slate-700 bg-gray-50 dark:bg-slate-800/80 flex flex-wrap items-center">
                   <Tabs.Tab
                     value="knowledge"
                     className="text-base font-medium px-8 py-4 transition"
@@ -1626,6 +1634,17 @@ function ProfilePageContent() {
                         {t("meet")} {profileData?.first_name || ""}
                       </Tabs.Tab>
                     )}
+                  {canRequestSpecifiedInsighterProject && (
+                    <div className="ms-auto flex items-center px-3 py-2">
+                      <Link
+                        href={specifiedInsighterProjectHref}
+                        className="inline-flex h-10 items-center gap-2 rounded-full bg-[#1C7CBB] px-4 text-sm font-semibold text-white shadow-sm transition hover:bg-[#166A9F] focus:outline-none focus:ring-2 focus:ring-sky-300"
+                      >
+                        <IconBriefcase size={18} stroke={2} />
+                        <span>{locale === "ar" ? "إنشاء مشروع" : "Create Project"}</span>
+                      </Link>
+                    </div>
+                  )}
                 </Tabs.List>
 
                 <div className="relative">

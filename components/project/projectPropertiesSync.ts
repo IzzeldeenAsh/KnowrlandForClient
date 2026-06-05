@@ -2,6 +2,7 @@ import { getApiUrl } from '@/app/config'
 import { getAuthToken } from '@/lib/authToken'
 import { assertProjectApiResponse } from './projectApiError'
 import { readStoredProjectRequestUuid } from './projectRequestUuid'
+import { isSpecifiedInsighterProject } from './specifiedInsighterProject'
 import { projectWizardStorage, type WizardLocale } from './wizardStorage'
 
 function normalizeValue(value: string | null): string {
@@ -71,14 +72,14 @@ function mapPreferredInsighterType(value: string): 'individual' | 'company' | 'e
 export type ProjectPropertiesPayload = {
   phase: string
   business_type: string
-  insighter_preferred_type: 'individual' | 'company' | 'either' | ''
-  insighter_origin_id: string
-  insighter_origin_type: string
-  insighter_min_years_experience: string
-  insighter_max_years_experience: string
-  company_min_team_size: string
-  company_max_team_size: string
   deadline: string
+  insighter_preferred_type?: 'individual' | 'company' | 'either' | ''
+  insighter_origin_id?: string
+  insighter_origin_type?: string
+  insighter_min_years_experience?: string
+  insighter_max_years_experience?: string
+  company_min_team_size?: string
+  company_max_team_size?: string
 }
 
 export function buildProjectPropertiesPayload(
@@ -97,11 +98,20 @@ export function buildProjectPropertiesPayload(
   ).trim()
   const hasOrigin = Boolean(insighterOriginType && insighterOriginId)
 
-  return {
+  const basePayload = {
     phase: mapPhase(readStorageValue(locale, projectWizardStorage.projectStatusKey(locale))),
     business_type: mapBusinessType(
       readStorageValue(locale, projectWizardStorage.whoAreYouKey(locale))
     ),
+    deadline: readStorageValue(locale, projectWizardStorage.deadlineKey(locale)).trim(),
+  }
+
+  if (isSpecifiedInsighterProject(locale)) {
+    return basePayload
+  }
+
+  return {
+    ...basePayload,
     insighter_preferred_type: preferredInsighterType,
     insighter_origin_id: hasOrigin ? insighterOriginId : '',
     insighter_origin_type: hasOrigin ? insighterOriginType : '',
@@ -127,7 +137,6 @@ export function buildProjectPropertiesPayload(
       preferredInsighterType === 'company'
         ? readStorageValue(locale, projectWizardStorage.companyMaxTeamSizeKey(locale)).trim()
         : '',
-    deadline: readStorageValue(locale, projectWizardStorage.deadlineKey(locale)).trim(),
   }
 }
 

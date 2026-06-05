@@ -19,6 +19,10 @@ import {
 } from '@/components/project/projectApiError'
 import { syncProjectProperties } from '@/components/project/projectPropertiesSync'
 import { readStoredProjectRequestUuid } from '@/components/project/projectRequestUuid'
+import {
+  getSpecifiedInsighterLabel,
+  isSpecifiedInsighterProject,
+} from '@/components/project/specifiedInsighterProject'
 import { readProjectAddonsState, readProjectScopeSnapshot } from '../projectAddonsState'
 import { projectTypeLabel } from '../projectLabels'
 import { readProjectDescriptionState } from '../projectDescriptionState'
@@ -813,6 +817,7 @@ export default function ProjectReviewStep({
   const [review, setReview] = useState<ReviewData | null>(null)
   const [error, setError] = useState<string | null>(null)
   const [submitting, setSubmitting] = useState(false)
+  const [isSpecifiedInsighter, setIsSpecifiedInsighter] = useState(false)
 
   useProjectStepErrorToast(error, locale)
 
@@ -821,6 +826,8 @@ export default function ProjectReviewStep({
 
     const load = async () => {
       setError(null)
+      const specificProject = isSpecifiedInsighterProject(locale)
+      setIsSpecifiedInsighter(specificProject)
 
       const projectUuid = readStoredProjectRequestUuid(locale)
 
@@ -1114,6 +1121,14 @@ export default function ProjectReviewStep({
         value: [review.service],
         editStepId: projectWizardStepIds.service,
       },
+      ...(isSpecifiedInsighter
+        ? [
+            {
+              label: isRTL ? 'نوع المطابقة' : 'Matching mode',
+              value: [getSpecifiedInsighterLabel(locale)],
+            },
+          ]
+        : []),
       {
         label: isRTL ? 'مرحلة المشروع' : 'Project status',
         value: [review.projectStatus],
@@ -1130,7 +1145,7 @@ export default function ProjectReviewStep({
         editStepId: projectWizardStepIds.projectDeadline,
       },
     ]
-  }, [isRTL, review])
+  }, [isRTL, isSpecifiedInsighter, locale, review])
 
   const scopeRows = useMemo(() => {
     if (!review) return []
@@ -1183,26 +1198,30 @@ export default function ProjectReviewStep({
         variant: 'chips' as const,
         editStepId: 'target-market',
       },
-      {
-        label: isRTL ? 'نوع الخبير المفضل' : 'Preferred insighter type',
-        value: [review.preferredInsighterType],
-        editStepId: projectWizardStepIds.preferredInsighterType,
-      },
-      {
-        label: isRTL ? 'الأصل المفضل' : 'Preferred origin',
-        value: [review.origin],
-        editStepId: projectWizardStepIds.insighterOrigin,
-      },
-      {
-        label: isRTL ? 'سنوات الخبرة' : 'Experience range',
-        value: review.experienceRange === emptyText ? [] : [review.experienceRange],
-        editStepId: projectWizardStepIds.insighterExperience,
-      },
-      {
-        label: isRTL ? 'حجم فريق الشركة' : 'Company team size',
-        value: review.teamSizeRange === emptyText ? [] : [review.teamSizeRange],
-        editStepId: projectWizardStepIds.companyTeamSize,
-      },
+      ...(isSpecifiedInsighter
+        ? []
+        : [
+            {
+              label: isRTL ? 'نوع الخبير المفضل' : 'Preferred insighter type',
+              value: [review.preferredInsighterType],
+              editStepId: projectWizardStepIds.preferredInsighterType,
+            },
+            {
+              label: isRTL ? 'الأصل المفضل' : 'Preferred origin',
+              value: [review.origin],
+              editStepId: projectWizardStepIds.insighterOrigin,
+            },
+            {
+              label: isRTL ? 'سنوات الخبرة' : 'Experience range',
+              value: review.experienceRange === emptyText ? [] : [review.experienceRange],
+              editStepId: projectWizardStepIds.insighterExperience,
+            },
+            {
+              label: isRTL ? 'حجم فريق الشركة' : 'Company team size',
+              value: review.teamSizeRange === emptyText ? [] : [review.teamSizeRange],
+              editStepId: projectWizardStepIds.companyTeamSize,
+            },
+          ]),
       {
         label: isRTL ? 'اجتماع الانطلاقة' : 'Kickoff meeting',
         value: [
@@ -1217,7 +1236,7 @@ export default function ProjectReviewStep({
         editStepId: projectWizardStepIds.kickoffMeeting,
       },
     ]
-  }, [emptyText, isRTL, review])
+  }, [emptyText, isRTL, isSpecifiedInsighter, review])
 
   const onContinue = async () => {
     if (submitting) return
@@ -1318,7 +1337,15 @@ export default function ProjectReviewStep({
               />
 
               <SectionBlock
-                title={isRTL ? 'السوق وتفضيلات الخبير' : 'Market and expert preferences'}
+                title={
+                  isSpecifiedInsighter
+                    ? isRTL
+                      ? 'تفضيلات المشروع'
+                      : 'Project preferences'
+                    : isRTL
+                      ? 'السوق وتفضيلات الخبير'
+                      : 'Market and expert preferences'
+                }
                 rows={preferenceRows}
                 emptyText={emptyText}
                 toneIndex={2}

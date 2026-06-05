@@ -5,10 +5,12 @@ import { useTranslations } from 'next-intl'
 import { usePathname } from 'next/navigation'
 import { SvgIcon } from '../../SvgIcon'
 import { Notification } from '@/services/notifications.service'
+import { routeForNotification } from '@/utils/notificationRoute'
 
 interface NotificationsInnerProps {
   notifications: Notification[]
   parent: string
+  roles?: string[]
   onNotificationClick: (id: string) => Promise<void>
   onClickOutside: () => void
 }
@@ -429,6 +431,7 @@ const getNotificationLink = (type: string, parent: string): string => {
 export default function NotificationsInner({
   notifications,
   parent,
+  roles = [],
   onNotificationClick,
   onClickOutside
 }: NotificationsInnerProps) {
@@ -562,6 +565,19 @@ export default function NotificationsInner({
         return
       }
 
+      // Case 1b: Project notifications → Angular dashboard (localhost:4200).
+      // Keyed on event_name first, with sub_type + role fallback for REST history.
+      const projectUrl = routeForNotification(notification, roles)
+      if (projectUrl) {
+        try {
+          await onNotificationClick(notification.id)
+        } catch {
+          // ignore errors and still navigate
+        }
+        window.location.href = projectUrl
+        return
+      }
+
       // Case 2: Compute single-page redirects
       let url: string | null = null
       if (notification.type === 'order') {
@@ -604,7 +620,7 @@ export default function NotificationsInner({
         window.location.href = url
       }
     },
-    [onNotificationClick, currentLanguage]
+    [onNotificationClick, currentLanguage, roles]
   )
 
   return (

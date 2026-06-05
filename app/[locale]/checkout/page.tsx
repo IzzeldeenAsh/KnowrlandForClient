@@ -749,7 +749,7 @@ export default function CheckoutPage() {
         const parsed = text.trim() ? JSON.parse(text) : null;
         const responseData = parsed?.data || parsed;
         const client_secret = responseData?.client_secret;
-        const order_uuid = responseData?.order_uuid;
+        const order_uuid = responseData?.order_uuid || responseData?.uuid;
         const guestToken = responseData?.token;
 
         if (!client_secret || !order_uuid || !guestToken) {
@@ -847,7 +847,7 @@ export default function CheckoutPage() {
       const responseData = data.data || data;
 
       // Store the order UUID for later use
-      const checkoutOrderUuid = responseData.uuid || responseData.order_uuid;
+      const checkoutOrderUuid = responseData.order_uuid || responseData.uuid;
       if (checkoutOrderUuid) {
         setOrderUuid(checkoutOrderUuid);
         orderUuidRef.current = checkoutOrderUuid;
@@ -865,7 +865,8 @@ export default function CheckoutPage() {
 
         // Check different possible response structures
         const responseData = data.data || data;
-        const { client_secret, order_uuid } = responseData;
+        const client_secret = responseData.client_secret;
+        const order_uuid = responseData.order_uuid || responseData.uuid || checkoutOrderUuid;
 
         console.log('Client secret:', client_secret, 'Order UUID:', order_uuid); // Debug log
 
@@ -905,9 +906,10 @@ export default function CheckoutPage() {
 
           router.push(stripeUrl);
           return;
-        } else {
-          console.log('Missing client_secret or order_uuid in response'); // Debug log
         }
+
+        console.log('Missing client_secret or order_uuid in response'); // Debug log
+        throw new Error("Stripe payment details are missing from checkout response");
       }
 
       // For free or wallet payments, show success UI

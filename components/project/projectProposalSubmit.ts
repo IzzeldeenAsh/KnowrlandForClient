@@ -2,6 +2,7 @@ import { getApiUrl } from '@/app/config'
 import { getAuthToken } from '@/lib/authToken'
 import { assertProjectApiResponse } from './projectApiError'
 import { readStoredProposalMatchUuid } from './projectProposalMatchUuid'
+import { isSpecifiedInsighterProject } from './specifiedInsighterProject'
 import { projectWizardStorage, type WizardLocale } from './wizardStorage'
 
 function readStorageValue(locale: WizardLocale, key: string): string {
@@ -68,15 +69,19 @@ export async function submitProjectProposal(locale: WizardLocale) {
   const proposalMatchUuid = readStoredProposalMatchUuid(locale)
   if (!proposalMatchUuid) throw new Error('no_match_request_uuid')
 
-  const matches = readStoredSelectedMatchIds(locale)
-  if (matches.length === 0) throw new Error('no_matches')
-
   const deadlineOffer = formatProposalDeadlineOffer(
     readStorageValue(locale, projectWizardStorage.deadlineOfferKey(locale))
   )
+  const isSpecific = isSpecifiedInsighterProject(locale)
+  const matches = isSpecific ? [] : readStoredSelectedMatchIds(locale)
+  if (!isSpecific && matches.length === 0) throw new Error('no_matches')
 
   const res = await fetch(
-    getApiUrl(`/api/account/project/proposal/submit/${proposalMatchUuid}`),
+    getApiUrl(
+      isSpecific
+        ? `/api/account/project/proposal/submit-specific-match/${proposalMatchUuid}`
+        : `/api/account/project/proposal/submit/${proposalMatchUuid}`
+    ),
     {
       method: 'POST',
       headers: {
@@ -86,10 +91,14 @@ export async function submitProjectProposal(locale: WizardLocale) {
         'Accept-Language': locale === 'ar' ? 'ar' : 'en',
         'X-Timezone': Intl.DateTimeFormat().resolvedOptions().timeZone,
       },
-      body: JSON.stringify({
-        deadline_offer: deadlineOffer,
-        matches,
-      }),
+      body: JSON.stringify(
+        isSpecific
+          ? { deadline_offer: deadlineOffer }
+          : {
+              deadline_offer: deadlineOffer,
+              matches,
+            }
+      ),
     }
   )
 

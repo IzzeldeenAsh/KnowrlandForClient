@@ -9,6 +9,12 @@ import {
   extractProjectRequestUuid,
   writeStoredProjectRequestUuid,
 } from '../projectRequestUuid'
+import {
+  clearStoredProposalMatchUuid,
+  extractProjectProposalMatchUuid,
+  writeStoredProposalMatchUuid,
+} from '../projectProposalMatchUuid'
+import { readStoredSpecifiedInsighterUuid } from '../specifiedInsighterProject'
 import { projectWizardStorage, type WizardLocale } from '../wizardStorage'
 import { getApiUrl } from '@/app/config'
 import { getAuthToken } from '@/lib/authToken'
@@ -217,7 +223,9 @@ export default function ServiceQuestion({ locale }: { locale: WizardLocale }) {
   const resetDownstreamWizardState = (preservePrompt: boolean) => {
     try {
       clearStoredProjectRequestUuid(locale)
+      clearStoredProposalMatchUuid(locale)
       window.sessionStorage.removeItem(projectWizardStorage.projectScopeSnapshotKey(locale))
+      window.sessionStorage.removeItem(projectWizardStorage.selectedMatchIdsKey(locale))
 
       if (!preservePrompt) {
         window.sessionStorage.removeItem(projectWizardStorage.servicePromptKey(locale))
@@ -285,8 +293,14 @@ export default function ServiceQuestion({ locale }: { locale: WizardLocale }) {
 
       const prompt = payload.isOtherSelected ? payload.servicePrompt.trim() : ''
       const apiServiceId = payload.serviceId
+      const specifiedInsighterUuid = readStoredSpecifiedInsighterUuid(locale)
+      const initiatePath = specifiedInsighterUuid
+        ? `/api/account/project/definition/initiate-specific/${encodeURIComponent(
+            specifiedInsighterUuid
+          )}`
+        : '/api/account/project/definition/initiate'
 
-      const initRes = await fetch(getApiUrl('/api/account/project/definition/initiate'), {
+      const initRes = await fetch(getApiUrl(initiatePath), {
         method: 'POST',
         headers,
         body: JSON.stringify({
@@ -304,6 +318,13 @@ export default function ServiceQuestion({ locale }: { locale: WizardLocale }) {
       if (!projectUuid) throw new Error('init_bad_response')
 
       writeStoredProjectRequestUuid(locale, projectUuid)
+      if (specifiedInsighterUuid) {
+        const proposalMatchUuid = extractProjectProposalMatchUuid(initJson)
+        if (!proposalMatchUuid) throw new Error('init_bad_response')
+        writeStoredProposalMatchUuid(locale, proposalMatchUuid)
+      } else {
+        clearStoredProposalMatchUuid(locale)
+      }
       try {
         window.sessionStorage.setItem(
           projectWizardStorage.serviceComponentsPayloadKey(locale),

@@ -6,6 +6,15 @@ function normalizeProposalMatchUuid(value: unknown): string {
   return ''
 }
 
+export function extractProjectProposalMatchUuid(payload: unknown): string {
+  const data = (payload as any)?.data ?? payload
+  return normalizeProposalMatchUuid(
+    (data as any)?.project_proposal_match_uuid ??
+      (data as any)?.proposal_match_uuid ??
+      (data as any)?.match_uuid
+  )
+}
+
 export function readStoredProposalMatchUuid(locale: WizardLocale): string {
   if (typeof window === 'undefined') return ''
 

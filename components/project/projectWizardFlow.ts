@@ -1,5 +1,6 @@
 import { projectWizardStorage, type WizardLocale } from './wizardStorage'
 import { readProjectAddonsState } from './projectAddonsState'
+import { isSpecifiedInsighterProject } from './specifiedInsighterProject'
 
 export const projectWizardStepIds = {
   projectType: 'project-type',
@@ -168,13 +169,24 @@ export function getProjectWizardStepOrder(locale: WizardLocale): string[] {
   const serviceComponentSlugs = readServiceComponentSlugs(locale)
   const preferredInsighterType = readPreferredInsighterType(locale)
   const skipKickoffMeeting = readProjectAddonsState(locale).kickoffMeeting.skipped
+  const specifiedInsighterProject = isSpecifiedInsighterProject(locale)
 
   const postOriginSteps =
-    preferredInsighterType === 'Individual'
-      ? [projectWizardStepIds.insighterExperience]
-      : preferredInsighterType === 'Company'
-        ? [projectWizardStepIds.companyTeamSize]
-        : []
+    specifiedInsighterProject
+      ? []
+      : preferredInsighterType === 'Individual'
+        ? [projectWizardStepIds.insighterExperience]
+        : preferredInsighterType === 'Company'
+          ? [projectWizardStepIds.companyTeamSize]
+          : []
+
+  const insighterPreferenceSteps = specifiedInsighterProject
+    ? []
+    : [
+        projectWizardStepIds.preferredInsighterType,
+        projectWizardStepIds.insighterOrigin,
+        ...postOriginSteps,
+      ]
 
   return [
     projectWizardStepIds.projectType,
@@ -185,15 +197,13 @@ export function getProjectWizardStepOrder(locale: WizardLocale): string[] {
     ...serviceComponentSlugs,
     projectWizardStepIds.projectStatus,
     projectWizardStepIds.whoAreYou,
-    projectWizardStepIds.preferredInsighterType,
-    projectWizardStepIds.insighterOrigin,
-    ...postOriginSteps,
+    ...insighterPreferenceSteps,
     projectWizardStepIds.projectDeadline,
     projectWizardStepIds.projectDescription,
     projectWizardStepIds.addonsIntro,
     ...(skipKickoffMeeting ? [] : [projectWizardStepIds.kickoffMeeting]),
     projectWizardStepIds.projectReview,
-    projectWizardStepIds.projectMatches,
+    ...(specifiedInsighterProject ? [] : [projectWizardStepIds.projectMatches]),
     projectWizardStepIds.deadlineOffer,
   ]
 }

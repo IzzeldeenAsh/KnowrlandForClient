@@ -1648,7 +1648,7 @@ export default function ProfileSettingsClient({
                         isSaving={savingField === 'industries'}
                         onEdit={() => setTreeModal('industries')}
                       />
-                      {/* <ProfileRow
+                     <ProfileRow
                         label={isRtl ? 'سنوات الخبرة' : 'Years of Experience'}
                         value={form.experience ? `${form.experience} ${isRtl ? 'سنة' : 'years'}` : '-'}
                         isEditing={editingField === 'experience'}
@@ -1672,7 +1672,7 @@ export default function ProfileSettingsClient({
                         <p className="mt-2 text-xs text-slate-400">
                           {isRtl ? `الحد الأقصى ${MAX_EXPERIENCE_YEARS} سنة.` : `Maximum ${MAX_EXPERIENCE_YEARS} years allowed.`}
                         </p>
-                      </ProfileRow> */}
+                      </ProfileRow>
                       <ProfileRow
                         label={isRtl ? 'نبذة' : 'Bio'}
                         value={form.bio || '-'}

@@ -23,6 +23,7 @@ import { syncServiceComponents } from '@/components/project/serviceComponentsSyn
 import { useProjectStepErrorToast } from '@/components/project/useProjectStepErrorToast'
 import { useProjectWizardNavigation } from '@/components/project/useProjectWizardNavigation'
 import { projectWizardStorage, type WizardLocale } from '@/components/project/wizardStorage'
+import UrgentDateNotice from '@/components/project/questions/UrgentDateNotice'
 import {
   getReportTypeOptions,
   normalizeReportTypes,
@@ -577,6 +578,7 @@ export default function DeliverableStageQuestion({
               locale={locale}
               label={isRTL ? 'تاريخ التسليم' : 'Delivery date'}
             />
+            {isUrgentProject ? <UrgentDateNotice locale={locale} /> : null}
             {dateValidationMessage ? (
               <p className="mt-2 text-xs font-semibold text-rose-600">
                 {dateValidationMessage}

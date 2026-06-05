@@ -6,6 +6,7 @@ let lastChannelName: string | null = null
 let lastToken: string | null = null
 let lastLocale: string | null = null
 let didBindDebugHandlers = false
+const channelsWithEventLogging = new Set<string>()
 
 type PusherOpts = {
   key: string
@@ -13,16 +14,48 @@ type PusherOpts = {
   authEndpoint: string
 }
 
+function getRuntimeEnv(name: string): string | undefined {
+  if (typeof window === 'undefined') return undefined
+  return (window as any).__env?.[name]
+}
+
+function firstNonEmpty(...values: Array<string | undefined>): string {
+  return values.map((value) => value?.trim()).find(Boolean) ?? ''
+}
+
+function isInternalEvent(eventName: string): boolean {
+  return eventName.startsWith('pusher:') || eventName.startsWith('pusher_internal:')
+}
+
+function logReceivedEvent(channelName: string, eventName: string, data: any) {
+  if (isInternalEvent(eventName)) return
+  console.log('[Pusher] Event received', {
+    channelName,
+    eventName,
+    payload: data,
+  })
+}
+
 function getConfig(): PusherOpts {
-  const key = (process.env.NEXT_PUBLIC_PUSHER_KEY ?? '41745ad5e299f4af9e36').trim()
-  const cluster = (process.env.NEXT_PUBLIC_PUSHER_CLUSTER ?? 'eu').trim()
-  const authEndpoint = (
+  const key = firstNonEmpty(
+    getRuntimeEnv('PUSHER_KEY'),
+    process.env.NEXT_PUBLIC_PUSHER_KEY,
+    '41745ad5e299f4af9e36'
+  )
+  const cluster = firstNonEmpty(
+    getRuntimeEnv('PUSHER_CLUSTER'),
+    process.env.NEXT_PUBLIC_PUSHER_CLUSTER,
+    'eu'
+  )
+  const authEndpoint = firstNonEmpty(
+    getRuntimeEnv('PUSHER_AUTH_ENDPOINT'),
+    process.env.NEXT_PUBLIC_PUSHER_AUTH_ENDPOINT,
     'https://api.insightabusiness.com/broadcasting/auth'
-  ).trim()
+  )
   if (!key || !authEndpoint) {
     console.error('[Pusher] Missing env: NEXT_PUBLIC_PUSHER_KEY or NEXT_PUBLIC_PUSHER_AUTH_ENDPOINT')
   }
-  return { key: key!, cluster, authEndpoint: authEndpoint! }
+  return { key, cluster, authEndpoint }
 }
 
 export function getPusher(token: string, currentLocale: string): Pusher {
@@ -96,12 +129,7 @@ export function getPusher(token: string, currentLocale: string): Pusher {
       }
     })
 
-    // Log *everything* that reaches the client (including internal pusher:* events).
-    if (typeof (pusher as any).bind_global === 'function') {
-      ; (pusher as any).bind_global((eventName: string, data: any) => {
-        //   console.log('[Pusher] Global event', eventName, data)
-      })
-    }
+    // Event payload logging is bound per channel in subscribePrivateUser.
   }
 
   return pusher
@@ -124,6 +152,12 @@ export function subscribePrivateUser(userId: number, token: string, currentLocal
 
   //console.log('[Pusher] Subscribing', { channelName })
   const channel = client.subscribe(channelName)
+  if (!channelsWithEventLogging.has(channelName) && typeof (channel as any).bind_global === 'function') {
+    channelsWithEventLogging.add(channelName)
+    ;(channel as any).bind_global((eventName: string, data: any) => {
+      logReceivedEvent(channelName, eventName, data)
+    })
+  }
 
   channel.bind('pusher:subscription_succeeded', () => {
     // console.log('[Pusher] Subscription succeeded', { channelName })
@@ -166,6 +200,7 @@ export function unsubscribePrivateUser(userId: number) {
     try {
       pusher.unsubscribe(channelName)
       if (lastChannelName === channelName) lastChannelName = null
+      channelsWithEventLogging.delete(channelName)
     } catch (e) {
       console.warn('[Pusher] Unsubscribe warning', e)
     }
@@ -193,5 +228,6 @@ export function disconnectPusher() {
     lastToken = null
     lastLocale = null
     didBindDebugHandlers = false
+    channelsWithEventLogging.clear()
   }
 }

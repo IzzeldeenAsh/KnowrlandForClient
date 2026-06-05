@@ -10,6 +10,11 @@ import {
   projectWizardStorage,
   type WizardLocale,
 } from "../wizardStorage";
+import {
+  clearStoredSpecifiedInsighterUuid,
+  specifiedInsighterQueryParam,
+  writeStoredSpecifiedInsighterUuid,
+} from "../specifiedInsighterProject";
 import ChoiceCard from "./ChoiceCard";
 import {
   IconBriefcaseFilled,
@@ -149,10 +154,33 @@ export default function ProjectTypeQuestion({
   }, []);
 
   useEffect(() => {
-    if (searchParams?.get("fresh") !== "1") return;
-    clearProjectWizardStorage(locale);
-    setSelected(null);
-    router.replace(`/${locale}/project/wizard/project-type`, { scroll: false });
+    const specifiedInsighterUuid =
+      searchParams?.get(specifiedInsighterQueryParam)?.trim() || "";
+
+    if (searchParams?.get("fresh") === "1") {
+      clearProjectWizardStorage(locale);
+      if (specifiedInsighterUuid) {
+        writeStoredSpecifiedInsighterUuid(locale, specifiedInsighterUuid);
+      } else {
+        clearStoredSpecifiedInsighterUuid(locale);
+      }
+      setSelected(null);
+
+      const nextParams = new URLSearchParams();
+      if (specifiedInsighterUuid) {
+        nextParams.set(specifiedInsighterQueryParam, specifiedInsighterUuid);
+      }
+      const nextQuery = nextParams.toString();
+      router.replace(
+        `/${locale}/project/wizard/project-type${nextQuery ? `?${nextQuery}` : ""}`,
+        { scroll: false }
+      );
+      return;
+    }
+
+    if (specifiedInsighterUuid) {
+      writeStoredSpecifiedInsighterUuid(locale, specifiedInsighterUuid);
+    }
   }, [locale, router, searchParams]);
 
   useEffect(() => {

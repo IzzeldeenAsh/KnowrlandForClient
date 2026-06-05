@@ -30,7 +30,7 @@ export default function ProjectSubmissionSuccessStep({
 
   return (
     <div
-      className="mx-auto flex min-h-full w-full max-w-6xl items-center justify-center py-6"
+      className="mx-auto flex min-h-full w-full max-w-6xl items-center justify-center px-1 py-6 sm:px-0"
       dir={isRTL ? 'rtl' : 'ltr'}
     >
       {isEnglish ? (
@@ -77,13 +77,11 @@ export default function ProjectSubmissionSuccessStep({
         }
       `}</style>
 
-      <div
-       
-      >
+      <div className="relative w-full overflow-hidden px-3 py-4 sm:px-6 sm:py-8">
         <div className="pointer-events-none absolute inset-0 overflow-hidden">
-          <div className="absolute left-1/2 top-[22%] h-[22rem] w-[22rem] -translate-x-1/2 rounded-full bg-[radial-gradient(circle,rgba(28,124,187,0.16),rgba(28,124,187,0)_68%)] blur-2xl" />
-          <div className="absolute right-[12%] top-[18%] h-24 w-24 rounded-full bg-[radial-gradient(circle,rgba(251,191,36,0.32),rgba(251,191,36,0)_70%)] blur-xl" />
-          <div className="absolute left-[10%] bottom-[18%] h-28 w-28 rounded-full bg-[radial-gradient(circle,rgba(52,211,153,0.24),rgba(52,211,153,0)_70%)] blur-xl" />
+          <div className="absolute left-1/2 top-[18%] h-64 w-64 -translate-x-1/2 rounded-full bg-[radial-gradient(circle,rgba(28,124,187,0.16),rgba(28,124,187,0)_68%)] blur-2xl sm:h-[22rem] sm:w-[22rem]" />
+          <div className="absolute right-[8%] top-[16%] h-16 w-16 rounded-full bg-[radial-gradient(circle,rgba(251,191,36,0.32),rgba(251,191,36,0)_70%)] blur-xl sm:h-24 sm:w-24" />
+          <div className="absolute left-[6%] bottom-[16%] h-20 w-20 rounded-full bg-[radial-gradient(circle,rgba(52,211,153,0.24),rgba(52,211,153,0)_70%)] blur-xl sm:h-28 sm:w-28" />
 
           {[
             { left: '16%', top: '22%', delay: '0s', duration: '9s' },
@@ -94,7 +92,7 @@ export default function ProjectSubmissionSuccessStep({
           ].map((particle) => (
             <span
               key={`${particle.left}-${particle.top}`}
-              className="absolute block h-3 w-3 rounded-full bg-white/90 shadow-[0_0_0_6px_rgba(255,255,255,0.12)]"
+              className="absolute hidden h-3 w-3 rounded-full bg-white/90 shadow-[0_0_0_6px_rgba(255,255,255,0.12)] sm:block"
               style={{
                 left: particle.left,
                 top: particle.top,
@@ -105,7 +103,7 @@ export default function ProjectSubmissionSuccessStep({
         </div>
 
         <div className="relative z-10 flex flex-col items-center text-center">
-          <div className="relative flex h-44 w-44 items-center justify-center">
+          <div className="relative flex h-32 w-32 items-center justify-center sm:h-44 sm:w-44">
             <span
               className="absolute inset-0 rounded-full border border-sky-200/80 bg-sky-100/50"
               style={{ animation: 'projectSuccessPulse 2.8s ease-out infinite' }}
@@ -115,15 +113,13 @@ export default function ProjectSubmissionSuccessStep({
               style={{ animation: 'projectSuccessFloat 6s ease-in-out infinite' }}
             />
 
-          
-
             <div
-              className="relative flex h-28 w-28 items-center justify-center rounded-full bg-[linear-gradient(145deg,#169b62,#49c98b)] text-white shadow-[0_18px_40px_rgba(22,155,98,0.35)]"
+              className="relative flex h-20 w-20 items-center justify-center rounded-full bg-[linear-gradient(145deg,#169b62,#49c98b)] text-white shadow-[0_18px_40px_rgba(22,155,98,0.35)] sm:h-28 sm:w-28"
               style={{ animation: 'projectSuccessCheckCircle 600ms ease-out both' }}
             >
               <div className="absolute inset-1 rounded-full border border-white/25" />
               <svg
-                className="relative h-14 w-14"
+                className="relative h-10 w-10 sm:h-14 sm:w-14"
                 viewBox="0 0 24 24"
                 fill="none"
                 xmlns="http://www.w3.org/2000/svg"
@@ -146,16 +142,16 @@ export default function ProjectSubmissionSuccessStep({
           </div>
           <h1
             id="project-submission-success-title"
-            className="mt-6 max-w-3xl text-[clamp(2rem,5vw,3rem)] font-medium leading-[1.2]  text-slate-950"
+            className="mt-4 max-w-3xl text-3xl font-medium leading-[1.2] text-slate-950 sm:mt-6 sm:text-[clamp(2rem,5vw,3rem)]"
           >
             {title}
           </h1>
 
-          <p className="mt-5 max-w-2xl text-sm leading-7 text-slate-600 sm:text-base">
+          <p className="mt-4 max-w-2xl text-sm leading-7 text-slate-600 sm:mt-5 sm:text-base">
             {body}
           </p>
 
-          <div className="mt-8 w-full max-w-2xl rounded-[28px] border border-sky-100/80 bg-white/75 px-5 py-5 text-start shadow-[0_18px_50px_rgba(15,23,42,0.06)] backdrop-blur-xl sm:px-6">
+          <div className="mt-6 w-full max-w-2xl rounded-[18px] border border-sky-100/80 bg-white/75 px-4 py-4 text-start shadow-[0_18px_50px_rgba(15,23,42,0.06)] backdrop-blur-xl sm:mt-8 sm:rounded-[28px] sm:px-6 sm:py-5">
             <div className="text-[11px] font-semibold text-slate-400">
               {statLabel}
             </div>
@@ -164,7 +160,7 @@ export default function ProjectSubmissionSuccessStep({
             </div>
           </div>
 
-          <div className="mt-10 flex w-full max-w-xl flex-col items-stretch justify-center gap-3 sm:flex-row">
+          <div className="mt-7 flex w-full max-w-xl flex-col items-stretch justify-center gap-3 sm:mt-10 sm:flex-row">
             <Link
               href="https://app.insightabusiness.com/app/insighter-dashboard/projects-created"
               className="btn-sm rounded-full bg-[#1C7CBB] px-6 py-3 text-center text-white shadow-[0_18px_40px_rgba(28,124,187,0.28)] transition-all duration-200 hover:-translate-y-0.5 hover:bg-[#17689e]"
