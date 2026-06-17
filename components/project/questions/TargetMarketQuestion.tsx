@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import Link from 'next/link'
 import {
   assertProjectApiResponse,
@@ -96,6 +96,10 @@ export default function TargetMarketQuestion({ locale }: { locale: WizardLocale 
   const [blocIds, setBlocIds] = useState<number[]>([])
 
   const [countryQuery, setCountryQuery] = useState('')
+
+  // When the user actively picks "Worldwide", auto-advance to the next step
+  // as soon as the (auto-selected) regions are loaded.
+  const pendingWorldwideAdvanceRef = useRef(false)
 
   useEffect(() => {
     const timer = window.setTimeout(() => setEntered(true), 30)
@@ -251,6 +255,7 @@ export default function TargetMarketQuestion({ locale }: { locale: WizardLocale 
     }
 
     if (next === 'worldwide') {
+      pendingWorldwideAdvanceRef.current = true
       await ensureRegions()
     }
   }
@@ -396,6 +401,14 @@ export default function TargetMarketQuestion({ locale }: { locale: WizardLocale 
       setSubmitting(false)
     }
   }
+
+  useEffect(() => {
+    if (!pendingWorldwideAdvanceRef.current) return
+    if (mode !== 'worldwide' || regionIds.length === 0 || submitting) return
+    pendingWorldwideAdvanceRef.current = false
+    void onContinue()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [mode, regionIds, submitting])
 
   return (
     <div className="w-full max-w-5xl mx-auto" dir={isRTL ? 'rtl' : 'ltr'}>

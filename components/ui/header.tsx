@@ -451,10 +451,7 @@ export default function Header() {
   return (
     <>
       <div ref={headerShellRef} className="sticky top-0 z-50">
-        {/* Beta Warning Bar */}
-        <div className="w-full bg-gradient-to-r from-blue-500 to-cyan-500 text-white py-2 px-4 text-center text-xs md:text-lg font-medium relative z-40">
-          <span>{t('beta.notice')}</span>
-        </div>
+       
 
         <header
           className={[

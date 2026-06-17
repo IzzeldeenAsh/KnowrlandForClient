@@ -5,12 +5,8 @@ import Link from 'next/link'
 import {
   IconCloudUpload,
   IconDeviceDesktopUp,
-  IconFileSpreadsheet,
   IconFileTextFilled,
-  IconFileTypeDocx,
-  IconFileTypePdf,
   IconMapPinFilled,
-  IconPresentationFilled,
 } from '@tabler/icons-react'
 import { getProjectApiErrorMessage } from '@/components/project/projectApiError'
 import InlineDateCalendar from '@/components/project/questions/InlineDateCalendar'
@@ -301,22 +297,20 @@ function getDateValidationMessage(params: {
   return null
 }
 
-function ReportTypeIcon({ value }: { value: string }) {
-  if (value === 'pdf') return <IconFileTypePdf className="h-6 w-6" stroke={1.4} />
-  if (value === 'docx') return <IconFileTypeDocx className="h-6 w-6" stroke={1.4} />
-  if (value === 'xlsx') return <IconFileSpreadsheet className="h-6 w-6" stroke={1.4} />
-  if (value === 'pptx') return <IconPresentationFilled className="h-6 w-6" />
-
-  return <IconFileTextFilled className="h-6 w-6" />
+const REPORT_TYPE_ICON_SRC: Record<string, string> = {
+  pdf: 'https://res.cloudinary.com/dsiku9ipv/image/upload/v1781525110/pdf_136522_urotaw.png',
+  docx: 'https://res.cloudinary.com/dsiku9ipv/image/upload/v1781104177/Microsoft_Office_Word__2025_present_1_sywxfd.png',
+  xlsx: 'https://res.cloudinary.com/dsiku9ipv/image/upload/v1781104176/Microsoft_Office_Excel__2025_present_1_scjtip.png',
+  pptx: 'https://res.cloudinary.com/dsiku9ipv/image/upload/v1781104175/Microsoft_Office_PowerPoint__2025_present_1_ofrkfx.png',
 }
 
-function reportTypeTone(value: string): string {
-  if (value === 'pdf') return 'bg-rose-50 ring-rose-200/70 text-rose-700'
-  if (value === 'docx') return 'bg-blue-50 ring-blue-200/70 text-blue-700'
-  if (value === 'xlsx') return 'bg-emerald-50 ring-emerald-200/70 text-emerald-700'
-  if (value === 'pptx') return 'bg-orange-50 ring-orange-200/70 text-orange-700'
+function ReportTypeIcon({ value }: { value: string }) {
+  const src = REPORT_TYPE_ICON_SRC[value]
+  if (src) {
+    return <img src={src} alt="" className="h-11 w-11 shrink-0 object-contain" />
+  }
 
-  return 'bg-slate-50 ring-slate-200/70 text-slate-700'
+  return <IconFileTextFilled className="h-10 w-10 shrink-0" />
 }
 
 function getStepCopy(params: {
@@ -617,12 +611,7 @@ export default function DeliverableStageQuestion({
                     className="h-5 w-5 shrink-0 rounded border-slate-300 text-[#1C7CBB] accent-[#1C7CBB]"
                     aria-hidden="true"
                   />
-                  <span
-                    className={`${iconBadgeBase} ${reportTypeTone(reportType.value)}`}
-                    aria-hidden="true"
-                  >
-                    <ReportTypeIcon value={reportType.value} />
-                  </span>
+                  <ReportTypeIcon value={reportType.value} />
                   <span className="text-sm font-bold text-slate-900">
                     {reportType.label}
                   </span>

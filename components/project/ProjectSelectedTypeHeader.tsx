@@ -3,10 +3,6 @@
 import { useEffect, useState, type ReactNode } from 'react'
 import { projectWizardStorage, type WizardLocale } from './wizardStorage'
 import { projectTypeLabel } from './projectLabels'
-import {
-  getSpecifiedInsighterLabel,
-  isSpecifiedInsighterProject,
-} from './specifiedInsighterProject'
 
 type Props = {
   locale: WizardLocale
@@ -24,7 +20,6 @@ export default function ProjectSelectedTypeHeader({
   const isRTL = locale === 'ar'
   const typeLabel = projectTypeLabel(locale, projectTypeId)
   const [serviceLabel, setServiceLabel] = useState<string | null>(null)
-  const [isSpecifiedInsighter, setIsSpecifiedInsighter] = useState(false)
 
   useEffect(() => {
     try {
@@ -32,18 +27,14 @@ export default function ProjectSelectedTypeHeader({
         projectWizardStorage.serviceLabelKey(locale)
       )
       setServiceLabel(storedServiceLabel?.trim() || null)
-      setIsSpecifiedInsighter(isSpecifiedInsighterProject(locale))
     } catch {
       setServiceLabel(null)
-      setIsSpecifiedInsighter(false)
     }
   }, [locale])
 
   if (!typeLabel) return null
 
   const headerLabel = serviceLabel ? `${typeLabel} - ${serviceLabel}` : typeLabel
-  const statusLabel =
-    status || (isSpecifiedInsighter ? getSpecifiedInsighterLabel(locale) : null)
 
   return (
     <div
@@ -59,7 +50,7 @@ export default function ProjectSelectedTypeHeader({
         <span className="text-sm bg-gradient-to-r from-blue-700 via-sky-600 to-cyan-500 bg-clip-text text-transparent rounded-full px-3 py-.5 border border-blue-400">
           {headerLabel}
         </span>
-        {statusLabel ? <span className="text-xs font-semibold text-slate-600 rounded-full px-3 py-1 border border-slate-400">{statusLabel}</span> : null}
+        {status ? <span className="text-xs font-semibold text-slate-600 rounded-full px-3 py-1 border border-slate-400">{status}</span> : null}
       </div>
     </div>
   )

@@ -123,7 +123,7 @@ export default function ProjectAddonsIntroStep({
               text-slate-950"
             >
               {stacked.map((line, idx) => (
-                <div key={line} className="inline-flex items-center gap-3">
+                <div key={line} className="flex items-center gap-3">
                   <span>{line}</span>
                   {idx === stacked.length - 1 ? (
                     <IconSparklesFilled

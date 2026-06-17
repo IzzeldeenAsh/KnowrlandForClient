@@ -17,6 +17,11 @@ import type { Notification } from '@/services/notifications.service'
 
 export const DASHBOARD = 'https://app.insightabusiness.com'
 
+// `project.discussion.message` always lands on the production dashboard host,
+// regardless of the host the backend baked into `param` (it may be localhost in
+// dev). See `discussionUrlFromParam`.
+const PROD_DASHBOARD = 'https://app.foresighta.co'
+
 // Dashboard list pages (used as guards when `param` is missing).
 const INSIGHTER_ON_WORK = `${DASHBOARD}/app/insighter-dashboard/on-work-projects`
 const CLIENT_PROJECTS = `${DASHBOARD}/app/insighter-dashboard/projects-created`
@@ -35,6 +40,28 @@ function isInsighterSide(roles: string[] = []): boolean {
 
 function hasParam(param: unknown): boolean {
   return param !== undefined && param !== null && param !== ''
+}
+
+/**
+ * `project.discussion.message` is special: the backend resolves the exact
+ * destination (proposal vs project stage, client vs insighter side) and ships
+ * the full URL in `param`. We don't re-derive the route here — we just take its
+ * path, pin it to the production dashboard host, and force the discussion tab.
+ */
+function discussionUrlFromParam(param: unknown): string {
+  const raw = hasParam(param) ? String(param).trim() : ''
+
+  let path = ''
+  try {
+    // `param` is usually a full URL (localhost or prod) — keep only its path.
+    path = new URL(raw).pathname
+  } catch {
+    // Not an absolute URL: treat as a path and drop any existing query/hash.
+    path = raw.split(/[?#]/)[0]
+    if (path && !path.startsWith('/')) path = `/${path}`
+  }
+
+  return `${PROD_DASHBOARD}${path}?tab=discussion`
 }
 
 /** insighter → on-work details, client → projects-created details (role-based events). */
@@ -76,6 +103,8 @@ export function routeForNotification(
       return SALES
     case 'project.file.uploaded':
       return roleBasedProjectUrl(param, roles)
+    case 'project.discussion.message':
+      return discussionUrlFromParam(param)
   }
 
   // 2) REST-history fallback (no event_name): route by sub_type + role.
@@ -95,6 +124,8 @@ export function routeForNotification(
     case 'project_closed':
     case 'project':
       return roleBasedProjectUrl(param, roles)
+    case 'project_discussion':
+      return discussionUrlFromParam(param)
   }
 
   return null

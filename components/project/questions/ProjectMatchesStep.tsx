@@ -61,20 +61,14 @@ type MatchedInsighter = {
   insighter: MatchInsighter
   match_score: number
   is_match_all_properties?: boolean
+  is_match_before?: boolean
   status?: string | null
   matches?: MatchCriteria
 }
 
 type MatchApiResponse = {
-  data?:
-  | MatchedInsighter[]
-  | {
-    uuid?: string
-    status?: string | null
-    deadline_offer?: string | null
-    total_matches?: number
-    matches?: MatchedInsighter[]
-  }
+  submitted?: MatchedInsighter[]
+  unsubmitted?: { proposal_uuid?: string; matches?: MatchedInsighter[] }[]
 }
 
 type MatchFetchResult = {
@@ -285,7 +279,7 @@ async function fetchMatchedInsighters(
   }
 
   const res = await fetch(
-    getApiUrl(`/api/account/project/proposal/match/default/${projectUuid}`),
+    getApiUrl(`/api/account/project/proposal/match/list/${projectUuid}`),
     {
       method: 'GET',
       headers: {
@@ -303,17 +297,11 @@ async function fetchMatchedInsighters(
 
   const json = (await res.json()) as MatchApiResponse
 
-  if (Array.isArray(json.data)) {
+  const group = json.unsubmitted?.[0]
+  if (group) {
     return {
-      proposalMatchUuid: '',
-      matches: json.data,
-    }
-  }
-
-  if (json.data && Array.isArray(json.data.matches)) {
-    return {
-      proposalMatchUuid: stringifyValue(json.data.uuid),
-      matches: json.data.matches,
+      proposalMatchUuid: stringifyValue(group.proposal_uuid),
+      matches: group.matches ?? [],
     }
   }
 
@@ -445,8 +433,8 @@ function MatchAvatar({
   size?: number
 }) {
   const overlaySize = Math.max(30, Math.round(size * 0.36))
-  const mainImage = isCompany ? companyLogo || profileImage : profileImage
-  const overlayImage = isCompany ? profileImage : companyLogo
+  const mainImage = isCompany ? companyLogo : profileImage
+  const overlayImage = isCompany ? null : companyLogo
   const shouldShowOverlay = Boolean(overlayImage) && overlayImage !== mainImage
 
   return (
@@ -501,6 +489,9 @@ function MatchLoader({
           {cards.map((card, index) => {
             const isCompany = isCompanyLikeInsighter(card.insighter.roles)
             const companyName = stringifyValue(card.insighter.company?.legal_name)
+            const displayName = isCompany
+              ? companyName || (isRTL ? 'شركة' : 'Company')
+              : card.insighter.name
             const countryName = card.insighter.country
               ? getDisplayName(isRTL ? 'ar' : 'en', card.insighter.country)
               : ''
@@ -524,7 +515,7 @@ function MatchLoader({
                     }`}
                 >
                   <MatchAvatar
-                    name={card.insighter.name}
+                    name={displayName}
                     profileImage={card.insighter.profile_photo_url}
                     companyLogo={card.insighter.company?.logo}
                     isCompany={isCompany}
@@ -536,7 +527,7 @@ function MatchLoader({
                       className={`flex flex-wrap items-center gap-2 ${isRTL ? 'justify-end' : 'justify-start'}`}
                     >
                       <div className="truncate text-base font-semibold tracking-tight text-slate-950 sm:text-lg">
-                        {card.insighter.name}
+                        {displayName}
                       </div>
                       {showVerifiedBadge ? (
                         <CheckBadgeIcon className="h-4 w-4 shrink-0 text-[#3B82F6]" aria-hidden="true" />
@@ -547,13 +538,6 @@ function MatchLoader({
                         {isCompany ? 'Company' : 'INSIGHTER'}
                       </span>
                     </div>
-
-                    {isCompany && companyName ? (
-                      <div className="mt-1 text-[11px] font-semibold text-[#3B82F6] sm:text-xs">
-                        {isRTL ? 'مدير في ' : 'Manager at '}
-                        <span className="underline underline-offset-2">{companyName}</span>
-                      </div>
-                    ) : null}
 
                     {countryName ? (
                       <div
@@ -702,6 +686,9 @@ function MatchedInsighterCard({
   const isCompany = isCompanyLikeInsighter(match.insighter.roles)
   const companyName = stringifyValue(match.insighter.company?.legal_name)
   const companyUuid = stringifyValue(match.insighter.company?.uuid)
+  const displayName = isCompany
+    ? companyName || (isRTL ? 'شركة' : 'Company')
+    : match.insighter.name
   const countryName = match.insighter.country
     ? getDisplayName(locale, match.insighter.country)
     : ''
@@ -709,6 +696,9 @@ function MatchedInsighterCard({
   const badgeLabel = isRTL ? (isCompany ? 'شركة' : 'خبير') : isCompany ? 'Company' : 'INSIGHTER'
   const insighterHref = getInsighterProfileHref(locale, match.insighter.uuid)
   const companyHref = companyUuid ? getCompanyProfileHref(locale, companyUuid) : ''
+  const profileHref = isCompany
+    ? companyHref || getCompanyProfileHref(locale, match.insighter.uuid)
+    : insighterHref
   const showVerifiedBadge = Boolean(match.insighter.company?.verified)
   const hasMatches = match.matches && Object.keys(match.matches).length > 0
 
@@ -731,7 +721,7 @@ function MatchedInsighterCard({
               onChange={onToggleSelected}
               onClick={(event) => event.stopPropagation()}
               className="h-5 w-5 rounded border-slate-300 text-[#1C7CBB] focus:ring-2 focus:ring-blue-200"
-              aria-label={isRTL ? `تحديد ${match.insighter.name}` : `Select ${match.insighter.name}`}
+              aria-label={isRTL ? `تحديد ${displayName}` : `Select ${displayName}`}
             />
           </div>
 
@@ -740,7 +730,7 @@ function MatchedInsighterCard({
               className={`flex flex-1 items-start gap-4 rounded-[22px] ${isRTL ? 'flex-row-reverse text-right' : ''}`}
             >
               <MatchAvatar
-                name={match.insighter.name}
+                name={displayName}
                 profileImage={match.insighter.profile_photo_url}
                 companyLogo={match.insighter.company?.logo}
                 isCompany={isCompany}
@@ -753,7 +743,7 @@ function MatchedInsighterCard({
                     }`}
                 >
                   <span className="truncate text-base font-semibold tracking-tight text-slate-950 sm:text-lg">
-                    {match.insighter.name}
+                    {displayName}
                   </span>
 
                   {showVerifiedBadge ? (
@@ -770,22 +760,30 @@ function MatchedInsighterCard({
                   </span>
                 </div>
 
-                {isCompany && companyName ? (
-                  <div className="mt-1 text-[11px] font-semibold text-[#3B82F6] sm:text-xs">
-                    {isRTL ? 'مدير في ' : 'Manager at '}
-                    {companyUuid ? (
-                      <Link
-                        href={companyHref}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        onClick={(event) => event.stopPropagation()}
-                        className="underline underline-offset-2 hover:opacity-80"
-                      >
-                        {companyName}
-                      </Link>
-                    ) : (
-                      <span>{companyName}</span>
-                    )}
+                {isCompany && match.insighter.name ? (
+                  <div
+                    className={`mt-1.5 flex items-center gap-1.5 text-[11px] text-slate-500 sm:text-xs ${isRTL ? 'flex-row-reverse justify-end' : ''
+                      }`}
+                  >
+                    <span className="shrink-0 text-slate-400">{isRTL ? 'بواسطة' : 'By'}</span>
+                    <span className="relative inline-flex h-5 w-5 shrink-0 items-center justify-center overflow-hidden rounded-full border border-slate-200 bg-slate-100">
+                      {match.insighter.profile_photo_url ? (
+                        <Image
+                          src={match.insighter.profile_photo_url}
+                          alt={match.insighter.name}
+                          width={20}
+                          height={20}
+                          className="h-full w-full object-cover object-top"
+                        />
+                      ) : (
+                        <span className="text-[8px] font-semibold text-slate-500">
+                          {getInitials(match.insighter.name)}
+                        </span>
+                      )}
+                    </span>
+                    <span className="truncate font-medium text-slate-700">
+                      {match.insighter.name}
+                    </span>
                   </div>
                 ) : null}
 
@@ -808,7 +806,7 @@ function MatchedInsighterCard({
                 ) : null}
 
                 <Link
-                  href={insighterHref}
+                  href={profileHref}
                   target="_blank"
                   rel="noopener noreferrer"
                   onClick={(event) => event.stopPropagation()}
@@ -849,7 +847,7 @@ function MatchedInsighterCard({
         >
           <div className={`flex min-w-0 flex-1 flex-wrap gap-2 ${isRTL ? 'justify-end' : ''}`}>
             <Link
-              href={insighterHref}
+              href={profileHref}
               target="_blank"
               rel="noopener noreferrer"
               onClick={(event) => event.stopPropagation()}

@@ -171,7 +171,11 @@ const getColorClassesForSubType = (subType: string) => {
 
 // Helper function to determine background color based on notification sub_type
 // This matches the Angular notificationsBg pipe
-const getNotificationBg = (subType: string): string => {
+const getNotificationBg = (subType: string, subTypeValue?: string): string => {
+  // "Reviewed" shares one sub_type for Approved and Changes Requested.
+  if (subType === 'project_review_submission_reviewed') {
+    return isChangesRequestedLabel(subTypeValue) ? 'yellow' : 'green';
+  }
   switch (subType) {
     case 'order':
     case 'knowledge': // used as sub_type for order notifications
@@ -207,6 +211,12 @@ const getNotificationBg = (subType: string): string => {
       return 'green';
     case 'share':
       return 'yellow';
+    // Project notifications
+    case 'project': // contract signed / offer accepted
+    case 'project_service': // service started
+      return 'green';
+    case 'project_closed': // project closed
+      return 'red';
     default:
       return 'blue';
   }
@@ -228,8 +238,22 @@ const getTailwindColor = (color: string): string => {
   return colorMap[color] || 'blue';
 }
 
+// Detects the "Changes Requested" status from the localized status label (en/ar).
+const isChangesRequestedLabel = (subTypeValue?: string): boolean => {
+  const label = (subTypeValue ?? '').toLowerCase()
+  return label.includes('change') || label.includes('تعديل')
+}
+
 // Helper function to get icon name based on notification sub_type (like the Angular notificationsIcons pipe)
-const getNotificationIconName = (subType: string): string => {
+const getNotificationIconName = (subType: string, subTypeValue?: string): string => {
+  // "Reviewed" shares one sub_type for Approved and Changes Requested,
+  // so disambiguate by the localized status label.
+  if (subType === 'project_review_submission_reviewed') {
+    return isChangesRequestedLabel(subTypeValue)
+      ? 'keen:message-notif' // changes requested
+      : 'duotune/files/fil025.svg' // approved (file-check)
+  }
+
   switch (subType) {
     case 'order':
     case 'sale': // used as sub_type for order notifications
@@ -299,6 +323,20 @@ const getNotificationIconName = (subType: string): string => {
         return 'duotune/communication/com007.svg';
     case 'project_proposal_offer':
       return 'keen:briefcase';
+    // Project notifications
+    case 'project_proposal': // new project request / invitation
+      return 'duotune/files/fil024.svg';
+    case 'project': // contract signed / offer accepted
+      return 'duotune/files/fil025.svg';
+    case 'project_closed': // project closed
+      return 'duotune/general/gen040.svg';
+    case 'project_service': // project service started (ready to begin)
+      return 'keen:chart-line-star';
+    case 'project_review_submission': // review submitted to client
+      return 'keen:file-up';
+    // 'project_review_submission_reviewed' handled above (status-dependent)
+    case 'project_file_uploaded': // file uploaded to project
+      return 'duotune/files/fil018.svg';
     default:
       return 'duotune/general/gen007.svg';
   }
@@ -306,7 +344,10 @@ const getNotificationIconName = (subType: string): string => {
 
 const renderKeenIcon = (iconName: string, className: string): React.ReactNode => {
   const pathCounts: Record<string, number> = {
-    briefcase: 2
+    briefcase: 2,
+    'chart-line-star': 3,
+    'file-up': 2,
+    'message-notif': 5
   }
 
   const pathCount = pathCounts[iconName] ?? 0
@@ -323,9 +364,9 @@ const renderKeenIcon = (iconName: string, className: string): React.ReactNode =>
 
 
 // Helper function to determine icon based on notification sub_type
-const getNotificationIcon = (subType: string, color?: string): React.ReactNode => {
+const getNotificationIcon = (subType: string, color?: string, subTypeValue?: string): React.ReactNode => {
   // Get the SVG icon path from the duotune directory
-  const iconPath = getNotificationIconName(subType);
+  const iconPath = getNotificationIconName(subType, subTypeValue);
   
   // Get the Tailwind color from the notification color (if provided)
   const tailwindColor = color ? getTailwindColor(color) : 'blue';
@@ -483,8 +524,8 @@ export default function NotificationsInner({
     const color = VARIANT_TO_TW_COLOR[variant] ?? 'blue'
     const colorClasses = COLOR_CLASSES_BY_TW[color]
     const title = getNotificationName(notification.sub_type, currentLanguage)
-    const iconPath = getNotificationIconName(notification.sub_type)
-    const bg = getNotificationBg(notification.sub_type)
+    const iconPath = getNotificationIconName(notification.sub_type, notification.sub_type_value)
+    const bg = getNotificationBg(notification.sub_type, notification.sub_type_value)
     const messageText = htmlToText(notification.message)
     const unreadMessageHtml = sanitizeNotificationHtml(notification.message)
 
@@ -506,7 +547,7 @@ export default function NotificationsInner({
         <div className="flex items-start">
           <div className={`flex-shrink-0 ${isRTL ? 'ml-3' : 'mr-4'}`}>
           <div className={` h-12 w-12 rounded-md flex items-center justify-center `}>
-                {getNotificationIcon(notification.sub_type, getNotificationBg(notification.sub_type))}
+                {getNotificationIcon(notification.sub_type, getNotificationBg(notification.sub_type, notification.sub_type_value), notification.sub_type_value)}
                 </div>
           </div>
 

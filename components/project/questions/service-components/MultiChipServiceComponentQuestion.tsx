@@ -122,12 +122,19 @@ export default function MultiChipServiceComponentQuestion({
                 key={opt.value}
                 type="button"
                 onClick={() => onToggle(opt.value)}
-                className={`rounded-full border px-3 py-1.5 text-xs sm:text-sm font-semibold transition-colors ${
+                className={`inline-flex items-center gap-2 rounded-full border px-3 py-1.5 text-xs sm:text-sm font-semibold transition-colors ${
                   checked
                     ? 'border-blue-300 bg-blue-50 text-blue-700'
                     : 'border-slate-200 bg-white/80 text-slate-700 hover:bg-white'
-                }`}
+                } ${isRTL ? 'flex-row-reverse' : ''}`}
               >
+                {opt.iconSrc ? (
+                  <img
+                    src={opt.iconSrc}
+                    alt=""
+                    className="h-5 w-5 shrink-0 object-contain"
+                  />
+                ) : null}
                 {opt.label}
               </button>
             )

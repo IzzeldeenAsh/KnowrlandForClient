@@ -282,6 +282,27 @@ function ProfilePageContent() {
   const activeTab = searchParams.get("tab") || "knowledge";
   const isViewingInsighterEntity = (enterpriseType ?? entityParam) === "insighter";
 
+  const logProfileResponse = (
+    source: "insighter" | "company",
+    payload: unknown
+  ) => {
+    const profile =
+      payload &&
+        typeof payload === "object" &&
+        "data" in payload
+        ? (payload as { data: unknown }).data
+        : payload;
+
+    console.log("[ProfilePage] profile API response", {
+      source,
+      uuid,
+      locale,
+      entityParam,
+      profile,
+      rawResponse: payload,
+    });
+  };
+
   // Ref to prevent duplicate API calls
   const fetchingProfileRef = useRef(false);
 
@@ -331,6 +352,7 @@ function ProfilePageContent() {
 
           if (response.ok) {
             const data = await response.json();
+            logProfileResponse("insighter", data);
             setProfileData(data.data);
           } else {
             // Fall back to company API if insighter fails
@@ -350,6 +372,7 @@ function ProfilePageContent() {
             }
 
             const data = await response.json();
+            logProfileResponse("company", data);
 
             // Create a ProfileData object from company data
             const companyProfileData: ProfileData = {
@@ -368,6 +391,8 @@ function ProfilePageContent() {
               consulting_field: data.data.consulting_field || [],
               social: data.data.social || [],
               insighter_company: data.data.insighter_company || [],
+              receive_project_services_active:
+                data.data.receive_project_services_active,
               company: {
                 legal_name: data.data.legal_name,
                 website: data.data.website,
@@ -400,6 +425,7 @@ function ProfilePageContent() {
           if (response.ok) {
             // It's a company profile
             const data = await response.json();
+            logProfileResponse("company", data);
 
             // Create a ProfileData object from company data
             const companyProfileData: ProfileData = {
@@ -418,6 +444,8 @@ function ProfilePageContent() {
               consulting_field: data.data.consulting_field || [],
               social: data.data.social || [],
               insighter_company: data.data.insighter_company || [],
+              receive_project_services_active:
+                data.data.receive_project_services_active,
               company: {
                 legal_name: data.data.legal_name,
                 website: data.data.website,
@@ -451,6 +479,7 @@ function ProfilePageContent() {
             }
 
             const data = await response.json();
+            logProfileResponse("insighter", data);
             setProfileData(data.data);
           }
         }
@@ -818,10 +847,12 @@ function ProfilePageContent() {
   const isCompany = profileData?.roles.includes("company");
   const isInsighter = profileData?.roles.includes("insighter");
   const isCompanyInsighter = profileData?.roles.includes("company-insighter");
+  const companyOwnerInsighterUuid =
+    profileData?.insighter_company?.find((insighter) => insighter.owner)?.uuid || "";
+  const specifiedInsighterUuid =
+    companyOwnerInsighterUuid || (isViewingInsighterEntity ? profileData?.uuid || uuid : "");
   const canRequestSpecifiedInsighterProject =
-    isViewingInsighterEntity &&
-    profileData?.receive_project_services_active === true;
-  const specifiedInsighterUuid = profileData?.uuid || uuid;
+    profileData?.receive_project_services_active === true && Boolean(specifiedInsighterUuid);
   const specifiedInsighterProjectHref = `/${locale}/project/wizard/project-type?fresh=1&${specifiedInsighterQueryParam}=${encodeURIComponent(specifiedInsighterUuid)}`;
 
   // Function to handle pagination
@@ -1502,11 +1533,15 @@ function ProfilePageContent() {
 
                         {/* Action Buttons */}
                         <div className="flex flex-wrap gap-3 mb-4 justify-center md:justify-start">
-                          <ProfileShare
-                            profileData={profileData}
-                            enterpriseType={enterpriseType}
-                            locale={locale}
-                          />
+                          {canRequestSpecifiedInsighterProject && (
+                            <Link
+                              href={specifiedInsighterProjectHref}
+                              className="inline-flex items-center gap-2 rounded-md bg-gradient-to-r from-blue-500 to-teal-400 px-3 py-2 text-xs font-medium text-white transition-all duration-200 hover:-translate-y-0.5 hover:from-blue-600 hover:to-teal-500 hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-sky-300"
+                            >
+                              <IconBriefcase size={16} stroke={2} />
+                              <span>{locale === "ar" ? "طلب خدمة مشروع" : "Request Project Service"}</span>
+                            </Link>
+                          )}
                         </div>
                       </div>
 
@@ -1634,17 +1669,13 @@ function ProfilePageContent() {
                         {t("meet")} {profileData?.first_name || ""}
                       </Tabs.Tab>
                     )}
-                  {canRequestSpecifiedInsighterProject && (
-                    <div className="ms-auto flex items-center px-3 py-2">
-                      <Link
-                        href={specifiedInsighterProjectHref}
-                        className="inline-flex h-10 items-center gap-2 rounded-full bg-[#1C7CBB] px-4 text-sm font-semibold text-white shadow-sm transition hover:bg-[#166A9F] focus:outline-none focus:ring-2 focus:ring-sky-300"
-                      >
-                        <IconBriefcase size={18} stroke={2} />
-                        <span>{locale === "ar" ? "إنشاء مشروع" : "Create Project"}</span>
-                      </Link>
-                    </div>
-                  )}
+                  <div className="ms-auto flex items-center px-3 py-2">
+                    <ProfileShare
+                      profileData={profileData}
+                      enterpriseType={enterpriseType}
+                      locale={locale}
+                    />
+                  </div>
                 </Tabs.List>
 
                 <div className="relative">

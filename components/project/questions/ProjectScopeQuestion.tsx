@@ -461,7 +461,7 @@ export default function ProjectScopeQuestion({ locale }: { locale: WizardLocale 
             activeController = new AbortController()
 
             try {
-              const url = getApiUrl(`/api/account/project/request/${projectUuid}`)
+              const url = getApiUrl(`/api/account/project/show/${projectUuid}`)
               const res = await fetch(url, {
                 method: 'GET',
                 headers: {
@@ -704,6 +704,23 @@ export default function ProjectScopeQuestion({ locale }: { locale: WizardLocale 
     )
   }
 
+  const selectableCount = availableScopes.length + namedManualScopes.length
+
+  const allSelected =
+    selectableCount > 0 &&
+    availableScopes.every((s) => selectedParentIds.includes(s.id)) &&
+    namedManualScopes.every((s) => selectedManualScopeIds.includes(s.id))
+
+  const toggleSelectAll = () => {
+    if (allSelected) {
+      setSelectedParentIds([])
+      setSelectedManualScopeIds([])
+    } else {
+      setSelectedParentIds(availableScopes.map((s) => s.id))
+      setSelectedManualScopeIds(namedManualScopes.map((s) => s.id))
+    }
+  }
+
   const toggleManualScope = (id: string) => {
     setSelectedManualScopeIds((prev) =>
       prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]
@@ -826,6 +843,7 @@ export default function ProjectScopeQuestion({ locale }: { locale: WizardLocale 
           type: toApiProjectType(projectType),
           service_id: serviceId,
           service_prompt: prompt,
+          prompt_ai: prompt,
         }),
       })
 
@@ -860,7 +878,7 @@ export default function ProjectScopeQuestion({ locale }: { locale: WizardLocale 
         setAiAttempt(attempt)
 
         try {
-          const url = getApiUrl(`/api/account/project/request/${nextProjectUuid}`)
+          const url = getApiUrl(`/api/account/project/show/${nextProjectUuid}`)
           const res = await fetch(url, {
             method: 'GET',
             headers: {
@@ -965,17 +983,19 @@ export default function ProjectScopeQuestion({ locale }: { locale: WizardLocale 
         ) : null}
         <h2
           id="project-scope-question-title"
-          className="text-2xl font-medium tracking-tight text-slate-900 sm:text-3xl"
+          className="text-xl font-medium tracking-tight text-slate-900 sm:text-2xl"
           dangerouslySetInnerHTML={{ __html: title }}
         />
-        <p className="mt-2 text-sm font-semibold text-slate-600 sm:text-base">{subtitle}</p>
+        <p className="mt-1.5 max-w-3xl text-sm font-semibold leading-relaxed text-slate-600">
+          {subtitle}
+        </p>
       </div>
 
       {error ? <div className="mt-4 text-sm font-semibold text-rose-700">{error}</div> : null}
 
 
 
-      <div className="mt-6 sm:mt-10 pb-[100px] pg:pb-0">
+      <div className="mt-5 pb-[100px] lg:pb-0 sm:mt-7">
         {loading ? (
           isOtherFlow && aiMode === 'polling' ? (
             <AiGeneratingScopesLoader
@@ -989,8 +1009,41 @@ export default function ProjectScopeQuestion({ locale }: { locale: WizardLocale 
             </div>
           )
         ) : showScopePicker ? (
+          <>
+          {selectableCount > 0 ? (
+            <div
+              className={`mb-3 flex items-center ${isRTL ? 'justify-start flex-row-reverse' : 'justify-end'}`}
+            >
+              <button
+                type="button"
+                onClick={toggleSelectAll}
+                className={`inline-flex items-center gap-2 rounded-full border px-3.5 py-1.5 text-xs font-semibold transition-colors ${
+                  allSelected
+                    ? 'border-blue-300 bg-blue-50 text-[#1C7CBB]'
+                    : 'border-slate-200 bg-white/70 text-slate-600 hover:bg-white'
+                } ${isRTL ? 'flex-row-reverse' : ''}`}
+              >
+                <span
+                  className={`inline-flex h-4 w-4 items-center justify-center rounded border ${
+                    allSelected
+                      ? 'border-[#1C7CBB] bg-[#1C7CBB] text-white'
+                      : 'border-slate-300 bg-white'
+                  }`}
+                >
+                  {allSelected ? <IconCheck size={12} stroke={3} /> : null}
+                </span>
+                {allSelected
+                  ? isRTL
+                    ? 'إلغاء تحديد الكل'
+                    : 'Deselect all'
+                  : isRTL
+                    ? 'تحديد الكل'
+                    : 'Select all'}
+              </button>
+            </div>
+          ) : null}
           <div
-            className="grid grid-cols-1 gap-3 sm:grid-cols-2"
+            className="grid grid-cols-1 gap-2.5 sm:grid-cols-2 lg:grid-cols-3"
             role="group"
             aria-label={title}
           >
@@ -999,7 +1052,7 @@ export default function ProjectScopeQuestion({ locale }: { locale: WizardLocale 
               return (
                 <label
                   key={scope.id}
-                  className={`flex min-h-[72px] cursor-pointer items-center gap-3 rounded-2xl border px-5 py-4 text-start shadow-sm backdrop-blur-md transition-all duration-300 ${
+                  className={`flex min-h-[56px] cursor-pointer items-center gap-2.5 rounded-xl border px-3.5 py-3 text-start shadow-sm backdrop-blur-md transition-all duration-300 sm:px-4 ${
                     checked
                       ? 'border-blue-300 bg-white/70'
                       : 'border-white/30 bg-white/40 hover:bg-white/55'
@@ -1016,9 +1069,9 @@ export default function ProjectScopeQuestion({ locale }: { locale: WizardLocale 
                     type="checkbox"
                     checked={checked}
                     onChange={() => toggleParent(scope.id)}
-                    className="h-5 w-5 shrink-0 rounded border-slate-300 text-[#1C7CBB] focus:ring-2 focus:ring-blue-200"
+                    className="h-4 w-4 shrink-0 rounded border-slate-300 text-[#1C7CBB] focus:ring-2 focus:ring-blue-200"
                   />
-                  <span className="text-sm font-semibold text-slate-900 sm:text-base">
+                  <span className="text-sm font-semibold leading-snug text-slate-900">
                     {scope.name}
                   </span>
                 </label>
@@ -1030,7 +1083,7 @@ export default function ProjectScopeQuestion({ locale }: { locale: WizardLocale 
               return (
               <div
                 key={scope.id}
-                className={`flex min-h-[72px] items-center gap-3 rounded-2xl border px-5 py-4 shadow-sm backdrop-blur-md ${
+                className={`flex min-h-[56px] items-center gap-2.5 rounded-xl border px-3.5 py-3 shadow-sm backdrop-blur-md sm:px-4 ${
                   checked
                     ? 'border-blue-300 bg-white/70'
                     : 'border-white/30 bg-white/40'
@@ -1040,18 +1093,18 @@ export default function ProjectScopeQuestion({ locale }: { locale: WizardLocale 
                   type="checkbox"
                   checked={checked}
                   onChange={() => toggleManualScope(scope.id)}
-                  className="h-5 w-5 shrink-0 rounded border-slate-300 text-[#1C7CBB] focus:ring-2 focus:ring-blue-200"
+                  className="h-4 w-4 shrink-0 rounded border-slate-300 text-[#1C7CBB] focus:ring-2 focus:ring-blue-200"
                 />
-                <span className={`flex-1 text-sm font-semibold text-slate-900 ${isRTL ? 'text-right' : 'text-left'}`}>
+                <span className={`flex-1 text-sm font-semibold leading-snug text-slate-900 ${isRTL ? 'text-right' : 'text-left'}`}>
                   {scope.name}
                 </span>
                 <button
                   type="button"
                   onClick={() => removeManualScope(scope.id)}
                   aria-label={isRTL ? 'إزالة النطاق' : 'Remove scope'}
-                  className="inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-full border border-slate-200 bg-white/80 text-slate-500 hover:bg-white hover:text-slate-700"
+                  className="inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-full border border-slate-200 bg-white/80 text-slate-500 hover:bg-white hover:text-slate-700"
                 >
-                  <IconXboxXFilled size={16} />
+                  <IconXboxXFilled size={14} />
                 </button>
               </div>
               )
@@ -1059,10 +1112,10 @@ export default function ProjectScopeQuestion({ locale }: { locale: WizardLocale 
 
             {pendingScopeName !== null ? (
               <div
-                className={`flex min-h-[72px] items-center gap-3 rounded-2xl border border-white/30 bg-white/55 px-5 py-4 shadow-sm backdrop-blur-md ${isRTL ? 'flex-row-reverse' : ''}`}
+                className={`flex min-h-[56px] items-center gap-2.5 rounded-xl border border-white/30 bg-white/55 px-3.5 py-3 shadow-sm backdrop-blur-md sm:px-4 ${isRTL ? 'flex-row-reverse' : ''}`}
               >
                 <span
-                  className="inline-flex h-5 w-5 shrink-0 items-center justify-center rounded-md border border-slate-300 bg-white/80"
+                  className="inline-flex h-4 w-4 shrink-0 items-center justify-center rounded border border-slate-300 bg-white/80"
                   aria-hidden="true"
                 />
                 <input
@@ -1082,18 +1135,18 @@ export default function ProjectScopeQuestion({ locale }: { locale: WizardLocale 
                   onMouseDown={(event) => event.preventDefault()}
                   onClick={commitPendingScope}
                   aria-label={isRTL ? 'إضافة النطاق' : 'Add scope'}
-                  className="inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-emerald-500 text-white shadow-sm hover:bg-emerald-600 active:bg-emerald-700"
+                  className="inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-emerald-500 text-white shadow-sm hover:bg-emerald-600 active:bg-emerald-700"
                 >
-                  <IconCheck size={14} stroke={2.5} />
+                  <IconCheck size={13} stroke={2.5} />
                 </button>
                 <button
                   type="button"
                   onMouseDown={(event) => event.preventDefault()}
                   onClick={cancelPendingScope}
                   aria-label={isRTL ? 'إلغاء' : 'Cancel'}
-                  className="inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-rose-500 text-white shadow-sm hover:bg-rose-600 active:bg-rose-700"
+                  className="inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-rose-500 text-white shadow-sm hover:bg-rose-600 active:bg-rose-700"
                 >
-                  <IconXboxXFilled size={15} />
+                  <IconXboxXFilled size={13} />
                 </button>
               </div>
             ) : null}
@@ -1104,7 +1157,7 @@ export default function ProjectScopeQuestion({ locale }: { locale: WizardLocale 
                 if (pendingScopeName !== null) event.preventDefault()
               }}
               onClick={startAddScope}
-              className={`flex min-h-[72px] w-full items-center justify-center gap-2 rounded-2xl border-2 border-blue-300 bg-white/40 px-5 py-4 shadow-sm backdrop-blur-md transition-all duration-200 hover:bg-blue-50/30 ${
+              className={`flex min-h-[56px] w-full items-center justify-center gap-2 rounded-xl border border-dashed border-blue-300 bg-white/35 px-3.5 py-3 shadow-sm backdrop-blur-md transition-all duration-200 hover:bg-blue-50/30 sm:px-4 ${
                 entered
                   ? 'translate-x-0 opacity-100'
                   : isRTL
@@ -1113,12 +1166,13 @@ export default function ProjectScopeQuestion({ locale }: { locale: WizardLocale 
               }`}
               style={{ transitionDelay: `${110 + availableScopes.length * 45}ms` }}
             >
-              <IconPlusFilled size={18} className="shrink-0 text-blue-500" />
-              <span className="text-sm font-semibold text-blue-500 sm:text-base">
+              <IconPlusFilled size={15} className="shrink-0 text-blue-500" />
+              <span className="text-sm font-semibold text-blue-500">
                 {isRTL ? 'إضافة نطاق' : 'Add Scope'}
               </span>
             </button>
           </div>
+          </>
         ) : isOtherFlow ? (
           <div></div>
         ) : null}

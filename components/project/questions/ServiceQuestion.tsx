@@ -1,8 +1,22 @@
 'use client'
 
 import { useEffect, useMemo, useState } from 'react'
+import type { ComponentType } from 'react'
 import Link from 'next/link'
-import ChoiceCard from './ChoiceCard'
+import {
+  IconArrowUp,
+  IconCheck,
+  IconSparklesFilled,
+  IconChartBar,
+  IconChartArrowsVertical,
+  IconClipboardText,
+  IconDeviceDesktopAnalytics,
+  IconBuildingBank,
+  IconTargetArrow,
+  IconCoins,
+  IconShieldCheck,
+  IconReportAnalytics,
+} from '@tabler/icons-react'
 import ProjectSelectedTypeHeader from '../ProjectSelectedTypeHeader'
 import {
   clearStoredProjectRequestUuid,
@@ -29,6 +43,96 @@ type Service = {
   id: number
   name: string
   slug: string
+}
+
+type TablerIcon = ComponentType<{ size?: number; stroke?: number; className?: string }>
+
+type ServiceMeta = {
+  Icon: TablerIcon
+  iconClass: string
+  description: { en: string; ar: string }
+}
+
+// Hardcoded presentation metadata per service slug. Icons are placeholders to be
+// swapped for custom illustrations later.
+const SERVICE_META: Record<string, ServiceMeta> = {
+  'market-research': {
+    Icon: IconChartBar,
+    iconClass: 'bg-blue-50 text-blue-600',
+    description: {
+      en: 'Understand market size, demand, and competition.',
+      ar: 'افهم حجم السوق والطلب والمنافسة.',
+    },
+  },
+  'feasibility-study': {
+    Icon: IconChartArrowsVertical,
+    iconClass: 'bg-amber-50 text-amber-600',
+    description: {
+      en: 'Assess viability, profitability, and next steps.',
+      ar: 'قيّم الجدوى والربحية والخطوات التالية.',
+    },
+  },
+  'business-plan': {
+    Icon: IconClipboardText,
+    iconClass: 'bg-emerald-50 text-emerald-600',
+    description: {
+      en: 'Build a roadmap for strategy and operations.',
+      ar: 'ابنِ خارطة طريق للاستراتيجية والعمليات.',
+    },
+  },
+  'digital-transformation': {
+    Icon: IconDeviceDesktopAnalytics,
+    iconClass: 'bg-violet-50 text-violet-600',
+    description: {
+      en: 'Modernize processes and technology to scale.',
+      ar: 'حدّث العمليات والتقنيات للتوسع.',
+    },
+  },
+  'company-valuation': {
+    Icon: IconBuildingBank,
+    iconClass: 'bg-cyan-50 text-cyan-600',
+    description: {
+      en: "Determine your company's fair value.",
+      ar: 'حدّد القيمة العادلة لشركتك.',
+    },
+  },
+  'go-to-market-strategy': {
+    Icon: IconTargetArrow,
+    iconClass: 'bg-rose-50 text-rose-600',
+    description: {
+      en: 'Plan launch, positioning, and customer growth.',
+      ar: 'خطّط للإطلاق والتموضع ونمو العملاء.',
+    },
+  },
+  'fundraising-strategy': {
+    Icon: IconCoins,
+    iconClass: 'bg-teal-50 text-teal-600',
+    description: {
+      en: 'Prepare to raise capital and attract investors.',
+      ar: 'استعد لجمع التمويل وجذب المستثمرين.',
+    },
+  },
+  'policies-procedures-governance': {
+    Icon: IconShieldCheck,
+    iconClass: 'bg-indigo-50 text-indigo-600',
+    description: {
+      en: 'Set governance, policies, and compliance.',
+      ar: 'ضع الحوكمة والسياسات والامتثال.',
+    },
+  },
+}
+
+const FALLBACK_SERVICE_META: ServiceMeta = {
+  Icon: IconReportAnalytics,
+  iconClass: 'bg-slate-100 text-slate-600',
+  description: {
+    en: 'Advisory tailored to your business needs.',
+    ar: 'استشارة مصممة لاحتياجات عملك.',
+  },
+}
+
+function getServiceMeta(service: Service): ServiceMeta {
+  return SERVICE_META[(service.slug || '').trim().toLowerCase()] || FALLBACK_SERVICE_META
 }
 
 function isOtherService(service: Service | null): boolean {
@@ -67,6 +171,85 @@ function safeParseSelectedServiceId(value: string | null): number | null {
   } catch {
     return coerceFiniteNumber(value)
   }
+}
+
+function AiScopePromptComposer({
+  isRTL,
+  value,
+  loading,
+  onChange,
+  onSend,
+}: {
+  isRTL: boolean
+  value: string
+  loading: boolean
+  onChange: (next: string) => void
+  onSend: () => void
+}) {
+  const canSend = value.trim().length > 0 && !loading
+
+  return (
+    <div>
+      <style>{`
+        .ai-service-input {
+          scrollbar-width: none;
+          -ms-overflow-style: none;
+        }
+        .ai-service-input::-webkit-scrollbar {
+          display: none;
+        }
+        .ai-service-input:focus {
+          outline: none !important;
+          box-shadow: none !important;
+          border-color: transparent !important;
+        }
+      `}</style>
+      <div className={`flex items-center gap-2.5 ${isRTL ? 'flex-row-reverse text-right' : ''}`}>
+        <span className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border border-sky-200/80 bg-gradient-to-br from-sky-50 to-cyan-100/80 text-sky-600 shadow-sm">
+          <IconSparklesFilled size={18} className="animate-pulse" />
+        </span>
+        <div>
+          <h3 className="text-base font-semibold text-slate-900">
+            {isRTL ? 'أو صف خدمتك للذكاء الاصطناعي' : 'Or describe your service to our AI'}
+          </h3>
+        </div>
+      </div>
+
+      <div
+        className={`mt-3 flex items-end gap-2 rounded-xl border border-slate-200/80 bg-white/85 px-3 py-3 shadow-sm ${isRTL ? 'flex-row-reverse' : ''
+          }`}
+      >
+        <textarea
+          value={value}
+          onChange={(e) => onChange(e.target.value)}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter' && !e.shiftKey) {
+              e.preventDefault()
+              if (canSend) onSend()
+            }
+          }}
+          rows={2}
+          dir="auto"
+          className="ai-service-input min-h-[60px] w-full resize-none border-0 bg-transparent px-1 py-1 text-sm font-medium text-slate-900 outline-none focus:ring-0 placeholder:text-xs placeholder:text-slate-400"
+          placeholder={isRTL ? 'صف خدمتك...' : 'Describe your service...'}
+        />
+
+        <button
+          type="button"
+          onClick={onSend}
+          disabled={!canSend}
+          aria-label={isRTL ? 'توليد النطاقات' : 'Generate scopes'}
+          title={isRTL ? 'توليد النطاقات' : 'Generate scopes'}
+          className={`inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-full transition ${canSend
+              ? 'bg-[#1C7CBB] text-white shadow-md shadow-sky-500/20 hover:bg-[#176799]'
+              : 'bg-slate-200 text-slate-500'
+            }`}
+        >
+          <IconArrowUp size={18} stroke={2.2} />
+        </button>
+      </div>
+    </div>
+  )
 }
 
 export default function ServiceQuestion({ locale }: { locale: WizardLocale }) {
@@ -161,12 +344,22 @@ export default function ServiceQuestion({ locale }: { locale: WizardLocale }) {
   }, [isRTL, locale])
 
   const title = isRTL
-    ? 'ما نوع الخدمات  <br> التي تبحث عنها؟'
-    : 'What type of services <br> are you looking for?'
+    ? 'ما نوع الخدمات التي تبحث عنها؟'
+    : 'What type of services are you looking for?'
 
   const selectedService = useMemo(
     () => (services || []).find((service) => service.id === selectedId) || null,
     [services, selectedId]
+  )
+
+  const otherService = useMemo(
+    () => (services || []).find((service) => isOtherService(service)) || null,
+    [services]
+  )
+
+  const predefinedServices = useMemo(
+    () => (services || []).filter((service) => !isOtherService(service)),
+    [services]
   )
 
   const isOtherSelected = isOtherService(selectedService)
@@ -308,6 +501,7 @@ export default function ServiceQuestion({ locale }: { locale: WizardLocale }) {
           type: toApiProjectType(projectType),
           service_id: apiServiceId,
           service_prompt: prompt,
+          prompt_ai: prompt,
         }),
       })
 
@@ -419,10 +613,34 @@ export default function ServiceQuestion({ locale }: { locale: WizardLocale }) {
     })
   }
 
-  const cards = useMemo(() => services || [], [services])
+  const onSendAiPrompt = async () => {
+    if (submitting) return
+
+    const prompt = servicePrompt.trim()
+    if (!prompt) {
+      setError(
+        isRTL
+          ? 'اكتب وصفًا للخدمة أولًا لتوليد النطاقات.'
+          : 'Write a service description first to generate scopes.'
+      )
+      return
+    }
+
+    const otherServiceId = otherService?.id ?? 10
+    setSelectedId(otherServiceId)
+    setError(null)
+    resetDownstreamWizardState(true)
+
+    await submitSelection({
+      serviceId: otherServiceId,
+      isOtherSelected: true,
+      servicePrompt: prompt,
+      serviceLabel: null,
+    })
+  }
 
   return (
-    <div className="w-full max-w-5xl mx-auto" dir={isRTL ? 'rtl' : 'ltr'}>
+    <div className="w-full max-w-6xl mx-auto" dir={isRTL ? 'rtl' : 'ltr'}>
       <ProjectSelectedTypeHeader
         locale={locale}
         entered={entered}
@@ -454,32 +672,83 @@ export default function ServiceQuestion({ locale }: { locale: WizardLocale }) {
         <div className="mt-4 text-sm font-semibold text-rose-700">{error}</div>
       ) : null}
 
-      <div className="mt-6 sm:mt-10 pb-[100px] lg:pb-0" role="radiogroup" aria-label={title}>
+      <div className="mt-6 sm:mt-8 pb-[100px] lg:pb-0">
         {loading ? (
           <div className="text-sm font-semibold text-slate-600">
             {isRTL ? 'جاري التحميل…' : 'Loading…'}
           </div>
         ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-3 lg:grid-cols-4 gap-3">
-            {cards.map((service, index) => {
-              const checked = selectedId === service.id
-              return (
-                <ChoiceCard
-                  key={service.id}
-                  role="radio"
-                  checked={checked}
-                  title={service.name}
-                  align="start"
-                  size="sm"
-                  isRTL={isRTL}
-                  entered={entered}
-                  delayMs={110 + index * 50}
-                  onSelect={() => onSelect(service)}
-                  className="min-h-[110px]"
-                />
-              )
-            })}
-          </div>
+          <>
+            {predefinedServices.length > 0 ? (
+              <div>
+                <div
+                  className="grid auto-rows-fr grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4"
+                  role="radiogroup"
+                  aria-label={
+                    isRTL ? 'الخدمات المعرّفة مسبقًا' : 'Predefined services'
+                  }
+                >
+                  {predefinedServices.map((service, index) => {
+                    const checked = selectedId === service.id
+                    const meta = getServiceMeta(service)
+                    const ServiceIcon = meta.Icon
+                    return (
+                      <button
+                        key={service.id}
+                        type="button"
+                        role="radio"
+                        aria-checked={checked}
+                        disabled={submitting}
+                        onClick={() => onSelect(service)}
+                        style={{ transitionDelay: `${110 + index * 35}ms` }}
+                        className={`group relative flex min-h-[116px] items-start gap-3 rounded-2xl border p-3.5 text-start transition-all duration-300 disabled:cursor-not-allowed ${checked
+                            ? 'border-[#1C7CBB] bg-white shadow-sm ring-1 ring-[#1C7CBB]'
+                            : 'border-transparent bg-slate-100/80 hover:bg-slate-100'
+                          } ${entered
+                            ? 'translate-y-0 opacity-100'
+                            : 'translate-y-2 opacity-0'
+                          } ${isRTL ? 'flex-row-reverse text-right' : ''}`}
+                      >
+                        <span
+                          className={`inline-flex h-12 w-12 shrink-0 items-center justify-center rounded-xl ${meta.iconClass}`}
+                        >
+                          <ServiceIcon size={26} stroke={1.7} />
+                        </span>
+                        <span className="min-w-0 flex-1">
+                          <span className="block text-sm font-semibold leading-snug text-slate-900">
+                            {service.name}
+                          </span>
+                          <span className="mt-0.5 block text-xs font-medium leading-relaxed text-slate-500">
+                            {isRTL ? meta.description.ar : meta.description.en}
+                          </span>
+                        </span>
+                        {checked ? (
+                          <span
+                            className={`absolute top-2.5 inline-flex h-5 w-5 items-center justify-center rounded-full bg-[#1C7CBB] text-white ${isRTL ? 'left-2.5' : 'right-2.5'}`}
+                          >
+                            <IconCheck size={12} stroke={3} />
+                          </span>
+                        ) : null}
+                      </button>
+                    )
+                  })}
+                </div>
+              </div>
+            ) : null}
+
+            <div className="mt-6">
+              <AiScopePromptComposer
+                isRTL={isRTL}
+                value={servicePrompt}
+                loading={submitting}
+                onChange={(next) => {
+                  if (error) setError(null)
+                  setServicePrompt(next)
+                }}
+                onSend={onSendAiPrompt}
+              />
+            </div>
+          </>
         )}
       </div>
 

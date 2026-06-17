@@ -6,21 +6,37 @@ interface SvgIconProps {
   color?: string;
 }
 
+const svgCache = new Map<string, string>();
+const pendingFetches = new Map<string, Promise<string>>();
+
 export const SvgIcon: React.FC<SvgIconProps> = ({ src, className = '', color }) => {
-  const [svgContent, setSvgContent] = useState<string>('');
+  const [svgContent, setSvgContent] = useState<string>(() => svgCache.get(src) ?? '');
 
   useEffect(() => {
+    if (svgCache.has(src)) {
+      setSvgContent(svgCache.get(src)!);
+      return;
+    }
+
+    let cancelled = false;
+
     const fetchSvg = async () => {
       try {
-        const response = await fetch(src);
-        const svgText = await response.text();
-        setSvgContent(svgText);
+        if (!pendingFetches.has(src)) {
+          pendingFetches.set(src, fetch(src).then(r => r.text()));
+        }
+        const svgText = await pendingFetches.get(src)!;
+        svgCache.set(src, svgText);
+        pendingFetches.delete(src);
+        if (!cancelled) setSvgContent(svgText);
       } catch (error) {
+        pendingFetches.delete(src);
         console.error('Error loading SVG:', error);
       }
     };
 
     fetchSvg();
+    return () => { cancelled = true; };
   }, [src]);
 
   return (

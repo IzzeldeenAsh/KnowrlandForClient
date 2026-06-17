@@ -1,7 +1,7 @@
 'use client'
 
 import Image from 'next/image'
-import { useEffect, useMemo, useState } from 'react'
+import { Fragment, useEffect, useMemo, useState } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import {
@@ -98,7 +98,8 @@ type ReviewRow = {
   label: string
   value: string[]
   fileTypes?: string[]
-  variant?: 'default' | 'chips'
+  variant?: 'default' | 'chips' | 'scope-table'
+  scopeGroups?: Array<{ name: string; subscopes: string[] }>
   editStepId?: string
   wide?: boolean
 }
@@ -737,7 +738,46 @@ function SectionBlock({
 
             {row.value.length > 0 || (row.fileTypes?.length ?? 0) > 0 ? (
               <div className="space-y-3">
-                {row.value.length > 0 ? (
+                {row.variant === 'scope-table' && row.scopeGroups ? (
+                  <div className="overflow-hidden rounded-xl border border-slate-200">
+                    <table className="w-full border-collapse text-sm">
+                      <tbody>
+                        {row.scopeGroups.map((group, groupIndex) => (
+                          <Fragment key={`${row.label}-${groupIndex}`}>
+                            <tr>
+                              <th
+                                scope="colgroup"
+                                className={`bg-slate-50 px-4 py-3 font-semibold text-slate-900 ${
+                                  isRTL ? 'text-right' : 'text-left'
+                                } ${
+                                  groupIndex > 0 ? 'border-t border-slate-200' : ''
+                                }`}
+                              >
+                                {group.name}
+                              </th>
+                            </tr>
+                            {group.subscopes.length > 0 ? (
+                              group.subscopes.map((sub, subIndex) => (
+                                <tr
+                                  key={`${row.label}-${groupIndex}-${subIndex}`}
+                                  className="border-t border-slate-200"
+                                >
+                                  <td
+                                    className={`px-4 py-2.5 align-top leading-6 text-slate-700 ${
+                                      isRTL ? 'text-right' : 'text-left'
+                                    }`}
+                                  >
+                                    {sub}
+                                  </td>
+                                </tr>
+                              ))
+                            ) : null}
+                          </Fragment>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                ) : row.value.length > 0 ? (
                   <ul className="space-y-2">
                     {row.variant === 'chips' ? (
                       <li className="flex items-start gap-3 text-sm leading-6 text-slate-800">
@@ -1153,18 +1193,28 @@ export default function ProjectReviewStep({
     return [
       {
         label: isRTL ? 'النطاق' : 'Scope',
+        variant: 'scope-table' as const,
+        scopeGroups: review.scopeSnapshot.map((scope) => ({
+          name: scope.name,
+          subscopes: scope.subscopes,
+        })),
         value: review.scopeSnapshot.flatMap((scope) =>
           scope.subscopes.length > 0
             ? scope.subscopes.map((subscope) => `${scope.name}: ${subscope}`)
             : [scope.name]
         ),
         editStepId: projectWizardStepIds.projectSubscopes,
+        wide: true,
       },
-      {
-        label: isRTL ? 'ملاحظة الخدمة' : 'Service note',
-        value: review.servicePrompt ? [review.servicePrompt] : [],
-        editStepId: projectWizardStepIds.service,
-      },
+      ...(review.servicePrompt
+        ? [
+            {
+              label: isRTL ? 'ملاحظة الخدمة' : 'Service note',
+              value: [review.servicePrompt],
+              editStepId: projectWizardStepIds.service,
+            },
+          ]
+        : []),
     ]
   }, [isRTL, review])
 

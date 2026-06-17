@@ -230,7 +230,7 @@ export default function ProjectTypeQuestion({
     : "Choose the engagement model that fits your consulting request.";
   const fieldsLabel = isRTL ? "مناسب ل" : "Best for";
 
-  const iconSize = 40;
+  const iconSize = 36;
   const iconStroke = 1.6;
   const optionIcons: Record<
     ProjectTypeId,
@@ -307,19 +307,20 @@ export default function ProjectTypeQuestion({
               isRTL={isRTL}
               delayMs={110 + index * 70}
               align="start"
-              className="min-h-[420px]"
+              className="min-h-[350px]"
+              contentClassName="!py-5"
               iconSize={iconSize}
               iconStroke={iconStroke}
             >
-              <div className="text-sm text-slate-700 leading-relaxed">
-                <ul className="list-disc ps-5 space-y-1.5">
+              <div className="text-xs text-slate-700 leading-normal">
+                <ul className="list-disc ps-5 space-y-1">
                   {option.description.map((line, i) => (
                     <li key={i}>{line}</li>
                   ))}
                 </ul>
               </div>
 
-              <div className={`${option.id === "urgent_request" ? (isRTL ? "pt-24" : "pt-16") : "mt-auto pt-6"}`}>
+              <div className="mt-auto pt-4">
                 <div className="text-[10px] font-light tracking-wide text-blue-700 uppercase">
                   {fieldsLabel}
                 </div>

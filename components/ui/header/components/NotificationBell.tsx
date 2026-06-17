@@ -52,6 +52,7 @@ const PROJECT_EVENTS = [
   'project.review.submission.reviewed',
   'project.file.uploaded',
   'project.service.started',
+  'project.discussion.message',
   'order.project',
 ] as const
 
