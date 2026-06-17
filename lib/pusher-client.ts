@@ -40,7 +40,7 @@ function getConfig(): PusherOpts {
   const key = firstNonEmpty(
     getRuntimeEnv('PUSHER_KEY'),
     process.env.NEXT_PUBLIC_PUSHER_KEY,
-    '41745ad5e299f4af9e36'
+    '81566bb993a074e07d41'
   )
   const cluster = firstNonEmpty(
     getRuntimeEnv('PUSHER_CLUSTER'),
