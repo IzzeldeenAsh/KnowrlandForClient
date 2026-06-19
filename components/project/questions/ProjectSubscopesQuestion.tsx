@@ -1063,7 +1063,7 @@ export default function ProjectSubscopesQuestion({ locale }: { locale: WizardLoc
             }
           `}</style>
         ) : null}
-        <div className={`flex flex-wrap items-center gap-3 ${isRTL ? 'justify-end' : 'justify-start'}`}>
+        <div className="flex flex-wrap items-center justify-start gap-3">
           <h2
             id="project-subscopes-question-title"
             className="text-lg font-semibold tracking-tight text-slate-900 sm:text-xl"

@@ -85,7 +85,7 @@ function AiGeneratingScopesLoader({
   attempt: number
   maxAttempts: number
 }) {
-  const title = isRTL ? 'الذكاء الاصطناعي يولد نطاقات المشروع...' : 'Generating AI scopes...'
+  const title = isRTL ? 'جار إنشاء نطاقات المشروع...' : 'Generating AI scopes...'
   const subtitle = isRTL
     ? `جاري التحقق من الاقتراحات… (${attempt}/${maxAttempts})`
     : `Checking for suggestions… (${attempt}/${maxAttempts})`
@@ -103,7 +103,7 @@ function AiGeneratingScopesLoader({
         }
       `}</style>
 
-      <div className={`flex items-center gap-3 ${isRTL ? 'flex-row-reverse' : ''}`}>
+      <div className="flex items-center gap-3 text-start">
         <div className="min-w-0">
           <div
             className="text-xl font-semibold tracking-[0.02em] sm:text-2xl"
@@ -953,13 +953,13 @@ export default function ProjectScopeQuestion({ locale }: { locale: WizardLocale 
         projectTypeId={projectType}
         status={
           isOtherFlow && aiMode === 'polling' ? (
-            <span className={`inline-flex items-center gap-2 ${isRTL ? 'flex-row-reverse' : ''}`}>
+            <span className="inline-flex items-center gap-2">
               <span className="relative inline-flex h-2 w-2">
                 <span className="absolute inline-flex h-full w-full rounded-full bg-blue-500 opacity-40 animate-ping" />
                 <span className="relative inline-flex h-2 w-2 rounded-full bg-blue-600" />
               </span>
               <span className="animate-pulse">
-                {isRTL ? 'يولّد الذكاء الاصطناعي النطاقات…' : 'AI generating scopes…'}
+                {isRTL ? 'جار إنشاء النطاقات…' : 'AI generating scopes…'}
               </span>
             </span>
           ) : null

@@ -487,7 +487,7 @@ export default function TargetMarketQuestion({ locale }: { locale: WizardLocale 
           <div className="mt-4 text-sm font-semibold text-rose-700">{error}</div>
         ) : null}
 
-        {selectedTargetMarketItems.length > 0 ? (
+        {mode !== 'worldwide' && selectedTargetMarketItems.length > 0 ? (
           <div className="mt-4 rounded-2xl border border-blue-100 bg-white/60 px-4 py-3 shadow-sm backdrop-blur-md">
             <div className="mb-2 text-xs font-bold uppercase tracking-wide text-slate-500">
               {isRTL ? 'اختيارك' : 'Selected'}
@@ -502,16 +502,14 @@ export default function TargetMarketQuestion({ locale }: { locale: WizardLocale 
                     <img src={item.flagSrc} alt="" className="h-4 w-4 object-contain" />
                   ) : null}
                   <span>{item.label}</span>
-                  {mode !== 'worldwide' ? (
-                    <button
-                      type="button"
-                      onClick={() => removeSelectedTargetMarketItem(item.id)}
-                      aria-label={isRTL ? 'إزالة الاختيار' : 'Remove selection'}
-                      className="inline-flex h-5 w-5 items-center justify-center rounded-full text-slate-400 hover:bg-rose-50 hover:text-rose-500"
-                    >
-                      ×
-                    </button>
-                  ) : null}
+                  <button
+                    type="button"
+                    onClick={() => removeSelectedTargetMarketItem(item.id)}
+                    aria-label={isRTL ? 'إزالة الاختيار' : 'Remove selection'}
+                    className="inline-flex h-5 w-5 items-center justify-center rounded-full text-slate-400 hover:bg-rose-50 hover:text-rose-500"
+                  >
+                    ×
+                  </button>
                 </span>
               ))}
             </div>

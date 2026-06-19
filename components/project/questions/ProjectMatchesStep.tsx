@@ -541,7 +541,7 @@ function MatchLoader({
 
                     {countryName ? (
                       <div
-                        className={`mt-2 flex items-center gap-2 text-[11px] text-slate-600 sm:text-xs ${isRTL ? 'flex-row-reverse justify-end' : ''}`}
+                        className="mt-2 flex items-center justify-start gap-2 text-[11px] text-slate-600 sm:text-xs"
                       >
                         {countryFlag ? (
                           <Image
@@ -713,7 +713,7 @@ function MatchedInsighterCard({
         className="cursor-pointer p-4 sm:p-5"
         onClick={onToggleSelected}
       >
-        <div className={`flex items-start gap-3 ${isRTL ? 'flex-row-reverse text-right' : ''}`}>
+        <div className="flex items-start gap-3 text-start">
           <div className="flex self-start pt-1">
             <input
               type="checkbox"
@@ -725,9 +725,9 @@ function MatchedInsighterCard({
             />
           </div>
 
-          <div className={`flex flex-1 items-start gap-3 ${isRTL ? 'flex-row-reverse' : ''}`}>
+          <div className="flex flex-1 items-start gap-3">
             <div
-              className={`flex flex-1 items-start gap-4 rounded-[22px] ${isRTL ? 'flex-row-reverse text-right' : ''}`}
+              className="flex flex-1 items-start gap-4 rounded-[22px] text-start"
             >
               <MatchAvatar
                 name={displayName}
@@ -739,8 +739,7 @@ function MatchedInsighterCard({
 
               <div className="min-w-0 flex-1">
                 <div
-                  className={`flex flex-wrap items-center gap-2 ${isRTL ? 'justify-end' : 'justify-start'
-                    }`}
+                  className="flex flex-wrap items-center justify-start gap-2"
                 >
                   <span className="truncate text-base font-semibold tracking-tight text-slate-950 sm:text-lg">
                     {displayName}
@@ -762,8 +761,7 @@ function MatchedInsighterCard({
 
                 {isCompany && match.insighter.name ? (
                   <div
-                    className={`mt-1.5 flex items-center gap-1.5 text-[11px] text-slate-500 sm:text-xs ${isRTL ? 'flex-row-reverse justify-end' : ''
-                      }`}
+                    className="mt-1.5 flex items-center justify-start gap-1.5 text-[11px] text-slate-500 sm:text-xs"
                   >
                     <span className="shrink-0 text-slate-400">{isRTL ? 'بواسطة' : 'By'}</span>
                     <span className="relative inline-flex h-5 w-5 shrink-0 items-center justify-center overflow-hidden rounded-full border border-slate-200 bg-slate-100">
@@ -789,8 +787,7 @@ function MatchedInsighterCard({
 
                 {countryName ? (
                   <div
-                    className={`mt-2 flex items-center gap-2 text-[11px] text-slate-600 sm:text-xs ${isRTL ? 'flex-row-reverse justify-end' : ''
-                      }`}
+                    className="mt-2 flex items-center justify-start gap-2 text-[11px] text-slate-600 sm:text-xs"
                   >
                     {countryFlag ? (
                       <Image
@@ -843,9 +840,9 @@ function MatchedInsighterCard({
         </div>
 
         <div
-          className={`mt-4 flex items-center justify-between gap-3 sm:hidden ${isRTL ? 'flex-row-reverse' : ''}`}
+          className="mt-4 flex items-center justify-between gap-3 sm:hidden"
         >
-          <div className={`flex min-w-0 flex-1 flex-wrap gap-2 ${isRTL ? 'justify-end' : ''}`}>
+          <div className="flex min-w-0 flex-1 flex-wrap justify-start gap-2">
             <Link
               href={profileHref}
               target="_blank"

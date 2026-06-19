@@ -204,7 +204,7 @@ function AiScopePromptComposer({
           border-color: transparent !important;
         }
       `}</style>
-      <div className={`flex items-center gap-2.5 ${isRTL ? 'flex-row-reverse text-right' : ''}`}>
+      <div className="flex items-center gap-2.5 text-start">
         <span className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border border-sky-200/80 bg-gradient-to-br from-sky-50 to-cyan-100/80 text-sky-600 shadow-sm">
           <IconSparklesFilled size={18} className="animate-pulse" />
         </span>
@@ -707,7 +707,7 @@ export default function ServiceQuestion({ locale }: { locale: WizardLocale }) {
                           } ${entered
                             ? 'translate-y-0 opacity-100'
                             : 'translate-y-2 opacity-0'
-                          } ${isRTL ? 'flex-row-reverse text-right' : ''}`}
+                          }`}
                       >
                         <span
                           className={`inline-flex h-12 w-12 shrink-0 items-center justify-center rounded-xl ${meta.iconClass}`}
