@@ -619,6 +619,7 @@ function ProfilePageContent() {
   // State to track if user is authenticated
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
   const [authChecked, setAuthChecked] = useState<boolean>(false);
+  const [currentUserUuid, setCurrentUserUuid] = useState<string | null>(null);
   // State to track if current profile is the user's own profile
   const [isOwnProfile, setIsOwnProfile] = useState<boolean>(false);
 
@@ -631,6 +632,8 @@ function ProfilePageContent() {
       // If no token, user is not authenticated
       if (!token) {
         setIsAuthenticated(false);
+        setCurrentUserUuid(null);
+        setIsOwnProfile(false);
         setAuthChecked(true);
         return;
       }
@@ -652,18 +655,22 @@ function ProfilePageContent() {
 
         if (response.ok) {
           const userData = await response.json();
+          const authenticatedUserUuid = userData?.data?.uuid ?? null;
           setIsAuthenticated(true);
+          setCurrentUserUuid(authenticatedUserUuid);
           // Compare UUIDs to determine if this is the user's own profile
-          if (userData?.data?.uuid === uuid) {
-            setIsOwnProfile(true);
-          }
+          setIsOwnProfile(authenticatedUserUuid === uuid);
         } else {
           // Token is invalid or expired
           setIsAuthenticated(false);
+          setCurrentUserUuid(null);
+          setIsOwnProfile(false);
         }
       } catch (error) {
         console.error("Error fetching user profile:", error);
         setIsAuthenticated(false);
+        setCurrentUserUuid(null);
+        setIsOwnProfile(false);
       } finally {
         setAuthChecked(true);
       }
@@ -851,8 +858,13 @@ function ProfilePageContent() {
     profileData?.insighter_company?.find((insighter) => insighter.owner)?.uuid || "";
   const specifiedInsighterUuid =
     companyOwnerInsighterUuid || (isViewingInsighterEntity ? profileData?.uuid || uuid : "");
+  const isRequestingOwnService =
+    Boolean(currentUserUuid) && currentUserUuid === specifiedInsighterUuid;
   const canRequestSpecifiedInsighterProject =
-    profileData?.receive_project_services_active === true && Boolean(specifiedInsighterUuid);
+    authChecked &&
+    !isRequestingOwnService &&
+    profileData?.receive_project_services_active === true &&
+    Boolean(specifiedInsighterUuid);
   const specifiedInsighterProjectHref = `/${locale}/project/wizard/project-type?fresh=1&${specifiedInsighterQueryParam}=${encodeURIComponent(specifiedInsighterUuid)}`;
 
   // Function to handle pagination
