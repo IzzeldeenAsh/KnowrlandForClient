@@ -77,8 +77,21 @@ function roleBasedProjectUrl(param: unknown, roles: string[]): string {
  * notification isn't one of the project events (caller should fall back to its
  * existing routing).
  */
+function dashboardUrlFromBackendUrl(rawUrl: unknown): string | null {
+  if (!hasParam(rawUrl)) return null
+
+  const raw = String(rawUrl).trim()
+  try {
+    const parsed = new URL(raw)
+    return `${DASHBOARD}${parsed.pathname}${parsed.search}`
+  } catch {
+    const path = raw.startsWith('/') ? raw : `/${raw}`
+    return `${DASHBOARD}${path}`
+  }
+}
+
 export function routeForNotification(
-  notification: Pick<Notification, 'event_name' | 'type' | 'sub_type' | 'param'>,
+  notification: Pick<Notification, 'event_name' | 'type' | 'sub_type' | 'param' | 'url'>,
   roles: string[] = []
 ): string | null {
   const param = notification.param
@@ -95,6 +108,7 @@ export function routeForNotification(
       return hasParam(param) ? `${INSIGHTER_ON_WORK}/details/${param}` : INSIGHTER_ON_WORK
     case 'project.client.closed':
     case 'project.client.contract':
+    case 'project.client.started':
     case 'project.review.submission':
       return hasParam(param) ? `${CLIENT_PROJECTS}/${param}` : CLIENT_PROJECTS
     case 'project.service.started':
@@ -105,6 +119,11 @@ export function routeForNotification(
       return roleBasedProjectUrl(param, roles)
     case 'project.discussion.message':
       return discussionUrlFromParam(param)
+    case 'project.insighter.offer.technical-decision':
+    case 'project.insighter.offer.not-selected':
+      return PROJECT_OFFERS
+    case 'project.insighter.cancelled':
+      return dashboardUrlFromBackendUrl(notification.url) ?? INSIGHTER_ON_WORK
   }
 
   // 2) REST-history fallback (no event_name): route by sub_type + role.
@@ -117,6 +136,11 @@ export function routeForNotification(
       return hasParam(param) ? `${INSIGHTER_ON_WORK}/details/${param}` : INSIGHTER_ON_WORK
     case 'project_review_submission':
       return hasParam(param) ? `${CLIENT_PROJECTS}/${param}` : CLIENT_PROJECTS
+    case 'project_offer_technical_decision':
+    case 'project_offer_not_selected':
+      return PROJECT_OFFERS
+    case 'project_cancelled':
+      return dashboardUrlFromBackendUrl(notification.url) ?? INSIGHTER_ON_WORK
     case 'project_service':
       return INSIGHTER_ON_WORK
     case 'project_file_uploaded':

@@ -17,21 +17,9 @@ import { useUserProfile } from '@/components/ui/header/hooks/useUserProfile'
 import {usePusherNotificaitons} from '@/hooks/usePusherNotifications';
 import { subscribePrivateUser, unsubscribePrivateUser, bindGlobal, unbindGlobal } from '@/lib/pusher-client';
 
-// Notification bell icon as SVG
+// KeenThemes notification bell, matching the Angular application.
 const NotificationIcon = () => (
-  <svg 
-    xmlns="http://www.w3.org/2000/svg" 
-    viewBox="0 0 24 24" 
-    fill="none" 
-    stroke="currentColor" 
-    strokeWidth="2" 
-    strokeLinecap="round" 
-    strokeLinejoin="round" 
-    className="w-5 h-5"
-  >
-    <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
-    <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
-  </svg>
+  <i className="ki-outline ki-notification-on text-xl leading-none" aria-hidden="true" />
 )
 
 type NotificationBellProps = {
@@ -47,12 +35,16 @@ const PROJECT_EVENTS = [
   'project.client.closed',
   'project.insighter.closed',
   'project.client.contract',
+  'project.client.started',
   'project.insighter.contract',
   'project.review.submission',
   'project.review.submission.reviewed',
   'project.file.uploaded',
   'project.service.started',
   'project.discussion.message',
+  'project.insighter.offer.technical-decision',
+  'project.insighter.offer.not-selected',
+  'project.insighter.cancelled',
   'order.project',
 ] as const
 
@@ -74,6 +66,7 @@ export default function NotificationBell({ parent = 'client' }: NotificationBell
       notifiable_id: data?.notifiable_id ?? 0,
       request_id: data?.request_id ?? 0,
       param: data?.param ?? null,
+      url: data?.url,
       sub_type: data?.sub_type ?? 'info',
       sub_type_value: data?.sub_type_value,
       redirect_page: !!data?.redirect_page,
@@ -92,6 +85,7 @@ export default function NotificationBell({ parent = 'client' }: NotificationBell
     eventNames: [
       'account.activated',
       'account.deactivated',
+      'account.stripe.restricted',
       'knowledge.accepted',
       'knowledge.declined',
       'order.insight',
@@ -105,6 +99,7 @@ export default function NotificationBell({ parent = 'client' }: NotificationBell
       'meeting.insighter_meeting_approved',
       'meeting.insighter_meeting_reminder',
       'meeting.insighter_meeting_client_new',
+      'meeting.insighter_meeting_client_reschedule',
       'requests.action',
       'requests'
     ]

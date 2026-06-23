@@ -169,6 +169,7 @@ export function subscribePrivateUser(userId: number, token: string, currentLocal
   const events = [
     'account.activated',
     'account.deactivated',
+    'account.stripe.restricted',
     'knowledge.accepted',
     'knowledge.declined',
     'order.insight',
@@ -182,6 +183,11 @@ export function subscribePrivateUser(userId: number, token: string, currentLocal
     'meeting.insighter_meeting_approved',
     'meeting.insighter_meeting_reminder',
     'meeting.insighter_meeting_client_new',
+    'meeting.insighter_meeting_client_reschedule',
+    'project.client.started',
+    'project.insighter.offer.technical-decision',
+    'project.insighter.offer.not-selected',
+    'project.insighter.cancelled',
     'requests.action',
     'requests'
   ]

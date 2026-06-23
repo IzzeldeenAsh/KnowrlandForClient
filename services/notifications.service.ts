@@ -10,6 +10,7 @@ export interface Notification {
   notifiable_id: number
   request_id: number
   param: any
+  url?: string
   sub_type: string
   redirect_page: boolean
   read_at?: string
@@ -301,4 +302,4 @@ export function subscribeToNotifications(callback: (notifications: Notification[
 
 export function clearNotifications(): void {
   notificationService.clearNotifications();
-} 
+}
