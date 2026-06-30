@@ -27,7 +27,7 @@ export default function Footer() {
                   <br />
                   &copy; 2026   {isRTL ? 'إنسايتا بيزنس' : 'Insighta Business.'}
                   <br />
-                  {isRTL ? 'الإصدار 1.2' : 'Version 1.2'}
+                  {isRTL ? 'الإصدار 2' : 'Version 2'}
                 </div>
               </div>
               {/* Social links */}

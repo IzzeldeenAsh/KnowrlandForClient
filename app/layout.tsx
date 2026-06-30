@@ -2,7 +2,15 @@
 import React from 'react';
 import Script from 'next/script';
 import { getLocale } from 'next-intl/server';
+import { Almarai } from 'next/font/google';
 import { publicBaseUrl } from './config';
+
+const almarai = Almarai({
+  subsets: ['arabic'],
+  weight: ['300', '400', '700', '800'],
+  variable: '--font-almarai',
+  display: 'swap',
+});
 
 export const metadata = {
   metadataBase: new URL(publicBaseUrl),
@@ -18,7 +26,7 @@ export default async function RootLayout({
   const direction = locale === 'ar' ? 'rtl' : 'ltr';
 
   return (
-    <html lang={locale} dir={direction} className="scroll-smooth">
+    <html lang={locale} dir={direction} className={`${almarai.variable} scroll-smooth`}>
       <head>
         {/* Favicon and Icons */}
         <link rel="icon" type="image/x-icon" href="/favicon.ico" sizes="any" />

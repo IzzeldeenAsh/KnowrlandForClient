@@ -147,6 +147,11 @@ interface ProfileData {
   receive_project_services_active?: boolean;
 }
 
+interface CompanyServiceTarget {
+  specifiedInsighterUuid: string;
+  receiveProjectServicesActive: boolean;
+}
+
 // Updated Knowledge interface to match API response
 interface KnowledgeApiItem {
   slug: string;
@@ -246,6 +251,8 @@ function ProfilePageContent() {
   }
   const [insighterStatistics, setInsighterStatistics] =
     useState<InsighterStatistics | null>(null);
+  const [companyServiceTarget, setCompanyServiceTarget] =
+    useState<CompanyServiceTarget | null>(null);
 
   const params = useParams();
   const searchParams = useSearchParams();
@@ -549,6 +556,69 @@ function ProfilePageContent() {
 
     fetchKnowledgeData();
   }, [uuid, locale, knowledgePage, selectedType, profileData]);
+
+  useEffect(() => {
+    const companyUuid = profileData?.company?.uuid;
+    const roles = profileData?.roles ?? [];
+    const shouldResolveCompanyTarget =
+      isViewingInsighterEntity &&
+      Boolean(companyUuid) &&
+      (roles.includes("company") || roles.includes("company-insighter"));
+
+    if (!shouldResolveCompanyTarget || !companyUuid) {
+      setCompanyServiceTarget(null);
+      return;
+    }
+
+    let cancelled = false;
+
+    const fetchCompanyServiceTarget = async () => {
+      try {
+        const response = await fetch(
+          `https://api.insightabusiness.com/api/platform/company/profile/${companyUuid}`,
+          {
+            headers: {
+              "Content-Type": "application/json",
+              Accept: "application/json",
+              "Accept-Language": locale,
+            },
+            cache: "no-store",
+          }
+        );
+
+        if (!response.ok) {
+          if (!cancelled) setCompanyServiceTarget(null);
+          return;
+        }
+
+        const payload = (await response.json()) as {
+          data?: {
+            receive_project_services_active?: boolean;
+            insighter_company?: CompanyInsighter[];
+          };
+        };
+        const ownerUuid =
+          payload.data?.insighter_company?.find((insighter) => insighter.owner)
+            ?.uuid || "";
+
+        if (!cancelled) {
+          setCompanyServiceTarget({
+            specifiedInsighterUuid: ownerUuid,
+            receiveProjectServicesActive:
+              payload.data?.receive_project_services_active === true,
+          });
+        }
+      } catch {
+        if (!cancelled) setCompanyServiceTarget(null);
+      }
+    };
+
+    fetchCompanyServiceTarget();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [profileData, isViewingInsighterEntity, locale]);
 
   // Fetch the unfiltered "All" total for company profiles (so the stat doesn't follow filters),
   // even if the user lands directly on a filtered URL.
@@ -854,18 +924,35 @@ function ProfilePageContent() {
   const isCompany = profileData?.roles.includes("company");
   const isInsighter = profileData?.roles.includes("insighter");
   const isCompanyInsighter = profileData?.roles.includes("company-insighter");
+  const shouldUseCompanyServiceTarget =
+    isViewingInsighterEntity &&
+    Boolean(profileData?.company?.uuid) &&
+    Boolean(isCompany || isCompanyInsighter);
   const companyOwnerInsighterUuid =
     profileData?.insighter_company?.find((insighter) => insighter.owner)?.uuid || "";
   const specifiedInsighterUuid =
-    companyOwnerInsighterUuid || (isViewingInsighterEntity ? profileData?.uuid || uuid : "");
+    shouldUseCompanyServiceTarget
+      ? companyServiceTarget?.specifiedInsighterUuid || ""
+      : companyOwnerInsighterUuid || (isViewingInsighterEntity ? profileData?.uuid || uuid : "");
+  const receiveProjectServicesActive = shouldUseCompanyServiceTarget
+    ? companyServiceTarget?.receiveProjectServicesActive === true
+    : profileData?.receive_project_services_active === true;
   const isRequestingOwnService =
     Boolean(currentUserUuid) && currentUserUuid === specifiedInsighterUuid;
   const canRequestSpecifiedInsighterProject =
     authChecked &&
     !isRequestingOwnService &&
-    profileData?.receive_project_services_active === true &&
+    receiveProjectServicesActive &&
     Boolean(specifiedInsighterUuid);
   const specifiedInsighterProjectHref = `/${locale}/project/wizard/project-type?fresh=1&${specifiedInsighterQueryParam}=${encodeURIComponent(specifiedInsighterUuid)}`;
+  const requestServiceButtonLabel =
+    isCompanyInsighter && profileData?.company?.legal_name
+      ? locale === "ar"
+        ? `طلب خدمة من ${profileData.company.legal_name}`
+        : `Request Service from ${profileData.company.legal_name}`
+      : locale === "ar"
+        ? "طلب خدمة"
+        : "Request Service";
 
   // Function to handle pagination
   const handlePageChange = (page: number) => {
@@ -1551,7 +1638,7 @@ function ProfilePageContent() {
                               className="inline-flex items-center gap-2 rounded-md bg-gradient-to-r from-blue-500 to-teal-400 px-3 py-2 text-xs font-medium text-white transition-all duration-200 hover:-translate-y-0.5 hover:from-blue-600 hover:to-teal-500 hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-sky-300"
                             >
                               <IconBriefcase size={16} stroke={2} />
-                              <span>{locale === "ar" ? "طلب خدمة مشروع" : "Request Project Service"}</span>
+                              <span>{requestServiceButtonLabel}</span>
                             </Link>
                           )}
                         </div>

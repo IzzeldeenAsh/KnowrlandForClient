@@ -1103,11 +1103,11 @@ export default function ProjectSubscopesQuestion({ locale }: { locale: WizardLoc
                   className="h-full rounded-lg border border-slate-200/80 bg-white/45 shadow-sm backdrop-blur-md"
                 >
                   <div className="flex h-full flex-col gap-2 p-4">
-                    <div className={`flex flex-wrap items-start justify-between gap-2 ${isRTL ? 'flex-row-reverse text-right' : 'text-left'}`}>
+                    <div className={`flex flex-wrap items-start justify-between gap-2 ${isRTL ? 'text-right' : 'text-left'}`}>
                       <div className="min-w-0 text-base font-bold leading-tight text-slate-900">
                         {parent.name}
                       </div>
-                      <div className={`flex shrink-0 items-center gap-2 ${isRTL ? 'flex-row-reverse' : ''}`}>
+                      <div className="flex shrink-0 items-center gap-2">
                         {children.length > 0 ? (
                           <button
                             type="button"
@@ -1150,7 +1150,7 @@ export default function ProjectSubscopesQuestion({ locale }: { locale: WizardLoc
                                 <button
                                   type="button"
                                   onClick={() => toggleChild(parent.id, child.id)}
-                                  className={`flex min-w-0 flex-1 items-start gap-2.5 ${isRTL ? 'flex-row-reverse text-right' : 'text-left'
+                                  className={`flex min-w-0 flex-1 items-start gap-2.5 ${isRTL ? 'text-right' : 'text-left'
                                     }`}
                                 >
                                   <span
@@ -1224,7 +1224,7 @@ export default function ProjectSubscopesQuestion({ locale }: { locale: WizardLoc
                                       <button
                                         type="button"
                                         onClick={() => toggleManualSubscopeConfirmed(scopeKey, sub.id)}
-                                        className={`flex min-w-0 flex-1 items-start gap-2.5 ${isRTL ? 'flex-row-reverse text-right' : 'text-left'}`}
+                                        className={`flex min-w-0 flex-1 items-start gap-2.5 ${isRTL ? 'text-right' : 'text-left'}`}
                                       >
                                         <span
                                           className={`inline-flex h-5 w-5 shrink-0 items-center justify-center rounded-md border ${
@@ -1341,7 +1341,7 @@ export default function ProjectSubscopesQuestion({ locale }: { locale: WizardLoc
                   className="h-full rounded-lg border border-slate-200/80 bg-white/45 shadow-sm backdrop-blur-md"
                 >
                   <div className="flex h-full flex-col gap-2 p-4">
-                    <div className={`flex flex-wrap items-start justify-between gap-2 ${isRTL ? 'flex-row-reverse text-right' : 'text-left'}`}>
+                    <div className={`flex flex-wrap items-start justify-between gap-2 ${isRTL ? 'text-right' : 'text-left'}`}>
                       <div className="min-w-0 text-base font-bold leading-tight text-slate-900">
                         {scope.name}
                       </div>
@@ -1368,7 +1368,7 @@ export default function ProjectSubscopesQuestion({ locale }: { locale: WizardLoc
                                     <button
                                       type="button"
                                       onClick={() => toggleManualSubscopeConfirmed(scopeKey, sub.id)}
-                                      className={`flex min-w-0 flex-1 items-start gap-2.5 ${isRTL ? 'flex-row-reverse text-right' : 'text-left'}`}
+                                      className={`flex min-w-0 flex-1 items-start gap-2.5 ${isRTL ? 'text-right' : 'text-left'}`}
                                     >
                                       <span
                                         className={`inline-flex h-5 w-5 shrink-0 items-center justify-center rounded-md border ${

@@ -726,7 +726,7 @@ export default function NotificationsInner({
   return (
     <div
       ref={componentRef}
-      className="w-full h-full bg-white shadow-xl overflow-hidden flex flex-col animate-fadeIn"
+      className="font-almarai w-full h-full bg-white shadow-xl overflow-hidden flex flex-col animate-fadeIn"
       dir={isRTL ? 'rtl' : 'ltr'}
       style={{
         animation: 'fadeIn 0.2s ease-out'

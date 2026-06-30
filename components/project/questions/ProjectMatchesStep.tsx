@@ -54,12 +54,24 @@ type MatchInsighter = {
   company?: MatchCompany | null
 }
 
-type MatchCriteria = Record<string, boolean | undefined>
+type MatchCriteriaValue = boolean | MatchCriteria | null | undefined
+
+interface MatchCriteria {
+  [key: string]: MatchCriteriaValue
+}
+
+type MatchScoreBreakdown = {
+  ai_expertise_match_score?: number | string | null
+  match_service_score?: number | string | null
+  property_score?: number | string | null
+  final_score?: number | string | null
+}
 
 type MatchedInsighter = {
   uuid: string
   insighter: MatchInsighter
-  match_score: number
+  match_score?: number | string | null
+  matches_score?: MatchScoreBreakdown | null
   is_match_all_properties?: boolean
   is_match_before?: boolean
   status?: string | null
@@ -246,6 +258,23 @@ function normalizeValue(value: unknown): string {
 function stringifyValue(value: unknown): string {
   if (value === null || value === undefined) return ''
   return String(value).trim()
+}
+
+function coerceScore(value: unknown): number {
+  const score = typeof value === 'number' ? value : Number(value)
+  return Number.isFinite(score) ? score : 0
+}
+
+function clampScore(score: number): number {
+  return Math.min(Math.max(score, 0), 1)
+}
+
+function getFinalMatchScore(match: MatchedInsighter): number {
+  return coerceScore(match.matches_score?.final_score ?? match.match_score)
+}
+
+function formatScorePercent(score: number): string {
+  return `${Math.round(clampScore(score) * 100)}%`
 }
 
 function getDisplayName(
@@ -567,7 +596,7 @@ function MatchLoader({
 }
 
 function MatchScoreDonut({ score, isRTL }: { score: number; isRTL: boolean }) {
-  const pct = Math.round(Math.min(Math.max(score, 0), 1) * 100)
+  const pct = Math.round(clampScore(score) * 100)
   const radius = 30
   const stroke = 5
   const circumference = 2 * Math.PI * radius
@@ -622,6 +651,28 @@ const MATCH_CRITERIA_LABELS: Record<string, { en: string; ar: string }> = {
   EXPERIENCE_MATCH: { en: 'Experience', ar: 'الخبرة' },
   TEAM_SIZE_MATCH: { en: 'Team size', ar: 'حجم الفريق' },
   INSIGHTER_TYPE_MATCH: { en: 'Insighter type', ar: 'نوع الخبير' },
+  AI_EXPERTISE_MATCH: { en: 'AI match score', ar: 'نتيجة تطابق الذكاء الاصطناعي' },
+  MATCH_SERVICE: { en: 'Service', ar: 'الخدمة' },
+}
+
+function getMatchCriteriaLabel(key: string, isRTL: boolean): string {
+  const normalizedKey = key.toUpperCase()
+  const label = MATCH_CRITERIA_LABELS[normalizedKey]
+  if (label) return isRTL ? label.ar : label.en
+
+  return key
+    .replace(/_MATCH$/, '')
+    .replace(/_/g, ' ')
+    .toLowerCase()
+    .replace(/\b\w/g, (c) => c.toUpperCase())
+}
+
+function flattenMatchCriteria(matches: MatchCriteria): [string, boolean][] {
+  return Object.entries(matches).flatMap(([key, value]) => {
+    if (typeof value === 'boolean') return [[key, value] as [string, boolean]]
+    if (value && typeof value === 'object') return flattenMatchCriteria(value)
+    return []
+  })
 }
 
 function MatchCriteriaPanel({
@@ -631,17 +682,13 @@ function MatchCriteriaPanel({
   matches: MatchCriteria
   isRTL: boolean
 }) {
-  const entries = Object.entries(matches).filter(([, value]) => value !== undefined)
+  const entries = flattenMatchCriteria(matches)
   if (entries.length === 0) return null
 
   return (
     <div className={`flex flex-wrap gap-2 ${isRTL ? 'flex-row-reverse' : ''}`}>
       {entries.map(([key, matched]) => {
-        const label = MATCH_CRITERIA_LABELS[key]
-          ? isRTL
-            ? MATCH_CRITERIA_LABELS[key].ar
-            : MATCH_CRITERIA_LABELS[key].en
-          : key.replace(/_MATCH$/, '').replace(/_/g, ' ').toLowerCase().replace(/\b\w/g, (c) => c.toUpperCase())
+        const label = getMatchCriteriaLabel(key, isRTL)
 
         return (
           <div
@@ -664,6 +711,115 @@ function MatchCriteriaPanel({
           </div>
         )
       })}
+    </div>
+  )
+}
+
+const MATCH_SCORE_BREAKDOWN_LABELS: Record<keyof Required<Pick<MatchScoreBreakdown, 'ai_expertise_match_score' | 'match_service_score' | 'property_score'>>, { en: string; ar: string; color: string; bg: string }> = {
+  ai_expertise_match_score: {
+    en: 'AI match score',
+    ar: 'نتيجة تطابق الذكاء الاصطناعي',
+    color: '#3b82f6',
+    bg: 'bg-blue-500',
+  },
+  match_service_score: {
+    en: 'Service match',
+    ar: 'تطابق الخدمة',
+    color: '#14b8a6',
+    bg: 'bg-teal-500',
+  },
+  property_score: {
+    en: 'Properties',
+    ar: 'الخصائص',
+    color: '#f59e0b',
+    bg: 'bg-amber-500',
+  },
+}
+
+function getScoreBreakdownItems(scores: MatchScoreBreakdown | null | undefined) {
+  if (!scores) return []
+
+  return (Object.keys(MATCH_SCORE_BREAKDOWN_LABELS) as Array<keyof typeof MATCH_SCORE_BREAKDOWN_LABELS>)
+    .map((key) => ({
+      key,
+      ...MATCH_SCORE_BREAKDOWN_LABELS[key],
+      score: coerceScore(scores[key]),
+    }))
+}
+
+function hasScoreBreakdown(scores: MatchScoreBreakdown | null | undefined): boolean {
+  if (!scores) return false
+
+  return (Object.keys(MATCH_SCORE_BREAKDOWN_LABELS) as Array<keyof typeof MATCH_SCORE_BREAKDOWN_LABELS>)
+    .some((key) => scores[key] !== undefined && scores[key] !== null)
+}
+
+function MatchScoreBreakdownChart({
+  scores,
+  isRTL,
+}: {
+  scores: MatchScoreBreakdown
+  isRTL: boolean
+}) {
+  const items = getScoreBreakdownItems(scores)
+  const total = items.reduce((sum, item) => sum + Math.max(item.score, 0), 0)
+  const finalScore = clampScore(coerceScore(scores.final_score ?? total))
+
+  return (
+    <div className="rounded-[18px] border border-slate-100 bg-white/55 p-3">
+      <div className="mb-3 flex items-center justify-between gap-3">
+        <p className="text-[10px] font-semibold uppercase tracking-wide text-slate-400">
+          {isRTL ? 'تفصيل النتيجة' : 'Score breakdown'}
+        </p>
+        <span className="text-xs font-semibold text-slate-700">
+          {formatScorePercent(finalScore)}
+        </span>
+      </div>
+
+      <div className="flex h-2 overflow-hidden rounded-full bg-slate-100">
+        <div
+          className="flex h-full overflow-hidden rounded-full"
+          style={{ width: `${finalScore * 100}%` }}
+        >
+          {items.map((item) => {
+            const width = total > 0 ? (Math.max(item.score, 0) / total) * 100 : 0
+            return (
+              <div
+                key={item.key}
+                className={item.bg}
+                style={{ width: `${width}%` }}
+                aria-hidden="true"
+              />
+            )
+          })}
+        </div>
+      </div>
+
+      <div className="mt-3 space-y-2.5">
+        {items.map((item) => (
+          <div key={item.key}>
+            <div className="mb-1 flex items-center justify-between gap-3 text-[11px]">
+              <span className="inline-flex min-w-0 items-center gap-1.5 font-medium text-slate-600">
+                <span
+                  className="h-2 w-2 shrink-0 rounded-full"
+                  style={{ backgroundColor: item.color }}
+                />
+                <span className="truncate">{isRTL ? item.ar : item.en}</span>
+              </span>
+              <span className="shrink-0 font-semibold text-slate-700">
+                {formatScorePercent(item.score)}
+              </span>
+            </div>
+            <div className="h-1.5 overflow-hidden rounded-full bg-slate-100">
+              <div
+                className={`h-full rounded-full ${item.bg}`}
+                style={{ width: `${clampScore(item.score) * 100}%` }}
+                aria-hidden="true"
+              />
+            </div>
+          </div>
+        ))}
+      </div>
     </div>
   )
 }
@@ -700,7 +856,10 @@ function MatchedInsighterCard({
     ? companyHref || getCompanyProfileHref(locale, match.insighter.uuid)
     : insighterHref
   const showVerifiedBadge = Boolean(match.insighter.company?.verified)
-  const hasMatches = match.matches && Object.keys(match.matches).length > 0
+  const finalMatchScore = getFinalMatchScore(match)
+  const hasMatches = Boolean(match.matches && flattenMatchCriteria(match.matches).length > 0)
+  const hasBreakdown = hasScoreBreakdown(match.matches_score)
+  const hasDetails = hasMatches || hasBreakdown
 
   return (
     <article
@@ -820,8 +979,8 @@ function MatchedInsighterCard({
 
             {/* Score + expand button column */}
             <div className="hidden shrink-0 flex-col items-center gap-2 sm:flex">
-              <MatchScoreDonut score={match.match_score} isRTL={isRTL} />
-              {hasMatches ? (
+              <MatchScoreDonut score={finalMatchScore} isRTL={isRTL} />
+              {hasDetails ? (
                 <button
                   type="button"
                   onClick={(e) => { e.stopPropagation(); setIsExpanded((v) => !v) }}
@@ -857,7 +1016,7 @@ function MatchedInsighterCard({
               </svg>
             </Link>
 
-            {hasMatches ? (
+            {hasDetails ? (
               <button
                 type="button"
                 onClick={(e) => {
@@ -877,18 +1036,26 @@ function MatchedInsighterCard({
           </div>
 
           <div className="shrink-0">
-            <MatchScoreDonut score={match.match_score} isRTL={isRTL} />
+            <MatchScoreDonut score={finalMatchScore} isRTL={isRTL} />
           </div>
         </div>
       </div>
 
-      {/* Expanded match criteria panel */}
-      {hasMatches && isExpanded ? (
-        <div className={`border-t border-slate-100/70 px-4 py-3 sm:px-5 ${isRTL ? 'text-right' : ''}`}>
-          <p className="mb-2.5 text-[10px] font-semibold uppercase tracking-wide text-slate-400">
-            {isRTL ? 'معايير التطابق' : 'Match criteria'}
-          </p>
-          <MatchCriteriaPanel matches={match.matches!} isRTL={isRTL} />
+      {/* Expanded match details panel */}
+      {hasDetails && isExpanded ? (
+        <div className={`space-y-3 border-t border-slate-100/70 px-4 py-3 sm:px-5 ${isRTL ? 'text-right' : ''}`}>
+          {match.matches_score ? (
+            <MatchScoreBreakdownChart scores={match.matches_score} isRTL={isRTL} />
+          ) : null}
+
+          {hasMatches && match.matches ? (
+            <div>
+              <p className="mb-2.5 text-[10px] font-semibold uppercase tracking-wide text-slate-400">
+                {isRTL ? 'معايير التطابق' : 'Match criteria'}
+              </p>
+              <MatchCriteriaPanel matches={match.matches} isRTL={isRTL} />
+            </div>
+          ) : null}
         </div>
       ) : null}
     </article>

@@ -9,16 +9,10 @@ import {
   getProjectApiErrorMessage,
 } from '@/components/project/projectApiError'
 import {
-  extractProjectRequestUuid,
+  clearStoredProjectRequestUuid,
   readStoredProjectRequestUuid,
-  writeStoredProjectRequestUuid,
 } from '@/components/project/projectRequestUuid'
-import {
-  clearStoredProposalMatchUuid,
-  extractProjectProposalMatchUuid,
-  writeStoredProposalMatchUuid,
-} from '@/components/project/projectProposalMatchUuid'
-import { readStoredSpecifiedInsighterUuid } from '@/components/project/specifiedInsighterProject'
+import { clearStoredProposalMatchUuid } from '@/components/project/projectProposalMatchUuid'
 import { useProjectStepErrorToast } from '@/components/project/useProjectStepErrorToast'
 import { useProjectWizardNavigation } from '@/components/project/useProjectWizardNavigation'
 import { getApiUrl } from '@/app/config'
@@ -28,9 +22,11 @@ import { projectWizardStorage, type WizardLocale } from '@/components/project/wi
 type ScopeChild = { id: number; name: string }
 type ScopeParent = { id: number; name: string; children: ScopeChild[] }
 type ManualScope = { id: string; name: string }
+type AiIntakeQuestion = { key: string; question: string }
+type AiIntakeStatus = 'idle' | 'polling' | 'clarification' | 'failed' | 'timeout'
 
-const AI_POLL_ATTEMPTS = 6
-const AI_POLL_INTERVAL_MS = 5000
+const AI_POLL_ATTEMPTS = 7
+const AI_POLL_INTERVAL_MS = 10000
 
 function sleep(ms: number) {
   return new Promise<void>((resolve) => window.setTimeout(resolve, ms))
@@ -76,19 +72,8 @@ function coerceNumericIdOrHash(rawId: unknown, name: string): number {
   return h < 0 ? h : -h
 }
 
-function AiGeneratingScopesLoader({
-  isRTL,
-  attempt,
-  maxAttempts,
-}: {
-  isRTL: boolean
-  attempt: number
-  maxAttempts: number
-}) {
-  const title = isRTL ? 'جار إنشاء نطاقات المشروع...' : 'Generating AI scopes...'
-  const subtitle = isRTL
-    ? `جاري التحقق من الاقتراحات… (${attempt}/${maxAttempts})`
-    : `Checking for suggestions… (${attempt}/${maxAttempts})`
+function AiGeneratingScopesLoader({ isRTL }: { isRTL: boolean }) {
+  const title = isRTL ? 'جار البحث...' : 'Thinking...'
 
   return (
     <div >
@@ -125,100 +110,6 @@ function AiGeneratingScopesLoader({
   )
 }
 
-function AiScopePromptComposer({
-  isRTL,
-  value,
-  loading,
-  hasGenerated,
-  onChange,
-  onSend,
-}: {
-  isRTL: boolean
-  value: string
-  loading: boolean
-  hasGenerated: boolean
-  onChange: (next: string) => void
-  onSend: () => void
-}) {
-  const canSend = value.trim().length > 0 && !loading
-
-  return (
-    <div >
-      <div
-        className={`flex items-center gap-2 text-[11px] font-bold uppercase  text-sky-700 ${isRTL ? 'flex-row-reverse' : ''
-          }`}
-      >
-        <span className="inline-flex h-8 w-8 items-center justify-center rounded-2xl border border-sky-200/80 bg-gradient-to-br from-sky-50 to-cyan-100/80 text-sky-600 shadow-sm">
-          <IconSparklesFilled size={16} className="animate-pulse" />
-        </span>
-        <span>{isRTL ? 'مولد نطاقات الذكاء الاصطناعي' : 'AI Scope Generator'}</span>
-      </div>
-
-      <div className="mt-4 overflow-hidden rounded-[1.75rem] border border-slate-200/80 bg-white/85 shadow-sm">
-        <textarea
-          value={value}
-          onChange={(e) => onChange(e.target.value)}
-          onKeyDown={(e) => {
-            if (e.key === 'Enter' && !e.shiftKey) {
-              e.preventDefault()
-              if (canSend) onSend()
-            }
-          }}
-          rows={4}
-          dir="auto"
-          className="min-h-[148px] w-full resize-none border-0 bg-transparent px-5 py-4 text-sm font-medium text-slate-900 outline-none placeholder:text-slate-400 sm:text-base"
-          placeholder={
-            isRTL
-              ? 'صف خدمتك بالطريقة التي تكتب بها للذكاء الاصطناعي. مثال: أحتاج إلى خدمة تساعدني على تقييم سوق جديد وتحديد الفرص والمنافسين...'
-              : 'Describe your service like you would ask AI. Example: I need help evaluating a new market, identifying opportunities, competitors, and the right research outputs...'
-          }
-        />
-
-        <div
-          className={`flex items-center justify-between gap-3 border-t border-slate-200/70 px-4 py-3 ${isRTL ? 'flex-row-reverse' : ''
-            }`}
-        >
-          <div className="text-xs font-semibold text-slate-500">
-            {isRTL
-              ? 'حرّر الوصف ثم أعد التوليد في أي وقت. Shift + Enter لسطر جديد.'
-              : 'Edit the prompt and regenerate anytime. Shift + Enter for a new line.'}
-          </div>
-
-          <button
-            type="button"
-            onClick={onSend}
-            disabled={!canSend}
-            aria-label={
-              hasGenerated
-                ? isRTL
-                  ? 'إعادة توليد النطاقات'
-                  : 'Regenerate scopes'
-                : isRTL
-                  ? 'توليد النطاقات'
-                  : 'Generate scopes'
-            }
-            title={
-              hasGenerated
-                ? isRTL
-                  ? 'إعادة توليد النطاقات'
-                  : 'Regenerate scopes'
-                : isRTL
-                  ? 'توليد النطاقات'
-                  : 'Generate scopes'
-            }
-            className={`inline-flex h-11 w-11 items-center justify-center rounded-full transition ${canSend
-                ? 'bg-[#1C7CBB] text-white shadow-lg shadow-sky-500/20 hover:bg-[#176799]'
-                : 'bg-slate-200 text-slate-500'
-              }`}
-          >
-            <IconArrowUp size={20} stroke={2.2} />
-          </button>
-        </div>
-      </div>
-    </div>
-  )
-}
-
 function safeParseNumberArray(value: string | null): number[] {
   if (!value) return []
   try {
@@ -228,6 +119,212 @@ function safeParseNumberArray(value: string | null): number[] {
   } catch {
     return []
   }
+}
+
+function normalizeAiIntakeQuestions(input: unknown): AiIntakeQuestion[] {
+  if (!Array.isArray(input)) return []
+
+  return input
+    .map((item) => {
+      const raw = item as any
+      const key = String(raw?.key ?? raw?.id ?? '').trim()
+      const question = String(raw?.question ?? raw?.text ?? raw?.label ?? '').trim()
+
+      return { key, question }
+    })
+    .filter((item) => Boolean(item.key) && Boolean(item.question))
+}
+
+function extractAiIntakeStatus(payload: unknown): {
+  status: string
+  needsClarification: boolean
+  questions: AiIntakeQuestion[]
+} {
+  const data = (payload as any)?.data ?? payload
+  const status = String((data as any)?.status ?? '').trim().toLowerCase()
+  const questions = normalizeAiIntakeQuestions((data as any)?.questions)
+
+  return {
+    status,
+    needsClarification:
+      Boolean((data as any)?.needs_clarification) ||
+      status === 'needs_clarification',
+    questions,
+  }
+}
+
+function AiClarificationQuestions({
+  isRTL,
+  questions,
+  answers,
+  submitting,
+  onAnswer,
+  onSubmit,
+}: {
+  isRTL: boolean
+  questions: AiIntakeQuestion[]
+  answers: Record<string, string>
+  submitting: boolean
+  onAnswer: (key: string, value: string) => void
+  onSubmit: () => void
+}) {
+  const [currentIndex, setCurrentIndex] = useState(0)
+  const currentQuestion = questions[currentIndex] || null
+  const currentAnswer = currentQuestion
+    ? String(answers[currentQuestion.key] || '').trim()
+    : ''
+  const isFirstQuestion = currentIndex === 0
+  const isLastQuestion = currentIndex >= questions.length - 1
+  const allAnswered =
+    questions.length > 0 &&
+    questions.every((question) => String(answers[question.key] || '').trim())
+
+  useEffect(() => {
+    setCurrentIndex(0)
+  }, [questions])
+
+  const goPrevious = () => {
+    setCurrentIndex((index) => Math.max(0, index - 1))
+  }
+
+  const goNext = () => {
+    if (!currentAnswer) return
+    setCurrentIndex((index) => Math.min(questions.length - 1, index + 1))
+  }
+
+  if (!currentQuestion) return null
+
+  return (
+    <div className="max-w-3xl rounded-2xl border border-sky-100 bg-white/80 p-4 shadow-sm">
+      <div className={`flex items-start gap-3 ${isRTL ? 'flex-row-reverse' : ''}`}>
+        <span className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border border-sky-200/80 bg-sky-50 text-sky-600">
+          <IconSparklesFilled size={17} />
+        </span>
+        <div className="min-w-0 flex-1">
+          <div className="text-sm font-semibold text-slate-900">
+            {isRTL ? 'نحتاج بعض التفاصيل قبل المتابعة' : 'A few details are needed before continuing'}
+          </div>
+          <div className="mt-1 text-xs font-semibold leading-relaxed text-slate-500">
+            {isRTL
+              ? 'أجب على الأسئلة القصيرة وسنراجع الطلب مرة أخرى.'
+              : 'Answer the short questions and we will review the request again.'}
+          </div>
+        </div>
+      </div>
+
+      <div className="mt-4">
+        <div className={`mb-3 flex items-center gap-1.5 ${isRTL ? 'flex-row-reverse' : ''}`}>
+          {questions.map((question, index) => (
+            <span
+              key={question.key}
+              className={`h-1.5 rounded-full transition-all ${
+                index === currentIndex
+                  ? 'w-8 bg-[#1C7CBB]'
+                  : answers[question.key]?.trim()
+                    ? 'w-3 bg-sky-300'
+                    : 'w-3 bg-slate-200'
+              }`}
+              aria-hidden="true"
+            />
+          ))}
+        </div>
+
+        <label className="block">
+          <span className="block rounded-2xl rounded-bl-md bg-slate-100 px-3 py-2 text-sm font-semibold leading-relaxed text-slate-800">
+            {currentQuestion.question}
+          </span>
+          <textarea
+            value={answers[currentQuestion.key] || ''}
+            onChange={(event) => onAnswer(currentQuestion.key, event.target.value)}
+            rows={2}
+            dir="auto"
+            placeholder={isRTL ? 'اكتب إجابتك...' : 'Type your answer...'}
+            className="mt-2 min-h-[54px] w-full resize-none rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm font-medium text-slate-900 outline-none focus:border-sky-300 focus:ring-2 focus:ring-sky-100"
+          />
+        </label>
+      </div>
+
+      <div className={`mt-4 flex items-center justify-between gap-3 ${isRTL ? 'flex-row-reverse' : ''}`}>
+        <button
+          type="button"
+          onClick={goPrevious}
+          disabled={isFirstQuestion || submitting}
+          className={`inline-flex h-10 items-center rounded-full px-4 text-sm font-semibold transition ${
+            !isFirstQuestion && !submitting
+              ? 'border border-slate-200 bg-white text-slate-700 hover:bg-slate-50'
+              : 'cursor-not-allowed border border-slate-100 bg-slate-100 text-slate-400'
+          }`}
+        >
+          {isRTL ? 'السابق' : 'Back'}
+        </button>
+
+        <button
+          type="button"
+          onClick={isLastQuestion ? onSubmit : goNext}
+          disabled={submitting || !currentAnswer || (isLastQuestion && !allAnswered)}
+          className={`inline-flex h-10 items-center gap-2 rounded-full px-4 text-sm font-semibold transition ${
+            !submitting && currentAnswer && (!isLastQuestion || allAnswered)
+              ? 'bg-[#1C7CBB] text-white hover:bg-[#176799]'
+              : 'cursor-not-allowed bg-slate-200 text-slate-500'
+          }`}
+        >
+          <span>
+            {submitting
+              ? isRTL
+                ? 'جاري الإرسال...'
+                : 'Sending...'
+              : isLastQuestion
+                ? isRTL
+                  ? 'إرسال الإجابات'
+                  : 'Send answers'
+                : isRTL
+                  ? 'التالي'
+                  : 'Next'}
+          </span>
+          <IconArrowUp size={16} stroke={2.2} />
+        </button>
+      </div>
+    </div>
+  )
+}
+
+function AiIntakeFallback({
+  isRTL,
+  mode,
+  onBackToServices,
+}: {
+  isRTL: boolean
+  mode: 'failed' | 'timeout'
+  onBackToServices: () => void
+}) {
+  const title =
+    mode === 'timeout'
+      ? isRTL
+        ? 'استغرق تحليل الطلب وقتًا أطول من المتوقع'
+        : 'The prompt analysis took longer than expected'
+      : isRTL
+        ? 'تعذر تحليل الطلب'
+        : 'The prompt could not be analyzed'
+
+  const message = isRTL
+    ? 'يرجى الرجوع واختيار خدمة من الخدمات المعرّفة مسبقًا للمتابعة.'
+    : 'Please go back and choose one of the predefined services to continue.'
+
+  return (
+    <div className="max-w-2xl rounded-2xl border border-rose-100 bg-white/85 p-4 shadow-sm">
+      <div className="text-base font-semibold text-slate-900">{title}</div>
+      <p className="mt-1.5 text-sm font-semibold leading-relaxed text-slate-600">
+        {message}
+      </p>
+      <button
+        type="button"
+        onClick={onBackToServices}
+        className="mt-4 rounded-full bg-[#1C7CBB] px-5 py-2 text-sm font-semibold text-white hover:bg-[#176799]"
+      >
+        {isRTL ? 'اختيار خدمة معرّفة مسبقًا' : 'Choose a predefined service'}
+      </button>
+    </div>
+  )
 }
 
 function safeParseSelectedServiceId(value: string | null): number | null {
@@ -324,22 +421,6 @@ function extractSuggestedScopesFromProjectRequest(json: unknown): ScopeParent[] 
   return []
 }
 
-function toApiLanguage(value: string | null, locale: WizardLocale) {
-  const v = (value || '').toLowerCase()
-  if (v.includes('arab')) return 'arabic'
-  if (v.includes('english')) return 'english'
-  return locale === 'ar' ? 'arabic' : 'english'
-}
-
-function toApiProjectType(value: string | null) {
-  if (value === 'ad_hoc') return 'ad_hoc'
-  if (value === 'frame_work_agreement' || value === 'framework') {
-    return 'frame_work_agreement'
-  }
-  if (value === 'urgent_request' || value === 'urgent') return 'urgent_request'
-  return 'ad_hoc'
-}
-
 // components are fetched after scope sync (next step)
 
 export default function ProjectScopeQuestion({ locale }: { locale: WizardLocale }) {
@@ -350,16 +431,18 @@ export default function ProjectScopeQuestion({ locale }: { locale: WizardLocale 
 
   const [entered, setEntered] = useState(false)
   const [projectType, setProjectType] = useState<string | null>(null)
-  const [deliverablesLanguage, setDeliverablesLanguage] = useState<string | null>(null)
   const [serviceId, setServiceId] = useState<number | null>(null)
   const [projectUuid, setProjectUuid] = useState('')
-  const [servicePrompt, setServicePrompt] = useState('')
 
   const [scopes, setScopes] = useState<ScopeParent[] | null>(null)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
-  const [aiAttempt, setAiAttempt] = useState(0)
-  const [aiMode, setAiMode] = useState<'idle' | 'polling' | 'timeout'>('idle')
+  const [aiMode, setAiMode] = useState<AiIntakeStatus>('idle')
+  const [aiQuestions, setAiQuestions] = useState<AiIntakeQuestion[]>([])
+  const [aiAnswers, setAiAnswers] = useState<Record<string, string>>({})
+  const [submittingClarification, setSubmittingClarification] = useState(false)
+  const [aiPollVersion, setAiPollVersion] = useState(0)
+  const delayNextAiClarificationCheckRef = useRef(false)
 
   useProjectStepErrorToast(error, locale)
 
@@ -368,8 +451,6 @@ export default function ProjectScopeQuestion({ locale }: { locale: WizardLocale 
   const [selectedManualScopeIds, setSelectedManualScopeIds] = useState<string[]>([])
   const [otherOpen, setOtherOpen] = useState(false)
   const [pendingScopeName, setPendingScopeName] = useState<string | null>(null)
-
-  const skipNextOtherRestoreRef = useRef(false)
 
   useEffect(() => {
     const timer = window.setTimeout(() => setEntered(true), 30)
@@ -381,20 +462,12 @@ export default function ProjectScopeQuestion({ locale }: { locale: WizardLocale 
       setProjectType(
         window.sessionStorage.getItem(projectWizardStorage.projectTypeKey(locale))
       )
-      setDeliverablesLanguage(
-        window.sessionStorage.getItem(
-          projectWizardStorage.deliverablesLanguageKey(locale)
-        )
-      )
       setServiceId(
         safeParseSelectedServiceId(
           window.sessionStorage.getItem(projectWizardStorage.serviceIdsKey(locale))
         )
       )
       setProjectUuid(readStoredProjectRequestUuid(locale))
-      setServicePrompt(
-        window.sessionStorage.getItem(projectWizardStorage.servicePromptKey(locale)) || ''
-      )
       setSelectedParentIds(
         safeParseNumberArray(
           window.sessionStorage.getItem(
@@ -424,15 +497,11 @@ export default function ProjectScopeQuestion({ locale }: { locale: WizardLocale 
 
       const isOther = serviceId === 10 || readServiceIsOther(locale)
 
-      if (isOther && skipNextOtherRestoreRef.current) {
-        skipNextOtherRestoreRef.current = false
-        return
-      }
-
       setError(null)
 
       if (isOther) {
-        setAiAttempt(0)
+        setAiQuestions([])
+        setAiAnswers({})
 
         if (!projectUuid) {
           setAiMode('idle')
@@ -453,15 +522,21 @@ export default function ProjectScopeQuestion({ locale }: { locale: WizardLocale 
         setAiMode('polling')
 
         try {
+          if (delayNextAiClarificationCheckRef.current) {
+            delayNextAiClarificationCheckRef.current = false
+            await sleep(AI_POLL_INTERVAL_MS)
+            if (cancelled) return
+          }
+
           for (let attempt = 1; attempt <= AI_POLL_ATTEMPTS; attempt += 1) {
             if (cancelled) return
-            setAiAttempt(attempt)
-
             activeController?.abort()
             activeController = new AbortController()
 
             try {
-              const url = getApiUrl(`/api/account/project/show/${projectUuid}`)
+              const url = getApiUrl(
+                `/api/account/project/definition/ai-intake/check-clarification/${projectUuid}`
+              )
               const res = await fetch(url, {
                 method: 'GET',
                 headers: {
@@ -474,26 +549,91 @@ export default function ProjectScopeQuestion({ locale }: { locale: WizardLocale 
                 signal: activeController.signal,
               })
 
-              if (res.ok) {
-                const json = (await res.json()) as unknown
-                const list = extractSuggestedScopesFromProjectRequest(json)
-                if (list.length > 0) {
-                  if (!cancelled) {
-                    setScopes(list)
-                    setAiMode('idle')
-                  }
-                  return
+              await assertProjectApiResponse(
+                res,
+                isRTL
+                  ? 'تعذر التحقق من حالة الطلب.'
+                  : 'Failed to check the prompt status.'
+              )
+
+              const json = (await res.json()) as unknown
+              const intake = extractAiIntakeStatus(json)
+
+              if (intake.needsClarification) {
+                if (!cancelled) {
+                  setAiQuestions(intake.questions)
+                  setAiAnswers({})
+                  setScopes(null)
+                  setAiMode('clarification')
                 }
+                return
               }
-            } catch {
-              // ignore, retry
+
+              if (intake.status === 'ready') {
+                activeController?.abort()
+                activeController = new AbortController()
+
+                const showRes = await fetch(
+                  getApiUrl(`/api/account/project/show/${projectUuid}`),
+                  {
+                    method: 'GET',
+                    headers: {
+                      Authorization: `Bearer ${token}`,
+                      Accept: 'application/json',
+                      'Accept-Language': locale === 'ar' ? 'ar' : 'en',
+                      'X-Timezone': Intl.DateTimeFormat().resolvedOptions().timeZone,
+                    },
+                    cache: 'no-store',
+                    signal: activeController.signal,
+                  }
+                )
+
+                await assertProjectApiResponse(
+                  showRes,
+                  isRTL
+                    ? 'تعذر تحميل النطاقات المقترحة.'
+                    : 'Failed to load suggested scopes.'
+                )
+
+                const showJson = (await showRes.json()) as unknown
+                const showList = extractSuggestedScopesFromProjectRequest(showJson)
+
+                if (!cancelled) {
+                  setScopes(showList)
+                  setAiMode('idle')
+                }
+                return
+              }
+
+              if (intake.status === 'failed') {
+                if (!cancelled) {
+                  setScopes(null)
+                  setAiMode('failed')
+                }
+                return
+              }
+            } catch (err) {
+              if (cancelled) return
+              if (attempt >= AI_POLL_ATTEMPTS) {
+                setError(
+                  getProjectApiErrorMessage(
+                    err,
+                    isRTL
+                      ? 'تعذر التحقق من حالة الطلب.'
+                      : 'Failed to check the prompt status.'
+                  )
+                )
+                setScopes(null)
+                setAiMode('failed')
+                return
+              }
             }
 
             if (attempt < AI_POLL_ATTEMPTS) await sleep(AI_POLL_INTERVAL_MS)
           }
 
           if (!cancelled) {
-            setScopes([])
+            setScopes(null)
             setAiMode('timeout')
           }
         } catch {
@@ -503,7 +643,7 @@ export default function ProjectScopeQuestion({ locale }: { locale: WizardLocale 
                 ? 'تعذر تحميل النطاقات المقترحة.'
                 : 'Failed to load suggested scopes.'
             )
-            setScopes([])
+            setScopes(null)
             setAiMode('idle')
           }
         } finally {
@@ -522,7 +662,6 @@ export default function ProjectScopeQuestion({ locale }: { locale: WizardLocale 
 
       setLoading(true)
       setAiMode('idle')
-      setAiAttempt(0)
 
       try {
         const url = getApiUrl(`/api/common/setting/service/scope/${serviceId}`)
@@ -568,7 +707,7 @@ export default function ProjectScopeQuestion({ locale }: { locale: WizardLocale 
       cancelled = true
       activeController?.abort()
     }
-  }, [isRTL, locale, projectUuid, serviceId])
+  }, [aiPollVersion, isRTL, locale, projectUuid, serviceId])
 
   const isOtherFlow = useMemo(
     () => Boolean(serviceId) && (serviceId === 10 || readServiceIsOther(locale)),
@@ -589,7 +728,6 @@ export default function ProjectScopeQuestion({ locale }: { locale: WizardLocale 
   const availableScopes = scopes || []
   const scopesReady = scopes !== null && !loading
   const noScopesAvailable = scopesReady && availableScopes.length === 0
-  const hasAiRequest = isOtherFlow && Boolean(projectUuid)
   const showScopePicker =
     hasServiceSelection &&
     (!isOtherFlow || scopesReady || namedManualScopes.length > 0 || otherOpen)
@@ -609,14 +747,14 @@ export default function ProjectScopeQuestion({ locale }: { locale: WizardLocale 
     ? availableScopes.length > 0
       ? isRTL
         ? 'اختر نطاقات المشروع التي أنشأها الذكاء الاصطناعي'
-        : 'Select AI-generated project scopes'
+        : 'Select AI-suggested project scopes'
       : noScopesAvailable
         ? isRTL
-          ? 'حسّن الوصف أو أضف نطاقاتك'
-          : 'Refine your prompt or add your own scopes'
+          ? 'أضف نطاقات المشروع'
+          : 'Add project scopes'
         : isRTL
-          ? 'صف خدمتك لتوليد نطاقات المشروع'
-          : 'Describe your service to generate AI scopes'
+          ? 'جار مراجعة طلب الخدمة'
+          : 'Reviewing your service request'
     : noScopesAvailable
       ? isRTL
         ? 'أضف نطاقات المشروع'
@@ -628,15 +766,15 @@ export default function ProjectScopeQuestion({ locale }: { locale: WizardLocale 
   const subtitle = isOtherFlow
     ? availableScopes.length > 0
       ? isRTL
-        ? 'يمكنك تعديل الوصف وإعادة التوليد في أي وقت، ثم اختيار أكثر من نطاق.'
-        : 'Edit the prompt and regenerate anytime, then select one or more scopes.'
+        ? 'اختر نطاقًا واحدًا أو أكثر للمتابعة.'
+        : 'Select one or more scopes to continue.'
       : noScopesAvailable
         ? isRTL
-          ? 'لم تظهر نطاقات بعد. عدّل الوصف أو أضف النطاقات يدويًا.'
-          : 'No scopes appeared yet. Refine the prompt or add scopes manually.'
+          ? 'لم تظهر نطاقات بعد. أضف النطاقات يدويًا للمتابعة.'
+          : 'No scopes appeared yet. Add scopes manually to continue.'
         : isRTL
-          ? 'اكتب طلبك بالطريقة التي تستخدمها مع الذكاء الاصطناعي، ثم اضغط إرسال.'
-          : 'Write your request the way you would ask AI, then press send.'
+          ? 'نراجع وصف الخدمة قبل عرض خيارات النطاقات.'
+          : 'We are reviewing your service description before showing scope options.'
     : noScopesAvailable
       ? isRTL
         ? 'أضف نطاقات المشروع يدويًا (يمكنك إضافة أكثر من نطاق).'
@@ -652,51 +790,18 @@ export default function ProjectScopeQuestion({ locale }: { locale: WizardLocale 
   }, [scopes, selectedParentIds])
 
   const hasAnyChildren = selectedParents.some((s) => (s.children || []).length > 0)
+  const aiIntakeBlocking =
+    isOtherFlow &&
+    (loading ||
+      aiMode === 'polling' ||
+      aiMode === 'clarification' ||
+      aiMode === 'failed' ||
+      aiMode === 'timeout' ||
+      submittingClarification)
 
   const canContinue =
-    (selectedParents.length > 0 || selectedManualScopes.length > 0) && !loading
-
-  const persistPrompt = (nextPrompt: string) => {
-    setServicePrompt(nextPrompt)
-    try {
-      window.sessionStorage.setItem(projectWizardStorage.servicePromptKey(locale), nextPrompt)
-    } catch {
-      // ignore
-    }
-  }
-
-  const clearGeneratedScopeSelections = () => {
-    setSelectedParentIds([])
-
-    try {
-      window.sessionStorage.removeItem(projectWizardStorage.projectScopeSnapshotKey(locale))
-      window.sessionStorage.setItem(
-        projectWizardStorage.serviceScopeParentIdsKey(locale),
-        JSON.stringify([])
-      )
-      window.sessionStorage.setItem(
-        projectWizardStorage.serviceScopeChildIdsByParentKey(locale),
-        JSON.stringify({})
-      )
-      window.sessionStorage.setItem(
-        projectWizardStorage.serviceScopeHasChildrenKey(locale),
-        '0'
-      )
-      window.sessionStorage.setItem(
-        projectWizardStorage.serviceComponentSlugsKey(locale),
-        JSON.stringify([])
-      )
-      window.sessionStorage.setItem(
-        projectWizardStorage.serviceComponentsPayloadKey(locale),
-        JSON.stringify({ components: {} })
-      )
-      window.sessionStorage.removeItem(
-        projectWizardStorage.serviceManualSubscopesByScopeKey(locale)
-      )
-    } catch {
-      // ignore
-    }
-  }
+    (selectedParents.length > 0 || selectedManualScopes.length > 0) &&
+    !aiIntakeBlocking
 
   const toggleParent = (id: number) => {
     setSelectedParentIds((prev) =>
@@ -793,16 +898,48 @@ export default function ProjectScopeQuestion({ locale }: { locale: WizardLocale 
     })
   }
 
-  const generateAiScopes = async () => {
-    if (!isOtherFlow || !serviceId || loading) return
-
-    const prompt = servicePrompt.trim()
-    if (!prompt) {
-      setError(
-        isRTL
-          ? 'اكتب وصفًا للخدمة أولًا لتوليد النطاقات.'
-          : 'Write a service description first to generate scopes.'
+  const returnToDefinedServices = () => {
+    try {
+      window.sessionStorage.removeItem(projectWizardStorage.serviceIdsKey(locale))
+      window.sessionStorage.removeItem(projectWizardStorage.serviceIsOtherKey(locale))
+      window.sessionStorage.removeItem(projectWizardStorage.serviceLabelKey(locale))
+      window.sessionStorage.removeItem(projectWizardStorage.servicePromptKey(locale))
+      window.sessionStorage.removeItem(projectWizardStorage.projectScopeSnapshotKey(locale))
+      window.sessionStorage.removeItem(projectWizardStorage.serviceManualScopesKey(locale))
+      window.sessionStorage.removeItem(
+        projectWizardStorage.serviceManualSubscopesByScopeKey(locale)
       )
+      window.sessionStorage.setItem(
+        projectWizardStorage.serviceScopeParentIdsKey(locale),
+        JSON.stringify([])
+      )
+      window.sessionStorage.setItem(
+        projectWizardStorage.serviceComponentSlugsKey(locale),
+        JSON.stringify([])
+      )
+      window.sessionStorage.setItem(
+        projectWizardStorage.serviceComponentsPayloadKey(locale),
+        JSON.stringify({ components: {} })
+      )
+    } catch {
+      // ignore
+    }
+
+    clearStoredProjectRequestUuid(locale)
+    clearStoredProposalMatchUuid(locale)
+    nav.goBack()
+  }
+
+  const submitAiClarificationAnswers = async () => {
+    if (!projectUuid || aiQuestions.length === 0 || submittingClarification) return
+
+    const payload = aiQuestions.map((question) => ({
+      key: question.key,
+      answer: String(aiAnswers[question.key] || '').trim(),
+    }))
+
+    if (payload.some((answer) => !answer.answer)) {
+      setError(isRTL ? 'يرجى الإجابة على جميع الأسئلة.' : 'Please answer all questions.')
       return
     }
 
@@ -812,113 +949,45 @@ export default function ProjectScopeQuestion({ locale }: { locale: WizardLocale 
       return
     }
 
+    setSubmittingClarification(true)
     setError(null)
-    clearGeneratedScopeSelections()
-    setScopes(null)
-    setLoading(true)
-    setAiMode('polling')
-    setAiAttempt(0)
 
     try {
-      const headers: HeadersInit = {
-        Authorization: `Bearer ${token}`,
-        Accept: 'application/json',
-        'Content-Type': 'application/json',
-        'Accept-Language': locale === 'ar' ? 'ar' : 'en',
-        'X-Timezone': Intl.DateTimeFormat().resolvedOptions().timeZone,
-      }
-
-      const specifiedInsighterUuid = readStoredSpecifiedInsighterUuid(locale)
-      const initiatePath = specifiedInsighterUuid
-        ? `/api/account/project/definition/initiate-specific/${encodeURIComponent(
-            specifiedInsighterUuid
-          )}`
-        : '/api/account/project/definition/initiate'
-
-      const initRes = await fetch(getApiUrl(initiatePath), {
-        method: 'POST',
-        headers,
-        body: JSON.stringify({
-          language: toApiLanguage(deliverablesLanguage, locale),
-          type: toApiProjectType(projectType),
-          service_id: serviceId,
-          service_prompt: prompt,
-          prompt_ai: prompt,
-        }),
-      })
-
-      await assertProjectApiResponse(
-        initRes,
-        isRTL ? 'تعذر توليد نطاقات المشروع.' : 'Failed to generate project scopes.'
+      const res = await fetch(
+        getApiUrl(`/api/account/project/definition/ai-intake/answers/${projectUuid}`),
+        {
+          method: 'POST',
+          headers: {
+            Authorization: `Bearer ${token}`,
+            Accept: 'application/json',
+            'Content-Type': 'application/json',
+            'Accept-Language': locale === 'ar' ? 'ar' : 'en',
+            'X-Timezone': Intl.DateTimeFormat().resolvedOptions().timeZone,
+          },
+          body: JSON.stringify({ answers: payload }),
+        }
       )
 
-      const initJson = (await initRes.json()) as unknown
-      const nextProjectUuid = extractProjectRequestUuid(initJson)
-      if (!nextProjectUuid) throw new Error('init_bad_response')
+      await assertProjectApiResponse(
+        res,
+        isRTL ? 'تعذر إرسال الإجابات.' : 'Failed to submit answers.'
+      )
 
-      if (specifiedInsighterUuid) {
-        const proposalMatchUuid = extractProjectProposalMatchUuid(initJson)
-        if (!proposalMatchUuid) throw new Error('init_bad_response')
-        writeStoredProposalMatchUuid(locale, proposalMatchUuid)
-      } else {
-        clearStoredProposalMatchUuid(locale)
-      }
-
-      skipNextOtherRestoreRef.current = true
-      setProjectUuid(nextProjectUuid)
-
-      writeStoredProjectRequestUuid(locale, nextProjectUuid)
-      try {
-        window.sessionStorage.setItem(projectWizardStorage.servicePromptKey(locale), prompt)
-      } catch {
-        // ignore
-      }
-
-      for (let attempt = 1; attempt <= AI_POLL_ATTEMPTS; attempt += 1) {
-        setAiAttempt(attempt)
-
-        try {
-          const url = getApiUrl(`/api/account/project/show/${nextProjectUuid}`)
-          const res = await fetch(url, {
-            method: 'GET',
-            headers: {
-              Authorization: `Bearer ${token}`,
-              Accept: 'application/json',
-              'Accept-Language': locale === 'ar' ? 'ar' : 'en',
-              'X-Timezone': Intl.DateTimeFormat().resolvedOptions().timeZone,
-            },
-            cache: 'no-store',
-          })
-
-          if (res.ok) {
-            const json = (await res.json()) as unknown
-            const list = extractSuggestedScopesFromProjectRequest(json)
-            if (list.length > 0) {
-              setScopes(list)
-              setAiMode('idle')
-              return
-            }
-          }
-        } catch {
-          // ignore, retry
-        }
-
-        if (attempt < AI_POLL_ATTEMPTS) await sleep(AI_POLL_INTERVAL_MS)
-      }
-
-      setScopes([])
-      setAiMode('timeout')
+      setAiQuestions([])
+      setAiAnswers({})
+      setScopes(null)
+      delayNextAiClarificationCheckRef.current = true
+      setAiMode('polling')
+      setAiPollVersion((version) => version + 1)
     } catch (err) {
       setError(
         getProjectApiErrorMessage(
           err,
-          isRTL ? 'تعذر توليد نطاقات المشروع.' : 'Failed to generate project scopes.'
+          isRTL ? 'تعذر إرسال الإجابات.' : 'Failed to submit answers.'
         )
       )
-      setScopes([])
-      setAiMode('idle')
     } finally {
-      setLoading(false)
+      setSubmittingClarification(false)
     }
   }
 
@@ -958,9 +1027,7 @@ export default function ProjectScopeQuestion({ locale }: { locale: WizardLocale 
                 <span className="absolute inline-flex h-full w-full rounded-full bg-blue-500 opacity-40 animate-ping" />
                 <span className="relative inline-flex h-2 w-2 rounded-full bg-blue-600" />
               </span>
-              <span className="animate-pulse">
-                {isRTL ? 'جار إنشاء النطاقات…' : 'AI generating scopes…'}
-              </span>
+            
             </span>
           ) : null
         }
@@ -998,16 +1065,30 @@ export default function ProjectScopeQuestion({ locale }: { locale: WizardLocale 
       <div className="mt-5 pb-[100px] lg:pb-0 sm:mt-7">
         {loading ? (
           isOtherFlow && aiMode === 'polling' ? (
-            <AiGeneratingScopesLoader
-              isRTL={isRTL}
-              attempt={Math.max(1, aiAttempt)}
-              maxAttempts={AI_POLL_ATTEMPTS}
-            />
+            <AiGeneratingScopesLoader isRTL={isRTL} />
           ) : (
             <div className="text-sm font-semibold text-slate-600">
               {isRTL ? 'جاري التحميل…' : 'Loading…'}
             </div>
           )
+        ) : isOtherFlow && aiMode === 'clarification' ? (
+          <AiClarificationQuestions
+            isRTL={isRTL}
+            questions={aiQuestions}
+            answers={aiAnswers}
+            submitting={submittingClarification}
+            onAnswer={(key, value) => {
+              if (error) setError(null)
+              setAiAnswers((prev) => ({ ...prev, [key]: value }))
+            }}
+            onSubmit={submitAiClarificationAnswers}
+          />
+        ) : isOtherFlow && (aiMode === 'failed' || aiMode === 'timeout') ? (
+          <AiIntakeFallback
+            isRTL={isRTL}
+            mode={aiMode}
+            onBackToServices={returnToDefinedServices}
+          />
         ) : showScopePicker ? (
           <>
           {selectableCount > 0 ? (
@@ -1177,21 +1258,6 @@ export default function ProjectScopeQuestion({ locale }: { locale: WizardLocale 
           <div></div>
         ) : null}
       </div>
-      {isOtherFlow ? (
-        <div className="mt-6 sm:mt-10 pb-[100px] sm:pb-0">
-          <AiScopePromptComposer
-            isRTL={isRTL}
-            value={servicePrompt}
-            loading={loading}
-            hasGenerated={hasAiRequest || availableScopes.length > 0 || aiMode === 'timeout'}
-            onChange={(next) => {
-              if (error) setError(null)
-              persistPrompt(next)
-            }}
-            onSend={generateAiScopes}
-          />
-        </div>
-      ) : null}
       <div className="fixed bottom-0 left-0 right-0 z-20 border-t border-slate-200/70 bg-white/80 backdrop-blur-md">
         <div className="mx-auto w-full max-w-6xl px-4 pt-4 pb-[calc(env(safe-area-inset-bottom)+1rem)] lg:px-0">
           <div className="flex items-center justify-between gap-3">

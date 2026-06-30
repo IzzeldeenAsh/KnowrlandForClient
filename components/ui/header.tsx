@@ -497,7 +497,7 @@ export default function Header() {
 
                       <HoverCard.Dropdown
                         style={{ background: 'linear-gradient(to right, #1C2F67, #242B6A)', borderColor: '#2F378A' }}
-                        className="transition-all duration-300 ease-in-out transform hover:scale-[1.01] shadow-xl"
+                        className="font-almarai transition-all duration-300 ease-in-out transform hover:scale-[1.01] shadow-xl"
                       >
                         <Group justify="space-between" px="md" className="transition-colors duration-200 hover:bg-slate-800/20 rounded p-2">
                           <Text fw={500} c='white' className="text-glow">{t('industriesDropdown.featuredTitle')}</Text>

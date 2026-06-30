@@ -18,7 +18,10 @@ export function IndustriesMenu() {
         </button>
       </HoverCard.Target>
 
-      <HoverCard.Dropdown style={{ background: 'white', borderColor: '#e5e7eb' }}>
+      <HoverCard.Dropdown
+        style={{ background: 'white', borderColor: '#e5e7eb' }}
+        className="font-almarai"
+      >
         <Group justify="space-between" px="md">
           <Text fw={600} c="dark" size="sm">Featured Industries</Text>
           <Anchor href={`/${currentLocale}/all-industries`} fz="xs" c="blue">
