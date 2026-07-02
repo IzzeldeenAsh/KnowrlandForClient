@@ -210,7 +210,7 @@ function AiScopePromptComposer({
         </span>
         <div>
           <h3 className="text-base font-semibold text-slate-900">
-            {isRTL ? 'أو صف خدمتك للذكاء الاصطناعي' : 'Or describe your service to our AI'}
+            {isRTL ? 'أو صف خدمتك للذكاء الاصطناعي لنقترح عليك نطاقًا مناسبًا' : 'Or describe your service to our AI so we can suggest a related scope for you'}
           </h3>
         </div>
       </div>

@@ -490,7 +490,7 @@ export default function Hero() {
                         group-hover:bg-[position:100%_0]
                       "
                       >
-                        {currentLocale === 'en' ? 'START A PROJECT' : 'ابدأ مشروعك'}
+                        {currentLocale === 'en' ? 'REQUEST SERVICE' : 'اطلب خدمة'}
                       </span>
 
                       <span

@@ -6,20 +6,7 @@ import { KnowledgeDetails } from "./types";
 import Reviews from "./Reviews";
 import AskInsighter from "./AskInsighter";
 import { useParams, useRouter, useSearchParams } from "next/navigation";
-import Link from "next/link";
 import { getAuthToken } from "@/lib/authToken";
-import { specifiedInsighterQueryParam } from "@/components/project/specifiedInsighterProject";
-import { IconBriefcase } from "@tabler/icons-react";
-
-type CompanyServiceTarget = {
-  specifiedInsighterUuid: string;
-  receiveProjectServicesActive: boolean;
-};
-
-type CompanyInsighter = {
-  uuid?: string;
-  owner?: boolean;
-};
 
 function TabContent({ activeTab, knowledge, knowledgeSlug, onRefreshData }: { activeTab: string; knowledge: KnowledgeDetails; knowledgeSlug: string; onRefreshData?: () => void | Promise<void> }) {
   const params = useParams();
@@ -76,77 +63,11 @@ export default function TabsContent({ knowledge, knowledgeSlug }: { knowledge: K
 
   // Track knowledge data updates
   const [knowledgeData, setKnowledgeData] = useState(knowledge);
-  const [companyServiceTarget, setCompanyServiceTarget] =
-    useState<CompanyServiceTarget | null>(null);
 
   // Update knowledgeData when prop changes
   useEffect(() => {
     setKnowledgeData(knowledge);
   }, [knowledge]);
-
-  const insighterRoles = knowledgeData.insighter?.roles ?? [];
-  const isCompanyMemberInsight =
-    (insighterRoles.includes('company') || insighterRoles.includes('company-insighter')) &&
-    Boolean(knowledgeData.insighter?.company?.uuid);
-  const companyLegalName = knowledgeData.insighter?.company?.legal_name?.trim() || '';
-
-  useEffect(() => {
-    const companyUuid = knowledgeData.insighter?.company?.uuid;
-
-    if (!isCompanyMemberInsight || !companyUuid) {
-      setCompanyServiceTarget(null);
-      return;
-    }
-
-    let cancelled = false;
-
-    const fetchCompanyServiceTarget = async () => {
-      try {
-        const response = await fetch(
-          `https://api.insightabusiness.com/api/platform/company/profile/${companyUuid}`,
-          {
-            headers: {
-              "Content-Type": "application/json",
-              Accept: "application/json",
-              "Accept-Language": locale,
-            },
-            cache: "no-store",
-          }
-        );
-
-        if (!response.ok) {
-          if (!cancelled) setCompanyServiceTarget(null);
-          return;
-        }
-
-        const payload = (await response.json()) as {
-          data?: {
-            receive_project_services_active?: boolean;
-            insighter_company?: CompanyInsighter[];
-          };
-        };
-        const ownerUuid =
-          payload.data?.insighter_company?.find((insighter) => insighter.owner)
-            ?.uuid || "";
-
-        if (!cancelled) {
-          setCompanyServiceTarget({
-            specifiedInsighterUuid: ownerUuid,
-            receiveProjectServicesActive:
-              payload.data?.receive_project_services_active === true,
-          });
-        }
-      } catch {
-        if (!cancelled) setCompanyServiceTarget(null);
-      }
-    };
-
-    fetchCompanyServiceTarget();
-
-    return () => {
-      cancelled = true;
-    };
-  }, [knowledgeData.insighter?.company?.uuid, isCompanyMemberInsight, locale]);
 
   // Check for tab query parameter on mount
   useEffect(() => {
@@ -211,9 +132,6 @@ export default function TabsContent({ knowledge, knowledgeSlug }: { knowledge: K
     overview: isRTL ? 'نظرة عامة' : 'Overview',
     reviews: isRTL ? 'تقييمات وآراء' : 'Reviews',
     askInsighter: isRTL ? 'اسأل الخبير' : 'Ask Insighter',
-    requestService: isRTL
-      ? `طلب خدمة من ${companyLegalName}`
-      : `Request Service from ${companyLegalName}`,
   };
 
   // Map display labels to internal tab keys
@@ -224,48 +142,10 @@ export default function TabsContent({ knowledge, knowledgeSlug }: { knowledge: K
   };
 
   const tabs = [translations.overview, translations.reviews, translations.askInsighter];
-  const canRequestCompanyService =
-    isCompanyMemberInsight &&
-    !knowledgeData.is_owner &&
-    Boolean(companyLegalName) &&
-    companyServiceTarget?.receiveProjectServicesActive === true &&
-    Boolean(companyServiceTarget.specifiedInsighterUuid);
-  const companyServiceInsighterUuid = companyServiceTarget?.specifiedInsighterUuid || "";
-  const companyServiceHref = canRequestCompanyService
-    ? `/${locale}/project/wizard/project-type?fresh=1&${specifiedInsighterQueryParam}=${encodeURIComponent(companyServiceInsighterUuid)}`
-    : "";
-  const meetHref = `/${locale}/profile/${knowledgeData.insighter.uuid}?entity=insighter&tab=meet`;
-  const meetLabel =
-    locale === 'en'
-      ? 'Meet ' + knowledgeData.insighter.name.toLowerCase()
-      : 'قابل الخبير ' + knowledgeData.insighter.name.toLowerCase();
-  const actionButtonClass =
-    "relative inline-flex max-h-[34px] shadow-none items-center justify-center gap-2 px-3 py-1.5 text-center text-sm bg-gradient-to-r from-blue-500 to-teal-400 text-white rounded-md shadow-lg hover:from-blue-600 hover:to-teal-500 focus:outline-none focus:ring-2 focus:ring-blue-300";
 
   return (
     <div className="mb-6" dir={isRTL ? 'rtl' : 'ltr'}>
       <div className="border-b border-gray-200">
-        {!knowledgeData.is_owner && (
-          <div className="flex flex-wrap justify-center gap-2 ps-4 sm:ps-8 w-fit sm:mt-0 sm:ms-auto sm:hidden">
-            <Link
-              href={meetHref}
-              className={actionButtonClass}
-            >
-              <span className="pointer-events-none absolute inset-0 rounded-md bg-gradient-to-r from-blue-500 to-teal-400 opacity-20 animate-ping [animation-duration:2.5s]"></span>
-              <span className="relative font-semibold capitalize">
-                {meetLabel}
-              </span>
-            </Link>
-            {canRequestCompanyService && (
-              <Link href={companyServiceHref} className={actionButtonClass}>
-                <IconBriefcase size={16} stroke={2} />
-                <span className="relative font-semibold">
-                  {translations.requestService}
-                </span>
-              </Link>
-            )}
-          </div>
-        )}
         <nav className="-mb-px flex  knowledge-tab-nav relative" aria-label={isRTL ? 'تبويبات المحتوى' : 'Content tabs'} role="tablist">
 
           {tabs.map((tab) => (
@@ -309,27 +189,6 @@ export default function TabsContent({ knowledge, knowledgeSlug }: { knowledge: K
               {tab}
             </button>
           ))}
-          {!knowledgeData.is_owner && (
-            <div className="flex flex-wrap items-center justify-center gap-2 ps-4 sm:ps-8 sm:mt-0 sm:ms-auto hidden sm:flex">
-              <Link
-                href={meetHref}
-                className={actionButtonClass}
-              >
-                <span className="pointer-events-none absolute inset-0 rounded-md bg-gradient-to-r from-blue-500 to-teal-400 opacity-20 animate-ping [animation-duration:2.5s]"></span>
-                <span className="relative font-semibold capitalize">
-                  {meetLabel}
-                </span>
-              </Link>
-              {canRequestCompanyService && (
-                <Link href={companyServiceHref} className={actionButtonClass}>
-                  <IconBriefcase size={16} stroke={2} />
-                  <span className="relative font-semibold">
-                    {translations.requestService}
-                  </span>
-                </Link>
-              )}
-            </div>
-          )}
         </nav>
 
 

@@ -25,8 +25,8 @@ type ManualScope = { id: string; name: string }
 type AiIntakeQuestion = { key: string; question: string }
 type AiIntakeStatus = 'idle' | 'polling' | 'clarification' | 'failed' | 'timeout'
 
-const AI_POLL_ATTEMPTS = 7
-const AI_POLL_INTERVAL_MS = 10000
+const AI_POLL_ATTEMPTS = 6
+const AI_POLL_INTERVAL_MS = 5000
 
 function sleep(ms: number) {
   return new Promise<void>((resolve) => window.setTimeout(resolve, ms))
@@ -72,8 +72,25 @@ function coerceNumericIdOrHash(rawId: unknown, name: string): number {
   return h < 0 ? h : -h
 }
 
-function AiGeneratingScopesLoader({ isRTL }: { isRTL: boolean }) {
-  const title = isRTL ? 'جار البحث...' : 'Thinking...'
+function AiGeneratingScopesLoader({
+  isRTL,
+  requestUnderstood,
+}: {
+  isRTL: boolean
+  requestUnderstood: boolean
+}) {
+  const title = requestUnderstood
+    ? isRTL
+      ? 'تم فهم طلبك'
+      : 'Request understood'
+    : isRTL
+      ? 'جار البحث...'
+      : 'Thinking...'
+  const subtitle = requestUnderstood
+    ? isRTL
+      ? 'جاري تحديد النطاقات المناسبة لطلبك.'
+      : 'Preparing the right scopes for your request.'
+    : ''
 
   return (
     <div >
@@ -104,6 +121,11 @@ function AiGeneratingScopesLoader({ isRTL }: { isRTL: boolean }) {
           >
             {title}
           </div>
+          {subtitle ? (
+            <div className="mt-1 text-sm font-semibold text-slate-500">
+              {subtitle}
+            </div>
+          ) : null}
         </div>
       </div>
     </div>
@@ -442,6 +464,7 @@ export default function ProjectScopeQuestion({ locale }: { locale: WizardLocale 
   const [aiAnswers, setAiAnswers] = useState<Record<string, string>>({})
   const [submittingClarification, setSubmittingClarification] = useState(false)
   const [aiPollVersion, setAiPollVersion] = useState(0)
+  const [aiRequestUnderstood, setAiRequestUnderstood] = useState(false)
   const delayNextAiClarificationCheckRef = useRef(false)
 
   useProjectStepErrorToast(error, locale)
@@ -635,6 +658,7 @@ export default function ProjectScopeQuestion({ locale }: { locale: WizardLocale 
           if (!cancelled) {
             setScopes(null)
             setAiMode('timeout')
+            setAiRequestUnderstood(false)
           }
         } catch {
           if (!cancelled) {
@@ -645,6 +669,7 @@ export default function ProjectScopeQuestion({ locale }: { locale: WizardLocale 
             )
             setScopes(null)
             setAiMode('idle')
+            setAiRequestUnderstood(false)
           }
         } finally {
           if (!cancelled) setLoading(false)
@@ -773,7 +798,7 @@ export default function ProjectScopeQuestion({ locale }: { locale: WizardLocale 
           ? 'لم تظهر نطاقات بعد. أضف النطاقات يدويًا للمتابعة.'
           : 'No scopes appeared yet. Add scopes manually to continue.'
         : isRTL
-          ? 'نراجع وصف الخدمة قبل عرض خيارات النطاقات.'
+          ? 'جار معالجة وصف الخدمة قبل عرض خيارات النطاقات.'
           : 'We are reviewing your service description before showing scope options.'
     : noScopesAvailable
       ? isRTL
@@ -976,6 +1001,7 @@ export default function ProjectScopeQuestion({ locale }: { locale: WizardLocale 
       setAiQuestions([])
       setAiAnswers({})
       setScopes(null)
+      setAiRequestUnderstood(true)
       delayNextAiClarificationCheckRef.current = true
       setAiMode('polling')
       setAiPollVersion((version) => version + 1)
@@ -1065,7 +1091,10 @@ export default function ProjectScopeQuestion({ locale }: { locale: WizardLocale 
       <div className="mt-5 pb-[100px] lg:pb-0 sm:mt-7">
         {loading ? (
           isOtherFlow && aiMode === 'polling' ? (
-            <AiGeneratingScopesLoader isRTL={isRTL} />
+            <AiGeneratingScopesLoader
+              isRTL={isRTL}
+              requestUnderstood={aiRequestUnderstood}
+            />
           ) : (
             <div className="text-sm font-semibold text-slate-600">
               {isRTL ? 'جاري التحميل…' : 'Loading…'}

@@ -24,14 +24,14 @@ export default function ProjectIntro({ locale }: ProjectIntroProps) {
 
   const copy = isRTL
     ? {
-      title: 'ابدأ مشروعك ',
+      title: 'اطلب خدمة',
       eyebrow: 'اطلب خدمة مخصصة',
       line1: 'ابدأ مشروعك مع خبراء متخصصين',
       line2: 'لتمكين عملك من النجاح',
       cta: 'ابدأ',
     }
     : {
-      title: 'Start a project',
+      title: 'Request Service',
       eyebrow: 'Request a Custom Service',
       line1: 'Start your project with subject matter experts',
       line2: 'that lead your business to success',

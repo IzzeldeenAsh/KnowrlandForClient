@@ -151,11 +151,12 @@ export default function ProjectSubmissionSuccessStep({
             {body}
           </p>
 
-          <div className="mt-6 w-full max-w-2xl rounded-[18px] border border-sky-100/80 bg-white/75 px-4 py-4 text-start shadow-[0_18px_50px_rgba(15,23,42,0.06)] backdrop-blur-xl sm:mt-8 sm:rounded-[28px] sm:px-6 sm:py-5">
-            <div className="text-[11px] font-semibold text-slate-400">
+          <div className="mt-6 w-full max-w-2xl text-center sm:mt-8">
+            <div className="text-[11px] font-semibold uppercase tracking-[0.14em] text-sky-700">
               {statLabel}
             </div>
-            <div className="mt-2 text-sm font-medium leading-7 text-slate-700 sm:text-[15px]">
+            <div className="mx-auto mt-2 h-px w-20 bg-gradient-to-r from-transparent via-sky-300 to-transparent" aria-hidden="true" />
+            <div className="mt-4 text-base font-medium leading-7 text-slate-800 sm:text-[17px]">
               {statText}
             </div>
           </div>

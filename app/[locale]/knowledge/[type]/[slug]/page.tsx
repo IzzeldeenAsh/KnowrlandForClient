@@ -22,6 +22,7 @@ import { Rating, Text } from "@mantine/core";
 import LanguageMismatchNotifier from './LanguageMismatchNotifier';
 import RelatedKnowledgeSummarySection, { type RelatedKnowledgeSummaryItem } from './RelatedKnowledgeSummarySection';
 import RelatedKnowledgeItemsSection, { type RelatedKnowledgeItems } from './RelatedKnowledgeItemsSection';
+import KnowledgeAuthorActions from './KnowledgeAuthorActions';
 
 interface KnowledgeDetails {
   id: number;
@@ -535,6 +536,13 @@ export default async function KnowledgePage({ params }: Props) {
                         return `${day} ${month} ${year}`;
                       })()}
                   </span>
+                </div>
+                <div className="flex items-center ps-4 sm:ps-8 mt-2 sm:mt-0">
+                  <KnowledgeAuthorActions
+                    locale={locale}
+                    isOwner={knowledge.is_owner}
+                    insighter={knowledge.insighter}
+                  />
                 </div>
                 {knowledge.review && knowledge.review.length > 0 && (
                   <div className="flex flex-col ps-4 sm:ps-8 mt-2 sm:mt-0">

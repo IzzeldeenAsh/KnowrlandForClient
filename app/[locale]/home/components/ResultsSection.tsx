@@ -168,7 +168,7 @@ const ResultsSection: React.FC<ResultsSectionProps> = ({
             onClick={() => router.push(`/${locale}/project`)}
             className="inline-flex items-center justify-center gap-2 rounded-xl bg-[#1c64f2] px-6 py-3 text-sm font-semibold text-white shadow-sm hover:bg-[#1a56db] focus:outline-none focus:ring-2 focus:ring-[#1c64f2] focus:ring-offset-2"
           >
-            {locale === 'ar' ? 'ابدأ مشروعاً' : 'Start a Project'}
+            {locale === 'ar' ? 'اطلب خدمة' : 'Request Service'}
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true">
               <path d="M5 12H19" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
               <path d="M12 5L19 12L12 19" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />

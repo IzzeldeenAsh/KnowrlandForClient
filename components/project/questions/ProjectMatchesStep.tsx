@@ -651,7 +651,7 @@ const MATCH_CRITERIA_LABELS: Record<string, { en: string; ar: string }> = {
   EXPERIENCE_MATCH: { en: 'Experience', ar: 'الخبرة' },
   TEAM_SIZE_MATCH: { en: 'Team size', ar: 'حجم الفريق' },
   INSIGHTER_TYPE_MATCH: { en: 'Insighter type', ar: 'نوع الخبير' },
-  AI_EXPERTISE_MATCH: { en: 'AI match score', ar: 'نتيجة تطابق الذكاء الاصطناعي' },
+  AI_EXPERTISE_MATCH: { en: 'Published expertise and knowledge match score', ar: 'نتيجة تطابق الخبرات والمعارف المنشورة' },
   MATCH_SERVICE: { en: 'Service', ar: 'الخدمة' },
 }
 
@@ -717,8 +717,8 @@ function MatchCriteriaPanel({
 
 const MATCH_SCORE_BREAKDOWN_LABELS: Record<keyof Required<Pick<MatchScoreBreakdown, 'ai_expertise_match_score' | 'match_service_score' | 'property_score'>>, { en: string; ar: string; color: string; bg: string }> = {
   ai_expertise_match_score: {
-    en: 'AI match score',
-    ar: 'نتيجة تطابق الذكاء الاصطناعي',
+    en: 'Published expertise and insights match score',
+    ar: 'نتيجة تطابق الخبرات والمعارف المنشورة',
     color: '#3b82f6',
     bg: 'bg-blue-500',
   },
