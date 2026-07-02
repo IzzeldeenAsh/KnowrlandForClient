@@ -182,7 +182,7 @@ export default function TopicsTab() {
 
   const fetchIndustries = useCallback(async (signal?: AbortSignal) => {
     try {
-      const response = await fetch('https://api.insightabusiness.com/api/common/setting/industry/tree-list', {
+      const response = await fetch('https://api.foresighta.co/api/common/setting/industry/tree-list', {
         method: 'GET',
         cache: 'no-store',
         signal,
@@ -221,7 +221,7 @@ export default function TopicsTab() {
           return;
         }
 
-        const url = new URL('https://api.insightabusiness.com/api/admin/setting/topic');
+        const url = new URL('https://api.foresighta.co/api/admin/setting/topic');
         url.searchParams.set('page', String(page));
         if (statusFilter.trim()) url.searchParams.set('status', statusFilter.trim());
         if (keyword.trim()) url.searchParams.set('keyword', keyword.trim());
@@ -317,8 +317,8 @@ export default function TopicsTab() {
 
       const url =
         modalMode === 'create'
-          ? 'https://api.insightabusiness.com/api/admin/setting/topic'
-          : `https://api.insightabusiness.com/api/admin/setting/topic/${selectedTopic?.id ?? ''}`;
+          ? 'https://api.foresighta.co/api/admin/setting/topic'
+          : `https://api.foresighta.co/api/admin/setting/topic/${selectedTopic?.id ?? ''}`;
 
       const response = await fetch(url, {
         method: modalMode === 'create' ? 'POST' : 'PUT',
@@ -361,7 +361,7 @@ export default function TopicsTab() {
         return;
       }
 
-      const response = await fetch(`https://api.insightabusiness.com/api/admin/setting/topic/${topic.id}`, {
+      const response = await fetch(`https://api.foresighta.co/api/admin/setting/topic/${topic.id}`, {
         method: 'DELETE',
         cache: 'no-store',
         headers: buildAuthHeaders(token),

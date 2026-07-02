@@ -15,7 +15,7 @@
 
 import type { Notification } from '@/services/notifications.service'
 
-export const DASHBOARD = 'https://app.insightabusiness.com'
+export const DASHBOARD = 'http://localhost:4200'
 
 // `project.discussion.message` always lands on the production dashboard host,
 // regardless of the host the backend baked into `param` (it may be localhost in

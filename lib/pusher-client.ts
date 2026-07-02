@@ -50,7 +50,7 @@ function getConfig(): PusherOpts {
   const authEndpoint = firstNonEmpty(
     getRuntimeEnv('PUSHER_AUTH_ENDPOINT'),
     process.env.NEXT_PUBLIC_PUSHER_AUTH_ENDPOINT,
-    'https://api.insightabusiness.com/broadcasting/auth'
+    'https://api.foresighta.co/broadcasting/auth'
   )
   if (!key || !authEndpoint) {
     console.error('[Pusher] Missing env: NEXT_PUBLIC_PUSHER_KEY or NEXT_PUBLIC_PUSHER_AUTH_ENDPOINT')

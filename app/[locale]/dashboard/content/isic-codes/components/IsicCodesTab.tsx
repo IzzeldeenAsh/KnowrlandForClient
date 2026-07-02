@@ -157,7 +157,7 @@ export default function IsicCodesTab() {
     setError('');
 
     try {
-      const response = await fetch('https://api.insightabusiness.com/api/common/setting/isic-code/tree-list', {
+      const response = await fetch('https://api.foresighta.co/api/common/setting/isic-code/tree-list', {
         method: 'GET',
         cache: 'no-store',
         signal,
@@ -260,8 +260,8 @@ export default function IsicCodesTab() {
 
       const url =
         modalMode === 'create'
-          ? 'https://api.insightabusiness.com/api/admin/setting/isic-code'
-          : `https://api.insightabusiness.com/api/admin/setting/isic-code/${selectedKey ?? ''}`;
+          ? 'https://api.foresighta.co/api/admin/setting/isic-code'
+          : `https://api.foresighta.co/api/admin/setting/isic-code/${selectedKey ?? ''}`;
 
       const response = await fetch(url, {
         method: modalMode === 'create' ? 'POST' : 'PUT',
@@ -306,7 +306,7 @@ export default function IsicCodesTab() {
         return;
       }
 
-      const response = await fetch(`https://api.insightabusiness.com/api/admin/setting/isic-code/${key}`, {
+      const response = await fetch(`https://api.foresighta.co/api/admin/setting/isic-code/${key}`, {
         method: 'DELETE',
         cache: 'no-store',
         headers: buildAuthHeaders(token),

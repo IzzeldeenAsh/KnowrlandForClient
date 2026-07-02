@@ -1,0 +1,42 @@
+{
+  "pages": {
+    "/[locale]/insighter-dashboard/my-orders/page": [
+      "static/chunks/node_modules_next_dist_8db7fb1f._.js",
+      "static/chunks/app_icon--metadata_f8182b1e.js",
+      "static/chunks/node_modules_c6117d34._.js",
+      "static/chunks/[next]_internal_font_google_almarai_9fee7768_module_be17dce9.css",
+      "static/chunks/app_layout_tsx_f8182b1e._.js",
+      "static/chunks/node_modules_133faa92._.js",
+      "static/chunks/app_error_tsx_059b41a8._.js",
+      "static/chunks/app_error_tsx_85a4becb._.js",
+      "static/chunks/app_not-found_tsx_85a4becb._.js",
+      "static/chunks/node_modules_next_dist_client_components_builtin_global-error_85a4becb.js",
+      "static/chunks/_2e06be73._.css",
+      "static/chunks/_6697e5e5._.js",
+      "static/chunks/node_modules_next_a37994a7._.js",
+      "static/chunks/node_modules_@mantine_core_esm_4dabc503._.js",
+      "static/chunks/node_modules_@floating-ui_react_dist_22386cb2._.js",
+      "static/chunks/node_modules_pusher-js_dist_web_pusher_6ae92419.js",
+      "static/chunks/node_modules_ef785701._.js",
+      "static/chunks/app_[locale]_layout_tsx_85a4becb._.js",
+      "static/chunks/_f7f97662._.js",
+      "static/chunks/app_[locale]_error_tsx_6454acc7._.js",
+      "static/chunks/_75cce640._.js",
+      "static/chunks/app_[locale]_not-found_tsx_6454acc7._.js",
+      "static/chunks/_c2d312f4._.js",
+      "static/chunks/app_[locale]_insighter-dashboard_layout_tsx_6454acc7._.js",
+      "static/chunks/_12b186a5._.js",
+      "static/chunks/node_modules_a5b68af2._.js",
+      "static/chunks/app_[locale]_insighter-dashboard_my-orders_page_tsx_e5402b45._.js",
+      "static/chunks/[turbopack]_browser_dev_hmr-client_hmr-client_ts_4e3b0bdd._.js",
+      "static/chunks/node_modules_next_dist_compiled_react-dom_1e674e59._.js",
+      "static/chunks/node_modules_next_dist_compiled_next-devtools_index_a9cb0712.js",
+      "static/chunks/node_modules_next_dist_compiled_5150ccfd._.js",
+      "static/chunks/node_modules_next_dist_client_cf1d9188._.js",
+      "static/chunks/node_modules_next_dist_b0daae9a._.js",
+      "static/chunks/4e2c9_@swc_helpers_cjs_2b52ba32._.js",
+      "static/chunks/_a0ff3932._.js",
+      "static/chunks/turbopack-_3fb52da9._.js"
+    ]
+  }
+}

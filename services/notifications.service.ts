@@ -83,7 +83,7 @@ class NotificationService {
         return [];
       }
 
-      const response = await fetch('https://api.insightabusiness.com/api/account/notification', {
+      const response = await fetch('https://api.foresighta.co/api/account/notification', {
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json',
@@ -128,7 +128,7 @@ class NotificationService {
         return false;
       }
 
-      const response = await fetch(`https://api.insightabusiness.com/api/account/notification/read/${id}`, {
+      const response = await fetch(`https://api.foresighta.co/api/account/notification/read/${id}`, {
         method: 'PUT',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -170,7 +170,7 @@ class NotificationService {
         return false;
       }
 
-      const response = await fetch('https://api.insightabusiness.com/api/account/notification/read', {
+      const response = await fetch('https://api.foresighta.co/api/account/notification/read', {
         method: 'PUT',
         headers: {
           'Authorization': `Bearer ${token}`,

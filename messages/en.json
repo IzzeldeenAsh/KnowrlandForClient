@@ -4,49 +4,48 @@
         "description": "Home Page Description",
         "publishButton": "Publish your work here!"
     },
- 
     "Hero": {
         "tagline": "Beyond Research Boundaries",
         "title": "Insights and experts that lead your business to excellence.",
-        "description":"Find data, reports, and subject matter experts, and more",
-        "searchPlaceholder": "Search&nbsp;<strong>Insight</strong>&nbsp;and&nbsp;<strong>Insighters</strong>&nbsp;(Insight Expert)...",        
-        "searchPlaceholderMobile":"Search in data, reports, insights...",
+        "description": "Find data, reports, and subject matter experts, and more",
+        "searchPlaceholder": "Search&nbsp;<strong>Insight</strong>&nbsp;and&nbsp;<strong>Insighters</strong>&nbsp;(Insight Expert)...",
+        "searchPlaceholderMobile": "Search in data, reports, insights...",
         "direction": "ltr"
     },
-    "HeroInsighter":{
-        "title":"Welcome to Insighta",
-        "description":"Where your expertise becomes a valuable currency"
+    "HeroInsighter": {
+        "title": "Welcome to Insighta",
+        "description": "Where your expertise becomes a valuable currency"
     },
-    "InsighterFeatures":{
-        "title":"Welcome to Insighta",
-        "description":"Where your expertise becomes a valuable currency",
-        "section3":{
-            "title":"A Sustainable Insight Ecosystem",
-            "description":"Insighta empowers experts like you to share insight continuously—turning expertise into sustainable income with every upload, whether new or updated."
+    "InsighterFeatures": {
+        "title": "Welcome to Insighta",
+        "description": "Where your expertise becomes a valuable currency",
+        "section3": {
+            "title": "A Sustainable Insight Ecosystem",
+            "description": "Insighta empowers experts like you to share insight continuously—turning expertise into sustainable income with every upload, whether new or updated."
         },
-        "section4":{
-            "title":"A Sustainable Revenue Stream",
-            "description":"Start earning by sharing your insights and experience on Insighta. You Set the Value: Choose your price, and every time your work is downloaded, you're paid Directly."
+        "section4": {
+            "title": "A Sustainable Revenue Stream",
+            "description": "Start earning by sharing your insights and experience on Insighta. You Set the Value: Choose your price, and every time your work is downloaded, you're paid Directly."
         },
-        "section1":{
-            "title":"Bring your insight to light by sharing it on the platform",
-            "description":"Start earning today by Bringing your data, studies, reports, and insights out from the confines of your desk. Share them with the world to discover, value, and invest in."
+        "section1": {
+            "title": "Bring your insight to light by sharing it on the platform",
+            "description": "Start earning today by Bringing your data, studies, reports, and insights out from the confines of your desk. Share them with the world to discover, value, and invest in."
         },
-        "section2":{
-            "title":"Don't let your expertise fade to silence; let it bloom into sustainable revenue",
-            "description":"Start earning by sharing your insight and experience onInsighta. You Set the Value: Choose your price, and every time your work is downloaded, you're paid Directly."
+        "section2": {
+            "title": "Don't let your expertise fade to silence; let it bloom into sustainable revenue",
+            "description": "Start earning by sharing your insight and experience onInsighta. You Set the Value: Choose your price, and every time your work is downloaded, you're paid Directly."
         },
-        "section5":{
-            "title":"Join our insight Ecosystem to Unlock a Recurring Revenue Stream",
-            "description":"Start earning by sharing your insights and experience on Insighta. You Set the Value: Choose your price, and every time your work is downloaded, you're paid directly."
+        "section5": {
+            "title": "Join our insight Ecosystem to Unlock a Recurring Revenue Stream",
+            "description": "Start earning by sharing your insights and experience on Insighta. You Set the Value: Choose your price, and every time your work is downloaded, you're paid directly."
         },
-        "section6":{
-            "title":"Insighta ecosystem keeps you aligned with client demand",
-            "description":"Start creating what clients truly need in your field. Once you register as an Insighter, you'll receive notifications about client requests, enabling you to produce relevant data, reports, and insights from your area of expertise.\n\nOn-Demand Insight Production\n\nSmart Alerts for You & Your Clients\n\nWork Anytime, Anywhere"
+        "section6": {
+            "title": "Insighta ecosystem keeps you aligned with client demand",
+            "description": "Start creating what clients truly need in your field. Once you register as an Insighter, you'll receive notifications about client requests, enabling you to produce relevant data, reports, and insights from your area of expertise.\n\nOn-Demand Insight Production\n\nSmart Alerts for You & Your Clients\n\nWork Anytime, Anywhere"
         },
-        "dataTypeSection":{
-            "title":"What data, insights, reports, or expertise have you locked away?",
-            "description":"Insighta is your platform to showcase and monetize your intellectual assets. The platform organizes all your published material—including data and insights by category, making it easy for global audiences to find and purchase your work."
+        "dataTypeSection": {
+            "title": "What data, insights, reports, or expertise have you locked away?",
+            "description": "Insighta is your platform to showcase and monetize your intellectual assets. The platform organizes all your published material—including data and insights by category, making it easy for global audiences to find and purchase your work."
         },
         "showMore": "Show More",
         "insighter": {
@@ -57,61 +56,61 @@
             "point2": "who shares valuable data, reports, insights, case studies, or practical tools on Insighta platform to empower others and help businesses grow;",
             "point3": "A insight contributor who earns income each time their expertise is accessed.",
             "roles": {
-              "fieldExpert": "Field expert",
-              "strategist": "Strategist",
-              "consultant": "Consultant",
-              "technician": "Technician"
+                "fieldExpert": "Field expert",
+                "strategist": "Strategist",
+                "consultant": "Consultant",
+                "technician": "Technician"
             },
             "uploadTitle": "What data, reports and insights can you upload as",
             "cta": "Become an Insighter",
             "readMore": "Read more",
             "joinUs": "You can join now, it's easy,free, and worth it.",
             "uploadTypes": {
-            "businessReports": "Business Reports & Market Insights",
-            "playbooks": "Playbooks & Strategy Documents",
-            "manuals": "Operational Manuals & SOPs",
-            "technicalGuides": "Technical Guides & Field Insight",
-            "trainingMaterials": "Training Materials & Courses",
-            "dataSets": "Data Sets & Templates",
-            "supplyChain": "Supply Chain",
-            "marketSize": "Market Size",
-            "customerBehavior": "Customer Behavior",
-            "internationalTrade": "International Trade",
-            "investmentOpportunities": "Investment Opportunities",
-            "investmentGrowthStrategies": "Investment & Growth Strategies",
-            "businessStrategiesPlans": "Business Strategies & Plans",
-            "currentStateAnalysis": "Current State Analysis",
-            "benchmarkingStudies": "Benchmarking Studies",
-            "statistics": "General & Sector-Specific Statistics",
-            "regulatoryPolicies": "Official Policies & Procedures",
-            "technicalStudies": "Specialized Technical Studies",
-            "supplierListsPriceQuotes": "Supplier Lists & Price Quotes",
-            "pricingStrategies": "Pricing Policies & Strategies",
-            "marketTrendsPriceForecasts": "Market Trends & Price Forecasts",
-            "periodicReportsMarketInsights": "Periodic Reports & Market Insights",
-            "competitorAnalysis": "Competitor Analysis",
-            "marketEntryStrategies": "Market Entry Strategies",
-            "exportOpportunities": "Export Opportunities & Potential Clients",
-            "feasibilityStudies": "Feasibility Studies",
-            "digitalTransformation": "Digital Transformation & Automation",
-            "complianceGovernance": "Compliance & Governance Policies",
-            "organizationalChangePlans": "Organizational Change Plans",
-            "projectIdeasSolutions": "Project Ideas & Practical Solutions",
-            "focusGroupWorkshopOutputs": "Focus Group & Workshop Outputs",
-            "supplyChainSources": "Supply Chain & Input Sources",
-            "salesDataConsumerBehavior": "Sales Data & Consumer Behavior",
-            "operationalWorkEnvironment": "Operational Conditions & Work Environment",
-            "qualityMetrics": "Quality Metrics & Statistics",
-            "operationalCaseStudies": "Operational Case Studies",
-            "rootCauseAnalysis": "Results & Root Cause Analysis",
-            "productionAssessment": "Production Line & Equipment Assessment",
-            "financialAnalysis": "Financial Data & Analysis",
-            "businessNews": "Business News & Updates",
-            "trainingContent": "Training & Educational Content",
-            "skillDevelopmentPlans": "Skill Development Plans",
-            "businessTemplates": "Business Tools & Templates (Excel, BI)",
-            "decisionMakingTools": "Data Analysis & Decision-Making Tools"
-          }
+                "businessReports": "Business Reports & Market Insights",
+                "playbooks": "Playbooks & Strategy Documents",
+                "manuals": "Operational Manuals & SOPs",
+                "technicalGuides": "Technical Guides & Field Insight",
+                "trainingMaterials": "Training Materials & Courses",
+                "dataSets": "Data Sets & Templates",
+                "supplyChain": "Supply Chain",
+                "marketSize": "Market Size",
+                "customerBehavior": "Customer Behavior",
+                "internationalTrade": "International Trade",
+                "investmentOpportunities": "Investment Opportunities",
+                "investmentGrowthStrategies": "Investment & Growth Strategies",
+                "businessStrategiesPlans": "Business Strategies & Plans",
+                "currentStateAnalysis": "Current State Analysis",
+                "benchmarkingStudies": "Benchmarking Studies",
+                "statistics": "General & Sector-Specific Statistics",
+                "regulatoryPolicies": "Official Policies & Procedures",
+                "technicalStudies": "Specialized Technical Studies",
+                "supplierListsPriceQuotes": "Supplier Lists & Price Quotes",
+                "pricingStrategies": "Pricing Policies & Strategies",
+                "marketTrendsPriceForecasts": "Market Trends & Price Forecasts",
+                "periodicReportsMarketInsights": "Periodic Reports & Market Insights",
+                "competitorAnalysis": "Competitor Analysis",
+                "marketEntryStrategies": "Market Entry Strategies",
+                "exportOpportunities": "Export Opportunities & Potential Clients",
+                "feasibilityStudies": "Feasibility Studies",
+                "digitalTransformation": "Digital Transformation & Automation",
+                "complianceGovernance": "Compliance & Governance Policies",
+                "organizationalChangePlans": "Organizational Change Plans",
+                "projectIdeasSolutions": "Project Ideas & Practical Solutions",
+                "focusGroupWorkshopOutputs": "Focus Group & Workshop Outputs",
+                "supplyChainSources": "Supply Chain & Input Sources",
+                "salesDataConsumerBehavior": "Sales Data & Consumer Behavior",
+                "operationalWorkEnvironment": "Operational Conditions & Work Environment",
+                "qualityMetrics": "Quality Metrics & Statistics",
+                "operationalCaseStudies": "Operational Case Studies",
+                "rootCauseAnalysis": "Results & Root Cause Analysis",
+                "productionAssessment": "Production Line & Equipment Assessment",
+                "financialAnalysis": "Financial Data & Analysis",
+                "businessNews": "Business News & Updates",
+                "trainingContent": "Training & Educational Content",
+                "skillDevelopmentPlans": "Skill Development Plans",
+                "businessTemplates": "Business Tools & Templates (Excel, BI)",
+                "decisionMakingTools": "Data Analysis & Decision-Making Tools"
+            }
         },
         "items": [
             {
@@ -122,21 +121,21 @@
                 "position": "right"
             },
             {
-              "title": "Bring your insight to light by sharing it on the platform",
-              "description": "Start earning today by bringing your data, studies, reports, and insights out from the confines of your desk. Share them with the world to discover, value, and invest in.",
-              "image": "/images/insighter-1.png",
-              "icon": "/images/insighter-1-icon.svg",
-              "position": "left"
+                "title": "Bring your insight to light by sharing it on the platform",
+                "description": "Start earning today by bringing your data, studies, reports, and insights out from the confines of your desk. Share them with the world to discover, value, and invest in.",
+                "image": "/images/insighter-1.png",
+                "icon": "/images/insighter-1-icon.svg",
+                "position": "left"
             },
             {
-              "title": "Don't let your expertise fade to silence; let it bloom into sustainable revenue",
-              "description": "Start earning by sharing your insight and experience on Knoldiq. You Set the Value: Choose your price, and every time your work is downloaded, you're paid directly.",
-              "image": "/images/insighter-3.png",
-              "icon": "/images/insighter-3-icon.svg",
-              "position": "right"
+                "title": "Don't let your expertise fade to silence; let it bloom into sustainable revenue",
+                "description": "Start earning by sharing your insight and experience on Knoldiq. You Set the Value: Choose your price, and every time your work is downloaded, you're paid directly.",
+                "image": "/images/insighter-3.png",
+                "icon": "/images/insighter-3-icon.svg",
+                "position": "right"
             }
-          ],
-          "ctaButton": "Get Started",
+        ],
+        "ctaButton": "Get Started",
         "insightSection": {
             "title": "What data, insights, reports, or expertise have you locked away?",
             "description": "Insighta is your platform to showcase and monetize your intellectual assets. The platform organizes all your published material—including data and insights by category, making it easy for global audiences to find and purchase your work."
@@ -187,19 +186,18 @@
             "fasterDecisions": {
                 "title": "AI-Powered Assistance"
             },
-            "titleIndustry":{
-                    "title":""
+            "titleIndustry": {
+                "title": ""
             }
         },
         "direction": "ltr"
     },
     "Testimonials": {
         "tagline": "Bringing You Closer to Resolution",
-        "title":"Latest Reports",
-
+        "title": "Latest Reports",
         "paid": "Paid",
         "free": "Free",
-        "description":"Stay ahead with newly uploaded expert reports, technical guides, and real-world analyses",
+        "description": "Stay ahead with newly uploaded expert reports, technical guides, and real-world analyses",
         "insights": {
             "title": "Statistics",
             "description": "Explore datasets and analysis for smarter next move in your business",
@@ -257,7 +255,7 @@
         "direction": "ltr",
         "tabs": {
             "no-monthly-subscription": {
-                "title":"Purchase part of a report, section or file"
+                "title": "Purchase part of a report, section or file"
             },
             "payAsYouGo": {
                 "title": "No monthly fees- One time purchase"
@@ -314,8 +312,8 @@
         "description": "Join Insighta Marketplace and become an Insighter. Turn your expertise into income and connect with clients who need your expertise.",
         "button": "Get Started",
         "contact": "For inquiries and collaborations, reach out to us at",
-        "topTag":"Turn Your Expertise into Profit.",
-        "topTag2":"Ready to deliver measurable business impact?"
+        "topTag": "Turn Your Expertise into Profit.",
+        "topTag2": "Ready to deliver measurable business impact?"
     },
     "Footer": {
         "copyright": " 2026 Insightabusiness.com. All Rights Reserved.",
@@ -351,12 +349,20 @@
             "privacy": "Privacy Policy",
             "dataLicensing": "Data Licensing Agreement",
             "cookies": "Cookies Policy"
+        },
+        "knowledge": {
+            "title": "Insight",
+            "insights": "Statistics",
+            "reports": "Reports",
+            "data": "Data",
+            "manual": "Manuals",
+            "courses": "Courses"
         }
     },
-    "aboutUsPage":{
-        "mainTitle":"About Insighta",
-        "mainSubTitle":"Where Insights Meets Opportunity",
-        "firstParagraph":"Insighta is a pioneering digital platform that provides individuals and businesses with access to high-quality business insights, such as data, reports, statistics, and manuals across various industries. Our mission is to facilitate seamless insight sharing by offering a structured and accessible marketplace for expert-driven content.",
+    "aboutUsPage": {
+        "mainTitle": "About Insighta",
+        "mainSubTitle": "Where Insights Meets Opportunity",
+        "firstParagraph": "Insighta is a pioneering digital platform that provides individuals and businesses with access to high-quality business insights, such as data, reports, statistics, and manuals across various industries. Our mission is to facilitate seamless insight sharing by offering a structured and accessible marketplace for expert-driven content.",
         "firstParagraphPartTwo": "Whether you're a professional seeking a valuable insight or an industry expert looking to monetize your expertise, Insighta is your gateway to trusted insights.",
         "ourVision": "Our Vision",
         "ourVisionPart1": "At Insighta, we envision a world where expertise is easily accessible, enabling businesses and professionals to make informed decisions with confidence.",
@@ -371,21 +377,21 @@
         "whatOffer3P": " – Insighta features an advanced AI-supported search engine that enhances discoverability and accessibility of insights, making it easier for users to find relevant information. Our data is structured based on international standards such as ISIC and Products, ensuring seamless integration into global business frameworks.",
         "whatOffer4": "Monetization for Experts",
         "whatOffer4P": " – Subject matter experts, consultants, and analysts can publish and sell their data, report and statistics, earning revenue from their knowledge contributions.",
-         "whatOffer5": "Company & Expert Collaboration",
+        "whatOffer5": "Company & Expert Collaboration",
         "whatOffer5P": " – Experts on Insighta can be individual professionals or companies. The platform supports company creation, allowing company owners to invite experts—both from within the platform and external professionals—to contribute knowledge, upload insights, and sell data and reports.",
         "whatOffer6": "Global Accessibility",
         "whatOffer6P": " – Serving professionals and businesses worldwide, with a focus on the EU, GCC region, U.S., and Jordan.",
-        "benefitKnoldg":"Who Can Benefit from Insighta?",
-        "benefitKnoldg1":"Businesses & Investors",
-        "benefitKnoldgp1":" – Gain access to industry reports, market research, and expert analyses and statistics.",
-        "benefitKnoldg2":"Consultants & Experts",
-        "benefitKnoldgp2":" – Share your expertise, grow your audience, and earn from your Business insights.",
-        "benefitKnoldg3":"Academics & Researchers",
-        "benefitKnoldgp3":" – Distribute valuable insights to a wider professional audience.",
-        "benefitKnoldg4":"Government & Policy Makers",
-        "benefitKnoldgp4":" – Utilize expert insights for informed policymaking and economic development.",
-        "parentCompanyTitle":"Our Parent Company - A&B Consulting",
-        "parentCompanyParagraph":"Insighta is proudly owned and operated by A&B Consulting, a firm dedicated to driving business success through strategic insights and sustainable solutions. With a strong foundation in consulting and research, A&B Consulting ensures that Insighta remains a trusted and professional platform for knowledge exchange."
+        "benefitKnoldg": "Who Can Benefit from Insighta?",
+        "benefitKnoldg1": "Businesses & Investors",
+        "benefitKnoldgp1": " – Gain access to industry reports, market research, and expert analyses and statistics.",
+        "benefitKnoldg2": "Consultants & Experts",
+        "benefitKnoldgp2": " – Share your expertise, grow your audience, and earn from your Business insights.",
+        "benefitKnoldg3": "Academics & Researchers",
+        "benefitKnoldgp3": " – Distribute valuable insights to a wider professional audience.",
+        "benefitKnoldg4": "Government & Policy Makers",
+        "benefitKnoldgp4": " – Utilize expert insights for informed policymaking and economic development.",
+        "parentCompanyTitle": "Our Parent Company - A&B Consulting",
+        "parentCompanyParagraph": "Insighta is proudly owned and operated by A&B Consulting, a firm dedicated to driving business success through strategic insights and sustainable solutions. With a strong foundation in consulting and research, A&B Consulting ensures that Insighta remains a trusted and professional platform for knowledge exchange."
     },
     "Resources": {
         "user-guide": "User Guide",
@@ -441,7 +447,7 @@
         "login": "Login",
         "insighter": "Insighter",
         "manager": "Manager",
-         "myConsultingSchedule": "My Consulting Schedule",
+        "myConsultingSchedule": "My Consulting Schedule",
         "companyInsighter": "Company-Insighter",
         "company": "Company",
         "client": "Client",
@@ -455,7 +461,7 @@
         "dashboard": "Dashboard",
         "myRequests": "Requests",
         "accountSettings": "Account Settings",
-        "settings":"Settings",
+        "settings": "Settings",
         "becomeInsighter": "Become an Insighter",
         "becomeInsighterDescription": "Register as a insight provider and start uploading reports and data on the platform",
         "myCompany": "My Team",
@@ -511,7 +517,7 @@
         "verified": "Verified",
         "notVerified": "Not Verified",
         "follow": "Follow",
-        "meet":"Meet",
+        "meet": "Meet",
         "scheduleAMeeting": "Schedule a Meeting",
         "publishedInsight": "Published <br/> Insight",
         "consultingSessions": "Sessions <br/> Booked",
@@ -519,9 +525,8 @@
         "aboutCompany": "About Company",
         "aboutManager": "About Manager",
         "with": "with",
-        "previous":"Previous",
-        "next":"Next",
-      
+        "previous": "Previous",
+        "next": "Next",
         "insight": "Insight Uploads",
         "availableTimes": "Available Times",
         "book": "Book",
@@ -529,15 +534,15 @@
         "checkBackLater": "Please check back later for availability",
         "loginToView": "You need to login to view",
         "loginRequired": "Login Required",
-        "paymentSuccessful":"Payment Successfull",
-        "paymentOptions":"Payment Options",
-        "close":"Close",
+        "paymentSuccessful": "Payment Successfull",
+        "paymentOptions": "Payment Options",
+        "close": "Close",
         "login": "Login",
         "socialMedia": "Social Media",
         "noBioAvailable": "No bio available",
         "comingSoon": "Coming Soon",
         "contentUpdateSoon": "This section will be updated soon with insightful content",
-        "selectDate":"Select a Date",
+        "selectDate": "Select a Date",
         "sessionRate": "Session Rate:",
         "paymentMethod": "Payment Method",
         "knoldgWallet": "Insighta Wallet",
@@ -572,87 +577,87 @@
         "course": "Course"
     },
     "termsAndConditions": {
-        "mainTitle":"Terms of Service – Insighta Business",
-        "Introduction":"Introduction",
-        "welcomeKnoldg":"Welcome to Insighta Business, an online platform providing access to expert insights, reports, and data. By accessing or using our Platform, you agree to these Terms of Service. If you do not agree, please refrain from using Insighta Business.",
-        "Definitions":"Definitions",
-        "authorizedUsers":"Authorized Users: Individuals or organizations registered and granted access based on their account type.",
-        "expertContributors":"Expert Contributors: Individuals or entities uploading reports, insights, or data for sale or free display.",
-        "subscribersPurchasers":"Subscribers and Buyers: Users purchasing or subscribing to access reports, insights, or related materials.",
-        "userRoles":"User Types",
-        "primaryUser":"",
-        "freeUsers":"Free Users – may browse and download limited public content.",
-        "payYou":"Pay-per-use Users – purchase individual insights or reports.",
-        "subscribers":"Subscribers – enjoy tiered subscription packages with broader access.",
-        "expertContributors2":"Expert Contributors – upload and sell content under a Data Licensing Agreement.",
-        "purchasingReports":"Report Purchases and Licensing",
-        "UsersPurchaseReports":"Reports may be bought individually or through subscription tiers.",
-        "payYou2":"Purchased content is for internal or personal use only. Redistribution or resale is prohibited.",
-        "subscription":"Each report may carry usage restrictions or expiry conditions set by the contributor.",
-        "enterpriseLicensing":"Intellectual Property",
-        "purchasedreports":"All content, code, and trademarks belong to Insighta Business or its contributors.",
-        "reportsRestrictions":"Users may not copy or distribute content without written consent.",
-        "reportsCreation":"Related Documents",
-        "knoldgCurates":"",
-        "knoldgCuratesRich":"These Terms are to be read together with the <privacy>Privacy Policy</privacy>, <cookies>Cookies Policy</cookies>, and <licensing>Data Licensing Agreement</licensing>.",
-        "expertEnsure":"",
-        "privacyLinkLabel":"Privacy Policy",
-        "cookiesLinkLabel":"Cookies Policy",
-        "licensingLinkLabel":"Data Licensing Agreement",
-        "AccountRegistration":"Account Registration and Obligations",
-        "Usersaccurate":"Users must provide accurate registration information.",
-        "Usersresponsible":"Users are responsible for safeguarding login credentials.",
-        "Knoldgnotified":"Any unauthorized activity must be reported immediately to privacy@insightabusiness.com.",
-        "PaymentsRefunds":"Payments, Refunds, and Renewals",
-        "Acceptedpayment":"Payments accepted via credit card, PayPal, bank transfer, or regional options.",
-        "RefundsNotAllowed":"Refunds are only allowed in cases of duplicate charges or technical errors.",
-        "SubscriptionRenew":"Subscriptions renew automatically unless cancelled.",
-        "ServiceModifications":"Service Modifications",
-        "KnoldgRight":"Insighta Business may update or discontinue features without prior notice.",
-        "Usersnotified":"Significant changes affecting access or pricing will be communicated to users.",
-        "LimitationLiability":"Limitation of Liability",
-        "ServicesMaterials":"Services and materials are provided “as is.”",
-        "Knoldgliable":"Insighta Business is not liable for business decisions made based on purchased information.",
-        "Liabilitycapped":"Liability is limited to the amount paid for the specific disputed service.",
-        "GoverningDispute":"Governing Law and Disputes",
-        "ForEU":"EU Users: GDPR and EU consumer protection laws apply.",
-        "ForUS":"US Users: CCPA and applicable state privacy laws apply.",
-        "ForJordan":"Jordan & GCC Users: Local e-commerce and data protection laws apply.",
-        "Jordanianlaw":"All disputes shall be governed by Jordanian law and settled by arbitration or competent courts in Amman.",
-        "lastUpdatedTerms":"Last Updated: November 2025"
+        "mainTitle": "Terms of Service – Insighta Business",
+        "Introduction": "Introduction",
+        "welcomeKnoldg": "Welcome to Insighta Business, an online platform providing access to expert insights, reports, and data. By accessing or using our Platform, you agree to these Terms of Service. If you do not agree, please refrain from using Insighta Business.",
+        "Definitions": "Definitions",
+        "authorizedUsers": "Authorized Users: Individuals or organizations registered and granted access based on their account type.",
+        "expertContributors": "Expert Contributors: Individuals or entities uploading reports, insights, or data for sale or free display.",
+        "subscribersPurchasers": "Subscribers and Buyers: Users purchasing or subscribing to access reports, insights, or related materials.",
+        "userRoles": "User Types",
+        "primaryUser": "",
+        "freeUsers": "Free Users – may browse and download limited public content.",
+        "payYou": "Pay-per-use Users – purchase individual insights or reports.",
+        "subscribers": "Subscribers – enjoy tiered subscription packages with broader access.",
+        "expertContributors2": "Expert Contributors – upload and sell content under a Data Licensing Agreement.",
+        "purchasingReports": "Report Purchases and Licensing",
+        "UsersPurchaseReports": "Reports may be bought individually or through subscription tiers.",
+        "payYou2": "Purchased content is for internal or personal use only. Redistribution or resale is prohibited.",
+        "subscription": "Each report may carry usage restrictions or expiry conditions set by the contributor.",
+        "enterpriseLicensing": "Intellectual Property",
+        "purchasedreports": "All content, code, and trademarks belong to Insighta Business or its contributors.",
+        "reportsRestrictions": "Users may not copy or distribute content without written consent.",
+        "reportsCreation": "Related Documents",
+        "knoldgCurates": "",
+        "knoldgCuratesRich": "These Terms are to be read together with the <privacy>Privacy Policy</privacy>, <cookies>Cookies Policy</cookies>, and <licensing>Data Licensing Agreement</licensing>.",
+        "expertEnsure": "",
+        "privacyLinkLabel": "Privacy Policy",
+        "cookiesLinkLabel": "Cookies Policy",
+        "licensingLinkLabel": "Data Licensing Agreement",
+        "AccountRegistration": "Account Registration and Obligations",
+        "Usersaccurate": "Users must provide accurate registration information.",
+        "Usersresponsible": "Users are responsible for safeguarding login credentials.",
+        "Knoldgnotified": "Any unauthorized activity must be reported immediately to privacy@insightabusiness.com.",
+        "PaymentsRefunds": "Payments, Refunds, and Renewals",
+        "Acceptedpayment": "Payments accepted via credit card, PayPal, bank transfer, or regional options.",
+        "RefundsNotAllowed": "Refunds are only allowed in cases of duplicate charges or technical errors.",
+        "SubscriptionRenew": "Subscriptions renew automatically unless cancelled.",
+        "ServiceModifications": "Service Modifications",
+        "KnoldgRight": "Insighta Business may update or discontinue features without prior notice.",
+        "Usersnotified": "Significant changes affecting access or pricing will be communicated to users.",
+        "LimitationLiability": "Limitation of Liability",
+        "ServicesMaterials": "Services and materials are provided “as is.”",
+        "Knoldgliable": "Insighta Business is not liable for business decisions made based on purchased information.",
+        "Liabilitycapped": "Liability is limited to the amount paid for the specific disputed service.",
+        "GoverningDispute": "Governing Law and Disputes",
+        "ForEU": "EU Users: GDPR and EU consumer protection laws apply.",
+        "ForUS": "US Users: CCPA and applicable state privacy laws apply.",
+        "ForJordan": "Jordan & GCC Users: Local e-commerce and data protection laws apply.",
+        "Jordanianlaw": "All disputes shall be governed by Jordanian law and settled by arbitration or competent courts in Amman.",
+        "lastUpdatedTerms": "Last Updated: November 2025"
     },
     "privacyPage": {
-        "mainTitle":"Privacy Policy – Insighta Business",
-        "DataCollection":"Data Collection and Use",
-        "Knoldgcollects":"We collect personal information such as account details, browsing behavior, and purchase records to improve user experience.",
-        "Accountdetails":"",
-        "Browsingbehavior":"",
-        "PurchaseHistory":"",
-        "LegalBasis":"Legal Basis under GDPR",
-        "WeProcess":"Processing relies on:",
-        "UserConsent":"User consent (e.g., marketing emails)",
-        "ContractuaNecessity":"Contractual necessity (e.g., payment processing)",
-        "LegitimateInterests":"Legitimate interests (e.g., fraud prevention and service improvement)",
-        "DataSharing":"Data Sharing and Transfers",
-        "PersonalData":"We do not sell personal data.",
-        "DataShared":"Data may be shared with payment processors or anti-fraud providers.",
-        "InformationDisclosed":"If transferred outside the EU, we apply Standard Contractual Clauses or equivalent safeguards.",
-        "CookiesTracking":"Updates",
-        "KnoldgCookies":"We may modify this policy.",
-        "UsersCookie":"Continued use of the platform after changes constitutes acceptance.",
-        "UserRights":"User Rights",
-        "UsersHave":"You may request access, correction, deletion, portability, or withdrawal of consent at any time via privacy@insightabusiness.com.",
-        "AccessCorrect":"",
-        "OptCommunications":"",
-        "RequestPortability":"",
-        "Withdrawonsent":"",
-        "DataSecurity":"Security",
-        "Knoldgemploys":"We employ encryption, secure access controls, and regular monitoring to protect personal data.",
-        "StrictSecurity":"",
-        "RetentionPeriod":"Data Retention",
-        "PersonalData2":"Personal data is retained only as long as necessary for service delivery or legal compliance.",
-        "privacyLastUpdate":"Last Updated: November 2026 | Contact: privacy@insightabusiness.com",
-        "privacyContact":""
+        "mainTitle": "Privacy Policy – Insighta Business",
+        "DataCollection": "Data Collection and Use",
+        "Knoldgcollects": "We collect personal information such as account details, browsing behavior, and purchase records to improve user experience.",
+        "Accountdetails": "",
+        "Browsingbehavior": "",
+        "PurchaseHistory": "",
+        "LegalBasis": "Legal Basis under GDPR",
+        "WeProcess": "Processing relies on:",
+        "UserConsent": "User consent (e.g., marketing emails)",
+        "ContractuaNecessity": "Contractual necessity (e.g., payment processing)",
+        "LegitimateInterests": "Legitimate interests (e.g., fraud prevention and service improvement)",
+        "DataSharing": "Data Sharing and Transfers",
+        "PersonalData": "We do not sell personal data.",
+        "DataShared": "Data may be shared with payment processors or anti-fraud providers.",
+        "InformationDisclosed": "If transferred outside the EU, we apply Standard Contractual Clauses or equivalent safeguards.",
+        "CookiesTracking": "Updates",
+        "KnoldgCookies": "We may modify this policy.",
+        "UsersCookie": "Continued use of the platform after changes constitutes acceptance.",
+        "UserRights": "User Rights",
+        "UsersHave": "You may request access, correction, deletion, portability, or withdrawal of consent at any time via privacy@insightabusiness.com.",
+        "AccessCorrect": "",
+        "OptCommunications": "",
+        "RequestPortability": "",
+        "Withdrawonsent": "",
+        "DataSecurity": "Security",
+        "Knoldgemploys": "We employ encryption, secure access controls, and regular monitoring to protect personal data.",
+        "StrictSecurity": "",
+        "RetentionPeriod": "Data Retention",
+        "PersonalData2": "Personal data is retained only as long as necessary for service delivery or legal compliance.",
+        "privacyLastUpdate": "Last Updated: November 2026 | Contact: privacy@insightabusiness.com",
+        "privacyContact": ""
     },
     "dataLicenseAgreement": {
         "mainTitle": "Data Licensing Agreement – Insighta Business",
@@ -707,26 +712,26 @@
         "relationLineRich": "This document complements the <privacy>Privacy Policy</privacy> and <terms>Terms of Service</terms>.",
         "lastUpdatedCookies": "Last Updated: November 2025"
     },
-        "contactUsPage": {
-                "contactUsTitle": "Message us now — We'd be happy to help!",
-                "contactUsFirstName": "First Name",
-                "contactUsFirstNameplaceholder": "E.g., Mark",
-                "contactUsLastName": "Last Name",
-                "contactUsLastNameplaceholder": "E.g., Rossi",
-                "contactUsPhone": "Phone Number",
-                "contactUsPhoneplaceholder": "+9***********",
-                "contactUsEmail": "Email Address",
-                "contactUsEmailplaceholder": "example@email.com",
-                "contactUsMessage": "Message",
-                "contactUsMessageplaceholder": "Type your message here...",
-                "send": "Send Message",
-                "regionalOperations": "Regional Operations - Jordan",
-                "jordanPhone": "+962777771429",
-                "somethingWentWrong": "Something went wrong",
-                "contactUsSuccessMessage": "Your message has been sent successfully",
-                "sending": "Sending message...",
-                "contactUsSuccessSubtext": "We will get back to you as soon as possible"
-        },
+    "contactUsPage": {
+        "contactUsTitle": "Message us now — We'd be happy to help!",
+        "contactUsFirstName": "First Name",
+        "contactUsFirstNameplaceholder": "E.g., Mark",
+        "contactUsLastName": "Last Name",
+        "contactUsLastNameplaceholder": "E.g., Rossi",
+        "contactUsPhone": "Phone Number",
+        "contactUsPhoneplaceholder": "+9***********",
+        "contactUsEmail": "Email Address",
+        "contactUsEmailplaceholder": "example@email.com",
+        "contactUsMessage": "Message",
+        "contactUsMessageplaceholder": "Type your message here...",
+        "send": "Send Message",
+        "regionalOperations": "Regional Operations - Jordan",
+        "jordanPhone": "+962777771429",
+        "somethingWentWrong": "Something went wrong",
+        "contactUsSuccessMessage": "Your message has been sent successfully",
+        "sending": "Sending message...",
+        "contactUsSuccessSubtext": "We will get back to you as soon as possible"
+    },
     "dataNotAvailable": "No Insight Available Yet",
     "industryInsight": "Available Insight types",
     "subIndustry": "Sub Industry",
@@ -741,27 +746,391 @@
         "NO_NEW": "No new notifications",
         "VIEW": "View"
     },
-     "typeLabel": {
-    "report": "Report",
-    "insight": "Insight",
-    "data": "Data",
-    "statistics": "Statistics",
-    "statistic": "Statistic",
-    "manual": "Manual",
-    "course": "Course"
-  },
-  "countryUpdate": {
-    "title": "Update Country",
-    "country": "Country",
-    "selectCountry": "Select Country",
-    "countryRequired": "Country is required",
-    "updateCountry": "Update Country",
-    "updating": "Updating...",
-    "countryUpdateRequired": "Country Update Required",
-    "pleaseSelectCountry": "Please select your country to continue",
-    "thisInfoRequired": "This information is required ",
-    "loadingCountries": "Loading countries...",
-    "failedToLoadCountries": "Failed to load countries"
-  }
-
+    "typeLabel": {
+        "report": "Report",
+        "insight": "Insight",
+        "data": "Data",
+        "statistics": "Statistics",
+        "statistic": "Statistic",
+        "manual": "Manual",
+        "course": "Course"
+    },
+    "countryUpdate": {
+        "title": "Update Country",
+        "country": "Country",
+        "selectCountry": "Select Country",
+        "countryRequired": "Country is required",
+        "updateCountry": "Update Country",
+        "updating": "Updating...",
+        "countryUpdateRequired": "Country Update Required",
+        "pleaseSelectCountry": "Please select your country to continue",
+        "thisInfoRequired": "This information is required ",
+        "loadingCountries": "Loading countries...",
+        "failedToLoadCountries": "Failed to load countries"
+    },
+    "InsighterDashboard": {
+        "nav": {
+            "menu": "Menu",
+            "overview": "Overview",
+            "myRequests": "Requests",
+            "myCompany": "My Team",
+            "insights": "Insights",
+            "myKnowledge": "My library",
+            "myDownloads": "My Downloads",
+            "readLater": "Bookmarks",
+            "meetings": "Sessions",
+            "consultingSchedule": "Session Settings",
+            "projects": "Projects",
+            "clientProjects": "Client Projects",
+            "myProjects": "My Projects",
+            "projectSettings": "Project Settings",
+            "marketplace": "Marketplace",
+            "myOrders": "My Purchases",
+            "sales": "Sales",
+            "wallet": "Wallet",
+            "settings": "General Settings",
+            "accountSettings": "Account Settings",
+            "notificationSettings": "Notification Settings",
+            "paymentSettings": "Payout Settings",
+            "expandMenu": "Expand Menu",
+            "collapseMenu": "Collapse Menu"
+        },
+        "common": {
+            "comingSoon": "This page is being migrated and will be available soon.",
+            "loading": "Loading..."
+        },
+        "myDashboard": {
+            "widgets": {
+                "inWallet": "In Wallet",
+                "meetingsToday": "Sessions Today",
+                "pendingRequests": "Pending Request",
+                "todaySessions": "Today's Sessions"
+            },
+            "agreement": {
+                "message": "You have not accepted the latest agreement.",
+                "review": "Review & Accept"
+            },
+            "promo": {
+                "projectTitle": "Start receiving project requests",
+                "projectText": "Complete project service setup to define your services, rate, and preferred request types.",
+                "projectAction": "Start setup",
+                "upgradeTitle": "Upgrade to a Company Account",
+                "upgradeDescription": "Access premium business features and streamline team collaboration.",
+                "upgradePendingDescription": "Your company account activation request is currently being processed. We will notify you once it is approved.",
+                "upgradePending": "Request Pending",
+                "upgradeNow": "Upgrade Now",
+                "notifTitle": "WhatsApp & SMS notifications",
+                "notifText": "Want to receive notifications by WhatsApp and SMS? Enable channels and add your numbers in Notification Settings.",
+                "notifAction": "Update Settings",
+                "publishTitle": "Publish Your Insights",
+                "publishText": "Start earning from your expertise by publishing insight-ready content.",
+                "publishAction": "Publish Now"
+            },
+            "company": {
+                "publishedKnowledge": "Published Insights",
+                "total": "Total",
+                "noData": "No data available",
+                "startUploading": "Start Publishing",
+                "startUploadingDescription": "Share your insight with the world!",
+                "myLibrary": "My Library",
+                "buildTeam": "Build your team!",
+                "buildTeamDescription": "Grow your business by adding team members to your company",
+                "addEmployee": "Add a team member"
+            },
+            "knowledgeTypes": {
+                "title": "Uploaded Knowledge",
+                "subtitle": "Statistics of your insight content by type",
+                "loadError": "Failed to load insight type statistics. Please try again.",
+                "retry": "Retry",
+                "noData": "No insight type statistics available.",
+                "total": "Total",
+                "items": "items",
+                "report": "Report",
+                "statistic": "Statistic",
+                "manual": "Manual",
+                "data": "Data",
+                "insight": "Insight",
+                "course": "Course",
+                "media": "Media",
+                "other": "Other"
+            },
+            "client": {
+                "latestInsights": "Latest Insights",
+                "dataLabel": "Data",
+                "dataDescription": "Explore recently added datasets and figures.",
+                "reportLabel": "Reports",
+                "reportDescription": "Download the latest research and reports.",
+                "statisticLabel": "Statistics",
+                "statisticDescription": "Review the newest analyst statistics and findings.",
+                "manualLabel": "Manuals",
+                "manualDescription": "Quick guides to help you apply best practices.",
+                "courseLabel": "Courses",
+                "courseDescription": "Learning paths curated for your growth.",
+                "becomeInsighterTitle": "Become an Insighter",
+                "becomeInsighterDescription": "Sharing insight empowers us all to grow and innovate together!",
+                "startNow": "Start Now"
+            }
+        },
+        "myKnowledge": {
+            "title": "Knowledge",
+            "tabs": {
+                "general": "All Knowledge",
+                "posted": "Published",
+                "scheduled": "Scheduled",
+                "unpublished": "Drafts",
+                "packages": "Packages"
+            },
+            "search": "Search...",
+            "addKnowledge": "Add Knowledge",
+            "table": {
+                "name": "Knowledge Name",
+                "type": "Type",
+                "price": "Total Price",
+                "status": "Status",
+                "actions": ""
+            },
+            "actions": {
+                "view": "View",
+                "edit": "Edit",
+                "delete": "Delete",
+                "publish": "Publish",
+                "unpublish": "Unpublish",
+                "schedule": "Schedule"
+            },
+            "status": {
+                "published": "Published",
+                "unpublished": "Draft",
+                "scheduled": "Scheduled",
+                "in_review": "In Review",
+                "draft": "Draft"
+            },
+            "types": {
+                "all": "All",
+                "data": "Data",
+                "report": "Report",
+                "manual": "Manual",
+                "course": "Course",
+                "media": "Media",
+                "statistic": "Statistic",
+                "insight": "Insight"
+            },
+            "selected": "selected",
+            "deleteSelected": "Delete Selected",
+            "untitled": "Untitled knowledge",
+            "packageBadgeBoth": "Included in a package",
+            "packageBadgeOnly": "Published in a package only",
+            "empty": {
+                "title": "No Insight Items Found",
+                "message": "You do not have any insight items at the moment. New items will appear here once created.",
+                "filteredMessage": "No insight items match your current filter criteria. Try adjusting your filters or view all items.",
+                "noItemsYet": "You do not have any insight items yet",
+                "startCreating": "Start by creating your first insight item. You can add data, insights, reports, manuals, courses, or media."
+            },
+            "confirmDelete": {
+                "title": "Are you sure?",
+                "text": "You will not be able to revert this!",
+                "confirm": "Yes, delete!",
+                "confirmMany": "Yes, delete them!",
+                "cancel": "Cancel",
+                "deleted": "Deleted successfully"
+            },
+            "confirmUnpublish": {
+                "title": "Unpublish this knowledge?",
+                "confirm": "Yes, unpublish",
+                "success": "Knowledge unpublished"
+            },
+            "confirmPublish": {
+                "title": "Publish this knowledge now?",
+                "confirm": "Yes, publish",
+                "success": "Knowledge published"
+            }
+        },
+        "myRequests": {
+            "title": "Requests",
+            "insighterTitle": "Insighter Requests",
+            "subtitle": "Review the status of your platform requests here.",
+            "empty": {
+                "title": "No Requests Found",
+                "message": "You do not have any requests at the moment. New requests will appear here once created.",
+                "filteredMessage": "No requests match your current filter criteria. Try adjusting your filters or view all requests.",
+                "clearFilters": "Clear Filters"
+            },
+            "filter": {
+                "status": "Status",
+                "requestType": "Request Type",
+                "showAll": "Show All",
+                "pending": "Pending",
+                "approved": "Approved",
+                "rejected": "Rejected",
+                "acceptKnowledge": "Accept Knowledge"
+            },
+            "status": {
+                "pending": "Pending",
+                "approved": "Approved",
+                "declined": "Declined",
+                "rejected": "Rejected"
+            },
+            "view": "View",
+            "page": "Page",
+            "of": "of",
+            "dialog": {
+                "header": "Request Details",
+                "requestType": "Request Type",
+                "comments": "Comments",
+                "staffNotes": "Notes",
+                "noStaffNotes": "No staff notes available.",
+                "resendRequest": "Resend Request",
+                "resendPlaceholder": "Please explain why you are resending this request...",
+                "pendingRequestExists": "You already have a pending request of this type. Please wait for it to be processed before submitting a new one.",
+                "viewKnowledge": "View Knowledge",
+                "review": "Review",
+                "approve": "Approve",
+                "decline": "Decline",
+                "notesRequired": "Notes are required",
+                "notesPlaceholder": "Add your notes...",
+                "confirm": "Confirm",
+                "cancel": "Cancel",
+                "approveSuccess": "Request approved successfully",
+                "declineSuccess": "Request declined successfully",
+                "resendSuccess": "Request resent successfully",
+                "rejectedInfo": "This request has been rejected"
+            }
+        },
+        "myDownloads": {
+            "title": "My Downloads",
+            "searchPlaceholder": "Search for knowledge",
+            "viewAll": "View All",
+            "clearSearch": "Clear Search",
+            "knowledgeItems": "Insight",
+            "documents": "File",
+            "knowledgeSource": "Insight Source",
+            "noDownloads": "No downloads yet",
+            "noSearchResults": "No results found",
+            "selectKnowledge": "Select Knowledge",
+            "selectItemDetails": "Select Item Details",
+            "noDocuments": "No documents",
+            "download": "Download",
+            "downloadAll": "Download All",
+            "purchaseDate": "Purchase Date",
+            "downloadDate": "Download Date",
+            "type": "Type",
+            "publisher": "Publisher",
+            "by": "By",
+            "free": "Free",
+            "isNew": "New",
+            "view": "View",
+            "total": "Total",
+            "page": "Page",
+            "of": "of",
+            "downloadStarted": "Download started"
+        },
+        "readLater": {
+            "title": "Bookmarks",
+            "searchPlaceholder": "Search...",
+            "empty": "No bookmarked knowledge yet",
+            "emptyFiltered": "No results match your filters",
+            "remove": "Remove",
+            "removed": "Removed from bookmarks",
+            "view": "View",
+            "by": "By",
+            "publishedAt": "Published",
+            "page": "Page",
+            "of": "of"
+        },
+        "myOrders": {
+            "title": "My Purchases",
+            "subtitle": "Track your purchases and their details here.",
+            "tabs": {
+                "knowledge": "Insights",
+                "meeting": "Sessions",
+                "project": "Projects"
+            },
+            "order": "Order",
+            "ordered": "Ordered",
+            "by": "By",
+            "insighter": "Insighter",
+            "company": "Company",
+            "details": "Order Details",
+            "invoice": "Download Invoice",
+            "viewKnowledge": "View in Knowledge",
+            "empty": "No purchases yet",
+            "page": "Page",
+            "of": "of",
+            "status": {
+                "paid": "Paid",
+                "pending": "Pending",
+                "failed": "Failed",
+                "refunded": "Refunded",
+                "confirmed": "Confirmed"
+            },
+            "dialog": {
+                "header": "Order Details",
+                "orderNo": "Order No",
+                "invoiceNo": "Invoice No",
+                "date": "Date",
+                "amount": "Amount",
+                "status": "Status",
+                "payment": "Payment",
+                "method": "Method",
+                "card": "Card",
+                "receipt": "View Receipt",
+                "items": "Items",
+                "session": "Session",
+                "project": "Project",
+                "free": "Free"
+            }
+        },
+        "wallet": {
+            "title": "Wallet",
+            "balance": "Current Balance",
+            "inWallet": "In Wallet",
+            "periods": {
+                "weekly": "Weekly",
+                "monthly": "Monthly",
+                "yearly": "Yearly"
+            },
+            "deposits": "Deposits",
+            "withdrawals": "Withdrawals",
+            "transactions": "Transactions",
+            "deposit": "Deposit",
+            "withdraw": "Withdraw",
+            "noTransactions": "No transactions yet",
+            "details": "Details",
+            "page": "Page",
+            "of": "of"
+        },
+        "myMeetings": {
+            "title": "Sessions",
+            "tabs": {
+                "received": "Client Sessions",
+                "sent": "My Sessions"
+            },
+            "filters": {
+                "coming": "Upcoming",
+                "past": "Past",
+                "archived": "Archived"
+            },
+            "status": {
+                "approved": "Approved",
+                "pending": "Pending",
+                "postponed": "Postponed"
+            },
+            "join": "Join Session",
+            "approve": "Approve",
+            "postpone": "Postpone",
+            "archive": "Archive",
+            "unarchive": "Unarchive",
+            "notes": "Notes",
+            "notesPlaceholder": "Add your notes...",
+            "confirm": "Confirm",
+            "cancel": "Cancel",
+            "empty": "No sessions found",
+            "with": "With",
+            "approveSuccess": "Session approved",
+            "postponeSuccess": "Session postponed",
+            "archiveSuccess": "Session archived",
+            "page": "Page",
+            "of": "of"
+        }
+    }
 }

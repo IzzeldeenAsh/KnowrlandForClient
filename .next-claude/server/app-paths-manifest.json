@@ -1,0 +1,14 @@
+{
+  "/[locale]/insighter-dashboard/my-dashboard/page": "app/[locale]/insighter-dashboard/my-dashboard/page.js",
+  "/[locale]/insighter-dashboard/my-downloads/page": "app/[locale]/insighter-dashboard/my-downloads/page.js",
+  "/[locale]/insighter-dashboard/my-knowledge/general/page": "app/[locale]/insighter-dashboard/my-knowledge/general/page.js",
+  "/[locale]/insighter-dashboard/my-knowledge/packages/page": "app/[locale]/insighter-dashboard/my-knowledge/packages/page.js",
+  "/[locale]/insighter-dashboard/my-knowledge/posted/page": "app/[locale]/insighter-dashboard/my-knowledge/posted/page.js",
+  "/[locale]/insighter-dashboard/my-knowledge/scheduled/page": "app/[locale]/insighter-dashboard/my-knowledge/scheduled/page.js",
+  "/[locale]/insighter-dashboard/my-knowledge/unpublished/page": "app/[locale]/insighter-dashboard/my-knowledge/unpublished/page.js",
+  "/[locale]/insighter-dashboard/my-meetings/page": "app/[locale]/insighter-dashboard/my-meetings/page.js",
+  "/[locale]/insighter-dashboard/my-orders/page": "app/[locale]/insighter-dashboard/my-orders/page.js",
+  "/[locale]/insighter-dashboard/my-requests/page": "app/[locale]/insighter-dashboard/my-requests/page.js",
+  "/[locale]/insighter-dashboard/read-later/page": "app/[locale]/insighter-dashboard/read-later/page.js",
+  "/[locale]/insighter-dashboard/wallet/page": "app/[locale]/insighter-dashboard/wallet/page.js"
+}

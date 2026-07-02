@@ -89,7 +89,7 @@ export default function HsCodesTab() {
 
   const fetchIsicParents = useCallback(async (signal?: AbortSignal) => {
     try {
-      const response = await fetch('https://api.insightabusiness.com/api/common/setting/isic-code/tree/parent', {
+      const response = await fetch('https://api.foresighta.co/api/common/setting/isic-code/tree/parent', {
         method: 'GET',
         cache: 'no-store',
         signal,
@@ -115,7 +115,7 @@ export default function HsCodesTab() {
     setError('');
 
     try {
-      const response = await fetch('https://api.insightabusiness.com/api/common/setting/hs-code/list', {
+      const response = await fetch('https://api.foresighta.co/api/common/setting/hs-code/list', {
         method: 'GET',
         cache: 'no-store',
         signal,
@@ -208,8 +208,8 @@ export default function HsCodesTab() {
 
       const url =
         modalMode === 'create'
-          ? 'https://api.insightabusiness.com/api/admin/setting/hs-code'
-          : `https://api.insightabusiness.com/api/admin/setting/hs-code/${selectedHsCode?.id ?? ''}`;
+          ? 'https://api.foresighta.co/api/admin/setting/hs-code'
+          : `https://api.foresighta.co/api/admin/setting/hs-code/${selectedHsCode?.id ?? ''}`;
 
       const response = await fetch(url, {
         method: modalMode === 'create' ? 'POST' : 'PUT',
@@ -254,7 +254,7 @@ export default function HsCodesTab() {
         return;
       }
 
-      const response = await fetch(`https://api.insightabusiness.com/api/admin/setting/hs-code/${id}`, {
+      const response = await fetch(`https://api.foresighta.co/api/admin/setting/hs-code/${id}`, {
         method: 'DELETE',
         cache: 'no-store',
         headers: buildAuthHeaders(token),
