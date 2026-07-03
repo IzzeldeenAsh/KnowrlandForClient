@@ -57,7 +57,7 @@ export default function ReceiptDetailsModal({
         return;
       }
 
-      const response = await fetch(`https://api.insightabusiness.com/api/admin/fund/insighter/wired-transfer/show/${receiptId}`, {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/admin/fund/insighter/wired-transfer/show/${receiptId}`, {
         method: 'GET',
         cache: 'no-store',
         signal: controller.signal,

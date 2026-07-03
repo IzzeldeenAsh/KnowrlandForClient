@@ -312,7 +312,7 @@ export default function SearchResultsList({
 
       const method = currentState ? 'DELETE' : 'POST';
       const slug = item.url.split('/').pop();
-      const url = `https://api.insightabusiness.com/api/account/favorite/knowledge/${slug}`;
+      const url = `${process.env.NEXT_PUBLIC_API_URL}/api/account/favorite/knowledge/${slug}`;
 
 
       const axiosConfig = {

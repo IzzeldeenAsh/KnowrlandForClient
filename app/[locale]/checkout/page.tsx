@@ -273,7 +273,7 @@ export default function CheckoutPage() {
         const token = getAuthToken();
 
         const response = await fetch(
-          `https://api.insightabusiness.com/api/platform/industries/knowledge/${slug}`,
+          `${process.env.NEXT_PUBLIC_API_URL}/api/platform/industries/knowledge/${slug}`,
           {
             headers: {
               "Content-Type": "application/json",
@@ -319,7 +319,7 @@ export default function CheckoutPage() {
         if (!token) return;
 
         const response = await fetch(
-          "https://api.insightabusiness.com/api/account/wallet/balance",
+          `${process.env.NEXT_PUBLIC_API_URL}/api/account/wallet/balance`,
           {
             headers: {
               "Content-Type": "application/json",
@@ -365,7 +365,7 @@ export default function CheckoutPage() {
       try {
         setCountriesLoading(true);
         const res = await fetch(
-          "https://api.insightabusiness.com/api/common/setting/country/list",
+          `${process.env.NEXT_PUBLIC_API_URL}/api/common/setting/country/list`,
           {
             headers: {
               "Content-Type": "application/json",
@@ -501,7 +501,7 @@ export default function CheckoutPage() {
       setIsFetchingDownloadIds(true);
       const token = getAuthToken();
       const response = await fetch(
-        `https://api.insightabusiness.com/api/account/order/knowledge/${uuid}`,
+        `${process.env.NEXT_PUBLIC_API_URL}/api/account/order/knowledge/${uuid}`,
         {
           headers: {
             "Content-Type": "application/json",
@@ -597,13 +597,13 @@ export default function CheckoutPage() {
     }
 
     if (downloadId) {
-      window.location.href = `https://app.insightabusiness.com/app/insighter-dashboard/my-downloads?uuids=${downloadId}`;
+      window.location.href = `${process.env.NEXT_PUBLIC_DASHBOARD_URL}/app/insighter-dashboard/my-downloads?uuids=${downloadId}`;
       return;
     }
 
     const searchTitle = knowledge?.title || "";
     const searchParam = searchTitle ? `?search=${encodeURIComponent(searchTitle)}` : "";
-    window.location.href = `https://app.insightabusiness.com/app/insighter-dashboard/my-downloads${searchParam}`;
+    window.location.href = `${process.env.NEXT_PUBLIC_DASHBOARD_URL}/app/insighter-dashboard/my-downloads${searchParam}`;
   };
 
   const handleRedownload = async () => {
@@ -720,7 +720,7 @@ export default function CheckoutPage() {
         };
 
         const response = await fetch(
-          "https://api.insightabusiness.com/api/platform/guest/order/knowledge/checkout",
+          `${process.env.NEXT_PUBLIC_API_URL}/api/platform/guest/order/knowledge/checkout`,
           {
             method: "POST",
             headers: {
@@ -797,7 +797,7 @@ export default function CheckoutPage() {
       };
 
       const response = await fetch(
-        "https://api.insightabusiness.com/api/account/order/knowledge/checkout",
+        `${process.env.NEXT_PUBLIC_API_URL}/api/account/order/knowledge/checkout`,
         {
           method: "POST",
           headers: {

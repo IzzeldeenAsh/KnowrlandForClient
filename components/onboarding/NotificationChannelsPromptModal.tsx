@@ -29,9 +29,9 @@ export default function NotificationChannelsPromptModal({ locale }: Notification
   const isRTL = locale === 'ar';
   const promptImageUrl = isRTL ? PROMPT_IMAGE_URL_AR : PROMPT_IMAGE_URL_EN;
   const angularBaseUrl =
-    process.env.NEXT_PUBLIC_ANGULAR_APP_URL ||
     process.env.NEXT_PUBLIC_DASHBOARD_URL ||
-    'https://app.insightabusiness.com';
+    process.env.NEXT_PUBLIC_DASHBOARD_URL ||
+    `${process.env.NEXT_PUBLIC_DASHBOARD_URL}`;
   const settingsUrl = `${angularBaseUrl}/app/insighter-dashboard/account-settings/notification-settings`;
 
   const t = useMemo(() => {

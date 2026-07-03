@@ -7,6 +7,7 @@ import { useCountries, Country } from '@/app/lib/useCountries';
 import { useGlobalProfile } from '@/components/auth/GlobalProfileProvider';
 import { getAuthToken } from '@/lib/authToken';
 import { isAngularRouteUrl, toAngularAppUrl } from '@/lib/authRedirect';
+import { cookieDomainFragment } from '@/lib/cookieDomain';
 
 export default function UpdateCountryPage() {
   const [selectedCountry, setSelectedCountry] = useState<Country | null>(null);
@@ -37,7 +38,7 @@ export default function UpdateCountryPage() {
       throw new Error('No authentication token found');
     }
 
-    const response = await fetch('https://api.insightabusiness.com/api/account/profile/country', {
+    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/account/profile/country`, {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${token}`,
@@ -146,7 +147,7 @@ export default function UpdateCountryPage() {
     if (isLocalhost) {
       document.cookie = `${name}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;`;
     } else {
-      document.cookie = `${name}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/; Domain=.insightabusiness.com; Secure; SameSite=None;`;
+      document.cookie = `${name}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/; ${cookieDomainFragment()}Secure; SameSite=None;`;
     }
   };
   // Get localized country name

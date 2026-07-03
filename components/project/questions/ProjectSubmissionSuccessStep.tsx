@@ -163,7 +163,7 @@ export default function ProjectSubmissionSuccessStep({
 
           <div className="mt-7 flex w-full max-w-xl flex-col items-stretch justify-center gap-3 sm:mt-10 sm:flex-row">
             <Link
-              href="https://app.insightabusiness.com/app/insighter-dashboard/projects-created"
+              href={`${process.env.NEXT_PUBLIC_DASHBOARD_URL}/app/insighter-dashboard/projects-created`}
               className="btn-sm rounded-full bg-[#1C7CBB] px-6 py-3 text-center text-white shadow-[0_18px_40px_rgba(28,124,187,0.28)] transition-all duration-200 hover:-translate-y-0.5 hover:bg-[#17689e]"
             >
               {primaryAction}

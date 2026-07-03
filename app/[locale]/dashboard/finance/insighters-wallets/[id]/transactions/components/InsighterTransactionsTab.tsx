@@ -120,7 +120,7 @@ export default function InsighterTransactionsTab({ insighterId }: { insighterId:
           return;
         }
 
-        const url = new URL(`https://api.insightabusiness.com/api/admin/fund/insighter/transaction/${insighterId}`);
+        const url = new URL(`${process.env.NEXT_PUBLIC_API_URL}/api/admin/fund/insighter/transaction/${insighterId}`);
         url.searchParams.set('page', String(page));
         url.searchParams.set('per_time', selectedPeriod);
 

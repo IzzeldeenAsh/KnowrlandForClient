@@ -9,6 +9,7 @@ import Image from "next/image";
 import { IconLanguage } from '@tabler/icons-react';
 import { usePathname } from 'next/navigation';
 import { useTranslations } from 'next-intl';
+import { getCookieDomain as sharedGetCookieDomain, isSharedCookieHost } from '@/lib/cookieDomain';
 
 export default function Header() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -16,21 +17,9 @@ export default function Header() {
   const t = useTranslations('Header');
   const shouldHideHeader = pathname.includes('/dashboard') || pathname.includes('/callback');
   
-  // Helper function to get the base domain for cookies
-  const getCookieDomain = (): string | null => {
-    if (typeof window === 'undefined') return null;
-    const hostname = window.location.hostname;
-    if (hostname.includes('insightabusiness.com') || hostname.includes('foresighta.co')) {
-      return '.insightabusiness.com';
-    }
-    return null; // localhost
-  };
-
-  const isProduction = (): boolean => {
-    if (typeof window === 'undefined') return false;
-    const hostname = window.location.hostname;
-    return hostname.includes('insightabusiness.com') || hostname.includes('foresighta.co');
-  };
+  // Cookie helpers shared with the auth flows (env-aware Domain attribute)
+  const getCookieDomain = sharedGetCookieDomain;
+  const isProduction = isSharedCookieHost;
 
   // Helper function to clear duplicate cookies (handles both Angular SameSite=None and Next.js SameSite=Lax)
   const clearDuplicateCookies = (cookieName: string) => {

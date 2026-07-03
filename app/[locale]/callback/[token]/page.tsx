@@ -8,6 +8,7 @@ import { useLocale } from 'next-intl';
 import AgreementModal from '@/components/agreements/AgreementModal';
 import { getAuthToken, getTokenFromCookie } from '@/lib/authToken';
 import { getAngularAppOrigin, isAngularRouteUrl, toAngularAppUrl } from '@/lib/authRedirect';
+import { sharedCookieAttributes } from '@/lib/cookieDomain';
 interface ProfileResponse {
   data: {
     id: number;
@@ -172,9 +173,7 @@ export default function AuthCallback() {
         `token=${token}`,
         `Path=/`,
         `Max-Age=${60 * 60 * 24 * 7}`, // 7 days
-        `SameSite=None`,
-        `Domain=.insightabusiness.com`,
-        `Secure`
+        ...sharedCookieAttributes()
       ];
     }
 
@@ -224,9 +223,7 @@ export default function AuthCallback() {
         'token=',
         'Path=/',
         'Max-Age=-1',
-        'SameSite=None',
-        'Domain=.insightabusiness.com',
-        'Secure'
+        ...sharedCookieAttributes()
       ];
     }
 
@@ -239,7 +236,7 @@ export default function AuthCallback() {
       const userTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
       console.log('[TIMEZONE] Setting timezone:', userTimezone);
 
-      const timezoneResponse = await fetch('https://api.insightabusiness.com/api/account/timezone/set', {
+      const timezoneResponse = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/account/timezone/set`, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${authToken}`,
@@ -269,7 +266,7 @@ export default function AuthCallback() {
       try {
         console.log(`[token-callback] Profile fetch attempt ${attempt}/${maxRetries}`);
 
-        const response = await fetch('https://api.insightabusiness.com/api/account/profile', {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/account/profile`, {
           headers: {
             'Authorization': `Bearer ${authToken}`,
             "Content-Type": "application/json",
@@ -327,7 +324,7 @@ export default function AuthCallback() {
 
   const checkLatestAgreement = async (authToken: string, lang: string): Promise<boolean> => {
     try {
-      const res = await fetch('https://api.insightabusiness.com/api/account/agreement/check', {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/account/agreement/check`, {
         headers: {
           'Authorization': `Bearer ${authToken}`,
           'Accept': 'application/json',
@@ -454,9 +451,7 @@ export default function AuthCallback() {
         'auth_return_url=',
         'Path=/',
         'Max-Age=-1',
-        'SameSite=None',
-        'Domain=.insightabusiness.com',
-        'Secure'
+        ...sharedCookieAttributes()
       ];
     }
 
@@ -483,9 +478,7 @@ export default function AuthCallback() {
         `countryUpdateReturnUrl=${encodeURIComponent(url)}`,
         `Path=/`,
         `Max-Age=${60 * 60}`, // 1 hour
-        `SameSite=None`,
-        `Domain=.insightabusiness.com`,
-        `Secure`
+        ...sharedCookieAttributes()
       ];
     }
 

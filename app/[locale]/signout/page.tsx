@@ -2,6 +2,7 @@
 
 import { useEffect } from 'react';
 import { useRouter, useParams, useSearchParams } from 'next/navigation';
+import { cookieDomainFragment } from '@/lib/cookieDomain';
 
 export default function SignoutPage() {
   const router = useRouter();
@@ -16,8 +17,8 @@ export default function SignoutPage() {
       // Remove from current domain
       document.cookie = `${name}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;`;
       
-      // Remove from root domain and ensure Secure/SameSite settings match creation
-      document.cookie = `${name}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/; Domain=.insightabusiness.com; Secure; SameSite=None;`;
+      // Remove from the environment's shared root domain and ensure Secure/SameSite settings match creation
+      document.cookie = `${name}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/; ${cookieDomainFragment()}Secure; SameSite=None;`;
     };
     
     // Clear ALL possible localStorage keys from both apps
@@ -40,7 +41,7 @@ export default function SignoutPage() {
       // Create an iframe to silently trigger logout on Angular app
       const angularLogoutFrame = document.createElement('iframe');
       angularLogoutFrame.style.display = 'none';
-      angularLogoutFrame.src = `https://app.insightabusiness.com/auth/logout?redirect_uri=${encodeURIComponent(window.location.href)}`;
+      angularLogoutFrame.src = `${process.env.NEXT_PUBLIC_DASHBOARD_URL}/auth/logout?redirect_uri=${encodeURIComponent(window.location.href)}`;
       document.body.appendChild(angularLogoutFrame);
       
       // Remove iframe after 2 seconds to ensure logout completes

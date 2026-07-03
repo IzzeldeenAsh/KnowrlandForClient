@@ -8,6 +8,7 @@ import { useLocale } from 'next-intl';
 import AgreementModal from '@/components/agreements/AgreementModal';
 import { getAuthToken, getTokenFromCookie } from '@/lib/authToken';
 import { getAngularAppOrigin, isAngularRouteUrl, toAngularAppUrl } from '@/lib/authRedirect';
+import { sharedCookieAttributes } from '@/lib/cookieDomain';
 interface ProfileResponse {
   data: {
     id: number;
@@ -179,14 +180,12 @@ export default function QueryParamAuthCallback() {
         `SameSite=Lax` // More permissive for localhost
       ];
     } else {
-      // Use .insightabusiness.com domain for cross-domain cookie sharing between app.insightabusiness.com and www.insightabusiness.com
+      // Use the environment's shared domain for cross-subdomain cookie sharing with the Angular app
       cookieSettings = [
         `token=${token}`,
         `Path=/`,
         `Max-Age=${60 * 60 * 24 * 7}`, // 7 days
-        `SameSite=None`,
-        `Domain=.insightabusiness.com`,
-        `Secure`
+        ...sharedCookieAttributes()
       ];
     }
 
@@ -236,14 +235,12 @@ export default function QueryParamAuthCallback() {
         'Max-Age=-1'
       ];
     } else {
-      // Use .insightabusiness.com domain to match the cookie set by Angular app
+      // Use the environment's shared domain to match the cookie set by Angular app
       cookieSettings = [
         'token=',
         'Path=/',
         'Max-Age=-1',
-        'SameSite=None',
-        'Domain=.insightabusiness.com',
-        'Secure'
+        ...sharedCookieAttributes()
       ];
     }
 
@@ -256,7 +253,7 @@ export default function QueryParamAuthCallback() {
       const userTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
       console.log('[TIMEZONE] Setting timezone:', userTimezone);
 
-      const timezoneResponse = await fetch('https://api.insightabusiness.com/api/account/timezone/set', {
+      const timezoneResponse = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/account/timezone/set`, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${authToken}`,
@@ -419,14 +416,12 @@ export default function QueryParamAuthCallback() {
         'Max-Age=-1'
       ];
     } else {
-      // Use .insightabusiness.com domain to match the cookie set by Angular app
+      // Use the environment's shared domain to match the cookie set by Angular app
       cookieSettings = [
         'auth_return_url=',
         'Path=/',
         'Max-Age=-1',
-        'SameSite=None',
-        'Domain=.insightabusiness.com',
-        'Secure'
+        ...sharedCookieAttributes()
       ];
     }
 
@@ -452,14 +447,12 @@ export default function QueryParamAuthCallback() {
         `SameSite=Lax`
       ];
     } else {
-      // Use .insightabusiness.com domain to match the cookie set by Angular app
+      // Use the environment's shared domain to match the cookie set by Angular app
       cookieSettings = [
         `countryUpdateReturnUrl=${encodeURIComponent(url)}`,
         `Path=/`,
         `Max-Age=${60 * 60}`, // 1 hour
-        `SameSite=None`,
-        `Domain=.insightabusiness.com`,
-        `Secure`
+        ...sharedCookieAttributes()
       ];
     }
 
@@ -472,7 +465,7 @@ export default function QueryParamAuthCallback() {
       try {
         console.log(`[callback] Profile fetch attempt ${attempt}/${maxRetries}`);
 
-        const response = await fetch('https://api.insightabusiness.com/api/account/profile', {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/account/profile`, {
           headers: {
             'Authorization': `Bearer ${authToken}`,
             "Content-Type": "application/json",
@@ -530,7 +523,7 @@ export default function QueryParamAuthCallback() {
 
   const checkLatestAgreement = async (authToken: string, lang: string): Promise<boolean> => {
     try {
-      const res = await fetch('https://api.insightabusiness.com/api/account/agreement/check', {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/account/agreement/check`, {
         headers: {
           'Authorization': `Bearer ${authToken}`,
           'Accept': 'application/json',

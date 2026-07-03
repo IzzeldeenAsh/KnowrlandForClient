@@ -120,7 +120,7 @@ async function fetchKnowledgeData(type: string, slug: string, locale: string = '
     // Note: localStorage cleanup is handled by AuthHandler component
 
     const response = await fetch(
-      `https://api.insightabusiness.com/api/platform/industries/knowledge/${slug}`,
+      `${process.env.NEXT_PUBLIC_API_URL}/api/platform/industries/knowledge/${slug}`,
       {
         method: "GET",
         headers,
@@ -193,7 +193,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     return metadata;
   } catch (error) {
     const isRTL = locale === 'ar';
-    const baseUrl = 'https://insightabusiness.com';
+    const baseUrl = `${process.env.NEXT_PUBLIC_BASE_URL}`;
     const defaultSocialImage = 'https://res.cloudinary.com/dsiku9ipv/image/upload/v1769923661/drilldown_1_cjpvli_jprtoi.jpg';
     const pageUrl = `${baseUrl}/${locale}/knowledge/${type}/${slug}`;
 
@@ -201,7 +201,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     try {
       metadataBase = new URL(baseUrl);
     } catch {
-      metadataBase = new URL('https://insightabusiness.com');
+      metadataBase = new URL(`${process.env.NEXT_PUBLIC_BASE_URL}`);
     }
 
     const title = isRTL ? "الرؤى غير موجودة | Insighta" : "Insights Not Found |Insighta";

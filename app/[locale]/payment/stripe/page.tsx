@@ -128,7 +128,7 @@ function PaymentForm({
   const orderDetailsRef = useRef(orderDetails);
   const hasTriggeredAccountDownloadRef = useRef(false);
   const isProjectService = service.trim().toLowerCase() === "project";
-  const projectReturnUrl = returnUrl || "https://app.insightabusiness.com/app/insighter-dashboard/projects-created";
+  const projectReturnUrl = returnUrl || `${process.env.NEXT_PUBLIC_DASHBOARD_URL}/app/insighter-dashboard/projects-created`;
 
   // Get auth token from cookies
   const getAuthToken = () => {
@@ -155,7 +155,7 @@ function PaymentForm({
     }
 
     const response = await fetch(
-      `https://api.insightabusiness.com/api/platform/guest/order/knowledge/download/${orderUuid}`,
+      `${process.env.NEXT_PUBLIC_API_URL}/api/platform/guest/order/knowledge/download/${orderUuid}`,
       {
         method: "POST",
         headers: {
@@ -195,7 +195,7 @@ function PaymentForm({
       setIsFetchingDownloadIds(true);
       const token = getAuthToken();
       const response = await fetch(
-        `https://api.insightabusiness.com/api/account/order/knowledge/${uuid}`,
+        `${process.env.NEXT_PUBLIC_API_URL}/api/account/order/knowledge/${uuid}`,
         {
           headers: {
             "Content-Type": "application/json",
@@ -273,13 +273,13 @@ function PaymentForm({
     }
 
     if (knowledgeDownloadId) {
-      window.location.href = `https://app.insightabusiness.com/app/insighter-dashboard/my-downloads?uuids=${knowledgeDownloadId}`;
+      window.location.href = `${process.env.NEXT_PUBLIC_DASHBOARD_URL}/app/insighter-dashboard/my-downloads?uuids=${knowledgeDownloadId}`;
       return;
     }
 
     const searchTitle = orderDetails?.orderable?.knowledge?.[0]?.title || "";
     const searchParam = searchTitle ? `?search=${encodeURIComponent(searchTitle)}` : "";
-    window.location.href = `https://app.insightabusiness.com/app/insighter-dashboard/my-downloads${searchParam}`;
+    window.location.href = `${process.env.NEXT_PUBLIC_DASHBOARD_URL}/app/insighter-dashboard/my-downloads${searchParam}`;
   }, [fetchUpdatedOrderDetails, orderDetails, orderUuid, setOrderDetails]);
 
   const handleRedownload = useCallback(async () => {
@@ -361,7 +361,7 @@ function PaymentForm({
           if (!guestToken) return false;
 
           const response = await fetch(
-            `https://api.insightabusiness.com/api/platform/guest/order/knowledge/check-payment-succeeded/${orderUuid}`,
+            `${process.env.NEXT_PUBLIC_API_URL}/api/platform/guest/order/knowledge/check-payment-succeeded/${orderUuid}`,
             {
               method: "POST",
               headers: {
@@ -381,7 +381,7 @@ function PaymentForm({
 
         const token = getAuthToken();
         const response = await fetch(
-          `https://api.insightabusiness.com/api/account/order/knowledge/${orderUuid}`,
+          `${process.env.NEXT_PUBLIC_API_URL}/api/account/order/knowledge/${orderUuid}`,
           {
             headers: {
               "Content-Type": "application/json",
@@ -507,7 +507,7 @@ function PaymentForm({
           return;
         }
         const response = await fetch(
-          `https://api.insightabusiness.com/api/platform/guest/order/knowledge/check-payment-succeeded/${orderUuid}`,
+          `${process.env.NEXT_PUBLIC_API_URL}/api/platform/guest/order/knowledge/check-payment-succeeded/${orderUuid}`,
           {
             method: "POST",
             headers: {
@@ -538,7 +538,7 @@ function PaymentForm({
 
       const token = getAuthToken();
       const response = await fetch(
-        `https://api.insightabusiness.com/api/account/order/knowledge/check-payment-succeeded/${orderUuid}`,
+        `${process.env.NEXT_PUBLIC_API_URL}/api/account/order/knowledge/check-payment-succeeded/${orderUuid}`,
         {
           method: "POST",
           headers: {
@@ -740,7 +740,7 @@ function PaymentForm({
                   <Text size="md" ta="start">
                     {translations.guestSupportNotePrefix}
                     <a
-                      href="https://insightabusiness.com/en/contact"
+                      href={`${process.env.NEXT_PUBLIC_BASE_URL}/en/contact`}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="text-blue-600 hover:text-blue-700 underline underline-offset-2"
@@ -941,7 +941,7 @@ export default function StripePaymentPage() {
       try {
         const token = getAuthToken();
         const response = await fetch(
-          `https://api.insightabusiness.com/api/account/order/knowledge/${orderUuid}`,
+          `${process.env.NEXT_PUBLIC_API_URL}/api/account/order/knowledge/${orderUuid}`,
           {
             headers: {
               "Content-Type": "application/json",

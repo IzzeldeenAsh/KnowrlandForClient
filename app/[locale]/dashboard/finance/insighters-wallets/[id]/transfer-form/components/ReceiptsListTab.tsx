@@ -71,7 +71,7 @@ export default function ReceiptsListTab({
           return;
         }
 
-        const url = new URL(`https://api.insightabusiness.com/api/admin/fund/insighter/wired-transfer/${insighterId}`);
+        const url = new URL(`${process.env.NEXT_PUBLIC_API_URL}/api/admin/fund/insighter/wired-transfer/${insighterId}`);
         url.searchParams.set('page', String(page));
 
         const response = await fetch(url.toString(), {

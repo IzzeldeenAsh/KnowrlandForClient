@@ -13,7 +13,10 @@
     "security:audit": "npm audit",
     "security:fix": "npm audit fix",
     "security:check": "npm audit --audit-level=moderate && node scripts/security-check.js",
-    "security:verify": "node scripts/verify-integrity.js"
+    "security:verify": "node scripts/verify-integrity.js",
+    "build:stage": "NEXT_DIST_DIR=.next-local env-cmd -f .env.staging next build",
+    "build:prod": "NEXT_DIST_DIR=.next-local next build",
+    "prebuild:stage": "NEXT_DIST_DIR=.next-local node scripts/check-next-dir-perms.js"
   },
   "dependencies": {
     "@emotion/react": "^11.14.0",
@@ -29,6 +32,11 @@
     "@stripe/react-stripe-js": "^3.9.2",
     "@stripe/stripe-js": "^7.9.0",
     "@tabler/icons-react": "^3.31.0",
+    "@tiptap/extension-link": "^3.22.4",
+    "@tiptap/extension-placeholder": "^3.22.4",
+    "@tiptap/extension-underline": "^3.22.4",
+    "@tiptap/react": "^3.22.4",
+    "@tiptap/starter-kit": "^3.22.4",
     "@types/mdx": "^2.0.13",
     "@types/node": "^22.10.1",
     "@types/react": "19.0.1",
@@ -39,11 +47,6 @@
     "next": "^15.5.7",
     "next-intl": "^3.26.3",
     "next-mdx-remote": "^5.0.0",
-    "@tiptap/extension-link": "^3.22.4",
-    "@tiptap/extension-placeholder": "^3.22.4",
-    "@tiptap/extension-underline": "^3.22.4",
-    "@tiptap/react": "^3.22.4",
-    "@tiptap/starter-kit": "^3.22.4",
     "pusher-js": "^8.4.0",
     "react": "19.0.0",
     "react-dom": "19.0.0",
@@ -56,13 +59,14 @@
     "write-excel-file": "^4.0.3"
   },
   "devDependencies": {
-    "eslint": "^9.0.0",
-    "eslint-config-next": "15.5.7",
     "@tailwindcss/forms": "^0.5.7",
     "@tailwindcss/typography": "^0.5.10",
     "@types/aos": "^3.0.7",
     "autoprefixer": "^10.4.16",
     "cross-env": "^7.0.3",
+    "env-cmd": "^11.0.0",
+    "eslint": "^9.0.0",
+    "eslint-config-next": "15.5.7",
     "postcss": "^8.4.32",
     "tailwindcss": "^3.3.6"
   }

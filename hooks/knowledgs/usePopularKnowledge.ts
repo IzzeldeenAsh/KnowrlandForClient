@@ -35,7 +35,7 @@ interface PopularKnowledgeResponse {
 }
 
 const POPULAR_URL =
-  'https://api.insightabusiness.com/api/platform/industries/knowledge/popular';
+  `${process.env.NEXT_PUBLIC_API_URL}/api/platform/industries/knowledge/popular`;
 
 // Dedupe + cache per locale (prevents double GET in production if mounted twice)
 const popularCache = new Map<string, PopularKnowledgeItem[]>();

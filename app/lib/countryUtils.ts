@@ -1,6 +1,7 @@
 'use client';
 
 import { User } from '@/components/ui/header/hooks/useUserProfile';
+import { sharedCookieAttributes } from '@/lib/cookieDomain';
 
 /**
  * Check if user needs to update their country
@@ -34,9 +35,7 @@ export function storeReturnUrl(url: string) {
       `countryUpdateReturnUrl=${encodeURIComponent(url)}`,
       `Path=/`,
       `Max-Age=${60 * 60}`, // 1 hour
-      `SameSite=None`,
-      `Domain=.insightabusiness.com`,
-      `Secure`
+      ...sharedCookieAttributes()
     ];
   }
 
@@ -86,9 +85,7 @@ export function clearReturnUrl() {
       'countryUpdateReturnUrl=',
       'Path=/',
       'Max-Age=-1',
-      'SameSite=None',
-      'Domain=.insightabusiness.com',
-      'Secure'
+      ...sharedCookieAttributes()
     ];
   }
 

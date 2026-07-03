@@ -65,7 +65,7 @@ export default function KnowledgeAuthorActions({
       try {
         if (!companyUuid) {
           const response = await fetch(
-            `https://api.insightabusiness.com/api/platform/insighter/profile/${insighterUuid}`,
+            `${process.env.NEXT_PUBLIC_API_URL}/api/platform/insighter/profile/${insighterUuid}`,
             {
               headers: {
                 "Content-Type": "application/json",
@@ -102,7 +102,7 @@ export default function KnowledgeAuthorActions({
         }
 
         const response = await fetch(
-          `https://api.insightabusiness.com/api/platform/company/profile/${companyUuid}`,
+          `${process.env.NEXT_PUBLIC_API_URL}/api/platform/company/profile/${companyUuid}`,
           {
             headers: {
               "Content-Type": "application/json",

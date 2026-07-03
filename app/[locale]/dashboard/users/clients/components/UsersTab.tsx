@@ -262,7 +262,7 @@ export default function UsersTab() {
         setError('Missing auth token. Please sign in again.');
         return;
       }
-      const response = await fetch('https://api.insightabusiness.com/api/admin/account/client/list', {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/admin/account/client/list`, {
         method: 'GET',
         cache: 'no-store',
         signal,
@@ -400,7 +400,7 @@ export default function UsersTab() {
         return;
       }
       const response = await fetch(
-        `https://api.insightabusiness.com/api/admin/account/client/deactivate-delete/${modalState.client.id}`,
+        `${process.env.NEXT_PUBLIC_API_URL}/api/admin/account/client/deactivate-delete/${modalState.client.id}`,
         {
           method: 'POST',
           headers: buildAuthHeaders(token),

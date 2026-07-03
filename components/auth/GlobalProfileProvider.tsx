@@ -5,6 +5,7 @@ import { usePathname } from 'next/navigation';
 import { User } from '@/components/ui/header/hooks/useUserProfile';
 import { useLocale } from 'next-intl';
 import { getAuthToken } from '@/lib/authToken';
+import { cookieDomainsToClear } from '@/lib/cookieDomain';
 
 interface ProfileContextType {
   user: User | null;
@@ -49,7 +50,7 @@ let globalProfileCache: {
 };
 
 const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes cache
-const ANGULAR_APP_URL = process.env.NEXT_PUBLIC_ANGULAR_APP_URL || 'https://app.insightabusiness.com';
+const ANGULAR_APP_URL = process.env.NEXT_PUBLIC_DASHBOARD_URL || 'https://app.insightabusiness.com';
 
 export function GlobalProfileProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(globalProfileCache.user);
@@ -81,7 +82,7 @@ export function GlobalProfileProvider({ children }: { children: React.ReactNode 
     // Clear cookie variants (different Path/Domain combinations).
     // Note: Domain must match original cookie to be removed; we attempt common variants.
     const pathsToClear = ['/', '/en', '/ar'];
-    const domainsToClear = [undefined, '.insightabusiness.com'];
+    const domainsToClear = cookieDomainsToClear(); // [undefined, <env shared domain>]
     const cookieNames = ['token', 'auth_token', 'auth_user', 'auth_return_url'];
 
     for (const path of pathsToClear) {
@@ -113,7 +114,7 @@ export function GlobalProfileProvider({ children }: { children: React.ReactNode 
     for (let attempt = 1; attempt <= maxRetries; attempt++) {
       try {
 
-        const response = await fetch('https://api.insightabusiness.com/api/account/profile', {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/account/profile`, {
           method: 'GET',
           headers: {
             'Authorization': `Bearer ${token}`,

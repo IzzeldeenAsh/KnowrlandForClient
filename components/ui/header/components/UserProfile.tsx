@@ -14,11 +14,11 @@ type KnowledgeStatusStatistic = { status: string; count: number };
 type KnowledgeStatusStatisticsResponse = { data?: KnowledgeStatusStatistic[] };
 
 const API_BASE_URL: string =
-  process.env.NEXT_PUBLIC_API_URL || "https://api.insightabusiness.com";
+  process.env.NEXT_PUBLIC_API_URL || `${process.env.NEXT_PUBLIC_API_URL}`;
 
 // IMPORTANT: must be deterministic on BOTH SSR + first client render (hydration).
 const ANGULAR_APP_URL: string =
-  process.env.NEXT_PUBLIC_ANGULAR_APP_URL || "https://app.insightabusiness.com";
+  process.env.NEXT_PUBLIC_DASHBOARD_URL || `${process.env.NEXT_PUBLIC_DASHBOARD_URL}`;
 
 interface MenuPosition {
   top: number;
@@ -190,7 +190,7 @@ export function UserProfile({ isHome }: { isHome: boolean }) {
 
       try {
         const res = await fetch(
-          `https://api.insightabusiness.com/api/insighter/library/knowledge/status/statistics`,
+          `${process.env.NEXT_PUBLIC_API_URL}/api/insighter/library/knowledge/status/statistics`,
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -247,7 +247,7 @@ export function UserProfile({ isHome }: { isHome: boolean }) {
     return (
       <>
         <Link
-          href={`https://app.insightabusiness.com/auth/login?returnUrl=${encodeURIComponent(returnUrl)}`}
+          href={`${process.env.NEXT_PUBLIC_DASHBOARD_URL}/auth/login?returnUrl=${encodeURIComponent(returnUrl)}`}
           className="btn-sm bg-gray-800 text-gray-200 shadow hover:bg-gray-900"
         >
           {t("login")}
@@ -429,7 +429,7 @@ export function UserProfile({ isHome }: { isHome: boolean }) {
           {/* Dashboard — prominent top item */}
           <div className="px-3 pt-3 pb-3 border-b border-slate-100">
             <Link
-              href={`https://app.insightabusiness.com/app/insighter-dashboard/my-dashboard`}
+              href={`${process.env.NEXT_PUBLIC_DASHBOARD_URL}/app/insighter-dashboard/my-dashboard`}
               className="flex items-center gap-2.5 px-1 py-1 rounded-lg border border-indigo-50 bg-gradient-to-r from-white to-indigo-50 text-indigo-700 font-semibold hover:to-indigo-100 transition-colors"
               onClick={() => setMenuOpen(false)}
               style={{ fontSize: '13px' }}
@@ -472,7 +472,7 @@ export function UserProfile({ isHome }: { isHome: boolean }) {
                 roles.includes("company-insighter")) && (
                   <>
                     <Link
-                      href={`https://app.insightabusiness.com/app/add-knowledge/stepper`}
+                      href={`${process.env.NEXT_PUBLIC_DASHBOARD_URL}/app/add-knowledge/stepper`}
                       className="block px-4 py-2.5 text-sm font-medium text-sky-600 hover:bg-indigo-50 hover:text-sky-700"
                       onClick={() => setMenuOpen(false)}
                       style={{ fontSize: '13px' }}
@@ -480,7 +480,7 @@ export function UserProfile({ isHome }: { isHome: boolean }) {
                       {t("addInsight")}
                     </Link>
                     <Link
-                      href={`https://app.insightabusiness.com/app/insighter-dashboard/my-knowledge/general`}
+                      href={`${process.env.NEXT_PUBLIC_DASHBOARD_URL}/app/insighter-dashboard/my-knowledge/general`}
                       className="flex items-center gap-2 px-4 py-2.5 font-semibold text-slate-900 hover:bg-indigo-50 hover:text-sky-700"
                       onClick={() => setMenuOpen(false)}
                       style={{ fontSize: '13px' }}
@@ -497,7 +497,7 @@ export function UserProfile({ isHome }: { isHome: boolean }) {
 
               {(roles.includes('company') && (
                 <Link
-                  href={`https://app.insightabusiness.com/app/insighter-dashboard/my-company-settings`}
+                  href={`${process.env.NEXT_PUBLIC_DASHBOARD_URL}/app/insighter-dashboard/my-company-settings`}
                   className="block px-4 py-2.5  font-semibold text-slate-900 hover:bg-indigo-50 hover:text-sky-700"
                   onClick={() => setMenuOpen(false)}
                   style={{ fontSize: '13px' }}
@@ -507,7 +507,7 @@ export function UserProfile({ isHome }: { isHome: boolean }) {
               ))}
             </div>
             {!isClient$() && (<Link
-              href={`https://insightabusiness.com/en/profile/${user.uuid}?entity=insighter`}
+              href={`${process.env.NEXT_PUBLIC_BASE_URL}/en/profile/${user.uuid}?entity=insighter`}
               className="block px-4 py-2.5  font-semibold text-slate-900 hover:bg-indigo-50 hover:text-sky-700"
               style={{ fontSize: '13px' }}
               onClick={() => setMenuOpen(false)}
@@ -515,7 +515,7 @@ export function UserProfile({ isHome }: { isHome: boolean }) {
               {t("myInsighterPage")}
             </Link>)}
             <Link
-              href={`https://app.insightabusiness.com/app/insighter-dashboard/my-downloads`}
+              href={`${process.env.NEXT_PUBLIC_DASHBOARD_URL}/app/insighter-dashboard/my-downloads`}
               className="block px-4 py-2.5 font-semibold text-slate-900 hover:bg-indigo-50 hover:text-sky-700"
               onClick={() => setMenuOpen(false)}
               style={{ fontSize: '13px' }}
@@ -523,7 +523,7 @@ export function UserProfile({ isHome }: { isHome: boolean }) {
               {isRtl ? "التحميلات" : "My Downloads"}
             </Link>
             {/* <Link
-            href="https://app.insightabusiness.com/app/insighter-dashboard/my-consulting-schedule"
+            href={`${process.env.NEXT_PUBLIC_DASHBOARD_URL}/app/insighter-dashboard/my-consulting-schedule`}
             className="block px-4 py-2.5 font-semibold text-slate-900 hover:bg-indigo-50 hover:text-sky-700"
             onClick={() => setMenuOpen(false)}
             style={{fontSize: '13px'}}
@@ -539,7 +539,7 @@ export function UserProfile({ isHome }: { isHome: boolean }) {
               {t("myProfile")}
             </Link>
             <Link
-              href={`https://app.insightabusiness.com/app/insighter-dashboard/account-settings/general-settings`}
+              href={`${process.env.NEXT_PUBLIC_DASHBOARD_URL}/app/insighter-dashboard/account-settings/general-settings`}
               className="block px-4 py-2.5 font-semibold text-slate-900 hover:bg-indigo-50 hover:text-sky-700"
               onClick={() => setMenuOpen(false)}
               style={{ fontSize: '13px' }}
@@ -550,7 +550,7 @@ export function UserProfile({ isHome }: { isHome: boolean }) {
             {/* Show company settings only for company role */}
             {/* {roles.includes('company') && 
               <Link
-                href="https://app.insightabusiness.com/app/insighter-dashboard/my-company-settings"
+                href={`${process.env.NEXT_PUBLIC_DASHBOARD_URL}/app/insighter-dashboard/my-company-settings`}
                 className="block px-4 py-2.5 font-semibold text-slate-900 hover:bg-indigo-50 hover:text-sky-700"
                 onClick={() => setMenuOpen(false)}
                 style={{fontSize: '13px'}}
@@ -564,7 +564,7 @@ export function UserProfile({ isHome }: { isHome: boolean }) {
               !roles.includes("company-insighter") && (
                 <>
                   <Link
-                    href={`https://app.insightabusiness.com/app/insighter-register/vertical`}
+                    href={`${process.env.NEXT_PUBLIC_DASHBOARD_URL}/app/insighter-register/vertical`}
                     className="block px-4 py-2.5  font-semibold bg-clip-text text-transparent bg-gradient-to-r from-blue-500 to-teal-400"
                     onClick={() => setMenuOpen(false)}
                     style={{ fontSize: '13px' }}
@@ -583,7 +583,7 @@ export function UserProfile({ isHome }: { isHome: boolean }) {
             <div className="border-t border-slate-100">
               {isWhatsAppMissing && (
                 <Link
-                  href={`https://app.insightabusiness.com/app/insighter-dashboard/account-settings/notification-settings`}
+                  href={`${process.env.NEXT_PUBLIC_DASHBOARD_URL}/app/insighter-dashboard/account-settings/notification-settings`}
                   className="block px-4 pt-3 pb-2"
                   onClick={() => setMenuOpen(false)}
                 >

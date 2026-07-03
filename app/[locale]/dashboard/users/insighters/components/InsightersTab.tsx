@@ -202,12 +202,12 @@ function getActionLabel(action: InsighterAction): string {
 
 function getEndpoint(action: InsighterAction, id: number): string {
   if (action === 'activate') {
-    return `https://api.insightabusiness.com/api/admin/account/insighter/activate/${id}`;
+    return `${process.env.NEXT_PUBLIC_API_URL}/api/admin/account/insighter/activate/${id}`;
   }
   if (action === 'deactivate') {
-    return `https://api.insightabusiness.com/api/admin/account/insighter/deactivate/${id}`;
+    return `${process.env.NEXT_PUBLIC_API_URL}/api/admin/account/insighter/deactivate/${id}`;
   }
-  return `https://api.insightabusiness.com/api/admin/account/insighter/deactivate-delete/${id}`;
+  return `${process.env.NEXT_PUBLIC_API_URL}/api/admin/account/insighter/deactivate-delete/${id}`;
 }
 
 function normalizeInsighters(payload: unknown): InsighterRecord[] {
@@ -306,7 +306,7 @@ export default function InsightersTab() {
         return;
       }
 
-      const response = await fetch('https://api.insightabusiness.com/api/admin/account/insighter/list', {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/admin/account/insighter/list`, {
         method: 'GET',
         cache: 'no-store',
         signal,

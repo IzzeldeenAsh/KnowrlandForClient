@@ -6,6 +6,7 @@ import { usePathname } from 'next/navigation'
 import { IconLanguage } from '@tabler/icons-react'
 import { useTranslations } from 'next-intl'
 import { useLoading } from '@/components/context/LoadingContext'
+import { getCookieDomain as sharedGetCookieDomain, isSharedCookieHost } from '@/lib/cookieDomain'
 
 interface MobileMenuProps {
   isHomePage?: boolean;
@@ -28,21 +29,9 @@ export default function MobileMenu({ isHomePage = true }: MobileMenuProps) {
   // Dark border color for dividers
   const borderColorClass = "border-slate-700/50";
 
-  // Helper function to get the base domain for cookies
-  const getCookieDomain = (): string | null => {
-    if (typeof window === 'undefined') return null;
-    const hostname = window.location.hostname;
-    if (hostname.includes('insightabusiness.com') || hostname.includes('foresighta.co')) {
-      return '.insightabusiness.com';
-    }
-    return null; // localhost
-  };
-
-  const isProduction = (): boolean => {
-    if (typeof window === 'undefined') return false;
-    const hostname = window.location.hostname;
-    return hostname.includes('insightabusiness.com') || hostname.includes('foresighta.co');
-  };
+  // Cookie helpers shared with the auth flows (env-aware Domain attribute)
+  const getCookieDomain = sharedGetCookieDomain;
+  const isProduction = isSharedCookieHost;
 
   // Helper function to clear duplicate cookies (handles both Angular SameSite=None and Next.js SameSite=Lax)
   const clearDuplicateCookies = (cookieName: string) => {

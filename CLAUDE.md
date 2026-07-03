@@ -41,7 +41,7 @@ npm run lint         # Run Next.js ESLint
 - All components must support RTL/LTR layout switching
 
 **2. API Integration:**
-- Base API URL: `https://api.insightabusiness.com`
+- Base API URL comes from `process.env.NEXT_PUBLIC_API_URL` (see `.env.development` / `.env.staging` / `.env.production` and `app/config.ts`). Never hardcode environment URLs, Stripe keys, or Pusher keys — add env vars instead. Environments: dev/stage → `api.foresighta.co`, production → `api.insightabusiness.com`.
 - Uses Axios with interceptors for token management
 - Authentication via localStorage token + cookie fallback
 - Standard headers include locale, timezone, and bearer token

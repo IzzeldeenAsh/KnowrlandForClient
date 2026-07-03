@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from 'react';
 import { IconInfoCircle, IconLanguage } from '@tabler/icons-react';
 import { usePathname } from 'next/navigation';
 import { useAuth } from '@/hooks/useAuth';
+import { getCookieDomain } from '@/lib/cookieDomain';
 
 interface LanguageMismatchNotifierProps {
   knowledgeLanguage: string;
@@ -24,12 +25,14 @@ export default function LanguageMismatchNotifier({
 
   // Helper to clear duplicate cookies (handles both Angular SameSite=None and Next.js SameSite=Lax)
   const clearDuplicateCookies = (cookieName: string) => {
-    const prod = typeof window !== 'undefined' && (window.location.hostname.includes('insightabusiness.com') || window.location.hostname.includes('foresighta.co'));
+    const domain = getCookieDomain(); // env shared domain, null on localhost
     const clearVariations = [
       `${cookieName}=; Path=/; Max-Age=-1`,
-      `${cookieName}=; Domain=.insightabusiness.com; Path=/; Max-Age=-1; Secure; SameSite=None`,
-      `${cookieName}=; Domain=.insightabusiness.com; Path=/; Max-Age=-1; Secure; SameSite=Lax`,
-      `${cookieName}=; Path=/; Max-Age=-1; ${prod ? 'Secure; SameSite=None' : 'SameSite=Lax'}`
+      ...(domain ? [
+        `${cookieName}=; Domain=${domain}; Path=/; Max-Age=-1; Secure; SameSite=None`,
+        `${cookieName}=; Domain=${domain}; Path=/; Max-Age=-1; Secure; SameSite=Lax`,
+      ] : []),
+      `${cookieName}=; Path=/; Max-Age=-1; ${domain ? 'Secure; SameSite=None' : 'SameSite=Lax'}`
     ];
     clearVariations.forEach(variation => {
       document.cookie = variation;
@@ -42,7 +45,7 @@ export default function LanguageMismatchNotifier({
     clearDuplicateCookies('NEXT_LOCALE');
 
     // Cookie operations are synchronous - no timeout needed
-    const prod = typeof window !== 'undefined' && (window.location.hostname.includes('insightabusiness.com') || window.location.hostname.includes('foresighta.co'));
+    const domain = getCookieDomain(); // env shared domain, null on localhost
     const expirationDate = new Date();
     expirationDate.setFullYear(expirationDate.getFullYear() + 1);
 
@@ -54,8 +57,8 @@ export default function LanguageMismatchNotifier({
       `Max-Age=${60 * 60 * 24 * 365}`,
       `SameSite=Lax`
     ];
-    if (prod) {
-      cookieParts.push(`Domain=.insightabusiness.com`);
+    if (domain) {
+      cookieParts.push(`Domain=${domain}`);
       cookieParts.push(`Secure`);
     }
     document.cookie = cookieParts.join('; ');
@@ -68,7 +71,7 @@ export default function LanguageMismatchNotifier({
       `Max-Age=${60 * 60 * 24 * 365}`,
       `SameSite=Lax`
     ];
-    if (prod) nextLocaleParts.push(`Secure`);
+    if (domain) nextLocaleParts.push(`Secure`);
     document.cookie = nextLocaleParts.join('; ');
 
     // Compute current path without locale prefix

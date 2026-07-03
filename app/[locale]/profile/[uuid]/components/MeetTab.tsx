@@ -423,7 +423,7 @@ export default function MeetTab({
       const token = getAuthToken();
       if (!token) return;
 
-      const response = await fetch("https://api.insightabusiness.com/api/account/wallet/balance", {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/account/wallet/balance`, {
         headers: {
           "Content-Type": "application/json",
           Accept: "application/json",
@@ -507,7 +507,7 @@ export default function MeetTab({
       const token = getAuthToken();
 
       const response = await fetch(
-        "https://api.insightabusiness.com/api/account/meeting/client/check-duplicate-time",
+        `${process.env.NEXT_PUBLIC_API_URL}/api/account/meeting/client/check-duplicate-time`,
         {
           method: "POST",
           headers: {
@@ -548,7 +548,7 @@ export default function MeetTab({
     const checkStatus = async (): Promise<boolean> => {
       try {
         const response = await fetch(
-          `https://api.insightabusiness.com/api/account/order/meeting/${orderUuid}`,
+          `${process.env.NEXT_PUBLIC_API_URL}/api/account/order/meeting/${orderUuid}`,
           {
             headers: {
               "Content-Type": "application/json",
@@ -666,7 +666,7 @@ export default function MeetTab({
       }
 
       const response = await fetch(
-        `https://api.insightabusiness.com/api/account/order/meeting/checkout/${uuid}`,
+        `${process.env.NEXT_PUBLIC_API_URL}/api/account/order/meeting/checkout/${uuid}`,
         {
           method: "POST",
           headers: {
@@ -751,7 +751,7 @@ export default function MeetTab({
       setIsFinalVerifying(true);
       const token = getAuthToken();
       const response = await fetch(
-        `https://api.insightabusiness.com/api/account/order/meeting/check-payment-succeeded/${orderUuid}`,
+        `${process.env.NEXT_PUBLIC_API_URL}/api/account/order/meeting/check-payment-succeeded/${orderUuid}`,
         {
           method: "POST",
           headers: {
@@ -766,7 +766,7 @@ export default function MeetTab({
         // After backend confirmation, re-fetch order to verify status is paid
         try {
           const verifyResp = await fetch(
-            `https://api.insightabusiness.com/api/account/order/meeting/${orderUuid}`,
+            `${process.env.NEXT_PUBLIC_API_URL}/api/account/order/meeting/${orderUuid}`,
             {
               headers: {
                 "Content-Type": "application/json",
@@ -1154,7 +1154,7 @@ export default function MeetTab({
                       className="h-12 sm:h-14 text-base sm:text-lg bg-blue-600 hover:bg-blue-700"
                       onClick={() => {
                         if (!authRedirectUrl) return;
-                        const loginUrl = `https://app.insightabusiness.com/auth/login?returnUrl=${encodeURIComponent(
+                        const loginUrl = `${process.env.NEXT_PUBLIC_DASHBOARD_URL}/auth/login?returnUrl=${encodeURIComponent(
                           authRedirectUrl
                         )}`;
                         window.location.href = loginUrl;
@@ -1171,7 +1171,7 @@ export default function MeetTab({
                       className="h-12 sm:h-14 text-base sm:text-lg border-blue-600 text-blue-700 hover:bg-blue-50"
                       onClick={() => {
                         if (!authRedirectUrl) return;
-                        const signupUrl = `https://app.insightabusiness.com/auth/sign-up?returnUrl=${encodeURIComponent(
+                        const signupUrl = `${process.env.NEXT_PUBLIC_DASHBOARD_URL}/auth/sign-up?returnUrl=${encodeURIComponent(
                           authRedirectUrl
                         )}`;
                         window.location.href = signupUrl;
@@ -1581,7 +1581,7 @@ export default function MeetTab({
               className="bg-gradient-to-r from-blue-500 to-teal-400 hover:from-blue-600 hover:to-teal-500 transition-all"
               onClick={() => {
                 // Redirect to meetings dashboard
-                window.location.href = "https://app.insightabusiness.com/app/insighter-dashboard/my-meetings?tab=my-meetings";
+                window.location.href = `${process.env.NEXT_PUBLIC_DASHBOARD_URL}/app/insighter-dashboard/my-meetings?tab=my-meetings`;
               }}
             >
               {locale.startsWith('ar') ? 'اذهب إلى الجلسات الاستشارية' : 'Go to Sessions'}
