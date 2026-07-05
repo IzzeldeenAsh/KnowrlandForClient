@@ -177,7 +177,7 @@ interface SearchBarProps {
   locale: string;
   placeholder: string;
   onSubmit: (e: React.FormEvent) => void;
-  onDirectSearchResults?: (results: any) => void; // New prop to handle direct API search results
+  onDirectSearchResults?: (results: unknown) => void; // New prop to handle direct API search results
   onQueryChange?: (query: string) => void; // New prop to handle URL updates when query changes
   onSearch?: (query: string) => void; // New prop to trigger explicit searches
   // New props for ISIC/HS filters (moved from sidebar)
@@ -202,7 +202,6 @@ const SearchBar: React.FC<SearchBarProps> = ({
   locale,
   placeholder,
   onSubmit,
-  onDirectSearchResults,
   onQueryChange,
   onSearch,
   isicCodeFilter = null,
@@ -717,6 +716,7 @@ const SearchBar: React.FC<SearchBarProps> = ({
   } as const;
 
   const isHsDisabled = isLoadingHs;
+  const hasSearchQuery = searchQuery.trim().length > 0;
 
   const renderTypeIcon = (type: 'knowledge' | 'insighter', isActive: boolean) => (
     <span
@@ -866,39 +866,37 @@ const SearchBar: React.FC<SearchBarProps> = ({
             className={`${styles.searchBar} flex items-center bg-white border border-[#299af8] rounded-[6px] w-full px-3 py-2 gap-2`}
             style={{ fontSize: '16px' }}
           >
-            <button 
-              type="button"
-              className={`${isRtl ? 'mr-2' : 'ml-2'} bg-[#299af8] text-white p-2 rounded-[4px] flex items-center justify-center hover:bg-[#2185d6] transition-colors duration-150`}
-              onClick={async (e) => {
-                e.preventDefault();
-                hideSuggestions();
-                setSuggestionSelected(true);
-                setInputFocused(false);
-                
-                if (onSearch) {
-                  onSearch(searchQuery.trim());
-                } else {
-                  // Fallback: navigate preserving existing filters
-                  try {
-                    const params = new URLSearchParams(searchParams.toString());
-                    if (searchQuery.trim().length > 0) {
+            {hasSearchQuery && (
+              <button
+                type="button"
+                className={`${isRtl ? 'mr-2' : 'ml-2'} bg-[#299af8] text-white p-2 rounded-[4px] flex items-center justify-center hover:bg-[#2185d6] transition-colors duration-150`}
+                onClick={(e) => {
+                  e.preventDefault();
+                  hideSuggestions();
+                  setSuggestionSelected(true);
+                  setInputFocused(false);
+
+                  if (onSearch) {
+                    onSearch(searchQuery.trim());
+                  } else {
+                    // Fallback: navigate preserving existing filters
+                    try {
+                      const params = new URLSearchParams(searchParams.toString());
                       params.set('keyword', searchQuery.trim());
-                    } else {
-                      params.delete('keyword');
+                      params.set('search_type', searchType);
+                      params.delete('page');
+                      const nextUrl = `/${locale}/home?${params.toString()}`;
+                      router.push(nextUrl, { scroll: false });
+                    } catch {
+                      // Keep the click scoped to the visible keyword action.
                     }
-                    params.set('search_type', searchType);
-                    params.delete('page');
-                    const nextUrl = `/${locale}/home?${params.toString()}`;
-                    router.push(nextUrl, { scroll: false });
-                  } catch {
-                    onSubmit(e as any);
                   }
-                }
-              }}
-              aria-label={isRtl ? 'ابحث' : 'Search'}
-            >
-              <IconSearch size={18} />
-            </button>
+                }}
+                aria-label={isRtl ? 'ابحث' : 'Search'}
+              >
+                <IconSearch size={18} />
+              </button>
+            )}
             <input
               ref={searchInputRef}
               type="text"
@@ -1150,7 +1148,7 @@ const SearchBar: React.FC<SearchBarProps> = ({
                 ))}
               </div>,
               document.body
-            ) as any)
+            ))
           : null}
         {/* Selected ISIC/HS details under the search bar */}
         {(selectedIsic || selectedHs) && (
