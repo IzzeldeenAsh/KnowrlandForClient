@@ -20,8 +20,8 @@ import {
 import { syncProjectProperties } from '@/components/project/projectPropertiesSync'
 import { readStoredProjectRequestUuid } from '@/components/project/projectRequestUuid'
 import {
-  getSpecifiedInsighterLabel,
   isSpecifiedInsighterProject,
+  readStoredSpecifiedInsighterDisplay,
 } from '@/components/project/specifiedInsighterProject'
 import { readProjectAddonsState, readProjectScopeSnapshot } from '../projectAddonsState'
 import { projectTypeLabel } from '../projectLabels'
@@ -858,6 +858,7 @@ export default function ProjectReviewStep({
   const [error, setError] = useState<string | null>(null)
   const [submitting, setSubmitting] = useState(false)
   const [isSpecifiedInsighter, setIsSpecifiedInsighter] = useState(false)
+  const [specifiedInsighterDisplayName, setSpecifiedInsighterDisplayName] = useState('')
 
   useProjectStepErrorToast(error, locale)
 
@@ -868,6 +869,9 @@ export default function ProjectReviewStep({
       setError(null)
       const specificProject = isSpecifiedInsighterProject(locale)
       setIsSpecifiedInsighter(specificProject)
+      setSpecifiedInsighterDisplayName(
+        specificProject ? readStoredSpecifiedInsighterDisplay(locale)?.name || '' : ''
+      )
 
       const projectUuid = readStoredProjectRequestUuid(locale)
 
@@ -1165,7 +1169,11 @@ export default function ProjectReviewStep({
         ? [
             {
               label: isRTL ? 'نوع المطابقة' : 'Matching mode',
-              value: [getSpecifiedInsighterLabel(locale)],
+              value: [
+                specifiedInsighterDisplayName
+                  ? `${isRTL ? 'الخدمة بواسطة' : 'Service by'} ${specifiedInsighterDisplayName}`
+                  : isRTL ? 'الخدمة بواسطة' : 'Service by',
+              ],
             },
           ]
         : []),
@@ -1185,7 +1193,7 @@ export default function ProjectReviewStep({
         editStepId: projectWizardStepIds.projectDeadline,
       },
     ]
-  }, [isRTL, isSpecifiedInsighter, locale, review])
+  }, [isRTL, isSpecifiedInsighter, locale, review, specifiedInsighterDisplayName])
 
   const scopeRows = useMemo(() => {
     if (!review) return []
@@ -1287,6 +1295,12 @@ export default function ProjectReviewStep({
       },
     ]
   }, [emptyText, isRTL, isSpecifiedInsighter, review])
+
+  const reviewContinueLabel = isSpecifiedInsighter
+    ? nav.continueLabel
+    : isRTL
+      ? 'اعثر على الخبراء'
+      : 'Find your Experts'
 
   const onContinue = async () => {
     if (submitting) return
@@ -1451,7 +1465,7 @@ export default function ProjectReviewStep({
                   : 'bg-[#1C7CBB] text-white hover:bg-opacity-90'
               }`}
             >
-              {submitting ? (isRTL ? 'جاري الحفظ...' : 'Saving...') : nav.continueLabel}
+              {submitting ? (isRTL ? 'جاري الحفظ...' : 'Saving...') : reviewContinueLabel}
             </button>
           </div>
         </div>

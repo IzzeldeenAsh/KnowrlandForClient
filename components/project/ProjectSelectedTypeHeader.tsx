@@ -3,6 +3,7 @@
 import { useEffect, useState, type ReactNode } from 'react'
 import { projectWizardStorage, type WizardLocale } from './wizardStorage'
 import { projectTypeLabel } from './projectLabels'
+import SpecifiedInsighterBadge from './SpecifiedInsighterBadge'
 
 type Props = {
   locale: WizardLocale
@@ -46,11 +47,14 @@ export default function ProjectSelectedTypeHeader({
             : 'opacity-0 -translate-x-4'
       }`}
     >
-      <div className="mt-1 inline-flex items-center gap-2">
-        <span className="text-sm bg-gradient-to-r from-blue-700 via-sky-600 to-cyan-500 bg-clip-text text-transparent rounded-full px-3 py-.5 border border-blue-400">
-          {headerLabel}
-        </span>
-        {status ? <span className="text-xs font-semibold text-slate-600 rounded-full px-3 py-1 border border-slate-400">{status}</span> : null}
+      <div className="mt-1 flex w-full flex-wrap items-center justify-between gap-3">
+        <div className="flex min-w-0 flex-wrap items-center gap-2">
+          <span className="text-sm bg-gradient-to-r from-blue-700 via-sky-600 to-cyan-500 bg-clip-text text-transparent rounded-full px-3 py-1 border border-blue-400">
+            {headerLabel}
+          </span>
+          {status ? <span className="text-xs font-semibold text-slate-600 rounded-full px-3 py-1 border border-slate-400">{status}</span> : null}
+        </div>
+        <SpecifiedInsighterBadge locale={locale} className="max-w-full sm:max-w-[45%]" />
       </div>
     </div>
   )

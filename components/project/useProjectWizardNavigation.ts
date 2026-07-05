@@ -2,7 +2,10 @@
 
 import { useEffect, useMemo, useState } from 'react'
 import { useParams, useRouter, useSearchParams } from 'next/navigation'
-import type { WizardLocale } from './wizardStorage'
+import {
+  ensureProjectWizardStorageForLocale,
+  type WizardLocale,
+} from './wizardStorage'
 import {
   getProjectWizardStepOrder,
   normalizeProjectWizardStepId,
@@ -12,6 +15,8 @@ import {
 const reviewReturnParam = 'returnTo'
 
 export function useProjectWizardNavigation(locale: WizardLocale) {
+  ensureProjectWizardStorageForLocale(locale)
+
   const params = useParams<{ step?: string }>()
   const router = useRouter()
   const searchParams = useSearchParams()

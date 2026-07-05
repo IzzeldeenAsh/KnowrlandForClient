@@ -71,6 +71,27 @@ export default function HomePage() {
   const [searchType, setSearchType] = useState<'knowledge' | 'insighter'>(initialType);
   const [activeTab] = useState<string | null>('all');
 
+  // Whether there is an active search (keyword or a real filter).
+  // Without one we show the centered landing view (hero + search bar only).
+  const hasInitialSearch = Boolean(
+    initialQuery.trim() !== '' ||
+    initialLanguage !== 'all' ||
+    initialCountry !== null ||
+    initialRegion !== null ||
+    initialEconomicBloc !== null ||
+    initialTag !== null ||
+    initialIndustry !== null ||
+    initialIsicCode !== null ||
+    initialHsCode !== null ||
+    initialPriceFilter !== null ||
+    initialRangeStart !== null ||
+    initialRangeEnd !== null ||
+    initialCategory !== 'all' ||
+    initialRole !== 'all' ||
+    initialYearOfStudy !== null
+  );
+  const [hasSearched, setHasSearched] = useState(hasInitialSearch);
+
   // Keep searchType synchronized with URL
   useEffect(() => {
     const urlSearchType = searchParams.get('search_type') as 'knowledge' | 'insighter';
@@ -310,6 +331,19 @@ export default function HomePage() {
     // Update URL with only search parameters
     router.push(`/${locale}/home?${urlParams.toString()}`, { scroll: false });
 
+    // Without a keyword, clearing the filters returns to the landing view
+    if (!searchQuery.trim()) {
+      setHasSearched(false);
+      setLoading(false);
+      setTotalPages(1);
+      setTotalItems(0);
+      resetSearchParamsRefFilters({ searchQuery: '' });
+      setTimeout(() => {
+        isFilterResetInProgressRef.current = false;
+      }, 500);
+      return;
+    }
+
     // Explicitly trigger search with reset parameters
     try {
       const handleError = (errorMessage: string) => {
@@ -506,6 +540,19 @@ export default function HomePage() {
 
     // Update URL with clean parameters for the new search type
     router.push(`/${locale}/home?${urlParams.toString()}`, { scroll: false });
+
+    // With no keyword there is nothing to search — stay on the landing view
+    if (!searchQuery.trim()) {
+      setHasSearched(false);
+      setLoading(false);
+      resetSearchParamsRefFilters({ searchQuery: '', searchType: type });
+      setTimeout(() => {
+        isSearchTypeChangingRef.current = false;
+      }, 500);
+      return;
+    }
+
+    setHasSearched(true);
 
     // Perform the search immediately with the new search type and explicitly reset filters
     try {
@@ -803,9 +850,6 @@ export default function HomePage() {
     if (initialized) return;
     const query = searchParams.get('keyword');
     const type = searchParams.get('search_type') as 'knowledge' | 'insighter';
-    const accuracy = searchParams.get('accuracy');
-    const language = searchParams.get('language');
-    const country = searchParams.get('country');
     const categoryType = searchParams.get('type');
 
     // Read ALL filter parameters directly from URL to avoid state synchronization issues
@@ -824,16 +868,28 @@ export default function HomePage() {
     const urlRole = (searchParams.get('role') as 'all' | 'company' | 'individual') || 'all';
 
 
-    // Set loading to true immediately if we have any search parameters
-    const hasSearchParams = query || type || language || country || categoryType || accuracy ||
-      urlIndustry || urlRegion || urlEconomicBloc || urlIsicCode || urlHsCode || urlRole;
-    if (hasSearchParams) {
+    // Only trigger a search when the URL carries a keyword or a real filter.
+    // A bare landing URL (just search_type / accuracy) keeps the centered hero view.
+    const shouldTriggerSearch = Boolean(
+      (query && query.trim() !== '') ||
+      urlLanguage !== 'all' ||
+      urlCountry !== null ||
+      urlRegion !== null ||
+      urlEconomicBloc !== null ||
+      urlTag !== null ||
+      urlIndustry !== null ||
+      urlIsicCode !== null ||
+      urlHsCode !== null ||
+      urlPriceFilter !== null ||
+      urlRangeStart !== null ||
+      urlRangeEnd !== null ||
+      (categoryType && categoryType !== 'all') ||
+      urlRole !== 'all'
+    );
+
+    if (shouldTriggerSearch) {
       setLoading(true);
     }
-
-    // Trigger search if we have query parameters OR other search parameters that should show results
-    const shouldTriggerSearch = query || type || accuracy || language || country || categoryType ||
-      urlIndustry || urlRegion || urlEconomicBloc || urlIsicCode || urlHsCode || urlRole;
 
     if (shouldTriggerSearch) {
 
@@ -919,9 +975,6 @@ export default function HomePage() {
       };
 
       triggerSearch();
-    } else if (hasSearchParams) {
-      // If we have other search parameters but no query, still set loading off after a brief moment
-      setTimeout(() => setLoading(false), 100);
     }
 
     // Set initialized after handling initial URL parameters
@@ -1106,6 +1159,26 @@ export default function HomePage() {
         setCurrentPage(urlPage);
       } else if (isPageChangeInProgressRef.current || skipNextSearchEffectRef.current) {
       }
+
+      // Keep the landing vs results layout in sync with the URL
+      setHasSearched(Boolean(
+        (urlQuery && urlQuery.trim() !== '') ||
+        (urlLanguage && urlLanguage !== 'all') ||
+        urlCountry !== null ||
+        urlRegion !== null ||
+        urlEconomicBloc !== null ||
+        urlTag !== null ||
+        urlIndustry !== null ||
+        urlIsicCode !== null ||
+        urlHsCode !== null ||
+        urlPriceFilter !== null ||
+        urlRangeStart !== null ||
+        urlRangeEnd !== null ||
+        urlCoverStart !== null ||
+        urlCoverEnd !== null ||
+        (urlCategory && urlCategory !== 'all') ||
+        urlRole !== 'all'
+      ));
     };
 
     updateStates();
@@ -1135,12 +1208,49 @@ export default function HomePage() {
 
   // Dedicated search function for explicit user actions (Enter, button click, suggestion selection)
   const executeSearch = useCallback(async (queryToSearch?: string) => {
-    const query = queryToSearch || searchQuery.trim();
+    const query = (queryToSearch || searchQuery).trim();
 
     // Update the search query state if a specific query was provided (from suggestion selection)
     if (queryToSearch && queryToSearch !== searchQuery) {
       setSearchQuery(queryToSearch);
     }
+
+    // Empty search returns to the landing view instead of listing everything
+    if (!query) {
+      isFilterResetInProgressRef.current = true;
+      setHasSearched(false);
+      setLoading(false);
+      setSearchResults([]);
+      setKnowledgeItems([]);
+      setStatistics([]);
+      setTotalPages(1);
+      setTotalItems(0);
+      setCurrentPage(1);
+      setLanguageFilter('all');
+      setCountryFilter(null);
+      setRegionFilter(null);
+      setEconomicBlocFilter(null);
+      setTagFilter(null);
+      setIndustryFilter(null);
+      setIsicCodeFilter(null);
+      setHsCodeFilter(null);
+      setPriceFilter(null);
+      setRangeStartFilter(null);
+      setRangeEndFilter(null);
+      setYearOfStudyFilter(null);
+      setSelectedCategory('all');
+      setAccuracyFilter('all');
+      setRoleFilter('all');
+      resetSearchParamsRefFilters({ searchQuery: '' });
+      prevSearchQueryRef.current = '';
+      router.push(`/${locale}/home?search_type=${searchType}`, { scroll: false });
+      setTimeout(() => {
+        isFilterResetInProgressRef.current = false;
+      }, 500);
+      return;
+    }
+
+    setHasSearched(true);
 
     // Update URL with search parameters
     updateUrlWithFilters({ query: query, type: searchType });
@@ -1201,7 +1311,7 @@ export default function HomePage() {
     } finally {
       setLoading(false);
     }
-  }, [searchQuery, searchType, locale, activeTab, languageFilter, countryFilter, regionFilter, economicBlocFilter, isicCodeFilter, selectedCategory, industryFilter, priceFilter, hsCodeFilter, updateUrlWithFilters, toast, accuracyFilter, roleFilter, rangeStartFilter, rangeEndFilter, yearOfStudyFilter]);
+  }, [searchQuery, searchType, locale, router, activeTab, languageFilter, countryFilter, regionFilter, economicBlocFilter, isicCodeFilter, selectedCategory, industryFilter, priceFilter, hsCodeFilter, updateUrlWithFilters, toast, accuracyFilter, roleFilter, rangeStartFilter, rangeEndFilter, yearOfStudyFilter]);
 
   // Handle search submission (Enter key or search button)
   const handleSubmit = (e: React.FormEvent) => {
@@ -1233,6 +1343,31 @@ export default function HomePage() {
     rangeEndFilter,
     yearOfStudyFilter
   });
+
+  // Reset the tracked filter params to defaults so the main search effect
+  // doesn't see stale values and re-fetch when the next real search happens
+  const resetSearchParamsRefFilters = (overrides: Partial<typeof searchParamsRef.current> = {}) => {
+    searchParamsRef.current = {
+      ...searchParamsRef.current,
+      currentPage: 1,
+      languageFilter: 'all',
+      countryFilter: null,
+      regionFilter: null,
+      economicBlocFilter: null,
+      tagFilter: null,
+      industryFilter: null,
+      isicCodeFilter: null,
+      hsCodeFilter: null,
+      priceFilter: null,
+      rangeStartFilter: null,
+      rangeEndFilter: null,
+      yearOfStudyFilter: null,
+      selectedCategory: 'all',
+      accuracyFilter: 'all',
+      roleFilter: 'all',
+      ...overrides,
+    };
+  };
 
   // Track previous search query to avoid redundant API calls
   const prevSearchQueryRef = useRef(searchQuery);
@@ -1371,6 +1506,33 @@ export default function HomePage() {
       return; // Don't reset the flag here - let pagination handle it
     }
 
+    // No active search: keep the landing view. Sync the params ref so the
+    // next real search doesn't detect stale changes and double-fetch.
+    if (!hasSearched) {
+      searchParamsRef.current = {
+        locale,
+        currentPage,
+        languageFilter,
+        countryFilter,
+        regionFilter,
+        economicBlocFilter,
+        tagFilter,
+        activeTab,
+        searchQuery: searchParamsRef.current.searchQuery,
+        searchType,
+        selectedCategory,
+        industryFilter,
+        isicCodeFilter,
+        hsCodeFilter,
+        priceFilter,
+        accuracyFilter,
+        roleFilter,
+        rangeStartFilter,
+        rangeEndFilter,
+        yearOfStudyFilter
+      };
+      return;
+    }
 
     // If this effect runs due to a change in search parameters (not pagination),
     // we should reset the lastDirectPageRef to ensure proper page handling
@@ -1533,7 +1695,7 @@ export default function HomePage() {
       }
     };
     // REMOVED searchQuery from dependencies - only trigger on filter changes, not query changes
-  }, [locale, languageFilter, countryFilter, regionFilter, economicBlocFilter, tagFilter, activeTab, searchType, initialized, toast, selectedCategory, industryFilter, isicCodeFilter, hsCodeFilter, priceFilter, accuracyFilter, roleFilter, rangeStartFilter, rangeEndFilter, yearOfStudyFilter, fetchStatisticsIfNeeded]);
+  }, [locale, languageFilter, countryFilter, regionFilter, economicBlocFilter, tagFilter, activeTab, searchType, initialized, hasSearched, toast, selectedCategory, industryFilter, isicCodeFilter, hsCodeFilter, priceFilter, accuracyFilter, roleFilter, rangeStartFilter, rangeEndFilter, yearOfStudyFilter, fetchStatisticsIfNeeded]);
 
   return (
     <main ref={mainRef} className='h-full min-h-0 flex flex-col bg-gray-50'>
@@ -1549,8 +1711,8 @@ export default function HomePage() {
           <div className="w-full h-full min-h-0">
             <div className="max-w-8xl 2xl:max-w-none h-full min-h-0">
               <div className="flex gap-0 items-start h-full min-h-0">
-                {/* Sidebar (FilterBox) + Reddit-style collapse bar */}
-                <div className="hidden lg:flex lg:flex-shrink-0 h-full min-h-0 relative">
+                {/* Sidebar (FilterBox) + Reddit-style collapse bar — hidden until the user searches */}
+                <div className={`${hasSearched ? 'hidden lg:flex' : 'hidden'} lg:flex-shrink-0 h-full min-h-0 relative`}>
                   {/* Filter panel */}
                   <aside
                     className={`transition-all duration-300 ease-in-out overflow-hidden ${filtersVisible
@@ -1616,12 +1778,12 @@ export default function HomePage() {
                 </div>
 
                 {/* Content (Hero + Controls + Results) */}
-                <div ref={contentScrollRef} className="flex-1 h-full min-h-0 overflow-y-auto">
+                <div ref={contentScrollRef} className={`flex-1 h-full min-h-0 overflow-y-auto ${!hasSearched ? 'flex flex-col justify-center' : ''}`}>
 
-                  {/* Mobile floating Filters button */}
+                  {/* Mobile floating Filters button — hidden until the user searches */}
                   <button
                     onClick={() => setIsFilterDrawerOpen(true)}
-                    className={`lg:hidden fixed bottom-4 ${locale === 'ar' ? 'left-4' : 'right-4'} z-30 inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-full shadow-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500`}
+                    className={`${hasSearched ? 'lg:hidden' : 'hidden'} fixed bottom-4 ${locale === 'ar' ? 'left-4' : 'right-4'} z-30 inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-full shadow-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500`}
                     aria-label={locale === 'ar' ? 'فتح الفلاتر' : 'Open filters'}
                   >
                     <svg width="20" height="20" viewBox="0 0 25 25" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -1634,7 +1796,7 @@ export default function HomePage() {
                   </button>
 
                   {/* Hero Banner Section (inside content column) */}
-                  <div className="relative overflow-hidden pt-5 pb-16">
+                  <div className={`relative overflow-hidden ${hasSearched ? 'pt-5 pb-16' : 'py-10'}`}>
                     <div className="absolute inset-0 z-0">
                       <svg className="absolute right-0 top-0 h-full w-1/2 translate-x-1/3 transform text-white opacity-10" fill="none" viewBox="0 0 400 400">
                         <defs>
@@ -1685,8 +1847,8 @@ export default function HomePage() {
                     </div>
                   </div>
 
-                  {/* Results section */}
-                  {(() => {
+                  {/* Results section — only shown once the user has searched */}
+                  {hasSearched && (() => {
                     return searchType === 'insighter' ? (
                       <InsightersResultsSection
                         key={`insighter-section-${searchType}-${totalItems}`}

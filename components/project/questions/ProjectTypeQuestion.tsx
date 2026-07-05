@@ -4,17 +4,30 @@ import { useEffect, useMemo, useState } from "react";
 import type { ReactNode } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
+import { getApiUrl } from "@/app/config";
 import { useProjectWizardNavigation } from "../useProjectWizardNavigation";
 import {
-  clearProjectWizardStorage,
+  clearProjectWizardStorageLocalePair,
   projectWizardStorage,
   type WizardLocale,
 } from "../wizardStorage";
 import {
+  clearStoredSpecifiedInsighterDisplay,
   clearStoredSpecifiedInsighterUuid,
+  normalizeSpecifiedInsighterRole,
+  readStoredSpecifiedInsighterDisplay,
+  readStoredSpecifiedInsighterProfileUuid,
+  readStoredSpecifiedInsighterRole,
+  specifiedInsighterProfileUuidQueryParam,
   specifiedInsighterQueryParam,
+  specifiedInsighterRoleQueryParam,
+  type SpecifiedInsighterRole,
   writeStoredSpecifiedInsighterUuid,
+  writeStoredSpecifiedInsighterDisplay,
+  writeStoredSpecifiedInsighterProfileUuid,
+  writeStoredSpecifiedInsighterRole,
 } from "../specifiedInsighterProject";
+import SpecifiedInsighterBadge from "../SpecifiedInsighterBadge";
 import ChoiceCard from "./ChoiceCard";
 import {
   IconBriefcaseFilled,
@@ -32,6 +45,18 @@ type ProjectTypeOption = {
   consultingFields: string;
 };
 
+type ProfilePayload = {
+  data?: {
+    uuid?: string;
+    name?: string | null;
+    first_name?: string | null;
+    last_name?: string | null;
+    profile_photo_url?: string | null;
+    legal_name?: string | null;
+    logo?: string | null;
+  };
+};
+
 function splitCommaList(value: string): string[] {
   return value
     .split(/[,،]/g)
@@ -46,6 +71,74 @@ function normalizeProjectTypeId(value: string | null): ProjectTypeId | null {
     return "frame_work_agreement";
   if (value === "urgent_request" || value === "urgent") return "urgent_request";
   return null;
+}
+
+function getProfileDisplayName(role: SpecifiedInsighterRole, data: ProfilePayload["data"]) {
+  if (!data) return "";
+  if (role === "company") return String(data.legal_name || data.name || "").trim();
+
+  const fullName = String(data.name || "").trim();
+  if (fullName) return fullName;
+
+  return [data.first_name, data.last_name]
+    .map((value) => String(value || "").trim())
+    .filter(Boolean)
+    .join(" ");
+}
+
+function shouldFetchSpecifiedDisplay(
+  locale: WizardLocale,
+  role: SpecifiedInsighterRole,
+  profileUuid: string
+) {
+  const storedDisplay = readStoredSpecifiedInsighterDisplay(locale);
+  if (!storedDisplay) return true;
+
+  return storedDisplay.role !== role || storedDisplay.uuid !== profileUuid;
+}
+
+async function fetchSpecifiedInsighterDisplay(params: {
+  locale: WizardLocale;
+  role: SpecifiedInsighterRole;
+  profileUuid: string;
+}) {
+  const { locale, role, profileUuid } = params;
+  if (!profileUuid) return;
+
+  const endpoint =
+    role === "company"
+      ? `/api/platform/company/profile/${encodeURIComponent(profileUuid)}`
+      : `/api/platform/insighter/profile/${encodeURIComponent(profileUuid)}`;
+
+  try {
+    const response = await fetch(getApiUrl(endpoint), {
+      headers: {
+        "Content-Type": "application/json",
+        Accept: "application/json",
+        "Accept-Language": locale === "ar" ? "ar" : "en",
+      },
+      cache: "no-store",
+    });
+
+    if (!response.ok) return;
+
+    const payload = (await response.json()) as ProfilePayload;
+    const data = payload.data;
+    const name = getProfileDisplayName(role, data);
+    if (!name) return;
+
+    writeStoredSpecifiedInsighterDisplay(locale, {
+      role,
+      uuid: String(data?.uuid || profileUuid).trim(),
+      name,
+      imageUrl:
+        role === "company"
+          ? String(data?.logo || "").trim() || null
+          : String(data?.profile_photo_url || "").trim() || null,
+    });
+  } catch {
+    // Specified mode should still work if display metadata cannot be fetched.
+  }
 }
 
 function getOptions(locale: WizardLocale): ProjectTypeOption[] {
@@ -156,11 +249,20 @@ export default function ProjectTypeQuestion({
   useEffect(() => {
     const specifiedInsighterUuid =
       searchParams?.get(specifiedInsighterQueryParam)?.trim() || "";
+    const specifiedInsighterRole = normalizeSpecifiedInsighterRole(
+      searchParams?.get(specifiedInsighterRoleQueryParam)
+    );
+    const specifiedInsighterProfileUuid =
+      searchParams?.get(specifiedInsighterProfileUuidQueryParam)?.trim() ||
+      specifiedInsighterUuid;
 
     if (searchParams?.get("fresh") === "1") {
-      clearProjectWizardStorage(locale);
+      clearProjectWizardStorageLocalePair(locale);
       if (specifiedInsighterUuid) {
         writeStoredSpecifiedInsighterUuid(locale, specifiedInsighterUuid);
+        writeStoredSpecifiedInsighterRole(locale, specifiedInsighterRole);
+        writeStoredSpecifiedInsighterProfileUuid(locale, specifiedInsighterProfileUuid);
+        clearStoredSpecifiedInsighterDisplay(locale);
       } else {
         clearStoredSpecifiedInsighterUuid(locale);
       }
@@ -169,6 +271,8 @@ export default function ProjectTypeQuestion({
       const nextParams = new URLSearchParams();
       if (specifiedInsighterUuid) {
         nextParams.set(specifiedInsighterQueryParam, specifiedInsighterUuid);
+        nextParams.set(specifiedInsighterRoleQueryParam, specifiedInsighterRole);
+        nextParams.set(specifiedInsighterProfileUuidQueryParam, specifiedInsighterProfileUuid);
       }
       const nextQuery = nextParams.toString();
       router.replace(
@@ -180,6 +284,27 @@ export default function ProjectTypeQuestion({
 
     if (specifiedInsighterUuid) {
       writeStoredSpecifiedInsighterUuid(locale, specifiedInsighterUuid);
+      writeStoredSpecifiedInsighterRole(locale, specifiedInsighterRole);
+      writeStoredSpecifiedInsighterProfileUuid(locale, specifiedInsighterProfileUuid);
+      if (shouldFetchSpecifiedDisplay(locale, specifiedInsighterRole, specifiedInsighterProfileUuid)) {
+        clearStoredSpecifiedInsighterDisplay(locale);
+        void fetchSpecifiedInsighterDisplay({
+          locale,
+          role: specifiedInsighterRole,
+          profileUuid: specifiedInsighterProfileUuid,
+        });
+      }
+    } else if (readStoredSpecifiedInsighterProfileUuid(locale)) {
+      const storedRole = readStoredSpecifiedInsighterRole(locale);
+      const storedProfileUuid = readStoredSpecifiedInsighterProfileUuid(locale);
+      if (shouldFetchSpecifiedDisplay(locale, storedRole, storedProfileUuid)) {
+        clearStoredSpecifiedInsighterDisplay(locale);
+        void fetchSpecifiedInsighterDisplay({
+          locale,
+          role: storedRole,
+          profileUuid: storedProfileUuid,
+        });
+      }
     }
   }, [locale, router, searchParams]);
 
@@ -225,9 +350,6 @@ export default function ProjectTypeQuestion({
   };
 
   const title = isRTL ? "اختر نوع مشروعك" : "Select your project type";
-  const helper = isRTL
-    ? "اختر نموذج التعاقد الأنسب لطلبك الاستشاري."
-    : "Choose the engagement model that fits your consulting request.";
   const fieldsLabel = isRTL ? "مناسب ل" : "Best for";
 
   const iconSize = 36;
@@ -285,6 +407,9 @@ export default function ProjectTypeQuestion({
         >
           {title}
         </h2>
+        <div className="mt-3">
+          <SpecifiedInsighterBadge locale={locale} />
+        </div>
       </div>
 
       <div

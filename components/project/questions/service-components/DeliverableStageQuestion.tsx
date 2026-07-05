@@ -109,6 +109,23 @@ function addDaysToIsoDate(value: string, days: number): string {
   }
 }
 
+function formatIsoDateLabel(value: string, locale: WizardLocale): string {
+  if (!value) return ''
+
+  const [year, month, day] = value.split('-').map((part) => Number(part))
+  if (!year || !month || !day) return value
+
+  try {
+    return new Intl.DateTimeFormat(locale === 'ar' ? 'ar' : 'en', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
+    }).format(new Date(year, month - 1, day))
+  } catch {
+    return value
+  }
+}
+
 function normalizeProjectType(value: string | null): string | null {
   if (!value) return null
   if (value === 'urgent' || value === 'urgent_request') return 'urgent_request'
@@ -433,6 +450,11 @@ export default function DeliverableStageQuestion({
       ? getDateValidationMessage({ isRTL, stage, drafts, isUrgentProject })
       : null
   const reportTypeOptions = useMemo(() => getReportTypeOptions(locale), [locale])
+  const finalVersionMinDate = isUrgentProject
+    ? drafts.first_draft.date || addDaysIsoDate(1)
+    : addDaysToIsoDate(drafts.first_draft.date, 1) || addDaysIsoDate(1)
+  const showFinalVersionDateHelper =
+    stepKind === 'date' && stage === 'final_version'
 
   const updateCurrentDraft = (next: DeliverableStageDraft) => {
     setDrafts((prev) => {
@@ -556,14 +578,23 @@ export default function DeliverableStageQuestion({
       >
         {stepKind === 'date' ? (
           <div className="max-w-sm">
+            {showFinalVersionDateHelper ? (
+              <div className="mb-3 rounded-[10px] border border-amber-200 bg-amber-50/90 px-3 py-2 text-start text-xs font-semibold leading-relaxed text-amber-900">
+                {isRTL
+                  ? isUrgentProject
+                    ? `يمكن أن تكون النسخة النهائية في نفس يوم المسودة الأولى أو بعده: ${formatIsoDateLabel(drafts.first_draft.date, locale)}.`
+                    : `يجب أن تكون النسخة النهائية بعد تاريخ المسودة الأولى: ${formatIsoDateLabel(drafts.first_draft.date, locale)}.`
+                  : isUrgentProject
+                    ? `Final version can be the same day as the first draft or after it: ${formatIsoDateLabel(drafts.first_draft.date, locale)}.`
+                    : `Final version must be after the first draft date: ${formatIsoDateLabel(drafts.first_draft.date, locale)}.`}
+              </div>
+            ) : null}
             <InlineDateCalendar
               value={currentDraft.date}
               min={
                 stage === 'first_draft'
                   ? addDaysIsoDate(1)
-                  : isUrgentProject
-                    ? drafts.first_draft.date || addDaysIsoDate(1)
-                    : addDaysToIsoDate(drafts.first_draft.date, 1) || addDaysIsoDate(1)
+                  : finalVersionMinDate
               }
               max={isUrgentProject ? addDaysIsoDate(1) : undefined}
               onChange={(date) =>

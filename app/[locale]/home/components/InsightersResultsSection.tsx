@@ -6,6 +6,11 @@ import Link from 'next/link';
 import LoadingState from './LoadingState';
 import { IconRosetteDiscountCheckFilled } from '@tabler/icons-react';
 import { Rating, Pagination } from '@mantine/core';
+import {
+  specifiedInsighterProfileUuidQueryParam,
+  specifiedInsighterQueryParam,
+  specifiedInsighterRoleQueryParam,
+} from '@/components/project/specifiedInsighterProject';
 
 function getInitials(fullName: string, maxLetters = 2) {
   const cleaned = (fullName || '').trim();
@@ -24,6 +29,11 @@ function getInitials(fullName: string, maxLetters = 2) {
     .map((p) => (Array.from(p)[0] ?? ''))
     .join('')
     .toUpperCase();
+}
+
+function isReceiveProjectServicesActive(value: unknown, activeFlag?: unknown) {
+  if (activeFlag === true) return true;
+  return typeof value === 'string' && value.toLowerCase() === 'active';
 }
 
 // Import existing SearchResultItem type or define a compatible type
@@ -47,11 +57,19 @@ export interface InsighterProfile {
     name: string;
     flag: string;
   };
+  receive_project_services?: 'active' | 'inactive' | string | null;
+  receive_project_services_active?: boolean;
 }
+
+type InsighterSearchResult = Partial<InsighterProfile> & {
+  id?: string | number;
+  photo?: string | null;
+  image?: string | null;
+};
 
 interface InsightersResultsSectionProps {
   searchQuery: string;
-  searchResults: any[]; // Accept any array and we'll handle type checking internally
+  searchResults: unknown[];
   loading: boolean;
   currentPage: number;
   setCurrentPage: (page: number) => void;
@@ -63,7 +81,6 @@ interface InsightersResultsSectionProps {
 }
 
 const InsightersResultsSection: React.FC<InsightersResultsSectionProps> = ({
-  searchQuery,
   searchResults,
   loading,
   currentPage,
@@ -93,9 +110,12 @@ const InsightersResultsSection: React.FC<InsightersResultsSectionProps> = ({
               <div className={`grid grid-cols-1 md:grid-cols-2 gap-6 px-10 ${
                 filtersVisible ? 'lg:grid-cols-3' : 'lg:grid-cols-4'
               }`}>
-                {searchResults.map((insighter) => {
+                {searchResults.map((rawInsighter) => {
+                  const insighter = (
+                    rawInsighter && typeof rawInsighter === 'object' ? rawInsighter : {}
+                  ) as InsighterSearchResult;
                   // Extract properties safely with fallbacks
-                  const uuid = insighter.uuid || insighter.id || '';
+                  const uuid = String(insighter.uuid || insighter.id || '');
                   const name = insighter.name || '';
                   const photoUrl = insighter.profile_photo_url || insighter.photo || insighter.image || null;
                   const roles = insighter.roles || [];
@@ -105,6 +125,21 @@ const InsightersResultsSection: React.FC<InsightersResultsSectionProps> = ({
                   const reviewsSummary = insighter.reviews_summary || { count: 0, average: 0 };
                   const company = insighter.company;
                   const country = insighter.country;
+                  const canRequestService = Boolean(uuid) && isReceiveProjectServicesActive(
+                    insighter.receive_project_services,
+                    insighter.receive_project_services_active
+                  );
+                  const specifiedInsighterRole =
+                    (isCompany || isCompanyInsighter) && company?.uuid ? 'company' : 'insighter';
+                  const specifiedInsighterProfileUuid =
+                    specifiedInsighterRole === 'company' ? company?.uuid || uuid : uuid;
+                  const serviceRequestParams = new URLSearchParams({
+                    fresh: '1',
+                    [specifiedInsighterQueryParam]: uuid,
+                    [specifiedInsighterRoleQueryParam]: specifiedInsighterRole,
+                    [specifiedInsighterProfileUuidQueryParam]: specifiedInsighterProfileUuid,
+                  });
+                  const serviceRequestHref = `/${locale}/project/wizard/project-type?${serviceRequestParams.toString()}`;
                   
                   return (
                     <Link 
@@ -259,6 +294,17 @@ const InsightersResultsSection: React.FC<InsightersResultsSectionProps> = ({
                       </div>
                        {/* Action Buttons */}
                        <div className="flex flex-col gap-2 w-full">
+                          {canRequestService && (
+                            <Link
+                              href={serviceRequestHref}
+                              onClick={(e) => e.stopPropagation()}
+                              className="flex-1"
+                            >
+                              <button className="w-full bg-gradient-to-r from-blue-500 to-teal-400 text-xs text-white px-6 py-2 rounded-md font-medium hover:shadow-lg transition-all duration-300">
+                                {locale === 'ar' ? 'طلب خدمة' : 'Request a Service'}
+                              </button>
+                            </Link>
+                          )}
                           <Link
                             href={`/${locale}/profile/${uuid}?entity=insighter&tab=meet`}
                             onClick={(e) => e.stopPropagation()}

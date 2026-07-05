@@ -134,26 +134,14 @@ export default function DeadlineOfferQuestion({
     if (!dateValue) {
       setError(
         isRTL
-          ? 'يرجى اختيار تاريخ أو استخدام التخطي.'
-          : 'Please select a date or use skip.'
+          ? 'يرجى اختيار تاريخ.'
+          : 'Please select a date.'
       )
       return
     }
 
     try {
       window.sessionStorage.setItem(storageKey, dateValue)
-    } catch {
-      // ignore
-    }
-
-    await submitProposal()
-  }
-
-  const onSkip = async () => {
-    if (submitting) return
-
-    try {
-      window.sessionStorage.setItem(storageKey, '')
     } catch {
       // ignore
     }
@@ -265,15 +253,6 @@ export default function DeadlineOfferQuestion({
             </Link>
 
             <div className="flex items-center gap-3">
-              <button
-                type="button"
-                onClick={() => void onSkip()}
-                disabled={submitting}
-                className="btn-sm px-5 py-2 rounded-full text-slate-700 bg-white/80 hover:bg-white border border-slate-200 disabled:cursor-not-allowed disabled:opacity-60"
-              >
-                {isRTL ? 'تخطي' : 'Skip'}
-              </button>
-
               <button
                 type="button"
                 onClick={() => void onContinue()}

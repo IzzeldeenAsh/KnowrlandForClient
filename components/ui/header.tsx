@@ -19,6 +19,7 @@ import { useUserProfile } from '@/components/ui/header/hooks/useUserProfile';
 import { stopNotificationPolling } from '@/services/notifications.service';
 import { getAuthToken } from '@/lib/authToken'
 import { getCookieDomain as sharedGetCookieDomain, isSharedCookieHost } from '@/lib/cookieDomain'
+import { copyProjectWizardStorageLocale } from '@/components/project/wizardStorage'
 
 interface Industry {
   id: number;
@@ -405,6 +406,10 @@ export default function Header() {
     // Get the current path without locale prefix
     const currentPath = pathname.split('/').slice(2).join('/');
 
+    if (currentPath.startsWith('project/wizard')) {
+      copyProjectWizardStorageLocale(currentLocale, locale);
+    }
+
     // Get current query parameters
     const currentSearch = typeof window !== 'undefined' ? window.location.search : '';
 
@@ -577,7 +582,8 @@ export default function Header() {
                           leftSection: (
                             <button
                               type="submit"
-                              className="p-1 text-slate-300 hover:text-white transition-all duration-200 cursor-pointer"
+                              disabled={searchQuery.trim().length === 0}
+                              className="p-1 text-slate-300 hover:text-white transition-all duration-200 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:text-slate-300"
                               onClick={(e) => {
                                 e.stopPropagation();
                                 handleSearchSubmit(e as any);
@@ -591,7 +597,8 @@ export default function Header() {
                           rightSection: (
                             <button
                               type="submit"
-                              className="p-1 text-slate-300 hover:text-white transition-all duration-200 cursor-pointer"
+                              disabled={searchQuery.trim().length === 0}
+                              className="p-1 text-slate-300 hover:text-white transition-all duration-200 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:text-slate-300"
                               onClick={(e) => {
                                 e.stopPropagation();
                                 handleSearchSubmit(e as any);
@@ -652,7 +659,7 @@ export default function Header() {
                   </li>
                 )}
 
-                {/* Mobile search button - only show on smaller screens */}
+                {/* Mobile search button - only show on smaller screens when search bar is visible */}
                 {!shouldHideSearchBar() && (
                   <li className="xl:hidden mr-1 md:mr-2">
                     <button

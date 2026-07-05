@@ -4,6 +4,28 @@ function projectWizardStoragePrefix(locale: WizardLocale) {
   return `project:wizard:${locale}:`
 }
 
+function siblingWizardLocale(locale: WizardLocale) {
+  return String(locale || '').toLowerCase().startsWith('ar') ? 'en' : 'ar'
+}
+
+function listProjectWizardStorageKeys(locale: WizardLocale): string[] {
+  if (typeof window === 'undefined') return []
+
+  const prefix = projectWizardStoragePrefix(locale)
+  const keys: string[] = []
+
+  try {
+    for (let index = 0; index < window.sessionStorage.length; index += 1) {
+      const key = window.sessionStorage.key(index)
+      if (key?.startsWith(prefix)) keys.push(key)
+    }
+  } catch {
+    return []
+  }
+
+  return keys
+}
+
 export const projectWizardStorage = {
   projectTypeKey(locale: WizardLocale) {
     return `project:wizard:${locale}:projectType`
@@ -116,6 +138,15 @@ export const projectWizardStorage = {
   specifiedInsighterUuidKey(locale: WizardLocale) {
     return `project:wizard:${locale}:specifiedInsighterUuid`
   },
+  specifiedInsighterRoleKey(locale: WizardLocale) {
+    return `project:wizard:${locale}:specifiedInsighterRole`
+  },
+  specifiedInsighterProfileUuidKey(locale: WizardLocale) {
+    return `project:wizard:${locale}:specifiedInsighterProfileUuid`
+  },
+  specifiedInsighterDisplayKey(locale: WizardLocale) {
+    return `project:wizard:${locale}:specifiedInsighterDisplay`
+  },
   deadlineKey(locale: WizardLocale) {
     return `project:wizard:${locale}:deadline`
   },
@@ -125,13 +156,7 @@ export function clearProjectWizardStorage(locale: WizardLocale) {
   if (typeof window === 'undefined') return
 
   try {
-    const prefix = projectWizardStoragePrefix(locale)
-    const keysToRemove: string[] = []
-
-    for (let index = 0; index < window.sessionStorage.length; index += 1) {
-      const key = window.sessionStorage.key(index)
-      if (key?.startsWith(prefix)) keysToRemove.push(key)
-    }
+    const keysToRemove = listProjectWizardStorageKeys(locale)
 
     for (const key of keysToRemove) {
       window.sessionStorage.removeItem(key)
@@ -139,4 +164,50 @@ export function clearProjectWizardStorage(locale: WizardLocale) {
   } catch {
     // ignore storage access errors
   }
+}
+
+export function clearProjectWizardStorageLocalePair(locale: WizardLocale) {
+  clearProjectWizardStorage(locale)
+  clearProjectWizardStorage(siblingWizardLocale(locale))
+}
+
+export function hasProjectWizardStorage(locale: WizardLocale): boolean {
+  return listProjectWizardStorageKeys(locale).length > 0
+}
+
+export function copyProjectWizardStorageLocale(
+  sourceLocale: WizardLocale,
+  targetLocale: WizardLocale
+): boolean {
+  if (typeof window === 'undefined') return false
+
+  const sourcePrefix = projectWizardStoragePrefix(sourceLocale)
+  const targetPrefix = projectWizardStoragePrefix(targetLocale)
+  if (sourcePrefix === targetPrefix) return false
+
+  try {
+    const sourceKeys = listProjectWizardStorageKeys(sourceLocale)
+    if (sourceKeys.length === 0) return false
+
+    clearProjectWizardStorage(targetLocale)
+
+    for (const sourceKey of sourceKeys) {
+      const value = window.sessionStorage.getItem(sourceKey)
+      if (value === null) continue
+
+      const targetKey = `${targetPrefix}${sourceKey.slice(sourcePrefix.length)}`
+      window.sessionStorage.setItem(targetKey, value)
+    }
+
+    return true
+  } catch {
+    return false
+  }
+}
+
+export function ensureProjectWizardStorageForLocale(locale: WizardLocale): boolean {
+  if (typeof window === 'undefined') return false
+  if (hasProjectWizardStorage(locale)) return false
+
+  return copyProjectWizardStorageLocale(siblingWizardLocale(locale), locale)
 }

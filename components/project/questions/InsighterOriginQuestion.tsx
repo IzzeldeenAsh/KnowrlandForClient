@@ -151,8 +151,8 @@ export default function InsighterOriginQuestion({
     : 'What should be the origin of this insighter?'
 
   const subtitle = isRTL
-    ? 'اختر دولة واحدة أو منطقة واحدة.'
-    : 'Select one country or one region.'
+    ? 'اختر دولة واحدة أو منطقة واحدة، أو اجعلها لكل العالم.'
+    : 'Select one country, one region, or make it worldwide.'
 
   const shouldDeferPropertiesSync =
     nav.nextStepId === projectWizardStepIds.insighterExperience ||
@@ -323,6 +323,13 @@ export default function InsighterOriginQuestion({
       </span>
     ),
   }
+  const renderWorldwideIcon = ({ size }: { size: number }) => (
+    <span
+      className={`${iconBadgeBase} border-amber-200/80 bg-gradient-to-br from-amber-50 to-yellow-100/80 text-amber-600`}
+    >
+      <IconWorldFilled size={size * 0.58} />
+    </span>
+  )
 
   const onContinue = async () => {
     if (!originType || !originId || submitting) return
@@ -407,7 +414,21 @@ export default function InsighterOriginQuestion({
         </div>
 
         <div className="mt-6 sm:mt-20" role="radiogroup" aria-label={title}>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+            <ChoiceCard
+              checked={false}
+              title={isRTL ? 'كل العالم' : 'Worldwide'}
+              renderIcon={renderWorldwideIcon}
+              onSelect={() => void onSkip()}
+              entered={entered}
+              isRTL={isRTL}
+              delayMs={110}
+              align="center"
+              size="sm"
+              className="min-h-[150px]"
+              iconSize={56}
+              iconStroke={1.6}
+            />
             {originOptions.map((option, index) => (
               <ChoiceCard
                 key={option.value}
@@ -417,7 +438,7 @@ export default function InsighterOriginQuestion({
                 onSelect={() => void onSelectOriginType(option.value)}
                 entered={entered}
                 isRTL={isRTL}
-                delayMs={110 + index * 70}
+                delayMs={180 + index * 70}
                 align="center"
                 size="sm"
                 className="min-h-[150px]"

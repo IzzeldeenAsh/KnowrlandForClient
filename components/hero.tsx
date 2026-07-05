@@ -329,7 +329,8 @@ export default function Hero() {
                         {/* Search button */}
                         <button
                           type="submit"
-                          className="ml-2 bg-blue-600 text-white p-2 rounded-md flex items-center justify-center hover:bg-blue-700 transition duration-300"
+                          disabled={searchInput.trim().length === 0}
+                          className="ml-2 bg-blue-600 text-white p-2 rounded-md flex items-center justify-center hover:bg-blue-700 transition duration-300 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-blue-600"
                           aria-label="Search"
                         >
                           <svg

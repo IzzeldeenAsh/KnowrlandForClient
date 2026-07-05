@@ -9,7 +9,7 @@ import React, { useEffect, useState, useRef, Suspense } from "react";
 import axios from "axios";
 
 import Stripes from "@/public/images/stripes-dark.svg";
-import { Avatar, Container, Tabs, Group, Text, Tooltip } from "@mantine/core";
+import { Avatar, Button, Container, Tabs, Group, Modal, Text, Tooltip } from "@mantine/core";
 import { useParams, useRouter } from "next/navigation";
 import {
   IconRosetteDiscountCheckFilled,
@@ -38,7 +38,11 @@ import LinkedinSocialIcon from "@/app/components/icons/social/LinkedinSocialIcon
 import YoutubeSocialIcon from "@/app/components/icons/social/YoutubeSocialIcon";
 import XSocialIcon from "@/app/components/icons/social/XSocialIcon";
 import TiktokSocialIcon from "@/app/components/icons/social/TiktokSocialIcon";
-import { specifiedInsighterQueryParam } from "@/components/project/specifiedInsighterProject";
+import {
+  specifiedInsighterProfileUuidQueryParam,
+  specifiedInsighterQueryParam,
+  specifiedInsighterRoleQueryParam,
+} from "@/components/project/specifiedInsighterProject";
 
 
 
@@ -253,6 +257,8 @@ function ProfilePageContent() {
     useState<InsighterStatistics | null>(null);
   const [companyServiceTarget, setCompanyServiceTarget] =
     useState<CompanyServiceTarget | null>(null);
+  const [selfServiceRequestModalOpen, setSelfServiceRequestModalOpen] =
+    useState(false);
 
   const params = useParams();
   const searchParams = useSearchParams();
@@ -939,12 +945,28 @@ function ProfilePageContent() {
     : profileData?.receive_project_services_active === true;
   const isRequestingOwnService =
     Boolean(currentUserUuid) && currentUserUuid === specifiedInsighterUuid;
+  const shouldShowRequestServiceButton =
+    authChecked && receiveProjectServicesActive && Boolean(specifiedInsighterUuid);
   const canRequestSpecifiedInsighterProject =
     authChecked &&
     !isRequestingOwnService &&
     receiveProjectServicesActive &&
     Boolean(specifiedInsighterUuid);
-  const specifiedInsighterProjectHref = `/${locale}/project/wizard/project-type?fresh=1&${specifiedInsighterQueryParam}=${encodeURIComponent(specifiedInsighterUuid)}`;
+  const specifiedInsighterDisplayRole =
+    shouldUseCompanyServiceTarget || (!isViewingInsighterEntity && isCompany)
+      ? "company"
+      : "insighter";
+  const specifiedInsighterProfileUuid =
+    specifiedInsighterDisplayRole === "company"
+      ? profileData?.company?.uuid || uuid
+      : profileData?.uuid || uuid;
+  const specifiedInsighterProjectParams = new URLSearchParams({
+    fresh: "1",
+    [specifiedInsighterQueryParam]: specifiedInsighterUuid,
+    [specifiedInsighterRoleQueryParam]: specifiedInsighterDisplayRole,
+    [specifiedInsighterProfileUuidQueryParam]: specifiedInsighterProfileUuid,
+  });
+  const specifiedInsighterProjectHref = `/${locale}/project/wizard/project-type?${specifiedInsighterProjectParams.toString()}`;
   const requestServiceButtonLabel =
     isCompanyInsighter && profileData?.company?.legal_name
       ? locale === "ar"
@@ -1268,6 +1290,26 @@ function ProfilePageContent() {
             />
           </div>
         )}
+        <Modal
+          opened={selfServiceRequestModalOpen}
+          onClose={() => setSelfServiceRequestModalOpen(false)}
+          centered
+          title={locale === "ar" ? "طلب خدمة" : "Request Service"}
+        >
+          <Text size="sm" c="dimmed">
+            {locale === "ar"
+              ? "لا يمكنك طلب خدمة من نفسك."
+              : "You can't request a service from yourself."}
+          </Text>
+          <Group justify="flex-end" mt="md">
+            <Button
+              className="bg-gradient-to-r from-blue-500 to-teal-400 hover:from-blue-600 hover:to-teal-500 transition-all"
+              onClick={() => setSelfServiceRequestModalOpen(false)}
+            >
+              {locale === "ar" ? "حسنًا" : "OK"}
+            </Button>
+          </Group>
+        </Modal>
         {/* Decorative elements */}
         <div className="relative z-0 w-full overflow-hidden">
           <div
@@ -1632,7 +1674,16 @@ function ProfilePageContent() {
 
                         {/* Action Buttons */}
                         <div className="flex flex-wrap gap-3 mb-4 justify-center md:justify-start">
-                          {canRequestSpecifiedInsighterProject && (
+                          {shouldShowRequestServiceButton && isRequestingOwnService ? (
+                            <button
+                              type="button"
+                              onClick={() => setSelfServiceRequestModalOpen(true)}
+                              className="inline-flex items-center gap-2 rounded-md bg-gradient-to-r from-blue-500 to-teal-400 px-3 py-2 text-xs font-medium text-white transition-all duration-200 hover:-translate-y-0.5 hover:from-blue-600 hover:to-teal-500 hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-sky-300"
+                            >
+                              <IconBriefcase size={16} stroke={2} />
+                              <span>{requestServiceButtonLabel}</span>
+                            </button>
+                          ) : canRequestSpecifiedInsighterProject ? (
                             <Link
                               href={specifiedInsighterProjectHref}
                               className="inline-flex items-center gap-2 rounded-md bg-gradient-to-r from-blue-500 to-teal-400 px-3 py-2 text-xs font-medium text-white transition-all duration-200 hover:-translate-y-0.5 hover:from-blue-600 hover:to-teal-500 hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-sky-300"
@@ -1640,7 +1691,7 @@ function ProfilePageContent() {
                               <IconBriefcase size={16} stroke={2} />
                               <span>{requestServiceButtonLabel}</span>
                             </Link>
-                          )}
+                          ) : null}
                         </div>
                       </div>
 

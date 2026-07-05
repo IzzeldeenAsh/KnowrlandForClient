@@ -229,8 +229,8 @@ function AiScopePromptComposer({
             }
           }}
           rows={2}
-          dir="auto"
-          className="ai-service-input min-h-[60px] w-full resize-none border-0 bg-transparent px-1 py-1 text-sm font-medium text-slate-900 outline-none focus:ring-0 placeholder:text-xs placeholder:text-slate-400"
+          dir={isRTL ? 'rtl' : 'ltr'}
+          className={`ai-service-input min-h-[60px] w-full resize-none border-0 bg-transparent px-1 py-1 text-sm font-medium text-slate-900 outline-none focus:ring-0 placeholder:text-xs placeholder:text-slate-400 ${isRTL ? 'text-right' : 'text-left'}`}
           placeholder={isRTL ? 'صف خدمتك...' : 'Describe your service...'}
         />
 
