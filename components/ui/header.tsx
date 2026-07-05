@@ -29,7 +29,7 @@ interface Industry {
 }
 
 // Global cache for industries to prevent duplicate API calls
-let industriesCache: {
+const industriesCache: {
   data: Industry[];
   lastFetchTime: number;
   isLoading: boolean;
@@ -250,8 +250,12 @@ export default function Header() {
   // Handle search input submission
   const handleSearchSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    if (!searchQuery.trim()) return;
+
     handleSearch(searchQuery);
   };
+
+  const hasSearchQuery = searchQuery.trim().length > 0;
 
   const isProjectRoute = (): boolean => {
     const pathSegments = pathname.split('/').filter(segment => segment !== '');
@@ -579,34 +583,26 @@ export default function Header() {
                       // Position search icon based on locale - right for LTR, left for RTL
                       {...(currentLocale === 'ar'
                         ? {
-                          leftSection: (
+                          leftSection: hasSearchQuery ? (
                             <button
                               type="submit"
-                              disabled={searchQuery.trim().length === 0}
-                              className="p-1 text-slate-300 hover:text-white transition-all duration-200 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:text-slate-300"
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                handleSearchSubmit(e as any);
-                              }}
+                              className="p-1 text-slate-300 hover:text-white transition-all duration-200 cursor-pointer"
+                              aria-label="Search"
                             >
                               <IconSearch size={16} />
                             </button>
-                          )
+                          ) : undefined
                         }
                         : {
-                          rightSection: (
+                          rightSection: hasSearchQuery ? (
                             <button
                               type="submit"
-                              disabled={searchQuery.trim().length === 0}
-                              className="p-1 text-slate-300 hover:text-white transition-all duration-200 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:text-slate-300"
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                handleSearchSubmit(e as any);
-                              }}
+                              className="p-1 text-slate-300 hover:text-white transition-all duration-200 cursor-pointer"
+                              aria-label="Search"
                             >
                               <IconSearch size={16} />
                             </button>
-                          )
+                          ) : undefined
                         }
                       )}
                       styles={{

@@ -416,57 +416,89 @@ export default async function KnowledgePage({ params }: Props) {
                   </div>
                 </div>
               </div>
-              <div className="flex flex-wrap gap-4 sm:gap-6 text-sm mt-4">
-                {
-                  (knowledge.insighter?.roles?.includes('company') || knowledge.insighter?.roles?.includes('company-insighter')) ? (
-                    // Company display
-                    <>
-                      <div className="relative w-[40px] h-[40px] sm:w-[50px] sm:h-[50px]">
-                        <Link href={`/${locale}/profile/${knowledge.insighter.company?.uuid || knowledge.insighter.uuid}?entity=company`} className="block h-full">
-                          {knowledge.insighter.company?.logo ? (
-                            <Image
-                              src={knowledge.insighter.company.logo}
-                              alt={`${knowledge.insighter.company.legal_name || 'Company'} logo - ${knowledge.title} publisher`}
-                              fill={true}
-                              sizes="(max-width: 640px) 40px, 50px"
-                              className="rounded-full object-cover object-top"
-                            />
-                          ) : (
-                            <div className="w-full h-full rounded-full bg-blue-500 flex items-center justify-center">
-                              <span className="text-sm sm:text-lg text-white font-semibold">
-                                {(knowledge.insighter.company?.legal_name || 'C')
-                                  .split(" ")
-                                  .map((word: string) => word[0])
-                                  .join("")
-                                  .toUpperCase()}
-                              </span>
-                            </div>
-                          )}
-                        </Link>
-                      </div>
-                      <span className="flex flex-col">
-                        <span className="text-sm text-gray-500">{translations.company}</span>
-                        <span className="text-sm font-bold text-gray-700">
-                          <Link className="hover:text-blue-600" href={`/${locale}/profile/${knowledge.insighter.company?.uuid || knowledge.insighter.uuid}`}>
-                            {knowledge.insighter.company?.legal_name || knowledge.insighter.name}
-                          </Link>
-                        </span>
-                      </span>
-                      <div className="flex flex-col ps-4 sm:ps-8 mt-2 sm:mt-0">
-                        <span className="text-gray-500 text-sm">{translations.publishedBy}</span>
-                        <div className="flex items-center gap-2">
-                          <div className="relative w-[18px] h-[18px] sm:w-[20px] sm:h-[20px]">
-                            {knowledge.insighter.profile_photo_url ? (
+              <div className="mt-4 flex flex-col gap-3 text-sm">
+                <div className="flex flex-wrap gap-4 sm:gap-6">
+                  {
+                    (knowledge.insighter?.roles?.includes('company') || knowledge.insighter?.roles?.includes('company-insighter')) ? (
+                      // Company display
+                      <>
+                        <div className="relative w-[40px] h-[40px] sm:w-[50px] sm:h-[50px]">
+                          <Link href={`/${locale}/profile/${knowledge.insighter.company?.uuid || knowledge.insighter.uuid}?entity=company`} className="block h-full">
+                            {knowledge.insighter.company?.logo ? (
                               <Image
-                                src={knowledge.insighter.profile_photo_url}
-                                alt={`${knowledge.insighter.name} profile photo - ${knowledge.title} author`}
+                                src={knowledge.insighter.company.logo}
+                                alt={`${knowledge.insighter.company.legal_name || 'Company'} logo - ${knowledge.title} publisher`}
                                 fill={true}
-                                sizes="20px"
+                                sizes="(max-width: 640px) 40px, 50px"
                                 className="rounded-full object-cover object-top"
                               />
                             ) : (
                               <div className="w-full h-full rounded-full bg-blue-500 flex items-center justify-center">
-                                <span className="text-[6px] sm:text-[8px] text-white font-semibold">
+                                <span className="text-sm sm:text-lg text-white font-semibold">
+                                  {(knowledge.insighter.company?.legal_name || 'C')
+                                    .split(" ")
+                                    .map((word: string) => word[0])
+                                    .join("")
+                                    .toUpperCase()}
+                                </span>
+                              </div>
+                            )}
+                          </Link>
+                        </div>
+                        <span className="flex flex-col">
+                          <span className="text-sm text-gray-500">{translations.company}</span>
+                          <span className="text-sm font-bold text-gray-700">
+                            <Link className="hover:text-blue-600" href={`/${locale}/profile/${knowledge.insighter.company?.uuid || knowledge.insighter.uuid}`}>
+                              {knowledge.insighter.company?.legal_name || knowledge.insighter.name}
+                            </Link>
+                          </span>
+                        </span>
+                        <div className="flex flex-col ps-4 sm:ps-8 mt-2 sm:mt-0">
+                          <span className="text-gray-500 text-sm">{translations.publishedBy}</span>
+                          <div className="flex items-center gap-2">
+                            <div className="relative w-[18px] h-[18px] sm:w-[20px] sm:h-[20px]">
+                              {knowledge.insighter.profile_photo_url ? (
+                                <Image
+                                  src={knowledge.insighter.profile_photo_url}
+                                  alt={`${knowledge.insighter.name} profile photo - ${knowledge.title} author`}
+                                  fill={true}
+                                  sizes="20px"
+                                  className="rounded-full object-cover object-top"
+                                />
+                              ) : (
+                                <div className="w-full h-full rounded-full bg-blue-500 flex items-center justify-center">
+                                  <span className="text-[6px] sm:text-[8px] text-white font-semibold">
+                                    {knowledge.insighter.name
+                                      .split(" ")
+                                      .map((word: string) => word[0])
+                                      .join("")
+                                      .toUpperCase()}
+                                  </span>
+                                </div>
+                              )}
+                            </div>
+                            <Link className="hover:text-blue-600 text-sm capitalize" href={`/${locale}/profile/${knowledge.insighter.uuid}?entity=insighter`}>
+                              {knowledge.insighter.name.toLowerCase()}
+                            </Link>
+                          </div>
+                        </div>
+                      </>
+                    ) : (
+                      // Original insighter display
+                      <>
+                        <div className="relative w-[40px] h-[40px] sm:w-[50px] sm:h-[50px]">
+                          <Link href={`/${locale}/profile/${knowledge.insighter.uuid}?entity=insighter`} className="block h-full">
+                            {knowledge.insighter.profile_photo_url ? (
+                              <Image
+                                src={knowledge.insighter.profile_photo_url}
+                                alt={`${knowledge.insighter.name} profile photo - ${knowledge.title} insighter`}
+                                fill={true}
+                                sizes="(max-width: 640px) 40px, 50px"
+                                className="rounded-full object-cover object-top"
+                              />
+                            ) : (
+                              <div className="w-full h-full rounded-full bg-blue-500 flex items-center justify-center">
+                                <span className="text-sm sm:text-lg text-white font-semibold">
                                   {knowledge.insighter.name
                                     .split(" ")
                                     .map((word: string) => word[0])
@@ -475,100 +507,68 @@ export default async function KnowledgePage({ params }: Props) {
                                 </span>
                               </div>
                             )}
-                          </div>
-                          <Link className="hover:text-blue-600 text-sm capitalize" href={`/${locale}/profile/${knowledge.insighter.uuid}?entity=insighter`}>
-                            {knowledge.insighter.name.toLowerCase()}
                           </Link>
                         </div>
-                      </div>
-                    </>
-                  ) : (
-                    // Original insighter display
-                    <>
-                      <div className="relative w-[40px] h-[40px] sm:w-[50px] sm:h-[50px]">
-                        <Link href={`/${locale}/profile/${knowledge.insighter.uuid}?entity=insighter`} className="block h-full">
-                          {knowledge.insighter.profile_photo_url ? (
-                            <Image
-                              src={knowledge.insighter.profile_photo_url}
-                              alt={`${knowledge.insighter.name} profile photo - ${knowledge.title} insighter`}
-                              fill={true}
-                              sizes="(max-width: 640px) 40px, 50px"
-                              className="rounded-full object-cover object-top"
-                            />
-                          ) : (
-                            <div className="w-full h-full rounded-full bg-blue-500 flex items-center justify-center">
-                              <span className="text-sm sm:text-lg text-white font-semibold">
-                                {knowledge.insighter.name
-                                  .split(" ")
-                                  .map((word: string) => word[0])
-                                  .join("")
-                                  .toUpperCase()}
-                              </span>
-                            </div>
-                          )}
-                        </Link>
-                      </div>
-                      <span className="flex flex-col">
-                        <span className="text-sm text-gray-500">{translations.insighter}</span>
-                        <span className="text-sm font-bold text-gray-700">
-                          <Link className="hover:text-blue-600" href={`/${locale}/profile/${knowledge.insighter.uuid}?entity=insighter`}>
-                            {knowledge.insighter.name}
-                          </Link>
+                        <span className="flex flex-col">
+                          <span className="text-sm text-gray-500">{translations.insighter}</span>
+                          <span className="text-sm font-bold text-gray-700">
+                            <Link className="hover:text-blue-600" href={`/${locale}/profile/${knowledge.insighter.uuid}?entity=insighter`}>
+                              {knowledge.insighter.name}
+                            </Link>
+                          </span>
                         </span>
-                      </span>
-                    </>
-                  )}
-                <div className="flex flex-col ps-4 sm:ps-8 mt-2 sm:mt-0">
-                  <span className="text-gray-500 text-sm">{translations.published}</span>
-                  <span className="text-sm font-bold text-gray-700" style={{ direction: isRTL ? 'ltr' : 'ltr' }}>
-                    {knowledge.published_at === null
-                      ? "N/A"
-                      : (() => {
-                        const date = new Date(knowledge.published_at);
-                        // Always format as "09 Jan 2026"
-                        const day = date.getDate().toString().padStart(2, '0');
-                        // Use en-US for LTR, use 'en-GB' for RTL (so the order is dd MMM yyyy for RTL)
-                        const effectiveLocale = isRTL ? 'en-GB' : (locale || 'en-US');
-                        const month = date
-                          .toLocaleString(effectiveLocale, { month: "short" });
-                        const year = date.getFullYear();
-                        // For RTL locales, swap the order: always day month year
-                        return `${day} ${month} ${year}`;
-                      })()}
-                  </span>
-                </div>
-                <div className="flex items-center ps-4 sm:ps-8 mt-2 sm:mt-0">
-                  <KnowledgeAuthorActions
-                    locale={locale}
-                    isOwner={knowledge.is_owner}
-                    insighter={knowledge.insighter}
-                  />
-                </div>
-                {knowledge.review && knowledge.review.length > 0 && (
+                      </>
+                    )}
                   <div className="flex flex-col ps-4 sm:ps-8 mt-2 sm:mt-0">
-                    <span className="text-gray-500 text-sm">{translations.rating}</span>
-                    <div className="flex items-center">
-                      {(() => {
-                        // Calculate average rating, capping individual ratings at 5
-                        const validRatings = knowledge.review
-                          .map((review: { rate?: number }) => Math.min(5, review.rate || 0))
-                          .filter((rate: number) => !isNaN(rate) && rate > 0);
-
-                        const avgRating = validRatings.length > 0
-                          ? validRatings.reduce((sum: number, rate: number) => sum + rate, 0) / validRatings.length
-                          : 0;
-
-                        return (
-                          <>
-                            <Rating value={avgRating} fractions={2} readOnly size="sm" />
-                            <span className="text-xs text-gray-500 ml-1">{avgRating.toFixed(1)} ({knowledge.review.length})</span>
-                          </>
-                        );
-                      })()}
-                    </div>
+                    <span className="text-gray-500 text-sm">{translations.published}</span>
+                    <span className="text-sm font-bold text-gray-700" style={{ direction: isRTL ? 'ltr' : 'ltr' }}>
+                      {knowledge.published_at === null
+                        ? "N/A"
+                        : (() => {
+                          const date = new Date(knowledge.published_at);
+                          // Always format as "09 Jan 2026"
+                          const day = date.getDate().toString().padStart(2, '0');
+                          // Use en-US for LTR, use 'en-GB' for RTL (so the order is dd MMM yyyy for RTL)
+                          const effectiveLocale = isRTL ? 'en-GB' : (locale || 'en-US');
+                          const month = date
+                            .toLocaleString(effectiveLocale, { month: "short" });
+                          const year = date.getFullYear();
+                          // For RTL locales, swap the order: always day month year
+                          return `${day} ${month} ${year}`;
+                        })()}
+                    </span>
                   </div>
-                )}
+                  {knowledge.review && knowledge.review.length > 0 && (
+                    <div className="flex flex-col ps-4 sm:ps-8 mt-2 sm:mt-0">
+                      <span className="text-gray-500 text-sm">{translations.rating}</span>
+                      <div className="flex items-center">
+                        {(() => {
+                          // Calculate average rating, capping individual ratings at 5
+                          const validRatings = knowledge.review
+                            .map((review: { rate?: number }) => Math.min(5, review.rate || 0))
+                            .filter((rate: number) => !isNaN(rate) && rate > 0);
 
+                          const avgRating = validRatings.length > 0
+                            ? validRatings.reduce((sum: number, rate: number) => sum + rate, 0) / validRatings.length
+                            : 0;
+
+                          return (
+                            <>
+                              <Rating value={avgRating} fractions={2} readOnly size="sm" />
+                              <span className="text-xs text-gray-500 ml-1">{avgRating.toFixed(1)} ({knowledge.review.length})</span>
+                            </>
+                          );
+                        })()}
+                      </div>
+                    </div>
+                  )}
+                </div>
+                <KnowledgeAuthorActions
+                  locale={locale}
+                  isOwner={knowledge.is_owner}
+                  insighter={knowledge.insighter}
+                  className="mt-4 w-full justify-start"
+                />
               </div>
             </div>
           </div>

@@ -183,7 +183,7 @@ export default function KnowledgeAuthorActions({
     "inline-flex max-h-[34px] items-center justify-center gap-2 rounded-md bg-[rgb(56_159_227)] px-3 py-1.5 text-center text-sm font-semibold text-white transition-colors hover:bg-[rgb(42_139_203)] focus:outline-none focus:ring-2 focus:ring-blue-200";
 
   return (
-    <div className={`flex flex-wrap items-center justify-center gap-2 ${className}`}>
+    <div className={`flex flex-wrap items-center gap-2 ${className}`}>
       <Link href={meetHref} className={buttonClass}>
         <IconCalendarTime size={16} stroke={2} />
         <span className="capitalize">{meetLabel}</span>
