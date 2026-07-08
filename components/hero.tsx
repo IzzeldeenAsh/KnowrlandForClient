@@ -65,7 +65,7 @@ function Placeholder() {
 
   return (
     <div
-      className="absolute inset-y-0 flex items-center pointer-events-none text-gray-500 md:text-lg text-base px-5"
+      className="absolute inset-y-0 left-0 right-0 flex items-center pointer-events-none text-gray-500 text-sm sm:text-base md:text-lg leading-tight px-3 sm:px-5 whitespace-nowrap"
       dangerouslySetInnerHTML={{ __html: placeholderText }}
     />
   );
@@ -290,7 +290,7 @@ export default function Hero() {
                           onFocus={() => searchInput && suggestions.length > 0 && setShowSuggestions(true)}
                           onKeyDown={handleKeyDown}
                           //                            placeholder={window.innerWidth < 768 ? t('searchPlaceholderMobile') : t('searchPlaceholder')} // The native placeholder is removed.
-                          className="flex-1 outline-none bg-transparent border-none focus-outline-none focus:border-none focus:ring-0 md:text-lg text-base placeholder-transparent text-gray-800 w-full"
+                          className="flex-1 outline-none bg-transparent border-none focus-outline-none focus:border-none focus:ring-0 text-sm sm:text-base md:text-lg placeholder-transparent text-gray-800 w-full"
                           autoComplete="off"
                           dir={currentLocale === 'ar' ? 'rtl' : 'ltr'}
                         />

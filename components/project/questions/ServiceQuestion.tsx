@@ -445,6 +445,7 @@ export default function ServiceQuestion({ locale }: { locale: WizardLocale }) {
         JSON.stringify({})
       )
       window.sessionStorage.removeItem(projectWizardStorage.serviceManualScopesKey(locale))
+      window.sessionStorage.removeItem(projectWizardStorage.serviceAiSuggestedScopesKey(locale))
       window.sessionStorage.removeItem(
         projectWizardStorage.serviceManualSubscopesByScopeKey(locale)
       )
@@ -546,6 +547,9 @@ export default function ServiceQuestion({ locale }: { locale: WizardLocale }) {
           JSON.stringify({})
         )
         window.sessionStorage.removeItem(projectWizardStorage.serviceManualScopesKey(locale))
+        window.sessionStorage.removeItem(
+          projectWizardStorage.serviceAiSuggestedScopesKey(locale)
+        )
         window.sessionStorage.removeItem(
           projectWizardStorage.serviceManualSubscopesByScopeKey(locale)
         )

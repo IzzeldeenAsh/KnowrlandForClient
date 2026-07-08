@@ -10,10 +10,11 @@ import { IconCreditCard, IconCheck, IconLock, IconInfoCircle } from "@tabler/ico
 import PageIllustration from "@/components/page-illustration";
 import { downloadAccountKnowledge } from "@/lib/knowledgeDownload";
 import { Elements, PaymentElement, useElements, useStripe } from "@stripe/react-stripe-js";
+import { getStripePublishableKey } from "@/app/config";
 import styles from "./payment.module.css";
 
 // Initialize Stripe
-const stripePromise = loadStripe("pk_live_51RvbpYRIE7WtDi9SLKPBxKTPyTkULT1e36AZMOcmtUomKgW99akiph2PVg5mmUcPtyAjvlXwP1wy70OFvooJLpQc00CNQYKb96");
+const stripePromise = loadStripe(getStripePublishableKey());
 
 // File icon mapping function
 const getFileIconByExtension = (extension: string) => {

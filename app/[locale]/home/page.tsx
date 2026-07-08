@@ -1,6 +1,7 @@
 'use client'
 
 import React, { useState, useEffect, useCallback, useRef } from 'react'
+import Image from 'next/image';
 import { useParams, useSearchParams, useRouter } from 'next/navigation';
 import { useToast } from '@/components/toast/ToastContext';
 import PageIllustration from "@/components/page-illustration";
@@ -14,6 +15,8 @@ import SearchBar from './components/SearchBar';
 import ResultsSection from './components/ResultsSection';
 import InsightersResultsSection from './components/InsightersResultsSection';
 import FilterBox from './components/FilterBox';
+import ServiceRequestCTA from './components/ServiceRequestCTA';
+import MinimalFooter from './components/MinimalFooter';
 
 
 // Import utils
@@ -1778,7 +1781,7 @@ export default function HomePage() {
                 </div>
 
                 {/* Content (Hero + Controls + Results) */}
-                <div ref={contentScrollRef} className={`flex-1 h-full min-h-0 overflow-y-auto ${!hasSearched ? 'flex flex-col justify-center' : ''}`}>
+                <div ref={contentScrollRef} className={`flex-1 h-full min-h-0 overflow-y-auto ${!hasSearched ? 'grid grid-rows-[1fr_auto]' : ''}`}>
 
                   {/* Mobile floating Filters button — hidden until the user searches */}
                   <button
@@ -1796,8 +1799,11 @@ export default function HomePage() {
                   </button>
 
                   {/* Hero Banner Section (inside content column) */}
-                  <div className={`relative overflow-hidden ${hasSearched ? 'pt-5 pb-16' : 'py-10'}`}>
-                    <div className="absolute inset-0 z-0">
+                  <div
+                    className={`relative ${hasSearched ? 'overflow-hidden pt-5 pb-16' : 'pb-10 flex flex-col items-stretch justify-center'}`}
+                    style={!hasSearched ? { paddingTop: 'calc(var(--app-header-height, 80px) + 2.5rem)' } : undefined}
+                  >
+                    <div className="absolute inset-0 z-0 overflow-hidden">
                       <svg className="absolute right-0 top-0 h-full w-1/2 translate-x-1/3 transform text-white opacity-10" fill="none" viewBox="0 0 400 400">
                         <defs>
                           <pattern id="91c570bc-8fb3-48a2-a478-944f3c995113" x="0" y="0" width="20" height="20" patternUnits="userSpaceOnUse">
@@ -1808,8 +1814,13 @@ export default function HomePage() {
                       </svg>
                     </div>
 
-                    <div className="relative z-10 mx-auto max-w-7xl px-4 sm:px-6">
+                    <div className="relative z-10 mx-auto w-full max-w-7xl px-4 sm:px-6">
                       <div className="text-center">
+                        {!hasSearched && (
+                          <div className="mb-6 flex justify-center">
+                            <Image src="/images/logo.svg" alt="Insighta" width={56} height={56} priority />
+                          </div>
+                        )}
                         <div className="flex  flex-col align-center justify-center gap-2" style={{ lineHeight: '1.3' }}>
                           <h1 className="text-3xl sm:text-4xl md:text-4xl font-extrabold tracking-tight text-gray-900 text-center ">
                             {locale === 'ar' ? 'ابحث في التقارير والبيانات والرؤى' : 'Search data, reports, and insights'}
@@ -1845,7 +1856,12 @@ export default function HomePage() {
 
                       </div>
                     </div>
+
+                    {/* Service request CTA — only on the landing view (no active search) */}
+                    {!hasSearched && <ServiceRequestCTA locale={locale} />}
                   </div>
+
+                  {!hasSearched && <MinimalFooter locale={locale} />}
 
                   {/* Results section — only shown once the user has searched */}
                   {hasSearched && (() => {

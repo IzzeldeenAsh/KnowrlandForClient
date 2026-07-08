@@ -380,16 +380,23 @@ function coerceScopeParents(input: unknown): ScopeParent[] {
       const name =
         typeof raw === 'string' || typeof raw === 'number'
           ? String(raw).trim()
-          : String(raw?.name ?? raw?.title ?? raw?.label ?? '').trim()
+          : String(raw?.name ?? raw?.title ?? raw?.label ?? raw?.scope ?? '').trim()
       const id = coerceNumericIdOrHash(raw?.id, name || String(parentIndex))
-      const childrenRaw = raw?.children
+      const childrenRaw =
+        raw?.children ??
+        raw?.subscopes ??
+        raw?.sub_scopes ??
+        raw?.suggest_sub_scopes ??
+        raw?.suggested_sub_scopes
       const children: ScopeChild[] = Array.isArray(childrenRaw)
         ? childrenRaw
           .map((c: any, childIndex: number) => {
             const childName =
               typeof c === 'string' || typeof c === 'number'
                 ? String(c).trim()
-                : String(c?.name ?? c?.title ?? c?.label ?? '').trim()
+                : String(
+                    c?.name ?? c?.title ?? c?.label ?? c?.scope ?? c?.sub_scope ?? ''
+                  ).trim()
             return {
               id: coerceNumericIdOrHash(
                 c?.id,
@@ -441,6 +448,23 @@ function extractSuggestedScopesFromProjectRequest(json: unknown): ScopeParent[] 
   }
 
   return []
+}
+
+function persistAiSuggestedScopes(locale: WizardLocale, scopes: ScopeParent[]) {
+  try {
+    if (scopes.length > 0) {
+      window.sessionStorage.setItem(
+        projectWizardStorage.serviceAiSuggestedScopesKey(locale),
+        JSON.stringify(scopes)
+      )
+    } else {
+      window.sessionStorage.removeItem(
+        projectWizardStorage.serviceAiSuggestedScopesKey(locale)
+      )
+    }
+  } catch {
+    // ignore
+  }
 }
 
 // components are fetched after scope sync (next step)
@@ -593,36 +617,41 @@ export default function ProjectScopeQuestion({ locale }: { locale: WizardLocale 
               }
 
               if (intake.status === 'ready') {
-                activeController?.abort()
-                activeController = new AbortController()
+                let showList = extractSuggestedScopesFromProjectRequest(json)
 
-                const showRes = await fetch(
-                  getApiUrl(`/api/account/project/show/${projectUuid}`),
-                  {
-                    method: 'GET',
-                    headers: {
-                      Authorization: `Bearer ${token}`,
-                      Accept: 'application/json',
-                      'Accept-Language': locale === 'ar' ? 'ar' : 'en',
-                      'X-Timezone': Intl.DateTimeFormat().resolvedOptions().timeZone,
-                    },
-                    cache: 'no-store',
-                    signal: activeController.signal,
-                  }
-                )
+                if (showList.length === 0) {
+                  activeController?.abort()
+                  activeController = new AbortController()
 
-                await assertProjectApiResponse(
-                  showRes,
-                  isRTL
-                    ? 'تعذر تحميل النطاقات المقترحة.'
-                    : 'Failed to load suggested scopes.'
-                )
+                  const showRes = await fetch(
+                    getApiUrl(`/api/account/project/show/${projectUuid}`),
+                    {
+                      method: 'GET',
+                      headers: {
+                        Authorization: `Bearer ${token}`,
+                        Accept: 'application/json',
+                        'Accept-Language': locale === 'ar' ? 'ar' : 'en',
+                        'X-Timezone': Intl.DateTimeFormat().resolvedOptions().timeZone,
+                      },
+                      cache: 'no-store',
+                      signal: activeController.signal,
+                    }
+                  )
 
-                const showJson = (await showRes.json()) as unknown
-                const showList = extractSuggestedScopesFromProjectRequest(showJson)
+                  await assertProjectApiResponse(
+                    showRes,
+                    isRTL
+                      ? 'تعذر تحميل النطاقات المقترحة.'
+                      : 'Failed to load suggested scopes.'
+                  )
+
+                  const showJson = (await showRes.json()) as unknown
+                  showList = extractSuggestedScopesFromProjectRequest(showJson)
+                }
 
                 if (!cancelled) {
                   setScopes(showList)
+                  persistAiSuggestedScopes(locale, showList)
                   setAiMode('idle')
                 }
                 return
@@ -931,6 +960,7 @@ export default function ProjectScopeQuestion({ locale }: { locale: WizardLocale 
       window.sessionStorage.removeItem(projectWizardStorage.servicePromptKey(locale))
       window.sessionStorage.removeItem(projectWizardStorage.projectScopeSnapshotKey(locale))
       window.sessionStorage.removeItem(projectWizardStorage.serviceManualScopesKey(locale))
+      window.sessionStorage.removeItem(projectWizardStorage.serviceAiSuggestedScopesKey(locale))
       window.sessionStorage.removeItem(
         projectWizardStorage.serviceManualSubscopesByScopeKey(locale)
       )

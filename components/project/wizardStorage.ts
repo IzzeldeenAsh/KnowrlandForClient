@@ -117,6 +117,9 @@ export const projectWizardStorage = {
   serviceManualSubscopesByScopeKey(locale: WizardLocale) {
     return `project:wizard:${locale}:serviceManualSubscopesByScope`
   },
+  serviceAiSuggestedScopesKey(locale: WizardLocale) {
+    return `project:wizard:${locale}:serviceAiSuggestedScopes`
+  },
   serviceComponentsPayloadKey(locale: WizardLocale) {
     return `project:wizard:${locale}:serviceComponentsPayload`
   },

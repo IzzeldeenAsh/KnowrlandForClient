@@ -157,16 +157,23 @@ function coerceScopeParents(input: unknown): ScopeParent[] {
       const name =
         typeof raw === 'string' || typeof raw === 'number'
           ? String(raw).trim()
-          : String(raw?.name ?? raw?.title ?? raw?.label ?? '').trim()
+          : String(raw?.name ?? raw?.title ?? raw?.label ?? raw?.scope ?? '').trim()
       const id = coerceNumericIdOrHash(raw?.id, name || String(parentIndex))
-      const childrenRaw = raw?.children
+      const childrenRaw =
+        raw?.children ??
+        raw?.subscopes ??
+        raw?.sub_scopes ??
+        raw?.suggest_sub_scopes ??
+        raw?.suggested_sub_scopes
       const children: ScopeChild[] = Array.isArray(childrenRaw)
         ? childrenRaw
           .map((c: any, childIndex: number) => {
             const childName =
               typeof c === 'string' || typeof c === 'number'
                 ? String(c).trim()
-                : String(c?.name ?? c?.title ?? c?.label ?? '').trim()
+                : String(
+                    c?.name ?? c?.title ?? c?.label ?? c?.scope ?? c?.sub_scope ?? ''
+                  ).trim()
             return {
               id: coerceNumericIdOrHash(
                 c?.id,
@@ -218,6 +225,28 @@ function extractSuggestedScopesFromProjectRequest(json: unknown): ScopeParent[] 
   }
 
   return []
+}
+
+function safeParseStoredSuggestedScopes(value: string | null): ScopeParent[] {
+  if (!value) return []
+  try {
+    return coerceScopeParents(JSON.parse(value) as unknown)
+  } catch {
+    return []
+  }
+}
+
+function persistAiSuggestedScopes(locale: WizardLocale, scopes: ScopeParent[]) {
+  try {
+    if (scopes.length > 0) {
+      window.sessionStorage.setItem(
+        projectWizardStorage.serviceAiSuggestedScopesKey(locale),
+        JSON.stringify(scopes)
+      )
+    }
+  } catch {
+    // ignore
+  }
 }
 
 async function fetchServiceComponents(params: {
@@ -561,9 +590,23 @@ export default function ProjectSubscopesQuestion({ locale }: { locale: WizardLoc
       try {
         const isOther = serviceId === 10 || readServiceIsOther(locale)
 
+        if (isOther) {
+          const stored = safeParseStoredSuggestedScopes(
+            window.sessionStorage.getItem(
+              projectWizardStorage.serviceAiSuggestedScopesKey(locale)
+            )
+          )
+          if (stored.length > 0) {
+            if (!cancelled) setScopes(stored)
+            return
+          }
+        }
+
         const url = isOther
           ? projectUuid
-            ? getApiUrl(`/api/account/project/show/${projectUuid}`)
+            ? getApiUrl(
+                `/api/account/project/definition/ai-intake/check-clarification/${projectUuid}`
+              )
             : null
           : getApiUrl(`/api/common/setting/service/scope/${serviceId}`)
 
@@ -586,11 +629,35 @@ export default function ProjectSubscopesQuestion({ locale }: { locale: WizardLoc
         )
 
         const json = (await res.json()) as unknown
-        const list = isOther
+        let list = isOther
           ? extractSuggestedScopesFromProjectRequest(json)
           : coerceScopeParents((json as any)?.data)
 
-        if (!cancelled) setScopes(list || [])
+        if (isOther && list.length === 0 && projectUuid) {
+          const showRes = await fetch(getApiUrl(`/api/account/project/show/${projectUuid}`), {
+            method: 'GET',
+            headers: {
+              Authorization: `Bearer ${token}`,
+              Accept: 'application/json',
+              'Accept-Language': locale === 'ar' ? 'ar' : 'en',
+              'X-Timezone': Intl.DateTimeFormat().resolvedOptions().timeZone,
+            },
+            cache: 'no-store',
+          })
+
+          await assertProjectApiResponse(
+            showRes,
+            isRTL ? 'تعذر تحميل نطاقات الخدمة.' : 'Failed to load service scopes.'
+          )
+
+          const showJson = (await showRes.json()) as unknown
+          list = extractSuggestedScopesFromProjectRequest(showJson)
+        }
+
+        if (!cancelled) {
+          setScopes(list || [])
+          if (isOther) persistAiSuggestedScopes(locale, list || [])
+        }
       } catch (err) {
         if (!cancelled) {
           setError(
