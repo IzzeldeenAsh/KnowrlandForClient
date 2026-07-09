@@ -23,7 +23,7 @@ const MinimalFooter: React.FC<MinimalFooterProps> = ({ locale }) => {
   ];
 
   return (
-    <footer className="mt-auto bg-gray-100 text-sm text-gray-600" dir={isRTL ? 'rtl' : 'ltr'}>
+    <footer className="mt-auto bg-[rgb(224,237,250)] text-sm text-gray-600" dir={isRTL ? 'rtl' : 'ltr'}>
       <div className="flex flex-col items-center gap-3 px-6 py-3 sm:flex-row sm:justify-between">
         <ul className="flex flex-wrap items-center justify-center gap-x-6 gap-y-2 sm:justify-start">
           {leftLinks.map((link) => (

@@ -13,7 +13,7 @@
 
 /* Default header height to avoid layout jump before ResizeObserver runs */
 :root {
-  --app-header-height: 80px;
+  --app-header-height: 5px;
 }
 
 /* Additional Tailwind directives: https://tailwindcss.com/docs/functions-and-directives/#responsive */

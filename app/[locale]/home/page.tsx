@@ -1800,8 +1800,8 @@ export default function HomePage() {
 
                   {/* Hero Banner Section (inside content column) */}
                   <div
-                    className={`relative ${hasSearched ? 'overflow-hidden pt-5 pb-16' : 'pb-10 flex flex-col items-stretch justify-center'}`}
-                    style={!hasSearched ? { paddingTop: 'calc(var(--app-header-height, 80px) + 2.5rem)' } : undefined}
+                    className={`relative ${hasSearched ? 'overflow-hidden pt-1 pb-5' : 'pb-2 flex flex-col items-stretch justify-center'}`}
+                    style={!hasSearched ? { paddingTop: '25px' } : undefined}
                   >
                     <div className="absolute inset-0 z-0 overflow-hidden">
                       <svg className="absolute right-0 top-0 h-full w-1/2 translate-x-1/3 transform text-white opacity-10" fill="none" viewBox="0 0 400 400">

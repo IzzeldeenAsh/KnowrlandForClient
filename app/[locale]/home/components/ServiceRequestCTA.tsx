@@ -11,7 +11,7 @@ const ServiceRequestCTA: React.FC<ServiceRequestCTAProps> = ({ locale }) => {
   const isRTL = locale === 'ar';
 
   return (
-    <div className="relative mx-auto mt-4 max-w-4xl px-4 pb-16 sm:px-6" dir={isRTL ? 'rtl' : 'ltr'}>
+    <div className="relative mx-auto mt-4 max-w-4xl px-4 pb-5 sm:px-6" dir={isRTL ? 'rtl' : 'ltr'}>
       {/* Soft ambient glow behind the heading */}
       <div className="pointer-events-none absolute inset-x-0 top-0 flex justify-center" aria-hidden="true">
         <div className="h-64 w-[36rem] max-w-full rounded-full bg-gradient-to-r from-blue-400/10 via-teal-300/10 to-blue-400/10 blur-3xl" />
