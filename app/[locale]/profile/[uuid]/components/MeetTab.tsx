@@ -7,6 +7,9 @@ import {
   IconChevronRight,
   IconCalendarEvent,
   IconWallet,
+  IconVideo,
+  IconMapPin,
+  IconCheck,
 } from "@tabler/icons-react";
 import {
   Modal,
@@ -30,6 +33,10 @@ interface MeetingTime {
   start_time: string;
   end_time: string;
   rate: string;
+  place?: string;
+  place_name?: string;
+  available_places?: string[];
+  default_physical_location?: string | null;
 }
 
 interface MeetingAvailability {
@@ -190,6 +197,8 @@ export default function MeetTab({
 
   // Modal and booking states
   const [isBookingModalOpen, setIsBookingModalOpen] = useState(false);
+  const [isPlaceModalOpen, setIsPlaceModalOpen] = useState(false);
+  const [selectedPlace, setSelectedPlace] = useState<"online" | "physically" | null>(null);
   const [meetingTitle, setMeetingTitle] = useState("");
   const [meetingDescription, setMeetingDescription] = useState("");
   const [isBookingLoading, setIsBookingLoading] = useState(false);
@@ -294,6 +303,7 @@ export default function MeetTab({
     sp.set("title", meetingTitle || "");
     sp.set("description", meetingDescription || "");
     sp.set("payment_method", paymentMethod || "");
+    sp.set("place", selectedPlace || "");
 
     url.search = sp.toString();
     return url.toString();
@@ -325,6 +335,7 @@ export default function MeetTab({
       "title",
       "description",
       "payment_method",
+      "place",
     ];
     keys.forEach((k) => sp.delete(k));
     url.search = sp.toString();
@@ -343,6 +354,9 @@ export default function MeetTab({
     const meetTitle = sp.get("title");
     const meetDesc = sp.get("description");
     const meetPayment = sp.get("payment_method");
+    const meetPlaceRaw = sp.get("place");
+    const meetPlace =
+      meetPlaceRaw === "online" || meetPlaceRaw === "physically" ? meetPlaceRaw : null;
 
     const meetDate = normalizeDateKey(meetDateRaw);
     const meetStart = normalizeTimeKey(meetStartRaw);
@@ -358,6 +372,7 @@ export default function MeetTab({
       meetTitle || "",
       meetDesc || "",
       meetPayment || "",
+      meetPlace || "",
     ].join("|");
     if (processedMeetPrefillKey === currentKey) return;
 
@@ -395,6 +410,20 @@ export default function MeetTab({
 
     if (found) {
       handleTimeClick(found);
+
+      // Restore the session place. If it can't be determined and the slot offers
+      // both, fall back to the place-selection modal instead of the booking form.
+      const places = getAvailablePlaces(found);
+      if (meetPlace && places.includes(meetPlace)) {
+        setSelectedPlace(meetPlace);
+      } else if (places.length === 1) {
+        setSelectedPlace(places[0]);
+      } else {
+        setSelectedPlace(null);
+        setIsBookingModalOpen(false);
+        setIsPlaceModalOpen(true);
+      }
+
       // Only strip params after successful selection, so we don't lose them if slot isn't found
       stripMeetParamsFromUrl();
       setProcessedMeetPrefillKey(currentKey);
@@ -680,6 +709,7 @@ export default function MeetTab({
             meeting_date: selectedDate,
             start_time: selectedMeetingTime.start_time.substring(0, 5),
             end_time: selectedMeetingTime.end_time.substring(0, 5),
+            place: selectedPlace,
             title: meetingTitle || `Meeting with ${defaultName}`,
             description: meetingDescription || "No description provided",
             payment_method: isFree ? "free" : paymentMethod,
@@ -825,13 +855,46 @@ export default function MeetTab({
   };
 
   // Override the handleBookMeeting from props to open modal
+  // Resolve which places a slot allows. Falls back to the single `place` value
+  // (or online) when the API doesn't provide the explicit list.
+  const getAvailablePlaces = (time: MeetingTime | null): ("online" | "physically")[] => {
+    if (!time) return [];
+    const list =
+      Array.isArray(time.available_places) && time.available_places.length
+        ? time.available_places
+        : time.place === "both"
+          ? ["online", "physically"]
+          : time.place === "physically"
+            ? ["physically"]
+            : ["online"];
+    return list.filter(
+      (p): p is "online" | "physically" => p === "online" || p === "physically"
+    );
+  };
+
   const handleBookMeetingClick = () => {
+    const places = getAvailablePlaces(selectedMeetingTime);
+    // Pre-select the only option when there's no real choice; force a choice when both exist.
+    setSelectedPlace(places.length === 1 ? places[0] : null);
+    setIsPlaceModalOpen(true);
+  };
+
+  // Continue from the "session type" modal into the existing booking flow.
+  const proceedFromPlaceModal = () => {
+    if (!selectedPlace) return;
+    setIsPlaceModalOpen(false);
     setIsBookingModalOpen(true);
     setBookingStep(1);
   };
 
+  const closePlaceModal = () => {
+    setIsPlaceModalOpen(false);
+  };
+
   const closeBookingModal = () => {
     setIsBookingModalOpen(false);
+    setIsPlaceModalOpen(false);
+    setSelectedPlace(null);
     setHasCheckedDuplicate(false);
     setBookingStep(1);
     setClientSecret(null);
@@ -1079,6 +1142,122 @@ export default function MeetTab({
           </div>
         )}
 
+        {/* Session Type (Place) Selection Modal */}
+        <Modal
+          opened={isPlaceModalOpen}
+          onClose={closePlaceModal}
+          size="md"
+          centered
+          title={isRTL ? "اختر نوع الجلسة" : "Select session type"}
+        >
+          <div className="p-2" dir={isRTL ? "rtl" : "ltr"}>
+            {(() => {
+              const places = getAvailablePlaces(selectedMeetingTime);
+              const onlineAvailable = places.includes("online");
+              const onsiteAvailable = places.includes("physically");
+              const onlyOne = places.length === 1;
+              const physicalLocation = selectedMeetingTime?.default_physical_location || null;
+              const optionClass = (active: boolean, enabled: boolean) =>
+                `w-full flex items-center gap-3 border rounded-lg p-4 mb-3 text-start transition-all ${
+                  !enabled
+                    ? "opacity-50 cursor-not-allowed border-gray-200 dark:border-slate-700"
+                    : active
+                      ? "border-blue-500 bg-blue-50 dark:bg-slate-700 cursor-pointer"
+                      : "border-gray-200 dark:border-slate-700 hover:border-blue-300 cursor-pointer"
+                }`;
+              return (
+                <>
+                  <p className="text-sm text-gray-500 dark:text-gray-300 mb-4">
+                    {isRTL
+                      ? "اختر طريقة حضور هذه الجلسة."
+                      : "Choose how you'd like to attend this session."}
+                  </p>
+
+                  <button
+                    type="button"
+                    disabled={!onlineAvailable}
+                    onClick={() => onlineAvailable && setSelectedPlace("online")}
+                    className={optionClass(selectedPlace === "online", onlineAvailable)}
+                  >
+                    <IconVideo size={22} className="text-blue-500 shrink-0" />
+                    <div className="flex-1">
+                      <span className="font-medium block">
+                        {isRTL ? "عن بُعد" : "Online"}
+                      </span>
+                      {!onlineAvailable && (
+                        <span className="text-xs text-gray-400">
+                          {isRTL ? "غير متاح لهذه الجلسة" : "Not available for this session"}
+                        </span>
+                      )}
+                    </div>
+                    {selectedPlace === "online" && (
+                      <IconCheck size={20} className="text-blue-500 shrink-0" />
+                    )}
+                  </button>
+
+                  <button
+                    type="button"
+                    disabled={!onsiteAvailable}
+                    onClick={() => onsiteAvailable && setSelectedPlace("physically")}
+                    className={optionClass(selectedPlace === "physically", onsiteAvailable)}
+                  >
+                    <IconMapPin size={22} className="text-blue-500 shrink-0" />
+                    <div className="flex-1">
+                      <span className="font-medium block">
+                        {isRTL ? "حضورياً" : "On Site"}
+                      </span>
+                      {!onsiteAvailable ? (
+                        <span className="text-xs text-gray-400">
+                          {isRTL ? "غير متاح لهذه الجلسة" : "Not available for this session"}
+                        </span>
+                      ) : (
+                        physicalLocation && (
+                          <span className="text-xs text-gray-500 dark:text-gray-300">
+                            {physicalLocation}
+                          </span>
+                        )
+                      )}
+                    </div>
+                    {selectedPlace === "physically" && (
+                      <IconCheck size={20} className="text-blue-500 shrink-0" />
+                    )}
+                  </button>
+
+                  {onlyOne && (
+                    <p className="text-xs text-gray-500 dark:text-gray-300 mb-4">
+                      {isRTL
+                        ? `الخيار الوحيد المتاح لهذه الجلسة هو "${onlineAvailable ? "عن بُعد" : "حضورياً"}" .`
+                        : `Only "${onlineAvailable ? "Online" : "On Site"}" is available for this session.`}
+                    </p>
+                  )}
+
+                  <div className="flex gap-3 mt-2">
+                    <button
+                      type="button"
+                      onClick={closePlaceModal}
+                      className="flex-1 py-2.5 px-4 rounded-lg font-medium border border-gray-200 dark:border-slate-600 text-gray-600 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-slate-700"
+                    >
+                      {isRTL ? "إلغاء" : "Cancel"}
+                    </button>
+                    <button
+                      type="button"
+                      disabled={!selectedPlace}
+                      onClick={proceedFromPlaceModal}
+                      className={`flex-1 py-2.5 px-4 rounded-lg font-medium transition-colors ${
+                        selectedPlace
+                          ? "bg-blue-500 text-white hover:bg-blue-600"
+                          : "bg-gray-200 text-gray-400 cursor-not-allowed"
+                      }`}
+                    >
+                      {isRTL ? "متابعة" : "Continue"}
+                    </button>
+                  </div>
+                </>
+              );
+            })()}
+          </div>
+        </Modal>
+
         {/* Meeting Booking Modal */}
         <Modal
           opened={isBookingModalOpen}
@@ -1109,6 +1288,27 @@ export default function MeetTab({
                   {selectedMeetingTime.start_time.substring(0, 5)} -{" "}
                   {selectedMeetingTime.end_time.substring(0, 5)}
                 </p>
+                {selectedPlace && (
+                  <p className="mt-1 inline-flex items-center gap-1.5 text-sm font-medium text-blue-600 dark:text-blue-300">
+                    {selectedPlace === "physically" ? (
+                      <IconMapPin size={16} />
+                    ) : (
+                      <IconVideo size={16} />
+                    )}
+                    {selectedPlace === "physically"
+                      ? isRTL
+                        ? "حضورياً"
+                        : "On Site"
+                      : isRTL
+                        ? "عن بُعد"
+                        : "Online"}
+                  </p>
+                )}
+                {selectedPlace === "physically" && selectedMeetingTime.default_physical_location && (
+                  <p className="mt-0.5 text-xs text-gray-500 dark:text-gray-300">
+                    {selectedMeetingTime.default_physical_location}
+                  </p>
+                )}
                 <div className="mt-2 p-2 bg-white dark:bg-slate-600 rounded border">
                   <div className="flex justify-between items-center">
                     <span className="text-sm text-gray-600 dark:text-gray-300">

@@ -194,6 +194,10 @@ interface MeetingTime {
   start_time: string;
   end_time: string;
   rate: string;
+  place?: string;
+  place_name?: string;
+  available_places?: string[];
+  default_physical_location?: string | null;
 }
 
 interface MeetingAvailability {
