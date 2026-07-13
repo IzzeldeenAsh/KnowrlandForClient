@@ -9,19 +9,23 @@ import {
   IconWallet,
   IconVideo,
   IconMapPin,
-  IconCheck,
+  IconBrandWhatsapp,
+  IconInfoCircle,
 } from "@tabler/icons-react";
 import {
   Modal,
   TextInput,
   Textarea,
   Button,
+  Select,
+  Tooltip,
 } from "@mantine/core";
 import { useTranslations } from "next-intl";
 import { Elements, useStripe, useElements, PaymentElement } from "@stripe/react-stripe-js";
 import { loadStripe } from "@stripe/stripe-js";
 import { VisaIcon, MasterCardIcon, GooglePayIcon, ApplePayIcon } from "@/components/payment-icons";
 import { useUserProfile } from "@/app/lib/useUserProfile";
+import { useCountries } from "@/app/lib/useCountries";
 import { getAuthToken } from "@/lib/authToken";
 import { getStripePublishableKey } from "@/app/config";
 
@@ -187,7 +191,8 @@ export default function MeetTab({
   getDayName,
 }: MeetTabProps) {
   const t = useTranslations("ProfilePage");
-  const { roles } = useUserProfile();
+  const { roles, refreshProfile } = useUserProfile();
+  const { countries, isLoading: areCountriesLoading } = useCountries();
 
   // Check if user is client-only (has "client" role but not insighter, company, or company-insighter)
   const isClientOnlyUser =
@@ -197,7 +202,6 @@ export default function MeetTab({
 
   // Modal and booking states
   const [isBookingModalOpen, setIsBookingModalOpen] = useState(false);
-  const [isPlaceModalOpen, setIsPlaceModalOpen] = useState(false);
   const [selectedPlace, setSelectedPlace] = useState<"online" | "physically" | null>(null);
   const [meetingTitle, setMeetingTitle] = useState("");
   const [meetingDescription, setMeetingDescription] = useState("");
@@ -231,6 +235,29 @@ export default function MeetTab({
   const [showPaymentExpiredModal, setShowPaymentExpiredModal] = useState(false);
   const [authRedirectUrl, setAuthRedirectUrl] = useState<string | null>(null);
   const [processedMeetPrefillKey, setProcessedMeetPrefillKey] = useState<string | null>(null);
+  const [isWhatsAppModalOpen, setIsWhatsAppModalOpen] = useState(false);
+  const [isCheckingWhatsApp, setIsCheckingWhatsApp] = useState(false);
+  const [isSavingWhatsApp, setIsSavingWhatsApp] = useState(false);
+  const [whatsAppCountryCode, setWhatsAppCountryCode] = useState("");
+  const [whatsAppNumber, setWhatsAppNumber] = useState("");
+  const [whatsAppError, setWhatsAppError] = useState<string | null>(null);
+  const [notificationProfile, setNotificationProfile] = useState<Record<string, unknown> | null>(null);
+  const [hasVerifiedWhatsAppForBooking, setHasVerifiedWhatsAppForBooking] = useState(false);
+
+  const countryCodeOptions = React.useMemo(() => {
+    const uniqueCodes = new Set<string>();
+    return countries.reduce<{ value: string; label: string }[]>((options, country) => {
+      const code = String(country.international_code || "").replace(/^\+/, "");
+      if (!code || uniqueCodes.has(code)) return options;
+      uniqueCodes.add(code);
+      const name = country.names?.[isRTL ? "ar" : "en"] || country.name;
+      options.push({
+        value: code,
+        label: `${name} (+${code})`,
+      });
+      return options;
+    }, []);
+  }, [countries, isRTL]);
 
   // Fetch wallet balance when component mounts
   useEffect(() => {
@@ -411,8 +438,7 @@ export default function MeetTab({
     if (found) {
       handleTimeClick(found);
 
-      // Restore the session place. If it can't be determined and the slot offers
-      // both, fall back to the place-selection modal instead of the booking form.
+      // Restore the selected session type, or preselect the sole available type.
       const places = getAvailablePlaces(found);
       if (meetPlace && places.includes(meetPlace)) {
         setSelectedPlace(meetPlace);
@@ -420,8 +446,6 @@ export default function MeetTab({
         setSelectedPlace(places[0]);
       } else {
         setSelectedPlace(null);
-        setIsBookingModalOpen(false);
-        setIsPlaceModalOpen(true);
       }
 
       // Only strip params after successful selection, so we don't lose them if slot isn't found
@@ -651,6 +675,14 @@ export default function MeetTab({
       return;
     }
 
+    // Also enforce the gate at checkout. This covers users returning from the
+    // guest sign-in flow, where the booking modal is restored automatically.
+    if (!hasVerifiedWhatsAppForBooking) {
+      setIsBookingModalOpen(false);
+      await handleBookMeetingClick();
+      return;
+    }
+
     setIsBookingLoading(true);
     setBookingError(null);
 
@@ -872,28 +904,137 @@ export default function MeetTab({
     );
   };
 
-  const handleBookMeetingClick = () => {
-    const places = getAvailablePlaces(selectedMeetingTime);
-    // Pre-select the only option when there's no real choice; force a choice when both exist.
-    setSelectedPlace(places.length === 1 ? places[0] : null);
-    setIsPlaceModalOpen(true);
-  };
-
-  // Continue from the "session type" modal into the existing booking flow.
-  const proceedFromPlaceModal = () => {
-    if (!selectedPlace) return;
-    setIsPlaceModalOpen(false);
+  const openBookingModal = () => {
+    setBookingError(null);
     setIsBookingModalOpen(true);
     setBookingStep(1);
   };
 
-  const closePlaceModal = () => {
-    setIsPlaceModalOpen(false);
+  const selectMeetingTime = (
+    time: MeetingTime,
+    place?: "online" | "physically"
+  ) => {
+    handleTimeClick(time);
+    const places = getAvailablePlaces(time);
+    setSelectedPlace(place && places.includes(place) ? place : places.length === 1 ? places[0] : null);
+  };
+
+  const handleBookMeetingClick = async () => {
+    if (!selectedMeetingTime || !selectedPlace) return;
+    if (!isAuthenticated) {
+      openBookingModal();
+      return;
+    }
+
+    setIsCheckingWhatsApp(true);
+    setBookingError(null);
+    try {
+      const token = getAuthToken();
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/account/profile`, {
+        headers: {
+          Accept: "application/json",
+          "Accept-Language": locale,
+          "X-Timezone": Intl.DateTimeFormat().resolvedOptions().timeZone,
+          ...(token && { Authorization: `Bearer ${token}` }),
+        },
+      });
+      if (!response.ok) throw new Error("Failed to check WhatsApp details");
+
+      const body = await response.json();
+      const profile = (body.data || body) as Record<string, unknown>;
+      const status = String(profile.whatsapp_status || "inactive");
+      const countryCode = String(profile.whatsapp_country_code || "").replace(/^\+/, "");
+      const number = String(profile.whatsapp_number || "");
+
+      if (status === "active" && countryCode && number) {
+        setHasVerifiedWhatsAppForBooking(true);
+        openBookingModal();
+        return;
+      }
+
+      setIsBookingModalOpen(false);
+      setNotificationProfile(profile);
+      setWhatsAppCountryCode(countryCode);
+      setWhatsAppNumber(number);
+      setWhatsAppError(null);
+      setIsWhatsAppModalOpen(true);
+    } catch (error) {
+      setBookingError(
+        isRTL
+          ? "تعذر التحقق من بيانات واتساب. يرجى المحاولة مرة أخرى."
+          : error instanceof Error
+            ? error.message
+            : "Could not verify your WhatsApp details. Please try again."
+      );
+    } finally {
+      setIsCheckingWhatsApp(false);
+    }
+  };
+
+  const saveWhatsAppAndContinue = async () => {
+    const normalizedNumber = whatsAppNumber.replace(/\D/g, "");
+    if (!whatsAppCountryCode || normalizedNumber.length < 6 || normalizedNumber.length > 15) {
+      setWhatsAppError(
+        isRTL
+          ? "يرجى اختيار رمز البلد وإدخال رقم واتساب صحيح."
+          : "Select a country code and enter a valid WhatsApp number."
+      );
+      return;
+    }
+
+    setIsSavingWhatsApp(true);
+    setWhatsAppError(null);
+    try {
+      const token = getAuthToken();
+      const profile = notificationProfile || {};
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/api/account/profile/notification/channel`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Accept: "application/json",
+            "Accept-Language": locale,
+            "X-Timezone": Intl.DateTimeFormat().resolvedOptions().timeZone,
+            ...(token && { Authorization: `Bearer ${token}` }),
+          },
+          body: JSON.stringify({
+            whatsapp_status: "active",
+            whatsapp_country_code: whatsAppCountryCode,
+            whatsapp_number: normalizedNumber,
+            sms_status: profile.sms_status || "inactive",
+            sms_whatsapp: profile.sms_whatsapp || profile.sms_status || "inactive",
+            sms_country_code: profile.sms_country_code || "",
+            sms_number: profile.sms_number || "",
+          }),
+        }
+      );
+
+      if (!response.ok) {
+        const errorBody = await response.json().catch(() => null);
+        throw new Error(errorBody?.message || "Failed to save WhatsApp details");
+      }
+
+      await refreshProfile().catch(() => undefined);
+      setHasVerifiedWhatsAppForBooking(true);
+      setIsWhatsAppModalOpen(false);
+      openBookingModal();
+    } catch (error) {
+      setWhatsAppError(
+        error instanceof Error
+          ? error.message
+          : isRTL
+            ? "تعذر حفظ رقم واتساب."
+            : "Could not save your WhatsApp number."
+      );
+    } finally {
+      setIsSavingWhatsApp(false);
+    }
   };
 
   const closeBookingModal = () => {
     setIsBookingModalOpen(false);
-    setIsPlaceModalOpen(false);
+    setHasVerifiedWhatsAppForBooking(false);
     setSelectedPlace(null);
     setHasCheckedDuplicate(false);
     setBookingStep(1);
@@ -1061,12 +1202,32 @@ export default function MeetTab({
                             const rate = parseFloat(time.rate);
                             const isFree = rate === 0;
 
+                            const availablePlaces = getAvailablePlaces(time);
+                            const onlineAvailable = availablePlaces.includes("online");
+                            const onsiteAvailable = availablePlaces.includes("physically");
+                            const typeIconClass = (available: boolean, active: boolean) =>
+                              `inline-flex h-8 w-8 items-center justify-center rounded-md border transition-all ${
+                                !available
+                                  ? "cursor-not-allowed border-gray-200 bg-gray-100 text-gray-300 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-600"
+                                  : active
+                                    ? "border-blue-500 bg-blue-500 text-white shadow-sm"
+                                    : "border-gray-200 bg-white text-gray-500 hover:border-blue-300 hover:bg-blue-50 hover:text-blue-600 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-300"
+                              }`;
+
                             return (
-                              <button
+                              <div
                                 key={index}
-                                onClick={() => handleTimeClick(time)}
+                                role="button"
+                                tabIndex={0}
+                                onClick={() => selectMeetingTime(time)}
+                                onKeyDown={(event) => {
+                                  if (event.key === "Enter" || event.key === " ") {
+                                    event.preventDefault();
+                                    selectMeetingTime(time);
+                                  }
+                                }}
                                 className={`
-                                w-full p-3 rounded-lg border text-left transition-colors
+                                w-full p-3 rounded-lg border text-left transition-colors cursor-pointer
                                 ${isSelected
                                     ? "border-blue-500 bg-blue-50 text-blue-700"
                                     : "border-gray-200 hover:border-blue-300 hover:bg-blue-50"
@@ -1087,16 +1248,72 @@ export default function MeetTab({
                                       hour12: false
                                     })}
                                   </span>
-                                  <span
-                                    className={`text-sm font-bold ${isFree
-                                      ? "text-green-600"
-                                      : "text-gray-600"
-                                      }`}
-                                  >
-                                    {isFree ? "Free" : `$${rate}`}
-                                  </span>
+                                  <div className="flex items-center gap-2">
+                                    <Tooltip
+                                      label={
+                                        onlineAvailable
+                                          ? isRTL ? "جلسة عن بُعد" : "Online session"
+                                          : isRTL ? "الجلسة عن بُعد غير متاحة في هذا الوقت" : "Online is unavailable for this time slot"
+                                      }
+                                      withArrow
+                                    >
+                                      <span>
+                                        <button
+                                          type="button"
+                                          aria-label={isRTL ? "اختيار جلسة عن بُعد" : "Select online session"}
+                                          aria-pressed={isSelected && selectedPlace === "online"}
+                                          disabled={!onlineAvailable}
+                                          onClick={(event) => {
+                                            event.stopPropagation();
+                                            selectMeetingTime(time, "online");
+                                          }}
+                                          className={typeIconClass(
+                                            onlineAvailable,
+                                            isSelected && selectedPlace === "online"
+                                          )}
+                                        >
+                                          <IconVideo size={17} />
+                                        </button>
+                                      </span>
+                                    </Tooltip>
+                                    <Tooltip
+                                      label={
+                                        onsiteAvailable
+                                          ? isRTL ? "جلسة حضورية" : "On-site session"
+                                          : isRTL ? "الجلسة الحضورية غير متاحة في هذا الوقت" : "On-site is unavailable for this time slot"
+                                      }
+                                      withArrow
+                                    >
+                                      <span>
+                                        <button
+                                          type="button"
+                                          aria-label={isRTL ? "اختيار جلسة حضورية" : "Select on-site session"}
+                                          aria-pressed={isSelected && selectedPlace === "physically"}
+                                          disabled={!onsiteAvailable}
+                                          onClick={(event) => {
+                                            event.stopPropagation();
+                                            selectMeetingTime(time, "physically");
+                                          }}
+                                          className={typeIconClass(
+                                            onsiteAvailable,
+                                            isSelected && selectedPlace === "physically"
+                                          )}
+                                        >
+                                          <IconMapPin size={17} />
+                                        </button>
+                                      </span>
+                                    </Tooltip>
+                                    <span
+                                      className={`min-w-6 text-end text-sm font-bold ${isFree
+                                        ? "text-green-600"
+                                        : "text-gray-600"
+                                        }`}
+                                    >
+                                      {isFree ? (isRTL ? "مجانية" : "Free") : `$${rate}`}
+                                    </span>
+                                  </div>
                                 </div>
-                              </button>
+                              </div>
                             );
                           }
                         )
@@ -1109,19 +1326,41 @@ export default function MeetTab({
 
                     {/* Book button - hide when viewing own profile */}
                     {!isOwnProfile && (
-                      <button
-                        onClick={handleBookMeetingClick}
-                        disabled={!selectedMeetingTime}
-                        className={`
-                          w-full py-3 px-6 rounded-lg font-medium transition-colors
-                          ${selectedMeetingTime
-                            ? "bg-blue-500 text-white hover:bg-blue-600"
-                            : "bg-gray-200 text-gray-400 cursor-not-allowed"
-                          }
-                        `}
-                      >
-                        {t("book")}
-                      </button>
+                      <>
+                        <button
+                          onClick={handleBookMeetingClick}
+                          disabled={!selectedMeetingTime || !selectedPlace || isCheckingWhatsApp}
+                          className={`
+                            w-full py-3 px-6 rounded-lg font-medium transition-colors
+                            ${selectedMeetingTime && selectedPlace && !isCheckingWhatsApp
+                              ? "bg-blue-500 text-white hover:bg-blue-600"
+                              : "bg-gray-200 text-gray-400 cursor-not-allowed"
+                            }
+                          `}
+                        >
+                          {isCheckingWhatsApp
+                            ? isRTL ? "جارٍ التحقق..." : "Checking..."
+                            : t("book")}
+                        </button>
+                        {!selectedPlace && selectedMeetingTime && getAvailablePlaces(selectedMeetingTime).length > 1 && (
+                          <p className="mt-2 text-center text-xs font-medium text-amber-600 dark:text-amber-400">
+                            {isRTL
+                              ? "اختر نوع الجلسة من الأيقونات أعلاه للمتابعة."
+                              : "Choose a session type from the icons above to continue."}
+                          </p>
+                        )}
+                        <div className="mt-3 flex items-start gap-2 rounded-lg bg-emerald-50 px-3 py-2.5 text-xs leading-5 text-emerald-800 dark:bg-emerald-950/30 dark:text-emerald-200">
+                          <IconBrandWhatsapp size={18} className="mt-0.5 shrink-0" />
+                          <p>
+                            {isRTL
+                              ? "في حال الحجز الحضوري، ستصلك رسالة واتساب تحتوي على معلومات التواصل مع الإنسايتر."
+                              : "For on-site bookings, you’ll receive a WhatsApp message with the Insighter’s contact information."}
+                          </p>
+                        </div>
+                        {bookingError && !isBookingModalOpen && (
+                          <p className="mt-2 text-center text-sm text-red-600">{bookingError}</p>
+                        )}
+                      </>
                     )}
 
 
@@ -1142,119 +1381,113 @@ export default function MeetTab({
           </div>
         )}
 
-        {/* Session Type (Place) Selection Modal */}
+        {/* WhatsApp is mandatory before an authenticated user can book. */}
         <Modal
-          opened={isPlaceModalOpen}
-          onClose={closePlaceModal}
-          size="md"
+          opened={isWhatsAppModalOpen}
+          onClose={() => !isSavingWhatsApp && setIsWhatsAppModalOpen(false)}
+          size="lg"
           centered
-          title={isRTL ? "اختر نوع الجلسة" : "Select session type"}
+          title={isRTL ? "أضف رقم واتساب للمتابعة" : "Add WhatsApp to continue"}
         >
           <div className="p-2" dir={isRTL ? "rtl" : "ltr"}>
-            {(() => {
-              const places = getAvailablePlaces(selectedMeetingTime);
-              const onlineAvailable = places.includes("online");
-              const onsiteAvailable = places.includes("physically");
-              const onlyOne = places.length === 1;
-              const physicalLocation = selectedMeetingTime?.default_physical_location || null;
-              const optionClass = (active: boolean, enabled: boolean) =>
-                `w-full flex items-center gap-3 border rounded-lg p-4 mb-3 text-start transition-all ${
-                  !enabled
-                    ? "opacity-50 cursor-not-allowed border-gray-200 dark:border-slate-700"
-                    : active
-                      ? "border-blue-500 bg-blue-50 dark:bg-slate-700 cursor-pointer"
-                      : "border-gray-200 dark:border-slate-700 hover:border-blue-300 cursor-pointer"
-                }`;
-              return (
-                <>
-                  <p className="text-sm text-gray-500 dark:text-gray-300 mb-4">
-                    {isRTL
-                      ? "اختر طريقة حضور هذه الجلسة."
-                      : "Choose how you'd like to attend this session."}
-                  </p>
+            <div className="mb-5 flex items-start gap-3 rounded-xl border border-emerald-100 bg-emerald-50 p-4 dark:border-emerald-900 dark:bg-emerald-950/30">
+              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-emerald-500 text-white">
+                <IconBrandWhatsapp size={23} />
+              </div>
+              <div>
+                <p className="font-semibold text-gray-900 dark:text-white">
+                  {isRTL ? "ابقَ على اطلاع بتفاصيل حجزك" : "Stay updated on your booking"}
+                </p>
+                <p className="mt-1 text-sm leading-5 text-gray-600 dark:text-gray-300">
+                  {isRTL
+                    ? "رقم واتساب مطلوب لإكمال الحجز ومشاركة تفاصيل الجلسة بأمان."
+                    : "A WhatsApp number is required to complete booking and securely share session details."}
+                </p>
+              </div>
+            </div>
 
-                  <button
-                    type="button"
-                    disabled={!onlineAvailable}
-                    onClick={() => onlineAvailable && setSelectedPlace("online")}
-                    className={optionClass(selectedPlace === "online", onlineAvailable)}
-                  >
-                    <IconVideo size={22} className="text-blue-500 shrink-0" />
-                    <div className="flex-1">
-                      <span className="font-medium block">
-                        {isRTL ? "عن بُعد" : "Online"}
-                      </span>
-                      {!onlineAvailable && (
-                        <span className="text-xs text-gray-400">
-                          {isRTL ? "غير متاح لهذه الجلسة" : "Not available for this session"}
-                        </span>
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-[minmax(240px,1.1fr)_minmax(0,1.35fr)]">
+              <Select
+                label={isRTL ? "رمز البلد" : "Country code"}
+                placeholder={isRTL ? "اختر الرمز" : "Select code"}
+                data={countryCodeOptions}
+                value={whatsAppCountryCode || null}
+                onChange={(value) => setWhatsAppCountryCode(value || "")}
+                searchable
+                required
+                disabled={areCountriesLoading}
+                nothingFoundMessage={isRTL ? "لا توجد نتائج" : "No countries found"}
+                comboboxProps={{
+                  width: 390,
+                  position: isRTL ? "bottom-end" : "bottom-start",
+                }}
+                styles={{
+                  dropdown: {
+                    maxWidth: "calc(100vw - 32px)",
+                    overflowX: "hidden",
+                  },
+                }}
+                renderOption={({ option }) => {
+                  const country = countries.find(
+                    (item) => String(item.international_code || "").replace(/^\+/, "") === option.value
+                  );
+                  return (
+                    <div className="flex w-full min-w-0 items-center gap-2.5">
+                      {country?.flag && (
+                        <img
+                          src={`/images/flags/${country.flag}.svg`}
+                          alt=""
+                          className="h-4 w-6 shrink-0 rounded-sm object-cover"
+                        />
                       )}
+                      <span className="min-w-0 truncate">{option.label}</span>
                     </div>
-                    {selectedPlace === "online" && (
-                      <IconCheck size={20} className="text-blue-500 shrink-0" />
-                    )}
-                  </button>
+                  );
+                }}
+              />
+              <TextInput
+                label={isRTL ? "رقم واتساب" : "WhatsApp number"}
+                placeholder={isRTL ? "مثال: 7986456456" : "e.g. 7986456456"}
+                leftSection={<IconBrandWhatsapp size={17} className="text-emerald-600" />}
+                value={whatsAppNumber}
+                onChange={(event) => setWhatsAppNumber(event.currentTarget.value.replace(/[^\d\s()-]/g, ""))}
+                inputMode="tel"
+                required
+              />
+            </div>
 
-                  <button
-                    type="button"
-                    disabled={!onsiteAvailable}
-                    onClick={() => onsiteAvailable && setSelectedPlace("physically")}
-                    className={optionClass(selectedPlace === "physically", onsiteAvailable)}
-                  >
-                    <IconMapPin size={22} className="text-blue-500 shrink-0" />
-                    <div className="flex-1">
-                      <span className="font-medium block">
-                        {isRTL ? "حضورياً" : "On Site"}
-                      </span>
-                      {!onsiteAvailable ? (
-                        <span className="text-xs text-gray-400">
-                          {isRTL ? "غير متاح لهذه الجلسة" : "Not available for this session"}
-                        </span>
-                      ) : (
-                        physicalLocation && (
-                          <span className="text-xs text-gray-500 dark:text-gray-300">
-                            {physicalLocation}
-                          </span>
-                        )
-                      )}
-                    </div>
-                    {selectedPlace === "physically" && (
-                      <IconCheck size={20} className="text-blue-500 shrink-0" />
-                    )}
-                  </button>
+            <div className="mt-3 flex items-start gap-2 text-xs text-gray-500 dark:text-gray-400">
+              <IconInfoCircle size={16} className="mt-0.5 shrink-0" />
+              <p>
+                {isRTL
+                  ? "أدخل الرقم بدون رمز البلد أو الصفر في بدايته."
+                  : "Enter the number without the country code or a leading zero."}
+              </p>
+            </div>
 
-                  {onlyOne && (
-                    <p className="text-xs text-gray-500 dark:text-gray-300 mb-4">
-                      {isRTL
-                        ? `الخيار الوحيد المتاح لهذه الجلسة هو "${onlineAvailable ? "عن بُعد" : "حضورياً"}" .`
-                        : `Only "${onlineAvailable ? "Online" : "On Site"}" is available for this session.`}
-                    </p>
-                  )}
+            {whatsAppError && (
+              <div className="mt-4 rounded-lg bg-red-50 p-3 text-sm text-red-700 dark:bg-red-950/30 dark:text-red-300">
+                {whatsAppError}
+              </div>
+            )}
 
-                  <div className="flex gap-3 mt-2">
-                    <button
-                      type="button"
-                      onClick={closePlaceModal}
-                      className="flex-1 py-2.5 px-4 rounded-lg font-medium border border-gray-200 dark:border-slate-600 text-gray-600 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-slate-700"
-                    >
-                      {isRTL ? "إلغاء" : "Cancel"}
-                    </button>
-                    <button
-                      type="button"
-                      disabled={!selectedPlace}
-                      onClick={proceedFromPlaceModal}
-                      className={`flex-1 py-2.5 px-4 rounded-lg font-medium transition-colors ${
-                        selectedPlace
-                          ? "bg-blue-500 text-white hover:bg-blue-600"
-                          : "bg-gray-200 text-gray-400 cursor-not-allowed"
-                      }`}
-                    >
-                      {isRTL ? "متابعة" : "Continue"}
-                    </button>
-                  </div>
-                </>
-              );
-            })()}
+            <div className="mt-6 flex justify-end gap-3">
+              <Button
+                variant="subtle"
+                onClick={() => setIsWhatsAppModalOpen(false)}
+                disabled={isSavingWhatsApp}
+              >
+                {isRTL ? "إلغاء" : "Cancel"}
+              </Button>
+              <Button
+                onClick={saveWhatsAppAndContinue}
+                loading={isSavingWhatsApp}
+                leftSection={<IconBrandWhatsapp size={18} />}
+                color="green"
+              >
+                {isRTL ? "حفظ ومتابعة" : "Save & continue"}
+              </Button>
+            </div>
           </div>
         </Modal>
 
