@@ -35,9 +35,15 @@ const TAB_BUTTON_CLASS =
   'inline-flex items-center justify-center rounded-md border px-4 py-2 text-xs font-medium shadow-sm transition-colors';
 const SELECT_CLASS =
   'h-8 rounded-md border border-slate-200 bg-white px-3 text-xs text-slate-700 shadow-sm outline-none focus:border-blue-400 focus:border-[1px]';
+const CHIP_BUTTON_BASE_CLASS =
+  'inline-flex h-8 items-center justify-center rounded-full border px-3 text-xs font-medium shadow-sm transition-colors';
+const CHIP_BUTTON_ACTIVE_CLASS = 'border-blue-600 bg-blue-600 text-white';
+const CHIP_BUTTON_INACTIVE_CLASS = 'border-slate-200 bg-white text-slate-700 hover:bg-slate-50';
 
 type OrderTabKey = 'knowledge' | 'meetings' | 'projects';
 type CompletionFilter = 'all' | 'complete' | 'incomplete';
+type PaymentTypeFilter = 'all' | 'down_payment' | 'final_payment' | 'full_payment';
+type PaymentStateFilter = 'all' | 'attempt' | 'failed';
 
 const ORDER_TAB_CONFIG: Array<{ key: OrderTabKey; label: string; endpoint: string }> = [
   { key: 'knowledge', label: 'Insight', endpoint: `${process.env.NEXT_PUBLIC_API_URL}/api/admin/order/knowledge` },
@@ -49,6 +55,19 @@ const COMPLETION_FILTER_OPTIONS: Array<{ value: CompletionFilter; label: string 
   { value: 'all', label: 'All' },
   { value: 'complete', label: 'Complete' },
   { value: 'incomplete', label: 'Incomplete' },
+];
+
+const PAYMENT_TYPE_FILTER_OPTIONS: Array<{ value: PaymentTypeFilter; label: string }> = [
+  { value: 'all', label: 'All payments' },
+  { value: 'down_payment', label: 'Down payment' },
+  { value: 'final_payment', label: 'Final payment' },
+  { value: 'full_payment', label: 'Full payment' },
+];
+
+const PAYMENT_STATE_FILTER_OPTIONS: Array<{ value: PaymentStateFilter; label: string }> = [
+  { value: 'all', label: 'All states' },
+  { value: 'attempt', label: 'Attempt' },
+  { value: 'failed', label: 'Failed' },
 ];
 
 const DEFAULT_META: OrderMeta = { current_page: 1, last_page: 1, per_page: 10, total: 0 };
@@ -137,6 +156,8 @@ export default function OrdersTab() {
 
   const [perPage, setPerPage] = useState<number>(10);
   const [completionFilter, setCompletionFilter] = useState<CompletionFilter>('all');
+  const [paymentTypeFilter, setPaymentTypeFilter] = useState<PaymentTypeFilter>('all');
+  const [paymentStateFilter, setPaymentStateFilter] = useState<PaymentStateFilter>('all');
   const [searchInput, setSearchInput] = useState<string>('');
   const [searchQuery, setSearchQuery] = useState<string>('');
 
@@ -161,6 +182,8 @@ export default function OrdersTab() {
       page = 1,
       perPageValue = perPage,
       statusFilter: CompletionFilter = completionFilter,
+      paymentTypeValue: PaymentTypeFilter = paymentTypeFilter,
+      paymentStateValue: PaymentStateFilter = paymentStateFilter,
       signal?: AbortSignal,
     ) => {
       setIsLoading(true);
@@ -180,6 +203,12 @@ export default function OrdersTab() {
         url.searchParams.set('page', String(page));
         url.searchParams.set('per_page', String(perPageValue));
         url.searchParams.set('status', statusFilter);
+        if (statusFilter === 'incomplete') {
+          if (tab === 'projects') {
+            url.searchParams.set('order_payment_type', paymentTypeValue);
+          }
+          url.searchParams.set('payment_state', paymentStateValue);
+        }
         if (searchQuery) {
           url.searchParams.set('search', searchQuery);
         }
@@ -216,25 +245,35 @@ export default function OrdersTab() {
         setIsLoading(false);
       }
     },
-    [completionFilter, handleServerErrors, perPage, searchQuery],
+    [completionFilter, handleServerErrors, paymentStateFilter, paymentTypeFilter, perPage, searchQuery],
   );
 
-  const refresh = useCallback((tab: OrderTabKey, page: number, perPageValue: number, statusFilter: CompletionFilter) => {
-    currentRequestAbort.current?.abort();
-    const controller = new AbortController();
-    currentRequestAbort.current = controller;
-    void fetchOrders(tab, page, perPageValue, statusFilter, controller.signal);
-  }, [fetchOrders]);
+  const refresh = useCallback(
+    (
+      tab: OrderTabKey,
+      page: number,
+      perPageValue: number,
+      statusFilter: CompletionFilter,
+      paymentTypeValue: PaymentTypeFilter,
+      paymentStateValue: PaymentStateFilter,
+    ) => {
+      currentRequestAbort.current?.abort();
+      const controller = new AbortController();
+      currentRequestAbort.current = controller;
+      void fetchOrders(tab, page, perPageValue, statusFilter, paymentTypeValue, paymentStateValue, controller.signal);
+    },
+    [fetchOrders],
+  );
 
   useEffect(() => {
-    refresh(activeTab, 1, perPage, completionFilter);
+    refresh(activeTab, 1, perPage, completionFilter, paymentTypeFilter, paymentStateFilter);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [activeTab, completionFilter, perPage, searchQuery]);
+  }, [activeTab, completionFilter, paymentTypeFilter, paymentStateFilter, perPage, searchQuery]);
 
   const pages = getPaginationWindow(meta.current_page, meta.last_page, 5);
 
   const onPageChange = (page: number) => {
-    refresh(activeTab, page, perPage, completionFilter);
+    refresh(activeTab, page, perPage, completionFilter, paymentTypeFilter, paymentStateFilter);
   };
 
   const onSearchKeyDown = (event: KeyboardEvent<HTMLInputElement>) => {
@@ -262,16 +301,39 @@ export default function OrdersTab() {
     setMeta({ ...DEFAULT_META, per_page: perPage });
     setError('');
     setActiveTab(tab);
+    if (tab !== 'projects') {
+      setPaymentTypeFilter('all');
+    }
   };
 
-  const handleCompletionFilterChange = (value: CompletionFilter) => {
-    if (value === completionFilter) return;
+  const resetListForFilterChange = () => {
     currentRequestAbort.current?.abort();
     closeDetails();
     setOrders([]);
     setMeta({ ...DEFAULT_META, per_page: perPage });
     setError('');
+  };
+
+  const handleCompletionFilterChange = (value: CompletionFilter) => {
+    if (value === completionFilter) return;
+    resetListForFilterChange();
     setCompletionFilter(value);
+    if (value !== 'incomplete') {
+      setPaymentTypeFilter('all');
+      setPaymentStateFilter('all');
+    }
+  };
+
+  const handlePaymentTypeFilterChange = (value: PaymentTypeFilter) => {
+    if (value === paymentTypeFilter) return;
+    resetListForFilterChange();
+    setPaymentTypeFilter(value);
+  };
+
+  const handlePaymentStateFilterChange = (value: PaymentStateFilter) => {
+    if (value === paymentStateFilter) return;
+    resetListForFilterChange();
+    setPaymentStateFilter(value);
   };
 
   return (
@@ -332,8 +394,59 @@ export default function OrdersTab() {
               </option>
             ))}
           </select>
+
         </div>
       </div>
+
+      {completionFilter === 'incomplete' ? (
+        <div className="mt-3 flex flex-col gap-2 sm:flex-row sm:flex-wrap sm:items-center">
+          {activeTab === 'projects' ? (
+            <>
+              <div className="flex flex-wrap items-center gap-1.5" role="group" aria-label="Filter orders by payment type">
+                {PAYMENT_TYPE_FILTER_OPTIONS.map((option) => {
+                  const isActive = option.value === paymentTypeFilter;
+                  return (
+                    <button
+                      key={option.value}
+                      type="button"
+                      onClick={() => handlePaymentTypeFilterChange(option.value)}
+                      aria-pressed={isActive}
+                      className={[
+                        CHIP_BUTTON_BASE_CLASS,
+                        isActive ? CHIP_BUTTON_ACTIVE_CLASS : CHIP_BUTTON_INACTIVE_CLASS,
+                      ].join(' ')}
+                    >
+                      {option.label}
+                    </button>
+                  );
+                })}
+              </div>
+
+              <span className="hidden h-5 w-px bg-slate-200 sm:block" aria-hidden="true" />
+            </>
+          ) : null}
+
+          <div className="flex flex-wrap items-center gap-1.5" role="group" aria-label="Filter orders by payment state">
+            {PAYMENT_STATE_FILTER_OPTIONS.map((option) => {
+              const isActive = option.value === paymentStateFilter;
+              return (
+                <button
+                  key={option.value}
+                  type="button"
+                  onClick={() => handlePaymentStateFilterChange(option.value)}
+                  aria-pressed={isActive}
+                  className={[
+                    CHIP_BUTTON_BASE_CLASS,
+                    isActive ? CHIP_BUTTON_ACTIVE_CLASS : CHIP_BUTTON_INACTIVE_CLASS,
+                  ].join(' ')}
+                >
+                  {option.label}
+                </button>
+              );
+            })}
+          </div>
+        </div>
+      ) : null}
 
       <div className="mt-4 overflow-hidden rounded-md border border-slate-200 bg-white shadow-sm">
         <div className="overflow-x-auto">

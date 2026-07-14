@@ -35,18 +35,14 @@ const ServiceRequestCTA: React.FC<ServiceRequestCTAProps> = ({ locale }) => {
             </>
           )}
         </h2>
-        <p className="mx-auto mt-4 max-w-2xl text-base leading-7 text-gray-600 sm:text-lg">
-          {isRTL
-            ? 'أرسل طلب خدمة ودع خبراءنا المختصين يعدّون لك البيانات أو التقرير أو الرؤية التي تحتاجها بالضبط.'
-            : 'Submit a service request and let our expert Insighters build the exact data, report, or insight you need.'}
-        </p>
+       
 
         <div className="mt-8 flex items-center justify-center">
           <Link
             href={`/${locale}/project/wizard/project-type`}
             className="group inline-flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-blue-500 to-teal-400 px-8 py-3.5 text-sm font-semibold text-white shadow-md transition-all duration-200 hover:shadow-lg hover:brightness-105 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 sm:text-base"
           >
-            {isRTL ? 'اطلب خدمة الآن' : 'Make a Service Request'}
+            {isRTL ? 'ابدأ الطلب': 'Start Request'}
             <svg
               width="16"
               height="16"
