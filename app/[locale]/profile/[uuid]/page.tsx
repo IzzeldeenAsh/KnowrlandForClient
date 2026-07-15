@@ -297,7 +297,7 @@ function ProfilePageContent() {
   // Get entity type from search params (safe for SSR)
   const entityParam = searchParams.get("entity");
   const activeTab = searchParams.get("tab") || "knowledge";
-  const isViewingInsighterEntity = (enterpriseType ?? entityParam) === "insighter";
+  const isViewingInsighterEntity = enterpriseType === "insighter";
 
   const logProfileResponse = (
     source: "insighter" | "company",
@@ -351,10 +351,13 @@ function ProfilePageContent() {
       fetchingProfileRef.current = true;
 
       try {
-        const entityType = entityParam;
-        setEnterpriseType(entityType);
+        // The ?entity= param is only a *hint* for which endpoint to try
+        // first. The resolved entity type is decided by whichever endpoint
+        // actually returns data (see the setEnterpriseType calls below), so
+        // the page stays correct even when the param is missing or wrong.
+        const entityHint = entityParam;
         // If entity=insighter is specified, try insighter API first
-        if (entityType === "insighter") {
+        if (entityHint === "insighter") {
           // Try insighter API first
           let response = await fetch(
             `${process.env.NEXT_PUBLIC_API_URL}/api/platform/insighter/profile/${uuid}`,
@@ -371,6 +374,7 @@ function ProfilePageContent() {
             const data = await response.json();
             logProfileResponse("insighter", data);
             setProfileData(data.data);
+            setEnterpriseType("insighter");
           } else {
             // Fall back to company API if insighter fails
             response = await fetch(
@@ -425,6 +429,7 @@ function ProfilePageContent() {
             };
 
             setProfileData(companyProfileData);
+            setEnterpriseType(null);
           }
         } else {
           // Default behavior: try company API first
@@ -478,6 +483,7 @@ function ProfilePageContent() {
             };
 
             setProfileData(companyProfileData);
+            setEnterpriseType(null);
           } else {
             // Try insighter API if company API fails
             response = await fetch(
@@ -498,6 +504,7 @@ function ProfilePageContent() {
             const data = await response.json();
             logProfileResponse("insighter", data);
             setProfileData(data.data);
+            setEnterpriseType("insighter");
           }
         }
       } catch (error) {
@@ -513,19 +520,42 @@ function ProfilePageContent() {
     }
   }, [uuid, locale, entityParam]);
 
+  // Keep the URL's ?entity= param in sync with the *resolved* entity type, so
+  // reloads and shared links carry the correct value. This repairs URLs that
+  // arrive with a missing or wrong entity param (the root cause of an
+  // insighter rendering as an empty company profile).
+  useEffect(() => {
+    if (loading || !profileData) return;
+    const desired = enterpriseType === "insighter" ? "insighter" : null;
+    const current = searchParams.get("entity");
+    if (desired === current) return; // already correct (incl. both null)
+
+    const nextParams = new URLSearchParams(searchParams.toString());
+    if (desired) {
+      nextParams.set("entity", desired);
+    } else {
+      nextParams.delete("entity");
+    }
+    const qs = nextParams.toString();
+    router.replace(
+      qs ? `/${locale}/profile/${uuid}?${qs}` : `/${locale}/profile/${uuid}`,
+      { scroll: false }
+    );
+  }, [enterpriseType, loading, profileData, searchParams, router, locale, uuid]);
+
   useEffect(() => {
     const fetchKnowledgeData = async () => {
       if (!uuid || !profileData) return;
 
       setLoadingKnowledge(true);
       try {
-        // Check URL query parameter to determine which API to use
-        const urlParams = new URLSearchParams(window.location.search);
-        const entityType = urlParams.get("entity");
+        // Use the *resolved* entity type (decided by which profile endpoint
+        // returned data), not the URL param — the param may be missing/wrong.
+        const isInsighterEntity = enterpriseType === "insighter";
 
         // Now fetch the filtered data
         let url =
-          entityType === "insighter"
+          isInsighterEntity
             ? `${process.env.NEXT_PUBLIC_API_URL}/api/platform/insighter/knowledge/${uuid}?page=${knowledgePage}&per_page=12`
             : `${process.env.NEXT_PUBLIC_API_URL}/api/platform/company/knowledge/${uuid}?page=${knowledgePage}&per_page=12`;
 
@@ -551,7 +581,7 @@ function ProfilePageContent() {
 
         // When on a company page, cache the "All" total when the current request is unfiltered.
         // This ensures the Published Insight stat stays stable while filters change.
-        if (entityType !== "insighter" && !selectedType) {
+        if (!isInsighterEntity && !selectedType) {
           const total = data?.meta?.total;
           if (typeof total === "number") {
             setAllKnowledgeTotal(total);
@@ -565,7 +595,7 @@ function ProfilePageContent() {
     };
 
     fetchKnowledgeData();
-  }, [uuid, locale, knowledgePage, selectedType, profileData]);
+  }, [uuid, locale, knowledgePage, selectedType, profileData, enterpriseType]);
 
   useEffect(() => {
     const companyUuid = profileData?.company?.uuid;
@@ -668,7 +698,7 @@ function ProfilePageContent() {
   // Fetch insighter statistics when viewing an insighter profile
   useEffect(() => {
     const fetchInsighterStatistics = async () => {
-      if (!uuid || (enterpriseType ?? searchParams.get("entity")) !== "insighter") {
+      if (!uuid || enterpriseType !== "insighter") {
         setInsighterStatistics(null);
         return;
       }
@@ -873,7 +903,7 @@ function ProfilePageContent() {
     }
 
     // Fetch meeting availability when switching to meet tab
-    if (value === "meet" && entityParam === "insighter") {
+    if (value === "meet" && enterpriseType === "insighter") {
       fetchMeetingAvailability();
     }
   };
@@ -882,12 +912,12 @@ function ProfilePageContent() {
   useEffect(() => {
     if (
       activeTab === "meet" &&
-      entityParam === "insighter" &&
+      enterpriseType === "insighter" &&
       authChecked
     ) {
       fetchMeetingAvailability();
     }
-  }, [activeTab, entityParam, authChecked]); // Run once authentication status is confirmed
+  }, [activeTab, enterpriseType, authChecked]); // Run once authentication status is confirmed
 
 
 
@@ -1370,7 +1400,7 @@ function ProfilePageContent() {
                   <div className="flex-shrink-0">
                     <div className="w-32 h-32 rounded-full  border border-blue-500 relative">
                       {isCompany && profileData.company?.logo ? (
-                        <Link href={`${profileData.company?.uuid}`}>
+                        <Link href={`/${locale}/profile/${profileData.company?.uuid}`}>
                           <Image
                             src={profileData.company.logo}
                             alt={
@@ -1399,7 +1429,7 @@ function ProfilePageContent() {
                       )}
                       {isCompanyInsighter && profileData.company?.logo && (
                         <div className="absolute top-[100px] -right-3 w-14 h-14 rounded-full overflow-hidden shadow-sm bg-white dark:bg-slate-700 z-10 border-4 border-white bg-white">
-                          <Link href={`${profileData.company?.uuid}`}>
+                          <Link href={`/${locale}/profile/${profileData.company?.uuid}`}>
                             <Image
                               src={profileData.company.logo}
                               alt={profileData.company.legal_name}
@@ -1484,7 +1514,7 @@ function ProfilePageContent() {
                           <div className="text-blue-500 mb-2 text-sm font-semibold text-center md:text-start">
                             {locale === "ar" ? "مدير في " : "Manager at "}
                             <Link
-                              href={`${profileData.company?.uuid}`}
+                              href={`/${locale}/profile/${profileData.company?.uuid}`}
                               className="underline underline-offset-2 hover:opacity-80"
                             >
                               {profileData.company.legal_name}
@@ -1494,7 +1524,7 @@ function ProfilePageContent() {
                         {isCompanyInsighter && profileData.company?.legal_name && (
                           <div className="text-blue-500 mb-2 text-sm font-semibold text-center md:text-start">
                             <Link
-                              href={`${profileData.company?.uuid}`}
+                              href={`/${locale}/profile/${profileData.company?.uuid}`}
                               className="underline underline-offset-2 hover:opacity-80"
                             >
                               {profileData.company.legal_name}

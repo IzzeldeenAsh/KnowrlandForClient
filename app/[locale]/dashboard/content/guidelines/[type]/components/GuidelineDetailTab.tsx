@@ -6,8 +6,36 @@ import { useParams, useRouter } from 'next/navigation';
 import { getAuthToken } from '@/lib/authToken';
 import { useToast } from '@/components/toast/ToastContext';
 import { buildAuthHeaders, parseApiError } from '../../../../_config/api';
+import GuidelineEditor from './GuidelineEditor';
+import { highlightVariables, normalizeVariables } from './guidelineHtml';
 
 type GuidelineType = { value: string; label: string };
+
+// Fixed variable catalog per guideline type — mirrors the backend renderer's
+// tokens. Used as a fallback so the insert-variable chips always show, even when
+// a version was saved without its variables list.
+const DEFAULT_VARIABLES: Record<string, string[]> = {
+  contract: [
+    'contract_language',
+    'court_country',
+    'client_name',
+    'client_country',
+    'client_email',
+    'client_phone',
+    'insighter_name',
+    'insighter_company',
+    'insighter_country',
+    'insighter_email',
+    'insighter_phone',
+    'project_title',
+    'project_no',
+    'contract_date',
+    'project_amount',
+    'project_deadline_date',
+    'logo',
+    'project_scopes',
+  ],
+};
 
 type GuidelineDetail = {
   uuid: string;
@@ -16,6 +44,7 @@ type GuidelineDetail = {
   version: string;
   file: any;
   apply_at?: string;
+  variables?: string[] | null;
 };
 
 const SECONDARY_BUTTON_CLASS =
@@ -94,7 +123,7 @@ function HtmlBlock({
       >
         <div
           className="prose prose-slate max-w-none text-sm"
-          dangerouslySetInnerHTML={{ __html: html || '' }}
+          dangerouslySetInnerHTML={{ __html: highlightVariables(html || '') }}
         />
         {!expanded && hasOverflow ? (
           <div className="pointer-events-none absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t from-white to-transparent" />
@@ -124,6 +153,7 @@ type AddVersionPayload = {
 function AddVersionModal({
   isOpen,
   type,
+  variables,
   submitError,
   isSubmitting,
   onClose,
@@ -131,6 +161,7 @@ function AddVersionModal({
 }: {
   isOpen: boolean;
   type: string;
+  variables: string[];
   submitError: string;
   isSubmitting: boolean;
   onClose: () => void;
@@ -145,8 +176,6 @@ function AddVersionModal({
     applyAt: '',
   });
   const [localError, setLocalError] = useState('');
-  const [previewEn, setPreviewEn] = useState(false);
-  const [previewAr, setPreviewAr] = useState(false);
 
   useEffect(() => {
     if (!isOpen) return;
@@ -159,8 +188,6 @@ function AddVersionModal({
       applyAt: '',
     });
     setLocalError('');
-    setPreviewEn(false);
-    setPreviewAr(false);
   }, [isOpen]);
 
   if (!isOpen) return null;
@@ -212,12 +239,7 @@ function AddVersionModal({
 
         <div className="mt-3 grid grid-cols-1 gap-3 lg:grid-cols-2">
           <div className="rounded-md border border-slate-200 bg-white p-3">
-            <div className="flex items-center justify-between">
-              <div className="text-xs font-semibold text-slate-700">English</div>
-              <button type="button" onClick={() => setPreviewEn((v) => !v)} className={SECONDARY_BUTTON_CLASS}>
-                {previewEn ? 'Edit' : 'Preview'}
-              </button>
-            </div>
+            <div className="text-xs font-semibold text-slate-700">English</div>
             <div className="mt-2 space-y-2">
               <div>
                 <label className="mb-1 block text-xs font-semibold text-slate-700">Name (English)</label>
@@ -229,30 +251,18 @@ function AddVersionModal({
               </div>
               <div>
                 <label className="mb-1 block text-xs font-semibold text-slate-700">Guideline (English)</label>
-                {previewEn ? (
-                  <div className="rounded-md border border-slate-200 bg-white p-3">
-                    <div className="prose prose-slate max-w-none text-sm" dangerouslySetInnerHTML={{ __html: form.guidelineEn || '' }} />
-                  </div>
-                ) : (
-                  <textarea
-                    value={form.guidelineEn}
-                    onChange={(e) => setForm((p) => ({ ...p, guidelineEn: e.target.value }))}
-                    rows={10}
-                    className="w-full rounded-md border border-slate-200 bg-white px-3 py-2 text-xs text-slate-700 shadow-sm outline-none focus:border-blue-400"
-                    placeholder="HTML content..."
-                  />
-                )}
+                <GuidelineEditor
+                  value={form.guidelineEn}
+                  onChange={(html) => setForm((p) => ({ ...p, guidelineEn: html }))}
+                  variables={variables}
+                  dir="ltr"
+                />
               </div>
             </div>
           </div>
 
           <div className="rounded-md border border-slate-200 bg-white p-3">
-            <div className="flex items-center justify-between">
-              <div className="text-xs font-semibold text-slate-700">العربية</div>
-              <button type="button" onClick={() => setPreviewAr((v) => !v)} className={SECONDARY_BUTTON_CLASS}>
-                {previewAr ? 'Edit' : 'Preview'}
-              </button>
-            </div>
+            <div className="text-xs font-semibold text-slate-700">العربية</div>
             <div className="mt-2 space-y-2">
               <div>
                 <label className="mb-1 block text-xs font-semibold text-slate-700">Name (Arabic)</label>
@@ -265,20 +275,12 @@ function AddVersionModal({
               </div>
               <div>
                 <label className="mb-1 block text-xs font-semibold text-slate-700">Guideline (Arabic)</label>
-                {previewAr ? (
-                  <div className="rounded-md border border-slate-200 bg-white p-3" dir="rtl">
-                    <div className="prose prose-slate max-w-none text-sm" dangerouslySetInnerHTML={{ __html: form.guidelineAr || '' }} />
-                  </div>
-                ) : (
-                  <textarea
-                    dir="rtl"
-                    value={form.guidelineAr}
-                    onChange={(e) => setForm((p) => ({ ...p, guidelineAr: e.target.value }))}
-                    rows={10}
-                    className="w-full rounded-md border border-slate-200 bg-white px-3 py-2 text-xs text-slate-700 shadow-sm outline-none focus:border-blue-400"
-                    placeholder="HTML content..."
-                  />
-                )}
+                <GuidelineEditor
+                  value={form.guidelineAr}
+                  onChange={(html) => setForm((p) => ({ ...p, guidelineAr: html }))}
+                  variables={variables}
+                  dir="rtl"
+                />
               </div>
             </div>
           </div>
@@ -451,6 +453,8 @@ export default function GuidelineDetailTab() {
       formData.append('guideline[ar]', payload.guidelineAr);
       formData.append('version', payload.version);
       formData.append('apply_at', payload.applyAt);
+      // Carry the variable catalog forward so new versions keep their {{tags}}.
+      variables.forEach((variable) => formData.append('variables[]', variable));
 
       const headers = {
         Accept: 'application/json',
@@ -488,6 +492,10 @@ export default function GuidelineDetailTab() {
   const title = guidelineType?.label || type || 'Guideline';
   const currentFiles = extractFileLinks(currentGuideline?.file);
   const lastFiles = extractFileLinks(lastGuideline?.file);
+  const variables = useMemo(() => {
+    const fromApi = normalizeVariables(currentGuideline?.variables ?? lastGuideline?.variables);
+    return fromApi.length ? fromApi : (DEFAULT_VARIABLES[type] ?? []);
+  }, [currentGuideline?.variables, lastGuideline?.variables, type]);
 
   return (
     <div className="mt-4">
@@ -554,6 +562,24 @@ export default function GuidelineDetailTab() {
               </div>
             ) : null}
 
+            {variables.length ? (
+              <div className="mt-3 rounded-md border border-blue-200 bg-blue-50 p-2">
+                <div className="mb-1.5 text-[11px] font-semibold text-blue-700">
+                  Available variables — use as {'{{tag}}'} placeholders in the guideline text
+                </div>
+                <div className="flex flex-wrap gap-1.5">
+                  {variables.map((variable) => (
+                    <span
+                      key={variable}
+                      className="inline-flex items-center rounded-md border border-blue-200 bg-white px-2 py-0.5 font-mono text-[11px] text-blue-700"
+                    >
+                      {variable}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            ) : null}
+
             <div className="mt-3">
               <HtmlBlock html={currentGuideline.guideline} />
             </div>
@@ -595,6 +621,7 @@ export default function GuidelineDetailTab() {
       <AddVersionModal
         isOpen={modalOpen}
         type={type}
+        variables={variables}
         submitError={submitError}
         isSubmitting={isSubmitting}
         onClose={closeModal}
