@@ -1032,6 +1032,14 @@ export default function MeetTab({
     }
   };
 
+  const skipWhatsAppAndContinue = () => {
+    // WhatsApp is optional: allow the user to bypass it and continue booking.
+    setWhatsAppError(null);
+    setHasVerifiedWhatsAppForBooking(true);
+    setIsWhatsAppModalOpen(false);
+    openBookingModal();
+  };
+
   const closeBookingModal = () => {
     setIsBookingModalOpen(false);
     setHasVerifiedWhatsAppForBooking(false);
@@ -1381,13 +1389,13 @@ export default function MeetTab({
           </div>
         )}
 
-        {/* WhatsApp is mandatory before an authenticated user can book. */}
+        {/* WhatsApp is optional: the user can add it or skip and continue booking. */}
         <Modal
           opened={isWhatsAppModalOpen}
           onClose={() => !isSavingWhatsApp && setIsWhatsAppModalOpen(false)}
           size="lg"
           centered
-          title={isRTL ? "أضف رقم واتساب للمتابعة" : "Add WhatsApp to continue"}
+          title={isRTL ? "أضف رقم واتساب (اختياري)" : "Add WhatsApp (optional)"}
         >
           <div className="p-2" dir={isRTL ? "rtl" : "ltr"}>
             <div className="mb-5 flex items-start gap-3 rounded-xl border border-emerald-100 bg-emerald-50 p-4 dark:border-emerald-900 dark:bg-emerald-950/30">
@@ -1400,8 +1408,8 @@ export default function MeetTab({
                 </p>
                 <p className="mt-1 text-sm leading-5 text-gray-600 dark:text-gray-300">
                   {isRTL
-                    ? "رقم واتساب مطلوب لإكمال الحجز ومشاركة تفاصيل الجلسة بأمان."
-                    : "A WhatsApp number is required to complete booking and securely share session details."}
+                    ? "أضف رقم واتساب لتلقّي تحديثات الحجز ومشاركة تفاصيل الجلسة بأمان، أو تخطَّ الآن وتابع."
+                    : "Add a WhatsApp number to receive booking updates and securely share session details, or skip for now and continue."}
                 </p>
               </div>
             </div>
@@ -1414,7 +1422,6 @@ export default function MeetTab({
                 value={whatsAppCountryCode || null}
                 onChange={(value) => setWhatsAppCountryCode(value || "")}
                 searchable
-                required
                 disabled={areCountriesLoading}
                 nothingFoundMessage={isRTL ? "لا توجد نتائج" : "No countries found"}
                 comboboxProps={{
@@ -1452,7 +1459,6 @@ export default function MeetTab({
                 value={whatsAppNumber}
                 onChange={(event) => setWhatsAppNumber(event.currentTarget.value.replace(/[^\d\s()-]/g, ""))}
                 inputMode="tel"
-                required
               />
             </div>
 
@@ -1474,10 +1480,10 @@ export default function MeetTab({
             <div className="mt-6 flex justify-end gap-3">
               <Button
                 variant="subtle"
-                onClick={() => setIsWhatsAppModalOpen(false)}
+                onClick={skipWhatsAppAndContinue}
                 disabled={isSavingWhatsApp}
               >
-                {isRTL ? "إلغاء" : "Cancel"}
+                {isRTL ? "تخطي الآن" : "Skip for now"}
               </Button>
               <Button
                 onClick={saveWhatsAppAndContinue}
