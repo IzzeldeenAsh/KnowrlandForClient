@@ -5,6 +5,7 @@ import { isSpecifiedInsighterProject } from './specifiedInsighterProject'
 export const projectWizardStepIds = {
   projectType: 'project-type',
   deliverablesLanguage: 'deliverables-language',
+  insighterIndustry: 'insighter-industry',
   service: 'service',
   projectScope: 'project-scope',
   projectSubscopes: 'project-subscopes',
@@ -191,6 +192,7 @@ export function getProjectWizardStepOrder(locale: WizardLocale): string[] {
   return [
     projectWizardStepIds.projectType,
     projectWizardStepIds.deliverablesLanguage,
+    projectWizardStepIds.insighterIndustry,
     projectWizardStepIds.service,
     projectWizardStepIds.projectScope,
     projectWizardStepIds.projectSubscopes,

@@ -16,6 +16,9 @@ import {
   IconCoins,
   IconShieldCheck,
   IconReportAnalytics,
+  IconFileSearch,
+  IconBulb,
+  IconFileDollar,
 } from '@tabler/icons-react'
 import ProjectSelectedTypeHeader from '../ProjectSelectedTypeHeader'
 import {
@@ -118,6 +121,30 @@ const SERVICE_META: Record<string, ServiceMeta> = {
     description: {
       en: 'Set governance, policies, and compliance.',
       ar: 'ضع الحوكمة والسياسات والامتثال.',
+    },
+  },
+  'brief-feasibility-study': {
+    Icon: IconFileSearch,
+    iconClass: 'bg-lime-50 text-lime-600',
+    description: {
+      en: 'Quick check on whether your idea holds up.',
+      ar: 'فحص سريع لمدى جدوى فكرتك.',
+    },
+  },
+  'opportunity-evaluation': {
+    Icon: IconBulb,
+    iconClass: 'bg-orange-50 text-orange-600',
+    description: {
+      en: 'Weigh the potential of a business opportunity.',
+      ar: 'قيّم إمكانات الفرصة التجارية.',
+    },
+  },
+  'funding-application': {
+    Icon: IconFileDollar,
+    iconClass: 'bg-fuchsia-50 text-fuchsia-600',
+    description: {
+      en: 'Prepare and package your funding application.',
+      ar: 'جهّز وأعدّ طلب التمويل الخاص بك.',
     },
   },
 }
@@ -487,6 +514,11 @@ export default function ServiceQuestion({ locale }: { locale: WizardLocale }) {
 
       const prompt = payload.isOtherSelected ? payload.servicePrompt.trim() : ''
       const apiServiceId = payload.serviceId
+      const insighterIndustryId = safeParseSelectedServiceId(
+        window.sessionStorage.getItem(
+          projectWizardStorage.insighterIndustryIdKey(locale)
+        )
+      )
       const specifiedInsighterUuid = readStoredSpecifiedInsighterUuid(locale)
       const initiatePath = specifiedInsighterUuid
         ? `/api/account/project/definition/initiate-specific/${encodeURIComponent(
@@ -501,6 +533,9 @@ export default function ServiceQuestion({ locale }: { locale: WizardLocale }) {
           language: toApiLanguage(deliverablesLanguage),
           type: toApiProjectType(projectType),
           service_id: apiServiceId,
+          ...(insighterIndustryId != null
+            ? { insighter_industry_id: insighterIndustryId }
+            : {}),
           service_prompt: prompt,
           prompt_ai: prompt,
         }),

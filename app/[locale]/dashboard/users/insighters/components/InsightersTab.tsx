@@ -1,12 +1,13 @@
 'use client';
 
 import { Tooltip } from '@mantine/core';
-import { IconBrandWhatsapp } from '@tabler/icons-react';
+import { IconBrandWhatsapp, IconBriefcase, IconFilter, IconMail, IconX } from '@tabler/icons-react';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { getAuthToken } from '@/lib/authToken';
 import { useToast } from '@/components/toast/ToastContext';
 import { buildAuthHeaders, parseApiError } from '../../../_config/api';
 import InsighterActionModal from './InsighterActionModal';
+import InsighterEmailModal, { type EmailTarget } from './InsighterEmailModal';
 
 type InsighterAction = 'activate' | 'deactivate' | 'delete';
 
@@ -20,11 +21,33 @@ type InsighterRecord = {
   status: string;
   verified: boolean;
   profilePhotoUrl: string | null;
+  receiveProjectServices: ProjectServicesStatus;
+};
+
+// Mirrors ProjectReceiveStausEnum on the backend; null when the insighter has no
+// project settings row yet.
+type ProjectServicesStatus = 'active' | 'inactive' | null;
+
+type BooleanFilter = '' | 'true' | 'false';
+type ActivityPeriod = '' | 'week' | 'month' | '3month' | 'year' | 'more_than_year';
+
+type InsighterFilters = {
+  whatsappActivated: BooleanFilter;
+  receiveServiceActivated: BooleanFilter;
+  lastActivity: ActivityPeriod;
+  publishedInsightsPeriod: ActivityPeriod;
+  publishedInsightsMoreThan: string;
 };
 
 type ActionModalState = {
   isOpen: boolean;
   action: InsighterAction;
+  insighter: InsighterRecord | null;
+};
+
+type EmailModalState = {
+  isOpen: boolean;
+  target: EmailTarget;
   insighter: InsighterRecord | null;
 };
 
@@ -89,6 +112,54 @@ const PRIMARY_BUTTON_CLASS =
   'h-8 rounded-md border border-blue-600 bg-blue-600 px-4 text-xs font-medium text-white shadow-sm hover:bg-blue-700';
 const ROW_ACTION_BUTTON_CLASS =
   'rounded-md border bg-white px-2 py-1 text-[10px] font-medium shadow-sm';
+const FILTER_INPUT_CLASS =
+  'mt-1.5 h-9 w-full rounded-md border border-slate-200 bg-white px-3 text-xs text-slate-700 shadow-sm outline-none transition focus:border-blue-400 focus:ring-2 focus:ring-blue-100';
+
+const EMPTY_FILTERS: InsighterFilters = {
+  whatsappActivated: '',
+  receiveServiceActivated: '',
+  lastActivity: '',
+  publishedInsightsPeriod: '',
+  publishedInsightsMoreThan: '',
+};
+
+const PERIOD_OPTIONS: Array<{ value: ActivityPeriod; label: string }> = [
+  { value: '', label: 'Any time' },
+  { value: 'week', label: 'Last week' },
+  { value: 'month', label: 'Last month' },
+  { value: '3month', label: 'Last 3 months' },
+  { value: 'year', label: 'Last year' },
+  { value: 'more_than_year', label: 'More than a year ago' },
+];
+
+function countActiveFilters(filters: InsighterFilters): number {
+  return Object.values(filters).filter(Boolean).length;
+}
+
+function buildInsighterListUrl(filters: InsighterFilters): string {
+  const url = new URL(
+    `${process.env.NEXT_PUBLIC_API_URL}/api/admin/account/insighter/list`,
+    window.location.origin
+  );
+
+  if (filters.whatsappActivated) {
+    url.searchParams.set('whatsapp_activated', filters.whatsappActivated);
+  }
+  if (filters.receiveServiceActivated) {
+    url.searchParams.set('receive_service_activated', filters.receiveServiceActivated);
+  }
+  if (filters.lastActivity) {
+    url.searchParams.set('last_activity', filters.lastActivity);
+  }
+  if (filters.publishedInsightsPeriod) {
+    url.searchParams.set('published_insights_period', filters.publishedInsightsPeriod);
+  }
+  if (filters.publishedInsightsMoreThan) {
+    url.searchParams.set('published_insights_more_than', filters.publishedInsightsMoreThan);
+  }
+
+  return url.toString();
+}
 
 function clampNumber(value: number, min: number, max: number): number {
   return Math.min(Math.max(value, min), max);
@@ -210,6 +281,13 @@ function getEndpoint(action: InsighterAction, id: number): string {
   return `${process.env.NEXT_PUBLIC_API_URL}/api/admin/account/insighter/deactivate-delete/${id}`;
 }
 
+function normalizeProjectServices(value: unknown): ProjectServicesStatus {
+  const normalized = typeof value === 'string' ? value.trim().toLowerCase() : '';
+  if (normalized === 'active') return 'active';
+  if (normalized === 'inactive') return 'inactive';
+  return null;
+}
+
 function normalizeInsighters(payload: unknown): InsighterRecord[] {
   if (!payload || typeof payload !== 'object') {
     return [];
@@ -232,6 +310,7 @@ function normalizeInsighters(payload: unknown): InsighterRecord[] {
         insighter_status?: string;
         verified?: boolean | number | string;
         profile_photo_url?: string | null;
+        receive_project_services?: string | null;
       };
 
       const numericId = Number(row.id);
@@ -261,6 +340,7 @@ function normalizeInsighters(payload: unknown): InsighterRecord[] {
           typeof row.profile_photo_url === 'string' && row.profile_photo_url.trim()
             ? row.profile_photo_url
             : null,
+        receiveProjectServices: normalizeProjectServices(row.receive_project_services),
       } satisfies InsighterRecord;
     })
     .filter((insighter): insighter is InsighterRecord => insighter !== null);
@@ -285,6 +365,8 @@ export default function InsightersTab() {
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [error, setError] = useState<string>('');
   const [searchInput, setSearchInput] = useState<string>('');
+  const [draftFilters, setDraftFilters] = useState<InsighterFilters>(EMPTY_FILTERS);
+  const [appliedFilters, setAppliedFilters] = useState<InsighterFilters>(EMPTY_FILTERS);
   const [modalState, setModalState] = useState<ActionModalState>({
     isOpen: false,
     action: 'deactivate',
@@ -293,6 +375,16 @@ export default function InsightersTab() {
   const [staffNotes, setStaffNotes] = useState<string>('');
   const [submitError, setSubmitError] = useState<string>('');
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
+  const [emailModalState, setEmailModalState] = useState<EmailModalState>({
+    isOpen: false,
+    target: 'specific',
+    insighter: null,
+  });
+  const [emailSubject, setEmailSubject] = useState<string>('');
+  const [emailMessage, setEmailMessage] = useState<string>('');
+  const [emailSubmitError, setEmailSubmitError] = useState<string>('');
+  const [isEmailSubmitting, setIsEmailSubmitting] = useState<boolean>(false);
+  const [broadcastConfirmed, setBroadcastConfirmed] = useState<boolean>(false);
 
   const fetchInsighters = useCallback(async (signal?: AbortSignal) => {
     setIsLoading(true);
@@ -306,7 +398,7 @@ export default function InsightersTab() {
         return;
       }
 
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/admin/account/insighter/list`, {
+      const response = await fetch(buildInsighterListUrl(appliedFilters), {
         method: 'GET',
         cache: 'no-store',
         signal,
@@ -335,7 +427,7 @@ export default function InsightersTab() {
     } finally {
       setIsLoading(false);
     }
-  }, [handleServerErrors]);
+  }, [appliedFilters, handleServerErrors]);
 
   useEffect(() => {
     const controller = new AbortController();
@@ -400,6 +492,119 @@ export default function InsightersTab() {
       topCountries,
     };
   }, [insighters]);
+
+  const activeFilterCount = countActiveFilters(appliedFilters);
+
+  const updateDraftFilter = <Key extends keyof InsighterFilters>(
+    key: Key,
+    value: InsighterFilters[Key]
+  ) => {
+    setDraftFilters((current) => ({ ...current, [key]: value }));
+  };
+
+  const applyFilters = () => {
+    setAppliedFilters({ ...draftFilters });
+  };
+
+  const clearFilters = () => {
+    setDraftFilters({ ...EMPTY_FILTERS });
+    setAppliedFilters({ ...EMPTY_FILTERS });
+  };
+
+  const openEmailModal = (target: EmailTarget, insighter: InsighterRecord | null = null) => {
+    setEmailModalState({ isOpen: true, target, insighter });
+    setEmailSubject('');
+    setEmailMessage('');
+    setEmailSubmitError('');
+    setIsEmailSubmitting(false);
+    setBroadcastConfirmed(false);
+  };
+
+  const resetEmailComposer = () => {
+    setEmailModalState({ isOpen: false, target: 'specific', insighter: null });
+    setEmailSubject('');
+    setEmailMessage('');
+    setEmailSubmitError('');
+    setIsEmailSubmitting(false);
+    setBroadcastConfirmed(false);
+  };
+
+  const closeEmailModal = () => {
+    if (isEmailSubmitting) return;
+    resetEmailComposer();
+  };
+
+  const submitEmail = async () => {
+    const trimmedSubject = emailSubject.trim();
+    const trimmedMessage = emailMessage.trim();
+
+    if (!trimmedSubject || !trimmedMessage) {
+      setEmailSubmitError('Subject and message are required.');
+      return;
+    }
+    if (emailModalState.target === 'specific' && !emailModalState.insighter) {
+      setEmailSubmitError('Select an insighter before sending.');
+      return;
+    }
+    if (emailModalState.target === 'all' && !broadcastConfirmed) {
+      setEmailSubmitError('Confirm the broadcast before sending.');
+      return;
+    }
+
+    setEmailSubmitError('');
+    setIsEmailSubmitting(true);
+
+    try {
+      const token = getAuthToken();
+      if (!token) {
+        setEmailSubmitError('Missing auth token. Please sign in again.');
+        setIsEmailSubmitting(false);
+        return;
+      }
+
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/api/admin/account/insighter/send-email`,
+        {
+          method: 'POST',
+          headers: buildAuthHeaders(token),
+          body: JSON.stringify({
+            target: emailModalState.target,
+            ...(emailModalState.target === 'specific'
+              ? { user_id: emailModalState.insighter?.id }
+              : {}),
+            subject: trimmedSubject,
+            message: trimmedMessage,
+          }),
+        }
+      );
+
+      if (!response.ok) {
+        throw await parseApiError(response);
+      }
+
+      const payload = (await response.json().catch(() => null)) as { recipients?: unknown } | null;
+      const recipientCount = Number(payload?.recipients);
+      const targetLabel =
+        emailModalState.target === 'all'
+          ? Number.isFinite(recipientCount)
+            ? `${recipientCount} insighters`
+            : 'all insighters'
+          : emailModalState.insighter?.name ?? 'the insighter';
+
+      resetEmailComposer();
+      success(`Email queued for ${targetLabel}.`, '', 6000);
+    } catch (requestError) {
+      handleServerErrors(requestError);
+      const message =
+        requestError && typeof requestError === 'object' && 'message' in requestError
+          ? String((requestError as { message?: unknown }).message ?? 'Unable to queue the email right now.')
+          : requestError instanceof Error
+            ? requestError.message
+            : 'Unable to queue the email right now.';
+      setEmailSubmitError(message);
+      setIsEmailSubmitting(false);
+    }
+  };
 
   const openActionModal = (insighter: InsighterRecord, action: InsighterAction) => {
     setModalState({
@@ -479,9 +684,16 @@ export default function InsightersTab() {
       <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
         <div className="flex flex-col">
           <h2 className="text-lg font-semibold text-slate-900">Insighters list</h2>
+          <p className="mt-0.5 text-xs text-slate-500">Manage accounts and communicate with your insighter network.</p>
         </div>
-
-
+        <button
+          type="button"
+          onClick={() => openEmailModal('all')}
+          className="inline-flex h-9 items-center justify-center gap-2 rounded-md border border-blue-600 bg-blue-600 px-4 text-xs font-semibold text-white shadow-sm transition hover:bg-blue-700"
+        >
+          <IconMail size={15} aria-hidden="true" />
+          Email all insighters
+        </button>
       </div>
 
       <div className="mt-4 grid grid-cols-1 gap-3 lg:grid-cols-4">
@@ -576,19 +788,134 @@ export default function InsightersTab() {
           </div>
         </div>
       </div>
-      <div className="mt-8 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-end sm:flex-1 sm:pl-4">
-        <div className="relative flex-1 sm:max-w-[520px]">
-          <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-slate-400">
-            <SearchIcon />
-          </span>
-          <input
-            type="text"
-            value={searchInput}
-            onChange={(event) => setSearchInput(event.target.value)}
-            placeholder="Search insighters..."
-            className={INPUT_CLASS}
-          />
+      <div className="mt-8 rounded-lg border border-slate-200 bg-slate-50/70 p-3 shadow-sm">
+        <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
+          <div className="flex items-center gap-2">
+            <span className="inline-flex h-8 w-8 items-center justify-center rounded-md bg-blue-600 text-white shadow-sm">
+              <IconFilter size={16} aria-hidden="true" />
+            </span>
+            <div>
+              <div className="flex items-center gap-2">
+                <h3 className="text-sm font-semibold text-slate-900">Filter insighters</h3>
+                {activeFilterCount > 0 ? (
+                  <span className="rounded-full bg-blue-100 px-2 py-0.5 text-[10px] font-bold text-blue-700">
+                    {activeFilterCount} active
+                  </span>
+                ) : null}
+              </div>
+              <p className="text-[11px] text-slate-500">Narrow the list using account activity and publishing signals.</p>
+            </div>
+          </div>
+          <div className="relative w-full lg:max-w-[420px]">
+            <label htmlFor="insighter-search" className="sr-only">Search insighters</label>
+            <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-slate-400">
+              <SearchIcon />
+            </span>
+            <input
+              id="insighter-search"
+              type="search"
+              value={searchInput}
+              onChange={(event) => setSearchInput(event.target.value)}
+              placeholder="Search by name, email, phone, or country..."
+              className={INPUT_CLASS}
+            />
+          </div>
         </div>
+
+        <div className="mt-3 grid grid-cols-1 gap-3 border-t border-slate-200 pt-3 sm:grid-cols-2 xl:grid-cols-5">
+          <label className="text-[11px] font-semibold text-slate-600">
+            WhatsApp
+            <select
+              value={draftFilters.whatsappActivated}
+              onChange={(event) => updateDraftFilter('whatsappActivated', event.target.value as BooleanFilter)}
+              className={FILTER_INPUT_CLASS}
+            >
+              <option value="">Any status</option>
+              <option value="true">Activated</option>
+              <option value="false">Not activated</option>
+            </select>
+          </label>
+
+          <label className="text-[11px] font-semibold text-slate-600">
+            Project services
+            <select
+              value={draftFilters.receiveServiceActivated}
+              onChange={(event) => updateDraftFilter('receiveServiceActivated', event.target.value as BooleanFilter)}
+              className={FILTER_INPUT_CLASS}
+            >
+              <option value="">Any status</option>
+              <option value="true">Receiving services</option>
+              <option value="false">Not receiving services</option>
+            </select>
+          </label>
+
+          <label className="text-[11px] font-semibold text-slate-600">
+            Last activity
+            <select
+              value={draftFilters.lastActivity}
+              onChange={(event) => updateDraftFilter('lastActivity', event.target.value as ActivityPeriod)}
+              className={FILTER_INPUT_CLASS}
+            >
+              {PERIOD_OPTIONS.map((option) => (
+                <option key={option.value || 'any'} value={option.value}>{option.label}</option>
+              ))}
+            </select>
+          </label>
+
+          <label className="text-[11px] font-semibold text-slate-600">
+            Published insights
+            <select
+              value={draftFilters.publishedInsightsPeriod}
+              onChange={(event) => updateDraftFilter('publishedInsightsPeriod', event.target.value as ActivityPeriod)}
+              className={FILTER_INPUT_CLASS}
+            >
+              {PERIOD_OPTIONS.map((option) => (
+                <option key={option.value || 'any'} value={option.value}>{option.label}</option>
+              ))}
+            </select>
+          </label>
+
+          <label className="text-[11px] font-semibold text-slate-600">
+            More than this many insights
+            <input
+              type="number"
+              min="1"
+              step="1"
+              inputMode="numeric"
+              value={draftFilters.publishedInsightsMoreThan}
+              onChange={(event) => {
+                const { value } = event.target;
+                if (value === '' || /^[1-9]\d*$/.test(value)) {
+                  updateDraftFilter('publishedInsightsMoreThan', value);
+                }
+              }}
+              placeholder="e.g. 3"
+              className={FILTER_INPUT_CLASS}
+            />
+          </label>
+        </div>
+
+        <div className="mt-3 flex flex-wrap items-center justify-end gap-2">
+          <button
+            type="button"
+            onClick={clearFilters}
+            disabled={countActiveFilters(draftFilters) === 0 && activeFilterCount === 0}
+            className="inline-flex h-8 items-center gap-1.5 rounded-md border border-slate-200 bg-white px-3 text-xs font-medium text-slate-600 shadow-sm transition hover:bg-slate-100 disabled:cursor-not-allowed disabled:opacity-40"
+          >
+            <IconX size={14} aria-hidden="true" />
+            Clear
+          </button>
+          <button type="button" onClick={applyFilters} className={`${PRIMARY_BUTTON_CLASS} inline-flex items-center gap-1.5`}>
+            <IconFilter size={14} aria-hidden="true" />
+            Apply filters
+          </button>
+        </div>
+      </div>
+      <div className="mt-3 flex items-center justify-between gap-3 text-[11px] text-slate-500">
+        <span>
+          Showing <strong className="font-semibold text-slate-700">{filteredInsighters.length}</strong> insighter{filteredInsighters.length === 1 ? '' : 's'}
+        </span>
+        {activeFilterCount > 0 ? <span>Server filters applied</span> : null}
       </div>
       <div className="mt-3 overflow-hidden rounded-md border border-slate-200">
         <div className="overflow-x-auto">
@@ -689,6 +1016,21 @@ export default function InsightersTab() {
                               </a>
                             </Tooltip>
                           ) : null}
+                          {insighter.receiveProjectServices === 'active' ? (
+                            <Tooltip
+                              label="Available for project services"
+                              withArrow
+                              position="top"
+                              openDelay={100}
+                            >
+                              <span
+                                className="inline-flex h-7 w-7 items-center justify-center rounded-full bg-blue-50 text-blue-600 ring-1 ring-blue-200"
+                                aria-label={`${insighter.name} is available for project services`}
+                              >
+                                <IconBriefcase size={15} />
+                              </span>
+                            </Tooltip>
+                          ) : null}
                         </div>
                       </td>
                       <td className="px-3 py-2">{insighter.country ?? '-'}</td>
@@ -703,6 +1045,14 @@ export default function InsightersTab() {
                       </td>
                       <td className="px-3 py-2">
                         <div className="flex flex-wrap items-center gap-2">
+                          <button
+                            type="button"
+                            onClick={() => openEmailModal('specific', insighter)}
+                            className={`${ROW_ACTION_BUTTON_CLASS} inline-flex items-center gap-1 border-blue-300 text-blue-700 hover:bg-blue-50`}
+                          >
+                            <IconMail size={12} aria-hidden="true" />
+                            Email
+                          </button>
                           {isInactive ? (
                             <button
                               type="button"
@@ -750,6 +1100,22 @@ export default function InsightersTab() {
         onClose={closeActionModal}
         onSubmit={submitAction}
         onStaffNotesChange={setStaffNotes}
+      />
+      <InsighterEmailModal
+        isOpen={emailModalState.isOpen}
+        target={emailModalState.target}
+        recipientName={emailModalState.insighter?.name ?? ''}
+        recipientEmail={emailModalState.insighter?.email ?? ''}
+        subject={emailSubject}
+        message={emailMessage}
+        submitError={emailSubmitError}
+        isSubmitting={isEmailSubmitting}
+        broadcastConfirmed={broadcastConfirmed}
+        onClose={closeEmailModal}
+        onSubmit={submitEmail}
+        onSubjectChange={setEmailSubject}
+        onMessageChange={setEmailMessage}
+        onBroadcastConfirmedChange={setBroadcastConfirmed}
       />
     </div>
   );

@@ -113,6 +113,7 @@ type ReviewData = {
   title: string
   projectType: string
   deliverablesLanguage: string
+  insighterIndustry: string
   service: string
   projectStatus: string
   whoAreYou: string
@@ -883,6 +884,10 @@ export default function ProjectReviewStep({
         locale,
         projectWizardStorage.deliverablesLanguageKey(locale)
       )
+      const insighterIndustryLabel = readStorageValue(
+        locale,
+        projectWizardStorage.insighterIndustryLabelKey(locale)
+      )
       const storedServiceLabel = readStorageValue(
         locale,
         projectWizardStorage.serviceLabelKey(locale)
@@ -1102,6 +1107,8 @@ export default function ProjectReviewStep({
         projectType: projectTypeValue || (isRTL ? 'غير محدد' : 'Not specified'),
         deliverablesLanguage:
           deliverablesLanguage || (isRTL ? 'غير محدد' : 'Not specified'),
+        insighterIndustry:
+          insighterIndustryLabel || (isRTL ? 'غير محدد' : 'Not specified'),
         service: serviceName,
         projectStatus: projectStatusValue || (isRTL ? 'غير محدد' : 'Not specified'),
         whoAreYou: businessTypeValue || (isRTL ? 'غير محدد' : 'Not specified'),
@@ -1159,6 +1166,11 @@ export default function ProjectReviewStep({
         label: isRTL ? 'لغة المخرجات' : 'Deliverables language',
         value: [review.deliverablesLanguage],
         editStepId: projectWizardStepIds.deliverablesLanguage,
+      },
+      {
+        label: isRTL ? 'الصناعة' : 'Industry',
+        value: [review.insighterIndustry],
+        editStepId: projectWizardStepIds.insighterIndustry,
       },
       {
         label: isRTL ? 'الخدمة' : 'Service',

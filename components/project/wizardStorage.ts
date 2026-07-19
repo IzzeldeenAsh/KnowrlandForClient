@@ -45,6 +45,12 @@ export const projectWizardStorage = {
   deliverablesLanguageKey(locale: WizardLocale) {
     return `project:wizard:${locale}:deliverablesLanguage`
   },
+  insighterIndustryIdKey(locale: WizardLocale) {
+    return `project:wizard:${locale}:insighterIndustryId`
+  },
+  insighterIndustryLabelKey(locale: WizardLocale) {
+    return `project:wizard:${locale}:insighterIndustryLabel`
+  },
   preferredInsighterTypeKey(locale: WizardLocale) {
     return `project:wizard:${locale}:preferredInsighterType`
   },

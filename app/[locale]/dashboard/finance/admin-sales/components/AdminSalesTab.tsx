@@ -19,6 +19,7 @@ type PeriodStatisticsData = {
   order_statistics: Record<string, OrderStatistics>;
   knowledge_order_statistics: Record<string, OrderStatistics>;
   meeting_booking_order_statistics: Record<string, OrderStatistics>;
+  project_order_statistics: Record<string, OrderStatistics>;
 };
 
 type TotalStatisticsData = {
@@ -47,6 +48,7 @@ function getText(locale: string, key: string): string {
     YEARLY: { en: 'Yearly', ar: 'سنوي' },
     KNOWLEDGE: { en: 'Knowledge', ar: 'المعرفة' },
     MEETINGS: { en: 'Sessions', ar: 'الجلسات الاستشارية' },
+    PROJECTS: { en: 'Projects', ar: 'المشاريع' },
     WARNING: { en: 'Warning', ar: 'تحذير' },
     NO_EXPORT: { en: 'No data available to export', ar: 'لا توجد بيانات للتصدير' },
     EXPORT_SUCCESS: { en: 'Export Successful', ar: 'نجح التصدير' },
@@ -196,12 +198,14 @@ function RevenueChart({
   labels,
   knowledgeData,
   meetingData,
+  projectData,
   locale,
   period,
 }: {
   labels: string[];
   knowledgeData: number[];
   meetingData: number[];
+  projectData: number[];
   locale: string;
   period: PeriodType;
 }) {
@@ -227,10 +231,10 @@ function RevenueChart({
   );
 
   const maxValue = useMemo(() => {
-    const all = [...knowledgeData, ...meetingData];
+    const all = [...knowledgeData, ...meetingData, ...projectData];
     const max = all.reduce((acc, v) => (Number.isFinite(v) ? Math.max(acc, v) : acc), 0);
     return max <= 0 ? 1 : max;
-  }, [knowledgeData, meetingData]);
+  }, [knowledgeData, meetingData, projectData]);
 
   const plotW = Math.max(1, width - padding.left - padding.right);
   const plotH = Math.max(1, height - padding.top - padding.bottom);
@@ -300,6 +304,8 @@ function RevenueChart({
   const knowledgeArea = useMemo(() => buildAreaPath(knowledgeData), [buildAreaPath, knowledgeData]);
   const meetingLine = useMemo(() => buildLinePath(meetingData), [buildLinePath, meetingData]);
   const meetingArea = useMemo(() => buildAreaPath(meetingData), [buildAreaPath, meetingData]);
+  const projectLine = useMemo(() => buildLinePath(projectData), [buildLinePath, projectData]);
+  const projectArea = useMemo(() => buildAreaPath(projectData), [buildAreaPath, projectData]);
 
   const onPointerMove = useCallback(
     (event: PointerEvent<SVGSVGElement>) => {
@@ -320,9 +326,10 @@ function RevenueChart({
     const label = labels[hoverIndex] ?? '';
     const knowledge = knowledgeData[hoverIndex] ?? 0;
     const meetings = meetingData[hoverIndex] ?? 0;
+    const projects = projectData[hoverIndex] ?? 0;
     const left = xForIndex(hoverIndex);
-    return { label, knowledge, meetings, left };
-  }, [hoverIndex, knowledgeData, labels, meetingData, xForIndex]);
+    return { label, knowledge, meetings, projects, left };
+  }, [hoverIndex, knowledgeData, labels, meetingData, projectData, xForIndex]);
 
   const yTicks = useMemo(() => {
     const steps = 4;
@@ -375,6 +382,10 @@ function RevenueChart({
               <stop offset="0%" stopColor="rgba(80, 200, 120, 0.2)" />
               <stop offset="100%" stopColor="rgba(80, 200, 120, 0)" />
             </linearGradient>
+            <linearGradient id="projectFill" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stopColor="rgba(114, 57, 234, 0.2)" />
+              <stop offset="100%" stopColor="rgba(114, 57, 234, 0)" />
+            </linearGradient>
           </defs>
 
           {yTicks.map((tick) => (
@@ -417,9 +428,11 @@ function RevenueChart({
 
           {knowledgeArea ? <path d={knowledgeArea} fill="url(#knowledgeFill)" /> : null}
           {meetingArea ? <path d={meetingArea} fill="url(#meetingFill)" /> : null}
+          {projectArea ? <path d={projectArea} fill="url(#projectFill)" /> : null}
 
           {knowledgeLine ? <path d={knowledgeLine} fill="none" stroke="#3799FF" strokeWidth={2} /> : null}
           {meetingLine ? <path d={meetingLine} fill="none" stroke="#50C878" strokeWidth={2} /> : null}
+          {projectLine ? <path d={projectLine} fill="none" stroke="#7239EA" strokeWidth={2} /> : null}
 
           {tooltip ? (
             <line
@@ -437,7 +450,8 @@ function RevenueChart({
             ? [
               { color: '#3799FF', value: tooltip.knowledge },
               { color: '#50C878', value: tooltip.meetings },
-            ].map((series, idx) => (
+              { color: '#7239EA', value: tooltip.projects },
+            ].map((series) => (
               <g key={series.color}>
                 <circle cx={tooltip.left} cy={yForValue(series.value)} r={6} fill={series.color} opacity={0.18} />
                 <circle cx={tooltip.left} cy={yForValue(series.value)} r={4} fill={series.color} stroke="#ffffff" strokeWidth={2} />
@@ -470,6 +484,13 @@ function RevenueChart({
                   <span className="font-medium">{getText(locale, 'MEETINGS')}</span>
                 </div>
                 <span className="font-semibold">{formatCurrency(tooltip.meetings)}</span>
+              </div>
+              <div className="flex items-center justify-between gap-2">
+                <div className="flex items-center gap-2">
+                  <span className="inline-block h-2 w-2 rounded-full" style={{ background: '#7239EA' }} />
+                  <span className="font-medium">{getText(locale, 'PROJECTS')}</span>
+                </div>
+                <span className="font-semibold">{formatCurrency(tooltip.projects)}</span>
               </div>
             </div>
           </div>
@@ -630,10 +651,21 @@ export default function AdminSalesTab() {
         ]),
       ];
 
+      const projectRows: Array<Array<string | number>> = [
+        headers,
+        ...periodLabels.map((period) => [
+          period,
+          periodStatistics.project_order_statistics?.[period]?.orders_total ?? 0,
+          periodStatistics.project_order_statistics?.[period]?.orders_amount ?? 0,
+          periodStatistics.project_order_statistics?.[period]?.platform_orders_amount ?? 0,
+        ]),
+      ];
+
       const workbookXml = buildSpreadsheetMlWorkbook([
         { name: locale === 'ar' ? 'إحصائيات_الطلبات' : 'Order_Statistics', rows: overallRows },
         { name: locale === 'ar' ? 'طلبات_المعرفة' : 'Knowledge_Orders', rows: knowledgeRows },
         { name: locale === 'ar' ? 'طلبات_الاجتماعات' : 'Meeting_Orders', rows: meetingRows },
+        { name: locale === 'ar' ? 'طلبات_المشاريع' : 'Project_Orders', rows: projectRows },
       ]);
 
       const fileName = `${locale === 'ar' ? 'تقرير_مبيعات_الإدارة' : 'admin_sales_report'}_${periodText}_${dateString}.xml`;
@@ -661,7 +693,8 @@ export default function AdminSalesTab() {
     const labels = Object.keys(periodStatistics.order_statistics ?? {});
     const knowledgeData = labels.map((label) => periodStatistics.knowledge_order_statistics?.[label]?.orders_amount ?? 0);
     const meetingData = labels.map((label) => periodStatistics.meeting_booking_order_statistics?.[label]?.orders_amount ?? 0);
-    return { labels, knowledgeData, meetingData };
+    const projectData = labels.map((label) => periodStatistics.project_order_statistics?.[label]?.orders_amount ?? 0);
+    return { labels, knowledgeData, meetingData, projectData };
   }, [periodStatistics]);
 
   return (
@@ -735,6 +768,7 @@ export default function AdminSalesTab() {
                 labels={chartModel.labels}
                 knowledgeData={chartModel.knowledgeData}
                 meetingData={chartModel.meetingData}
+                projectData={chartModel.projectData}
                 locale={locale}
                 period={selectedPeriod}
               />
