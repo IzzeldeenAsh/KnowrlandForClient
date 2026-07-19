@@ -28,7 +28,7 @@ type InsighterRecord = {
 // project settings row yet.
 type ProjectServicesStatus = 'active' | 'inactive' | null;
 
-type BooleanFilter = '' | 'true' | 'false';
+type BooleanFilter = '' | '1' | '0';
 type ActivityPeriod = '' | 'week' | 'month' | '3month' | 'year' | 'more_than_year';
 
 type InsighterFilters = {
@@ -108,8 +108,6 @@ function formatWhatsappNumber(countryCode: string | null, phoneNumber: string | 
 
 const INPUT_CLASS =
   'h-8 w-full rounded-md border border-slate-200 bg-white pl-9 pr-3 text-xs text-slate-700 shadow-sm outline-none focus:border-blue-400';
-const PRIMARY_BUTTON_CLASS =
-  'h-8 rounded-md border border-blue-600 bg-blue-600 px-4 text-xs font-medium text-white shadow-sm hover:bg-blue-700';
 const ROW_ACTION_BUTTON_CLASS =
   'rounded-md border bg-white px-2 py-1 text-[10px] font-medium shadow-sm';
 const FILTER_INPUT_CLASS =
@@ -365,8 +363,7 @@ export default function InsightersTab() {
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [error, setError] = useState<string>('');
   const [searchInput, setSearchInput] = useState<string>('');
-  const [draftFilters, setDraftFilters] = useState<InsighterFilters>(EMPTY_FILTERS);
-  const [appliedFilters, setAppliedFilters] = useState<InsighterFilters>(EMPTY_FILTERS);
+  const [filters, setFilters] = useState<InsighterFilters>(EMPTY_FILTERS);
   const [modalState, setModalState] = useState<ActionModalState>({
     isOpen: false,
     action: 'deactivate',
@@ -398,7 +395,7 @@ export default function InsightersTab() {
         return;
       }
 
-      const response = await fetch(buildInsighterListUrl(appliedFilters), {
+      const response = await fetch(buildInsighterListUrl(filters), {
         method: 'GET',
         cache: 'no-store',
         signal,
@@ -427,7 +424,7 @@ export default function InsightersTab() {
     } finally {
       setIsLoading(false);
     }
-  }, [appliedFilters, handleServerErrors]);
+  }, [filters, handleServerErrors]);
 
   useEffect(() => {
     const controller = new AbortController();
@@ -493,22 +490,17 @@ export default function InsightersTab() {
     };
   }, [insighters]);
 
-  const activeFilterCount = countActiveFilters(appliedFilters);
+  const activeFilterCount = countActiveFilters(filters);
 
-  const updateDraftFilter = <Key extends keyof InsighterFilters>(
+  const updateFilter = <Key extends keyof InsighterFilters>(
     key: Key,
     value: InsighterFilters[Key]
   ) => {
-    setDraftFilters((current) => ({ ...current, [key]: value }));
-  };
-
-  const applyFilters = () => {
-    setAppliedFilters({ ...draftFilters });
+    setFilters((current) => ({ ...current, [key]: value }));
   };
 
   const clearFilters = () => {
-    setDraftFilters({ ...EMPTY_FILTERS });
-    setAppliedFilters({ ...EMPTY_FILTERS });
+    setFilters({ ...EMPTY_FILTERS });
   };
 
   const openEmailModal = (target: EmailTarget, insighter: InsighterRecord | null = null) => {
@@ -826,34 +818,34 @@ export default function InsightersTab() {
           <label className="text-[11px] font-semibold text-slate-600">
             WhatsApp
             <select
-              value={draftFilters.whatsappActivated}
-              onChange={(event) => updateDraftFilter('whatsappActivated', event.target.value as BooleanFilter)}
+              value={filters.whatsappActivated}
+              onChange={(event) => updateFilter('whatsappActivated', event.target.value as BooleanFilter)}
               className={FILTER_INPUT_CLASS}
             >
               <option value="">Any status</option>
-              <option value="true">Activated</option>
-              <option value="false">Not activated</option>
+              <option value="1">Activated</option>
+              <option value="0">Not activated</option>
             </select>
           </label>
 
           <label className="text-[11px] font-semibold text-slate-600">
             Project services
             <select
-              value={draftFilters.receiveServiceActivated}
-              onChange={(event) => updateDraftFilter('receiveServiceActivated', event.target.value as BooleanFilter)}
+              value={filters.receiveServiceActivated}
+              onChange={(event) => updateFilter('receiveServiceActivated', event.target.value as BooleanFilter)}
               className={FILTER_INPUT_CLASS}
             >
               <option value="">Any status</option>
-              <option value="true">Receiving services</option>
-              <option value="false">Not receiving services</option>
+              <option value="1">Receiving services</option>
+              <option value="0">Not receiving services</option>
             </select>
           </label>
 
           <label className="text-[11px] font-semibold text-slate-600">
             Last activity
             <select
-              value={draftFilters.lastActivity}
-              onChange={(event) => updateDraftFilter('lastActivity', event.target.value as ActivityPeriod)}
+              value={filters.lastActivity}
+              onChange={(event) => updateFilter('lastActivity', event.target.value as ActivityPeriod)}
               className={FILTER_INPUT_CLASS}
             >
               {PERIOD_OPTIONS.map((option) => (
@@ -865,8 +857,8 @@ export default function InsightersTab() {
           <label className="text-[11px] font-semibold text-slate-600">
             Published insights
             <select
-              value={draftFilters.publishedInsightsPeriod}
-              onChange={(event) => updateDraftFilter('publishedInsightsPeriod', event.target.value as ActivityPeriod)}
+              value={filters.publishedInsightsPeriod}
+              onChange={(event) => updateFilter('publishedInsightsPeriod', event.target.value as ActivityPeriod)}
               className={FILTER_INPUT_CLASS}
             >
               {PERIOD_OPTIONS.map((option) => (
@@ -882,11 +874,11 @@ export default function InsightersTab() {
               min="1"
               step="1"
               inputMode="numeric"
-              value={draftFilters.publishedInsightsMoreThan}
+              value={filters.publishedInsightsMoreThan}
               onChange={(event) => {
                 const { value } = event.target;
                 if (value === '' || /^[1-9]\d*$/.test(value)) {
-                  updateDraftFilter('publishedInsightsMoreThan', value);
+                  updateFilter('publishedInsightsMoreThan', value);
                 }
               }}
               placeholder="e.g. 3"
@@ -895,19 +887,19 @@ export default function InsightersTab() {
           </label>
         </div>
 
-        <div className="mt-3 flex flex-wrap items-center justify-end gap-2">
+        <div className="mt-3 flex flex-wrap items-center justify-between gap-2">
+          <span className="inline-flex items-center gap-1.5 text-[11px] font-medium text-slate-500" aria-live="polite">
+            <span className={`h-1.5 w-1.5 rounded-full ${isLoading ? 'animate-pulse bg-blue-500' : 'bg-emerald-500'}`} />
+            {isLoading ? 'Updating results...' : 'Results update automatically'}
+          </span>
           <button
             type="button"
             onClick={clearFilters}
-            disabled={countActiveFilters(draftFilters) === 0 && activeFilterCount === 0}
+            disabled={activeFilterCount === 0}
             className="inline-flex h-8 items-center gap-1.5 rounded-md border border-slate-200 bg-white px-3 text-xs font-medium text-slate-600 shadow-sm transition hover:bg-slate-100 disabled:cursor-not-allowed disabled:opacity-40"
           >
             <IconX size={14} aria-hidden="true" />
             Clear
-          </button>
-          <button type="button" onClick={applyFilters} className={`${PRIMARY_BUTTON_CLASS} inline-flex items-center gap-1.5`}>
-            <IconFilter size={14} aria-hidden="true" />
-            Apply filters
           </button>
         </div>
       </div>
