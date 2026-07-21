@@ -2,6 +2,9 @@
 
 import { IconAlertTriangle, IconMail, IconUser, IconUsers, IconX } from '@tabler/icons-react';
 import { useEffect } from 'react';
+import ContactMessageReplyEditor, {
+  richTextToPlainText,
+} from '../../../contact-messages/components/ContactMessageReplyEditor';
 
 export type EmailTarget = 'specific' | 'all';
 
@@ -55,9 +58,10 @@ export default function InsighterEmailModal({
   if (!isOpen) return null;
 
   const isBroadcast = target === 'all';
+  const messageText = richTextToPlainText(message);
   const canSubmit =
     subject.trim().length > 0 &&
-    message.trim().length > 0 &&
+    messageText.length > 0 &&
     (!isBroadcast || broadcastConfirmed) &&
     !isSubmitting;
 
@@ -143,19 +147,14 @@ export default function InsighterEmailModal({
 
           <div>
             <div className="mb-1.5 flex items-center justify-between gap-3">
-              <label htmlFor="insighter-email-message" className="text-xs font-semibold text-slate-700">
-                Message
-              </label>
-              <span className="text-[10px] text-slate-400">{message.length}/10,000</span>
+              <span className="text-xs font-semibold text-slate-700">Message</span>
+              <span className="text-[10px] text-slate-400">{messageText.length} characters</span>
             </div>
-            <textarea
-              id="insighter-email-message"
-              rows={7}
-              maxLength={10000}
+            <ContactMessageReplyEditor
               value={message}
-              onChange={(event) => onMessageChange(event.target.value)}
+              onChange={onMessageChange}
               placeholder="Write the message insighters will receive..."
-              className={`${FIELD_CLASS} resize-y py-3 leading-6`}
+              disabled={isSubmitting}
             />
             <p className="mt-1.5 text-[11px] text-slate-500">
               The recipient’s name and Insighta email branding are added automatically.

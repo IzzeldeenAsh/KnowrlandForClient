@@ -193,7 +193,8 @@ interface KnowledgeResponse {
 interface MeetingTime {
   start_time: string;
   end_time: string;
-  rate: string;
+  rate: string | number;
+  rate_physical?: string | number | null;
   place?: string;
   place_name?: string;
   available_places?: string[];

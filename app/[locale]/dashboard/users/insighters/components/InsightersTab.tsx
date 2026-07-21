@@ -1,13 +1,14 @@
 'use client';
 
 import { Tooltip } from '@mantine/core';
-import { IconBrandWhatsapp, IconBriefcase, IconFilter, IconMail, IconX } from '@tabler/icons-react';
+import { IconBrandWhatsapp, IconBriefcase, IconFileCheck, IconFileX, IconFilter, IconMail, IconX } from '@tabler/icons-react';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { getAuthToken } from '@/lib/authToken';
 import { useToast } from '@/components/toast/ToastContext';
 import { buildAuthHeaders, parseApiError } from '../../../_config/api';
 import InsighterActionModal from './InsighterActionModal';
 import InsighterEmailModal, { type EmailTarget } from './InsighterEmailModal';
+import { richTextToPlainText } from '../../../contact-messages/components/ContactMessageReplyEditor';
 
 type InsighterAction = 'activate' | 'deactivate' | 'delete';
 
@@ -22,6 +23,7 @@ type InsighterRecord = {
   verified: boolean;
   profilePhotoUrl: string | null;
   receiveProjectServices: ProjectServicesStatus;
+  publishedInsightAtLeastOne: boolean;
 };
 
 // Mirrors ProjectReceiveStausEnum on the backend; null when the insighter has no
@@ -309,6 +311,7 @@ function normalizeInsighters(payload: unknown): InsighterRecord[] {
         verified?: boolean | number | string;
         profile_photo_url?: string | null;
         receive_project_services?: string | null;
+        published_insight_at_least_one?: boolean | number | string | null;
       };
 
       const numericId = Number(row.id);
@@ -339,6 +342,11 @@ function normalizeInsighters(payload: unknown): InsighterRecord[] {
             ? row.profile_photo_url
             : null,
         receiveProjectServices: normalizeProjectServices(row.receive_project_services),
+        publishedInsightAtLeastOne:
+          row.published_insight_at_least_one === true ||
+          row.published_insight_at_least_one === 1 ||
+          row.published_insight_at_least_one === '1' ||
+          row.published_insight_at_least_one === 'true',
       } satisfies InsighterRecord;
     })
     .filter((insighter): insighter is InsighterRecord => insighter !== null);
@@ -530,7 +538,7 @@ export default function InsightersTab() {
     const trimmedSubject = emailSubject.trim();
     const trimmedMessage = emailMessage.trim();
 
-    if (!trimmedSubject || !trimmedMessage) {
+    if (!trimmedSubject || !richTextToPlainText(trimmedMessage)) {
       setEmailSubmitError('Subject and message are required.');
       return;
     }
@@ -1023,6 +1031,32 @@ export default function InsightersTab() {
                               </span>
                             </Tooltip>
                           ) : null}
+                          <Tooltip
+                            label={insighter.publishedInsightAtLeastOne ? 'Has published insights' : 'No published insights'}
+                            withArrow
+                            position="top"
+                            openDelay={100}
+                          >
+                            <span
+                              className={`inline-flex h-7 w-7 items-center justify-center rounded-full ring-1 ${
+                                insighter.publishedInsightAtLeastOne
+                                  ? 'bg-violet-50 text-violet-600 ring-violet-200'
+                                  : 'bg-slate-100 text-slate-400 ring-slate-200'
+                              }`}
+                              aria-label={
+                                insighter.publishedInsightAtLeastOne
+                                  ? `${insighter.name} has published at least one insight`
+                                  : `${insighter.name} has no published insights`
+                              }
+                              aria-disabled={!insighter.publishedInsightAtLeastOne}
+                            >
+                              {insighter.publishedInsightAtLeastOne ? (
+                                <IconFileCheck size={15} />
+                              ) : (
+                                <IconFileX size={15} />
+                              )}
+                            </span>
+                          </Tooltip>
                         </div>
                       </td>
                       <td className="px-3 py-2">{insighter.country ?? '-'}</td>

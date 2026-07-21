@@ -6,6 +6,7 @@ export const projectWizardStepIds = {
   projectType: 'project-type',
   deliverablesLanguage: 'deliverables-language',
   insighterIndustry: 'insighter-industry',
+  insighterSubIndustry: 'insighter-sub-industry',
   service: 'service',
   projectScope: 'project-scope',
   projectSubscopes: 'project-subscopes',
@@ -166,11 +167,26 @@ function readPreferredInsighterType(
   return null
 }
 
+function selectedIndustryParentHasChildren(locale: WizardLocale): boolean {
+  if (typeof window === 'undefined') return false
+
+  try {
+    return (
+      window.sessionStorage.getItem(
+        projectWizardStorage.insighterIndustryParentHasChildrenKey(locale)
+      ) === '1'
+    )
+  } catch {
+    return false
+  }
+}
+
 export function getProjectWizardStepOrder(locale: WizardLocale): string[] {
   const serviceComponentSlugs = readServiceComponentSlugs(locale)
   const preferredInsighterType = readPreferredInsighterType(locale)
   const skipKickoffMeeting = readProjectAddonsState(locale).kickoffMeeting.skipped
   const specifiedInsighterProject = isSpecifiedInsighterProject(locale)
+  const includeSubIndustryStep = selectedIndustryParentHasChildren(locale)
 
   const postOriginSteps =
     specifiedInsighterProject
@@ -193,6 +209,9 @@ export function getProjectWizardStepOrder(locale: WizardLocale): string[] {
     projectWizardStepIds.projectType,
     projectWizardStepIds.deliverablesLanguage,
     projectWizardStepIds.insighterIndustry,
+    ...(includeSubIndustryStep
+      ? [projectWizardStepIds.insighterSubIndustry]
+      : []),
     projectWizardStepIds.service,
     projectWizardStepIds.projectScope,
     projectWizardStepIds.projectSubscopes,

@@ -1,7 +1,7 @@
 'use client';
 
 import { Tooltip } from '@mantine/core';
-import { IconBrandWhatsapp } from '@tabler/icons-react';
+import { IconBrandWhatsapp, IconBriefcase, IconFileCheck, IconFileX, IconFilter, IconX } from '@tabler/icons-react';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { getAuthToken } from '@/lib/authToken';
 import { useToast } from '@/components/toast/ToastContext';
@@ -9,6 +9,18 @@ import { buildAuthHeaders, parseApiError } from '../../../_config/api';
 import CompanyActionModal from './CompanyActionModal';
 
 type CompanyAction = 'activate' | 'deactivate' | 'delete';
+
+type BooleanFilter = '' | '1' | '0';
+type ActivityPeriod = '' | 'week' | 'month' | '3month' | 'year' | 'more_than_year';
+
+type CompanyFilters = {
+  whatsappActivated: BooleanFilter;
+  receiveServiceActivated: BooleanFilter;
+  publishedInsightsPeriod: ActivityPeriod;
+  publishedInsightsMoreThan: string;
+};
+
+type ProjectServicesStatus = 'active' | 'inactive' | null;
 
 type CompanyRecord = {
   id: number;
@@ -21,6 +33,8 @@ type CompanyRecord = {
   verified: boolean;
   logoUrl: string | null;
   companyName: string | null;
+  receiveProjectServices: ProjectServicesStatus;
+  publishedInsightAtLeastOne: boolean;
 };
 
 type ActionModalState = {
@@ -90,6 +104,50 @@ const PRIMARY_BUTTON_CLASS =
   'h-8 rounded-md border border-blue-600 bg-blue-600 px-4 text-xs font-medium text-white shadow-sm hover:bg-blue-700';
 const ROW_ACTION_BUTTON_CLASS =
   'rounded-md border bg-white px-2 py-1 text-[10px] font-medium shadow-sm';
+const FILTER_INPUT_CLASS =
+  'mt-1.5 h-9 w-full rounded-md border border-slate-200 bg-white px-3 text-xs text-slate-700 shadow-sm outline-none transition focus:border-blue-400 focus:ring-2 focus:ring-blue-100';
+
+const EMPTY_FILTERS: CompanyFilters = {
+  whatsappActivated: '',
+  receiveServiceActivated: '',
+  publishedInsightsPeriod: '',
+  publishedInsightsMoreThan: '',
+};
+
+const PERIOD_OPTIONS: Array<{ value: ActivityPeriod; label: string }> = [
+  { value: '', label: 'Any time' },
+  { value: 'week', label: 'Last week' },
+  { value: 'month', label: 'Last month' },
+  { value: '3month', label: 'Last 3 months' },
+  { value: 'year', label: 'Last year' },
+  { value: 'more_than_year', label: 'More than a year ago' },
+];
+
+function countActiveFilters(filters: CompanyFilters): number {
+  return Object.values(filters).filter(Boolean).length;
+}
+
+function buildCompanyListUrl(filters: CompanyFilters): string {
+  const url = new URL(
+    `${process.env.NEXT_PUBLIC_API_URL}/api/admin/account/company/list`,
+    window.location.origin
+  );
+
+  if (filters.whatsappActivated) {
+    url.searchParams.set('whatsapp_activated', filters.whatsappActivated);
+  }
+  if (filters.receiveServiceActivated) {
+    url.searchParams.set('receive_service_activated', filters.receiveServiceActivated);
+  }
+  if (filters.publishedInsightsPeriod) {
+    url.searchParams.set('published_insights_period', filters.publishedInsightsPeriod);
+  }
+  if (filters.publishedInsightsMoreThan) {
+    url.searchParams.set('published_insights_more_than', filters.publishedInsightsMoreThan);
+  }
+
+  return url.toString();
+}
 
 function clampNumber(value: number, min: number, max: number): number {
   return Math.min(Math.max(value, min), max);
@@ -211,6 +269,13 @@ function getEndpoint(action: CompanyAction, id: number): string {
   return `${process.env.NEXT_PUBLIC_API_URL}/api/admin/account/company/deactivate-delete/${id}`;
 }
 
+function normalizeProjectServices(value: unknown): ProjectServicesStatus {
+  const normalized = typeof value === 'string' ? value.trim().toLowerCase() : '';
+  if (normalized === 'active') return 'active';
+  if (normalized === 'inactive') return 'inactive';
+  return null;
+}
+
 function normalizeCompanies(payload: unknown): CompanyRecord[] {
   if (!payload || typeof payload !== 'object') {
     return [];
@@ -232,6 +297,8 @@ function normalizeCompanies(payload: unknown): CompanyRecord[] {
         country?: string | null;
         profile_photo_url?: string | null;
         verified?: boolean | number | string;
+        receive_project_services?: string | null;
+        published_insight_at_least_one?: boolean | number | string | null;
         company?: {
           legal_name?: string;
           status?: string;
@@ -287,6 +354,12 @@ function normalizeCompanies(payload: unknown): CompanyRecord[] {
         verified: Boolean(row.verified),
         logoUrl: resolvedLogoUrl,
         companyName: resolvedCompanyName,
+        receiveProjectServices: normalizeProjectServices(row.receive_project_services),
+        publishedInsightAtLeastOne:
+          row.published_insight_at_least_one === true ||
+          row.published_insight_at_least_one === 1 ||
+          row.published_insight_at_least_one === '1' ||
+          row.published_insight_at_least_one === 'true',
       } satisfies CompanyRecord;
     })
     .filter((company): company is CompanyRecord => company !== null);
@@ -311,6 +384,7 @@ export default function CompaniesTab() {
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [error, setError] = useState<string>('');
   const [searchInput, setSearchInput] = useState<string>('');
+  const [filters, setFilters] = useState<CompanyFilters>(EMPTY_FILTERS);
   const [modalState, setModalState] = useState<ActionModalState>({
     isOpen: false,
     action: 'deactivate',
@@ -332,7 +406,7 @@ export default function CompaniesTab() {
         return;
       }
 
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/admin/account/company/list`, {
+      const response = await fetch(buildCompanyListUrl(filters), {
         method: 'GET',
         cache: 'no-store',
         signal,
@@ -361,7 +435,7 @@ export default function CompaniesTab() {
     } finally {
       setIsLoading(false);
     }
-  }, [handleServerErrors]);
+  }, [filters, handleServerErrors]);
 
   useEffect(() => {
     const controller = new AbortController();
@@ -426,6 +500,19 @@ export default function CompaniesTab() {
       topCountries,
     };
   }, [companies]);
+
+  const activeFilterCount = countActiveFilters(filters);
+
+  const updateFilter = <Key extends keyof CompanyFilters>(
+    key: Key,
+    value: CompanyFilters[Key]
+  ) => {
+    setFilters((current) => ({ ...current, [key]: value }));
+  };
+
+  const clearFilters = () => {
+    setFilters({ ...EMPTY_FILTERS });
+  };
 
   const openActionModal = (company: CompanyRecord, action: CompanyAction) => {
     setModalState({
@@ -602,19 +689,121 @@ export default function CompaniesTab() {
           </div>
         </div>
       </div>
-      <div className=" mt-8 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-end sm:flex-1 sm:pl-4">
-        <div className="relative flex-1 sm:max-w-[520px]">
-          <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-slate-400">
-            <SearchIcon />
-          </span>
-          <input
-            type="text"
-            value={searchInput}
-            onChange={(event) => setSearchInput(event.target.value)}
-            placeholder="Search companies..."
-            className={INPUT_CLASS}
-          />
+      <div className="mt-8 rounded-lg border border-slate-200 bg-slate-50/70 p-3 shadow-sm">
+        <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
+          <div className="flex items-center gap-2">
+            <span className="inline-flex h-8 w-8 items-center justify-center rounded-md bg-blue-600 text-white shadow-sm">
+              <IconFilter size={16} aria-hidden="true" />
+            </span>
+            <div>
+              <div className="flex items-center gap-2">
+                <h3 className="text-sm font-semibold text-slate-900">Filter companies</h3>
+                {activeFilterCount > 0 ? (
+                  <span className="rounded-full bg-blue-100 px-2 py-0.5 text-[10px] font-bold text-blue-700">
+                    {activeFilterCount} active
+                  </span>
+                ) : null}
+              </div>
+              <p className="text-[11px] text-slate-500">Narrow the list using service and publishing signals.</p>
+            </div>
+          </div>
+          <div className="relative w-full lg:max-w-[420px]">
+            <label htmlFor="company-search" className="sr-only">Search companies</label>
+            <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-slate-400">
+              <SearchIcon />
+            </span>
+            <input
+              id="company-search"
+              type="search"
+              value={searchInput}
+              onChange={(event) => setSearchInput(event.target.value)}
+              placeholder="Search by name, email, phone, or country..."
+              className={INPUT_CLASS}
+            />
+          </div>
         </div>
+
+        <div className="mt-3 grid grid-cols-1 gap-3 border-t border-slate-200 pt-3 sm:grid-cols-2 xl:grid-cols-4">
+          <label className="text-[11px] font-semibold text-slate-600">
+            WhatsApp
+            <select
+              value={filters.whatsappActivated}
+              onChange={(event) => updateFilter('whatsappActivated', event.target.value as BooleanFilter)}
+              className={FILTER_INPUT_CLASS}
+            >
+              <option value="">Any status</option>
+              <option value="1">Activated</option>
+              <option value="0">Not activated</option>
+            </select>
+          </label>
+
+          <label className="text-[11px] font-semibold text-slate-600">
+            Project services
+            <select
+              value={filters.receiveServiceActivated}
+              onChange={(event) => updateFilter('receiveServiceActivated', event.target.value as BooleanFilter)}
+              className={FILTER_INPUT_CLASS}
+            >
+              <option value="">Any status</option>
+              <option value="1">Receiving services</option>
+              <option value="0">Not receiving services</option>
+            </select>
+          </label>
+
+          <label className="text-[11px] font-semibold text-slate-600">
+            Published insights
+            <select
+              value={filters.publishedInsightsPeriod}
+              onChange={(event) => updateFilter('publishedInsightsPeriod', event.target.value as ActivityPeriod)}
+              className={FILTER_INPUT_CLASS}
+            >
+              {PERIOD_OPTIONS.map((option) => (
+                <option key={option.value || 'any'} value={option.value}>{option.label}</option>
+              ))}
+            </select>
+          </label>
+
+          <label className="text-[11px] font-semibold text-slate-600">
+            More than this many insights
+            <input
+              type="number"
+              min="1"
+              step="1"
+              inputMode="numeric"
+              value={filters.publishedInsightsMoreThan}
+              onChange={(event) => {
+                const { value } = event.target;
+                if (value === '' || /^[1-9]\d*$/.test(value)) {
+                  updateFilter('publishedInsightsMoreThan', value);
+                }
+              }}
+              placeholder="e.g. 3"
+              className={FILTER_INPUT_CLASS}
+            />
+          </label>
+        </div>
+
+        <div className="mt-3 flex flex-wrap items-center justify-between gap-2">
+          <span className="inline-flex items-center gap-1.5 text-[11px] font-medium text-slate-500" aria-live="polite">
+            <span className={`h-1.5 w-1.5 rounded-full ${isLoading ? 'animate-pulse bg-blue-500' : 'bg-emerald-500'}`} />
+            {isLoading ? 'Updating results...' : 'Results update automatically'}
+          </span>
+          <button
+            type="button"
+            onClick={clearFilters}
+            disabled={activeFilterCount === 0}
+            className="inline-flex h-8 items-center gap-1.5 rounded-md border border-slate-200 bg-white px-3 text-xs font-medium text-slate-600 shadow-sm transition hover:bg-slate-100 disabled:cursor-not-allowed disabled:opacity-40"
+          >
+            <IconX size={14} aria-hidden="true" />
+            Clear
+          </button>
+        </div>
+      </div>
+      <div className="mt-3 flex items-center justify-between gap-3 text-[11px] text-slate-500">
+        <span>
+          Showing <strong className="font-semibold text-slate-700">{filteredCompanies.length}</strong> compan{filteredCompanies.length === 1 ? 'y' : 'ies'}
+        </span>
+        {activeFilterCount > 0 ? <span>Server filters applied</span> : null}
       </div>
       <div className="mt-3 overflow-hidden rounded-md border border-slate-200">
         <div className="overflow-x-auto">
@@ -717,6 +906,47 @@ export default function CompaniesTab() {
                               </a>
                             </Tooltip>
                           ) : null}
+                          {company.receiveProjectServices === 'active' ? (
+                            <Tooltip
+                              label="Available for project services"
+                              withArrow
+                              position="top"
+                              openDelay={100}
+                            >
+                              <span
+                                className="inline-flex h-7 w-7 items-center justify-center rounded-full bg-blue-50 text-blue-600 ring-1 ring-blue-200"
+                                aria-label={`${displayName} is available for project services`}
+                              >
+                                <IconBriefcase size={15} />
+                              </span>
+                            </Tooltip>
+                          ) : null}
+                          <Tooltip
+                            label={company.publishedInsightAtLeastOne ? 'Has published insights' : 'No published insights'}
+                            withArrow
+                            position="top"
+                            openDelay={100}
+                          >
+                            <span
+                              className={`inline-flex h-7 w-7 items-center justify-center rounded-full ring-1 ${
+                                company.publishedInsightAtLeastOne
+                                  ? 'bg-violet-50 text-violet-600 ring-violet-200'
+                                  : 'bg-slate-100 text-slate-400 ring-slate-200'
+                              }`}
+                              aria-label={
+                                company.publishedInsightAtLeastOne
+                                  ? `${displayName} has published at least one insight`
+                                  : `${displayName} has no published insights`
+                              }
+                              aria-disabled={!company.publishedInsightAtLeastOne}
+                            >
+                              {company.publishedInsightAtLeastOne ? (
+                                <IconFileCheck size={15} />
+                              ) : (
+                                <IconFileX size={15} />
+                              )}
+                            </span>
+                          </Tooltip>
                         </div>
                       </td>
                       <td className="px-3 py-2">{company.country ?? '-'}</td>

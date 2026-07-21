@@ -80,6 +80,7 @@ export default function Hero() {
   const projectIntroHref = `/${currentLocale}/project`;
   const projectWizardHref = `/${currentLocale}/project/wizard/project-type?fresh=1`;
   const [searchInput, setSearchInput] = useState('');
+  const [searchType, setSearchType] = useState<'knowledge' | 'insighter'>('knowledge');
   const [suggestions, setSuggestions] = useState<string[]>([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -175,7 +176,7 @@ export default function Hero() {
 
     // Build URL params
     const params = new URLSearchParams();
-    params.set('search_type', 'knowledge');
+    params.set('search_type', searchType);
     params.set('keyword', suggestion);
     params.set('accuracy', 'any');
 
@@ -202,7 +203,7 @@ export default function Hero() {
 
     // Build URL params
     const params = new URLSearchParams();
-    params.set('search_type', 'knowledge');
+    params.set('search_type', searchType);
     params.set('keyword', trimmedSearchInput);
     params.set('accuracy', 'any');
 
@@ -267,12 +268,61 @@ export default function Hero() {
              lg:text-5xl 
              
              max-w-3xl mx-auto bg-clip-text text-transparent bg-gradient-to-r from-slate-200/60 via-slate-200 to-slate-200/60 pb-5 leading-[1.5]" data-aos="fade-down">{t('title')}</h2>
-            <p className=" text-sm sm:text-lg text-slate-300 mb-8" data-aos="fade-down" data-aos-delay="200">
+            <p className=" text-sm sm:text-lg text-slate-300 mb-6" data-aos="fade-down" data-aos-delay="200">
               {t('description')}
             </p>
             <div className="max-w-4xl mx-auto w-full pb-4" data-aos="fade-down" data-aos-delay="300">
               <div className="relative">
-                <form onSubmit={handleSubmit} className="flex flex-col items-center gap-3">
+                <form onSubmit={handleSubmit} className="flex flex-col items-center gap-6">
+                  {/* Search type toggle: By Insight / By Insighter */}
+                  <div className="flex flex-wrap items-center justify-center gap-3">
+                    {(['knowledge', 'insighter'] as const).map((type) => {
+                      const isActive = searchType === type;
+                      const label =
+                        type === 'knowledge'
+                          ? currentLocale === 'ar' ? 'المنشورات' : 'By Insight'
+                          : currentLocale === 'ar' ? 'الخبراء (انسايتر)' : 'By Insighter';
+                      return (
+                        <button
+                          key={type}
+                          type="button"
+                          onClick={() => setSearchType(type)}
+                          aria-pressed={isActive}
+                          className={`flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-semibold transition-all duration-200 shadow-sm border ${
+                            isActive
+                              ? 'bg-[#299af8] border-[#299af8] text-white shadow-md'
+                              : 'bg-white/10 border-white/20 text-slate-200 hover:bg-white/20'
+                          } ${currentLocale === 'ar' ? 'flex-row-reverse' : ''}`}
+                        >
+                          <span
+                            className={`flex items-center justify-center w-6 h-6 rounded-full border ${
+                              isActive ? 'bg-white/20 border-white/40 text-white' : 'bg-white/10 border-white/20 text-slate-100'
+                            }`}
+                          >
+                            {type === 'knowledge' ? (
+                              <svg xmlns="http://www.w3.org/2000/svg" className="w-3.5 h-3.5" viewBox="0 0 24 24" strokeWidth="2" stroke="currentColor" fill="none" strokeLinecap="round" strokeLinejoin="round">
+                                <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                                <path d="M3 19a9 9 0 0 1 9 0a9 9 0 0 1 9 0" />
+                                <path d="M3 6a9 9 0 0 1 9 0a9 9 0 0 1 9 0" />
+                                <path d="M3 6l0 13" />
+                                <path d="M12 6l0 13" />
+                                <path d="M21 6l0 13" />
+                              </svg>
+                            ) : (
+                              <svg xmlns="http://www.w3.org/2000/svg" className="w-3.5 h-3.5" viewBox="0 0 24 24" strokeWidth="2" stroke="currentColor" fill="none" strokeLinecap="round" strokeLinejoin="round">
+                                <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                                <path d="M9 7m-4 0a4 4 0 1 0 8 0a4 4 0 1 0 -8 0" />
+                                <path d="M3 21v-2a4 4 0 0 1 4 -4h4a4 4 0 0 1 4 4v2" />
+                                <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+                                <path d="M21 21v-2a4 4 0 0 0 -3 -3.85" />
+                              </svg>
+                            )}
+                          </span>
+                          <span>{label}</span>
+                        </button>
+                      );
+                    })}
+                  </div>
                   <div className="relative w-full">
                     {/* Simple search bar */}
                     <div className="flex items-center w-full bg-white border border-gray-300 rounded-md shadow-lg overflow-hidden p-2" style={{ minHeight: '60px' }}>

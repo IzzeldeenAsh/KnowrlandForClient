@@ -18,7 +18,6 @@ import {
   Textarea,
   Button,
   Select,
-  Tooltip,
 } from "@mantine/core";
 import { useTranslations } from "next-intl";
 import { Elements, useStripe, useElements, PaymentElement } from "@stripe/react-stripe-js";
@@ -36,7 +35,8 @@ const stripePromise = loadStripe(getStripePublishableKey());
 interface MeetingTime {
   start_time: string;
   end_time: string;
-  rate: string;
+  rate: string | number;
+  rate_physical?: string | number | null;
   place?: string;
   place_name?: string;
   available_places?: string[];
@@ -47,6 +47,18 @@ interface MeetingAvailability {
   date: string;
   times: MeetingTime[];
 }
+
+const getMeetingRate = (
+  time: MeetingTime,
+  place: "online" | "physically" | null
+): number => {
+  const rawRate = place === "physically" && time.rate_physical != null
+    ? time.rate_physical
+    : time.rate;
+  const rate = Number(rawRate);
+
+  return Number.isFinite(rate) ? rate : 0;
+};
 
 interface MeetTabProps {
   locale: string;
@@ -655,7 +667,7 @@ export default function MeetTab({
 
     // Guests: allow filling form, then redirect to login/signup with params
     if (!isAuthenticated) {
-      const meetingPrice = parseFloat(selectedMeetingTime.rate);
+      const meetingPrice = getMeetingRate(selectedMeetingTime, selectedPlace);
       const isFree = meetingPrice === 0;
 
       if (!isFree && !paymentMethod) {
@@ -717,7 +729,7 @@ export default function MeetTab({
       const defaultName = uuid.toString().split("-")[0] || "consultant";
 
       // Check if meeting requires payment
-      const meetingPrice = parseFloat(selectedMeetingTime.rate);
+      const meetingPrice = getMeetingRate(selectedMeetingTime, selectedPlace);
       const isFree = meetingPrice === 0;
 
       // For paid meetings, check payment method selection
@@ -1207,20 +1219,25 @@ export default function MeetTab({
                           (time, index) => {
                             const isSelected =
                               selectedMeetingTime === time;
-                            const rate = parseFloat(time.rate);
-                            const isFree = rate === 0;
-
                             const availablePlaces = getAvailablePlaces(time);
                             const onlineAvailable = availablePlaces.includes("online");
                             const onsiteAvailable = availablePlaces.includes("physically");
-                            const typeIconClass = (available: boolean, active: boolean) =>
-                              `inline-flex h-8 w-8 items-center justify-center rounded-md border transition-all ${
-                                !available
-                                  ? "cursor-not-allowed border-gray-200 bg-gray-100 text-gray-300 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-600"
-                                  : active
-                                    ? "border-blue-500 bg-blue-500 text-white shadow-sm"
-                                    : "border-gray-200 bg-white text-gray-500 hover:border-blue-300 hover:bg-blue-50 hover:text-blue-600 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-300"
+                            const typeChoiceClass = (active: boolean) =>
+                              `group flex w-full min-w-0 items-center gap-2 rounded-lg border px-2.5 py-2 text-start transition-all ${
+                                active
+                                  ? "border-blue-500 bg-blue-500 text-white shadow-sm"
+                                  : "border-gray-200 bg-white text-gray-600 hover:border-blue-300 hover:bg-blue-50 hover:text-blue-700 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-200 dark:hover:border-blue-500 dark:hover:bg-slate-700"
                               }`;
+                            const typeIconClass = (active: boolean) =>
+                              `inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-md ${
+                                active
+                                  ? "bg-white/20 text-white"
+                                  : "bg-gray-50 text-gray-500 group-hover:bg-white group-hover:text-blue-600 dark:bg-slate-700 dark:text-slate-300"
+                              }`;
+                            const priceLabel = (place: "online" | "physically") => {
+                              const price = getMeetingRate(time, place);
+                              return price === 0 ? (isRTL ? "مجانية" : "Free") : `$${price}`;
+                            };
 
                             return (
                               <div
@@ -1242,8 +1259,8 @@ export default function MeetTab({
                                   }
                               `}
                               >
-                                <div className="flex justify-between items-center">
-                                  <span className="font-medium">
+                                <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                                  <span className="shrink-0 font-medium">
                                     {new Date(`1970-01-01T${time.start_time}`).toLocaleTimeString(locale, {
                                       hour: '2-digit',
                                       minute: '2-digit',
@@ -1256,69 +1273,56 @@ export default function MeetTab({
                                       hour12: false
                                     })}
                                   </span>
-                                  <div className="flex items-center gap-2">
-                                    <Tooltip
-                                      label={
-                                        onlineAvailable
-                                          ? isRTL ? "جلسة عن بُعد" : "Online session"
-                                          : isRTL ? "الجلسة عن بُعد غير متاحة في هذا الوقت" : "Online is unavailable for this time slot"
-                                      }
-                                      withArrow
-                                    >
-                                      <span>
-                                        <button
-                                          type="button"
-                                          aria-label={isRTL ? "اختيار جلسة عن بُعد" : "Select online session"}
-                                          aria-pressed={isSelected && selectedPlace === "online"}
-                                          disabled={!onlineAvailable}
-                                          onClick={(event) => {
-                                            event.stopPropagation();
-                                            selectMeetingTime(time, "online");
-                                          }}
-                                          className={typeIconClass(
-                                            onlineAvailable,
-                                            isSelected && selectedPlace === "online"
-                                          )}
-                                        >
-                                          <IconVideo size={17} />
-                                        </button>
-                                      </span>
-                                    </Tooltip>
-                                    <Tooltip
-                                      label={
-                                        onsiteAvailable
-                                          ? isRTL ? "جلسة حضورية" : "On-site session"
-                                          : isRTL ? "الجلسة الحضورية غير متاحة في هذا الوقت" : "On-site is unavailable for this time slot"
-                                      }
-                                      withArrow
-                                    >
-                                      <span>
-                                        <button
-                                          type="button"
-                                          aria-label={isRTL ? "اختيار جلسة حضورية" : "Select on-site session"}
-                                          aria-pressed={isSelected && selectedPlace === "physically"}
-                                          disabled={!onsiteAvailable}
-                                          onClick={(event) => {
-                                            event.stopPropagation();
-                                            selectMeetingTime(time, "physically");
-                                          }}
-                                          className={typeIconClass(
-                                            onsiteAvailable,
-                                            isSelected && selectedPlace === "physically"
-                                          )}
-                                        >
-                                          <IconMapPin size={17} />
-                                        </button>
-                                      </span>
-                                    </Tooltip>
-                                    <span
-                                      className={`min-w-6 text-end text-sm font-bold ${isFree
-                                        ? "text-green-600"
-                                        : "text-gray-600"
-                                        }`}
-                                    >
-                                      {isFree ? (isRTL ? "مجانية" : "Free") : `$${rate}`}
-                                    </span>
+                                  <div className="grid w-full grid-cols-2 gap-2 sm:w-auto">
+                                    {onlineAvailable && (
+                                      <button
+                                        type="button"
+                                        aria-label={isRTL ? `اختيار جلسة عن بُعد، ${priceLabel("online")}` : `Select online session, ${priceLabel("online")}`}
+                                        aria-pressed={isSelected && selectedPlace === "online"}
+                                        onClick={(event) => {
+                                          event.stopPropagation();
+                                          selectMeetingTime(time, "online");
+                                        }}
+                                        className={typeChoiceClass(isSelected && selectedPlace === "online")}
+                                      >
+                                        <span className={typeIconClass(isSelected && selectedPlace === "online")}>
+                                          <IconVideo size={16} />
+                                        </span>
+                                        <span className="flex min-w-0 flex-col leading-tight">
+                                          <span className="text-[11px] font-medium opacity-80">
+                                            {isRTL ? "عن بُعد" : "Online"}
+                                          </span>
+                                          <span className={`text-sm font-bold ${getMeetingRate(time, "online") === 0 && !(isSelected && selectedPlace === "online") ? "text-green-600" : ""}`}>
+                                            {priceLabel("online")}
+                                          </span>
+                                        </span>
+                                      </button>
+                                    )}
+
+                                    {onsiteAvailable && (
+                                      <button
+                                        type="button"
+                                        aria-label={isRTL ? `اختيار جلسة حضورية، ${priceLabel("physically")}` : `Select on-site session, ${priceLabel("physically")}`}
+                                        aria-pressed={isSelected && selectedPlace === "physically"}
+                                        onClick={(event) => {
+                                          event.stopPropagation();
+                                          selectMeetingTime(time, "physically");
+                                        }}
+                                        className={typeChoiceClass(isSelected && selectedPlace === "physically")}
+                                      >
+                                        <span className={typeIconClass(isSelected && selectedPlace === "physically")}>
+                                          <IconMapPin size={16} />
+                                        </span>
+                                        <span className="flex min-w-0 flex-col leading-tight">
+                                          <span className="text-[11px] font-medium opacity-80">
+                                            {isRTL ? "حضوري" : "On Site"}
+                                          </span>
+                                          <span className={`text-sm font-bold ${getMeetingRate(time, "physically") === 0 && !(isSelected && selectedPlace === "physically") ? "text-green-600" : ""}`}>
+                                            {priceLabel("physically")}
+                                          </span>
+                                        </span>
+                                      </button>
+                                    )}
                                   </div>
                                 </div>
                               </div>
@@ -1554,14 +1558,14 @@ export default function MeetTab({
                       {t("sessionRate")}
                     </span>
                     <span
-                      className={`font-bold ${parseFloat(selectedMeetingTime.rate) === 0
+                      className={`font-bold ${getMeetingRate(selectedMeetingTime, selectedPlace) === 0
                         ? "text-green-600"
                         : "text-blue-600"
                         }`}
                     >
-                      {parseFloat(selectedMeetingTime.rate) === 0
+                      {getMeetingRate(selectedMeetingTime, selectedPlace) === 0
                         ? "Free"
-                        : `$${selectedMeetingTime.rate}`}
+                        : `$${getMeetingRate(selectedMeetingTime, selectedPlace)}`}
                     </span>
                   </div>
                 </div>
@@ -1678,7 +1682,7 @@ export default function MeetTab({
                 </div>
 
                 {/* Payment Section */}
-                {selectedMeetingTime && parseFloat(selectedMeetingTime.rate) > 0 && (
+                {selectedMeetingTime && getMeetingRate(selectedMeetingTime, selectedPlace) > 0 && (
                   <div className="mb-6">
                     <h4 className="font-medium mb-4 text-gray-800 dark:text-gray-200 required">{t("paymentOptions")}</h4>
 
@@ -1690,12 +1694,12 @@ export default function MeetTab({
                           className={`border rounded-lg p-4 cursor-pointer transition-all min-h-[72px] ${paymentMethod === "manual"
                             ? "border-blue-500 bg-blue-50 dark:bg-blue-900/20"
                             : "border-gray-200 dark:border-slate-600 hover:border-gray-300 dark:hover:border-slate-500"
-                            } ${walletBalance < parseFloat(selectedMeetingTime.rate)
+                            } ${walletBalance < getMeetingRate(selectedMeetingTime, selectedPlace)
                               ? "opacity-50 cursor-not-allowed"
                               : ""
                             }`}
                           onClick={() => {
-                            if (walletBalance >= parseFloat(selectedMeetingTime.rate)) {
+                            if (walletBalance >= getMeetingRate(selectedMeetingTime, selectedPlace)) {
                               setPaymentMethod("manual")
                             }
                           }}
@@ -1706,9 +1710,9 @@ export default function MeetTab({
                               name="paymentMethod"
                               value="manual"
                               checked={paymentMethod === "manual"}
-                              disabled={walletBalance < parseFloat(selectedMeetingTime.rate)}
+                              disabled={walletBalance < getMeetingRate(selectedMeetingTime, selectedPlace)}
                               onChange={() => {
-                                if (walletBalance >= parseFloat(selectedMeetingTime.rate)) {
+                                if (walletBalance >= getMeetingRate(selectedMeetingTime, selectedPlace)) {
                                   setPaymentMethod("manual")
                                 }
                               }}
@@ -1730,7 +1734,7 @@ export default function MeetTab({
                                     <div className="text-sm font-semibold text-gray-700 dark:text-gray-300">
                                       ${walletBalance.toFixed(2)}
                                     </div>
-                                    {walletBalance >= parseFloat(selectedMeetingTime.rate) ? (
+                                    {walletBalance >= getMeetingRate(selectedMeetingTime, selectedPlace) ? (
                                       <div className="text-xs text-green-600 dark:text-green-400 font-medium">
                                         {locale.startsWith('ar') ? 'رصيد كافي' : 'Sufficient'}
                                       </div>
@@ -1791,7 +1795,7 @@ export default function MeetTab({
                   </div>
                 )}
 
-                {selectedMeetingTime && parseFloat(selectedMeetingTime.rate) === 0 && (
+                {selectedMeetingTime && getMeetingRate(selectedMeetingTime, selectedPlace) === 0 && (
                   <div className="mb-4 p-3 bg-green-50 dark:bg-green-900/20 rounded">
                     <p className="text-sm text-green-700 dark:text-green-300">
                       {t("freeSession")}

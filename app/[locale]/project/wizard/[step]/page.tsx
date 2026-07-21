@@ -18,6 +18,7 @@ import ProjectMatchesStep from '@/components/project/questions/ProjectMatchesSte
 import ProjectSubmissionSuccessStep from '@/components/project/questions/ProjectSubmissionSuccessStep'
 import DeliverablesLanguageQuestion from '@/components/project/questions/DeliverablesLanguageQuestion'
 import InsighterIndustryQuestion from '@/components/project/questions/InsighterIndustryQuestion'
+import InsighterSubIndustryQuestion from '@/components/project/questions/InsighterSubIndustryQuestion'
 import TargetMarketQuestion from '@/components/project/questions/TargetMarketQuestion'
 import ServiceQuestion from '@/components/project/questions/ServiceQuestion'
 import ProjectScopeQuestion from '@/components/project/questions/ProjectScopeQuestion'
@@ -79,6 +80,16 @@ export default async function ProjectWizardStepPage({ params }: PageProps) {
       <ProjectWizardShell align="top">
         <div className="w-full pt-2 sm:pt-4">
           <InsighterIndustryQuestion locale={locale} />
+        </div>
+      </ProjectWizardShell>
+    )
+  }
+
+  if (step === 'insighter-sub-industry') {
+    return (
+      <ProjectWizardShell align="top">
+        <div className="w-full pt-2 sm:pt-4">
+          <InsighterSubIndustryQuestion locale={locale} />
         </div>
       </ProjectWizardShell>
     )

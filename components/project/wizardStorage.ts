@@ -51,6 +51,15 @@ export const projectWizardStorage = {
   insighterIndustryLabelKey(locale: WizardLocale) {
     return `project:wizard:${locale}:insighterIndustryLabel`
   },
+  insighterIndustryParentIdKey(locale: WizardLocale) {
+    return `project:wizard:${locale}:insighterIndustryParentId`
+  },
+  insighterIndustryParentLabelKey(locale: WizardLocale) {
+    return `project:wizard:${locale}:insighterIndustryParentLabel`
+  },
+  insighterIndustryParentHasChildrenKey(locale: WizardLocale) {
+    return `project:wizard:${locale}:insighterIndustryParentHasChildren`
+  },
   preferredInsighterTypeKey(locale: WizardLocale) {
     return `project:wizard:${locale}:preferredInsighterType`
   },
