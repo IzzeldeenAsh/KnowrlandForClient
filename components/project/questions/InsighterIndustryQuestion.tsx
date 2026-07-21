@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useState } from 'react'
 import type { ComponentType } from 'react'
+import { createPortal } from 'react-dom'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import {
@@ -131,6 +132,7 @@ export function IndustryCard({
   onClick,
   isRTL,
   showIcon = true,
+  compact = false,
 }: {
   industry: IndustryNode
   checked: boolean
@@ -140,9 +142,46 @@ export function IndustryCard({
   onClick: () => void
   isRTL: boolean
   showIcon?: boolean
+  compact?: boolean
 }) {
   const meta = getIndustryMeta(industry)
   const IndustryIcon = meta.Icon
+
+  if (compact) {
+    return (
+      <button
+        type="button"
+        role="radio"
+        aria-checked={checked}
+        disabled={disabled}
+        onClick={onClick}
+        className={`group flex min-h-14 items-center gap-3 px-4 py-3 text-start transition-colors disabled:cursor-not-allowed ${
+          checked
+            ? 'bg-sky-50 text-[#176a9f]'
+            : 'bg-white text-slate-800 hover:bg-slate-50'
+        }`}
+      >
+        <span
+          className={`inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-lg ${meta.iconClass}`}
+        >
+          <IndustryIcon size={18} stroke={1.8} />
+        </span>
+        <span className="min-w-0 flex-1 text-sm font-semibold leading-snug">
+          {industry.label}
+        </span>
+        <span
+          className={`inline-flex h-5 w-5 shrink-0 items-center justify-center rounded-full border transition-colors ${
+            checked
+              ? 'border-[#1C7CBB] bg-[#1C7CBB] text-white'
+              : 'border-slate-300 bg-white text-transparent group-hover:border-slate-400'
+          }`}
+          aria-hidden="true"
+        >
+          <IconCheck size={12} stroke={3} />
+        </span>
+      </button>
+    )
+  }
 
   return (
     <button
@@ -469,9 +508,9 @@ export default function InsighterIndustryQuestion({ locale }: { locale: WizardLo
         )}
       </div>
 
-      {showAllParents ? (
+      {showAllParents ? createPortal(
         <div
-          className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/35 p-4 backdrop-blur-sm"
+          className="fixed inset-0 z-[9999] flex items-center justify-center bg-slate-950/35 p-4 backdrop-blur-sm"
           role="presentation"
           onMouseDown={(event) => {
             if (event.target === event.currentTarget) setShowAllParents(false)
@@ -481,9 +520,9 @@ export default function InsighterIndustryQuestion({ locale }: { locale: WizardLo
             role="dialog"
             aria-modal="true"
             aria-labelledby="all-industries-title"
-            className="flex max-h-[min(780px,calc(100vh-2rem))] w-full max-w-5xl flex-col overflow-hidden rounded-3xl border border-white/70 bg-white shadow-2xl shadow-slate-900/20"
+            className="flex max-h-[min(720px,calc(100vh-2rem))] w-full max-w-3xl flex-col overflow-hidden rounded-2xl border border-white/70 bg-white shadow-2xl shadow-slate-900/20"
           >
-            <div className="flex items-start justify-between gap-4 border-b border-slate-200/80 px-5 py-5 sm:px-7">
+            <div className="flex items-start justify-between gap-4 border-b border-slate-200/80 px-5 py-4 sm:px-6">
               <div className="text-start">
                 <h3 id="all-industries-title" className="text-xl font-bold text-slate-900">
                   {isRTL ? 'جميع الصناعات الرئيسية' : 'All parent industries'}
@@ -504,8 +543,8 @@ export default function InsighterIndustryQuestion({ locale }: { locale: WizardLo
               </button>
             </div>
 
-            <div className="border-b border-slate-100 px-5 py-4 sm:px-7">
-              <div className="relative max-w-md">
+            <div className="border-b border-slate-100 px-5 py-3.5 sm:px-6">
+              <div className="relative">
                 <span
                   className={`pointer-events-none absolute top-1/2 -translate-y-1/2 text-slate-400 ${
                     isRTL ? 'right-3' : 'left-3'
@@ -526,10 +565,10 @@ export default function InsighterIndustryQuestion({ locale }: { locale: WizardLo
               </div>
             </div>
 
-            <div className="overflow-y-auto px-5 py-5 sm:px-7 sm:py-6">
+            <div className="overflow-y-auto bg-slate-50/70 px-5 py-4 sm:px-6 sm:py-5">
               {filteredParents.length > 0 ? (
                 <div
-                  className="grid auto-rows-fr grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3"
+                  className="grid grid-cols-1 gap-px overflow-hidden rounded-xl border border-slate-200 bg-slate-200 sm:grid-cols-2"
                   role="radiogroup"
                   aria-label={isRTL ? 'جميع الصناعات الرئيسية' : 'All parent industries'}
                 >
@@ -543,6 +582,7 @@ export default function InsighterIndustryQuestion({ locale }: { locale: WizardLo
                       disabled={isAdvancing}
                       onClick={() => advanceFromParent(parent)}
                       isRTL={isRTL}
+                      compact
                     />
                   ))}
                 </div>
@@ -553,7 +593,8 @@ export default function InsighterIndustryQuestion({ locale }: { locale: WizardLo
               )}
             </div>
           </section>
-        </div>
+        </div>,
+        document.body
       ) : null}
 
       <div className="fixed bottom-0 left-0 right-0 z-20 border-t border-slate-200/70 bg-white/80 backdrop-blur-md">
