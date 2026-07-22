@@ -34,6 +34,22 @@ export function formatErrorMessage(errorResponse: ErrorResponse): string {
   return formattedMessage;
 }
 
+// Normalize the autocomplete payload. The API returns `searchKeywords` as a
+// JSON-encoded string (e.g. "[\"ai\",\"iot\"]"); older responses returned a
+// plain array. Always resolve to a string[] so callers can safely .map() it.
+function parseSearchKeywords(value: unknown): string[] {
+  if (Array.isArray(value)) return value as string[];
+  if (typeof value === 'string') {
+    try {
+      const parsed = JSON.parse(value);
+      return Array.isArray(parsed) ? parsed : [];
+    } catch {
+      return [];
+    }
+  }
+  return [];
+}
+
 // API function for autocomplete
 export async function fetchAutocomplete(
   keyword: string,
@@ -71,7 +87,7 @@ export async function fetchAutocomplete(
     if (!response.ok) throw new Error('Network response was not ok');
 
     const data = await response.json();
-    return data.data.searchKeywords || [];
+    return parseSearchKeywords(data?.data?.searchKeywords);
   } catch (error: any) {
     if (error.name !== 'AbortError') {
       console.error('Error fetching autocomplete suggestions:', error);

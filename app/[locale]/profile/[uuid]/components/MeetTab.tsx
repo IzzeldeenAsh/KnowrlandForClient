@@ -1223,7 +1223,7 @@ export default function MeetTab({
                             const onlineAvailable = availablePlaces.includes("online");
                             const onsiteAvailable = availablePlaces.includes("physically");
                             const typeChoiceClass = (active: boolean) =>
-                              `group flex w-full min-w-0 items-center gap-2 rounded-lg border px-2.5 py-2 text-start transition-all ${
+                              `group relative flex min-w-0 items-center justify-center gap-2 rounded-lg border px-2.5 py-2 text-center transition-all ${
                                 active
                                   ? "border-blue-500 bg-blue-500 text-white shadow-sm"
                                   : "border-gray-200 bg-white text-gray-600 hover:border-blue-300 hover:bg-blue-50 hover:text-blue-700 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-200 dark:hover:border-blue-500 dark:hover:bg-slate-700"
@@ -1273,10 +1273,11 @@ export default function MeetTab({
                                       hour12: false
                                     })}
                                   </span>
-                                  <div className="grid w-full grid-cols-2 gap-2 sm:w-auto">
+                                  <div className="flex w-full justify-end gap-2 sm:w-auto">
                                     {onlineAvailable && (
                                       <button
                                         type="button"
+                                        title={isRTL ? "جلسة عن بُعد" : "Online session"}
                                         aria-label={isRTL ? `اختيار جلسة عن بُعد، ${priceLabel("online")}` : `Select online session, ${priceLabel("online")}`}
                                         aria-pressed={isSelected && selectedPlace === "online"}
                                         onClick={(event) => {
@@ -1288,13 +1289,14 @@ export default function MeetTab({
                                         <span className={typeIconClass(isSelected && selectedPlace === "online")}>
                                           <IconVideo size={16} />
                                         </span>
-                                        <span className="flex min-w-0 flex-col leading-tight">
-                                          <span className="text-[11px] font-medium opacity-80">
-                                            {isRTL ? "عن بُعد" : "Online"}
-                                          </span>
-                                          <span className={`text-sm font-bold ${getMeetingRate(time, "online") === 0 && !(isSelected && selectedPlace === "online") ? "text-green-600" : ""}`}>
-                                            {priceLabel("online")}
-                                          </span>
+                                        <span className={`text-sm font-bold leading-tight ${getMeetingRate(time, "online") === 0 && !(isSelected && selectedPlace === "online") ? "text-green-600" : ""}`}>
+                                          {priceLabel("online")}
+                                        </span>
+                                        <span
+                                          role="tooltip"
+                                          className="pointer-events-none absolute -top-9 left-1/2 z-10 -translate-x-1/2 whitespace-nowrap rounded bg-gray-800 px-2 py-1 text-xs font-medium text-white opacity-0 shadow-sm transition-opacity group-hover:opacity-100 group-focus-visible:opacity-100 dark:bg-gray-100 dark:text-gray-900"
+                                        >
+                                          {isRTL ? "جلسة عن بُعد" : "Online session"}
                                         </span>
                                       </button>
                                     )}
@@ -1302,6 +1304,7 @@ export default function MeetTab({
                                     {onsiteAvailable && (
                                       <button
                                         type="button"
+                                        title={isRTL ? "جلسة حضورية" : "On-site session"}
                                         aria-label={isRTL ? `اختيار جلسة حضورية، ${priceLabel("physically")}` : `Select on-site session, ${priceLabel("physically")}`}
                                         aria-pressed={isSelected && selectedPlace === "physically"}
                                         onClick={(event) => {
@@ -1313,13 +1316,14 @@ export default function MeetTab({
                                         <span className={typeIconClass(isSelected && selectedPlace === "physically")}>
                                           <IconMapPin size={16} />
                                         </span>
-                                        <span className="flex min-w-0 flex-col leading-tight">
-                                          <span className="text-[11px] font-medium opacity-80">
-                                            {isRTL ? "حضوري" : "On Site"}
-                                          </span>
-                                          <span className={`text-sm font-bold ${getMeetingRate(time, "physically") === 0 && !(isSelected && selectedPlace === "physically") ? "text-green-600" : ""}`}>
-                                            {priceLabel("physically")}
-                                          </span>
+                                        <span className={`text-sm font-bold leading-tight ${getMeetingRate(time, "physically") === 0 && !(isSelected && selectedPlace === "physically") ? "text-green-600" : ""}`}>
+                                          {priceLabel("physically")}
+                                        </span>
+                                        <span
+                                          role="tooltip"
+                                          className="pointer-events-none absolute -top-9 left-1/2 z-10 -translate-x-1/2 whitespace-nowrap rounded bg-gray-800 px-2 py-1 text-xs font-medium text-white opacity-0 shadow-sm transition-opacity group-hover:opacity-100 group-focus-visible:opacity-100 dark:bg-gray-100 dark:text-gray-900"
+                                        >
+                                          {isRTL ? "جلسة حضورية" : "On-site session"}
                                         </span>
                                       </button>
                                     )}
