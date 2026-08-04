@@ -458,7 +458,6 @@ async function fetchProjectRequest(
 
 function isOtherService(service: RequestService | null | undefined): boolean {
   if (!service) return false
-  if (service.id === 10) return true
 
   const slug = String(service.slug || '').trim().toLowerCase()
   const name = String(service.name || '').trim().toLowerCase()
