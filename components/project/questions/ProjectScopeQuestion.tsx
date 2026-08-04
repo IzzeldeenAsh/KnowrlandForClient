@@ -542,7 +542,7 @@ export default function ProjectScopeQuestion({ locale }: { locale: WizardLocale 
         return
       }
 
-      const isOther = serviceId === 10 || readServiceIsOther(locale)
+      const isOther = readServiceIsOther(locale)
 
       setError(null)
 
@@ -764,7 +764,7 @@ export default function ProjectScopeQuestion({ locale }: { locale: WizardLocale 
   }, [aiPollVersion, isRTL, locale, projectUuid, serviceId])
 
   const isOtherFlow = useMemo(
-    () => Boolean(serviceId) && (serviceId === 10 || readServiceIsOther(locale)),
+    () => Boolean(serviceId) && readServiceIsOther(locale),
     [locale, serviceId]
   )
 

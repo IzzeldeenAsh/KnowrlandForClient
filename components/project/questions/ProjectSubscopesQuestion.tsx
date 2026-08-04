@@ -588,7 +588,7 @@ export default function ProjectSubscopesQuestion({ locale }: { locale: WizardLoc
 
       setLoading(true)
       try {
-        const isOther = serviceId === 10 || readServiceIsOther(locale)
+        const isOther = readServiceIsOther(locale)
 
         if (isOther) {
           const stored = safeParseStoredSuggestedScopes(
@@ -1068,7 +1068,7 @@ export default function ProjectSubscopesQuestion({ locale }: { locale: WizardLoc
           locale,
           token,
           serviceId,
-          isOther: serviceId === 10 || readServiceIsOther(locale),
+          isOther: readServiceIsOther(locale),
           projectUuid,
         })
       )
