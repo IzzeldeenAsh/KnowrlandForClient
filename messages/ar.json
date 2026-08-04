@@ -139,6 +139,10 @@
     },
     "Header": {
         "navigation": {
+            "feed": "المستجدات",
+            "home": "الرئيسية",
+            "documents": "المستندات",
+            "types": "الأنواع",
             "industries": "مجالات",
             "reports": "تقرير",
             "data": "بيانات",

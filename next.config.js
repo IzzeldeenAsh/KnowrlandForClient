@@ -36,7 +36,12 @@ const nextConfig = {
               "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
               "img-src 'self' data: https: blob:",
               "font-src 'self' data: https://fonts.gstatic.com",
-              `connect-src 'self' https://www.google-analytics.com https://www.googletagmanager.com ${process.env.NEXT_PUBLIC_API_URL || 'https://api.insightabusiness.com'} https://api.stripe.com https://*.pusher.com wss://*.pusher.com https://sockjs-eu.pusher.com`,
+              // blob: is required to read metadata from a locally selected video
+              // before upload; stream.mux.com serves feed video playback.
+              "media-src 'self' blob: https://stream.mux.com",
+              // *.mux.com covers both the regional direct-upload hosts returned by
+              // /feed/post/video/init and HLS playback segment requests.
+              `connect-src 'self' https://www.google-analytics.com https://www.googletagmanager.com ${process.env.NEXT_PUBLIC_API_URL || 'https://api.insightabusiness.com'} https://api.stripe.com https://*.pusher.com wss://*.pusher.com https://sockjs-eu.pusher.com https://*.mux.com`,
               "frame-src https://js.stripe.com https://hooks.stripe.com",
               "frame-ancestors 'none'",
               "base-uri 'self'",

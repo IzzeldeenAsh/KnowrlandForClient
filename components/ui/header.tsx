@@ -139,9 +139,6 @@ export default function Header() {
   const [hasToken, setHasToken] = useState<boolean>(false);
   const shouldShowAuthSkeleton = !isAuthResolved;
 
-  // Always use dark style with white text, as requested
-  const textColorClass = ' hover:text-white transition-all duration-300 ease-in-out px-3 py-2 rounded-md hover:bg-slate-700/50';
-  const menuTextColorClass = 'text-white hover:text-gray-100 transition-all duration-300 ease-in-out px-3 py-2 rounded-md hover:bg-[#3B8AEF]/20';
   const searchInputStyles = {
     input: {
       // Keep the search input dark even when scrolled to avoid a "white block" look.
@@ -266,13 +263,14 @@ export default function Header() {
   const shouldHideSearchBar = (): boolean => {
     const pathSegments = pathname.split('/').filter(segment => segment !== '');
 
-    // Hide on base URL (e.g., /en, /ar)
+    // Hide on base URL / feed (e.g., /en, /ar)
     if (pathSegments.length === 1) {
       return true;
     }
 
-    // Hide on home page (e.g., /en/home, /ar/home)
-    if (pathSegments.length === 2 && pathSegments[1] === 'home') {
+    // Hide on the landing page (e.g., /en/landing, /ar/landing)
+    // and on the search page (e.g., /en/home, /ar/home)
+    if (pathSegments.length === 2 && (pathSegments[1] === 'home' || pathSegments[1] === 'landing')) {
       return true;
     }
 
@@ -284,26 +282,46 @@ export default function Header() {
     return false;
   };
 
-  // Add active link styling function
-  const isActiveLink = (path: string): string => {
-    // Split the pathname into segments
-    const pathSegments = pathname.split('/');
-    // Get the last segment or check against specific routes
-    const currentPath = pathSegments[pathSegments.length - 1] || pathSegments[pathSegments.length - 2];
+  // Knowledge types shown inside the "Types" dropdown
+  const knowledgeTypes: { slug: string; label: string }[] = [
+    { slug: 'data', label: t('navigation.data') },
+    { slug: 'report', label: t('navigation.reports') },
+    { slug: 'statistic', label: t('navigation.statistics') },
+    { slug: 'manual', label: t('navigation.manuals') },
+    { slug: 'course', label: t('navigation.courses') },
+  ];
 
-    // Check for exact match in segment or specific path cases
-    if (currentPath === path ||
-      (path === 'statistic' && currentPath === 'statistic') ||
-      (path === 'data' && currentPath === 'data') ||
-      (path === 'report' && currentPath === 'report') ||
-      (path === 'manual' && currentPath === 'manual') ||
-      (path === 'course' && currentPath === 'course') ||
-      (path === 'all-industries' && pathname.includes('/all-industries'))
-    ) {
-      return 'bg-[#3B8AEF] text-white';
+  const pathAfterLocale = pathname.split('/').filter(Boolean).slice(1).join('/');
+
+  // Which top-level nav entry is currently active
+  const isActiveNav = (key: 'feed' | 'home' | 'documents' | 'industries' | 'types'): boolean => {
+    switch (key) {
+      case 'feed':
+        return pathAfterLocale === '';
+      case 'home':
+        return pathAfterLocale === 'landing';
+      case 'documents':
+        return pathAfterLocale === 'home';
+      case 'industries':
+        return pathname.includes('/all-industries') || pathname.includes('/industry');
+      case 'types':
+        return knowledgeTypes.some(({ slug }) => pathAfterLocale === `industries/${slug}`);
+      default:
+        return false;
     }
-    return '';
   };
+
+  // Shared styling for a top-level nav entry (active entry gets the blue underline)
+  const navItemClass = (active: boolean): string =>
+    [
+      'relative flex items-center font-medium text-xs md:text-sm xl:mx-1 px-3 py-2 rounded-md transition-all duration-300 ease-in-out',
+      active ? 'text-white font-bold' : 'text-white/80 hover:text-white hover:bg-[#3B8AEF]/20',
+    ].join(' ');
+
+  const NavUnderline = ({ active }: { active: boolean }) =>
+    active ? (
+      <span className="absolute inset-x-2 -bottom-[10px] h-[3px] rounded-full bg-[#3B8AEF]" />
+    ) : null;
 
   useEffect(() => {
     // Fetch industries data with caching
@@ -469,16 +487,33 @@ export default function Header() {
               <nav className="hidden lg:flex flex-1 overflow-visible min-w-0">
                 <ul className="flex justify-start items-center w-full gap-0.5 md:gap-1">
                   <li>
+                    <Link className={navItemClass(isActiveNav('feed'))} href={`/${currentLocale}`}>
+                      {t('navigation.feed')}
+                      <NavUnderline active={isActiveNav('feed')} />
+                    </Link>
+                  </li>
+                  <li>
+                    <Link className={navItemClass(isActiveNav('home'))} href={`/${currentLocale}/landing`}>
+                      {t('navigation.home')}
+                      <NavUnderline active={isActiveNav('home')} />
+                    </Link>
+                  </li>
+                  <li>
+                    <Link className={navItemClass(isActiveNav('documents'))} href={`/${currentLocale}/home`}>
+                      {t('navigation.documents')}
+                      <NavUnderline active={isActiveNav('documents')} />
+                    </Link>
+                  </li>
+                  <li>
                     <HoverCard
                       id={`industries-hovercard-${currentLocale}`}
                       position='bottom'
                       radius="sm" shadow="md" withinPortal>
                       <HoverCard.Target>
-                        <Link href={`/${currentLocale}/all-industries`}>
-                          <button className={` text-white ${textColorClass} font-medium text-xs md:text-sm xl:mx-1 flex items-center group ${isActiveLink('all-industries')}`}>
-                            <span className="mr-1">{t('navigation.industries')}</span>
-                            <IconChevronDown size={16} className="group-hover:translate-y-0.5 transition-transform duration-200" />
-                          </button>
+                        <Link href={`/${currentLocale}/all-industries`} className={`${navItemClass(isActiveNav('industries'))} group`}>
+                          <span className="mr-1">{t('navigation.industries')}</span>
+                          <IconChevronDown size={16} className="group-hover:translate-y-0.5 transition-transform duration-200" />
+                          <NavUnderline active={isActiveNav('industries')} />
                         </Link>
                       </HoverCard.Target>
 
@@ -546,19 +581,39 @@ export default function Header() {
                     </HoverCard>
                   </li>
                   <li>
-                    <Link className={`font-medium text-xs md:text-sm ${menuTextColorClass} text-white xl:mx-1 ${isActiveLink('data')}`} href={`/${currentLocale}/industries/data`}>{t('navigation.data')}</Link>
-                  </li>
-                  <li>
-                    <Link className={`font-medium text-xs md:text-sm ${menuTextColorClass} text-white xl:mx-1 ${isActiveLink('report')}`} href={`/${currentLocale}/industries/report`}>{t('navigation.reports')}</Link>
-                  </li>
-                  <li>
-                    <Link className={`font-medium text-xs md:text-sm ${menuTextColorClass} text-white xl:mx-1 ${isActiveLink('statistic')}`} href={`/${currentLocale}/industries/statistic`}>{t('navigation.statistics')}</Link>
-                  </li>
-                  <li className='md:block hidden'>
-                    <Link className={`font-medium text-xs md:text-sm ${menuTextColorClass} text-white xl:mx-1 ${isActiveLink('manual')}`} href={`/${currentLocale}/industries/manual`}>{t('navigation.manuals')}</Link>
-                  </li>
-                  <li className='md:block hidden'>
-                    <Link className={`font-medium text-xs md:text-sm ${menuTextColorClass} text-white xl:mx-1 ${isActiveLink('course')}`} href={`/${currentLocale}/industries/course`}>{t('navigation.courses')}</Link>
+                    <HoverCard
+                      id={`types-hovercard-${currentLocale}`}
+                      position="bottom-start"
+                      radius="md" shadow="lg" withinPortal>
+                      <HoverCard.Target>
+                        <Link href={`/${currentLocale}/industries/data`} className={`${navItemClass(isActiveNav('types'))} group`}>
+                          <span className="mr-1">{t('navigation.types')}</span>
+                          <IconChevronDown size={16} className="group-hover:translate-y-0.5 transition-transform duration-200" />
+                          <NavUnderline active={isActiveNav('types')} />
+                        </Link>
+                      </HoverCard.Target>
+
+                      <HoverCard.Dropdown
+                        style={{ background: '#ffffff', borderColor: 'rgba(15, 22, 41, 0.08)' }}
+                        className="font-almarai p-2 shadow-xl"
+                      >
+                        <ul className="min-w-[200px]">
+                          {knowledgeTypes.map(({ slug, label }) => (
+                            <li key={slug}>
+                              <Link
+                                href={`/${currentLocale}/industries/${slug}`}
+                                className={`block rounded-md px-4 py-2.5 text-sm transition-colors duration-200 hover:bg-slate-100 ${pathAfterLocale === `industries/${slug}`
+                                  ? 'font-bold text-[#3B8AEF]'
+                                  : 'text-slate-800'
+                                  }`}
+                              >
+                                {label}
+                              </Link>
+                            </li>
+                          ))}
+                        </ul>
+                      </HoverCard.Dropdown>
+                    </HoverCard>
                   </li>
                 </ul>
               </nav>
