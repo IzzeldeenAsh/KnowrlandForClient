@@ -67,6 +67,14 @@ const SERVICE_META: Record<string, ServiceMeta> = {
       ar: 'افهم حجم السوق والطلب والمنافسة.',
     },
   },
+  'pre-feasibility-study': {
+    Icon: IconFileSearch,
+    iconClass: 'bg-lime-50 text-lime-600',
+    description: {
+      en: 'Quickly assess whether your idea is worth developing.',
+      ar: 'قيّم بسرعة ما إذا كانت فكرتك جديرة بالتطوير.',
+    },
+  },
   'feasibility-study': {
     Icon: IconChartArrowsVertical,
     iconClass: 'bg-amber-50 text-amber-600',
@@ -164,7 +172,6 @@ function getServiceMeta(service: Service): ServiceMeta {
 
 function isOtherService(service: Service | null): boolean {
   if (!service) return false
-  if (service.id === 10) return true
 
   const slug = (service.slug || '').trim().toLowerCase()
   const name = (service.name || '').trim().toLowerCase()
@@ -665,7 +672,16 @@ export default function ServiceQuestion({ locale }: { locale: WizardLocale }) {
       return
     }
 
-    const otherServiceId = otherService?.id ?? 10
+    if (!otherService) {
+      setError(
+        isRTL
+          ? 'تعذر العثور على خدمة «أخرى».'
+          : 'The Other service is currently unavailable.'
+      )
+      return
+    }
+
+    const otherServiceId = otherService.id
     setSelectedId(otherServiceId)
     setError(null)
     resetDownstreamWizardState(true)
