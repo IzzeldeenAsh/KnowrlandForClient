@@ -168,13 +168,25 @@ export default function MobileMenu({ isHomePage = true }: MobileMenuProps) {
       >
         <ul className={`rounded-lg px-4 py-1.5 max-w-full ${menuBgStyle} bg-opacity-95 backdrop-blur-sm`}>
           <li>
-            <Link className={`flex font-medium text-sm ${menuTextColorClass} py-1.5`} href={`/${currentLocale}/all-industries`}>{t('navigation.industries')}</Link>
+            <Link className={`flex font-medium text-sm ${menuTextColorClass} py-1.5`} href={`/${currentLocale}`}>{t('navigation.feed')}</Link>
           </li>
           <li>
-            <Link className={`flex font-medium text-sm ${menuTextColorClass} py-1.5`} href={`/${currentLocale}/industries/report`}>{t('navigation.reports')}</Link>
+            <Link className={`flex font-medium text-sm ${menuTextColorClass} py-1.5`} href={`/${currentLocale}/landing`}>{t('navigation.home')}</Link>
+          </li>
+          <li>
+            <Link className={`flex font-medium text-sm ${menuTextColorClass} py-1.5`} href={`/${currentLocale}/home`}>{t('navigation.documents')}</Link>
+          </li>
+          <li>
+            <Link className={`flex font-medium text-sm ${menuTextColorClass} py-1.5`} href={`/${currentLocale}/all-industries`}>{t('navigation.industries')}</Link>
+          </li>
+          <li className={`border-t ${borderColorClass} mt-1 pt-1`}>
+            <span className="flex text-xs font-semibold uppercase tracking-wide text-slate-500 py-1.5">{t('navigation.types')}</span>
           </li>
           <li>
             <Link className={`flex font-medium text-sm ${menuTextColorClass} py-1.5`} href={`/${currentLocale}/industries/data`}>{t('navigation.data')}</Link>
+          </li>
+          <li>
+            <Link className={`flex font-medium text-sm ${menuTextColorClass} py-1.5`} href={`/${currentLocale}/industries/report`}>{t('navigation.reports')}</Link>
           </li>
           <li>
             <Link className={`flex font-medium text-sm ${menuTextColorClass} py-1.5`} href={`/${currentLocale}/industries/statistic`}>{t('navigation.statistics')}</Link>
@@ -185,7 +197,7 @@ export default function MobileMenu({ isHomePage = true }: MobileMenuProps) {
           <li>
             <Link className={`flex font-medium text-sm ${menuTextColorClass} py-1.5`} href={`/${currentLocale}/industries/course`}>{t('navigation.courses')}</Link>
           </li>
-          
+
         </ul>
       </nav>
     </div>

@@ -13,7 +13,10 @@ export default function ConditionalAuthBanner() {
   const isHomePage =
     (pathSegments.length === 1 && pathSegments[0] === 'home') ||
     (pathSegments.length === 2 && pathSegments[1] === 'home');
-  if (isHomePage) {
+  const isFeedPage =
+    pathSegments.length === 1 &&
+    (pathSegments[0] === 'en' || pathSegments[0] === 'ar');
+  if (isHomePage || isFeedPage) {
     return null;
   }
 
@@ -25,7 +28,11 @@ export default function ConditionalAuthBanner() {
   }
 
   // Hide on callback routes to keep a clean full-screen loader
-  if (pathname.includes('/callback')) {
+  if (
+    pathname.includes('/callback') ||
+    pathname.includes('/onboarding') ||
+    pathname.includes('/update-country')
+  ) {
     return null;
   }
 

@@ -144,6 +144,10 @@
     },
     "Header": {
         "navigation": {
+            "feed": "Feed",
+            "home": "Home",
+            "documents": "Documents",
+            "types": "Types",
             "industries": "Industries",
             "reports": "Reports",
             "statistics": "Statistics",
