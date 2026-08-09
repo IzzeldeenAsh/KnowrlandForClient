@@ -65,6 +65,7 @@ export interface FeedItemRelatedInsight {
   title: string
   slug: string
   description: string | null
+  price?: number | string | null
 }
 
 export interface FeedItemStats {
@@ -148,6 +149,16 @@ export interface ImageMediaEntry {
 
 export interface ImageTextPostPayload extends PublishPostPayload {
   media?: ImageMediaEntry[]
+}
+
+export interface ArticlePayload {
+  title: string
+  body: string
+  industryId: number | null
+  tags: number[]
+  relatedInsights: number[]
+  coverImage?: File | null
+  removeCover?: boolean
 }
 
 // ---------- Helpers ----------
@@ -458,6 +469,121 @@ async function saveImageTextPost(
   }
 
   if (uuid) return uuid
+
+  const body = await response.json()
+  return body.data?.uuid
+}
+
+// ---------- Article ----------
+
+export async function publishArticle(
+  payload: ArticlePayload,
+  locale: string,
+  uuid?: string,
+): Promise<string> {
+  return saveArticle(payload, 'published', locale, uuid)
+}
+
+export async function saveArticleDraft(
+  payload: ArticlePayload,
+  locale: string,
+  uuid?: string,
+): Promise<string> {
+  return saveArticle(payload, 'draft', locale, uuid)
+}
+
+async function saveArticle(
+  payload: ArticlePayload,
+  status: 'draft' | 'published',
+  locale: string,
+  uuid?: string,
+): Promise<string> {
+  const jsonPayload = {
+    title: payload.title,
+    body: payload.body,
+    industry_id: payload.industryId,
+    status,
+    tags: payload.tags,
+    related_insights: payload.relatedInsights,
+    remove_cover: payload.removeCover === true,
+  }
+
+  if (uuid) {
+    const uploadCoverBeforePublishing = status === 'published' && !!payload.coverImage
+    const response = await fetch(getApiUrl(`/api/insighter/feed/article/${uuid}`), {
+      method: 'PUT',
+      headers: { ...authHeaders(locale), 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        ...jsonPayload,
+        status: uploadCoverBeforePublishing ? 'draft' : status,
+      }),
+    })
+
+    if (!response.ok) {
+      await parseErrorMessage(
+        response,
+        status === 'draft' ? 'Unable to save the article draft.' : 'Unable to publish the article.',
+      )
+    }
+
+    if (payload.coverImage) {
+      const coverFormData = new FormData()
+      coverFormData.append('_method', 'PUT')
+      coverFormData.append('cover_image', payload.coverImage)
+
+      const coverResponse = await fetch(getApiUrl(`/api/insighter/feed/article/${uuid}`), {
+        method: 'POST',
+        headers: authHeaders(locale),
+        body: coverFormData,
+      })
+
+      if (!coverResponse.ok) {
+        await parseErrorMessage(coverResponse, 'Unable to upload the article cover image.')
+      }
+    }
+
+    if (uploadCoverBeforePublishing) {
+      const publishResponse = await fetch(getApiUrl(`/api/insighter/feed/article/${uuid}`), {
+        method: 'PUT',
+        headers: { ...authHeaders(locale), 'Content-Type': 'application/json' },
+        body: JSON.stringify({ status: 'published' }),
+      })
+
+      if (!publishResponse.ok) {
+        await parseErrorMessage(publishResponse, 'Unable to publish the article.')
+      }
+    }
+
+    return uuid
+  }
+
+  const formData = new FormData()
+  formData.append('title', payload.title)
+  formData.append('body', payload.body)
+  formData.append('status', status)
+  if (payload.industryId !== null) {
+    formData.append('industry_id', String(payload.industryId))
+  }
+  payload.tags.forEach((tagId, index) => formData.append(`tags[${index}]`, String(tagId)))
+  payload.relatedInsights.forEach((knowledgeId, index) =>
+    formData.append(`related_insights[${index}]`, String(knowledgeId)),
+  )
+  if (payload.coverImage) {
+    formData.append('cover_image', payload.coverImage)
+  }
+
+  const response = await fetch(getApiUrl('/api/insighter/feed/article'), {
+    method: 'POST',
+    headers: authHeaders(locale),
+    body: formData,
+  })
+
+  if (!response.ok) {
+    await parseErrorMessage(
+      response,
+      status === 'draft' ? 'Unable to save the article draft.' : 'Unable to publish the article.',
+    )
+  }
 
   const body = await response.json()
   return body.data?.uuid

@@ -1,13 +1,12 @@
 'use client'
 
-import { Menu, Modal } from '@mantine/core'
+import { Badge, Menu, Modal } from '@mantine/core'
 import {
+  IconArticle,
   IconDots,
-  IconEye,
   IconFileDescription,
   IconLoader2,
   IconPhoto,
-  IconShare3,
   IconTrash,
   IconVideo,
 } from '@tabler/icons-react'
@@ -28,6 +27,7 @@ import {
   getMyFeeds,
   type FeedItem,
   type FeedItemMedia,
+  type FeedItemRelatedInsight,
 } from '@/services/feed.service'
 
 type MyFeedsTimelineProps = {
@@ -58,6 +58,9 @@ const copyByLocale = {
     deleteFailed: 'Unable to delete the post.',
     postActions: 'Post actions',
     imageAlt: 'Post image',
+    articleCoverAlt: 'Article cover',
+    article: 'Article',
+    minuteRead: 'min read',
     attachment: 'Open attachment',
   },
   ar: {
@@ -83,6 +86,9 @@ const copyByLocale = {
     deleteFailed: 'تعذر حذف المنشور.',
     postActions: 'إجراءات المنشور',
     imageAlt: 'صورة المنشور',
+    articleCoverAlt: 'غلاف المقال',
+    article: 'مقال',
+    minuteRead: 'دقيقة قراءة',
     attachment: 'فتح المرفق',
   },
 } as const
@@ -97,6 +103,21 @@ function stripHtml(html: string): string {
 
   const doc = new DOMParser().parseFromString(html, 'text/html')
   return (doc.body.textContent ?? '').replace(/\s+/g, ' ').trim()
+}
+
+function getInsightPrice(price: FeedItemRelatedInsight['price'], freeLabel: string) {
+  const normalizedPrice = String(price ?? '').trim()
+  if (!normalizedPrice) return null
+
+  const numericPrice = Number(normalizedPrice)
+  if (!Number.isNaN(numericPrice)) {
+    return {
+      label: numericPrice === 0 ? freeLabel : `$${numericPrice.toLocaleString('en-US', { maximumFractionDigits: 2 })}`,
+      isFree: numericPrice === 0,
+    }
+  }
+
+  return { label: normalizedPrice, isFree: false }
 }
 
 function formatPostDate(value: string | null, locale: string): string | null {
@@ -199,6 +220,74 @@ function VideoPlayer({ media, title }: { media: FeedItemMedia; title: string }) 
   )
 }
 
+function ArticlePreview({
+  item,
+  cover,
+  locale,
+}: {
+  item: FeedItem
+  cover?: FeedItemMedia
+  locale: string
+}) {
+  const isArabic = locale === 'ar'
+  const copy = copyByLocale[isArabic ? 'ar' : 'en']
+  const articleText = stripHtml(item.excerpt || item.body || '')
+  const wordCount = stripHtml(item.body || '').split(/\s+/).filter(Boolean).length
+  const readingMinutes = Math.max(1, Math.ceil(wordCount / 220))
+
+  return (
+    <Link
+      href={`/${locale}/article/${item.uuid}`}
+      aria-label={`${copy.article}: ${item.title ?? articleText}`}
+      className="group -mx-5 mt-5 block overflow-hidden border-y border-[#DCE4ED] bg-[#F3F6F8] transition-colors hover:bg-[#EDF2F6] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[#2378E8] sm:-mx-6"
+    >
+      {cover?.url ? (
+        <div className="relative aspect-[1.91/1] w-full overflow-hidden bg-[#E8EDF2]">
+          <img
+            src={cover.url}
+            alt={cover.name || item.title || copy.articleCoverAlt}
+            loading="lazy"
+            className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-[1.015]"
+          />
+        </div>
+      ) : (
+        <div className="flex aspect-[1.91/1] w-full items-center justify-center bg-[linear-gradient(135deg,#EAF1F8_0%,#DCE8F4_100%)] text-[#6C829E]">
+          <IconArticle aria-hidden className="h-12 w-12" stroke={1.3} />
+        </div>
+      )}
+
+      <div className="px-5 py-4 sm:px-6 sm:py-5">
+        <div className="flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.08em] text-[#5D7089]">
+          <IconArticle aria-hidden className="h-4 w-4 text-[#2378E8]" stroke={1.8} />
+          <span>{copy.article}</span>
+          <span aria-hidden className="h-0.5 w-0.5 rounded-full bg-[#91A0B3]" />
+          <span className="normal-case tracking-normal">
+            {readingMinutes} {copy.minuteRead}
+          </span>
+        </div>
+
+        {item.title && (
+          <h2
+            dir="auto"
+            className="mt-2.5 text-start text-[20px] font-bold leading-7 tracking-[-0.025em] text-[#101724] sm:text-[22px] sm:leading-8"
+          >
+            {item.title}
+          </h2>
+        )}
+
+        {articleText && (
+          <p
+            dir="auto"
+            className="mt-1.5 line-clamp-2 text-start text-[14px] leading-6 text-[#56677E] sm:text-[15px]"
+          >
+            {articleText}
+          </p>
+        )}
+      </div>
+    </Link>
+  )
+}
+
 function RelatedInsightIcon({ type }: { type: string }) {
   switch (type) {
     case 'report':
@@ -229,7 +318,9 @@ function FeedCard({
   const copy = copyByLocale[isArabic ? 'ar' : 'en']
   const [openingInsight, setOpeningInsight] = useState<string | null>(null)
   const date = formatPostDate(item.published_at ?? item.created_at, locale)
+  const isArticle = item.content_type === 'article'
   const imageMedia = item.media.filter((media) => media.media_type === 'image' && media.url)
+  const articleCover = isArticle ? imageMedia[0] : undefined
   const videoMedia = item.media.find((media) => media.media_type === 'video')
   const attachments = item.media.filter(
     (media) => media.media_type === 'attachment' && media.url,
@@ -253,7 +344,7 @@ function FeedCard({
 
   return (
     <article className="relative overflow-visible rounded-lg border border-[#D9E3EF] bg-white px-5 py-5 sm:px-6">
-      <div className="flex min-h-9 items-start justify-between gap-4">
+      <div className="flex min-h-9 items-start justify-between gap-2 sm:gap-4">
         <div className="min-w-0">
           {insighter && (
             <div className="flex items-center gap-3">
@@ -272,20 +363,25 @@ function FeedCard({
               </div>
               <div className="min-w-0">
                 <p className="truncate text-[14px] font-semibold text-[#101724]">{insighter.name}</p>
-                <div className="flex flex-wrap items-center gap-x-1.5 gap-y-0.5 text-[12.5px] text-[#7A8BA4]">
+                <div className="flex flex-nowrap items-center gap-x-1.5 text-[12.5px] text-[#7A8BA4]">
                   {item.industry && (
                     <Link
                       href={`/${locale}/sub-industry/${item.industry.id}/${item.industry.slug}`}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="font-medium text-[#2378E8] hover:underline"
+                      className="min-w-0 truncate font-medium text-[#2378E8] hover:underline"
                     >
                       {item.industry.name}
                     </Link>
                   )}
-                  {date && item.industry && <span aria-hidden>·</span>}
+                  {date && item.industry && <span aria-hidden className="shrink-0">·</span>}
                   {date && (
-                    <time dateTime={item.published_at ?? item.created_at ?? undefined}>{date}</time>
+                    <time
+                      dateTime={item.published_at ?? item.created_at ?? undefined}
+                      className="shrink-0 whitespace-nowrap"
+                    >
+                      {date}
+                    </time>
                   )}
                 </div>
               </div>
@@ -321,33 +417,22 @@ function FeedCard({
         </div>
       </div>
 
-      {item.title && (
+      {!isArticle && item.title && (
         <h2 className="mt-4 text-[19px] font-bold leading-7 tracking-[-0.02em] text-[#101724]">
           {item.title}
         </h2>
       )}
 
-      {item.body && (
-        <p className={`${item.title ? 'mt-2' : 'mt-4'} whitespace-pre-wrap text-[16px] leading-7 text-[#1C2433]`}>
+      {!isArticle && item.body && (
+        <p className={`${item.title ? 'mt-2' : 'mt-4'} whitespace-pre-wrap text-[13px] leading-[1.2rem] text-[#1C2433] sm:text-[16px] sm:leading-7`}>
           {item.body}
         </p>
       )}
 
-      {item.tags.length > 0 && (
-        <div className="mt-4 flex flex-wrap gap-2">
-          {item.tags.map((tag) => (
-            <span
-              key={tag.id}
-              className="rounded-full bg-[#F0F5FC] px-2.5 py-1 text-[11px] font-medium text-[#536680]"
-            >
-              #{tag.name}
-            </span>
-          ))}
-        </div>
-      )}
+      {isArticle && <ArticlePreview item={item} cover={articleCover} locale={locale} />}
 
-      {videoMedia && <VideoPlayer media={videoMedia} title={item.title ?? item.body ?? 'Video'} />}
-      {imageMedia.length > 0 && <ImageGallery media={imageMedia} imageAlt={copy.imageAlt} />}
+      {!isArticle && videoMedia && <VideoPlayer media={videoMedia} title={item.title ?? item.body ?? 'Video'} />}
+      {!isArticle && imageMedia.length > 0 && <ImageGallery media={imageMedia} imageAlt={copy.imageAlt} />}
 
       {attachments.length > 0 && (
         <div className="mt-5 space-y-2">
@@ -367,11 +452,15 @@ function FeedCard({
       )}
 
       {item.related_insights.length > 0 && (
-        <div className="mt-5 space-y-3">
-          {item.related_insights.map((insight) => (
+        <div className="-mx-5 -mb-5 mt-5 divide-y divide-[#E7EDF5] overflow-hidden rounded-b-lg border-t border-[#E7EDF5] sm:-mx-6 sm:-mb-6">
+          {item.related_insights.map((insight) => {
+            const insightKey = `${insight.type}-${insight.slug}`
+            const insightPrice = getInsightPrice(insight.price, locale === 'ar' ? 'مجاني' : 'Free')
+
+            return (
             <div
               key={`${insight.type}-${insight.slug}`}
-              className="group flex flex-col overflow-hidden rounded-lg border border-[#D8E3F0] bg-white shadow-sm transition duration-300 hover:-translate-y-0.5 hover:border-[#2378E8]/60 hover:shadow-[0_5px_14px_rgba(35,120,232,0.12)] sm:flex-row"
+              className="group flex flex-col overflow-hidden bg-white transition-colors duration-300 hover:bg-[#F8FAFD] sm:flex-row"
             >
               <Link
                 href={`/${locale}/knowledge/${insight.type}/${insight.slug}`}
@@ -398,32 +487,34 @@ function FeedCard({
 
               <div className="flex min-h-[130px] min-w-0 flex-1 flex-col justify-center bg-white px-4 py-4 sm:min-h-[155px] sm:px-5">
                 <div className="min-w-0">
-                  <div className="text-[10px] font-bold uppercase tracking-[0.14em] text-[#2378E8]">
-                    Insight
-                  </div>
                   {insight.description && (
                     <p
                       dir="auto"
-                      className="mt-2 line-clamp-2 text-[13px] leading-5 text-[#667894] sm:text-[14px]"
+                      className="line-clamp-3 text-[13px] leading-[1.2rem] text-[#667894] sm:text-[14px]"
                     >
                       {stripHtml(insight.description)}
                     </p>
                   )}
+                  <div className="mt-3 flex items-center justify-between gap-3" dir={locale === 'ar' ? 'rtl' : 'ltr'}>
+                    {insightPrice ? (
+                      <Badge color={insightPrice.isFree ? 'green' : 'yellow'} variant="light" className="shrink-0 font-semibold">
+                        <span dir={insightPrice.isFree ? 'auto' : 'ltr'} lang={insightPrice.isFree ? undefined : 'en'}>{insightPrice.label}</span>
+                      </Badge>
+                    ) : <span />}
                   <Link
                     href={`/${locale}/knowledge/${insight.type}/${insight.slug}`}
                     target="_blank"
                     rel="noreferrer"
-                    aria-busy={openingInsight === `${insight.type}-${insight.slug}`}
+                    aria-busy={openingInsight === insightKey}
                     onClick={() => {
-                      const insightKey = `${insight.type}-${insight.slug}`
                       setOpeningInsight(insightKey)
                       window.setTimeout(() => {
                         setOpeningInsight((current) => (current === insightKey ? null : current))
                       }, 1800)
                     }}
-                    className="mt-3 inline-flex min-h-9 items-center justify-center rounded-full border border-[#2378E8] px-4 text-center text-[13px] font-medium text-[#2378E8] transition-colors hover:bg-[#F2F7FF] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2378E8] focus-visible:ring-offset-2"
+                    className="inline-flex min-h-9 items-center justify-center rounded-full border border-[#2378E8] px-4 text-center text-[13px] font-medium text-[#2378E8] transition-colors hover:bg-[#F2F7FF] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2378E8] focus-visible:ring-offset-2"
                   >
-                    {openingInsight === `${insight.type}-${insight.slug}` ? (
+                    {openingInsight === insightKey ? (
                       <>
                         <IconLoader2 aria-hidden className="me-1.5 h-4 w-4 animate-spin" stroke={2} />
                         <span aria-live="polite">{copy.openingInsight}</span>
@@ -432,23 +523,14 @@ function FeedCard({
                       copy.viewInsight
                     )}
                   </Link>
+                  </div>
                 </div>
               </div>
             </div>
-          ))}
+            )
+          })}
         </div>
       )}
-
-      <div className="mt-5 flex items-center gap-5 border-t border-[#E7EDF5] pt-4 text-[13px] text-[#8292A9]">
-        <span className="inline-flex items-center gap-1.5">
-          <IconEye aria-hidden className="h-4 w-4" stroke={1.7} />
-          {item.stats.views_count.toLocaleString()} {copy.views}
-        </span>
-        <span className="inline-flex items-center gap-1.5">
-          <IconShare3 aria-hidden className="h-4 w-4" stroke={1.7} />
-          {item.stats.shares_count.toLocaleString()} {copy.shares}
-        </span>
-      </div>
     </article>
   )
 }

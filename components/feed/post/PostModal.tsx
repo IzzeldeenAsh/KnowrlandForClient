@@ -2,11 +2,11 @@
 
 import { Modal, Progress } from '@mantine/core'
 import {
-  IconChevronDown,
+  IconChevronLeft,
+  IconChevronRight,
   IconCircleCheck,
   IconFileDescription,
   IconFolderOpen,
-  IconHash,
   IconLoader2,
   IconPhoto,
   IconTrash,
@@ -14,7 +14,7 @@ import {
   IconX,
 } from '@tabler/icons-react'
 import Image from 'next/image'
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 // Registers the <mux-player> custom element; self-hosted via npm (no CSP
 // script-src change needed, unlike the CDN <script> embed Mux's docs default to).
 import '@mux/mux-player'
@@ -37,7 +37,8 @@ import {
   type FeedTag,
   type LibraryKnowledgeItem,
 } from '@/services/feed.service'
-import IndustrySelectModal, { type IndustryOption } from './IndustrySelectModal'
+import IndustryField from './IndustryField'
+import { type IndustryOption } from './IndustrySelectModal'
 import KnowledgeLibraryDrawer from './KnowledgeLibraryDrawer'
 
 export type PostModalMode = 'post' | 'video'
@@ -87,6 +88,10 @@ const copyByLocale = {
     titleVideo: 'Create a video post',
     close: 'Close post composer',
     selectIndustry: 'Select industry',
+    step1Label: 'Step 1 of 2 · Write your post',
+    step2Label: 'Step 2 of 2 · Categorize',
+    next: 'Next',
+    back: 'Back',
     description: 'Post description',
     bodyPlaceholder: 'Share knowledge, an insight, or a useful idea',
     uploadTitle: 'Upload your video',
@@ -108,7 +113,7 @@ const copyByLocale = {
     tagsHint: 'Tags are optional — they help the right experts find your insight.',
     noTags: 'No tags available for this industry yet.',
     shareFromLibrary: 'Share from library',
-    publish: 'Publish',
+    publish: 'Post',
     publishing: 'Publishing…',
     saveDraft: 'Save draft',
     savingDraft: 'Saving…',
@@ -140,6 +145,10 @@ const copyByLocale = {
     titleVideo: 'إنشاء منشور فيديو',
     close: 'إغلاق محرر المنشور',
     selectIndustry: 'اختر المجال',
+    step1Label: 'الخطوة 1 من 2 · اكتب منشورك',
+    step2Label: 'الخطوة 2 من 2 · التصنيف',
+    next: 'التالي',
+    back: 'رجوع',
     description: 'وصف المنشور',
     bodyPlaceholder: 'شارك معرفة أو رؤية أو فكرة مفيدة',
     uploadTitle: 'ارفع الفيديو',
@@ -228,6 +237,8 @@ export default function PostModal({
   const { user } = useUserProfile()
 
   // --- Post content state ---
+  // Two-step flow: 1 = write the post, 2 = categorize (industry + tags)
+  const [step, setStep] = useState<1 | 2>(1)
   const [body, setBody] = useState('')
   const [industry, setIndustry] = useState<IndustryOption | null>(null)
   const [selectedTags, setSelectedTags] = useState<FeedTag[]>([])
@@ -249,9 +260,7 @@ export default function PostModal({
   })
 
   // --- Sub-panel state ---
-  const [industryModalOpened, setIndustryModalOpened] = useState(false)
   const [libraryDrawerOpened, setLibraryDrawerOpened] = useState(false)
-  const [tagsPanelOpened, setTagsPanelOpened] = useState(false)
   const [industryTags, setIndustryTags] = useState<FeedTag[]>([])
   const [isLoadingTags, setIsLoadingTags] = useState(false)
 
@@ -305,6 +314,7 @@ export default function PostModal({
     abortUploadRef.current?.()
     abortUploadRef.current = null
     stopPolling()
+    setStep(1)
     setBody('')
     setIndustry(null)
     setSelectedTags([])
@@ -315,7 +325,6 @@ export default function PostModal({
       })
       return []
     })
-    setTagsPanelOpened(false)
     setVideoPhase('none')
     setVideoFileName('')
     setUploadPercent(0)
@@ -574,19 +583,6 @@ export default function PostModal({
 
   // --- Tags ---
 
-  const openTagsPanel = async () => {
-    if (!industry) return
-    setTagsPanelOpened((previous) => !previous)
-    if (industryTags.length === 0) {
-      setIsLoadingTags(true)
-      try {
-        setIndustryTags(await fetchIndustryTags(industry.id, locale))
-      } finally {
-        setIsLoadingTags(false)
-      }
-    }
-  }
-
   const toggleTag = (tag: FeedTag) => {
     setSelectedTags((previous) =>
       previous.some((selected) => selected.id === tag.id)
@@ -600,12 +596,64 @@ export default function PostModal({
       // Tags belong to an industry: reset them on change
       setSelectedTags([])
       setIndustryTags([])
-      setTagsPanelOpened(false)
     }
     setIndustry(option)
     setTouchedFields((previous) => ({ ...previous, industry: true }))
     setDirtyFields((previous) => ({ ...previous, industry: true }))
-    setIndustryModalOpened(false)
+  }
+
+  // Load suggested tags once an industry is chosen on step 2. Tags reset to []
+  // on industry change (see handleIndustrySelect), which retriggers this fetch.
+  useEffect(() => {
+    if (step !== 2 || !industry || industryTags.length > 0) return
+
+    let cancelled = false
+    setIsLoadingTags(true)
+    fetchIndustryTags(industry.id, locale)
+      .then((tags) => {
+        if (!cancelled) setIndustryTags(tags)
+      })
+      .catch(() => {
+        if (!cancelled) setIndustryTags([])
+      })
+      .finally(() => {
+        if (!cancelled) setIsLoadingTags(false)
+      })
+
+    return () => {
+      cancelled = true
+    }
+  }, [step, industry, industryTags.length, locale])
+
+  // --- Step navigation ---
+
+  // The compose step (step 1) owns the body and media; it must be valid before
+  // the author can move on to categorizing the post.
+  const focusStep1Field = (missingVideo: boolean) => {
+    window.requestAnimationFrame(() => {
+      if (missingVideo) {
+        ;(videoSelectButtonRef.current ?? videoFieldRef.current)?.focus()
+      } else {
+        bodyInputRef.current?.focus()
+      }
+    })
+  }
+
+  const handleNext = () => {
+    if (isPublishing || isSavingDraft || isDiscardingDraft) return
+
+    const missingVideo = isVideoFlow && videoPhase !== 'ready'
+    const missingBody = body.trim() === ''
+
+    setTouchedFields((previous) => ({ ...previous, video: isVideoFlow, body: true }))
+    setDirtyFields((previous) => ({ ...previous, video: isVideoFlow, body: true }))
+
+    if (missingVideo || missingBody) {
+      focusStep1Field(missingVideo)
+      return
+    }
+
+    setStep(2)
   }
 
   // --- Publish ---
@@ -621,15 +669,15 @@ export default function PostModal({
     setDirtyFields({ industry: true, video: isVideoFlow, body: true })
 
     if (missingIndustry || missingVideo || missingBody || !industry) {
-      window.requestAnimationFrame(() => {
-        if (missingIndustry) {
-          industryButtonRef.current?.focus()
-        } else if (missingVideo) {
-          ;(videoSelectButtonRef.current ?? videoFieldRef.current)?.focus()
-        } else {
-          bodyInputRef.current?.focus()
-        }
-      })
+      // Body/media live on step 1; industry lives on step 2. Send the author to
+      // the step that holds the first missing field.
+      if (missingBody || missingVideo) {
+        setStep(1)
+        focusStep1Field(missingVideo)
+      } else {
+        setStep(2)
+        window.requestAnimationFrame(() => industryButtonRef.current?.focus())
+      }
       return
     }
 
@@ -678,15 +726,13 @@ export default function PostModal({
     setDirtyFields({ industry: true, video: isVideoFlow, body: true })
 
     if (missingIndustry || missingVideo || missingBody || !industry) {
-      window.requestAnimationFrame(() => {
-        if (missingIndustry) {
-          industryButtonRef.current?.focus()
-        } else if (missingVideo) {
-          ;(videoSelectButtonRef.current ?? videoFieldRef.current)?.focus()
-        } else {
-          bodyInputRef.current?.focus()
-        }
-      })
+      if (missingBody || missingVideo) {
+        setStep(1)
+        focusStep1Field(missingVideo)
+      } else {
+        setStep(2)
+        window.requestAnimationFrame(() => industryButtonRef.current?.focus())
+      }
       return
     }
 
@@ -782,46 +828,32 @@ export default function PostModal({
             void handlePublish()
           }}
         >
-          {/* Author + industry pill */}
-          <div className="flex items-start gap-3 pe-12">
-            <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-[#E0ECFB] text-[13px] font-bold text-[#1D74E0]">
-              {initials}
+          {/* Author + step indicator */}
+          <div className="flex items-center gap-3 pe-12">
+            <div className="flex h-11 w-11 shrink-0 items-center justify-center overflow-hidden rounded-full bg-[#E0ECFB] text-[13px] font-bold text-[#1D74E0]">
+              {user?.profile_photo_url ? (
+                <Image
+                  src={user.profile_photo_url}
+                  alt={fullName}
+                  width={44}
+                  height={44}
+                  unoptimized
+                  className="h-full w-full object-cover"
+                />
+              ) : (
+                initials
+              )}
             </div>
             <div className="min-w-0 flex-1">
               <div className="truncate text-[15px] font-bold text-[#0B1220]">{fullName}</div>
-              <button
-                ref={industryButtonRef}
-                type="button"
-                onClick={() => setIndustryModalOpened(true)}
-                onBlur={() =>
-                  setTouchedFields((previous) => ({ ...previous, industry: true }))
-                }
-                aria-invalid={industryInvalid || undefined}
-                aria-describedby={industryInvalid ? 'feed-post-industry-error' : undefined}
-                data-dirty={dirtyFields.industry || undefined}
-                className={`mt-1.5 inline-flex min-h-10 items-center gap-1.5 rounded-md border px-2.5 py-1.5 text-[13px] font-medium text-[#1D74E0] transition-colors hover:bg-[#F2F7FF] focus-visible:outline-none ${
-                  industryInvalid
-                    ? 'border-[#C23B32] bg-[#FFF8F7]'
-                    : 'border-[#C9DCF6] focus-visible:border-[#8FB9EA]'
-                }`}
-              >
-                <IconHash aria-hidden className="h-3.5 w-3.5" stroke={2} />
-                <span className="max-w-[220px] truncate">
-                  {industry?.name ?? copy.selectIndustry}
-                </span>
-                <IconChevronDown aria-hidden className="h-3.5 w-3.5" stroke={2} />
-              </button>
-              {industryInvalid && (
-                <p
-                  id="feed-post-industry-error"
-                  className="mt-1.5 text-[12px] font-medium text-[#A9322B]"
-                >
-                  {copy.industryRequired}
-                </p>
-              )}
+              <div className="mt-0.5 truncate text-[12.5px] font-medium text-[#5A6B84]">
+                {step === 1 ? copy.step1Label : copy.step2Label}
+              </div>
             </div>
           </div>
 
+        {/* ===== Step 1: write your post ===== */}
+        <div className={step === 1 ? undefined : 'hidden'}>
         {/* Body: hidden until video upload allows editing, avoiding an empty locked area */}
         {!bodyLocked && (
           <div className="mt-4">
@@ -1062,30 +1094,54 @@ export default function PostModal({
             ))}
           </div>
         )}
+        </div>
+        {/* ===== End step 1 ===== */}
 
-        {/* Selected tags */}
-        {selectedTags.length > 0 && (
-          <div className="mt-3 flex flex-wrap gap-2">
-            {selectedTags.map((tag) => (
-              <button
-                key={tag.id}
-                type="button"
-                onClick={() => toggleTag(tag)}
-                className="inline-flex items-center gap-1.5 rounded-full bg-[#EDF3FC] px-3 py-1.5 text-[13px] font-medium text-[#1D74E0] transition-colors hover:bg-[#E0ECFB]"
-              >
-                #{tag.name}
-                <IconX aria-hidden className="h-3.5 w-3.5" stroke={2} />
-              </button>
-            ))}
+        {/* ===== Step 2: categorize (industry + tags) ===== */}
+        {step === 2 && (
+          <div className="mt-4">
+            <IndustryField
+              locale={locale}
+              value={industry}
+              invalid={industryInvalid}
+              errorId="feed-post-industry-error"
+              buttonRef={industryButtonRef}
+              onSelect={handleIndustrySelect}
+              onBlur={() =>
+                setTouchedFields((previous) => ({ ...previous, industry: true }))
+              }
+            />
+            {industryInvalid && (
+              <p id="feed-post-industry-error" className="mt-1.5 text-[12px] font-medium text-[#A9322B]">
+                {copy.industryRequired}
+              </p>
+            )}
           </div>
         )}
 
-        {/* Suggested tags panel */}
-        {tagsPanelOpened && industry && (
-          <div className="mt-3 rounded-md border border-[#E5EAF2] bg-[#FAFCFE] p-4">
-            <div className="text-[11.5px] font-semibold uppercase tracking-wide text-[#5A6B84]">
-              {copy.suggestedTags}
-            </div>
+        {/* Tags: only surfaced once an industry is chosen */}
+        {step === 2 && industry && (
+          <>
+            {selectedTags.length > 0 && (
+              <div className="mt-3 flex flex-wrap gap-2">
+                {selectedTags.map((tag) => (
+                  <button
+                    key={tag.id}
+                    type="button"
+                    onClick={() => toggleTag(tag)}
+                    className="inline-flex items-center gap-1.5 rounded-full bg-[#EDF3FC] px-3 py-1.5 text-[13px] font-medium text-[#1D74E0] transition-colors hover:bg-[#E0ECFB]"
+                  >
+                    #{tag.name}
+                    <IconX aria-hidden className="h-3.5 w-3.5" stroke={2} />
+                  </button>
+                ))}
+              </div>
+            )}
+
+            <div className="mt-3 rounded-md border border-[#E5EAF2] bg-[#FAFCFE] p-4">
+              <div className="text-[11.5px] font-semibold uppercase tracking-wide text-[#5A6B84]">
+                {copy.suggestedTags}
+              </div>
             <div className="mt-3 flex max-h-48 flex-wrap gap-2 overflow-y-auto">
               {isLoadingTags ? (
                 <span className="text-[13px] text-[#94A3B8]">…</span>
@@ -1111,8 +1167,9 @@ export default function PostModal({
                 })
               )}
             </div>
-            <p className="mt-3 text-[12.5px] text-[#94A3B8]">{copy.tagsHint}</p>
-          </div>
+              <p className="mt-3 text-[12.5px] text-[#94A3B8]">{copy.tagsHint}</p>
+            </div>
+          </>
         )}
 
         {/* Footer */}
@@ -1129,75 +1186,92 @@ export default function PostModal({
                 <span className="hidden sm:inline">{copy.discardDraft}</span>
               </button>
             )}
-            {!isVideoFlow && !hasVideo && (
+            {step === 1 ? (
+              <>
+                {!isVideoFlow && !hasVideo && (
+                  <button
+                    type="button"
+                    aria-label="Add images"
+                    onClick={() => imageInputRef.current?.click()}
+                    className={footerIconClass}
+                  >
+                    <IconPhoto aria-hidden stroke={1.7} className="h-5 w-5 text-[#1EAB5A]" />
+                  </button>
+                )}
+                {mode === 'post' && !hasImages && !hasVideo && (
+                  <button
+                    type="button"
+                    aria-label="Add video"
+                    onClick={() => videoInputRef.current?.click()}
+                    className={footerIconClass}
+                  >
+                    <IconVideo aria-hidden stroke={1.7} className="h-5 w-5 text-[#E8513E]" />
+                  </button>
+                )}
+                <button
+                  type="button"
+                  onClick={() => setLibraryDrawerOpened(true)}
+                  className={`flex h-9 items-center gap-1.5 rounded-lg px-2.5 text-[14px] font-medium transition-colors focus-visible:outline-[1px] focus-visible:outline-offset-1 focus-visible:outline-[#B7D2F4] ${
+                    relatedInsights.length > 0
+                      ? 'bg-[#EDF3FC] text-[#1D74E0]'
+                      : 'text-[#5A6B84] hover:bg-[#F3F6FB]'
+                  }`}
+                >
+                  <IconFolderOpen aria-hidden stroke={1.7} className="h-4.5 w-4.5" />
+                  <span className="hidden sm:inline">{copy.shareFromLibrary}</span>
+                </button>
+              </>
+            ) : (
               <button
                 type="button"
-                aria-label="Add images"
-                onClick={() => imageInputRef.current?.click()}
-                className={footerIconClass}
+                onClick={() => setStep(1)}
+                disabled={isPublishing || isSavingDraft || isDiscardingDraft}
+                className="inline-flex min-h-10 items-center gap-1.5 rounded-md px-3 text-[14px] font-medium text-[#5A6B84] transition-colors hover:bg-[#F3F6FB] focus-visible:outline-[1px] focus-visible:outline-offset-1 focus-visible:outline-[#B7D2F4] disabled:opacity-50"
               >
-                <IconPhoto aria-hidden stroke={1.7} className="h-5 w-5 text-[#1EAB5A]" />
+                {isArabic ? (
+                  <IconChevronRight aria-hidden className="h-4 w-4" stroke={2} />
+                ) : (
+                  <IconChevronLeft aria-hidden className="h-4 w-4" stroke={2} />
+                )}
+                {copy.back}
               </button>
             )}
-            {mode === 'post' && !hasImages && !hasVideo && (
-              <button
-                type="button"
-                aria-label="Add video"
-                onClick={() => videoInputRef.current?.click()}
-                className={footerIconClass}
-              >
-                <IconVideo aria-hidden stroke={1.7} className="h-5 w-5 text-[#E8513E]" />
-              </button>
-            )}
-            <button
-              type="button"
-              onClick={openTagsPanel}
-              disabled={!industry}
-              title={!industry ? copy.industryFirst : undefined}
-              className={`flex h-9 items-center gap-1.5 rounded-lg px-2.5 text-[14px] font-medium transition-colors focus-visible:outline-[1px] focus-visible:outline-offset-1 focus-visible:outline-[#B7D2F4] ${
-                selectedTags.length > 0
-                  ? 'bg-[#EDF3FC] text-[#1D74E0]'
-                  : 'text-[#5A6B84] hover:bg-[#F3F6FB]'
-              } disabled:cursor-not-allowed disabled:opacity-45`}
-            >
-              <IconHash aria-hidden className="h-4 w-4" stroke={2} />
-              {selectedTags.length > 0 ? copy.tagsCount(selectedTags.length) : copy.addTags}
-            </button>
-            <button
-              type="button"
-              onClick={() => setLibraryDrawerOpened(true)}
-              className={`flex h-9 items-center gap-1.5 rounded-lg px-2.5 text-[14px] font-medium transition-colors focus-visible:outline-[1px] focus-visible:outline-offset-1 focus-visible:outline-[#B7D2F4] ${
-                relatedInsights.length > 0
-                  ? 'bg-[#EDF3FC] text-[#1D74E0]'
-                  : 'text-[#5A6B84] hover:bg-[#F3F6FB]'
-              }`}
-            >
-              <IconFolderOpen aria-hidden stroke={1.7} className="h-4.5 w-4.5" />
-              <span className="hidden sm:inline">{copy.shareFromLibrary}</span>
-            </button>
           </div>
 
           <div className="flex items-center gap-2">
-            <button
-              type="button"
-              onClick={() => void handleSaveDraft()}
-              disabled={isPublishing || isSavingDraft || isDiscardingDraft}
-              aria-busy={isSavingDraft}
-              className="inline-flex min-h-10 items-center justify-center rounded-md border border-[#C9DCF6] bg-white px-4 py-2.5 text-[14px] font-medium text-[#1D74E0] transition-colors hover:bg-[#F2F7FF] focus-visible:outline-[1px] focus-visible:outline-offset-1 focus-visible:outline-[#B7D2F4] disabled:cursor-wait disabled:opacity-55"
-            >
-              {isSavingDraft && (
-                <IconLoader2 aria-hidden className="me-1.5 h-4 w-4 animate-spin" stroke={2} />
-              )}
-              {isSavingDraft ? copy.savingDraft : copy.saveDraft}
-            </button>
-            <button
-              type="submit"
-              disabled={isPublishing || isSavingDraft || isDiscardingDraft}
-              aria-busy={isPublishing}
-              className="min-h-10 rounded-md bg-[#1D74E0] px-6 py-2.5 text-[14px] font-medium text-white transition-colors hover:bg-[#155CB8] focus-visible:outline-[1px] focus-visible:outline-offset-1 focus-visible:outline-[#B7D2F4] disabled:cursor-wait disabled:bg-[#93B9E8]"
-            >
-              {isPublishing ? copy.publishing : copy.publish}
-            </button>
+            {step === 1 ? (
+              <button
+                type="button"
+                onClick={handleNext}
+                disabled={isPublishing || isSavingDraft || isDiscardingDraft}
+                className="min-h-10 rounded-md bg-[#1D74E0] px-6 py-2.5 text-[14px] font-medium text-white transition-colors hover:bg-[#155CB8] focus-visible:outline-[1px] focus-visible:outline-offset-1 focus-visible:outline-[#B7D2F4] disabled:cursor-not-allowed disabled:bg-[#93B9E8]"
+              >
+                {copy.next}
+              </button>
+            ) : (
+              <>
+                <button
+                  type="button"
+                  onClick={() => void handleSaveDraft()}
+                  disabled={isPublishing || isSavingDraft || isDiscardingDraft}
+                  aria-busy={isSavingDraft}
+                  className="inline-flex min-h-10 items-center justify-center rounded-md border border-[#C9DCF6] bg-white px-4 py-2.5 text-[14px] font-medium text-[#1D74E0] transition-colors hover:bg-[#F2F7FF] focus-visible:outline-[1px] focus-visible:outline-offset-1 focus-visible:outline-[#B7D2F4] disabled:cursor-wait disabled:opacity-55"
+                >
+                  {isSavingDraft && (
+                    <IconLoader2 aria-hidden className="me-1.5 h-4 w-4 animate-spin" stroke={2} />
+                  )}
+                  {isSavingDraft ? copy.savingDraft : copy.saveDraft}
+                </button>
+                <button
+                  type="submit"
+                  disabled={isPublishing || isSavingDraft || isDiscardingDraft}
+                  aria-busy={isPublishing}
+                  className="min-h-10 rounded-md bg-[#1D74E0] px-6 py-2.5 text-[14px] font-medium text-white transition-colors hover:bg-[#155CB8] focus-visible:outline-[1px] focus-visible:outline-offset-1 focus-visible:outline-[#B7D2F4] disabled:cursor-wait disabled:bg-[#93B9E8]"
+                >
+                  {isPublishing ? copy.publishing : copy.publish}
+                </button>
+              </>
+            )}
           </div>
         </div>
 
@@ -1263,14 +1337,6 @@ export default function PostModal({
           </button>
         </div>
       </Modal>
-
-      <IndustrySelectModal
-        locale={locale}
-        opened={industryModalOpened}
-        selectedId={industry?.id ?? null}
-        onClose={() => setIndustryModalOpened(false)}
-        onSelect={handleIndustrySelect}
-      />
 
       <KnowledgeLibraryDrawer
         locale={locale}

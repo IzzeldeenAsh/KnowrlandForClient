@@ -28,7 +28,11 @@ export default function ConditionalAuthBanner() {
   }
 
   // Hide on callback routes to keep a clean full-screen loader
-  if (pathname.includes('/callback')) {
+  if (
+    pathname.includes('/callback') ||
+    pathname.includes('/onboarding') ||
+    pathname.includes('/update-country')
+  ) {
     return null;
   }
 

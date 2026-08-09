@@ -1,0 +1,103 @@
+.editorShell :global(.mantine-RichTextEditor-root) {
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+}
+
+.editorShell :global(.mantine-RichTextEditor-toolbar) {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  min-height: 54px;
+  border: 0;
+  border-bottom: 1px solid #e2e8f0;
+  background: rgba(255, 255, 255, 0.96);
+  padding: 10px 0;
+  backdrop-filter: blur(12px);
+}
+
+.editorShell :global(.mantine-RichTextEditor-content) {
+  background: transparent;
+}
+
+.editorShell :global(.tiptap) {
+  min-height: 480px;
+  padding: 28px 0 80px;
+  color: #263246;
+  font-size: 18px;
+  line-height: 1.85;
+  outline: none;
+}
+
+.editorShell :global(.tiptap p) {
+  margin: 0 0 1.15em;
+}
+
+.editorShell :global(.tiptap h1),
+.editorShell :global(.tiptap h2),
+.editorShell :global(.tiptap h3) {
+  margin: 1.6em 0 0.55em;
+  color: #101827;
+  font-weight: 600;
+  letter-spacing: -0.025em;
+}
+
+.editorShell :global(.tiptap h1) { font-size: 2rem; }
+.editorShell :global(.tiptap h2) { font-size: 1.55rem; }
+.editorShell :global(.tiptap h3) { font-size: 1.25rem; }
+
+.editorShell :global(.tiptap ul),
+.editorShell :global(.tiptap ol) {
+  margin: 0 0 1.25em;
+  padding-inline-start: 1.5em;
+}
+
+.editorShell :global(.tiptap ul) { list-style: disc; }
+.editorShell :global(.tiptap ol) { list-style: decimal; }
+
+.editorShell :global(.tiptap blockquote) {
+  margin: 1.7em 0;
+  border-inline-start: 4px solid #2c7be5;
+  padding: 0.2em 0 0.2em 1.25em;
+  color: #4b5d76;
+  font-size: 1.15em;
+}
+
+.editorShell :global(.tiptap pre) {
+  margin: 1.5em 0;
+  overflow-x: auto;
+  border-radius: 8px;
+  background: #0d1b2e;
+  padding: 18px 20px;
+  color: #dbeafe;
+  font-size: 14px;
+  line-height: 1.65;
+}
+
+.editorShell :global(.tiptap a) {
+  color: #1769c2;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.editorShell :global(.tiptap hr) {
+  margin: 2.5em 0;
+  border: 0;
+  border-top: 1px solid #dbe3ee;
+}
+
+.editorShell :global(.tiptap p.is-editor-empty:first-child::before) {
+  float: left;
+  height: 0;
+  color: #9aa8ba;
+  content: attr(data-placeholder);
+  pointer-events: none;
+}
+
+@media (max-width: 640px) {
+  .editorShell :global(.tiptap) {
+    min-height: 360px;
+    padding-top: 22px;
+    font-size: 16px;
+  }
+}

@@ -9,7 +9,7 @@ interface CountryGuardProps {
 }
 
 /**
- * Component that checks if user has a country set and redirects to update page if not
+ * Keeps country-dependent screens aligned with the server-owned onboarding state.
  */
 export default function CountryGuard({ children, enabled = true }: CountryGuardProps) {
   const params = useParams();

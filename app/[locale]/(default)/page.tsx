@@ -22,12 +22,12 @@ export default async function Feed({ params, searchParams }: FeedProps) {
 
   return (
     <div dir={isRTL ? 'rtl' : 'ltr'} className="bg-[#EEF2FA] text-slate-900 min-h-screen">
-      <div className="mx-auto max-w-7xl px-4 py-6 lg:px-8">
-        <div className="grid grid-cols-1 gap-6 lg:grid-cols-[256px_minmax(0,1fr)_280px] xl:grid-cols-[256px_minmax(0,1fr)_300px]">
-          {/* Left column - role-aware account menu */}
+      <div className="mx-auto max-w-7xl px-0 py-6 sm:px-4 lg:px-8">
+        <div className="grid grid-cols-1 gap-6 lg:grid-cols-[280px_minmax(0,1fr)_280px] xl:grid-cols-[280px_minmax(0,1fr)_300px]">
+          {/* Left column - dashboard navigation with the feed profile card */}
           <aside className="hidden lg:block">
-            <div className="sticky top-[calc(var(--app-header-height,88px)+24px)]">
-              <FeedSidebar locale={locale} myFeedsActive={showMyFeeds} />
+            <div className="no-scrollbar sticky top-[calc(var(--app-header-height,88px)+24px)] max-h-[calc(100vh-var(--app-header-height,88px)-48px)] overflow-y-auto pe-1">
+              <FeedSidebar locale={locale} />
             </div>
           </aside>
 

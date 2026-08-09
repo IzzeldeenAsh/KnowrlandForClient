@@ -44,7 +44,7 @@ const copyByLocale = {
 // Module-level cache: the industry tree rarely changes within a session
 const industriesCache: Record<string, IndustryNode[]> = {}
 
-async function fetchIndustryTree(locale: string): Promise<IndustryNode[]> {
+export async function fetchIndustryTree(locale: string): Promise<IndustryNode[]> {
   if (industriesCache[locale]) return industriesCache[locale]
 
   const response = await fetch(getApiUrl('/api/common/setting/industry/tree'), {
@@ -61,9 +61,9 @@ async function fetchIndustryTree(locale: string): Promise<IndustryNode[]> {
   return industriesCache[locale]
 }
 
-type IndustryGroup = { parentKey: number; parentLabel: string; children: IndustryNode[] }
+export type IndustryGroup = { parentKey: number; parentLabel: string; children: IndustryNode[] }
 
-function collectLeafGroups(nodes: IndustryNode[]): IndustryGroup[] {
+export function collectLeafGroups(nodes: IndustryNode[]): IndustryGroup[] {
   const groups: IndustryGroup[] = []
 
   const collectLeaves = (node: IndustryNode): IndustryNode[] =>

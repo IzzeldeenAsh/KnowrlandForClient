@@ -9,6 +9,10 @@ import AgreementModal from '@/components/agreements/AgreementModal';
 import { getAuthToken, getTokenFromCookie } from '@/lib/authToken';
 import { getAngularAppOrigin, isAngularRouteUrl, toAngularAppUrl } from '@/lib/authRedirect';
 import { sharedCookieAttributes } from '@/lib/cookieDomain';
+import {
+  fetchOnboardingPromptStatuses,
+  getVisibleSupportedPrompts,
+} from '@/services/onboarding.service';
 interface ProfileResponse {
   data: {
     id: number;
@@ -138,7 +142,7 @@ export default function QueryParamAuthCallback() {
             return;
           }
         }
-        setTimeout(() => handleRedirect(response.data), 200);
+        setTimeout(() => void handleRedirect(response.data), 200);
 
       } catch (error) {
         console.error('[callback] Error in authentication flow:', error);
@@ -278,7 +282,7 @@ export default function QueryParamAuthCallback() {
   };
 
   // Helper function to handle redirects
-  const handleRedirect = (userData: any) => {
+  const handleRedirect = async (userData: any) => {
     storePromptPendingFlag();
     console.log('[callback] Handling redirect for user:', userData.email);
     console.log('[callback] User roles:', userData.roles);
@@ -313,42 +317,6 @@ export default function QueryParamAuthCallback() {
       return;
     }
 
-    // Check if user needs to update country
-    if (!userData.country_id) {
-      console.log('[callback] User missing country, redirecting to country update');
-
-      // Store the intended destination for after country update
-      const storedReturnUrl = getCookie('auth_return_url');
-      const finalReturnUrl = returnUrl || storedReturnUrl;
-
-      let redirectUrl: string;
-      if (finalReturnUrl && finalReturnUrl !== '/' && !finalReturnUrl.includes('/login') && !finalReturnUrl.includes('/auth/')) {
-        // Store the return URL for after country update
-        redirectUrl = finalReturnUrl;
-        storeCountryUpdateReturnUrl(finalReturnUrl);
-      } else if (userData.roles &&
-        (userData.roles.includes('insighter') ||
-          userData.roles.includes('company') ||
-          userData.roles.includes('company-insighter'))) {
-        // Store Angular dashboard as return URL
-        redirectUrl = '/app/insighter-dashboard/my-dashboard';
-        storeCountryUpdateReturnUrl(redirectUrl);
-      } else {
-        // Store home page as return URL
-        redirectUrl = `/${preferredLanguage}/home`;
-        storeCountryUpdateReturnUrl(redirectUrl);
-      }
-
-      // Clean up auth return URL cookie
-      if (getCookie('auth_return_url')) {
-        clearReturnUrlCookie();
-      }
-
-      // Redirect to country update page with redirect parameter
-      window.location.href = `/${preferredLanguage}/update-country?redirect=${encodeURIComponent(redirectUrl)}`;
-      return;
-    }
-
     // Check for stored returnUrl in cookie as fallback (for social auth)
     const storedReturnUrl = getCookie('auth_return_url');
     console.log('[callback] Stored return URL from cookie:', storedReturnUrl);
@@ -356,6 +324,45 @@ export default function QueryParamAuthCallback() {
     const finalReturnUrlRaw = returnUrl || storedReturnUrl;
     const finalReturnUrl = normalizeNextUrlToLocale(finalReturnUrlRaw, preferredLanguage || 'en');
     console.log('[callback] Final return URL:', finalReturnUrl);
+
+    const isUsableReturnUrl = Boolean(
+      finalReturnUrl &&
+      finalReturnUrl !== '/' &&
+      !finalReturnUrl.includes('/login') &&
+      !finalReturnUrl.includes('/auth/'),
+    );
+    const isProfessionalRole = userData.roles &&
+      (userData.roles.includes('insighter') ||
+        userData.roles.includes('company') ||
+        userData.roles.includes('company-insighter'));
+    const defaultDestination = isProfessionalRole
+      ? '/app/insighter-dashboard/my-dashboard'
+      : `/${preferredLanguage}/home${shouldPromptAddChannels ? '?promptAddChannels=1' : ''}`;
+    const intendedDestination = isUsableReturnUrl && finalReturnUrl
+      ? finalReturnUrl
+      : defaultDestination;
+
+    // Every successful login checks the server-owned onboarding state. If the
+    // check is temporarily unavailable, fail open so authentication is never blocked.
+    const authToken = token || getAuthToken();
+    if (authToken) {
+      try {
+        const prompts = await fetchOnboardingPromptStatuses({
+          token: authToken,
+          locale: preferredLanguage || 'en',
+        });
+
+        if (getVisibleSupportedPrompts(prompts).length > 0) {
+          if (storedReturnUrl) clearReturnUrlCookie();
+          window.location.replace(
+            `/${preferredLanguage}/onboarding?redirect=${encodeURIComponent(intendedDestination)}`,
+          );
+          return;
+        }
+      } catch (error) {
+        console.error('[callback] Onboarding status check failed; continuing login:', error);
+      }
+    }
 
     // Clean up the stored return URL cookie
     if (storedReturnUrl) {
@@ -421,37 +428,6 @@ export default function QueryParamAuthCallback() {
         'auth_return_url=',
         'Path=/',
         'Max-Age=-1',
-        ...sharedCookieAttributes()
-      ];
-    }
-
-    document.cookie = cookieSettings.join('; ');
-  };
-
-  // Helper function to store country update return URL
-  const storeCountryUpdateReturnUrl = (url: string) => {
-    localStorage.setItem('countryUpdateReturnUrl', url);
-
-    // Also store in cookie for cross-domain compatibility
-    const isLocalhost = window.location.hostname === 'localhost' ||
-      window.location.hostname === '127.0.0.1' ||
-      window.location.hostname.startsWith('localhost:') ||
-      window.location.hostname.startsWith('127.0.0.1:');
-
-    let cookieSettings;
-    if (isLocalhost) {
-      cookieSettings = [
-        `countryUpdateReturnUrl=${encodeURIComponent(url)}`,
-        `Path=/`,
-        `Max-Age=${60 * 60}`, // 1 hour
-        `SameSite=Lax`
-      ];
-    } else {
-      // Use the environment's shared domain to match the cookie set by Angular app
-      cookieSettings = [
-        `countryUpdateReturnUrl=${encodeURIComponent(url)}`,
-        `Path=/`,
-        `Max-Age=${60 * 60}`, // 1 hour
         ...sharedCookieAttributes()
       ];
     }
@@ -548,11 +524,11 @@ export default function QueryParamAuthCallback() {
         onClose={() => {
           // proceed even if user cancels/closes
           setLoading(true);
-          if (postAcceptUser) handleRedirect(postAcceptUser);
+          if (postAcceptUser) void handleRedirect(postAcceptUser);
         }}
         onAccepted={() => {
           setLoading(true);
-          if (postAcceptUser) handleRedirect(postAcceptUser);
+          if (postAcceptUser) void handleRedirect(postAcceptUser);
         }}
         locale={locale}
       />

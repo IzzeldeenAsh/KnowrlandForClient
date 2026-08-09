@@ -12,7 +12,7 @@ interface ProfileContextType {
   roles: string[];
   isLoading: boolean;
   isAuthResolved: boolean;
-  refreshProfile: () => Promise<void>;
+  refreshProfile: (forceRefresh?: boolean) => Promise<void>;
   signOut: () => void;
 }
 

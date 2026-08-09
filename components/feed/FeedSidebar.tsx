@@ -3,38 +3,59 @@
 import Image from 'next/image'
 import Link from 'next/link'
 import {
-  IconBuilding,
+  IconBell,
+  IconBook,
+  IconBookmark,
+  IconBriefcase,
+  IconCalendar,
+  IconCalendarCog,
+  IconChartLine,
+  IconCreditCard,
   IconDownload,
-  IconFileDescription,
+  IconFileText,
+  IconFolders,
   IconLayoutDashboard,
-  IconListDetails,
-  IconLogout,
-  IconSettings,
+  IconMessage2,
+  IconSettings2,
+  IconShoppingBag,
   IconSparkles,
-  IconUserCircle,
+  IconUserEdit,
+  IconUsers,
+  IconWallet,
   type Icon,
 } from '@tabler/icons-react'
-import { useEffect, useState } from 'react'
+import { useEffect, useState, type ReactNode } from 'react'
+import { dashboardUrl } from '@/app/config'
 import { useUserProfile } from '@/components/ui/header/hooks/useUserProfile'
-import { apiBaseUrl, dashboardUrl } from '@/app/config'
-import { getAuthToken } from '@/lib/authToken'
 
 type FeedSidebarProps = {
   locale: string
 }
 
 type SidebarCopy = {
-  dashboard: string
-  library: string
-  myFeeds: string
-  draft: string
-  completeNow: string
-  myTeam: string
-  myPage: string
-  downloads: string
-  profile: string
+  menu: string
+  overview: string
+  myPosts: string
+  myRequests: string
+  myCompany: string
+  insights: string
+  myKnowledge: string
+  myDownloads: string
+  readLater: string
+  meetings: string
+  mySchedule: string
+  projects: string
+  clientProjects: string
+  myProjects: string
+  projectSettings: string
+  marketplace: string
+  myPurchases: string
+  sales: string
+  wallet: string
   settings: string
-  signOut: string
+  accountSettings: string
+  notificationSettings: string
+  paymentSettings: string
   insighter: string
   manager: string
   client: string
@@ -45,33 +66,42 @@ type SidebarCopy = {
   logIn: string
 }
 
-type KnowledgeStatusStatistic = {
-  status: string
-  count: number
-}
-
 type SidebarItemProps = {
-  href?: string
+  href: string
   icon: Icon
   label: string
-  onClick?: () => void
-  badge?: React.ReactNode
-  active?: boolean
+}
+
+type DashboardSectionProps = {
+  title: string
+  children: ReactNode
 }
 
 const copyByLocale: Record<'en' | 'ar', SidebarCopy> = {
   en: {
-    dashboard: 'Dashboard',
-    library: 'My library',
-    myFeeds: 'My Posts',
-    draft: 'Draft',
-    completeNow: 'Complete Now!',
-    myTeam: 'My Team',
-    myPage: 'My Page',
-    downloads: 'My Downloads',
-    profile: 'Profile',
+    menu: 'Menu',
+    overview: 'Overview',
+    myPosts: 'My Posts',
+    myRequests: 'My Requests',
+    myCompany: 'My Company',
+    insights: 'Insights',
+    myKnowledge: 'My Insight',
+    myDownloads: 'My Downloads',
+    readLater: 'Read Later',
+    meetings: 'Sessions',
+    mySchedule: 'My Schedule',
+    projects: 'Projects',
+    clientProjects: 'Client Projects',
+    myProjects: 'My Projects',
+    projectSettings: 'Project Settings',
+    marketplace: 'Marketplace',
+    myPurchases: 'My Purchases',
+    sales: 'Sales',
+    wallet: 'Wallet',
     settings: 'Settings',
-    signOut: 'Sign Out',
+    accountSettings: 'Account Settings',
+    notificationSettings: 'Notification Settings',
+    paymentSettings: 'Payment Settings',
     insighter: 'Insighter',
     manager: 'Manager',
     client: 'Client',
@@ -82,17 +112,29 @@ const copyByLocale: Record<'en' | 'ar', SidebarCopy> = {
     logIn: 'Log in',
   },
   ar: {
-    dashboard: 'لوحة المعلومات',
-    library: 'مكتبتي',
-    myFeeds: 'منشوراتي',
-    draft: 'مسودة',
-    completeNow: 'أكمل الآن!',
-    myTeam: 'فريقي',
-    myPage: 'صفحتي',
-    downloads: 'التحميلات',
-    profile: 'ملفي الشخصي',
+    menu: 'القائمة',
+    overview: 'نظرة عامة',
+    myPosts: 'منشوراتي',
+    myRequests: 'طلباتي',
+    myCompany: 'شركتي',
+    insights: 'الرؤى',
+    myKnowledge: 'معرفتي',
+    myDownloads: 'تحميلاتي',
+    readLater: 'اقرأ لاحقاً',
+    meetings: 'الجلسات الاستشارية',
+    mySchedule: 'جدولي الاستشاري',
+    projects: 'المشاريع',
+    clientProjects: 'مشاريع العملاء',
+    myProjects: 'مشاريعي',
+    projectSettings: 'إعدادات المشروع',
+    marketplace: 'السوق',
+    myPurchases: 'طلباتي',
+    sales: 'المبيعات',
+    wallet: 'المحفظة',
     settings: 'الإعدادات',
-    signOut: 'تسجيل الخروج',
+    accountSettings: 'إعدادات الحساب',
+    notificationSettings: 'إعدادات الإشعارات',
+    paymentSettings: 'إعدادات الدفع',
     insighter: 'إنسايتر',
     manager: 'مدير',
     client: 'عميل',
@@ -104,55 +146,52 @@ const copyByLocale: Record<'en' | 'ar', SidebarCopy> = {
   },
 }
 
-function SidebarItem({ href, icon: ItemIcon, label, onClick, badge, active = false }: SidebarItemProps) {
-  const content = (
-    <>
-      <ItemIcon aria-hidden stroke={1.75} className="h-[18px] w-[18px] shrink-0 text-[#60728F]" />
-      <span className="min-w-0 flex-1">{label}</span>
-      {badge}
-    </>
-  )
-
-  const className = `group flex min-h-12 w-full items-center gap-3 px-[18px] text-start text-[14px] transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[#2378E8] ${
-    active
-      ? 'bg-[#EEF5FF] font-semibold text-[#2378E8]'
-      : 'font-normal text-[#1C2433] hover:bg-[#F4F8FF]'
-  }`
-
-  if (href) {
-    return (
-      <Link href={href} className={className} aria-current={active ? 'page' : undefined}>
-        {content}
-      </Link>
-    )
-  }
-
+function SidebarItem({ href, icon: ItemIcon, label }: SidebarItemProps) {
   return (
-    <button type="button" onClick={onClick} className={className}>
-      {content}
-    </button>
+    <Link
+      href={href}
+      className="group flex min-h-11 items-center gap-3 border-b border-[#F1F1F1] px-4 py-3 text-start text-[14px] font-normal text-[#495057] transition-colors duration-150 last:border-b-0 hover:bg-[#F8F9FA] hover:text-[#2378E8] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[#2378E8]"
+    >
+      <span className="flex h-6 w-6 shrink-0 items-center justify-center text-[#60728F] transition-colors group-hover:text-[#2378E8]">
+        <ItemIcon aria-hidden stroke={1.75} className="h-[18px] w-[18px]" />
+      </span>
+      <span className="min-w-0 flex-1">{label}</span>
+    </Link>
+  )
+}
+
+function DashboardSection({ title, children }: DashboardSectionProps) {
+  return (
+    <section className="overflow-hidden rounded-lg border border-[#E7E7E7] bg-white transition-shadow duration-200 hover:shadow-[0_6px_16px_rgba(0,0,0,0.08)]">
+      <header className="flex min-h-[54px] items-center border-b border-[#E9ECEF] bg-[#F8F9FA] px-4 py-3">
+        <h2 className="m-0 text-[16px] font-semibold leading-6 text-[#495057]">{title}</h2>
+      </header>
+      <div>{children}</div>
+    </section>
   )
 }
 
 function SidebarSkeleton() {
   return (
-    <div
-      aria-label="Loading profile menu"
-      className="overflow-hidden rounded-lg border border-[#D9E3EF] bg-white"
-    >
-      <div className="flex h-[216px] animate-pulse flex-col items-center bg-[#F8FAFD] px-5 pt-6">
+    <div aria-label="Loading profile menu" className="space-y-6">
+      <div className="flex h-[216px] animate-pulse flex-col items-center rounded-lg border border-[#D9E3EF] bg-[#F8FAFD] px-5 pt-6">
         <div className="h-24 w-24 rounded-full bg-slate-200" />
         <div className="mt-4 h-5 w-32 rounded-full bg-slate-200" />
         <div className="mt-3 h-[23px] w-20 rounded bg-slate-200" />
       </div>
-      <div className="space-y-px bg-[#E7EDF5]">
-        {[72, 108, 92, 80, 102].map((width) => (
-          <div key={width} className="flex h-12 items-center gap-3 bg-white px-[18px]">
-            <div className="h-[18px] w-[18px] animate-pulse rounded bg-slate-100" />
-            <div className="h-3 animate-pulse rounded bg-slate-100" style={{ width }} />
+      {[3, 3, 2].map((rows, sectionIndex) => (
+        <div key={sectionIndex} className="overflow-hidden rounded-lg border border-[#E7E7E7] bg-white">
+          <div className="h-[54px] animate-pulse border-b border-[#E9ECEF] bg-[#F8F9FA] px-4 py-4">
+            <div className="h-4 w-20 rounded bg-slate-200" />
           </div>
-        ))}
-      </div>
+          {Array.from({ length: rows }).map((_, rowIndex) => (
+            <div key={rowIndex} className="flex h-11 items-center gap-3 border-b border-[#F1F1F1] px-4 last:border-b-0">
+              <div className="h-[18px] w-[18px] animate-pulse rounded bg-slate-100" />
+              <div className="h-3 w-24 animate-pulse rounded bg-slate-100" />
+            </div>
+          ))}
+        </div>
+      ))}
     </div>
   )
 }
@@ -171,14 +210,8 @@ function GuestSidebar({ locale }: FeedSidebarProps) {
   const signupUrl = `${dashboardUrl}/auth/sign-up?returnUrl=${encodedReturnUrl}`
 
   return (
-    <section
-      aria-labelledby="feed-auth-title"
-      className="overflow-hidden rounded-lg border border-[#D7E1EC] bg-white p-5"
-    >
-      <div
-        aria-hidden
-        className="mb-5 flex h-10 w-10 items-center justify-center rounded-md bg-[#EAF3FF] text-[#2378E8]"
-      >
+    <section aria-labelledby="feed-auth-title" className="overflow-hidden rounded-lg border border-[#D7E1EC] bg-white p-5">
+      <div aria-hidden className="mb-5 flex h-10 w-10 items-center justify-center rounded-md bg-[#EAF3FF] text-[#2378E8]">
         <IconSparkles stroke={1.8} className="h-5 w-5" />
       </div>
       <h2 id="feed-auth-title" className="text-[20px] font-extrabold leading-tight tracking-[-0.02em] text-[#101724]">
@@ -203,66 +236,19 @@ function GuestSidebar({ locale }: FeedSidebarProps) {
   )
 }
 
-export default function FeedSidebar({
-  locale,
-  myFeedsActive = false,
-}: FeedSidebarProps & { myFeedsActive?: boolean }) {
+export default function FeedSidebar({ locale }: FeedSidebarProps) {
   const isArabic = locale === 'ar'
   const copy = copyByLocale[isArabic ? 'ar' : 'en']
-  const { user, roles, isLoading, isAuthResolved, handleSignOut } = useUserProfile()
-  const [unpublishedDraftCount, setUnpublishedDraftCount] = useState(0)
+  const { user, roles, isLoading, isAuthResolved } = useUserProfile()
 
-  const isProvider = roles.some((role) =>
-    ['insighter', 'company', 'company-insighter'].includes(role),
-  )
+  const isInsighter = roles.includes('insighter')
+  const isCompany = roles.includes('company')
+  const isCompanyInsighter = roles.includes('company-insighter')
   const isPureClient =
     roles.includes('client') &&
     !roles.some((role) => ['insighter', 'company', 'company-insighter'].includes(role))
-
-  useEffect(() => {
-    if (!isProvider) {
-      setUnpublishedDraftCount(0)
-      return
-    }
-
-    const token = getAuthToken()
-    if (!token) return
-
-    const controller = new AbortController()
-
-    async function loadDraftCount() {
-      try {
-        const response = await fetch(
-          `${apiBaseUrl}/api/insighter/library/knowledge/status/statistics`,
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-              Accept: 'application/json',
-              'Content-Type': 'application/json',
-              'Accept-Language': isArabic ? 'ar' : 'en',
-              'X-Timezone': Intl.DateTimeFormat().resolvedOptions().timeZone,
-            },
-            cache: 'no-store',
-            signal: controller.signal,
-          },
-        )
-
-        if (!response.ok) return
-
-        const responseBody = (await response.json()) as {
-          data?: KnowledgeStatusStatistic[]
-        }
-        const count =
-          responseBody.data?.find((statistic) => statistic.status === 'unpublished')?.count ?? 0
-        setUnpublishedDraftCount(count)
-      } catch (error) {
-        if (error instanceof Error && error.name === 'AbortError') return
-      }
-    }
-
-    loadDraftCount()
-    return () => controller.abort()
-  }, [isArabic, isProvider])
+  const isProvider = isInsighter || isCompany || isCompanyInsighter
+  const hasProjectAccess = isProvider || isPureClient
 
   if (!isAuthResolved || isLoading) {
     return <SidebarSkeleton />
@@ -274,27 +260,18 @@ export default function FeedSidebar({
 
   const initials = `${user.first_name?.[0] ?? ''}${user.last_name?.[0] ?? ''}`.toUpperCase()
   const fullName = `${user.first_name ?? ''} ${user.last_name ?? ''}`.trim() || user.name
-  const roleLabel = roles.includes('company-insighter')
+  const roleLabel = isCompanyInsighter
     ? `${copy.insighter} ${copy.at} ${user.company?.legal_name ?? ''}`.trim()
-    : roles.includes('insighter')
+    : isInsighter
       ? copy.insighter
-      : roles.includes('company')
+      : isCompany
         ? `${user.company?.legal_name ?? ''} · ${copy.manager}`.replace(/^ · /, '')
         : copy.client
-
-  const draftBadge =
-    unpublishedDraftCount > 0 ? (
-      <span className="shrink-0 rounded bg-[#FFF4DE] px-2 py-1 text-[11px] font-semibold leading-4 text-[#B87518]">
-        {unpublishedDraftCount} {copy.draft} — {copy.completeNow}
-      </span>
-    ) : undefined
+  const dashboardBase = `${dashboardUrl}/app/insighter-dashboard`
 
   return (
-    <nav
-      aria-label={isArabic ? 'قائمة الحساب' : 'Account menu'}
-      className="overflow-hidden rounded-lg border border-[#D9E3EF] bg-white"
-    >
-      <div className="relative flex h-[216px] flex-col items-center overflow-hidden bg-[#F8FAFD] px-5 pb-[22px] pt-6 text-center">
+    <nav aria-label={isArabic ? 'قائمة الحساب' : 'Account menu'} className="space-y-6">
+      <section className="relative flex h-[216px] flex-col items-center overflow-hidden rounded-lg border border-[#D9E3EF] bg-[#F8FAFD] px-5 pb-[22px] pt-6 text-center">
         <svg
           aria-hidden
           className="pointer-events-none absolute inset-x-0 top-7 h-20 w-full text-[#BFD7FF]"
@@ -314,114 +291,92 @@ export default function FeedSidebar({
 
         <div className="relative z-10 h-24 w-24 overflow-hidden rounded-full border-4 border-white bg-[#E7F0FE]">
           {user.profile_photo_url ? (
-            <Image
-              src={user.profile_photo_url}
-              alt={fullName}
-              fill
-              sizes="96px"
-              quality={100}
-              className="object-cover object-top"
-              priority
-            />
+            <Image src={user.profile_photo_url} alt={fullName} fill sizes="96px" className="object-cover" />
           ) : (
             <div className="flex h-full w-full items-center justify-center text-[24px] font-extrabold text-[#2378E8]">
               {initials || 'I'}
             </div>
           )}
         </div>
-        <h2 className="relative z-10 mt-4 max-w-full truncate text-[16px] font-bold text-[#101724]">
-          {fullName}
-        </h2>
+        <h2 className="relative z-10 mt-4 max-w-full truncate text-[16px] font-bold text-[#101724]">{fullName}</h2>
         <span className="relative z-10 mt-3 max-w-full rounded bg-[#DFF7F6] px-3 py-[3px] text-[11px] font-semibold leading-[17px] text-[#139A91]">
           {roleLabel}
         </span>
-      </div>
+      </section>
 
-      <div className="border-t border-[#E5EBF3] p-[14px]">
-        <Link
-          href={`${dashboardUrl}/app/insighter-dashboard/my-dashboard`}
-          className="flex h-[52px] items-center gap-3 rounded-md border border-[#CFE0FA] bg-[#EFF5FD] px-3 text-[14px] font-semibold text-[#2378E8] transition duration-150 hover:border-[#AFCDF7] hover:bg-[#E8F1FD] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2378E8]"
-        >
-          <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-md bg-white">
-            <IconLayoutDashboard aria-hidden stroke={2} className="h-[18px] w-[18px]" />
-          </span>
-          {copy.dashboard}
-        </Link>
-      </div>
+      <DashboardSection title={copy.menu}>
+        <SidebarItem href={`${dashboardBase}/my-dashboard`} icon={IconLayoutDashboard} label={copy.overview} />
+        <SidebarItem href={`/${locale}?view=my-feeds`} icon={IconMessage2} label={copy.myPosts} />
+        {!isPureClient && (
+          <SidebarItem href={`${dashboardBase}/my-requests`} icon={IconFileText} label={copy.myRequests} />
+        )}
+        {isCompany && (
+          <SidebarItem href={`${dashboardBase}/my-company-settings`} icon={IconUsers} label={copy.myCompany} />
+        )}
+      </DashboardSection>
 
-      {isProvider && (
-        <div className="border-t border-[#E5EBF3]">
+      <DashboardSection title={copy.insights}>
+        {!isPureClient && (
+          <SidebarItem href={`${dashboardBase}/my-knowledge`} icon={IconBook} label={copy.myKnowledge} />
+        )}
+        <SidebarItem href={`${dashboardBase}/my-downloads`} icon={IconDownload} label={copy.myDownloads} />
+        <SidebarItem href={`${dashboardBase}/read-later`} icon={IconBookmark} label={copy.readLater} />
+      </DashboardSection>
+
+      <DashboardSection title={copy.meetings}>
+        <SidebarItem href={`${dashboardBase}/my-meetings`} icon={IconCalendar} label={copy.meetings} />
+        {!isPureClient && (
           <SidebarItem
-            href={`/${locale}?view=my-feeds`}
-            icon={IconListDetails}
-            label={copy.myFeeds}
-            active={myFeedsActive}
+            href={`${dashboardBase}/account-settings/consulting-schedule`}
+            icon={IconCalendarCog}
+            label={copy.mySchedule}
           />
-        </div>
+        )}
+      </DashboardSection>
+
+      {hasProjectAccess && (
+        <DashboardSection title={copy.projects}>
+          {!isPureClient && (
+            <SidebarItem href={`${dashboardBase}/project-offers`} icon={IconBriefcase} label={copy.clientProjects} />
+          )}
+          <SidebarItem href={`${dashboardBase}/projects-created`} icon={IconFolders} label={copy.myProjects} />
+          {!isPureClient && (
+            <SidebarItem
+              href={`${dashboardBase}/account-settings/project-settings`}
+              icon={IconSettings2}
+              label={copy.projectSettings}
+            />
+          )}
+        </DashboardSection>
       )}
 
-      {isProvider && (
-        <div className="border-t border-[#E5EBF3] px-[18px] py-3">
-          <Link
-            href={`${dashboardUrl}/app/insighter-dashboard/my-knowledge/general`}
-            className="block text-[#1C2433] transition-colors hover:text-[#2378E8] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2378E8]"
-          >
-            <span className="flex items-center gap-2.5 text-[14px] font-normal">
-              <IconFileDescription aria-hidden stroke={1.75} className="h-[18px] w-[18px] text-[#60728F]" />
-              {copy.library}
-            </span>
-            {draftBadge && <span className="mt-2 block">{draftBadge}</span>}
-          </Link>
-        </div>
-      )}
+      <DashboardSection title={copy.marketplace}>
+        <SidebarItem href={`${dashboardBase}/my-orders`} icon={IconShoppingBag} label={copy.myPurchases} />
+        {isProvider && <SidebarItem href={`${dashboardBase}/sales`} icon={IconChartLine} label={copy.sales} />}
+        {(isInsighter || isCompany) && (
+          <SidebarItem href={`${dashboardBase}/wallet`} icon={IconWallet} label={copy.wallet} />
+        )}
+      </DashboardSection>
 
-      {roles.includes('company') && (
-        <div className="border-t border-[#E5EBF3]">
+      <DashboardSection title={copy.settings}>
+        <SidebarItem
+          href={`${dashboardBase}/account-settings/general-settings`}
+          icon={IconUserEdit}
+          label={copy.accountSettings}
+        />
+        <SidebarItem
+          href={`${dashboardBase}/account-settings/notification-settings`}
+          icon={IconBell}
+          label={copy.notificationSettings}
+        />
+        {(isInsighter || isCompany) && (
           <SidebarItem
-            href={`${dashboardUrl}/app/insighter-dashboard/my-company-settings`}
-            icon={IconBuilding}
-            label={copy.myTeam}
+            href={`${dashboardBase}/account-settings/payment-settings`}
+            icon={IconCreditCard}
+            label={copy.paymentSettings}
           />
-        </div>
-      )}
-
-      {!isPureClient && (
-        <div className="border-t border-[#E5EBF3]">
-          <SidebarItem
-            href={`/${locale}/profile/${user.uuid}?entity=insighter`}
-            icon={IconUserCircle}
-            label={copy.myPage}
-          />
-        </div>
-      )}
-
-      <div className="border-t border-[#E5EBF3]">
-        <SidebarItem
-          href={`${dashboardUrl}/app/insighter-dashboard/my-downloads`}
-          icon={IconDownload}
-          label={copy.downloads}
-        />
-      </div>
-
-      <div className="border-t border-[#E5EBF3]">
-        <SidebarItem
-          href={`/${locale}/profile/settings`}
-          icon={IconUserCircle}
-          label={copy.profile}
-        />
-      </div>
-
-      <div className="border-t border-[#E5EBF3]">
-        <SidebarItem
-          href={`${dashboardUrl}/app/insighter-dashboard/account-settings/general-settings`}
-          icon={IconSettings}
-          label={copy.settings}
-        />
-      </div>
-
-      <div className="border-t border-[#E5EBF3]">
-        <SidebarItem icon={IconLogout} label={copy.signOut} onClick={handleSignOut} />
-      </div>
+        )}
+      </DashboardSection>
     </nav>
   )
 }

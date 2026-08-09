@@ -32,6 +32,8 @@ export function UserProfile({ isHome }: { isHome: boolean }) {
   const pathname = usePathname();
   const isRtl = pathname.startsWith("/ar");
   const localeFromPath = isRtl ? "ar" : "en";
+  // On the feed (main) page the menu is trimmed to just My Page + Profile.
+  const isFeedPage = pathname.split("/").filter(Boolean).slice(1).join("/") === "";
   const isWhatsAppMissing = String(user?.whatsapp_number ?? "").trim().length === 0;
   const promoCardSrc = isRtl
     ? "https://res.cloudinary.com/dsiku9ipv/image/upload/v1771682845/promo-ar-card_nwfawc.png"
@@ -427,6 +429,7 @@ export function UserProfile({ isHome }: { isHome: boolean }) {
           </div>
 
           {/* Dashboard — prominent top item */}
+          {!isFeedPage && (
           <div className="px-3 pt-3 pb-3 border-b border-slate-100">
             <Link
               href={`${process.env.NEXT_PUBLIC_DASHBOARD_URL}/app/insighter-dashboard/my-dashboard`}
@@ -464,8 +467,10 @@ export function UserProfile({ isHome }: { isHome: boolean }) {
               {t("dashboard")}
             </Link>
           </div>
+          )}
 
           <div className="py-2 px-3">
+            {!isFeedPage && (
             <div className={roles.includes("insighter") || roles.includes("company") || roles.includes("company-insighter") ? "border-b border-slate-100" : ""}>
               {(roles.includes("insighter") ||
                 roles.includes("company") ||
@@ -506,6 +511,7 @@ export function UserProfile({ isHome }: { isHome: boolean }) {
                 </Link>
               ))}
             </div>
+            )}
             {!isClient$() && (<Link
               href={`${process.env.NEXT_PUBLIC_BASE_URL}/en/profile/${user.uuid}?entity=insighter`}
               className="block px-4 py-2.5  font-semibold text-slate-900 hover:bg-indigo-50 hover:text-sky-700"
@@ -514,6 +520,7 @@ export function UserProfile({ isHome }: { isHome: boolean }) {
             >
               {t("myInsighterPage")}
             </Link>)}
+            {!isFeedPage && (
             <Link
               href={`${process.env.NEXT_PUBLIC_DASHBOARD_URL}/app/insighter-dashboard/my-downloads`}
               className="block px-4 py-2.5 font-semibold text-slate-900 hover:bg-indigo-50 hover:text-sky-700"
@@ -522,6 +529,7 @@ export function UserProfile({ isHome }: { isHome: boolean }) {
             >
               {isRtl ? "التحميلات" : "My Downloads"}
             </Link>
+            )}
             {/* <Link
             href={`${process.env.NEXT_PUBLIC_DASHBOARD_URL}/app/insighter-dashboard/my-consulting-schedule`}
             className="block px-4 py-2.5 font-semibold text-slate-900 hover:bg-indigo-50 hover:text-sky-700"
@@ -538,6 +546,7 @@ export function UserProfile({ isHome }: { isHome: boolean }) {
             >
               {t("myProfile")}
             </Link>
+            {!isFeedPage && (
             <Link
               href={`${process.env.NEXT_PUBLIC_DASHBOARD_URL}/app/insighter-dashboard/account-settings/general-settings`}
               className="block px-4 py-2.5 font-semibold text-slate-900 hover:bg-indigo-50 hover:text-sky-700"
@@ -546,6 +555,7 @@ export function UserProfile({ isHome }: { isHome: boolean }) {
             >
               {t("settings")}
             </Link>
+            )}
 
             {/* Show company settings only for company role */}
             {/* {roles.includes('company') && 
@@ -558,7 +568,8 @@ export function UserProfile({ isHome }: { isHome: boolean }) {
                 {t("myCompany")}
               </Link>
             } */}
-            {roles.includes("client") &&
+            {!isFeedPage &&
+              roles.includes("client") &&
               !roles.includes("insighter") &&
               !roles.includes("company") &&
               !roles.includes("company-insighter") && (
@@ -581,7 +592,7 @@ export function UserProfile({ isHome }: { isHome: boolean }) {
               )}
 
             <div className="border-t border-slate-100">
-              {isWhatsAppMissing && (
+              {!isFeedPage && isWhatsAppMissing && (
                 <Link
                   href={`${process.env.NEXT_PUBLIC_DASHBOARD_URL}/app/insighter-dashboard/account-settings/notification-settings`}
                   className="block px-4 pt-3 pb-2"

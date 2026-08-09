@@ -1,6 +1,7 @@
 'use client'
 
-import { IconArticle, IconFileText, IconLoader2, IconPhoto, IconVideo } from '@tabler/icons-react'
+import { IconArticle, IconPhoto, IconVideo } from '@tabler/icons-react'
+import { useRouter } from 'next/navigation'
 import { useCallback, useEffect, useState } from 'react'
 import { useToast } from '@/components/toast/ToastContext'
 import { useUserProfile } from '@/components/ui/header/hooks/useUserProfile'
@@ -17,8 +18,6 @@ const copyByLocale = {
     video: 'Video',
     image: 'Image',
     article: 'Article',
-    savedDraft: 'You have a saved draft',
-    continueDraft: 'Continue editing',
     checkingDraft: 'Checking your draft…',
   },
   ar: {
@@ -26,14 +25,13 @@ const copyByLocale = {
     video: 'فيديو',
     image: 'صورة',
     article: 'مقال',
-    savedDraft: 'لديك مسودة محفوظة',
-    continueDraft: 'متابعة التعديل',
     checkingDraft: 'جارٍ التحقق من المسودة…',
   },
 } as const
 
 export default function FeedComposer({ locale }: FeedComposerProps) {
   const copy = copyByLocale[locale === 'ar' ? 'ar' : 'en']
+  const router = useRouter()
   const toast = useToast()
   const { user, roles, isAuthResolved } = useUserProfile()
   const [modalMode, setModalMode] = useState<PostModalMode | null>(null)
@@ -68,15 +66,20 @@ export default function FeedComposer({ locale }: FeedComposerProps) {
     return () => controller.abort()
   }, [canPost, isAuthResolved, refreshDraft])
 
-  const openComposer = async (requestedMode: PostModalMode) => {
+  const openComposer = async (requestedMode: PostModalMode | 'article') => {
     if (isCheckingDraft) return
     setIsCheckingDraft(true)
     try {
       const currentDraft = await refreshDraft()
+      if (currentDraft?.content_type === 'article' || (!currentDraft && requestedMode === 'article')) {
+        router.push(`/${locale}/article/write`)
+        return
+      }
+
       setModalMode(
         currentDraft
           ? currentDraft.media_type === 'video' ? 'video' : 'post'
-          : requestedMode,
+          : requestedMode as PostModalMode,
       )
     } catch (error) {
       toast.error(error instanceof Error ? error.message : copy.checkingDraft)
@@ -114,39 +117,13 @@ export default function FeedComposer({ locale }: FeedComposerProps) {
       label: copy.article,
       icon: IconArticle,
       color: '#C8780A',
-      // Article composer is a separate upcoming flow
-      onClick: undefined,
+      onClick: () => void openComposer('article'),
     },
   ]
 
   return (
     <>
       <div className="overflow-hidden rounded-lg border border-[#DCE4EF] bg-white">
-        {draft && (
-          <button
-            type="button"
-            onClick={() => void openComposer(draft.media_type === 'video' ? 'video' : 'post')}
-            disabled={isCheckingDraft}
-            className="flex w-full items-center gap-3 border-b border-[#F0DCA8] bg-[#FFFBF1] px-4 py-3 text-start transition-colors hover:bg-[#FFF7E2] disabled:cursor-wait"
-          >
-            <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[#FFF0C7] text-[#A96710]">
-              {isCheckingDraft ? (
-                <IconLoader2 aria-hidden className="h-4 w-4 animate-spin" stroke={2} />
-              ) : (
-                <IconFileText aria-hidden className="h-4 w-4" stroke={1.8} />
-              )}
-            </span>
-            <span className="min-w-0 flex-1">
-              <span className="block text-[12px] font-semibold text-[#8A5A10]">{copy.savedDraft}</span>
-              <span className="mt-0.5 block truncate text-[13px] text-[#5D6D89]">
-                {draft.title || draft.body || copy.continueDraft}
-              </span>
-            </span>
-            <span className="shrink-0 text-[12px] font-semibold text-[#1D74E0]">
-              {copy.continueDraft}
-            </span>
-          </button>
-        )}
         <div className="flex min-h-[68px] items-center gap-4 px-4">
           <div className="h-10 w-10 shrink-0 overflow-hidden rounded-full bg-[#E7F0FD]">
             {user?.profile_photo_url ? (

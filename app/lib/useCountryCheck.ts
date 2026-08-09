@@ -1,9 +1,10 @@
 'use client';
 
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { usePathname, useSearchParams } from 'next/navigation';
 import { useGlobalProfile } from '@/components/auth/GlobalProfileProvider';
-import { needsCountryUpdate, shouldRequireCountry, redirectToCountryUpdate } from './countryUtils';
+import { getAuthToken } from '@/lib/authToken';
+import { fetchOnboardingPromptStatuses } from '@/services/onboarding.service';
 
 interface UseCountryCheckOptions {
   locale: string;
@@ -11,46 +12,65 @@ interface UseCountryCheckOptions {
 }
 
 /**
- * Hook to check if user needs to update country and redirect if necessary
+ * Protects country-dependent screens using the backend onboarding state.
  */
 export function useCountryCheck({ locale, enabled = true }: UseCountryCheckOptions) {
-  const { user, isLoading } = useGlobalProfile();
+  const { user, isLoading: isProfileLoading } = useGlobalProfile();
   const pathname = usePathname();
   const searchParams = useSearchParams();
+  const [isChecking, setIsChecking] = useState(false);
+  const [needsUpdate, setNeedsUpdate] = useState(false);
+  const [checkedUserId, setCheckedUserId] = useState<number | null>(null);
 
   useEffect(() => {
-    // Skip if disabled or still loading
-    if (!enabled || isLoading) {
-      return;
-    }
+    if (!enabled || isProfileLoading || !user) return;
 
-    // Skip if no user (not authenticated)
-    if (!user) {
-      return;
-    }
+    const token = getAuthToken();
+    if (!token) return;
 
-    // Skip if current route doesn't require country
-    if (!shouldRequireCountry(pathname)) {
-      console.log('[useCountryCheck] Skipping country check for route:', pathname);
-      return;
-    }
+    let cancelled = false;
+    const checkCountryPrompt = async () => {
+      setIsChecking(true);
+      try {
+        const prompts = await fetchOnboardingPromptStatuses({ token, locale });
+        const countryPrompt = prompts.find((prompt) => prompt.prompt_key === 'country');
+        const shouldRedirect = countryPrompt?.should_show === true;
 
-    // Check if user needs country update
-    if (needsCountryUpdate(user)) {
-      console.log('[useCountryCheck] User needs country update, redirecting');
+        if (cancelled) return;
+        setNeedsUpdate(shouldRedirect);
 
-      // Build full URL with search parameters
-      const fullUrl = searchParams.toString()
-        ? `${pathname}?${searchParams.toString()}`
-        : pathname;
+        if (shouldRedirect) {
+          const fullUrl = searchParams.toString()
+            ? `${pathname}?${searchParams.toString()}`
+            : pathname;
+          window.location.replace(
+            `/${locale}/onboarding?redirect=${encodeURIComponent(fullUrl)}`,
+          );
+        }
+      } catch (error) {
+        // A temporary prompt-status failure must not make protected pages unusable.
+        console.error('[useCountryCheck] Unable to check onboarding status:', error);
+        if (!cancelled) setNeedsUpdate(false);
+      } finally {
+        if (!cancelled) {
+          setCheckedUserId(user.id);
+          setIsChecking(false);
+        }
+      }
+    };
 
-      redirectToCountryUpdate(locale, fullUrl);
-    }
-  }, [user, isLoading, pathname, searchParams, locale, enabled]);
+    void checkCountryPrompt();
+    return () => {
+      cancelled = true;
+    };
+  }, [enabled, isProfileLoading, locale, pathname, searchParams, user]);
 
   return {
-    needsUpdate: needsCountryUpdate(user),
-    isLoading,
+    needsUpdate,
+    isLoading:
+      isProfileLoading ||
+      isChecking ||
+      Boolean(enabled && user && checkedUserId !== user.id),
     user
   };
 }

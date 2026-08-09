@@ -293,6 +293,10 @@ export default function Header() {
 
   const pathAfterLocale = pathname.split('/').filter(Boolean).slice(1).join('/');
 
+  // On the feed (main) page, the Industries and Types menus are hidden to keep
+  // the nav focused on the feed experience.
+  const isFeedPage = pathAfterLocale === '';
+
   // Which top-level nav entry is currently active
   const isActiveNav = (key: 'feed' | 'home' | 'documents' | 'industries' | 'types'): boolean => {
     switch (key) {
@@ -449,7 +453,12 @@ export default function Header() {
 
   // Hide header on callback routes to avoid visual flicker/loaders during auth.
   // Hide on dashboard routes because the dashboard renders its own AppShell header/sidebar.
-  if (pathname.includes('/callback') || pathname.includes('/dashboard')) {
+  if (
+    pathname.includes('/callback') ||
+    pathname.includes('/dashboard') ||
+    pathname.includes('/onboarding') ||
+    pathname.includes('/update-country')
+  ) {
     return null;
   }
 
@@ -498,12 +507,7 @@ export default function Header() {
                       <NavUnderline active={isActiveNav('home')} />
                     </Link>
                   </li>
-                  <li>
-                    <Link className={navItemClass(isActiveNav('documents'))} href={`/${currentLocale}/home`}>
-                      {t('navigation.documents')}
-                      <NavUnderline active={isActiveNav('documents')} />
-                    </Link>
-                  </li>
+                  {!isFeedPage && (
                   <li>
                     <HoverCard
                       id={`industries-hovercard-${currentLocale}`}
@@ -580,6 +584,8 @@ export default function Header() {
                       </HoverCard.Dropdown>
                     </HoverCard>
                   </li>
+                  )}
+                  {!isFeedPage && (
                   <li>
                     <HoverCard
                       id={`types-hovercard-${currentLocale}`}
@@ -615,6 +621,7 @@ export default function Header() {
                       </HoverCard.Dropdown>
                     </HoverCard>
                   </li>
+                  )}
                 </ul>
               </nav>
 

@@ -1,0 +1,99 @@
+.articleBody {
+  color: #29384d;
+  font-size: 17px;
+  line-height: 1.9;
+  overflow-wrap: anywhere;
+}
+
+.articleBody :global(p) {
+  margin: 0 0 1.4em;
+}
+
+.articleBody :global(h1),
+.articleBody :global(h2),
+.articleBody :global(h3),
+.articleBody :global(h4) {
+  margin: 1.8em 0 0.65em;
+  color: #101827;
+  font-weight: 700;
+  line-height: 1.3;
+  letter-spacing: -0.025em;
+}
+
+.articleBody :global(h1) { font-size: 2rem; }
+.articleBody :global(h2) { font-size: 1.65rem; }
+.articleBody :global(h3) { font-size: 1.35rem; }
+.articleBody :global(h4) { font-size: 1.15rem; }
+
+.articleBody :global(ul),
+.articleBody :global(ol) {
+  margin: 0 0 1.5em;
+  padding-inline-start: 1.6em;
+}
+
+.articleBody :global(ul) { list-style: disc; }
+.articleBody :global(ol) { list-style: decimal; }
+.articleBody :global(li) { margin: 0.45em 0; padding-inline-start: 0.25em; }
+
+.articleBody :global(blockquote) {
+  margin: 1.8em 0;
+  border-inline-start: 4px solid #2378e8;
+  border-radius: 0 8px 8px 0;
+  background: #f2f7fd;
+  padding: 1.1em 1.4em;
+  color: #405672;
+  font-size: 1.08em;
+}
+
+.articleBody :global(a) {
+  color: #1769c2;
+  font-weight: 600;
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 3px;
+}
+
+.articleBody :global(pre) {
+  margin: 1.8em 0;
+  overflow-x: auto;
+  border-radius: 12px;
+  background: #0d1b2e;
+  padding: 1.25rem 1.4rem;
+  color: #dbeafe;
+  font-size: 14px;
+  line-height: 1.7;
+}
+
+.articleBody :global(code) {
+  border-radius: 4px;
+  background: #edf2f7;
+  padding: 0.15em 0.35em;
+  color: #ad2f45;
+  font-size: 0.88em;
+}
+
+.articleBody :global(pre code) {
+  background: transparent;
+  padding: 0;
+  color: inherit;
+}
+
+.articleBody :global(hr) {
+  margin: 2.5em 0;
+  border: 0;
+  border-top: 1px solid #dce4ed;
+}
+
+.articleBody > :global(:first-child) { margin-top: 0; }
+.articleBody > :global(:last-child) { margin-bottom: 0; }
+
+@media (max-width: 640px) {
+  .articleBody {
+    font-size: 16px;
+    line-height: 1.82;
+  }
+
+  .articleBody :global(h1) { font-size: 1.65rem; }
+  .articleBody :global(h2) { font-size: 1.4rem; }
+  .articleBody :global(h3) { font-size: 1.2rem; }
+}

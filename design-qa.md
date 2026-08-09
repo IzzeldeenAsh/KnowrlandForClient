@@ -1,49 +1,30 @@
-# My Feeds design QA
+# Onboarding design QA
 
-- Source visual truth: `/var/folders/bp/jypbddkj1g758_mdbfx68vzw0000gn/T/TemporaryItems/NSIRD_screencaptureui_9SyPKU/Screenshot 2026-07-31 at 1.24.51 PM.png`
-- Implementation screenshot: `/Users/izzeddinashour/Desktop/Production-KNOLDG/KnowrlandForClient/my-feeds-qa.png`
-- Full comparison: `/Users/izzeddinashour/Desktop/Production-KNOLDG/KnowrlandForClient/design-qa-comparison.png`
-- Focused comparison: `/Users/izzeddinashour/Desktop/Production-KNOLDG/KnowrlandForClient/design-qa-focused.png`
-- Requested viewport: 1487 × 769 CSS px
-- Source pixels: 1486 × 770
-- Implementation pixels: 1472 × 761
-- Density normalization: 1× captures compared proportionally without stretching
-- State: desktop My Feeds timeline with one representative post; only fields returned by the backend feed resource are displayed
+## Evidence
 
-## Full-view comparison evidence
+- Reference: `/var/folders/bp/jypbddkj1g758_mdbfx68vzw0000gn/T/codex-clipboard-f8ffcb42-d922-40af-bc04-f9b22148e8db.png`
+- Implementation capture: `design-qa-implementation.png`
+- Side-by-side comparison: `design-qa-comparison.png`
+- Reference size: 400 × 300
+- Browser viewport: 1000 × 750
+- Normalized comparison: 1600 × 600, with each image fitted into an 800 × 600 panel
+- State: English country-selection step using the development-only design preview
 
-The implementation uses the existing three-column feed shell rather than expanding the reference card across the full viewport. Inside the center timeline, the card keeps the reference hierarchy: metadata and owner actions at the top, post copy, related-insight panel, and views/share statistics. The surrounding application shell and narrower card width are intentional product constraints.
+## Design check
 
-## Focused comparison evidence
+- Layout: passed. The compact centered card, split-panel proportion, answer-panel density, and footer alignment follow the supplied reference.
+- User-directed composition: passed. The illustration and stepper were removed; the dark panel now carries the requirement, large question, and supporting copy higher in the composition. The white panel contains only the answer controls and action.
+- Typography: passed. The question is visually dominant on the background panel while answer labels remain compact and readable.
+- Color and imagery: passed. A restrained Insighta navy/cobalt abstract background supports white copy without competing with it. Contrast remains strong.
+- Spacing and responsive behavior: passed. Desktop spacing is balanced and the mobile layout reserves enough height for the large question before the answer area.
+- Interaction: passed. Country search renders correctly, Jordan can be selected, `aria-selected` updates to `true`, and Continue remains available.
+- Runtime: passed. TypeScript completed without errors, the diff has no whitespace errors, and the browser console contains no errors.
+- Copy: passed. Existing localized onboarding copy is preserved and moved to the intended panel.
 
-The focused card comparison confirms:
+## Iteration history
 
-- The top-end dots placement, light border, white surface, blue industry treatment, related-insight panel, outlined CTA, and muted statistics match the reference direction.
-- Author name, avatar, role, job title, Track action, related-insight description, Meet, Request Service, View Insights, and Share actions are omitted because the backend feed response does not provide the required data.
-- The existing application font is retained. Weight, hierarchy, line height, and wrapping remain legible at the narrower timeline width.
-- Existing product color tokens are used consistently for blue actions, muted metadata, green published status, pale media treatment, and card borders.
-- The related-insight panel uses the existing Tabler icon set rather than a placeholder or custom-drawn asset.
-- Copy comes from live API fields or localized UI labels.
-
-## Interaction and runtime checks
-
-- Opened the post actions menu from the dots button.
-- Opened the delete confirmation from the menu.
-- Cancelled deletion without issuing a destructive request.
-- Checked the browser console after the interaction; no errors were present.
-- The authenticated API request and destructive confirmation action were not executed because the verification browser was signed out.
-
-## Findings
-
-No actionable P0, P1, or P2 visual differences remain. The omitted reference content is unsupported by the current API and was explicitly excluded by the requested scope.
-
-## Comparison history
-
-- Initial comparison: no P0/P1/P2 mismatch found after accounting for the existing timeline width and unsupported API fields.
-- No visual fixes were required after the comparison.
-
-## Follow-up polish
-
-- P3: If the feed resource later exposes author/profile data or a related-insight description, those reference sections can be restored without changing the card structure.
+1. The initial split layout placed an illustration on the left and the question with its controls on the right. The user requested no illustration and a clearer division of responsibilities between panels.
+2. Replaced the illustration with an abstract brand background, moved the question hierarchy to the left, and reduced the right panel to selection and action controls.
+3. Removed the step label and progress indicator, then lifted the requirement tag, question, and supporting copy into the upper portion of the background panel.
 
 final result: passed

@@ -9,6 +9,10 @@ import AgreementModal from '@/components/agreements/AgreementModal';
 import { getAuthToken, getTokenFromCookie } from '@/lib/authToken';
 import { getAngularAppOrigin, isAngularRouteUrl, toAngularAppUrl } from '@/lib/authRedirect';
 import { sharedCookieAttributes } from '@/lib/cookieDomain';
+import {
+  fetchOnboardingPromptStatuses,
+  getVisibleSupportedPrompts,
+} from '@/services/onboarding.service';
 interface ProfileResponse {
   data: {
     id: number;
@@ -131,7 +135,7 @@ export default function AuthCallback() {
           }
         }
         // Proceed to redirect
-        setTimeout(() => handleRedirect(response.data), 200);
+        setTimeout(() => void handleRedirect(response.data), 200);
 
       } catch (error) {
         console.error('[token-callback] Error in authentication flow:', error);
@@ -340,49 +344,12 @@ export default function AuthCallback() {
   };
 
   // Helper function to handle redirects
-  const handleRedirect = (userData: any) => {
+  const handleRedirect = async (userData: any) => {
     storePromptPendingFlag();
     // Check if user has admin role
     if (userData.roles && (userData.roles.includes('admin') || userData.roles.includes('staff'))) {
       console.log('[token-callback] Admin user detected, redirecting to admin dashboard');
       window.location.href = `${getAngularAppOrigin()}/admin-dashboard/admin/dashboard/main-dashboard/requests`;
-      return;
-    }
-
-    // Check if user needs to update country
-    if (!userData.country_id) {
-      console.log('[token-callback] User missing country, redirecting to country update');
-
-      // Store the intended destination for after country update
-      const returnUrl = searchParams.get('returnUrl');
-      const storedReturnUrl = getCookie('auth_return_url');
-      const finalReturnUrl = returnUrl || storedReturnUrl;
-
-      let redirectUrl: string;
-      if (finalReturnUrl && finalReturnUrl !== '/' && !finalReturnUrl.includes('/login') && !finalReturnUrl.includes('/auth/')) {
-        // Store the return URL for after country update
-        redirectUrl = finalReturnUrl;
-        storeCountryUpdateReturnUrl(finalReturnUrl);
-      } else if (userData.roles &&
-        (userData.roles.includes('insighter') ||
-          userData.roles.includes('company') ||
-          userData.roles.includes('company-insighter'))) {
-        // Store Angular dashboard as return URL
-        redirectUrl = '/app/insighter-dashboard/my-dashboard';
-        storeCountryUpdateReturnUrl(redirectUrl);
-      } else {
-        // Store home page as return URL
-        redirectUrl = `/${locale}/home`;
-        storeCountryUpdateReturnUrl(redirectUrl);
-      }
-
-      // Clean up auth return URL cookie
-      if (getCookie('auth_return_url')) {
-        clearReturnUrlCookie();
-      }
-
-      // Redirect to country update page with redirect parameter
-      window.location.href = `/${locale}/update-country?redirect=${encodeURIComponent(redirectUrl)}`;
       return;
     }
 
@@ -392,6 +359,42 @@ export default function AuthCallback() {
     // Check for stored returnUrl in cookie as fallback (for social auth)
     const storedReturnUrl = getCookie('auth_return_url');
     const finalReturnUrl = returnUrl || storedReturnUrl;
+
+    const isUsableReturnUrl = Boolean(
+      finalReturnUrl &&
+      finalReturnUrl !== '/' &&
+      !finalReturnUrl.includes('/login') &&
+      !finalReturnUrl.includes('/auth/'),
+    );
+    const isProfessionalRole = userData.roles &&
+      (userData.roles.includes('insighter') ||
+        userData.roles.includes('company') ||
+        userData.roles.includes('company-insighter'));
+    const defaultDestination = isProfessionalRole
+      ? '/app/insighter-dashboard/my-dashboard'
+      : `/${locale}/home${shouldPromptAddChannels ? '?promptAddChannels=1' : ''}`;
+    const intendedDestination = isUsableReturnUrl && finalReturnUrl
+      ? finalReturnUrl
+      : defaultDestination;
+
+    // The API response is the single source of truth for both required and
+    // optional prompts; the profile's country_id is no longer used as a gate.
+    const authToken = token || getAuthToken();
+    if (authToken) {
+      try {
+        const prompts = await fetchOnboardingPromptStatuses({ token: authToken, locale });
+
+        if (getVisibleSupportedPrompts(prompts).length > 0) {
+          if (storedReturnUrl) clearReturnUrlCookie();
+          window.location.replace(
+            `/${locale}/onboarding?redirect=${encodeURIComponent(intendedDestination)}`,
+          );
+          return;
+        }
+      } catch (error) {
+        console.error('[token-callback] Onboarding status check failed; continuing login:', error);
+      }
+    }
 
     // Clean up the stored return URL cookie
     if (storedReturnUrl) {
@@ -458,33 +461,6 @@ export default function AuthCallback() {
     document.cookie = cookieSettings.join('; ');
   };
 
-  // Helper function to store country update return URL
-  const storeCountryUpdateReturnUrl = (url: string) => {
-    localStorage.setItem('countryUpdateReturnUrl', url);
-
-    // Also store in cookie for cross-domain compatibility
-    const isLocalhost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
-
-    let cookieSettings;
-    if (isLocalhost) {
-      cookieSettings = [
-        `countryUpdateReturnUrl=${encodeURIComponent(url)}`,
-        `Path=/`,
-        `Max-Age=${60 * 60}`, // 1 hour
-        `SameSite=Lax`
-      ];
-    } else {
-      cookieSettings = [
-        `countryUpdateReturnUrl=${encodeURIComponent(url)}`,
-        `Path=/`,
-        `Max-Age=${60 * 60}`, // 1 hour
-        ...sharedCookieAttributes()
-      ];
-    }
-
-    document.cookie = cookieSettings.join('; ');
-  };
-
   return (
     <>
       {loading && (
@@ -495,11 +471,11 @@ export default function AuthCallback() {
         onClose={() => {
           // proceed even if user cancels/closes
           setLoading(true);
-          if (postAcceptUser) handleRedirect(postAcceptUser);
+          if (postAcceptUser) void handleRedirect(postAcceptUser);
         }}
         onAccepted={() => {
           setLoading(true);
-          if (postAcceptUser) handleRedirect(postAcceptUser);
+          if (postAcceptUser) void handleRedirect(postAcceptUser);
         }}
         locale={locale}
       />
