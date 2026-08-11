@@ -493,7 +493,7 @@ export default function Header() {
               </div>
 
               {/* Desktop navigation */}
-              <nav className="hidden lg:flex flex-1 overflow-visible min-w-0">
+              <nav className="hidden xl:flex flex-1 overflow-visible min-w-0">
                 <ul className="flex justify-start items-center w-full gap-0.5 md:gap-1">
                   <li>
                     <Link className={navItemClass(isActiveNav('feed'))} href={`/${currentLocale}`}>

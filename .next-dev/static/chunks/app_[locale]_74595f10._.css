@@ -1,0 +1,190 @@
+/* [project]/app/[locale]/home/utils/custom-search-engine-styles.module.css [app-client] (css) */
+.custom-search-engine-styles-module__toAkcW__searchBar {
+  box-sizing: border-box;
+  border-radius: 5px;
+  transition: background-color .3s, color .3s, transform .3s;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, .08), 0 2px 1px rgba(67, 94, 131, .15);
+}
+
+.custom-search-engine-styles-module__toAkcW__tp-course-details2-widget {
+  max-width: 400px;
+  position: -webkit-sticky;
+  position: sticky;
+  z-index: 25 !important;
+  margin-top: -380px !important;
+  top: 100px !important;
+}
+
+/* [project]/app/[locale]/profile/[uuid]/profile.module.css [app-client] (css) */
+.profile-module__3HWcJW__iconWrapper {
+  justify-content: center;
+  align-items: center;
+  display: flex;
+}
+
+.profile-module__3HWcJW__icon {
+  transition: color .2s ease-in-out;
+}
+
+.profile-module__3HWcJW__iconAll {
+  color: #3b82f6;
+}
+
+.profile-module__3HWcJW__iconData {
+  color: #000;
+}
+
+.profile-module__3HWcJW__iconInsight {
+  color: #8a1538;
+}
+
+.profile-module__3HWcJW__iconReport {
+  color: #3699ff;
+}
+
+.profile-module__3HWcJW__iconManual {
+  color: #ff9f43;
+}
+
+.profile-module__3HWcJW__iconCourse {
+  color: #0abb87;
+}
+
+.profile-module__3HWcJW__iconActive {
+  color: #fff !important;
+}
+
+.profile-module__3HWcJW__iconReport.profile-module__3HWcJW__iconActive path[fill="white"] {
+  fill: #3699ff !important;
+}
+
+.profile-module__3HWcJW__iconManual.profile-module__3HWcJW__iconActive path[fill="white"] {
+  fill: #ff9f43 !important;
+}
+
+@keyframes profile-module__3HWcJW__checkmark {
+  0% {
+    stroke-dasharray: 24;
+    stroke-dashoffset: 24px;
+    opacity: 0;
+  }
+
+  20% {
+    opacity: 1;
+  }
+
+  100% {
+    stroke-dasharray: 24;
+    stroke-dashoffset: 0;
+    opacity: 1;
+  }
+}
+
+@keyframes profile-module__3HWcJW__circleExpand {
+  0% {
+    opacity: 0;
+    transform: scale(0);
+  }
+
+  50% {
+    opacity: 1;
+  }
+
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes profile-module__3HWcJW__fadeInUp {
+  0% {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.profile-module__3HWcJW__countBadge {
+  color: inherit;
+  background-color: rgba(0, 0, 0, .08);
+  border-radius: 10px;
+  justify-content: center;
+  align-items: center;
+  margin-left: 6px;
+  padding: 2px 6px;
+  font-size: 10px;
+  font-weight: 600;
+  display: inline-flex;
+}
+
+.profile-module__3HWcJW__filterButton {
+  color: #4b5563;
+  background-color: #f3f4f6;
+  border-radius: 9999px;
+  align-items: center;
+  padding: .5rem 1rem;
+  font-size: .75rem;
+  font-weight: 500;
+  transition: all .2s ease-in-out;
+  display: flex;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, .05);
+}
+
+.dark .profile-module__3HWcJW__filterButton {
+  color: #e5e7eb;
+  background-color: rgba(51, 65, 85, .5);
+}
+
+.profile-module__3HWcJW__filterButtonActive {
+  color: #fff;
+}
+
+.profile-module__3HWcJW__filterAllActive {
+  background-color: #3b82f6 !important;
+}
+
+.profile-module__3HWcJW__filterDataActive {
+  background-color: #000 !important;
+}
+
+.profile-module__3HWcJW__filterInsightActive {
+  background-color: #891638 !important;
+}
+
+.profile-module__3HWcJW__filterReportActive {
+  background-color: #3699ff !important;
+}
+
+.profile-module__3HWcJW__filterManualActive {
+  background-color: #ff9f43 !important;
+}
+
+.profile-module__3HWcJW__filterCourseActive {
+  background-color: #0abb87 !important;
+}
+
+@keyframes profile-module__3HWcJW__shinyGradientSlide {
+  0% {
+    background-position: 0%;
+  }
+
+  100% {
+    background-position: 200%;
+  }
+}
+
+.profile-module__3HWcJW__shinyGradientText {
+  -webkit-text-fill-color: transparent;
+  color: rgba(0, 0, 0, 0);
+  background-image: linear-gradient(90deg, #3b82f6 0%, #2dd4bf 50%, #3b82f6 100%);
+  background-size: 200% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  animation: 2.5s linear infinite profile-module__3HWcJW__shinyGradientSlide;
+}
+
+/*# sourceMappingURL=app_%5Blocale%5D_74595f10._.css.map*/

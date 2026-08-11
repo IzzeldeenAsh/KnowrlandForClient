@@ -1,0 +1,88 @@
+/* [project]/app/[locale]/knowledge/[type]/[slug]/AskInsighter.module.css [app-client] (css) */
+.AskInsighter-module__RxMWsq__threadWrapper, .AskInsighter-module__RxMWsq__commentContainer {
+  position: relative;
+}
+
+[dir="rtl"] .AskInsighter-module__RxMWsq__commentContainer {
+  margin-left: 0;
+}
+
+.AskInsighter-module__RxMWsq__commentBox {
+  border-radius: .375rem;
+  position: relative;
+}
+
+.AskInsighter-module__RxMWsq__commentAvatar {
+  z-index: 2;
+  color: #374151;
+  background-color: #fff;
+  border: 1px solid #d1d5db;
+  border-radius: 50%;
+  justify-content: center;
+  align-items: center;
+  width: 40px;
+  height: 40px;
+  font-weight: 500;
+  display: flex;
+}
+
+.AskInsighter-module__RxMWsq__commentAvatar img {
+  -o-object-fit: cover;
+  object-fit: cover;
+  -o-object-position: top;
+  object-position: top;
+}
+
+.dark .AskInsighter-module__RxMWsq__commentAvatar {
+  background-color: #1f2937;
+  border-color: #4b5563;
+}
+
+.AskInsighter-module__RxMWsq__commentsThreadLine {
+  cursor: pointer;
+  padding: 0 calc(1.35rem - 1px);
+  display: flex;
+}
+
+.AskInsighter-module__RxMWsq__commentsThreadLine:before {
+  content: "";
+  border-left: 2px solid #eae6df;
+  height: calc(100% + 1.7rem);
+}
+
+.AskInsighter-module__RxMWsq__curveElement {
+  cursor: pointer;
+  padding: 0 calc(1.35rem - 1px);
+  display: flex;
+}
+
+.AskInsighter-module__RxMWsq__curveElement:before {
+  content: "";
+  border-bottom: 2px solid #eae6df;
+  border-left: 2px solid #eae6df;
+  border-radius: 0 0 0 .8rem;
+  width: 1.6rem;
+  height: calc(33px - .8rem);
+  transform: rotateY(0);
+}
+
+[dir="rtl"] .AskInsighter-module__RxMWsq__curveElement:before {
+  transform: rotateY(180deg);
+}
+
+.AskInsighter-module__RxMWsq__emptyThread {
+  cursor: pointer;
+  padding: 0 calc(1.35rem - 1px);
+  display: flex;
+}
+
+.AskInsighter-module__RxMWsq__emptyThread:before {
+  content: "";
+  border-bottom: 2px solid #fff;
+  border-left: 2px solid #fff;
+  border-radius: 0 0 0 .8rem;
+  width: calc(1.6rem + 38px);
+  height: calc(33px - .8rem);
+}
+
+/*# sourceMappingURL=app_%5Blocale%5D_knowledge_%5Btype%5D_%5Bslug%5D_AskInsighter_module_css_bad6b30c._.single.css.map*/

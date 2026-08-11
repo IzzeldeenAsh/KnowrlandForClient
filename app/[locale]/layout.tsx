@@ -23,6 +23,7 @@ import RoleGuard from '@/components/auth/RoleGuard';
 import AnalyticsProvider from '@/app/analytics-provider';
 import { generateOrganizationSchema, generateWebSiteSchema } from '@/utils/seo';
 import { publicBaseUrl } from '@/app/config';
+import FloatingFeedButton from '@/components/feed/FloatingFeedButton';
 
 
 const almarai = Almarai({
@@ -206,6 +207,7 @@ export default async function RootLayout({
                     >
                       {children}
                     </div>
+                    <FloatingFeedButton locale={locale} />
                     <ConditionalAuthBanner />
                   </RoleGuard>
                 </GlobalProfileProvider>

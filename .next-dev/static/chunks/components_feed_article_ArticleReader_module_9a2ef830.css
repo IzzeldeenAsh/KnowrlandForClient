@@ -1,0 +1,252 @@
+/* [project]/components/feed/article/ArticleReader.module.css [app-client] (css) */
+.ArticleReader-module__lP8bda__articleBody {
+  color: #29384d;
+  overflow-wrap: anywhere;
+  font-size: 17px;
+  line-height: 1.9;
+}
+
+.ArticleReader-module__lP8bda__articleBody p {
+  margin: 0 0 1.4em;
+}
+
+.ArticleReader-module__lP8bda__articleBody h1 {
+  color: #101827;
+  letter-spacing: -.025em;
+  margin: 1.8em 0 .65em;
+  font-weight: 700;
+  line-height: 1.3;
+}
+
+.ArticleReader-module__lP8bda__articleBody h2 {
+  color: #101827;
+  letter-spacing: -.025em;
+  margin: 1.8em 0 .65em;
+  font-weight: 700;
+  line-height: 1.3;
+}
+
+.ArticleReader-module__lP8bda__articleBody h3 {
+  color: #101827;
+  letter-spacing: -.025em;
+  margin: 1.8em 0 .65em;
+  font-weight: 700;
+  line-height: 1.3;
+}
+
+.ArticleReader-module__lP8bda__articleBody h4 {
+  color: #101827;
+  letter-spacing: -.025em;
+  margin: 1.8em 0 .65em;
+  font-weight: 700;
+  line-height: 1.3;
+}
+
+.ArticleReader-module__lP8bda__articleBody h1 {
+  font-size: 2rem;
+}
+
+.ArticleReader-module__lP8bda__articleBody h2 {
+  font-size: 1.65rem;
+}
+
+.ArticleReader-module__lP8bda__articleBody h3 {
+  font-size: 1.35rem;
+}
+
+.ArticleReader-module__lP8bda__articleBody h4 {
+  font-size: 1.15rem;
+}
+
+.ArticleReader-module__lP8bda__articleBody ul {
+  margin: 0 0 1.5em;
+}
+
+.ArticleReader-module__lP8bda__articleBody ul:not(:-webkit-any(:lang(ae), :lang(ar), :lang(arc), :lang(bcc), :lang(bqi), :lang(ckb), :lang(dv), :lang(fa), :lang(glk), :lang(he), :lang(ku), :lang(mzn), :lang(nqo), :lang(pnb), :lang(ps), :lang(sd), :lang(ug), :lang(ur), :lang(yi))) {
+  padding-left: 1.6em;
+}
+
+.ArticleReader-module__lP8bda__articleBody ul:not(:-moz-any(:lang(ae), :lang(ar), :lang(arc), :lang(bcc), :lang(bqi), :lang(ckb), :lang(dv), :lang(fa), :lang(glk), :lang(he), :lang(ku), :lang(mzn), :lang(nqo), :lang(pnb), :lang(ps), :lang(sd), :lang(ug), :lang(ur), :lang(yi))) {
+  padding-left: 1.6em;
+}
+
+.ArticleReader-module__lP8bda__articleBody ul:not(:is(:lang(ae), :lang(ar), :lang(arc), :lang(bcc), :lang(bqi), :lang(ckb), :lang(dv), :lang(fa), :lang(glk), :lang(he), :lang(ku), :lang(mzn), :lang(nqo), :lang(pnb), :lang(ps), :lang(sd), :lang(ug), :lang(ur), :lang(yi))) {
+  padding-left: 1.6em;
+}
+
+.ArticleReader-module__lP8bda__articleBody ul:-webkit-any(:lang(ae), :lang(ar), :lang(arc), :lang(bcc), :lang(bqi), :lang(ckb), :lang(dv), :lang(fa), :lang(glk), :lang(he), :lang(ku), :lang(mzn), :lang(nqo), :lang(pnb), :lang(ps), :lang(sd), :lang(ug), :lang(ur), :lang(yi)) {
+  padding-right: 1.6em;
+}
+
+.ArticleReader-module__lP8bda__articleBody ul:-moz-any(:lang(ae), :lang(ar), :lang(arc), :lang(bcc), :lang(bqi), :lang(ckb), :lang(dv), :lang(fa), :lang(glk), :lang(he), :lang(ku), :lang(mzn), :lang(nqo), :lang(pnb), :lang(ps), :lang(sd), :lang(ug), :lang(ur), :lang(yi)) {
+  padding-right: 1.6em;
+}
+
+.ArticleReader-module__lP8bda__articleBody ul:is(:lang(ae), :lang(ar), :lang(arc), :lang(bcc), :lang(bqi), :lang(ckb), :lang(dv), :lang(fa), :lang(glk), :lang(he), :lang(ku), :lang(mzn), :lang(nqo), :lang(pnb), :lang(ps), :lang(sd), :lang(ug), :lang(ur), :lang(yi)) {
+  padding-right: 1.6em;
+}
+
+.ArticleReader-module__lP8bda__articleBody ol {
+  margin: 0 0 1.5em;
+}
+
+.ArticleReader-module__lP8bda__articleBody ol:not(:-webkit-any(:lang(ae), :lang(ar), :lang(arc), :lang(bcc), :lang(bqi), :lang(ckb), :lang(dv), :lang(fa), :lang(glk), :lang(he), :lang(ku), :lang(mzn), :lang(nqo), :lang(pnb), :lang(ps), :lang(sd), :lang(ug), :lang(ur), :lang(yi))) {
+  padding-left: 1.6em;
+}
+
+.ArticleReader-module__lP8bda__articleBody ol:not(:-moz-any(:lang(ae), :lang(ar), :lang(arc), :lang(bcc), :lang(bqi), :lang(ckb), :lang(dv), :lang(fa), :lang(glk), :lang(he), :lang(ku), :lang(mzn), :lang(nqo), :lang(pnb), :lang(ps), :lang(sd), :lang(ug), :lang(ur), :lang(yi))) {
+  padding-left: 1.6em;
+}
+
+.ArticleReader-module__lP8bda__articleBody ol:not(:is(:lang(ae), :lang(ar), :lang(arc), :lang(bcc), :lang(bqi), :lang(ckb), :lang(dv), :lang(fa), :lang(glk), :lang(he), :lang(ku), :lang(mzn), :lang(nqo), :lang(pnb), :lang(ps), :lang(sd), :lang(ug), :lang(ur), :lang(yi))) {
+  padding-left: 1.6em;
+}
+
+.ArticleReader-module__lP8bda__articleBody ol:-webkit-any(:lang(ae), :lang(ar), :lang(arc), :lang(bcc), :lang(bqi), :lang(ckb), :lang(dv), :lang(fa), :lang(glk), :lang(he), :lang(ku), :lang(mzn), :lang(nqo), :lang(pnb), :lang(ps), :lang(sd), :lang(ug), :lang(ur), :lang(yi)) {
+  padding-right: 1.6em;
+}
+
+.ArticleReader-module__lP8bda__articleBody ol:-moz-any(:lang(ae), :lang(ar), :lang(arc), :lang(bcc), :lang(bqi), :lang(ckb), :lang(dv), :lang(fa), :lang(glk), :lang(he), :lang(ku), :lang(mzn), :lang(nqo), :lang(pnb), :lang(ps), :lang(sd), :lang(ug), :lang(ur), :lang(yi)) {
+  padding-right: 1.6em;
+}
+
+.ArticleReader-module__lP8bda__articleBody ol:is(:lang(ae), :lang(ar), :lang(arc), :lang(bcc), :lang(bqi), :lang(ckb), :lang(dv), :lang(fa), :lang(glk), :lang(he), :lang(ku), :lang(mzn), :lang(nqo), :lang(pnb), :lang(ps), :lang(sd), :lang(ug), :lang(ur), :lang(yi)) {
+  padding-right: 1.6em;
+}
+
+.ArticleReader-module__lP8bda__articleBody ul {
+  list-style: outside;
+}
+
+.ArticleReader-module__lP8bda__articleBody ol {
+  list-style: decimal;
+}
+
+.ArticleReader-module__lP8bda__articleBody li {
+  margin: .45em 0;
+}
+
+.ArticleReader-module__lP8bda__articleBody li:not(:-webkit-any(:lang(ae), :lang(ar), :lang(arc), :lang(bcc), :lang(bqi), :lang(ckb), :lang(dv), :lang(fa), :lang(glk), :lang(he), :lang(ku), :lang(mzn), :lang(nqo), :lang(pnb), :lang(ps), :lang(sd), :lang(ug), :lang(ur), :lang(yi))) {
+  padding-left: .25em;
+}
+
+.ArticleReader-module__lP8bda__articleBody li:not(:-moz-any(:lang(ae), :lang(ar), :lang(arc), :lang(bcc), :lang(bqi), :lang(ckb), :lang(dv), :lang(fa), :lang(glk), :lang(he), :lang(ku), :lang(mzn), :lang(nqo), :lang(pnb), :lang(ps), :lang(sd), :lang(ug), :lang(ur), :lang(yi))) {
+  padding-left: .25em;
+}
+
+.ArticleReader-module__lP8bda__articleBody li:not(:is(:lang(ae), :lang(ar), :lang(arc), :lang(bcc), :lang(bqi), :lang(ckb), :lang(dv), :lang(fa), :lang(glk), :lang(he), :lang(ku), :lang(mzn), :lang(nqo), :lang(pnb), :lang(ps), :lang(sd), :lang(ug), :lang(ur), :lang(yi))) {
+  padding-left: .25em;
+}
+
+.ArticleReader-module__lP8bda__articleBody li:-webkit-any(:lang(ae), :lang(ar), :lang(arc), :lang(bcc), :lang(bqi), :lang(ckb), :lang(dv), :lang(fa), :lang(glk), :lang(he), :lang(ku), :lang(mzn), :lang(nqo), :lang(pnb), :lang(ps), :lang(sd), :lang(ug), :lang(ur), :lang(yi)) {
+  padding-right: .25em;
+}
+
+.ArticleReader-module__lP8bda__articleBody li:-moz-any(:lang(ae), :lang(ar), :lang(arc), :lang(bcc), :lang(bqi), :lang(ckb), :lang(dv), :lang(fa), :lang(glk), :lang(he), :lang(ku), :lang(mzn), :lang(nqo), :lang(pnb), :lang(ps), :lang(sd), :lang(ug), :lang(ur), :lang(yi)) {
+  padding-right: .25em;
+}
+
+.ArticleReader-module__lP8bda__articleBody li:is(:lang(ae), :lang(ar), :lang(arc), :lang(bcc), :lang(bqi), :lang(ckb), :lang(dv), :lang(fa), :lang(glk), :lang(he), :lang(ku), :lang(mzn), :lang(nqo), :lang(pnb), :lang(ps), :lang(sd), :lang(ug), :lang(ur), :lang(yi)) {
+  padding-right: .25em;
+}
+
+.ArticleReader-module__lP8bda__articleBody blockquote {
+  color: #405672;
+  background: #f2f7fd;
+  border-radius: 0 8px 8px 0;
+  margin: 1.8em 0;
+  padding: 1.1em 1.4em;
+  font-size: 1.08em;
+}
+
+.ArticleReader-module__lP8bda__articleBody blockquote:not(:-webkit-any(:lang(ae), :lang(ar), :lang(arc), :lang(bcc), :lang(bqi), :lang(ckb), :lang(dv), :lang(fa), :lang(glk), :lang(he), :lang(ku), :lang(mzn), :lang(nqo), :lang(pnb), :lang(ps), :lang(sd), :lang(ug), :lang(ur), :lang(yi))) {
+  border-left: 4px solid #2378e8;
+}
+
+.ArticleReader-module__lP8bda__articleBody blockquote:not(:-moz-any(:lang(ae), :lang(ar), :lang(arc), :lang(bcc), :lang(bqi), :lang(ckb), :lang(dv), :lang(fa), :lang(glk), :lang(he), :lang(ku), :lang(mzn), :lang(nqo), :lang(pnb), :lang(ps), :lang(sd), :lang(ug), :lang(ur), :lang(yi))) {
+  border-left: 4px solid #2378e8;
+}
+
+.ArticleReader-module__lP8bda__articleBody blockquote:not(:is(:lang(ae), :lang(ar), :lang(arc), :lang(bcc), :lang(bqi), :lang(ckb), :lang(dv), :lang(fa), :lang(glk), :lang(he), :lang(ku), :lang(mzn), :lang(nqo), :lang(pnb), :lang(ps), :lang(sd), :lang(ug), :lang(ur), :lang(yi))) {
+  border-left: 4px solid #2378e8;
+}
+
+.ArticleReader-module__lP8bda__articleBody blockquote:-webkit-any(:lang(ae), :lang(ar), :lang(arc), :lang(bcc), :lang(bqi), :lang(ckb), :lang(dv), :lang(fa), :lang(glk), :lang(he), :lang(ku), :lang(mzn), :lang(nqo), :lang(pnb), :lang(ps), :lang(sd), :lang(ug), :lang(ur), :lang(yi)) {
+  border-right: 4px solid #2378e8;
+}
+
+.ArticleReader-module__lP8bda__articleBody blockquote:-moz-any(:lang(ae), :lang(ar), :lang(arc), :lang(bcc), :lang(bqi), :lang(ckb), :lang(dv), :lang(fa), :lang(glk), :lang(he), :lang(ku), :lang(mzn), :lang(nqo), :lang(pnb), :lang(ps), :lang(sd), :lang(ug), :lang(ur), :lang(yi)) {
+  border-right: 4px solid #2378e8;
+}
+
+.ArticleReader-module__lP8bda__articleBody blockquote:is(:lang(ae), :lang(ar), :lang(arc), :lang(bcc), :lang(bqi), :lang(ckb), :lang(dv), :lang(fa), :lang(glk), :lang(he), :lang(ku), :lang(mzn), :lang(nqo), :lang(pnb), :lang(ps), :lang(sd), :lang(ug), :lang(ur), :lang(yi)) {
+  border-right: 4px solid #2378e8;
+}
+
+.ArticleReader-module__lP8bda__articleBody a {
+  color: #1769c2;
+  text-underline-offset: 3px;
+  font-weight: 600;
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+}
+
+.ArticleReader-module__lP8bda__articleBody pre {
+  color: #dbeafe;
+  background: #0d1b2e;
+  border-radius: 12px;
+  margin: 1.8em 0;
+  padding: 1.25rem 1.4rem;
+  font-size: 14px;
+  line-height: 1.7;
+  overflow-x: auto;
+}
+
+.ArticleReader-module__lP8bda__articleBody code {
+  color: #ad2f45;
+  background: #edf2f7;
+  border-radius: 4px;
+  padding: .15em .35em;
+  font-size: .88em;
+}
+
+.ArticleReader-module__lP8bda__articleBody pre code {
+  color: inherit;
+  background: none;
+  padding: 0;
+}
+
+.ArticleReader-module__lP8bda__articleBody hr {
+  border: 0;
+  border-top: 1px solid #dce4ed;
+  margin: 2.5em 0;
+}
+
+.ArticleReader-module__lP8bda__articleBody > :first-child {
+  margin-top: 0;
+}
+
+.ArticleReader-module__lP8bda__articleBody > :last-child {
+  margin-bottom: 0;
+}
+
+@media (max-width: 640px) {
+  .ArticleReader-module__lP8bda__articleBody {
+    font-size: 16px;
+    line-height: 1.82;
+  }
+
+  .ArticleReader-module__lP8bda__articleBody h1 {
+    font-size: 1.65rem;
+  }
+
+  .ArticleReader-module__lP8bda__articleBody h2 {
+    font-size: 1.4rem;
+  }
+
+  .ArticleReader-module__lP8bda__articleBody h3 {
+    font-size: 1.2rem;
+  }
+}
+
+/*# sourceMappingURL=components_feed_article_ArticleReader_module_9a2ef830.css.map*/

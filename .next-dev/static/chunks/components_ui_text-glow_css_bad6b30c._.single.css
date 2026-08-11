@@ -1,0 +1,97 @@
+/* [project]/components/ui/text-glow.css [app-client] (css) */
+.text-glow {
+  text-shadow: 0 0 8px rgba(59, 138, 239, .4), 0 0 20px rgba(59, 138, 239, .2);
+  transition: text-shadow .3s ease-in-out;
+}
+
+.text-glow:hover {
+  text-shadow: 0 0 10px rgba(59, 138, 239, .6), 0 0 25px rgba(59, 138, 239, .4);
+}
+
+.industry-nav {
+  position: relative;
+  overflow: hidden;
+}
+
+.industry-nav:before {
+  content: "";
+  opacity: 0;
+  background: linear-gradient(#3b8aef, #1c2f67);
+  width: 3px;
+  height: 100%;
+  transition: all .1s ease-in-out;
+  position: absolute;
+  top: 0;
+  left: -10px;
+}
+
+.industry-nav:hover:before {
+  opacity: 1;
+  left: 0;
+}
+
+.insighter-word-slot {
+  align-items: center;
+  height: 1.8em;
+  display: inline-flex;
+  position: relative;
+  overflow: hidden;
+  width: -moz-fit-content !important;
+  width: fit-content !important;
+}
+
+.insighter-word-slot:not(:-webkit-any(:lang(ae), :lang(ar), :lang(arc), :lang(bcc), :lang(bqi), :lang(ckb), :lang(dv), :lang(fa), :lang(glk), :lang(he), :lang(ku), :lang(mzn), :lang(nqo), :lang(pnb), :lang(ps), :lang(sd), :lang(ug), :lang(ur), :lang(yi))) {
+  padding-left: 3px;
+}
+
+.insighter-word-slot:not(:-moz-any(:lang(ae), :lang(ar), :lang(arc), :lang(bcc), :lang(bqi), :lang(ckb), :lang(dv), :lang(fa), :lang(glk), :lang(he), :lang(ku), :lang(mzn), :lang(nqo), :lang(pnb), :lang(ps), :lang(sd), :lang(ug), :lang(ur), :lang(yi))) {
+  padding-left: 3px;
+}
+
+.insighter-word-slot:not(:is(:lang(ae), :lang(ar), :lang(arc), :lang(bcc), :lang(bqi), :lang(ckb), :lang(dv), :lang(fa), :lang(glk), :lang(he), :lang(ku), :lang(mzn), :lang(nqo), :lang(pnb), :lang(ps), :lang(sd), :lang(ug), :lang(ur), :lang(yi))) {
+  padding-left: 3px;
+}
+
+.insighter-word-slot:-webkit-any(:lang(ae), :lang(ar), :lang(arc), :lang(bcc), :lang(bqi), :lang(ckb), :lang(dv), :lang(fa), :lang(glk), :lang(he), :lang(ku), :lang(mzn), :lang(nqo), :lang(pnb), :lang(ps), :lang(sd), :lang(ug), :lang(ur), :lang(yi)) {
+  padding-right: 3px;
+}
+
+.insighter-word-slot:-moz-any(:lang(ae), :lang(ar), :lang(arc), :lang(bcc), :lang(bqi), :lang(ckb), :lang(dv), :lang(fa), :lang(glk), :lang(he), :lang(ku), :lang(mzn), :lang(nqo), :lang(pnb), :lang(ps), :lang(sd), :lang(ug), :lang(ur), :lang(yi)) {
+  padding-right: 3px;
+}
+
+.insighter-word-slot:is(:lang(ae), :lang(ar), :lang(arc), :lang(bcc), :lang(bqi), :lang(ckb), :lang(dv), :lang(fa), :lang(glk), :lang(he), :lang(ku), :lang(mzn), :lang(nqo), :lang(pnb), :lang(ps), :lang(sd), :lang(ug), :lang(ur), :lang(yi)) {
+  padding-right: 3px;
+}
+
+.insighter-word {
+  text-align: center;
+  white-space: nowrap;
+  will-change: transform, opacity, filter;
+  text-shadow: 0 0 14px rgba(255, 255, 255, .18);
+  opacity: 1;
+  filter: blur();
+  transition: transform .3s cubic-bezier(.33, 1, .36, 1), opacity .3s, filter .3s;
+  display: block;
+  transform: translateY(0)scale(1);
+}
+
+.insighter-word.is-hidden {
+  opacity: 0;
+  filter: blur(6px);
+  transform: translateY(-24%)scale(.985);
+}
+
+.insighter-word.is-visible {
+  opacity: 1;
+  filter: blur();
+  transform: translateY(0)scale(1);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .insighter-word {
+    transition: none;
+  }
+}
+
+/*# sourceMappingURL=components_ui_text-glow_css_bad6b30c._.single.css.map*/

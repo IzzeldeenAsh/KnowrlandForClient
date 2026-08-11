@@ -14,18 +14,24 @@ import { format } from 'date-fns'
 import { arSA, enUS } from 'date-fns/locale'
 import Link from 'next/link'
 import { useEffect, useMemo, useState } from 'react'
-import { getFeedItem, type FeedItem, type FeedItemRelatedInsight } from '@/services/feed.service'
+import {
+  getCommunityFeedArticle,
+  getFeedItem,
+  type FeedItem,
+  type FeedItemRelatedInsight,
+} from '@/services/feed.service'
 import styles from './ArticleReader.module.css'
 
 type ArticleReaderProps = {
   locale: string
-  uuid: string
+  identifier: string
+  isPublic: boolean
 }
 
 const copyByLocale = {
   en: {
     article: 'Article',
-    back: 'Back to my posts',
+    back: 'Back to Feed',
     loading: 'Loading article…',
     loadFailed: 'We couldn’t load this article.',
     notArticle: 'This content is not an article.',
@@ -38,7 +44,7 @@ const copyByLocale = {
   },
   ar: {
     article: 'مقال',
-    back: 'العودة إلى منشوراتي',
+    back: 'العودة إلى الموجز',
     loading: 'جارٍ تحميل المقال…',
     loadFailed: 'تعذر تحميل هذا المقال.',
     notArticle: 'هذا المحتوى ليس مقالاً.',
@@ -136,7 +142,7 @@ function ArticleSkeleton({ label }: { label: string }) {
     <div aria-label={label} className="mx-auto max-w-[1040px] animate-pulse px-4 py-8 lg:px-8">
       <div className="h-5 w-36 rounded bg-slate-200" />
       <div className="mt-7 overflow-hidden rounded-2xl border border-slate-200 bg-white">
-        <div className="aspect-[2.25/1] bg-slate-200" />
+        <div className="h-[clamp(140px,20vw,220px)] bg-slate-200" />
         <div className="mx-auto max-w-[790px] px-6 py-10 sm:px-10">
           <div className="h-4 w-40 rounded bg-slate-200" />
           <div className="mt-5 h-10 w-full rounded bg-slate-200" />
@@ -153,7 +159,7 @@ function ArticleSkeleton({ label }: { label: string }) {
   )
 }
 
-export default function ArticleReader({ locale, uuid }: ArticleReaderProps) {
+export default function ArticleReader({ locale, identifier, isPublic }: ArticleReaderProps) {
   const isArabic = locale === 'ar'
   const copy = copyByLocale[isArabic ? 'ar' : 'en']
   const BackIcon = isArabic ? IconArrowRight : IconArrowLeft
@@ -168,7 +174,11 @@ export default function ArticleReader({ locale, uuid }: ArticleReaderProps) {
     setIsLoading(true)
     setError(null)
 
-    getFeedItem(uuid, locale)
+    const loadArticle = isPublic
+      ? getCommunityFeedArticle(identifier, locale)
+      : getFeedItem(identifier, locale)
+
+    loadArticle
       .then((result) => {
         if (!active) return
         if (result.content_type !== 'article') {
@@ -187,7 +197,7 @@ export default function ArticleReader({ locale, uuid }: ArticleReaderProps) {
     return () => {
       active = false
     }
-  }, [copy.loadFailed, copy.notArticle, locale, reloadKey, uuid])
+  }, [copy.loadFailed, copy.notArticle, identifier, isPublic, locale, reloadKey])
 
   const sanitizedBody = useMemo(() => sanitizeRichText(item?.body ?? ''), [item?.body])
   const readingMinutes = useMemo(() => {
@@ -204,7 +214,7 @@ export default function ArticleReader({ locale, uuid }: ArticleReaderProps) {
           <IconArticle aria-hidden className="mx-auto h-11 w-11 text-[#8293A9]" stroke={1.4} />
           <h1 className="mt-5 text-2xl font-bold text-[#142033]">{error ?? copy.loadFailed}</h1>
           <div className="mt-7 flex flex-wrap justify-center gap-3">
-            <Link href={`/${locale}?view=my-feeds`} className="inline-flex min-h-11 items-center rounded-full border border-[#CBD7E5] px-5 text-sm font-semibold text-[#4B5E77] hover:bg-[#F5F8FB]">
+            <Link href={`/${locale}`} className="inline-flex min-h-11 items-center rounded-full border border-[#CBD7E5] px-5 text-sm font-semibold text-[#4B5E77] hover:bg-[#F5F8FB]">
               {copy.back}
             </Link>
             <button type="button" onClick={() => setReloadKey((current) => current + 1)} className="min-h-11 rounded-full bg-[#2378E8] px-5 text-sm font-semibold text-white hover:bg-[#1769C2]">
@@ -230,18 +240,18 @@ export default function ArticleReader({ locale, uuid }: ArticleReaderProps) {
   return (
     <div dir={isArabic ? 'rtl' : 'ltr'} className="min-h-[calc(100vh-var(--app-header-height,88px))] bg-[#F2F5F8] text-[#142033]">
       <main className="mx-auto max-w-[1040px] px-4 py-7 sm:py-10 lg:px-8 lg:py-12">
-        <Link href={`/${locale}?view=my-feeds`} className="inline-flex min-h-10 items-center gap-2 rounded-full px-3 text-sm font-semibold text-[#53677F] transition-colors hover:bg-white hover:text-[#2378E8] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2378E8]">
+        <Link href={`/${locale}`} className="inline-flex min-h-10 items-center gap-2 rounded-full px-3 text-sm font-semibold text-[#53677F] transition-colors hover:bg-white hover:text-[#2378E8] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2378E8]">
           <BackIcon aria-hidden className="h-4 w-4" stroke={2} />
           {copy.back}
         </Link>
 
         <article className="mt-4 overflow-hidden rounded-2xl border border-[#D8E1EB] bg-white shadow-[0_22px_60px_rgba(31,48,70,0.08)] sm:mt-6">
           {cover?.url ? (
-            <div className="h-[clamp(150px,25vw,260px)] overflow-hidden bg-[#E5EBF1]">
+            <div className="h-[clamp(140px,20vw,220px)] overflow-hidden bg-[#E5EBF1]">
               <img src={cover.url} alt={cover.name || item.title || copy.coverAlt} className="h-full w-full object-cover" />
             </div>
           ) : (
-            <div className="flex h-[clamp(190px,34vw,340px)] items-center justify-center bg-[linear-gradient(135deg,#EAF1F8_0%,#DCE8F4_100%)] text-[#7890AB]">
+            <div className="flex h-[clamp(140px,20vw,220px)] items-center justify-center bg-[linear-gradient(135deg,#EAF1F8_0%,#DCE8F4_100%)] text-[#7890AB]">
               <IconArticle aria-hidden className="h-16 w-16" stroke={1.2} />
             </div>
           )}
@@ -254,7 +264,7 @@ export default function ArticleReader({ locale, uuid }: ArticleReaderProps) {
               {publishedDate && <><span aria-hidden>·</span><time dateTime={item.published_at ?? item.created_at ?? undefined}>{copy.published} {publishedDate}</time></>}
             </div>
 
-            <h1 dir="auto" className="mt-5 text-start text-[clamp(2rem,5vw,3.7rem)] font-bold leading-[1.12] tracking-[-0.035em] text-[#101827]">
+            <h1 dir="auto" className="mt-5 text-start text-[clamp(1.65rem,3.5vw,2.65rem)] font-bold leading-[1.18] tracking-[-0.03em] text-[#101827]">
               {item.title}
             </h1>
 

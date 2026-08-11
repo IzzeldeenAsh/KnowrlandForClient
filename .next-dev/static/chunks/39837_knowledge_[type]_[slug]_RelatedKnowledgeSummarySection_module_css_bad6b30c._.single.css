@@ -1,0 +1,39 @@
+/* [project]/app/[locale]/knowledge/[type]/[slug]/RelatedKnowledgeSummarySection.module.css [app-client] (css) */
+.RelatedKnowledgeSummarySection-module__7p5gna__summaryCarousel .swiper-wrapper {
+  align-items: stretch;
+}
+
+.RelatedKnowledgeSummarySection-module__7p5gna__summaryCarousel .swiper-slide {
+  height: auto;
+  display: flex;
+}
+
+.RelatedKnowledgeSummarySection-module__7p5gna__summaryCarousel .swiper-slide > * {
+  width: 100%;
+  height: 100%;
+  min-height: var(--card-min-height, 390px);
+}
+
+.RelatedKnowledgeSummarySection-module__7p5gna__cardInner {
+  flex-direction: column;
+  min-height: 100%;
+  display: flex;
+}
+
+.RelatedKnowledgeSummarySection-module__7p5gna__cardContent {
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+  display: flex;
+}
+
+.RelatedKnowledgeSummarySection-module__7p5gna__cardBody {
+  flex: 1;
+  min-height: 0;
+}
+
+.RelatedKnowledgeSummarySection-module__7p5gna__cardFooter {
+  flex-shrink: 0;
+}
+
+/*# sourceMappingURL=39837_knowledge_%5Btype%5D_%5Bslug%5D_RelatedKnowledgeSummarySection_module_css_bad6b30c._.single.css.map*/

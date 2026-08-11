@@ -1,0 +1,6 @@
+{
+  "version": 3,
+  "sources": [],
+  "sections": [
+    {"offset": {"line": 1, "column": 0}, "map": {"version":3,"sources":["turbopack:///[project]/app/[locale]/knowledge/[type]/[slug]/RelatedKnowledgeSummarySection.module.css"],"sourcesContent":[".summaryCarousel :global(.swiper-wrapper) {\n  align-items: stretch;\n}\n\n.summaryCarousel :global(.swiper-slide) {\n  height: auto;\n  display: flex;\n}\n\n.summaryCarousel :global(.swiper-slide) > * {\n  width: 100%;\n  height: 100%;\n  min-height: var(--card-min-height, 390px);\n}\n\n.cardInner {\n  display: flex;\n  flex-direction: column;\n  min-height: 100%;\n}\n\n.cardContent {\n  flex: 1;\n  display: flex;\n  flex-direction: column;\n  min-height: 0;\n}\n\n.cardBody {\n  flex: 1;\n  min-height: 0;\n}\n\n.cardFooter {\n  flex-shrink: 0;\n}\n\n"],"names":[],"mappings":"AAAA;;;;AAIA;;;;;AAKA;;;;;;AAMA;;;;;;AAMA;;;;;;;AAOA;;;;;AAKA"}}]
+}

@@ -12,6 +12,8 @@ type MuxPlayerAttributes = DetailedHTMLProps<HTMLAttributes<HTMLElement>, HTMLEl
   'stream-type'?: string
   poster?: string
   'metadata-video-title'?: string
+  preload?: 'none' | 'metadata' | 'auto' | ''
+  'max-resolution'?: '480p' | '540p' | '720p' | '1080p' | '1440p' | '2160p'
   'primary-color'?: string
   'accent-color'?: string
   // No Mux Data env-key is configured, so this is inert either way, but set

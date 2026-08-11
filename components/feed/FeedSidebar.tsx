@@ -2,6 +2,7 @@
 
 import Image from 'next/image'
 import Link from 'next/link'
+import { useSearchParams } from 'next/navigation'
 import {
   IconBell,
   IconBook,
@@ -30,6 +31,8 @@ import { useUserProfile } from '@/components/ui/header/hooks/useUserProfile'
 
 type FeedSidebarProps = {
   locale: string
+  /** Hide the avatar/name profile card (e.g. in the mobile header menu). */
+  hideProfileCard?: boolean
 }
 
 type SidebarCopy = {
@@ -70,11 +73,14 @@ type SidebarItemProps = {
   href: string
   icon: Icon
   label: string
+  isActive?: boolean
+  compact?: boolean
 }
 
 type DashboardSectionProps = {
   title: string
   children: ReactNode
+  compact?: boolean
 }
 
 const copyByLocale: Record<'en' | 'ar', SidebarCopy> = {
@@ -146,13 +152,30 @@ const copyByLocale: Record<'en' | 'ar', SidebarCopy> = {
   },
 }
 
-function SidebarItem({ href, icon: ItemIcon, label }: SidebarItemProps) {
+function SidebarItem({ href, icon: ItemIcon, label, isActive = false, compact = false }: SidebarItemProps) {
   return (
     <Link
       href={href}
-      className="group flex min-h-11 items-center gap-3 border-b border-[#F1F1F1] px-4 py-3 text-start text-[14px] font-normal text-[#495057] transition-colors duration-150 last:border-b-0 hover:bg-[#F8F9FA] hover:text-[#2378E8] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[#2378E8]"
+      aria-current={isActive ? 'page' : undefined}
+      className={`group flex items-center gap-3 text-start text-[14px] transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[#2378E8] ${
+        compact
+          ? `min-h-10 border-b border-[#E2E8F0] px-2 py-2 last:border-b-0 ${
+              isActive
+                ? 'rounded-md bg-[#EDF4FD] font-semibold text-[#2378E8]'
+                : 'font-normal text-[#495057] hover:bg-[#F8F9FA] hover:text-[#2378E8]'
+            }`
+          : `min-h-11 border-b border-s-2 border-b-[#F1F1F1] px-4 py-3 ${
+        isActive
+          ? 'border-s-[#2378E8] bg-[#EDF4FD] font-semibold text-[#2378E8]'
+          : 'border-s-transparent font-normal text-[#495057] hover:bg-[#F8F9FA] hover:text-[#2378E8]'
+          }`
+      }`}
     >
-      <span className="flex h-6 w-6 shrink-0 items-center justify-center text-[#60728F] transition-colors group-hover:text-[#2378E8]">
+      <span
+        className={`flex h-6 w-6 shrink-0 items-center justify-center transition-colors ${
+          isActive ? 'text-[#2378E8]' : 'text-[#60728F] group-hover:text-[#2378E8]'
+        }`}
+      >
         <ItemIcon aria-hidden stroke={1.75} className="h-[18px] w-[18px]" />
       </span>
       <span className="min-w-0 flex-1">{label}</span>
@@ -160,7 +183,18 @@ function SidebarItem({ href, icon: ItemIcon, label }: SidebarItemProps) {
   )
 }
 
-function DashboardSection({ title, children }: DashboardSectionProps) {
+function DashboardSection({ title, children, compact = false }: DashboardSectionProps) {
+  if (compact) {
+    return (
+      <section className="border-b border-[#D7E1EC] py-2 last:border-b-0">
+        <header className="flex items-center px-2 pb-1 pt-2">
+          <h2 className="m-0 text-[11px] font-bold uppercase tracking-[0.08em] text-[#718096]">{title}</h2>
+        </header>
+        <div>{children}</div>
+      </section>
+    )
+  }
+
   return (
     <section className="overflow-hidden rounded-lg border border-[#E7E7E7] bg-white transition-shadow duration-200 hover:shadow-[0_6px_16px_rgba(0,0,0,0.08)]">
       <header className="flex min-h-[54px] items-center border-b border-[#E9ECEF] bg-[#F8F9FA] px-4 py-3">
@@ -236,10 +270,12 @@ function GuestSidebar({ locale }: FeedSidebarProps) {
   )
 }
 
-export default function FeedSidebar({ locale }: FeedSidebarProps) {
+export default function FeedSidebar({ locale, hideProfileCard = false }: FeedSidebarProps) {
   const isArabic = locale === 'ar'
   const copy = copyByLocale[isArabic ? 'ar' : 'en']
   const { user, roles, isLoading, isAuthResolved } = useUserProfile()
+  const searchParams = useSearchParams()
+  const isMyPostsActive = searchParams.get('view') === 'my-feeds'
 
   const isInsighter = roles.includes('insighter')
   const isCompany = roles.includes('company')
@@ -270,7 +306,8 @@ export default function FeedSidebar({ locale }: FeedSidebarProps) {
   const dashboardBase = `${dashboardUrl}/app/insighter-dashboard`
 
   return (
-    <nav aria-label={isArabic ? 'قائمة الحساب' : 'Account menu'} className="space-y-6">
+    <nav aria-label={isArabic ? 'قائمة الحساب' : 'Account menu'} className={hideProfileCard ? 'space-y-0' : 'space-y-6'}>
+      {!hideProfileCard && (
       <section className="relative flex h-[216px] flex-col items-center overflow-hidden rounded-lg border border-[#D9E3EF] bg-[#F8FAFD] px-5 pb-[22px] pt-6 text-center">
         <svg
           aria-hidden
@@ -303,77 +340,89 @@ export default function FeedSidebar({ locale }: FeedSidebarProps) {
           {roleLabel}
         </span>
       </section>
+      )}
 
-      <DashboardSection title={copy.menu}>
-        <SidebarItem href={`${dashboardBase}/my-dashboard`} icon={IconLayoutDashboard} label={copy.overview} />
-        <SidebarItem href={`/${locale}?view=my-feeds`} icon={IconMessage2} label={copy.myPosts} />
+      <DashboardSection title={copy.menu} compact={hideProfileCard}>
+        <SidebarItem href={`${dashboardBase}/my-dashboard`} icon={IconLayoutDashboard} label={copy.overview} compact={hideProfileCard} />
+        <SidebarItem
+          href={`/${locale}?view=my-feeds`}
+          icon={IconMessage2}
+          label={copy.myPosts}
+          isActive={isMyPostsActive}
+          compact={hideProfileCard}
+        />
         {!isPureClient && (
-          <SidebarItem href={`${dashboardBase}/my-requests`} icon={IconFileText} label={copy.myRequests} />
+          <SidebarItem href={`${dashboardBase}/my-requests`} icon={IconFileText} label={copy.myRequests} compact={hideProfileCard} />
         )}
         {isCompany && (
-          <SidebarItem href={`${dashboardBase}/my-company-settings`} icon={IconUsers} label={copy.myCompany} />
+          <SidebarItem href={`${dashboardBase}/my-company-settings`} icon={IconUsers} label={copy.myCompany} compact={hideProfileCard} />
         )}
       </DashboardSection>
 
-      <DashboardSection title={copy.insights}>
+      <DashboardSection title={copy.insights} compact={hideProfileCard}>
         {!isPureClient && (
-          <SidebarItem href={`${dashboardBase}/my-knowledge`} icon={IconBook} label={copy.myKnowledge} />
+          <SidebarItem href={`${dashboardBase}/my-knowledge`} icon={IconBook} label={copy.myKnowledge} compact={hideProfileCard} />
         )}
-        <SidebarItem href={`${dashboardBase}/my-downloads`} icon={IconDownload} label={copy.myDownloads} />
-        <SidebarItem href={`${dashboardBase}/read-later`} icon={IconBookmark} label={copy.readLater} />
+        <SidebarItem href={`${dashboardBase}/my-downloads`} icon={IconDownload} label={copy.myDownloads} compact={hideProfileCard} />
+        <SidebarItem href={`${dashboardBase}/read-later`} icon={IconBookmark} label={copy.readLater} compact={hideProfileCard} />
       </DashboardSection>
 
-      <DashboardSection title={copy.meetings}>
-        <SidebarItem href={`${dashboardBase}/my-meetings`} icon={IconCalendar} label={copy.meetings} />
+      <DashboardSection title={copy.meetings} compact={hideProfileCard}>
+        <SidebarItem href={`${dashboardBase}/my-meetings`} icon={IconCalendar} label={copy.meetings} compact={hideProfileCard} />
         {!isPureClient && (
           <SidebarItem
             href={`${dashboardBase}/account-settings/consulting-schedule`}
             icon={IconCalendarCog}
             label={copy.mySchedule}
+            compact={hideProfileCard}
           />
         )}
       </DashboardSection>
 
       {hasProjectAccess && (
-        <DashboardSection title={copy.projects}>
+        <DashboardSection title={copy.projects} compact={hideProfileCard}>
           {!isPureClient && (
-            <SidebarItem href={`${dashboardBase}/project-offers`} icon={IconBriefcase} label={copy.clientProjects} />
+            <SidebarItem href={`${dashboardBase}/project-offers`} icon={IconBriefcase} label={copy.clientProjects} compact={hideProfileCard} />
           )}
-          <SidebarItem href={`${dashboardBase}/projects-created`} icon={IconFolders} label={copy.myProjects} />
+          <SidebarItem href={`${dashboardBase}/projects-created`} icon={IconFolders} label={copy.myProjects} compact={hideProfileCard} />
           {!isPureClient && (
             <SidebarItem
               href={`${dashboardBase}/account-settings/project-settings`}
               icon={IconSettings2}
               label={copy.projectSettings}
+              compact={hideProfileCard}
             />
           )}
         </DashboardSection>
       )}
 
-      <DashboardSection title={copy.marketplace}>
-        <SidebarItem href={`${dashboardBase}/my-orders`} icon={IconShoppingBag} label={copy.myPurchases} />
-        {isProvider && <SidebarItem href={`${dashboardBase}/sales`} icon={IconChartLine} label={copy.sales} />}
+      <DashboardSection title={copy.marketplace} compact={hideProfileCard}>
+        <SidebarItem href={`${dashboardBase}/my-orders`} icon={IconShoppingBag} label={copy.myPurchases} compact={hideProfileCard} />
+        {isProvider && <SidebarItem href={`${dashboardBase}/sales`} icon={IconChartLine} label={copy.sales} compact={hideProfileCard} />}
         {(isInsighter || isCompany) && (
-          <SidebarItem href={`${dashboardBase}/wallet`} icon={IconWallet} label={copy.wallet} />
+          <SidebarItem href={`${dashboardBase}/wallet`} icon={IconWallet} label={copy.wallet} compact={hideProfileCard} />
         )}
       </DashboardSection>
 
-      <DashboardSection title={copy.settings}>
+      <DashboardSection title={copy.settings} compact={hideProfileCard}>
         <SidebarItem
           href={`${dashboardBase}/account-settings/general-settings`}
           icon={IconUserEdit}
           label={copy.accountSettings}
+          compact={hideProfileCard}
         />
         <SidebarItem
           href={`${dashboardBase}/account-settings/notification-settings`}
           icon={IconBell}
           label={copy.notificationSettings}
+          compact={hideProfileCard}
         />
         {(isInsighter || isCompany) && (
           <SidebarItem
             href={`${dashboardBase}/account-settings/payment-settings`}
             icon={IconCreditCard}
             label={copy.paymentSettings}
+            compact={hideProfileCard}
           />
         )}
       </DashboardSection>

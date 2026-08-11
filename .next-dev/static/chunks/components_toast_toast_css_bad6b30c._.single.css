@@ -1,0 +1,131 @@
+/* [project]/components/toast/toast.css [app-client] (css) */
+.toast-container {
+  z-index: 90;
+  max-width: 380px;
+  position: fixed;
+  top: 1.5rem;
+  right: 1.5rem;
+}
+
+.toast {
+  color: #3f4254;
+  background-color: #fff;
+  background-clip: padding-box;
+  border: none;
+  border-radius: .475rem;
+  width: 380px;
+  max-width: 100%;
+  margin-bottom: 1rem;
+  transition: transform .15s ease-in-out, opacity .15s ease-in-out;
+  overflow: hidden;
+  box-shadow: 0 .1rem 1rem rgba(0, 0, 0, .1);
+}
+
+.toast.fade {
+  transition: opacity .15s linear;
+}
+
+.toast.show {
+  opacity: 1;
+  display: block;
+}
+
+.toast:not(.show) {
+  display: none;
+}
+
+.toast-header {
+  color: #181c32;
+  background-color: #fff;
+  background-clip: padding-box;
+  border-bottom: 1px solid #eff2f5;
+  align-items: center;
+  padding: .5rem 1rem;
+  display: flex;
+}
+
+.toast-header .btn-close {
+  cursor: pointer;
+  opacity: .4;
+  color: #a1a5b7;
+  background: none;
+  border: 0;
+  margin-left: .5rem;
+  margin-right: -.25rem;
+  padding: .25rem;
+  font-size: .7rem;
+  font-weight: 500;
+  line-height: 1;
+}
+
+.toast-header .btn-close:hover {
+  opacity: .75;
+}
+
+.toast-header .btn-close:focus {
+  outline: none;
+}
+
+.toast-header .me-auto {
+  font-size: .8rem;
+  font-weight: 600;
+  margin-right: auto !important;
+}
+
+.toast-header .toast-time {
+  color: #a1a5b7;
+  font-size: .75rem;
+}
+
+.toast-body {
+  color: #7e8299;
+  padding: .5rem 1rem;
+  font-size: .75rem;
+  line-height: 1.5;
+}
+
+.text-success {
+  color: #50cd89 !important;
+}
+
+.text-danger {
+  color: #f1416c !important;
+}
+
+.text-warning {
+  color: #ffc700 !important;
+}
+
+.text-info {
+  color: #299af8 !important;
+}
+
+.fs-2 {
+  font-size: .8rem !important;
+}
+
+.me-3 {
+  margin-right: .75rem !important;
+}
+
+[dir="rtl"] .toast-container {
+  left: 1rem;
+  right: auto;
+}
+
+[dir="rtl"] .toast-header .me-auto {
+  margin-left: auto !important;
+  margin-right: 0 !important;
+}
+
+[dir="rtl"] .toast-header .me-3 {
+  margin-left: 1rem !important;
+  margin-right: 0 !important;
+}
+
+[dir="rtl"] .toast-header .btn-close {
+  margin-left: -.25rem;
+  margin-right: .5rem;
+}
+
+/*# sourceMappingURL=components_toast_toast_css_bad6b30c._.single.css.map*/

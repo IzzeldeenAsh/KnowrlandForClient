@@ -3,17 +3,20 @@
 import { Badge, Menu, Modal } from '@mantine/core'
 import {
   IconArticle,
+  IconChevronLeft,
+  IconChevronRight,
   IconDots,
   IconFileDescription,
   IconLoader2,
   IconPhoto,
   IconTrash,
   IconVideo,
+  IconX,
 } from '@tabler/icons-react'
 import { formatDistanceToNow, isValid } from 'date-fns'
 import { arSA, enUS } from 'date-fns/locale'
 import Link from 'next/link'
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import '@mux/mux-player'
 import CourseIcon from '@/components/icons/CourseIcon'
 import DataIcon from '@/components/icons/DataIcon'
@@ -60,8 +63,12 @@ const copyByLocale = {
     imageAlt: 'Post image',
     articleCoverAlt: 'Article cover',
     article: 'Article',
-    minuteRead: 'min read',
     attachment: 'Open attachment',
+    openImage: 'Open image',
+    imageCount: (current: number, total: number) => `Image ${current} of ${total}`,
+    previousImage: 'Previous image',
+    nextImage: 'Next image',
+    closeImagePreview: 'Close image preview',
   },
   ar: {
     title: 'منشوراتي',
@@ -88,8 +95,12 @@ const copyByLocale = {
     imageAlt: 'صورة المنشور',
     articleCoverAlt: 'غلاف المقال',
     article: 'مقال',
-    minuteRead: 'دقيقة قراءة',
     attachment: 'فتح المرفق',
+    openImage: 'فتح الصورة',
+    imageCount: (current: number, total: number) => `الصورة ${current} من ${total}`,
+    previousImage: 'الصورة السابقة',
+    nextImage: 'الصورة التالية',
+    closeImagePreview: 'إغلاق معاينة الصورة',
   },
 } as const
 
@@ -132,7 +143,7 @@ function formatPostDate(value: string | null, locale: string): string | null {
   })
 }
 
-function FeedSkeleton() {
+export function FeedSkeleton() {
   return (
     <div className="space-y-4" aria-hidden>
       {[0, 1].map((item) => (
@@ -153,62 +164,176 @@ function FeedSkeleton() {
 function ImageGallery({
   media,
   imageAlt,
+  locale,
+  flushBottom = false,
 }: {
   media: FeedItemMedia[]
   imageAlt: string
+  locale: string
+  flushBottom?: boolean
 }) {
   const visibleMedia = media.slice(0, 4)
   const isSingleImage = visibleMedia.length === 1
+  const isArabic = locale === 'ar'
+  const copy = copyByLocale[isArabic ? 'ar' : 'en']
+  const [activeImageIndex, setActiveImageIndex] = useState<number | null>(null)
+  const activeMedia = activeImageIndex === null ? null : media[activeImageIndex]
+  const isCarousel = media.length > 1
+
+  const showPreviousImage = () => {
+    setActiveImageIndex((current) =>
+      current === null ? 0 : (current - 1 + media.length) % media.length,
+    )
+  }
+
+  const showNextImage = () => {
+    setActiveImageIndex((current) =>
+      current === null ? 0 : (current + 1) % media.length,
+    )
+  }
 
   return (
-    <div
-      className={`mt-5 grid overflow-hidden rounded-md border border-[#E0E7F0] bg-[#F6F9FD] ${
-        isSingleImage ? 'grid-cols-1' : 'grid-cols-2'
-      }`}
-    >
-      {visibleMedia.map((item, index) => (
-        <div
-          key={item.id}
-          className={`relative flex items-center justify-center overflow-hidden ${
-            visibleMedia.length === 3 && index === 0 ? 'row-span-2' : ''
-          } ${index > 0 ? 'border-s border-[#E0E7F0]' : ''} ${
-            index > 1 ? 'border-t border-[#E0E7F0]' : ''
-          }`}
-        >
-          <img
-            src={item.url ?? ''}
-            alt={item.name || imageAlt}
-            loading="lazy"
-            className="block h-auto max-w-full object-contain"
-            style={{ maxHeight: isSingleImage ? 520 : 360 }}
-          />
-          {index === 3 && media.length > 4 && (
-            <div className="absolute inset-0 flex items-center justify-center bg-[#101724]/65 text-xl font-bold text-white">
-              +{media.length - 4}
-            </div>
-          )}
-        </div>
-      ))}
-    </div>
+    <>
+      <div
+        className={`-mx-5 mt-5 grid overflow-hidden border-y border-[#E0E7F0] bg-[#F6F9FD] sm:-mx-6 ${
+          flushBottom ? '-mb-5 rounded-b-lg sm:-mb-6' : ''
+        } ${
+          isSingleImage ? 'grid-cols-1' : 'grid-cols-2'
+        }`}
+      >
+        {visibleMedia.map((item, index) => (
+          <button
+            key={item.id}
+            type="button"
+            onClick={() => setActiveImageIndex(index)}
+            aria-label={isCarousel ? `${copy.openImage}: ${copy.imageCount(index + 1, media.length)}` : copy.openImage}
+            className={`relative flex cursor-zoom-in items-center justify-center overflow-hidden focus-visible:z-10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[#2378E8] ${
+              visibleMedia.length === 3 && index === 0 ? 'row-span-2' : ''
+            } ${index > 0 ? 'border-s border-[#E0E7F0]' : ''} ${
+              index > 1 ? 'border-t border-[#E0E7F0]' : ''
+            }`}
+          >
+            <img
+              src={item.url ?? ''}
+              alt={item.name || imageAlt}
+              loading="lazy"
+              className="block h-auto max-w-full object-contain transition-transform duration-200 hover:scale-[1.01]"
+              style={{ maxHeight: isSingleImage ? 'min(650px, 70dvh)' : 'min(360px, 35dvh)' }}
+            />
+            {index === 3 && media.length > 4 && (
+              <span className="absolute inset-0 flex items-center justify-center bg-[#101724]/65 text-xl font-bold text-white">
+                +{media.length - 4}
+              </span>
+            )}
+          </button>
+        ))}
+      </div>
+
+      <Modal
+        opened={activeMedia !== null}
+        onClose={() => setActiveImageIndex(null)}
+        centered
+        size="xl"
+        padding={0}
+        yOffset={24}
+        withCloseButton={false}
+        overlayProps={{ backgroundOpacity: 0.72, blur: 3 }}
+        classNames={{
+          content: 'overflow-hidden bg-[#101724]',
+          body: 'p-0',
+        }}
+        styles={{ content: { overflowY: 'hidden' } }}
+      >
+        {activeMedia && (
+          <div className="relative flex min-h-[220px] items-center justify-center bg-[#101724]" dir={isArabic ? 'rtl' : 'ltr'}>
+            <button
+              type="button"
+              onClick={() => setActiveImageIndex(null)}
+              aria-label={copy.closeImagePreview}
+              className="absolute end-4 top-4 z-10 flex h-10 w-10 items-center justify-center rounded-full bg-white text-[#101724] shadow-lg transition-transform hover:scale-105 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-[#101724]"
+            >
+              <IconX aria-hidden className="h-5 w-5" stroke={2.2} />
+            </button>
+            <img
+              src={activeMedia.url ?? ''}
+              alt={activeMedia.name || imageAlt}
+              className="block max-w-[92vw] object-contain"
+              style={{ maxHeight: 'calc(100dvh - 48px)' }}
+            />
+
+            {isCarousel && (
+              <>
+                <button
+                  type="button"
+                  onClick={showPreviousImage}
+                  aria-label={copy.previousImage}
+                  className="absolute start-3 top-1/2 flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full bg-black/55 text-white shadow-lg transition-colors hover:bg-black/75 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white sm:start-5"
+                >
+                  {isArabic ? <IconChevronRight aria-hidden className="h-6 w-6" /> : <IconChevronLeft aria-hidden className="h-6 w-6" />}
+                </button>
+                <button
+                  type="button"
+                  onClick={showNextImage}
+                  aria-label={copy.nextImage}
+                  className="absolute end-3 top-1/2 flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full bg-black/55 text-white shadow-lg transition-colors hover:bg-black/75 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white sm:end-5"
+                >
+                  {isArabic ? <IconChevronLeft aria-hidden className="h-6 w-6" /> : <IconChevronRight aria-hidden className="h-6 w-6" />}
+                </button>
+                <p className="absolute bottom-3 left-1/2 -translate-x-1/2 rounded-full bg-black/60 px-3 py-1 text-xs font-medium text-white" dir="auto">
+                  {copy.imageCount((activeImageIndex ?? 0) + 1, media.length)}
+                </p>
+              </>
+            )}
+          </div>
+        )}
+      </Modal>
+    </>
   )
 }
 
-function VideoPlayer({ media, title }: { media: FeedItemMedia; title: string }) {
+function VideoPlayer({ media, title, flushBottom = false }: { media: FeedItemMedia; title: string; flushBottom?: boolean }) {
+  const containerRef = useRef<HTMLDivElement | null>(null)
+  const [isInViewport, setIsInViewport] = useState(false)
+
+  useEffect(() => {
+    const container = containerRef.current
+    if (!container || !media.provider_playback_id) return
+
+    // Do not mount a player until its card is actually visible. Unmounting it
+    // after it leaves the viewport releases Safari's video decoder, avoiding
+    // simultaneous playback for every video in a long feed.
+    const observer = new IntersectionObserver(
+      ([entry]) => setIsInViewport(entry.isIntersecting),
+      { threshold: 0.01 },
+    )
+
+    observer.observe(container)
+    return () => observer.disconnect()
+  }, [media.provider_playback_id])
+
   if (media.provider_playback_id) {
     return (
-      <div className="mt-5 flex max-h-[720px] justify-center overflow-hidden rounded-md bg-black">
-        <mux-player
-          playback-id={media.provider_playback_id}
-          stream-type="on-demand"
-          metadata-video-title={title}
-          accent-color="#2378E8"
-          disable-tracking=""
-          autoplay="muted"
-          muted
-          loop
-          playsinline
-          style={{ width: '100%', maxHeight: '720px', display: 'block' }}
-        />
+      <div
+        ref={containerRef}
+        className={`-mx-5 mt-5 flex justify-center overflow-hidden bg-black sm:-mx-6 ${flushBottom ? '-mb-5 rounded-b-lg sm:-mb-6' : ''}`}
+        style={{ maxHeight: 'min(650px, 70dvh)' }}
+      >
+        {isInViewport && (
+          <mux-player
+            playback-id={media.provider_playback_id}
+            stream-type="on-demand"
+            metadata-video-title={title}
+            accent-color="#2378E8"
+            disable-tracking=""
+            preload="metadata"
+            max-resolution="720p"
+            autoplay="muted"
+            muted
+            loop
+            playsinline
+            style={{ width: '100%', maxHeight: 'min(650px, 70dvh)', display: 'block' }}
+          />
+        )}
       </div>
     )
   }
@@ -224,22 +349,30 @@ function ArticlePreview({
   item,
   cover,
   locale,
+  isPublic,
+  flushBottom = false,
 }: {
   item: FeedItem
   cover?: FeedItemMedia
   locale: string
+  isPublic: boolean
+  flushBottom?: boolean
 }) {
   const isArabic = locale === 'ar'
   const copy = copyByLocale[isArabic ? 'ar' : 'en']
   const articleText = stripHtml(item.excerpt || item.body || '')
-  const wordCount = stripHtml(item.body || '').split(/\s+/).filter(Boolean).length
-  const readingMinutes = Math.max(1, Math.ceil(wordCount / 220))
 
   return (
     <Link
-      href={`/${locale}/article/${item.uuid}`}
+      href={
+        isPublic && item.slug
+          ? `/${locale}/article/${item.slug}`
+          : `/${locale}/article/${item.uuid}?source=my-feeds`
+      }
       aria-label={`${copy.article}: ${item.title ?? articleText}`}
-      className="group -mx-5 mt-5 block overflow-hidden border-y border-[#DCE4ED] bg-[#F3F6F8] transition-colors hover:bg-[#EDF2F6] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[#2378E8] sm:-mx-6"
+      className={`group -mx-5 mt-5 block overflow-hidden border-y border-[#DCE4ED] bg-[#F3F6F8] transition-colors hover:bg-[#EDF2F6] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[#2378E8] sm:-mx-6 ${
+        flushBottom ? '-mb-5 rounded-b-lg sm:-mb-6' : ''
+      }`}
     >
       {cover?.url ? (
         <div className="relative aspect-[1.91/1] w-full overflow-hidden bg-[#E8EDF2]">
@@ -260,10 +393,6 @@ function ArticlePreview({
         <div className="flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.08em] text-[#5D7089]">
           <IconArticle aria-hidden className="h-4 w-4 text-[#2378E8]" stroke={1.8} />
           <span>{copy.article}</span>
-          <span aria-hidden className="h-0.5 w-0.5 rounded-full bg-[#91A0B3]" />
-          <span className="normal-case tracking-normal">
-            {readingMinutes} {copy.minuteRead}
-          </span>
         </div>
 
         {item.title && (
@@ -305,14 +434,16 @@ function RelatedInsightIcon({ type }: { type: string }) {
   }
 }
 
-function FeedCard({
+export function FeedCard({
   item,
   locale,
   onDelete,
+  articleAccess = 'owner',
 }: {
   item: FeedItem
   locale: string
-  onDelete: (item: FeedItem) => void
+  onDelete?: (item: FeedItem) => void
+  articleAccess?: 'community' | 'owner'
 }) {
   const isArabic = locale === 'ar'
   const copy = copyByLocale[isArabic ? 'ar' : 'en']
@@ -325,6 +456,8 @@ function FeedCard({
   const attachments = item.media.filter(
     (media) => media.media_type === 'attachment' && media.url,
   )
+  const hasPostMedia = Boolean(videoMedia) || imageMedia.length > 0
+  const isMediaLast = attachments.length === 0 && item.related_insights.length === 0
   const statusTone =
     item.status === 'published'
       ? 'bg-[#EAF8F1] text-[#168A55]'
@@ -362,7 +495,14 @@ function FeedCard({
                 )}
               </div>
               <div className="min-w-0">
-                <p className="truncate text-[14px] font-semibold text-[#101724]">{insighter.name}</p>
+                <Link
+                  href={`/${locale}/profile/${insighter.uuid}?entity=insighter`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="block truncate text-[14px] font-semibold text-[#101724] transition-colors hover:text-[#2378E8] hover:underline focus-visible:rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2378E8] focus-visible:ring-offset-1"
+                >
+                  {insighter.name}
+                </Link>
                 <div className="flex flex-nowrap items-center gap-x-1.5 text-[12.5px] text-[#7A8BA4]">
                   {item.industry && (
                     <Link
@@ -389,32 +529,34 @@ function FeedCard({
           )}
         </div>
 
-        <div className="flex shrink-0 items-center gap-2">
-          <span className={`inline-block rounded-full px-2.5 py-1 text-[11px] font-semibold ${statusTone}`}>
-            {item.status_label}
-          </span>
+        {onDelete && (
+          <div className="flex shrink-0 items-center gap-2">
+            <span className={`inline-block rounded-full px-2.5 py-1 text-[11px] font-semibold ${statusTone}`}>
+              {item.status_label}
+            </span>
 
-          <Menu shadow="md" width={170} position={isArabic ? 'bottom-start' : 'bottom-end'}>
-            <Menu.Target>
-              <button
-                type="button"
-                aria-label={copy.postActions}
-                className="flex h-9 w-9 items-center justify-center rounded-full text-[#8FA0B7] transition-colors hover:bg-[#F1F5FA] hover:text-[#253247] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2378E8]"
-              >
-                <IconDots aria-hidden className="h-5 w-5" stroke={2.2} />
-              </button>
-            </Menu.Target>
-            <Menu.Dropdown>
-              <Menu.Item
-                color="red"
-                leftSection={<IconTrash aria-hidden className="h-4 w-4" stroke={1.8} />}
-                onClick={() => onDelete(item)}
-              >
-                {copy.delete}
-              </Menu.Item>
-            </Menu.Dropdown>
-          </Menu>
-        </div>
+            <Menu shadow="md" width={170} position={isArabic ? 'bottom-start' : 'bottom-end'}>
+              <Menu.Target>
+                <button
+                  type="button"
+                  aria-label={copy.postActions}
+                  className="flex h-9 w-9 items-center justify-center rounded-full text-[#8FA0B7] transition-colors hover:bg-[#F1F5FA] hover:text-[#253247] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2378E8]"
+                >
+                  <IconDots aria-hidden className="h-5 w-5" stroke={2.2} />
+                </button>
+              </Menu.Target>
+              <Menu.Dropdown>
+                <Menu.Item
+                  color="red"
+                  leftSection={<IconTrash aria-hidden className="h-4 w-4" stroke={1.8} />}
+                  onClick={() => onDelete(item)}
+                >
+                  {copy.delete}
+                </Menu.Item>
+              </Menu.Dropdown>
+            </Menu>
+          </div>
+        )}
       </div>
 
       {!isArticle && item.title && (
@@ -429,10 +571,18 @@ function FeedCard({
         </p>
       )}
 
-      {isArticle && <ArticlePreview item={item} cover={articleCover} locale={locale} />}
+      {isArticle && (
+        <ArticlePreview
+          item={item}
+          cover={articleCover}
+          locale={locale}
+          isPublic={articleAccess === 'community'}
+          flushBottom={isMediaLast}
+        />
+      )}
 
-      {!isArticle && videoMedia && <VideoPlayer media={videoMedia} title={item.title ?? item.body ?? 'Video'} />}
-      {!isArticle && imageMedia.length > 0 && <ImageGallery media={imageMedia} imageAlt={copy.imageAlt} />}
+      {!isArticle && videoMedia && <VideoPlayer media={videoMedia} title={item.title ?? item.body ?? 'Video'} flushBottom={isMediaLast} />}
+      {!isArticle && imageMedia.length > 0 && <ImageGallery media={imageMedia} imageAlt={copy.imageAlt} locale={locale} flushBottom={isMediaLast} />}
 
       {attachments.length > 0 && (
         <div className="mt-5 space-y-2">
@@ -452,7 +602,7 @@ function FeedCard({
       )}
 
       {item.related_insights.length > 0 && (
-        <div className="-mx-5 -mb-5 mt-5 divide-y divide-[#E7EDF5] overflow-hidden rounded-b-lg border-t border-[#E7EDF5] sm:-mx-6 sm:-mb-6">
+        <div className={`-mx-5 -mb-5 ${hasPostMedia ? 'mt-0' : 'mt-5'} divide-y divide-[#E7EDF5] overflow-hidden rounded-b-lg border-t border-[#E7EDF5] sm:-mx-6 sm:-mb-6`}>
           {item.related_insights.map((insight) => {
             const insightKey = `${insight.type}-${insight.slug}`
             const insightPrice = getInsightPrice(insight.price, locale === 'ar' ? 'مجاني' : 'Free')

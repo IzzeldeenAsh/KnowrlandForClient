@@ -1,0 +1,6 @@
+{
+  "version": 3,
+  "sources": [],
+  "sections": [
+    {"offset": {"line": 4, "column": 0}, "map": {"version":3,"sources":["file:///Users/izzeddinashour/Desktop/Production-KNOLDG/KnowrlandForClient/app/%5Blocale%5D/callback/layout.tsx"],"sourcesContent":["import { Locale } from '@/i18n/routing';\n\nexport default function CallbackLayout({\n  children,\n}: {\n  children: React.ReactNode;\n}) {\n  return (\n    <div className=\"callback-container\">\n      {children}\n    </div>\n  );\n} "],"names":[],"mappings":";;;;;;AAEe,SAAS,eAAe,EACrC,QAAQ,EAGT;IACC,qBACE,8OAAC;QAAI,WAAU;kBACZ;;;;;;AAGP","debugId":null}}]
+}

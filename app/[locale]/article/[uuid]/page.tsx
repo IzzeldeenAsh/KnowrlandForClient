@@ -7,10 +7,12 @@ export const metadata = {
 
 type ArticlePageProps = {
   params: Promise<{ locale: string; uuid: string }>
+  searchParams: Promise<{ source?: string }>
 }
 
-export default async function ArticlePage({ params }: ArticlePageProps) {
+export default async function ArticlePage({ params, searchParams }: ArticlePageProps) {
   const { locale, uuid } = await params
+  const { source } = await searchParams
 
-  return <ArticleReader locale={locale} uuid={uuid} />
+  return <ArticleReader locale={locale} identifier={uuid} isPublic={source !== 'my-feeds'} />
 }

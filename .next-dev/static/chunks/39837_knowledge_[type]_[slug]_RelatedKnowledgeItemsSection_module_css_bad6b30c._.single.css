@@ -1,0 +1,95 @@
+/* [project]/app/[locale]/knowledge/[type]/[slug]/RelatedKnowledgeItemsSection.module.css [app-client] (css) */
+.RelatedKnowledgeItemsSection-module__CK5lJq__relatedItemsCarousel .swiper-wrapper {
+  align-items: stretch;
+  padding: 18px 0 26px;
+}
+
+.RelatedKnowledgeItemsSection-module__CK5lJq__relatedItemsCarousel .swiper-slide {
+  opacity: .01;
+  filter: saturate(.9) blur(.25px);
+  will-change: opacity, filter;
+  transition: opacity .52s, filter .52s;
+}
+
+.RelatedKnowledgeItemsSection-module__CK5lJq__relatedItemsCarousel .swiper-slide-prev {
+  opacity: .7;
+  filter: saturate(.95);
+}
+
+.RelatedKnowledgeItemsSection-module__CK5lJq__relatedItemsCarousel .swiper-slide-next {
+  opacity: .7;
+  filter: saturate(.95);
+}
+
+.RelatedKnowledgeItemsSection-module__CK5lJq__relatedItemsCarousel .swiper-slide-active {
+  opacity: 1;
+  filter: none;
+}
+
+.RelatedKnowledgeItemsSection-module__CK5lJq__relatedItemsCarousel .slideInner {
+  will-change: transform, box-shadow;
+  transition: transform .52s, box-shadow .52s;
+  transform: scale(.94);
+}
+
+.RelatedKnowledgeItemsSection-module__CK5lJq__relatedItemsCarousel .swiper-slide-prev .slideInner {
+  transform: scale(.985);
+}
+
+.RelatedKnowledgeItemsSection-module__CK5lJq__relatedItemsCarousel .swiper-slide-next .slideInner {
+  transform: scale(.985);
+}
+
+.RelatedKnowledgeItemsSection-module__CK5lJq__relatedItemsCarousel .swiper-slide-active .slideInner {
+  transform: scale(1.06);
+  box-shadow: 0 14px 36px rgba(2, 132, 199, .15);
+}
+
+@media (max-width: 639px) {
+  .RelatedKnowledgeItemsSection-module__CK5lJq__relatedItemsCarousel .swiper-wrapper {
+    padding: 8px 0 16px;
+  }
+
+  .RelatedKnowledgeItemsSection-module__CK5lJq__relatedItemsCarousel .slideInner {
+    transform: scale(1);
+  }
+
+  .RelatedKnowledgeItemsSection-module__CK5lJq__relatedItemsCarousel .swiper-slide-prev .slideInner {
+    transform: scale(1);
+  }
+
+  .RelatedKnowledgeItemsSection-module__CK5lJq__relatedItemsCarousel .swiper-slide-next .slideInner {
+    transform: scale(1);
+  }
+
+  .RelatedKnowledgeItemsSection-module__CK5lJq__relatedItemsCarousel .swiper-slide-active .slideInner {
+    transform: scale(1);
+  }
+}
+
+.RelatedKnowledgeItemsSection-module__CK5lJq__relatedItemsCarousel .knoldg-swiper-nav-disabled {
+  opacity: .4;
+  pointer-events: none;
+}
+
+.RelatedKnowledgeItemsSection-module__CK5lJq__relatedItemsCarousel .knoldg-swiper-nav-locked {
+  opacity: .4;
+  pointer-events: none;
+}
+
+.RelatedKnowledgeItemsSection-module__CK5lJq__relatedItemsCarousel .knoldg-swiper-nav-hidden {
+  opacity: .4;
+  pointer-events: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .RelatedKnowledgeItemsSection-module__CK5lJq__relatedItemsCarousel .swiper-slide {
+    transition: none;
+  }
+
+  .RelatedKnowledgeItemsSection-module__CK5lJq__relatedItemsCarousel .slideInner {
+    transition: none;
+  }
+}
+
+/*# sourceMappingURL=39837_knowledge_%5Btype%5D_%5Bslug%5D_RelatedKnowledgeItemsSection_module_css_bad6b30c._.single.css.map*/

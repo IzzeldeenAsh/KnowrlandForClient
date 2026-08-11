@@ -87,6 +87,7 @@ export interface FeedItemInsighter {
 
 export interface FeedItem {
   uuid: string
+  slug: string | null
   content_type: 'post' | 'article'
   content_type_label: string
   media_type: 'image' | 'video' | 'attachment' | 'thumbnail' | null
@@ -135,6 +136,36 @@ export interface FeedPage {
   meta: PaginatedMeta
 }
 
+export interface CommunityFeedMeta {
+  snapshot_at: string
+  ranking_version: string
+  has_more: boolean
+  next_cursor: string | null
+  is_guest_preview?: boolean
+  preview_limit?: number
+  authentication_required_for_more?: boolean
+  limit?: number
+  candidate_count?: number
+  feed_session_id?: string
+}
+
+export interface CommunityFeedPage {
+  data: FeedItem[]
+  meta: CommunityFeedMeta
+}
+
+export class CommunityFeedApiError extends Error {
+  constructor(
+    message: string,
+    public readonly status: number,
+    public readonly code: string | null = null,
+    public readonly refreshRequired: boolean = false,
+  ) {
+    super(message)
+    this.name = 'CommunityFeedApiError'
+  }
+}
+
 export interface PublishPostPayload {
   body: string
   industryId: number
@@ -163,12 +194,16 @@ export interface ArticlePayload {
 
 // ---------- Helpers ----------
 
-function authHeaders(locale: string): Record<string, string> {
-  const headers: Record<string, string> = {
+function publicHeaders(locale: string): Record<string, string> {
+  return {
     Accept: 'application/json',
     'Accept-Language': locale,
     'X-Timezone': Intl.DateTimeFormat().resolvedOptions().timeZone,
   }
+}
+
+function authHeaders(locale: string): Record<string, string> {
+  const headers = publicHeaders(locale)
 
   const token = getAuthToken()
   if (token) {
@@ -288,6 +323,28 @@ export async function getFeedItem(uuid: string, locale: string): Promise<FeedIte
   return body.data
 }
 
+export async function getCommunityFeedArticle(
+  slug: string,
+  locale: string,
+  signal?: AbortSignal,
+): Promise<FeedItem> {
+  const response = await fetch(
+    getApiUrl(`/api/platform/community/feed/articles/${encodeURIComponent(slug)}`),
+    {
+      headers: publicHeaders(locale),
+      cache: 'no-store',
+      signal,
+    },
+  )
+
+  if (!response.ok) {
+    await parseErrorMessage(response, 'Unable to load the article.')
+  }
+
+  const body = await response.json()
+  return body.data
+}
+
 export async function getFeedDraft(locale: string, signal?: AbortSignal): Promise<FeedItem | null> {
   const response = await fetch(getApiUrl('/api/insighter/feed/draft'), {
     headers: authHeaders(locale),
@@ -332,6 +389,76 @@ export async function getMyFeeds(
       total: body.data?.length ?? 0,
     },
   }
+}
+
+async function requestCommunityFeed(
+  path: string,
+  locale: string,
+  signal?: AbortSignal,
+): Promise<CommunityFeedPage> {
+  const response = await fetch(getApiUrl(path), {
+    headers: authHeaders(locale),
+    cache: 'no-store',
+    signal,
+  })
+
+  if (!response.ok) {
+    let message = 'Unable to load the community feed.'
+    let code: string | null = null
+    let refreshRequired = false
+
+    try {
+      const body = await response.json()
+      if (typeof body?.message === 'string' && body.message.trim() !== '') {
+        message = body.message
+      }
+      if (typeof body?.code === 'string') code = body.code
+      refreshRequired = body?.refresh_required === true
+    } catch {
+      // Keep the fallback for non-JSON error responses.
+    }
+
+    throw new CommunityFeedApiError(message, response.status, code, refreshRequired)
+  }
+
+  const body = await response.json()
+  return {
+    data: body.data ?? [],
+    meta: {
+      snapshot_at: body.meta?.snapshot_at ?? '',
+      ranking_version: body.meta?.ranking_version ?? '',
+      has_more: body.meta?.has_more === true,
+      next_cursor: body.meta?.next_cursor ?? null,
+      is_guest_preview: body.meta?.is_guest_preview,
+      preview_limit: body.meta?.preview_limit,
+      authentication_required_for_more: body.meta?.authentication_required_for_more,
+      limit: body.meta?.limit,
+      candidate_count: body.meta?.candidate_count,
+      feed_session_id: body.meta?.feed_session_id,
+    },
+  }
+}
+
+export async function getCommunityFeedPreview(
+  locale: string,
+  signal?: AbortSignal,
+): Promise<CommunityFeedPage> {
+  return requestCommunityFeed('/api/platform/community/feed/preview', locale, signal)
+}
+
+export async function getCommunityFeed(
+  locale: string,
+  cursor?: string | null,
+  signal?: AbortSignal,
+): Promise<CommunityFeedPage> {
+  const params = new URLSearchParams({ limit: '10' })
+  if (cursor) params.set('cursor', cursor)
+
+  return requestCommunityFeed(
+    `/api/platform/community/feed?${params.toString()}`,
+    locale,
+    signal,
+  )
 }
 
 export async function deleteFeedItem(uuid: string, locale: string): Promise<void> {

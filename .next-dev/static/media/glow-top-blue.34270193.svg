@@ -1,0 +1,26 @@
+<svg version="1.2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1404 658" width="1404" height="658">
+	<title>glow-top</title>
+	<defs>
+		<radialGradient id="g1" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="matrix(0,704.06,-704.06,0,696.633,1.08)">
+			<stop offset="0" stop-color="#85b0f9" stop-opacity="1"/>
+			<stop offset=".01" stop-color="#85b0f9" stop-opacity=".984"/>
+			<stop offset=".22" stop-color="#4478ec" stop-opacity=".64"/>
+			<stop offset="1" stop-color="#0f172a" stop-opacity="0"/>
+		</radialGradient>
+		<filter x="-50%" y="-50%" width="200%" height="200%" id="f1"> <feGaussianBlur stdDeviation="50"/> </filter>
+		<linearGradient id="g2" x2="1" gradientUnits="userSpaceOnUse" gradientTransform="matrix(138.3,362.95,-213.504,81.354,343.34,-181.04)">
+			<stop offset="0" stop-color="#ffffff" stop-opacity="1"/>
+			<stop offset="1" stop-color="#ffffff" stop-opacity="0"/>
+		</linearGradient>
+	</defs>
+	<style>
+		.s0 { fill: url(#g1) } 
+		.s1 { filter: url(#f1);fill: url(#g2) } 
+	</style>
+	<path id="b" fillRule="evenodd" class="s0" d="m-460 0h2324v658h-2324z"/>
+	<g>
+		<g>
+			<path fillRule="evenodd" class="s1" d="m169-216l461 369-284 58-177-427z"/>
+		</g>
+	</g>
+</svg>

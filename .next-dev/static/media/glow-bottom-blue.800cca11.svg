@@ -1,0 +1,35 @@
+<svg version="1.2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 2146 744" width="2146" height="744">
+	<title>glow-bottom</title>
+	<defs>
+		<radialGradient id="g1" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="matrix(3.703,-725.203,725.203,3.703,1073,815.637)">
+			<stop offset="0" stop-color="#d9dcff" stop-opacity="1"/>
+			<stop offset=".22" stop-color="#365fe3" stop-opacity="1"/>
+			<stop offset="1" stop-color="#0f172a" stop-opacity="0"/>
+		</radialGradient>
+		<filter x="-50%" y="-50%" width="200%" height="200%" id="f1"> <feGaussianBlur stdDeviation="50"/> </filter>
+		<linearGradient id="g2" x2="1" gradientUnits="userSpaceOnUse" gradientTransform="matrix(46.48,296.7,-577.445,90.461,1680.33,705.94)">
+			<stop offset="0" stop-color="#5688f4"/>
+			<stop offset="1" stop-color="#658eef"/>
+		</linearGradient>
+		<linearGradient id="g3" x2="1" gradientUnits="userSpaceOnUse" gradientTransform="matrix(142.91,362.95,-208.143,81.955,944.93,196.31)">
+			<stop offset="0" stop-color="#3f6ed1" stop-opacity="1"/>
+			<stop offset="1" stop-color="#6390f1" stop-opacity="0"/>
+		</linearGradient>
+	</defs>
+	<style>
+		.s0 { fill: url(#g1) } 
+		.s1 { filter: url(#f1);fill: url(#g2) } 
+		.s2 { filter: url(#f1);fill: url(#g3) } 
+	</style>
+	<g>
+		<g>
+			<path fillRule="evenodd" class="s0" d="m2300-114v921h-2440v-921z"/>
+			<g>
+				<path class="s1" d="m1835.7 667.8c-3.7-3-8.7-3.6-13-1.6-4.3 2-7 6.4-7 11.1v98.6h-430.4c-6.8 0-12.3 5.5-12.3 12.3v98.6c0 6.8 5.5 12.3 12.3 12.3h430.4v98.6c0 4.7 2.7 9.1 7 11.1 4.3 2 9.3 1.4 13-1.6l196.8-160.1c2.8-2.4 4.5-5.9 4.5-9.6 0-3.7-1.7-7.2-4.5-9.6 0 0-196.8-160.1-196.8-160.1z"/>
+			</g>
+			<g>
+				<path fillRule="evenodd" class="s2" d="m773 160l461 369-284 58-177-427z"/>
+			</g>
+		</g>
+	</g>
+</svg>

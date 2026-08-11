@@ -1,0 +1,142 @@
+/* [project]/app/[locale]/topic/[id]/[slug]/knowledge-card.module.css [app-client] (css) */
+.knowledge-card-module__Tm2cMq__card {
+  cursor: pointer;
+  background-color: #fff;
+  border: 1px solid #e9ecef;
+  border-radius: 4px;
+  flex-direction: column;
+  height: 100%;
+  padding: 0;
+  transition: transform .3s, box-shadow .3s, border-color .3s;
+  display: flex;
+  overflow: hidden;
+}
+
+.knowledge-card-module__Tm2cMq__card:hover {
+  border-color: rgba(51, 154, 240, .4);
+  transform: translateY(-3px);
+  box-shadow: 0 4px 8px rgba(51, 154, 240, .15);
+}
+
+.knowledge-card-module__Tm2cMq__title {
+  font-family: "Greycliff CF", var(--mantine-font-family);
+  color: #fff;
+  margin-bottom: .5rem;
+  font-size: 1.2rem;
+  transition: color .2s;
+}
+
+.knowledge-card-module__Tm2cMq__card:hover .knowledge-card-module__Tm2cMq__title {
+  color: var(--mantine-color-blue-2);
+}
+
+.knowledge-card-module__Tm2cMq__footer {
+  padding: var(--mantine-spacing-xs) var(--mantine-spacing-lg);
+  margin-top: var(--mantine-spacing-md);
+  border-top: 1px solid var(--mantine-color-gray-2);
+  transition: border-color .2s;
+}
+
+.knowledge-card-module__Tm2cMq__card:hover .knowledge-card-module__Tm2cMq__footer {
+  border-color: rgba(51, 154, 240, .3);
+}
+
+.knowledge-card-module__Tm2cMq__description {
+  margin-bottom: 1rem;
+  font-size: .875rem;
+  display: block;
+}
+
+.knowledge-card-module__Tm2cMq__typeBadge {
+  color: #fff;
+  border-radius: 4px;
+  align-items: center;
+  padding: 5px 10px;
+  font-size: .8rem;
+  display: flex;
+  background-color: #228be6 !important;
+}
+
+.knowledge-card-module__Tm2cMq__priceBadge {
+  font-weight: 800;
+}
+
+.knowledge-card-module__Tm2cMq__actionButton {
+  border-radius: 6px;
+  justify-content: center;
+  align-items: center;
+  width: 2.2rem;
+  height: 2.2rem;
+  transition: background-color .2s;
+  display: flex;
+}
+
+.knowledge-card-module__Tm2cMq__avatar {
+  border: 1px solid #228be6;
+}
+
+.knowledge-card-module__Tm2cMq__avatar img {
+  -o-object-fit: cover;
+  object-fit: cover;
+  -o-object-position: top;
+  object-position: top;
+}
+
+.knowledge-card-module__Tm2cMq__darkSection {
+  color: #fff;
+  background-color: #111;
+  background-image: url("/images/test2.png");
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
+  flex-direction: column;
+  justify-content: space-between;
+  min-height: 208px;
+  padding: 25px 20px;
+  display: flex;
+}
+
+.knowledge-card-module__Tm2cMq__darkSectionWithBottomMeta {
+  padding-bottom: 60px;
+}
+
+.knowledge-card-module__Tm2cMq__bottomMetaRow {
+  align-items: center;
+  gap: 12px;
+  display: flex;
+  position: absolute;
+  bottom: 16px;
+  left: 16px;
+  right: 16px;
+}
+
+.knowledge-card-module__Tm2cMq__bottomMetaRowRtl {
+  flex-direction: row-reverse;
+}
+
+.knowledge-card-module__Tm2cMq__bottomMetaRowBoth {
+  justify-content: space-between;
+}
+
+.knowledge-card-module__Tm2cMq__bottomMetaRowSingle {
+  justify-content: flex-start;
+}
+
+.knowledge-card-module__Tm2cMq__bottomMetaItem {
+  white-space: nowrap;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+  display: inline-flex;
+}
+
+.knowledge-card-module__Tm2cMq__whiteSection {
+  background-color: #fff;
+  flex-direction: column;
+  flex-grow: 1;
+  justify-content: space-between;
+  padding: 20px;
+  display: flex;
+}
+
+/*# sourceMappingURL=app_%5Blocale%5D_topic_%5Bid%5D_%5Bslug%5D_knowledge-card_module_css_bad6b30c._.single.css.map*/

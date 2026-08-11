@@ -1,0 +1,6 @@
+{
+  "version": 3,
+  "sources": [],
+  "sections": [
+    {"offset": {"line": 1, "column": 0}, "map": {"version":3,"sources":["turbopack:///[project]/app/[locale]/home/utils/custom-search-engine-styles.module.css"],"sourcesContent":[".searchBar {\n    border-radius: 5px;\n    box-shadow: 0 1px 3px #00000014, 0 2px 1px #435e8326;\n    box-sizing: border-box;\n    transition: background-color .3s, color .3s, transform .3s;\n}\n\n.tp-course-details2-widget {\n    top: 100px !important;\n    margin-top: -380px !important;\n    position: sticky;\n    max-width: 400px;\n    z-index: 25 !important;\n}\n\n"],"names":[],"mappings":"AAAA;;;;;;;AAOA"}}]
+}

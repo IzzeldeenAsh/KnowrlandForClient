@@ -7,6 +7,8 @@ import { IconLanguage } from '@tabler/icons-react'
 import { useTranslations } from 'next-intl'
 import { useLoading } from '@/components/context/LoadingContext'
 import { getCookieDomain as sharedGetCookieDomain, isSharedCookieHost } from '@/lib/cookieDomain'
+import { useUserProfile } from '@/components/ui/header/hooks/useUserProfile'
+import FeedSidebar from '@/components/feed/FeedSidebar'
 
 interface MobileMenuProps {
   isHomePage?: boolean;
@@ -19,6 +21,13 @@ export default function MobileMenu({ isHomePage = true }: MobileMenuProps) {
   const pathname = usePathname();
   const isRtl = pathname.startsWith('/ar');
   const currentLocale = pathname.split('/')[1];
+
+  // On the feed (main) page, logged-in users get the dashboard sidebar in the
+  // mobile menu instead of the standard nav links, mirroring the desktop layout.
+  const { user } = useUserProfile();
+  const pathAfterLocale = pathname.split('/').filter(Boolean).slice(1).join('/');
+  const isFeedPage = pathAfterLocale === '';
+  const showFeedSidebar = isFeedPage && !!user;
 
   // Always use dark style with white text (matching the updated header)
   const menuTextColorClass = 'text-slate-300 hover:text-white';
@@ -124,7 +133,7 @@ export default function MobileMenu({ isHomePage = true }: MobileMenuProps) {
   })
 
   return (
-    <div className="lg:hidden flex items-center ml-4">
+    <div className="xl:hidden flex items-center ml-4">
       {/* Hamburger button */}
       <button
         ref={trigger}
@@ -159,14 +168,39 @@ export default function MobileMenu({ isHomePage = true }: MobileMenuProps) {
         </svg>
       </button>
 
-      {/*Mobile navigation */}
+      {mobileNavOpen && (
+        <button
+          type="button"
+          aria-label={isRtl ? 'إغلاق القائمة' : 'Close menu'}
+          className="fixed inset-x-0 bottom-0 top-16 z-40 bg-slate-950/45 backdrop-blur-[1px] md:top-20"
+          onClick={() => setMobileNavOpen(false)}
+        />
+      )}
+
+      {/* Side drawer navigation */}
       <nav
         id="mobile-nav"
         ref={mobileNav}
-        className={`fixed top-16 z-50 ${isRtl ? 'right-0' : 'left-0'} w-full px-4 sm:px-6 overflow-hidden transition-all duration-300 ease-in-out`}
-        style={mobileNavOpen ? { maxHeight: mobileNav.current?.scrollHeight, opacity: 1 } : { maxHeight: 0, opacity: 0.8 }}
+        aria-hidden={!mobileNavOpen}
+        className={`fixed bottom-0 top-16 z-50 w-[min(22rem,calc(100vw-2.5rem))] overflow-y-auto bg-[#EEF2FA] transition-transform duration-300 ease-out md:top-20 sm:w-[22rem] ${
+          isRtl
+            ? `right-0 shadow-[-12px_0_32px_rgba(15,23,42,0.2)] ${mobileNavOpen ? 'translate-x-0' : 'translate-x-full'}`
+            : `left-0 shadow-[12px_0_32px_rgba(15,23,42,0.2)] ${mobileNavOpen ? 'translate-x-0' : '-translate-x-full'}`
+        }`}
       >
-        <ul className={`rounded-lg px-4 py-1.5 max-w-full ${menuBgStyle} bg-opacity-95 backdrop-blur-sm`}>
+        {showFeedSidebar ? (
+          <div
+            className="min-h-full p-4"
+            dir={isRtl ? 'rtl' : 'ltr'}
+            onClick={(e) => {
+              // Close the menu once a navigation link is tapped.
+              if ((e.target as HTMLElement).closest('a')) setMobileNavOpen(false)
+            }}
+          >
+            <FeedSidebar locale={currentLocale} hideProfileCard />
+          </div>
+        ) : (
+        <ul className={`min-h-full px-5 py-6 ${menuBgStyle} bg-opacity-95`}>
           <li>
             <Link className={`flex font-medium text-sm ${menuTextColorClass} py-1.5`} href={`/${currentLocale}`}>{t('navigation.feed')}</Link>
           </li>
@@ -199,6 +233,7 @@ export default function MobileMenu({ isHomePage = true }: MobileMenuProps) {
           </li>
 
         </ul>
+        )}
       </nav>
     </div>
   )

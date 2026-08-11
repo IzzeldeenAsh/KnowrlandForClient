@@ -30,6 +30,8 @@ const copyByLocale = {
     search: 'Search industries…',
     loading: 'Loading industries…',
     empty: 'No industries match your search.',
+    error: 'Could not load industries.',
+    retry: 'Try again',
     close: 'Close industry selection',
   },
   ar: {
@@ -37,28 +39,50 @@ const copyByLocale = {
     search: 'ابحث في المجالات…',
     loading: 'جارٍ تحميل المجالات…',
     empty: 'لا توجد مجالات مطابقة لبحثك.',
+    error: 'تعذر تحميل المجالات.',
+    retry: 'حاول مرة أخرى',
     close: 'إغلاق اختيار المجال',
   },
 } as const
 
 // Module-level cache: the industry tree rarely changes within a session
 const industriesCache: Record<string, IndustryNode[]> = {}
+// De-dupe concurrent callers (e.g. IndustryField + IndustrySelectModal open at once)
+const pendingFetches: Record<string, Promise<IndustryNode[]> | undefined> = {}
+
+// A stalled connection never rejects on its own, so without a timeout the
+// caller's loading state can hang forever. Bound every attempt so it always
+// settles and the UI can fall back to a retryable error state.
+const FETCH_TIMEOUT_MS = 12000
 
 export async function fetchIndustryTree(locale: string): Promise<IndustryNode[]> {
   if (industriesCache[locale]) return industriesCache[locale]
+  if (pendingFetches[locale]) return pendingFetches[locale]!
 
-  const response = await fetch(getApiUrl('/api/common/setting/industry/tree'), {
+  const controller = new AbortController()
+  const timeoutId = setTimeout(() => controller.abort(), FETCH_TIMEOUT_MS)
+
+  const request = fetch(getApiUrl('/api/common/setting/industry/tree'), {
+    signal: controller.signal,
     headers: {
       Accept: 'application/json',
       'Accept-Language': locale,
       'X-Timezone': Intl.DateTimeFormat().resolvedOptions().timeZone,
     },
   })
-  if (!response.ok) throw new Error('Failed to fetch industries')
+    .then(async (response) => {
+      if (!response.ok) throw new Error('Failed to fetch industries')
+      const data = (await response.json()) as IndustryNode[]
+      industriesCache[locale] = data ?? []
+      return industriesCache[locale]
+    })
+    .finally(() => {
+      clearTimeout(timeoutId)
+      delete pendingFetches[locale]
+    })
 
-  const data = (await response.json()) as IndustryNode[]
-  industriesCache[locale] = data ?? []
-  return industriesCache[locale]
+  pendingFetches[locale] = request
+  return request
 }
 
 export type IndustryGroup = { parentKey: number; parentLabel: string; children: IndustryNode[] }
@@ -87,7 +111,9 @@ export default function IndustrySelectModal({
   const copy = copyByLocale[locale === 'ar' ? 'ar' : 'en']
   const [groups, setGroups] = useState<IndustryGroup[]>([])
   const [isLoading, setIsLoading] = useState(false)
+  const [hasError, setHasError] = useState(false)
   const [searchTerm, setSearchTerm] = useState('')
+  const [retryToken, setRetryToken] = useState(0)
 
   useEffect(() => {
     if (!opened) return
@@ -95,12 +121,16 @@ export default function IndustrySelectModal({
     let cancelled = false
     setSearchTerm('')
     setIsLoading(true)
+    setHasError(false)
     fetchIndustryTree(locale)
       .then((tree) => {
         if (!cancelled) setGroups(collectLeafGroups(tree))
       })
       .catch(() => {
-        if (!cancelled) setGroups([])
+        if (!cancelled) {
+          setGroups([])
+          setHasError(true)
+        }
       })
       .finally(() => {
         if (!cancelled) setIsLoading(false)
@@ -109,7 +139,7 @@ export default function IndustrySelectModal({
     return () => {
       cancelled = true
     }
-  }, [opened, locale])
+  }, [opened, locale, retryToken])
 
   const filteredGroups = useMemo(() => {
     const query = searchTerm.trim().toLowerCase()
@@ -161,6 +191,17 @@ export default function IndustrySelectModal({
           <p role="status" className="py-8 text-center text-[13px] text-[#64748B]">
             {copy.loading}
           </p>
+        ) : hasError ? (
+          <div className="flex flex-col items-center gap-3 py-8 text-center">
+            <p className="text-[13px] text-[#94A3B8]">{copy.error}</p>
+            <button
+              type="button"
+              onClick={() => setRetryToken((previous) => previous + 1)}
+              className="rounded-md border border-[#D6E0EC] px-4 py-1.5 text-[13px] font-medium text-[#1D74E0] transition-colors hover:bg-[#F3F6FB] focus-visible:outline-[1px] focus-visible:outline-offset-1 focus-visible:outline-[#B7D2F4]"
+            >
+              {copy.retry}
+            </button>
+          </div>
         ) : filteredGroups.length === 0 ? (
           <p className="py-8 text-center text-[13px] text-[#94A3B8]">{copy.empty}</p>
         ) : (
