@@ -1,0 +1,206 @@
+/* [project]/components/feed/article/ArticleEditor.module.css [app-client] (css) */
+.ArticleEditor-module__zzoD3G__editorShell .mantine-RichTextEditor-root {
+  background: none;
+  border: 0;
+  border-radius: 0;
+}
+
+.ArticleEditor-module__zzoD3G__editorShell .mantine-RichTextEditor-toolbar {
+  z-index: 20;
+  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(12px);
+  background: rgba(255, 255, 255, .96);
+  border: 0;
+  border-bottom: 1px solid #e2e8f0;
+  min-height: 54px;
+  padding: 10px 0;
+  position: -webkit-sticky;
+  position: sticky;
+  top: 0;
+}
+
+.ArticleEditor-module__zzoD3G__editorShell .mantine-RichTextEditor-content {
+  background: none;
+}
+
+.ArticleEditor-module__zzoD3G__editorShell .tiptap {
+  color: #263246;
+  outline: none;
+  min-height: 480px;
+  padding: 28px 0 80px;
+  font-size: 18px;
+  line-height: 1.85;
+}
+
+.ArticleEditor-module__zzoD3G__editorShell .tiptap p {
+  margin: 0 0 1.15em;
+}
+
+.ArticleEditor-module__zzoD3G__editorShell .tiptap h1 {
+  color: #101827;
+  letter-spacing: -.025em;
+  margin: 1.6em 0 .55em;
+  font-weight: 600;
+}
+
+.ArticleEditor-module__zzoD3G__editorShell .tiptap h2 {
+  color: #101827;
+  letter-spacing: -.025em;
+  margin: 1.6em 0 .55em;
+  font-weight: 600;
+}
+
+.ArticleEditor-module__zzoD3G__editorShell .tiptap h3 {
+  color: #101827;
+  letter-spacing: -.025em;
+  margin: 1.6em 0 .55em;
+  font-weight: 600;
+}
+
+.ArticleEditor-module__zzoD3G__editorShell .tiptap h1 {
+  font-size: 2rem;
+}
+
+.ArticleEditor-module__zzoD3G__editorShell .tiptap h2 {
+  font-size: 1.55rem;
+}
+
+.ArticleEditor-module__zzoD3G__editorShell .tiptap h3 {
+  font-size: 1.25rem;
+}
+
+.ArticleEditor-module__zzoD3G__editorShell .tiptap ul {
+  margin: 0 0 1.25em;
+}
+
+.ArticleEditor-module__zzoD3G__editorShell .tiptap ul:not(:-webkit-any(:lang(ae), :lang(ar), :lang(arc), :lang(bcc), :lang(bqi), :lang(ckb), :lang(dv), :lang(fa), :lang(glk), :lang(he), :lang(ku), :lang(mzn), :lang(nqo), :lang(pnb), :lang(ps), :lang(sd), :lang(ug), :lang(ur), :lang(yi))) {
+  padding-left: 1.5em;
+}
+
+.ArticleEditor-module__zzoD3G__editorShell .tiptap ul:not(:-moz-any(:lang(ae), :lang(ar), :lang(arc), :lang(bcc), :lang(bqi), :lang(ckb), :lang(dv), :lang(fa), :lang(glk), :lang(he), :lang(ku), :lang(mzn), :lang(nqo), :lang(pnb), :lang(ps), :lang(sd), :lang(ug), :lang(ur), :lang(yi))) {
+  padding-left: 1.5em;
+}
+
+.ArticleEditor-module__zzoD3G__editorShell .tiptap ul:not(:is(:lang(ae), :lang(ar), :lang(arc), :lang(bcc), :lang(bqi), :lang(ckb), :lang(dv), :lang(fa), :lang(glk), :lang(he), :lang(ku), :lang(mzn), :lang(nqo), :lang(pnb), :lang(ps), :lang(sd), :lang(ug), :lang(ur), :lang(yi))) {
+  padding-left: 1.5em;
+}
+
+.ArticleEditor-module__zzoD3G__editorShell .tiptap ul:-webkit-any(:lang(ae), :lang(ar), :lang(arc), :lang(bcc), :lang(bqi), :lang(ckb), :lang(dv), :lang(fa), :lang(glk), :lang(he), :lang(ku), :lang(mzn), :lang(nqo), :lang(pnb), :lang(ps), :lang(sd), :lang(ug), :lang(ur), :lang(yi)) {
+  padding-right: 1.5em;
+}
+
+.ArticleEditor-module__zzoD3G__editorShell .tiptap ul:-moz-any(:lang(ae), :lang(ar), :lang(arc), :lang(bcc), :lang(bqi), :lang(ckb), :lang(dv), :lang(fa), :lang(glk), :lang(he), :lang(ku), :lang(mzn), :lang(nqo), :lang(pnb), :lang(ps), :lang(sd), :lang(ug), :lang(ur), :lang(yi)) {
+  padding-right: 1.5em;
+}
+
+.ArticleEditor-module__zzoD3G__editorShell .tiptap ul:is(:lang(ae), :lang(ar), :lang(arc), :lang(bcc), :lang(bqi), :lang(ckb), :lang(dv), :lang(fa), :lang(glk), :lang(he), :lang(ku), :lang(mzn), :lang(nqo), :lang(pnb), :lang(ps), :lang(sd), :lang(ug), :lang(ur), :lang(yi)) {
+  padding-right: 1.5em;
+}
+
+.ArticleEditor-module__zzoD3G__editorShell .tiptap ol {
+  margin: 0 0 1.25em;
+}
+
+.ArticleEditor-module__zzoD3G__editorShell .tiptap ol:not(:-webkit-any(:lang(ae), :lang(ar), :lang(arc), :lang(bcc), :lang(bqi), :lang(ckb), :lang(dv), :lang(fa), :lang(glk), :lang(he), :lang(ku), :lang(mzn), :lang(nqo), :lang(pnb), :lang(ps), :lang(sd), :lang(ug), :lang(ur), :lang(yi))) {
+  padding-left: 1.5em;
+}
+
+.ArticleEditor-module__zzoD3G__editorShell .tiptap ol:not(:-moz-any(:lang(ae), :lang(ar), :lang(arc), :lang(bcc), :lang(bqi), :lang(ckb), :lang(dv), :lang(fa), :lang(glk), :lang(he), :lang(ku), :lang(mzn), :lang(nqo), :lang(pnb), :lang(ps), :lang(sd), :lang(ug), :lang(ur), :lang(yi))) {
+  padding-left: 1.5em;
+}
+
+.ArticleEditor-module__zzoD3G__editorShell .tiptap ol:not(:is(:lang(ae), :lang(ar), :lang(arc), :lang(bcc), :lang(bqi), :lang(ckb), :lang(dv), :lang(fa), :lang(glk), :lang(he), :lang(ku), :lang(mzn), :lang(nqo), :lang(pnb), :lang(ps), :lang(sd), :lang(ug), :lang(ur), :lang(yi))) {
+  padding-left: 1.5em;
+}
+
+.ArticleEditor-module__zzoD3G__editorShell .tiptap ol:-webkit-any(:lang(ae), :lang(ar), :lang(arc), :lang(bcc), :lang(bqi), :lang(ckb), :lang(dv), :lang(fa), :lang(glk), :lang(he), :lang(ku), :lang(mzn), :lang(nqo), :lang(pnb), :lang(ps), :lang(sd), :lang(ug), :lang(ur), :lang(yi)) {
+  padding-right: 1.5em;
+}
+
+.ArticleEditor-module__zzoD3G__editorShell .tiptap ol:-moz-any(:lang(ae), :lang(ar), :lang(arc), :lang(bcc), :lang(bqi), :lang(ckb), :lang(dv), :lang(fa), :lang(glk), :lang(he), :lang(ku), :lang(mzn), :lang(nqo), :lang(pnb), :lang(ps), :lang(sd), :lang(ug), :lang(ur), :lang(yi)) {
+  padding-right: 1.5em;
+}
+
+.ArticleEditor-module__zzoD3G__editorShell .tiptap ol:is(:lang(ae), :lang(ar), :lang(arc), :lang(bcc), :lang(bqi), :lang(ckb), :lang(dv), :lang(fa), :lang(glk), :lang(he), :lang(ku), :lang(mzn), :lang(nqo), :lang(pnb), :lang(ps), :lang(sd), :lang(ug), :lang(ur), :lang(yi)) {
+  padding-right: 1.5em;
+}
+
+.ArticleEditor-module__zzoD3G__editorShell .tiptap ul {
+  list-style: outside;
+}
+
+.ArticleEditor-module__zzoD3G__editorShell .tiptap ol {
+  list-style: decimal;
+}
+
+.ArticleEditor-module__zzoD3G__editorShell .tiptap blockquote {
+  color: #4b5d76;
+  margin: 1.7em 0;
+  padding: .2em 0 .2em 1.25em;
+  font-size: 1.15em;
+}
+
+.ArticleEditor-module__zzoD3G__editorShell .tiptap blockquote:not(:-webkit-any(:lang(ae), :lang(ar), :lang(arc), :lang(bcc), :lang(bqi), :lang(ckb), :lang(dv), :lang(fa), :lang(glk), :lang(he), :lang(ku), :lang(mzn), :lang(nqo), :lang(pnb), :lang(ps), :lang(sd), :lang(ug), :lang(ur), :lang(yi))) {
+  border-left: 4px solid #2c7be5;
+}
+
+.ArticleEditor-module__zzoD3G__editorShell .tiptap blockquote:not(:-moz-any(:lang(ae), :lang(ar), :lang(arc), :lang(bcc), :lang(bqi), :lang(ckb), :lang(dv), :lang(fa), :lang(glk), :lang(he), :lang(ku), :lang(mzn), :lang(nqo), :lang(pnb), :lang(ps), :lang(sd), :lang(ug), :lang(ur), :lang(yi))) {
+  border-left: 4px solid #2c7be5;
+}
+
+.ArticleEditor-module__zzoD3G__editorShell .tiptap blockquote:not(:is(:lang(ae), :lang(ar), :lang(arc), :lang(bcc), :lang(bqi), :lang(ckb), :lang(dv), :lang(fa), :lang(glk), :lang(he), :lang(ku), :lang(mzn), :lang(nqo), :lang(pnb), :lang(ps), :lang(sd), :lang(ug), :lang(ur), :lang(yi))) {
+  border-left: 4px solid #2c7be5;
+}
+
+.ArticleEditor-module__zzoD3G__editorShell .tiptap blockquote:-webkit-any(:lang(ae), :lang(ar), :lang(arc), :lang(bcc), :lang(bqi), :lang(ckb), :lang(dv), :lang(fa), :lang(glk), :lang(he), :lang(ku), :lang(mzn), :lang(nqo), :lang(pnb), :lang(ps), :lang(sd), :lang(ug), :lang(ur), :lang(yi)) {
+  border-right: 4px solid #2c7be5;
+}
+
+.ArticleEditor-module__zzoD3G__editorShell .tiptap blockquote:-moz-any(:lang(ae), :lang(ar), :lang(arc), :lang(bcc), :lang(bqi), :lang(ckb), :lang(dv), :lang(fa), :lang(glk), :lang(he), :lang(ku), :lang(mzn), :lang(nqo), :lang(pnb), :lang(ps), :lang(sd), :lang(ug), :lang(ur), :lang(yi)) {
+  border-right: 4px solid #2c7be5;
+}
+
+.ArticleEditor-module__zzoD3G__editorShell .tiptap blockquote:is(:lang(ae), :lang(ar), :lang(arc), :lang(bcc), :lang(bqi), :lang(ckb), :lang(dv), :lang(fa), :lang(glk), :lang(he), :lang(ku), :lang(mzn), :lang(nqo), :lang(pnb), :lang(ps), :lang(sd), :lang(ug), :lang(ur), :lang(yi)) {
+  border-right: 4px solid #2c7be5;
+}
+
+.ArticleEditor-module__zzoD3G__editorShell .tiptap pre {
+  color: #dbeafe;
+  background: #0d1b2e;
+  border-radius: 8px;
+  margin: 1.5em 0;
+  padding: 18px 20px;
+  font-size: 14px;
+  line-height: 1.65;
+  overflow-x: auto;
+}
+
+.ArticleEditor-module__zzoD3G__editorShell .tiptap a {
+  color: #1769c2;
+  text-underline-offset: 3px;
+  text-decoration: underline;
+}
+
+.ArticleEditor-module__zzoD3G__editorShell .tiptap hr {
+  border: 0;
+  border-top: 1px solid #dbe3ee;
+  margin: 2.5em 0;
+}
+
+.ArticleEditor-module__zzoD3G__editorShell .tiptap p.is-editor-empty:first-child:before {
+  float: left;
+  color: #9aa8ba;
+  content: attr(data-placeholder);
+  pointer-events: none;
+  height: 0;
+}
+
+@media (max-width: 640px) {
+  .ArticleEditor-module__zzoD3G__editorShell .tiptap {
+    min-height: 360px;
+    padding-top: 22px;
+    font-size: 16px;
+  }
+}
+
+/*# sourceMappingURL=components_feed_article_ArticleEditor_module_0f40a1fb.css.map*/

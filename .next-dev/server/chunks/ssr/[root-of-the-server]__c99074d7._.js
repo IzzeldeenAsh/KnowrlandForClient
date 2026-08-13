@@ -84,8 +84,8 @@ var __TURBOPACK__imported__module__$5b$project$5d2f$components$2f$feed$2f$articl
 ;
 ;
 const metadata = {
-    title: 'Article - Insighta Business',
-    description: 'Read an article published by an Insighta expert.'
+    title: 'White Paper - Insighta Business',
+    description: 'Read a White Paper published by an Insighta expert.'
 };
 async function ArticlePage({ params, searchParams }) {
     const { locale, uuid } = await params;

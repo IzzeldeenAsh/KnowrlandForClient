@@ -9,6 +9,7 @@ import '@mantine/tiptap/styles.css';
 import {NextIntlClientProvider} from 'next-intl';
 import {getMessages} from 'next-intl/server';
 import {notFound} from 'next/navigation';
+import { Suspense } from 'react';
 import {Locale, routing} from '@/i18n/routing';
 import Header from '@/components/ui/header';
 import { LoadingProvider } from '@/components/context/LoadingContext';
@@ -207,7 +208,9 @@ export default async function RootLayout({
                     >
                       {children}
                     </div>
-                    <FloatingFeedButton locale={locale} />
+                    <Suspense fallback={null}>
+                      <FloatingFeedButton locale={locale} />
+                    </Suspense>
                     <ConditionalAuthBanner />
                   </RoleGuard>
                 </GlobalProfileProvider>

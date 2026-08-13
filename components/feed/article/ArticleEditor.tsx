@@ -21,8 +21,10 @@ import { useToast } from '@/components/toast/ToastContext'
 import { useUserProfile } from '@/components/ui/header/hooks/useUserProfile'
 import {
   fetchIndustryTags,
+  fetchLibraryKnowledgeById,
   getFeedDraft,
   publishArticle,
+  saveArticleDraft,
   type FeedItem,
   type FeedTag,
   type LibraryKnowledgeItem,
@@ -38,10 +40,10 @@ const COVER_MAX_BYTES = 5 * 1024 * 1024
 
 const copyByLocale = {
   en: {
-    individualArticle: 'Individual article',
+    individualArticle: 'Individual White Paper',
     loading: 'Loading…',
-    publish: 'Post',
-    publishing: 'Posting…',
+    publish: 'Publish',
+    publishing: 'Publishing…',
     cover: 'Add a cover image',
     coverHint: 'Recommended 1920 × 1080 · JPG, PNG or WebP · 5 MB max',
     replaceCover: 'Replace cover image',
@@ -49,8 +51,8 @@ const copyByLocale = {
     title: 'Title',
     titlePlaceholder: 'Title',
     bodyPlaceholder: 'Write here. Share the expertise only you can bring…',
-    settings: 'Article settings',
-    settingsHint: 'Help the right people discover this article.',
+    settings: 'White Paper settings',
+    settingsHint: 'Help the right people discover this White Paper.',
     industry: 'Industry',
     selectIndustry: 'Select an industry',
     tags: 'Tags',
@@ -61,22 +63,26 @@ const copyByLocale = {
     relatedHint: 'Connect published work from your library.',
     chooseInsights: 'Choose from library',
     titleRequired: 'Add a title before continuing.',
-    bodyRequired: 'Write some article content before continuing.',
+    bodyRequired: 'Write some White Paper content before continuing.',
     industryRequired: 'Select an industry before continuing.',
-    bodyTooLong: `The formatted article must be ${ARTICLE_BODY_LIMIT.toLocaleString()} characters or fewer.`,
+    coverRequired: 'Add a cover image before continuing.',
+    bodyTooLong: `The formatted White Paper must be ${ARTICLE_BODY_LIMIT.toLocaleString()} characters or fewer.`,
     wrongCover: 'Choose a JPG, PNG, or WebP image.',
     largeCover: 'The cover image must be 5 MB or smaller.',
     smallCover: 'The cover image must be at least 552 × 276 pixels.',
-    published: 'Your article has been published.',
-    loadFailed: 'Unable to load your article draft.',
+    published: 'Your White Paper has been published.',
+    loadFailed: 'Unable to load your White Paper draft.',
+    draftSavedRedirecting: 'Draft saved. Taking you to publishing…',
+    newKnowledgeAttached: 'Your new knowledge item has been attached.',
+    newKnowledgeMissing: 'We could not find the item you just published. Try adding it from your library.',
     existingPost: 'You already have a post draft in progress.',
-    continuePost: 'Continue editing it from the feed before starting an article.',
+    continuePost: 'Continue editing it from the feed before starting a White Paper.',
     returnToFeed: 'Return to feed',
-    accessTitle: 'Article publishing is available to Insighters.',
-    accessBody: 'Sign in with an Insighter or company account to write an article.',
+    accessTitle: 'White Paper publishing is available to Insighters.',
+    accessBody: 'Sign in with an Insighter or company account to write a White Paper.',
   },
   ar: {
-    individualArticle: 'مقال فردي',
+    individualArticle: 'ورقة بيضاء فردية',
     loading: 'جارٍ التحميل…',
     publish: 'نشر',
     publishing: 'جارٍ النشر…',
@@ -87,8 +93,8 @@ const copyByLocale = {
     title: 'العنوان',
     titlePlaceholder: 'العنوان',
     bodyPlaceholder: 'اكتب هنا وشارك الخبرة التي تميزك…',
-    settings: 'إعدادات المقال',
-    settingsHint: 'ساعد الأشخاص المناسبين في اكتشاف هذا المقال.',
+    settings: 'إعدادات الورقة البيضاء',
+    settingsHint: 'ساعد الأشخاص المناسبين في اكتشاف هذه الورقة البيضاء.',
     industry: 'المجال',
     selectIndustry: 'اختر مجالاً',
     tags: 'الوسوم',
@@ -99,19 +105,23 @@ const copyByLocale = {
     relatedHint: 'اربط أعمالاً منشورة من مكتبتك.',
     chooseInsights: 'اختر من المكتبة',
     titleRequired: 'أضف عنواناً قبل المتابعة.',
-    bodyRequired: 'اكتب محتوى المقال قبل المتابعة.',
+    bodyRequired: 'اكتب محتوى الورقة البيضاء قبل المتابعة.',
     industryRequired: 'اختر مجالاً قبل المتابعة.',
-    bodyTooLong: `يجب ألا يتجاوز المقال المنسق ${ARTICLE_BODY_LIMIT.toLocaleString()} حرفاً.`,
+    coverRequired: 'أضف صورة غلاف قبل المتابعة.',
+    bodyTooLong: `يجب ألا تتجاوز الورقة البيضاء المنسقة ${ARTICLE_BODY_LIMIT.toLocaleString()} حرفاً.`,
     wrongCover: 'اختر صورة بصيغة JPG أو PNG أو WebP.',
     largeCover: 'يجب ألا يزيد حجم صورة الغلاف على 5 ميجابايت.',
     smallCover: 'يجب ألا تقل أبعاد صورة الغلاف عن 552 × 276 بكسل.',
-    published: 'تم نشر مقالك.',
-    loadFailed: 'تعذر تحميل مسودة المقال.',
+    published: 'تم نشر ورقتك البيضاء.',
+    loadFailed: 'تعذر تحميل مسودة الورقة البيضاء.',
+    draftSavedRedirecting: 'تم حفظ المسودة. سيتم نقلك إلى النشر…',
+    newKnowledgeAttached: 'تم إرفاق عنصر المعرفة الجديد.',
+    newKnowledgeMissing: 'تعذر العثور على العنصر الذي نشرته للتو. حاول إضافته من مكتبتك.',
     existingPost: 'لديك مسودة منشور قيد التحرير.',
-    continuePost: 'أكمل تحريرها من صفحة الخلاصة قبل بدء مقال.',
+    continuePost: 'أكمل تحريرها من صفحة الخلاصة قبل بدء ورقة بيضاء.',
     returnToFeed: 'العودة إلى الخلاصة',
-    accessTitle: 'نشر المقالات متاح للمستشارين.',
-    accessBody: 'سجّل الدخول بحساب مستشار أو شركة لكتابة مقال.',
+    accessTitle: 'نشر الأوراق البيضاء متاح للمستشارين.',
+    accessBody: 'سجّل الدخول بحساب مستشار أو شركة لكتابة ورقة بيضاء.',
   },
 } as const
 
@@ -257,6 +267,10 @@ export default function ArticleEditor({ locale }: ArticleEditorProps) {
       toast.error(copy.industryRequired)
       return false
     }
+    if (!coverPreview || removeCover) {
+      toast.error(copy.coverRequired)
+      return false
+    }
     return true
   }
 
@@ -273,6 +287,74 @@ export default function ArticleEditor({ locale }: ArticleEditorProps) {
       setIsPublishing(false)
     }
   }
+
+  // Empty-library CTA: save the article as a draft, then head to the knowledge
+  // stepper. It redirects back here with ?attach_knowledge=<id> so we can attach
+  // the new item automatically (handled by the return effect below).
+  const handlePublishNewKnowledge = async () => {
+    if (isPublishing) return
+    if (!title.trim()) {
+      toast.error(copy.titleRequired)
+      return
+    }
+    setLibraryDrawerOpened(false)
+    try {
+      const uuid = await saveArticleDraft(payload, locale, draftUuid ?? undefined)
+      setDraftUuid(uuid)
+      toast.success(copy.draftSavedRedirecting)
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : copy.loadFailed)
+      return
+    }
+
+    const returnUrl = `${window.location.origin}${window.location.pathname}`
+    window.location.href =
+      `${process.env.NEXT_PUBLIC_DASHBOARD_URL}/app/add-knowledge/stepper` +
+      `?return_url=${encodeURIComponent(returnUrl)}`
+  }
+
+  // On return from publishing, fetch the new item and attach it to the article.
+  const autoAttachedIdRef = useRef<number | null>(null)
+  useEffect(() => {
+    if (!isAuthResolved || !canPublish) return
+
+    const params = new URLSearchParams(window.location.search)
+    const raw = params.get('attach_knowledge')
+    if (!raw) return
+
+    params.delete('attach_knowledge')
+    const query = params.toString()
+    router.replace(`${window.location.pathname}${query ? `?${query}` : ''}`, { scroll: false })
+
+    const id = Number(raw)
+    if (!Number.isInteger(id) || id <= 0) return
+    if (autoAttachedIdRef.current === id) return
+    autoAttachedIdRef.current = id
+
+    let cancelled = false
+    void (async () => {
+      try {
+        const item = await fetchLibraryKnowledgeById(id, locale)
+        if (cancelled) return
+        if (item) {
+          setRelatedInsights((previous) =>
+            previous.some((entry) => entry.id === item.id) || previous.length >= 3
+              ? previous
+              : [...previous, item],
+          )
+          toast.success(copy.newKnowledgeAttached)
+        } else {
+          toast.error(copy.newKnowledgeMissing)
+        }
+      } catch {
+        if (!cancelled) toast.error(copy.newKnowledgeMissing)
+      }
+    })()
+
+    return () => {
+      cancelled = true
+    }
+  }, [isAuthResolved, canPublish, locale, copy, toast, router])
 
   const handleCoverChange = async (file: File | undefined) => {
     if (!file) return
@@ -429,7 +511,7 @@ export default function ArticleEditor({ locale }: ArticleEditorProps) {
       </main>
 
       <IndustrySelectModal locale={locale} opened={industryModalOpened} selectedId={industry?.id ?? null} onClose={() => setIndustryModalOpened(false)} onSelect={(option) => { if (option.id !== industry?.id) { setSelectedTags([]); setIndustryTags([]) }; setIndustry(option); setIndustryModalOpened(false) }} />
-      <KnowledgeLibraryDrawer locale={locale} opened={libraryDrawerOpened} selected={relatedInsights} onClose={() => setLibraryDrawerOpened(false)} onConfirm={(items) => { setRelatedInsights(items); setLibraryDrawerOpened(false) }} />
+      <KnowledgeLibraryDrawer locale={locale} opened={libraryDrawerOpened} selected={relatedInsights} onClose={() => setLibraryDrawerOpened(false)} onConfirm={(items) => { setRelatedInsights(items); setLibraryDrawerOpened(false) }} onPublishNew={() => { void handlePublishNewKnowledge() }} />
     </div>
   )
 }

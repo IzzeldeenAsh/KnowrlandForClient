@@ -1,12 +1,15 @@
 'use client'
 
 import Footer from '@/components/ui/footer'
+import { usePathname } from 'next/navigation'
 
 export default function DefaultLayout({
   children,
 }: {
   children: React.ReactNode
 }) {  
+  const pathname = usePathname()
+  const isFeedPage = pathname.split('/').filter(Boolean).length === 1
 
   return (
     <>
@@ -16,7 +19,7 @@ export default function DefaultLayout({
         </div>
       </main>
 
-      <Footer />
+      {!isFeedPage && <Footer />}
     </>
   )
 }

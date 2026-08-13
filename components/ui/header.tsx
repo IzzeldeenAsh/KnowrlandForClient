@@ -3,11 +3,11 @@ import Link from 'next/link'
 import Logo from './logo'
 import MobileMenu from './mobile-menu'
 import { useEffect, useLayoutEffect, useRef, useState } from 'react'
-import { IconChevronDown, IconLanguage, IconSearch } from '@tabler/icons-react'
+import { IconChevronDown, IconLanguage, IconSearch, IconX } from '@tabler/icons-react'
 import { HoverCard, Group, Text, Anchor, Divider, SimpleGrid, Button, TextInput } from '@mantine/core'
 import { UserProfile } from './header/components/UserProfile'
 import { useTranslations } from 'next-intl'
-import { usePathname, useRouter } from 'next/navigation'
+import { usePathname, useRouter, useSearchParams } from 'next/navigation'
 import { useRouter as useI18nRouter } from '@/i18n/routing'
 import { useLoading } from '@/components/context/LoadingContext'
 import Particles from '@/components/particles'
@@ -119,9 +119,13 @@ export default function Header() {
   const { isLoading: isAppLoading, setIsLoading: setAppLoading } = useLoading();
   const pathname = usePathname();
   const router = useRouter();
+  const currentSearchParams = useSearchParams();
   const ctaCycleTimerRef = useRef<number | null>(null);
   const ctaSwapTimerRef = useRef<number | null>(null);
   const currentLocale = pathname.split('/')[1] || 'en';
+  const pathAfterLocale = pathname.split('/').filter(Boolean).slice(1).join('/');
+  const isFeedPage = pathAfterLocale === '';
+  const activeFeedKeyword = isFeedPage ? currentSearchParams.get('keyword') ?? '' : '';
   const isArabicLocale = currentLocale === 'ar';
   const animatedCtaWords = isArabicLocale ? ['كإنسايتر', 'كخبير'] : ['Insighter', 'Expert'];
   const [animatedCtaWordIndex, setAnimatedCtaWordIndex] = useState(0);
@@ -162,8 +166,36 @@ export default function Header() {
     },
   } as const;
 
+  const feedSearchInputStyles = {
+    input: {
+      backgroundColor: '#FFFFFF',
+      border: '1px solid #CBD5E1',
+      color: '#1E293B',
+      direction: currentLocale === 'ar' ? 'rtl' : 'ltr',
+      '&::placeholder': {
+        color: '#64748B',
+      },
+      '&:focus': {
+        borderColor: '#2378E8',
+        backgroundColor: '#FFFFFF',
+      },
+      '&:hover': {
+        backgroundColor: '#FFFFFF',
+      },
+    },
+    section: {
+      color: '#475569',
+    },
+  } as const;
+
   // Handle search submission
   const handleSearch = (query: string, searchType: 'knowledge' | 'insighter' = 'knowledge') => {
+    if (isFeedPage) {
+      const keyword = query.trim();
+      router.push(keyword ? `/${currentLocale}?keyword=${encodeURIComponent(keyword)}` : `/${currentLocale}`);
+      return;
+    }
+
     const searchParams = new URLSearchParams();
     if (query.trim()) {
       searchParams.set('keyword', query.trim());
@@ -180,6 +212,28 @@ export default function Header() {
     setHasToken(!!getAuthToken());
     setReturnUrl(window.location.href);
   }, [pathname]);
+
+  useEffect(() => {
+    if (isFeedPage) {
+      setSearchQuery(activeFeedKeyword);
+    }
+  }, [activeFeedKeyword, isFeedPage]);
+
+  useEffect(() => {
+    if (!isFeedPage) return;
+
+    const keyword = searchQuery.trim();
+    if (keyword === activeFeedKeyword.trim()) return;
+
+    const timeoutId = window.setTimeout(() => {
+      router.replace(
+        keyword ? `/${currentLocale}?keyword=${encodeURIComponent(keyword)}` : `/${currentLocale}`,
+        { scroll: false },
+      );
+    }, 1000);
+
+    return () => window.clearTimeout(timeoutId);
+  }, [activeFeedKeyword, currentLocale, isFeedPage, router, searchQuery]);
 
   useEffect(() => {
     setAnimatedCtaWordIndex(0);
@@ -252,6 +306,11 @@ export default function Header() {
     handleSearch(searchQuery);
   };
 
+  const clearFeedSearch = () => {
+    setSearchQuery('');
+    router.push(`/${currentLocale}`);
+  };
+
   const hasSearchQuery = searchQuery.trim().length > 0;
 
   const isProjectRoute = (): boolean => {
@@ -262,11 +321,6 @@ export default function Header() {
   // Check if current route should hide search bar
   const shouldHideSearchBar = (): boolean => {
     const pathSegments = pathname.split('/').filter(segment => segment !== '');
-
-    // Hide on base URL / feed (e.g., /en, /ar)
-    if (pathSegments.length === 1) {
-      return true;
-    }
 
     // Hide on the landing page (e.g., /en/landing, /ar/landing)
     // and on the search page (e.g., /en/home, /ar/home)
@@ -291,11 +345,8 @@ export default function Header() {
     { slug: 'course', label: t('navigation.courses') },
   ];
 
-  const pathAfterLocale = pathname.split('/').filter(Boolean).slice(1).join('/');
-
   // On the feed (main) page, the Industries and Types menus are hidden to keep
   // the nav focused on the feed experience.
-  const isFeedPage = pathAfterLocale === '';
 
   // Which top-level nav entry is currently active
   const isActiveNav = (key: 'feed' | 'home' | 'documents' | 'industries' | 'types'): boolean => {
@@ -484,7 +535,7 @@ export default function Header() {
           {/* Illustration */}
 
 
-          <div className="mx-auto px-2 sm:px-4 md:px-8 lg:px-12 max-w-full relative z-100">
+          <div className="mx-auto px-2 sm:px-3 md:px-5 lg:px-6 max-w-full relative z-100">
             <div className="flex items-center justify-between h-16 md:h-20 gap-1 md:gap-2">
 
               {/* Site branding */}
@@ -626,12 +677,17 @@ export default function Header() {
               </nav>
 
               {/* Header Search Bar */}
-              {!shouldHideSearchBar() && (
+              {!shouldHideSearchBar() && !isFeedPage && (
                 <div className="hidden xl:flex items-center mx-4">
                   <form onSubmit={handleSearchSubmit} className="flex items-center">
                     <TextInput
                       id={`header-search-${currentLocale}`}
-                      placeholder={currentLocale === 'ar' ? 'البحث...' : 'Search...'}
+                      placeholder={isFeedPage
+                        ? (currentLocale === 'ar' ? 'ابحث في الموجز...' : 'Search the feed...')
+                        : (currentLocale === 'ar' ? 'البحث...' : 'Search...')}
+                      aria-label={isFeedPage
+                        ? (currentLocale === 'ar' ? 'البحث في الموجز' : 'Search the feed')
+                        : (currentLocale === 'ar' ? 'البحث' : 'Search')}
                       value={searchQuery}
                       onChange={(e) => setSearchQuery(e.currentTarget.value)}
                       onKeyDown={(e) => {
@@ -717,13 +773,14 @@ export default function Header() {
                   </li>
                 )}
 
-                {/* Mobile search button - only show on smaller screens when search bar is visible */}
-                {!shouldHideSearchBar() && (
+                {/* Smaller screens use the search field inside the feed column. */}
+                {!shouldHideSearchBar() && !isFeedPage && (
                   <li className="xl:hidden mr-1 md:mr-2">
                     <button
                       onClick={() => {
                         router.push(`/${currentLocale}/home`);
                       }}
+                      aria-label={currentLocale === 'ar' ? 'فتح البحث' : 'Open search'}
                       className="flex items-center p-2 text-slate-300 hover:text-white hover:bg-[#3B8AEF]/20 rounded-md transition-all duration-200"
                     >
                       <IconSearch size={18} />
@@ -763,6 +820,89 @@ export default function Header() {
               <MobileMenu isHomePage={true} />
 
             </div>
+
+            {isFeedPage && (
+              <div className="pointer-events-none absolute inset-0 hidden xl:block">
+                <div className="mx-auto grid h-full max-w-7xl grid-cols-[280px_minmax(0,1fr)_300px] items-center gap-6 px-0 sm:px-4 lg:px-6">
+                  <form
+                    onSubmit={handleSearchSubmit}
+                    className={`pointer-events-auto col-start-2 ${isArabicLocale
+                      ? 'justify-self-center w-[clamp(20rem,38vw,48rem)]'
+                      : 'w-full'
+                      }`}
+                    role="search"
+                  >
+                    <TextInput
+                      id={`header-search-${currentLocale}`}
+                      placeholder={currentLocale === 'ar' ? 'ابحث في الموجز...' : 'Search the feed...'}
+                      aria-label={currentLocale === 'ar' ? 'البحث في الموجز' : 'Search the feed'}
+                      value={searchQuery}
+                      onChange={(event) => setSearchQuery(event.currentTarget.value)}
+                      onKeyDown={(event) => {
+                        if (event.key === 'Escape') {
+                          setSearchQuery('');
+                        }
+                      }}
+                      size="sm"
+                      radius="md"
+                      className="w-full"
+                      {...(currentLocale === 'ar'
+                        ? {
+                          rightSectionWidth: 38,
+                          rightSection: (
+                            <button
+                              type="submit"
+                              className="p-1 text-[#475569] transition-colors hover:text-[#1E293B]"
+                              aria-label="بحث"
+                            >
+                              <IconSearch size={17} aria-hidden />
+                            </button>
+                          ),
+                          leftSectionWidth: hasSearchQuery ? 38 : undefined,
+                          leftSection: hasSearchQuery ? (
+                            <button
+                              type="button"
+                              onClick={clearFeedSearch}
+                              className="p-1 text-[#64748B] transition-colors hover:text-[#1E293B]"
+                              aria-label="مسح البحث"
+                            >
+                              <IconX size={17} />
+                            </button>
+                          ) : undefined
+                        }
+                        : {
+                          leftSectionWidth: 38,
+                          leftSection: (
+                            <button
+                              type="submit"
+                              className="p-1 text-[#475569] transition-colors hover:text-[#1E293B]"
+                              aria-label="Search"
+                            >
+                              <IconSearch size={17} aria-hidden />
+                            </button>
+                          ),
+                          rightSectionWidth: hasSearchQuery ? 38 : undefined,
+                          rightSection: hasSearchQuery ? (
+                            <button
+                              type="button"
+                              onClick={clearFeedSearch}
+                              className="p-1 text-[#64748B] transition-colors hover:text-[#1E293B]"
+                              aria-label="Clear search"
+                            >
+                              <IconX size={17} />
+                            </button>
+                          ) : undefined
+                        }
+                      )}
+                      leftSectionPointerEvents="all"
+                      rightSectionPointerEvents="all"
+                      styles={feedSearchInputStyles}
+                    />
+                  </form>
+                </div>
+              </div>
+            )}
+
           </div>
         </header>
       </div>

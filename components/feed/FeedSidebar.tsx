@@ -3,6 +3,7 @@
 import Image from 'next/image'
 import Link from 'next/link'
 import { useSearchParams } from 'next/navigation'
+import { useTranslations } from 'next-intl'
 import {
   IconBell,
   IconBook,
@@ -11,9 +12,9 @@ import {
   IconCalendar,
   IconCalendarCog,
   IconChartLine,
+  IconChevronDown,
   IconCreditCard,
   IconDownload,
-  IconFileText,
   IconFolders,
   IconLayoutDashboard,
   IconMessage2,
@@ -39,7 +40,6 @@ type SidebarCopy = {
   menu: string
   overview: string
   myPosts: string
-  myRequests: string
   myCompany: string
   insights: string
   myKnowledge: string
@@ -79,6 +79,7 @@ type SidebarItemProps = {
 
 type DashboardSectionProps = {
   title: string
+  icon: Icon
   children: ReactNode
   compact?: boolean
 }
@@ -86,12 +87,11 @@ type DashboardSectionProps = {
 const copyByLocale: Record<'en' | 'ar', SidebarCopy> = {
   en: {
     menu: 'Menu',
-    overview: 'Overview',
+    overview: 'Dashboard',
     myPosts: 'My Posts',
-    myRequests: 'My Requests',
     myCompany: 'My Company',
     insights: 'Insights',
-    myKnowledge: 'My Insight',
+    myKnowledge: 'My Library',
     myDownloads: 'My Downloads',
     readLater: 'Read Later',
     meetings: 'Sessions',
@@ -119,12 +119,11 @@ const copyByLocale: Record<'en' | 'ar', SidebarCopy> = {
   },
   ar: {
     menu: 'القائمة',
-    overview: 'نظرة عامة',
+    overview: 'لوحة التحكم',
     myPosts: 'منشوراتي',
-    myRequests: 'طلباتي',
     myCompany: 'شركتي',
     insights: 'الرؤى',
-    myKnowledge: 'معرفتي',
+    myKnowledge: 'مكتبتي',
     myDownloads: 'تحميلاتي',
     readLater: 'اقرأ لاحقاً',
     meetings: 'الجلسات الاستشارية',
@@ -183,25 +182,65 @@ function SidebarItem({ href, icon: ItemIcon, label, isActive = false, compact = 
   )
 }
 
-function DashboardSection({ title, children, compact = false }: DashboardSectionProps) {
-  if (compact) {
-    return (
-      <section className="border-b border-[#D7E1EC] py-2 last:border-b-0">
-        <header className="flex items-center px-2 pb-1 pt-2">
-          <h2 className="m-0 text-[11px] font-bold uppercase tracking-[0.08em] text-[#718096]">{title}</h2>
-        </header>
-        <div>{children}</div>
-      </section>
-    )
-  }
+function DashboardSection({ title, icon: SectionIcon, children, compact = false }: DashboardSectionProps) {
+  const [isExpanded, setIsExpanded] = useState(false)
 
   return (
-    <section className="overflow-hidden rounded-lg border border-[#E7E7E7] bg-white transition-shadow duration-200 hover:shadow-[0_6px_16px_rgba(0,0,0,0.08)]">
-      <header className="flex min-h-[54px] items-center border-b border-[#E9ECEF] bg-[#F8F9FA] px-4 py-3">
-        <h2 className="m-0 text-[16px] font-semibold leading-6 text-[#495057]">{title}</h2>
-      </header>
-      <div>{children}</div>
+    <section className="border-b border-[#E2E8F0] last:border-b-0">
+      <button
+        type="button"
+        onClick={() => setIsExpanded((expanded) => !expanded)}
+        aria-expanded={isExpanded}
+        className={`flex w-full items-center gap-3 text-start transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[#2378E8] ${
+          compact
+            ? 'min-h-10 px-2 py-2'
+            : 'min-h-[54px] px-4 py-3'
+          } ${isExpanded ? 'bg-[#F8FAFC]' : 'bg-white hover:bg-[#F8FAFC]'}`}
+      >
+        <span className={`flex shrink-0 items-center justify-center text-[#2378E8] ${compact ? 'h-5 w-5' : 'h-6 w-6'}`}>
+          <SectionIcon aria-hidden stroke={1.8} className={compact ? 'h-4 w-4' : 'h-5 w-5'} />
+        </span>
+        <h2 className={`m-0 min-w-0 flex-1 font-semibold leading-6 text-[#364152] ${compact ? 'text-[12px]' : 'text-[16px]'}`}>
+          {title}
+        </h2>
+        <IconChevronDown
+          aria-hidden
+          className={`shrink-0 text-[#718096] transition-transform duration-200 ${isExpanded ? 'rotate-180' : ''}`}
+          size={compact ? 16 : 18}
+          stroke={2}
+        />
+      </button>
+      {isExpanded && <div>{children}</div>}
     </section>
+  )
+}
+
+function SidebarLegalFooter({ locale }: { locale: string }) {
+  const t = useTranslations('Footer')
+  const isArabic = locale === 'ar'
+  const legalLinks = [
+    { href: `/${locale}/legals/privacy`, label: t('legals.privacy') },
+    { href: `/${locale}/legals/terms`, label: t('legals.terms') },
+    { href: `/${locale}/legals/cookies`, label: t('legals.cookies') },
+    { href: `/${locale}/legals/licensing`, label: t('legals.dataLicensing') },
+  ]
+
+  return (
+    <footer className="px-2 py-1 text-[11px] leading-5 text-[#718096]" dir={isArabic ? 'rtl' : 'ltr'}>
+      <p className="m-0 whitespace-nowrap">{isArabic ? '© 2026 إنسايتا بيزنس' : '© 2026 Insighta Business'}</p>
+      <ul className="mt-3 space-y-1.5">
+        {legalLinks.map((link) => (
+          <li key={link.href}>
+            <Link
+              href={link.href}
+              className="text-[#5D7089] transition-colors hover:text-[#2378E8] focus-visible:rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2378E8] focus-visible:ring-offset-2"
+            >
+              {link.label}
+            </Link>
+          </li>
+        ))}
+      </ul>
+    </footer>
   )
 }
 
@@ -213,7 +252,7 @@ function SidebarSkeleton() {
         <div className="mt-4 h-5 w-32 rounded-full bg-slate-200" />
         <div className="mt-3 h-[23px] w-20 rounded bg-slate-200" />
       </div>
-      {[3, 3, 2].map((rows, sectionIndex) => (
+      {[2, 3, 2].map((rows, sectionIndex) => (
         <div key={sectionIndex} className="overflow-hidden rounded-lg border border-[#E7E7E7] bg-white">
           <div className="h-[54px] animate-pulse border-b border-[#E9ECEF] bg-[#F8F9FA] px-4 py-4">
             <div className="h-4 w-20 rounded bg-slate-200" />
@@ -342,24 +381,32 @@ export default function FeedSidebar({ locale, hideProfileCard = false }: FeedSid
       </section>
       )}
 
-      <DashboardSection title={copy.menu} compact={hideProfileCard}>
+      <div className="overflow-hidden rounded-lg border border-[#D7E1EC] bg-white shadow-[0_2px_8px_rgba(27,56,93,0.04)]">
+      <DashboardSection title={copy.menu} icon={IconLayoutDashboard} compact={hideProfileCard}>
         <SidebarItem href={`${dashboardBase}/my-dashboard`} icon={IconLayoutDashboard} label={copy.overview} compact={hideProfileCard} />
-        <SidebarItem
-          href={`/${locale}?view=my-feeds`}
-          icon={IconMessage2}
-          label={copy.myPosts}
-          isActive={isMyPostsActive}
-          compact={hideProfileCard}
-        />
         {!isPureClient && (
-          <SidebarItem href={`${dashboardBase}/my-requests`} icon={IconFileText} label={copy.myRequests} compact={hideProfileCard} />
+          <SidebarItem
+            href={`/${locale}?view=my-feeds`}
+            icon={IconMessage2}
+            label={copy.myPosts}
+            isActive={isMyPostsActive}
+            compact={hideProfileCard}
+          />
         )}
         {isCompany && (
           <SidebarItem href={`${dashboardBase}/my-company-settings`} icon={IconUsers} label={copy.myCompany} compact={hideProfileCard} />
         )}
       </DashboardSection>
 
-      <DashboardSection title={copy.insights} compact={hideProfileCard}>
+      <DashboardSection title={copy.marketplace} icon={IconShoppingBag} compact={hideProfileCard}>
+        <SidebarItem href={`${dashboardBase}/my-orders`} icon={IconShoppingBag} label={copy.myPurchases} compact={hideProfileCard} />
+        {isProvider && <SidebarItem href={`${dashboardBase}/sales`} icon={IconChartLine} label={copy.sales} compact={hideProfileCard} />}
+        {(isInsighter || isCompany) && (
+          <SidebarItem href={`${dashboardBase}/wallet`} icon={IconWallet} label={copy.wallet} compact={hideProfileCard} />
+        )}
+      </DashboardSection>
+
+      <DashboardSection title={copy.insights} icon={IconBook} compact={hideProfileCard}>
         {!isPureClient && (
           <SidebarItem href={`${dashboardBase}/my-knowledge`} icon={IconBook} label={copy.myKnowledge} compact={hideProfileCard} />
         )}
@@ -367,7 +414,7 @@ export default function FeedSidebar({ locale, hideProfileCard = false }: FeedSid
         <SidebarItem href={`${dashboardBase}/read-later`} icon={IconBookmark} label={copy.readLater} compact={hideProfileCard} />
       </DashboardSection>
 
-      <DashboardSection title={copy.meetings} compact={hideProfileCard}>
+      <DashboardSection title={copy.meetings} icon={IconCalendar} compact={hideProfileCard}>
         <SidebarItem href={`${dashboardBase}/my-meetings`} icon={IconCalendar} label={copy.meetings} compact={hideProfileCard} />
         {!isPureClient && (
           <SidebarItem
@@ -380,7 +427,7 @@ export default function FeedSidebar({ locale, hideProfileCard = false }: FeedSid
       </DashboardSection>
 
       {hasProjectAccess && (
-        <DashboardSection title={copy.projects} compact={hideProfileCard}>
+        <DashboardSection title={copy.projects} icon={IconBriefcase} compact={hideProfileCard}>
           {!isPureClient && (
             <SidebarItem href={`${dashboardBase}/project-offers`} icon={IconBriefcase} label={copy.clientProjects} compact={hideProfileCard} />
           )}
@@ -396,15 +443,7 @@ export default function FeedSidebar({ locale, hideProfileCard = false }: FeedSid
         </DashboardSection>
       )}
 
-      <DashboardSection title={copy.marketplace} compact={hideProfileCard}>
-        <SidebarItem href={`${dashboardBase}/my-orders`} icon={IconShoppingBag} label={copy.myPurchases} compact={hideProfileCard} />
-        {isProvider && <SidebarItem href={`${dashboardBase}/sales`} icon={IconChartLine} label={copy.sales} compact={hideProfileCard} />}
-        {(isInsighter || isCompany) && (
-          <SidebarItem href={`${dashboardBase}/wallet`} icon={IconWallet} label={copy.wallet} compact={hideProfileCard} />
-        )}
-      </DashboardSection>
-
-      <DashboardSection title={copy.settings} compact={hideProfileCard}>
+      <DashboardSection title={copy.settings} icon={IconSettings2} compact={hideProfileCard}>
         <SidebarItem
           href={`${dashboardBase}/account-settings/general-settings`}
           icon={IconUserEdit}
@@ -426,6 +465,8 @@ export default function FeedSidebar({ locale, hideProfileCard = false }: FeedSid
           />
         )}
       </DashboardSection>
+      </div>
+      <SidebarLegalFooter locale={locale} />
     </nav>
   )
 }

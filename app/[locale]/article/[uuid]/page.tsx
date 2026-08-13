@@ -1,8 +1,8 @@
 import ArticleReader from '@/components/feed/article/ArticleReader'
 
 export const metadata = {
-  title: 'Article - Insighta Business',
-  description: 'Read an article published by an Insighta expert.',
+  title: 'White Paper - Insighta Business',
+  description: 'Read a White Paper published by an Insighta expert.',
 }
 
 type ArticlePageProps = {

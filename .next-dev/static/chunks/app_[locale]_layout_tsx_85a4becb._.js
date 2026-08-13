@@ -7,7 +7,7 @@
   "static/chunks/node_modules_@mantine_core_esm_4dabc503._.js",
   "static/chunks/node_modules_@floating-ui_react_dist_22386cb2._.js",
   "static/chunks/node_modules_pusher-js_dist_web_pusher_6ae92419.js",
-  "static/chunks/node_modules_095368ff._.js"
+  "static/chunks/node_modules_e7b5c97e._.js"
 ],
     source: "dynamic"
 });

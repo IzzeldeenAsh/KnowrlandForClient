@@ -1,23 +1,42 @@
 'use client'
 
-import { IconLock, IconLoader2, IconPhoto } from '@tabler/icons-react'
+import {
+  IconLoader2,
+  IconLock,
+  IconPhoto,
+  IconSearch,
+} from '@tabler/icons-react'
 import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { dashboardUrl, publicBaseUrl } from '@/app/config'
 import { useToast } from '@/components/toast/ToastContext'
 import { useUserProfile } from '@/components/ui/header/hooks/useUserProfile'
+import { useAllIndustries } from '@/hooks/industries/useAllIndustries'
 import {
   CommunityFeedApiError,
   getCommunityFeed,
   getCommunityFeedPreview,
+  searchCommunityFeed,
   type CommunityFeedMeta,
+  type CommunityFeedSearchMeta,
   type FeedItem,
 } from '@/services/feed.service'
 import { FeedCard, FeedSkeleton } from './MyFeedsTimeline'
+import { useFeedSearchInsights } from './FeedSearchInsightsContext'
+import RoleUpgradeCard from './RoleUpgradeCard'
+import TopDocumentsCard from './TopDocumentsCard'
+import RelatedDocumentsCard from './RelatedDocumentsCard'
+import { Fragment } from 'react'
 
 type CommunityFeedTimelineProps = {
   locale: string
+  keyword?: string
+  industry?: number | null
+  contentType?: 'post' | 'article' | null
 }
+
+type FeedMeta = CommunityFeedMeta | CommunityFeedSearchMeta
 
 const copyByLocale = {
   en: {
@@ -34,6 +53,18 @@ const copyByLocale = {
     loadingMore: 'Loading more posts…',
     endOfFeed: 'You’re all caught up.',
     sessionRefreshed: 'Your feed was refreshed because the previous session expired.',
+    searchResults: 'Search results',
+    searchFor: 'Matches for',
+    allIndustries: 'All industries',
+    allContent: 'All content',
+    posts: 'Posts',
+    articles: 'White Papers',
+    noMatchesTitle: 'No feed matches found',
+    noMatchesDescription: 'Try a broader keyword or remove one of the filters.',
+    noMoreMatches: 'You’ve reached the end of these results.',
+    moreFromCommunity: 'More from the community',
+    searchSessionRefreshed: 'Your search was refreshed because the previous session expired.',
+    searchLoginDescription: 'Log in to search posts, White Papers, and expert insights.',
   },
   ar: {
     title: 'موجز المجتمع',
@@ -49,10 +80,22 @@ const copyByLocale = {
     loadingMore: 'جارٍ تحميل المزيد من المنشورات…',
     endOfFeed: 'لقد اطّلعت على جميع المنشورات.',
     sessionRefreshed: 'تم تحديث موجزك لانتهاء جلسة التصفح السابقة.',
+    searchResults: 'نتائج البحث',
+    searchFor: 'نتائج مطابقة لـ',
+    allIndustries: 'كل القطاعات',
+    allContent: 'كل المحتوى',
+    posts: 'منشورات',
+    articles: 'أوراق بيضاء',
+    noMatchesTitle: 'لم نجد نتائج في الموجز',
+    noMatchesDescription: 'جرّب كلمة أوسع أو أزل أحد عوامل التصفية.',
+    noMoreMatches: 'وصلت إلى نهاية هذه النتائج.',
+    moreFromCommunity: 'المزيد من المجتمع',
+    searchSessionRefreshed: 'تم تحديث البحث لانتهاء جلسة البحث السابقة.',
+    searchLoginDescription: 'سجّل الدخول للبحث في المنشورات والأوراق البيضاء ورؤى الخبراء.',
   },
 } as const
 
-function GuestFeedGate({ locale }: { locale: string }) {
+function GuestFeedGate({ locale, isSearching = false }: { locale: string; isSearching?: boolean }) {
   const copy = copyByLocale[locale === 'ar' ? 'ar' : 'en']
   const [returnUrl, setReturnUrl] = useState(`${publicBaseUrl}/${locale}`)
 
@@ -71,7 +114,7 @@ function GuestFeedGate({ locale }: { locale: string }) {
         {copy.loginTitle}
       </h2>
       <p className="mx-auto mt-2 max-w-md text-[13px] leading-6 text-[#64748B]">
-        {copy.loginDescription}
+        {isSearching ? copy.searchLoginDescription : copy.loginDescription}
       </p>
       <div className="mx-auto mt-5 flex max-w-sm flex-col gap-2.5 sm:flex-row sm:justify-center">
         <Link
@@ -91,13 +134,90 @@ function GuestFeedGate({ locale }: { locale: string }) {
   )
 }
 
-export default function CommunityFeedTimeline({ locale }: CommunityFeedTimelineProps) {
+function FeedSearchHeader({
+  locale,
+  keyword,
+  industry,
+  contentType,
+}: Required<Pick<CommunityFeedTimelineProps, 'locale' | 'keyword'>> &
+  Pick<CommunityFeedTimelineProps, 'industry' | 'contentType'>) {
+  const isRTL = locale === 'ar'
+  const copy = copyByLocale[isRTL ? 'ar' : 'en']
+  const router = useRouter()
+  const { industries, isLoading } = useAllIndustries({ locale, topSubIndustry: 0 })
+
+  const updateFilters = (nextIndustry: number | null, nextContentType: 'post' | 'article' | null) => {
+    const params = new URLSearchParams({ keyword })
+    if (nextIndustry) params.set('industry', String(nextIndustry))
+    if (nextContentType) params.set('content_type', nextContentType)
+    router.replace(`/${locale}?${params.toString()}`, { scroll: false })
+  }
+
+  return (
+    <div className="space-y-2.5 px-4 py-1 sm:px-6 xl:px-1 md:flex md:items-end md:justify-between md:gap-4 md:space-y-0">
+      <div className="min-w-0">
+        <span className="inline-flex items-center gap-1.5 text-[10px] font-semibold uppercase tracking-[0.1em] text-[#64748B]">
+          <IconSearch aria-hidden className="h-3.5 w-3.5 text-[#2378E8]" stroke={2} />
+          {copy.searchResults}
+        </span>
+        <h1 className="mt-1 text-[15px] font-semibold tracking-[-0.015em] text-[#334155] sm:text-base">
+          {copy.searchFor}{' '}
+          <bdi className="font-semibold text-[#2378E8]">“{keyword}”</bdi>
+        </h1>
+      </div>
+
+      <div className="grid grid-cols-2 gap-2.5 md:w-80 md:shrink-0">
+        <select
+          value={industry ?? ''}
+          disabled={isLoading}
+          onChange={(event) => updateFilters(event.target.value ? Number(event.target.value) : null, contentType ?? null)}
+          aria-label={copy.allIndustries}
+          className="min-h-9 w-full rounded-md border border-[#D7E1EE] bg-white px-2.5 text-[12px] font-medium text-[#475569] outline-none transition-colors focus:border-[#2378E8] focus:ring-2 focus:ring-[#2378E8]/15 disabled:cursor-wait disabled:opacity-60 sm:text-[13px]"
+        >
+          <option value="">{copy.allIndustries}</option>
+          {industries.map((item) => (
+            <option key={item.id} value={item.id}>
+              {item.name}
+            </option>
+          ))}
+        </select>
+        <select
+          value={contentType ?? ''}
+          onChange={(event) => updateFilters(industry ?? null, (event.target.value || null) as 'post' | 'article' | null)}
+          aria-label={copy.allContent}
+          className="min-h-9 w-full rounded-md border border-[#D7E1EE] bg-white px-2.5 text-[12px] font-medium text-[#475569] outline-none transition-colors focus:border-[#2378E8] focus:ring-2 focus:ring-[#2378E8]/15 sm:text-[13px]"
+        >
+          <option value="">{copy.allContent}</option>
+          <option value="post">{copy.posts}</option>
+          <option value="article">{copy.articles}</option>
+        </select>
+      </div>
+    </div>
+  )
+}
+
+export default function CommunityFeedTimeline({
+  locale,
+  keyword = '',
+  industry = null,
+  contentType = null,
+}: CommunityFeedTimelineProps) {
   const copy = copyByLocale[locale === 'ar' ? 'ar' : 'en']
   const toast = useToast()
   const { user, isAuthResolved } = useUserProfile()
   const isAuthenticated = user !== null
+  const normalizedKeyword = keyword.trim()
+  const isSearching = normalizedKeyword.length > 0
+  const {
+    setInsights: setRelatedDocuments,
+    setIsLoading: setRelatedDocumentsLoading,
+  } = useFeedSearchInsights()
   const [items, setItems] = useState<FeedItem[]>([])
-  const [meta, setMeta] = useState<CommunityFeedMeta | null>(null)
+  const [meta, setMeta] = useState<FeedMeta | null>(null)
+  // When a search runs out of matches we keep the timeline alive by streaming
+  // in the regular community feed (social-media style). These track that phase.
+  const [overflowMeta, setOverflowMeta] = useState<CommunityFeedMeta | null>(null)
+  const [overflowStartIndex, setOverflowStartIndex] = useState<number | null>(null)
   const [isLoading, setIsLoading] = useState(true)
   const [isLoadingMore, setIsLoadingMore] = useState(false)
   const [loadError, setLoadError] = useState(false)
@@ -110,22 +230,52 @@ export default function CommunityFeedTimeline({ locale }: CommunityFeedTimelineP
       setLoadError(false)
       setItems([])
       setMeta(null)
+      setOverflowMeta(null)
+      setOverflowStartIndex(null)
+
+      setRelatedDocuments([])
+      setRelatedDocumentsLoading(isSearching)
+
+      if (isSearching && !isAuthenticated) {
+        setIsLoading(false)
+        setRelatedDocumentsLoading(false)
+        return
+      }
 
       try {
-        const result = isAuthenticated
-          ? await getCommunityFeed(locale, null, signal)
-          : await getCommunityFeedPreview(locale, signal)
+        if (isSearching) {
+          const result = await searchCommunityFeed(
+            locale,
+            {
+              keyword: normalizedKeyword,
+              industry,
+              contentType,
+              limit: 10,
+            },
+            signal,
+          )
+          setItems(result.feed)
+          setRelatedDocuments(result.insights.slice(0, 5))
+          setMeta(result.meta)
+        } else {
+          const result = isAuthenticated
+            ? await getCommunityFeed(locale, null, signal)
+            : await getCommunityFeedPreview(locale, signal)
 
-        setItems(result.data)
-        setMeta(result.meta)
+          setItems(result.data)
+          setMeta(result.meta)
+        }
       } catch (error) {
         if (error instanceof DOMException && error.name === 'AbortError') return
         setLoadError(true)
       } finally {
-        if (!signal?.aborted) setIsLoading(false)
+        if (!signal?.aborted) {
+          setIsLoading(false)
+          setRelatedDocumentsLoading(false)
+        }
       }
     },
-    [isAuthenticated, locale],
+    [contentType, industry, isAuthenticated, isSearching, locale, normalizedKeyword, setRelatedDocuments, setRelatedDocumentsLoading],
   )
 
   useEffect(() => {
@@ -144,29 +294,64 @@ export default function CommunityFeedTimeline({ locale }: CommunityFeedTimelineP
     return () => window.removeEventListener('feed:published', refresh)
   }, [isAuthenticated, loadFirstPage])
 
+  // Search results are finite; the community feed is what keeps the page
+  // scrolling. `overflowActive` means we've exhausted the matches and are now
+  // appending the regular feed underneath them.
+  const overflowActive = overflowStartIndex !== null
+  const searchHasMore = Boolean(meta?.has_more && meta?.next_cursor)
+  const hasMore = isSearching
+    ? overflowActive
+      ? Boolean(overflowMeta?.has_more && overflowMeta?.next_cursor)
+      : // more matches to page through, or matches exist to overflow past into
+        // the community feed (skip overflow entirely on a zero-result search)
+        searchHasMore || items.length > 0
+    : Boolean(meta?.has_more && meta?.next_cursor)
+
+  const appendItems = useCallback((incoming: FeedItem[]) => {
+    setItems((previous) => {
+      const existingUuids = new Set(previous.map((item) => item.uuid))
+      return [...previous, ...incoming.filter((item) => !existingUuids.has(item.uuid))]
+    })
+  }, [])
+
   const loadMore = useCallback(async () => {
-    if (
-      !isAuthenticated ||
-      loadingMoreRef.current ||
-      !meta?.has_more ||
-      !meta.next_cursor
-    ) {
-      return
-    }
+    if (!isAuthenticated || loadingMoreRef.current) return
 
     loadingMoreRef.current = true
     setIsLoadingMore(true)
 
     try {
-      const result = await getCommunityFeed(locale, meta.next_cursor)
-      setItems((previous) => {
-        const existingUuids = new Set(previous.map((item) => item.uuid))
-        return [...previous, ...result.data.filter((item) => !existingUuids.has(item.uuid))]
-      })
-      setMeta(result.meta)
+      if (isSearching && !searchHasMore) {
+        // Matches are exhausted — stream in the regular community feed.
+        const cursor = overflowActive ? overflowMeta?.next_cursor ?? null : null
+        if (overflowActive && !cursor) return
+
+        const next = await getCommunityFeed(locale, cursor)
+        setItems((previous) => {
+          if (overflowStartIndex === null) setOverflowStartIndex(previous.length)
+          const existingUuids = new Set(previous.map((item) => item.uuid))
+          return [...previous, ...next.data.filter((item) => !existingUuids.has(item.uuid))]
+        })
+        setOverflowMeta(next.meta)
+        return
+      }
+
+      const nextItems = isSearching
+        ? await searchCommunityFeed(locale, {
+            keyword: normalizedKeyword,
+            cursor: meta!.next_cursor,
+            industry,
+            contentType,
+            limit: 10,
+          })
+        : await getCommunityFeed(locale, meta!.next_cursor)
+
+      const incomingItems = 'feed' in nextItems ? nextItems.feed : nextItems.data
+      appendItems(incomingItems)
+      setMeta(nextItems.meta)
     } catch (error) {
       if (error instanceof CommunityFeedApiError && error.refreshRequired) {
-        toast.info(copy.sessionRefreshed, '')
+        toast.info(isSearching ? copy.searchSessionRefreshed : copy.sessionRefreshed, '')
         await loadFirstPage()
       } else {
         toast.error(error instanceof Error ? error.message : copy.loadError)
@@ -175,11 +360,11 @@ export default function CommunityFeedTimeline({ locale }: CommunityFeedTimelineP
       loadingMoreRef.current = false
       setIsLoadingMore(false)
     }
-  }, [copy.loadError, copy.sessionRefreshed, isAuthenticated, loadFirstPage, locale, meta, toast])
+  }, [appendItems, contentType, copy.loadError, copy.searchSessionRefreshed, copy.sessionRefreshed, industry, isAuthenticated, isSearching, loadFirstPage, locale, meta, normalizedKeyword, overflowActive, overflowMeta, overflowStartIndex, searchHasMore, toast])
 
   useEffect(() => {
     const sentinel = sentinelRef.current
-    if (!sentinel || !isAuthenticated || !meta?.has_more) return
+    if (!sentinel || !isAuthenticated || !hasMore) return
 
     const observer = new IntersectionObserver(
       (entries) => {
@@ -190,76 +375,136 @@ export default function CommunityFeedTimeline({ locale }: CommunityFeedTimelineP
 
     observer.observe(sentinel)
     return () => observer.disconnect()
-  }, [isAuthenticated, loadMore, meta?.has_more])
+  }, [hasMore, isAuthenticated, loadMore])
+
+  const searchHeader = isSearching ? (
+    <FeedSearchHeader
+      locale={locale}
+      keyword={normalizedKeyword}
+      industry={industry}
+      contentType={contentType}
+    />
+  ) : null
 
   if (!isAuthResolved || isLoading) {
     return (
-      <section aria-label={copy.loading}>
-        <FeedSkeleton />
-      </section>
+      <div className="space-y-4">
+        {searchHeader}
+        <section aria-label={copy.loading}>
+          <FeedSkeleton />
+        </section>
+      </div>
+    )
+  }
+
+  if (isSearching && !isAuthenticated) {
+    return (
+      <div className="space-y-4">
+        {searchHeader}
+        <GuestFeedGate locale={locale} isSearching />
+      </div>
     )
   }
 
   if (loadError) {
     return (
-      <section className="rounded-lg border border-[#DCE4EF] bg-white px-6 py-12 text-center">
-        <h1 className="text-[18px] font-bold text-[#101724]">{copy.loadError}</h1>
-        <button
-          type="button"
-          onClick={() => void loadFirstPage()}
-          className="mt-4 min-h-10 rounded-md bg-[#2378E8] px-5 text-[13px] font-semibold text-white transition-colors hover:bg-[#1B64C5] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2378E8] focus-visible:ring-offset-2"
-        >
-          {copy.tryAgain}
-        </button>
-      </section>
+      <div className="space-y-4">
+        {searchHeader}
+        <section className="rounded-lg border border-[#DCE4EF] bg-white px-6 py-12 text-center">
+          <h1 className="text-[18px] font-bold text-[#101724]">{copy.loadError}</h1>
+          <button
+            type="button"
+            onClick={() => void loadFirstPage()}
+            className="mt-4 min-h-10 rounded-md bg-[#2378E8] px-5 text-[13px] font-semibold text-white transition-colors hover:bg-[#1B64C5] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2378E8] focus-visible:ring-offset-2"
+          >
+            {copy.tryAgain}
+          </button>
+        </section>
+      </div>
     )
   }
 
   return (
-    <section aria-label={copy.title}>
-      {items.length === 0 ? (
-        <div className="rounded-lg border border-[#DCE4EF] bg-white px-6 py-14 text-center">
-          <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-[#EDF4FD] text-[#2378E8]">
-            <IconPhoto aria-hidden className="h-5 w-5" stroke={1.7} />
+    <div className="space-y-4">
+      {searchHeader}
+
+      <section aria-label={copy.title}>
+
+        {items.length === 0 ? (
+          <div className="rounded-lg border border-[#DCE4EF] bg-white px-6 py-14 text-center">
+            <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-[#EDF4FD] text-[#2378E8]">
+              {isSearching ? (
+                <IconSearch aria-hidden className="h-5 w-5" stroke={1.7} />
+              ) : (
+                <IconPhoto aria-hidden className="h-5 w-5" stroke={1.7} />
+              )}
+            </div>
+            <h2 className="mt-4 text-[18px] font-bold text-[#101724]">
+              {isSearching ? copy.noMatchesTitle : copy.emptyTitle}
+            </h2>
+            <p className="mx-auto mt-2 max-w-sm text-[13px] leading-6 text-[#64748B]">
+              {isSearching ? copy.noMatchesDescription : copy.emptyDescription}
+            </p>
           </div>
-          <h2 className="mt-4 text-[18px] font-bold text-[#101724]">{copy.emptyTitle}</h2>
-          <p className="mx-auto mt-2 max-w-sm text-[13px] leading-6 text-[#64748B]">
-            {copy.emptyDescription}
+        ) : (
+          <div className="space-y-4">
+            {items.map((item, index) => {
+              // The right-column widgets are hidden below xl, so weave them
+              // between posts (LinkedIn-style) on mobile/tablet. Positions clamp
+              // to the last post so short feeds still surface them.
+              const upgradeIndex = Math.min(1, items.length - 1)
+              const documentsIndex = Math.min(3, items.length - 1)
+
+              return (
+                <Fragment key={item.uuid}>
+                  {index === overflowStartIndex && (
+                    <div className="flex items-center gap-3 py-1" role="separator" aria-label={copy.moreFromCommunity}>
+                      <span className="h-px flex-1 bg-[#E2E8F0]" />
+                      <span className="text-[11px] font-semibold uppercase tracking-[0.08em] text-[#8A99B1]">
+                        {copy.moreFromCommunity}
+                      </span>
+                      <span className="h-px flex-1 bg-[#E2E8F0]" />
+                    </div>
+                  )}
+                  <FeedCard item={item} locale={locale} articleAccess="community" />
+                  {index === upgradeIndex && (
+                    <RoleUpgradeCard locale={locale} className="xl:hidden" />
+                  )}
+                  {index === documentsIndex &&
+                    (isSearching ? (
+                      <RelatedDocumentsCard locale={locale} className="xl:hidden" />
+                    ) : (
+                      <TopDocumentsCard locale={locale} className="xl:hidden" />
+                    ))}
+                </Fragment>
+              )
+            })}
+          </div>
+        )}
+
+        {!isAuthenticated && !isSearching && (
+          <div className="mt-4">
+            <GuestFeedGate locale={locale} />
+          </div>
+        )}
+
+        {isAuthenticated && hasMore && (
+          <div ref={sentinelRef} className="flex min-h-20 items-center justify-center" aria-live="polite">
+            {isLoadingMore && (
+              <span className="inline-flex items-center gap-2 text-[13px] text-[#64748B]">
+                <IconLoader2 aria-hidden className="h-4 w-4 animate-spin" stroke={2} />
+                {copy.loadingMore}
+              </span>
+            )}
+          </div>
+        )}
+
+        {isAuthenticated && items.length > 0 && !hasMore && (
+          <p className="py-6 text-center text-[12px] text-[#8A99B1]">
+            {isSearching && !overflowActive ? copy.noMoreMatches : copy.endOfFeed}
           </p>
-        </div>
-      ) : (
-        <div className="space-y-4">
-          {items.map((item) => (
-            <FeedCard
-              key={item.uuid}
-              item={item}
-              locale={locale}
-              articleAccess="community"
-            />
-          ))}
-        </div>
-      )}
-
-      {!isAuthenticated && (
-        <div className="mt-4">
-          <GuestFeedGate locale={locale} />
-        </div>
-      )}
-
-      {isAuthenticated && meta?.has_more && (
-        <div ref={sentinelRef} className="flex min-h-20 items-center justify-center" aria-live="polite">
-          {isLoadingMore && (
-            <span className="inline-flex items-center gap-2 text-[13px] text-[#64748B]">
-              <IconLoader2 aria-hidden className="h-4 w-4 animate-spin" stroke={2} />
-              {copy.loadingMore}
-            </span>
-          )}
-        </div>
-      )}
-
-      {isAuthenticated && items.length > 0 && meta && !meta.has_more && (
-        <p className="py-6 text-center text-[12px] text-[#8A99B1]">{copy.endOfFeed}</p>
-      )}
-    </section>
+        )}
+      </section>
+    </div>
   )
 }

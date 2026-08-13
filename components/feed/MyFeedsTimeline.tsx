@@ -3,6 +3,7 @@
 import { Badge, Menu, Modal } from '@mantine/core'
 import {
   IconArticle,
+  IconBriefcase,
   IconChevronLeft,
   IconChevronRight,
   IconDots,
@@ -10,21 +11,32 @@ import {
   IconLoader2,
   IconPhoto,
   IconTrash,
+  IconUsers,
   IconVideo,
   IconX,
 } from '@tabler/icons-react'
 import { formatDistanceToNow, isValid } from 'date-fns'
 import { arSA, enUS } from 'date-fns/locale'
 import Link from 'next/link'
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { Fragment, useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import '@mux/mux-player'
 import CourseIcon from '@/components/icons/CourseIcon'
 import DataIcon from '@/components/icons/DataIcon'
 import InsightIcon from '@/components/icons/InsightIcon'
 import ManualIcon from '@/components/icons/ManualIcon'
 import ReportIcon from '@/components/icons/ReportIcon'
+import { publicBaseUrl } from '@/app/config'
+import FeedShare from '@/components/feed/FeedShare'
+import RoleUpgradeCard from '@/components/feed/RoleUpgradeCard'
+import TopDocumentsCard from '@/components/feed/TopDocumentsCard'
 import { useToast } from '@/components/toast/ToastContext'
 import { useUserProfile } from '@/components/ui/header/hooks/useUserProfile'
+import {
+  specifiedInsighterProfileUuidQueryParam,
+  specifiedInsighterQueryParam,
+  specifiedInsighterRoleQueryParam,
+} from '@/components/project/specifiedInsighterProject'
+import { isFirstWordArabic } from '@/app/utils/textUtils'
 import {
   deleteFeedItem,
   getMyFeeds,
@@ -61,14 +73,16 @@ const copyByLocale = {
     deleteFailed: 'Unable to delete the post.',
     postActions: 'Post actions',
     imageAlt: 'Post image',
-    articleCoverAlt: 'Article cover',
-    article: 'Article',
+    articleCoverAlt: 'White Paper cover',
+    article: 'White Paper',
     attachment: 'Open attachment',
     openImage: 'Open image',
     imageCount: (current: number, total: number) => `Image ${current} of ${total}`,
     previousImage: 'Previous image',
     nextImage: 'Next image',
     closeImagePreview: 'Close image preview',
+    meet: 'Meet',
+    requestService: 'Request Service',
   },
   ar: {
     title: 'منشوراتي',
@@ -93,14 +107,16 @@ const copyByLocale = {
     deleteFailed: 'تعذر حذف المنشور.',
     postActions: 'إجراءات المنشور',
     imageAlt: 'صورة المنشور',
-    articleCoverAlt: 'غلاف المقال',
-    article: 'مقال',
+    articleCoverAlt: 'غلاف الورقة البيضاء',
+    article: 'ورقة بيضاء',
     attachment: 'فتح المرفق',
     openImage: 'فتح الصورة',
     imageCount: (current: number, total: number) => `الصورة ${current} من ${total}`,
     previousImage: 'الصورة السابقة',
     nextImage: 'الصورة التالية',
     closeImagePreview: 'إغلاق معاينة الصورة',
+    meet: 'اجتماع',
+    requestService: 'طلب خدمة',
   },
 } as const
 
@@ -172,13 +188,63 @@ function ImageGallery({
   locale: string
   flushBottom?: boolean
 }) {
-  const visibleMedia = media.slice(0, 4)
-  const isSingleImage = visibleMedia.length === 1
+  const isSingleImage = media.length === 1
+  const isTwoImageLayout = media.length === 2
+  const hasInlineCarousel = media.length > 2
   const isArabic = locale === 'ar'
   const copy = copyByLocale[isArabic ? 'ar' : 'en']
   const [activeImageIndex, setActiveImageIndex] = useState<number | null>(null)
+  const [carouselIndex, setCarouselIndex] = useState(0)
+  const carouselRef = useRef<HTMLDivElement | null>(null)
+  const carouselFrameRef = useRef<number | null>(null)
   const activeMedia = activeImageIndex === null ? null : media[activeImageIndex]
   const isCarousel = media.length > 1
+
+  useEffect(() => {
+    setCarouselIndex(0)
+
+    return () => {
+      if (carouselFrameRef.current !== null) {
+        window.cancelAnimationFrame(carouselFrameRef.current)
+      }
+    }
+  }, [media.length])
+
+  const goToCarouselImage = (nextIndex: number) => {
+    const boundedIndex = Math.max(0, Math.min(nextIndex, media.length - 1))
+    const slide = carouselRef.current?.querySelector<HTMLElement>(
+      `[data-feed-image-index="${boundedIndex}"]`,
+    )
+
+    slide?.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' })
+    setCarouselIndex(boundedIndex)
+  }
+
+  const updateCarouselIndex = () => {
+    if (carouselFrameRef.current !== null) return
+
+    carouselFrameRef.current = window.requestAnimationFrame(() => {
+      carouselFrameRef.current = null
+      const carousel = carouselRef.current
+      if (!carousel) return
+
+      const carouselCenter = carousel.getBoundingClientRect().left + carousel.clientWidth / 2
+      let closestIndex = 0
+      let closestDistance = Number.POSITIVE_INFINITY
+
+      carousel.querySelectorAll<HTMLElement>('[data-feed-image-index]').forEach((slide) => {
+        const bounds = slide.getBoundingClientRect()
+        const distance = Math.abs(bounds.left + bounds.width / 2 - carouselCenter)
+
+        if (distance < closestDistance) {
+          closestDistance = distance
+          closestIndex = Number(slide.dataset.feedImageIndex ?? 0)
+        }
+      })
+
+      setCarouselIndex(closestIndex)
+    })
+  }
 
   const showPreviousImage = () => {
     setActiveImageIndex((current) =>
@@ -194,40 +260,126 @@ function ImageGallery({
 
   return (
     <>
-      <div
-        className={`-mx-5 mt-5 grid overflow-hidden border-y border-[#E0E7F0] bg-[#F6F9FD] sm:-mx-6 ${
-          flushBottom ? '-mb-5 rounded-b-lg sm:-mb-6' : ''
-        } ${
-          isSingleImage ? 'grid-cols-1' : 'grid-cols-2'
-        }`}
-      >
-        {visibleMedia.map((item, index) => (
+      {isSingleImage && (
+        <div
+          className={`-mx-5 mt-5 overflow-hidden border-y border-[#E0E7F0] bg-[#F6F9FD] sm:-mx-6 ${
+            flushBottom ? '-mb-5 rounded-b-lg sm:-mb-6' : ''
+          }`}
+        >
           <button
-            key={item.id}
             type="button"
-            onClick={() => setActiveImageIndex(index)}
-            aria-label={isCarousel ? `${copy.openImage}: ${copy.imageCount(index + 1, media.length)}` : copy.openImage}
-            className={`relative flex cursor-zoom-in items-center justify-center overflow-hidden focus-visible:z-10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[#2378E8] ${
-              visibleMedia.length === 3 && index === 0 ? 'row-span-2' : ''
-            } ${index > 0 ? 'border-s border-[#E0E7F0]' : ''} ${
-              index > 1 ? 'border-t border-[#E0E7F0]' : ''
-            }`}
+            onClick={() => setActiveImageIndex(0)}
+            aria-label={copy.openImage}
+            className="relative flex w-full cursor-zoom-in items-center justify-center overflow-hidden focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[#2378E8]"
           >
             <img
-              src={item.url ?? ''}
-              alt={item.name || imageAlt}
+              src={media[0].url ?? ''}
+              alt={media[0].name || imageAlt}
               loading="lazy"
-              className="block h-auto max-w-full object-contain transition-transform duration-200 hover:scale-[1.01]"
-              style={{ maxHeight: isSingleImage ? 'min(650px, 70dvh)' : 'min(360px, 35dvh)' }}
+              className="block h-auto max-w-full object-contain"
+              style={{ maxHeight: 'min(650px, 70dvh)' }}
             />
-            {index === 3 && media.length > 4 && (
-              <span className="absolute inset-0 flex items-center justify-center bg-[#101724]/65 text-xl font-bold text-white">
-                +{media.length - 4}
-              </span>
-            )}
           </button>
-        ))}
-      </div>
+        </div>
+      )}
+
+      {isTwoImageLayout && (
+        <div
+          className={`-mx-5 mt-5 grid grid-cols-2 gap-1.5 overflow-hidden border-y border-[#E0E7F0] bg-white sm:-mx-6 ${
+            flushBottom ? '-mb-5 rounded-b-lg sm:-mb-6' : ''
+          }`}
+          dir={isArabic ? 'rtl' : 'ltr'}
+        >
+          {media.map((item, index) => (
+            <button
+              key={item.id}
+              type="button"
+              onClick={() => setActiveImageIndex(index)}
+              aria-label={`${copy.openImage}: ${copy.imageCount(index + 1, media.length)}`}
+              className="relative aspect-square cursor-zoom-in overflow-hidden rounded-md bg-[#101724] focus-visible:z-10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[#2378E8]"
+            >
+              <img
+                src={item.url ?? ''}
+                alt={item.name || imageAlt}
+                loading="lazy"
+                className="h-full w-full object-contain"
+              />
+            </button>
+          ))}
+        </div>
+      )}
+
+      {hasInlineCarousel && (
+        <div
+          className={`relative -mx-5 mt-5 overflow-hidden border-y border-[#D9E2ED] bg-[#E9EEF5] py-1.5 sm:-mx-6 ${
+            flushBottom ? '-mb-5 rounded-b-lg sm:-mb-6' : ''
+          }`}
+          dir={isArabic ? 'rtl' : 'ltr'}
+        >
+          <div
+            ref={carouselRef}
+            role="region"
+            aria-label={copy.imageCount(carouselIndex + 1, media.length)}
+            tabIndex={0}
+            onScroll={updateCarouselIndex}
+            onKeyDown={(event) => {
+              if (event.key === 'ArrowLeft') {
+                event.preventDefault()
+                goToCarouselImage(carouselIndex + (isArabic ? 1 : -1))
+              }
+              if (event.key === 'ArrowRight') {
+                event.preventDefault()
+                goToCarouselImage(carouselIndex + (isArabic ? -1 : 1))
+              }
+            }}
+            className="flex snap-x snap-mandatory gap-1.5 overflow-x-auto pe-[8%] ps-0 [scrollbar-width:none] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[#2378E8] [&::-webkit-scrollbar]:hidden sm:pe-[12%]"
+          >
+            {media.map((item, index) => (
+              <button
+                key={item.id}
+                type="button"
+                data-feed-image-index={index}
+                onClick={() => setActiveImageIndex(index)}
+                aria-label={`${copy.openImage}: ${copy.imageCount(index + 1, media.length)}`}
+                className="relative aspect-[4/3] w-[84%] shrink-0 snap-center cursor-zoom-in overflow-hidden rounded-md bg-[#101724] shadow-sm focus-visible:z-10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-white sm:w-[76%]"
+              >
+                <img
+                  src={item.url ?? ''}
+                  alt={item.name || imageAlt}
+                  loading="lazy"
+                  className="h-full w-full object-contain"
+                />
+              </button>
+            ))}
+          </div>
+
+          <span
+            className="pointer-events-none absolute end-3 top-3 rounded-md bg-[#101724]/80 px-2 py-1 text-xs font-semibold tabular-nums text-white shadow-sm backdrop-blur-sm"
+            aria-live="polite"
+          >
+            {carouselIndex + 1}/{media.length}
+          </span>
+
+          <button
+            type="button"
+            onClick={() => goToCarouselImage(carouselIndex - 1)}
+            disabled={carouselIndex === 0}
+            aria-label={copy.previousImage}
+            className="absolute start-2 top-1/2 hidden h-9 w-9 -translate-y-1/2 items-center justify-center rounded-full bg-white/95 text-[#253247] shadow-md transition hover:scale-105 hover:bg-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2378E8] disabled:pointer-events-none disabled:opacity-0 sm:flex"
+          >
+            {isArabic ? <IconChevronRight aria-hidden className="h-5 w-5" /> : <IconChevronLeft aria-hidden className="h-5 w-5" />}
+          </button>
+          <button
+            type="button"
+            onClick={() => goToCarouselImage(carouselIndex + 1)}
+            disabled={carouselIndex === media.length - 1}
+            aria-label={copy.nextImage}
+            className="absolute end-2 top-1/2 hidden h-9 w-9 -translate-y-1/2 items-center justify-center rounded-full bg-white/95 text-[#253247] shadow-md transition hover:scale-105 hover:bg-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2378E8] disabled:pointer-events-none disabled:opacity-0 sm:flex"
+          >
+            {isArabic ? <IconChevronLeft aria-hidden className="h-5 w-5" /> : <IconChevronRight aria-hidden className="h-5 w-5" />}
+          </button>
+        </div>
+      )}
 
       <Modal
         opened={activeMedia !== null}
@@ -293,47 +445,90 @@ function ImageGallery({
 
 function VideoPlayer({ media, title, flushBottom = false }: { media: FeedItemMedia; title: string; flushBottom?: boolean }) {
   const containerRef = useRef<HTMLDivElement | null>(null)
+  const [shouldPreload, setShouldPreload] = useState(false)
   const [isInViewport, setIsInViewport] = useState(false)
 
   useEffect(() => {
     const container = containerRef.current
     if (!container || !media.provider_playback_id) return
 
-    // Do not mount a player until its card is actually visible. Unmounting it
-    // after it leaves the viewport releases Safari's video decoder, avoiding
-    // simultaneous playback for every video in a long feed.
-    const observer = new IntersectionObserver(
+    // Mount and buffer roughly one screen before the card becomes visible.
+    // Keeping this window bounded avoids loading every video in a long feed.
+    const preloadObserver = new IntersectionObserver(
+      ([entry]) => setShouldPreload(entry.isIntersecting),
+      { rootMargin: '100% 0px' },
+    )
+    const playbackObserver = new IntersectionObserver(
       ([entry]) => setIsInViewport(entry.isIntersecting),
       { threshold: 0.01 },
     )
 
-    observer.observe(container)
-    return () => observer.disconnect()
+    preloadObserver.observe(container)
+    playbackObserver.observe(container)
+
+    return () => {
+      preloadObserver.disconnect()
+      playbackObserver.disconnect()
+    }
   }, [media.provider_playback_id])
 
+  useEffect(() => {
+    const player = containerRef.current?.querySelector('mux-player') as
+      | (HTMLElement & { play: () => Promise<void>; pause: () => void })
+      | null
+
+    if (!player) return
+
+    if (isInViewport) {
+      void player.play().catch(() => {
+        // Autoplay can still be blocked by browser or device policy.
+      })
+    } else {
+      player.pause()
+    }
+  }, [isInViewport, shouldPreload])
+
   if (media.provider_playback_id) {
+    // Reserve the box at the video's real aspect ratio so it doesn't collapse
+    // to a tiny height before Mux loads metadata (avoids the layout shift where
+    // the player snaps to full size on scroll/playback). Falls back to 16/9.
+    const aspectRatio =
+      media.width && media.height ? `${media.width} / ${media.height}` : '16 / 9'
+    // Portrait videos are bound by height (the maxHeight cap) so the width is
+    // derived and the box stays narrow; landscape videos fill the card width.
+    const isPortrait = !!(media.width && media.height && media.height > media.width)
+
     return (
+      // Full-width black band that letterboxes and centers the video box.
       <div
-        ref={containerRef}
         className={`-mx-5 mt-5 flex justify-center overflow-hidden bg-black sm:-mx-6 ${flushBottom ? '-mb-5 rounded-b-lg sm:-mb-6' : ''}`}
-        style={{ maxHeight: 'min(650px, 70dvh)' }}
       >
-        {isInViewport && (
-          <mux-player
-            playback-id={media.provider_playback_id}
-            stream-type="on-demand"
-            metadata-video-title={title}
-            accent-color="#2378E8"
-            disable-tracking=""
-            preload="metadata"
-            max-resolution="720p"
-            autoplay="muted"
-            muted
-            loop
-            playsinline
-            style={{ width: '100%', maxHeight: 'min(650px, 70dvh)', display: 'block' }}
-          />
-        )}
+        <div
+          ref={containerRef}
+          style={{
+            aspectRatio,
+            maxHeight: 'min(650px, 70dvh)',
+            ...(isPortrait
+              ? { height: 'min(650px, 70dvh)', width: 'auto', maxWidth: '100%' }
+              : { width: '100%' }),
+          }}
+        >
+          {shouldPreload && (
+            <mux-player
+              playback-id={media.provider_playback_id}
+              stream-type="on-demand"
+              metadata-video-title={title}
+              accent-color="#2378E8"
+              disable-tracking=""
+              preload="auto"
+              max-resolution="720p"
+              muted
+              loop
+              playsinline
+              style={{ width: '100%', height: '100%', display: 'block' }}
+            />
+          )}
+        </div>
       </div>
     )
   }
@@ -361,6 +556,8 @@ function ArticlePreview({
   const isArabic = locale === 'ar'
   const copy = copyByLocale[isArabic ? 'ar' : 'en']
   const articleText = stripHtml(item.excerpt || item.body || '')
+  const isArticleTitleArabic = isFirstWordArabic(item.title ?? '')
+  const isArticleTextArabic = isFirstWordArabic(articleText)
 
   return (
     <Link
@@ -397,8 +594,8 @@ function ArticlePreview({
 
         {item.title && (
           <h2
-            dir="auto"
-            className="mt-2.5 text-start text-[20px] font-bold leading-7 tracking-[-0.025em] text-[#101724] sm:text-[22px] sm:leading-8"
+            dir={isArticleTitleArabic ? 'rtl' : 'ltr'}
+            className={`mt-2.5 text-[20px] font-bold leading-7 tracking-[-0.025em] text-[#101724] sm:text-[22px] sm:leading-8 ${isArticleTitleArabic ? 'text-right' : 'text-left'}`}
           >
             {item.title}
           </h2>
@@ -406,8 +603,8 @@ function ArticlePreview({
 
         {articleText && (
           <p
-            dir="auto"
-            className="mt-1.5 line-clamp-2 text-start text-[14px] leading-6 text-[#56677E] sm:text-[15px]"
+            dir={isArticleTextArabic ? 'rtl' : 'ltr'}
+            className={`mt-1.5 line-clamp-2 text-[14px] leading-6 text-[#56677E] sm:text-[15px] ${isArticleTextArabic ? 'text-right' : 'text-left'}`}
           >
             {articleText}
           </p>
@@ -447,9 +644,12 @@ export function FeedCard({
 }) {
   const isArabic = locale === 'ar'
   const copy = copyByLocale[isArabic ? 'ar' : 'en']
+  const { user } = useUserProfile()
   const [openingInsight, setOpeningInsight] = useState<string | null>(null)
   const date = formatPostDate(item.published_at ?? item.created_at, locale)
   const isArticle = item.content_type === 'article'
+  const isPostTitleArabic = isFirstWordArabic(item.title ?? '')
+  const isPostBodyArabic = isFirstWordArabic(item.body ?? '')
   const imageMedia = item.media.filter((media) => media.media_type === 'image' && media.url)
   const articleCover = isArticle ? imageMedia[0] : undefined
   const videoMedia = item.media.find((media) => media.media_type === 'video')
@@ -457,7 +657,9 @@ export function FeedCard({
     (media) => media.media_type === 'attachment' && media.url,
   )
   const hasPostMedia = Boolean(videoMedia) || imageMedia.length > 0
-  const isMediaLast = attachments.length === 0 && item.related_insights.length === 0
+  const showEngagementActions = articleAccess === 'community' && Boolean(item.insighter)
+  const isMediaLast =
+    attachments.length === 0 && item.related_insights.length === 0 && !showEngagementActions
   const statusTone =
     item.status === 'published'
       ? 'bg-[#EAF8F1] text-[#168A55]'
@@ -474,6 +676,26 @@ export function FeedCard({
         .join('')
         .toUpperCase()
     : ''
+
+  // Community-feed engagement actions (Meet / Request Service / Share) are only
+  // meaningful when viewing someone else's published post in the public feed.
+  // `showEngagementActions` is derived above (near the media flags).
+  const isOwnPost = Boolean(user?.uuid && insighter && user.uuid === insighter.uuid)
+  const meetHref = insighter
+    ? `/${locale}/profile/${insighter.uuid}?entity=insighter&tab=meet`
+    : ''
+  const requestServiceHref = insighter
+    ? `/${locale}/project/wizard/project-type?${new URLSearchParams({
+        fresh: '1',
+        [specifiedInsighterQueryParam]: insighter.uuid,
+        [specifiedInsighterRoleQueryParam]: 'insighter',
+        [specifiedInsighterProfileUuidQueryParam]: insighter.uuid,
+      }).toString()}`
+    : ''
+  const shareUrl = isArticle
+    ? `${publicBaseUrl}/${locale}/article/${item.slug ?? item.uuid}`
+    : `${publicBaseUrl}/${locale}/post/${item.uuid}`
+  const shareTitle = item.title?.trim() || stripHtml(item.body ?? '').slice(0, 120) || insighter?.name || ''
 
   return (
     <article className="relative overflow-visible rounded-lg border border-[#D9E3EF] bg-white px-5 py-5 sm:px-6">
@@ -560,13 +782,19 @@ export function FeedCard({
       </div>
 
       {!isArticle && item.title && (
-        <h2 className="mt-4 text-[19px] font-bold leading-7 tracking-[-0.02em] text-[#101724]">
+        <h2
+          dir={isPostTitleArabic ? 'rtl' : 'ltr'}
+          className={`mt-4 text-[19px] font-bold leading-7 tracking-[-0.02em] text-[#101724] ${isPostTitleArabic ? 'text-right' : 'text-left'}`}
+        >
           {item.title}
         </h2>
       )}
 
       {!isArticle && item.body && (
-        <p className={`${item.title ? 'mt-2' : 'mt-4'} whitespace-pre-wrap text-[13px] leading-[1.2rem] text-[#1C2433] sm:text-[16px] sm:leading-7`}>
+        <p
+          dir={isPostBodyArabic ? 'rtl' : 'ltr'}
+          className={`${item.title ? 'mt-2' : 'mt-4'} whitespace-pre-wrap text-[13px] leading-[1.2rem] text-[#1C2433] sm:text-[16px] sm:leading-7 ${isPostBodyArabic ? 'text-right' : 'text-left'}`}
+        >
           {item.body}
         </p>
       )}
@@ -602,7 +830,9 @@ export function FeedCard({
       )}
 
       {item.related_insights.length > 0 && (
-        <div className={`-mx-5 -mb-5 ${hasPostMedia ? 'mt-0' : 'mt-5'} divide-y divide-[#E7EDF5] overflow-hidden rounded-b-lg border-t border-[#E7EDF5] sm:-mx-6 sm:-mb-6`}>
+        <div className={`-mx-5 ${hasPostMedia ? 'mt-0' : 'mt-5'} divide-y divide-[#E7EDF5] overflow-hidden border-t border-[#E7EDF5] sm:-mx-6 ${
+          showEngagementActions ? 'border-b' : '-mb-5 rounded-b-lg sm:-mb-6'
+        }`}>
           {item.related_insights.map((insight) => {
             const insightKey = `${insight.type}-${insight.slug}`
             const insightPrice = getInsightPrice(insight.price, locale === 'ar' ? 'مجاني' : 'Free')
@@ -679,6 +909,44 @@ export function FeedCard({
             </div>
             )
           })}
+        </div>
+      )}
+
+      {showEngagementActions && insighter && (
+        <div
+          className="mt-4 flex items-center justify-around border-t border-[#EEF2F7] pt-2"
+          dir={isArabic ? 'rtl' : 'ltr'}
+        >
+          {!isOwnPost && (
+            <Link
+              href={meetHref}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex flex-1 items-center justify-center gap-2 rounded-md px-2 py-2.5 text-[14px] font-medium text-[#5A6B85] transition-colors hover:bg-[#F5F8FC] hover:text-[#101724] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2378E8]"
+            >
+              <IconUsers aria-hidden className="h-[18px] w-[18px] text-[#2378E8]" stroke={1.8} />
+              <span>{copy.meet}</span>
+            </Link>
+          )}
+
+          {!isOwnPost && (
+            <Link
+              href={requestServiceHref}
+              className="inline-flex flex-1 items-center justify-center gap-2 rounded-md px-2 py-2.5 text-[14px] font-medium text-[#5A6B85] transition-colors hover:bg-[#F5F8FC] hover:text-[#101724] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2378E8]"
+            >
+              <IconBriefcase aria-hidden className="h-[18px] w-[18px] text-[#16A34A]" stroke={1.8} />
+              <span>{copy.requestService}</span>
+            </Link>
+          )}
+
+          <FeedShare
+            shareUrl={shareUrl}
+            shareTitle={shareTitle}
+            authorName={insighter.name}
+            authorPhotoUrl={insighter.profile_photo_url}
+            locale={locale}
+            shareKind={isArticle ? 'white-paper' : 'post'}
+          />
         </div>
       )}
     </article>
@@ -824,14 +1092,25 @@ export default function MyFeedsTimeline({ locale }: MyFeedsTimelineProps) {
         </div>
       ) : (
         <div className="space-y-4">
-          {items.map((item) => (
-            <FeedCard
-              key={item.uuid}
-              item={item}
-              locale={locale}
-              onDelete={setDeleteCandidate}
-            />
-          ))}
+          {items.map((item, index) => {
+            // Right-column widgets are hidden below xl, so weave them between
+            // posts (LinkedIn-style) on mobile/tablet. Positions clamp to the
+            // last post so short feeds still surface them.
+            const upgradeIndex = Math.min(1, items.length - 1)
+            const documentsIndex = Math.min(3, items.length - 1)
+
+            return (
+              <Fragment key={item.uuid}>
+                <FeedCard item={item} locale={locale} onDelete={setDeleteCandidate} />
+                {index === upgradeIndex && (
+                  <RoleUpgradeCard locale={locale} className="xl:hidden" />
+                )}
+                {index === documentsIndex && (
+                  <TopDocumentsCard locale={locale} className="xl:hidden" />
+                )}
+              </Fragment>
+            )
+          })}
         </div>
       )}
 

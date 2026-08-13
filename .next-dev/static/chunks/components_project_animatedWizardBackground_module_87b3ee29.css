@@ -1,0 +1,172 @@
+/* [project]/components/project/animatedWizardBackground.module.css [app-client] (css) */
+.animatedWizardBackground-module__uLJEoq__root {
+  pointer-events: none;
+  isolation: isolate;
+  contain: paint;
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  overflow: hidden;
+}
+
+.animatedWizardBackground-module__uLJEoq__base {
+  background: radial-gradient(1200px 700px at 50% 15%, #fff, #f0f7ff 55%, #fff 100%), linear-gradient(#fff, #f8fbff);
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+}
+
+.animatedWizardBackground-module__uLJEoq__wash {
+  filter: blur(34px) saturate(2.6) contrast(1.12);
+  opacity: .85;
+  mix-blend-mode: multiply;
+  will-change: transform;
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
+  background-image: radial-gradient(closest-side at 12% 22%, rgba(28, 124, 187, .9), rgba(0, 0, 0, 0) 62%), radial-gradient(closest-side at 88% 18%, rgba(99, 102, 241, .78), rgba(0, 0, 0, 0) 62%), radial-gradient(closest-side at 68% 88%, rgba(20, 186, 106, .72), rgba(0, 0, 0, 0) 62%), radial-gradient(closest-side at 18% 86%, rgba(34, 211, 238, .76), rgba(0, 0, 0, 0) 62%), radial-gradient(closest-side at 55% 55%, rgba(236, 72, 153, .5), rgba(0, 0, 0, 0) 62%);
+  background-size: 220% 220%;
+  animation: 2s ease-in-out infinite alternate animatedWizardBackground-module__uLJEoq__washMove;
+  position: absolute;
+  top: -45%;
+  bottom: -45%;
+  left: -45%;
+  right: -45%;
+  transform: translate3d(0, 0, 0)scale(1.1);
+}
+
+.animatedWizardBackground-module__uLJEoq__washTwo {
+  filter: blur(40px) saturate(2.7) contrast(1.1);
+  opacity: .8;
+  mix-blend-mode: multiply;
+  will-change: transform;
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
+  background-image: radial-gradient(closest-side at 22% 35%, rgba(59, 130, 246, .8), rgba(0, 0, 0, 0) 62%), radial-gradient(closest-side at 72% 30%, rgba(168, 85, 247, .74), rgba(0, 0, 0, 0) 62%), radial-gradient(closest-side at 50% 85%, rgba(14, 165, 233, .74), rgba(0, 0, 0, 0) 62%);
+  background-size: 240% 240%;
+  animation: 1.8s ease-in-out infinite alternate animatedWizardBackground-module__uLJEoq__washMoveTwo;
+  position: absolute;
+  top: -50%;
+  bottom: -50%;
+  left: -50%;
+  right: -50%;
+  transform: translate3d(0, 0, 0)scale(1.08);
+}
+
+.animatedWizardBackground-module__uLJEoq__blob {
+  filter: blur(86px) saturate(2.6);
+  opacity: .55;
+  mix-blend-mode: multiply;
+  will-change: transform;
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
+  border-radius: 9999px;
+  width: 72vmax;
+  height: 72vmax;
+  position: absolute;
+  transform: translate3d(0, 0, 0);
+}
+
+.animatedWizardBackground-module__uLJEoq__blobOne {
+  background: radial-gradient(circle at 30% 30%, #1c7cbb, rgba(0, 0, 0, 0) 60%);
+  animation: 9s ease-in-out infinite alternate animatedWizardBackground-module__uLJEoq__blobOne;
+  top: -30vmax;
+  left: -20vmax;
+}
+
+.animatedWizardBackground-module__uLJEoq__blobTwo {
+  background: radial-gradient(circle at 30% 30%, #14ba6a, rgba(0, 0, 0, 0) 60%);
+  animation: 10s ease-in-out infinite alternate animatedWizardBackground-module__uLJEoq__blobTwo;
+  bottom: -32vmax;
+  right: -22vmax;
+}
+
+.animatedWizardBackground-module__uLJEoq__blobThree {
+  background: radial-gradient(circle at 30% 30%, rgba(99, 102, 241, .95), rgba(0, 0, 0, 0) 60%);
+  animation: 11s ease-in-out infinite alternate animatedWizardBackground-module__uLJEoq__blobThree;
+  top: 18%;
+  right: -18vmax;
+}
+
+.animatedWizardBackground-module__uLJEoq__blobFour {
+  background: radial-gradient(circle at 30% 30%, rgba(236, 72, 153, .9), rgba(0, 0, 0, 0) 60%);
+  animation: 12s ease-in-out infinite alternate animatedWizardBackground-module__uLJEoq__blobFour;
+  bottom: -28vmax;
+  left: 15%;
+}
+
+.animatedWizardBackground-module__uLJEoq__centerFade {
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
+  background: radial-gradient(760px 460px at 50% 38%, rgba(255, 255, 255, .92), rgba(255, 255, 255, .62) 62%, rgba(255, 255, 255, .16) 100%), linear-gradient(rgba(255, 255, 255, .55), rgba(255, 255, 255, .35));
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+}
+
+@keyframes animatedWizardBackground-module__uLJEoq__washMove {
+  0% {
+    transform: translate3d(-10%, -7%, 0)scale(1.2)rotate(-3deg);
+  }
+
+  100% {
+    transform: translate3d(10%, 7%, 0)scale(1.28)rotate(3deg);
+  }
+}
+
+@keyframes animatedWizardBackground-module__uLJEoq__washMoveTwo {
+  0% {
+    transform: translate3d(9%, -9%, 0)scale(1.18)rotate(2deg);
+  }
+
+  100% {
+    transform: translate3d(-9%, 9%, 0)scale(1.26)rotate(-2deg);
+  }
+}
+
+@keyframes animatedWizardBackground-module__uLJEoq__blobOne {
+  0% {
+    transform: translate3d(0, 0, 0)scale(1);
+  }
+
+  100% {
+    transform: translate3d(30vmin, 18vmin, 0)scale(1.25);
+  }
+}
+
+@keyframes animatedWizardBackground-module__uLJEoq__blobTwo {
+  0% {
+    transform: translate3d(0, 0, 0)scale(1);
+  }
+
+  100% {
+    transform: translate3d(-34vmin, -22vmin, 0)scale(1.28);
+  }
+}
+
+@keyframes animatedWizardBackground-module__uLJEoq__blobThree {
+  0% {
+    transform: translate3d(0, 0, 0)scale(1);
+  }
+
+  100% {
+    transform: translate3d(-22vmin, 26vmin, 0)scale(1.22);
+  }
+}
+
+@keyframes animatedWizardBackground-module__uLJEoq__blobFour {
+  0% {
+    transform: translate3d(0, 0, 0)scale(1);
+  }
+
+  100% {
+    transform: translate3d(30vmin, -18vmin, 0)scale(1.26);
+  }
+}
+
+/*# sourceMappingURL=components_project_animatedWizardBackground_module_87b3ee29.css.map*/

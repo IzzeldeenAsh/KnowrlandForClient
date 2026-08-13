@@ -1,8 +1,8 @@
 import ArticleEditor from '@/components/feed/article/ArticleEditor'
 
 export const metadata = {
-  title: 'Write an article - Insighta Business',
-  description: 'Create and publish a long-form article on Insighta.',
+  title: 'Write a White Paper - Insighta Business',
+  description: 'Create and publish a long-form White Paper on Insighta.',
 }
 
 type WriteArticlePageProps = {

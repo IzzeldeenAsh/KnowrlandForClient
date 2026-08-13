@@ -1,44 +1,68 @@
 'use client'
 
-import { IconArrowRight, IconSparkles } from '@tabler/icons-react'
+import { IconArrowRight, IconGift } from '@tabler/icons-react'
 import { useUserProfile } from '@/components/ui/header/hooks/useUserProfile'
 
 type RoleUpgradeCardProps = {
   locale: string
+  className?: string
 }
 
-const copyByLocale = {
+type RoleUpgradeCopy = {
+  eyebrow: string
+  title: string
+  benefits?: readonly string[]
+  action: string
+}
+
+const copyByLocale: Record<'en' | 'ar', Record<'insighter' | 'client', RoleUpgradeCopy>> = {
   en: {
     insighter: {
-      eyebrow: 'For Insighters',
+      eyebrow: 'Upgrade for free',
       title: 'Grow as a company',
-      description: 'Bring your team, services, and expertise together under one trusted company profile.',
+      benefits: [
+        'Create a trusted company profile',
+        'Add and manage your team with centralized publishing control',
+        'Strengthen your digital presence and promote your services',
+      ],
       action: 'Upgrade to Company',
     },
     client: {
       eyebrow: 'Share your expertise',
       title: 'Become an Insighter',
-      description: 'Publish knowledge, offer your services, and build a professional presence on Insighta.',
+      benefits: [
+        'Create posts that showcase your expertise',
+        'Publish insights and original knowledge',
+        'Share your expertise and promote your services',
+      ],
       action: 'Become an Insighter',
     },
   },
   ar: {
     insighter: {
-      eyebrow: 'للخبراء',
+      eyebrow: 'الترقية مجانًا',
       title: 'نمِّ حضورك كشركة',
-      description: 'اجمع فريقك وخدماتك وخبراتك ضمن صفحة شركة موثوقة ومتكاملة.',
+      benefits: [
+        'أنشئ ملفًا موثوقًا لشركتك',
+        'أضف فريقك وأدره مع التحكم المركزي بالنشر',
+        'عزّز حضورك الرقمي وروّج لخدماتك',
+      ],
       action: 'الترقية إلى شركة',
     },
     client: {
       eyebrow: 'شارك خبرتك',
       title: 'كن خبيراً',
-      description: 'انشر معرفتك، وقدّم خدماتك، وابنِ حضورك المهني على إنسايتا.',
+      benefits: [
+        'إنشاء منشورات تُبرز خبرتك',
+        'نشر الرؤى والمعرفة الأصيلة',
+        'مشاركة خبرتك والترويج لخدماتك',
+      ],
       action: 'كن خبيراً',
     },
   },
 } as const
 
-export default function RoleUpgradeCard({ locale }: RoleUpgradeCardProps) {
+export default function RoleUpgradeCard({ locale, className }: RoleUpgradeCardProps) {
   const isArabic = locale === 'ar'
   const { user, roles, isAuthResolved } = useUserProfile()
 
@@ -62,7 +86,7 @@ export default function RoleUpgradeCard({ locale }: RoleUpgradeCardProps) {
         isInsighterOnly
           ? 'border-[#B8DBE4] bg-[#E9F8F3] bg-cover bg-center'
           : 'border-[#BFD8F7] bg-gradient-to-br from-[#EAF3FF] via-white to-[#E7FAF8]'
-      }`}
+      }${className ? ` ${className}` : ''}`}
       style={
         isInsighterOnly
           ? {
@@ -91,8 +115,8 @@ export default function RoleUpgradeCard({ locale }: RoleUpgradeCardProps) {
             ? 'border-white/70 bg-white/55 text-[#245578]'
             : 'border-[#BCD7F6] bg-white/75 text-[#1D67BC]'
         }`}>
-          <IconSparkles aria-hidden className="h-3.5 w-3.5" stroke={1.9} />
-          {copy.eyebrow}
+            <IconGift aria-hidden className="h-3.5 w-3.5" stroke={1.9} />
+            {copy.eyebrow}
         </span>
       </div>
 
@@ -104,11 +128,15 @@ export default function RoleUpgradeCard({ locale }: RoleUpgradeCardProps) {
       >
         {copy.title}
       </h2>
-      <p className={`mt-2 text-[13px] leading-5 ${
-        isInsighterOnly ? 'text-[#47677D]' : 'text-[#566A86]'
-      }`}>
-        {copy.description}
-      </p>
+      <ul
+        className={`mt-3 list-disc space-y-1.5 ps-4 text-[13px] leading-5 ${
+          isInsighterOnly ? 'text-[#47677D]' : 'text-[#566A86]'
+        }`}
+      >
+        {copy.benefits?.map((benefit) => (
+          <li key={benefit}>{benefit}</li>
+        ))}
+      </ul>
 
       <button
         type="button"

@@ -9,6 +9,7 @@ import {
   IconFolderOpen,
   IconLoader2,
   IconPhoto,
+  IconPlus,
   IconTrash,
   IconVideo,
   IconX,
@@ -22,8 +23,10 @@ import { useToast } from '@/components/toast/ToastContext'
 import { useUserProfile } from '@/components/ui/header/hooks/useUserProfile'
 import {
   checkVideoUploadStatus,
+  createSuggestTag,
   deleteFeedItem,
   fetchIndustryTags,
+  fetchLibraryKnowledgeById,
   getFeedDraft,
   getFeedItem,
   initVideoPost,
@@ -52,6 +55,12 @@ type PostModalProps = {
   onDraftSaved: (draft: FeedItem) => void
   onDraftDiscarded: () => void
   onPublished: () => void
+  // When the composer reopens after the user published a new knowledge item,
+  // this id is fetched and attached to the post automatically.
+  autoAttachKnowledgeId?: number | null
+  // Called once the auto-attach id has been handled, so the parent can clear it
+  // (and the URL) and avoid re-attaching on the next open.
+  onAutoAttachHandled?: () => void
 }
 
 // 'stalled' means the bytes reached the provider but Mux has not reported the
@@ -93,7 +102,7 @@ const copyByLocale = {
     next: 'Next',
     back: 'Back',
     description: 'Post description',
-    bodyPlaceholder: 'Share knowledge, an insight, or a useful idea',
+    bodyPlaceholder: 'Share your insights...',
     uploadTitle: 'Upload your video',
     uploadHint: 'MP4 or MOV, up to 10 minutes. The video must finish uploading before you can write a description.',
     selectVideo: 'Select video',
@@ -110,15 +119,23 @@ const copyByLocale = {
     addTags: 'Add Tags',
     tagsCount: (count: number) => `Tags · ${count}`,
     suggestedTags: 'Suggested tags',
+    optionalBadge: 'Optional',
     tagsHint: 'Tags are optional — they help the right experts find your insight.',
     noTags: 'No tags available for this industry yet.',
-    shareFromLibrary: 'Share from library',
+    addTagPlaceholder: 'Initiate a new tag…',
+    addTag: 'Add',
+    addTagHint: 'Type a tag and press Enter, or tap a chip below to select it.',
+    addTagError: 'Unable to add the tag.',
+    shareFromLibrary: 'Share from Insighta library',
     publish: 'Post',
     publishing: 'Publishing…',
     saveDraft: 'Save draft',
     savingDraft: 'Saving…',
     draftSaved: 'Your draft has been saved.',
     draftSaveFailed: 'Unable to save your draft.',
+    draftSavedRedirecting: 'Draft saved. Taking you to publishing…',
+    newKnowledgeAttached: 'Your new knowledge item has been attached.',
+    newKnowledgeMissing: 'We could not find the item you just published. Try adding it from your library.',
     discardDraft: 'Discard draft',
     discardTitle: 'Discard this draft?',
     discardDescription: 'This permanently removes the draft and its uploaded media.',
@@ -167,8 +184,13 @@ const copyByLocale = {
     addTags: 'إضافة وسوم',
     tagsCount: (count: number) => `وسوم · ${count}`,
     suggestedTags: 'وسوم مقترحة',
+    optionalBadge: 'اختياري',
     tagsHint: 'الوسوم اختيارية — تساعد الخبراء المناسبين في العثور على رؤيتك.',
     noTags: 'لا توجد وسوم متاحة لهذا المجال بعد.',
+    addTagPlaceholder: 'أضف وسمًا جديدًا…',
+    addTag: 'إضافة',
+    addTagHint: 'اكتب وسمًا واضغط Enter، أو اضغط على وسم بالأسفل لتحديده.',
+    addTagError: 'تعذر إضافة الوسم.',
     shareFromLibrary: 'مشاركة من المكتبة',
     publish: 'نشر',
     publishing: 'جارٍ النشر…',
@@ -176,6 +198,9 @@ const copyByLocale = {
     savingDraft: 'جارٍ الحفظ…',
     draftSaved: 'تم حفظ المسودة.',
     draftSaveFailed: 'تعذر حفظ المسودة.',
+    draftSavedRedirecting: 'تم حفظ المسودة. سيتم نقلك إلى النشر…',
+    newKnowledgeAttached: 'تم إرفاق عنصر المعرفة الجديد.',
+    newKnowledgeMissing: 'تعذر العثور على العنصر الذي نشرته للتو. حاول إضافته من مكتبتك.',
     discardDraft: 'حذف المسودة',
     discardTitle: 'حذف هذه المسودة؟',
     discardDescription: 'سيؤدي هذا إلى حذف المسودة والوسائط المرفوعة نهائياً.',
@@ -230,6 +255,8 @@ export default function PostModal({
   onDraftSaved,
   onDraftDiscarded,
   onPublished,
+  autoAttachKnowledgeId,
+  onAutoAttachHandled,
 }: PostModalProps) {
   const isArabic = locale === 'ar'
   const copy = copyByLocale[isArabic ? 'ar' : 'en']
@@ -263,6 +290,8 @@ export default function PostModal({
   const [libraryDrawerOpened, setLibraryDrawerOpened] = useState(false)
   const [industryTags, setIndustryTags] = useState<FeedTag[]>([])
   const [isLoadingTags, setIsLoadingTags] = useState(false)
+  const [newTagName, setNewTagName] = useState('')
+  const [isAddingTag, setIsAddingTag] = useState(false)
 
   // --- Video state ---
   const [videoPhase, setVideoPhase] = useState<VideoPhase>('none')
@@ -318,6 +347,7 @@ export default function PostModal({
     setBody('')
     setIndustry(null)
     setSelectedTags([])
+    setNewTagName('')
     setRelatedInsights([])
     setImages((previous) => {
       previous.forEach((image) => {
@@ -591,11 +621,40 @@ export default function PostModal({
     )
   }
 
+  // "Add Tag" flow (mirrors Angular add-knowledge step 4): if the typed name
+  // already exists in the industry's tags, just select it; otherwise create a
+  // custom tag via the API and select it.
+  const addNewTag = async () => {
+    const name = newTagName.trim()
+    if (!name || !industry || isAddingTag) return
+
+    const normalized = name.toLowerCase()
+    const existing = industryTags.find((tag) => tag.name.trim().toLowerCase() === normalized)
+    if (existing) {
+      if (!selectedTags.some((tag) => tag.id === existing.id)) toggleTag(existing)
+      setNewTagName('')
+      return
+    }
+
+    setIsAddingTag(true)
+    try {
+      const created = await createSuggestTag(industry.id, name, locale)
+      setIndustryTags((previous) => [created, ...previous])
+      setSelectedTags((previous) => [...previous, created])
+      setNewTagName('')
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : copy.addTagError)
+    } finally {
+      setIsAddingTag(false)
+    }
+  }
+
   const handleIndustrySelect = (option: IndustryOption) => {
     if (option.id !== industry?.id) {
       // Tags belong to an industry: reset them on change
       setSelectedTags([])
       setIndustryTags([])
+      setNewTagName('')
     }
     setIndustry(option)
     setTouchedFields((previous) => ({ ...previous, industry: true }))
@@ -715,8 +774,12 @@ export default function PostModal({
     }
   }
 
-  const handleSaveDraft = async () => {
-    if (isPublishing || isSavingDraft || isDiscardingDraft) return
+  // Validate the required fields and persist the draft. Returns the saved draft,
+  // or null if validation failed / the save errored (callers decide what to do
+  // next: close the modal, or redirect to publishing). Shared by "Save draft"
+  // and the "Save and start publish" empty-state CTA.
+  const persistDraft = async (): Promise<FeedItem | null> => {
+    if (isPublishing || isSavingDraft || isDiscardingDraft) return null
 
     const missingIndustry = industry === null
     const missingVideo = isVideoFlow && videoUuidRef.current === null
@@ -733,7 +796,7 @@ export default function PostModal({
         setStep(2)
         window.requestAnimationFrame(() => industryButtonRef.current?.focus())
       }
-      return
+      return null
     }
 
     setIsSavingDraft(true)
@@ -762,15 +825,77 @@ export default function PostModal({
 
       const savedDraft = await getFeedDraft(locale)
       if (!savedDraft) throw new Error(copy.draftSaveFailed)
-
-      toast.success(copy.draftSaved)
-      onDraftSaved(savedDraft)
+      return savedDraft
     } catch (error) {
       toast.error(error instanceof Error ? error.message : copy.draftSaveFailed)
+      return null
     } finally {
       setIsSavingDraft(false)
     }
   }
+
+  const handleSaveDraft = async () => {
+    const savedDraft = await persistDraft()
+    if (!savedDraft) return
+    toast.success(copy.draftSaved)
+    onDraftSaved(savedDraft)
+  }
+
+  // Empty-library CTA: save the post as a draft, then send the user to the
+  // knowledge stepper. The stepper redirects back to this feed with
+  // ?attach_knowledge=<id> so we can reopen the composer and attach the new
+  // item automatically (handled in FeedComposer + the auto-attach effect below).
+  const handlePublishNewKnowledge = async () => {
+    const savedDraft = await persistDraft()
+    if (!savedDraft) return
+
+    onDraftSaved(savedDraft)
+    toast.success(copy.draftSavedRedirecting)
+
+    // Come back to exactly the page the composer lives on; the stepper appends
+    // the published knowledge id to this URL.
+    const returnUrl = `${window.location.origin}${window.location.pathname}`
+    const stepperUrl =
+      `${process.env.NEXT_PUBLIC_DASHBOARD_URL}/app/add-knowledge/stepper` +
+      `?return_url=${encodeURIComponent(returnUrl)}`
+    window.location.href = stepperUrl
+  }
+
+  // On return from publishing a new knowledge item, fetch it and attach it to the
+  // post automatically. Guarded by a ref so it runs once per id even before the
+  // parent clears it.
+  const autoAttachedIdRef = useRef<number | null>(null)
+  useEffect(() => {
+    if (!opened || !autoAttachKnowledgeId) return
+    if (autoAttachedIdRef.current === autoAttachKnowledgeId) return
+    autoAttachedIdRef.current = autoAttachKnowledgeId
+
+    let cancelled = false
+    void (async () => {
+      try {
+        const item = await fetchLibraryKnowledgeById(autoAttachKnowledgeId, locale)
+        if (cancelled) return
+        if (item) {
+          setRelatedInsights((previous) =>
+            previous.some((entry) => entry.id === item.id) || previous.length >= 3
+              ? previous
+              : [...previous, item],
+          )
+          toast.success(copy.newKnowledgeAttached)
+        } else {
+          toast.error(copy.newKnowledgeMissing)
+        }
+      } catch {
+        if (!cancelled) toast.error(copy.newKnowledgeMissing)
+      } finally {
+        if (!cancelled) onAutoAttachHandled?.()
+      }
+    })()
+
+    return () => {
+      cancelled = true
+    }
+  }, [opened, autoAttachKnowledgeId, locale, copy, toast, onAutoAttachHandled])
 
   const handleDiscardDraft = async () => {
     if (!draft || isPublishing || isSavingDraft || isDiscardingDraft) return
@@ -1139,9 +1264,46 @@ export default function PostModal({
             )}
 
             <div className="mt-3 rounded-md border border-[#E5EAF2] bg-[#FAFCFE] p-4">
-              <div className="text-[11.5px] font-semibold uppercase tracking-wide text-[#5A6B84]">
-                {copy.suggestedTags}
+              <div className="flex items-center gap-2">
+                <span className="text-[11.5px] font-semibold uppercase tracking-wide text-[#5A6B84]">
+                  {copy.suggestedTags}
+                </span>
+                <span className="inline-flex items-center rounded-full bg-[#FF8A3D] px-2.5 py-0.5 text-[10.5px] font-bold uppercase tracking-wide text-white">
+                  {copy.optionalBadge}
+                </span>
               </div>
+
+              {/* Add a custom tag (mirrors Angular add-knowledge step 4) */}
+              <div className="mt-3 flex gap-2">
+                <input
+                  type="text"
+                  value={newTagName}
+                  onChange={(event) => setNewTagName(event.currentTarget.value)}
+                  onKeyDown={(event) => {
+                    if (event.key === 'Enter') {
+                      event.preventDefault()
+                      addNewTag()
+                    }
+                  }}
+                  placeholder={copy.addTagPlaceholder}
+                  className="h-10 min-w-0 flex-1 rounded-md border border-[#D6E0EC] bg-white px-3 text-[13.5px] text-[#1C2433] transition-colors placeholder:text-[#94A3B8] focus-visible:border-[#8FB9EA] focus-visible:outline-none"
+                />
+                <button
+                  type="button"
+                  onClick={addNewTag}
+                  disabled={!newTagName.trim() || isAddingTag}
+                  className="inline-flex h-10 shrink-0 items-center gap-1.5 rounded-md bg-[#1D74E0] px-4 text-[13.5px] font-semibold text-white transition-colors hover:bg-[#1A67C8] disabled:opacity-50"
+                >
+                  {isAddingTag ? (
+                    <IconLoader2 aria-hidden className="h-4 w-4 animate-spin" stroke={2} />
+                  ) : (
+                    <IconPlus aria-hidden className="h-4 w-4" stroke={2.2} />
+                  )}
+                  {copy.addTag}
+                </button>
+              </div>
+              <p className="mt-2 text-[12px] text-[#94A3B8]">{copy.addTagHint}</p>
+
             <div className="mt-3 flex max-h-48 flex-wrap gap-2 overflow-y-auto">
               {isLoadingTags ? (
                 <span className="text-[13px] text-[#94A3B8]">…</span>
@@ -1346,6 +1508,10 @@ export default function PostModal({
         onConfirm={(items) => {
           setRelatedInsights(items)
           setLibraryDrawerOpened(false)
+        }}
+        onPublishNew={() => {
+          setLibraryDrawerOpened(false)
+          void handlePublishNewKnowledge()
         }}
       />
     </>

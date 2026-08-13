@@ -85,6 +85,20 @@ export async function fetchIndustryTree(locale: string): Promise<IndustryNode[]>
   return request
 }
 
+// Single-select radio indicator shown at the start of every selectable row.
+function RadioDot({ checked }: { checked: boolean }) {
+  return (
+    <span
+      aria-hidden
+      className={`me-2.5 grid h-4 w-4 shrink-0 place-items-center rounded-full border transition-colors ${
+        checked ? 'border-[#1D74E0]' : 'border-[#C2CEDE]'
+      }`}
+    >
+      {checked ? <span className="h-2 w-2 rounded-full bg-[#1D74E0]" /> : null}
+    </span>
+  )
+}
+
 export type IndustryGroup = { parentKey: number; parentLabel: string; children: IndustryNode[] }
 
 export function collectLeafGroups(nodes: IndustryNode[]): IndustryGroup[] {
@@ -93,8 +107,11 @@ export function collectLeafGroups(nodes: IndustryNode[]): IndustryGroup[] {
   const collectLeaves = (node: IndustryNode): IndustryNode[] =>
     node.children.length === 0 ? [node] : node.children.flatMap(collectLeaves)
 
+  // The parent (top-level node) is itself selectable, so it is not injected as a
+  // child here. A parent with no descendants simply yields an empty child list
+  // and is picked via its own header row.
   for (const parent of nodes) {
-    const children = parent.children.length === 0 ? [parent] : parent.children.flatMap(collectLeaves)
+    const children = parent.children.flatMap(collectLeaves)
     groups.push({ parentKey: parent.key, parentLabel: parent.label, children })
   }
 
@@ -146,11 +163,19 @@ export default function IndustrySelectModal({
     if (query === '') return groups
 
     return groups
-      .map((group) => ({
-        ...group,
-        children: group.children.filter((child) => child.label.toLowerCase().includes(query)),
-      }))
-      .filter((group) => group.children.length > 0)
+      .map((group) => {
+        // When the parent itself matches, keep all its children so the whole
+        // group stays pickable; otherwise narrow to the matching children.
+        if (group.parentLabel.toLowerCase().includes(query)) return group
+        return {
+          ...group,
+          children: group.children.filter((child) => child.label.toLowerCase().includes(query)),
+        }
+      })
+      .filter(
+        (group) =>
+          group.parentLabel.toLowerCase().includes(query) || group.children.length > 0,
+      )
   }, [groups, searchTerm])
 
   return (
@@ -205,17 +230,30 @@ export default function IndustrySelectModal({
         ) : filteredGroups.length === 0 ? (
           <p className="py-8 text-center text-[13px] text-[#94A3B8]">{copy.empty}</p>
         ) : (
-          filteredGroups.map((group) => (
+          filteredGroups.map((group) => {
+            const isParentSelected = group.parentKey === selectedId
+            return (
             <section
               key={group.parentKey}
               aria-labelledby={`industry-group-${group.parentKey}`}
               className="mb-4 overflow-hidden rounded-md border border-[#E1E8F1] bg-white"
             >
-              <h3
-                id={`industry-group-${group.parentKey}`}
-                className="border-b border-[#DCE6F2] bg-[#F3F7FC] px-3 py-2.5 text-[12px] font-bold text-[#2168B5]"
-              >
-                {group.parentLabel}
+              <h3 id={`industry-group-${group.parentKey}`} className="m-0">
+                <button
+                  type="button"
+                  aria-pressed={isParentSelected}
+                  onClick={() => onSelect({ id: group.parentKey, name: group.parentLabel })}
+                  className={`flex w-full items-center px-3 py-2.5 text-start text-[12px] font-bold transition-colors focus-visible:outline-[1px] focus-visible:outline-offset-[-1px] focus-visible:outline-[#B7D2F4] ${
+                    group.children.length > 0 ? 'border-b' : ''
+                  } ${
+                    isParentSelected
+                      ? 'border-[#CBE0F8] bg-[#EAF3FE] text-[#1D5FAD]'
+                      : 'border-[#DCE6F2] bg-[#F3F7FC] text-[#2168B5] hover:bg-[#EAF1FA]'
+                  }`}
+                >
+                  <RadioDot checked={isParentSelected} />
+                  <span className="min-w-0 truncate">{group.parentLabel}</span>
+                </button>
               </h3>
               <ul>
                 {group.children.map((child) => {
@@ -234,6 +272,7 @@ export default function IndustrySelectModal({
                             : 'text-[#1C2433] hover:bg-[#F8FAFD]'
                         }`}
                       >
+                        <RadioDot checked={isSelected} />
                         <span className="min-w-0 truncate">{child.label}</span>
                       </button>
                     </li>
@@ -241,7 +280,8 @@ export default function IndustrySelectModal({
                 })}
               </ul>
             </section>
-          ))
+            )
+          })
         )}
       </div>
     </Modal>

@@ -49,7 +49,9 @@ export default function IndustryField({
         ref={buttonRef}
         type="button"
         onClick={() => setModalOpened(true)}
-        onBlur={onBlur}
+        onBlur={() => {
+          if (!modalOpened) onBlur?.()
+        }}
         aria-haspopup="dialog"
         aria-expanded={modalOpened}
         aria-invalid={invalid || undefined}
@@ -75,7 +77,10 @@ export default function IndustryField({
         locale={locale}
         opened={modalOpened}
         selectedId={value?.id ?? null}
-        onClose={() => setModalOpened(false)}
+        onClose={() => {
+          setModalOpened(false)
+          onBlur?.()
+        }}
         onSelect={(option) => {
           onSelect(option)
           setModalOpened(false)

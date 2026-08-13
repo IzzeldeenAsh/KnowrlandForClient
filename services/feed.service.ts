@@ -154,6 +154,51 @@ export interface CommunityFeedPage {
   meta: CommunityFeedMeta
 }
 
+export interface CommunityFeedSearchInsight {
+  searchable_id: number
+  searchable_type: string
+  title: string
+  description: string | null
+  review: number | null
+  url: string
+  type: string
+  published_at: string
+  insighter: FeedItemInsighter | null
+  paid: boolean
+  price: number
+  is_read_later: boolean
+  total_downloads: number
+  cover_start: string | null
+  cover_end: string | null
+  language: 'english' | 'arabic'
+}
+
+export interface CommunityFeedSearchMeta {
+  scope: 'all'
+  language: 'english' | 'arabic'
+  snapshot_at: string
+  search_version: string
+  insights_limit: number
+  feed_limit: number
+  has_more: boolean
+  next_cursor: string | null
+  feed_search_session_id: string | null
+}
+
+export interface CommunityFeedSearchPage {
+  insights: CommunityFeedSearchInsight[]
+  feed: FeedItem[]
+  meta: CommunityFeedSearchMeta
+}
+
+export interface CommunityFeedSearchParams {
+  keyword: string
+  cursor?: string | null
+  industry?: number | null
+  contentType?: 'post' | 'article' | null
+  limit?: number
+}
+
 export class CommunityFeedApiError extends Error {
   constructor(
     message: string,
@@ -338,7 +383,29 @@ export async function getCommunityFeedArticle(
   )
 
   if (!response.ok) {
-    await parseErrorMessage(response, 'Unable to load the article.')
+    await parseErrorMessage(response, 'Unable to load the White Paper.')
+  }
+
+  const body = await response.json()
+  return body.data
+}
+
+export async function getCommunityFeedPost(
+  uuid: string,
+  locale: string,
+  signal?: AbortSignal,
+): Promise<FeedItem> {
+  const response = await fetch(
+    getApiUrl(`/api/platform/community/feed/posts/${encodeURIComponent(uuid)}`),
+    {
+      headers: publicHeaders(locale),
+      cache: 'no-store',
+      signal,
+    },
+  )
+
+  if (!response.ok) {
+    await parseErrorMessage(response, 'Unable to load the post.')
   }
 
   const body = await response.json()
@@ -459,6 +526,68 @@ export async function getCommunityFeed(
     locale,
     signal,
   )
+}
+
+export async function searchCommunityFeed(
+  locale: string,
+  search: CommunityFeedSearchParams,
+  signal?: AbortSignal,
+): Promise<CommunityFeedSearchPage> {
+  const params = new URLSearchParams({
+    keyword: search.keyword.trim(),
+    accuracy: 'any',
+    limit: String(search.limit ?? 10),
+  })
+
+  if (search.cursor) params.set('cursor', search.cursor)
+  if (search.industry) params.set('industry', String(search.industry))
+  if (search.contentType) params.set('content_type', search.contentType)
+
+  const response = await fetch(
+    getApiUrl(`/api/platform/community/feed/search?${params.toString()}`),
+    {
+      headers: authHeaders(locale),
+      cache: 'no-store',
+      signal,
+    },
+  )
+
+  if (!response.ok) {
+    let message = 'Unable to search the community feed.'
+    let code: string | null = null
+    let refreshRequired = false
+
+    try {
+      const body = await response.json()
+      if (typeof body?.message === 'string' && body.message.trim() !== '') {
+        message = body.message
+      }
+      if (typeof body?.code === 'string') code = body.code
+      refreshRequired = body?.refresh_required === true
+    } catch {
+      // Keep the fallback for non-JSON error responses.
+    }
+
+    throw new CommunityFeedApiError(message, response.status, code, refreshRequired)
+  }
+
+  const body = await response.json()
+
+  return {
+    insights: body.data?.insights ?? [],
+    feed: body.data?.feed ?? [],
+    meta: {
+      scope: 'all',
+      language: body.meta?.language === 'arabic' ? 'arabic' : 'english',
+      snapshot_at: body.meta?.snapshot_at ?? '',
+      search_version: body.meta?.search_version ?? '',
+      insights_limit: body.meta?.insights_limit ?? 0,
+      feed_limit: body.meta?.feed_limit ?? search.limit ?? 10,
+      has_more: body.meta?.has_more === true,
+      next_cursor: body.meta?.next_cursor ?? null,
+      feed_search_session_id: body.meta?.feed_search_session_id ?? null,
+    },
+  }
 }
 
 export async function deleteFeedItem(uuid: string, locale: string): Promise<void> {
@@ -649,7 +778,7 @@ async function saveArticle(
     if (!response.ok) {
       await parseErrorMessage(
         response,
-        status === 'draft' ? 'Unable to save the article draft.' : 'Unable to publish the article.',
+        status === 'draft' ? 'Unable to save the White Paper draft.' : 'Unable to publish the White Paper.',
       )
     }
 
@@ -665,7 +794,7 @@ async function saveArticle(
       })
 
       if (!coverResponse.ok) {
-        await parseErrorMessage(coverResponse, 'Unable to upload the article cover image.')
+        await parseErrorMessage(coverResponse, 'Unable to upload the White Paper cover image.')
       }
     }
 
@@ -677,7 +806,7 @@ async function saveArticle(
       })
 
       if (!publishResponse.ok) {
-        await parseErrorMessage(publishResponse, 'Unable to publish the article.')
+        await parseErrorMessage(publishResponse, 'Unable to publish the White Paper.')
       }
     }
 
@@ -708,7 +837,7 @@ async function saveArticle(
   if (!response.ok) {
     await parseErrorMessage(
       response,
-      status === 'draft' ? 'Unable to save the article draft.' : 'Unable to publish the article.',
+      status === 'draft' ? 'Unable to save the White Paper draft.' : 'Unable to publish the White Paper.',
     )
   }
 
@@ -727,6 +856,27 @@ export async function fetchIndustryTags(industryId: number, locale: string): Pro
 
   const body = await response.json()
   return (body.data ?? []).map((tag: FeedTag) => ({ id: tag.id, name: tag.name }))
+}
+
+// Create a custom tag under an industry (mirrors the Angular add-knowledge
+// step-4 "Add Tag" flow) and return it so the caller can select it right away.
+export async function createSuggestTag(
+  industryId: number,
+  name: string,
+  locale: string,
+): Promise<FeedTag> {
+  const response = await fetch(getApiUrl('/api/insighter/tag/suggest'), {
+    method: 'POST',
+    headers: { ...authHeaders(locale), 'Content-Type': 'application/json' },
+    body: JSON.stringify({ industry_id: industryId, name: { en: name, ar: name } }),
+  })
+
+  if (!response.ok) {
+    await parseErrorMessage(response, 'Unable to add the tag.')
+  }
+
+  const body = await response.json()
+  return { id: body.data.tag_id, name }
 }
 
 export async function fetchPublishedLibraryKnowledge(
@@ -754,4 +904,22 @@ export async function fetchPublishedLibraryKnowledge(
     })),
     meta: body.meta ?? { current_page: page, last_page: page, per_page: 10, total: 0 },
   }
+}
+
+// Locate a single published library item by id. There is no by-id endpoint, so
+// we walk the paginated library (newest first) until we find it. Used when the
+// user returns from publishing a new knowledge item to auto-attach it. Capped so
+// a stale/removed id can't page forever.
+export async function fetchLibraryKnowledgeById(
+  id: number,
+  locale: string,
+  maxPages = 5,
+): Promise<LibraryKnowledgeItem | null> {
+  for (let page = 1; page <= maxPages; page += 1) {
+    const result = await fetchPublishedLibraryKnowledge(page, locale)
+    const match = result.data.find((item) => item.id === id)
+    if (match) return match
+    if (page >= result.meta.last_page) break
+  }
+  return null
 }

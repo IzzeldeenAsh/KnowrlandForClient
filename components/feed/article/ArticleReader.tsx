@@ -14,6 +14,8 @@ import { format } from 'date-fns'
 import { arSA, enUS } from 'date-fns/locale'
 import Link from 'next/link'
 import { useEffect, useMemo, useState } from 'react'
+import { publicBaseUrl } from '@/app/config'
+import FeedShare from '@/components/feed/FeedShare'
 import {
   getCommunityFeedArticle,
   getFeedItem,
@@ -30,32 +32,35 @@ type ArticleReaderProps = {
 
 const copyByLocale = {
   en: {
-    article: 'Article',
     back: 'Back to Feed',
-    loading: 'Loading article…',
-    loadFailed: 'We couldn’t load this article.',
-    notArticle: 'This content is not an article.',
+    loading: 'Loading White Paper…',
+    loadFailed: 'We couldn’t load this White Paper.',
+    notArticle: 'This content is not a White Paper.',
     tryAgain: 'Try again',
     minuteRead: 'min read',
     published: 'Published',
+    publisher: 'Publisher',
     viewInsight: 'View',
     openingInsight: 'Opening…',
-    coverAlt: 'Article cover',
   },
   ar: {
-    article: 'مقال',
     back: 'العودة إلى الموجز',
-    loading: 'جارٍ تحميل المقال…',
-    loadFailed: 'تعذر تحميل هذا المقال.',
-    notArticle: 'هذا المحتوى ليس مقالاً.',
+    loading: 'جارٍ تحميل الورقة البيضاء…',
+    loadFailed: 'تعذر تحميل هذه الورقة البيضاء.',
+    notArticle: 'هذا المحتوى ليس ورقة بيضاء.',
     tryAgain: 'حاول مرة أخرى',
     minuteRead: 'دقيقة قراءة',
     published: 'نُشر',
+    publisher: 'الناشر',
     viewInsight: 'عرض',
     openingInsight: 'جارٍ الفتح…',
-    coverAlt: 'غلاف المقال',
   },
 } as const
+
+function truncateLabel(value: string, maxLength = 38): string {
+  if (value.length <= maxLength) return value
+  return `${value.slice(0, maxLength).trimEnd()}…`
+}
 
 const allowedTags = new Set([
   'p',
@@ -139,20 +144,20 @@ function formatArticleDate(value: string | null, locale: string): string | null 
 
 function ArticleSkeleton({ label }: { label: string }) {
   return (
-    <div aria-label={label} className="mx-auto max-w-[1040px] animate-pulse px-4 py-8 lg:px-8">
-      <div className="h-5 w-36 rounded bg-slate-200" />
-      <div className="mt-7 overflow-hidden rounded-2xl border border-slate-200 bg-white">
-        <div className="h-[clamp(140px,20vw,220px)] bg-slate-200" />
-        <div className="mx-auto max-w-[790px] px-6 py-10 sm:px-10">
-          <div className="h-4 w-40 rounded bg-slate-200" />
-          <div className="mt-5 h-10 w-full rounded bg-slate-200" />
-          <div className="mt-3 h-10 w-4/5 rounded bg-slate-200" />
-          <div className="mt-10 h-px bg-slate-200" />
-          <div className="mt-8 space-y-3">
-            <div className="h-4 rounded bg-slate-100" />
-            <div className="h-4 rounded bg-slate-100" />
-            <div className="h-4 w-3/4 rounded bg-slate-100" />
-          </div>
+    <div aria-label={label} className={styles.skeleton}>
+      <div className={styles.skeletonHero}>
+        <div className={styles.skeletonInner}>
+          <div className={styles.skeletonTitle} />
+          <div className={styles.skeletonTitleShort} />
+        </div>
+      </div>
+      <div className={styles.skeletonContent}>
+        <div className={styles.skeletonSide} />
+        <div className={styles.skeletonLines}>
+          <div />
+          <div />
+          <div />
+          <div />
         </div>
       </div>
     </div>
@@ -237,65 +242,89 @@ export default function ArticleReader({ locale, identifier, isPublic }: ArticleR
     .join('')
     .toUpperCase() || 'I'
 
+  const shareUrl = `${publicBaseUrl}/${locale}/article/${item.slug ?? identifier}`
+
   return (
-    <div dir={isArabic ? 'rtl' : 'ltr'} className="min-h-[calc(100vh-var(--app-header-height,88px))] bg-[#F2F5F8] text-[#142033]">
-      <main className="mx-auto max-w-[1040px] px-4 py-7 sm:py-10 lg:px-8 lg:py-12">
-        <Link href={`/${locale}`} className="inline-flex min-h-10 items-center gap-2 rounded-full px-3 text-sm font-semibold text-[#53677F] transition-colors hover:bg-white hover:text-[#2378E8] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2378E8]">
-          <BackIcon aria-hidden className="h-4 w-4" stroke={2} />
+    <div dir={isArabic ? 'rtl' : 'ltr'} className={styles.page}>
+      <header
+        className={`${styles.hero} ${cover?.url ? styles.heroWithImage : styles.heroWithoutImage}`}
+        style={cover?.url ? { backgroundImage: `url(${cover.url})` } : undefined}
+      >
+        <div className={styles.heroShade} />
+        <div className={styles.heroInner}>
+          <div className={styles.heroTitleRow}>
+            <div className={styles.heroContent}>
+              {item.industry && (
+                <Link
+                  href={`/${locale}/sub-industry/${item.industry.id}/${item.industry.slug}`}
+                  className={styles.heroIndustryEyebrow}
+                  title={item.industry.name}
+                >
+                  <IconBuildingSkyscraper aria-hidden />
+                  <span>{truncateLabel(item.industry.name)}</span>
+                </Link>
+              )}
+              <h1 dir="auto">{item.title}</h1>
+            </div>
+            <div className={styles.heroActions}>
+              <FeedShare
+                shareUrl={shareUrl}
+                shareTitle={item.title ?? ''}
+                authorName={insighter?.name ?? 'Insighta'}
+                authorPhotoUrl={insighter?.profile_photo_url}
+                locale={locale}
+                shareKind="white-paper"
+                triggerClassName={styles.shareButton}
+                hideTriggerLabel
+              />
+            </div>
+          </div>
+
+          <div className={styles.heroMetaRow}>
+            {insighter && (
+              <div className={`${styles.heroMetaItem} ${styles.heroAuthor}`}>
+                <Link
+                  href={`/${locale}/profile/${insighter.uuid}?entity=insighter`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className={styles.heroAuthorLink}
+                >
+                  <div className={styles.authorAvatar}>
+                    {insighter.profile_photo_url ? <img src={insighter.profile_photo_url} alt={insighter.name} /> : <span>{initials}</span>}
+                  </div>
+                  <div className={styles.heroAuthorText}>
+                    <span className={styles.heroMetaLabel}>{copy.publisher}</span>
+                    <strong>{insighter.name}</strong>
+                    {insighter.company && <small>{insighter.company.legal_name ?? insighter.company.name}</small>}
+                  </div>
+                </Link>
+              </div>
+            )}
+
+            {publishedDate && (
+              <time className={`${styles.heroMetaItem} ${styles.heroPublished}`} dateTime={item.published_at ?? item.created_at ?? undefined}>
+                <span className={styles.heroMetaLabel}>{copy.published}</span>
+                <strong>{publishedDate}</strong>
+              </time>
+            )}
+
+            <div className={`${styles.heroMetaItem} ${styles.heroReadTime}`}>
+              <IconClock aria-hidden />
+              <strong>{readingMinutes} {copy.minuteRead}</strong>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      <main className={styles.contentShell}>
+        <Link href={`/${locale}`} className={styles.backLink}>
+          <BackIcon aria-hidden />
           {copy.back}
         </Link>
 
-        <article className="mt-4 overflow-hidden rounded-2xl border border-[#D8E1EB] bg-white shadow-[0_22px_60px_rgba(31,48,70,0.08)] sm:mt-6">
-          {cover?.url ? (
-            <div className="h-[clamp(140px,20vw,220px)] overflow-hidden bg-[#E5EBF1]">
-              <img src={cover.url} alt={cover.name || item.title || copy.coverAlt} className="h-full w-full object-cover" />
-            </div>
-          ) : (
-            <div className="flex h-[clamp(140px,20vw,220px)] items-center justify-center bg-[linear-gradient(135deg,#EAF1F8_0%,#DCE8F4_100%)] text-[#7890AB]">
-              <IconArticle aria-hidden className="h-16 w-16" stroke={1.2} />
-            </div>
-          )}
-
-          <div className="mx-auto max-w-[790px] px-6 py-8 sm:px-10 sm:py-12 lg:px-12 lg:py-14">
-            <div className="flex flex-wrap items-center gap-x-2.5 gap-y-2 text-[12px] font-semibold text-[#65778D]">
-              <span className="inline-flex items-center gap-1.5 uppercase tracking-[0.1em] text-[#2378E8]"><IconArticle aria-hidden className="h-4 w-4" />{copy.article}</span>
-              <span aria-hidden>·</span>
-              <span className="inline-flex items-center gap-1.5"><IconClock aria-hidden className="h-4 w-4" />{readingMinutes} {copy.minuteRead}</span>
-              {publishedDate && <><span aria-hidden>·</span><time dateTime={item.published_at ?? item.created_at ?? undefined}>{copy.published} {publishedDate}</time></>}
-            </div>
-
-            <h1 dir="auto" className="mt-5 text-start text-[clamp(1.65rem,3.5vw,2.65rem)] font-bold leading-[1.18] tracking-[-0.03em] text-[#101827]">
-              {item.title}
-            </h1>
-
-            {(insighter || item.industry) && (
-              <div className="mt-8 flex flex-wrap items-center gap-4 border-y border-[#E4EAF0] py-5">
-                {insighter && (
-                  <div className="flex min-w-0 items-center gap-3">
-                    <div className="h-11 w-11 shrink-0 overflow-hidden rounded-full bg-[#E7F0FE]">
-                      {insighter.profile_photo_url ? <img src={insighter.profile_photo_url} alt={insighter.name} className="h-full w-full object-cover" /> : <span className="flex h-full items-center justify-center text-sm font-bold text-[#2378E8]">{initials}</span>}
-                    </div>
-                    <div className="min-w-0">
-                      <p className="truncate text-sm font-bold text-[#1D2A3D]">{insighter.name}</p>
-                      {insighter.company && <p className="truncate text-xs text-[#718298]">{insighter.company.legal_name ?? insighter.company.name}</p>}
-                    </div>
-                  </div>
-                )}
-                {item.industry && (
-                  <Link href={`/${locale}/sub-industry/${item.industry.id}/${item.industry.slug}`} className="inline-flex items-center gap-2 rounded-full bg-[#EDF4FC] px-3 py-2 text-xs font-semibold text-[#2378E8] hover:bg-[#E1EDFA]">
-                    <IconBuildingSkyscraper aria-hidden className="h-4 w-4" />{item.industry.name}
-                  </Link>
-                )}
-              </div>
-            )}
-
-            {item.tags.length > 0 && (
-              <div className="mt-7 flex flex-wrap gap-2">
-                {item.tags.map((tag) => <span key={tag.id} className="rounded-full bg-[#F0F4F8] px-3 py-1.5 text-xs font-semibold text-[#556A84]">#{tag.name}</span>)}
-              </div>
-            )}
-
-            <div dir="auto" className={`${styles.articleBody} mt-9`} dangerouslySetInnerHTML={{ __html: sanitizedBody }} />
+        <article className={styles.articleLayout}>
+          <div className={styles.articleMain}>
+            <div dir="auto" className={styles.articleBody} dangerouslySetInnerHTML={{ __html: sanitizedBody }} />
 
             {item.related_insights.length > 0 && (
               <div className="-mx-6 mt-12 divide-y divide-[#E7EDF5] overflow-hidden rounded-xl border border-[#E7EDF5] sm:-mx-10 lg:-mx-12">
