@@ -469,6 +469,21 @@ type MuxPlayerElement = HTMLElement & {
   pause: () => void
 }
 
+// iPads and iPhones have a small fixed pool of hardware video decoders, and
+// WebKit fails streams with MEDIA_ERR_DECODE when a feed keeps several of them
+// busy. Allow only one feed video to play at a time: claiming playback pauses
+// whichever video currently holds it.
+let pauseActiveFeedVideo: (() => void) | null = null
+
+function claimFeedPlayback(pause: () => void) {
+  if (pauseActiveFeedVideo && pauseActiveFeedVideo !== pause) pauseActiveFeedVideo()
+  pauseActiveFeedVideo = pause
+}
+
+function releaseFeedPlayback(pause: () => void) {
+  if (pauseActiveFeedVideo === pause) pauseActiveFeedVideo = null
+}
+
 function VideoPlayer({
   media,
   title,
@@ -487,6 +502,12 @@ function VideoPlayer({
   // Bumped to remount the player after a decode failure (see the error effect).
   const [playerEpoch, setPlayerEpoch] = useState(0)
   const decodeRetriesRef = useRef(0)
+  const fatalErrorRef = useRef(false)
+
+  const pauseSelf = useCallback(() => {
+    const player = containerRef.current?.querySelector('mux-player') as MuxPlayerElement | null
+    player?.pause()
+  }, [])
 
   const playMuted = useCallback(async () => {
     const player = containerRef.current?.querySelector('mux-player') as MuxPlayerElement | null
@@ -494,6 +515,7 @@ function VideoPlayer({
 
     // WebKit requires the underlying media property to be muted before play().
     player.muted = true
+    claimFeedPlayback(pauseSelf)
 
     try {
       await player.play()
@@ -502,7 +524,7 @@ function VideoPlayer({
       setAutoplayBlocked(true)
       console.warn('Mux autoplay was blocked by the browser.', error)
     }
-  }, [])
+  }, [pauseSelf])
 
   useEffect(() => {
     const container = containerRef.current
@@ -510,15 +532,18 @@ function VideoPlayer({
 
     setAutoplayBlocked(false)
 
-    // Mount and buffer roughly one screen before the card becomes visible.
-    // Keeping this window bounded avoids loading every video in a long feed.
+    // Mount roughly half a screen before the card becomes visible. Keeping
+    // this window tight bounds how many media elements exist at once, which
+    // matters on iOS/iPadOS where decoder resources are scarce.
     const preloadObserver = new IntersectionObserver(
       ([entry]) => setShouldPreload(entry.isIntersecting),
-      { rootMargin: '100% 0px' },
+      { rootMargin: '50% 0px' },
     )
+    // Require the card to be mostly visible before it counts as "in viewport"
+    // so barely-visible videos at the screen edges don't compete for playback.
     const playbackObserver = new IntersectionObserver(
       ([entry]) => setIsInViewport(entry.isIntersecting),
-      { threshold: 0.01 },
+      { threshold: 0.5 },
     )
 
     preloadObserver.observe(container)
@@ -539,21 +564,25 @@ function VideoPlayer({
       void playMuted()
     } else {
       player.pause()
+      releaseFeedPlayback(pauseSelf)
       setAutoplayBlocked(false)
     }
-  }, [isInViewport, playMuted, shouldPreload, playerEpoch])
+  }, [isInViewport, playMuted, pauseSelf, shouldPreload, playerEpoch])
+
+  // Release the shared playback slot when the card unmounts entirely.
+  useEffect(() => () => releaseFeedPlayback(pauseSelf), [pauseSelf])
 
   useEffect(() => {
     if (!shouldPreload) return
 
-    const player = containerRef.current?.querySelector('mux-player') as
-      | (MuxPlayerElement & { error?: { code?: number } })
-      | null
+    const player = containerRef.current?.querySelector('mux-player') as MuxPlayerElement | null
     if (!player) return
 
+    fatalErrorRef.current = false
+
     const handleError = (event: Event) => {
-      const detail = (event as CustomEvent<{ code?: number } | undefined>).detail
-      const code = detail?.code ?? player.error?.code
+      fatalErrorRef.current = true
+      const code = (event as CustomEvent<{ code?: number } | undefined>).detail?.code
       // MEDIA_ERR_DECODE (3): iPad WebKit has a small pool of hardware decoder
       // instances and can transiently fail a stream when the feed holds several
       // players at once. Remounting the player recovers playback.
@@ -617,7 +646,16 @@ function VideoPlayer({
           {autoplayBlocked && isInViewport && (
             <button
               type="button"
-              onClick={() => void playMuted()}
+              onClick={() => {
+                if (fatalErrorRef.current) {
+                  // play() on failed media just rejects again; remount the
+                  // player and let the playback effect restart it.
+                  decodeRetriesRef.current = 0
+                  setPlayerEpoch((epoch) => epoch + 1)
+                } else {
+                  void playMuted()
+                }
+              }}
               aria-label={playLabel}
               className="absolute inset-0 z-10 flex items-center justify-center bg-black/25 text-white transition-colors hover:bg-black/35 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-white"
             >
