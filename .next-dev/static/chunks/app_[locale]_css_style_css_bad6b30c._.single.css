@@ -10780,6 +10780,11 @@ input[type="search"]::-webkit-search-results-decoration {
   color: rgba(191, 215, 255, var(--tw-text-opacity, 1));
 }
 
+.text-\[\#C77D10\] {
+  --tw-text-opacity: 1;
+  color: rgba(199, 125, 16, var(--tw-text-opacity, 1));
+}
+
 .text-\[\#C8780A\] {
   --tw-text-opacity: 1;
   color: rgba(200, 120, 10, var(--tw-text-opacity, 1));
@@ -11259,11 +11264,6 @@ input[type="search"]::-webkit-search-results-decoration {
 .text-yellow-800 {
   --tw-text-opacity: 1;
   color: rgba(133, 77, 14, var(--tw-text-opacity, 1));
-}
-
-.text-\[\#C77D10\] {
-  --tw-text-opacity: 1;
-  color: rgba(199, 125, 16, var(--tw-text-opacity, 1));
 }
 
 .underline {

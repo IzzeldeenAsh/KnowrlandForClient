@@ -3519,6 +3519,30 @@ function ImageGallery(param) {
 }
 _s(ImageGallery, "tUMko85fuNBibhc43PZHhs4lYDM=");
 _c1 = ImageGallery;
+// iPads and iPhones have a small fixed pool of hardware video decoders, and
+// WebKit fails streams with MEDIA_ERR_DECODE when a feed keeps several of them
+// busy. Allow only one feed video to play at a time: claiming playback pauses
+// whichever video currently holds it.
+// Pick the HLS engine per browser engine, not per platform. Apple WebKit
+// (Safari, plus every WebKit-based iOS browser — navigator.vendor is "Apple
+// Computer, Inc." there) plays HLS natively and reliably, while its MSE path
+// (ManagedMediaSource) throws decode errors. Chromium (vendor "Google Inc."),
+// including Blink-based Chrome on iPadOS and Android, claims native HLS
+// support but its demuxer fails on Mux streams with
+// DEMUXER_ERROR_COULD_NOT_PARSE — it needs hls.js/MSE, as does Firefox.
+function preferredHlsPlayback() {
+    var _navigator_vendor;
+    if (typeof navigator === 'undefined') return 'mse';
+    return ((_navigator_vendor = navigator.vendor) === null || _navigator_vendor === void 0 ? void 0 : _navigator_vendor.includes('Apple')) ? 'native' : 'mse';
+}
+let pauseActiveFeedVideo = null;
+function claimFeedPlayback(pause) {
+    if (pauseActiveFeedVideo && pauseActiveFeedVideo !== pause) pauseActiveFeedVideo();
+    pauseActiveFeedVideo = pause;
+}
+function releaseFeedPlayback(pause) {
+    if (pauseActiveFeedVideo === pause) pauseActiveFeedVideo = null;
+}
 function VideoPlayer(param) {
     let { media, title, playLabel, flushBottom = false } = param;
     _s1();
@@ -3526,6 +3550,17 @@ function VideoPlayer(param) {
     const [shouldPreload, setShouldPreload] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])(false);
     const [isInViewport, setIsInViewport] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])(false);
     const [autoplayBlocked, setAutoplayBlocked] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])(false);
+    // Bumped to remount the player after a decode failure (see the error effect).
+    const [playerEpoch, setPlayerEpoch] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])(0);
+    const decodeRetriesRef = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useRef"])(0);
+    const fatalErrorRef = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useRef"])(false);
+    const pauseSelf = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useCallback"])({
+        "VideoPlayer.useCallback[pauseSelf]": ()=>{
+            var _containerRef_current;
+            const player = (_containerRef_current = containerRef.current) === null || _containerRef_current === void 0 ? void 0 : _containerRef_current.querySelector('mux-player');
+            player === null || player === void 0 ? void 0 : player.pause();
+        }
+    }["VideoPlayer.useCallback[pauseSelf]"], []);
     const playMuted = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useCallback"])({
         "VideoPlayer.useCallback[playMuted]": async ()=>{
             var _containerRef_current;
@@ -3533,6 +3568,7 @@ function VideoPlayer(param) {
             if (!player) return;
             // WebKit requires the underlying media property to be muted before play().
             player.muted = true;
+            claimFeedPlayback(pauseSelf);
             try {
                 await player.play();
                 setAutoplayBlocked(false);
@@ -3541,29 +3577,34 @@ function VideoPlayer(param) {
                 console.warn('Mux autoplay was blocked by the browser.', error);
             }
         }
-    }["VideoPlayer.useCallback[playMuted]"], []);
+    }["VideoPlayer.useCallback[playMuted]"], [
+        pauseSelf
+    ]);
     (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useEffect"])({
         "VideoPlayer.useEffect": ()=>{
             const container = containerRef.current;
             if (!container || !media.provider_playback_id) return;
             setAutoplayBlocked(false);
-            // Mount and buffer roughly one screen before the card becomes visible.
-            // Keeping this window bounded avoids loading every video in a long feed.
+            // Mount roughly half a screen before the card becomes visible. Keeping
+            // this window tight bounds how many media elements exist at once, which
+            // matters on iOS/iPadOS where decoder resources are scarce.
             const preloadObserver = new IntersectionObserver({
                 "VideoPlayer.useEffect": (param)=>{
                     let [entry] = param;
                     return setShouldPreload(entry.isIntersecting);
                 }
             }["VideoPlayer.useEffect"], {
-                rootMargin: '100% 0px'
+                rootMargin: '50% 0px'
             });
+            // Require the card to be mostly visible before it counts as "in viewport"
+            // so barely-visible videos at the screen edges don't compete for playback.
             const playbackObserver = new IntersectionObserver({
                 "VideoPlayer.useEffect": (param)=>{
                     let [entry] = param;
                     return setIsInViewport(entry.isIntersecting);
                 }
             }["VideoPlayer.useEffect"], {
-                threshold: 0.01
+                threshold: 0.5
             });
             preloadObserver.observe(container);
             playbackObserver.observe(container);
@@ -3586,13 +3627,56 @@ function VideoPlayer(param) {
                 void playMuted();
             } else {
                 player.pause();
+                releaseFeedPlayback(pauseSelf);
                 setAutoplayBlocked(false);
             }
         }
     }["VideoPlayer.useEffect"], [
         isInViewport,
         playMuted,
-        shouldPreload
+        pauseSelf,
+        shouldPreload,
+        playerEpoch
+    ]);
+    // Release the shared playback slot when the card unmounts entirely.
+    (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useEffect"])({
+        "VideoPlayer.useEffect": ()=>({
+                "VideoPlayer.useEffect": ()=>releaseFeedPlayback(pauseSelf)
+            })["VideoPlayer.useEffect"]
+    }["VideoPlayer.useEffect"], [
+        pauseSelf
+    ]);
+    (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useEffect"])({
+        "VideoPlayer.useEffect": ()=>{
+            var _containerRef_current;
+            if (!shouldPreload) return;
+            const player = (_containerRef_current = containerRef.current) === null || _containerRef_current === void 0 ? void 0 : _containerRef_current.querySelector('mux-player');
+            if (!player) return;
+            fatalErrorRef.current = false;
+            const handleError = {
+                "VideoPlayer.useEffect.handleError": (event)=>{
+                    var _detail;
+                    fatalErrorRef.current = true;
+                    const code = (_detail = event.detail) === null || _detail === void 0 ? void 0 : _detail.code;
+                    // MEDIA_ERR_DECODE (3): iPad WebKit has a small pool of hardware decoder
+                    // instances and can transiently fail a stream when the feed holds several
+                    // players at once. Remounting the player recovers playback.
+                    if (code === MediaError.MEDIA_ERR_DECODE && decodeRetriesRef.current < 2) {
+                        decodeRetriesRef.current += 1;
+                        setPlayerEpoch({
+                            "VideoPlayer.useEffect.handleError": (epoch)=>epoch + 1
+                        }["VideoPlayer.useEffect.handleError"]);
+                    }
+                }
+            }["VideoPlayer.useEffect.handleError"];
+            player.addEventListener('error', handleError);
+            return ({
+                "VideoPlayer.useEffect": ()=>player.removeEventListener('error', handleError)
+            })["VideoPlayer.useEffect"];
+        }
+    }["VideoPlayer.useEffect"], [
+        shouldPreload,
+        playerEpoch
     ]);
     if (media.provider_playback_id) {
         // Reserve the box at the video's real aspect ratio so it doesn't collapse
@@ -3627,7 +3711,8 @@ function VideoPlayer(param) {
                         "accent-color": "#2378E8",
                         "disable-tracking": "",
                         autoplay: isInViewport ? 'muted' : false,
-                        preload: "auto",
+                        "prefer-playback": preferredHlsPlayback(),
+                        preload: isInViewport ? 'auto' : 'metadata',
                         "max-resolution": "720p",
                         muted: true,
                         loop: true,
@@ -3637,14 +3722,23 @@ function VideoPlayer(param) {
                             height: '100%',
                             display: 'block'
                         }
-                    }, void 0, false, {
+                    }, playerEpoch, false, {
                         fileName: "[project]/components/feed/MyFeedsTimeline.tsx",
-                        lineNumber: 570,
+                        lineNumber: 638,
                         columnNumber: 13
                     }, this),
                     autoplayBlocked && isInViewport && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
                         type: "button",
-                        onClick: ()=>void playMuted(),
+                        onClick: ()=>{
+                            if (fatalErrorRef.current) {
+                                // play() on failed media just rejects again; remount the
+                                // player and let the playback effect restart it.
+                                decodeRetriesRef.current = 0;
+                                setPlayerEpoch((epoch)=>epoch + 1);
+                            } else {
+                                void playMuted();
+                            }
+                        },
                         "aria-label": playLabel,
                         className: "absolute inset-0 z-10 flex items-center justify-center bg-black/25 text-white transition-colors hover:bg-black/35 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-white",
                         children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -3655,30 +3749,30 @@ function VideoPlayer(param) {
                                     className: "h-5 w-5"
                                 }, void 0, false, {
                                     fileName: "[project]/components/feed/MyFeedsTimeline.tsx",
-                                    lineNumber: 593,
+                                    lineNumber: 672,
                                     columnNumber: 17
                                 }, this),
                                 playLabel
                             ]
                         }, void 0, true, {
                             fileName: "[project]/components/feed/MyFeedsTimeline.tsx",
-                            lineNumber: 592,
+                            lineNumber: 671,
                             columnNumber: 15
                         }, this)
                     }, void 0, false, {
                         fileName: "[project]/components/feed/MyFeedsTimeline.tsx",
-                        lineNumber: 586,
+                        lineNumber: 656,
                         columnNumber: 13
                     }, this)
                 ]
             }, void 0, true, {
                 fileName: "[project]/components/feed/MyFeedsTimeline.tsx",
-                lineNumber: 558,
+                lineNumber: 626,
                 columnNumber: 9
             }, this)
         }, void 0, false, {
             fileName: "[project]/components/feed/MyFeedsTimeline.tsx",
-            lineNumber: 555,
+            lineNumber: 623,
             columnNumber: 7
         }, this));
     }
@@ -3690,16 +3784,16 @@ function VideoPlayer(param) {
             stroke: 1.5
         }, void 0, false, {
             fileName: "[project]/components/feed/MyFeedsTimeline.tsx",
-            lineNumber: 605,
+            lineNumber: 684,
             columnNumber: 7
         }, this)
     }, void 0, false, {
         fileName: "[project]/components/feed/MyFeedsTimeline.tsx",
-        lineNumber: 604,
+        lineNumber: 683,
         columnNumber: 5
     }, this);
 }
-_s1(VideoPlayer, "y7BQsLyJoJbplmDQIddFyIqR2TM=");
+_s1(VideoPlayer, "E3hWgJ+gfTSnB+eR/d089gSh9Aw=");
 _c2 = VideoPlayer;
 function ArticlePreview(param) {
     let { item, cover, locale, isPublic, flushBottom = false } = param;
@@ -3724,12 +3818,12 @@ function ArticlePreview(param) {
                     className: "h-full w-full object-cover transition-transform duration-500 group-hover:scale-[1.015]"
                 }, void 0, false, {
                     fileName: "[project]/components/feed/MyFeedsTimeline.tsx",
-                    lineNumber: 643,
+                    lineNumber: 722,
                     columnNumber: 11
                 }, this)
             }, void 0, false, {
                 fileName: "[project]/components/feed/MyFeedsTimeline.tsx",
-                lineNumber: 642,
+                lineNumber: 721,
                 columnNumber: 9
             }, this) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                 className: "flex aspect-[1.91/1] w-full items-center justify-center bg-[linear-gradient(135deg,#EAF1F8_0%,#DCE8F4_100%)] text-[#6C829E]",
@@ -3739,12 +3833,12 @@ function ArticlePreview(param) {
                     stroke: 1.3
                 }, void 0, false, {
                     fileName: "[project]/components/feed/MyFeedsTimeline.tsx",
-                    lineNumber: 652,
+                    lineNumber: 731,
                     columnNumber: 11
                 }, this)
             }, void 0, false, {
                 fileName: "[project]/components/feed/MyFeedsTimeline.tsx",
-                lineNumber: 651,
+                lineNumber: 730,
                 columnNumber: 9
             }, this),
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -3759,20 +3853,20 @@ function ArticlePreview(param) {
                                 stroke: 1.8
                             }, void 0, false, {
                                 fileName: "[project]/components/feed/MyFeedsTimeline.tsx",
-                                lineNumber: 658,
+                                lineNumber: 737,
                                 columnNumber: 11
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
                                 children: copy.article
                             }, void 0, false, {
                                 fileName: "[project]/components/feed/MyFeedsTimeline.tsx",
-                                lineNumber: 659,
+                                lineNumber: 738,
                                 columnNumber: 11
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "[project]/components/feed/MyFeedsTimeline.tsx",
-                        lineNumber: 657,
+                        lineNumber: 736,
                         columnNumber: 9
                     }, this),
                     item.title && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("h2", {
@@ -3781,7 +3875,7 @@ function ArticlePreview(param) {
                         children: item.title
                     }, void 0, false, {
                         fileName: "[project]/components/feed/MyFeedsTimeline.tsx",
-                        lineNumber: 663,
+                        lineNumber: 742,
                         columnNumber: 11
                     }, this),
                     articleText && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -3790,19 +3884,19 @@ function ArticlePreview(param) {
                         children: articleText
                     }, void 0, false, {
                         fileName: "[project]/components/feed/MyFeedsTimeline.tsx",
-                        lineNumber: 672,
+                        lineNumber: 751,
                         columnNumber: 11
                     }, this)
                 ]
             }, void 0, true, {
                 fileName: "[project]/components/feed/MyFeedsTimeline.tsx",
-                lineNumber: 656,
+                lineNumber: 735,
                 columnNumber: 7
             }, this)
         ]
     }, void 0, true, {
         fileName: "[project]/components/feed/MyFeedsTimeline.tsx",
-        lineNumber: 630,
+        lineNumber: 709,
         columnNumber: 5
     }, this);
 }
@@ -3816,7 +3910,7 @@ function RelatedInsightIcon(param) {
                 height: 16
             }, void 0, false, {
                 fileName: "[project]/components/feed/MyFeedsTimeline.tsx",
-                lineNumber: 687,
+                lineNumber: 766,
                 columnNumber: 14
             }, this);
         case 'manual':
@@ -3825,7 +3919,7 @@ function RelatedInsightIcon(param) {
                 height: 16
             }, void 0, false, {
                 fileName: "[project]/components/feed/MyFeedsTimeline.tsx",
-                lineNumber: 689,
+                lineNumber: 768,
                 columnNumber: 14
             }, this);
         case 'statistic':
@@ -3834,7 +3928,7 @@ function RelatedInsightIcon(param) {
                 height: 16
             }, void 0, false, {
                 fileName: "[project]/components/feed/MyFeedsTimeline.tsx",
-                lineNumber: 691,
+                lineNumber: 770,
                 columnNumber: 14
             }, this);
         case 'data':
@@ -3843,7 +3937,7 @@ function RelatedInsightIcon(param) {
                 height: 16
             }, void 0, false, {
                 fileName: "[project]/components/feed/MyFeedsTimeline.tsx",
-                lineNumber: 693,
+                lineNumber: 772,
                 columnNumber: 14
             }, this);
         case 'course':
@@ -3852,7 +3946,7 @@ function RelatedInsightIcon(param) {
                 height: 16
             }, void 0, false, {
                 fileName: "[project]/components/feed/MyFeedsTimeline.tsx",
-                lineNumber: 695,
+                lineNumber: 774,
                 columnNumber: 14
             }, this);
         default:
@@ -3861,7 +3955,7 @@ function RelatedInsightIcon(param) {
                 height: 16
             }, void 0, false, {
                 fileName: "[project]/components/feed/MyFeedsTimeline.tsx",
-                lineNumber: 697,
+                lineNumber: 776,
                 columnNumber: 14
             }, this);
     }
@@ -3955,19 +4049,19 @@ function FeedCard(param) {
                                         className: "h-full w-full object-cover"
                                     }, void 0, false, {
                                         fileName: "[project]/components/feed/MyFeedsTimeline.tsx",
-                                        lineNumber: 804,
+                                        lineNumber: 883,
                                         columnNumber: 19
                                     }, this) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                                         className: "flex h-full w-full items-center justify-center text-[13px] font-bold text-[#2378E8]",
                                         children: initials || 'I'
                                     }, void 0, false, {
                                         fileName: "[project]/components/feed/MyFeedsTimeline.tsx",
-                                        lineNumber: 810,
+                                        lineNumber: 889,
                                         columnNumber: 19
                                     }, this)
                                 }, void 0, false, {
                                     fileName: "[project]/components/feed/MyFeedsTimeline.tsx",
-                                    lineNumber: 802,
+                                    lineNumber: 881,
                                     columnNumber: 15
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -3981,7 +4075,7 @@ function FeedCard(param) {
                                             children: insighter.name
                                         }, void 0, false, {
                                             fileName: "[project]/components/feed/MyFeedsTimeline.tsx",
-                                            lineNumber: 816,
+                                            lineNumber: 895,
                                             columnNumber: 17
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -3995,7 +4089,7 @@ function FeedCard(param) {
                                                     children: item.industry.name
                                                 }, void 0, false, {
                                                     fileName: "[project]/components/feed/MyFeedsTimeline.tsx",
-                                                    lineNumber: 826,
+                                                    lineNumber: 905,
                                                     columnNumber: 21
                                                 }, this),
                                                 date && item.industry && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -4004,7 +4098,7 @@ function FeedCard(param) {
                                                     children: "·"
                                                 }, void 0, false, {
                                                     fileName: "[project]/components/feed/MyFeedsTimeline.tsx",
-                                                    lineNumber: 835,
+                                                    lineNumber: 914,
                                                     columnNumber: 45
                                                 }, this),
                                                 date && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("time", {
@@ -4013,30 +4107,30 @@ function FeedCard(param) {
                                                     children: date
                                                 }, void 0, false, {
                                                     fileName: "[project]/components/feed/MyFeedsTimeline.tsx",
-                                                    lineNumber: 837,
+                                                    lineNumber: 916,
                                                     columnNumber: 21
                                                 }, this)
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/components/feed/MyFeedsTimeline.tsx",
-                                            lineNumber: 824,
+                                            lineNumber: 903,
                                             columnNumber: 17
                                         }, this)
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/components/feed/MyFeedsTimeline.tsx",
-                                    lineNumber: 815,
+                                    lineNumber: 894,
                                     columnNumber: 15
                                 }, this)
                             ]
                         }, void 0, true, {
                             fileName: "[project]/components/feed/MyFeedsTimeline.tsx",
-                            lineNumber: 801,
+                            lineNumber: 880,
                             columnNumber: 13
                         }, this)
                     }, void 0, false, {
                         fileName: "[project]/components/feed/MyFeedsTimeline.tsx",
-                        lineNumber: 799,
+                        lineNumber: 878,
                         columnNumber: 9
                     }, this),
                     (onDelete || articleAccess === 'community') && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -4063,7 +4157,7 @@ function FeedCard(param) {
                                                 stroke: 2
                                             }, void 0, false, {
                                                 fileName: "[project]/components/feed/MyFeedsTimeline.tsx",
-                                                lineNumber: 873,
+                                                lineNumber: 952,
                                                 columnNumber: 23
                                             }, this) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$tabler$2f$icons$2d$react$2f$dist$2f$esm$2f$icons$2f$IconRadar$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__IconRadar$3e$__["IconRadar"], {
                                                 "aria-hidden": true,
@@ -4071,30 +4165,30 @@ function FeedCard(param) {
                                                 stroke: 1.9
                                             }, void 0, false, {
                                                 fileName: "[project]/components/feed/MyFeedsTimeline.tsx",
-                                                lineNumber: 875,
+                                                lineNumber: 954,
                                                 columnNumber: 23
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
                                                 children: isTracked ? copy.untrack : copy.track
                                             }, void 0, false, {
                                                 fileName: "[project]/components/feed/MyFeedsTimeline.tsx",
-                                                lineNumber: 877,
+                                                lineNumber: 956,
                                                 columnNumber: 21
                                             }, this)
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/components/feed/MyFeedsTimeline.tsx",
-                                        lineNumber: 860,
+                                        lineNumber: 939,
                                         columnNumber: 19
                                     }, this)
                                 }, void 0, false, {
                                     fileName: "[project]/components/feed/MyFeedsTimeline.tsx",
-                                    lineNumber: 859,
+                                    lineNumber: 938,
                                     columnNumber: 17
                                 }, this)
                             }, void 0, false, {
                                 fileName: "[project]/components/feed/MyFeedsTimeline.tsx",
-                                lineNumber: 853,
+                                lineNumber: 932,
                                 columnNumber: 15
                             }, this),
                             onDelete && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -4102,7 +4196,7 @@ function FeedCard(param) {
                                 children: item.status_label
                             }, void 0, false, {
                                 fileName: "[project]/components/feed/MyFeedsTimeline.tsx",
-                                lineNumber: 884,
+                                lineNumber: 963,
                                 columnNumber: 15
                             }, this),
                             onDelete && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mantine$2f$core$2f$esm$2f$components$2f$Menu$2f$Menu$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__["Menu"], {
@@ -4121,17 +4215,17 @@ function FeedCard(param) {
                                                 stroke: 2.2
                                             }, void 0, false, {
                                                 fileName: "[project]/components/feed/MyFeedsTimeline.tsx",
-                                                lineNumber: 897,
+                                                lineNumber: 976,
                                                 columnNumber: 21
                                             }, this)
                                         }, void 0, false, {
                                             fileName: "[project]/components/feed/MyFeedsTimeline.tsx",
-                                            lineNumber: 892,
+                                            lineNumber: 971,
                                             columnNumber: 19
                                         }, this)
                                     }, void 0, false, {
                                         fileName: "[project]/components/feed/MyFeedsTimeline.tsx",
-                                        lineNumber: 891,
+                                        lineNumber: 970,
                                         columnNumber: 17
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mantine$2f$core$2f$esm$2f$components$2f$Menu$2f$Menu$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__["Menu"].Dropdown, {
@@ -4143,37 +4237,37 @@ function FeedCard(param) {
                                                 stroke: 1.8
                                             }, void 0, false, {
                                                 fileName: "[project]/components/feed/MyFeedsTimeline.tsx",
-                                                lineNumber: 903,
+                                                lineNumber: 982,
                                                 columnNumber: 34
                                             }, void 0),
                                             onClick: ()=>onDelete(item),
                                             children: copy.delete
                                         }, void 0, false, {
                                             fileName: "[project]/components/feed/MyFeedsTimeline.tsx",
-                                            lineNumber: 901,
+                                            lineNumber: 980,
                                             columnNumber: 19
                                         }, this)
                                     }, void 0, false, {
                                         fileName: "[project]/components/feed/MyFeedsTimeline.tsx",
-                                        lineNumber: 900,
+                                        lineNumber: 979,
                                         columnNumber: 17
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/components/feed/MyFeedsTimeline.tsx",
-                                lineNumber: 890,
+                                lineNumber: 969,
                                 columnNumber: 15
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "[project]/components/feed/MyFeedsTimeline.tsx",
-                        lineNumber: 851,
+                        lineNumber: 930,
                         columnNumber: 11
                     }, this)
                 ]
             }, void 0, true, {
                 fileName: "[project]/components/feed/MyFeedsTimeline.tsx",
-                lineNumber: 798,
+                lineNumber: 877,
                 columnNumber: 7
             }, this),
             !isArticle && item.title && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("h2", {
@@ -4182,7 +4276,7 @@ function FeedCard(param) {
                 children: item.title
             }, void 0, false, {
                 fileName: "[project]/components/feed/MyFeedsTimeline.tsx",
-                lineNumber: 916,
+                lineNumber: 995,
                 columnNumber: 9
             }, this),
             !isArticle && item.body && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -4191,7 +4285,7 @@ function FeedCard(param) {
                 children: item.body
             }, void 0, false, {
                 fileName: "[project]/components/feed/MyFeedsTimeline.tsx",
-                lineNumber: 925,
+                lineNumber: 1004,
                 columnNumber: 9
             }, this),
             isArticle && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(ArticlePreview, {
@@ -4202,7 +4296,7 @@ function FeedCard(param) {
                 flushBottom: isMediaLast
             }, void 0, false, {
                 fileName: "[project]/components/feed/MyFeedsTimeline.tsx",
-                lineNumber: 934,
+                lineNumber: 1013,
                 columnNumber: 9
             }, this),
             !isArticle && videoMedia && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(VideoPlayer, {
@@ -4212,7 +4306,7 @@ function FeedCard(param) {
                 flushBottom: isMediaLast
             }, void 0, false, {
                 fileName: "[project]/components/feed/MyFeedsTimeline.tsx",
-                lineNumber: 944,
+                lineNumber: 1023,
                 columnNumber: 9
             }, this),
             !isArticle && imageMedia.length > 0 && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(ImageGallery, {
@@ -4222,7 +4316,7 @@ function FeedCard(param) {
                 flushBottom: isMediaLast
             }, void 0, false, {
                 fileName: "[project]/components/feed/MyFeedsTimeline.tsx",
-                lineNumber: 951,
+                lineNumber: 1030,
                 columnNumber: 47
             }, this),
             attachments.length > 0 && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -4241,7 +4335,7 @@ function FeedCard(param) {
                                 stroke: 1.7
                             }, void 0, false, {
                                 fileName: "[project]/components/feed/MyFeedsTimeline.tsx",
-                                lineNumber: 963,
+                                lineNumber: 1042,
                                 columnNumber: 15
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -4249,19 +4343,19 @@ function FeedCard(param) {
                                 children: (_attachment_name = attachment.name) !== null && _attachment_name !== void 0 ? _attachment_name : copy.attachment
                             }, void 0, false, {
                                 fileName: "[project]/components/feed/MyFeedsTimeline.tsx",
-                                lineNumber: 964,
+                                lineNumber: 1043,
                                 columnNumber: 15
                             }, this)
                         ]
                     }, attachment.id, true, {
                         fileName: "[project]/components/feed/MyFeedsTimeline.tsx",
-                        lineNumber: 956,
+                        lineNumber: 1035,
                         columnNumber: 13
                     }, this);
                 })
             }, void 0, false, {
                 fileName: "[project]/components/feed/MyFeedsTimeline.tsx",
-                lineNumber: 954,
+                lineNumber: 1033,
                 columnNumber: 9
             }, this),
             item.related_insights.length > 0 && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -4287,7 +4381,7 @@ function FeedCard(param) {
                                                     type: insight.type
                                                 }, void 0, false, {
                                                     fileName: "[project]/components/feed/MyFeedsTimeline.tsx",
-                                                    lineNumber: 992,
+                                                    lineNumber: 1071,
                                                     columnNumber: 21
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -4295,13 +4389,13 @@ function FeedCard(param) {
                                                     children: insight.type
                                                 }, void 0, false, {
                                                     fileName: "[project]/components/feed/MyFeedsTimeline.tsx",
-                                                    lineNumber: 993,
+                                                    lineNumber: 1072,
                                                     columnNumber: 21
                                                 }, this)
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/components/feed/MyFeedsTimeline.tsx",
-                                            lineNumber: 991,
+                                            lineNumber: 1070,
                                             columnNumber: 19
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("h3", {
@@ -4310,18 +4404,18 @@ function FeedCard(param) {
                                             children: insight.title
                                         }, void 0, false, {
                                             fileName: "[project]/components/feed/MyFeedsTimeline.tsx",
-                                            lineNumber: 997,
+                                            lineNumber: 1076,
                                             columnNumber: 19
                                         }, this)
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/components/feed/MyFeedsTimeline.tsx",
-                                    lineNumber: 990,
+                                    lineNumber: 1069,
                                     columnNumber: 17
                                 }, this)
                             }, void 0, false, {
                                 fileName: "[project]/components/feed/MyFeedsTimeline.tsx",
-                                lineNumber: 983,
+                                lineNumber: 1062,
                                 columnNumber: 15
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -4335,7 +4429,7 @@ function FeedCard(param) {
                                             children: stripHtml(insight.description)
                                         }, void 0, false, {
                                             fileName: "[project]/components/feed/MyFeedsTimeline.tsx",
-                                            lineNumber: 1009,
+                                            lineNumber: 1088,
                                             columnNumber: 21
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -4352,16 +4446,16 @@ function FeedCard(param) {
                                                         children: insightPrice.label
                                                     }, void 0, false, {
                                                         fileName: "[project]/components/feed/MyFeedsTimeline.tsx",
-                                                        lineNumber: 1019,
+                                                        lineNumber: 1098,
                                                         columnNumber: 25
                                                     }, this)
                                                 }, void 0, false, {
                                                     fileName: "[project]/components/feed/MyFeedsTimeline.tsx",
-                                                    lineNumber: 1018,
+                                                    lineNumber: 1097,
                                                     columnNumber: 23
                                                 }, this) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {}, void 0, false, {
                                                     fileName: "[project]/components/feed/MyFeedsTimeline.tsx",
-                                                    lineNumber: 1021,
+                                                    lineNumber: 1100,
                                                     columnNumber: 25
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$client$2f$app$2d$dir$2f$link$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"], {
@@ -4384,7 +4478,7 @@ function FeedCard(param) {
                                                                 stroke: 2
                                                             }, void 0, false, {
                                                                 fileName: "[project]/components/feed/MyFeedsTimeline.tsx",
-                                                                lineNumber: 1037,
+                                                                lineNumber: 1116,
                                                                 columnNumber: 25
                                                             }, this),
                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -4392,43 +4486,43 @@ function FeedCard(param) {
                                                                 children: copy.openingInsight
                                                             }, void 0, false, {
                                                                 fileName: "[project]/components/feed/MyFeedsTimeline.tsx",
-                                                                lineNumber: 1038,
+                                                                lineNumber: 1117,
                                                                 columnNumber: 25
                                                             }, this)
                                                         ]
                                                     }, void 0, true) : copy.viewInsight
                                                 }, void 0, false, {
                                                     fileName: "[project]/components/feed/MyFeedsTimeline.tsx",
-                                                    lineNumber: 1022,
+                                                    lineNumber: 1101,
                                                     columnNumber: 19
                                                 }, this)
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/components/feed/MyFeedsTimeline.tsx",
-                                            lineNumber: 1016,
+                                            lineNumber: 1095,
                                             columnNumber: 19
                                         }, this)
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/components/feed/MyFeedsTimeline.tsx",
-                                    lineNumber: 1007,
+                                    lineNumber: 1086,
                                     columnNumber: 17
                                 }, this)
                             }, void 0, false, {
                                 fileName: "[project]/components/feed/MyFeedsTimeline.tsx",
-                                lineNumber: 1006,
+                                lineNumber: 1085,
                                 columnNumber: 15
                             }, this)
                         ]
                     }, "".concat(insight.type, "-").concat(insight.slug), true, {
                         fileName: "[project]/components/feed/MyFeedsTimeline.tsx",
-                        lineNumber: 979,
+                        lineNumber: 1058,
                         columnNumber: 13
                     }, this);
                 })
             }, void 0, false, {
                 fileName: "[project]/components/feed/MyFeedsTimeline.tsx",
-                lineNumber: 971,
+                lineNumber: 1050,
                 columnNumber: 9
             }, this),
             showEngagementActions && insighter && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -4447,20 +4541,20 @@ function FeedCard(param) {
                                 stroke: 1.8
                             }, void 0, false, {
                                 fileName: "[project]/components/feed/MyFeedsTimeline.tsx",
-                                lineNumber: 1065,
+                                lineNumber: 1144,
                                 columnNumber: 15
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
                                 children: copy.meet
                             }, void 0, false, {
                                 fileName: "[project]/components/feed/MyFeedsTimeline.tsx",
-                                lineNumber: 1066,
+                                lineNumber: 1145,
                                 columnNumber: 15
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "[project]/components/feed/MyFeedsTimeline.tsx",
-                        lineNumber: 1059,
+                        lineNumber: 1138,
                         columnNumber: 13
                     }, this),
                     !isOwnPost && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$client$2f$app$2d$dir$2f$link$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"], {
@@ -4473,20 +4567,20 @@ function FeedCard(param) {
                                 stroke: 1.8
                             }, void 0, false, {
                                 fileName: "[project]/components/feed/MyFeedsTimeline.tsx",
-                                lineNumber: 1075,
+                                lineNumber: 1154,
                                 columnNumber: 15
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
                                 children: copy.requestService
                             }, void 0, false, {
                                 fileName: "[project]/components/feed/MyFeedsTimeline.tsx",
-                                lineNumber: 1076,
+                                lineNumber: 1155,
                                 columnNumber: 15
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "[project]/components/feed/MyFeedsTimeline.tsx",
-                        lineNumber: 1071,
+                        lineNumber: 1150,
                         columnNumber: 13
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$feed$2f$FeedSaveButton$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"], {
@@ -4499,7 +4593,7 @@ function FeedCard(param) {
                         onChange: (isSaved)=>onSaveChange === null || onSaveChange === void 0 ? void 0 : onSaveChange(item, isSaved)
                     }, void 0, false, {
                         fileName: "[project]/components/feed/MyFeedsTimeline.tsx",
-                        lineNumber: 1080,
+                        lineNumber: 1159,
                         columnNumber: 11
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$feed$2f$FeedShare$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"], {
@@ -4511,19 +4605,19 @@ function FeedCard(param) {
                         shareKind: isArticle ? 'white-paper' : 'post'
                     }, void 0, false, {
                         fileName: "[project]/components/feed/MyFeedsTimeline.tsx",
-                        lineNumber: 1090,
+                        lineNumber: 1169,
                         columnNumber: 11
                     }, this)
                 ]
             }, void 0, true, {
                 fileName: "[project]/components/feed/MyFeedsTimeline.tsx",
-                lineNumber: 1054,
+                lineNumber: 1133,
                 columnNumber: 9
             }, this)
         ]
     }, void 0, true, {
         fileName: "[project]/components/feed/MyFeedsTimeline.tsx",
-        lineNumber: 797,
+        lineNumber: 876,
         columnNumber: 5
     }, this);
 }
@@ -4653,12 +4747,12 @@ function MyFeedsTimeline(param) {
             "aria-label": copy.loading,
             children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(FeedSkeleton, {}, void 0, false, {
                 fileName: "[project]/components/feed/MyFeedsTimeline.tsx",
-                lineNumber: 1202,
+                lineNumber: 1281,
                 columnNumber: 9
             }, this)
         }, void 0, false, {
             fileName: "[project]/components/feed/MyFeedsTimeline.tsx",
-            lineNumber: 1201,
+            lineNumber: 1280,
             columnNumber: 7
         }, this);
     }
@@ -4671,7 +4765,7 @@ function MyFeedsTimeline(param) {
                     children: copy.loadError
                 }, void 0, false, {
                     fileName: "[project]/components/feed/MyFeedsTimeline.tsx",
-                    lineNumber: 1210,
+                    lineNumber: 1289,
                     columnNumber: 9
                 }, this),
                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
@@ -4681,13 +4775,13 @@ function MyFeedsTimeline(param) {
                     children: copy.tryAgain
                 }, void 0, false, {
                     fileName: "[project]/components/feed/MyFeedsTimeline.tsx",
-                    lineNumber: 1211,
+                    lineNumber: 1290,
                     columnNumber: 9
                 }, this)
             ]
         }, void 0, true, {
             fileName: "[project]/components/feed/MyFeedsTimeline.tsx",
-            lineNumber: 1209,
+            lineNumber: 1288,
             columnNumber: 7
         }, this);
     }
@@ -4703,7 +4797,7 @@ function MyFeedsTimeline(param) {
                         children: copy.title
                     }, void 0, false, {
                         fileName: "[project]/components/feed/MyFeedsTimeline.tsx",
-                        lineNumber: 1225,
+                        lineNumber: 1304,
                         columnNumber: 9
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -4711,13 +4805,13 @@ function MyFeedsTimeline(param) {
                         children: copy.count(total)
                     }, void 0, false, {
                         fileName: "[project]/components/feed/MyFeedsTimeline.tsx",
-                        lineNumber: 1228,
+                        lineNumber: 1307,
                         columnNumber: 9
                     }, this)
                 ]
             }, void 0, true, {
                 fileName: "[project]/components/feed/MyFeedsTimeline.tsx",
-                lineNumber: 1224,
+                lineNumber: 1303,
                 columnNumber: 7
             }, this),
             items.length === 0 ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -4731,12 +4825,12 @@ function MyFeedsTimeline(param) {
                             stroke: 1.7
                         }, void 0, false, {
                             fileName: "[project]/components/feed/MyFeedsTimeline.tsx",
-                            lineNumber: 1234,
+                            lineNumber: 1313,
                             columnNumber: 13
                         }, this)
                     }, void 0, false, {
                         fileName: "[project]/components/feed/MyFeedsTimeline.tsx",
-                        lineNumber: 1233,
+                        lineNumber: 1312,
                         columnNumber: 11
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("h2", {
@@ -4744,7 +4838,7 @@ function MyFeedsTimeline(param) {
                         children: copy.emptyTitle
                     }, void 0, false, {
                         fileName: "[project]/components/feed/MyFeedsTimeline.tsx",
-                        lineNumber: 1236,
+                        lineNumber: 1315,
                         columnNumber: 11
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -4752,13 +4846,13 @@ function MyFeedsTimeline(param) {
                         children: copy.emptyDescription
                     }, void 0, false, {
                         fileName: "[project]/components/feed/MyFeedsTimeline.tsx",
-                        lineNumber: 1237,
+                        lineNumber: 1316,
                         columnNumber: 11
                     }, this)
                 ]
             }, void 0, true, {
                 fileName: "[project]/components/feed/MyFeedsTimeline.tsx",
-                lineNumber: 1232,
+                lineNumber: 1311,
                 columnNumber: 9
             }, this) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                 className: "space-y-4",
@@ -4776,7 +4870,7 @@ function MyFeedsTimeline(param) {
                                 onDelete: setDeleteCandidate
                             }, void 0, false, {
                                 fileName: "[project]/components/feed/MyFeedsTimeline.tsx",
-                                lineNumber: 1252,
+                                lineNumber: 1331,
                                 columnNumber: 17
                             }, this),
                             index === upgradeIndex && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$feed$2f$RoleUpgradeCard$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"], {
@@ -4784,7 +4878,7 @@ function MyFeedsTimeline(param) {
                                 className: "xl:hidden"
                             }, void 0, false, {
                                 fileName: "[project]/components/feed/MyFeedsTimeline.tsx",
-                                lineNumber: 1254,
+                                lineNumber: 1333,
                                 columnNumber: 19
                             }, this),
                             index === documentsIndex && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$feed$2f$TopDocumentsCard$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"], {
@@ -4792,19 +4886,19 @@ function MyFeedsTimeline(param) {
                                 className: "xl:hidden"
                             }, void 0, false, {
                                 fileName: "[project]/components/feed/MyFeedsTimeline.tsx",
-                                lineNumber: 1257,
+                                lineNumber: 1336,
                                 columnNumber: 19
                             }, this)
                         ]
                     }, item.uuid, true, {
                         fileName: "[project]/components/feed/MyFeedsTimeline.tsx",
-                        lineNumber: 1251,
+                        lineNumber: 1330,
                         columnNumber: 15
                     }, this);
                 })
             }, void 0, false, {
                 fileName: "[project]/components/feed/MyFeedsTimeline.tsx",
-                lineNumber: 1242,
+                lineNumber: 1321,
                 columnNumber: 9
             }, this),
             page < lastPage && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
@@ -4815,7 +4909,7 @@ function MyFeedsTimeline(param) {
                 children: isLoadingMore ? copy.loadingMore : copy.loadMore
             }, void 0, false, {
                 fileName: "[project]/components/feed/MyFeedsTimeline.tsx",
-                lineNumber: 1266,
+                lineNumber: 1345,
                 columnNumber: 9
             }, this),
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mantine$2f$core$2f$esm$2f$components$2f$Modal$2f$Modal$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__["Modal"], {
@@ -4846,7 +4940,7 @@ function MyFeedsTimeline(param) {
                         children: copy.deleteDescription
                     }, void 0, false, {
                         fileName: "[project]/components/feed/MyFeedsTimeline.tsx",
-                        lineNumber: 1292,
+                        lineNumber: 1371,
                         columnNumber: 9
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -4860,7 +4954,7 @@ function MyFeedsTimeline(param) {
                                 children: copy.cancel
                             }, void 0, false, {
                                 fileName: "[project]/components/feed/MyFeedsTimeline.tsx",
-                                lineNumber: 1294,
+                                lineNumber: 1373,
                                 columnNumber: 11
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
@@ -4871,25 +4965,25 @@ function MyFeedsTimeline(param) {
                                 children: isDeleting ? copy.deleting : copy.delete
                             }, void 0, false, {
                                 fileName: "[project]/components/feed/MyFeedsTimeline.tsx",
-                                lineNumber: 1302,
+                                lineNumber: 1381,
                                 columnNumber: 11
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "[project]/components/feed/MyFeedsTimeline.tsx",
-                        lineNumber: 1293,
+                        lineNumber: 1372,
                         columnNumber: 9
                     }, this)
                 ]
             }, void 0, true, {
                 fileName: "[project]/components/feed/MyFeedsTimeline.tsx",
-                lineNumber: 1276,
+                lineNumber: 1355,
                 columnNumber: 7
             }, this)
         ]
     }, void 0, true, {
         fileName: "[project]/components/feed/MyFeedsTimeline.tsx",
-        lineNumber: 1223,
+        lineNumber: 1302,
         columnNumber: 5
     }, this);
 }
