@@ -84,8 +84,8 @@ var __TURBOPACK__imported__module__$5b$project$5d2f$components$2f$feed$2f$articl
 ;
 ;
 const metadata = {
-    title: 'Write an article - Insighta Business',
-    description: 'Create and publish a long-form article on Insighta.'
+    title: 'Write a White Paper - Insighta Business',
+    description: 'Create and publish a long-form White Paper on Insighta.'
 };
 async function WriteArticlePage({ params }) {
     const { locale } = await params;

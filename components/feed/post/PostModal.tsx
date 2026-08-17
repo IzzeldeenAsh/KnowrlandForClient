@@ -41,6 +41,7 @@ import {
   type LibraryKnowledgeItem,
 } from '@/services/feed.service'
 import IndustryField from './IndustryField'
+import ImageCropEditor from './ImageCropEditor'
 import { type IndustryOption } from './IndustrySelectModal'
 import KnowledgeLibraryDrawer from './KnowledgeLibraryDrawer'
 
@@ -126,7 +127,7 @@ const copyByLocale = {
     addTag: 'Add',
     addTagHint: 'Type a tag and press Enter, or tap a chip below to select it.',
     addTagError: 'Unable to add the tag.',
-    shareFromLibrary: 'Share from Insighta library',
+    shareFromLibrary: 'Attach from Insighta library',
     publish: 'Post',
     publishing: 'Publishing…',
     saveDraft: 'Save draft',
@@ -271,6 +272,8 @@ export default function PostModal({
   const [selectedTags, setSelectedTags] = useState<FeedTag[]>([])
   const [relatedInsights, setRelatedInsights] = useState<LibraryKnowledgeItem[]>([])
   const [images, setImages] = useState<SelectedImage[]>([])
+  const [imageCropQueue, setImageCropQueue] = useState<File[]>([])
+  const [imageCropBatchTotal, setImageCropBatchTotal] = useState(0)
   const [isPublishing, setIsPublishing] = useState(false)
   const [isSavingDraft, setIsSavingDraft] = useState(false)
   const [isDiscardingDraft, setIsDiscardingDraft] = useState(false)
@@ -303,6 +306,7 @@ export default function PostModal({
   const videoUuidRef = useRef<string | null>(null)
   const abortUploadRef = useRef<(() => void) | null>(null)
   const pollTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const replaceSavedImagesRef = useRef(false)
 
   const videoInputRef = useRef<HTMLInputElement>(null)
   const imageInputRef = useRef<HTMLInputElement>(null)
@@ -355,6 +359,9 @@ export default function PostModal({
       })
       return []
     })
+    setImageCropQueue([])
+    setImageCropBatchTotal(0)
+    replaceSavedImagesRef.current = false
     setVideoPhase('none')
     setVideoFileName('')
     setUploadPercent(0)
@@ -561,11 +568,12 @@ export default function PostModal({
 
   // --- Image handling ---
 
-  const addImages = (files: FileList | null) => {
+  const beginImageCrop = (files: FileList | null) => {
     if (!files || files.length === 0) return
 
-    const accepted: SelectedImage[] = []
-    let remaining = MAX_IMAGES - images.length
+    const hasSavedImages = images.some((image) => image.file === null)
+    const accepted: File[] = []
+    let remaining = MAX_IMAGES - (hasSavedImages ? 0 : images.length)
 
     for (const file of Array.from(files)) {
       if (remaining <= 0) {
@@ -576,20 +584,47 @@ export default function PostModal({
         toast.warning(copy.imageTooLarge(file.name))
         continue
       }
-      accepted.push({ file, name: file.name, previewUrl: URL.createObjectURL(file) })
+      accepted.push(file)
       remaining -= 1
     }
 
     if (accepted.length > 0) {
+      replaceSavedImagesRef.current = hasSavedImages
+      setImageCropBatchTotal(accepted.length)
+      setImageCropQueue(accepted)
+    }
+  }
+
+  const applyCroppedImage = (file: File) => {
+    if (file.size > MAX_IMAGE_BYTES) {
+      toast.warning(copy.imageTooLarge(file.name))
+    } else {
+      const selectedImage: SelectedImage = {
+        file,
+        name: file.name,
+        previewUrl: URL.createObjectURL(file),
+      }
+
       setImages((previous) => {
-        const hasSavedImages = previous.some((image) => image.file === null)
-        if (hasSavedImages) {
+        if (replaceSavedImagesRef.current) {
+          previous.forEach((image) => {
+            if (image.previewUrl.startsWith('blob:')) URL.revokeObjectURL(image.previewUrl)
+          })
+          replaceSavedImagesRef.current = false
           toast.warning(copy.replacingSavedImages)
-          return accepted
+          return [selectedImage]
         }
-        return [...previous, ...accepted]
+        return [...previous, selectedImage]
       })
     }
+
+    setImageCropQueue((previous) => previous.slice(1))
+  }
+
+  const cancelImageCrop = () => {
+    setImageCropQueue([])
+    setImageCropBatchTotal(0)
+    replaceSavedImagesRef.current = false
   }
 
   const removeImage = (index: number) => {
@@ -1062,6 +1097,8 @@ export default function PostModal({
                       metadata-video-title={videoFileName}
                       accent-color="#1D74E0"
                       disable-tracking=""
+                      preload="metadata"
+                      playsinline
                       style={{ width: '100%', maxHeight: '480px', display: 'block' }}
                     />
                   </div>
@@ -1458,12 +1495,23 @@ export default function PostModal({
           multiple
           className="hidden"
           onChange={(event) => {
-            addImages(event.currentTarget.files)
+            beginImageCrop(event.currentTarget.files)
             event.currentTarget.value = ''
           }}
         />
         </form>
       </Modal>
+
+      <ImageCropEditor
+        key={imageCropQueue[0] ? `${imageCropQueue[0].name}-${imageCropQueue[0].lastModified}-${imageCropQueue.length}` : 'closed'}
+        file={imageCropQueue[0] ?? null}
+        locale={locale}
+        opened={imageCropQueue.length > 0}
+        position={imageCropBatchTotal - imageCropQueue.length + 1}
+        total={imageCropBatchTotal}
+        onCancel={cancelImageCrop}
+        onApply={applyCroppedImage}
+      />
 
       <Modal
         opened={discardConfirmOpened}

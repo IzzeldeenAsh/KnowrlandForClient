@@ -16,13 +16,12 @@ import {
   IconCreditCard,
   IconDownload,
   IconFolders,
-  IconLayoutDashboard,
+  IconListDetails,
   IconMessage2,
   IconSettings2,
   IconShoppingBag,
   IconSparkles,
   IconUserEdit,
-  IconUsers,
   IconWallet,
   type Icon,
 } from '@tabler/icons-react'
@@ -37,10 +36,11 @@ type FeedSidebarProps = {
 }
 
 type SidebarCopy = {
-  menu: string
   overview: string
+  posts: string
+  communityPosts: string
   myPosts: string
-  myCompany: string
+  savedPosts: string
   insights: string
   myKnowledge: string
   myDownloads: string
@@ -82,14 +82,16 @@ type DashboardSectionProps = {
   icon: Icon
   children: ReactNode
   compact?: boolean
+  defaultExpanded?: boolean
 }
 
 const copyByLocale: Record<'en' | 'ar', SidebarCopy> = {
   en: {
-    menu: 'Menu',
     overview: 'Dashboard',
+    posts: 'Posts',
+    communityPosts: 'Community Posts',
     myPosts: 'My Posts',
-    myCompany: 'My Company',
+    savedPosts: 'Saved Posts',
     insights: 'Insights',
     myKnowledge: 'My Library',
     myDownloads: 'My Downloads',
@@ -118,10 +120,11 @@ const copyByLocale: Record<'en' | 'ar', SidebarCopy> = {
     logIn: 'Log in',
   },
   ar: {
-    menu: 'القائمة',
     overview: 'لوحة التحكم',
+    posts: 'المنشورات',
+    communityPosts: 'منشورات المجتمع',
     myPosts: 'منشوراتي',
-    myCompany: 'شركتي',
+    savedPosts: 'المنشورات المحفوظة',
     insights: 'الرؤى',
     myKnowledge: 'مكتبتي',
     myDownloads: 'تحميلاتي',
@@ -171,7 +174,7 @@ function SidebarItem({ href, icon: ItemIcon, label, isActive = false, compact = 
       }`}
     >
       <span
-        className={`flex h-6 w-6 shrink-0 items-center justify-center transition-colors ${
+        className={`flex h-6 w-8 shrink-0 items-center justify-center transition-colors ${
           isActive ? 'text-[#2378E8]' : 'text-[#60728F] group-hover:text-[#2378E8]'
         }`}
       >
@@ -182,8 +185,56 @@ function SidebarItem({ href, icon: ItemIcon, label, isActive = false, compact = 
   )
 }
 
-function DashboardSection({ title, icon: SectionIcon, children, compact = false }: DashboardSectionProps) {
-  const [isExpanded, setIsExpanded] = useState(false)
+function DashboardLink({ href, label, compact = false }: Pick<SidebarItemProps, 'href' | 'label' | 'compact'>) {
+  return (
+    <Link
+      href={href}
+      className={`group flex items-center gap-2.5 rounded-lg border border-[#D7E1EC] bg-white text-start font-semibold text-indigo-700 transition-colors hover:bg-[#F8FAFC] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[#2378E8] ${
+        compact ? 'min-h-10 px-2 py-1 text-[12px]' : 'min-h-[54px] px-4 py-2 text-[16px]'
+      }`}
+    >
+      <DashboardIcon />
+      <span className="min-w-0 flex-1">{label}</span>
+    </Link>
+  )
+}
+
+function DashboardIcon() {
+  return (
+    <svg aria-hidden width="33" height="33" viewBox="0 0 33 33" fill="none" xmlns="http://www.w3.org/2000/svg" className="shrink-0">
+      <g filter="url(#feed-dashboard-icon-shadow)">
+        <rect x="3.75" y="2.43994" width="25" height="25" rx="6.25" fill="white" shapeRendering="crispEdges" />
+        <path d="M9.375 21.8149V19.9399H11.875V21.8149" fill="#FFC657" />
+        <path d="M9.375 19.9399V18.0649H11.875V19.9399" fill="#FFE0A6" />
+        <path d="M13.125 21.8149V18.3774H15.625V21.8149" fill="#1072FF" />
+        <path d="M13.125 18.3774V14.9399H15.625V18.3774" fill="#CBE1FF" />
+        <path d="M20.625 21.8149V15.5649H23.125V21.8149" fill="#1072FF" />
+        <path d="M20.625 15.5649V9.31494H23.125V15.5649" fill="#CBE1FF" />
+        <path d="M16.875 21.8149V17.1274H19.375V21.8149" fill="#FFC657" />
+        <path d="M16.875 17.1274V12.4399H19.375V17.1274" fill="#FFE0A6" />
+      </g>
+      <defs>
+        <filter id="feed-dashboard-icon-shadow" x="0" y="-0.000058651" width="32.5" height="32.5" filterUnits="userSpaceOnUse" colorInterpolationFilters="sRGB">
+          <feFlood floodOpacity="0" result="BackgroundImageFix" />
+          <feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" result="hardAlpha" />
+          <feOffset dy="1.31" />
+          <feGaussianBlur stdDeviation="1.875" />
+          <feComposite in2="hardAlpha" operator="out" />
+          <feColorMatrix type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.12 0" />
+          <feBlend mode="normal" in2="BackgroundImageFix" result="effect1_dropShadow" />
+          <feBlend mode="normal" in="SourceGraphic" in2="effect1_dropShadow" result="shape" />
+        </filter>
+      </defs>
+    </svg>
+  )
+}
+
+function DashboardSection({ title, icon: SectionIcon, children, compact = false, defaultExpanded = false }: DashboardSectionProps) {
+  const [isExpanded, setIsExpanded] = useState(defaultExpanded)
+
+  useEffect(() => {
+    if (defaultExpanded) setIsExpanded(true)
+  }, [defaultExpanded])
 
   return (
     <section className="border-b border-[#E2E8F0] last:border-b-0">
@@ -197,7 +248,7 @@ function DashboardSection({ title, icon: SectionIcon, children, compact = false 
             : 'min-h-[54px] px-4 py-3'
           } ${isExpanded ? 'bg-[#F8FAFC]' : 'bg-white hover:bg-[#F8FAFC]'}`}
       >
-        <span className={`flex shrink-0 items-center justify-center text-[#2378E8] ${compact ? 'h-5 w-5' : 'h-6 w-6'}`}>
+        <span className={`flex shrink-0 items-center justify-center text-[#2378E8] ${compact ? 'h-5 w-6' : 'h-6 w-8'}`}>
           <SectionIcon aria-hidden stroke={1.8} className={compact ? 'h-4 w-4' : 'h-5 w-5'} />
         </span>
         <h2 className={`m-0 min-w-0 flex-1 font-semibold leading-6 text-[#364152] ${compact ? 'text-[12px]' : 'text-[16px]'}`}>
@@ -314,7 +365,9 @@ export default function FeedSidebar({ locale, hideProfileCard = false }: FeedSid
   const copy = copyByLocale[isArabic ? 'ar' : 'en']
   const { user, roles, isLoading, isAuthResolved } = useUserProfile()
   const searchParams = useSearchParams()
+  const isCommunityPostsActive = !searchParams.get('view')
   const isMyPostsActive = searchParams.get('view') === 'my-feeds'
+  const isSavedPostsActive = searchParams.get('view') === 'saved-posts'
 
   const isInsighter = roles.includes('insighter')
   const isCompany = roles.includes('company')
@@ -345,7 +398,7 @@ export default function FeedSidebar({ locale, hideProfileCard = false }: FeedSid
   const dashboardBase = `${dashboardUrl}/app/insighter-dashboard`
 
   return (
-    <nav aria-label={isArabic ? 'قائمة الحساب' : 'Account menu'} className={hideProfileCard ? 'space-y-0' : 'space-y-6'}>
+    <nav aria-label={isArabic ? 'قائمة الحساب' : 'Account menu'} className={hideProfileCard ? 'space-y-2' : 'space-y-4'}>
       {!hideProfileCard && (
       <section className="relative flex h-[216px] flex-col items-center overflow-hidden rounded-lg border border-[#D9E3EF] bg-[#F8FAFD] px-5 pb-[22px] pt-6 text-center">
         <svg
@@ -381,21 +434,36 @@ export default function FeedSidebar({ locale, hideProfileCard = false }: FeedSid
       </section>
       )}
 
+      <DashboardLink href={`${dashboardBase}/my-dashboard`} label={copy.overview} compact={hideProfileCard} />
+
       <div className="overflow-hidden rounded-lg border border-[#D7E1EC] bg-white shadow-[0_2px_8px_rgba(27,56,93,0.04)]">
-      <DashboardSection title={copy.menu} icon={IconLayoutDashboard} compact={hideProfileCard}>
-        <SidebarItem href={`${dashboardBase}/my-dashboard`} icon={IconLayoutDashboard} label={copy.overview} compact={hideProfileCard} />
-        {!isPureClient && (
-          <SidebarItem
-            href={`/${locale}?view=my-feeds`}
-            icon={IconMessage2}
-            label={copy.myPosts}
-            isActive={isMyPostsActive}
-            compact={hideProfileCard}
-          />
-        )}
-        {isCompany && (
-          <SidebarItem href={`${dashboardBase}/my-company-settings`} icon={IconUsers} label={copy.myCompany} compact={hideProfileCard} />
-        )}
+      <DashboardSection
+        title={copy.posts}
+        icon={IconMessage2}
+        compact={hideProfileCard}
+        defaultExpanded={isCommunityPostsActive || isMyPostsActive || isSavedPostsActive}
+      >
+        <SidebarItem
+          href={`/${locale}`}
+          icon={IconListDetails}
+          label={copy.communityPosts}
+          isActive={isCommunityPostsActive}
+          compact={hideProfileCard}
+        />
+        <SidebarItem
+          href={`/${locale}?view=my-feeds`}
+          icon={IconMessage2}
+          label={copy.myPosts}
+          isActive={isMyPostsActive}
+          compact={hideProfileCard}
+        />
+        <SidebarItem
+          href={`/${locale}?view=saved-posts`}
+          icon={IconBookmark}
+          label={copy.savedPosts}
+          isActive={isSavedPostsActive}
+          compact={hideProfileCard}
+        />
       </DashboardSection>
 
       <DashboardSection title={copy.marketplace} icon={IconShoppingBag} compact={hideProfileCard}>

@@ -506,6 +506,8 @@ __turbopack_context__.s([
     ()=>saveVideoPostDraft,
     "searchCommunityFeed",
     ()=>searchCommunityFeed,
+    "setCommunityFeedItemTracked",
+    ()=>setCommunityFeedItemTracked,
     "uploadVideoToProvider",
     ()=>uploadVideoToProvider
 ]);
@@ -633,8 +635,8 @@ async function getCommunityFeedArticle(slug, locale, signal) {
     const body = await response.json();
     return body.data;
 }
-async function getCommunityFeedPost(uuid, locale, signal) {
-    const response = await fetch((0, __TURBOPACK__imported__module__$5b$project$5d2f$app$2f$config$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["getApiUrl"])("/api/platform/community/feed/posts/".concat(encodeURIComponent(uuid))), {
+async function getCommunityFeedPost(slug, locale, signal) {
+    const response = await fetch((0, __TURBOPACK__imported__module__$5b$project$5d2f$app$2f$config$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["getApiUrl"])("/api/platform/community/feed/posts/".concat(encodeURIComponent(slug))), {
         headers: publicHeaders(locale),
         cache: 'no-store',
         signal
@@ -734,6 +736,17 @@ async function getCommunityFeed(locale, cursor, signal) {
     });
     if (cursor) params.set('cursor', cursor);
     return requestCommunityFeed("/api/platform/community/feed?".concat(params.toString()), locale, signal);
+}
+async function setCommunityFeedItemTracked(uuid, isTracked, locale) {
+    const response = await fetch((0, __TURBOPACK__imported__module__$5b$project$5d2f$app$2f$config$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["getApiUrl"])("/api/platform/community/feed/track/".concat(encodeURIComponent(uuid))), {
+        method: isTracked ? 'PUT' : 'DELETE',
+        headers: authHeaders(locale)
+    });
+    if (!response.ok) {
+        await parseErrorMessage(response, isTracked ? 'Unable to track this post.' : 'Unable to untrack this post.');
+    }
+    const body = await response.json();
+    return body.data;
 }
 async function searchCommunityFeed(locale, search, signal) {
     var _body_data, _body_data1, _body_meta, _body_meta1, _body_meta2, _body_meta3, _body_meta4, _body_meta5, _body_meta6, _body_meta7;
@@ -1870,7 +1883,7 @@ function ArticleReader(param) {
                                                                                 setOpeningInsight((current)=>current === insightKey ? null : current);
                                                                             }, 1800);
                                                                         },
-                                                                        className: "inline-flex min-h-9 items-center justify-center rounded-full border border-[#2378E8] px-4 text-center text-[13px] font-medium text-[#2378E8] transition-colors hover:bg-[#F2F7FF] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2378E8] focus-visible:ring-offset-2",
+                                                                        className: "inline-flex min-h-7 items-center justify-center rounded-full border border-[#2378E8] px-2 py-0.5 text-center text-[13px] font-medium text-[#2378E8] transition-colors hover:bg-[#F2F7FF] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2378E8] focus-visible:ring-offset-2",
                                                                         children: openingInsight === insightKey ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["Fragment"], {
                                                                             children: [
                                                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$tabler$2f$icons$2d$react$2f$dist$2f$esm$2f$icons$2f$IconLoader2$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__IconLoader2$3e$__["IconLoader2"], {

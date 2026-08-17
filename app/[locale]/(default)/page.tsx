@@ -2,6 +2,7 @@ import FeedSidebar from '@/components/feed/FeedSidebar'
 import CommunityFeedTimeline from '@/components/feed/CommunityFeedTimeline'
 import FeedMobileSearch from '@/components/feed/FeedMobileSearch'
 import MyFeedsTimeline from '@/components/feed/MyFeedsTimeline'
+import SavedPostsTimeline from '@/components/feed/SavedPostsTimeline'
 import FeedComposer from '@/components/feed/post/FeedComposer'
 import RoleUpgradeCard from '@/components/feed/RoleUpgradeCard'
 import RelatedDocumentsCard from '@/components/feed/RelatedDocumentsCard'
@@ -28,13 +29,14 @@ export default async function Feed({ params, searchParams }: FeedProps) {
   const { view, keyword: rawKeyword, industry: rawIndustry, content_type: rawContentType } = await searchParams
   const isRTL = locale === 'ar'
   const showMyFeeds = view === 'my-feeds'
+  const showSavedPosts = view === 'saved-posts'
   const keyword = rawKeyword?.trim() ?? ''
   const parsedIndustry = Number(rawIndustry)
   const industry = Number.isInteger(parsedIndustry) && parsedIndustry > 0 ? parsedIndustry : null
   const contentType = rawContentType === 'post' || rawContentType === 'article'
     ? rawContentType
     : null
-  const isSearching = keyword.length > 0 && !showMyFeeds
+  const isSearching = keyword.length > 0 && !showMyFeeds && !showSavedPosts
 
   return (
     <FeedSearchInsightsProvider>
@@ -51,9 +53,11 @@ export default async function Feed({ params, searchParams }: FeedProps) {
             {/* Center column - composer + feed */}
             <section className="grid gap-4">
               <FeedMobileSearch locale={locale} />
-              {!isSearching && <FeedComposer locale={locale} />}
+              {!isSearching && !showSavedPosts && <FeedComposer locale={locale} />}
 
-              {showMyFeeds ? (
+              {showSavedPosts ? (
+                <SavedPostsTimeline locale={locale} />
+              ) : showMyFeeds ? (
                 <MyFeedsTimeline locale={locale} />
               ) : (
                 <CommunityFeedTimeline

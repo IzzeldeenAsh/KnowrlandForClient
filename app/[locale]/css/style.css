@@ -203,3 +203,9 @@ img{
   object-fit: cover !important;
   object-position: top !important;
 }
+
+/* Show the whole image (never crop) inside a fixed feed media frame */
+img.feed-media-contain {
+  object-fit: contain !important;
+  object-position: center !important;
+}

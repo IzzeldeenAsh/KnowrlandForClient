@@ -1,0 +1,9146 @@
+module.exports = [
+"[project]/app/[locale]/profile/[uuid]/profile.module.css [app-ssr] (css module)", ((__turbopack_context__) => {
+
+__turbopack_context__.v({
+  "checkmark": "profile-module__3HWcJW__checkmark",
+  "circleExpand": "profile-module__3HWcJW__circleExpand",
+  "countBadge": "profile-module__3HWcJW__countBadge",
+  "fadeInUp": "profile-module__3HWcJW__fadeInUp",
+  "filterAllActive": "profile-module__3HWcJW__filterAllActive",
+  "filterButton": "profile-module__3HWcJW__filterButton",
+  "filterButtonActive": "profile-module__3HWcJW__filterButtonActive",
+  "filterCourseActive": "profile-module__3HWcJW__filterCourseActive",
+  "filterDataActive": "profile-module__3HWcJW__filterDataActive",
+  "filterInsightActive": "profile-module__3HWcJW__filterInsightActive",
+  "filterManualActive": "profile-module__3HWcJW__filterManualActive",
+  "filterReportActive": "profile-module__3HWcJW__filterReportActive",
+  "icon": "profile-module__3HWcJW__icon",
+  "iconActive": "profile-module__3HWcJW__iconActive",
+  "iconAll": "profile-module__3HWcJW__iconAll",
+  "iconCourse": "profile-module__3HWcJW__iconCourse",
+  "iconData": "profile-module__3HWcJW__iconData",
+  "iconInsight": "profile-module__3HWcJW__iconInsight",
+  "iconManual": "profile-module__3HWcJW__iconManual",
+  "iconReport": "profile-module__3HWcJW__iconReport",
+  "iconWrapper": "profile-module__3HWcJW__iconWrapper",
+  "shinyGradientSlide": "profile-module__3HWcJW__shinyGradientSlide",
+  "shinyGradientText": "profile-module__3HWcJW__shinyGradientText",
+});
+}),
+"[project]/app/lib/useCountryCheck.ts [app-ssr] (ecmascript)", ((__turbopack_context__) => {
+"use strict";
+
+__turbopack_context__.s([
+    "useCountryCheck",
+    ()=>useCountryCheck
+]);
+var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/next/dist/server/route-modules/app-page/vendored/ssr/react.js [app-ssr] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$navigation$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/next/navigation.js [app-ssr] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$components$2f$auth$2f$GlobalProfileProvider$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/components/auth/GlobalProfileProvider.tsx [app-ssr] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$authToken$2e$ts__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/lib/authToken.ts [app-ssr] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$services$2f$onboarding$2e$service$2e$ts__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/services/onboarding.service.ts [app-ssr] (ecmascript)");
+'use client';
+;
+;
+;
+;
+;
+function useCountryCheck({ locale, enabled = true }) {
+    const { user, isLoading: isProfileLoading } = (0, __TURBOPACK__imported__module__$5b$project$5d2f$components$2f$auth$2f$GlobalProfileProvider$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useGlobalProfile"])();
+    const pathname = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$navigation$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["usePathname"])();
+    const searchParams = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$navigation$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useSearchParams"])();
+    const [isChecking, setIsChecking] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useState"])(false);
+    const [needsUpdate, setNeedsUpdate] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useState"])(false);
+    const [checkedUserId, setCheckedUserId] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useState"])(null);
+    (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useEffect"])(()=>{
+        if (!enabled || isProfileLoading || !user) return;
+        const token = (0, __TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$authToken$2e$ts__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["getAuthToken"])();
+        if (!token) return;
+        let cancelled = false;
+        const checkCountryPrompt = async ()=>{
+            setIsChecking(true);
+            try {
+                const prompts = await (0, __TURBOPACK__imported__module__$5b$project$5d2f$services$2f$onboarding$2e$service$2e$ts__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["fetchOnboardingPromptStatuses"])({
+                    token,
+                    locale
+                });
+                const countryPrompt = prompts.find((prompt)=>prompt.prompt_key === 'country');
+                const shouldRedirect = countryPrompt?.should_show === true;
+                if (cancelled) return;
+                setNeedsUpdate(shouldRedirect);
+                if (shouldRedirect) {
+                    const fullUrl = searchParams.toString() ? `${pathname}?${searchParams.toString()}` : pathname;
+                    window.location.replace(`/${locale}/onboarding?redirect=${encodeURIComponent(fullUrl)}`);
+                }
+            } catch (error) {
+                // A temporary prompt-status failure must not make protected pages unusable.
+                console.error('[useCountryCheck] Unable to check onboarding status:', error);
+                if (!cancelled) setNeedsUpdate(false);
+            } finally{
+                if (!cancelled) {
+                    setCheckedUserId(user.id);
+                    setIsChecking(false);
+                }
+            }
+        };
+        void checkCountryPrompt();
+        return ()=>{
+            cancelled = true;
+        };
+    }, [
+        enabled,
+        isProfileLoading,
+        locale,
+        pathname,
+        searchParams,
+        user
+    ]);
+    return {
+        needsUpdate,
+        isLoading: isProfileLoading || isChecking || Boolean(enabled && user && checkedUserId !== user.id),
+        user
+    };
+}
+}),
+"[project]/app/[locale]/topic/[id]/[slug]/knowledge-card.module.css [app-ssr] (css module)", ((__turbopack_context__) => {
+
+__turbopack_context__.v({
+  "actionButton": "knowledge-card-module__Tm2cMq__actionButton",
+  "avatar": "knowledge-card-module__Tm2cMq__avatar",
+  "bottomMetaItem": "knowledge-card-module__Tm2cMq__bottomMetaItem",
+  "bottomMetaRow": "knowledge-card-module__Tm2cMq__bottomMetaRow",
+  "bottomMetaRowBoth": "knowledge-card-module__Tm2cMq__bottomMetaRowBoth",
+  "bottomMetaRowRtl": "knowledge-card-module__Tm2cMq__bottomMetaRowRtl",
+  "bottomMetaRowSingle": "knowledge-card-module__Tm2cMq__bottomMetaRowSingle",
+  "card": "knowledge-card-module__Tm2cMq__card",
+  "darkSection": "knowledge-card-module__Tm2cMq__darkSection",
+  "darkSectionWithBottomMeta": "knowledge-card-module__Tm2cMq__darkSectionWithBottomMeta",
+  "description": "knowledge-card-module__Tm2cMq__description",
+  "footer": "knowledge-card-module__Tm2cMq__footer",
+  "priceBadge": "knowledge-card-module__Tm2cMq__priceBadge",
+  "title": "knowledge-card-module__Tm2cMq__title",
+  "typeBadge": "knowledge-card-module__Tm2cMq__typeBadge",
+  "whiteSection": "knowledge-card-module__Tm2cMq__whiteSection",
+});
+}),
+"[project]/app/[locale]/knowledge/[type]/[slug]/AuthModal.tsx [app-ssr] (ecmascript)", ((__turbopack_context__) => {
+"use strict";
+
+__turbopack_context__.s([
+    "default",
+    ()=>__TURBOPACK__default__export__
+]);
+var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/next/dist/server/route-modules/app-page/vendored/ssr/react-jsx-dev-runtime.js [app-ssr] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mantine$2f$core$2f$esm$2f$components$2f$Modal$2f$Modal$2e$mjs__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/@mantine/core/esm/components/Modal/Modal.mjs [app-ssr] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mantine$2f$core$2f$esm$2f$components$2f$Button$2f$Button$2e$mjs__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/@mantine/core/esm/components/Button/Button.mjs [app-ssr] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mantine$2f$core$2f$esm$2f$components$2f$Text$2f$Text$2e$mjs__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/@mantine/core/esm/components/Text/Text.mjs [app-ssr] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mantine$2f$core$2f$esm$2f$components$2f$Stack$2f$Stack$2e$mjs__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/@mantine/core/esm/components/Stack/Stack.mjs [app-ssr] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mantine$2f$core$2f$esm$2f$core$2f$Box$2f$Box$2e$mjs__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/@mantine/core/esm/core/Box/Box.mjs [app-ssr] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mantine$2f$core$2f$esm$2f$components$2f$Divider$2f$Divider$2e$mjs__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/@mantine/core/esm/components/Divider/Divider.mjs [app-ssr] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mantine$2f$core$2f$esm$2f$components$2f$Group$2f$Group$2e$mjs__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/@mantine/core/esm/components/Group/Group.mjs [app-ssr] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$tabler$2f$icons$2d$react$2f$dist$2f$esm$2f$icons$2f$IconLogin$2e$mjs__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__$3c$export__default__as__IconLogin$3e$__ = __turbopack_context__.i("[project]/node_modules/@tabler/icons-react/dist/esm/icons/IconLogin.mjs [app-ssr] (ecmascript) <export default as IconLogin>");
+var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$tabler$2f$icons$2d$react$2f$dist$2f$esm$2f$icons$2f$IconUserPlus$2e$mjs__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__$3c$export__default__as__IconUserPlus$3e$__ = __turbopack_context__.i("[project]/node_modules/@tabler/icons-react/dist/esm/icons/IconUserPlus.mjs [app-ssr] (ecmascript) <export default as IconUserPlus>");
+var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$tabler$2f$icons$2d$react$2f$dist$2f$esm$2f$icons$2f$IconDownload$2e$mjs__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__$3c$export__default__as__IconDownload$3e$__ = __turbopack_context__.i("[project]/node_modules/@tabler/icons-react/dist/esm/icons/IconDownload.mjs [app-ssr] (ecmascript) <export default as IconDownload>");
+var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$tabler$2f$icons$2d$react$2f$dist$2f$esm$2f$icons$2f$IconShoppingBag$2e$mjs__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__$3c$export__default__as__IconShoppingBag$3e$__ = __turbopack_context__.i("[project]/node_modules/@tabler/icons-react/dist/esm/icons/IconShoppingBag.mjs [app-ssr] (ecmascript) <export default as IconShoppingBag>");
+var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$tabler$2f$icons$2d$react$2f$dist$2f$esm$2f$icons$2f$IconBellRinging$2e$mjs__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__$3c$export__default__as__IconBellRinging$3e$__ = __turbopack_context__.i("[project]/node_modules/@tabler/icons-react/dist/esm/icons/IconBellRinging.mjs [app-ssr] (ecmascript) <export default as IconBellRinging>");
+var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$tabler$2f$icons$2d$react$2f$dist$2f$esm$2f$icons$2f$IconSparkles$2e$mjs__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__$3c$export__default__as__IconSparkles$3e$__ = __turbopack_context__.i("[project]/node_modules/@tabler/icons-react/dist/esm/icons/IconSparkles.mjs [app-ssr] (ecmascript) <export default as IconSparkles>");
+var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$image$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/next/image.js [app-ssr] (ecmascript)");
+'use client';
+;
+;
+;
+;
+// Helper function to get the Angular app URL based on current domain
+const getAngularAppUrl = ()=>{
+    if ("TURBOPACK compile-time truthy", 1) return `${"TURBOPACK compile-time value", "http://localhost:4200"}`;
+    //TURBOPACK unreachable
+    ;
+    const hostname = undefined;
+    const protocol = undefined;
+};
+const AuthModal = ({ opened, onClose, locale, guestCheckoutUrl = null, disableGuestCheckout = false, loginReturnUrl = null })=>{
+    const isRTL = locale === 'ar';
+    const angularAppUrl = getAngularAppUrl();
+    const translations = {
+        title: isRTL ? 'الشراء' : 'Buy Now',
+        titleDisableGuestCheckout: isRTL ? 'التسجيل' : 'Login/Signup',
+        message: isRTL ? 'سجّل دخولك أو أنشئ حساباً للاستفادة من مزايا إضافية وتجربة أفضل.' : 'Log in or create an account to unlock extra benefits and a better experience.',
+        signUp: isRTL ? 'إنشاء حساب' : 'Sign Up',
+        logIn: isRTL ? 'تسجيل الدخول' : 'Log In',
+        benefitsTitle: isRTL ? 'لماذا تسجّل حساباً؟' : 'Why sign in/up?',
+        benefit1: isRTL ? 'إمكانية إعادة التحميل في أي وقت' : 'Re-download anytime',
+        benefit2: isRTL ? 'تتبع مشترياتك وتنظيمها بسهولة' : 'Track and manage your purchases',
+        benefit3: isRTL ? 'تنبيهات وتحديثات ومحتوى مشابه' : 'Get updates and related insights',
+        benefit4: isRTL ? 'تجربة أسرع ودعم أفضل' : 'Faster experience and better support',
+        buyAsGuest: isRTL ? 'الشراء كضيف' : 'Buy as Guest',
+        or: isRTL ? 'أو' : 'OR',
+        guestDisabledNote: isRTL ? 'الشراء كضيف غير متاح لهذا الطلب. الرجاء تسجيل الدخول للمتابعة.' : 'Guest checkout is not available for this request. Please log in to continue.',
+        cancel: isRTL ? 'إلغاء' : 'Cancel'
+    };
+    const handleSignUp = ()=>{
+        const returnUrl = loginReturnUrl ? `${window.location.origin}${loginReturnUrl}` : window.location.href;
+        window.location.href = `${angularAppUrl}/auth/sign-up?returnUrl=${encodeURIComponent(returnUrl)}`;
+    };
+    const handleLogIn = ()=>{
+        const returnUrl = loginReturnUrl ? `${window.location.origin}${loginReturnUrl}` : window.location.href;
+        window.location.href = `${angularAppUrl}/auth/login?returnUrl=${encodeURIComponent(returnUrl)}`;
+    };
+    const handleBuyAsGuest = ()=>{
+        if (!guestCheckoutUrl || disableGuestCheckout) return;
+        window.location.href = guestCheckoutUrl;
+    };
+    return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mantine$2f$core$2f$esm$2f$components$2f$Modal$2f$Modal$2e$mjs__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["Modal"], {
+        opened: opened,
+        onClose: onClose,
+        title: disableGuestCheckout ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mantine$2f$core$2f$esm$2f$components$2f$Text$2f$Text$2e$mjs__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["Text"], {
+            size: "lg",
+            fw: 600,
+            children: translations.titleDisableGuestCheckout
+        }, void 0, false, {
+            fileName: "[project]/app/[locale]/knowledge/[type]/[slug]/AuthModal.tsx",
+            lineNumber: 94,
+            columnNumber: 7
+        }, void 0) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mantine$2f$core$2f$esm$2f$components$2f$Text$2f$Text$2e$mjs__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["Text"], {
+            size: "lg",
+            fw: 600,
+            children: translations.title
+        }, void 0, false, {
+            fileName: "[project]/app/[locale]/knowledge/[type]/[slug]/AuthModal.tsx",
+            lineNumber: 95,
+            columnNumber: 7
+        }, void 0),
+        centered: true,
+        size: "lg",
+        padding: "lg",
+        styles: {
+            title: {
+                fontSize: '1.15rem',
+                fontWeight: 700
+            },
+            body: {
+                paddingTop: 8
+            }
+        },
+        dir: isRTL ? 'rtl' : 'ltr',
+        children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mantine$2f$core$2f$esm$2f$components$2f$Stack$2f$Stack$2e$mjs__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["Stack"], {
+            gap: "sm",
+            children: [
+                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mantine$2f$core$2f$esm$2f$core$2f$Box$2f$Box$2e$mjs__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["Box"], {
+                    className: "text-center",
+                    children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$image$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["default"], {
+                        src: "/images/joinUs.svg",
+                        alt: "Join Us",
+                        width: 200,
+                        height: 150,
+                        style: {
+                            margin: '0 auto'
+                        },
+                        priority: true
+                    }, void 0, false, {
+                        fileName: "[project]/app/[locale]/knowledge/[type]/[slug]/AuthModal.tsx",
+                        lineNumber: 110,
+                        columnNumber: 11
+                    }, ("TURBOPACK compile-time value", void 0))
+                }, void 0, false, {
+                    fileName: "[project]/app/[locale]/knowledge/[type]/[slug]/AuthModal.tsx",
+                    lineNumber: 109,
+                    columnNumber: 9
+                }, ("TURBOPACK compile-time value", void 0)),
+                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mantine$2f$core$2f$esm$2f$components$2f$Text$2f$Text$2e$mjs__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["Text"], {
+                    size: "sm",
+                    c: "dimmed",
+                    ta: "center",
+                    children: translations.message
+                }, void 0, false, {
+                    fileName: "[project]/app/[locale]/knowledge/[type]/[slug]/AuthModal.tsx",
+                    lineNumber: 119,
+                    columnNumber: 9
+                }, ("TURBOPACK compile-time value", void 0)),
+                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                    className: "flex flex-col sm:flex-row gap-2 w-full",
+                    children: [
+                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mantine$2f$core$2f$esm$2f$components$2f$Button$2f$Button$2e$mjs__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["Button"], {
+                            leftSection: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$tabler$2f$icons$2d$react$2f$dist$2f$esm$2f$icons$2f$IconLogin$2e$mjs__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__$3c$export__default__as__IconLogin$3e$__["IconLogin"], {
+                                size: 18
+                            }, void 0, false, {
+                                fileName: "[project]/app/[locale]/knowledge/[type]/[slug]/AuthModal.tsx",
+                                lineNumber: 124,
+                                columnNumber: 26
+                            }, void 0),
+                            onClick: handleLogIn,
+                            variant: "light",
+                            size: "md",
+                            fullWidth: true,
+                            children: translations.logIn
+                        }, void 0, false, {
+                            fileName: "[project]/app/[locale]/knowledge/[type]/[slug]/AuthModal.tsx",
+                            lineNumber: 123,
+                            columnNumber: 11
+                        }, ("TURBOPACK compile-time value", void 0)),
+                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mantine$2f$core$2f$esm$2f$components$2f$Button$2f$Button$2e$mjs__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["Button"], {
+                            leftSection: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$tabler$2f$icons$2d$react$2f$dist$2f$esm$2f$icons$2f$IconUserPlus$2e$mjs__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__$3c$export__default__as__IconUserPlus$3e$__["IconUserPlus"], {
+                                size: 18
+                            }, void 0, false, {
+                                fileName: "[project]/app/[locale]/knowledge/[type]/[slug]/AuthModal.tsx",
+                                lineNumber: 134,
+                                columnNumber: 26
+                            }, void 0),
+                            onClick: handleSignUp,
+                            size: "md",
+                            fullWidth: true,
+                            children: translations.signUp
+                        }, void 0, false, {
+                            fileName: "[project]/app/[locale]/knowledge/[type]/[slug]/AuthModal.tsx",
+                            lineNumber: 133,
+                            columnNumber: 11
+                        }, ("TURBOPACK compile-time value", void 0))
+                    ]
+                }, void 0, true, {
+                    fileName: "[project]/app/[locale]/knowledge/[type]/[slug]/AuthModal.tsx",
+                    lineNumber: 122,
+                    columnNumber: 1
+                }, ("TURBOPACK compile-time value", void 0)),
+                !disableGuestCheckout && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mantine$2f$core$2f$esm$2f$core$2f$Box$2f$Box$2e$mjs__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["Box"], {
+                    p: "md",
+                    style: {
+                        border: '1px solid var(--mantine-color-gray-2)',
+                        borderRadius: 12,
+                        background: 'linear-gradient(180deg, rgba(59,130,246,0.06), rgba(20,184,166,0.04))'
+                    },
+                    children: [
+                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mantine$2f$core$2f$esm$2f$components$2f$Text$2f$Text$2e$mjs__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["Text"], {
+                            fw: 700,
+                            mb: 10,
+                            children: translations.benefitsTitle
+                        }, void 0, false, {
+                            fileName: "[project]/app/[locale]/knowledge/[type]/[slug]/AuthModal.tsx",
+                            lineNumber: 153,
+                            columnNumber: 11
+                        }, ("TURBOPACK compile-time value", void 0)),
+                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mantine$2f$core$2f$esm$2f$components$2f$Stack$2f$Stack$2e$mjs__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["Stack"], {
+                            gap: 10,
+                            children: [
+                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mantine$2f$core$2f$esm$2f$components$2f$Group$2f$Group$2e$mjs__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["Group"], {
+                                    gap: 10,
+                                    wrap: "nowrap",
+                                    align: "center",
+                                    children: [
+                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mantine$2f$core$2f$esm$2f$core$2f$Box$2f$Box$2e$mjs__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["Box"], {
+                                            style: {
+                                                width: 34,
+                                                height: 34,
+                                                borderRadius: 10,
+                                                display: 'flex',
+                                                alignItems: 'center',
+                                                justifyContent: 'center',
+                                                background: 'rgba(59,130,246,0.12)',
+                                                color: 'rgb(37,99,235)',
+                                                flexShrink: 0
+                                            },
+                                            children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$tabler$2f$icons$2d$react$2f$dist$2f$esm$2f$icons$2f$IconDownload$2e$mjs__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__$3c$export__default__as__IconDownload$3e$__["IconDownload"], {
+                                                size: 18
+                                            }, void 0, false, {
+                                                fileName: "[project]/app/[locale]/knowledge/[type]/[slug]/AuthModal.tsx",
+                                                lineNumber: 172,
+                                                columnNumber: 17
+                                            }, ("TURBOPACK compile-time value", void 0))
+                                        }, void 0, false, {
+                                            fileName: "[project]/app/[locale]/knowledge/[type]/[slug]/AuthModal.tsx",
+                                            lineNumber: 159,
+                                            columnNumber: 15
+                                        }, ("TURBOPACK compile-time value", void 0)),
+                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mantine$2f$core$2f$esm$2f$components$2f$Text$2f$Text$2e$mjs__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["Text"], {
+                                            size: "sm",
+                                            children: translations.benefit1
+                                        }, void 0, false, {
+                                            fileName: "[project]/app/[locale]/knowledge/[type]/[slug]/AuthModal.tsx",
+                                            lineNumber: 174,
+                                            columnNumber: 15
+                                        }, ("TURBOPACK compile-time value", void 0))
+                                    ]
+                                }, void 0, true, {
+                                    fileName: "[project]/app/[locale]/knowledge/[type]/[slug]/AuthModal.tsx",
+                                    lineNumber: 158,
+                                    columnNumber: 13
+                                }, ("TURBOPACK compile-time value", void 0)),
+                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mantine$2f$core$2f$esm$2f$components$2f$Group$2f$Group$2e$mjs__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["Group"], {
+                                    gap: 10,
+                                    wrap: "nowrap",
+                                    align: "center",
+                                    children: [
+                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mantine$2f$core$2f$esm$2f$core$2f$Box$2f$Box$2e$mjs__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["Box"], {
+                                            style: {
+                                                width: 34,
+                                                height: 34,
+                                                borderRadius: 10,
+                                                display: 'flex',
+                                                alignItems: 'center',
+                                                justifyContent: 'center',
+                                                background: 'rgba(20,184,166,0.12)',
+                                                color: 'rgb(13,148,136)',
+                                                flexShrink: 0
+                                            },
+                                            children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$tabler$2f$icons$2d$react$2f$dist$2f$esm$2f$icons$2f$IconShoppingBag$2e$mjs__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__$3c$export__default__as__IconShoppingBag$3e$__["IconShoppingBag"], {
+                                                size: 18
+                                            }, void 0, false, {
+                                                fileName: "[project]/app/[locale]/knowledge/[type]/[slug]/AuthModal.tsx",
+                                                lineNumber: 191,
+                                                columnNumber: 17
+                                            }, ("TURBOPACK compile-time value", void 0))
+                                        }, void 0, false, {
+                                            fileName: "[project]/app/[locale]/knowledge/[type]/[slug]/AuthModal.tsx",
+                                            lineNumber: 178,
+                                            columnNumber: 15
+                                        }, ("TURBOPACK compile-time value", void 0)),
+                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mantine$2f$core$2f$esm$2f$components$2f$Text$2f$Text$2e$mjs__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["Text"], {
+                                            size: "sm",
+                                            children: translations.benefit2
+                                        }, void 0, false, {
+                                            fileName: "[project]/app/[locale]/knowledge/[type]/[slug]/AuthModal.tsx",
+                                            lineNumber: 193,
+                                            columnNumber: 15
+                                        }, ("TURBOPACK compile-time value", void 0))
+                                    ]
+                                }, void 0, true, {
+                                    fileName: "[project]/app/[locale]/knowledge/[type]/[slug]/AuthModal.tsx",
+                                    lineNumber: 177,
+                                    columnNumber: 13
+                                }, ("TURBOPACK compile-time value", void 0)),
+                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mantine$2f$core$2f$esm$2f$components$2f$Group$2f$Group$2e$mjs__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["Group"], {
+                                    gap: 10,
+                                    wrap: "nowrap",
+                                    align: "center",
+                                    children: [
+                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mantine$2f$core$2f$esm$2f$core$2f$Box$2f$Box$2e$mjs__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["Box"], {
+                                            style: {
+                                                width: 34,
+                                                height: 34,
+                                                borderRadius: 10,
+                                                display: 'flex',
+                                                alignItems: 'center',
+                                                justifyContent: 'center',
+                                                background: 'rgba(245,158,11,0.14)',
+                                                color: 'rgb(217,119,6)',
+                                                flexShrink: 0
+                                            },
+                                            children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$tabler$2f$icons$2d$react$2f$dist$2f$esm$2f$icons$2f$IconBellRinging$2e$mjs__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__$3c$export__default__as__IconBellRinging$3e$__["IconBellRinging"], {
+                                                size: 18
+                                            }, void 0, false, {
+                                                fileName: "[project]/app/[locale]/knowledge/[type]/[slug]/AuthModal.tsx",
+                                                lineNumber: 210,
+                                                columnNumber: 17
+                                            }, ("TURBOPACK compile-time value", void 0))
+                                        }, void 0, false, {
+                                            fileName: "[project]/app/[locale]/knowledge/[type]/[slug]/AuthModal.tsx",
+                                            lineNumber: 197,
+                                            columnNumber: 15
+                                        }, ("TURBOPACK compile-time value", void 0)),
+                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mantine$2f$core$2f$esm$2f$components$2f$Text$2f$Text$2e$mjs__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["Text"], {
+                                            size: "sm",
+                                            children: translations.benefit3
+                                        }, void 0, false, {
+                                            fileName: "[project]/app/[locale]/knowledge/[type]/[slug]/AuthModal.tsx",
+                                            lineNumber: 212,
+                                            columnNumber: 15
+                                        }, ("TURBOPACK compile-time value", void 0))
+                                    ]
+                                }, void 0, true, {
+                                    fileName: "[project]/app/[locale]/knowledge/[type]/[slug]/AuthModal.tsx",
+                                    lineNumber: 196,
+                                    columnNumber: 13
+                                }, ("TURBOPACK compile-time value", void 0)),
+                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mantine$2f$core$2f$esm$2f$components$2f$Group$2f$Group$2e$mjs__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["Group"], {
+                                    gap: 10,
+                                    wrap: "nowrap",
+                                    align: "center",
+                                    children: [
+                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mantine$2f$core$2f$esm$2f$core$2f$Box$2f$Box$2e$mjs__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["Box"], {
+                                            style: {
+                                                width: 34,
+                                                height: 34,
+                                                borderRadius: 10,
+                                                display: 'flex',
+                                                alignItems: 'center',
+                                                justifyContent: 'center',
+                                                background: 'rgba(139,92,246,0.14)',
+                                                color: 'rgb(124,58,237)',
+                                                flexShrink: 0
+                                            },
+                                            children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$tabler$2f$icons$2d$react$2f$dist$2f$esm$2f$icons$2f$IconSparkles$2e$mjs__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__$3c$export__default__as__IconSparkles$3e$__["IconSparkles"], {
+                                                size: 18
+                                            }, void 0, false, {
+                                                fileName: "[project]/app/[locale]/knowledge/[type]/[slug]/AuthModal.tsx",
+                                                lineNumber: 229,
+                                                columnNumber: 17
+                                            }, ("TURBOPACK compile-time value", void 0))
+                                        }, void 0, false, {
+                                            fileName: "[project]/app/[locale]/knowledge/[type]/[slug]/AuthModal.tsx",
+                                            lineNumber: 216,
+                                            columnNumber: 15
+                                        }, ("TURBOPACK compile-time value", void 0)),
+                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mantine$2f$core$2f$esm$2f$components$2f$Text$2f$Text$2e$mjs__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["Text"], {
+                                            size: "sm",
+                                            children: translations.benefit4
+                                        }, void 0, false, {
+                                            fileName: "[project]/app/[locale]/knowledge/[type]/[slug]/AuthModal.tsx",
+                                            lineNumber: 231,
+                                            columnNumber: 15
+                                        }, ("TURBOPACK compile-time value", void 0))
+                                    ]
+                                }, void 0, true, {
+                                    fileName: "[project]/app/[locale]/knowledge/[type]/[slug]/AuthModal.tsx",
+                                    lineNumber: 215,
+                                    columnNumber: 13
+                                }, ("TURBOPACK compile-time value", void 0))
+                            ]
+                        }, void 0, true, {
+                            fileName: "[project]/app/[locale]/knowledge/[type]/[slug]/AuthModal.tsx",
+                            lineNumber: 157,
+                            columnNumber: 11
+                        }, ("TURBOPACK compile-time value", void 0))
+                    ]
+                }, void 0, true, {
+                    fileName: "[project]/app/[locale]/knowledge/[type]/[slug]/AuthModal.tsx",
+                    lineNumber: 145,
+                    columnNumber: 9
+                }, ("TURBOPACK compile-time value", void 0)),
+                !disableGuestCheckout && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mantine$2f$core$2f$esm$2f$components$2f$Stack$2f$Stack$2e$mjs__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["Stack"], {
+                    gap: "sm",
+                    w: "100%",
+                    children: guestCheckoutUrl && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["Fragment"], {
+                        children: [
+                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mantine$2f$core$2f$esm$2f$components$2f$Divider$2f$Divider$2e$mjs__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["Divider"], {
+                                label: translations.or,
+                                labelPosition: "center",
+                                my: 4,
+                                styles: {
+                                    label: {
+                                        fontSize: 12,
+                                        fontWeight: 700,
+                                        color: 'var(--mantine-color-gray-6)'
+                                    }
+                                }
+                            }, void 0, false, {
+                                fileName: "[project]/app/[locale]/knowledge/[type]/[slug]/AuthModal.tsx",
+                                lineNumber: 240,
+                                columnNumber: 15
+                            }, ("TURBOPACK compile-time value", void 0)),
+                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mantine$2f$core$2f$esm$2f$components$2f$Button$2f$Button$2e$mjs__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["Button"], {
+                                onClick: handleBuyAsGuest,
+                                variant: "outline",
+                                size: "md",
+                                fullWidth: true,
+                                disabled: disableGuestCheckout,
+                                children: translations.buyAsGuest
+                            }, void 0, false, {
+                                fileName: "[project]/app/[locale]/knowledge/[type]/[slug]/AuthModal.tsx",
+                                lineNumber: 253,
+                                columnNumber: 15
+                            }, ("TURBOPACK compile-time value", void 0)),
+                            disableGuestCheckout && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mantine$2f$core$2f$esm$2f$components$2f$Text$2f$Text$2e$mjs__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["Text"], {
+                                size: "xs",
+                                c: "dimmed",
+                                ta: "center",
+                                children: translations.guestDisabledNote
+                            }, void 0, false, {
+                                fileName: "[project]/app/[locale]/knowledge/[type]/[slug]/AuthModal.tsx",
+                                lineNumber: 264,
+                                columnNumber: 17
+                            }, ("TURBOPACK compile-time value", void 0))
+                        ]
+                    }, void 0, true)
+                }, void 0, false, {
+                    fileName: "[project]/app/[locale]/knowledge/[type]/[slug]/AuthModal.tsx",
+                    lineNumber: 237,
+                    columnNumber: 9
+                }, ("TURBOPACK compile-time value", void 0))
+            ]
+        }, void 0, true, {
+            fileName: "[project]/app/[locale]/knowledge/[type]/[slug]/AuthModal.tsx",
+            lineNumber: 106,
+            columnNumber: 7
+        }, ("TURBOPACK compile-time value", void 0))
+    }, void 0, false, {
+        fileName: "[project]/app/[locale]/knowledge/[type]/[slug]/AuthModal.tsx",
+        lineNumber: 89,
+        columnNumber: 5
+    }, ("TURBOPACK compile-time value", void 0));
+};
+const __TURBOPACK__default__export__ = AuthModal;
+}),
+"[project]/app/[locale]/topic/[id]/[slug]/KnowledgeGrid.tsx [app-ssr] (ecmascript)", ((__turbopack_context__) => {
+"use strict";
+
+__turbopack_context__.s([
+    "default",
+    ()=>KnowledgeGrid
+]);
+var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/next/dist/server/route-modules/app-page/vendored/ssr/react-jsx-dev-runtime.js [app-ssr] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/next/dist/server/route-modules/app-page/vendored/ssr/react.js [app-ssr] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mantine$2f$core$2f$esm$2f$components$2f$Text$2f$Text$2e$mjs__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/@mantine/core/esm/components/Text/Text.mjs [app-ssr] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mantine$2f$core$2f$esm$2f$components$2f$Card$2f$Card$2e$mjs__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/@mantine/core/esm/components/Card/Card.mjs [app-ssr] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mantine$2f$core$2f$esm$2f$components$2f$Badge$2f$Badge$2e$mjs__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/@mantine/core/esm/components/Badge/Badge.mjs [app-ssr] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mantine$2f$core$2f$esm$2f$components$2f$Avatar$2f$Avatar$2e$mjs__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/@mantine/core/esm/components/Avatar/Avatar.mjs [app-ssr] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mantine$2f$core$2f$esm$2f$components$2f$Rating$2f$Rating$2e$mjs__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/@mantine/core/esm/components/Rating/Rating.mjs [app-ssr] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$client$2f$app$2d$dir$2f$link$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/next/dist/client/app-dir/link.js [app-ssr] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$image$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/next/image.js [app-ssr] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$heroicons$2f$react$2f$24$2f$outline$2f$esm$2f$ArrowDownTrayIcon$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__$3c$export__default__as__ArrowDownTrayIcon$3e$__ = __turbopack_context__.i("[project]/node_modules/@heroicons/react/24/outline/esm/ArrowDownTrayIcon.js [app-ssr] (ecmascript) <export default as ArrowDownTrayIcon>");
+var __TURBOPACK__imported__module__$5b$project$5d2f$components$2f$icons$2f$DataIcon$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/components/icons/DataIcon.tsx [app-ssr] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$components$2f$icons$2f$InsightIcon$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/components/icons/InsightIcon.tsx [app-ssr] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$components$2f$icons$2f$ManualIcon$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/components/icons/ManualIcon.tsx [app-ssr] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$components$2f$icons$2f$ReportIcon$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/components/icons/ReportIcon.tsx [app-ssr] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$components$2f$icons$2f$CourseIcon$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/components/icons/CourseIcon.tsx [app-ssr] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$date$2d$fns$2f$formatDistanceToNow$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/date-fns/formatDistanceToNow.js [app-ssr] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$app$2f5b$locale$5d2f$topic$2f5b$id$5d2f5b$slug$5d2f$knowledge$2d$card$2e$module$2e$css__$5b$app$2d$ssr$5d$__$28$css__module$29$__ = __turbopack_context__.i("[project]/app/[locale]/topic/[id]/[slug]/knowledge-card.module.css [app-ssr] (css module)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$navigation$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/next/navigation.js [app-ssr] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$date$2d$fns$2f$locale$2f$ar$2d$SA$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/date-fns/locale/ar-SA.js [app-ssr] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$date$2d$fns$2f$locale$2f$en$2d$US$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/date-fns/locale/en-US.js [app-ssr] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$axios$2f$lib$2f$axios$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/axios/lib/axios.js [app-ssr] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$app$2f5b$locale$5d2f$knowledge$2f5b$type$5d2f5b$slug$5d2f$AuthModal$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/app/[locale]/knowledge/[type]/[slug]/AuthModal.tsx [app-ssr] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$hooks$2f$useAuth$2e$ts__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/hooks/useAuth.ts [app-ssr] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$app$2f$config$2e$ts__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/app/config.ts [app-ssr] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$authToken$2e$ts__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/lib/authToken.ts [app-ssr] (ecmascript)");
+"use client";
+;
+;
+;
+;
+;
+;
+;
+;
+;
+;
+;
+;
+;
+;
+;
+;
+;
+;
+;
+;
+const BookmarkUnselectedIcon = (props)=>{
+    const { width = 33, height = 33, ...rest } = props;
+    return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("svg", {
+        width: width,
+        height: height,
+        viewBox: "0 0 33 33",
+        fill: "none",
+        xmlns: "http://www.w3.org/2000/svg",
+        ...rest,
+        children: [
+            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("path", {
+                d: "M16.658 2.38159C15.1433 2.38159 13.6287 2.38159 12.1172 2.38159C11.3277 2.38159 10.5349 2.38159 9.74536 2.38159C8.63354 2.38159 7.5604 2.59751 6.59038 3.1647C5.21753 3.96714 4.17339 5.36577 3.85112 6.92876C3.74155 7.45405 3.71899 7.97935 3.71899 8.51431V12.1108V17.9406V24.0701V28.4722V29.3971C3.71899 29.8999 3.89302 30.3961 4.26362 30.7506C4.87593 31.3339 5.78149 31.4113 6.50015 30.9794C7.75054 30.2286 8.99771 29.4777 10.2481 28.7268C11.708 27.8502 13.1646 26.9705 14.6245 26.0939C14.7115 26.0423 14.7953 25.9908 14.8823 25.9392C14.5568 25.9392 14.2313 25.9392 13.9058 25.9392C14.3086 26.1809 14.7147 26.4258 15.1175 26.6675C16.0295 27.2154 16.9383 27.7632 17.8503 28.3111C18.7978 28.8815 19.7453 29.4519 20.6927 30.0223C21.2212 30.3381 21.7465 30.6572 22.275 30.973C23.0743 31.4532 24.1023 31.3082 24.6824 30.5605C24.966 30.1931 25.0659 29.7613 25.0659 29.3069C25.0659 28.7075 25.0659 28.1081 25.0659 27.5086C25.0659 26.4774 25.0659 25.4494 25.0659 24.4181C25.0659 23.2547 25.0659 22.0946 25.0659 20.9312C25.0659 19.9354 25.0659 18.9396 25.0659 17.9438C25.0659 17.4121 25.0659 16.8835 25.0659 16.3518C25.0659 16.326 25.0659 16.3035 25.0659 16.2777C25.0659 15.7717 24.6211 15.2883 24.0991 15.3109C23.5738 15.3334 23.1323 15.7363 23.1323 16.2777V17.6022V20.7765V24.5889V27.8825C23.1323 28.4013 23.1419 28.9234 23.1323 29.4455C23.1323 29.4938 23.1291 29.5421 23.1226 29.5937C23.1355 29.5067 23.1452 29.4229 23.1581 29.3359C23.1452 29.4068 23.1258 29.4745 23.0968 29.5389C23.1291 29.4616 23.1613 29.3842 23.1935 29.3069C23.1742 29.3456 23.1548 29.381 23.1355 29.4165C23.0614 29.5583 23.3095 29.2263 23.1709 29.3681C23.0388 29.5002 23.3224 29.2843 23.2386 29.323C23.1935 29.3423 23.1548 29.3713 23.1097 29.3939C23.1871 29.3617 23.2644 29.3294 23.3417 29.2972C23.2741 29.323 23.2096 29.3423 23.1387 29.3584C23.2257 29.3456 23.3095 29.3359 23.3965 29.323C23.316 29.3327 23.2386 29.3327 23.1581 29.3262C23.2451 29.3391 23.3289 29.3488 23.4159 29.3617C23.345 29.352 23.2805 29.3327 23.2161 29.3101L23.4481 29.4068C23.1323 29.2714 22.8358 29.0523 22.5425 28.875C21.8819 28.4754 21.218 28.0791 20.5574 27.6794C19.0234 26.7578 17.4894 25.8329 15.9554 24.9112C15.6009 24.6985 15.2432 24.4826 14.8887 24.2699C14.5955 24.0926 14.2055 24.0926 13.9123 24.2699C12.9455 24.8532 11.9754 25.4333 11.0086 26.0166C9.49077 26.9318 7.96968 27.8438 6.45181 28.759C6.21011 28.9041 5.96841 29.0491 5.72671 29.1973C5.60425 29.2714 5.48501 29.352 5.35288 29.41L5.58491 29.3133C5.51724 29.3359 5.45278 29.3552 5.38511 29.3649C5.47212 29.352 5.55591 29.3423 5.64292 29.3294C5.56235 29.3359 5.48501 29.3359 5.40444 29.3262C5.49145 29.3391 5.57524 29.3488 5.66226 29.3617C5.59136 29.3488 5.52368 29.3294 5.45923 29.3004L5.69126 29.3971C5.65259 29.3778 5.61714 29.3584 5.58169 29.3391C5.43989 29.265 5.77183 29.5131 5.63003 29.3746C5.4979 29.2424 5.71382 29.526 5.67515 29.4422C5.65581 29.3971 5.62681 29.3584 5.60425 29.3133C5.63647 29.3907 5.6687 29.468 5.70093 29.5454C5.67515 29.4777 5.65581 29.4132 5.6397 29.3423C5.65259 29.4293 5.66226 29.5131 5.67515 29.6001C5.64614 29.3746 5.66548 29.1361 5.66548 28.9073C5.66548 28.3852 5.66548 27.8631 5.66548 27.3411C5.66548 25.6105 5.66548 23.8799 5.66548 22.1461C5.66548 20.0579 5.66548 17.9728 5.66548 15.8845C5.66548 14.1088 5.66548 12.3332 5.66548 10.5575C5.66548 9.76147 5.66226 8.96548 5.66548 8.16948C5.66548 7.95679 5.67837 7.74731 5.70737 7.53784C5.69448 7.62485 5.68481 7.70864 5.67192 7.79565C5.72993 7.36382 5.84595 6.94487 6.01353 6.54204C5.9813 6.61938 5.94907 6.69673 5.91685 6.77407C6.03931 6.4937 6.18433 6.22622 6.35513 5.97163C6.39702 5.90718 6.44536 5.84595 6.49048 5.78149C6.57749 5.65903 6.35835 5.94585 6.42925 5.85884C6.45181 5.83306 6.47437 5.80405 6.49692 5.77827C6.59683 5.65903 6.69995 5.54624 6.80952 5.43667C6.91587 5.33354 7.02544 5.23364 7.13823 5.14019C7.16401 5.11763 7.19302 5.09507 7.2188 5.07251C6.98032 5.27554 7.09956 5.16597 7.15757 5.12085C7.21558 5.07895 7.27358 5.03706 7.33159 4.99839C7.59263 4.82437 7.86655 4.67612 8.15659 4.55688C8.07925 4.58911 8.0019 4.62134 7.92456 4.65356C8.3145 4.49243 8.72056 4.38286 9.13628 4.32808C9.04927 4.34097 8.96548 4.35063 8.87847 4.36353C9.2523 4.31519 9.62935 4.32163 10.0064 4.32163H11.6757H15.7202H16.6773C17.1833 4.32163 17.6667 3.8769 17.6441 3.35483C17.6022 2.8231 17.1994 2.38159 16.658 2.38159Z",
+                fill: "currentColor"
+            }, void 0, false, {
+                fileName: "[project]/app/[locale]/topic/[id]/[slug]/KnowledgeGrid.tsx",
+                lineNumber: 34,
+                columnNumber: 7
+            }, ("TURBOPACK compile-time value", void 0)),
+            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("path", {
+                d: "M23.1064 2.70376V5.58804V10.1449V11.1955C23.1064 11.7014 23.5512 12.1848 24.0732 12.1623C24.5985 12.1397 25.04 11.7369 25.04 11.1955C25.04 10.2351 25.04 9.27154 25.04 8.31118C25.04 6.79331 25.04 5.27222 25.04 3.75435C25.04 3.40308 25.04 3.05503 25.04 2.70376C25.04 2.19781 24.5953 1.71441 24.0732 1.73697C23.5479 1.75952 23.1064 2.16236 23.1064 2.70376Z",
+                fill: "currentColor"
+            }, void 0, false, {
+                fileName: "[project]/app/[locale]/topic/[id]/[slug]/KnowledgeGrid.tsx",
+                lineNumber: 38,
+                columnNumber: 7
+            }, ("TURBOPACK compile-time value", void 0)),
+            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("path", {
+                d: "M19.8258 7.91479H22.7101H27.2669H28.3175C28.8235 7.91479 29.3069 7.47007 29.2843 6.948C29.2618 6.42271 28.8589 5.9812 28.3175 5.9812C27.3572 5.9812 26.3936 5.9812 25.4333 5.9812C23.9154 5.9812 22.3943 5.9812 20.8764 5.9812C20.5251 5.9812 20.1771 5.9812 19.8258 5.9812C19.3199 5.9812 18.8365 6.42593 18.859 6.948C18.8848 7.47329 19.2844 7.91479 19.8258 7.91479Z",
+                fill: "currentColor"
+            }, void 0, false, {
+                fileName: "[project]/app/[locale]/topic/[id]/[slug]/KnowledgeGrid.tsx",
+                lineNumber: 42,
+                columnNumber: 7
+            }, ("TURBOPACK compile-time value", void 0))
+        ]
+    }, void 0, true, {
+        fileName: "[project]/app/[locale]/topic/[id]/[slug]/KnowledgeGrid.tsx",
+        lineNumber: 26,
+        columnNumber: 5
+    }, ("TURBOPACK compile-time value", void 0));
+};
+const BookmarkSelectedIcon = (props)=>{
+    const { width = 28, height = 28, ...rest } = props;
+    return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("svg", {
+        width: width,
+        height: height,
+        viewBox: "0 0 28 28",
+        fill: "none",
+        xmlns: "http://www.w3.org/2000/svg",
+        ...rest,
+        children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("path", {
+            d: "M21.9024 27.6937L14 22.0555L6.09771 27.6937C5.02583 28.4594 3.53833 27.6937 3.53833 26.3758V2.32969C3.53833 1.04453 4.58286 0 5.86802 0H22.1321C23.4172 0 24.4618 1.04453 24.4618 2.32969V26.3758C24.4618 27.6937 22.9743 28.4594 21.9024 27.6937Z",
+            fill: "currentColor"
+        }, void 0, false, {
+            fileName: "[project]/app/[locale]/topic/[id]/[slug]/KnowledgeGrid.tsx",
+            lineNumber: 61,
+            columnNumber: 7
+        }, ("TURBOPACK compile-time value", void 0))
+    }, void 0, false, {
+        fileName: "[project]/app/[locale]/topic/[id]/[slug]/KnowledgeGrid.tsx",
+        lineNumber: 53,
+        columnNumber: 5
+    }, ("TURBOPACK compile-time value", void 0));
+};
+function getInitials(name) {
+    if (!name) return '';
+    return name.split(" ").map((word)=>word[0]).join("").toUpperCase();
+}
+function formatPublishedDate(dateString, locale = 'en') {
+    // Ensure we're working with UTC time to avoid server/client mismatches
+    const date = new Date(dateString);
+    // إنشاء نسخة UTC من التاريخ الأصلي
+    const utcDate = new Date(Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate(), date.getUTCHours(), date.getUTCMinutes()));
+    // اختيار اللغة
+    const selectedLocale = locale === 'ar' ? __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$date$2d$fns$2f$locale$2f$ar$2d$SA$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["arSA"] : __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$date$2d$fns$2f$locale$2f$en$2d$US$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["enUS"];
+    return (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$date$2d$fns$2f$formatDistanceToNow$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["formatDistanceToNow"])(utcDate, {
+        addSuffix: true,
+        locale: selectedLocale
+    });
+}
+function truncateDescription(description, wordLimit = 20) {
+    if (!description) return "";
+    // Remove HTML tags to get plain text
+    const plainText = description.replace(/<[^>]*>/g, "");
+    const words = plainText.split(/\s+/);
+    if (words.length <= wordLimit) return plainText;
+    return words.slice(0, wordLimit).join(" ") + "...";
+}
+// Format coverage years nicely
+function formatCoverageRange(start, end) {
+    const hasStart = typeof start === 'number' && !Number.isNaN(start);
+    const hasEnd = typeof end === 'number' && !Number.isNaN(end);
+    if (hasStart && hasEnd) {
+        return start === end ? String(start) : `${start}–${end}`;
+    }
+    if (hasStart) return String(start);
+    if (hasEnd) return String(end);
+    return '';
+}
+function KnowledgeGrid({ knowledge, topicName, showHeader = true, colNumbers = 3, locale, showInsighter = true }) {
+    const params = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$navigation$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useParams"])();
+    const currentLocale = locale || params.locale || "en";
+    const isRTL = currentLocale === "ar";
+    // Auth Modal state
+    const [authModalOpened, setAuthModalOpened] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useState"])(false);
+    // State for tracking read later status for each item
+    const [readLaterStates, setReadLaterStates] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useState"])({});
+    const [loadingStates, setLoadingStates] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useState"])({});
+    // Use auth hook
+    const { isLoggedIn } = (0, __TURBOPACK__imported__module__$5b$project$5d2f$hooks$2f$useAuth$2e$ts__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useAuth"])();
+    // Handle read later toggle
+    const handleReadLaterToggle = async (item, e)=>{
+        if (!isLoggedIn) {
+            setAuthModalOpened(true);
+            return;
+        }
+        e.preventDefault();
+        e.stopPropagation();
+        const itemKey = item.slug;
+        const currentState = readLaterStates[itemKey] ?? item.is_read_later ?? false;
+        setLoadingStates((prev)=>({
+                ...prev,
+                [itemKey]: true
+            }));
+        try {
+            const token = (0, __TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$authToken$2e$ts__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["getAuthToken"])();
+            if (!token) {
+                setAuthModalOpened(true);
+                return;
+            }
+            const method = currentState ? 'DELETE' : 'POST';
+            const url = (0, __TURBOPACK__imported__module__$5b$project$5d2f$app$2f$config$2e$ts__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["getApiUrl"])(`/api/account/favorite/knowledge/${item.slug}`);
+            const response = await (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$axios$2f$lib$2f$axios$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["default"])({
+                method,
+                url,
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`,
+                    'Accept': 'application/json',
+                    'Accept-language': currentLocale
+                }
+            });
+            // Check for successful responses (200, 201, 204)
+            if (response.status >= 200 && response.status < 300) {
+                setReadLaterStates((prev)=>({
+                        ...prev,
+                        [itemKey]: !currentState
+                    }));
+            }
+        } catch (error) {
+        // Silently handle error in production
+        } finally{
+            setLoadingStates((prev)=>({
+                    ...prev,
+                    [itemKey]: false
+                }));
+        }
+    };
+    const typeTranslations = {
+        report: isRTL ? "تقرير" : "Reports",
+        manual: isRTL ? "دليل" : "Manuals",
+        statistic: isRTL ? "إحصائيات" : "Statistics",
+        data: isRTL ? "بيانات" : "Data",
+        article: isRTL ? "مجالات" : "Articles",
+        course: isRTL ? "دورة تدريبية" : "Course"
+    };
+    // Localized strings
+    const translations = {
+        knowledge: isRTL ? "المستندات" : "Insights",
+        exploreInsights: isRTL ? `استكشف المستندات ضمن ${topicName}` : `Explore insights within ${topicName}`,
+        noItems: isRTL ? "لا توجد عناصر معرفية متاحة بعد" : "No knowledge items available yet",
+        posted: isRTL ? "نُشر" : "Posted",
+        free: isRTL ? "مجاني" : "Free",
+        partial: isRTL ? "مدفوع جزئي" : "Partial Paid",
+        freeDocs: isRTL ? "مستندات مجانية" : "Free docs",
+        paid: isRTL ? "مدفوع" : "PAID",
+        insighter: isRTL ? "إنسايتر" : "Insighter",
+        company: isRTL ? "الشركة" : "Company",
+        by: isRTL ? "من قبل" : "By",
+        downloads: isRTL ? "تحميل" : "Downloads",
+        downloaded: isRTL ? "تم التحميل" : "Downloaded",
+        time: isRTL ? "مرة" : "time",
+        times: isRTL ? "مرات" : "times",
+        download: isRTL ? "تحميل" : "Download"
+    };
+    return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+        className: "max-w-6xl mx-auto",
+        dir: isRTL ? "rtl" : "ltr",
+        children: [
+            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                className: `grid sm:grid-cols-2 lg:grid-cols-${colNumbers} gap-4 max-w-7xl mx-auto`,
+                children: [
+                    knowledge.map((item, index)=>{
+                        const normalizedPrice = String(item.price ?? item.total_price ?? "").trim();
+                        const hasPrice = normalizedPrice !== "";
+                        const numericPrice = Number(normalizedPrice);
+                        const isNumericPrice = normalizedPrice !== "" && !Number.isNaN(numericPrice);
+                        const formattedPrice = isNumericPrice ? `$${numericPrice.toLocaleString('en-US', {
+                            maximumFractionDigits: 2
+                        })}` : normalizedPrice;
+                        const paidStatus = typeof item.paid === 'string' ? item.paid : typeof item.paid === 'boolean' ? item.paid ? 'paid' : 'free' : typeof item.paid_status === 'string' ? item.paid_status : undefined;
+                        const shouldShowFree = paidStatus === 'free' || !paidStatus && isNumericPrice && numericPrice === 0;
+                        const shouldShowPartial = paidStatus === 'partial_paid';
+                        const shouldShowPaid = paidStatus === 'paid';
+                        const shouldShowPricing = shouldShowFree || shouldShowPartial || shouldShowPaid && hasPrice && numericPrice > 0 || !paidStatus && hasPrice && numericPrice > 0;
+                        const coverageText = formatCoverageRange(item.cover_start, item.cover_end);
+                        // Get review value - prefer review string, fallback to review_summary.average
+                        const reviewValue = item.review ? parseFloat(item.review) : item.review_summary?.average ?? 0;
+                        const reviewCount = item.review_summary?.count ?? 0;
+                        const showReview = reviewValue >= 1;
+                        const showDownloads = item.total_downloads !== undefined && item.total_downloads > 0;
+                        const showBottomMeta = showReview || showDownloads;
+                        const insighterRoles = item.insighter?.roles ?? [];
+                        const isCompanyProfile = insighterRoles.includes("company") || insighterRoles.includes("company-insighter");
+                        const isInsighterProfile = insighterRoles.includes("insighter");
+                        return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mantine$2f$core$2f$esm$2f$components$2f$Card$2f$Card$2e$mjs__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["Card"], {
+                            withBorder: true,
+                            padding: "lg",
+                            radius: "xs",
+                            className: __TURBOPACK__imported__module__$5b$project$5d2f$app$2f5b$locale$5d2f$topic$2f5b$id$5d2f5b$slug$5d2f$knowledge$2d$card$2e$module$2e$css__$5b$app$2d$ssr$5d$__$28$css__module$29$__["default"].card,
+                            component: "div",
+                            children: [
+                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$client$2f$app$2d$dir$2f$link$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["default"], {
+                                    href: `/${currentLocale}/knowledge/${item.type}/${item.slug}`,
+                                    className: "block relative h-full flex flex-col",
+                                    onClick: (e)=>{
+                                        // Check if the URL is valid before navigation
+                                        if (!item.slug || item.slug.trim() === '') {
+                                            e.preventDefault();
+                                            console.error('Invalid slug for item:', item);
+                                            return;
+                                        }
+                                    },
+                                    children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                        className: `${__TURBOPACK__imported__module__$5b$project$5d2f$app$2f5b$locale$5d2f$topic$2f5b$id$5d2f5b$slug$5d2f$knowledge$2d$card$2e$module$2e$css__$5b$app$2d$ssr$5d$__$28$css__module$29$__["default"].darkSection} ${showBottomMeta ? __TURBOPACK__imported__module__$5b$project$5d2f$app$2f5b$locale$5d2f$topic$2f5b$id$5d2f5b$slug$5d2f$knowledge$2d$card$2e$module$2e$css__$5b$app$2d$ssr$5d$__$28$css__module$29$__["default"].darkSectionWithBottomMeta : ""} relative`,
+                                        children: [
+                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                children: [
+                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                        className: "flex items-center mb-3",
+                                                        children: [
+                                                            item.type === "report" && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$icons$2f$ReportIcon$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["default"], {
+                                                                width: 20,
+                                                                height: 20
+                                                            }, void 0, false, {
+                                                                fileName: "[project]/app/[locale]/topic/[id]/[slug]/KnowledgeGrid.tsx",
+                                                                lineNumber: 341,
+                                                                columnNumber: 48
+                                                            }, this),
+                                                            item.type === "manual" && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$icons$2f$ManualIcon$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["default"], {
+                                                                width: 20,
+                                                                height: 20
+                                                            }, void 0, false, {
+                                                                fileName: "[project]/app/[locale]/topic/[id]/[slug]/KnowledgeGrid.tsx",
+                                                                lineNumber: 342,
+                                                                columnNumber: 48
+                                                            }, this),
+                                                            item.type === "statistic" && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$icons$2f$InsightIcon$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["default"], {
+                                                                width: 20,
+                                                                height: 20
+                                                            }, void 0, false, {
+                                                                fileName: "[project]/app/[locale]/topic/[id]/[slug]/KnowledgeGrid.tsx",
+                                                                lineNumber: 343,
+                                                                columnNumber: 51
+                                                            }, this),
+                                                            item.type === "data" && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$icons$2f$DataIcon$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["default"], {
+                                                                width: 20,
+                                                                height: 20
+                                                            }, void 0, false, {
+                                                                fileName: "[project]/app/[locale]/topic/[id]/[slug]/KnowledgeGrid.tsx",
+                                                                lineNumber: 344,
+                                                                columnNumber: 46
+                                                            }, this),
+                                                            item.type === "course" && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$icons$2f$CourseIcon$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["default"], {
+                                                                width: 20,
+                                                                height: 20
+                                                            }, void 0, false, {
+                                                                fileName: "[project]/app/[locale]/topic/[id]/[slug]/KnowledgeGrid.tsx",
+                                                                lineNumber: 345,
+                                                                columnNumber: 48
+                                                            }, this),
+                                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mantine$2f$core$2f$esm$2f$components$2f$Badge$2f$Badge$2e$mjs__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["Badge"], {
+                                                                c: '#67b5f6',
+                                                                w: "fit-content",
+                                                                className: "capitalize ml-2 ",
+                                                                variant: "light",
+                                                                children: item.type && typeof item.type === 'string' ? typeTranslations[item.type.toLowerCase()] || item.type : ''
+                                                            }, void 0, false, {
+                                                                fileName: "[project]/app/[locale]/topic/[id]/[slug]/KnowledgeGrid.tsx",
+                                                                lineNumber: 347,
+                                                                columnNumber: 21
+                                                            }, this)
+                                                        ]
+                                                    }, void 0, true, {
+                                                        fileName: "[project]/app/[locale]/topic/[id]/[slug]/KnowledgeGrid.tsx",
+                                                        lineNumber: 340,
+                                                        columnNumber: 19
+                                                    }, this),
+                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mantine$2f$core$2f$esm$2f$components$2f$Text$2f$Text$2e$mjs__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["Text"], {
+                                                        style: {
+                                                            wordBreak: 'break-word'
+                                                        },
+                                                        fw: 700,
+                                                        className: `${__TURBOPACK__imported__module__$5b$project$5d2f$app$2f5b$locale$5d2f$topic$2f5b$id$5d2f5b$slug$5d2f$knowledge$2d$card$2e$module$2e$css__$5b$app$2d$ssr$5d$__$28$css__module$29$__["default"].title} ${item.language === 'arabic' ? 'text-right' : 'text-left'}`,
+                                                        pt: 4,
+                                                        lineClamp: 2,
+                                                        dir: item.language === 'arabic' ? 'rtl' : 'ltr',
+                                                        children: item.title
+                                                    }, void 0, false, {
+                                                        fileName: "[project]/app/[locale]/topic/[id]/[slug]/KnowledgeGrid.tsx",
+                                                        lineNumber: 352,
+                                                        columnNumber: 19
+                                                    }, this),
+                                                    coverageText && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                        className: `${item.language === 'arabic' ? 'text-right' : 'text-left'}`,
+                                                        dir: item.language === 'arabic' ? 'rtl' : 'ltr',
+                                                        children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                            className: `text-lg  font-bold leading-none   drop-shadow-lg text-blue-400`,
+                                                            children: coverageText
+                                                        }, void 0, false, {
+                                                            fileName: "[project]/app/[locale]/topic/[id]/[slug]/KnowledgeGrid.tsx",
+                                                            lineNumber: 364,
+                                                            columnNumber: 21
+                                                        }, this)
+                                                    }, void 0, false, {
+                                                        fileName: "[project]/app/[locale]/topic/[id]/[slug]/KnowledgeGrid.tsx",
+                                                        lineNumber: 363,
+                                                        columnNumber: 19
+                                                    }, this)
+                                                ]
+                                            }, void 0, true, {
+                                                fileName: "[project]/app/[locale]/topic/[id]/[slug]/KnowledgeGrid.tsx",
+                                                lineNumber: 339,
+                                                columnNumber: 17
+                                            }, this),
+                                            showBottomMeta && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                className: `${__TURBOPACK__imported__module__$5b$project$5d2f$app$2f5b$locale$5d2f$topic$2f5b$id$5d2f5b$slug$5d2f$knowledge$2d$card$2e$module$2e$css__$5b$app$2d$ssr$5d$__$28$css__module$29$__["default"].bottomMetaRow} ${isRTL ? __TURBOPACK__imported__module__$5b$project$5d2f$app$2f5b$locale$5d2f$topic$2f5b$id$5d2f5b$slug$5d2f$knowledge$2d$card$2e$module$2e$css__$5b$app$2d$ssr$5d$__$28$css__module$29$__["default"].bottomMetaRowRtl : ""} ${showReview && showDownloads ? __TURBOPACK__imported__module__$5b$project$5d2f$app$2f5b$locale$5d2f$topic$2f5b$id$5d2f5b$slug$5d2f$knowledge$2d$card$2e$module$2e$css__$5b$app$2d$ssr$5d$__$28$css__module$29$__["default"].bottomMetaRowBoth : __TURBOPACK__imported__module__$5b$project$5d2f$app$2f5b$locale$5d2f$topic$2f5b$id$5d2f5b$slug$5d2f$knowledge$2d$card$2e$module$2e$css__$5b$app$2d$ssr$5d$__$28$css__module$29$__["default"].bottomMetaRowSingle}`,
+                                                children: [
+                                                    showDownloads && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                        className: __TURBOPACK__imported__module__$5b$project$5d2f$app$2f5b$locale$5d2f$topic$2f5b$id$5d2f5b$slug$5d2f$knowledge$2d$card$2e$module$2e$css__$5b$app$2d$ssr$5d$__$28$css__module$29$__["default"].bottomMetaItem,
+                                                        children: [
+                                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                                                className: "flex items-center justify-center w-6 h-6 bg-white bg-opacity-20 rounded-full",
+                                                                children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$heroicons$2f$react$2f$24$2f$outline$2f$esm$2f$ArrowDownTrayIcon$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__$3c$export__default__as__ArrowDownTrayIcon$3e$__["ArrowDownTrayIcon"], {
+                                                                    className: "w-3 h-3 text-white"
+                                                                }, void 0, false, {
+                                                                    fileName: "[project]/app/[locale]/topic/[id]/[slug]/KnowledgeGrid.tsx",
+                                                                    lineNumber: 387,
+                                                                    columnNumber: 27
+                                                                }, this)
+                                                            }, void 0, false, {
+                                                                fileName: "[project]/app/[locale]/topic/[id]/[slug]/KnowledgeGrid.tsx",
+                                                                lineNumber: 386,
+                                                                columnNumber: 25
+                                                            }, this),
+                                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mantine$2f$core$2f$esm$2f$components$2f$Text$2f$Text$2e$mjs__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["Text"], {
+                                                                size: "xs",
+                                                                className: "text-white font-medium",
+                                                                children: [
+                                                                    item.total_downloads.toLocaleString(),
+                                                                    " ",
+                                                                    item.total_downloads === 1 ? translations.download : translations.downloads
+                                                                ]
+                                                            }, void 0, true, {
+                                                                fileName: "[project]/app/[locale]/topic/[id]/[slug]/KnowledgeGrid.tsx",
+                                                                lineNumber: 389,
+                                                                columnNumber: 25
+                                                            }, this)
+                                                        ]
+                                                    }, void 0, true, {
+                                                        fileName: "[project]/app/[locale]/topic/[id]/[slug]/KnowledgeGrid.tsx",
+                                                        lineNumber: 385,
+                                                        columnNumber: 23
+                                                    }, this),
+                                                    showReview && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                        className: __TURBOPACK__imported__module__$5b$project$5d2f$app$2f5b$locale$5d2f$topic$2f5b$id$5d2f5b$slug$5d2f$knowledge$2d$card$2e$module$2e$css__$5b$app$2d$ssr$5d$__$28$css__module$29$__["default"].bottomMetaItem,
+                                                        children: [
+                                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mantine$2f$core$2f$esm$2f$components$2f$Rating$2f$Rating$2e$mjs__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["Rating"], {
+                                                                value: reviewValue,
+                                                                fractions: 2,
+                                                                readOnly: true,
+                                                                size: "sm"
+                                                            }, void 0, false, {
+                                                                fileName: "[project]/app/[locale]/topic/[id]/[slug]/KnowledgeGrid.tsx",
+                                                                lineNumber: 400,
+                                                                columnNumber: 25
+                                                            }, this),
+                                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mantine$2f$core$2f$esm$2f$components$2f$Text$2f$Text$2e$mjs__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["Text"], {
+                                                                size: "xs",
+                                                                fw: 500,
+                                                                className: "text-sky-500",
+                                                                style: {
+                                                                    whiteSpace: "nowrap"
+                                                                },
+                                                                children: reviewValue.toFixed(1)
+                                                            }, void 0, false, {
+                                                                fileName: "[project]/app/[locale]/topic/[id]/[slug]/KnowledgeGrid.tsx",
+                                                                lineNumber: 406,
+                                                                columnNumber: 25
+                                                            }, this)
+                                                        ]
+                                                    }, void 0, true, {
+                                                        fileName: "[project]/app/[locale]/topic/[id]/[slug]/KnowledgeGrid.tsx",
+                                                        lineNumber: 399,
+                                                        columnNumber: 23
+                                                    }, this)
+                                                ]
+                                            }, void 0, true, {
+                                                fileName: "[project]/app/[locale]/topic/[id]/[slug]/KnowledgeGrid.tsx",
+                                                lineNumber: 375,
+                                                columnNumber: 19
+                                            }, this)
+                                        ]
+                                    }, void 0, true, {
+                                        fileName: "[project]/app/[locale]/topic/[id]/[slug]/KnowledgeGrid.tsx",
+                                        lineNumber: 334,
+                                        columnNumber: 15
+                                    }, this)
+                                }, void 0, false, {
+                                    fileName: "[project]/app/[locale]/topic/[id]/[slug]/KnowledgeGrid.tsx",
+                                    lineNumber: 321,
+                                    columnNumber: 15
+                                }, this),
+                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                    className: __TURBOPACK__imported__module__$5b$project$5d2f$app$2f5b$locale$5d2f$topic$2f5b$id$5d2f5b$slug$5d2f$knowledge$2d$card$2e$module$2e$css__$5b$app$2d$ssr$5d$__$28$css__module$29$__["default"].whiteSection + " flex flex-col h-full ",
+                                    children: [
+                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                            className: "flex justify-between items-center pb-4",
+                                            children: [
+                                                showInsighter && item.insighter && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                    className: "flex items-center",
+                                                    children: [
+                                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                            className: "relative",
+                                                            children: [
+                                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                                    className: "object-cover object-top",
+                                                                    children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$client$2f$app$2d$dir$2f$link$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["default"], {
+                                                                        href: isCompanyProfile ? `/${currentLocale}/profile/${item.insighter.company?.uuid}` : `/${currentLocale}/profile/${item.insighter.uuid || item.insighter.name}?entity=insighter`,
+                                                                        children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mantine$2f$core$2f$esm$2f$components$2f$Avatar$2f$Avatar$2e$mjs__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["Avatar"], {
+                                                                            src: isCompanyProfile && item.insighter.company?.logo ? item.insighter.company.logo : item.insighter.profile_photo_url,
+                                                                            radius: "xl",
+                                                                            alt: item.insighter.name,
+                                                                            size: "md",
+                                                                            className: `${__TURBOPACK__imported__module__$5b$project$5d2f$app$2f5b$locale$5d2f$topic$2f5b$id$5d2f5b$slug$5d2f$knowledge$2d$card$2e$module$2e$css__$5b$app$2d$ssr$5d$__$28$css__module$29$__["default"].avatar} avatar-top-position`,
+                                                                            children: !(isCompanyProfile && item.insighter.company?.logo) && !item.insighter.profile_photo_url && getInitials(item.insighter.name)
+                                                                        }, void 0, false, {
+                                                                            fileName: "[project]/app/[locale]/topic/[id]/[slug]/KnowledgeGrid.tsx",
+                                                                            lineNumber: 433,
+                                                                            columnNumber: 22
+                                                                        }, this)
+                                                                    }, void 0, false, {
+                                                                        fileName: "[project]/app/[locale]/topic/[id]/[slug]/KnowledgeGrid.tsx",
+                                                                        lineNumber: 428,
+                                                                        columnNumber: 20
+                                                                    }, this)
+                                                                }, void 0, false, {
+                                                                    fileName: "[project]/app/[locale]/topic/[id]/[slug]/KnowledgeGrid.tsx",
+                                                                    lineNumber: 427,
+                                                                    columnNumber: 20
+                                                                }, this),
+                                                                insighterRoles.includes("company-insighter") && item.insighter.profile_photo_url && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$client$2f$app$2d$dir$2f$link$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["default"], {
+                                                                    href: `/${currentLocale}/profile/${item.insighter.uuid || item.insighter.name}?entity=insighter`,
+                                                                    children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mantine$2f$core$2f$esm$2f$components$2f$Avatar$2f$Avatar$2e$mjs__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["Avatar"], {
+                                                                        src: item.insighter.profile_photo_url,
+                                                                        radius: "xl",
+                                                                        size: "xs",
+                                                                        className: "absolute bottom-0 right-0 translate-x-1/3 rounded-full translate-y-1/3 z-10 avatar-top-position",
+                                                                        alt: item.insighter.name,
+                                                                        style: {
+                                                                            boxShadow: '0 0 0 2px white',
+                                                                            position: 'absolute'
+                                                                        }
+                                                                    }, void 0, false, {
+                                                                        fileName: "[project]/app/[locale]/topic/[id]/[slug]/KnowledgeGrid.tsx",
+                                                                        lineNumber: 451,
+                                                                        columnNumber: 27
+                                                                    }, this)
+                                                                }, void 0, false, {
+                                                                    fileName: "[project]/app/[locale]/topic/[id]/[slug]/KnowledgeGrid.tsx",
+                                                                    lineNumber: 450,
+                                                                    columnNumber: 27
+                                                                }, this),
+                                                                insighterRoles.includes("company") && item.insighter.profile_photo_url && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$client$2f$app$2d$dir$2f$link$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["default"], {
+                                                                    href: `/${currentLocale}/profile/${item.insighter.uuid || item.insighter.name}?entity=insighter`,
+                                                                    children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mantine$2f$core$2f$esm$2f$components$2f$Avatar$2f$Avatar$2e$mjs__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["Avatar"], {
+                                                                        src: item.insighter.profile_photo_url,
+                                                                        radius: "xl",
+                                                                        size: "xs",
+                                                                        className: "absolute bottom-0 right-0 translate-x-1/3 rounded-full translate-y-1/3 z-10 avatar-top-position",
+                                                                        alt: item.insighter.name,
+                                                                        style: {
+                                                                            boxShadow: '0 0 0 2px white',
+                                                                            position: 'absolute'
+                                                                        }
+                                                                    }, void 0, false, {
+                                                                        fileName: "[project]/app/[locale]/topic/[id]/[slug]/KnowledgeGrid.tsx",
+                                                                        lineNumber: 466,
+                                                                        columnNumber: 27
+                                                                    }, this)
+                                                                }, void 0, false, {
+                                                                    fileName: "[project]/app/[locale]/topic/[id]/[slug]/KnowledgeGrid.tsx",
+                                                                    lineNumber: 465,
+                                                                    columnNumber: 27
+                                                                }, this)
+                                                            ]
+                                                        }, void 0, true, {
+                                                            fileName: "[project]/app/[locale]/topic/[id]/[slug]/KnowledgeGrid.tsx",
+                                                            lineNumber: 426,
+                                                            columnNumber: 23
+                                                        }, this),
+                                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                            className: "ms-3",
+                                                            children: [
+                                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mantine$2f$core$2f$esm$2f$components$2f$Text$2f$Text$2e$mjs__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["Text"], {
+                                                                    fw: 600,
+                                                                    size: "sm",
+                                                                    className: "capitalize",
+                                                                    children: [
+                                                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$client$2f$app$2d$dir$2f$link$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["default"], {
+                                                                            href: `/${currentLocale}/profile/${item.insighter.uuid || item.insighter.name}?entity=insighter`,
+                                                                            children: isInsighterProfile && item.insighter.name.toLowerCase()
+                                                                        }, void 0, false, {
+                                                                            fileName: "[project]/app/[locale]/topic/[id]/[slug]/KnowledgeGrid.tsx",
+                                                                            lineNumber: 483,
+                                                                            columnNumber: 27
+                                                                        }, this),
+                                                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$client$2f$app$2d$dir$2f$link$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["default"], {
+                                                                            href: `/${currentLocale}/profile/${item.insighter.company?.uuid}`,
+                                                                            children: insighterRoles.includes("company") && (item.insighter.company ? isRTL ? ` ${item.insighter.company.legal_name}` : `${item.insighter.company.legal_name} ` : translations.company)
+                                                                        }, void 0, false, {
+                                                                            fileName: "[project]/app/[locale]/topic/[id]/[slug]/KnowledgeGrid.tsx",
+                                                                            lineNumber: 487,
+                                                                            columnNumber: 25
+                                                                        }, this),
+                                                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$client$2f$app$2d$dir$2f$link$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["default"], {
+                                                                            href: `/${currentLocale}/profile/${item.insighter.company?.uuid}`,
+                                                                            children: insighterRoles.includes("company-insighter") && (item.insighter.company ? isRTL ? ` ${item.insighter.company.legal_name}` : `${item.insighter.company.legal_name} ` : translations.company)
+                                                                        }, void 0, false, {
+                                                                            fileName: "[project]/app/[locale]/topic/[id]/[slug]/KnowledgeGrid.tsx",
+                                                                            lineNumber: 497,
+                                                                            columnNumber: 27
+                                                                        }, this)
+                                                                    ]
+                                                                }, void 0, true, {
+                                                                    fileName: "[project]/app/[locale]/topic/[id]/[slug]/KnowledgeGrid.tsx",
+                                                                    lineNumber: 482,
+                                                                    columnNumber: 25
+                                                                }, this),
+                                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mantine$2f$core$2f$esm$2f$components$2f$Text$2f$Text$2e$mjs__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["Text"], {
+                                                                    c: "dimmed",
+                                                                    size: "xs",
+                                                                    className: "capitalize",
+                                                                    children: [
+                                                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$client$2f$app$2d$dir$2f$link$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["default"], {
+                                                                            href: `/${currentLocale}/profile/${item.insighter.uuid || item.insighter.name}?entity=insighter`,
+                                                                            children: isInsighterProfile && translations.insighter
+                                                                        }, void 0, false, {
+                                                                            fileName: "[project]/app/[locale]/topic/[id]/[slug]/KnowledgeGrid.tsx",
+                                                                            lineNumber: 509,
+                                                                            columnNumber: 27
+                                                                        }, this),
+                                                                        insighterRoles.includes("company") && (item.insighter.company ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$client$2f$app$2d$dir$2f$link$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["default"], {
+                                                                            href: `/${currentLocale}/profile/${item.insighter.uuid || item.insighter.name}?entity=insighter`,
+                                                                            children: [
+                                                                                translations.by,
+                                                                                " ",
+                                                                                item.insighter.name.toLowerCase()
+                                                                            ]
+                                                                        }, void 0, true, {
+                                                                            fileName: "[project]/app/[locale]/topic/[id]/[slug]/KnowledgeGrid.tsx",
+                                                                            lineNumber: 516,
+                                                                            columnNumber: 34
+                                                                        }, this) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$client$2f$app$2d$dir$2f$link$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["default"], {
+                                                                            href: `/${currentLocale}/profile/${item.insighter.uuid || item.insighter.name}?entity=insighter`,
+                                                                            children: "Company"
+                                                                        }, void 0, false, {
+                                                                            fileName: "[project]/app/[locale]/topic/[id]/[slug]/KnowledgeGrid.tsx",
+                                                                            lineNumber: 519,
+                                                                            columnNumber: 33
+                                                                        }, this)),
+                                                                        insighterRoles.includes("company-insighter") && (item.insighter.company ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$client$2f$app$2d$dir$2f$link$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["default"], {
+                                                                            href: `/${currentLocale}/profile/${item.insighter.uuid || item.insighter.name}?entity=insighter`,
+                                                                            children: [
+                                                                                translations.by,
+                                                                                " ",
+                                                                                item.insighter.name.toLowerCase()
+                                                                            ]
+                                                                        }, void 0, true, {
+                                                                            fileName: "[project]/app/[locale]/topic/[id]/[slug]/KnowledgeGrid.tsx",
+                                                                            lineNumber: 526,
+                                                                            columnNumber: 31
+                                                                        }, this) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                                                            children: translations.company
+                                                                        }, void 0, false, {
+                                                                            fileName: "[project]/app/[locale]/topic/[id]/[slug]/KnowledgeGrid.tsx",
+                                                                            lineNumber: 530,
+                                                                            columnNumber: 31
+                                                                        }, this))
+                                                                    ]
+                                                                }, void 0, true, {
+                                                                    fileName: "[project]/app/[locale]/topic/[id]/[slug]/KnowledgeGrid.tsx",
+                                                                    lineNumber: 508,
+                                                                    columnNumber: 25
+                                                                }, this)
+                                                            ]
+                                                        }, void 0, true, {
+                                                            fileName: "[project]/app/[locale]/topic/[id]/[slug]/KnowledgeGrid.tsx",
+                                                            lineNumber: 481,
+                                                            columnNumber: 23
+                                                        }, this)
+                                                    ]
+                                                }, void 0, true, {
+                                                    fileName: "[project]/app/[locale]/topic/[id]/[slug]/KnowledgeGrid.tsx",
+                                                    lineNumber: 425,
+                                                    columnNumber: 21
+                                                }, this),
+                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                    className: "flex gap-2",
+                                                    children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                        className: "relative",
+                                                        children: loadingStates[item.slug] ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                            className: "w-5 h-5 border-2 border-gray-400 border-t-transparent rounded-full animate-spin"
+                                                        }, void 0, false, {
+                                                            fileName: "[project]/app/[locale]/topic/[id]/[slug]/KnowledgeGrid.tsx",
+                                                            lineNumber: 542,
+                                                            columnNumber: 27
+                                                        }, this) : (item.slug in readLaterStates ? readLaterStates[item.slug] : item.is_read_later) ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(BookmarkSelectedIcon, {
+                                                            width: 17,
+                                                            height: 17,
+                                                            className: "text-[#861536] cursor-pointer hover:text-[#861536] transition-colors",
+                                                            onClick: (e)=>{
+                                                                e.preventDefault();
+                                                                e.stopPropagation();
+                                                                if (!loadingStates[item.slug]) {
+                                                                    handleReadLaterToggle(item, e);
+                                                                }
+                                                            },
+                                                            "aria-label": "Remove from Read Later"
+                                                        }, void 0, false, {
+                                                            fileName: "[project]/app/[locale]/topic/[id]/[slug]/KnowledgeGrid.tsx",
+                                                            lineNumber: 545,
+                                                            columnNumber: 29
+                                                        }, this) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(BookmarkUnselectedIcon, {
+                                                            width: 17,
+                                                            height: 17,
+                                                            className: "text-gray-600 cursor-pointer hover:text-gray-700 transition-colors",
+                                                            onClick: (e)=>{
+                                                                e.preventDefault();
+                                                                e.stopPropagation();
+                                                                if (!loadingStates[item.slug]) {
+                                                                    handleReadLaterToggle(item, e);
+                                                                }
+                                                            },
+                                                            "aria-label": "Add to Read Later"
+                                                        }, void 0, false, {
+                                                            fileName: "[project]/app/[locale]/topic/[id]/[slug]/KnowledgeGrid.tsx",
+                                                            lineNumber: 559,
+                                                            columnNumber: 29
+                                                        }, this)
+                                                    }, void 0, false, {
+                                                        fileName: "[project]/app/[locale]/topic/[id]/[slug]/KnowledgeGrid.tsx",
+                                                        lineNumber: 540,
+                                                        columnNumber: 23
+                                                    }, this)
+                                                }, void 0, false, {
+                                                    fileName: "[project]/app/[locale]/topic/[id]/[slug]/KnowledgeGrid.tsx",
+                                                    lineNumber: 538,
+                                                    columnNumber: 19
+                                                }, this)
+                                            ]
+                                        }, void 0, true, {
+                                            fileName: "[project]/app/[locale]/topic/[id]/[slug]/KnowledgeGrid.tsx",
+                                            lineNumber: 423,
+                                            columnNumber: 17
+                                        }, this),
+                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                            className: "flex justify-between items-center pt-2 mt-auto mt-6 border-t border-gray-100 w-full",
+                                            children: [
+                                                item.published_at && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mantine$2f$core$2f$esm$2f$components$2f$Text$2f$Text$2e$mjs__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["Text"], {
+                                                    c: "dimmed",
+                                                    size: "xs",
+                                                    dir: isRTL ? 'rtl' : 'ltr',
+                                                    children: [
+                                                        translations.posted,
+                                                        " ",
+                                                        formatPublishedDate(item.published_at, currentLocale)
+                                                    ]
+                                                }, void 0, true, {
+                                                    fileName: "[project]/app/[locale]/topic/[id]/[slug]/KnowledgeGrid.tsx",
+                                                    lineNumber: 582,
+                                                    columnNumber: 21
+                                                }, this),
+                                                shouldShowPricing && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                    className: "flex items-center gap-2",
+                                                    children: [
+                                                        shouldShowPartial && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mantine$2f$core$2f$esm$2f$components$2f$Text$2f$Text$2e$mjs__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["Text"], {
+                                                            size: "xs",
+                                                            c: "dimmed",
+                                                            className: "whitespace-nowrap",
+                                                            children: [
+                                                                translations.freeDocs,
+                                                                " +"
+                                                            ]
+                                                        }, void 0, true, {
+                                                            fileName: "[project]/app/[locale]/topic/[id]/[slug]/KnowledgeGrid.tsx",
+                                                            lineNumber: 589,
+                                                            columnNumber: 25
+                                                        }, this),
+                                                        (shouldShowPaid || !paidStatus && hasPrice && numericPrice > 0 || shouldShowPartial && hasPrice && numericPrice > 0) && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mantine$2f$core$2f$esm$2f$components$2f$Badge$2f$Badge$2e$mjs__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["Badge"], {
+                                                            color: "yellow",
+                                                            variant: "light",
+                                                            className: __TURBOPACK__imported__module__$5b$project$5d2f$app$2f5b$locale$5d2f$topic$2f5b$id$5d2f5b$slug$5d2f$knowledge$2d$card$2e$module$2e$css__$5b$app$2d$ssr$5d$__$28$css__module$29$__["default"].priceBadge,
+                                                            children: shouldShowPartial && hasPrice && numericPrice > 0 ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                                                dir: "ltr",
+                                                                lang: "en",
+                                                                children: formattedPrice
+                                                            }, void 0, false, {
+                                                                fileName: "[project]/app/[locale]/topic/[id]/[slug]/KnowledgeGrid.tsx",
+                                                                lineNumber: 596,
+                                                                columnNumber: 29
+                                                            }, this) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                                                dir: "ltr",
+                                                                lang: "en",
+                                                                children: formattedPrice
+                                                            }, void 0, false, {
+                                                                fileName: "[project]/app/[locale]/topic/[id]/[slug]/KnowledgeGrid.tsx",
+                                                                lineNumber: 599,
+                                                                columnNumber: 29
+                                                            }, this)
+                                                        }, void 0, false, {
+                                                            fileName: "[project]/app/[locale]/topic/[id]/[slug]/KnowledgeGrid.tsx",
+                                                            lineNumber: 594,
+                                                            columnNumber: 25
+                                                        }, this),
+                                                        shouldShowPartial && !hasPrice && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mantine$2f$core$2f$esm$2f$components$2f$Badge$2f$Badge$2e$mjs__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["Badge"], {
+                                                            color: "yellow",
+                                                            variant: "light",
+                                                            className: __TURBOPACK__imported__module__$5b$project$5d2f$app$2f5b$locale$5d2f$topic$2f5b$id$5d2f5b$slug$5d2f$knowledge$2d$card$2e$module$2e$css__$5b$app$2d$ssr$5d$__$28$css__module$29$__["default"].priceBadge,
+                                                            style: {
+                                                                fontWeight: '500'
+                                                            },
+                                                            children: translations.partial
+                                                        }, void 0, false, {
+                                                            fileName: "[project]/app/[locale]/topic/[id]/[slug]/KnowledgeGrid.tsx",
+                                                            lineNumber: 604,
+                                                            columnNumber: 25
+                                                        }, this),
+                                                        shouldShowFree && !shouldShowPartial && !(shouldShowPaid && hasPrice && numericPrice > 0) && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mantine$2f$core$2f$esm$2f$components$2f$Badge$2f$Badge$2e$mjs__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["Badge"], {
+                                                            color: "green",
+                                                            variant: "light",
+                                                            className: __TURBOPACK__imported__module__$5b$project$5d2f$app$2f5b$locale$5d2f$topic$2f5b$id$5d2f5b$slug$5d2f$knowledge$2d$card$2e$module$2e$css__$5b$app$2d$ssr$5d$__$28$css__module$29$__["default"].priceBadge,
+                                                            children: translations.free
+                                                        }, void 0, false, {
+                                                            fileName: "[project]/app/[locale]/topic/[id]/[slug]/KnowledgeGrid.tsx",
+                                                            lineNumber: 609,
+                                                            columnNumber: 25
+                                                        }, this)
+                                                    ]
+                                                }, void 0, true, {
+                                                    fileName: "[project]/app/[locale]/topic/[id]/[slug]/KnowledgeGrid.tsx",
+                                                    lineNumber: 587,
+                                                    columnNumber: 21
+                                                }, this)
+                                            ]
+                                        }, void 0, true, {
+                                            fileName: "[project]/app/[locale]/topic/[id]/[slug]/KnowledgeGrid.tsx",
+                                            lineNumber: 580,
+                                            columnNumber: 17
+                                        }, this)
+                                    ]
+                                }, void 0, true, {
+                                    fileName: "[project]/app/[locale]/topic/[id]/[slug]/KnowledgeGrid.tsx",
+                                    lineNumber: 421,
+                                    columnNumber: 15
+                                }, this)
+                            ]
+                        }, `${item.type}-${item.slug}-${index}`, true, {
+                            fileName: "[project]/app/[locale]/topic/[id]/[slug]/KnowledgeGrid.tsx",
+                            lineNumber: 313,
+                            columnNumber: 13
+                        }, this);
+                    }),
+                    knowledge.length === 0 && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                        className: "col-span-full flex flex-col items-center justify-center py-12 px-4",
+                        children: [
+                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$image$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["default"], {
+                                src: "/images/Search-Not-Found.svg",
+                                alt: "No results found",
+                                width: 300,
+                                height: 200,
+                                className: "mb-4"
+                            }, void 0, false, {
+                                fileName: "[project]/app/[locale]/topic/[id]/[slug]/KnowledgeGrid.tsx",
+                                lineNumber: 623,
+                                columnNumber: 13
+                            }, this),
+                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
+                                className: "text-gray-500 text-sm",
+                                children: translations.noItems
+                            }, void 0, false, {
+                                fileName: "[project]/app/[locale]/topic/[id]/[slug]/KnowledgeGrid.tsx",
+                                lineNumber: 630,
+                                columnNumber: 13
+                            }, this)
+                        ]
+                    }, void 0, true, {
+                        fileName: "[project]/app/[locale]/topic/[id]/[slug]/KnowledgeGrid.tsx",
+                        lineNumber: 622,
+                        columnNumber: 11
+                    }, this)
+                ]
+            }, void 0, true, {
+                fileName: "[project]/app/[locale]/topic/[id]/[slug]/KnowledgeGrid.tsx",
+                lineNumber: 275,
+                columnNumber: 7
+            }, this),
+            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$app$2f5b$locale$5d2f$knowledge$2f5b$type$5d2f5b$slug$5d2f$AuthModal$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["default"], {
+                opened: authModalOpened,
+                onClose: ()=>setAuthModalOpened(false),
+                locale: currentLocale
+            }, void 0, false, {
+                fileName: "[project]/app/[locale]/topic/[id]/[slug]/KnowledgeGrid.tsx",
+                lineNumber: 639,
+                columnNumber: 7
+            }, this)
+        ]
+    }, void 0, true, {
+        fileName: "[project]/app/[locale]/topic/[id]/[slug]/KnowledgeGrid.tsx",
+        lineNumber: 268,
+        columnNumber: 5
+    }, this);
+}
+}),
+"[project]/app/[locale]/profile/[uuid]/components/KnowledgeTab.tsx [app-ssr] (ecmascript)", ((__turbopack_context__) => {
+"use strict";
+
+__turbopack_context__.s([
+    "default",
+    ()=>KnowledgeTab
+]);
+var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/next/dist/server/route-modules/app-page/vendored/ssr/react-jsx-dev-runtime.js [app-ssr] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$tabler$2f$icons$2d$react$2f$dist$2f$esm$2f$icons$2f$IconFilter$2e$mjs__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__$3c$export__default__as__IconFilter$3e$__ = __turbopack_context__.i("[project]/node_modules/@tabler/icons-react/dist/esm/icons/IconFilter.mjs [app-ssr] (ecmascript) <export default as IconFilter>");
+var __TURBOPACK__imported__module__$5b$project$5d2f$app$2f5b$locale$5d2f$topic$2f5b$id$5d2f5b$slug$5d2f$KnowledgeGrid$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/app/[locale]/topic/[id]/[slug]/KnowledgeGrid.tsx [app-ssr] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2d$intl$2f$dist$2f$index$2e$react$2d$client$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/next-intl/dist/index.react-client.js [app-ssr] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$app$2f5b$locale$5d2f$profile$2f5b$uuid$5d2f$profile$2e$module$2e$css__$5b$app$2d$ssr$5d$__$28$css__module$29$__ = __turbopack_context__.i("[project]/app/[locale]/profile/[uuid]/profile.module.css [app-ssr] (css module)");
+"use client";
+;
+;
+;
+;
+;
+function KnowledgeTab({ locale, isRTL, knowledgeData, loadingKnowledge, knowledgeTypes, selectedType, profileData, handleTypeChange, handlePageChange, formatKnowledgeItems }) {
+    const t = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2d$intl$2f$dist$2f$index$2e$react$2d$client$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useTranslations"])("ProfilePage");
+    const filterT = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2d$intl$2f$dist$2f$index$2e$react$2d$client$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useTranslations"])("Filters");
+    return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+        className: "py-8 px-6 md:px-10",
+        children: [
+            knowledgeData && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                className: "mb-10 flex items-center flex-wrap gap-2 justify-end",
+                children: [
+                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                        className: "mr-1 opacity-60 flex items-center",
+                        children: [
+                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$tabler$2f$icons$2d$react$2f$dist$2f$esm$2f$icons$2f$IconFilter$2e$mjs__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__$3c$export__default__as__IconFilter$3e$__["IconFilter"], {
+                                size: 16,
+                                className: "mr-1"
+                            }, void 0, false, {
+                                fileName: "[project]/app/[locale]/profile/[uuid]/components/KnowledgeTab.tsx",
+                                lineNumber: 67,
+                                columnNumber: 13
+                            }, this),
+                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                className: "text-xs font-medium",
+                                children: [
+                                    filterT("filterBy"),
+                                    ":"
+                                ]
+                            }, void 0, true, {
+                                fileName: "[project]/app/[locale]/profile/[uuid]/components/KnowledgeTab.tsx",
+                                lineNumber: 68,
+                                columnNumber: 13
+                            }, this)
+                        ]
+                    }, void 0, true, {
+                        fileName: "[project]/app/[locale]/profile/[uuid]/components/KnowledgeTab.tsx",
+                        lineNumber: 66,
+                        columnNumber: 11
+                    }, this),
+                    knowledgeTypes.map((type)=>{
+                        const isActive = selectedType === type.id;
+                        return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
+                            onClick: ()=>handleTypeChange(type.id),
+                            className: `${__TURBOPACK__imported__module__$5b$project$5d2f$app$2f5b$locale$5d2f$profile$2f5b$uuid$5d2f$profile$2e$module$2e$css__$5b$app$2d$ssr$5d$__$28$css__module$29$__["default"].filterButton} ${isActive ? `${__TURBOPACK__imported__module__$5b$project$5d2f$app$2f5b$locale$5d2f$profile$2f5b$uuid$5d2f$profile$2e$module$2e$css__$5b$app$2d$ssr$5d$__$28$css__module$29$__["default"].filterButtonActive} ${type.filterClass}` : ""}`,
+                            children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                className: `flex items-center ${isRTL ? "flex-row-reverse" : ""}`,
+                                children: [
+                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                        className: __TURBOPACK__imported__module__$5b$project$5d2f$app$2f5b$locale$5d2f$profile$2f5b$uuid$5d2f$profile$2e$module$2e$css__$5b$app$2d$ssr$5d$__$28$css__module$29$__["default"].iconWrapper,
+                                        children: type.icon(isActive)
+                                    }, void 0, false, {
+                                        fileName: "[project]/app/[locale]/profile/[uuid]/components/KnowledgeTab.tsx",
+                                        lineNumber: 90,
+                                        columnNumber: 19
+                                    }, this),
+                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                        className: `${isRTL ? "me-2" : "ml-2"} font-medium text-xs`,
+                                        children: filterT(type.label)
+                                    }, void 0, false, {
+                                        fileName: "[project]/app/[locale]/profile/[uuid]/components/KnowledgeTab.tsx",
+                                        lineNumber: 93,
+                                        columnNumber: 19
+                                    }, this)
+                                ]
+                            }, void 0, true, {
+                                fileName: "[project]/app/[locale]/profile/[uuid]/components/KnowledgeTab.tsx",
+                                lineNumber: 85,
+                                columnNumber: 17
+                            }, this)
+                        }, type.id || "all", false, {
+                            fileName: "[project]/app/[locale]/profile/[uuid]/components/KnowledgeTab.tsx",
+                            lineNumber: 76,
+                            columnNumber: 15
+                        }, this);
+                    })
+                ]
+            }, void 0, true, {
+                fileName: "[project]/app/[locale]/profile/[uuid]/components/KnowledgeTab.tsx",
+                lineNumber: 65,
+                columnNumber: 9
+            }, this),
+            loadingKnowledge ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                className: "flex justify-center items-center py-12",
+                children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                    className: "animate-spin rounded-full h-10 w-10 border-4 border-gray-200 border-t-blue-500"
+                }, void 0, false, {
+                    fileName: "[project]/app/[locale]/profile/[uuid]/components/KnowledgeTab.tsx",
+                    lineNumber: 109,
+                    columnNumber: 11
+                }, this)
+            }, void 0, false, {
+                fileName: "[project]/app/[locale]/profile/[uuid]/components/KnowledgeTab.tsx",
+                lineNumber: 108,
+                columnNumber: 9
+            }, this) : knowledgeData && knowledgeData.data.length > 0 ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                children: [
+                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$app$2f5b$locale$5d2f$topic$2f5b$id$5d2f5b$slug$5d2f$KnowledgeGrid$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["default"], {
+                        knowledge: formatKnowledgeItems(),
+                        topicName: profileData?.name || "",
+                        showHeader: false,
+                        colNumbers: 3,
+                        locale: locale,
+                        showInsighter: false
+                    }, void 0, false, {
+                        fileName: "[project]/app/[locale]/profile/[uuid]/components/KnowledgeTab.tsx",
+                        lineNumber: 113,
+                        columnNumber: 11
+                    }, this),
+                    knowledgeData.meta.last_page > 1 && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                        className: "flex justify-center mt-10",
+                        children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                            className: "flex space-x-1",
+                            children: [
+                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
+                                    onClick: ()=>handlePageChange(knowledgeData.meta.current_page - 1),
+                                    disabled: !knowledgeData.links.prev,
+                                    className: `px-4 py-2 rounded-md ${!knowledgeData.links.prev ? "bg-gray-100 text-gray-400 cursor-not-allowed" : "bg-white text-gray-700 hover:bg-gray-50"} border border-gray-200`,
+                                    children: isRTL ? t("next") : t("previous")
+                                }, void 0, false, {
+                                    fileName: "[project]/app/[locale]/profile/[uuid]/components/KnowledgeTab.tsx",
+                                    lineNumber: 126,
+                                    columnNumber: 17
+                                }, this),
+                                knowledgeData.meta.links.filter((link)=>!link.label.includes("Previous") && !link.label.includes("Next")).map((link, index)=>{
+                                    if (link.label === "...") {
+                                        return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                            className: "px-4 py-2 text-gray-700",
+                                            children: "..."
+                                        }, `ellipsis-${index}`, false, {
+                                            fileName: "[project]/app/[locale]/profile/[uuid]/components/KnowledgeTab.tsx",
+                                            lineNumber: 151,
+                                            columnNumber: 25
+                                        }, this);
+                                    }
+                                    return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
+                                        onClick: ()=>link.url && handlePageChange(parseInt(link.label)),
+                                        className: `px-4 py-2 rounded-md border ${link.active ? "bg-blue-50 border-blue-500 text-blue-600" : "bg-white text-gray-700 hover:bg-gray-50 border-gray-200"}`,
+                                        children: link.label
+                                    }, `page-${link.label}`, false, {
+                                        fileName: "[project]/app/[locale]/profile/[uuid]/components/KnowledgeTab.tsx",
+                                        lineNumber: 160,
+                                        columnNumber: 23
+                                    }, this);
+                                }),
+                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
+                                    onClick: ()=>handlePageChange(knowledgeData.meta.current_page + 1),
+                                    disabled: !knowledgeData.links.next,
+                                    className: `px-4 py-2 rounded-md ${!knowledgeData.links.next ? "bg-gray-100 text-gray-400 cursor-not-allowed" : "bg-white text-gray-700 hover:bg-gray-50"} border border-gray-200`,
+                                    children: isRTL ? t("previous") : t("next")
+                                }, void 0, false, {
+                                    fileName: "[project]/app/[locale]/profile/[uuid]/components/KnowledgeTab.tsx",
+                                    lineNumber: 177,
+                                    columnNumber: 17
+                                }, this)
+                            ]
+                        }, void 0, true, {
+                            fileName: "[project]/app/[locale]/profile/[uuid]/components/KnowledgeTab.tsx",
+                            lineNumber: 125,
+                            columnNumber: 15
+                        }, this)
+                    }, void 0, false, {
+                        fileName: "[project]/app/[locale]/profile/[uuid]/components/KnowledgeTab.tsx",
+                        lineNumber: 124,
+                        columnNumber: 13
+                    }, this)
+                ]
+            }, void 0, true, {
+                fileName: "[project]/app/[locale]/profile/[uuid]/components/KnowledgeTab.tsx",
+                lineNumber: 112,
+                columnNumber: 9
+            }, this) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                className: "flex flex-col items-center justify-center py-12 px-4 bg-gray-50 dark:bg-slate-700/30 rounded-xl text-center",
+                children: [
+                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                        className: "bg-white dark:bg-slate-800 p-6 rounded-full mb-4 shadow-md",
+                        children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("svg", {
+                            xmlns: "http://www.w3.org/2000/svg",
+                            className: "h-12 w-12 text-gray-400",
+                            fill: "none",
+                            viewBox: "0 0 24 24",
+                            stroke: "currentColor",
+                            children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("path", {
+                                strokeLinecap: "round",
+                                strokeLinejoin: "round",
+                                strokeWidth: 2,
+                                d: "M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"
+                            }, void 0, false, {
+                                fileName: "[project]/app/[locale]/profile/[uuid]/components/KnowledgeTab.tsx",
+                                lineNumber: 206,
+                                columnNumber: 15
+                            }, this)
+                        }, void 0, false, {
+                            fileName: "[project]/app/[locale]/profile/[uuid]/components/KnowledgeTab.tsx",
+                            lineNumber: 199,
+                            columnNumber: 13
+                        }, this)
+                    }, void 0, false, {
+                        fileName: "[project]/app/[locale]/profile/[uuid]/components/KnowledgeTab.tsx",
+                        lineNumber: 198,
+                        columnNumber: 11
+                    }, this),
+                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("h3", {
+                        className: "text-xl font-medium mb-2",
+                        children: t("noKnowledgeItems")
+                    }, void 0, false, {
+                        fileName: "[project]/app/[locale]/profile/[uuid]/components/KnowledgeTab.tsx",
+                        lineNumber: 214,
+                        columnNumber: 11
+                    }, this),
+                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
+                        className: "text-gray-500",
+                        children: t("contentUpdateSoon")
+                    }, void 0, false, {
+                        fileName: "[project]/app/[locale]/profile/[uuid]/components/KnowledgeTab.tsx",
+                        lineNumber: 217,
+                        columnNumber: 11
+                    }, this)
+                ]
+            }, void 0, true, {
+                fileName: "[project]/app/[locale]/profile/[uuid]/components/KnowledgeTab.tsx",
+                lineNumber: 197,
+                columnNumber: 9
+            }, this)
+        ]
+    }, void 0, true, {
+        fileName: "[project]/app/[locale]/profile/[uuid]/components/KnowledgeTab.tsx",
+        lineNumber: 62,
+        columnNumber: 5
+    }, this);
+}
+}),
+"[project]/app/components/icons/NewCertificationIcon.tsx [app-ssr] (ecmascript)", ((__turbopack_context__) => {
+"use strict";
+
+__turbopack_context__.s([
+    "default",
+    ()=>__TURBOPACK__default__export__
+]);
+var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/next/dist/server/route-modules/app-page/vendored/ssr/react-jsx-dev-runtime.js [app-ssr] (ecmascript)");
+;
+const NewCertificationIcon = ({ width = 24, height = 24 })=>{
+    return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("svg", {
+        id: "Layer_1",
+        enableBackground: "new 0 0 540 540",
+        height: height,
+        viewBox: "0 0 540 540",
+        width: width,
+        xmlns: "http://www.w3.org/2000/svg",
+        children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("g", {
+            children: [
+                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("g", {
+                    fill: "#5c77ff",
+                    children: [
+                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("path", {
+                            d: "m187.12 285.69c6.66 2.229 13.72 4.109 21.22 5.59-.21 1.38-1 2.62-2.18 3.399-1.42.931-3.21 1.08-4.76.4-1.71-.75-3.53-1.13-5.41-1.13-3.15 0-6.13 1.08-8.53 3.05-.34.28-.67.58-.99.9-3.92 3.92-5.06 9.76-2.9 14.89.16.39.27.79.33 1.2.03.21.05.41.06.62.02 1.02-.27 2.04-.86 2.92-.11.16-.23.319-.36.47-.96 1.12-2.36 1.79-3.86 1.73h-.21c-4.44 0-8.51 2.159-11.02 5.689-.58.811-1.07 1.7-1.47 2.65-2.1 5.12-.9 10.97 3.08 14.859.97.95 1.5 2.24 1.5 3.57 0 .34-.03.67-.1 1.01-.02.101-.05.2-.08.3-.03.11-.05.21-.08.311-.47 1.39-1.54 2.51-2.92 3.05-1.6.62-3.04 1.54-4.26 2.68-2.19 2.061-3.68 4.82-4.15 7.841-.1.67-.15 1.35-.15 2.04 0 5.539 3.32 10.47 8.45 12.55 1.57.63 2.71 2.01 3.03 3.66.08.42.11.84.09 1.25-.04.77-.27 1.52-.66 2.189-.02.05-.04.09-.06.13-.01.021-.02.03-.03.04-.21.34-.46.65-.75.94-2.53 2.47-3.96 5.779-4.09 9.18h-84.06c-17.57-38.468-38.23-27.968-38.23-27.968l.26-246.79c28.48-6.6 37.97-37.97 37.97-37.97s-.23 2.05-.47 5.76v.01c-1.9 29.33-4.12 162.05 106.65 198.98z",
+                            opacity: ".3"
+                        }, void 0, false, {
+                            fileName: "[project]/app/components/icons/NewCertificationIcon.tsx",
+                            lineNumber: 23,
+                            columnNumber: 11
+                        }, ("TURBOPACK compile-time value", void 0)),
+                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("path", {
+                            d: "m422.151 80.94s.21 1.88.439 5.28c-.03-.05-.05-.09-.06-.13-.919-1.98-1.129-3.74-.379-5.15z",
+                            opacity: ".3"
+                        }, void 0, false, {
+                            fileName: "[project]/app/components/icons/NewCertificationIcon.tsx",
+                            lineNumber: 27,
+                            columnNumber: 11
+                        }, ("TURBOPACK compile-time value", void 0)),
+                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("path", {
+                            d: "m460.12 118.91v236.79c-28.771 6.21-37.97 37.97-37.97 37.97h-82.72c-.08-1.729-.489-3.42-1.21-4.99-.7-1.52-1.67-2.92-2.91-4.12-.909-.89-1.439-2.069-1.52-3.31-.01-.21-.01-.42.01-.62.01-.21.04-.42.08-.63.33-1.66 1.47-3.04 3.04-3.68.97-.38 1.87-.87 2.7-1.45.83-.57 1.58-1.23 2.25-1.96.04-.05.08-.101.12-.15.29-.31.55-.64.8-.99 1.67-2.27 2.63-5.06 2.63-8.039 0-5.561-3.36-10.5-8.55-12.58-1.561-.631-2.7-2-3.04-3.65-.33-1.66.189-3.36 1.39-4.55 3.95-3.91 5.141-9.74 3.03-14.84-2.13-5.091-7.06-8.38-12.55-8.38h-.29c-1.66 0-3.22-.83-4.15-2.221-.939-1.41-1.109-3.2-.439-4.76 2.199-5.12 1.08-10.97-2.86-14.9-2.55-2.56-5.94-3.96-9.53-3.96-1.859 0-3.67.37-5.37 1.101-.59.25-1.199.39-1.81.41-1.03.029-2.06-.25-2.93-.841-1.23-.81-2.021-2.109-2.2-3.56 7.29-1.5 14.17-3.37 20.649-5.58 109.961-37.31 107.75-169.45 105.85-198.71 0-.01 0-.01 0-.01-.01-.17-.021-.32-.03-.48 5.76 12.17 37.53 32.69 37.53 32.69z",
+                            opacity: ".3"
+                        }, void 0, false, {
+                            fileName: "[project]/app/components/icons/NewCertificationIcon.tsx",
+                            lineNumber: 31,
+                            columnNumber: 11
+                        }, ("TURBOPACK compile-time value", void 0))
+                    ]
+                }, void 0, true, {
+                    fileName: "[project]/app/components/icons/NewCertificationIcon.tsx",
+                    lineNumber: 22,
+                    columnNumber: 9
+                }, ("TURBOPACK compile-time value", void 0)),
+                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("path", {
+                    d: "m49.887 48.241h-14.344c2.31-.517 4.714-.78 7.172-.78 2.457 0 4.862.263 7.172.78z",
+                    style: {
+                        fill: 'none',
+                        stroke: '#464668',
+                        strokeLinecap: 'round',
+                        strokeLinejoin: 'round',
+                        strokeMiterlimit: '10',
+                        strokeWidth: '10'
+                    }
+                }, void 0, false, {
+                    fileName: "[project]/app/components/icons/NewCertificationIcon.tsx",
+                    lineNumber: 36,
+                    columnNumber: 9
+                }, ("TURBOPACK compile-time value", void 0)),
+                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("g", {
+                    children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("path", {
+                        d: "m531.563 20.039c-2.913 0-5.273-2.361-5.273-5.273-2.913 0-5.273-2.361-5.273-5.273s2.36-5.273 5.273-5.273h5.273c2.912 0 5.273 2.361 5.273 5.273v5.273c0 2.911-2.361 5.273-5.273 5.273z",
+                        fill: "#354b87"
+                    }, void 0, false, {
+                        fileName: "[project]/app/components/icons/NewCertificationIcon.tsx",
+                        lineNumber: 41,
+                        columnNumber: 11
+                    }, ("TURBOPACK compile-time value", void 0))
+                }, void 0, false, {
+                    fileName: "[project]/app/components/icons/NewCertificationIcon.tsx",
+                    lineNumber: 40,
+                    columnNumber: 9
+                }, ("TURBOPACK compile-time value", void 0)),
+                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("g", {
+                    children: [
+                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("g", {
+                            children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("path", {
+                                d: "m47.461 45.169c-2.912 0-5.273-2.63-5.273-5.873v-6.296c0-3.244 2.361-5.873 5.273-5.873s5.273 2.63 5.273 5.873v6.296c.001 3.243-2.361 5.873-5.273 5.873z",
+                                fill: "#5c77ff"
+                            }, void 0, false, {
+                                fileName: "[project]/app/components/icons/NewCertificationIcon.tsx",
+                                lineNumber: 48,
+                                columnNumber: 13
+                            }, ("TURBOPACK compile-time value", void 0))
+                        }, void 0, false, {
+                            fileName: "[project]/app/components/icons/NewCertificationIcon.tsx",
+                            lineNumber: 47,
+                            columnNumber: 11
+                        }, ("TURBOPACK compile-time value", void 0)),
+                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("g", {
+                            children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("path", {
+                                d: "m47.461 20.039c-2.912 0-5.273-2.361-5.273-5.273v-5.274c0-2.912 2.361-5.273 5.273-5.273h5.273c2.912 0 5.273 2.361 5.273 5.273s-2.361 5.273-5.273 5.273c.001 2.912-2.361 5.274-5.273 5.274z",
+                                fill: "#5c77ff"
+                            }, void 0, false, {
+                                fileName: "[project]/app/components/icons/NewCertificationIcon.tsx",
+                                lineNumber: 54,
+                                columnNumber: 13
+                            }, ("TURBOPACK compile-time value", void 0))
+                        }, void 0, false, {
+                            fileName: "[project]/app/components/icons/NewCertificationIcon.tsx",
+                            lineNumber: 53,
+                            columnNumber: 11
+                        }, ("TURBOPACK compile-time value", void 0)),
+                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("g", {
+                            children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("path", {
+                                d: "m504.764 14.765h-10.763c-2.913 0-5.273-2.361-5.273-5.273s2.36-5.273 5.273-5.273h10.763c2.913 0 5.273 2.361 5.273 5.273s-2.36 5.273-5.273 5.273zm-32.287 0h-10.764c-2.913 0-5.273-2.361-5.273-5.273s2.36-5.273 5.273-5.273h10.764c2.913 0 5.273 2.361 5.273 5.273s-2.361 5.273-5.273 5.273zm-32.289 0h-10.763c-2.913 0-5.273-2.361-5.273-5.273s2.36-5.273 5.273-5.273h10.763c2.912 0 5.273 2.361 5.273 5.273s-2.361 5.273-5.273 5.273zm-32.287 0h-10.763c-2.913 0-5.273-2.361-5.273-5.273s2.36-5.273 5.273-5.273h10.763c2.912 0 5.273 2.361 5.273 5.273s-2.361 5.273-5.273 5.273zm-32.288 0h-10.763c-2.913 0-5.273-2.361-5.273-5.273s2.36-5.273 5.273-5.273h10.763c2.913 0 5.273 2.361 5.273 5.273s-2.361 5.273-5.273 5.273zm-32.29 0h-10.762c-2.913 0-5.273-2.361-5.273-5.273s2.36-5.273 5.273-5.273h10.762c2.913 0 5.273 2.361 5.273 5.273s-2.359 5.273-5.273 5.273zm-32.287 0h-10.762c-2.913 0-5.273-2.361-5.273-5.273s2.36-5.273 5.273-5.273h10.762c2.913 0 5.273 2.361 5.273 5.273s-2.36 5.273-5.273 5.273zm-32.287 0h-10.763c-2.912 0-5.273-2.361-5.273-5.273s2.361-5.273 5.273-5.273h10.763c2.913 0 5.273 2.361 5.273 5.273s-2.36 5.273-5.273 5.273zm-32.288 0h-10.763c-2.912 0-5.273-2.361-5.273-5.273s2.361-5.273 5.273-5.273h10.763c2.912 0 5.273 2.361 5.273 5.273s-2.361 5.273-5.273 5.273zm-32.288 0h-10.763c-2.912 0-5.273-2.361-5.273-5.273s2.361-5.273 5.273-5.273h10.763c2.912 0 5.273 2.361 5.273 5.273s-2.36 5.273-5.273 5.273zm-32.287 0h-10.763c-2.912 0-5.273-2.361-5.273-5.273s2.361-5.273 5.273-5.273h10.763c2.912 0 5.273 2.361 5.273 5.273s-2.361 5.273-5.273 5.273zm-32.288 0h-10.763c-2.912 0-5.273-2.361-5.273-5.273s2.361-5.273 5.273-5.273h10.763c2.912 0 5.273 2.361 5.273 5.273s-2.361 5.273-5.273 5.273zm-32.287 0h-10.763c-2.912 0-5.273-2.361-5.273-5.273s2.361-5.273 5.273-5.273h10.763c2.912 0 5.273 2.361 5.273 5.273s-2.361 5.273-5.273 5.273zm-32.288 0h-10.764c-2.911 0-5.273-2.361-5.273-5.273s2.362-5.273 5.273-5.273h10.764c2.912 0 5.273 2.361 5.273 5.273s-2.361 5.273-5.273 5.273z",
+                                fill: "#5c77ff"
+                            }, void 0, false, {
+                                fileName: "[project]/app/components/icons/NewCertificationIcon.tsx",
+                                lineNumber: 60,
+                                columnNumber: 13
+                            }, ("TURBOPACK compile-time value", void 0))
+                        }, void 0, false, {
+                            fileName: "[project]/app/components/icons/NewCertificationIcon.tsx",
+                            lineNumber: 59,
+                            columnNumber: 11
+                        }, ("TURBOPACK compile-time value", void 0)),
+                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("g", {
+                            children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("path", {
+                                d: "m531.563 366.906c-2.913 0-5.273-2.36-5.273-5.273v-10.513c0-2.913 2.36-5.273 5.273-5.273 2.912 0 5.273 2.36 5.273 5.273v10.513c0 2.913-2.361 5.273-5.273 5.273zm0-31.534c-2.913 0-5.273-2.36-5.273-5.273v-10.511c0-2.913 2.36-5.273 5.273-5.273 2.912 0 5.273 2.36 5.273 5.273v10.511c0 2.912-2.361 5.273-5.273 5.273zm0-31.533c-2.913 0-5.273-2.36-5.273-5.273v-10.511c0-2.913 2.36-5.273 5.273-5.273 2.912 0 5.273 2.36 5.273 5.273v10.511c0 2.912-2.361 5.273-5.273 5.273zm0-31.534c-2.913 0-5.273-2.36-5.273-5.273v-10.511c0-2.912 2.36-5.273 5.273-5.273 2.912 0 5.273 2.361 5.273 5.273v10.511c0 2.912-2.361 5.273-5.273 5.273zm0-31.533c-2.913 0-5.273-2.361-5.273-5.273v-10.511c0-2.912 2.36-5.273 5.273-5.273 2.912 0 5.273 2.361 5.273 5.273v10.511c0 2.912-2.361 5.273-5.273 5.273zm0-31.533c-2.913 0-5.273-2.361-5.273-5.273v-10.511c0-2.912 2.36-5.273 5.273-5.273 2.912 0 5.273 2.361 5.273 5.273v10.511c0 2.912-2.361 5.273-5.273 5.273zm0-31.533c-2.913 0-5.273-2.362-5.273-5.273v-10.512c0-2.912 2.36-5.273 5.273-5.273 2.912 0 5.273 2.361 5.273 5.273v10.512c0 2.911-2.361 5.273-5.273 5.273zm0-31.533c-2.913 0-5.273-2.361-5.273-5.273v-10.512c0-2.911 2.36-5.273 5.273-5.273 2.912 0 5.273 2.362 5.273 5.273v10.512c0 2.911-2.361 5.273-5.273 5.273zm0-31.534c-2.913 0-5.273-2.361-5.273-5.273v-10.511c0-2.912 2.36-5.273 5.273-5.273 2.912 0 5.273 2.361 5.273 5.273v10.511c0 2.912-2.361 5.273-5.273 5.273zm0-31.534c-2.913 0-5.273-2.361-5.273-5.273v-10.511c0-2.912 2.36-5.273 5.273-5.273 2.912 0 5.273 2.361 5.273 5.273v10.511c0 2.913-2.361 5.273-5.273 5.273zm0-31.533c-2.913 0-5.273-2.361-5.273-5.273v-10.511c0-2.912 2.36-5.273 5.273-5.273 2.912 0 5.273 2.361 5.273 5.273v10.511c0 2.913-2.361 5.273-5.273 5.273z",
+                                fill: "#5c77ff"
+                            }, void 0, false, {
+                                fileName: "[project]/app/components/icons/NewCertificationIcon.tsx",
+                                lineNumber: 66,
+                                columnNumber: 13
+                            }, ("TURBOPACK compile-time value", void 0))
+                        }, void 0, false, {
+                            fileName: "[project]/app/components/icons/NewCertificationIcon.tsx",
+                            lineNumber: 65,
+                            columnNumber: 11
+                        }, ("TURBOPACK compile-time value", void 0)),
+                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("g", {
+                            children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("path", {
+                                d: "m531.563 393.201h-5.273c-2.913 0-5.273-2.36-5.273-5.273s2.36-5.273 5.273-5.273c0-2.913 2.36-5.273 5.273-5.273 2.912 0 5.273 2.36 5.273 5.273v5.273c0 2.912-2.361 5.273-5.273 5.273z",
+                                fill: "#5c77ff"
+                            }, void 0, false, {
+                                fileName: "[project]/app/components/icons/NewCertificationIcon.tsx",
+                                lineNumber: 72,
+                                columnNumber: 13
+                            }, ("TURBOPACK compile-time value", void 0))
+                        }, void 0, false, {
+                            fileName: "[project]/app/components/icons/NewCertificationIcon.tsx",
+                            lineNumber: 71,
+                            columnNumber: 11
+                        }, ("TURBOPACK compile-time value", void 0)),
+                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("g", {
+                            children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("path", {
+                                d: "m506.72 394.256h-6.514c-3.489 0-6.317-2.36-6.317-5.273s2.827-5.273 6.317-5.273h6.514c3.489 0 6.317 2.36 6.317 5.273s-2.828 5.273-6.317 5.273z",
+                                fill: "#5c77ff"
+                            }, void 0, false, {
+                                fileName: "[project]/app/components/icons/NewCertificationIcon.tsx",
+                                lineNumber: 78,
+                                columnNumber: 13
+                            }, ("TURBOPACK compile-time value", void 0))
+                        }, void 0, false, {
+                            fileName: "[project]/app/components/icons/NewCertificationIcon.tsx",
+                            lineNumber: 77,
+                            columnNumber: 11
+                        }, ("TURBOPACK compile-time value", void 0))
+                    ]
+                }, void 0, true, {
+                    fileName: "[project]/app/components/icons/NewCertificationIcon.tsx",
+                    lineNumber: 46,
+                    columnNumber: 9
+                }, ("TURBOPACK compile-time value", void 0)),
+                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("path", {
+                    d: "m467.543 48.241h-14.345c2.311-.517 4.715-.78 7.172-.78 2.458 0 4.863.263 7.173.78z",
+                    style: {
+                        fill: "none",
+                        stroke: "#464668",
+                        strokeLinecap: "round",
+                        strokeLinejoin: "round",
+                        strokeMiterlimit: "10",
+                        strokeWidth: "10"
+                    }
+                }, void 0, false, {
+                    fileName: "[project]/app/components/icons/NewCertificationIcon.tsx",
+                    lineNumber: 84,
+                    columnNumber: 9
+                }, ("TURBOPACK compile-time value", void 0)),
+                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("g", {
+                    fill: "#5c77ff",
+                    children: [
+                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("path", {
+                            d: "m237.701 455.307-30.319 77.31-12.811-29.368-29.368 12.81 30.376-77.421c2.518.056 5.091-.447 7.495-1.454-.111 7.384 4.196 14.376 11.412 17.396 7.216 2.965 15.216 1.063 20.362-4.195.672 1.791 1.622 3.468 2.853 4.922z"
+                        }, void 0, false, {
+                            fileName: "[project]/app/components/icons/NewCertificationIcon.tsx",
+                            lineNumber: 89,
+                            columnNumber: 11
+                        }, ("TURBOPACK compile-time value", void 0)),
+                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("path", {
+                            d: "m339.289 516.115-29.368-12.811-12.812 29.313-30.432-77.645c1.119-1.454 2.069-3.076 2.685-4.811 5.147 5.482 13.258 7.496 20.587 4.476 7.216-3.021 11.579-10.069 11.468-17.453 2.405 1.007 4.979 1.51 7.551 1.51z"
+                        }, void 0, false, {
+                            fileName: "[project]/app/components/icons/NewCertificationIcon.tsx",
+                            lineNumber: 90,
+                            columnNumber: 11
+                        }, ("TURBOPACK compile-time value", void 0))
+                    ]
+                }, void 0, true, {
+                    fileName: "[project]/app/components/icons/NewCertificationIcon.tsx",
+                    lineNumber: 88,
+                    columnNumber: 9
+                }, ("TURBOPACK compile-time value", void 0)),
+                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("path", {
+                    d: "m252.218 324.437 12.823 25.988 28.716 4.192-20.77 20.232 4.876 28.571-25.645-13.505-25.645 13.505 4.876-28.571-20.77-20.232 28.716-4.192z",
+                    fill: "#5c77ff"
+                }, void 0, false, {
+                    fileName: "[project]/app/components/icons/NewCertificationIcon.tsx",
+                    lineNumber: 92,
+                    columnNumber: 9
+                }, ("TURBOPACK compile-time value", void 0)),
+                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("path", {
+                    d: "m80.47 86.7c.3-1.88.46-3.8.47-5.76 0 0-.23 2.05-.47 5.76zm413.42-43.46h-484.4c-2.76 0-5 2.24-5 5v378.91c0 2.76 2.24 5 5 5h166.06c.98 1.63 2.14 3.17 3.52 4.55 4.38 4.37 10.18 6.81 16.29 6.88l.47.01c.96 0 1.93-.07 2.89-.189 1.83 6.979 6.8 12.84 13.76 15.75 2.86 1.18 5.87 1.779 8.95 1.779 4.15 0 8.24-1.12 11.8-3.18.18.23.36.45.54.67 4.49 5.5 11.14 8.66 18.25 8.66 7.3 0 14.08-3.311 18.62-9.12.08-.1.16-.2.23-.3 3.62 2.149 7.78 3.32 12.04 3.32 3.07 0 6.08-.601 8.97-1.79 6.95-2.9 11.94-8.771 13.771-15.78 1.109.149 2.229.22 3.38.22 6.229-.07 12.05-2.52 16.34-6.88 1.39-1.39 2.56-2.94 3.56-4.6h164.96c2.761 0 5-2.24 5-5v-378.91c-.001-2.76-2.24-5-5.001-5zm-168.1 364.55h-.04c-1.67 0-3.24.84-4.16 2.24-.939 1.399-1.1 3.18-.439 4.729 1.43 3.33 1.47 7.16.109 10.49-.68 1.65-1.68 3.14-2.979 4.45-2.46 2.5-5.79 3.89-9.311 3.93-1.96 0-3.85-.37-5.609-1.11-1.551-.659-3.341-.479-4.74.461-1.4.939-2.22 2.529-2.2 4.22.08 5.59-3.21 10.6-8.37 12.76-1.649.68-3.38 1.021-5.149 1.021-3.71 0-7.32-1.561-9.891-4.301-1.189-1.26-2.96-1.819-4.66-1.47-1.7.36-3.1 1.57-3.69 3.21-.41 1.14-1.07 2.3-1.92 3.42-2.61 3.33-6.51 5.24-10.72 5.24-4.09 0-7.92-1.82-10.55-5.04-.83-.99-1.54-2.19-2.09-3.57-.62-1.569-2-2.71-3.66-3.04-.32-.069-.65-.1-.98-.1-1.33 0-2.62.53-3.57 1.5-2.55 2.6-6.1 4.1-9.74 4.1-1.77 0-3.5-.35-5.12-1.01-5.16-2.17-8.43-7.16-8.35-12.71.03-1.69-.8-3.28-2.2-4.229-1.4-.94-3.18-1.11-4.74-.461-1.66.7-3.45 1.07-5.19 1.07l-.31-.01c-3.53-.04-6.87-1.45-9.38-3.94-1.21-1.229-2.16-2.64-2.84-4.18-.04-.13-.1-.26-.16-.38-.09-.23-.16-.45-.24-.68-.06-.2-.13-.4-.19-.601-.06-.229-.11-.46-.17-.68-.04-.21-.09-.41-.13-.62-.04-.23-.07-.46-.1-.7-.02-.2-.06-.41-.07-.62-.02-.229-.02-.47-.03-.71-.01-.2-.02-.41-.01-.609 0-.25.02-.49.04-.74.01-.2.02-.39.04-.58.03-.271.08-.521.13-.78.03-.18.05-.359.09-.529.06-.29.15-.58.23-.86.04-.15.07-.29.11-.43.14-.431.3-.851.48-1.261.08-.189.16-.39.21-.59.42-1.41.2-2.939-.63-4.18-.35-.53-.79-.98-1.3-1.34-.85-.601-1.87-.931-2.94-.891h-.21c-3.08 0-5.97-1.029-8.28-2.84-1.8-1.41-3.25-3.28-4.16-5.51-.25-.6-.46-1.23-.63-1.88 0-.01 0-.01 0-.01-.32-1.25-.44-2.521-.38-3.771.13-3.4 1.56-6.71 4.09-9.18.29-.29.54-.601.75-.94.01-.01.02-.02.03-.04.02-.04.04-.08.06-.13.39-.67.62-1.42.66-2.189.02-.41-.01-.83-.09-1.25-.32-1.65-1.46-3.03-3.03-3.66-5.13-2.08-8.45-7.011-8.45-12.55 0-.69.05-1.37.15-2.04.47-3.021 1.96-5.78 4.15-7.841 1.22-1.14 2.66-2.06 4.26-2.68 1.38-.54 2.45-1.66 2.92-3.05.03-.101.05-.2.08-.311.03-.1.06-.199.08-.3.07-.34.1-.67.1-1.01 0-1.33-.53-2.62-1.5-3.57-3.98-3.89-5.18-9.739-3.08-14.859.4-.95.89-1.84 1.47-2.65 2.51-3.53 6.58-5.689 11.02-5.689h.21c1.5.06 2.9-.61 3.86-1.73.13-.15.25-.31.36-.47.59-.88.88-1.9.86-2.92-.01-.21-.03-.41-.06-.62-.06-.41-.17-.811-.33-1.2-2.16-5.13-1.02-10.97 2.9-14.89.32-.32.65-.62.99-.9 2.4-1.97 5.38-3.05 8.53-3.05 1.88 0 3.7.38 5.41 1.13 1.55.68 3.34.53 4.76-.4 1.18-.779 1.97-2.02 2.18-3.399.05-.271.07-.54.07-.811-.04-4.479 2.18-8.68 5.72-11.21.82-.59 1.7-1.08 2.65-1.47 1.66-.68 3.39-1.021 5.16-1.021 3.53 0 7 1.41 9.53 3.881.44.439.96.779 1.51 1.02s1.15.38 1.76.4c.4.02.81-.011 1.21-.09.6-.12 1.16-.351 1.67-.671.01 0 .01-.01.02-.01.09-.06.18-.13.26-.189.08-.061.16-.11.23-.17.04-.03.07-.061.11-.101.12-.1.23-.2.33-.3.01-.01.02-.03.03-.03.13-.14.25-.279.37-.439.24-.32.44-.681.6-1.061 2.1-5 6.99-8.229 12.45-8.229 5.57 0 10.52 3.319 12.6 8.46.63 1.569 2.02 2.71 3.68 3.029 1.66.32 3.37-.22 4.54-1.43 3.79-3.92 9.82-5.25 14.92-3.109 5.09 2.109 8.36 7.069 8.32 12.63 0 .22.01.43.04.64.18 1.45.97 2.75 2.2 3.56.87.591 1.899.87 2.93.841.61-.021 1.22-.16 1.81-.41 1.7-.73 3.511-1.101 5.37-1.101 3.59 0 6.98 1.4 9.53 3.96 3.94 3.931 5.06 9.78 2.86 14.9-.67 1.56-.5 3.35.439 4.76.931 1.391 2.49 2.221 4.15 2.221h.29c5.49 0 10.42 3.289 12.55 8.38 2.11 5.1.92 10.93-3.03 14.84-1.2 1.189-1.72 2.89-1.39 4.55.34 1.65 1.479 3.02 3.04 3.65 5.189 2.08 8.55 7.02 8.55 12.58 0 2.979-.96 5.77-2.63 8.039-.25.351-.51.681-.8.99-.04.05-.08.101-.12.15-.67.729-1.42 1.39-2.25 1.96-.83.58-1.73 1.07-2.7 1.45-1.57.64-2.71 2.02-3.04 3.68-.04.21-.07.42-.08.63-.02.2-.02.41-.01.62.08 1.24.61 2.42 1.52 3.31 1.24 1.2 2.21 2.601 2.91 4.12.721 1.57 1.13 3.261 1.21 4.99.07 1.271-.04 2.55-.35 3.82-.17.66-.38 1.319-.66 1.979-2.099 5.062-7.019 8.322-12.63 8.322zm-282.82-52.09v-236.79c18.91-.13 34.61-14.06 37.5-32.2 0-.01 0-.01 0-.01.3-1.88.46-3.8.47-5.76h341.21c.01 1.75.14 3.46.38 5.15.029.2.06.4.09.61v.01c2.89 18.14 18.58 32.07 37.5 32.2v236.79c-20.88.14-37.83 17.1-37.97 37.97h-72.7c-.01-.07-.01-.13-.021-.2-.01-.35-.029-.7-.06-1.05-.01-.1-.01-.2-.021-.3-.05-.45-.1-.9-.17-1.34-.01-.07-.029-.15-.04-.23-.06-.359-.13-.729-.199-1.09l-.091-.39c-.08-.33-.159-.66-.25-.98-.029-.109-.06-.229-.09-.34-.13-.43-.26-.86-.41-1.28-.02-.04-.029-.08-.05-.13-.13-.37-.28-.74-.43-1.109-.061-.131-.11-.25-.16-.37-.14-.301-.27-.601-.42-.9-.06-.11-.11-.229-.17-.35-.21-.4-.42-.79-.64-1.181.71-.55 1.39-1.13 2.039-1.75 4.49-4.35 7.15-10.399 7.15-16.949 0-7.49-3.5-14.341-9.27-18.721 3.59-6.24 4.18-13.859 1.33-20.74-2.891-6.92-8.761-11.92-15.75-13.76.97-7.149-1.4-14.439-6.69-19.729-2.39-2.391-5.2-4.21-8.271-5.36-2.63-1.01-5.449-1.53-8.34-1.53-1.06 0-2.109.07-3.149.2-1.86-6.95-6.82-12.75-13.681-15.59-2.869-1.2-5.899-1.82-9-1.82-4.189 0-8.3 1.15-11.89 3.25-4.39-5.7-11.22-9.15-18.69-9.15-.46 0-.92.01-1.38.04-.51.03-1.02.08-1.53.14-6.23.77-11.83 3.97-15.63 8.83-3.51-1.95-7.5-3.02-11.54-3.02-3.08 0-6.09.59-8.96 1.77-1.72.71-3.33 1.6-4.8 2.66-4.41 3.149-7.56 7.729-8.96 12.97-1.07-.14-2.14-.22-3.23-.22-3.09 0-6.09.6-8.87 1.74-2.5 1.01-4.82 2.47-6.87 4.329-.29.261-.57.53-.85.811-1.69 1.68-3.07 3.57-4.15 5.6-2.3 4.301-3.2 9.21-2.57 14.07-6.54 1.72-12.11 6.21-15.16 12.47-.2.41-.4.84-.58 1.271-2.48 6.05-2.33 12.649.17 18.37.35.819.76 1.62 1.21 2.399-.36.28-.71.561-1.05.851-5.12 4.399-8.25 10.92-8.25 17.87 0 .47.01.93.04 1.39.4 6.91 3.77 13.16 9.12 17.26-.23.39-.44.79-.64 1.19-.06.109-.12.229-.17.35-.15.3-.29.6-.42.9-.06.13-.11.25-.16.37-.15.369-.3.75-.44 1.13-.01.04-.03.08-.04.12-.15.43-.29.859-.41 1.3-.03.1-.06.21-.09.31-.09.34-.17.681-.25 1.021-.03.12-.06.239-.08.37-.08.369-.15.739-.21 1.119-.01.07-.02.141-.03.21-.07.45-.12.9-.16 1.351-.01.09-.02.18-.02.27-.03.36-.05.73-.06 1.101-.01.06-.01.12-.01.18h-74.046c-.14-20.874-17.1-37.834-37.97-37.974zm445.92 66.45h-156.73c.01-.11.01-.21.02-.32.021-.19.03-.37.03-.561.021-.3.03-.59.03-.89v-.55c0-.32-.021-.64-.03-.96-.01-.15-.02-.311-.03-.46-.029-.48-.08-.95-.14-1.42.43-.12.86-.24 1.28-.38.17-.061.34-.12.51-.181.24-.09.49-.18.74-.27.189-.08.38-.16.569-.24.21-.1.431-.18.65-.28.19-.09.38-.189.57-.279.199-.101.409-.2.609-.311.19-.1.37-.2.55-.31.2-.11.41-.221.601-.34.18-.11.35-.221.53-.33.189-.13.39-.25.58-.38.17-.12.34-.24.5-.36.189-.14.38-.271.569-.42.16-.12.32-.25.47-.38.19-.15.37-.29.551-.45.16-.13.3-.271.449-.41.181-.16.36-.32.53-.479.141-.141.28-.29.42-.431.17-.17.34-.34.5-.52.141-.15.271-.3.4-.45.16-.18.32-.36.479-.55.12-.15.24-.32.37-.471.15-.189.3-.39.44-.579.12-.171.229-.33.35-.5.141-.2.28-.4.41-.61.11-.17.21-.34.32-.51.13-.21.26-.42.38-.641.1-.18.189-.359.29-.54.12-.22.229-.43.34-.659.09-.181.18-.37.26-.561.08-.17.16-.33.24-.5h79.99c1.439 0 2.819-.63 3.77-1.72.83-.96 1.271-2.19 1.221-3.45 0-.18-.021-.36-.051-.54-.18-1.33-.279-2.68-.279-4.03 0-.979.05-1.939.14-2.89 1.45-14.21 13.49-25.34 28.08-25.34 1.35 0 2.71.1 4.04.29 1.43.21 2.89-.221 3.979-1.17 1.101-.95 1.73-2.33 1.73-3.78v-247.467c0-1.45-.63-2.83-1.73-3.78-1.09-.95-2.55-1.37-3.979-1.17-1.34.19-2.7.29-4.04.29-14.59 0-26.63-11.13-28.08-25.35-.09-.94-.14-1.9-.14-2.88 0-1.35.1-2.7.279-4.03.21-1.44-.22-2.89-1.17-3.99-.95-1.09-2.33-1.72-3.77-1.72h-351.887c-1.45 0-2.83.63-3.78 1.72-.95 1.1-1.38 2.55-1.17 3.99.19 1.33.29 2.69.29 4.03 0 15.57-12.66 28.23-28.23 28.23-1.34 0-2.7-.1-4.04-.29-.08-.01-.17-.02-.25-.02-.09-.01-.19-.02-.29-.03-1.25-.04-2.48.39-3.44 1.22-1.09.95-1.72 2.33-1.72 3.78v247.47c0 .18.01.36.03.54.13 1.25.73 2.41 1.69 3.24s2.19 1.26 3.45 1.22c.18-.01.36-.021.54-.05 1.33-.19 2.69-.29 4.03-.29 15.57 0 28.23 12.66 28.23 28.229 0 1.34-.1 2.7-.29 4.03-.21 1.44.22 2.89 1.17 3.99.95 1.09 2.33 1.72 3.78 1.72h81.39l.18.39c.1.2.19.4.29.601.1.21.21.42.32.63.1.19.2.38.31.57.12.21.24.409.36.609.11.181.22.37.34.55.13.19.26.391.4.58.12.17.24.351.36.521.14.189.28.37.43.56.13.16.25.33.39.49.15.18.3.36.45.53.14.16.28.319.42.479.16.17.32.33.49.5.14.15.29.301.44.44.16.16.34.32.51.479.15.141.3.28.46.41.18.16.36.3.54.45.16.13.32.26.48.38.19.15.38.28.57.42.17.12.33.24.5.36.19.13.39.26.59.38l.51.33c.21.12.42.24.64.36.17.09.34.189.51.29.22.109.45.22.68.329.17.08.33.171.5.25.25.11.5.21.74.311.16.07.32.14.48.2.28.109.57.21.86.31.13.05.26.101.39.14.42.141.85.271 1.28.381-.06.479-.11.96-.15 1.439-.01.141-.01.28-.02.42-.02.351-.03.69-.04 1.03v.51c.01.32.01.641.03.95.01.18.02.35.03.52.01.131.01.25.02.381h-157.79v-368.909h474.4z",
+                    fill: "#354b87"
+                }, void 0, false, {
+                    fileName: "[project]/app/components/icons/NewCertificationIcon.tsx",
+                    lineNumber: 96,
+                    columnNumber: 9
+                }, ("TURBOPACK compile-time value", void 0)),
+                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("path", {
+                    d: "m252.22 290.785c-40.332 0-73.144 32.813-73.144 73.144 0 21.249 9.207 41.4 25.253 55.283 11.273 9.782 25.054 15.811 39.888 17.436 2.802.286 5.419.425 8.001.425s5.2-.139 8.038-.429c14.725-1.614 28.501-7.639 39.852-17.433 16.049-13.932 25.253-34.081 25.253-55.282.001-40.332-32.811-73.144-73.141-73.144zm41.345 120.864c-9.8 8.455-21.694 13.661-34.361 15.05-4.921.502-9.085.499-13.934.003-12.766-1.398-24.657-6.6-34.392-15.048-13.855-11.986-21.802-29.382-21.802-47.726 0-34.817 28.326-63.144 63.144-63.144 34.816 0 63.142 28.326 63.142 63.144 0 18.302-7.949 35.7-21.797 47.721z",
+                    fill: "#354b87"
+                }, void 0, false, {
+                    fileName: "[project]/app/components/icons/NewCertificationIcon.tsx",
+                    lineNumber: 100,
+                    columnNumber: 9
+                }, ("TURBOPACK compile-time value", void 0)),
+                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("path", {
+                    d: "m185.098 128.398h142.383c2.762 0 5-2.239 5-5s-2.238-5-5-5h-142.383c-2.761 0-5 2.239-5 5s2.239 5 5 5z",
+                    fill: "#5c77ff"
+                }, void 0, false, {
+                    fileName: "[project]/app/components/icons/NewCertificationIcon.tsx",
+                    lineNumber: 104,
+                    columnNumber: 9
+                }, ("TURBOPACK compile-time value", void 0)),
+                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("path", {
+                    d: "m412.91 175.351h-322.734c-2.761 0-5 2.239-5 5s2.239 5 5 5h322.734c2.762 0 5-2.239 5-5s-2.238-5-5-5z",
+                    fill: "#88a2ff"
+                }, void 0, false, {
+                    fileName: "[project]/app/components/icons/NewCertificationIcon.tsx",
+                    lineNumber: 108,
+                    columnNumber: 9
+                }, ("TURBOPACK compile-time value", void 0)),
+                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("path", {
+                    d: "m412.91 222.812h-322.734c-2.761 0-5 2.239-5 5s2.239 5 5 5h322.734c2.762 0 5-2.239 5-5s-2.238-5-5-5z",
+                    fill: "#9fb3fc"
+                }, void 0, false, {
+                    fileName: "[project]/app/components/icons/NewCertificationIcon.tsx",
+                    lineNumber: 112,
+                    columnNumber: 9
+                }, ("TURBOPACK compile-time value", void 0))
+            ]
+        }, void 0, true, {
+            fileName: "[project]/app/components/icons/NewCertificationIcon.tsx",
+            lineNumber: 21,
+            columnNumber: 7
+        }, ("TURBOPACK compile-time value", void 0))
+    }, void 0, false, {
+        fileName: "[project]/app/components/icons/NewCertificationIcon.tsx",
+        lineNumber: 13,
+        columnNumber: 5
+    }, ("TURBOPACK compile-time value", void 0));
+};
+const __TURBOPACK__default__export__ = NewCertificationIcon;
+}),
+"[project]/app/utils/textUtils.ts [app-ssr] (ecmascript)", ((__turbopack_context__) => {
+"use strict";
+
+/**
+ * Checks if the first word in a text string is Arabic
+ * Arabic characters are in the Unicode range U+0600 to U+06FF
+ * @param text - The text string to check
+ * @returns true if the first word contains Arabic characters, false otherwise
+ */ __turbopack_context__.s([
+    "isFirstWordArabic",
+    ()=>isFirstWordArabic
+]);
+function isFirstWordArabic(text) {
+    if (!text || typeof text !== 'string') {
+        return false;
+    }
+    // Trim whitespace and get the first word
+    const trimmedText = text.trim();
+    if (!trimmedText) {
+        return false;
+    }
+    // Extract the first word (split by whitespace and take the first non-empty part)
+    const firstWord = trimmedText.split(/\s+/)[0];
+    if (!firstWord) {
+        return false;
+    }
+    // Remove punctuation and special characters from the beginning/end of the word
+    // Using character classes compatible with ES5 (no Unicode property escapes)
+    // Matches any character that is NOT a letter (English or Arabic), number, or Arabic character
+    const cleanedWord = firstWord.replace(/^[^a-zA-Z0-9\u0600-\u06FF]+|[^a-zA-Z0-9\u0600-\u06FF]+$/g, '');
+    if (!cleanedWord) {
+        return false;
+    }
+    // Check if the word contains Arabic characters (Unicode range U+0600 to U+06FF)
+    // This includes Arabic letters, numbers, and diacritics
+    const arabicRegex = /[\u0600-\u06FF]/;
+    return arabicRegex.test(cleanedWord);
+}
+}),
+"[project]/app/[locale]/profile/[uuid]/components/AboutTab.tsx [app-ssr] (ecmascript)", ((__turbopack_context__) => {
+"use strict";
+
+__turbopack_context__.s([
+    "default",
+    ()=>AboutTab
+]);
+var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/next/dist/server/route-modules/app-page/vendored/ssr/react-jsx-dev-runtime.js [app-ssr] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/next/dist/server/route-modules/app-page/vendored/ssr/react.js [app-ssr] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2d$intl$2f$dist$2f$index$2e$react$2d$client$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/next-intl/dist/index.react-client.js [app-ssr] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$app$2f$components$2f$icons$2f$NewCertificationIcon$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/app/components/icons/NewCertificationIcon.tsx [app-ssr] (ecmascript)");
+"use client";
+;
+;
+;
+;
+function AboutTab({ locale, isRTL, profileData, isCompany, getSocialIcon, enterpriseType }) {
+    const t = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2d$intl$2f$dist$2f$index$2e$react$2d$client$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useTranslations"])("ProfilePage");
+    const [copied, setCopied] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useState"])(false);
+    const countryName = typeof profileData.country === "string" ? profileData.country : typeof profileData.country?.name === "string" ? profileData.country.name : locale === "ar" ? profileData.country?.name?.ar || profileData.country?.name?.en || "" : profileData.country?.name?.en || profileData.country?.name?.ar || "";
+    const formatWebsiteUrl = (url)=>{
+        if (!url) return "";
+        const trimmed = url.trim();
+        if (trimmed.startsWith("http://") || trimmed.startsWith("https://")) {
+            return trimmed;
+        }
+        return `https://${trimmed}`;
+    };
+    const formatSocialUrl = (url)=>{
+        if (!url) return "";
+        const trimmed = url.trim();
+        if (trimmed.startsWith("http://") || trimmed.startsWith("https://")) {
+            return trimmed;
+        }
+        return `https://${trimmed}`;
+    };
+    const handleCopyWebsite = async (e)=>{
+        e.preventDefault();
+        e.stopPropagation();
+        const websiteUrl = profileData.company?.website;
+        if (!websiteUrl) return;
+        const formattedUrl = formatWebsiteUrl(websiteUrl);
+        try {
+            await navigator.clipboard.writeText(formattedUrl);
+            setCopied(true);
+            setTimeout(()=>setCopied(false), 2000);
+        } catch (err) {
+            console.error("Failed to copy:", err);
+        }
+    };
+    const SOCIAL_PLATFORMS = [
+        {
+            key: "facebook",
+            label: "Facebook"
+        },
+        {
+            key: "instagram",
+            label: "Instagram"
+        },
+        {
+            key: "linkedin",
+            label: "LinkedIn"
+        },
+        {
+            key: "youtube",
+            label: "YouTube"
+        },
+        {
+            key: "x",
+            label: "X"
+        },
+        {
+            key: "tiktok",
+            label: "TikTok"
+        }
+    ];
+    const normalizeSocialType = (type)=>(type || "").toLowerCase().trim().replace(/\s+/g, "").replace(/[_-]/g, "");
+    const normalizePlatformKey = (type)=>{
+        const key = normalizeSocialType(type);
+        if (key === "twitter") return "x";
+        if (key === "fb") return "facebook";
+        if (key === "yt") return "youtube";
+        if (key === "insta") return "instagram";
+        return key;
+    };
+    const buildSocialLinkMap = (socials)=>{
+        const map = new Map();
+        for (const s of socials || []){
+            const platform = normalizePlatformKey(s.type);
+            const link = (s.link || "").trim();
+            if (!platform || !link) continue;
+            if (!SOCIAL_PLATFORMS.some((p)=>p.key === platform)) continue;
+            if (!map.has(platform)) map.set(platform, s);
+        }
+        return map;
+    };
+    const getSocialButtonClasses = (type, enabled)=>{
+        const key = normalizeSocialType(type);
+        // The SVGs themselves already include the colored circle background.
+        // Keep the wrappers identical (size/shape/hover/focus), regardless of platform.
+        const base = "inline-flex h-8 w-8 items-center justify-center rounded-full overflow-hidden shadow-sm ring-1 ring-black/5 dark:ring-white/10 transition-transform focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-offset-white dark:focus-visible:ring-offset-slate-900";
+        const enabledStyles = "hover:scale-105";
+        const disabledStyles = "opacity-35 grayscale cursor-not-allowed hover:scale-100";
+        switch(key){
+            case "facebook":
+            case "fb":
+                return `${base} ${enabled ? enabledStyles : disabledStyles} focus-visible:ring-[#3B5998]`;
+            case "x":
+            case "twitter":
+                return `${base} ${enabled ? enabledStyles : disabledStyles} focus-visible:ring-[#040709]`;
+            case "youtube":
+            case "yt":
+                return `${base} ${enabled ? enabledStyles : disabledStyles} focus-visible:ring-[#FF0000]`;
+            case "linkedin":
+                return `${base} ${enabled ? enabledStyles : disabledStyles} focus-visible:ring-[#0077B5]`;
+            case "instagram":
+            case "insta":
+                return `${base} ${enabled ? enabledStyles : disabledStyles} focus-visible:ring-[#E83678]`;
+            case "tiktok":
+                return `${base} ${enabled ? enabledStyles : disabledStyles} focus-visible:ring-[#0C0C0C]`;
+            default:
+                return `${base} ${enabled ? enabledStyles : disabledStyles}`;
+        }
+    };
+    const renderSocialRow = (socials)=>{
+        const links = buildSocialLinkMap(socials);
+        return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+            className: "flex flex-wrap gap-2 not-prose",
+            children: SOCIAL_PLATFORMS.map((p)=>{
+                const s = links.get(p.key);
+                const enabled = Boolean(s);
+                const icon = getSocialIcon(p.key);
+                if (!icon) return null;
+                const commonProps = {
+                    className: getSocialButtonClasses(p.key, enabled),
+                    title: enabled ? p.label : `${p.label} (not provided)`,
+                    "aria-label": p.label
+                };
+                if (!enabled) {
+                    return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                        ...commonProps,
+                        "aria-disabled": "true",
+                        children: icon
+                    }, p.key, false, {
+                        fileName: "[project]/app/[locale]/profile/[uuid]/components/AboutTab.tsx",
+                        lineNumber: 207,
+                        columnNumber: 15
+                    }, this);
+                }
+                return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("a", {
+                    href: formatSocialUrl(s.link),
+                    target: "_blank",
+                    rel: "noopener noreferrer",
+                    ...commonProps,
+                    children: icon
+                }, p.key, false, {
+                    fileName: "[project]/app/[locale]/profile/[uuid]/components/AboutTab.tsx",
+                    lineNumber: 218,
+                    columnNumber: 13
+                }, this);
+            })
+        }, void 0, false, {
+            fileName: "[project]/app/[locale]/profile/[uuid]/components/AboutTab.tsx",
+            lineNumber: 192,
+            columnNumber: 7
+        }, this);
+    };
+    return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+        className: "py-8 px-6 md:px-10",
+        children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+            className: "prose max-w-none dark:prose-invert",
+            children: [
+                enterpriseType === "insighter" && profileData.bio && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                    className: "bg-gray-50 dark:bg-slate-700/30 p-6 rounded-xl mb-10",
+                    "data-aos": "fade-up",
+                    children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                        className: "grid grid-cols-1 md:grid-cols-3 gap-6",
+                        children: [
+                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                className: "md:col-span-2",
+                                children: [
+                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("h3", {
+                                        className: "text-xl font-semibold mb-4 text-gray-800 dark:text-white flex items-center",
+                                        children: [
+                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("svg", {
+                                                xmlns: "http://www.w3.org/2000/svg",
+                                                className: `h-5 w-5 ${isRTL ? "ml-2" : "mr-2"} text-blue-500`,
+                                                fill: "none",
+                                                viewBox: "0 0 24 24",
+                                                stroke: "currentColor",
+                                                children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("path", {
+                                                    strokeLinecap: "round",
+                                                    strokeLinejoin: "round",
+                                                    strokeWidth: 2,
+                                                    d: "M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
+                                                }, void 0, false, {
+                                                    fileName: "[project]/app/[locale]/profile/[uuid]/components/AboutTab.tsx",
+                                                    lineNumber: 254,
+                                                    columnNumber: 21
+                                                }, this)
+                                            }, void 0, false, {
+                                                fileName: "[project]/app/[locale]/profile/[uuid]/components/AboutTab.tsx",
+                                                lineNumber: 245,
+                                                columnNumber: 19
+                                            }, this),
+                                            t("bio")
+                                        ]
+                                    }, void 0, true, {
+                                        fileName: "[project]/app/[locale]/profile/[uuid]/components/AboutTab.tsx",
+                                        lineNumber: 244,
+                                        columnNumber: 17
+                                    }, this),
+                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
+                                        className: "whitespace-pre-line text-gray-700 dark:text-gray-300",
+                                        children: profileData.bio
+                                    }, void 0, false, {
+                                        fileName: "[project]/app/[locale]/profile/[uuid]/components/AboutTab.tsx",
+                                        lineNumber: 263,
+                                        columnNumber: 17
+                                    }, this)
+                                ]
+                            }, void 0, true, {
+                                fileName: "[project]/app/[locale]/profile/[uuid]/components/AboutTab.tsx",
+                                lineNumber: 243,
+                                columnNumber: 15
+                            }, this),
+                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                className: "flex flex-col gap-4",
+                                children: [
+                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                        className: "bg-white dark:bg-slate-800 p-4 rounded-xl shadow-sm",
+                                        children: [
+                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
+                                                className: "text-sm text-gray-500 dark:text-gray-400 mb-2",
+                                                children: t("socialMedia")
+                                            }, void 0, false, {
+                                                fileName: "[project]/app/[locale]/profile/[uuid]/components/AboutTab.tsx",
+                                                lineNumber: 271,
+                                                columnNumber: 19
+                                            }, this),
+                                            renderSocialRow(profileData.social)
+                                        ]
+                                    }, void 0, true, {
+                                        fileName: "[project]/app/[locale]/profile/[uuid]/components/AboutTab.tsx",
+                                        lineNumber: 270,
+                                        columnNumber: 15
+                                    }, this),
+                                    countryName && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                        className: "bg-white dark:bg-slate-800 p-4 rounded-xl shadow-sm",
+                                        children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                            className: "flex items-start",
+                                            children: [
+                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                    className: "py-5",
+                                                    children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("svg", {
+                                                        xmlns: "http://www.w3.org/2000/svg",
+                                                        className: `h-5 w-5 text-gray-500 dark:text-gray-400 ${isRTL ? "ml-2" : "mr-2"}`,
+                                                        fill: "none",
+                                                        viewBox: "0 0 24 24",
+                                                        stroke: "currentColor",
+                                                        children: [
+                                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("path", {
+                                                                strokeLinecap: "round",
+                                                                strokeLinejoin: "round",
+                                                                strokeWidth: 2,
+                                                                d: "M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
+                                                            }, void 0, false, {
+                                                                fileName: "[project]/app/[locale]/profile/[uuid]/components/AboutTab.tsx",
+                                                                lineNumber: 290,
+                                                                columnNumber: 25
+                                                            }, this),
+                                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("path", {
+                                                                strokeLinecap: "round",
+                                                                strokeLinejoin: "round",
+                                                                strokeWidth: 2,
+                                                                d: "M15 11a3 3 0 11-6 0 3 3 0 016 0z"
+                                                            }, void 0, false, {
+                                                                fileName: "[project]/app/[locale]/profile/[uuid]/components/AboutTab.tsx",
+                                                                lineNumber: 296,
+                                                                columnNumber: 25
+                                                            }, this)
+                                                        ]
+                                                    }, void 0, true, {
+                                                        fileName: "[project]/app/[locale]/profile/[uuid]/components/AboutTab.tsx",
+                                                        lineNumber: 281,
+                                                        columnNumber: 23
+                                                    }, this)
+                                                }, void 0, false, {
+                                                    fileName: "[project]/app/[locale]/profile/[uuid]/components/AboutTab.tsx",
+                                                    lineNumber: 280,
+                                                    columnNumber: 23
+                                                }, this),
+                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                    children: [
+                                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
+                                                            className: "text-sm text-gray-500 dark:text-gray-400",
+                                                            children: t("address")
+                                                        }, void 0, false, {
+                                                            fileName: "[project]/app/[locale]/profile/[uuid]/components/AboutTab.tsx",
+                                                            lineNumber: 306,
+                                                            columnNumber: 25
+                                                        }, this),
+                                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
+                                                            className: "font-medium",
+                                                            children: countryName
+                                                        }, void 0, false, {
+                                                            fileName: "[project]/app/[locale]/profile/[uuid]/components/AboutTab.tsx",
+                                                            lineNumber: 309,
+                                                            columnNumber: 25
+                                                        }, this)
+                                                    ]
+                                                }, void 0, true, {
+                                                    fileName: "[project]/app/[locale]/profile/[uuid]/components/AboutTab.tsx",
+                                                    lineNumber: 304,
+                                                    columnNumber: 23
+                                                }, this)
+                                            ]
+                                        }, void 0, true, {
+                                            fileName: "[project]/app/[locale]/profile/[uuid]/components/AboutTab.tsx",
+                                            lineNumber: 279,
+                                            columnNumber: 21
+                                        }, this)
+                                    }, void 0, false, {
+                                        fileName: "[project]/app/[locale]/profile/[uuid]/components/AboutTab.tsx",
+                                        lineNumber: 278,
+                                        columnNumber: 19
+                                    }, this)
+                                ]
+                            }, void 0, true, {
+                                fileName: "[project]/app/[locale]/profile/[uuid]/components/AboutTab.tsx",
+                                lineNumber: 269,
+                                columnNumber: 15
+                            }, this)
+                        ]
+                    }, void 0, true, {
+                        fileName: "[project]/app/[locale]/profile/[uuid]/components/AboutTab.tsx",
+                        lineNumber: 242,
+                        columnNumber: 13
+                    }, this)
+                }, void 0, false, {
+                    fileName: "[project]/app/[locale]/profile/[uuid]/components/AboutTab.tsx",
+                    lineNumber: 238,
+                    columnNumber: 11
+                }, this),
+                isCompany && profileData.company && enterpriseType !== "insighter" && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                    className: "bg-gray-50 dark:bg-slate-700/30 rounded-xl p-4",
+                    "data-aos": "fade-up",
+                    "data-aos-delay": "400",
+                    children: [
+                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("h3", {
+                            className: "text-xl font-semibold text-gray-800 dark:text-white flex items-center",
+                            children: [
+                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("svg", {
+                                    xmlns: "http://www.w3.org/2000/svg",
+                                    className: `h-5 w-5 ${isRTL ? "ml-2" : "mr-2"} text-blue-500`,
+                                    fill: "none",
+                                    viewBox: "0 0 24 24",
+                                    stroke: "currentColor",
+                                    children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("path", {
+                                        strokeLinecap: "round",
+                                        strokeLinejoin: "round",
+                                        strokeWidth: 2,
+                                        d: "M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"
+                                    }, void 0, false, {
+                                        fileName: "[project]/app/[locale]/profile/[uuid]/components/AboutTab.tsx",
+                                        lineNumber: 340,
+                                        columnNumber: 17
+                                    }, this)
+                                }, void 0, false, {
+                                    fileName: "[project]/app/[locale]/profile/[uuid]/components/AboutTab.tsx",
+                                    lineNumber: 331,
+                                    columnNumber: 15
+                                }, this),
+                                t("companyInfo")
+                            ]
+                        }, void 0, true, {
+                            fileName: "[project]/app/[locale]/profile/[uuid]/components/AboutTab.tsx",
+                            lineNumber: 330,
+                            columnNumber: 13
+                        }, this),
+                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                            className: "grid grid-cols-1 md:grid-cols-3 gap-6",
+                            children: [
+                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                    className: "md:col-span-2 bg-white dark:bg-slate-800 p-4 rounded-xl shadow-sm h-full",
+                                    children: [
+                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
+                                            className: "text-sm text-gray-500 dark:text-gray-400 mb-2",
+                                            children: t("aboutUs")
+                                        }, void 0, false, {
+                                            fileName: "[project]/app/[locale]/profile/[uuid]/components/AboutTab.tsx",
+                                            lineNumber: 353,
+                                            columnNumber: 17
+                                        }, this),
+                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
+                                            className: `whitespace-pre-line ${typeof profileData.company.about_us === "string" && profileData.company.about_us.trim() && __turbopack_context__.r("[project]/app/utils/textUtils.ts [app-ssr] (ecmascript)").isFirstWordArabic(profileData.company.about_us) ? 'text-right' : 'text-left'}`,
+                                            dir: typeof profileData.company.about_us === "string" && profileData.company.about_us.trim() && __turbopack_context__.r("[project]/app/utils/textUtils.ts [app-ssr] (ecmascript)").isFirstWordArabic(profileData.company.about_us) ? 'rtl' : 'ltr',
+                                            children: profileData.company.about_us
+                                        }, void 0, false, {
+                                            fileName: "[project]/app/[locale]/profile/[uuid]/components/AboutTab.tsx",
+                                            lineNumber: 356,
+                                            columnNumber: 17
+                                        }, this)
+                                    ]
+                                }, void 0, true, {
+                                    fileName: "[project]/app/[locale]/profile/[uuid]/components/AboutTab.tsx",
+                                    lineNumber: 352,
+                                    columnNumber: 15
+                                }, this),
+                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                    className: "flex flex-col gap-4",
+                                    children: [
+                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                            className: "bg-white dark:bg-slate-800 p-4 rounded-xl shadow-sm",
+                                            children: [
+                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
+                                                    className: "text-sm text-gray-500 dark:text-gray-400 mb-1",
+                                                    children: t("websiteLabel")
+                                                }, void 0, false, {
+                                                    fileName: "[project]/app/[locale]/profile/[uuid]/components/AboutTab.tsx",
+                                                    lineNumber: 380,
+                                                    columnNumber: 19
+                                                }, this),
+                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                    className: "flex items-center gap-2",
+                                                    children: [
+                                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("a", {
+                                                            href: formatWebsiteUrl(profileData.company.website),
+                                                            target: "_blank",
+                                                            rel: "noopener noreferrer",
+                                                            className: "font-medium m-0 text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 hover:underline flex-1 truncate",
+                                                            children: profileData.company.website
+                                                        }, void 0, false, {
+                                                            fileName: "[project]/app/[locale]/profile/[uuid]/components/AboutTab.tsx",
+                                                            lineNumber: 384,
+                                                            columnNumber: 21
+                                                        }, this),
+                                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
+                                                            onClick: handleCopyWebsite,
+                                                            className: "flex-shrink-0 p-1.5 rounded-md hover:bg-gray-100 dark:hover:bg-slate-700 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-1",
+                                                            title: copied ? locale === "ar" ? "تم النسخ!" : "Copied!" : locale === "ar" ? "نسخ الرابط" : "Copy link",
+                                                            "aria-label": locale === "ar" ? "نسخ الرابط" : "Copy link",
+                                                            children: copied ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("svg", {
+                                                                xmlns: "http://www.w3.org/2000/svg",
+                                                                className: "h-5 w-5 text-green-600 dark:text-green-400",
+                                                                fill: "none",
+                                                                viewBox: "0 0 24 24",
+                                                                stroke: "currentColor",
+                                                                children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("path", {
+                                                                    strokeLinecap: "round",
+                                                                    strokeLinejoin: "round",
+                                                                    strokeWidth: 2,
+                                                                    d: "M5 13l4 4L19 7"
+                                                                }, void 0, false, {
+                                                                    fileName: "[project]/app/[locale]/profile/[uuid]/components/AboutTab.tsx",
+                                                                    lineNumber: 406,
+                                                                    columnNumber: 27
+                                                                }, this)
+                                                            }, void 0, false, {
+                                                                fileName: "[project]/app/[locale]/profile/[uuid]/components/AboutTab.tsx",
+                                                                lineNumber: 399,
+                                                                columnNumber: 25
+                                                            }, this) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("svg", {
+                                                                xmlns: "http://www.w3.org/2000/svg",
+                                                                className: "h-5 w-5 text-gray-600 dark:text-gray-400",
+                                                                fill: "none",
+                                                                viewBox: "0 0 24 24",
+                                                                stroke: "currentColor",
+                                                                children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("path", {
+                                                                    strokeLinecap: "round",
+                                                                    strokeLinejoin: "round",
+                                                                    strokeWidth: 2,
+                                                                    d: "M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"
+                                                                }, void 0, false, {
+                                                                    fileName: "[project]/app/[locale]/profile/[uuid]/components/AboutTab.tsx",
+                                                                    lineNumber: 421,
+                                                                    columnNumber: 27
+                                                                }, this)
+                                                            }, void 0, false, {
+                                                                fileName: "[project]/app/[locale]/profile/[uuid]/components/AboutTab.tsx",
+                                                                lineNumber: 414,
+                                                                columnNumber: 25
+                                                            }, this)
+                                                        }, void 0, false, {
+                                                            fileName: "[project]/app/[locale]/profile/[uuid]/components/AboutTab.tsx",
+                                                            lineNumber: 392,
+                                                            columnNumber: 21
+                                                        }, this)
+                                                    ]
+                                                }, void 0, true, {
+                                                    fileName: "[project]/app/[locale]/profile/[uuid]/components/AboutTab.tsx",
+                                                    lineNumber: 383,
+                                                    columnNumber: 19
+                                                }, this)
+                                            ]
+                                        }, void 0, true, {
+                                            fileName: "[project]/app/[locale]/profile/[uuid]/components/AboutTab.tsx",
+                                            lineNumber: 379,
+                                            columnNumber: 17
+                                        }, this),
+                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                            className: "bg-white dark:bg-slate-800 p-4 rounded-xl shadow-sm",
+                                            children: [
+                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
+                                                    className: "text-sm text-gray-500 dark:text-gray-400 mb-2",
+                                                    children: t("socialMedia")
+                                                }, void 0, false, {
+                                                    fileName: "[project]/app/[locale]/profile/[uuid]/components/AboutTab.tsx",
+                                                    lineNumber: 435,
+                                                    columnNumber: 19
+                                                }, this),
+                                                renderSocialRow(profileData.company.social)
+                                            ]
+                                        }, void 0, true, {
+                                            fileName: "[project]/app/[locale]/profile/[uuid]/components/AboutTab.tsx",
+                                            lineNumber: 434,
+                                            columnNumber: 17
+                                        }, this),
+                                        isCompany && (profileData.company?.address || countryName) && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                            className: "bg-white dark:bg-slate-800 p-4 rounded-xl shadow-sm",
+                                            children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                className: "flex items-center",
+                                                children: [
+                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("svg", {
+                                                        xmlns: "http://www.w3.org/2000/svg",
+                                                        className: `h-5 w-5 text-gray-500 dark:text-gray-400 ${isRTL ? "ml-2" : "mr-2"}`,
+                                                        fill: "none",
+                                                        viewBox: "0 0 24 24",
+                                                        stroke: "currentColor",
+                                                        children: [
+                                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("path", {
+                                                                strokeLinecap: "round",
+                                                                strokeLinejoin: "round",
+                                                                strokeWidth: 2,
+                                                                d: "M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
+                                                            }, void 0, false, {
+                                                                fileName: "[project]/app/[locale]/profile/[uuid]/components/AboutTab.tsx",
+                                                                lineNumber: 454,
+                                                                columnNumber: 25
+                                                            }, this),
+                                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("path", {
+                                                                strokeLinecap: "round",
+                                                                strokeLinejoin: "round",
+                                                                strokeWidth: 2,
+                                                                d: "M15 11a3 3 0 11-6 0 3 3 0 016 0z"
+                                                            }, void 0, false, {
+                                                                fileName: "[project]/app/[locale]/profile/[uuid]/components/AboutTab.tsx",
+                                                                lineNumber: 460,
+                                                                columnNumber: 25
+                                                            }, this)
+                                                        ]
+                                                    }, void 0, true, {
+                                                        fileName: "[project]/app/[locale]/profile/[uuid]/components/AboutTab.tsx",
+                                                        lineNumber: 445,
+                                                        columnNumber: 23
+                                                    }, this),
+                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                        children: [
+                                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
+                                                                className: "text-sm text-gray-500 dark:text-gray-400",
+                                                                children: t("address")
+                                                            }, void 0, false, {
+                                                                fileName: "[project]/app/[locale]/profile/[uuid]/components/AboutTab.tsx",
+                                                                lineNumber: 468,
+                                                                columnNumber: 25
+                                                            }, this),
+                                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
+                                                                className: "font-medium",
+                                                                children: [
+                                                                    profileData.company?.address,
+                                                                    profileData.company?.address && countryName && ", ",
+                                                                    countryName
+                                                                ]
+                                                            }, void 0, true, {
+                                                                fileName: "[project]/app/[locale]/profile/[uuid]/components/AboutTab.tsx",
+                                                                lineNumber: 471,
+                                                                columnNumber: 25
+                                                            }, this)
+                                                        ]
+                                                    }, void 0, true, {
+                                                        fileName: "[project]/app/[locale]/profile/[uuid]/components/AboutTab.tsx",
+                                                        lineNumber: 467,
+                                                        columnNumber: 23
+                                                    }, this)
+                                                ]
+                                            }, void 0, true, {
+                                                fileName: "[project]/app/[locale]/profile/[uuid]/components/AboutTab.tsx",
+                                                lineNumber: 444,
+                                                columnNumber: 21
+                                            }, this)
+                                        }, void 0, false, {
+                                            fileName: "[project]/app/[locale]/profile/[uuid]/components/AboutTab.tsx",
+                                            lineNumber: 443,
+                                            columnNumber: 19
+                                        }, this)
+                                    ]
+                                }, void 0, true, {
+                                    fileName: "[project]/app/[locale]/profile/[uuid]/components/AboutTab.tsx",
+                                    lineNumber: 377,
+                                    columnNumber: 15
+                                }, this)
+                            ]
+                        }, void 0, true, {
+                            fileName: "[project]/app/[locale]/profile/[uuid]/components/AboutTab.tsx",
+                            lineNumber: 350,
+                            columnNumber: 13
+                        }, this)
+                    ]
+                }, void 0, true, {
+                    fileName: "[project]/app/[locale]/profile/[uuid]/components/AboutTab.tsx",
+                    lineNumber: 325,
+                    columnNumber: 11
+                }, this),
+                profileData.certifications && profileData.certifications.length > 0 && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                    className: "mb-10",
+                    "data-aos": "fade-up",
+                    "data-aos-delay": "300",
+                    children: [
+                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("h3", {
+                            className: "text-xl font-semibold mb-6 text-gray-800 dark:text-white flex items-center",
+                            children: [
+                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("svg", {
+                                    xmlns: "http://www.w3.org/2000/svg",
+                                    className: `h-5 w-5 ${isRTL ? "ml-2" : "mr-2"} text-green-500`,
+                                    fill: "none",
+                                    viewBox: "0 0 24 24",
+                                    stroke: "currentColor",
+                                    children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("path", {
+                                        strokeLinecap: "round",
+                                        strokeLinejoin: "round",
+                                        strokeWidth: 2,
+                                        d: "M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z"
+                                    }, void 0, false, {
+                                        fileName: "[project]/app/[locale]/profile/[uuid]/components/AboutTab.tsx",
+                                        lineNumber: 502,
+                                        columnNumber: 19
+                                    }, this)
+                                }, void 0, false, {
+                                    fileName: "[project]/app/[locale]/profile/[uuid]/components/AboutTab.tsx",
+                                    lineNumber: 493,
+                                    columnNumber: 17
+                                }, this),
+                                t("certifications")
+                            ]
+                        }, void 0, true, {
+                            fileName: "[project]/app/[locale]/profile/[uuid]/components/AboutTab.tsx",
+                            lineNumber: 492,
+                            columnNumber: 15
+                        }, this),
+                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                            className: "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6",
+                            children: profileData.certifications.map((cert, index)=>/*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("a", {
+                                    href: cert.url,
+                                    target: "_blank",
+                                    rel: "noopener noreferrer",
+                                    className: "group block p-6 bg-white dark:bg-slate-800 rounded-xl border border-gray-100 dark:border-slate-700 hover:shadow-lg transition duration-300 transform hover:translate-y-[-4px]",
+                                    "data-aos": "fade-up",
+                                    "data-aos-delay": 100 * (index % 3 + 1),
+                                    "aria-label": `${t("certifications")}: ${cert.type.replace(/_/g, " ").toLowerCase()}`,
+                                    children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                        className: "flex flex-col items-center gap-4",
+                                        children: [
+                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                className: "rounded-2xl bg-gray-50 dark:bg-slate-700/40 p-4 ring-1 ring-gray-200/70 dark:ring-slate-600/50",
+                                                children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$app$2f$components$2f$icons$2f$NewCertificationIcon$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["default"], {
+                                                    width: 56,
+                                                    height: 56
+                                                }, void 0, false, {
+                                                    fileName: "[project]/app/[locale]/profile/[uuid]/components/AboutTab.tsx",
+                                                    lineNumber: 527,
+                                                    columnNumber: 25
+                                                }, this)
+                                            }, void 0, false, {
+                                                fileName: "[project]/app/[locale]/profile/[uuid]/components/AboutTab.tsx",
+                                                lineNumber: 526,
+                                                columnNumber: 23
+                                            }, this),
+                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                className: "text-center",
+                                                children: [
+                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
+                                                        className: "m-0 inline-flex items-center rounded-full bg-gray-50 dark:bg-slate-700/40 px-3 py-1 text-sm font-medium text-gray-700 dark:text-gray-200 ring-1 ring-gray-200/70 dark:ring-slate-600/50 ring-inset capitalize",
+                                                        children: cert.type.replace(/_/g, " ")
+                                                    }, void 0, false, {
+                                                        fileName: "[project]/app/[locale]/profile/[uuid]/components/AboutTab.tsx",
+                                                        lineNumber: 530,
+                                                        columnNumber: 25
+                                                    }, this),
+                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
+                                                        className: "m-0 mt-2 text-xs text-gray-500 dark:text-gray-400",
+                                                        children: t("websiteLabel")
+                                                    }, void 0, false, {
+                                                        fileName: "[project]/app/[locale]/profile/[uuid]/components/AboutTab.tsx",
+                                                        lineNumber: 533,
+                                                        columnNumber: 25
+                                                    }, this)
+                                                ]
+                                            }, void 0, true, {
+                                                fileName: "[project]/app/[locale]/profile/[uuid]/components/AboutTab.tsx",
+                                                lineNumber: 529,
+                                                columnNumber: 23
+                                            }, this)
+                                        ]
+                                    }, void 0, true, {
+                                        fileName: "[project]/app/[locale]/profile/[uuid]/components/AboutTab.tsx",
+                                        lineNumber: 525,
+                                        columnNumber: 21
+                                    }, this)
+                                }, cert.id, false, {
+                                    fileName: "[project]/app/[locale]/profile/[uuid]/components/AboutTab.tsx",
+                                    lineNumber: 513,
+                                    columnNumber: 19
+                                }, this))
+                        }, void 0, false, {
+                            fileName: "[project]/app/[locale]/profile/[uuid]/components/AboutTab.tsx",
+                            lineNumber: 511,
+                            columnNumber: 15
+                        }, this)
+                    ]
+                }, void 0, true, {
+                    fileName: "[project]/app/[locale]/profile/[uuid]/components/AboutTab.tsx",
+                    lineNumber: 487,
+                    columnNumber: 13
+                }, this),
+                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                    className: "grid grid-cols-1 md:grid-cols-2 gap-6 mb-10",
+                    children: [
+                        profileData.industries && profileData.industries.length > 0 && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                            className: "bg-white dark:bg-slate-800 rounded-xl border border-gray-100 dark:border-slate-700 p-5",
+                            "data-aos": "fade-up",
+                            "data-aos-delay": "100",
+                            children: [
+                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("h3", {
+                                    className: "text-xl font-semibold mb-4 text-gray-800 dark:text-white flex items-center",
+                                    children: [
+                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("svg", {
+                                            xmlns: "http://www.w3.org/2000/svg",
+                                            width: "24",
+                                            height: "24",
+                                            viewBox: "0 0 24 24",
+                                            fill: "none",
+                                            stroke: "currentColor",
+                                            strokeWidth: "2",
+                                            strokeLinecap: "round",
+                                            strokeLinejoin: "round",
+                                            className: `icon icon-tabler icons-tabler-outline icon-tabler-building-factory text-yellow-500 fs-5 ${isRTL ? "ml-2" : "mr-2"}`,
+                                            children: [
+                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("path", {
+                                                    stroke: "none",
+                                                    d: "M0 0h24v24H0z",
+                                                    fill: "none"
+                                                }, void 0, false, {
+                                                    fileName: "[project]/app/[locale]/profile/[uuid]/components/AboutTab.tsx",
+                                                    lineNumber: 568,
+                                                    columnNumber: 19
+                                                }, this),
+                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("path", {
+                                                    d: "M4 21c1.147 -4.02 1.983 -8.027 2 -12h6c.017 3.973 .853 7.98 2 12"
+                                                }, void 0, false, {
+                                                    fileName: "[project]/app/[locale]/profile/[uuid]/components/AboutTab.tsx",
+                                                    lineNumber: 569,
+                                                    columnNumber: 19
+                                                }, this),
+                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("path", {
+                                                    d: "M12.5 13h4.5c.025 2.612 .894 5.296 2 8"
+                                                }, void 0, false, {
+                                                    fileName: "[project]/app/[locale]/profile/[uuid]/components/AboutTab.tsx",
+                                                    lineNumber: 570,
+                                                    columnNumber: 19
+                                                }, this),
+                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("path", {
+                                                    d: "M9 5a2.4 2.4 0 0 1 2 -1a2.4 2.4 0 0 1 2 1a2.4 2.4 0 0 0 2 1a2.4 2.4 0 0 0 2 -1a2.4 2.4 0 0 1 2 -1a2.4 2.4 0 0 1 2 1"
+                                                }, void 0, false, {
+                                                    fileName: "[project]/app/[locale]/profile/[uuid]/components/AboutTab.tsx",
+                                                    lineNumber: 571,
+                                                    columnNumber: 19
+                                                }, this),
+                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("path", {
+                                                    d: "M3 21l19 0"
+                                                }, void 0, false, {
+                                                    fileName: "[project]/app/[locale]/profile/[uuid]/components/AboutTab.tsx",
+                                                    lineNumber: 572,
+                                                    columnNumber: 19
+                                                }, this)
+                                            ]
+                                        }, void 0, true, {
+                                            fileName: "[project]/app/[locale]/profile/[uuid]/components/AboutTab.tsx",
+                                            lineNumber: 554,
+                                            columnNumber: 17
+                                        }, this),
+                                        t("industries")
+                                    ]
+                                }, void 0, true, {
+                                    fileName: "[project]/app/[locale]/profile/[uuid]/components/AboutTab.tsx",
+                                    lineNumber: 553,
+                                    columnNumber: 15
+                                }, this),
+                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                    className: "flex flex-wrap gap-2",
+                                    children: profileData.industries.map((industry)=>/*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                            className: "bg-blue-50 dark:bg-blue-900/20 text-blue-800 dark:text-blue-300 px-3 py-1.5 rounded-full text-sm font-medium shadow-sm transition transform hover:translate-y-[-1px] hover:shadow",
+                                            children: industry.name
+                                        }, industry.id, false, {
+                                            fileName: "[project]/app/[locale]/profile/[uuid]/components/AboutTab.tsx",
+                                            lineNumber: 578,
+                                            columnNumber: 19
+                                        }, this))
+                                }, void 0, false, {
+                                    fileName: "[project]/app/[locale]/profile/[uuid]/components/AboutTab.tsx",
+                                    lineNumber: 576,
+                                    columnNumber: 15
+                                }, this)
+                            ]
+                        }, void 0, true, {
+                            fileName: "[project]/app/[locale]/profile/[uuid]/components/AboutTab.tsx",
+                            lineNumber: 548,
+                            columnNumber: 13
+                        }, this),
+                        profileData.consulting_field && profileData.consulting_field.length > 0 && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                            className: "bg-white dark:bg-slate-800 rounded-xl border border-gray-100 dark:border-slate-700 p-5",
+                            "data-aos": "fade-up",
+                            "data-aos-delay": "200",
+                            children: [
+                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("h3", {
+                                    className: "text-xl font-semibold mb-4 text-gray-800 dark:text-white flex items-center",
+                                    children: [
+                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("svg", {
+                                            xmlns: "http://www.w3.org/2000/svg",
+                                            className: `h-5 w-5 ${isRTL ? "ml-2" : "mr-2"} text-purple-500`,
+                                            fill: "none",
+                                            viewBox: "0 0 24 24",
+                                            stroke: "currentColor",
+                                            children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("path", {
+                                                strokeLinecap: "round",
+                                                strokeLinejoin: "round",
+                                                strokeWidth: 2,
+                                                d: "M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
+                                            }, void 0, false, {
+                                                fileName: "[project]/app/[locale]/profile/[uuid]/components/AboutTab.tsx",
+                                                lineNumber: 607,
+                                                columnNumber: 21
+                                            }, this)
+                                        }, void 0, false, {
+                                            fileName: "[project]/app/[locale]/profile/[uuid]/components/AboutTab.tsx",
+                                            lineNumber: 598,
+                                            columnNumber: 19
+                                        }, this),
+                                        t("consultingFields")
+                                    ]
+                                }, void 0, true, {
+                                    fileName: "[project]/app/[locale]/profile/[uuid]/components/AboutTab.tsx",
+                                    lineNumber: 597,
+                                    columnNumber: 17
+                                }, this),
+                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                    className: "flex flex-wrap gap-2",
+                                    children: profileData.consulting_field.map((field)=>/*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                            className: "bg-purple-50 dark:bg-purple-900/20 text-purple-800 dark:text-purple-300 px-3 py-1.5 rounded-full text-sm font-medium shadow-sm transition transform hover:translate-y-[-1px] hover:shadow",
+                                            children: locale === "ar" && field.names?.ar ? field.names.ar : field.name
+                                        }, field.id, false, {
+                                            fileName: "[project]/app/[locale]/profile/[uuid]/components/AboutTab.tsx",
+                                            lineNumber: 618,
+                                            columnNumber: 21
+                                        }, this))
+                                }, void 0, false, {
+                                    fileName: "[project]/app/[locale]/profile/[uuid]/components/AboutTab.tsx",
+                                    lineNumber: 616,
+                                    columnNumber: 17
+                                }, this)
+                            ]
+                        }, void 0, true, {
+                            fileName: "[project]/app/[locale]/profile/[uuid]/components/AboutTab.tsx",
+                            lineNumber: 592,
+                            columnNumber: 15
+                        }, this)
+                    ]
+                }, void 0, true, {
+                    fileName: "[project]/app/[locale]/profile/[uuid]/components/AboutTab.tsx",
+                    lineNumber: 545,
+                    columnNumber: 9
+                }, this)
+            ]
+        }, void 0, true, {
+            fileName: "[project]/app/[locale]/profile/[uuid]/components/AboutTab.tsx",
+            lineNumber: 235,
+            columnNumber: 7
+        }, this)
+    }, void 0, false, {
+        fileName: "[project]/app/[locale]/profile/[uuid]/components/AboutTab.tsx",
+        lineNumber: 234,
+        columnNumber: 5
+    }, this);
+}
+}),
+"[project]/app/lib/useUserProfile.ts [app-ssr] (ecmascript) <locals>", ((__turbopack_context__) => {
+"use strict";
+
+// Re-export the useUserProfile hook from its actual location
+__turbopack_context__.s([]);
+var __TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$header$2f$hooks$2f$useUserProfile$2e$ts__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/components/ui/header/hooks/useUserProfile.ts [app-ssr] (ecmascript)");
+;
+}),
+"[project]/app/lib/useCountries.ts [app-ssr] (ecmascript)", ((__turbopack_context__) => {
+"use strict";
+
+__turbopack_context__.s([
+    "useCountries",
+    ()=>useCountries
+]);
+var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/next/dist/server/route-modules/app-page/vendored/ssr/react.js [app-ssr] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2d$intl$2f$dist$2f$index$2e$react$2d$client$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/next-intl/dist/index.react-client.js [app-ssr] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$app$2f$config$2e$ts__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/app/config.ts [app-ssr] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$authToken$2e$ts__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/lib/authToken.ts [app-ssr] (ecmascript)");
+'use client';
+;
+;
+;
+;
+let countriesCache = {
+    countries: [],
+    lastFetchTime: 0,
+    isLoading: false,
+    pendingPromise: null
+};
+const CACHE_DURATION = 300000; // 5 minutes cache for countries (they don't change often)
+function useCountries() {
+    const [countries, setCountries] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useState"])(countriesCache.countries);
+    const [isLoading, setIsLoading] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useState"])(countriesCache.isLoading);
+    const [error, setError] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useState"])(null);
+    const locale = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2d$intl$2f$dist$2f$index$2e$react$2d$client$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useLocale"])();
+    const fetchCountriesWithRetry = async (maxRetries = 3)=>{
+        const token = (0, __TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$authToken$2e$ts__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["getAuthToken"])();
+        for(let attempt = 1; attempt <= maxRetries; attempt++){
+            try {
+                console.log(`[useCountries] Attempt ${attempt}/${maxRetries} to fetch countries`);
+                const headers = {
+                    "Content-Type": "application/json",
+                    "Accept": "application/json",
+                    "Accept-Language": locale,
+                    "X-Timezone": Intl.DateTimeFormat().resolvedOptions().timeZone
+                };
+                if (token) {
+                    headers['Authorization'] = `Bearer ${token}`;
+                }
+                const response = await fetch((0, __TURBOPACK__imported__module__$5b$project$5d2f$app$2f$config$2e$ts__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["getApiUrl"])("/api/common/setting/country/list"), {
+                    headers
+                });
+                console.log("[useCountries] Countries fetch response", {
+                    attempt,
+                    status: response.status,
+                    ok: response.ok,
+                    statusText: response.statusText
+                });
+                if (!response.ok) {
+                    // Handle specific status codes
+                    if (response.status === 0) {
+                        throw new Error('Network error or CORS issue. Please check your internet connection.');
+                    }
+                    if (attempt < maxRetries) {
+                        const delay = Math.pow(2, attempt - 1) * 1000;
+                        console.log(`[useCountries] Request failed, retrying in ${delay}ms...`);
+                        await new Promise((resolve)=>setTimeout(resolve, delay));
+                        continue;
+                    }
+                    throw new Error(`Failed to fetch countries: ${response.status} ${response.statusText}`);
+                }
+                const data = await response.json();
+                console.log("[useCountries] Successfully retrieved countries", {
+                    count: data.data.length
+                });
+                countriesCache.countries = data.data;
+                countriesCache.lastFetchTime = Date.now();
+                return data.data;
+            } catch (error) {
+                console.error(`[useCountries] Attempt ${attempt} failed:`, error);
+                // Handle network errors and CORS issues specifically
+                if (error instanceof TypeError && error.message.includes('Failed to fetch')) {
+                    console.error('[useCountries] Network error or CORS issue detected');
+                    if (attempt === maxRetries) {
+                        throw new Error('Network error: Unable to fetch countries. This may be due to CORS policy or network connectivity issues.');
+                    }
+                } else if (attempt === maxRetries) {
+                    throw error;
+                }
+                const delay = Math.pow(2, attempt - 1) * 1000;
+                await new Promise((resolve)=>setTimeout(resolve, delay));
+            }
+        }
+        return [];
+    };
+    const fetchCountries = async (forceRefresh = false)=>{
+        const now = Date.now();
+        if (!forceRefresh && countriesCache.countries.length > 0 && now - countriesCache.lastFetchTime < CACHE_DURATION) {
+            console.log("[useCountries] Using cached countries data");
+            return countriesCache.countries;
+        }
+        if (countriesCache.pendingPromise) {
+            console.log("[useCountries] Using pending promise");
+            return countriesCache.pendingPromise;
+        }
+        console.log("[useCountries] Starting new countries fetch");
+        countriesCache.isLoading = true;
+        countriesCache.pendingPromise = fetchCountriesWithRetry();
+        try {
+            const result = await countriesCache.pendingPromise;
+            return result;
+        } catch (error) {
+            console.error("[useCountries] Error fetching countries:", error);
+            throw error;
+        } finally{
+            countriesCache.isLoading = false;
+            countriesCache.pendingPromise = null;
+        }
+    };
+    (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useEffect"])(()=>{
+        const loadCountries = async ()=>{
+            // Skip loading if we're on sign-out related pages
+            if ("TURBOPACK compile-time falsy", 0) //TURBOPACK unreachable
+            ;
+            // Check if we have a valid token before starting
+            const token = (0, __TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$authToken$2e$ts__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["getAuthToken"])();
+            if (!token) {
+                console.log('[useCountries] No token available, skipping countries fetch');
+                return;
+            }
+            setIsLoading(true);
+            setError(null);
+            try {
+                const fetchedCountries = await fetchCountries();
+                setCountries(fetchedCountries);
+            } catch (error) {
+                const errorMessage = error instanceof Error ? error.message : 'Failed to fetch countries';
+                setError(errorMessage);
+                console.error('[useCountries] Error loading countries:', error);
+            } finally{
+                setIsLoading(false);
+            }
+        };
+        loadCountries();
+    }, [
+        locale
+    ]);
+    const getCountryById = (id)=>{
+        return countries.find((country)=>country.id === id);
+    };
+    const getCountryByIso2 = (iso2)=>{
+        return countries.find((country)=>country.iso2.toLowerCase() === iso2.toLowerCase());
+    };
+    const getCountryByIso3 = (iso3)=>{
+        return countries.find((country)=>country.iso3.toLowerCase() === iso3.toLowerCase());
+    };
+    const getLocalizedCountryName = (country)=>{
+        return country.names[locale] || country.name;
+    };
+    const getLocalizedNationality = (country)=>{
+        return country.nationalities[locale] || country.nationality;
+    };
+    return {
+        countries,
+        isLoading,
+        error,
+        getCountryById,
+        getCountryByIso2,
+        getCountryByIso3,
+        getLocalizedCountryName,
+        getLocalizedNationality,
+        refetch: ()=>fetchCountries(true)
+    };
+}
+}),
+"[project]/app/[locale]/profile/[uuid]/components/MeetTab.tsx [app-ssr] (ecmascript)", ((__turbopack_context__) => {
+"use strict";
+
+__turbopack_context__.s([
+    "default",
+    ()=>MeetTab
+]);
+var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/next/dist/server/route-modules/app-page/vendored/ssr/react-jsx-dev-runtime.js [app-ssr] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/next/dist/server/route-modules/app-page/vendored/ssr/react.js [app-ssr] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$tabler$2f$icons$2d$react$2f$dist$2f$esm$2f$icons$2f$IconCalendarX$2e$mjs__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__$3c$export__default__as__IconCalendarX$3e$__ = __turbopack_context__.i("[project]/node_modules/@tabler/icons-react/dist/esm/icons/IconCalendarX.mjs [app-ssr] (ecmascript) <export default as IconCalendarX>");
+var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$tabler$2f$icons$2d$react$2f$dist$2f$esm$2f$icons$2f$IconChevronLeft$2e$mjs__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__$3c$export__default__as__IconChevronLeft$3e$__ = __turbopack_context__.i("[project]/node_modules/@tabler/icons-react/dist/esm/icons/IconChevronLeft.mjs [app-ssr] (ecmascript) <export default as IconChevronLeft>");
+var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$tabler$2f$icons$2d$react$2f$dist$2f$esm$2f$icons$2f$IconChevronRight$2e$mjs__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__$3c$export__default__as__IconChevronRight$3e$__ = __turbopack_context__.i("[project]/node_modules/@tabler/icons-react/dist/esm/icons/IconChevronRight.mjs [app-ssr] (ecmascript) <export default as IconChevronRight>");
+var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$tabler$2f$icons$2d$react$2f$dist$2f$esm$2f$icons$2f$IconCalendarEvent$2e$mjs__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__$3c$export__default__as__IconCalendarEvent$3e$__ = __turbopack_context__.i("[project]/node_modules/@tabler/icons-react/dist/esm/icons/IconCalendarEvent.mjs [app-ssr] (ecmascript) <export default as IconCalendarEvent>");
+var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$tabler$2f$icons$2d$react$2f$dist$2f$esm$2f$icons$2f$IconWallet$2e$mjs__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__$3c$export__default__as__IconWallet$3e$__ = __turbopack_context__.i("[project]/node_modules/@tabler/icons-react/dist/esm/icons/IconWallet.mjs [app-ssr] (ecmascript) <export default as IconWallet>");
+var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$tabler$2f$icons$2d$react$2f$dist$2f$esm$2f$icons$2f$IconVideo$2e$mjs__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__$3c$export__default__as__IconVideo$3e$__ = __turbopack_context__.i("[project]/node_modules/@tabler/icons-react/dist/esm/icons/IconVideo.mjs [app-ssr] (ecmascript) <export default as IconVideo>");
+var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$tabler$2f$icons$2d$react$2f$dist$2f$esm$2f$icons$2f$IconMapPin$2e$mjs__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__$3c$export__default__as__IconMapPin$3e$__ = __turbopack_context__.i("[project]/node_modules/@tabler/icons-react/dist/esm/icons/IconMapPin.mjs [app-ssr] (ecmascript) <export default as IconMapPin>");
+var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$tabler$2f$icons$2d$react$2f$dist$2f$esm$2f$icons$2f$IconBrandWhatsapp$2e$mjs__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__$3c$export__default__as__IconBrandWhatsapp$3e$__ = __turbopack_context__.i("[project]/node_modules/@tabler/icons-react/dist/esm/icons/IconBrandWhatsapp.mjs [app-ssr] (ecmascript) <export default as IconBrandWhatsapp>");
+var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$tabler$2f$icons$2d$react$2f$dist$2f$esm$2f$icons$2f$IconInfoCircle$2e$mjs__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__$3c$export__default__as__IconInfoCircle$3e$__ = __turbopack_context__.i("[project]/node_modules/@tabler/icons-react/dist/esm/icons/IconInfoCircle.mjs [app-ssr] (ecmascript) <export default as IconInfoCircle>");
+var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mantine$2f$core$2f$esm$2f$components$2f$Modal$2f$Modal$2e$mjs__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/@mantine/core/esm/components/Modal/Modal.mjs [app-ssr] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mantine$2f$core$2f$esm$2f$components$2f$TextInput$2f$TextInput$2e$mjs__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/@mantine/core/esm/components/TextInput/TextInput.mjs [app-ssr] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mantine$2f$core$2f$esm$2f$components$2f$Textarea$2f$Textarea$2e$mjs__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/@mantine/core/esm/components/Textarea/Textarea.mjs [app-ssr] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mantine$2f$core$2f$esm$2f$components$2f$Button$2f$Button$2e$mjs__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/@mantine/core/esm/components/Button/Button.mjs [app-ssr] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mantine$2f$core$2f$esm$2f$components$2f$Select$2f$Select$2e$mjs__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/@mantine/core/esm/components/Select/Select.mjs [app-ssr] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2d$intl$2f$dist$2f$index$2e$react$2d$client$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/next-intl/dist/index.react-client.js [app-ssr] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$stripe$2f$react$2d$stripe$2d$js$2f$dist$2f$react$2d$stripe$2e$esm$2e$mjs__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/@stripe/react-stripe-js/dist/react-stripe.esm.mjs [app-ssr] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$stripe$2f$stripe$2d$js$2f$lib$2f$index$2e$mjs__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__$3c$locals$3e$__ = __turbopack_context__.i("[project]/node_modules/@stripe/stripe-js/lib/index.mjs [app-ssr] (ecmascript) <locals>");
+var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$stripe$2f$stripe$2d$js$2f$dist$2f$index$2e$mjs__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/@stripe/stripe-js/dist/index.mjs [app-ssr] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$components$2f$payment$2d$icons$2f$index$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/components/payment-icons/index.tsx [app-ssr] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$app$2f$lib$2f$useUserProfile$2e$ts__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__$3c$locals$3e$__ = __turbopack_context__.i("[project]/app/lib/useUserProfile.ts [app-ssr] (ecmascript) <locals>");
+var __TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$header$2f$hooks$2f$useUserProfile$2e$ts__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/components/ui/header/hooks/useUserProfile.ts [app-ssr] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$app$2f$lib$2f$useCountries$2e$ts__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/app/lib/useCountries.ts [app-ssr] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$authToken$2e$ts__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/lib/authToken.ts [app-ssr] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$app$2f$config$2e$ts__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/app/config.ts [app-ssr] (ecmascript)");
+"use client";
+;
+;
+;
+;
+;
+;
+;
+;
+;
+;
+;
+;
+// Initialize Stripe
+const stripePromise = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$stripe$2f$stripe$2d$js$2f$dist$2f$index$2e$mjs__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["loadStripe"])((0, __TURBOPACK__imported__module__$5b$project$5d2f$app$2f$config$2e$ts__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["getStripePublishableKey"])());
+const getMeetingRate = (time, place)=>{
+    const rawRate = place === "physically" && time.rate_physical != null ? time.rate_physical : time.rate;
+    const rate = Number(rawRate);
+    return Number.isFinite(rate) ? rate : 0;
+};
+const isSuccessfulMeetingPaymentStatus = (order)=>{
+    const status = order?.status?.toLowerCase();
+    const paymentStatus = order?.payment_status?.toLowerCase();
+    return status === "paid" || status === "completed" || status === "completed_pending_payment" || paymentStatus === "completed" || paymentStatus === "completed_pending_payment";
+};
+function StripePaymentForm({ clientSecret, onSuccess, onError, isProcessing, setIsProcessing, locale, externalError }) {
+    const stripe = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$stripe$2f$react$2d$stripe$2d$js$2f$dist$2f$react$2d$stripe$2e$esm$2e$mjs__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useStripe"])();
+    const elements = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$stripe$2f$react$2d$stripe$2d$js$2f$dist$2f$react$2d$stripe$2e$esm$2e$mjs__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useElements"])();
+    const [submitError, setSubmitError] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useState"])(null);
+    const handleSubmit = async (e)=>{
+        e.preventDefault();
+        if (!stripe || !elements) {
+            return;
+        }
+        setSubmitError(null);
+        setIsProcessing(true);
+        const { error } = await stripe.confirmPayment({
+            elements,
+            confirmParams: {
+                return_url: window.location.href
+            },
+            redirect: "if_required"
+        });
+        if (error) {
+            const message = error.message || "Payment failed";
+            setSubmitError(message);
+            onError(message);
+        } else {
+            onSuccess();
+        }
+        setIsProcessing(false);
+    };
+    return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("form", {
+        onSubmit: handleSubmit,
+        className: "space-y-4",
+        children: [
+            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$stripe$2f$react$2d$stripe$2d$js$2f$dist$2f$react$2d$stripe$2e$esm$2e$mjs__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["PaymentElement"], {}, void 0, false, {
+                fileName: "[project]/app/[locale]/profile/[uuid]/components/MeetTab.tsx",
+                lineNumber: 160,
+                columnNumber: 7
+            }, this),
+            (submitError || externalError) && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                className: "p-3 rounded-md bg-red-50 text-red-700 text-sm",
+                children: submitError || externalError
+            }, void 0, false, {
+                fileName: "[project]/app/[locale]/profile/[uuid]/components/MeetTab.tsx",
+                lineNumber: 162,
+                columnNumber: 9
+            }, this),
+            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mantine$2f$core$2f$esm$2f$components$2f$Button$2f$Button$2e$mjs__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["Button"], {
+                type: "submit",
+                disabled: !stripe || !elements || isProcessing,
+                loading: isProcessing,
+                fullWidth: true,
+                className: "bg-blue-500 hover:bg-blue-600",
+                children: locale.startsWith('ar') ? 'إتمام الدفع' : 'Complete Payment'
+            }, void 0, false, {
+                fileName: "[project]/app/[locale]/profile/[uuid]/components/MeetTab.tsx",
+                lineNumber: 166,
+                columnNumber: 7
+            }, this)
+        ]
+    }, void 0, true, {
+        fileName: "[project]/app/[locale]/profile/[uuid]/components/MeetTab.tsx",
+        lineNumber: 159,
+        columnNumber: 5
+    }, this);
+}
+function MeetTab({ locale, isRTL, profileData, isAuthenticated, loadingMeetings, meetingAvailability, currentMonth, selectedDate, selectedMeetingTime, uuid, isOwnProfile, handlePreviousMonth, handleNextMonth, handleDateClick, handleTimeClick, fetchMeetingAvailability, isDateActive, getMeetingTimesForDate, getMonthName, getShortWeekdayNames, getDaysInMonth, getFirstDayOfMonth, formatDateString, getDayName }) {
+    const t = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2d$intl$2f$dist$2f$index$2e$react$2d$client$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useTranslations"])("ProfilePage");
+    const { roles, refreshProfile } = (0, __TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$header$2f$hooks$2f$useUserProfile$2e$ts__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useUserProfile"])();
+    const { countries, isLoading: areCountriesLoading } = (0, __TURBOPACK__imported__module__$5b$project$5d2f$app$2f$lib$2f$useCountries$2e$ts__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useCountries"])();
+    // Check if user is client-only (has "client" role but not insighter, company, or company-insighter)
+    const isClientOnlyUser = Array.isArray(roles) && roles.includes("client") && !roles.some((r)=>[
+            "insighter",
+            "company",
+            "company-insighter",
+            "admin"
+        ].includes(r));
+    // Modal and booking states
+    const [isBookingModalOpen, setIsBookingModalOpen] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useState"])(false);
+    const [selectedPlace, setSelectedPlace] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useState"])(null);
+    const [meetingTitle, setMeetingTitle] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useState"])("");
+    const [meetingDescription, setMeetingDescription] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useState"])("");
+    const [isBookingLoading, setIsBookingLoading] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useState"])(false);
+    const [bookingError, setBookingError] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useState"])(null);
+    const [validationErrors, setValidationErrors] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useState"])({});
+    const [showDuplicateWarning, setShowDuplicateWarning] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useState"])(false);
+    const [isDuplicateCheckLoading, setIsDuplicateCheckLoading] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useState"])(false);
+    // Payment related states
+    const [paymentMethod, setPaymentMethod] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useState"])(null);
+    const [walletBalance, setWalletBalance] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useState"])(0);
+    const [showSuccessUI, setShowSuccessUI] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useState"])(false);
+    const [clientSecret, setClientSecret] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useState"])(null);
+    const [orderUuid, setOrderUuid] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useState"])(null);
+    const [showStripeElements, setShowStripeElements] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useState"])(false);
+    const [isPollingStatus, setIsPollingStatus] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useState"])(false);
+    const [isStripeProcessing, setIsStripeProcessing] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useState"])(false);
+    const [hasCheckedDuplicate, setHasCheckedDuplicate] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useState"])(false);
+    const [stripeErrorMessage, setStripeErrorMessage] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useState"])(null);
+    const [bookingStep, setBookingStep] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useState"])(1);
+    const [isFinalVerifying, setIsFinalVerifying] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useState"])(false);
+    const [didStripeConfirm, setDidStripeConfirm] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useState"])(false);
+    const [pollFinished, setPollFinished] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useState"])(false);
+    const [pollFoundPaid, setPollFoundPaid] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useState"])(null);
+    const [paymentExpiresAt, setPaymentExpiresAt] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useState"])(null);
+    const [timeLeftMs, setTimeLeftMs] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useState"])(0);
+    const [showPaymentExpiredModal, setShowPaymentExpiredModal] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useState"])(false);
+    const [authRedirectUrl, setAuthRedirectUrl] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useState"])(null);
+    const [processedMeetPrefillKey, setProcessedMeetPrefillKey] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useState"])(null);
+    const [isWhatsAppModalOpen, setIsWhatsAppModalOpen] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useState"])(false);
+    const [isCheckingWhatsApp, setIsCheckingWhatsApp] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useState"])(false);
+    const [isSavingWhatsApp, setIsSavingWhatsApp] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useState"])(false);
+    const [whatsAppCountryCode, setWhatsAppCountryCode] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useState"])("");
+    const [whatsAppNumber, setWhatsAppNumber] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useState"])("");
+    const [whatsAppError, setWhatsAppError] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useState"])(null);
+    const [notificationProfile, setNotificationProfile] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useState"])(null);
+    const [hasVerifiedWhatsAppForBooking, setHasVerifiedWhatsAppForBooking] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useState"])(false);
+    const countryCodeOptions = __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["default"].useMemo(()=>{
+        const uniqueCodes = new Set();
+        return countries.reduce((options, country)=>{
+            const code = String(country.international_code || "").replace(/^\+/, "");
+            if (!code || uniqueCodes.has(code)) return options;
+            uniqueCodes.add(code);
+            const name = country.names?.[isRTL ? "ar" : "en"] || country.name;
+            options.push({
+                value: code,
+                label: `${name} (+${code})`
+            });
+            return options;
+        }, []);
+    }, [
+        countries,
+        isRTL
+    ]);
+    // Fetch wallet balance when component mounts
+    (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useEffect"])(()=>{
+        if (isAuthenticated) {
+            fetchWalletBalance();
+        }
+    }, [
+        isAuthenticated
+    ]);
+    // Load meeting availability data when tab changes to "meet"
+    (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useEffect"])(()=>{
+        if (isBookingModalOpen && isAuthenticated) {
+            fetchWalletBalance();
+        }
+    }, [
+        isBookingModalOpen,
+        isAuthenticated
+    ]);
+    // Reset duplicate-check memo when selection changes or modal toggles
+    (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useEffect"])(()=>{
+        setHasCheckedDuplicate(false);
+    }, [
+        selectedDate,
+        selectedMeetingTime,
+        isBookingModalOpen
+    ]);
+    // Start/stop payment countdown when entering/leaving Stripe payment step
+    (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useEffect"])(()=>{
+        if (clientSecret && bookingStep === 2) {
+            if (!paymentExpiresAt) {
+                const expires = Date.now() + 30 * 60 * 1000;
+                setPaymentExpiresAt(expires);
+                setTimeLeftMs(expires - Date.now());
+            }
+        } else {
+            setPaymentExpiresAt(null);
+            setTimeLeftMs(0);
+        }
+    }, [
+        clientSecret,
+        bookingStep,
+        paymentExpiresAt
+    ]);
+    // Tick countdown every second
+    (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useEffect"])(()=>{
+        if (!paymentExpiresAt) return;
+        const tick = ()=>{
+            const remaining = paymentExpiresAt - Date.now();
+            setTimeLeftMs(Math.max(0, remaining));
+        };
+        tick();
+        const id = setInterval(tick, 1000);
+        return ()=>clearInterval(id);
+    }, [
+        paymentExpiresAt
+    ]);
+    // Auto-expire payment session when time runs out
+    (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useEffect"])(()=>{
+        if (paymentExpiresAt && timeLeftMs === 0 && bookingStep === 2) {
+            // Close modal, reset states, notify user, and refresh availability
+            setShowPaymentExpiredModal(true);
+            closeBookingModal();
+        }
+    }, [
+        timeLeftMs,
+        paymentExpiresAt,
+        bookingStep
+    ]);
+    const buildReturnUrlWithMeetingParams = ()=>{
+        if ("TURBOPACK compile-time truthy", 1) return null;
+        //TURBOPACK unreachable
+        ;
+        const url = undefined;
+        const sp = undefined;
+    };
+    const normalizeDateKey = (input)=>{
+        if (!input) return null;
+        // Extract YYYY-MM-DD from possible ISO strings
+        const match = String(input).match(/\d{4}-\d{2}-\d{2}/);
+        return match ? match[0] : null;
+    };
+    const normalizeTimeKey = (input)=>{
+        if (!input) return null;
+        // Extract HH:MM from formats like 09:00, 09:00:00, 09:00:00.000Z, etc.
+        const match = String(input).match(/(\d{2}):(\d{2})/);
+        return match ? `${match[1]}:${match[2]}` : null;
+    };
+    const stripMeetParamsFromUrl = ()=>{
+        if ("TURBOPACK compile-time truthy", 1) return;
+        //TURBOPACK unreachable
+        ;
+        const url = undefined;
+        const sp = undefined;
+        const keys = undefined;
+    };
+    // If we came back from Angular with booking params, auto-select and prefill
+    (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useEffect"])(()=>{
+        if ("TURBOPACK compile-time truthy", 1) return;
+        //TURBOPACK unreachable
+        ;
+        const sp = undefined;
+        const shouldAutoOpen = undefined;
+        const meetDateRaw = undefined;
+        const meetStartRaw = undefined;
+        const meetEndRaw = undefined;
+        const meetTitle = undefined;
+        const meetDesc = undefined;
+        const meetPayment = undefined;
+        const meetPlaceRaw = undefined;
+        const meetPlace = undefined;
+        const meetDate = undefined;
+        const meetStart = undefined;
+        const meetEnd = undefined;
+        const currentKey = undefined;
+        // Select date/time once availability is present
+        // Find matching day using tolerant date matching
+        const dayData = undefined;
+        const dateToSelect = undefined;
+        const times = undefined;
+        const found = undefined;
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [
+        meetingAvailability,
+        processedMeetPrefillKey
+    ]);
+    const formatTimeLeft = (ms)=>{
+        const totalSeconds = Math.max(0, Math.floor(ms / 1000));
+        const minutes = Math.floor(totalSeconds / 60);
+        const seconds = totalSeconds % 60;
+        return `${minutes.toString().padStart(2, "0")}:${seconds.toString().padStart(2, "0")}`;
+    };
+    const fetchWalletBalance = async ()=>{
+        try {
+            const token = (0, __TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$authToken$2e$ts__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["getAuthToken"])();
+            if (!token) return;
+            const response = await fetch(`${("TURBOPACK compile-time value", "https://api.foresighta.co")}/api/account/wallet/balance`, {
+                headers: {
+                    "Content-Type": "application/json",
+                    Accept: "application/json",
+                    "Accept-Language": locale,
+                    "X-Timezone": Intl.DateTimeFormat().resolvedOptions().timeZone,
+                    Authorization: `Bearer ${token}`
+                }
+            });
+            if (response.ok) {
+                const data = await response.json();
+                setWalletBalance(data.data?.balance || 0);
+            }
+        } catch (error) {
+            console.error("Error fetching wallet balance:", error);
+        }
+    };
+    const validateBookingForm = ()=>{
+        const errors = {};
+        // Title validation
+        if (!meetingTitle.trim()) {
+            errors.title = t("titleRequired");
+        } else if (meetingTitle.trim().length < 3) {
+            errors.title = t("titleTooShort");
+        } else if (meetingTitle.trim().length > 100) {
+            errors.title = t("titleTooLong");
+        }
+        // Description validation
+        if (meetingDescription.trim().length > 100) {
+            errors.description = t("descriptionTooLong");
+        }
+        setValidationErrors(errors);
+        return Object.keys(errors).length === 0;
+    };
+    // Handle title change with validation
+    const handleTitleChange = (value)=>{
+        setMeetingTitle(value);
+        // Real-time validation for title
+        const titleErrors = {};
+        if (value.trim() && value.trim().length < 3) {
+            titleErrors.title = t("titleTooShort");
+        } else if (value.trim().length > 50) {
+            titleErrors.title = t("titleTooLong");
+        }
+        setValidationErrors((prev)=>({
+                ...prev,
+                title: titleErrors.title
+            }));
+    };
+    // Handle description change with validation
+    const handleDescriptionChange = (value)=>{
+        setMeetingDescription(value);
+        // Real-time validation for description
+        const descErrors = {};
+        if (value.trim().length > 500) {
+            descErrors.description = t("descriptionTooLong");
+        }
+        setValidationErrors((prev)=>({
+                ...prev,
+                description: descErrors.description
+            }));
+    };
+    // Check for duplicate meeting times
+    const checkDuplicateMeetingTime = async (meetingDate, startTime, endTime)=>{
+        try {
+            const token = (0, __TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$authToken$2e$ts__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["getAuthToken"])();
+            const response = await fetch(`${("TURBOPACK compile-time value", "https://api.foresighta.co")}/api/account/meeting/client/check-duplicate-time`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    Accept: "application/json",
+                    "Accept-Language": locale,
+                    ...token && {
+                        Authorization: `Bearer ${token}`
+                    }
+                },
+                body: JSON.stringify({
+                    meeting_date: meetingDate,
+                    start_time: startTime,
+                    end_time: endTime
+                })
+            });
+            if (!response.ok) {
+                throw new Error("Failed to check duplicate meeting time");
+            }
+            const data = await response.json();
+            return data.data.exists;
+        } catch (error) {
+            console.error("Error checking duplicate meeting time:", error);
+            return false; // If check fails, allow booking to proceed
+        }
+    };
+    const pollOrderStatus = async (orderUuid)=>{
+        const token = (0, __TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$authToken$2e$ts__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["getAuthToken"])();
+        if (!token) return false;
+        const getPollingDelay = (attempt)=>{
+            const delays = [
+                1000,
+                2000,
+                3000,
+                5000,
+                8000,
+                10000
+            ];
+            return delays[Math.min(attempt, delays.length - 1)];
+        };
+        const checkStatus = async ()=>{
+            try {
+                const response = await fetch(`${("TURBOPACK compile-time value", "https://api.foresighta.co")}/api/account/order/meeting/${orderUuid}`, {
+                    headers: {
+                        "Content-Type": "application/json",
+                        Accept: "application/json",
+                        "Accept-Language": locale,
+                        "X-Timezone": Intl.DateTimeFormat().resolvedOptions().timeZone,
+                        Authorization: `Bearer ${token}`
+                    }
+                });
+                if (!response.ok) throw new Error("Failed to check payment status");
+                const data = await response.json();
+                return isSuccessfulMeetingPaymentStatus(data.data);
+            } catch (error) {
+                console.error("Error checking payment status:", error);
+                return false;
+            }
+        };
+        for(let attempt = 0; attempt < 10; attempt++){
+            const isPaid = await checkStatus();
+            if (isPaid) return true;
+            const delay = getPollingDelay(attempt);
+            await new Promise((resolve)=>setTimeout(resolve, delay));
+        }
+        return false;
+    };
+    const submitBookMeeting = async (skipDuplicateCheck = false)=>{
+        console.log("=== Starting submitBookMeeting ===");
+        console.log("Current paymentMethod:", paymentMethod);
+        if (!selectedDate || !selectedMeetingTime) {
+            setBookingError(locale.startsWith("ar") ? "يرجى اختيار التاريخ والوقت أولاً." : "Please select the date and time first.");
+            return;
+        }
+        // Validate form before submission
+        if (!validateBookingForm()) {
+            return;
+        }
+        // Guests: allow filling form, then redirect to login/signup with params
+        if (!isAuthenticated) {
+            const meetingPrice = getMeetingRate(selectedMeetingTime, selectedPlace);
+            const isFree = meetingPrice === 0;
+            if (!isFree && !paymentMethod) {
+                setBookingError("Please select a payment method");
+                return;
+            }
+            if (isFree) {
+                // keep URL param consistent (even though UI doesn't need selection for free sessions)
+                setPaymentMethod(null);
+            }
+            const returnUrl = buildReturnUrlWithMeetingParams();
+            if (!returnUrl) return;
+            setAuthRedirectUrl(returnUrl);
+            setBookingStep(3);
+            return;
+        }
+        // Also enforce the gate at checkout. This covers users returning from the
+        // guest sign-in flow, where the booking modal is restored automatically.
+        if (!hasVerifiedWhatsAppForBooking) {
+            setIsBookingModalOpen(false);
+            await handleBookMeetingClick();
+            return;
+        }
+        setIsBookingLoading(true);
+        setBookingError(null);
+        try {
+            // Check for duplicate meeting time first (unless skipped)
+            const shouldSkipDuplicate = skipDuplicateCheck || hasCheckedDuplicate;
+            if (!shouldSkipDuplicate) {
+                setIsDuplicateCheckLoading(true);
+                const isDuplicate = await checkDuplicateMeetingTime(selectedDate, selectedMeetingTime.start_time.substring(0, 5), selectedMeetingTime.end_time.substring(0, 5));
+                setIsDuplicateCheckLoading(false);
+                if (isDuplicate) {
+                    setShowDuplicateWarning(true);
+                    setIsBookingLoading(false);
+                    return;
+                }
+                // Remember that we have already validated this selection
+                setHasCheckedDuplicate(true);
+            } else if (skipDuplicateCheck) {
+                // If caller explicitly skipped (e.g., from warning), mark as checked
+                setHasCheckedDuplicate(true);
+            }
+            // Get auth token from cookies
+            const token = (0, __TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$authToken$2e$ts__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["getAuthToken"])();
+            // Get profile name from URL if profileData is unavailable
+            const defaultName = uuid.toString().split("-")[0] || "consultant";
+            // Check if meeting requires payment
+            const meetingPrice = getMeetingRate(selectedMeetingTime, selectedPlace);
+            const isFree = meetingPrice === 0;
+            // For paid meetings, check payment method selection
+            if (!isFree && !paymentMethod) {
+                setBookingError("Please select a payment method");
+                setIsBookingLoading(false);
+                return;
+            }
+            const response = await fetch(`${("TURBOPACK compile-time value", "https://api.foresighta.co")}/api/account/order/meeting/checkout/${uuid}`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    Accept: "application/json",
+                    "Accept-Language": locale,
+                    ...token && {
+                        Authorization: `Bearer ${token}`
+                    }
+                },
+                body: JSON.stringify({
+                    meeting_date: selectedDate,
+                    start_time: selectedMeetingTime.start_time.substring(0, 5),
+                    end_time: selectedMeetingTime.end_time.substring(0, 5),
+                    place: selectedPlace,
+                    title: meetingTitle || `Meeting with ${defaultName}`,
+                    description: meetingDescription || "No description provided",
+                    payment_method: isFree ? "free" : paymentMethod
+                })
+            });
+            if (!response.ok) {
+                const errorData = await response.json().catch(()=>({}));
+                throw new Error(errorData.message || "Failed to book meeting");
+            }
+            const data = await response.json();
+            // Handle different payment scenarios
+            if (isFree || paymentMethod === "manual") {
+                // Free session or wallet payment - booking is complete
+                setIsBookingModalOpen(false);
+                setMeetingTitle("");
+                setMeetingDescription("");
+                setPaymentMethod(null);
+                // Show enhanced success UI
+                setShowSuccessUI(true);
+                // Refresh availability and wallet balance
+                fetchMeetingAvailability();
+                fetchWalletBalance();
+            } else if (paymentMethod === "provider") {
+                // Stripe payment required
+                console.log('Stripe payment data:', data); // Debug log
+                // Check both possible response structures
+                const responseData = data.data || data;
+                const { client_secret, order_uuid } = responseData;
+                console.log('Extracted values:', {
+                    client_secret,
+                    order_uuid
+                }); // Debug log
+                if (client_secret && order_uuid) {
+                    setClientSecret(client_secret);
+                    setOrderUuid(order_uuid);
+                    setStripeErrorMessage(null);
+                    setBookingStep(2);
+                    // initialize 30-min payment session
+                    const expires = Date.now() + 30 * 60 * 1000;
+                    setPaymentExpiresAt(expires);
+                    setTimeLeftMs(expires - Date.now());
+                } else {
+                    console.error('Missing payment data in response:', responseData);
+                    throw new Error("Payment setup failed - missing payment information");
+                }
+            }
+        } catch (error) {
+            console.error("Error booking meeting:", error);
+            setBookingError(error instanceof Error ? error.message : "Failed to book meeting");
+        } finally{
+            setIsBookingLoading(false);
+        }
+    };
+    const finalVerifyMeetingPayment = async ()=>{
+        // Allow final verification ONLY if:
+        // - Stripe confirmation succeeded (card accepted)
+        // - Polling attempts have finished
+        // - Polling did not observe a paid status (still pending)
+        if (!orderUuid || !didStripeConfirm || !pollFinished || pollFoundPaid !== false) return;
+        try {
+            setIsFinalVerifying(true);
+            const token = (0, __TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$authToken$2e$ts__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["getAuthToken"])();
+            const response = await fetch(`${("TURBOPACK compile-time value", "https://api.foresighta.co")}/api/account/order/meeting/check-payment-succeeded/${orderUuid}`, {
+                method: "POST",
+                headers: {
+                    Accept: "application/json",
+                    "Accept-Language": locale,
+                    "X-Timezone": Intl.DateTimeFormat().resolvedOptions().timeZone,
+                    ...token && {
+                        Authorization: `Bearer ${token}`
+                    }
+                }
+            });
+            if (response.status === 204) {
+                // After backend confirmation, re-fetch order to verify status is paid
+                try {
+                    const verifyResp = await fetch(`${("TURBOPACK compile-time value", "https://api.foresighta.co")}/api/account/order/meeting/${orderUuid}`, {
+                        headers: {
+                            "Content-Type": "application/json",
+                            Accept: "application/json",
+                            "Accept-Language": locale,
+                            "X-Timezone": Intl.DateTimeFormat().resolvedOptions().timeZone,
+                            ...token && {
+                                Authorization: `Bearer ${token}`
+                            }
+                        }
+                    });
+                    if (verifyResp.ok) {
+                        const verifyData = await verifyResp.json();
+                        const isPaid = isSuccessfulMeetingPaymentStatus(verifyData?.data);
+                        if (isPaid) {
+                            setStripeErrorMessage(null);
+                            setShowSuccessUI(true);
+                            setIsBookingModalOpen(false);
+                            setBookingStep(1);
+                        } else {
+                            setStripeErrorMessage(locale.startsWith('ar') ? "لم يتم تأكيد حالة الطلب كمدفوع." : "Order status is not paid after verification.");
+                        }
+                    } else {
+                        setStripeErrorMessage(locale.startsWith('ar') ? "تعذر التحقق من حالة الطلب." : "Unable to verify order status.");
+                    }
+                } catch (e) {
+                    setStripeErrorMessage(locale.startsWith('ar') ? "حدث خطأ أثناء التحقق من حالة الطلب." : "An error occurred while verifying order status.");
+                }
+            } else {
+                setStripeErrorMessage(locale.startsWith('ar') ? "تعذر التحقق النهائي من الدفع. يرجى المحاولة لاحقاً." : "Payment could not be verified. Please try again later.");
+            }
+        } catch (err) {
+            console.error("Error verifying meeting payment:", err);
+            setStripeErrorMessage(locale.startsWith('ar') ? "فشل التحقق من الدفع." : "Payment verification failed.");
+        } finally{
+            setIsFinalVerifying(false);
+        }
+    };
+    // Override the handleBookMeeting from props to open modal
+    // Resolve which places a slot allows. Falls back to the single `place` value
+    // (or online) when the API doesn't provide the explicit list.
+    const getAvailablePlaces = (time)=>{
+        if (!time) return [];
+        const list = Array.isArray(time.available_places) && time.available_places.length ? time.available_places : time.place === "both" ? [
+            "online",
+            "physically"
+        ] : time.place === "physically" ? [
+            "physically"
+        ] : [
+            "online"
+        ];
+        return list.filter((p)=>p === "online" || p === "physically");
+    };
+    const openBookingModal = ()=>{
+        setBookingError(null);
+        setIsBookingModalOpen(true);
+        setBookingStep(1);
+    };
+    const selectMeetingTime = (time, place)=>{
+        handleTimeClick(time);
+        const places = getAvailablePlaces(time);
+        setSelectedPlace(place && places.includes(place) ? place : places.length === 1 ? places[0] : null);
+    };
+    const handleBookMeetingClick = async ()=>{
+        if (!selectedMeetingTime || !selectedPlace) return;
+        if (!isAuthenticated) {
+            openBookingModal();
+            return;
+        }
+        setIsCheckingWhatsApp(true);
+        setBookingError(null);
+        try {
+            const token = (0, __TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$authToken$2e$ts__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["getAuthToken"])();
+            const response = await fetch(`${("TURBOPACK compile-time value", "https://api.foresighta.co")}/api/account/profile`, {
+                headers: {
+                    Accept: "application/json",
+                    "Accept-Language": locale,
+                    "X-Timezone": Intl.DateTimeFormat().resolvedOptions().timeZone,
+                    ...token && {
+                        Authorization: `Bearer ${token}`
+                    }
+                }
+            });
+            if (!response.ok) throw new Error("Failed to check WhatsApp details");
+            const body = await response.json();
+            const profile = body.data || body;
+            const status = String(profile.whatsapp_status || "inactive");
+            const countryCode = String(profile.whatsapp_country_code || "").replace(/^\+/, "");
+            const number = String(profile.whatsapp_number || "");
+            if (status === "active" && countryCode && number) {
+                setHasVerifiedWhatsAppForBooking(true);
+                openBookingModal();
+                return;
+            }
+            setIsBookingModalOpen(false);
+            setNotificationProfile(profile);
+            setWhatsAppCountryCode(countryCode);
+            setWhatsAppNumber(number);
+            setWhatsAppError(null);
+            setIsWhatsAppModalOpen(true);
+        } catch (error) {
+            setBookingError(isRTL ? "تعذر التحقق من بيانات واتساب. يرجى المحاولة مرة أخرى." : error instanceof Error ? error.message : "Could not verify your WhatsApp details. Please try again.");
+        } finally{
+            setIsCheckingWhatsApp(false);
+        }
+    };
+    const saveWhatsAppAndContinue = async ()=>{
+        const normalizedNumber = whatsAppNumber.replace(/\D/g, "");
+        if (!whatsAppCountryCode || normalizedNumber.length < 6 || normalizedNumber.length > 15) {
+            setWhatsAppError(isRTL ? "يرجى اختيار رمز البلد وإدخال رقم واتساب صحيح." : "Select a country code and enter a valid WhatsApp number.");
+            return;
+        }
+        setIsSavingWhatsApp(true);
+        setWhatsAppError(null);
+        try {
+            const token = (0, __TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$authToken$2e$ts__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["getAuthToken"])();
+            const profile = notificationProfile || {};
+            const response = await fetch(`${("TURBOPACK compile-time value", "https://api.foresighta.co")}/api/account/profile/notification/channel`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    Accept: "application/json",
+                    "Accept-Language": locale,
+                    "X-Timezone": Intl.DateTimeFormat().resolvedOptions().timeZone,
+                    ...token && {
+                        Authorization: `Bearer ${token}`
+                    }
+                },
+                body: JSON.stringify({
+                    whatsapp_status: "active",
+                    whatsapp_country_code: whatsAppCountryCode,
+                    whatsapp_number: normalizedNumber,
+                    sms_status: profile.sms_status || "inactive",
+                    sms_whatsapp: profile.sms_whatsapp || profile.sms_status || "inactive",
+                    sms_country_code: profile.sms_country_code || "",
+                    sms_number: profile.sms_number || ""
+                })
+            });
+            if (!response.ok) {
+                const errorBody = await response.json().catch(()=>null);
+                throw new Error(errorBody?.message || "Failed to save WhatsApp details");
+            }
+            await refreshProfile().catch(()=>undefined);
+            setHasVerifiedWhatsAppForBooking(true);
+            setIsWhatsAppModalOpen(false);
+            openBookingModal();
+        } catch (error) {
+            setWhatsAppError(error instanceof Error ? error.message : isRTL ? "تعذر حفظ رقم واتساب." : "Could not save your WhatsApp number.");
+        } finally{
+            setIsSavingWhatsApp(false);
+        }
+    };
+    const skipWhatsAppAndContinue = ()=>{
+        // WhatsApp is optional: allow the user to bypass it and continue booking.
+        setWhatsAppError(null);
+        setHasVerifiedWhatsAppForBooking(true);
+        setIsWhatsAppModalOpen(false);
+        openBookingModal();
+    };
+    const closeBookingModal = ()=>{
+        setIsBookingModalOpen(false);
+        setHasVerifiedWhatsAppForBooking(false);
+        setSelectedPlace(null);
+        setHasCheckedDuplicate(false);
+        setBookingStep(1);
+        setClientSecret(null);
+        setOrderUuid(null);
+        setStripeErrorMessage(null);
+        setIsStripeProcessing(false);
+        setIsPollingStatus(false);
+        setDidStripeConfirm(false);
+        setPollFinished(false);
+        setPollFoundPaid(null);
+        setPaymentExpiresAt(null);
+        setTimeLeftMs(0);
+        setAuthRedirectUrl(null);
+        fetchMeetingAvailability();
+    };
+    return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+        className: "py-8 px-6 md:px-10",
+        children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+            className: "flex flex-col items-center max-w-3xl mx-auto",
+            children: [
+                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("h2", {
+                    className: "text-2xl font-semibold mb-6",
+                    children: [
+                        t("bookASession"),
+                        " ",
+                        t("with"),
+                        " ",
+                        profileData?.first_name || ""
+                    ]
+                }, void 0, true, {
+                    fileName: "[project]/app/[locale]/profile/[uuid]/components/MeetTab.tsx",
+                    lineNumber: 1078,
+                    columnNumber: 9
+                }, this),
+                loadingMeetings ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                    className: "flex justify-center items-center py-12",
+                    children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                        className: "animate-spin rounded-full h-10 w-10 border-4 border-gray-200 border-t-blue-500"
+                    }, void 0, false, {
+                        fileName: "[project]/app/[locale]/profile/[uuid]/components/MeetTab.tsx",
+                        lineNumber: 1085,
+                        columnNumber: 13
+                    }, this)
+                }, void 0, false, {
+                    fileName: "[project]/app/[locale]/profile/[uuid]/components/MeetTab.tsx",
+                    lineNumber: 1084,
+                    columnNumber: 11
+                }, this) : meetingAvailability.length === 0 ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                    className: "text-center py-16",
+                    children: [
+                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                            className: "flex justify-center mb-4",
+                            children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$tabler$2f$icons$2d$react$2f$dist$2f$esm$2f$icons$2f$IconCalendarX$2e$mjs__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__$3c$export__default__as__IconCalendarX$3e$__["IconCalendarX"], {
+                                size: 48,
+                                className: "text-gray-400"
+                            }, void 0, false, {
+                                fileName: "[project]/app/[locale]/profile/[uuid]/components/MeetTab.tsx",
+                                lineNumber: 1090,
+                                columnNumber: 15
+                            }, this)
+                        }, void 0, false, {
+                            fileName: "[project]/app/[locale]/profile/[uuid]/components/MeetTab.tsx",
+                            lineNumber: 1089,
+                            columnNumber: 13
+                        }, this),
+                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("h3", {
+                            className: "text-xl font-medium mb-2",
+                            children: t("noConsultingSessions")
+                        }, void 0, false, {
+                            fileName: "[project]/app/[locale]/profile/[uuid]/components/MeetTab.tsx",
+                            lineNumber: 1092,
+                            columnNumber: 13
+                        }, this),
+                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
+                            className: "text-gray-500",
+                            children: t("checkBackLater")
+                        }, void 0, false, {
+                            fileName: "[project]/app/[locale]/profile/[uuid]/components/MeetTab.tsx",
+                            lineNumber: 1095,
+                            columnNumber: 13
+                        }, this)
+                    ]
+                }, void 0, true, {
+                    fileName: "[project]/app/[locale]/profile/[uuid]/components/MeetTab.tsx",
+                    lineNumber: 1088,
+                    columnNumber: 11
+                }, this) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                    className: "w-full",
+                    children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                        className: "grid grid-cols-1 lg:grid-cols-2 gap-8",
+                        children: [
+                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                className: "bg-white dark:bg-slate-800 rounded-lg shadow-md p-6",
+                                children: [
+                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("h3", {
+                                        className: "text-lg font-semibold mb-4",
+                                        children: t("selectDate")
+                                    }, void 0, false, {
+                                        fileName: "[project]/app/[locale]/profile/[uuid]/components/MeetTab.tsx",
+                                        lineNumber: 1103,
+                                        columnNumber: 17
+                                    }, this),
+                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                        className: "flex justify-between items-center mb-4",
+                                        children: [
+                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
+                                                onClick: handlePreviousMonth,
+                                                className: "p-2 rounded-full hover:bg-gray-100 dark:hover:bg-slate-700 transition",
+                                                children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$tabler$2f$icons$2d$react$2f$dist$2f$esm$2f$icons$2f$IconChevronLeft$2e$mjs__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__$3c$export__default__as__IconChevronLeft$3e$__["IconChevronLeft"], {
+                                                    size: 18
+                                                }, void 0, false, {
+                                                    fileName: "[project]/app/[locale]/profile/[uuid]/components/MeetTab.tsx",
+                                                    lineNumber: 1113,
+                                                    columnNumber: 21
+                                                }, this)
+                                            }, void 0, false, {
+                                                fileName: "[project]/app/[locale]/profile/[uuid]/components/MeetTab.tsx",
+                                                lineNumber: 1109,
+                                                columnNumber: 19
+                                            }, this),
+                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("h3", {
+                                                className: "text-lg font-semibold",
+                                                children: [
+                                                    getMonthName(locale, currentMonth),
+                                                    " ",
+                                                    currentMonth.getFullYear()
+                                                ]
+                                            }, void 0, true, {
+                                                fileName: "[project]/app/[locale]/profile/[uuid]/components/MeetTab.tsx",
+                                                lineNumber: 1115,
+                                                columnNumber: 19
+                                            }, this),
+                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
+                                                onClick: handleNextMonth,
+                                                className: "p-2 rounded-full hover:bg-gray-100 dark:hover:bg-slate-700 transition",
+                                                children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$tabler$2f$icons$2d$react$2f$dist$2f$esm$2f$icons$2f$IconChevronRight$2e$mjs__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__$3c$export__default__as__IconChevronRight$3e$__["IconChevronRight"], {
+                                                    size: 18
+                                                }, void 0, false, {
+                                                    fileName: "[project]/app/[locale]/profile/[uuid]/components/MeetTab.tsx",
+                                                    lineNumber: 1123,
+                                                    columnNumber: 21
+                                                }, this)
+                                            }, void 0, false, {
+                                                fileName: "[project]/app/[locale]/profile/[uuid]/components/MeetTab.tsx",
+                                                lineNumber: 1119,
+                                                columnNumber: 19
+                                            }, this)
+                                        ]
+                                    }, void 0, true, {
+                                        fileName: "[project]/app/[locale]/profile/[uuid]/components/MeetTab.tsx",
+                                        lineNumber: 1108,
+                                        columnNumber: 17
+                                    }, this),
+                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                        className: "grid grid-cols-7 gap-1 mb-2",
+                                        children: getShortWeekdayNames(locale).map((day, index)=>/*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                className: "text-center text-sm font-medium text-gray-500 py-2",
+                                                children: day
+                                            }, index, false, {
+                                                fileName: "[project]/app/[locale]/profile/[uuid]/components/MeetTab.tsx",
+                                                lineNumber: 1130,
+                                                columnNumber: 21
+                                            }, this))
+                                    }, void 0, false, {
+                                        fileName: "[project]/app/[locale]/profile/[uuid]/components/MeetTab.tsx",
+                                        lineNumber: 1128,
+                                        columnNumber: 17
+                                    }, this),
+                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                        className: "grid grid-cols-7 gap-1",
+                                        children: (()=>{
+                                            const year = currentMonth.getFullYear();
+                                            const month = currentMonth.getMonth();
+                                            const daysInMonth = getDaysInMonth(year, month);
+                                            const firstDay = getFirstDayOfMonth(year, month);
+                                            const days = [];
+                                            // Empty cells for days before the first day of the month
+                                            for(let i = 0; i < firstDay; i++){
+                                                days.push(/*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                    className: "h-10"
+                                                }, `empty-${i}`, false, {
+                                                    fileName: "[project]/app/[locale]/profile/[uuid]/components/MeetTab.tsx",
+                                                    lineNumber: 1151,
+                                                    columnNumber: 25
+                                                }, this));
+                                            }
+                                            // Days of the month
+                                            for(let day = 1; day <= daysInMonth; day++){
+                                                const dateStr = formatDateString(year, month, day);
+                                                const isActive = isDateActive(dateStr);
+                                                const isSelected = dateStr === selectedDate;
+                                                days.push(/*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
+                                                    onClick: ()=>isActive ? handleDateClick(dateStr) : null,
+                                                    disabled: !isActive,
+                                                    className: `
+                            h-10 w-10 mx-auto rounded-full text-sm font-medium transition-colors
+                            ${isActive ? isSelected ? "bg-blue-500 text-white" : "bg-blue-50 text-blue-600 hover:bg-blue-100" : "text-gray-300 cursor-not-allowed"}
+                          `,
+                                                    children: day
+                                                }, day, false, {
+                                                    fileName: "[project]/app/[locale]/profile/[uuid]/components/MeetTab.tsx",
+                                                    lineNumber: 1169,
+                                                    columnNumber: 25
+                                                }, this));
+                                            }
+                                            return days;
+                                        })()
+                                    }, void 0, false, {
+                                        fileName: "[project]/app/[locale]/profile/[uuid]/components/MeetTab.tsx",
+                                        lineNumber: 1140,
+                                        columnNumber: 17
+                                    }, this)
+                                ]
+                            }, void 0, true, {
+                                fileName: "[project]/app/[locale]/profile/[uuid]/components/MeetTab.tsx",
+                                lineNumber: 1102,
+                                columnNumber: 15
+                            }, this),
+                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                className: "bg-white dark:bg-slate-800 rounded-lg shadow-md p-6",
+                                children: selectedDate ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["Fragment"], {
+                                    children: [
+                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("h3", {
+                                            className: "text-lg font-semibold mb-2",
+                                            children: locale.startsWith('ar') ? `الجلسات المتاحة في ${getDayName('en-US', new Date(selectedDate))}, ${new Date(selectedDate).toLocaleDateString('en-US', {
+                                                month: 'long',
+                                                day: 'numeric'
+                                            })}` : `Available sessions on ${getDayName('en-US', new Date(selectedDate))}, ${new Date(selectedDate).toLocaleDateString('en-US', {
+                                                month: 'long',
+                                                day: 'numeric'
+                                            })}`
+                                        }, void 0, false, {
+                                            fileName: "[project]/app/[locale]/profile/[uuid]/components/MeetTab.tsx",
+                                            lineNumber: 1198,
+                                            columnNumber: 21
+                                        }, this),
+                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
+                                            className: "text-sm text-gray-500 dark:text-gray-400 mb-4",
+                                            children: locale.startsWith('ar') ? `جميع الأوقات بتوقيت 24 ساعة في المنطقة الزمنية المحلية (${Intl.DateTimeFormat().resolvedOptions().timeZone})` : `All times shown in 24-hour format in your local timezone (${Intl.DateTimeFormat().resolvedOptions().timeZone})`
+                                        }, void 0, false, {
+                                            fileName: "[project]/app/[locale]/profile/[uuid]/components/MeetTab.tsx",
+                                            lineNumber: 1209,
+                                            columnNumber: 21
+                                        }, this),
+                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                            className: "space-y-3 mb-6",
+                                            children: getMeetingTimesForDate(selectedDate).length > 0 ? getMeetingTimesForDate(selectedDate).map((time, index)=>{
+                                                const isSelected = selectedMeetingTime === time;
+                                                const availablePlaces = getAvailablePlaces(time);
+                                                const onlineAvailable = availablePlaces.includes("online");
+                                                const onsiteAvailable = availablePlaces.includes("physically");
+                                                const typeChoiceClass = (active)=>`group relative flex min-w-0 items-center justify-center gap-2 rounded-lg border px-2.5 py-2 text-center transition-all ${active ? "border-blue-500 bg-blue-500 text-white shadow-sm" : "border-gray-200 bg-white text-gray-600 hover:border-blue-300 hover:bg-blue-50 hover:text-blue-700 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-200 dark:hover:border-blue-500 dark:hover:bg-slate-700"}`;
+                                                const typeIconClass = (active)=>`inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-md ${active ? "bg-white/20 text-white" : "bg-gray-50 text-gray-500 group-hover:bg-white group-hover:text-blue-600 dark:bg-slate-700 dark:text-slate-300"}`;
+                                                const priceLabel = (place)=>{
+                                                    const price = getMeetingRate(time, place);
+                                                    return price === 0 ? isRTL ? "مجانية" : "Free" : `$${price}`;
+                                                };
+                                                return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                    role: "button",
+                                                    tabIndex: 0,
+                                                    onClick: ()=>selectMeetingTime(time),
+                                                    onKeyDown: (event)=>{
+                                                        if (event.key === "Enter" || event.key === " ") {
+                                                            event.preventDefault();
+                                                            selectMeetingTime(time);
+                                                        }
+                                                    },
+                                                    className: `
+                                w-full p-3 rounded-lg border text-left transition-colors cursor-pointer
+                                ${isSelected ? "border-blue-500 bg-blue-50 text-blue-700" : "border-gray-200 hover:border-blue-300 hover:bg-blue-50"}
+                              `,
+                                                    children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                        className: "flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between",
+                                                        children: [
+                                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                                                className: "shrink-0 font-medium",
+                                                                children: [
+                                                                    new Date(`1970-01-01T${time.start_time}`).toLocaleTimeString(locale, {
+                                                                        hour: '2-digit',
+                                                                        minute: '2-digit',
+                                                                        hour12: false
+                                                                    }),
+                                                                    " ",
+                                                                    "-",
+                                                                    " ",
+                                                                    new Date(`1970-01-01T${time.end_time}`).toLocaleTimeString(locale, {
+                                                                        hour: '2-digit',
+                                                                        minute: '2-digit',
+                                                                        hour12: false
+                                                                    })
+                                                                ]
+                                                            }, void 0, true, {
+                                                                fileName: "[project]/app/[locale]/profile/[uuid]/components/MeetTab.tsx",
+                                                                lineNumber: 1263,
+                                                                columnNumber: 35
+                                                            }, this),
+                                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                                className: "flex w-full justify-end gap-2 sm:w-auto",
+                                                                children: [
+                                                                    onlineAvailable && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
+                                                                        type: "button",
+                                                                        title: isRTL ? "جلسة عن بُعد" : "Online session",
+                                                                        "aria-label": isRTL ? `اختيار جلسة عن بُعد، ${priceLabel("online")}` : `Select online session, ${priceLabel("online")}`,
+                                                                        "aria-pressed": isSelected && selectedPlace === "online",
+                                                                        onClick: (event)=>{
+                                                                            event.stopPropagation();
+                                                                            selectMeetingTime(time, "online");
+                                                                        },
+                                                                        className: typeChoiceClass(isSelected && selectedPlace === "online"),
+                                                                        children: [
+                                                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                                                                className: typeIconClass(isSelected && selectedPlace === "online"),
+                                                                                children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$tabler$2f$icons$2d$react$2f$dist$2f$esm$2f$icons$2f$IconVideo$2e$mjs__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__$3c$export__default__as__IconVideo$3e$__["IconVideo"], {
+                                                                                    size: 16
+                                                                                }, void 0, false, {
+                                                                                    fileName: "[project]/app/[locale]/profile/[uuid]/components/MeetTab.tsx",
+                                                                                    lineNumber: 1290,
+                                                                                    columnNumber: 43
+                                                                                }, this)
+                                                                            }, void 0, false, {
+                                                                                fileName: "[project]/app/[locale]/profile/[uuid]/components/MeetTab.tsx",
+                                                                                lineNumber: 1289,
+                                                                                columnNumber: 41
+                                                                            }, this),
+                                                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                                                                className: `text-sm font-bold leading-tight ${getMeetingRate(time, "online") === 0 && !(isSelected && selectedPlace === "online") ? "text-green-600" : ""}`,
+                                                                                children: priceLabel("online")
+                                                                            }, void 0, false, {
+                                                                                fileName: "[project]/app/[locale]/profile/[uuid]/components/MeetTab.tsx",
+                                                                                lineNumber: 1292,
+                                                                                columnNumber: 41
+                                                                            }, this),
+                                                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                                                                role: "tooltip",
+                                                                                className: "pointer-events-none absolute -top-9 left-1/2 z-10 -translate-x-1/2 whitespace-nowrap rounded bg-gray-800 px-2 py-1 text-xs font-medium text-white opacity-0 shadow-sm transition-opacity group-hover:opacity-100 group-focus-visible:opacity-100 dark:bg-gray-100 dark:text-gray-900",
+                                                                                children: isRTL ? "جلسة عن بُعد" : "Online session"
+                                                                            }, void 0, false, {
+                                                                                fileName: "[project]/app/[locale]/profile/[uuid]/components/MeetTab.tsx",
+                                                                                lineNumber: 1295,
+                                                                                columnNumber: 41
+                                                                            }, this)
+                                                                        ]
+                                                                    }, void 0, true, {
+                                                                        fileName: "[project]/app/[locale]/profile/[uuid]/components/MeetTab.tsx",
+                                                                        lineNumber: 1278,
+                                                                        columnNumber: 39
+                                                                    }, this),
+                                                                    onsiteAvailable && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
+                                                                        type: "button",
+                                                                        title: isRTL ? "جلسة حضورية" : "On-site session",
+                                                                        "aria-label": isRTL ? `اختيار جلسة حضورية، ${priceLabel("physically")}` : `Select on-site session, ${priceLabel("physically")}`,
+                                                                        "aria-pressed": isSelected && selectedPlace === "physically",
+                                                                        onClick: (event)=>{
+                                                                            event.stopPropagation();
+                                                                            selectMeetingTime(time, "physically");
+                                                                        },
+                                                                        className: typeChoiceClass(isSelected && selectedPlace === "physically"),
+                                                                        children: [
+                                                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                                                                className: typeIconClass(isSelected && selectedPlace === "physically"),
+                                                                                children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$tabler$2f$icons$2d$react$2f$dist$2f$esm$2f$icons$2f$IconMapPin$2e$mjs__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__$3c$export__default__as__IconMapPin$3e$__["IconMapPin"], {
+                                                                                    size: 16
+                                                                                }, void 0, false, {
+                                                                                    fileName: "[project]/app/[locale]/profile/[uuid]/components/MeetTab.tsx",
+                                                                                    lineNumber: 1317,
+                                                                                    columnNumber: 43
+                                                                                }, this)
+                                                                            }, void 0, false, {
+                                                                                fileName: "[project]/app/[locale]/profile/[uuid]/components/MeetTab.tsx",
+                                                                                lineNumber: 1316,
+                                                                                columnNumber: 41
+                                                                            }, this),
+                                                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                                                                className: `text-sm font-bold leading-tight ${getMeetingRate(time, "physically") === 0 && !(isSelected && selectedPlace === "physically") ? "text-green-600" : ""}`,
+                                                                                children: priceLabel("physically")
+                                                                            }, void 0, false, {
+                                                                                fileName: "[project]/app/[locale]/profile/[uuid]/components/MeetTab.tsx",
+                                                                                lineNumber: 1319,
+                                                                                columnNumber: 41
+                                                                            }, this),
+                                                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                                                                role: "tooltip",
+                                                                                className: "pointer-events-none absolute -top-9 left-1/2 z-10 -translate-x-1/2 whitespace-nowrap rounded bg-gray-800 px-2 py-1 text-xs font-medium text-white opacity-0 shadow-sm transition-opacity group-hover:opacity-100 group-focus-visible:opacity-100 dark:bg-gray-100 dark:text-gray-900",
+                                                                                children: isRTL ? "جلسة حضورية" : "On-site session"
+                                                                            }, void 0, false, {
+                                                                                fileName: "[project]/app/[locale]/profile/[uuid]/components/MeetTab.tsx",
+                                                                                lineNumber: 1322,
+                                                                                columnNumber: 41
+                                                                            }, this)
+                                                                        ]
+                                                                    }, void 0, true, {
+                                                                        fileName: "[project]/app/[locale]/profile/[uuid]/components/MeetTab.tsx",
+                                                                        lineNumber: 1305,
+                                                                        columnNumber: 39
+                                                                    }, this)
+                                                                ]
+                                                            }, void 0, true, {
+                                                                fileName: "[project]/app/[locale]/profile/[uuid]/components/MeetTab.tsx",
+                                                                lineNumber: 1276,
+                                                                columnNumber: 35
+                                                            }, this)
+                                                        ]
+                                                    }, void 0, true, {
+                                                        fileName: "[project]/app/[locale]/profile/[uuid]/components/MeetTab.tsx",
+                                                        lineNumber: 1262,
+                                                        columnNumber: 33
+                                                    }, this)
+                                                }, index, false, {
+                                                    fileName: "[project]/app/[locale]/profile/[uuid]/components/MeetTab.tsx",
+                                                    lineNumber: 1243,
+                                                    columnNumber: 31
+                                                }, this);
+                                            }) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
+                                                className: "text-gray-500 text-center py-8",
+                                                children: "No times available for this date"
+                                            }, void 0, false, {
+                                                fileName: "[project]/app/[locale]/profile/[uuid]/components/MeetTab.tsx",
+                                                lineNumber: 1337,
+                                                columnNumber: 25
+                                            }, this)
+                                        }, void 0, false, {
+                                            fileName: "[project]/app/[locale]/profile/[uuid]/components/MeetTab.tsx",
+                                            lineNumber: 1215,
+                                            columnNumber: 21
+                                        }, this),
+                                        !isOwnProfile && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["Fragment"], {
+                                            children: [
+                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
+                                                    onClick: handleBookMeetingClick,
+                                                    disabled: !selectedMeetingTime || !selectedPlace || isCheckingWhatsApp,
+                                                    className: `
+                            w-full py-3 px-6 rounded-lg font-medium transition-colors
+                            ${selectedMeetingTime && selectedPlace && !isCheckingWhatsApp ? "bg-blue-500 text-white hover:bg-blue-600" : "bg-gray-200 text-gray-400 cursor-not-allowed"}
+                          `,
+                                                    children: isCheckingWhatsApp ? isRTL ? "جارٍ التحقق..." : "Checking..." : t("book")
+                                                }, void 0, false, {
+                                                    fileName: "[project]/app/[locale]/profile/[uuid]/components/MeetTab.tsx",
+                                                    lineNumber: 1346,
+                                                    columnNumber: 25
+                                                }, this),
+                                                !selectedPlace && selectedMeetingTime && getAvailablePlaces(selectedMeetingTime).length > 1 && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
+                                                    className: "mt-2 text-center text-xs font-medium text-amber-600 dark:text-amber-400",
+                                                    children: isRTL ? "اختر نوع الجلسة من الأيقونات أعلاه للمتابعة." : "Choose a session type from the icons above to continue."
+                                                }, void 0, false, {
+                                                    fileName: "[project]/app/[locale]/profile/[uuid]/components/MeetTab.tsx",
+                                                    lineNumber: 1362,
+                                                    columnNumber: 27
+                                                }, this),
+                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                    className: "mt-3 flex items-start gap-2 rounded-lg bg-emerald-50 px-3 py-2.5 text-xs leading-5 text-emerald-800 dark:bg-emerald-950/30 dark:text-emerald-200",
+                                                    children: [
+                                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$tabler$2f$icons$2d$react$2f$dist$2f$esm$2f$icons$2f$IconBrandWhatsapp$2e$mjs__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__$3c$export__default__as__IconBrandWhatsapp$3e$__["IconBrandWhatsapp"], {
+                                                            size: 18,
+                                                            className: "mt-0.5 shrink-0"
+                                                        }, void 0, false, {
+                                                            fileName: "[project]/app/[locale]/profile/[uuid]/components/MeetTab.tsx",
+                                                            lineNumber: 1369,
+                                                            columnNumber: 27
+                                                        }, this),
+                                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
+                                                            children: isRTL ? "في حال الحجز الحضوري، ستصلك رسالة واتساب تحتوي على معلومات التواصل مع الإنسايتر." : "For on-site bookings, you’ll receive a WhatsApp message with the Insighter’s contact information."
+                                                        }, void 0, false, {
+                                                            fileName: "[project]/app/[locale]/profile/[uuid]/components/MeetTab.tsx",
+                                                            lineNumber: 1370,
+                                                            columnNumber: 27
+                                                        }, this)
+                                                    ]
+                                                }, void 0, true, {
+                                                    fileName: "[project]/app/[locale]/profile/[uuid]/components/MeetTab.tsx",
+                                                    lineNumber: 1368,
+                                                    columnNumber: 25
+                                                }, this),
+                                                bookingError && !isBookingModalOpen && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
+                                                    className: "mt-2 text-center text-sm text-red-600",
+                                                    children: bookingError
+                                                }, void 0, false, {
+                                                    fileName: "[project]/app/[locale]/profile/[uuid]/components/MeetTab.tsx",
+                                                    lineNumber: 1377,
+                                                    columnNumber: 27
+                                                }, this)
+                                            ]
+                                        }, void 0, true)
+                                    ]
+                                }, void 0, true) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                    className: "text-center py-12",
+                                    children: [
+                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$tabler$2f$icons$2d$react$2f$dist$2f$esm$2f$icons$2f$IconCalendarEvent$2e$mjs__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__$3c$export__default__as__IconCalendarEvent$3e$__["IconCalendarEvent"], {
+                                            size: 48,
+                                            className: "text-gray-300 mx-auto mb-4"
+                                        }, void 0, false, {
+                                            fileName: "[project]/app/[locale]/profile/[uuid]/components/MeetTab.tsx",
+                                            lineNumber: 1386,
+                                            columnNumber: 21
+                                        }, this),
+                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
+                                            className: "text-gray-500",
+                                            children: locale.startsWith('ar') ? "اختر تاريخ الجلسة ليتم عرض الأوقات المتاحة" : 'Please select a date to view available times'
+                                        }, void 0, false, {
+                                            fileName: "[project]/app/[locale]/profile/[uuid]/components/MeetTab.tsx",
+                                            lineNumber: 1390,
+                                            columnNumber: 21
+                                        }, this)
+                                    ]
+                                }, void 0, true, {
+                                    fileName: "[project]/app/[locale]/profile/[uuid]/components/MeetTab.tsx",
+                                    lineNumber: 1385,
+                                    columnNumber: 19
+                                }, this)
+                            }, void 0, false, {
+                                fileName: "[project]/app/[locale]/profile/[uuid]/components/MeetTab.tsx",
+                                lineNumber: 1195,
+                                columnNumber: 15
+                            }, this)
+                        ]
+                    }, void 0, true, {
+                        fileName: "[project]/app/[locale]/profile/[uuid]/components/MeetTab.tsx",
+                        lineNumber: 1100,
+                        columnNumber: 13
+                    }, this)
+                }, void 0, false, {
+                    fileName: "[project]/app/[locale]/profile/[uuid]/components/MeetTab.tsx",
+                    lineNumber: 1098,
+                    columnNumber: 11
+                }, this),
+                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mantine$2f$core$2f$esm$2f$components$2f$Modal$2f$Modal$2e$mjs__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["Modal"], {
+                    opened: isWhatsAppModalOpen,
+                    onClose: ()=>!isSavingWhatsApp && setIsWhatsAppModalOpen(false),
+                    size: "lg",
+                    centered: true,
+                    title: isRTL ? "أضف رقم واتساب (اختياري)" : "Add WhatsApp (optional)",
+                    children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                        className: "p-2",
+                        dir: isRTL ? "rtl" : "ltr",
+                        children: [
+                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                className: "mb-5 flex items-start gap-3 rounded-xl border border-emerald-100 bg-emerald-50 p-4 dark:border-emerald-900 dark:bg-emerald-950/30",
+                                children: [
+                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                        className: "flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-emerald-500 text-white",
+                                        children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$tabler$2f$icons$2d$react$2f$dist$2f$esm$2f$icons$2f$IconBrandWhatsapp$2e$mjs__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__$3c$export__default__as__IconBrandWhatsapp$3e$__["IconBrandWhatsapp"], {
+                                            size: 23
+                                        }, void 0, false, {
+                                            fileName: "[project]/app/[locale]/profile/[uuid]/components/MeetTab.tsx",
+                                            lineNumber: 1411,
+                                            columnNumber: 17
+                                        }, this)
+                                    }, void 0, false, {
+                                        fileName: "[project]/app/[locale]/profile/[uuid]/components/MeetTab.tsx",
+                                        lineNumber: 1410,
+                                        columnNumber: 15
+                                    }, this),
+                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                        children: [
+                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
+                                                className: "font-semibold text-gray-900 dark:text-white",
+                                                children: isRTL ? "ابقَ على اطلاع بتفاصيل حجزك" : "Stay updated on your booking"
+                                            }, void 0, false, {
+                                                fileName: "[project]/app/[locale]/profile/[uuid]/components/MeetTab.tsx",
+                                                lineNumber: 1414,
+                                                columnNumber: 17
+                                            }, this),
+                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
+                                                className: "mt-1 text-sm leading-5 text-gray-600 dark:text-gray-300",
+                                                children: isRTL ? "أضف رقم واتساب لتلقّي تحديثات الحجز ومشاركة تفاصيل الجلسة بأمان، أو تخطَّ الآن وتابع." : "Add a WhatsApp number to receive booking updates and securely share session details, or skip for now and continue."
+                                            }, void 0, false, {
+                                                fileName: "[project]/app/[locale]/profile/[uuid]/components/MeetTab.tsx",
+                                                lineNumber: 1417,
+                                                columnNumber: 17
+                                            }, this)
+                                        ]
+                                    }, void 0, true, {
+                                        fileName: "[project]/app/[locale]/profile/[uuid]/components/MeetTab.tsx",
+                                        lineNumber: 1413,
+                                        columnNumber: 15
+                                    }, this)
+                                ]
+                            }, void 0, true, {
+                                fileName: "[project]/app/[locale]/profile/[uuid]/components/MeetTab.tsx",
+                                lineNumber: 1409,
+                                columnNumber: 13
+                            }, this),
+                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                className: "grid grid-cols-1 gap-4 sm:grid-cols-[minmax(240px,1.1fr)_minmax(0,1.35fr)]",
+                                children: [
+                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mantine$2f$core$2f$esm$2f$components$2f$Select$2f$Select$2e$mjs__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["Select"], {
+                                        label: isRTL ? "رمز البلد" : "Country code",
+                                        placeholder: isRTL ? "اختر الرمز" : "Select code",
+                                        data: countryCodeOptions,
+                                        value: whatsAppCountryCode || null,
+                                        onChange: (value)=>setWhatsAppCountryCode(value || ""),
+                                        searchable: true,
+                                        disabled: areCountriesLoading,
+                                        nothingFoundMessage: isRTL ? "لا توجد نتائج" : "No countries found",
+                                        comboboxProps: {
+                                            width: 390,
+                                            position: isRTL ? "bottom-end" : "bottom-start"
+                                        },
+                                        styles: {
+                                            dropdown: {
+                                                maxWidth: "calc(100vw - 32px)",
+                                                overflowX: "hidden"
+                                            }
+                                        },
+                                        renderOption: ({ option })=>{
+                                            const country = countries.find((item)=>String(item.international_code || "").replace(/^\+/, "") === option.value);
+                                            return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                className: "flex w-full min-w-0 items-center gap-2.5",
+                                                children: [
+                                                    country?.flag && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("img", {
+                                                        src: `/images/flags/${country.flag}.svg`,
+                                                        alt: "",
+                                                        className: "h-4 w-6 shrink-0 rounded-sm object-cover"
+                                                    }, void 0, false, {
+                                                        fileName: "[project]/app/[locale]/profile/[uuid]/components/MeetTab.tsx",
+                                                        lineNumber: 1452,
+                                                        columnNumber: 25
+                                                    }, void 0),
+                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                                        className: "min-w-0 truncate",
+                                                        children: option.label
+                                                    }, void 0, false, {
+                                                        fileName: "[project]/app/[locale]/profile/[uuid]/components/MeetTab.tsx",
+                                                        lineNumber: 1458,
+                                                        columnNumber: 23
+                                                    }, void 0)
+                                                ]
+                                            }, void 0, true, {
+                                                fileName: "[project]/app/[locale]/profile/[uuid]/components/MeetTab.tsx",
+                                                lineNumber: 1450,
+                                                columnNumber: 21
+                                            }, void 0);
+                                        }
+                                    }, void 0, false, {
+                                        fileName: "[project]/app/[locale]/profile/[uuid]/components/MeetTab.tsx",
+                                        lineNumber: 1426,
+                                        columnNumber: 15
+                                    }, this),
+                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mantine$2f$core$2f$esm$2f$components$2f$TextInput$2f$TextInput$2e$mjs__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["TextInput"], {
+                                        label: isRTL ? "رقم واتساب" : "WhatsApp number",
+                                        placeholder: isRTL ? "مثال: 7986456456" : "e.g. 7986456456",
+                                        leftSection: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$tabler$2f$icons$2d$react$2f$dist$2f$esm$2f$icons$2f$IconBrandWhatsapp$2e$mjs__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__$3c$export__default__as__IconBrandWhatsapp$3e$__["IconBrandWhatsapp"], {
+                                            size: 17,
+                                            className: "text-emerald-600"
+                                        }, void 0, false, {
+                                            fileName: "[project]/app/[locale]/profile/[uuid]/components/MeetTab.tsx",
+                                            lineNumber: 1466,
+                                            columnNumber: 30
+                                        }, void 0),
+                                        value: whatsAppNumber,
+                                        onChange: (event)=>setWhatsAppNumber(event.currentTarget.value.replace(/[^\d\s()-]/g, "")),
+                                        inputMode: "tel"
+                                    }, void 0, false, {
+                                        fileName: "[project]/app/[locale]/profile/[uuid]/components/MeetTab.tsx",
+                                        lineNumber: 1463,
+                                        columnNumber: 15
+                                    }, this)
+                                ]
+                            }, void 0, true, {
+                                fileName: "[project]/app/[locale]/profile/[uuid]/components/MeetTab.tsx",
+                                lineNumber: 1425,
+                                columnNumber: 13
+                            }, this),
+                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                className: "mt-3 flex items-start gap-2 text-xs text-gray-500 dark:text-gray-400",
+                                children: [
+                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$tabler$2f$icons$2d$react$2f$dist$2f$esm$2f$icons$2f$IconInfoCircle$2e$mjs__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__$3c$export__default__as__IconInfoCircle$3e$__["IconInfoCircle"], {
+                                        size: 16,
+                                        className: "mt-0.5 shrink-0"
+                                    }, void 0, false, {
+                                        fileName: "[project]/app/[locale]/profile/[uuid]/components/MeetTab.tsx",
+                                        lineNumber: 1474,
+                                        columnNumber: 15
+                                    }, this),
+                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
+                                        children: isRTL ? "أدخل الرقم بدون رمز البلد أو الصفر في بدايته." : "Enter the number without the country code or a leading zero."
+                                    }, void 0, false, {
+                                        fileName: "[project]/app/[locale]/profile/[uuid]/components/MeetTab.tsx",
+                                        lineNumber: 1475,
+                                        columnNumber: 15
+                                    }, this)
+                                ]
+                            }, void 0, true, {
+                                fileName: "[project]/app/[locale]/profile/[uuid]/components/MeetTab.tsx",
+                                lineNumber: 1473,
+                                columnNumber: 13
+                            }, this),
+                            whatsAppError && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                className: "mt-4 rounded-lg bg-red-50 p-3 text-sm text-red-700 dark:bg-red-950/30 dark:text-red-300",
+                                children: whatsAppError
+                            }, void 0, false, {
+                                fileName: "[project]/app/[locale]/profile/[uuid]/components/MeetTab.tsx",
+                                lineNumber: 1483,
+                                columnNumber: 15
+                            }, this),
+                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                className: "mt-6 flex justify-end gap-3",
+                                children: [
+                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mantine$2f$core$2f$esm$2f$components$2f$Button$2f$Button$2e$mjs__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["Button"], {
+                                        variant: "subtle",
+                                        onClick: skipWhatsAppAndContinue,
+                                        disabled: isSavingWhatsApp,
+                                        children: isRTL ? "تخطي الآن" : "Skip for now"
+                                    }, void 0, false, {
+                                        fileName: "[project]/app/[locale]/profile/[uuid]/components/MeetTab.tsx",
+                                        lineNumber: 1489,
+                                        columnNumber: 15
+                                    }, this),
+                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mantine$2f$core$2f$esm$2f$components$2f$Button$2f$Button$2e$mjs__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["Button"], {
+                                        onClick: saveWhatsAppAndContinue,
+                                        loading: isSavingWhatsApp,
+                                        leftSection: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$tabler$2f$icons$2d$react$2f$dist$2f$esm$2f$icons$2f$IconBrandWhatsapp$2e$mjs__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__$3c$export__default__as__IconBrandWhatsapp$3e$__["IconBrandWhatsapp"], {
+                                            size: 18
+                                        }, void 0, false, {
+                                            fileName: "[project]/app/[locale]/profile/[uuid]/components/MeetTab.tsx",
+                                            lineNumber: 1499,
+                                            columnNumber: 30
+                                        }, void 0),
+                                        color: "green",
+                                        children: isRTL ? "حفظ ومتابعة" : "Save & continue"
+                                    }, void 0, false, {
+                                        fileName: "[project]/app/[locale]/profile/[uuid]/components/MeetTab.tsx",
+                                        lineNumber: 1496,
+                                        columnNumber: 15
+                                    }, this)
+                                ]
+                            }, void 0, true, {
+                                fileName: "[project]/app/[locale]/profile/[uuid]/components/MeetTab.tsx",
+                                lineNumber: 1488,
+                                columnNumber: 13
+                            }, this)
+                        ]
+                    }, void 0, true, {
+                        fileName: "[project]/app/[locale]/profile/[uuid]/components/MeetTab.tsx",
+                        lineNumber: 1408,
+                        columnNumber: 11
+                    }, this)
+                }, void 0, false, {
+                    fileName: "[project]/app/[locale]/profile/[uuid]/components/MeetTab.tsx",
+                    lineNumber: 1401,
+                    columnNumber: 9
+                }, this),
+                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mantine$2f$core$2f$esm$2f$components$2f$Modal$2f$Modal$2e$mjs__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["Modal"], {
+                    opened: isBookingModalOpen,
+                    onClose: ()=>{
+                        if (!(bookingStep === 2 && (isStripeProcessing || isPollingStatus))) {
+                            closeBookingModal();
+                        }
+                    },
+                    size: "lg",
+                    centered: true,
+                    children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                        className: "p-2",
+                        children: [
+                            bookingStep !== 3 && selectedDate && selectedMeetingTime && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                className: "mb-4 p-3 bg-blue-50 dark:bg-slate-700 rounded-lg",
+                                children: [
+                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
+                                        className: "text-sm text-gray-600 dark:text-gray-300",
+                                        children: [
+                                            t("bookingFor"),
+                                            ":"
+                                        ]
+                                    }, void 0, true, {
+                                        fileName: "[project]/app/[locale]/profile/[uuid]/components/MeetTab.tsx",
+                                        lineNumber: 1523,
+                                        columnNumber: 17
+                                    }, this),
+                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
+                                        className: "font-medium",
+                                        children: new Date(selectedDate).toLocaleDateString(undefined, {
+                                            weekday: "long",
+                                            year: "numeric",
+                                            month: "long",
+                                            day: "numeric"
+                                        })
+                                    }, void 0, false, {
+                                        fileName: "[project]/app/[locale]/profile/[uuid]/components/MeetTab.tsx",
+                                        lineNumber: 1526,
+                                        columnNumber: 17
+                                    }, this),
+                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
+                                        className: "font-medium",
+                                        children: [
+                                            selectedMeetingTime.start_time.substring(0, 5),
+                                            " -",
+                                            " ",
+                                            selectedMeetingTime.end_time.substring(0, 5)
+                                        ]
+                                    }, void 0, true, {
+                                        fileName: "[project]/app/[locale]/profile/[uuid]/components/MeetTab.tsx",
+                                        lineNumber: 1534,
+                                        columnNumber: 17
+                                    }, this),
+                                    selectedPlace && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
+                                        className: "mt-1 inline-flex items-center gap-1.5 text-sm font-medium text-blue-600 dark:text-blue-300",
+                                        children: [
+                                            selectedPlace === "physically" ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$tabler$2f$icons$2d$react$2f$dist$2f$esm$2f$icons$2f$IconMapPin$2e$mjs__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__$3c$export__default__as__IconMapPin$3e$__["IconMapPin"], {
+                                                size: 16
+                                            }, void 0, false, {
+                                                fileName: "[project]/app/[locale]/profile/[uuid]/components/MeetTab.tsx",
+                                                lineNumber: 1541,
+                                                columnNumber: 23
+                                            }, this) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$tabler$2f$icons$2d$react$2f$dist$2f$esm$2f$icons$2f$IconVideo$2e$mjs__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__$3c$export__default__as__IconVideo$3e$__["IconVideo"], {
+                                                size: 16
+                                            }, void 0, false, {
+                                                fileName: "[project]/app/[locale]/profile/[uuid]/components/MeetTab.tsx",
+                                                lineNumber: 1543,
+                                                columnNumber: 23
+                                            }, this),
+                                            selectedPlace === "physically" ? isRTL ? "حضورياً" : "On Site" : isRTL ? "عن بُعد" : "Online"
+                                        ]
+                                    }, void 0, true, {
+                                        fileName: "[project]/app/[locale]/profile/[uuid]/components/MeetTab.tsx",
+                                        lineNumber: 1539,
+                                        columnNumber: 19
+                                    }, this),
+                                    selectedPlace === "physically" && selectedMeetingTime.default_physical_location && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
+                                        className: "mt-0.5 text-xs text-gray-500 dark:text-gray-300",
+                                        children: selectedMeetingTime.default_physical_location
+                                    }, void 0, false, {
+                                        fileName: "[project]/app/[locale]/profile/[uuid]/components/MeetTab.tsx",
+                                        lineNumber: 1555,
+                                        columnNumber: 19
+                                    }, this),
+                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                        className: "mt-2 p-2 bg-white dark:bg-slate-600 rounded border",
+                                        children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                            className: "flex justify-between items-center",
+                                            children: [
+                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                                    className: "text-sm text-gray-600 dark:text-gray-300",
+                                                    children: t("sessionRate")
+                                                }, void 0, false, {
+                                                    fileName: "[project]/app/[locale]/profile/[uuid]/components/MeetTab.tsx",
+                                                    lineNumber: 1561,
+                                                    columnNumber: 21
+                                                }, this),
+                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                                    className: `font-bold ${getMeetingRate(selectedMeetingTime, selectedPlace) === 0 ? "text-green-600" : "text-blue-600"}`,
+                                                    children: getMeetingRate(selectedMeetingTime, selectedPlace) === 0 ? "Free" : `$${getMeetingRate(selectedMeetingTime, selectedPlace)}`
+                                                }, void 0, false, {
+                                                    fileName: "[project]/app/[locale]/profile/[uuid]/components/MeetTab.tsx",
+                                                    lineNumber: 1564,
+                                                    columnNumber: 21
+                                                }, this)
+                                            ]
+                                        }, void 0, true, {
+                                            fileName: "[project]/app/[locale]/profile/[uuid]/components/MeetTab.tsx",
+                                            lineNumber: 1560,
+                                            columnNumber: 19
+                                        }, this)
+                                    }, void 0, false, {
+                                        fileName: "[project]/app/[locale]/profile/[uuid]/components/MeetTab.tsx",
+                                        lineNumber: 1559,
+                                        columnNumber: 17
+                                    }, this)
+                                ]
+                            }, void 0, true, {
+                                fileName: "[project]/app/[locale]/profile/[uuid]/components/MeetTab.tsx",
+                                lineNumber: 1522,
+                                columnNumber: 15
+                            }, this),
+                            bookingStep !== 3 && bookingError && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                className: "mb-4 p-3 bg-red-50 dark:bg-red-900/30 text-red-700 dark:text-red-300 rounded-lg",
+                                children: bookingError
+                            }, void 0, false, {
+                                fileName: "[project]/app/[locale]/profile/[uuid]/components/MeetTab.tsx",
+                                lineNumber: 1580,
+                                columnNumber: 15
+                            }, this),
+                            bookingStep === 3 ? // Guest auth step: hide all details and show a clean CTA
+                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                className: "w-full",
+                                children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                    className: "rounded-xl border border-gray-100 dark:border-slate-700 bg-gradient-to-br from-blue-50 via-white to-teal-50 dark:from-slate-800 dark:via-slate-800 dark:to-slate-900 p-6 sm:p-8",
+                                    children: [
+                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                            className: "text-center mb-6",
+                                            children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("h3", {
+                                                className: "text-xl sm:text-2xl font-semibold text-gray-900 dark:text-gray-100",
+                                                children: locale.startsWith("ar") ? "سجّل الدخول أو أنشئ حساباً للمتابعة" : "Login or Sign up to continue"
+                                            }, void 0, false, {
+                                                fileName: "[project]/app/[locale]/profile/[uuid]/components/MeetTab.tsx",
+                                                lineNumber: 1590,
+                                                columnNumber: 21
+                                            }, this)
+                                        }, void 0, false, {
+                                            fileName: "[project]/app/[locale]/profile/[uuid]/components/MeetTab.tsx",
+                                            lineNumber: 1589,
+                                            columnNumber: 19
+                                        }, this),
+                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                            className: "grid grid-cols-1 gap-3 sm:gap-4",
+                                            children: [
+                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mantine$2f$core$2f$esm$2f$components$2f$Button$2f$Button$2e$mjs__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["Button"], {
+                                                    fullWidth: true,
+                                                    size: "lg",
+                                                    radius: "md",
+                                                    className: "h-12 sm:h-14 text-base sm:text-lg bg-blue-600 hover:bg-blue-700",
+                                                    onClick: ()=>{
+                                                        if (!authRedirectUrl) return;
+                                                        const loginUrl = `${("TURBOPACK compile-time value", "http://localhost:4200")}/auth/login?returnUrl=${encodeURIComponent(authRedirectUrl)}`;
+                                                        window.location.href = loginUrl;
+                                                    },
+                                                    children: locale.startsWith("ar") ? "تسجيل الدخول" : "Login"
+                                                }, void 0, false, {
+                                                    fileName: "[project]/app/[locale]/profile/[uuid]/components/MeetTab.tsx",
+                                                    lineNumber: 1598,
+                                                    columnNumber: 21
+                                                }, this),
+                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mantine$2f$core$2f$esm$2f$components$2f$Button$2f$Button$2e$mjs__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["Button"], {
+                                                    fullWidth: true,
+                                                    size: "lg",
+                                                    radius: "md",
+                                                    variant: "outline",
+                                                    className: "h-12 sm:h-14 text-base sm:text-lg border-blue-600 text-blue-700 hover:bg-blue-50",
+                                                    onClick: ()=>{
+                                                        if (!authRedirectUrl) return;
+                                                        const signupUrl = `${("TURBOPACK compile-time value", "http://localhost:4200")}/auth/sign-up?returnUrl=${encodeURIComponent(authRedirectUrl)}`;
+                                                        window.location.href = signupUrl;
+                                                    },
+                                                    children: locale.startsWith("ar") ? "إنشاء حساب" : "Sign Up"
+                                                }, void 0, false, {
+                                                    fileName: "[project]/app/[locale]/profile/[uuid]/components/MeetTab.tsx",
+                                                    lineNumber: 1614,
+                                                    columnNumber: 21
+                                                }, this)
+                                            ]
+                                        }, void 0, true, {
+                                            fileName: "[project]/app/[locale]/profile/[uuid]/components/MeetTab.tsx",
+                                            lineNumber: 1597,
+                                            columnNumber: 19
+                                        }, this)
+                                    ]
+                                }, void 0, true, {
+                                    fileName: "[project]/app/[locale]/profile/[uuid]/components/MeetTab.tsx",
+                                    lineNumber: 1588,
+                                    columnNumber: 17
+                                }, this)
+                            }, void 0, false, {
+                                fileName: "[project]/app/[locale]/profile/[uuid]/components/MeetTab.tsx",
+                                lineNumber: 1587,
+                                columnNumber: 15
+                            }, this) : bookingStep === 1 ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("form", {
+                                onSubmit: (e)=>{
+                                    e.preventDefault();
+                                    submitBookMeeting();
+                                },
+                                children: [
+                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                        className: "mb-4",
+                                        children: [
+                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mantine$2f$core$2f$esm$2f$components$2f$TextInput$2f$TextInput$2e$mjs__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["TextInput"], {
+                                                label: t("meetingTitle"),
+                                                placeholder: t("enterMeetingTitle"),
+                                                value: meetingTitle,
+                                                onChange: (e)=>handleTitleChange(e.target.value),
+                                                required: true,
+                                                error: validationErrors.title
+                                            }, void 0, false, {
+                                                fileName: "[project]/app/[locale]/profile/[uuid]/components/MeetTab.tsx",
+                                                lineNumber: 1641,
+                                                columnNumber: 19
+                                            }, this),
+                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                className: "flex justify-between mt-1",
+                                                children: [
+                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                                        className: "text-xs text-gray-500",
+                                                        children: t("minimum3Characters")
+                                                    }, void 0, false, {
+                                                        fileName: "[project]/app/[locale]/profile/[uuid]/components/MeetTab.tsx",
+                                                        lineNumber: 1650,
+                                                        columnNumber: 21
+                                                    }, this),
+                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                                        className: `text-xs ${meetingTitle.length > 50 ? "text-red-500" : "text-gray-500"}`,
+                                                        children: [
+                                                            meetingTitle.length,
+                                                            "/50"
+                                                        ]
+                                                    }, void 0, true, {
+                                                        fileName: "[project]/app/[locale]/profile/[uuid]/components/MeetTab.tsx",
+                                                        lineNumber: 1653,
+                                                        columnNumber: 21
+                                                    }, this)
+                                                ]
+                                            }, void 0, true, {
+                                                fileName: "[project]/app/[locale]/profile/[uuid]/components/MeetTab.tsx",
+                                                lineNumber: 1649,
+                                                columnNumber: 19
+                                            }, this)
+                                        ]
+                                    }, void 0, true, {
+                                        fileName: "[project]/app/[locale]/profile/[uuid]/components/MeetTab.tsx",
+                                        lineNumber: 1640,
+                                        columnNumber: 17
+                                    }, this),
+                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                        className: "mb-4",
+                                        children: [
+                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mantine$2f$core$2f$esm$2f$components$2f$Textarea$2f$Textarea$2e$mjs__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["Textarea"], {
+                                                label: t("meetingDescription"),
+                                                placeholder: t("enterMeetingDescription"),
+                                                value: meetingDescription,
+                                                onChange: (e)=>handleDescriptionChange(e.target.value),
+                                                minRows: 3,
+                                                error: validationErrors.description
+                                            }, void 0, false, {
+                                                fileName: "[project]/app/[locale]/profile/[uuid]/components/MeetTab.tsx",
+                                                lineNumber: 1665,
+                                                columnNumber: 19
+                                            }, this),
+                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                className: "flex justify-between mt-1",
+                                                children: [
+                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                                        className: "text-xs text-gray-500",
+                                                        children: t("optional")
+                                                    }, void 0, false, {
+                                                        fileName: "[project]/app/[locale]/profile/[uuid]/components/MeetTab.tsx",
+                                                        lineNumber: 1674,
+                                                        columnNumber: 21
+                                                    }, this),
+                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                                        className: `text-xs ${meetingDescription.length > 100 ? "text-red-500" : "text-gray-500"}`,
+                                                        children: [
+                                                            meetingDescription.length,
+                                                            "/100"
+                                                        ]
+                                                    }, void 0, true, {
+                                                        fileName: "[project]/app/[locale]/profile/[uuid]/components/MeetTab.tsx",
+                                                        lineNumber: 1677,
+                                                        columnNumber: 21
+                                                    }, this)
+                                                ]
+                                            }, void 0, true, {
+                                                fileName: "[project]/app/[locale]/profile/[uuid]/components/MeetTab.tsx",
+                                                lineNumber: 1673,
+                                                columnNumber: 19
+                                            }, this)
+                                        ]
+                                    }, void 0, true, {
+                                        fileName: "[project]/app/[locale]/profile/[uuid]/components/MeetTab.tsx",
+                                        lineNumber: 1664,
+                                        columnNumber: 17
+                                    }, this),
+                                    selectedMeetingTime && getMeetingRate(selectedMeetingTime, selectedPlace) > 0 && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                        className: "mb-6",
+                                        children: [
+                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("h4", {
+                                                className: "font-medium mb-4 text-gray-800 dark:text-gray-200 required",
+                                                children: t("paymentOptions")
+                                            }, void 0, false, {
+                                                fileName: "[project]/app/[locale]/profile/[uuid]/components/MeetTab.tsx",
+                                                lineNumber: 1691,
+                                                columnNumber: 21
+                                            }, this),
+                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                className: "flex flex-col gap-3",
+                                                children: [
+                                                    isAuthenticated && !isClientOnlyUser && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                        className: `border rounded-lg p-4 cursor-pointer transition-all min-h-[72px] ${paymentMethod === "manual" ? "border-blue-500 bg-blue-50 dark:bg-blue-900/20" : "border-gray-200 dark:border-slate-600 hover:border-gray-300 dark:hover:border-slate-500"} ${walletBalance < getMeetingRate(selectedMeetingTime, selectedPlace) ? "opacity-50 cursor-not-allowed" : ""}`,
+                                                        onClick: ()=>{
+                                                            if (walletBalance >= getMeetingRate(selectedMeetingTime, selectedPlace)) {
+                                                                setPaymentMethod("manual");
+                                                            }
+                                                        },
+                                                        children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                            className: "flex items-center justify-center  gap-4 h-full",
+                                                            children: [
+                                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("input", {
+                                                                    type: "radio",
+                                                                    name: "paymentMethod",
+                                                                    value: "manual",
+                                                                    checked: paymentMethod === "manual",
+                                                                    disabled: walletBalance < getMeetingRate(selectedMeetingTime, selectedPlace),
+                                                                    onChange: ()=>{
+                                                                        if (walletBalance >= getMeetingRate(selectedMeetingTime, selectedPlace)) {
+                                                                            setPaymentMethod("manual");
+                                                                        }
+                                                                    },
+                                                                    className: "w-4 h-4 flex-shrink-0"
+                                                                }, void 0, false, {
+                                                                    fileName: "[project]/app/[locale]/profile/[uuid]/components/MeetTab.tsx",
+                                                                    lineNumber: 1712,
+                                                                    columnNumber: 29
+                                                                }, this),
+                                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                                    className: "flex-1",
+                                                                    children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                                        className: "flex items-center justify-between",
+                                                                        children: [
+                                                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                                                className: "font-medium text-sm text-gray-800 dark:text-gray-200",
+                                                                                children: locale.startsWith('ar') ? 'محفظة إنسايتا' : 'Insighta Wallet'
+                                                                            }, void 0, false, {
+                                                                                fileName: "[project]/app/[locale]/profile/[uuid]/components/MeetTab.tsx",
+                                                                                lineNumber: 1727,
+                                                                                columnNumber: 33
+                                                                            }, this),
+                                                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                                                className: "flex items-center gap-3",
+                                                                                children: [
+                                                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                                                        className: "w-8 h-8 flex items-center justify-center flex-shrink-0",
+                                                                                        children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$tabler$2f$icons$2d$react$2f$dist$2f$esm$2f$icons$2f$IconWallet$2e$mjs__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__$3c$export__default__as__IconWallet$3e$__["IconWallet"], {
+                                                                                            size: 24,
+                                                                                            color: "#1BC653"
+                                                                                        }, void 0, false, {
+                                                                                            fileName: "[project]/app/[locale]/profile/[uuid]/components/MeetTab.tsx",
+                                                                                            lineNumber: 1732,
+                                                                                            columnNumber: 37
+                                                                                        }, this)
+                                                                                    }, void 0, false, {
+                                                                                        fileName: "[project]/app/[locale]/profile/[uuid]/components/MeetTab.tsx",
+                                                                                        lineNumber: 1731,
+                                                                                        columnNumber: 35
+                                                                                    }, this),
+                                                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                                                        className: "text-right",
+                                                                                        children: [
+                                                                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                                                                className: "text-sm font-semibold text-gray-700 dark:text-gray-300",
+                                                                                                children: [
+                                                                                                    "$",
+                                                                                                    walletBalance.toFixed(2)
+                                                                                                ]
+                                                                                            }, void 0, true, {
+                                                                                                fileName: "[project]/app/[locale]/profile/[uuid]/components/MeetTab.tsx",
+                                                                                                lineNumber: 1738,
+                                                                                                columnNumber: 37
+                                                                                            }, this),
+                                                                                            walletBalance >= getMeetingRate(selectedMeetingTime, selectedPlace) ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                                                                className: "text-xs text-green-600 dark:text-green-400 font-medium",
+                                                                                                children: locale.startsWith('ar') ? 'رصيد كافي' : 'Sufficient'
+                                                                                            }, void 0, false, {
+                                                                                                fileName: "[project]/app/[locale]/profile/[uuid]/components/MeetTab.tsx",
+                                                                                                lineNumber: 1742,
+                                                                                                columnNumber: 39
+                                                                                            }, this) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                                                                className: "text-xs text-red-500 font-medium",
+                                                                                                children: locale.startsWith('ar') ? 'رصيد غير كافي' : 'Insufficient'
+                                                                                            }, void 0, false, {
+                                                                                                fileName: "[project]/app/[locale]/profile/[uuid]/components/MeetTab.tsx",
+                                                                                                lineNumber: 1746,
+                                                                                                columnNumber: 39
+                                                                                            }, this)
+                                                                                        ]
+                                                                                    }, void 0, true, {
+                                                                                        fileName: "[project]/app/[locale]/profile/[uuid]/components/MeetTab.tsx",
+                                                                                        lineNumber: 1737,
+                                                                                        columnNumber: 35
+                                                                                    }, this)
+                                                                                ]
+                                                                            }, void 0, true, {
+                                                                                fileName: "[project]/app/[locale]/profile/[uuid]/components/MeetTab.tsx",
+                                                                                lineNumber: 1730,
+                                                                                columnNumber: 33
+                                                                            }, this)
+                                                                        ]
+                                                                    }, void 0, true, {
+                                                                        fileName: "[project]/app/[locale]/profile/[uuid]/components/MeetTab.tsx",
+                                                                        lineNumber: 1726,
+                                                                        columnNumber: 31
+                                                                    }, this)
+                                                                }, void 0, false, {
+                                                                    fileName: "[project]/app/[locale]/profile/[uuid]/components/MeetTab.tsx",
+                                                                    lineNumber: 1725,
+                                                                    columnNumber: 29
+                                                                }, this)
+                                                            ]
+                                                        }, void 0, true, {
+                                                            fileName: "[project]/app/[locale]/profile/[uuid]/components/MeetTab.tsx",
+                                                            lineNumber: 1711,
+                                                            columnNumber: 27
+                                                        }, this)
+                                                    }, void 0, false, {
+                                                        fileName: "[project]/app/[locale]/profile/[uuid]/components/MeetTab.tsx",
+                                                        lineNumber: 1697,
+                                                        columnNumber: 25
+                                                    }, this),
+                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                        className: `border rounded-lg p-4 cursor-pointer transition-all min-h-[72px] ${paymentMethod === "provider" ? "border-blue-500 bg-blue-50 dark:bg-blue-900/20" : "border-gray-200 dark:border-slate-600 hover:border-gray-300 dark:hover:border-slate-500"}`,
+                                                        onClick: ()=>setPaymentMethod("provider"),
+                                                        children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                            className: "flex items-center pt-2 justify-center gap-4 h-full",
+                                                            children: [
+                                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("input", {
+                                                                    type: "radio",
+                                                                    name: "paymentMethod",
+                                                                    value: "provider",
+                                                                    checked: paymentMethod === "provider",
+                                                                    onChange: ()=>setPaymentMethod("provider"),
+                                                                    className: "w-4 h-4 flex-shrink-0"
+                                                                }, void 0, false, {
+                                                                    fileName: "[project]/app/[locale]/profile/[uuid]/components/MeetTab.tsx",
+                                                                    lineNumber: 1767,
+                                                                    columnNumber: 27
+                                                                }, this),
+                                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                                    className: "flex-1",
+                                                                    children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                                        className: "flex items-center justify-between",
+                                                                        children: [
+                                                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                                                className: "font-medium text-sm text-gray-800 dark:text-gray-200",
+                                                                                children: locale.startsWith('ar') ? 'بطاقة الائتمان' : 'Credit Card'
+                                                                            }, void 0, false, {
+                                                                                fileName: "[project]/app/[locale]/profile/[uuid]/components/MeetTab.tsx",
+                                                                                lineNumber: 1777,
+                                                                                columnNumber: 31
+                                                                            }, this),
+                                                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                                                className: "flex items-center gap-1 sm:gap-3",
+                                                                                children: [
+                                                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                                                        className: "w-12 h-7 sm:w-16 sm:h-9 bg-gray-50/60 backdrop-blur-[8px] border border-gray-200/40 rounded-md flex items-center justify-center transition-all duration-200 hover:bg-gray-100/80 hover:border-gray-300/60 p-1 sm:p-2",
+                                                                                        children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$payment$2d$icons$2f$index$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["VisaIcon"], {}, void 0, false, {
+                                                                                            fileName: "[project]/app/[locale]/profile/[uuid]/components/MeetTab.tsx",
+                                                                                            lineNumber: 1782,
+                                                                                            columnNumber: 35
+                                                                                        }, this)
+                                                                                    }, void 0, false, {
+                                                                                        fileName: "[project]/app/[locale]/profile/[uuid]/components/MeetTab.tsx",
+                                                                                        lineNumber: 1781,
+                                                                                        columnNumber: 33
+                                                                                    }, this),
+                                                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                                                        className: "w-12 h-7 sm:w-16 sm:h-9 bg-gray-50/60 backdrop-blur-[8px] border border-gray-200/40 rounded-md flex items-center justify-center transition-all duration-200 hover:bg-gray-100/80 hover:border-gray-300/60 p-1 sm:p-2",
+                                                                                        children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$payment$2d$icons$2f$index$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["MasterCardIcon"], {}, void 0, false, {
+                                                                                            fileName: "[project]/app/[locale]/profile/[uuid]/components/MeetTab.tsx",
+                                                                                            lineNumber: 1785,
+                                                                                            columnNumber: 35
+                                                                                        }, this)
+                                                                                    }, void 0, false, {
+                                                                                        fileName: "[project]/app/[locale]/profile/[uuid]/components/MeetTab.tsx",
+                                                                                        lineNumber: 1784,
+                                                                                        columnNumber: 33
+                                                                                    }, this),
+                                                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                                                        className: "w-12 h-7 sm:w-16 sm:h-9 bg-gray-50/60 backdrop-blur-[8px] border border-gray-200/40 rounded-md flex items-center justify-center transition-all duration-200 hover:bg-gray-100/80 hover:border-gray-300/60 p-1 sm:p-2",
+                                                                                        children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$payment$2d$icons$2f$index$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["GooglePayIcon"], {}, void 0, false, {
+                                                                                            fileName: "[project]/app/[locale]/profile/[uuid]/components/MeetTab.tsx",
+                                                                                            lineNumber: 1788,
+                                                                                            columnNumber: 35
+                                                                                        }, this)
+                                                                                    }, void 0, false, {
+                                                                                        fileName: "[project]/app/[locale]/profile/[uuid]/components/MeetTab.tsx",
+                                                                                        lineNumber: 1787,
+                                                                                        columnNumber: 33
+                                                                                    }, this),
+                                                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                                                        className: "w-12 h-7 sm:w-16 sm:h-9 bg-gray-50/60 backdrop-blur-[8px] border border-gray-200/40 rounded-md flex items-center justify-center transition-all duration-200 hover:bg-gray-100/80 hover:border-gray-300/60 p-1 sm:p-2",
+                                                                                        children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$payment$2d$icons$2f$index$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["ApplePayIcon"], {}, void 0, false, {
+                                                                                            fileName: "[project]/app/[locale]/profile/[uuid]/components/MeetTab.tsx",
+                                                                                            lineNumber: 1791,
+                                                                                            columnNumber: 35
+                                                                                        }, this)
+                                                                                    }, void 0, false, {
+                                                                                        fileName: "[project]/app/[locale]/profile/[uuid]/components/MeetTab.tsx",
+                                                                                        lineNumber: 1790,
+                                                                                        columnNumber: 33
+                                                                                    }, this)
+                                                                                ]
+                                                                            }, void 0, true, {
+                                                                                fileName: "[project]/app/[locale]/profile/[uuid]/components/MeetTab.tsx",
+                                                                                lineNumber: 1780,
+                                                                                columnNumber: 31
+                                                                            }, this)
+                                                                        ]
+                                                                    }, void 0, true, {
+                                                                        fileName: "[project]/app/[locale]/profile/[uuid]/components/MeetTab.tsx",
+                                                                        lineNumber: 1776,
+                                                                        columnNumber: 29
+                                                                    }, this)
+                                                                }, void 0, false, {
+                                                                    fileName: "[project]/app/[locale]/profile/[uuid]/components/MeetTab.tsx",
+                                                                    lineNumber: 1775,
+                                                                    columnNumber: 27
+                                                                }, this)
+                                                            ]
+                                                        }, void 0, true, {
+                                                            fileName: "[project]/app/[locale]/profile/[uuid]/components/MeetTab.tsx",
+                                                            lineNumber: 1766,
+                                                            columnNumber: 25
+                                                        }, this)
+                                                    }, void 0, false, {
+                                                        fileName: "[project]/app/[locale]/profile/[uuid]/components/MeetTab.tsx",
+                                                        lineNumber: 1759,
+                                                        columnNumber: 23
+                                                    }, this)
+                                                ]
+                                            }, void 0, true, {
+                                                fileName: "[project]/app/[locale]/profile/[uuid]/components/MeetTab.tsx",
+                                                lineNumber: 1694,
+                                                columnNumber: 21
+                                            }, this)
+                                        ]
+                                    }, void 0, true, {
+                                        fileName: "[project]/app/[locale]/profile/[uuid]/components/MeetTab.tsx",
+                                        lineNumber: 1690,
+                                        columnNumber: 19
+                                    }, this),
+                                    selectedMeetingTime && getMeetingRate(selectedMeetingTime, selectedPlace) === 0 && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                        className: "mb-4 p-3 bg-green-50 dark:bg-green-900/20 rounded",
+                                        children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
+                                            className: "text-sm text-green-700 dark:text-green-300",
+                                            children: t("freeSession")
+                                        }, void 0, false, {
+                                            fileName: "[project]/app/[locale]/profile/[uuid]/components/MeetTab.tsx",
+                                            lineNumber: 1804,
+                                            columnNumber: 21
+                                        }, this)
+                                    }, void 0, false, {
+                                        fileName: "[project]/app/[locale]/profile/[uuid]/components/MeetTab.tsx",
+                                        lineNumber: 1803,
+                                        columnNumber: 19
+                                    }, this),
+                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                        className: "flex justify-end gap-3 mt-6",
+                                        children: [
+                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mantine$2f$core$2f$esm$2f$components$2f$Button$2f$Button$2e$mjs__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["Button"], {
+                                                variant: "subtle",
+                                                onClick: closeBookingModal,
+                                                children: t("cancel")
+                                            }, void 0, false, {
+                                                fileName: "[project]/app/[locale]/profile/[uuid]/components/MeetTab.tsx",
+                                                lineNumber: 1811,
+                                                columnNumber: 19
+                                            }, this),
+                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mantine$2f$core$2f$esm$2f$components$2f$Button$2f$Button$2e$mjs__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["Button"], {
+                                                type: "submit",
+                                                loading: isBookingLoading,
+                                                disabled: Object.keys(validationErrors).some((key)=>validationErrors[key]),
+                                                children: !isAuthenticated ? locale.startsWith("ar") ? "متابعة" : "Continue" : t("confirmBooking")
+                                            }, void 0, false, {
+                                                fileName: "[project]/app/[locale]/profile/[uuid]/components/MeetTab.tsx",
+                                                lineNumber: 1817,
+                                                columnNumber: 19
+                                            }, this)
+                                        ]
+                                    }, void 0, true, {
+                                        fileName: "[project]/app/[locale]/profile/[uuid]/components/MeetTab.tsx",
+                                        lineNumber: 1810,
+                                        columnNumber: 17
+                                    }, this)
+                                ]
+                            }, void 0, true, {
+                                fileName: "[project]/app/[locale]/profile/[uuid]/components/MeetTab.tsx",
+                                lineNumber: 1634,
+                                columnNumber: 15
+                            }, this) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["Fragment"], {
+                                children: clientSecret && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$stripe$2f$react$2d$stripe$2d$js$2f$dist$2f$react$2d$stripe$2e$esm$2e$mjs__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["Elements"], {
+                                    stripe: stripePromise,
+                                    options: {
+                                        clientSecret
+                                    },
+                                    children: isPollingStatus ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                        className: "py-10 text-center",
+                                        children: [
+                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                className: "animate-spin rounded-full h-10 w-10 border-4 border-gray-200 border-t-blue-500 mx-auto mb-3"
+                                            }, void 0, false, {
+                                                fileName: "[project]/app/[locale]/profile/[uuid]/components/MeetTab.tsx",
+                                                lineNumber: 1844,
+                                                columnNumber: 25
+                                            }, this),
+                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
+                                                className: "text-base font-medium text-gray-800 dark:text-gray-100",
+                                                children: t("verifyingPayment")
+                                            }, void 0, false, {
+                                                fileName: "[project]/app/[locale]/profile/[uuid]/components/MeetTab.tsx",
+                                                lineNumber: 1845,
+                                                columnNumber: 25
+                                            }, this),
+                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
+                                                className: "mt-2 text-sm text-gray-600 dark:text-gray-300",
+                                                children: locale.startsWith("ar") ? "يرجى الانتظار... يتم التحقق من الدفع الآن." : "Please wait... we’re verifying your payment now."
+                                            }, void 0, false, {
+                                                fileName: "[project]/app/[locale]/profile/[uuid]/components/MeetTab.tsx",
+                                                lineNumber: 1848,
+                                                columnNumber: 25
+                                            }, this)
+                                        ]
+                                    }, void 0, true, {
+                                        fileName: "[project]/app/[locale]/profile/[uuid]/components/MeetTab.tsx",
+                                        lineNumber: 1843,
+                                        columnNumber: 23
+                                    }, this) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["Fragment"], {
+                                        children: [
+                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                className: "mb-4 p-3 rounded-md bg-yellow-50 text-yellow-800 text-sm",
+                                                children: locale.startsWith('ar') ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["Fragment"], {
+                                                    children: [
+                                                        "لأسباب أمنية، تنتهي صلاحية جلسة الدفع خلال",
+                                                        " ",
+                                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                                            className: "font-semibold",
+                                                            children: formatTimeLeft(paymentExpiresAt ? timeLeftMs : 30 * 60 * 1000)
+                                                        }, void 0, false, {
+                                                            fileName: "[project]/app/[locale]/profile/[uuid]/components/MeetTab.tsx",
+                                                            lineNumber: 1860,
+                                                            columnNumber: 31
+                                                        }, this),
+                                                        ". إذا انتهى الوقت، يجب بدء عملية دفع جديدة."
+                                                    ]
+                                                }, void 0, true) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["Fragment"], {
+                                                    children: [
+                                                        "For security, this payment session will expire in",
+                                                        " ",
+                                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                                            className: "font-semibold",
+                                                            children: formatTimeLeft(paymentExpiresAt ? timeLeftMs : 30 * 60 * 1000)
+                                                        }, void 0, false, {
+                                                            fileName: "[project]/app/[locale]/profile/[uuid]/components/MeetTab.tsx",
+                                                            lineNumber: 1868,
+                                                            columnNumber: 31
+                                                        }, this),
+                                                        ". If time runs out, you’ll need to start a new payment."
+                                                    ]
+                                                }, void 0, true)
+                                            }, void 0, false, {
+                                                fileName: "[project]/app/[locale]/profile/[uuid]/components/MeetTab.tsx",
+                                                lineNumber: 1856,
+                                                columnNumber: 25
+                                            }, this),
+                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(StripePaymentForm, {
+                                                clientSecret: clientSecret,
+                                                onSuccess: async ()=>{
+                                                    if (orderUuid) {
+                                                        setDidStripeConfirm(true);
+                                                        setIsPollingStatus(true);
+                                                        const success = await pollOrderStatus(orderUuid);
+                                                        setIsPollingStatus(false);
+                                                        setPollFinished(true);
+                                                        setPollFoundPaid(success);
+                                                        if (success) {
+                                                            setShowSuccessUI(true);
+                                                            setIsBookingModalOpen(false);
+                                                            setBookingStep(1);
+                                                        } else {
+                                                            setStripeErrorMessage(t("paymentVerificationFailed"));
+                                                        }
+                                                    }
+                                                },
+                                                onError: (error)=>{
+                                                    // Card declined or Stripe confirmation failed
+                                                    setDidStripeConfirm(false);
+                                                    setPollFinished(false);
+                                                    setPollFoundPaid(null);
+                                                    setStripeErrorMessage(error);
+                                                },
+                                                isProcessing: isStripeProcessing,
+                                                setIsProcessing: setIsStripeProcessing,
+                                                locale: locale,
+                                                externalError: stripeErrorMessage || undefined
+                                            }, void 0, false, {
+                                                fileName: "[project]/app/[locale]/profile/[uuid]/components/MeetTab.tsx",
+                                                lineNumber: 1876,
+                                                columnNumber: 25
+                                            }, this),
+                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                className: "mt-4 flex items-center gap-3 justify-start",
+                                                children: [
+                                                    didStripeConfirm && pollFinished && pollFoundPaid === false && orderUuid && !isStripeProcessing && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mantine$2f$core$2f$esm$2f$components$2f$Button$2f$Button$2e$mjs__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["Button"], {
+                                                        onClick: finalVerifyMeetingPayment,
+                                                        loading: isFinalVerifying,
+                                                        disabled: isFinalVerifying,
+                                                        className: "bg-blue-500 hover:bg-blue-600",
+                                                        children: locale.startsWith('ar') ? 'محاولة أخيرة' : 'Retry Verification'
+                                                    }, void 0, false, {
+                                                        fileName: "[project]/app/[locale]/profile/[uuid]/components/MeetTab.tsx",
+                                                        lineNumber: 1910,
+                                                        columnNumber: 29
+                                                    }, this),
+                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mantine$2f$core$2f$esm$2f$components$2f$Button$2f$Button$2e$mjs__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["Button"], {
+                                                        variant: "subtle",
+                                                        onClick: ()=>{
+                                                            if (!isStripeProcessing) {
+                                                                setBookingStep(1);
+                                                                setDidStripeConfirm(false);
+                                                                setPollFinished(false);
+                                                                setPollFoundPaid(null);
+                                                            }
+                                                        },
+                                                        disabled: isStripeProcessing,
+                                                        children: locale.startsWith('ar') ? 'رجوع' : 'Back'
+                                                    }, void 0, false, {
+                                                        fileName: "[project]/app/[locale]/profile/[uuid]/components/MeetTab.tsx",
+                                                        lineNumber: 1919,
+                                                        columnNumber: 27
+                                                    }, this)
+                                                ]
+                                            }, void 0, true, {
+                                                fileName: "[project]/app/[locale]/profile/[uuid]/components/MeetTab.tsx",
+                                                lineNumber: 1908,
+                                                columnNumber: 25
+                                            }, this)
+                                        ]
+                                    }, void 0, true)
+                                }, void 0, false, {
+                                    fileName: "[project]/app/[locale]/profile/[uuid]/components/MeetTab.tsx",
+                                    lineNumber: 1836,
+                                    columnNumber: 19
+                                }, this)
+                            }, void 0, false)
+                        ]
+                    }, void 0, true, {
+                        fileName: "[project]/app/[locale]/profile/[uuid]/components/MeetTab.tsx",
+                        lineNumber: 1520,
+                        columnNumber: 11
+                    }, this)
+                }, void 0, false, {
+                    fileName: "[project]/app/[locale]/profile/[uuid]/components/MeetTab.tsx",
+                    lineNumber: 1509,
+                    columnNumber: 9
+                }, this),
+                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mantine$2f$core$2f$esm$2f$components$2f$Modal$2f$Modal$2e$mjs__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["Modal"], {
+                    opened: showDuplicateWarning,
+                    onClose: ()=>setShowDuplicateWarning(false),
+                    title: t("duplicateMeetingWarning"),
+                    size: "md",
+                    centered: true,
+                    children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                        className: "p-2",
+                        children: [
+                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
+                                className: "text-gray-700 mb-6",
+                                children: t("duplicateMeetingMessage", {
+                                    date: selectedDate ? new Date(selectedDate).toLocaleDateString() : "",
+                                    startTime: selectedMeetingTime?.start_time.substring(0, 5) || "",
+                                    endTime: selectedMeetingTime?.end_time.substring(0, 5) || ""
+                                })
+                            }, void 0, false, {
+                                fileName: "[project]/app/[locale]/profile/[uuid]/components/MeetTab.tsx",
+                                lineNumber: 1952,
+                                columnNumber: 13
+                            }, this),
+                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                className: "flex justify-end gap-3",
+                                children: [
+                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mantine$2f$core$2f$esm$2f$components$2f$Button$2f$Button$2e$mjs__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["Button"], {
+                                        variant: "subtle",
+                                        onClick: ()=>setShowDuplicateWarning(false),
+                                        children: t("cancel")
+                                    }, void 0, false, {
+                                        fileName: "[project]/app/[locale]/profile/[uuid]/components/MeetTab.tsx",
+                                        lineNumber: 1961,
+                                        columnNumber: 15
+                                    }, this),
+                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mantine$2f$core$2f$esm$2f$components$2f$Button$2f$Button$2e$mjs__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["Button"], {
+                                        color: "orange",
+                                        onClick: ()=>{
+                                            setShowDuplicateWarning(false);
+                                            submitBookMeeting(true); // Skip duplicate check
+                                        },
+                                        loading: isBookingLoading,
+                                        children: t("continueBooking")
+                                    }, void 0, false, {
+                                        fileName: "[project]/app/[locale]/profile/[uuid]/components/MeetTab.tsx",
+                                        lineNumber: 1967,
+                                        columnNumber: 15
+                                    }, this)
+                                ]
+                            }, void 0, true, {
+                                fileName: "[project]/app/[locale]/profile/[uuid]/components/MeetTab.tsx",
+                                lineNumber: 1960,
+                                columnNumber: 13
+                            }, this)
+                        ]
+                    }, void 0, true, {
+                        fileName: "[project]/app/[locale]/profile/[uuid]/components/MeetTab.tsx",
+                        lineNumber: 1951,
+                        columnNumber: 11
+                    }, this)
+                }, void 0, false, {
+                    fileName: "[project]/app/[locale]/profile/[uuid]/components/MeetTab.tsx",
+                    lineNumber: 1944,
+                    columnNumber: 9
+                }, this),
+                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mantine$2f$core$2f$esm$2f$components$2f$Modal$2f$Modal$2e$mjs__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["Modal"], {
+                    opened: showSuccessUI,
+                    onClose: ()=>{
+                        setShowSuccessUI(false);
+                        setShowStripeElements(false);
+                        setClientSecret(null);
+                        setOrderUuid(null);
+                    },
+                    size: "md",
+                    centered: true,
+                    withCloseButton: false,
+                    children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                        className: "text-center py-8",
+                        children: [
+                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                className: "mb-8",
+                                children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                    className: "mx-auto w-24 h-24 relative",
+                                    children: [
+                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                            className: "absolute inset-0 bg-gradient-to-br from-green-400 to-emerald-500 rounded-full opacity-20"
+                                        }, void 0, false, {
+                                            fileName: "[project]/app/[locale]/profile/[uuid]/components/MeetTab.tsx",
+                                            lineNumber: 1998,
+                                            columnNumber: 17
+                                        }, this),
+                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                            className: "absolute inset-0 bg-gradient-to-br from-green-500 to-emerald-600 rounded-full flex items-center justify-center",
+                                            children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("svg", {
+                                                className: "w-12 h-12",
+                                                viewBox: "0 0 24 24",
+                                                fill: "none",
+                                                xmlns: "http://www.w3.org/2000/svg",
+                                                children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("path", {
+                                                    strokeLinecap: "round",
+                                                    strokeLinejoin: "round",
+                                                    strokeWidth: 3,
+                                                    d: "M5 13l4 4L19 7",
+                                                    stroke: "white"
+                                                }, void 0, false, {
+                                                    fileName: "[project]/app/[locale]/profile/[uuid]/components/MeetTab.tsx",
+                                                    lineNumber: 2001,
+                                                    columnNumber: 21
+                                                }, this)
+                                            }, void 0, false, {
+                                                fileName: "[project]/app/[locale]/profile/[uuid]/components/MeetTab.tsx",
+                                                lineNumber: 2000,
+                                                columnNumber: 19
+                                            }, this)
+                                        }, void 0, false, {
+                                            fileName: "[project]/app/[locale]/profile/[uuid]/components/MeetTab.tsx",
+                                            lineNumber: 1999,
+                                            columnNumber: 17
+                                        }, this)
+                                    ]
+                                }, void 0, true, {
+                                    fileName: "[project]/app/[locale]/profile/[uuid]/components/MeetTab.tsx",
+                                    lineNumber: 1997,
+                                    columnNumber: 15
+                                }, this)
+                            }, void 0, false, {
+                                fileName: "[project]/app/[locale]/profile/[uuid]/components/MeetTab.tsx",
+                                lineNumber: 1996,
+                                columnNumber: 13
+                            }, this),
+                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("h1", {
+                                className: "text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-green-500 to-emerald-600 mb-2",
+                                children: locale.startsWith('ar') ? 'تهانينا!' : 'Congratulations!'
+                            }, void 0, false, {
+                                fileName: "[project]/app/[locale]/profile/[uuid]/components/MeetTab.tsx",
+                                lineNumber: 2014,
+                                columnNumber: 13
+                            }, this),
+                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("h2", {
+                                className: "text-xl font-semibold text-gray-800 dark:text-gray-200 mb-3",
+                                children: locale.startsWith('ar') ? 'تم حجز الجلسة الاستشارية بنجاح!' : 'Session Booked Successfully!'
+                            }, void 0, false, {
+                                fileName: "[project]/app/[locale]/profile/[uuid]/components/MeetTab.tsx",
+                                lineNumber: 2017,
+                                columnNumber: 13
+                            }, this),
+                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
+                                className: "text-gray-600 dark:text-gray-400 mb-8",
+                                children: locale.startsWith('ar') ? 'تم حجز الجلسة الاستشارية بنجاح وانتظر الموافقة عليه من الإنسايتر.' : 'Your session has been successfully booked and is waiting for Insighter\'s approval.'
+                            }, void 0, false, {
+                                fileName: "[project]/app/[locale]/profile/[uuid]/components/MeetTab.tsx",
+                                lineNumber: 2020,
+                                columnNumber: 13
+                            }, this),
+                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mantine$2f$core$2f$esm$2f$components$2f$Button$2f$Button$2e$mjs__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["Button"], {
+                                size: "md",
+                                className: "bg-gradient-to-r from-blue-500 to-teal-400 hover:from-blue-600 hover:to-teal-500 transition-all",
+                                onClick: ()=>{
+                                    // Redirect to meetings dashboard
+                                    window.location.href = `${"TURBOPACK compile-time value", "http://localhost:4200"}/app/insighter-dashboard/my-meetings?tab=my-meetings`;
+                                },
+                                children: locale.startsWith('ar') ? 'اذهب إلى الجلسات الاستشارية' : 'Go to Sessions'
+                            }, void 0, false, {
+                                fileName: "[project]/app/[locale]/profile/[uuid]/components/MeetTab.tsx",
+                                lineNumber: 2027,
+                                columnNumber: 13
+                            }, this)
+                        ]
+                    }, void 0, true, {
+                        fileName: "[project]/app/[locale]/profile/[uuid]/components/MeetTab.tsx",
+                        lineNumber: 1994,
+                        columnNumber: 11
+                    }, this)
+                }, void 0, false, {
+                    fileName: "[project]/app/[locale]/profile/[uuid]/components/MeetTab.tsx",
+                    lineNumber: 1982,
+                    columnNumber: 9
+                }, this),
+                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mantine$2f$core$2f$esm$2f$components$2f$Modal$2f$Modal$2e$mjs__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["Modal"], {
+                    opened: showPaymentExpiredModal,
+                    onClose: ()=>setShowPaymentExpiredModal(false),
+                    title: locale.startsWith('ar') ? 'انتهت جلسة الدفع' : 'Payment Session Expired',
+                    size: "md",
+                    centered: true,
+                    children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                        className: "p-2",
+                        children: [
+                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
+                                className: "text-gray-700 mb-6",
+                                children: locale.startsWith('ar') ? 'انتهت صلاحية جلسة الدفع بعد 30 دقيقة. يرجى المحاولة مرة أخرى لاحقاً.' : 'Your payment session expired after 30 minutes. Please try again later.'
+                            }, void 0, false, {
+                                fileName: "[project]/app/[locale]/profile/[uuid]/components/MeetTab.tsx",
+                                lineNumber: 2049,
+                                columnNumber: 13
+                            }, this),
+                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                className: "flex justify-end",
+                                children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mantine$2f$core$2f$esm$2f$components$2f$Button$2f$Button$2e$mjs__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["Button"], {
+                                    onClick: ()=>setShowPaymentExpiredModal(false),
+                                    children: locale.startsWith('ar') ? 'حسناً' : 'OK'
+                                }, void 0, false, {
+                                    fileName: "[project]/app/[locale]/profile/[uuid]/components/MeetTab.tsx",
+                                    lineNumber: 2055,
+                                    columnNumber: 15
+                                }, this)
+                            }, void 0, false, {
+                                fileName: "[project]/app/[locale]/profile/[uuid]/components/MeetTab.tsx",
+                                lineNumber: 2054,
+                                columnNumber: 13
+                            }, this)
+                        ]
+                    }, void 0, true, {
+                        fileName: "[project]/app/[locale]/profile/[uuid]/components/MeetTab.tsx",
+                        lineNumber: 2048,
+                        columnNumber: 11
+                    }, this)
+                }, void 0, false, {
+                    fileName: "[project]/app/[locale]/profile/[uuid]/components/MeetTab.tsx",
+                    lineNumber: 2041,
+                    columnNumber: 9
+                }, this)
+            ]
+        }, void 0, true, {
+            fileName: "[project]/app/[locale]/profile/[uuid]/components/MeetTab.tsx",
+            lineNumber: 1077,
+            columnNumber: 7
+        }, this)
+    }, void 0, false, {
+        fileName: "[project]/app/[locale]/profile/[uuid]/components/MeetTab.tsx",
+        lineNumber: 1076,
+        columnNumber: 5
+    }, this);
+}
+}),
+"[project]/app/[locale]/profile/[uuid]/components/PostsTab.tsx [app-ssr] (ecmascript)", ((__turbopack_context__) => {
+"use strict";
+
+__turbopack_context__.s([
+    "default",
+    ()=>PostsTab
+]);
+var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/next/dist/server/route-modules/app-page/vendored/ssr/react-jsx-dev-runtime.js [app-ssr] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$tabler$2f$icons$2d$react$2f$dist$2f$esm$2f$icons$2f$IconLoader2$2e$mjs__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__$3c$export__default__as__IconLoader2$3e$__ = __turbopack_context__.i("[project]/node_modules/@tabler/icons-react/dist/esm/icons/IconLoader2.mjs [app-ssr] (ecmascript) <export default as IconLoader2>");
+var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$tabler$2f$icons$2d$react$2f$dist$2f$esm$2f$icons$2f$IconPhoto$2e$mjs__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__$3c$export__default__as__IconPhoto$3e$__ = __turbopack_context__.i("[project]/node_modules/@tabler/icons-react/dist/esm/icons/IconPhoto.mjs [app-ssr] (ecmascript) <export default as IconPhoto>");
+var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/next/dist/server/route-modules/app-page/vendored/ssr/react.js [app-ssr] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$components$2f$feed$2f$MyFeedsTimeline$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/components/feed/MyFeedsTimeline.tsx [app-ssr] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$services$2f$feed$2e$service$2e$ts__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/services/feed.service.ts [app-ssr] (ecmascript)");
+'use client';
+;
+;
+;
+;
+;
+const copyByLocale = {
+    en: {
+        loading: 'Loading posts…',
+        emptyTitle: 'No posts yet',
+        emptyDescription: 'Published posts and White Papers from this insighter will appear here.',
+        loadError: 'We couldn’t load this insighter’s posts.',
+        tryAgain: 'Try again',
+        loadingMore: 'Loading more posts…',
+        endOfFeed: 'You’re all caught up.'
+    },
+    ar: {
+        loading: 'جارٍ تحميل المنشورات…',
+        emptyTitle: 'لا توجد منشورات بعد',
+        emptyDescription: 'ستظهر هنا منشورات وأوراق هذا الخبير المنشورة.',
+        loadError: 'تعذر تحميل منشورات هذا الخبير.',
+        tryAgain: 'حاول مرة أخرى',
+        loadingMore: 'جارٍ تحميل المزيد من المنشورات…',
+        endOfFeed: 'لقد اطّلعت على جميع المنشورات.'
+    }
+};
+function PostsTab({ uuid, locale }) {
+    const copy = copyByLocale[locale === 'ar' ? 'ar' : 'en'];
+    const [items, setItems] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useState"])([]);
+    const [meta, setMeta] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useState"])(null);
+    const [isLoading, setIsLoading] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useState"])(true);
+    const [isLoadingMore, setIsLoadingMore] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useState"])(false);
+    const [loadError, setLoadError] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useState"])(false);
+    const loadingMoreRef = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useRef"])(false);
+    const sentinelRef = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useRef"])(null);
+    const loadFirstPage = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useCallback"])(async (signal)=>{
+        setIsLoading(true);
+        setLoadError(false);
+        try {
+            const result = await (0, __TURBOPACK__imported__module__$5b$project$5d2f$services$2f$feed$2e$service$2e$ts__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["getInsighterProfileFeed"])(uuid, locale, null, signal);
+            setItems(result.data);
+            setMeta(result.meta);
+        } catch (error) {
+            if (error instanceof DOMException && error.name === 'AbortError') return;
+            setLoadError(true);
+        } finally{
+            if (!signal?.aborted) setIsLoading(false);
+        }
+    }, [
+        locale,
+        uuid
+    ]);
+    (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useEffect"])(()=>{
+        const controller = new AbortController();
+        void loadFirstPage(controller.signal);
+        return ()=>controller.abort();
+    }, [
+        loadFirstPage
+    ]);
+    const loadMore = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useCallback"])(async ()=>{
+        const cursor = meta?.next_cursor;
+        if (!cursor || loadingMoreRef.current) return;
+        loadingMoreRef.current = true;
+        setIsLoadingMore(true);
+        try {
+            const result = await (0, __TURBOPACK__imported__module__$5b$project$5d2f$services$2f$feed$2e$service$2e$ts__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["getInsighterProfileFeed"])(uuid, locale, cursor);
+            setItems((previous)=>{
+                const existingUuids = new Set(previous.map((item)=>item.uuid));
+                return [
+                    ...previous,
+                    ...result.data.filter((item)=>!existingUuids.has(item.uuid))
+                ];
+            });
+            setMeta(result.meta);
+        } catch  {
+            setLoadError(true);
+        } finally{
+            loadingMoreRef.current = false;
+            setIsLoadingMore(false);
+        }
+    }, [
+        locale,
+        meta?.next_cursor,
+        uuid
+    ]);
+    (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useEffect"])(()=>{
+        const sentinel = sentinelRef.current;
+        if (!sentinel || !meta?.has_more) return;
+        const observer = new IntersectionObserver((entries)=>{
+            if (entries[0]?.isIntersecting) void loadMore();
+        }, {
+            rootMargin: '600px 0px'
+        });
+        observer.observe(sentinel);
+        return ()=>observer.disconnect();
+    }, [
+        loadMore,
+        meta?.has_more
+    ]);
+    return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+        className: "bg-[#F3F6FA] px-4 py-6 sm:px-6 sm:py-8",
+        children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+            className: "mx-auto max-w-[680px]",
+            children: [
+                isLoading ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("section", {
+                    "aria-label": copy.loading,
+                    children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$feed$2f$MyFeedsTimeline$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["FeedSkeleton"], {}, void 0, false, {
+                        fileName: "[project]/app/[locale]/profile/[uuid]/components/PostsTab.tsx",
+                        lineNumber: 112,
+                        columnNumber: 13
+                    }, this)
+                }, void 0, false, {
+                    fileName: "[project]/app/[locale]/profile/[uuid]/components/PostsTab.tsx",
+                    lineNumber: 111,
+                    columnNumber: 11
+                }, this) : loadError && items.length === 0 ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("section", {
+                    className: "rounded-lg border border-[#DCE4EF] bg-white px-6 py-12 text-center",
+                    children: [
+                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("h2", {
+                            className: "text-[18px] font-bold text-[#101724]",
+                            children: copy.loadError
+                        }, void 0, false, {
+                            fileName: "[project]/app/[locale]/profile/[uuid]/components/PostsTab.tsx",
+                            lineNumber: 116,
+                            columnNumber: 13
+                        }, this),
+                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
+                            type: "button",
+                            onClick: ()=>void loadFirstPage(),
+                            className: "mt-4 min-h-10 rounded-md bg-[#2378E8] px-5 text-[13px] font-semibold text-white transition-colors hover:bg-[#1B64C5] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2378E8] focus-visible:ring-offset-2",
+                            children: copy.tryAgain
+                        }, void 0, false, {
+                            fileName: "[project]/app/[locale]/profile/[uuid]/components/PostsTab.tsx",
+                            lineNumber: 117,
+                            columnNumber: 13
+                        }, this)
+                    ]
+                }, void 0, true, {
+                    fileName: "[project]/app/[locale]/profile/[uuid]/components/PostsTab.tsx",
+                    lineNumber: 115,
+                    columnNumber: 11
+                }, this) : items.length === 0 ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("section", {
+                    className: "rounded-lg border border-[#DCE4EF] bg-white px-6 py-14 text-center",
+                    children: [
+                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                            className: "mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-[#EDF4FD] text-[#2378E8]",
+                            children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$tabler$2f$icons$2d$react$2f$dist$2f$esm$2f$icons$2f$IconPhoto$2e$mjs__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__$3c$export__default__as__IconPhoto$3e$__["IconPhoto"], {
+                                "aria-hidden": true,
+                                className: "h-5 w-5",
+                                stroke: 1.7
+                            }, void 0, false, {
+                                fileName: "[project]/app/[locale]/profile/[uuid]/components/PostsTab.tsx",
+                                lineNumber: 128,
+                                columnNumber: 15
+                            }, this)
+                        }, void 0, false, {
+                            fileName: "[project]/app/[locale]/profile/[uuid]/components/PostsTab.tsx",
+                            lineNumber: 127,
+                            columnNumber: 13
+                        }, this),
+                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("h2", {
+                            className: "mt-4 text-[18px] font-bold text-[#101724]",
+                            children: copy.emptyTitle
+                        }, void 0, false, {
+                            fileName: "[project]/app/[locale]/profile/[uuid]/components/PostsTab.tsx",
+                            lineNumber: 130,
+                            columnNumber: 13
+                        }, this),
+                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
+                            className: "mx-auto mt-2 max-w-sm text-[13px] leading-6 text-[#64748B]",
+                            children: copy.emptyDescription
+                        }, void 0, false, {
+                            fileName: "[project]/app/[locale]/profile/[uuid]/components/PostsTab.tsx",
+                            lineNumber: 131,
+                            columnNumber: 13
+                        }, this)
+                    ]
+                }, void 0, true, {
+                    fileName: "[project]/app/[locale]/profile/[uuid]/components/PostsTab.tsx",
+                    lineNumber: 126,
+                    columnNumber: 11
+                }, this) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                    className: "space-y-4",
+                    children: items.map((item)=>/*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$feed$2f$MyFeedsTimeline$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["FeedCard"], {
+                            item: item,
+                            locale: locale,
+                            articleAccess: "community"
+                        }, item.uuid, false, {
+                            fileName: "[project]/app/[locale]/profile/[uuid]/components/PostsTab.tsx",
+                            lineNumber: 138,
+                            columnNumber: 15
+                        }, this))
+                }, void 0, false, {
+                    fileName: "[project]/app/[locale]/profile/[uuid]/components/PostsTab.tsx",
+                    lineNumber: 136,
+                    columnNumber: 11
+                }, this),
+                items.length > 0 && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                    ref: sentinelRef,
+                    className: "flex min-h-14 items-center justify-center pt-4",
+                    "aria-live": "polite",
+                    children: isLoadingMore ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                        className: "inline-flex items-center gap-2 text-[13px] font-medium text-[#64748B]",
+                        children: [
+                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$tabler$2f$icons$2d$react$2f$dist$2f$esm$2f$icons$2f$IconLoader2$2e$mjs__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__$3c$export__default__as__IconLoader2$3e$__["IconLoader2"], {
+                                "aria-hidden": true,
+                                className: "h-4 w-4 animate-spin",
+                                stroke: 2
+                            }, void 0, false, {
+                                fileName: "[project]/app/[locale]/profile/[uuid]/components/PostsTab.tsx",
+                                lineNumber: 147,
+                                columnNumber: 17
+                            }, this),
+                            copy.loadingMore
+                        ]
+                    }, void 0, true, {
+                        fileName: "[project]/app/[locale]/profile/[uuid]/components/PostsTab.tsx",
+                        lineNumber: 146,
+                        columnNumber: 15
+                    }, this) : !meta?.has_more ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                        className: "text-[12px] text-[#8A9AAF]",
+                        children: copy.endOfFeed
+                    }, void 0, false, {
+                        fileName: "[project]/app/[locale]/profile/[uuid]/components/PostsTab.tsx",
+                        lineNumber: 151,
+                        columnNumber: 15
+                    }, this) : null
+                }, void 0, false, {
+                    fileName: "[project]/app/[locale]/profile/[uuid]/components/PostsTab.tsx",
+                    lineNumber: 144,
+                    columnNumber: 11
+                }, this)
+            ]
+        }, void 0, true, {
+            fileName: "[project]/app/[locale]/profile/[uuid]/components/PostsTab.tsx",
+            lineNumber: 109,
+            columnNumber: 7
+        }, this)
+    }, void 0, false, {
+        fileName: "[project]/app/[locale]/profile/[uuid]/components/PostsTab.tsx",
+        lineNumber: 108,
+        columnNumber: 5
+    }, this);
+}
+}),
+"[project]/app/[locale]/profile/[uuid]/components/ProfileShare.tsx [app-ssr] (ecmascript)", ((__turbopack_context__) => {
+"use strict";
+
+__turbopack_context__.s([
+    "default",
+    ()=>__TURBOPACK__default__export__
+]);
+var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/next/dist/server/route-modules/app-page/vendored/ssr/react-jsx-dev-runtime.js [app-ssr] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/next/dist/server/route-modules/app-page/vendored/ssr/react.js [app-ssr] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$navigation$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/next/navigation.js [app-ssr] (ecmascript)");
+'use client';
+;
+;
+;
+const ProfileShare = ({ profileData, enterpriseType, locale })=>{
+    const params = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$navigation$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useParams"])();
+    const currentLocale = locale || params.locale || 'en';
+    const isRTL = currentLocale === 'ar';
+    // Share Modal state
+    const [shareModalOpened, setShareModalOpened] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useState"])(false);
+    const [customShareMessage, setCustomShareMessage] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useState"])('');
+    const [linkCopied, setLinkCopied] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useState"])(false);
+    const shareTextareaRef = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useRef"])(null);
+    (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useEffect"])(()=>{
+        if (shareModalOpened) {
+            shareTextareaRef.current?.focus();
+        }
+    }, [
+        shareModalOpened
+    ]);
+    // Translations
+    const translations = {
+        share: isRTL ? 'شارك الصفحة' : 'Share Page',
+        shareProfile: isRTL ? 'شارك الملف الشخصي' : 'Share Profile',
+        customShareMessage: isRTL ? 'أضف رسالة شخصية' : 'Add a Personal Message',
+        shareMessageHint: isRTL ? 'أضف ملاحظة أو رسالة لتخصيص المشاركة...' : 'Add a note or message to personalize your share...',
+        characterCount: isRTL ? 'عدد الأحرف' : 'Character Count',
+        close: isRTL ? 'إغلاق' : 'Close',
+        copyLink: isRTL ? 'نسخ الرابط' : 'Copy Link',
+        linkCopied: isRTL ? 'تم نسخ الرابط!' : 'Link Copied!',
+        checkOutProfile: isRTL ? 'اعرض ملف الإنسايتر على انسايتا: ' : 'View insighter profile on Insighta: ',
+        viewProfile: isRTL ? 'عرض الملف الشخصي على' : 'View profile on',
+        foresighta: isRTL ? 'انسايتا' : 'Insighta'
+    };
+    // Share functionality
+    const handleShare = ()=>{
+        // Set default message based on profile type
+        const userName = enterpriseType === "insighter" ? `${profileData.first_name} ${profileData.last_name}`.trim() : profileData.company?.legal_name || profileData.name;
+        const defaultMessage = `${translations.checkOutProfile}${userName}`;
+        setCustomShareMessage(defaultMessage);
+        setShareModalOpened(true);
+    };
+    const shareToSocial = (platform)=>{
+        const url = encodeURIComponent(window.location.href);
+        const message = encodeURIComponent(customShareMessage);
+        const title = encodeURIComponent(document.title);
+        let shareUrl = '';
+        switch(platform){
+            case 'facebook':
+                shareUrl = `https://www.facebook.com/sharer/sharer.php?u=${url}&quote=${message}`;
+                break;
+            case 'twitter':
+                shareUrl = `https://twitter.com/intent/tweet?text=${message}&url=${url}`;
+                break;
+            case 'linkedin':
+                shareUrl = `https://www.linkedin.com/sharing/share-offsite/?url=${url}&title=${title}&summary=${message}`;
+                break;
+            case 'whatsapp':
+                shareUrl = `https://api.whatsapp.com/send?text=${message}%20${url}`;
+                break;
+        }
+        if (shareUrl) {
+            window.open(shareUrl, '_blank', 'width=600,height=400');
+            setShareModalOpened(false);
+        }
+    };
+    const handleCopyLink = async ()=>{
+        try {
+            await navigator.clipboard.writeText(window.location.href);
+            setLinkCopied(true);
+            setTimeout(()=>setLinkCopied(false), 2000);
+        } catch (error) {
+            console.error('Failed to copy link:', error);
+        }
+    };
+    return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["Fragment"], {
+        children: [
+            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
+                className: "flex items-center gap-2 px-3 py-2 bg-gradient-to-r from-blue-500 to-teal-400 text-white rounded-md hover:from-blue-600 hover:to-teal-500 transition-all duration-200 transform hover:-translate-y-0.5 hover:shadow-lg font-medium text-xs",
+                onClick: handleShare,
+                dir: isRTL ? 'rtl' : 'ltr',
+                children: [
+                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                        children: translations.share
+                    }, void 0, false, {
+                        fileName: "[project]/app/[locale]/profile/[uuid]/components/ProfileShare.tsx",
+                        lineNumber: 116,
+                        columnNumber: 9
+                    }, ("TURBOPACK compile-time value", void 0)),
+                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("svg", {
+                        className: "w-4 h-4",
+                        viewBox: "0 0 1024 1024",
+                        version: "1.1",
+                        xmlns: "http://www.w3.org/2000/svg",
+                        fill: "currentColor",
+                        children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("path", {
+                            d: "M767.99994 585.142857q75.995429 0 129.462857 53.394286t53.394286 129.462857-53.394286 129.462857-129.462857 53.394286-129.462857-53.394286-53.394286-129.462857q0-6.875429 1.170286-19.456l-205.677714-102.838857q-52.589714 49.152-124.562286 49.152-75.995429 0-129.462857-53.394286t-53.394286-129.462857 53.394286-129.462857 129.462857-53.394286q71.972571 0 124.562286 49.152l205.677714-102.838857q-1.170286-12.580571-1.170286-19.456 0-75.995429 53.394286-129.462857t129.462857-53.394286 129.462857 53.394286 53.394286 129.462857-53.394286 129.462857-129.462857 53.394286q-71.972571 0-124.562286-49.152l-205.677714 102.838857q1.170286 12.580571 1.170286 19.456t-1.170286 19.456l205.677714 102.838857q52.589714-49.152 124.562286-49.152z"
+                        }, void 0, false, {
+                            fileName: "[project]/app/[locale]/profile/[uuid]/components/ProfileShare.tsx",
+                            lineNumber: 124,
+                            columnNumber: 11
+                        }, ("TURBOPACK compile-time value", void 0))
+                    }, void 0, false, {
+                        fileName: "[project]/app/[locale]/profile/[uuid]/components/ProfileShare.tsx",
+                        lineNumber: 117,
+                        columnNumber: 9
+                    }, ("TURBOPACK compile-time value", void 0))
+                ]
+            }, void 0, true, {
+                fileName: "[project]/app/[locale]/profile/[uuid]/components/ProfileShare.tsx",
+                lineNumber: 111,
+                columnNumber: 7
+            }, ("TURBOPACK compile-time value", void 0)),
+            shareModalOpened && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                className: "fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4",
+                onClick: ()=>setShareModalOpened(false),
+                children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                    className: "bg-white dark:bg-slate-800 rounded-lg p-6 max-w-md w-full",
+                    onClick: (e)=>e.stopPropagation(),
+                    dir: isRTL ? 'rtl' : 'ltr',
+                    children: [
+                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                            className: "flex justify-between items-center mb-4 pb-4 border-b border-gray-200 dark:border-slate-700",
+                            children: [
+                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("h2", {
+                                    className: "text-xl font-bold text-gray-900 dark:text-white",
+                                    children: translations.shareProfile
+                                }, void 0, false, {
+                                    fileName: "[project]/app/[locale]/profile/[uuid]/components/ProfileShare.tsx",
+                                    lineNumber: 141,
+                                    columnNumber: 15
+                                }, ("TURBOPACK compile-time value", void 0)),
+                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
+                                    onClick: ()=>setShareModalOpened(false),
+                                    className: "text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 text-2xl leading-none",
+                                    children: "×"
+                                }, void 0, false, {
+                                    fileName: "[project]/app/[locale]/profile/[uuid]/components/ProfileShare.tsx",
+                                    lineNumber: 142,
+                                    columnNumber: 15
+                                }, ("TURBOPACK compile-time value", void 0))
+                            ]
+                        }, void 0, true, {
+                            fileName: "[project]/app/[locale]/profile/[uuid]/components/ProfileShare.tsx",
+                            lineNumber: 140,
+                            columnNumber: 13
+                        }, ("TURBOPACK compile-time value", void 0)),
+                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                            className: "mb-4 p-4 bg-gray-50 dark:bg-slate-700 rounded-lg",
+                            children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                className: "flex items-center gap-3",
+                                children: [
+                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                        className: "w-12 h-12 rounded-full overflow-hidden bg-gray-200 dark:bg-slate-600",
+                                        children: (enterpriseType === "insighter" ? profileData.profile_photo_url : profileData.company?.logo) ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("img", {
+                                            src: enterpriseType === "insighter" ? profileData.profile_photo_url : profileData.company.logo,
+                                            alt: enterpriseType === "insighter" ? `${profileData.first_name} ${profileData.last_name}` : profileData.company.legal_name,
+                                            className: "w-full h-full object-cover",
+                                            style: {
+                                                objectPosition: 'top',
+                                                objectFit: 'cover'
+                                            }
+                                        }, void 0, false, {
+                                            fileName: "[project]/app/[locale]/profile/[uuid]/components/ProfileShare.tsx",
+                                            lineNumber: 156,
+                                            columnNumber: 21
+                                        }, ("TURBOPACK compile-time value", void 0)) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                            className: "w-full h-full flex items-center justify-center bg-blue-500 text-white font-semibold text-sm",
+                                            children: enterpriseType === "insighter" ? `${profileData.first_name?.charAt(0) || ''}${profileData.last_name?.charAt(0) || ''}` : profileData.company?.legal_name?.charAt(0) || profileData.name?.charAt(0) || ''
+                                        }, void 0, false, {
+                                            fileName: "[project]/app/[locale]/profile/[uuid]/components/ProfileShare.tsx",
+                                            lineNumber: 163,
+                                            columnNumber: 21
+                                        }, ("TURBOPACK compile-time value", void 0))
+                                    }, void 0, false, {
+                                        fileName: "[project]/app/[locale]/profile/[uuid]/components/ProfileShare.tsx",
+                                        lineNumber: 154,
+                                        columnNumber: 17
+                                    }, ("TURBOPACK compile-time value", void 0)),
+                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                        children: [
+                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("h3", {
+                                                className: "font-semibold text-gray-900 dark:text-white",
+                                                children: enterpriseType === "insighter" ? `${profileData.first_name} ${profileData.last_name}`.trim() : profileData.company?.legal_name || profileData.name
+                                            }, void 0, false, {
+                                                fileName: "[project]/app/[locale]/profile/[uuid]/components/ProfileShare.tsx",
+                                                lineNumber: 174,
+                                                columnNumber: 19
+                                            }, ("TURBOPACK compile-time value", void 0)),
+                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
+                                                className: "text-sm text-gray-500 dark:text-gray-400",
+                                                children: [
+                                                    translations.viewProfile,
+                                                    " ",
+                                                    translations.foresighta
+                                                ]
+                                            }, void 0, true, {
+                                                fileName: "[project]/app/[locale]/profile/[uuid]/components/ProfileShare.tsx",
+                                                lineNumber: 180,
+                                                columnNumber: 19
+                                            }, ("TURBOPACK compile-time value", void 0))
+                                        ]
+                                    }, void 0, true, {
+                                        fileName: "[project]/app/[locale]/profile/[uuid]/components/ProfileShare.tsx",
+                                        lineNumber: 173,
+                                        columnNumber: 17
+                                    }, ("TURBOPACK compile-time value", void 0))
+                                ]
+                            }, void 0, true, {
+                                fileName: "[project]/app/[locale]/profile/[uuid]/components/ProfileShare.tsx",
+                                lineNumber: 152,
+                                columnNumber: 15
+                            }, ("TURBOPACK compile-time value", void 0))
+                        }, void 0, false, {
+                            fileName: "[project]/app/[locale]/profile/[uuid]/components/ProfileShare.tsx",
+                            lineNumber: 151,
+                            columnNumber: 13
+                        }, ("TURBOPACK compile-time value", void 0)),
+                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                            className: "mb-4",
+                            children: [
+                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("label", {
+                                    className: "block text-sm font-semibold mb-2 text-gray-700 dark:text-gray-300",
+                                    children: translations.customShareMessage
+                                }, void 0, false, {
+                                    fileName: "[project]/app/[locale]/profile/[uuid]/components/ProfileShare.tsx",
+                                    lineNumber: 189,
+                                    columnNumber: 15
+                                }, ("TURBOPACK compile-time value", void 0)),
+                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("textarea", {
+                                    className: "w-full p-3 border border-gray-300 dark:border-slate-600 dark:bg-slate-700 dark:text-white rounded-lg resize-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500",
+                                    rows: 3,
+                                    value: customShareMessage,
+                                    onChange: (e)=>setCustomShareMessage(e.target.value),
+                                    placeholder: translations.shareMessageHint,
+                                    ref: shareTextareaRef
+                                }, void 0, false, {
+                                    fileName: "[project]/app/[locale]/profile/[uuid]/components/ProfileShare.tsx",
+                                    lineNumber: 192,
+                                    columnNumber: 15
+                                }, ("TURBOPACK compile-time value", void 0))
+                            ]
+                        }, void 0, true, {
+                            fileName: "[project]/app/[locale]/profile/[uuid]/components/ProfileShare.tsx",
+                            lineNumber: 188,
+                            columnNumber: 13
+                        }, ("TURBOPACK compile-time value", void 0)),
+                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                            className: "mb-6",
+                            children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("small", {
+                                className: "text-gray-500 dark:text-gray-400",
+                                children: [
+                                    translations.characterCount,
+                                    ": ",
+                                    customShareMessage.length
+                                ]
+                            }, void 0, true, {
+                                fileName: "[project]/app/[locale]/profile/[uuid]/components/ProfileShare.tsx",
+                                lineNumber: 204,
+                                columnNumber: 15
+                            }, ("TURBOPACK compile-time value", void 0))
+                        }, void 0, false, {
+                            fileName: "[project]/app/[locale]/profile/[uuid]/components/ProfileShare.tsx",
+                            lineNumber: 203,
+                            columnNumber: 13
+                        }, ("TURBOPACK compile-time value", void 0)),
+                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                            className: "flex justify-center gap-3 mb-6",
+                            children: [
+                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
+                                    className: "w-12 h-12 bg-[#2196F3] hover:bg-blue-700 text-white rounded-full flex items-center justify-center transition-colors",
+                                    onClick: ()=>shareToSocial('facebook'),
+                                    title: "Share on Facebook",
+                                    children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("svg", {
+                                        width: "19",
+                                        height: "19",
+                                        viewBox: "0 0 19 19",
+                                        fill: "none",
+                                        xmlns: "http://www.w3.org/2000/svg",
+                                        children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("path", {
+                                            d: "M19 9.5576C19 4.27831 14.7476 0 9.5 0C4.25244 0 0 4.27712 0 9.5576C0 14.3275 3.47344 18.2816 8.01562 18.9988V12.3195H5.60263V9.5564H8.01562V7.45109C8.01562 5.05605 9.4335 3.73328 11.6042 3.73328C12.6433 3.73328 13.7311 3.91968 13.7311 3.91968V6.2708H12.5329C11.3525 6.2708 10.9844 7.00818 10.9844 7.76338V9.5576H13.6194L13.1979 12.3207H10.9844V19C15.5266 18.2816 19 14.3275 19 9.5576Z",
+                                            fill: "white"
+                                        }, void 0, false, {
+                                            fileName: "[project]/app/[locale]/profile/[uuid]/components/ProfileShare.tsx",
+                                            lineNumber: 218,
+                                            columnNumber: 19
+                                        }, ("TURBOPACK compile-time value", void 0))
+                                    }, void 0, false, {
+                                        fileName: "[project]/app/[locale]/profile/[uuid]/components/ProfileShare.tsx",
+                                        lineNumber: 217,
+                                        columnNumber: 17
+                                    }, ("TURBOPACK compile-time value", void 0))
+                                }, void 0, false, {
+                                    fileName: "[project]/app/[locale]/profile/[uuid]/components/ProfileShare.tsx",
+                                    lineNumber: 212,
+                                    columnNumber: 15
+                                }, ("TURBOPACK compile-time value", void 0)),
+                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
+                                    className: "w-12 h-12 bg-black hover:bg-gray-800 text-white rounded-full flex items-center justify-center transition-colors",
+                                    onClick: ()=>shareToSocial('twitter'),
+                                    title: "Share on Twitter",
+                                    children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("svg", {
+                                        width: "19",
+                                        height: "19",
+                                        viewBox: "0 0 19 19",
+                                        fill: "none",
+                                        xmlns: "http://www.w3.org/2000/svg",
+                                        children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("path", {
+                                            d: "M14.0248 3.65625H16.1725L11.4815 9.03014L17 16.3438H12.6801L9.29422 11.9092L5.4246 16.3438H3.27379L8.29031 10.5947L3 3.65625H7.42938L10.4867 7.70954L14.0248 3.65625ZM13.2703 15.0567H14.4598L6.7814 4.8762H5.50369L13.2703 15.0567Z",
+                                            fill: "white"
+                                        }, void 0, false, {
+                                            fileName: "[project]/app/[locale]/profile/[uuid]/components/ProfileShare.tsx",
+                                            lineNumber: 229,
+                                            columnNumber: 19
+                                        }, ("TURBOPACK compile-time value", void 0))
+                                    }, void 0, false, {
+                                        fileName: "[project]/app/[locale]/profile/[uuid]/components/ProfileShare.tsx",
+                                        lineNumber: 228,
+                                        columnNumber: 17
+                                    }, ("TURBOPACK compile-time value", void 0))
+                                }, void 0, false, {
+                                    fileName: "[project]/app/[locale]/profile/[uuid]/components/ProfileShare.tsx",
+                                    lineNumber: 223,
+                                    columnNumber: 15
+                                }, ("TURBOPACK compile-time value", void 0)),
+                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
+                                    className: "w-12 h-12 bg-[#0077b5] hover:bg-blue-800 text-white rounded-full flex items-center justify-center transition-colors",
+                                    onClick: ()=>shareToSocial('linkedin'),
+                                    title: "Share on LinkedIn",
+                                    children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("svg", {
+                                        width: "19",
+                                        height: "19",
+                                        viewBox: "0 0 19 19",
+                                        fill: "none",
+                                        xmlns: "http://www.w3.org/2000/svg",
+                                        children: [
+                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("g", {
+                                                clipPath: "url(#clip0_2202_2564)",
+                                                children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("path", {
+                                                    d: "M17.48 0H1.6233C0.756425 0 0 0.62344 0 1.47963V17.3719C0 18.2329 0.756425 19 1.6233 19H17.4752C18.3469 19 19 18.2281 19 17.3719V1.47963C19.0036 0.62344 18.3457 0 17.48 0ZM5.88881 15.8377H3.16705V7.37436H5.88881V15.8377ZM4.62175 6.08829H4.60274C3.73112 6.08829 3.16705 5.43994 3.16705 4.62769C3.16705 3.80119 3.74656 3.16825 4.63719 3.16825C5.52781 3.16825 6.07286 3.79644 6.09186 4.62769C6.09186 5.43994 5.52781 6.08829 4.62175 6.08829ZM15.8365 15.8377H13.1147V11.21C13.1147 10.1009 12.7181 9.34442 11.7337 9.34442C10.9808 9.34442 10.5355 9.85387 10.3384 10.3491C10.2647 10.5272 10.2446 10.7694 10.2446 11.0176V15.8377H7.5228V7.37436H10.2446V8.55237C10.6412 7.98831 11.2599 7.17606 12.6991 7.17606C14.4863 7.17606 15.8377 8.35407 15.8377 10.8929L15.8365 15.8377Z",
+                                                    fill: "white"
+                                                }, void 0, false, {
+                                                    fileName: "[project]/app/[locale]/profile/[uuid]/components/ProfileShare.tsx",
+                                                    lineNumber: 241,
+                                                    columnNumber: 21
+                                                }, ("TURBOPACK compile-time value", void 0))
+                                            }, void 0, false, {
+                                                fileName: "[project]/app/[locale]/profile/[uuid]/components/ProfileShare.tsx",
+                                                lineNumber: 240,
+                                                columnNumber: 19
+                                            }, ("TURBOPACK compile-time value", void 0)),
+                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("defs", {
+                                                children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("clipPath", {
+                                                    id: "clip0_2202_2564",
+                                                    children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("rect", {
+                                                        width: "19",
+                                                        height: "19",
+                                                        fill: "white"
+                                                    }, void 0, false, {
+                                                        fileName: "[project]/app/[locale]/profile/[uuid]/components/ProfileShare.tsx",
+                                                        lineNumber: 245,
+                                                        columnNumber: 23
+                                                    }, ("TURBOPACK compile-time value", void 0))
+                                                }, void 0, false, {
+                                                    fileName: "[project]/app/[locale]/profile/[uuid]/components/ProfileShare.tsx",
+                                                    lineNumber: 244,
+                                                    columnNumber: 21
+                                                }, ("TURBOPACK compile-time value", void 0))
+                                            }, void 0, false, {
+                                                fileName: "[project]/app/[locale]/profile/[uuid]/components/ProfileShare.tsx",
+                                                lineNumber: 243,
+                                                columnNumber: 19
+                                            }, ("TURBOPACK compile-time value", void 0))
+                                        ]
+                                    }, void 0, true, {
+                                        fileName: "[project]/app/[locale]/profile/[uuid]/components/ProfileShare.tsx",
+                                        lineNumber: 239,
+                                        columnNumber: 17
+                                    }, ("TURBOPACK compile-time value", void 0))
+                                }, void 0, false, {
+                                    fileName: "[project]/app/[locale]/profile/[uuid]/components/ProfileShare.tsx",
+                                    lineNumber: 234,
+                                    columnNumber: 15
+                                }, ("TURBOPACK compile-time value", void 0)),
+                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
+                                    className: "w-12 h-12 bg-green-500 hover:bg-green-600 text-white rounded-full flex items-center justify-center transition-colors",
+                                    onClick: ()=>shareToSocial('whatsapp'),
+                                    title: "Share on WhatsApp",
+                                    children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("svg", {
+                                        width: "19",
+                                        height: "19",
+                                        viewBox: "0 0 19 19",
+                                        fill: "none",
+                                        xmlns: "http://www.w3.org/2000/svg",
+                                        children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("path", {
+                                            d: "M16.1537 2.76093C14.3773 0.979684 12.0108 0 9.49584 0C4.3056 0 0.0807459 4.22394 0.0807459 9.41569C0.0807459 11.0734 0.512968 12.6944 1.33585 14.1229L0 19L4.99193 17.689C6.36578 18.4395 7.91419 18.8338 9.49109 18.8338H9.49584C14.6825 18.8338 19 14.6098 19 9.41806C18.9988 6.90412 17.9301 4.54218 16.1537 2.76093ZM9.49584 17.2484C8.08755 17.2484 6.71014 16.8708 5.50966 16.1583L5.22586 15.9885L2.26561 16.7651L3.05406 13.8771L2.86763 13.5803C2.08275 12.3334 1.67189 10.8953 1.67189 9.41569C1.67189 5.10269 5.18311 1.59125 9.50059 1.59125C11.5917 1.59125 13.5545 2.40588 15.0304 3.8855C16.5064 5.36513 17.4136 7.32925 17.41 9.42044C17.4088 13.737 13.8086 17.2484 9.49584 17.2484ZM13.7872 11.3869C13.5545 11.2682 12.3967 10.6994 12.1794 10.6234C11.9633 10.5426 11.8066 10.5046 11.6498 10.7421C11.4931 10.9796 11.0431 11.5057 10.9029 11.6672C10.7676 11.8239 10.6275 11.8453 10.3935 11.7266C9.01137 11.0354 8.10299 10.4928 7.19224 8.92763C6.95 8.51201 7.43447 8.54169 7.88332 7.64276C7.95932 7.48601 7.92131 7.35062 7.86194 7.23187C7.80257 7.11312 7.33235 5.95532 7.13642 5.48507C6.94525 5.02669 6.75051 5.09081 6.60683 5.0825C6.47147 5.07419 6.31473 5.07418 6.1568 5.07418C5.99887 5.07418 5.74595 5.13356 5.52865 5.36631C5.31254 5.60381 4.70577 6.17263 4.70577 7.33044C4.70577 8.48825 5.55002 9.60807 5.66402 9.76482C5.78276 9.92157 7.32167 12.2966 9.68464 13.319C11.1772 13.9638 11.7626 14.0184 12.5095 13.908C12.9631 13.8403 13.9 13.3392 14.0959 12.7882C14.2907 12.2372 14.2907 11.7658 14.2313 11.6684C14.1779 11.5603 14.0199 11.5009 13.7872 11.3869Z",
+                                            fill: "white"
+                                        }, void 0, false, {
+                                            fileName: "[project]/app/[locale]/profile/[uuid]/components/ProfileShare.tsx",
+                                            lineNumber: 258,
+                                            columnNumber: 19
+                                        }, ("TURBOPACK compile-time value", void 0))
+                                    }, void 0, false, {
+                                        fileName: "[project]/app/[locale]/profile/[uuid]/components/ProfileShare.tsx",
+                                        lineNumber: 257,
+                                        columnNumber: 17
+                                    }, ("TURBOPACK compile-time value", void 0))
+                                }, void 0, false, {
+                                    fileName: "[project]/app/[locale]/profile/[uuid]/components/ProfileShare.tsx",
+                                    lineNumber: 252,
+                                    columnNumber: 15
+                                }, ("TURBOPACK compile-time value", void 0))
+                            ]
+                        }, void 0, true, {
+                            fileName: "[project]/app/[locale]/profile/[uuid]/components/ProfileShare.tsx",
+                            lineNumber: 210,
+                            columnNumber: 13
+                        }, ("TURBOPACK compile-time value", void 0)),
+                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
+                            className: `w-full py-2 px-4 rounded-lg transition-colors font-medium ${linkCopied ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400' : 'bg-gray-100 hover:bg-gray-200 text-gray-700 dark:bg-slate-700 dark:hover:bg-slate-600 dark:text-gray-300'}`,
+                            onClick: handleCopyLink,
+                            children: linkCopied ? translations.linkCopied : translations.copyLink
+                        }, void 0, false, {
+                            fileName: "[project]/app/[locale]/profile/[uuid]/components/ProfileShare.tsx",
+                            lineNumber: 264,
+                            columnNumber: 13
+                        }, ("TURBOPACK compile-time value", void 0))
+                    ]
+                }, void 0, true, {
+                    fileName: "[project]/app/[locale]/profile/[uuid]/components/ProfileShare.tsx",
+                    lineNumber: 134,
+                    columnNumber: 11
+                }, ("TURBOPACK compile-time value", void 0))
+            }, void 0, false, {
+                fileName: "[project]/app/[locale]/profile/[uuid]/components/ProfileShare.tsx",
+                lineNumber: 130,
+                columnNumber: 9
+            }, ("TURBOPACK compile-time value", void 0))
+        ]
+    }, void 0, true);
+};
+const __TURBOPACK__default__export__ = ProfileShare;
+}),
+"[project]/app/components/icons/social/FacebookSocialIcon.tsx [app-ssr] (ecmascript)", ((__turbopack_context__) => {
+"use strict";
+
+__turbopack_context__.s([
+    "default",
+    ()=>FacebookSocialIcon
+]);
+var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/next/dist/server/route-modules/app-page/vendored/ssr/react-jsx-dev-runtime.js [app-ssr] (ecmascript)");
+;
+function FacebookSocialIcon({ size = 48, className }) {
+    return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("svg", {
+        width: size,
+        height: size,
+        viewBox: "0 0 48 48",
+        fill: "none",
+        xmlns: "http://www.w3.org/2000/svg",
+        className: className,
+        children: [
+            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("path", {
+                d: "M0 24C0 10.7452 10.7452 0 24 0C37.2548 0 48 10.7452 48 24C48 37.2548 37.2548 48 24 48C10.7452 48 0 37.2548 0 24Z",
+                fill: "#3B5998"
+            }, void 0, false, {
+                fileName: "[project]/app/components/icons/social/FacebookSocialIcon.tsx",
+                lineNumber: 18,
+                columnNumber: 7
+            }, this),
+            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("path", {
+                d: "M26.5015 38.1115V25.0542H30.1059L30.5836 20.5546H26.5015L26.5077 18.3025C26.5077 17.1289 26.6192 16.5001 28.3048 16.5001H30.5581V12H26.9532C22.6231 12 21.0991 14.1828 21.0991 17.8536V20.5551H18.4V25.0547H21.0991V38.1115H26.5015Z",
+                fill: "white"
+            }, void 0, false, {
+                fileName: "[project]/app/components/icons/social/FacebookSocialIcon.tsx",
+                lineNumber: 22,
+                columnNumber: 7
+            }, this)
+        ]
+    }, void 0, true, {
+        fileName: "[project]/app/components/icons/social/FacebookSocialIcon.tsx",
+        lineNumber: 10,
+        columnNumber: 5
+    }, this);
+}
+}),
+"[project]/app/components/icons/social/InstagramSocialIcon.tsx [app-ssr] (ecmascript)", ((__turbopack_context__) => {
+"use strict";
+
+__turbopack_context__.s([
+    "default",
+    ()=>InstagramSocialIcon
+]);
+var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/next/dist/server/route-modules/app-page/vendored/ssr/react-jsx-dev-runtime.js [app-ssr] (ecmascript)");
+;
+function InstagramSocialIcon({ size = 30, className }) {
+    return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("svg", {
+        width: size,
+        height: size,
+        viewBox: "0 0 30 30",
+        fill: "none",
+        xmlns: "http://www.w3.org/2000/svg",
+        className: className,
+        children: [
+            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("path", {
+                d: "M15.0342 0H14.9658C6.70044 0 0 6.70044 0 14.9658V15.0342C0 23.2996 6.70044 30 14.9658 30H15.0342C23.2996 30 30 23.2996 30 15.0342V14.9658C30 6.70044 23.2996 0 15.0342 0Z",
+                fill: "url(#paint0_linear_1145_416)"
+            }, void 0, false, {
+                fileName: "[project]/app/components/icons/social/InstagramSocialIcon.tsx",
+                lineNumber: 18,
+                columnNumber: 7
+            }, this),
+            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("path", {
+                d: "M19.6427 6.10352H10.3599C7.79531 6.10352 5.70898 8.18984 5.70898 10.7544V19.2468C5.70898 21.8114 7.79531 23.8977 10.3599 23.8977H19.6427C22.2073 23.8977 24.2936 21.8114 24.2936 19.2468V10.7544C24.2936 8.18984 22.2073 6.10352 19.6427 6.10352ZM7.34967 10.7544C7.34967 9.09479 8.70026 7.7442 10.3599 7.7442H19.6427C21.3023 7.7442 22.6529 9.09479 22.6529 10.7544V19.2468C22.6529 20.9064 21.3023 22.257 19.6427 22.257H10.3599C8.70026 22.257 7.34967 20.9064 7.34967 19.2468V10.7544Z",
+                fill: "white"
+            }, void 0, false, {
+                fileName: "[project]/app/components/icons/social/InstagramSocialIcon.tsx",
+                lineNumber: 22,
+                columnNumber: 7
+            }, this),
+            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("path", {
+                d: "M14.9999 19.3258C17.3848 19.3258 19.326 17.3856 19.326 14.9997C19.326 12.6138 17.3858 10.6736 14.9999 10.6736C12.6141 10.6736 10.6738 12.6138 10.6738 14.9997C10.6738 17.3856 12.6141 19.3258 14.9999 19.3258ZM14.9999 12.3153C16.4809 12.3153 17.6854 13.5198 17.6854 15.0007C17.6854 16.4817 16.4809 17.6862 14.9999 17.6862C13.519 17.6862 12.3145 16.4817 12.3145 15.0007C12.3145 13.5198 13.519 12.3153 14.9999 12.3153Z",
+                fill: "white"
+            }, void 0, false, {
+                fileName: "[project]/app/components/icons/social/InstagramSocialIcon.tsx",
+                lineNumber: 26,
+                columnNumber: 7
+            }, this),
+            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("path", {
+                d: "M19.7262 11.3732C20.3683 11.3732 20.8918 10.8506 20.8918 10.2072C20.8918 9.56378 20.3694 9.04126 19.7262 9.04126C19.0829 9.04126 18.5605 9.56378 18.5605 10.2072C18.5605 10.8506 19.0829 11.3732 19.7262 11.3732Z",
+                fill: "white"
+            }, void 0, false, {
+                fileName: "[project]/app/components/icons/social/InstagramSocialIcon.tsx",
+                lineNumber: 30,
+                columnNumber: 7
+            }, this),
+            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("defs", {
+                children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("linearGradient", {
+                    id: "paint0_linear_1145_416",
+                    x1: "4.38286",
+                    y1: "25.6171",
+                    x2: "25.6171",
+                    y2: "4.38391",
+                    gradientUnits: "userSpaceOnUse",
+                    children: [
+                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("stop", {
+                            stopColor: "#FAAD4F"
+                        }, void 0, false, {
+                            fileName: "[project]/app/components/icons/social/InstagramSocialIcon.tsx",
+                            lineNumber: 43,
+                            columnNumber: 11
+                        }, this),
+                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("stop", {
+                            offset: "0.35",
+                            stopColor: "#DD2A7B"
+                        }, void 0, false, {
+                            fileName: "[project]/app/components/icons/social/InstagramSocialIcon.tsx",
+                            lineNumber: 44,
+                            columnNumber: 11
+                        }, this),
+                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("stop", {
+                            offset: "0.62",
+                            stopColor: "#9537B0"
+                        }, void 0, false, {
+                            fileName: "[project]/app/components/icons/social/InstagramSocialIcon.tsx",
+                            lineNumber: 45,
+                            columnNumber: 11
+                        }, this),
+                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("stop", {
+                            offset: "1",
+                            stopColor: "#515BD4"
+                        }, void 0, false, {
+                            fileName: "[project]/app/components/icons/social/InstagramSocialIcon.tsx",
+                            lineNumber: 46,
+                            columnNumber: 11
+                        }, this)
+                    ]
+                }, void 0, true, {
+                    fileName: "[project]/app/components/icons/social/InstagramSocialIcon.tsx",
+                    lineNumber: 35,
+                    columnNumber: 9
+                }, this)
+            }, void 0, false, {
+                fileName: "[project]/app/components/icons/social/InstagramSocialIcon.tsx",
+                lineNumber: 34,
+                columnNumber: 7
+            }, this)
+        ]
+    }, void 0, true, {
+        fileName: "[project]/app/components/icons/social/InstagramSocialIcon.tsx",
+        lineNumber: 10,
+        columnNumber: 5
+    }, this);
+}
+}),
+"[project]/app/components/icons/social/LinkedinSocialIcon.tsx [app-ssr] (ecmascript)", ((__turbopack_context__) => {
+"use strict";
+
+__turbopack_context__.s([
+    "default",
+    ()=>LinkedinSocialIcon
+]);
+var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/next/dist/server/route-modules/app-page/vendored/ssr/react-jsx-dev-runtime.js [app-ssr] (ecmascript)");
+;
+function LinkedinSocialIcon({ size = 48, className }) {
+    return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("svg", {
+        width: size,
+        height: size,
+        viewBox: "0 0 48 48",
+        fill: "none",
+        xmlns: "http://www.w3.org/2000/svg",
+        className: className,
+        children: [
+            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("path", {
+                d: "M0 24C0 10.7452 10.7452 0 24 0C37.2548 0 48 10.7452 48 24C48 37.2548 37.2548 48 24 48C10.7452 48 0 37.2548 0 24Z",
+                fill: "#0077B5"
+            }, void 0, false, {
+                fileName: "[project]/app/components/icons/social/LinkedinSocialIcon.tsx",
+                lineNumber: 18,
+                columnNumber: 7
+            }, this),
+            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("path", {
+                fillRule: "evenodd",
+                clipRule: "evenodd",
+                d: "M17.3188 14.8227C17.3188 16.3918 16.1377 17.6473 14.2412 17.6473H14.2064C12.3805 17.6473 11.2 16.3918 11.2 14.8227C11.2 13.2204 12.4164 12 14.277 12C16.1377 12 17.2835 13.2204 17.3188 14.8227ZM16.9605 19.8778V36.2196H11.5216V19.8778H16.9605ZM36.5752 36.2196L36.5754 26.8497C36.5754 21.8303 33.8922 19.4941 30.3131 19.4941C27.4254 19.4941 26.1325 21.0802 25.4107 22.1929V19.8783H19.9711C20.0428 21.4117 19.9711 36.22 19.9711 36.22H25.4107V27.0934C25.4107 26.605 25.446 26.1178 25.5898 25.7681C25.9829 24.7924 26.8779 23.7822 28.3805 23.7822C30.3494 23.7822 31.1365 25.2807 31.1365 27.4767V36.2196H36.5752Z",
+                fill: "white"
+            }, void 0, false, {
+                fileName: "[project]/app/components/icons/social/LinkedinSocialIcon.tsx",
+                lineNumber: 22,
+                columnNumber: 7
+            }, this)
+        ]
+    }, void 0, true, {
+        fileName: "[project]/app/components/icons/social/LinkedinSocialIcon.tsx",
+        lineNumber: 10,
+        columnNumber: 5
+    }, this);
+}
+}),
+"[project]/app/components/icons/social/YoutubeSocialIcon.tsx [app-ssr] (ecmascript)", ((__turbopack_context__) => {
+"use strict";
+
+__turbopack_context__.s([
+    "default",
+    ()=>YoutubeSocialIcon
+]);
+var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/next/dist/server/route-modules/app-page/vendored/ssr/react-jsx-dev-runtime.js [app-ssr] (ecmascript)");
+;
+function YoutubeSocialIcon({ size = 48, className }) {
+    return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("svg", {
+        width: size,
+        height: size,
+        viewBox: "0 0 48 48",
+        fill: "none",
+        xmlns: "http://www.w3.org/2000/svg",
+        className: className,
+        children: [
+            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("path", {
+                d: "M0 24C0 10.7452 10.7452 0 24 0C37.2548 0 48 10.7452 48 24C48 37.2548 37.2548 48 24 48C10.7452 48 0 37.2548 0 24Z",
+                fill: "#FF0000"
+            }, void 0, false, {
+                fileName: "[project]/app/components/icons/social/YoutubeSocialIcon.tsx",
+                lineNumber: 18,
+                columnNumber: 7
+            }, this),
+            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("path", {
+                d: "M36.265 18.0732C35.9706 16.9422 35.1031 16.0516 34.0016 15.7493C32.0054 15.2 24 15.2 24 15.2C24 15.2 15.9946 15.2 13.9983 15.7493C12.8967 16.0516 12.0292 16.9422 11.7348 18.0732C11.2 20.1231 11.2 24.4 11.2 24.4C11.2 24.4 11.2 28.6768 11.7348 30.7268C12.0292 31.8578 12.8967 32.7484 13.9983 33.0508C15.9946 33.6 24 33.6 24 33.6C24 33.6 32.0054 33.6 34.0016 33.0508C35.1031 32.7484 35.9706 31.8578 36.265 30.7268C36.8 28.6768 36.8 24.4 36.8 24.4C36.8 24.4 36.8 20.1231 36.265 18.0732Z",
+                fill: "white"
+            }, void 0, false, {
+                fileName: "[project]/app/components/icons/social/YoutubeSocialIcon.tsx",
+                lineNumber: 22,
+                columnNumber: 7
+            }, this),
+            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("path", {
+                d: "M21.6 28.8V20.8L28 24.8001L21.6 28.8Z",
+                fill: "#FF0000"
+            }, void 0, false, {
+                fileName: "[project]/app/components/icons/social/YoutubeSocialIcon.tsx",
+                lineNumber: 26,
+                columnNumber: 7
+            }, this)
+        ]
+    }, void 0, true, {
+        fileName: "[project]/app/components/icons/social/YoutubeSocialIcon.tsx",
+        lineNumber: 10,
+        columnNumber: 5
+    }, this);
+}
+}),
+"[project]/app/components/icons/social/XSocialIcon.tsx [app-ssr] (ecmascript)", ((__turbopack_context__) => {
+"use strict";
+
+__turbopack_context__.s([
+    "default",
+    ()=>XSocialIcon
+]);
+var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/next/dist/server/route-modules/app-page/vendored/ssr/react-jsx-dev-runtime.js [app-ssr] (ecmascript)");
+;
+function XSocialIcon({ size = 48, className }) {
+    return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("svg", {
+        width: size,
+        height: size,
+        viewBox: "0 0 48 48",
+        fill: "none",
+        xmlns: "http://www.w3.org/2000/svg",
+        className: className,
+        children: [
+            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("path", {
+                d: "M0 24C0 10.7452 10.7452 0 24 0C37.2548 0 48 10.7452 48 24C48 37.2548 37.2548 48 24 48C10.7452 48 0 37.2548 0 24Z",
+                fill: "#040709"
+            }, void 0, false, {
+                fileName: "[project]/app/components/icons/social/XSocialIcon.tsx",
+                lineNumber: 18,
+                columnNumber: 7
+            }, this),
+            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("path", {
+                fillRule: "evenodd",
+                clipRule: "evenodd",
+                d: "M19.2479 14H12L20.5935 25.42L12.5497 35H16.2662L22.35 27.7544L27.7521 34.9334H35L26.1568 23.1815L26.1725 23.2018L33.7866 14.1334H30.0701L24.4157 20.8677L19.2479 14ZM16.0007 16H18.2571L30.9993 32.9333H28.7429L16.0007 16Z",
+                fill: "white"
+            }, void 0, false, {
+                fileName: "[project]/app/components/icons/social/XSocialIcon.tsx",
+                lineNumber: 22,
+                columnNumber: 7
+            }, this)
+        ]
+    }, void 0, true, {
+        fileName: "[project]/app/components/icons/social/XSocialIcon.tsx",
+        lineNumber: 10,
+        columnNumber: 5
+    }, this);
+}
+}),
+"[project]/app/components/icons/social/TiktokSocialIcon.tsx [app-ssr] (ecmascript)", ((__turbopack_context__) => {
+"use strict";
+
+__turbopack_context__.s([
+    "default",
+    ()=>TiktokSocialIcon
+]);
+var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/next/dist/server/route-modules/app-page/vendored/ssr/react-jsx-dev-runtime.js [app-ssr] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/next/dist/server/route-modules/app-page/vendored/ssr/react.js [app-ssr] (ecmascript)");
+;
+;
+function TiktokSocialIcon({ size = 48, className }) {
+    // Avoid SVG id collisions when rendering multiple instances on the page
+    const id = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useId"])();
+    const clipId = `tiktok-clip-${id}`;
+    return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("svg", {
+        width: size,
+        height: size,
+        viewBox: "0 0 48 48",
+        fill: "none",
+        xmlns: "http://www.w3.org/2000/svg",
+        className: className,
+        children: [
+            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("g", {
+                clipPath: `url(#${clipId})`,
+                children: [
+                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("path", {
+                        d: "M48.0012 24C48.0012 37.2543 37.2555 48 24 48H23.9551C10.7208 47.9752 0 37.2366 0 24C0 10.7634 10.7208 0.0236558 23.9551 0H24C37.2555 0 48.0012 10.7421 48.0012 24Z",
+                        fill: "black"
+                    }, void 0, false, {
+                        fileName: "[project]/app/components/icons/social/TiktokSocialIcon.tsx",
+                        lineNumber: 23,
+                        columnNumber: 9
+                    }, this),
+                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("path", {
+                        d: "M23.9551 0V48C10.7208 47.9752 0 37.2366 0 24C0 10.7634 10.7208 0.0236558 23.9551 0Z",
+                        fill: "#0C0C0C"
+                    }, void 0, false, {
+                        fileName: "[project]/app/components/icons/social/TiktokSocialIcon.tsx",
+                        lineNumber: 27,
+                        columnNumber: 9
+                    }, this),
+                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("path", {
+                        d: "M37.0592 17.3563L37.0297 22.2731C36.0715 22.2614 35.1183 22.1335 34.191 21.8923C32.7603 21.5185 31.411 20.8838 30.2109 20.0199C30.2109 20.5226 30.218 21.2725 30.218 22.1844C30.218 23.398 30.218 24.0875 30.2109 24.8197C30.1896 29.3427 30.302 30.2179 29.9045 32.0063C29.8219 32.4376 29.7088 32.8625 29.5663 33.2778C28.8022 35.4068 27.1368 37.1124 25.4395 38.0196C24.9658 38.2714 24.4687 38.4762 23.9551 38.6311C20.7474 39.6034 16.8927 38.7494 14.9032 36.3838L14.8902 36.3696L14.8748 36.3495C13.1846 34.3104 12.8156 31.131 12.7801 30.3173C12.7801 30.2132 12.773 30.1115 12.773 30.1115C12.747 28.9999 12.9069 27.8917 13.2461 26.8328C13.5891 25.7375 14.7187 23.4512 17.2558 22.0626C18.8381 21.2102 20.6441 20.8646 22.4293 21.0726L22.3713 26.0486C22.2708 26.0226 19.8402 25.4465 18.2446 27.1025C16.7992 28.6022 16.8927 31.0187 17.9181 32.3872C17.9725 32.4605 18.0305 32.5315 18.0908 32.5977C18.6645 33.2376 19.3919 33.4777 19.8828 33.6457C20.5336 33.8601 21.2167 33.9602 21.9018 33.9414C22.6356 33.9299 23.3495 33.7006 23.9527 33.2825C25.6205 32.1494 25.8452 30.1316 25.8535 30.0169C25.833 23.521 25.8137 17.0251 25.7955 10.5292V10.5233L28.9216 10.4677H28.9725L29.4255 10.4594C29.7595 11.6615 30.3257 12.7866 31.0921 13.7712C31.3335 14.0792 31.5943 14.3715 31.8727 14.6465C32.9247 15.6704 34.1884 16.4512 35.5748 16.934H35.5843C36.0652 17.1098 36.5581 17.2509 37.0592 17.3563Z",
+                        fill: "#FD2854"
+                    }, void 0, false, {
+                        fileName: "[project]/app/components/icons/social/TiktokSocialIcon.tsx",
+                        lineNumber: 31,
+                        columnNumber: 9
+                    }, this),
+                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("path", {
+                        d: "M35.6458 19.5811H35.6363C33.9528 19.8508 32.2294 19.7199 30.6059 19.199C29.4723 18.8305 28.4081 18.2752 27.4573 17.5561C28.0274 21.0022 28.0274 24.5186 27.4573 27.9647C26.782 32.0146 26.3585 34.5528 24.0982 36.1768C24.0509 36.2111 24.0024 36.2454 23.9539 36.2774C20.8325 38.391 16.4716 37.3419 14.8736 36.3471L14.85 36.3329L14.805 36.3046C14.2783 35.9556 13.7843 35.5598 13.3289 35.1218C12.5126 34.33 11.8613 33.3843 11.4124 32.3394C10.9636 31.2945 10.7261 30.1711 10.7138 29.0339C10.6834 27.8561 10.8789 26.6833 11.2898 25.579C11.5559 24.8693 12.5447 22.3453 15.2994 20.8088C17.0634 19.8416 19.1017 19.4966 21.0856 19.8295C21.0778 20.2237 21.0703 20.618 21.0632 21.0123V21.0205L21.017 23.5162C20.1537 23.3128 19.2612 23.2631 18.3806 23.3696C17.6709 23.4571 16.9755 23.5387 16.2362 24.0035C15.2894 24.6129 14.6194 25.5693 14.3698 26.6672C14.2118 27.199 14.1794 27.7601 14.2751 28.3065C14.3035 28.4627 14.5117 29.5473 15.387 30.3256C15.6815 30.587 15.8069 30.5976 16.2362 30.9986C16.6147 31.3534 16.7093 31.5237 17.0559 31.8182C17.0559 31.8182 17.141 31.8904 17.2806 31.9921C17.2896 31.9999 17.2991 32.007 17.309 32.0134C17.4999 32.153 17.7002 32.2791 17.9087 32.3907C18.7757 32.8449 20.3275 32.8934 21.4653 32.341C23.0396 31.5758 23.8983 29.8158 23.8948 28.7702C23.8758 22.2719 23.8565 15.7741 23.8368 9.27662H23.9456L28.7738 9.24823C28.7703 9.62484 28.8225 9.99989 28.9287 10.3612C28.9406 10.4003 28.9524 10.4369 28.9654 10.4795C28.9784 10.5221 28.9867 10.5422 28.9973 10.5718C29.0722 10.7683 29.1587 10.9603 29.2564 11.1466L29.3238 11.2826V11.2933C29.3227 11.2963 29.3227 11.2997 29.3238 11.3027L29.3344 11.3252L29.3451 11.3465C29.3515 11.3603 29.3586 11.3737 29.3664 11.3867C29.3735 11.4021 29.3817 11.4175 29.39 11.4328C29.435 11.5192 29.4965 11.6327 29.5663 11.7605C29.61 11.8397 29.6561 11.919 29.7035 11.997L29.7543 12.081C29.7792 12.1236 29.8052 12.1662 29.8312 12.2076L29.9258 12.3578C30.2937 12.9385 30.9395 13.9167 31.855 14.6559C33.1418 15.6944 34.6203 15.9878 35.5476 16.0753C35.5535 16.3663 35.5606 16.6572 35.5666 16.9482C35.6012 17.8266 35.6277 18.7042 35.6458 19.5811Z",
+                        fill: "#24F6FA"
+                    }, void 0, false, {
+                        fileName: "[project]/app/components/icons/social/TiktokSocialIcon.tsx",
+                        lineNumber: 35,
+                        columnNumber: 9
+                    }, this),
+                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("path", {
+                        d: "M35.6612 20.9709C33.224 21.0603 30.8312 20.3025 28.8897 18.8265V29.235C28.8661 29.6336 28.5172 34.0301 24.5454 36.4501C24.349 36.5683 24.1515 36.6783 23.954 36.7801C20.2175 38.6867 16.5663 37.1928 16.2055 37.0379C15.8468 36.9206 15.503 36.7619 15.1812 36.5648C15.0807 36.5021 14.9825 36.437 14.8891 36.3696L14.8051 36.3069C12.3685 34.4571 12.268 30.6887 12.2526 30.1328C12.2266 29.0211 12.3865 27.913 12.7257 26.8541C13.1279 25.5707 14.3284 23.4074 16.7354 22.0839C18.0635 21.3611 19.5561 20.9944 21.068 21.0194V21.0276C21.0482 22.2775 21.0285 23.5277 21.0088 24.7783C20.7545 24.7097 19.1956 24.317 17.6722 25.2762C16.7254 25.8856 16.0553 26.842 15.8057 27.9399C15.6564 28.4727 15.6241 29.0316 15.7111 29.578C15.8462 30.2528 16.1646 30.8773 16.6313 31.383C16.8275 31.609 17.0467 31.8139 17.2854 31.9945C17.2943 32.0022 17.3038 32.0093 17.3138 32.0158C17.5012 32.1604 17.702 32.2867 17.9134 32.3931L17.9205 32.399C18.3432 33.0372 18.9529 33.5292 19.6661 33.8074C20.3792 34.0856 21.161 34.1366 21.9042 33.9532C22.2505 33.8809 22.5868 33.7673 22.906 33.6149C23.2926 33.431 23.6469 33.1858 23.9551 32.8887C25.1521 31.7378 25.3272 30.1458 25.3355 30.05L25.2834 10.5469L25.8038 10.5363L28.93 10.4748H28.9749C28.9867 10.5055 28.9997 10.5363 29.0128 10.567C29.0849 10.7409 29.1712 10.9337 29.2718 11.1419L29.3392 11.2779V11.2886C29.3381 11.2916 29.3381 11.295 29.3392 11.298L29.3498 11.3205L29.3605 11.3418C29.3669 11.3555 29.374 11.369 29.3818 11.382C29.3889 11.3974 29.3972 11.4127 29.4054 11.4281C29.4598 11.5346 29.5237 11.6446 29.5817 11.7558C29.6254 11.835 29.6716 11.9142 29.7189 11.9923L29.7697 12.0763L29.8466 12.2028L29.9412 12.3531C30.4823 13.1993 31.1307 13.9717 31.8704 14.6512C32.9498 15.6395 34.2057 16.4155 35.5725 16.9387H35.582C35.5973 17.8152 35.6127 18.694 35.6269 19.5705L35.6612 20.9709Z",
+                        fill: "white"
+                    }, void 0, false, {
+                        fileName: "[project]/app/components/icons/social/TiktokSocialIcon.tsx",
+                        lineNumber: 39,
+                        columnNumber: 9
+                    }, this),
+                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("path", {
+                        opacity: "0.17",
+                        d: "M37.0592 17.3563L37.0296 22.2731C36.0715 22.2614 35.1183 22.1335 34.1909 21.8923C32.7603 21.5185 31.411 20.8838 30.2109 20.0199C30.2109 20.5226 30.218 21.2725 30.218 22.1844C30.218 23.398 30.218 24.0875 30.2109 24.8197C30.1896 29.3427 30.3019 30.2179 29.9045 32.0063C29.8218 32.4376 29.7088 32.8625 29.5662 33.2778C28.8022 35.4068 27.1368 37.1124 25.4395 38.0196C24.9658 38.2714 24.4687 38.4762 23.9551 38.6311V9.27662L28.7832 9.24823C28.7798 9.62484 28.832 9.99989 28.9382 10.3612C28.95 10.4003 28.9618 10.4369 28.9748 10.4795L29.4278 10.4712C29.7619 11.6734 30.3281 12.7985 31.0944 13.783C31.3359 14.091 31.5966 14.3833 31.875 14.6583C33.1619 15.6968 34.6404 15.9901 35.5677 16.0777C35.5736 16.3686 35.5807 16.6596 35.5866 16.9506C36.0672 17.1206 36.5593 17.2562 37.0592 17.3563Z",
+                        fill: "black"
+                    }, void 0, false, {
+                        fileName: "[project]/app/components/icons/social/TiktokSocialIcon.tsx",
+                        lineNumber: 43,
+                        columnNumber: 9
+                    }, this)
+                ]
+            }, void 0, true, {
+                fileName: "[project]/app/components/icons/social/TiktokSocialIcon.tsx",
+                lineNumber: 22,
+                columnNumber: 7
+            }, this),
+            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("defs", {
+                children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("clipPath", {
+                    id: clipId,
+                    children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("rect", {
+                        width: "48",
+                        height: "48",
+                        fill: "white"
+                    }, void 0, false, {
+                        fileName: "[project]/app/components/icons/social/TiktokSocialIcon.tsx",
+                        lineNumber: 51,
+                        columnNumber: 11
+                    }, this)
+                }, void 0, false, {
+                    fileName: "[project]/app/components/icons/social/TiktokSocialIcon.tsx",
+                    lineNumber: 50,
+                    columnNumber: 9
+                }, this)
+            }, void 0, false, {
+                fileName: "[project]/app/components/icons/social/TiktokSocialIcon.tsx",
+                lineNumber: 49,
+                columnNumber: 7
+            }, this)
+        ]
+    }, void 0, true, {
+        fileName: "[project]/app/components/icons/social/TiktokSocialIcon.tsx",
+        lineNumber: 14,
+        columnNumber: 5
+    }, this);
+}
+}),
+"[project]/app/[locale]/profile/[uuid]/page.tsx [app-ssr] (ecmascript)", ((__turbopack_context__) => {
+"use strict";
+
+__turbopack_context__.s([
+    "default",
+    ()=>ProfilePage
+]);
+var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/next/dist/server/route-modules/app-page/vendored/ssr/react-jsx-dev-runtime.js [app-ssr] (ecmascript)");
+// Import necessary for safe use of useSearchParams
+var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$navigation$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/next/navigation.js [app-ssr] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$footer$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/components/ui/footer.tsx [app-ssr] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$image$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/next/image.js [app-ssr] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/next/dist/server/route-modules/app-page/vendored/ssr/react.js [app-ssr] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$axios$2f$lib$2f$axios$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/axios/lib/axios.js [app-ssr] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$public$2f$images$2f$stripes$2d$dark$2e$svg$2e$mjs__$7b$__IMAGE__$3d3e$__$225b$project$5d2f$public$2f$images$2f$stripes$2d$dark$2e$svg__$28$static__in__ecmascript$2922$__$7d$__$5b$app$2d$ssr$5d$__$28$structured__image__object__with__data__url$2c$__ecmascript$29$__ = __turbopack_context__.i('[project]/public/images/stripes-dark.svg.mjs { IMAGE => "[project]/public/images/stripes-dark.svg (static in ecmascript)" } [app-ssr] (structured image object with data url, ecmascript)');
+var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mantine$2f$core$2f$esm$2f$components$2f$Avatar$2f$Avatar$2e$mjs__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/@mantine/core/esm/components/Avatar/Avatar.mjs [app-ssr] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mantine$2f$core$2f$esm$2f$components$2f$Button$2f$Button$2e$mjs__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/@mantine/core/esm/components/Button/Button.mjs [app-ssr] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mantine$2f$core$2f$esm$2f$components$2f$Tabs$2f$Tabs$2e$mjs__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/@mantine/core/esm/components/Tabs/Tabs.mjs [app-ssr] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mantine$2f$core$2f$esm$2f$components$2f$Group$2f$Group$2e$mjs__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/@mantine/core/esm/components/Group/Group.mjs [app-ssr] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mantine$2f$core$2f$esm$2f$components$2f$Modal$2f$Modal$2e$mjs__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/@mantine/core/esm/components/Modal/Modal.mjs [app-ssr] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mantine$2f$core$2f$esm$2f$components$2f$Text$2f$Text$2e$mjs__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/@mantine/core/esm/components/Text/Text.mjs [app-ssr] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mantine$2f$core$2f$esm$2f$components$2f$Tooltip$2f$Tooltip$2e$mjs__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/@mantine/core/esm/components/Tooltip/Tooltip.mjs [app-ssr] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$tabler$2f$icons$2d$react$2f$dist$2f$esm$2f$icons$2f$IconRosetteDiscountCheckFilled$2e$mjs__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__$3c$export__default__as__IconRosetteDiscountCheckFilled$3e$__ = __turbopack_context__.i("[project]/node_modules/@tabler/icons-react/dist/esm/icons/IconRosetteDiscountCheckFilled.mjs [app-ssr] (ecmascript) <export default as IconRosetteDiscountCheckFilled>");
+var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$tabler$2f$icons$2d$react$2f$dist$2f$esm$2f$icons$2f$IconFileReport$2e$mjs__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__$3c$export__default__as__IconFileReport$3e$__ = __turbopack_context__.i("[project]/node_modules/@tabler/icons-react/dist/esm/icons/IconFileReport.mjs [app-ssr] (ecmascript) <export default as IconFileReport>");
+var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$tabler$2f$icons$2d$react$2f$dist$2f$esm$2f$icons$2f$IconBrandHipchat$2e$mjs__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__$3c$export__default__as__IconBrandHipchat$3e$__ = __turbopack_context__.i("[project]/node_modules/@tabler/icons-react/dist/esm/icons/IconBrandHipchat.mjs [app-ssr] (ecmascript) <export default as IconBrandHipchat>");
+var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$tabler$2f$icons$2d$react$2f$dist$2f$esm$2f$icons$2f$IconBriefcase$2e$mjs__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__$3c$export__default__as__IconBriefcase$3e$__ = __turbopack_context__.i("[project]/node_modules/@tabler/icons-react/dist/esm/icons/IconBriefcase.mjs [app-ssr] (ecmascript) <export default as IconBriefcase>");
+var __TURBOPACK__imported__module__$5b$project$5d2f$components$2f$toast$2f$Toast$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/components/toast/Toast.tsx [app-ssr] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2d$intl$2f$dist$2f$index$2e$react$2d$client$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/next-intl/dist/index.react-client.js [app-ssr] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$app$2f5b$locale$5d2f$profile$2f5b$uuid$5d2f$profile$2e$module$2e$css__$5b$app$2d$ssr$5d$__$28$css__module$29$__ = __turbopack_context__.i("[project]/app/[locale]/profile/[uuid]/profile.module.css [app-ssr] (css module)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$client$2f$app$2d$dir$2f$link$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/next/dist/client/app-dir/link.js [app-ssr] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$components$2f$auth$2f$CountryGuard$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/components/auth/CountryGuard.tsx [app-ssr] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$header$2f$hooks$2f$useUserProfile$2e$ts__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/components/ui/header/hooks/useUserProfile.ts [app-ssr] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$components$2f$auth$2f$GlobalProfileProvider$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/components/auth/GlobalProfileProvider.tsx [app-ssr] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$components$2f$toast$2f$ToastContext$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/components/toast/ToastContext.tsx [app-ssr] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$app$2f5b$locale$5d2f$profile$2f5b$uuid$5d2f$components$2f$KnowledgeTab$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/app/[locale]/profile/[uuid]/components/KnowledgeTab.tsx [app-ssr] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$app$2f5b$locale$5d2f$profile$2f5b$uuid$5d2f$components$2f$AboutTab$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/app/[locale]/profile/[uuid]/components/AboutTab.tsx [app-ssr] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$app$2f5b$locale$5d2f$profile$2f5b$uuid$5d2f$components$2f$MeetTab$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/app/[locale]/profile/[uuid]/components/MeetTab.tsx [app-ssr] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$app$2f5b$locale$5d2f$profile$2f5b$uuid$5d2f$components$2f$PostsTab$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/app/[locale]/profile/[uuid]/components/PostsTab.tsx [app-ssr] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$app$2f5b$locale$5d2f$profile$2f5b$uuid$5d2f$components$2f$ProfileShare$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/app/[locale]/profile/[uuid]/components/ProfileShare.tsx [app-ssr] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$app$2f$components$2f$icons$2f$social$2f$FacebookSocialIcon$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/app/components/icons/social/FacebookSocialIcon.tsx [app-ssr] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$app$2f$components$2f$icons$2f$social$2f$InstagramSocialIcon$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/app/components/icons/social/InstagramSocialIcon.tsx [app-ssr] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$app$2f$components$2f$icons$2f$social$2f$LinkedinSocialIcon$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/app/components/icons/social/LinkedinSocialIcon.tsx [app-ssr] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$app$2f$components$2f$icons$2f$social$2f$YoutubeSocialIcon$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/app/components/icons/social/YoutubeSocialIcon.tsx [app-ssr] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$app$2f$components$2f$icons$2f$social$2f$XSocialIcon$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/app/components/icons/social/XSocialIcon.tsx [app-ssr] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$app$2f$components$2f$icons$2f$social$2f$TiktokSocialIcon$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/app/components/icons/social/TiktokSocialIcon.tsx [app-ssr] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$components$2f$project$2f$specifiedInsighterProject$2e$ts__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/components/project/specifiedInsighterProject.ts [app-ssr] (ecmascript)");
+"use client";
+;
+;
+;
+;
+;
+;
+;
+;
+;
+;
+;
+;
+;
+;
+;
+;
+;
+;
+;
+;
+;
+;
+;
+;
+;
+;
+;
+;
+;
+;
+function ProfilePageContent() {
+    // Helper to get initials from full name (unicode-safe)
+    const getInitials = (fullName, maxLetters = 2)=>{
+        const cleaned = (fullName || "").trim();
+        if (!cleaned) return "";
+        const parts = cleaned.split(/\s+/).filter(Boolean);
+        if (parts.length === 1) {
+            return Array.from(parts[0]).slice(0, maxLetters).join("").toUpperCase();
+        }
+        return parts.slice(0, maxLetters).map((p)=>Array.from(p)[0] ?? "").join("").toUpperCase();
+    };
+    const getCountryDisplayName = (country)=>{
+        if (typeof country === "string") return country;
+        if (typeof country?.name === "string") return country.name;
+        return locale === "ar" ? country?.name?.ar || country?.name?.en || "" : country?.name?.en || country?.name?.ar || "";
+    };
+    const [profileData, setProfileData] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useState"])(null);
+    const [loading, setLoading] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useState"])(true);
+    const [knowledgeData, setKnowledgeData] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useState"])(null);
+    // Store the "All" (unfiltered) total so the top stat doesn't change
+    // when the user switches filter chips on company profiles.
+    const [allKnowledgeTotal, setAllKnowledgeTotal] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useState"])(null);
+    const [knowledgePage, setKnowledgePage] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useState"])(1);
+    const [loadingKnowledge, setLoadingKnowledge] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useState"])(false);
+    const [selectedType, setSelectedType] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useState"])(null);
+    const [errorToast, setErrorToast] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useState"])({
+        show: false,
+        message: ""
+    });
+    const [insighterStatistics, setInsighterStatistics] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useState"])(null);
+    const [companyServiceTarget, setCompanyServiceTarget] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useState"])(null);
+    const [selfServiceRequestModalOpen, setSelfServiceRequestModalOpen] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useState"])(false);
+    const params = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$navigation$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useParams"])();
+    const searchParams = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$navigation$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useSearchParams"])();
+    const router = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$navigation$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useRouter"])();
+    const uuid = params.uuid;
+    const locale = params.locale;
+    const isRTL = locale === "ar";
+    const t = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2d$intl$2f$dist$2f$index$2e$react$2d$client$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useTranslations"])("ProfilePage");
+    const userProfileT = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2d$intl$2f$dist$2f$index$2e$react$2d$client$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useTranslations"])("UserProfile");
+    const filterT = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2d$intl$2f$dist$2f$index$2e$react$2d$client$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useTranslations"])("Filters");
+    const [enterpriseType, setEnterpriseType] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useState"])(null);
+    // Tab navigation loader (shows during URL/tab switch)
+    const [tabNavigating, setTabNavigating] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useState"])(false);
+    const [pendingTab, setPendingTab] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useState"])(null);
+    // Calendar booking states
+    const [loadingMeetings, setLoadingMeetings] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useState"])(false);
+    const [meetingAvailability, setMeetingAvailability] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useState"])([]);
+    const [selectedDate, setSelectedDate] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useState"])(null);
+    const [selectedMeetingTime, setSelectedMeetingTime] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useState"])(null);
+    const [currentMonth, setCurrentMonth] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useState"])(new Date());
+    // Hooks
+    const { user } = (0, __TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$header$2f$hooks$2f$useUserProfile$2e$ts__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useUserProfile"])();
+    const { refreshProfile } = (0, __TURBOPACK__imported__module__$5b$project$5d2f$components$2f$auth$2f$GlobalProfileProvider$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useGlobalProfile"])();
+    const toast = (0, __TURBOPACK__imported__module__$5b$project$5d2f$components$2f$toast$2f$ToastContext$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useToast"])();
+    // Get entity type from search params (safe for SSR)
+    const entityParam = searchParams.get("entity");
+    const activeTab = searchParams.get("tab") || (entityParam === "insighter" ? "posts" : "knowledge");
+    const isViewingInsighterEntity = enterpriseType === "insighter";
+    const logProfileResponse = (source, payload)=>{
+        const profile = payload && typeof payload === "object" && "data" in payload ? payload.data : payload;
+        console.log("[ProfilePage] profile API response", {
+            source,
+            uuid,
+            locale,
+            entityParam,
+            profile,
+            rawResponse: payload
+        });
+    };
+    // Ref to prevent duplicate API calls
+    const fetchingProfileRef = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useRef"])(false);
+    // Turn off the loader when the URL "tab" param actually changes to the desired value
+    (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useEffect"])(()=>{
+        if (!tabNavigating) return;
+        if (pendingTab && activeTab === pendingTab) {
+            setTabNavigating(false);
+            setPendingTab(null);
+            return;
+        }
+        // Safety: never keep the loader stuck (e.g., aborted navigation)
+        const timeout = window.setTimeout(()=>{
+            setTabNavigating(false);
+            setPendingTab(null);
+        }, 2000);
+        return ()=>window.clearTimeout(timeout);
+    }, [
+        activeTab,
+        pendingTab,
+        tabNavigating
+    ]);
+    (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useEffect"])(()=>{
+        const fetchProfileData = async ()=>{
+            // Prevent duplicate calls
+            if (fetchingProfileRef.current) {
+                return;
+            }
+            fetchingProfileRef.current = true;
+            try {
+                // The ?entity= param is only a *hint* for which endpoint to try
+                // first. The resolved entity type is decided by whichever endpoint
+                // actually returns data (see the setEnterpriseType calls below), so
+                // the page stays correct even when the param is missing or wrong.
+                const entityHint = entityParam;
+                // If entity=insighter is specified, try insighter API first
+                if (entityHint === "insighter") {
+                    // Try insighter API first
+                    let response = await fetch(`${("TURBOPACK compile-time value", "https://api.foresighta.co")}/api/platform/insighter/profile/${uuid}`, {
+                        headers: {
+                            "Content-Type": "application/json",
+                            Accept: "application/json",
+                            "Accept-Language": locale
+                        }
+                    });
+                    if (response.ok) {
+                        const data = await response.json();
+                        logProfileResponse("insighter", data);
+                        setProfileData(data.data);
+                        setEnterpriseType("insighter");
+                    } else {
+                        // Fall back to company API if insighter fails
+                        response = await fetch(`${("TURBOPACK compile-time value", "https://api.foresighta.co")}/api/platform/company/profile/${uuid}`, {
+                            headers: {
+                                "Content-Type": "application/json",
+                                Accept: "application/json",
+                                "Accept-Language": locale
+                            }
+                        });
+                        if (!response.ok) {
+                            throw new Error("Failed to fetch profile data");
+                        }
+                        const data = await response.json();
+                        logProfileResponse("company", data);
+                        // Create a ProfileData object from company data
+                        const companyProfileData = {
+                            uuid: data.data.uuid,
+                            country: data.data.country,
+                            country_flag: data.data.country_flag,
+                            name: data.data.legal_name,
+                            first_name: "",
+                            last_name: "",
+                            email: "",
+                            roles: [
+                                "company"
+                            ],
+                            profile_photo_url: data.data.logo,
+                            bio: data.data.about_us,
+                            certifications: data.data.certifications || [],
+                            industries: data.data.industries || [],
+                            consulting_field: data.data.consulting_field || [],
+                            social: data.data.social || [],
+                            insighter_company: data.data.insighter_company || [],
+                            receive_project_services_active: data.data.receive_project_services_active,
+                            company: {
+                                legal_name: data.data.legal_name,
+                                website: data.data.website,
+                                about_us: data.data.about_us,
+                                register_document: data.data.register_document,
+                                logo: data.data.logo,
+                                address: data.data.address,
+                                verified: data.data.verified,
+                                social: data.data.social || [],
+                                manager_country: data.data.manager_country,
+                                uuid: data.data.uuid
+                            }
+                        };
+                        setProfileData(companyProfileData);
+                        setEnterpriseType(null);
+                    }
+                } else {
+                    // Default behavior: try company API first
+                    let response = await fetch(`${("TURBOPACK compile-time value", "https://api.foresighta.co")}/api/platform/company/profile/${uuid}`, {
+                        headers: {
+                            "Content-Type": "application/json",
+                            Accept: "application/json",
+                            "Accept-Language": locale
+                        }
+                    });
+                    if (response.ok) {
+                        // It's a company profile
+                        const data = await response.json();
+                        logProfileResponse("company", data);
+                        // Create a ProfileData object from company data
+                        const companyProfileData = {
+                            uuid: data.data.uuid,
+                            country: data.data.country,
+                            country_flag: data.data.country_flag,
+                            name: data.data.legal_name,
+                            first_name: "",
+                            last_name: "",
+                            email: "",
+                            roles: [
+                                "company"
+                            ],
+                            profile_photo_url: data.data.logo,
+                            bio: data.data.about_us,
+                            certifications: data.data.certifications || [],
+                            industries: data.data.industries || [],
+                            consulting_field: data.data.consulting_field || [],
+                            social: data.data.social || [],
+                            insighter_company: data.data.insighter_company || [],
+                            receive_project_services_active: data.data.receive_project_services_active,
+                            company: {
+                                legal_name: data.data.legal_name,
+                                website: data.data.website,
+                                about_us: data.data.about_us,
+                                register_document: data.data.register_document,
+                                logo: data.data.logo,
+                                address: data.data.address,
+                                verified: data.data.verified,
+                                social: data.data.social || [],
+                                manager_country: data.data.manager_country,
+                                uuid: data.data.uuid
+                            }
+                        };
+                        setProfileData(companyProfileData);
+                        setEnterpriseType(null);
+                    } else {
+                        // Try insighter API if company API fails
+                        response = await fetch(`${("TURBOPACK compile-time value", "https://api.foresighta.co")}/api/platform/insighter/profile/${uuid}`, {
+                            headers: {
+                                "Content-Type": "application/json",
+                                Accept: "application/json",
+                                "Accept-Language": locale
+                            }
+                        });
+                        if (!response.ok) {
+                            throw new Error("Failed to fetch profile data");
+                        }
+                        const data = await response.json();
+                        logProfileResponse("insighter", data);
+                        setProfileData(data.data);
+                        setEnterpriseType("insighter");
+                    }
+                }
+            } catch (error) {
+                console.error("Error fetching profile data:", error);
+            } finally{
+                setLoading(false);
+                fetchingProfileRef.current = false;
+            }
+        };
+        if (uuid) {
+            fetchProfileData();
+        }
+    }, [
+        uuid,
+        locale,
+        entityParam
+    ]);
+    // Keep the URL's ?entity= param in sync with the *resolved* entity type, so
+    // reloads and shared links carry the correct value. This repairs URLs that
+    // arrive with a missing or wrong entity param (the root cause of an
+    // insighter rendering as an empty company profile).
+    (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useEffect"])(()=>{
+        if (loading || !profileData) return;
+        const desired = enterpriseType === "insighter" ? "insighter" : null;
+        const current = searchParams.get("entity");
+        if (desired === current) return; // already correct (incl. both null)
+        const nextParams = new URLSearchParams(searchParams.toString());
+        if (desired) {
+            nextParams.set("entity", desired);
+        } else {
+            nextParams.delete("entity");
+        }
+        const qs = nextParams.toString();
+        router.replace(qs ? `/${locale}/profile/${uuid}?${qs}` : `/${locale}/profile/${uuid}`, {
+            scroll: false
+        });
+    }, [
+        enterpriseType,
+        loading,
+        profileData,
+        searchParams,
+        router,
+        locale,
+        uuid
+    ]);
+    (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useEffect"])(()=>{
+        const fetchKnowledgeData = async ()=>{
+            if (!uuid || !profileData) return;
+            setLoadingKnowledge(true);
+            try {
+                // Use the *resolved* entity type (decided by which profile endpoint
+                // returned data), not the URL param — the param may be missing/wrong.
+                const isInsighterEntity = enterpriseType === "insighter";
+                // Now fetch the filtered data
+                let url = isInsighterEntity ? `${"TURBOPACK compile-time value", "https://api.foresighta.co"}/api/platform/insighter/knowledge/${uuid}?page=${knowledgePage}&per_page=12` : `${"TURBOPACK compile-time value", "https://api.foresighta.co"}/api/platform/company/knowledge/${uuid}?page=${knowledgePage}&per_page=12`;
+                if (selectedType) {
+                    url += `&type=${selectedType}`;
+                }
+                const response = await fetch(url, {
+                    headers: {
+                        "Content-Type": "application/json",
+                        Accept: "application/json",
+                        "Accept-Language": locale,
+                        "X-Timezone": Intl.DateTimeFormat().resolvedOptions().timeZone
+                    }
+                });
+                if (!response.ok) {
+                    throw new Error("Failed to fetch knowledge data");
+                }
+                const data = await response.json();
+                setKnowledgeData(data);
+                // When on a company page, cache the "All" total when the current request is unfiltered.
+                // This ensures the Published Insight stat stays stable while filters change.
+                if (!isInsighterEntity && !selectedType) {
+                    const total = data?.meta?.total;
+                    if (typeof total === "number") {
+                        setAllKnowledgeTotal(total);
+                    }
+                }
+            } catch (error) {
+                console.error("Error fetching knowledge data:", error);
+            } finally{
+                setLoadingKnowledge(false);
+            }
+        };
+        fetchKnowledgeData();
+    }, [
+        uuid,
+        locale,
+        knowledgePage,
+        selectedType,
+        profileData,
+        enterpriseType
+    ]);
+    (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useEffect"])(()=>{
+        const companyUuid = profileData?.company?.uuid;
+        const roles = profileData?.roles ?? [];
+        const shouldResolveCompanyTarget = isViewingInsighterEntity && Boolean(companyUuid) && (roles.includes("company") || roles.includes("company-insighter"));
+        if (!shouldResolveCompanyTarget || !companyUuid) {
+            setCompanyServiceTarget(null);
+            return;
+        }
+        let cancelled = false;
+        const fetchCompanyServiceTarget = async ()=>{
+            try {
+                const response = await fetch(`${("TURBOPACK compile-time value", "https://api.foresighta.co")}/api/platform/company/profile/${companyUuid}`, {
+                    headers: {
+                        "Content-Type": "application/json",
+                        Accept: "application/json",
+                        "Accept-Language": locale
+                    },
+                    cache: "no-store"
+                });
+                if (!response.ok) {
+                    if (!cancelled) setCompanyServiceTarget(null);
+                    return;
+                }
+                const payload = await response.json();
+                const ownerUuid = payload.data?.insighter_company?.find((insighter)=>insighter.owner)?.uuid || "";
+                if (!cancelled) {
+                    setCompanyServiceTarget({
+                        specifiedInsighterUuid: ownerUuid,
+                        receiveProjectServicesActive: payload.data?.receive_project_services_active === true
+                    });
+                }
+            } catch  {
+                if (!cancelled) setCompanyServiceTarget(null);
+            }
+        };
+        fetchCompanyServiceTarget();
+        return ()=>{
+            cancelled = true;
+        };
+    }, [
+        profileData,
+        isViewingInsighterEntity,
+        locale
+    ]);
+    // Fetch the unfiltered "All" total for company profiles (so the stat doesn't follow filters),
+    // even if the user lands directly on a filtered URL.
+    (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useEffect"])(()=>{
+        const fetchAllKnowledgeTotal = async ()=>{
+            if (!uuid || !profileData) return;
+            if (isViewingInsighterEntity) return;
+            try {
+                const response = await fetch(`${("TURBOPACK compile-time value", "https://api.foresighta.co")}/api/platform/company/knowledge/${uuid}?page=1&per_page=1`, {
+                    headers: {
+                        "Content-Type": "application/json",
+                        Accept: "application/json",
+                        "Accept-Language": locale
+                    }
+                });
+                if (!response.ok) return;
+                const data = await response.json();
+                const total = data?.meta?.total;
+                if (typeof total === "number") {
+                    setAllKnowledgeTotal(total);
+                }
+            } catch  {
+            // ignore - UI will fall back to knowledgeData?.meta.total
+            }
+        };
+        // Only fetch when we don't already have it.
+        if (allKnowledgeTotal == null) {
+            fetchAllKnowledgeTotal();
+        }
+    }, [
+        uuid,
+        locale,
+        profileData,
+        isViewingInsighterEntity,
+        allKnowledgeTotal
+    ]);
+    // Fetch insighter statistics when viewing an insighter profile
+    (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useEffect"])(()=>{
+        const fetchInsighterStatistics = async ()=>{
+            if (!uuid || enterpriseType !== "insighter") {
+                setInsighterStatistics(null);
+                return;
+            }
+            try {
+                const response = await fetch(`${("TURBOPACK compile-time value", "https://api.foresighta.co")}/api/platform/insighter/profile/statistics/${uuid}`, {
+                    headers: {
+                        "Content-Type": "application/json",
+                        Accept: "application/json",
+                        "Accept-Language": locale
+                    },
+                    cache: "no-store"
+                });
+                if (!response.ok) return;
+                const data = await response.json();
+                setInsighterStatistics(data?.data ?? null);
+            } catch  {
+                // Silently ignore; UI will fallback to 0
+                setInsighterStatistics(null);
+            }
+        };
+        fetchInsighterStatistics();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [
+        uuid,
+        locale,
+        enterpriseType
+    ]);
+    // State to track if user is authenticated
+    const [isAuthenticated, setIsAuthenticated] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useState"])(false);
+    const [authChecked, setAuthChecked] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useState"])(false);
+    const [currentUserUuid, setCurrentUserUuid] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useState"])(null);
+    // State to track if current profile is the user's own profile
+    const [isOwnProfile, setIsOwnProfile] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useState"])(false);
+    // Check if user is authenticated and fetch user profile if authenticated
+    (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useEffect"])(()=>{
+        const checkAuth = async ()=>{
+            // Get token from cookies
+            const token = ("TURBOPACK compile-time falsy", 0) ? "TURBOPACK unreachable" : null;
+            // If no token, user is not authenticated
+            if ("TURBOPACK compile-time truthy", 1) {
+                setIsAuthenticated(false);
+                setCurrentUserUuid(null);
+                setIsOwnProfile(false);
+                setAuthChecked(true);
+                return;
+            }
+            //TURBOPACK unreachable
+            ;
+        };
+        // Safe check for browser environment
+        if ("TURBOPACK compile-time falsy", 0) //TURBOPACK unreachable
+        ;
+        else {
+            setAuthChecked(true); // Mark as checked for SSR
+        }
+    }, [
+        uuid,
+        locale
+    ]);
+    const [showToast, setShowToast] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useState"])(false);
+    const [toastProps, setToastProps] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useState"])({
+        message: "",
+        type: "info"
+    });
+    // Helper function to format error messages from API
+    const formatErrorMessage = (error)=>{
+        if (error?.response?.data?.errors) {
+            const errors = error.response.data.errors;
+            // Join all error messages into a single string
+            return Object.values(errors).flat().join(", ");
+        }
+        if (error?.response?.data?.message) {
+            return error.response.data.message;
+        }
+        return "An error occurred. Please try again later.";
+    };
+    // Get auth token from cookies
+    const getAuthToken = ()=>{
+        const token = document.cookie.split("; ").find((row)=>row.startsWith("token="))?.split("=")[1];
+        return token;
+    };
+    // Function to fetch meeting availability data
+    const fetchMeetingAvailability = async ()=>{
+        if (!uuid) return;
+        setLoadingMeetings(true);
+        try {
+            // Token is optional: guests should be able to see the calendar
+            const token = getAuthToken();
+            // Calculate start and end date (3 months range starting from tomorrow)
+            const today = new Date();
+            // Start date is tomorrow
+            const tomorrow = new Date(today);
+            tomorrow.setDate(today.getDate() + 1);
+            const startDate = tomorrow.toISOString().split("T")[0]; // YYYY-MM-DD format
+            // End date is 1 year from tomorrow
+            const endDate = new Date(tomorrow);
+            endDate.setFullYear(tomorrow.getFullYear() + 1);
+            const endDateStr = endDate.toISOString().split("T")[0]; // YYYY-MM-DD format
+            const response = await __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$axios$2f$lib$2f$axios$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["default"].post(`${("TURBOPACK compile-time value", "https://api.foresighta.co")}/api/platform/insighter/meeting/available/hours/${uuid}`, {
+                start_date: startDate,
+                end_date: endDateStr
+            }, {
+                headers: {
+                    "Content-Type": "application/json",
+                    Accept: "application/json",
+                    "Accept-Language": locale,
+                    "X-Timezone": Intl.DateTimeFormat().resolvedOptions().timeZone,
+                    ...token ? {
+                        Authorization: `Bearer ${token}`
+                    } : {}
+                }
+            });
+            if (response.data?.data) {
+                setMeetingAvailability(response.data.data);
+            }
+        } catch (error) {
+            console.error("Error fetching meeting availability:", error);
+            const errorMessage = formatErrorMessage(error);
+            setToastProps({
+                message: errorMessage,
+                type: "error",
+                title: "Error"
+            });
+            setShowToast(true);
+        } finally{
+            setLoadingMeetings(false);
+        }
+    };
+    // Load meeting availability data when tab changes to "meet"
+    const handleTabChange = (value)=>{
+        // Show a loader immediately on tab click (URL update can feel like a pause)
+        setTabNavigating(true);
+        setPendingTab(value ?? "knowledge");
+        // Update URL with tab parameter
+        if ("TURBOPACK compile-time falsy", 0) //TURBOPACK unreachable
+        ;
+        // Fetch meeting availability when switching to meet tab
+        if (value === "meet" && enterpriseType === "insighter") {
+            fetchMeetingAvailability();
+        }
+    };
+    // Check URL parameters on initial load to fetch meeting data if needed
+    (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useEffect"])(()=>{
+        if (activeTab === "meet" && enterpriseType === "insighter" && authChecked) {
+            fetchMeetingAvailability();
+        }
+    }, [
+        activeTab,
+        enterpriseType,
+        authChecked
+    ]); // Run once authentication status is confirmed
+    const getSocialIcon = (type)=>{
+        const normalized = (type || "").toLowerCase().trim().replace(/\s+/g, "").replace(/[_-]/g, "");
+        switch(normalized){
+            case "facebook":
+            case "fb":
+                return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$app$2f$components$2f$icons$2f$social$2f$FacebookSocialIcon$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["default"], {
+                    size: 30
+                }, void 0, false, {
+                    fileName: "[project]/app/[locale]/profile/[uuid]/page.tsx",
+                    lineNumber: 938,
+                    columnNumber: 16
+                }, this);
+            case "x":
+            case "twitter":
+                return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$app$2f$components$2f$icons$2f$social$2f$XSocialIcon$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["default"], {
+                    size: 30
+                }, void 0, false, {
+                    fileName: "[project]/app/[locale]/profile/[uuid]/page.tsx",
+                    lineNumber: 941,
+                    columnNumber: 16
+                }, this);
+            case "youtube":
+            case "yt":
+                return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$app$2f$components$2f$icons$2f$social$2f$YoutubeSocialIcon$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["default"], {
+                    size: 30
+                }, void 0, false, {
+                    fileName: "[project]/app/[locale]/profile/[uuid]/page.tsx",
+                    lineNumber: 944,
+                    columnNumber: 16
+                }, this);
+            case "linkedin":
+                return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$app$2f$components$2f$icons$2f$social$2f$LinkedinSocialIcon$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["default"], {
+                    size: 30
+                }, void 0, false, {
+                    fileName: "[project]/app/[locale]/profile/[uuid]/page.tsx",
+                    lineNumber: 946,
+                    columnNumber: 16
+                }, this);
+            case "instagram":
+            case "insta":
+                return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$app$2f$components$2f$icons$2f$social$2f$InstagramSocialIcon$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["default"], {
+                    size: 30
+                }, void 0, false, {
+                    fileName: "[project]/app/[locale]/profile/[uuid]/page.tsx",
+                    lineNumber: 949,
+                    columnNumber: 16
+                }, this);
+            case "tiktok":
+            case "ticktok":
+                return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$app$2f$components$2f$icons$2f$social$2f$TiktokSocialIcon$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["default"], {
+                    size: 30
+                }, void 0, false, {
+                    fileName: "[project]/app/[locale]/profile/[uuid]/page.tsx",
+                    lineNumber: 952,
+                    columnNumber: 16
+                }, this);
+            default:
+                return null;
+        }
+    };
+    // Helper function to convert country code to flag emoji
+    const countryCodeToFlagEmoji = (countryCode)=>{
+        if (!countryCode) return "";
+        const OFFSET = 127397;
+        const codePoints = Array.from(countryCode.toUpperCase()).map((char)=>char.charCodeAt(0) + OFFSET);
+        return String.fromCodePoint(...codePoints);
+    };
+    const isCompany = profileData?.roles.includes("company");
+    const isInsighter = profileData?.roles.includes("insighter");
+    const isCompanyInsighter = profileData?.roles.includes("company-insighter");
+    const shouldUseCompanyServiceTarget = isViewingInsighterEntity && Boolean(profileData?.company?.uuid) && Boolean(isCompany || isCompanyInsighter);
+    const companyOwnerInsighterUuid = profileData?.insighter_company?.find((insighter)=>insighter.owner)?.uuid || "";
+    const specifiedInsighterUuid = shouldUseCompanyServiceTarget ? companyServiceTarget?.specifiedInsighterUuid || "" : companyOwnerInsighterUuid || (isViewingInsighterEntity ? profileData?.uuid || uuid : "");
+    const receiveProjectServicesActive = shouldUseCompanyServiceTarget ? companyServiceTarget?.receiveProjectServicesActive === true : profileData?.receive_project_services_active === true;
+    const isRequestingOwnService = Boolean(currentUserUuid) && currentUserUuid === specifiedInsighterUuid;
+    const shouldShowRequestServiceButton = authChecked && receiveProjectServicesActive && Boolean(specifiedInsighterUuid);
+    const canRequestSpecifiedInsighterProject = authChecked && !isRequestingOwnService && receiveProjectServicesActive && Boolean(specifiedInsighterUuid);
+    const specifiedInsighterDisplayRole = shouldUseCompanyServiceTarget || !isViewingInsighterEntity && isCompany ? "company" : "insighter";
+    const specifiedInsighterProfileUuid = specifiedInsighterDisplayRole === "company" ? profileData?.company?.uuid || uuid : profileData?.uuid || uuid;
+    const specifiedInsighterProjectParams = new URLSearchParams({
+        fresh: "1",
+        [__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$project$2f$specifiedInsighterProject$2e$ts__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["specifiedInsighterQueryParam"]]: specifiedInsighterUuid,
+        [__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$project$2f$specifiedInsighterProject$2e$ts__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["specifiedInsighterRoleQueryParam"]]: specifiedInsighterDisplayRole,
+        [__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$project$2f$specifiedInsighterProject$2e$ts__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["specifiedInsighterProfileUuidQueryParam"]]: specifiedInsighterProfileUuid
+    });
+    const specifiedInsighterProjectHref = `/${locale}/project/wizard/project-type?${specifiedInsighterProjectParams.toString()}`;
+    const requestServiceButtonLabel = isCompanyInsighter && profileData?.company?.legal_name ? locale === "ar" ? `طلب خدمة من ${profileData.company.legal_name}` : `Request Service from ${profileData.company.legal_name}` : locale === "ar" ? "طلب خدمة" : "Request Service";
+    // Function to handle pagination
+    const handlePageChange = (page)=>{
+        setKnowledgePage(page);
+    };
+    // Calendar utility functions
+    const getDaysInMonth = (year, month)=>{
+        return new Date(year, month + 1, 0).getDate();
+    };
+    const getFirstDayOfMonth = (year, month)=>{
+        return new Date(year, month, 1).getDay();
+    };
+    const formatDateString = (year, month, day)=>{
+        return `${year}-${String(month + 1).padStart(2, "0")}-${String(day).padStart(2, "0")}`;
+    };
+    const getDayName = (locale, date)=>{
+        return date.toLocaleDateString("en-US", {
+            weekday: "long"
+        });
+    };
+    const getMonthName = (locale, date)=>{
+        return date.toLocaleDateString("en-US", {
+            month: "long"
+        });
+    };
+    const getShortWeekdayNames = (locale)=>{
+        const names = [];
+        const date = new Date(2021, 0, 3); // Sunday
+        for(let i = 0; i < 7; i++){
+            const dayName = date.toLocaleDateString("en-US", {
+                weekday: "short"
+            });
+            names.push(dayName);
+            date.setDate(date.getDate() + 1);
+        }
+        return names;
+    };
+    const handlePreviousMonth = ()=>{
+        const newDate = new Date(currentMonth);
+        newDate.setMonth(currentMonth.getMonth() - 1);
+        setCurrentMonth(newDate);
+        setSelectedDate(null);
+        setSelectedMeetingTime(null);
+    };
+    const handleNextMonth = ()=>{
+        const newDate = new Date(currentMonth);
+        newDate.setMonth(currentMonth.getMonth() + 1);
+        setCurrentMonth(newDate);
+        setSelectedDate(null);
+        setSelectedMeetingTime(null);
+    };
+    const normalizeDateKey = (input)=>{
+        if (!input) return null;
+        const match = String(input).match(/\d{4}-\d{2}-\d{2}/);
+        return match ? match[0] : null;
+    };
+    // Check if a date is active (available for booking)
+    const isDateActive = (dateStr)=>{
+        const key = normalizeDateKey(dateStr);
+        if (!key) return false;
+        return meetingAvailability.some((day)=>{
+            const sameDay = normalizeDateKey(day.date) === key;
+            if (!sameDay) return false;
+            const hasTimes = Array.isArray(day.times) && (day.times.length ?? 0) > 0;
+            return Boolean(day.active) || hasTimes;
+        });
+    };
+    // Get meeting times for a specific date
+    const getMeetingTimesForDate = (dateStr)=>{
+        const key = normalizeDateKey(dateStr);
+        if (!key) return [];
+        const dayData = meetingAvailability.find((day)=>normalizeDateKey(day.date) === key);
+        return dayData?.times || [];
+    };
+    const handleDateClick = (dateStr)=>{
+        const key = normalizeDateKey(dateStr);
+        if (!key) return;
+        if (isDateActive(key)) {
+            // store normalized YYYY-MM-DD so downstream matching is consistent
+            setSelectedDate(key);
+            setSelectedMeetingTime(null);
+        }
+    };
+    const handleTimeClick = (time)=>{
+        setSelectedMeetingTime(time);
+    };
+    // Convert API knowledge items to the format expected by KnowledgeGrid
+    const formatKnowledgeItems = ()=>{
+        if (!knowledgeData || !profileData) return [];
+        return knowledgeData.data.map((item)=>({
+                ...item,
+                insighter: {
+                    name: profileData.name,
+                    profile_photo_url: profileData.profile_photo_url,
+                    roles: profileData.roles
+                }
+            }));
+    };
+    // Filter types for knowledge
+    const knowledgeTypes = [
+        {
+            id: null,
+            label: "all",
+            icon: (isActive)=>/*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("svg", {
+                    className: `${__TURBOPACK__imported__module__$5b$project$5d2f$app$2f5b$locale$5d2f$profile$2f5b$uuid$5d2f$profile$2e$module$2e$css__$5b$app$2d$ssr$5d$__$28$css__module$29$__["default"].icon} ${__TURBOPACK__imported__module__$5b$project$5d2f$app$2f5b$locale$5d2f$profile$2f5b$uuid$5d2f$profile$2e$module$2e$css__$5b$app$2d$ssr$5d$__$28$css__module$29$__["default"].iconData} ${isActive ? __TURBOPACK__imported__module__$5b$project$5d2f$app$2f5b$locale$5d2f$profile$2f5b$uuid$5d2f$profile$2e$module$2e$css__$5b$app$2d$ssr$5d$__$28$css__module$29$__["default"].iconActive : ""}`,
+                    width: "15",
+                    height: "15",
+                    viewBox: "0 0 24 24",
+                    fill: "none",
+                    xmlns: "http://www.w3.org/2000/svg",
+                    children: [
+                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("path", {
+                            d: "M12 18.5V19.38C12 21.25 11.25 22 9.37 22H4.62C3.17 22 2 20.83 2 19.38V14.63C2 12.75 2.75 12 4.62 12H5.5V15.5C5.5 17.16 6.84 18.5 8.5 18.5H12Z",
+                            fill: "currentColor"
+                        }, void 0, false, {
+                            fileName: "[project]/app/[locale]/profile/[uuid]/page.tsx",
+                            lineNumber: 1149,
+                            columnNumber: 11
+                        }, this),
+                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("path", {
+                            d: "M17 13.5V14.37C17 15.82 15.82 17 14.37 17H9.62C7.75 17 7 16.25 7 14.37V9.62C7 8.17 8.17 7 9.62 7H10.5V10.5C10.5 12.16 11.84 13.5 13.5 13.5H17Z",
+                            fill: "currentColor"
+                        }, void 0, false, {
+                            fileName: "[project]/app/[locale]/profile/[uuid]/page.tsx",
+                            lineNumber: 1153,
+                            columnNumber: 11
+                        }, this),
+                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("path", {
+                            d: "M22 4.62V9.37C22 11.25 21.25 12 19.37 12H14.62C12.75 12 12 11.25 12 9.37V4.62C12 2.75 12.75 2 14.62 2H19.37C21.25 2 22 2.75 22 4.62Z",
+                            fill: "currentColor"
+                        }, void 0, false, {
+                            fileName: "[project]/app/[locale]/profile/[uuid]/page.tsx",
+                            lineNumber: 1157,
+                            columnNumber: 11
+                        }, this)
+                    ]
+                }, void 0, true, {
+                    fileName: "[project]/app/[locale]/profile/[uuid]/page.tsx",
+                    lineNumber: 1140,
+                    columnNumber: 9
+                }, this),
+            filterClass: __TURBOPACK__imported__module__$5b$project$5d2f$app$2f5b$locale$5d2f$profile$2f5b$uuid$5d2f$profile$2e$module$2e$css__$5b$app$2d$ssr$5d$__$28$css__module$29$__["default"].filterAllActive
+        },
+        {
+            id: "data",
+            label: "data",
+            icon: (isActive)=>/*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("svg", {
+                    className: `${__TURBOPACK__imported__module__$5b$project$5d2f$app$2f5b$locale$5d2f$profile$2f5b$uuid$5d2f$profile$2e$module$2e$css__$5b$app$2d$ssr$5d$__$28$css__module$29$__["default"].icon} ${__TURBOPACK__imported__module__$5b$project$5d2f$app$2f5b$locale$5d2f$profile$2f5b$uuid$5d2f$profile$2e$module$2e$css__$5b$app$2d$ssr$5d$__$28$css__module$29$__["default"].iconData} ${isActive ? __TURBOPACK__imported__module__$5b$project$5d2f$app$2f5b$locale$5d2f$profile$2f5b$uuid$5d2f$profile$2e$module$2e$css__$5b$app$2d$ssr$5d$__$28$css__module$29$__["default"].iconActive : ""}`,
+                    width: "15",
+                    height: "15",
+                    viewBox: "0 0 30 34",
+                    fill: "none",
+                    xmlns: "http://www.w3.org/2000/svg",
+                    children: [
+                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("path", {
+                            d: "M14.5464 0C10.5851 0 6.86364 0.704566 4.06815 1.98373C1.48292 3.16777 0 4.73376 0 6.28348C0 7.8332 1.48292 9.39967 4.06815 10.5831C6.86364 11.8623 10.585 12.5669 14.5464 12.5669C18.5078 12.5669 22.2297 11.8623 25.0243 10.5831C27.6099 9.39967 29.0933 7.8333 29.0933 6.28348C29.0933 4.73367 27.6099 3.16777 25.0243 1.98373C22.2293 0.704566 18.5077 0 14.5464 0Z",
+                            fill: "currentColor"
+                        }, void 0, false, {
+                            fileName: "[project]/app/[locale]/profile/[uuid]/page.tsx",
+                            lineNumber: 1178,
+                            columnNumber: 11
+                        }, this),
+                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("path", {
+                            d: "M0 9.45442C0.821516 10.3442 1.99713 11.1499 3.49489 11.8359C6.46628 13.1954 10.3914 13.9444 14.5469 13.9444C18.7023 13.9444 22.627 13.1949 25.5984 11.8359C27.0961 11.1499 28.2718 10.3445 29.0933 9.45442V13.4496C29.0933 15.004 27.6131 16.5723 25.0331 17.7531C22.2436 19.029 18.5194 19.7326 14.5464 19.7326C10.5734 19.7326 6.84871 19.029 4.05982 17.7531C1.47967 16.5723 0 15.004 0 13.4496V9.45442Z",
+                            fill: "currentColor"
+                        }, void 0, false, {
+                            fileName: "[project]/app/[locale]/profile/[uuid]/page.tsx",
+                            lineNumber: 1182,
+                            columnNumber: 11
+                        }, this),
+                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("path", {
+                            d: "M29.0933 16.6207C26.6302 19.2908 21.1116 21.1102 14.5464 21.1102C7.98116 21.1102 2.46273 19.2908 0 16.6207V20.1383C0 21.6918 1.47967 23.261 4.05982 24.4417C6.84871 25.7181 10.5734 26.4217 14.5464 26.4217C18.5194 26.4217 22.2436 25.7181 25.0336 24.4417C27.6136 23.261 29.0933 21.6918 29.0933 20.1383V16.6207Z",
+                            fill: "currentColor"
+                        }, void 0, false, {
+                            fileName: "[project]/app/[locale]/profile/[uuid]/page.tsx",
+                            lineNumber: 1186,
+                            columnNumber: 11
+                        }, this),
+                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("path", {
+                            d: "M4.05982 31.608C1.47967 30.4272 0 28.858 0 27.3041V23.3093C2.46273 25.9799 7.98116 27.7994 14.5464 27.7994C21.1116 27.7994 26.6302 25.9799 29.0933 23.3093V27.3041C29.0933 28.858 27.6131 30.4272 25.0331 31.608C22.2436 32.8844 18.5194 33.5875 14.5464 33.5875C10.5734 33.5875 6.84871 32.8844 4.05982 31.608Z",
+                            fill: "currentColor"
+                        }, void 0, false, {
+                            fileName: "[project]/app/[locale]/profile/[uuid]/page.tsx",
+                            lineNumber: 1190,
+                            columnNumber: 11
+                        }, this)
+                    ]
+                }, void 0, true, {
+                    fileName: "[project]/app/[locale]/profile/[uuid]/page.tsx",
+                    lineNumber: 1169,
+                    columnNumber: 9
+                }, this),
+            filterClass: __TURBOPACK__imported__module__$5b$project$5d2f$app$2f5b$locale$5d2f$profile$2f5b$uuid$5d2f$profile$2e$module$2e$css__$5b$app$2d$ssr$5d$__$28$css__module$29$__["default"].filterDataActive
+        },
+        {
+            id: "statistic",
+            label: "statistics",
+            icon: (isActive)=>/*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("svg", {
+                    className: `${__TURBOPACK__imported__module__$5b$project$5d2f$app$2f5b$locale$5d2f$profile$2f5b$uuid$5d2f$profile$2e$module$2e$css__$5b$app$2d$ssr$5d$__$28$css__module$29$__["default"].icon} ${__TURBOPACK__imported__module__$5b$project$5d2f$app$2f5b$locale$5d2f$profile$2f5b$uuid$5d2f$profile$2e$module$2e$css__$5b$app$2d$ssr$5d$__$28$css__module$29$__["default"].iconInsight} ${isActive ? __TURBOPACK__imported__module__$5b$project$5d2f$app$2f5b$locale$5d2f$profile$2f5b$uuid$5d2f$profile$2e$module$2e$css__$5b$app$2d$ssr$5d$__$28$css__module$29$__["default"].iconActive : ""}`,
+                    width: "15",
+                    height: "15",
+                    viewBox: "0 0 42 42",
+                    fill: "none",
+                    xmlns: "http://www.w3.org/2000/svg",
+                    children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("path", {
+                        d: "M29.5625 0C37.1458 0 41.6663 4.52116 41.6455 12.1045V29.5625C41.6455 37.1457 37.1251 41.6669 29.542 41.667H12.1045C4.52127 41.667 0.00012927 37.146 0 29.542V12.1045C0 4.52116 4.52116 0 12.1045 0H29.5625ZM11.9346 21.46C10.7753 21.4601 9.83305 22.4022 9.83301 23.5615V29.4678C9.83321 30.6269 10.7754 31.5682 11.9346 31.5684C13.112 31.5684 14.0545 30.627 14.0547 29.4678V23.5615C14.0546 22.4021 13.1121 21.46 11.9346 21.46ZM19.96 12.1846C18.7825 12.1847 17.8409 13.1268 17.8408 14.2861V29.4678C17.841 30.6269 18.7827 31.5682 19.96 31.5684C21.1192 31.5684 22.0613 30.627 22.0615 29.4678V14.2861C22.0615 13.1267 21.1194 12.1846 19.96 12.1846ZM27.6689 8.83301C26.4561 8.83301 25.4854 9.93196 25.4854 11.2842V28.9912C25.4855 30.3434 26.4561 31.4424 27.6689 31.4424C28.863 31.4423 29.8329 30.3433 29.833 28.9912V11.2842C29.8329 9.93204 28.8631 8.83313 27.6689 8.83301Z",
+                        fill: "currentColor"
+                    }, void 0, false, {
+                        fileName: "[project]/app/[locale]/profile/[uuid]/page.tsx",
+                        lineNumber: 1211,
+                        columnNumber: 11
+                    }, this)
+                }, void 0, false, {
+                    fileName: "[project]/app/[locale]/profile/[uuid]/page.tsx",
+                    lineNumber: 1202,
+                    columnNumber: 9
+                }, this),
+            filterClass: __TURBOPACK__imported__module__$5b$project$5d2f$app$2f5b$locale$5d2f$profile$2f5b$uuid$5d2f$profile$2e$module$2e$css__$5b$app$2d$ssr$5d$__$28$css__module$29$__["default"].filterInsightActive
+        },
+        {
+            id: "report",
+            label: "report",
+            icon: (isActive)=>/*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("svg", {
+                    className: `${__TURBOPACK__imported__module__$5b$project$5d2f$app$2f5b$locale$5d2f$profile$2f5b$uuid$5d2f$profile$2e$module$2e$css__$5b$app$2d$ssr$5d$__$28$css__module$29$__["default"].icon} ${__TURBOPACK__imported__module__$5b$project$5d2f$app$2f5b$locale$5d2f$profile$2f5b$uuid$5d2f$profile$2e$module$2e$css__$5b$app$2d$ssr$5d$__$28$css__module$29$__["default"].iconReport} ${isActive ? __TURBOPACK__imported__module__$5b$project$5d2f$app$2f5b$locale$5d2f$profile$2f5b$uuid$5d2f$profile$2e$module$2e$css__$5b$app$2d$ssr$5d$__$28$css__module$29$__["default"].iconActive : ""}`,
+                    width: "15",
+                    height: "15",
+                    viewBox: "0 0 50 50",
+                    fill: "none",
+                    xmlns: "http://www.w3.org/2000/svg",
+                    children: [
+                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("path", {
+                            d: "M45.125 21.75L43.0833 30.4583C41.3333 37.9792 37.875 41.0208 31.375 40.3958C30.3333 40.3125 29.2083 40.125 28 39.8333L24.5 39C15.8125 36.9375 13.125 32.6458 15.1667 23.9375L17.2083 15.2083C17.625 13.4375 18.125 11.8958 18.75 10.625C21.1875 5.58333 25.3333 4.22916 32.2917 5.875L35.7708 6.6875C44.5 8.72916 47.1667 13.0417 45.125 21.75Z",
+                            fill: "currentColor"
+                        }, void 0, false, {
+                            fileName: "[project]/app/[locale]/profile/[uuid]/page.tsx",
+                            lineNumber: 1232,
+                            columnNumber: 11
+                        }, this),
+                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("path", {
+                            d: "M31.375 40.3958C30.0833 41.2708 28.4583 42 26.4792 42.6458L23.1875 43.7292C14.9167 46.3958 10.5625 44.1667 7.87499 35.8958L5.20833 27.6667C2.54166 19.3958 4.74999 15.0208 13.0208 12.3542L16.3125 11.2708C17.1667 11 17.9792 10.7708 18.75 10.625C18.125 11.8958 17.625 13.4375 17.2083 15.2083L15.1667 23.9375C13.125 32.6458 15.8125 36.9375 24.5 39L28 39.8333C29.2083 40.125 30.3333 40.3125 31.375 40.3958Z",
+                            fill: "currentColor"
+                        }, void 0, false, {
+                            fileName: "[project]/app/[locale]/profile/[uuid]/page.tsx",
+                            lineNumber: 1236,
+                            columnNumber: 11
+                        }, this),
+                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("path", {
+                            d: "M36.4375 21.8959C36.3125 21.8959 36.1875 21.875 36.0417 21.8542L25.9375 19.2917C25.1042 19.0834 24.6042 18.2292 24.8125 17.3959C25.0208 16.5625 25.875 16.0625 26.7083 16.2709L36.8125 18.8334C37.6458 19.0417 38.1458 19.8959 37.9375 20.7292C37.7708 21.4167 37.125 21.8959 36.4375 21.8959Z",
+                            fill: "white"
+                        }, void 0, false, {
+                            fileName: "[project]/app/[locale]/profile/[uuid]/page.tsx",
+                            lineNumber: 1240,
+                            columnNumber: 11
+                        }, this),
+                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("path", {
+                            d: "M30.3333 28.9375C30.2083 28.9375 30.0833 28.9167 29.9375 28.8959L23.875 27.3542C23.0417 27.1459 22.5417 26.2917 22.75 25.4584C22.9583 24.625 23.8125 24.125 24.6458 24.3334L30.7083 25.875C31.5417 26.0834 32.0417 26.9375 31.8333 27.7709C31.6667 28.4792 31.0417 28.9375 30.3333 28.9375Z",
+                            fill: "white"
+                        }, void 0, false, {
+                            fileName: "[project]/app/[locale]/profile/[uuid]/page.tsx",
+                            lineNumber: 1244,
+                            columnNumber: 11
+                        }, this)
+                    ]
+                }, void 0, true, {
+                    fileName: "[project]/app/[locale]/profile/[uuid]/page.tsx",
+                    lineNumber: 1223,
+                    columnNumber: 9
+                }, this),
+            filterClass: __TURBOPACK__imported__module__$5b$project$5d2f$app$2f5b$locale$5d2f$profile$2f5b$uuid$5d2f$profile$2e$module$2e$css__$5b$app$2d$ssr$5d$__$28$css__module$29$__["default"].filterReportActive
+        },
+        {
+            id: "manual",
+            label: "manual",
+            icon: (isActive)=>/*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("svg", {
+                    className: `${__TURBOPACK__imported__module__$5b$project$5d2f$app$2f5b$locale$5d2f$profile$2f5b$uuid$5d2f$profile$2e$module$2e$css__$5b$app$2d$ssr$5d$__$28$css__module$29$__["default"].icon} ${__TURBOPACK__imported__module__$5b$project$5d2f$app$2f5b$locale$5d2f$profile$2f5b$uuid$5d2f$profile$2e$module$2e$css__$5b$app$2d$ssr$5d$__$28$css__module$29$__["default"].iconManual} ${isActive ? __TURBOPACK__imported__module__$5b$project$5d2f$app$2f5b$locale$5d2f$profile$2f5b$uuid$5d2f$profile$2e$module$2e$css__$5b$app$2d$ssr$5d$__$28$css__module$29$__["default"].iconActive : ""}`,
+                    width: "15",
+                    height: "15",
+                    viewBox: "0 0 50 50",
+                    fill: "none",
+                    xmlns: "http://www.w3.org/2000/svg",
+                    children: [
+                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("path", {
+                            d: "M42.7083 14.5834V31.25H13.2292C9.95834 31.25 7.29167 33.9167 7.29167 37.1875V14.5834C7.29167 6.25002 9.37501 4.16669 17.7083 4.16669H32.2917C40.625 4.16669 42.7083 6.25002 42.7083 14.5834Z",
+                            fill: "currentColor"
+                        }, void 0, false, {
+                            fileName: "[project]/app/[locale]/profile/[uuid]/page.tsx",
+                            lineNumber: 1265,
+                            columnNumber: 11
+                        }, this),
+                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("path", {
+                            d: "M42.7083 31.25V38.5417C42.7083 42.5625 39.4375 45.8333 35.4167 45.8333H14.5833C10.5625 45.8333 7.29167 42.5625 7.29167 38.5417V37.1875C7.29167 33.9167 9.95834 31.25 13.2292 31.25H42.7083Z",
+                            fill: "currentColor"
+                        }, void 0, false, {
+                            fileName: "[project]/app/[locale]/profile/[uuid]/page.tsx",
+                            lineNumber: 1269,
+                            columnNumber: 11
+                        }, this),
+                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("path", {
+                            d: "M33.3333 16.1458H16.6667C15.8125 16.1458 15.1042 15.4375 15.1042 14.5833C15.1042 13.7291 15.8125 13.0208 16.6667 13.0208H33.3333C34.1875 13.0208 34.8958 13.7291 34.8958 14.5833C34.8958 15.4375 34.1875 16.1458 33.3333 16.1458Z",
+                            fill: "white"
+                        }, void 0, false, {
+                            fileName: "[project]/app/[locale]/profile/[uuid]/page.tsx",
+                            lineNumber: 1273,
+                            columnNumber: 11
+                        }, this),
+                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("path", {
+                            d: "M27.0833 23.4375H16.6667C15.8125 23.4375 15.1042 22.7292 15.1042 21.875C15.1042 21.0208 15.8125 20.3125 16.6667 20.3125H27.0833C27.9375 20.3125 28.6458 21.0208 28.6458 21.875C28.6458 22.7292 27.9375 23.4375 27.0833 23.4375Z",
+                            fill: "white"
+                        }, void 0, false, {
+                            fileName: "[project]/app/[locale]/profile/[uuid]/page.tsx",
+                            lineNumber: 1277,
+                            columnNumber: 11
+                        }, this)
+                    ]
+                }, void 0, true, {
+                    fileName: "[project]/app/[locale]/profile/[uuid]/page.tsx",
+                    lineNumber: 1256,
+                    columnNumber: 9
+                }, this),
+            filterClass: __TURBOPACK__imported__module__$5b$project$5d2f$app$2f5b$locale$5d2f$profile$2f5b$uuid$5d2f$profile$2e$module$2e$css__$5b$app$2d$ssr$5d$__$28$css__module$29$__["default"].filterManualActive
+        },
+        {
+            id: "course",
+            label: "course",
+            icon: (isActive)=>/*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("svg", {
+                    className: `${__TURBOPACK__imported__module__$5b$project$5d2f$app$2f5b$locale$5d2f$profile$2f5b$uuid$5d2f$profile$2e$module$2e$css__$5b$app$2d$ssr$5d$__$28$css__module$29$__["default"].icon} ${__TURBOPACK__imported__module__$5b$project$5d2f$app$2f5b$locale$5d2f$profile$2f5b$uuid$5d2f$profile$2e$module$2e$css__$5b$app$2d$ssr$5d$__$28$css__module$29$__["default"].iconCourse} ${isActive ? __TURBOPACK__imported__module__$5b$project$5d2f$app$2f5b$locale$5d2f$profile$2f5b$uuid$5d2f$profile$2e$module$2e$css__$5b$app$2d$ssr$5d$__$28$css__module$29$__["default"].iconActive : ""}`,
+                    width: "15",
+                    height: "15",
+                    viewBox: "0 0 39 36",
+                    fill: "none",
+                    xmlns: "http://www.w3.org/2000/svg",
+                    children: [
+                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("path", {
+                            d: "M31.9898 26.8163C31.9898 24.1788 29.8518 22.0408 27.2143 22.0408C24.5767 22.0408 22.4388 24.1788 22.4388 26.8163C22.4388 28.1696 23.0037 29.3885 23.9081 30.2576V36L27.2143 33.7959L30.5204 36V30.2576C31.4248 29.3885 31.9898 28.1696 31.9898 26.8163Z",
+                            fill: "currentColor"
+                        }, void 0, false, {
+                            fileName: "[project]/app/[locale]/profile/[uuid]/page.tsx",
+                            lineNumber: 1298,
+                            columnNumber: 11
+                        }, this),
+                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("path", {
+                            d: "M37.1327 0H1.86734C1.05624 0 0.397949 0.657551 0.397949 1.46939V30.8572C0.397949 31.6683 1.05624 32.3265 1.86734 32.3265H20.9694V31.3443C20.0143 30.0372 19.5 28.4694 19.5 26.8163C19.5 22.5625 22.9604 19.102 27.2143 19.102C31.4682 19.102 34.9286 22.5625 34.9286 26.8163C34.9286 28.4701 34.4143 30.038 33.4592 31.345V32.3265H37.1327C37.9438 32.3265 38.6021 31.6683 38.6021 30.8572V1.46939C38.6021 0.657551 37.9438 0 37.1327 0ZM20.9694 13.2245H8.47959V10.2857H20.9694V13.2245ZM30.5204 7.34694H8.47959V4.40816H30.5204V7.34694Z",
+                            fill: "currentColor"
+                        }, void 0, false, {
+                            fileName: "[project]/app/[locale]/profile/[uuid]/page.tsx",
+                            lineNumber: 1302,
+                            columnNumber: 11
+                        }, this)
+                    ]
+                }, void 0, true, {
+                    fileName: "[project]/app/[locale]/profile/[uuid]/page.tsx",
+                    lineNumber: 1289,
+                    columnNumber: 9
+                }, this),
+            filterClass: __TURBOPACK__imported__module__$5b$project$5d2f$app$2f5b$locale$5d2f$profile$2f5b$uuid$5d2f$profile$2e$module$2e$css__$5b$app$2d$ssr$5d$__$28$css__module$29$__["default"].filterCourseActive
+        }
+    ];
+    const handleTypeChange = (type)=>{
+        setSelectedType(type);
+        setKnowledgePage(1); // Reset to page 1 when changing filter
+    };
+    return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$auth$2f$CountryGuard$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["default"], {
+        children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+            className: "flex flex-col min-h-screen bg-gradient-to-b from-gray-50 to-white dark:from-slate-950 dark:to-slate-900",
+            children: [
+                showToast && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                    className: "fixed top-6 right-6 z-50",
+                    children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$toast$2f$Toast$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["default"], {
+                        message: toastProps.message,
+                        type: toastProps.type,
+                        title: toastProps.title,
+                        onClose: ()=>setShowToast(false)
+                    }, void 0, false, {
+                        fileName: "[project]/app/[locale]/profile/[uuid]/page.tsx",
+                        lineNumber: 1323,
+                        columnNumber: 13
+                    }, this)
+                }, void 0, false, {
+                    fileName: "[project]/app/[locale]/profile/[uuid]/page.tsx",
+                    lineNumber: 1322,
+                    columnNumber: 11
+                }, this),
+                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mantine$2f$core$2f$esm$2f$components$2f$Modal$2f$Modal$2e$mjs__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["Modal"], {
+                    opened: selfServiceRequestModalOpen,
+                    onClose: ()=>setSelfServiceRequestModalOpen(false),
+                    centered: true,
+                    title: locale === "ar" ? "طلب خدمة" : "Request Service",
+                    children: [
+                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mantine$2f$core$2f$esm$2f$components$2f$Text$2f$Text$2e$mjs__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["Text"], {
+                            size: "sm",
+                            c: "dimmed",
+                            children: locale === "ar" ? "لا يمكنك طلب خدمة من نفسك." : "You can't request a service from yourself."
+                        }, void 0, false, {
+                            fileName: "[project]/app/[locale]/profile/[uuid]/page.tsx",
+                            lineNumber: 1337,
+                            columnNumber: 11
+                        }, this),
+                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mantine$2f$core$2f$esm$2f$components$2f$Group$2f$Group$2e$mjs__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["Group"], {
+                            justify: "flex-end",
+                            mt: "md",
+                            children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mantine$2f$core$2f$esm$2f$components$2f$Button$2f$Button$2e$mjs__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["Button"], {
+                                className: "bg-gradient-to-r from-blue-500 to-teal-400 hover:from-blue-600 hover:to-teal-500 transition-all",
+                                onClick: ()=>setSelfServiceRequestModalOpen(false),
+                                children: locale === "ar" ? "حسنًا" : "OK"
+                            }, void 0, false, {
+                                fileName: "[project]/app/[locale]/profile/[uuid]/page.tsx",
+                                lineNumber: 1343,
+                                columnNumber: 13
+                            }, this)
+                        }, void 0, false, {
+                            fileName: "[project]/app/[locale]/profile/[uuid]/page.tsx",
+                            lineNumber: 1342,
+                            columnNumber: 11
+                        }, this)
+                    ]
+                }, void 0, true, {
+                    fileName: "[project]/app/[locale]/profile/[uuid]/page.tsx",
+                    lineNumber: 1331,
+                    columnNumber: 9
+                }, this),
+                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                    className: "relative z-0 w-full overflow-hidden",
+                    children: [
+                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                            className: "pointer-events-none absolute z-10 -translate-x-1/2 transform hidden md:block",
+                            style: {
+                                left: "28%",
+                                top: "5%"
+                            },
+                            "aria-hidden": "true",
+                            children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$image$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["default"], {
+                                className: "max-w-none opacity-30 dark:opacity-20",
+                                src: __TURBOPACK__imported__module__$5b$project$5d2f$public$2f$images$2f$stripes$2d$dark$2e$svg$2e$mjs__$7b$__IMAGE__$3d3e$__$225b$project$5d2f$public$2f$images$2f$stripes$2d$dark$2e$svg__$28$static__in__ecmascript$2922$__$7d$__$5b$app$2d$ssr$5d$__$28$structured__image__object__with__data__url$2c$__ecmascript$29$__["default"],
+                                width: 768,
+                                height: 768,
+                                style: {
+                                    width: "auto",
+                                    height: "auto"
+                                },
+                                alt: "Stripes",
+                                priority: true
+                            }, void 0, false, {
+                                fileName: "[project]/app/[locale]/profile/[uuid]/page.tsx",
+                                lineNumber: 1358,
+                                columnNumber: 13
+                            }, this)
+                        }, void 0, false, {
+                            fileName: "[project]/app/[locale]/profile/[uuid]/page.tsx",
+                            lineNumber: 1353,
+                            columnNumber: 11
+                        }, this),
+                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                            className: "absolute top-0 right-0 w-1/3 h-96 bg-gradient-radial from-blue-100/40 to-transparent dark:from-blue-900/10 rounded-full blur-3xl -translate-y-1/4 translate-x-1/4"
+                        }, void 0, false, {
+                            fileName: "[project]/app/[locale]/profile/[uuid]/page.tsx",
+                            lineNumber: 1368,
+                            columnNumber: 11
+                        }, this),
+                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                            className: "absolute bottom-0 left-0 w-1/4 h-64 bg-gradient-radial from-pink-100/30 to-transparent dark:from-pink-900/10 rounded-full blur-3xl translate-y-1/4 -translate-x-1/4"
+                        }, void 0, false, {
+                            fileName: "[project]/app/[locale]/profile/[uuid]/page.tsx",
+                            lineNumber: 1369,
+                            columnNumber: 11
+                        }, this)
+                    ]
+                }, void 0, true, {
+                    fileName: "[project]/app/[locale]/profile/[uuid]/page.tsx",
+                    lineNumber: 1352,
+                    columnNumber: 9
+                }, this),
+                loading ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                    className: "flex justify-center items-center min-h-[60vh]",
+                    children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                        className: "animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-blue-500"
+                    }, void 0, false, {
+                        fileName: "[project]/app/[locale]/profile/[uuid]/page.tsx",
+                        lineNumber: 1374,
+                        columnNumber: 13
+                    }, this)
+                }, void 0, false, {
+                    fileName: "[project]/app/[locale]/profile/[uuid]/page.tsx",
+                    lineNumber: 1373,
+                    columnNumber: 11
+                }, this) : profileData ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                    className: "w-full z-10",
+                    "data-aos": "fade-up",
+                    children: [
+                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                            className: "bg-white dark:bg-slate-800 overflow-hidden mb-4 pb-10",
+                            children: [
+                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                    className: "h-[100px] dark:from-blue-700 dark:to-indigo-800 relative",
+                                    children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                        className: "pointer-events-none absolute z-10 -translate-x-1/2 transform hidden md:block",
+                                        style: {
+                                            left: "28%"
+                                        },
+                                        "aria-hidden": "true",
+                                        children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$image$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["default"], {
+                                            className: "max-w-none opacity-50",
+                                            src: __TURBOPACK__imported__module__$5b$project$5d2f$public$2f$images$2f$stripes$2d$dark$2e$svg$2e$mjs__$7b$__IMAGE__$3d3e$__$225b$project$5d2f$public$2f$images$2f$stripes$2d$dark$2e$svg__$28$static__in__ecmascript$2922$__$7d$__$5b$app$2d$ssr$5d$__$28$structured__image__object__with__data__url$2c$__ecmascript$29$__["default"],
+                                            width: 768,
+                                            height: 768,
+                                            style: {
+                                                width: "auto",
+                                                height: "auto"
+                                            },
+                                            alt: "Stripes",
+                                            priority: true
+                                        }, void 0, false, {
+                                            fileName: "[project]/app/[locale]/profile/[uuid]/page.tsx",
+                                            lineNumber: 1387,
+                                            columnNumber: 19
+                                        }, this)
+                                    }, void 0, false, {
+                                        fileName: "[project]/app/[locale]/profile/[uuid]/page.tsx",
+                                        lineNumber: 1382,
+                                        columnNumber: 17
+                                    }, this)
+                                }, void 0, false, {
+                                    fileName: "[project]/app/[locale]/profile/[uuid]/page.tsx",
+                                    lineNumber: 1381,
+                                    columnNumber: 15
+                                }, this),
+                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                    className: "max-w-6xl z-20 mx-auto px-4 sm:px-6 relative -mt-16",
+                                    children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                        className: "flex flex-col md:flex-row gap-6  items-center md:items-start",
+                                        children: [
+                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                className: "flex-shrink-0",
+                                                children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                    className: "w-32 h-32 rounded-full  border border-blue-500 relative",
+                                                    children: [
+                                                        isCompany && profileData.company?.logo ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$client$2f$app$2d$dir$2f$link$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["default"], {
+                                                            href: `/${locale}/profile/${profileData.company?.uuid}`,
+                                                            children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$image$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["default"], {
+                                                                src: profileData.company.logo,
+                                                                alt: profileData.company?.legal_name || profileData.name,
+                                                                width: 400,
+                                                                height: 400,
+                                                                className: "w-full h-full rounded-full   object-cover"
+                                                            }, void 0, false, {
+                                                                fileName: "[project]/app/[locale]/profile/[uuid]/page.tsx",
+                                                                lineNumber: 1408,
+                                                                columnNumber: 27
+                                                            }, this)
+                                                        }, void 0, false, {
+                                                            fileName: "[project]/app/[locale]/profile/[uuid]/page.tsx",
+                                                            lineNumber: 1407,
+                                                            columnNumber: 25
+                                                        }, this) : profileData.profile_photo_url ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$image$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["default"], {
+                                                            src: profileData.profile_photo_url,
+                                                            alt: profileData.name,
+                                                            width: 400,
+                                                            height: 400,
+                                                            className: "w-full h-full rounded-full object-cover object-top"
+                                                        }, void 0, false, {
+                                                            fileName: "[project]/app/[locale]/profile/[uuid]/page.tsx",
+                                                            lineNumber: 1419,
+                                                            columnNumber: 25
+                                                        }, this) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                            className: "w-full h-full bg-gray-100 dark:bg-slate-700 flex items-center justify-center rounded-full",
+                                                            children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                                                className: "text-4xl font-bold text-gray-400 dark:text-slate-400",
+                                                                children: [
+                                                                    profileData.first_name?.charAt(0) || "",
+                                                                    profileData.last_name?.charAt(0) || ""
+                                                                ]
+                                                            }, void 0, true, {
+                                                                fileName: "[project]/app/[locale]/profile/[uuid]/page.tsx",
+                                                                lineNumber: 1428,
+                                                                columnNumber: 27
+                                                            }, this)
+                                                        }, void 0, false, {
+                                                            fileName: "[project]/app/[locale]/profile/[uuid]/page.tsx",
+                                                            lineNumber: 1427,
+                                                            columnNumber: 25
+                                                        }, this),
+                                                        isCompanyInsighter && profileData.company?.logo && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                            className: "absolute top-[100px] -right-3 w-14 h-14 rounded-full overflow-hidden shadow-sm bg-white dark:bg-slate-700 z-10 border-4 border-white bg-white",
+                                                            children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$client$2f$app$2d$dir$2f$link$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["default"], {
+                                                                href: `/${locale}/profile/${profileData.company?.uuid}`,
+                                                                children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$image$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["default"], {
+                                                                    src: profileData.company.logo,
+                                                                    alt: profileData.company.legal_name,
+                                                                    width: 80,
+                                                                    height: 80,
+                                                                    className: "w-full h-full object-cover"
+                                                                }, void 0, false, {
+                                                                    fileName: "[project]/app/[locale]/profile/[uuid]/page.tsx",
+                                                                    lineNumber: 1437,
+                                                                    columnNumber: 29
+                                                                }, this)
+                                                            }, void 0, false, {
+                                                                fileName: "[project]/app/[locale]/profile/[uuid]/page.tsx",
+                                                                lineNumber: 1436,
+                                                                columnNumber: 27
+                                                            }, this)
+                                                        }, void 0, false, {
+                                                            fileName: "[project]/app/[locale]/profile/[uuid]/page.tsx",
+                                                            lineNumber: 1435,
+                                                            columnNumber: 25
+                                                        }, this),
+                                                        isCompany && enterpriseType === "insighter" && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                            className: "absolute top-[100px] -right-3 w-14 h-14 rounded-full border-4 border-white bg-white dark:bg-slate-700 z-10",
+                                                            children: profileData.profile_photo_url ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$image$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["default"], {
+                                                                src: profileData.profile_photo_url,
+                                                                alt: profileData.name,
+                                                                width: 80,
+                                                                height: 80,
+                                                                className: "w-full h-full object-cover border-3 border-white rounded-full object-top"
+                                                            }, void 0, false, {
+                                                                fileName: "[project]/app/[locale]/profile/[uuid]/page.tsx",
+                                                                lineNumber: 1450,
+                                                                columnNumber: 29
+                                                            }, this) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                                className: "w-full h-full bg-gray-100 dark:bg-slate-700 flex items-center justify-center rounded-full",
+                                                                children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                                                    className: "text-sm font-bold text-gray-400 dark:text-slate-400",
+                                                                    children: [
+                                                                        profileData.first_name?.charAt(0) || "",
+                                                                        profileData.last_name?.charAt(0) || ""
+                                                                    ]
+                                                                }, void 0, true, {
+                                                                    fileName: "[project]/app/[locale]/profile/[uuid]/page.tsx",
+                                                                    lineNumber: 1459,
+                                                                    columnNumber: 31
+                                                                }, this)
+                                                            }, void 0, false, {
+                                                                fileName: "[project]/app/[locale]/profile/[uuid]/page.tsx",
+                                                                lineNumber: 1458,
+                                                                columnNumber: 29
+                                                            }, this)
+                                                        }, void 0, false, {
+                                                            fileName: "[project]/app/[locale]/profile/[uuid]/page.tsx",
+                                                            lineNumber: 1448,
+                                                            columnNumber: 25
+                                                        }, this)
+                                                    ]
+                                                }, void 0, true, {
+                                                    fileName: "[project]/app/[locale]/profile/[uuid]/page.tsx",
+                                                    lineNumber: 1405,
+                                                    columnNumber: 21
+                                                }, this)
+                                            }, void 0, false, {
+                                                fileName: "[project]/app/[locale]/profile/[uuid]/page.tsx",
+                                                lineNumber: 1404,
+                                                columnNumber: 19
+                                            }, this),
+                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                className: "flex-1",
+                                                children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                    className: "flex flex-col md:flex-row h-full justify-between items-center",
+                                                    children: [
+                                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                            children: [
+                                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                                    className: "flex flex-wrap items-center gap-2 mb-1 capitalize",
+                                                                    children: [
+                                                                        enterpriseType === "insighter" && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                                            children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("h1", {
+                                                                                className: "text-2xl font-bold",
+                                                                                children: [
+                                                                                    profileData.first_name.toLowerCase() || "",
+                                                                                    " ",
+                                                                                    profileData.last_name.toLowerCase() || ""
+                                                                                ]
+                                                                            }, void 0, true, {
+                                                                                fileName: "[project]/app/[locale]/profile/[uuid]/page.tsx",
+                                                                                lineNumber: 1479,
+                                                                                columnNumber: 31
+                                                                            }, this)
+                                                                        }, void 0, false, {
+                                                                            fileName: "[project]/app/[locale]/profile/[uuid]/page.tsx",
+                                                                            lineNumber: 1478,
+                                                                            columnNumber: 29
+                                                                        }, this),
+                                                                        enterpriseType !== "insighter" && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("h1", {
+                                                                            className: "text-2xl font-bold",
+                                                                            children: profileData.company?.legal_name || ""
+                                                                        }, void 0, false, {
+                                                                            fileName: "[project]/app/[locale]/profile/[uuid]/page.tsx",
+                                                                            lineNumber: 1486,
+                                                                            columnNumber: 29
+                                                                        }, this),
+                                                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$tabler$2f$icons$2d$react$2f$dist$2f$esm$2f$icons$2f$IconRosetteDiscountCheckFilled$2e$mjs__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__$3c$export__default__as__IconRosetteDiscountCheckFilled$3e$__["IconRosetteDiscountCheckFilled"], {
+                                                                            className: "w-5 h-5 text-blue-500"
+                                                                        }, void 0, false, {
+                                                                            fileName: "[project]/app/[locale]/profile/[uuid]/page.tsx",
+                                                                            lineNumber: 1490,
+                                                                            columnNumber: 27
+                                                                        }, this),
+                                                                        isCompany && enterpriseType === "insighter" && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                                                            className: `bg-[#EFF8FF] text-[#299AF8] font-bold text-xs px-2 py-0.5 rounded-full inline-flex items-center ${locale === "ar" ? "flex-row-reverse" : ""}`,
+                                                                            dir: locale === "ar" ? "rtl" : "ltr",
+                                                                            children: userProfileT("company")
+                                                                        }, void 0, false, {
+                                                                            fileName: "[project]/app/[locale]/profile/[uuid]/page.tsx",
+                                                                            lineNumber: 1493,
+                                                                            columnNumber: 29
+                                                                        }, this),
+                                                                        isInsighter && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                                                            className: "bg-green-100  text-[#1BC653] font-bold uppercase text-xs px-2 py-0.5 rounded-full inline-flex items-center",
+                                                                            children: userProfileT("insighter")
+                                                                        }, void 0, false, {
+                                                                            fileName: "[project]/app/[locale]/profile/[uuid]/page.tsx",
+                                                                            lineNumber: 1502,
+                                                                            columnNumber: 29
+                                                                        }, this),
+                                                                        isCompanyInsighter && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                                                            className: `bg-[#EFF8FF] text-[#299AF8] font-bold text-xs px-2 py-0.5 rounded-full inline-flex items-center ${locale === "ar" ? "flex-row-reverse" : ""}`,
+                                                                            dir: locale === "ar" ? "rtl" : "ltr",
+                                                                            children: userProfileT("company")
+                                                                        }, void 0, false, {
+                                                                            fileName: "[project]/app/[locale]/profile/[uuid]/page.tsx",
+                                                                            lineNumber: 1507,
+                                                                            columnNumber: 29
+                                                                        }, this)
+                                                                    ]
+                                                                }, void 0, true, {
+                                                                    fileName: "[project]/app/[locale]/profile/[uuid]/page.tsx",
+                                                                    lineNumber: 1475,
+                                                                    columnNumber: 25
+                                                                }, this),
+                                                                isCompany && enterpriseType === "insighter" && profileData.company?.legal_name && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                                    className: "text-blue-500 mb-2 text-sm font-semibold text-center md:text-start",
+                                                                    children: [
+                                                                        locale === "ar" ? "مدير في " : "Manager at ",
+                                                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$client$2f$app$2d$dir$2f$link$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["default"], {
+                                                                            href: `/${locale}/profile/${profileData.company?.uuid}`,
+                                                                            className: "underline underline-offset-2 hover:opacity-80",
+                                                                            children: profileData.company.legal_name
+                                                                        }, void 0, false, {
+                                                                            fileName: "[project]/app/[locale]/profile/[uuid]/page.tsx",
+                                                                            lineNumber: 1520,
+                                                                            columnNumber: 29
+                                                                        }, this)
+                                                                    ]
+                                                                }, void 0, true, {
+                                                                    fileName: "[project]/app/[locale]/profile/[uuid]/page.tsx",
+                                                                    lineNumber: 1518,
+                                                                    columnNumber: 27
+                                                                }, this),
+                                                                isCompanyInsighter && profileData.company?.legal_name && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                                    className: "text-blue-500 mb-2 text-sm font-semibold text-center md:text-start",
+                                                                    children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$client$2f$app$2d$dir$2f$link$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["default"], {
+                                                                        href: `/${locale}/profile/${profileData.company?.uuid}`,
+                                                                        className: "underline underline-offset-2 hover:opacity-80",
+                                                                        children: profileData.company.legal_name
+                                                                    }, void 0, false, {
+                                                                        fileName: "[project]/app/[locale]/profile/[uuid]/page.tsx",
+                                                                        lineNumber: 1530,
+                                                                        columnNumber: 29
+                                                                    }, this)
+                                                                }, void 0, false, {
+                                                                    fileName: "[project]/app/[locale]/profile/[uuid]/page.tsx",
+                                                                    lineNumber: 1529,
+                                                                    columnNumber: 27
+                                                                }, this),
+                                                                (profileData?.country || !enterpriseType && profileData?.company?.manager_country) && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                                    className: "mb-3 flex items-center justify-center md:justify-start gap-2",
+                                                                    children: !enterpriseType && profileData?.company?.manager_country ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["Fragment"], {
+                                                                        children: [
+                                                                            profileData.company.manager_country.flag ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$image$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["default"], {
+                                                                                src: `/images/flags/${profileData.company.manager_country.flag}.svg`,
+                                                                                alt: isRTL ? profileData.company.manager_country.name.ar || profileData.company.manager_country.name.en : profileData.company.manager_country.name.en || profileData.company.manager_country.name.ar,
+                                                                                width: 15,
+                                                                                height: 15,
+                                                                                className: "object-contain"
+                                                                            }, void 0, false, {
+                                                                                fileName: "[project]/app/[locale]/profile/[uuid]/page.tsx",
+                                                                                lineNumber: 1551,
+                                                                                columnNumber: 37
+                                                                            }, this) : profileData.company.manager_country.iso2 ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                                                                className: "text-xl",
+                                                                                role: "img",
+                                                                                "aria-label": isRTL ? profileData.company.manager_country.name.ar || profileData.company.manager_country.name.en : profileData.company.manager_country.name.en || profileData.company.manager_country.name.ar,
+                                                                                children: countryCodeToFlagEmoji(profileData.company.manager_country.iso2)
+                                                                            }, void 0, false, {
+                                                                                fileName: "[project]/app/[locale]/profile/[uuid]/page.tsx",
+                                                                                lineNumber: 1569,
+                                                                                columnNumber: 37
+                                                                            }, this) : null,
+                                                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                                                                className: "text-sm text-gray-600 dark:text-gray-400 font-medium",
+                                                                                children: isRTL ? profileData.company.manager_country.name.ar || profileData.company.manager_country.name.en : profileData.company.manager_country.name.en || profileData.company.manager_country.name.ar
+                                                                            }, void 0, false, {
+                                                                                fileName: "[project]/app/[locale]/profile/[uuid]/page.tsx",
+                                                                                lineNumber: 1589,
+                                                                                columnNumber: 35
+                                                                            }, this)
+                                                                        ]
+                                                                    }, void 0, true) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["Fragment"], {
+                                                                        children: [
+                                                                            profileData?.country_flag ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$image$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["default"], {
+                                                                                src: `/images/flags/${profileData.country_flag}.svg`,
+                                                                                alt: getCountryDisplayName(profileData.country),
+                                                                                width: 15,
+                                                                                height: 15,
+                                                                                className: "object-contain"
+                                                                            }, void 0, false, {
+                                                                                fileName: "[project]/app/[locale]/profile/[uuid]/page.tsx",
+                                                                                lineNumber: 1602,
+                                                                                columnNumber: 37
+                                                                            }, this) : profileData?.country_code ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                                                                className: "text-xl",
+                                                                                role: "img",
+                                                                                "aria-label": getCountryDisplayName(profileData.country),
+                                                                                children: countryCodeToFlagEmoji(profileData.country_code)
+                                                                            }, void 0, false, {
+                                                                                fileName: "[project]/app/[locale]/profile/[uuid]/page.tsx",
+                                                                                lineNumber: 1610,
+                                                                                columnNumber: 37
+                                                                            }, this) : null,
+                                                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                                                                className: "text-sm text-gray-600 dark:text-gray-400 font-medium",
+                                                                                children: getCountryDisplayName(profileData?.country ?? "")
+                                                                            }, void 0, false, {
+                                                                                fileName: "[project]/app/[locale]/profile/[uuid]/page.tsx",
+                                                                                lineNumber: 1620,
+                                                                                columnNumber: 35
+                                                                            }, this)
+                                                                        ]
+                                                                    }, void 0, true)
+                                                                }, void 0, false, {
+                                                                    fileName: "[project]/app/[locale]/profile/[uuid]/page.tsx",
+                                                                    lineNumber: 1545,
+                                                                    columnNumber: 29
+                                                                }, this),
+                                                                isCompany && !enterpriseType && profileData?.insighter_company && profileData.insighter_company.length > 0 && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                                    className: "mb-4 flex items-center justify-center md:justify-start",
+                                                                    children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mantine$2f$core$2f$esm$2f$components$2f$Avatar$2f$Avatar$2e$mjs__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["Avatar"].Group, {
+                                                                        spacing: "sm",
+                                                                        children: [
+                                                                            profileData.insighter_company.slice(0, 3).map((insighter)=>{
+                                                                                const isOwner = Boolean(insighter.owner);
+                                                                                const initials = insighter.name.split(" ").filter(Boolean).slice(0, 2).map((part)=>part.charAt(0).toUpperCase()).join("");
+                                                                                return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mantine$2f$core$2f$esm$2f$components$2f$Tooltip$2f$Tooltip$2e$mjs__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["Tooltip"], {
+                                                                                    label: isOwner ? `${insighter.name} • ${locale === "ar" ? "المدير" : "Manager"}` : insighter.name,
+                                                                                    withArrow: true,
+                                                                                    position: "top",
+                                                                                    children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$client$2f$app$2d$dir$2f$link$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["default"], {
+                                                                                        href: `/${locale}/profile/${insighter.uuid}?entity=insighter`,
+                                                                                        className: "block",
+                                                                                        children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                                                            children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mantine$2f$core$2f$esm$2f$components$2f$Avatar$2f$Avatar$2e$mjs__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["Avatar"], {
+                                                                                                src: insighter.profile_photo_url || undefined,
+                                                                                                radius: "xl",
+                                                                                                size: "md",
+                                                                                                color: "blue",
+                                                                                                children: !insighter.profile_photo_url ? initials : null
+                                                                                            }, void 0, false, {
+                                                                                                fileName: "[project]/app/[locale]/profile/[uuid]/page.tsx",
+                                                                                                lineNumber: 1665,
+                                                                                                columnNumber: 45
+                                                                                            }, this)
+                                                                                        }, void 0, false, {
+                                                                                            fileName: "[project]/app/[locale]/profile/[uuid]/page.tsx",
+                                                                                            lineNumber: 1662,
+                                                                                            columnNumber: 43
+                                                                                        }, this)
+                                                                                    }, void 0, false, {
+                                                                                        fileName: "[project]/app/[locale]/profile/[uuid]/page.tsx",
+                                                                                        lineNumber: 1658,
+                                                                                        columnNumber: 41
+                                                                                    }, this)
+                                                                                }, insighter.id, false, {
+                                                                                    fileName: "[project]/app/[locale]/profile/[uuid]/page.tsx",
+                                                                                    lineNumber: 1647,
+                                                                                    columnNumber: 39
+                                                                                }, this);
+                                                                            }),
+                                                                            profileData.insighter_company.length > 3 && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$client$2f$app$2d$dir$2f$link$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["default"], {
+                                                                                href: `/${locale}/profile/${uuid}?${(()=>{
+                                                                                    // Preserve any existing params (e.g. entity), only switch the tab.
+                                                                                    const params = new URLSearchParams(searchParams.toString());
+                                                                                    params.set("tab", "company-insighters");
+                                                                                    return params.toString();
+                                                                                })()}`,
+                                                                                className: "block",
+                                                                                prefetch: false,
+                                                                                onClick: (e)=>{
+                                                                                    // Avoid full navigation (can get stuck in loading);
+                                                                                    // behave like a tab switch and still update the URL.
+                                                                                    e.preventDefault();
+                                                                                    handleTabChange("company-insighters");
+                                                                                },
+                                                                                children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mantine$2f$core$2f$esm$2f$components$2f$Avatar$2f$Avatar$2e$mjs__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["Avatar"], {
+                                                                                    radius: "xl",
+                                                                                    size: "md",
+                                                                                    color: "gray",
+                                                                                    children: [
+                                                                                        "+",
+                                                                                        profileData.insighter_company.length - 3
+                                                                                    ]
+                                                                                }, void 0, true, {
+                                                                                    fileName: "[project]/app/[locale]/profile/[uuid]/page.tsx",
+                                                                                    lineNumber: 1699,
+                                                                                    columnNumber: 37
+                                                                                }, this)
+                                                                            }, void 0, false, {
+                                                                                fileName: "[project]/app/[locale]/profile/[uuid]/page.tsx",
+                                                                                lineNumber: 1681,
+                                                                                columnNumber: 35
+                                                                            }, this)
+                                                                        ]
+                                                                    }, void 0, true, {
+                                                                        fileName: "[project]/app/[locale]/profile/[uuid]/page.tsx",
+                                                                        lineNumber: 1634,
+                                                                        columnNumber: 31
+                                                                    }, this)
+                                                                }, void 0, false, {
+                                                                    fileName: "[project]/app/[locale]/profile/[uuid]/page.tsx",
+                                                                    lineNumber: 1633,
+                                                                    columnNumber: 29
+                                                                }, this),
+                                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                                    className: "flex flex-wrap gap-3 mb-4 justify-center md:justify-start",
+                                                                    children: shouldShowRequestServiceButton && isRequestingOwnService ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
+                                                                        type: "button",
+                                                                        onClick: ()=>setSelfServiceRequestModalOpen(true),
+                                                                        className: "inline-flex items-center gap-2 rounded-md bg-gradient-to-r from-blue-500 to-teal-400 px-3 py-2 text-xs font-medium text-white transition-all duration-200 hover:-translate-y-0.5 hover:from-blue-600 hover:to-teal-500 hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-sky-300",
+                                                                        children: [
+                                                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$tabler$2f$icons$2d$react$2f$dist$2f$esm$2f$icons$2f$IconBriefcase$2e$mjs__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__$3c$export__default__as__IconBriefcase$3e$__["IconBriefcase"], {
+                                                                                size: 16,
+                                                                                stroke: 2
+                                                                            }, void 0, false, {
+                                                                                fileName: "[project]/app/[locale]/profile/[uuid]/page.tsx",
+                                                                                lineNumber: 1721,
+                                                                                columnNumber: 31
+                                                                            }, this),
+                                                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                                                                children: requestServiceButtonLabel
+                                                                            }, void 0, false, {
+                                                                                fileName: "[project]/app/[locale]/profile/[uuid]/page.tsx",
+                                                                                lineNumber: 1722,
+                                                                                columnNumber: 31
+                                                                            }, this)
+                                                                        ]
+                                                                    }, void 0, true, {
+                                                                        fileName: "[project]/app/[locale]/profile/[uuid]/page.tsx",
+                                                                        lineNumber: 1716,
+                                                                        columnNumber: 29
+                                                                    }, this) : canRequestSpecifiedInsighterProject ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$client$2f$app$2d$dir$2f$link$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["default"], {
+                                                                        href: specifiedInsighterProjectHref,
+                                                                        className: "inline-flex items-center gap-2 rounded-md bg-gradient-to-r from-blue-500 to-teal-400 px-3 py-2 text-xs font-medium text-white transition-all duration-200 hover:-translate-y-0.5 hover:from-blue-600 hover:to-teal-500 hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-sky-300",
+                                                                        children: [
+                                                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$tabler$2f$icons$2d$react$2f$dist$2f$esm$2f$icons$2f$IconBriefcase$2e$mjs__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__$3c$export__default__as__IconBriefcase$3e$__["IconBriefcase"], {
+                                                                                size: 16,
+                                                                                stroke: 2
+                                                                            }, void 0, false, {
+                                                                                fileName: "[project]/app/[locale]/profile/[uuid]/page.tsx",
+                                                                                lineNumber: 1729,
+                                                                                columnNumber: 31
+                                                                            }, this),
+                                                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                                                                children: requestServiceButtonLabel
+                                                                            }, void 0, false, {
+                                                                                fileName: "[project]/app/[locale]/profile/[uuid]/page.tsx",
+                                                                                lineNumber: 1730,
+                                                                                columnNumber: 31
+                                                                            }, this)
+                                                                        ]
+                                                                    }, void 0, true, {
+                                                                        fileName: "[project]/app/[locale]/profile/[uuid]/page.tsx",
+                                                                        lineNumber: 1725,
+                                                                        columnNumber: 29
+                                                                    }, this) : null
+                                                                }, void 0, false, {
+                                                                    fileName: "[project]/app/[locale]/profile/[uuid]/page.tsx",
+                                                                    lineNumber: 1714,
+                                                                    columnNumber: 25
+                                                                }, this)
+                                                            ]
+                                                        }, void 0, true, {
+                                                            fileName: "[project]/app/[locale]/profile/[uuid]/page.tsx",
+                                                            lineNumber: 1473,
+                                                            columnNumber: 23
+                                                        }, this),
+                                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                            className: `flex justify-center gap-4 mt-5`,
+                                                            children: [
+                                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                                    className: "text-start bg-gradient-to-br from-white to-emerald-50 dark:from-slate-700 dark:to-slate-600 p-3 rounded-lg hover:shadow-md transition-all duration-300 transform hover:-translate-y-1 border border-gray-100 dark:border-slate-600 group",
+                                                                    children: [
+                                                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                                            className: "flex items-center mb-2",
+                                                                            children: [
+                                                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                                                    className: "p-1.5 bg-emerald-100 dark:bg-emerald-900/30 rounded-full me-2 group-hover:scale-110 transition-transform",
+                                                                                    children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$tabler$2f$icons$2d$react$2f$dist$2f$esm$2f$icons$2f$IconFileReport$2e$mjs__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__$3c$export__default__as__IconFileReport$3e$__["IconFileReport"], {
+                                                                                        size: 18,
+                                                                                        className: "text-emerald-500 dark:text-emerald-400",
+                                                                                        stroke: 2
+                                                                                    }, void 0, false, {
+                                                                                        fileName: "[project]/app/[locale]/profile/[uuid]/page.tsx",
+                                                                                        lineNumber: 1741,
+                                                                                        columnNumber: 31
+                                                                                    }, this)
+                                                                                }, void 0, false, {
+                                                                                    fileName: "[project]/app/[locale]/profile/[uuid]/page.tsx",
+                                                                                    lineNumber: 1740,
+                                                                                    columnNumber: 29
+                                                                                }, this),
+                                                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                                                                    className: "text-xs font-medium text-emerald-600 dark:text-emerald-300",
+                                                                                    dangerouslySetInnerHTML: {
+                                                                                        __html: t("publishedInsight")
+                                                                                    }
+                                                                                }, void 0, false, {
+                                                                                    fileName: "[project]/app/[locale]/profile/[uuid]/page.tsx",
+                                                                                    lineNumber: 1747,
+                                                                                    columnNumber: 29
+                                                                                }, this)
+                                                                            ]
+                                                                        }, void 0, true, {
+                                                                            fileName: "[project]/app/[locale]/profile/[uuid]/page.tsx",
+                                                                            lineNumber: 1739,
+                                                                            columnNumber: 27
+                                                                        }, this),
+                                                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
+                                                                            className: "bg-clip-text text-transparent bg-gradient-to-r from-emerald-600 to-teal-500 font-bold text-4xl",
+                                                                            children: isViewingInsighterEntity ? insighterStatistics?.total_published ?? knowledgeData?.meta.total ?? 0 : allKnowledgeTotal ?? knowledgeData?.meta.total ?? 0
+                                                                        }, void 0, false, {
+                                                                            fileName: "[project]/app/[locale]/profile/[uuid]/page.tsx",
+                                                                            lineNumber: 1754,
+                                                                            columnNumber: 27
+                                                                        }, this)
+                                                                    ]
+                                                                }, void 0, true, {
+                                                                    fileName: "[project]/app/[locale]/profile/[uuid]/page.tsx",
+                                                                    lineNumber: 1738,
+                                                                    columnNumber: 25
+                                                                }, this),
+                                                                isViewingInsighterEntity && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                                    className: "text-start bg-gradient-to-br from-white to-blue-50 dark:from-slate-700 dark:to-slate-600 p-3 rounded-lg hover:shadow-md transition-all duration-300 transform hover:-translate-y-1 border border-gray-100 dark:border-slate-600 group",
+                                                                    children: [
+                                                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                                            className: "flex items-center mb-2",
+                                                                            children: [
+                                                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                                                    className: "p-1.5 bg-blue-100 dark:bg-blue-900/30 rounded-full me-2 group-hover:scale-110 transition-transform",
+                                                                                    children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$tabler$2f$icons$2d$react$2f$dist$2f$esm$2f$icons$2f$IconBrandHipchat$2e$mjs__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__$3c$export__default__as__IconBrandHipchat$3e$__["IconBrandHipchat"], {
+                                                                                        size: 18,
+                                                                                        className: "text-blue-500 dark:text-blue-400",
+                                                                                        stroke: 2
+                                                                                    }, void 0, false, {
+                                                                                        fileName: "[project]/app/[locale]/profile/[uuid]/page.tsx",
+                                                                                        lineNumber: 1766,
+                                                                                        columnNumber: 33
+                                                                                    }, this)
+                                                                                }, void 0, false, {
+                                                                                    fileName: "[project]/app/[locale]/profile/[uuid]/page.tsx",
+                                                                                    lineNumber: 1765,
+                                                                                    columnNumber: 31
+                                                                                }, this),
+                                                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                                                                    className: "text-xs font-medium text-transparent bg-clip-text bg-gradient-to-r from-blue-500 to-teal-500",
+                                                                                    dangerouslySetInnerHTML: {
+                                                                                        __html: t("consultingSessions")
+                                                                                    }
+                                                                                }, void 0, false, {
+                                                                                    fileName: "[project]/app/[locale]/profile/[uuid]/page.tsx",
+                                                                                    lineNumber: 1772,
+                                                                                    columnNumber: 31
+                                                                                }, this)
+                                                                            ]
+                                                                        }, void 0, true, {
+                                                                            fileName: "[project]/app/[locale]/profile/[uuid]/page.tsx",
+                                                                            lineNumber: 1764,
+                                                                            columnNumber: 29
+                                                                        }, this),
+                                                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
+                                                                            className: "bg-clip-text text-transparent bg-gradient-to-r from-blue-500 to-teal-500 font-bold text-4xl",
+                                                                            children: insighterStatistics?.total_meeting ?? 0
+                                                                        }, void 0, false, {
+                                                                            fileName: "[project]/app/[locale]/profile/[uuid]/page.tsx",
+                                                                            lineNumber: 1779,
+                                                                            columnNumber: 29
+                                                                        }, this)
+                                                                    ]
+                                                                }, void 0, true, {
+                                                                    fileName: "[project]/app/[locale]/profile/[uuid]/page.tsx",
+                                                                    lineNumber: 1763,
+                                                                    columnNumber: 27
+                                                                }, this)
+                                                            ]
+                                                        }, void 0, true, {
+                                                            fileName: "[project]/app/[locale]/profile/[uuid]/page.tsx",
+                                                            lineNumber: 1737,
+                                                            columnNumber: 23
+                                                        }, this)
+                                                    ]
+                                                }, void 0, true, {
+                                                    fileName: "[project]/app/[locale]/profile/[uuid]/page.tsx",
+                                                    lineNumber: 1472,
+                                                    columnNumber: 21
+                                                }, this)
+                                            }, void 0, false, {
+                                                fileName: "[project]/app/[locale]/profile/[uuid]/page.tsx",
+                                                lineNumber: 1471,
+                                                columnNumber: 19
+                                            }, this)
+                                        ]
+                                    }, void 0, true, {
+                                        fileName: "[project]/app/[locale]/profile/[uuid]/page.tsx",
+                                        lineNumber: 1402,
+                                        columnNumber: 17
+                                    }, this)
+                                }, void 0, false, {
+                                    fileName: "[project]/app/[locale]/profile/[uuid]/page.tsx",
+                                    lineNumber: 1400,
+                                    columnNumber: 15
+                                }, this)
+                            ]
+                        }, void 0, true, {
+                            fileName: "[project]/app/[locale]/profile/[uuid]/page.tsx",
+                            lineNumber: 1379,
+                            columnNumber: 13
+                        }, this),
+                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                            className: "bg-white max-w-6xl mx-auto dark:bg-slate-800 rounded-xl shadow-lg overflow-hidden",
+                            "data-aos": "fade-up",
+                            "data-aos-delay": "100",
+                            children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mantine$2f$core$2f$esm$2f$components$2f$Tabs$2f$Tabs$2e$mjs__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["Tabs"], {
+                                value: activeTab,
+                                onChange: handleTabChange,
+                                styles: {
+                                    tab: {
+                                        "&[dataActive]": {
+                                            borderColor: "#3b82f6",
+                                            color: "#3b82f6",
+                                            fontWeight: "bold"
+                                        },
+                                        "&:hover": {
+                                            backgroundColor: "#f8fafc",
+                                            borderColor: "#e2e8f0"
+                                        }
+                                    }
+                                },
+                                children: [
+                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mantine$2f$core$2f$esm$2f$components$2f$Tabs$2f$Tabs$2e$mjs__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["Tabs"].List, {
+                                        className: "border-b border-gray-200 dark:border-slate-700 bg-gray-50 dark:bg-slate-800/80 flex flex-wrap items-center",
+                                        children: [
+                                            isViewingInsighterEntity && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mantine$2f$core$2f$esm$2f$components$2f$Tabs$2f$Tabs$2e$mjs__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["Tabs"].Tab, {
+                                                value: "posts",
+                                                className: "text-base font-medium px-8 py-4 transition",
+                                                children: t("feedPosts")
+                                            }, void 0, false, {
+                                                fileName: "[project]/app/[locale]/profile/[uuid]/page.tsx",
+                                                lineNumber: 1817,
+                                                columnNumber: 21
+                                            }, this),
+                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mantine$2f$core$2f$esm$2f$components$2f$Tabs$2f$Tabs$2e$mjs__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["Tabs"].Tab, {
+                                                value: "knowledge",
+                                                className: "text-base font-medium px-8 py-4 transition",
+                                                children: t("posts")
+                                            }, void 0, false, {
+                                                fileName: "[project]/app/[locale]/profile/[uuid]/page.tsx",
+                                                lineNumber: 1824,
+                                                columnNumber: 19
+                                            }, this),
+                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mantine$2f$core$2f$esm$2f$components$2f$Tabs$2f$Tabs$2e$mjs__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["Tabs"].Tab, {
+                                                value: "about",
+                                                className: "text-base font-medium px-8 py-4 transition",
+                                                children: isCompanyInsighter ? t("aboutMe") : isCompany && !enterpriseType ? t("aboutCompany") : isCompany && enterpriseType ? t("aboutManager") : enterpriseType === "insighter" ? t("aboutMe") : null
+                                            }, void 0, false, {
+                                                fileName: "[project]/app/[locale]/profile/[uuid]/page.tsx",
+                                                lineNumber: 1830,
+                                                columnNumber: 19
+                                            }, this),
+                                            isCompany && !enterpriseType && profileData.insighter_company && profileData.insighter_company.length > 0 && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mantine$2f$core$2f$esm$2f$components$2f$Tabs$2f$Tabs$2e$mjs__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["Tabs"].Tab, {
+                                                value: "company-insighters",
+                                                className: "text-base font-medium px-8 py-4 transition",
+                                                children: locale === "ar" ? "خبراء الشركة" : "Company Insighters"
+                                            }, void 0, false, {
+                                                fileName: "[project]/app/[locale]/profile/[uuid]/page.tsx",
+                                                lineNumber: 1851,
+                                                columnNumber: 23
+                                            }, this),
+                                            (isInsighter || isCompanyInsighter || isCompany) && enterpriseType === "insighter" && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mantine$2f$core$2f$esm$2f$components$2f$Tabs$2f$Tabs$2e$mjs__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["Tabs"].Tab, {
+                                                value: "meet",
+                                                className: `text-base font-medium px-8 py-4 transition ${__TURBOPACK__imported__module__$5b$project$5d2f$app$2f5b$locale$5d2f$profile$2f5b$uuid$5d2f$profile$2e$module$2e$css__$5b$app$2d$ssr$5d$__$28$css__module$29$__["default"].shinyGradientText}`,
+                                                children: [
+                                                    t("meet"),
+                                                    " ",
+                                                    profileData?.first_name || ""
+                                                ]
+                                            }, void 0, true, {
+                                                fileName: "[project]/app/[locale]/profile/[uuid]/page.tsx",
+                                                lineNumber: 1861,
+                                                columnNumber: 23
+                                            }, this),
+                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                className: "ms-auto flex items-center px-3 py-2",
+                                                children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$app$2f5b$locale$5d2f$profile$2f5b$uuid$5d2f$components$2f$ProfileShare$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["default"], {
+                                                    profileData: profileData,
+                                                    enterpriseType: enterpriseType,
+                                                    locale: locale
+                                                }, void 0, false, {
+                                                    fileName: "[project]/app/[locale]/profile/[uuid]/page.tsx",
+                                                    lineNumber: 1869,
+                                                    columnNumber: 21
+                                                }, this)
+                                            }, void 0, false, {
+                                                fileName: "[project]/app/[locale]/profile/[uuid]/page.tsx",
+                                                lineNumber: 1868,
+                                                columnNumber: 19
+                                            }, this)
+                                        ]
+                                    }, void 0, true, {
+                                        fileName: "[project]/app/[locale]/profile/[uuid]/page.tsx",
+                                        lineNumber: 1815,
+                                        columnNumber: 17
+                                    }, this),
+                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                        className: "relative",
+                                        children: [
+                                            tabNavigating && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                className: "absolute inset-0 z-20 flex items-center justify-center bg-white/70 dark:bg-slate-800/70 backdrop-blur-sm",
+                                                children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                    className: "flex items-center gap-3",
+                                                    children: [
+                                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                            className: "animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-blue-500"
+                                                        }, void 0, false, {
+                                                            fileName: "[project]/app/[locale]/profile/[uuid]/page.tsx",
+                                                            lineNumber: 1881,
+                                                            columnNumber: 25
+                                                        }, this),
+                                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                                            className: "text-sm font-medium text-gray-600 dark:text-gray-300",
+                                                            children: locale === "ar" ? "جارٍ التحميل..." : "Loading..."
+                                                        }, void 0, false, {
+                                                            fileName: "[project]/app/[locale]/profile/[uuid]/page.tsx",
+                                                            lineNumber: 1882,
+                                                            columnNumber: 25
+                                                        }, this)
+                                                    ]
+                                                }, void 0, true, {
+                                                    fileName: "[project]/app/[locale]/profile/[uuid]/page.tsx",
+                                                    lineNumber: 1880,
+                                                    columnNumber: 23
+                                                }, this)
+                                            }, void 0, false, {
+                                                fileName: "[project]/app/[locale]/profile/[uuid]/page.tsx",
+                                                lineNumber: 1879,
+                                                columnNumber: 21
+                                            }, this),
+                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mantine$2f$core$2f$esm$2f$components$2f$Tabs$2f$Tabs$2e$mjs__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["Tabs"].Panel, {
+                                                value: "knowledge",
+                                                children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$app$2f5b$locale$5d2f$profile$2f5b$uuid$5d2f$components$2f$KnowledgeTab$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["default"], {
+                                                    locale: locale,
+                                                    isRTL: isRTL,
+                                                    knowledgeData: knowledgeData,
+                                                    loadingKnowledge: loadingKnowledge,
+                                                    knowledgeTypes: knowledgeTypes,
+                                                    selectedType: selectedType,
+                                                    profileData: profileData,
+                                                    handleTypeChange: handleTypeChange,
+                                                    handlePageChange: handlePageChange,
+                                                    formatKnowledgeItems: formatKnowledgeItems
+                                                }, void 0, false, {
+                                                    fileName: "[project]/app/[locale]/profile/[uuid]/page.tsx",
+                                                    lineNumber: 1890,
+                                                    columnNumber: 21
+                                                }, this)
+                                            }, void 0, false, {
+                                                fileName: "[project]/app/[locale]/profile/[uuid]/page.tsx",
+                                                lineNumber: 1889,
+                                                columnNumber: 19
+                                            }, this),
+                                            isViewingInsighterEntity && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mantine$2f$core$2f$esm$2f$components$2f$Tabs$2f$Tabs$2e$mjs__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["Tabs"].Panel, {
+                                                value: "posts",
+                                                children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$app$2f5b$locale$5d2f$profile$2f5b$uuid$5d2f$components$2f$PostsTab$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["default"], {
+                                                    uuid: uuid,
+                                                    locale: locale
+                                                }, void 0, false, {
+                                                    fileName: "[project]/app/[locale]/profile/[uuid]/page.tsx",
+                                                    lineNumber: 1906,
+                                                    columnNumber: 23
+                                                }, this)
+                                            }, void 0, false, {
+                                                fileName: "[project]/app/[locale]/profile/[uuid]/page.tsx",
+                                                lineNumber: 1905,
+                                                columnNumber: 21
+                                            }, this),
+                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mantine$2f$core$2f$esm$2f$components$2f$Tabs$2f$Tabs$2e$mjs__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["Tabs"].Panel, {
+                                                value: "about",
+                                                children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$app$2f5b$locale$5d2f$profile$2f5b$uuid$5d2f$components$2f$AboutTab$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["default"], {
+                                                    locale: locale,
+                                                    isRTL: isRTL,
+                                                    profileData: profileData,
+                                                    isCompany: isCompany || false,
+                                                    getSocialIcon: getSocialIcon,
+                                                    enterpriseType: enterpriseType
+                                                }, void 0, false, {
+                                                    fileName: "[project]/app/[locale]/profile/[uuid]/page.tsx",
+                                                    lineNumber: 1911,
+                                                    columnNumber: 21
+                                                }, this)
+                                            }, void 0, false, {
+                                                fileName: "[project]/app/[locale]/profile/[uuid]/page.tsx",
+                                                lineNumber: 1910,
+                                                columnNumber: 19
+                                            }, this),
+                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mantine$2f$core$2f$esm$2f$components$2f$Tabs$2f$Tabs$2e$mjs__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["Tabs"].Panel, {
+                                                value: "company-insighters",
+                                                children: isCompany && !enterpriseType && profileData.insighter_company && profileData.insighter_company.length > 0 ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                    className: "p-6 sm:p-8",
+                                                    children: [
+                                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                            className: "mb-4 flex justify-between items-center",
+                                                            children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                                                className: "text-sm text-gray-500",
+                                                                children: [
+                                                                    profileData.insighter_company.length,
+                                                                    " ",
+                                                                    locale === "ar" ? "خبراء" : "insighters"
+                                                                ]
+                                                            }, void 0, true, {
+                                                                fileName: "[project]/app/[locale]/profile/[uuid]/page.tsx",
+                                                                lineNumber: 1929,
+                                                                columnNumber: 27
+                                                            }, this)
+                                                        }, void 0, false, {
+                                                            fileName: "[project]/app/[locale]/profile/[uuid]/page.tsx",
+                                                            lineNumber: 1928,
+                                                            columnNumber: 25
+                                                        }, this),
+                                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                            className: "grid grid-cols-1 md:grid-cols-3 gap-6",
+                                                            children: profileData.insighter_company.map((insighter)=>(()=>{
+                                                                    const isOwner = Boolean(insighter.owner);
+                                                                    const managerLabel = locale === "ar" ? "المدير" : "Manager";
+                                                                    return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$client$2f$app$2d$dir$2f$link$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["default"], {
+                                                                        href: `/${locale}/profile/${insighter.uuid}?entity=insighter`,
+                                                                        className: `flex flex-col justify-between gap-4 bg-white rounded-lg border overflow-hidden duration-300 p-5 hover:-translate-y-1 hover:shadow-md ${isOwner ? "border-blue-200 ring-1 ring-blue-100" : "border-gray-200"}`,
+                                                                        style: {
+                                                                            backgroundImage: "url('https://res.cloudinary.com/dsiku9ipv/image/upload/v1746774672/Artboard_2_qzimiu.png')",
+                                                                            backgroundSize: "cover",
+                                                                            backgroundPosition: "center"
+                                                                        },
+                                                                        children: [
+                                                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                                                className: "flex flex-col justify-center items-center gap-4",
+                                                                                children: [
+                                                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                                                        className: `relative w-16 h-16 rounded-full border overflow-hidden bg-blue-50 flex items-center justify-center ${isOwner ? "border-blue-500 ring-2 ring-blue-200" : "border-blue-500"}`,
+                                                                                        children: insighter.profile_photo_url ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$image$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["default"], {
+                                                                                            src: insighter.profile_photo_url,
+                                                                                            alt: insighter.name,
+                                                                                            fill: true,
+                                                                                            className: "object-cover rounded-full object-top"
+                                                                                        }, void 0, false, {
+                                                                                            fileName: "[project]/app/[locale]/profile/[uuid]/page.tsx",
+                                                                                            lineNumber: 1964,
+                                                                                            columnNumber: 41
+                                                                                        }, this) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                                                                            className: "text-xl font-semibold text-blue-600",
+                                                                                            children: getInitials(insighter.name)
+                                                                                        }, void 0, false, {
+                                                                                            fileName: "[project]/app/[locale]/profile/[uuid]/page.tsx",
+                                                                                            lineNumber: 1971,
+                                                                                            columnNumber: 41
+                                                                                        }, this)
+                                                                                    }, void 0, false, {
+                                                                                        fileName: "[project]/app/[locale]/profile/[uuid]/page.tsx",
+                                                                                        lineNumber: 1957,
+                                                                                        columnNumber: 37
+                                                                                    }, this),
+                                                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                                                        className: "flex-1 min-w-0",
+                                                                                        children: [
+                                                                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                                                                className: "flex flex-col items-center gap-2",
+                                                                                                children: [
+                                                                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                                                                        className: "flex items-center gap-2",
+                                                                                                        children: [
+                                                                                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
+                                                                                                                className: "font-semibold text-gray-900 truncate",
+                                                                                                                children: insighter.name
+                                                                                                            }, void 0, false, {
+                                                                                                                fileName: "[project]/app/[locale]/profile/[uuid]/page.tsx",
+                                                                                                                lineNumber: 1980,
+                                                                                                                columnNumber: 43
+                                                                                                            }, this),
+                                                                                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$tabler$2f$icons$2d$react$2f$dist$2f$esm$2f$icons$2f$IconRosetteDiscountCheckFilled$2e$mjs__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__$3c$export__default__as__IconRosetteDiscountCheckFilled$3e$__["IconRosetteDiscountCheckFilled"], {
+                                                                                                                className: "w-4 h-4 text-blue-500 flex-shrink-0"
+                                                                                                            }, void 0, false, {
+                                                                                                                fileName: "[project]/app/[locale]/profile/[uuid]/page.tsx",
+                                                                                                                lineNumber: 1983,
+                                                                                                                columnNumber: 43
+                                                                                                            }, this)
+                                                                                                        ]
+                                                                                                    }, void 0, true, {
+                                                                                                        fileName: "[project]/app/[locale]/profile/[uuid]/page.tsx",
+                                                                                                        lineNumber: 1979,
+                                                                                                        columnNumber: 41
+                                                                                                    }, this),
+                                                                                                    isOwner && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                                                                                        className: `inline-flex items-center rounded-full border mb-2 border-amber-200 bg-amber-50 text-amber-800 text-[11px] font-semibold px-2 py-0.5 ${locale === "ar" ? "flex-row-reverse" : ""}`,
+                                                                                                        dir: locale === "ar" ? "rtl" : "ltr",
+                                                                                                        children: managerLabel
+                                                                                                    }, void 0, false, {
+                                                                                                        fileName: "[project]/app/[locale]/profile/[uuid]/page.tsx",
+                                                                                                        lineNumber: 1986,
+                                                                                                        columnNumber: 43
+                                                                                                    }, this)
+                                                                                                ]
+                                                                                            }, void 0, true, {
+                                                                                                fileName: "[project]/app/[locale]/profile/[uuid]/page.tsx",
+                                                                                                lineNumber: 1978,
+                                                                                                columnNumber: 39
+                                                                                            }, this),
+                                                                                            insighter.country && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                                                                className: "mt-1 justify-center flex items-center gap-2 text-xs text-gray-600",
+                                                                                                children: [
+                                                                                                    insighter.country.flag && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$image$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["default"], {
+                                                                                                        src: `/images/flags/${insighter.country.flag}.svg`,
+                                                                                                        alt: insighter.country.name,
+                                                                                                        width: 14,
+                                                                                                        height: 14,
+                                                                                                        className: "object-contain"
+                                                                                                    }, void 0, false, {
+                                                                                                        fileName: "[project]/app/[locale]/profile/[uuid]/page.tsx",
+                                                                                                        lineNumber: 1998,
+                                                                                                        columnNumber: 45
+                                                                                                    }, this),
+                                                                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                                                                                        className: "truncate",
+                                                                                                        children: insighter.country.name
+                                                                                                    }, void 0, false, {
+                                                                                                        fileName: "[project]/app/[locale]/profile/[uuid]/page.tsx",
+                                                                                                        lineNumber: 2006,
+                                                                                                        columnNumber: 43
+                                                                                                    }, this)
+                                                                                                ]
+                                                                                            }, void 0, true, {
+                                                                                                fileName: "[project]/app/[locale]/profile/[uuid]/page.tsx",
+                                                                                                lineNumber: 1996,
+                                                                                                columnNumber: 41
+                                                                                            }, this)
+                                                                                        ]
+                                                                                    }, void 0, true, {
+                                                                                        fileName: "[project]/app/[locale]/profile/[uuid]/page.tsx",
+                                                                                        lineNumber: 1977,
+                                                                                        columnNumber: 37
+                                                                                    }, this)
+                                                                                ]
+                                                                            }, void 0, true, {
+                                                                                fileName: "[project]/app/[locale]/profile/[uuid]/page.tsx",
+                                                                                lineNumber: 1956,
+                                                                                columnNumber: 35
+                                                                            }, this),
+                                                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                                                className: "flex flex-col  gap-2 w-full",
+                                                                                children: [
+                                                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$client$2f$app$2d$dir$2f$link$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["default"], {
+                                                                                        href: `/${locale}/profile/${insighter.uuid}?entity=insighter&tab=meet`,
+                                                                                        onClick: (e)=>e.stopPropagation(),
+                                                                                        className: "flex-1",
+                                                                                        children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
+                                                                                            className: "w-full bg-gradient-to-r from-blue-500 to-teal-400 text-xs text-white px-6 py-2 rounded-md font-medium hover:shadow-lg transition-all duration-300",
+                                                                                            children: locale === "ar" ? "حجز مقابلة" : "Meet"
+                                                                                        }, void 0, false, {
+                                                                                            fileName: "[project]/app/[locale]/profile/[uuid]/page.tsx",
+                                                                                            lineNumber: 2019,
+                                                                                            columnNumber: 39
+                                                                                        }, this)
+                                                                                    }, void 0, false, {
+                                                                                        fileName: "[project]/app/[locale]/profile/[uuid]/page.tsx",
+                                                                                        lineNumber: 2014,
+                                                                                        columnNumber: 37
+                                                                                    }, this),
+                                                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$client$2f$app$2d$dir$2f$link$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["default"], {
+                                                                                        href: `/${locale}/profile/${insighter.uuid}?entity=insighter`,
+                                                                                        onClick: (e)=>e.stopPropagation(),
+                                                                                        className: "flex-1",
+                                                                                        children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
+                                                                                            className: "w-full bg-white text-xs text-gray-900 border border-gray-300 px-6 py-2 rounded-md font-medium hover:bg-blue-50 transition-all duration-300",
+                                                                                            children: locale === "ar" ? "عرض المستندات المنشورة" : "View Published Insights"
+                                                                                        }, void 0, false, {
+                                                                                            fileName: "[project]/app/[locale]/profile/[uuid]/page.tsx",
+                                                                                            lineNumber: 2028,
+                                                                                            columnNumber: 39
+                                                                                        }, this)
+                                                                                    }, void 0, false, {
+                                                                                        fileName: "[project]/app/[locale]/profile/[uuid]/page.tsx",
+                                                                                        lineNumber: 2023,
+                                                                                        columnNumber: 37
+                                                                                    }, this)
+                                                                                ]
+                                                                            }, void 0, true, {
+                                                                                fileName: "[project]/app/[locale]/profile/[uuid]/page.tsx",
+                                                                                lineNumber: 2013,
+                                                                                columnNumber: 35
+                                                                            }, this)
+                                                                        ]
+                                                                    }, insighter.uuid, true, {
+                                                                        fileName: "[project]/app/[locale]/profile/[uuid]/page.tsx",
+                                                                        lineNumber: 1942,
+                                                                        columnNumber: 33
+                                                                    }, this);
+                                                                })())
+                                                        }, void 0, false, {
+                                                            fileName: "[project]/app/[locale]/profile/[uuid]/page.tsx",
+                                                            lineNumber: 1934,
+                                                            columnNumber: 25
+                                                        }, this)
+                                                    ]
+                                                }, void 0, true, {
+                                                    fileName: "[project]/app/[locale]/profile/[uuid]/page.tsx",
+                                                    lineNumber: 1927,
+                                                    columnNumber: 23
+                                                }, this) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                    className: "py-10 text-center text-gray-500",
+                                                    children: locale === "ar" ? "لا يوجد خبراء للشركة حتى الآن" : "No company insighters available yet."
+                                                }, void 0, false, {
+                                                    fileName: "[project]/app/[locale]/profile/[uuid]/page.tsx",
+                                                    lineNumber: 2042,
+                                                    columnNumber: 23
+                                                }, this)
+                                            }, void 0, false, {
+                                                fileName: "[project]/app/[locale]/profile/[uuid]/page.tsx",
+                                                lineNumber: 1922,
+                                                columnNumber: 19
+                                            }, this),
+                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mantine$2f$core$2f$esm$2f$components$2f$Tabs$2f$Tabs$2e$mjs__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["Tabs"].Panel, {
+                                                value: "meet",
+                                                children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$app$2f5b$locale$5d2f$profile$2f5b$uuid$5d2f$components$2f$MeetTab$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["default"], {
+                                                    locale: locale,
+                                                    isRTL: isRTL,
+                                                    profileData: profileData,
+                                                    isAuthenticated: isAuthenticated,
+                                                    loadingMeetings: loadingMeetings,
+                                                    meetingAvailability: meetingAvailability,
+                                                    currentMonth: currentMonth,
+                                                    selectedDate: selectedDate,
+                                                    selectedMeetingTime: selectedMeetingTime,
+                                                    uuid: uuid,
+                                                    isOwnProfile: isOwnProfile,
+                                                    handlePreviousMonth: handlePreviousMonth,
+                                                    handleNextMonth: handleNextMonth,
+                                                    handleDateClick: handleDateClick,
+                                                    handleTimeClick: handleTimeClick,
+                                                    fetchMeetingAvailability: fetchMeetingAvailability,
+                                                    isDateActive: isDateActive,
+                                                    getMeetingTimesForDate: getMeetingTimesForDate,
+                                                    getMonthName: getMonthName,
+                                                    getShortWeekdayNames: getShortWeekdayNames,
+                                                    getDaysInMonth: getDaysInMonth,
+                                                    getFirstDayOfMonth: getFirstDayOfMonth,
+                                                    formatDateString: formatDateString,
+                                                    getDayName: getDayName
+                                                }, void 0, false, {
+                                                    fileName: "[project]/app/[locale]/profile/[uuid]/page.tsx",
+                                                    lineNumber: 2052,
+                                                    columnNumber: 21
+                                                }, this)
+                                            }, void 0, false, {
+                                                fileName: "[project]/app/[locale]/profile/[uuid]/page.tsx",
+                                                lineNumber: 2051,
+                                                columnNumber: 19
+                                            }, this)
+                                        ]
+                                    }, void 0, true, {
+                                        fileName: "[project]/app/[locale]/profile/[uuid]/page.tsx",
+                                        lineNumber: 1877,
+                                        columnNumber: 17
+                                    }, this)
+                                ]
+                            }, void 0, true, {
+                                fileName: "[project]/app/[locale]/profile/[uuid]/page.tsx",
+                                lineNumber: 1798,
+                                columnNumber: 15
+                            }, this)
+                        }, void 0, false, {
+                            fileName: "[project]/app/[locale]/profile/[uuid]/page.tsx",
+                            lineNumber: 1792,
+                            columnNumber: 13
+                        }, this)
+                    ]
+                }, void 0, true, {
+                    fileName: "[project]/app/[locale]/profile/[uuid]/page.tsx",
+                    lineNumber: 1377,
+                    columnNumber: 11
+                }, this) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                    className: "flex justify-center items-center min-h-[60vh]",
+                    children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                        className: "text-center",
+                        children: [
+                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                className: "bg-white dark:bg-slate-800 p-6 rounded-full mb-4 shadow-md inline-block",
+                                children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("svg", {
+                                    xmlns: "http://www.w3.org/2000/svg",
+                                    className: "h-12 w-12 text-gray-400",
+                                    fill: "none",
+                                    viewBox: "0 0 24 24",
+                                    stroke: "currentColor",
+                                    children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("path", {
+                                        strokeLinecap: "round",
+                                        strokeLinejoin: "round",
+                                        strokeWidth: 2,
+                                        d: "M12 4.354v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"
+                                    }, void 0, false, {
+                                        fileName: "[project]/app/[locale]/profile/[uuid]/page.tsx",
+                                        lineNumber: 2095,
+                                        columnNumber: 19
+                                    }, this)
+                                }, void 0, false, {
+                                    fileName: "[project]/app/[locale]/profile/[uuid]/page.tsx",
+                                    lineNumber: 2088,
+                                    columnNumber: 17
+                                }, this)
+                            }, void 0, false, {
+                                fileName: "[project]/app/[locale]/profile/[uuid]/page.tsx",
+                                lineNumber: 2087,
+                                columnNumber: 15
+                            }, this),
+                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
+                                className: "text-xl text-gray-600 dark:text-gray-300",
+                                children: t("profileNotFound")
+                            }, void 0, false, {
+                                fileName: "[project]/app/[locale]/profile/[uuid]/page.tsx",
+                                lineNumber: 2103,
+                                columnNumber: 15
+                            }, this)
+                        ]
+                    }, void 0, true, {
+                        fileName: "[project]/app/[locale]/profile/[uuid]/page.tsx",
+                        lineNumber: 2086,
+                        columnNumber: 13
+                    }, this)
+                }, void 0, false, {
+                    fileName: "[project]/app/[locale]/profile/[uuid]/page.tsx",
+                    lineNumber: 2085,
+                    columnNumber: 11
+                }, this),
+                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                    className: "flex-grow"
+                }, void 0, false, {
+                    fileName: "[project]/app/[locale]/profile/[uuid]/page.tsx",
+                    lineNumber: 2110,
+                    columnNumber: 9
+                }, this),
+                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$footer$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["default"], {}, void 0, false, {
+                    fileName: "[project]/app/[locale]/profile/[uuid]/page.tsx",
+                    lineNumber: 2111,
+                    columnNumber: 9
+                }, this)
+            ]
+        }, void 0, true, {
+            fileName: "[project]/app/[locale]/profile/[uuid]/page.tsx",
+            lineNumber: 1319,
+            columnNumber: 7
+        }, this)
+    }, void 0, false, {
+        fileName: "[project]/app/[locale]/profile/[uuid]/page.tsx",
+        lineNumber: 1318,
+        columnNumber: 5
+    }, this);
+}
+function ProfilePage() {
+    return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["Suspense"], {
+        fallback: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+            className: "flex justify-center items-center min-h-[60vh]",
+            children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                className: "animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-blue-500"
+            }, void 0, false, {
+                fileName: "[project]/app/[locale]/profile/[uuid]/page.tsx",
+                lineNumber: 2122,
+                columnNumber: 11
+            }, void 0)
+        }, void 0, false, {
+            fileName: "[project]/app/[locale]/profile/[uuid]/page.tsx",
+            lineNumber: 2121,
+            columnNumber: 9
+        }, void 0),
+        children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(ProfilePageContent, {}, void 0, false, {
+            fileName: "[project]/app/[locale]/profile/[uuid]/page.tsx",
+            lineNumber: 2126,
+            columnNumber: 7
+        }, this)
+    }, void 0, false, {
+        fileName: "[project]/app/[locale]/profile/[uuid]/page.tsx",
+        lineNumber: 2119,
+        columnNumber: 5
+    }, this);
+}
+}),
+];
+
+//# sourceMappingURL=app_7d7dceb0._.js.map

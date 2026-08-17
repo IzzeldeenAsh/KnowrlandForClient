@@ -15,6 +15,7 @@ import { arSA, enUS } from 'date-fns/locale'
 import Link from 'next/link'
 import { useEffect, useMemo, useState } from 'react'
 import { publicBaseUrl } from '@/app/config'
+import FeedSaveButton from '@/components/feed/FeedSaveButton'
 import FeedShare from '@/components/feed/FeedShare'
 import {
   getCommunityFeedArticle,
@@ -267,6 +268,16 @@ export default function ArticleReader({ locale, identifier, isPublic }: ArticleR
               <h1 dir="auto">{item.title}</h1>
             </div>
             <div className={styles.heroActions}>
+              {isPublic && (
+                <FeedSaveButton
+                  uuid={item.uuid}
+                  identifier={item.slug ?? identifier}
+                  contentType="article"
+                  initialIsSaved={item.is_saved}
+                  locale={locale}
+                  tone="hero"
+                />
+              )}
               <FeedShare
                 shareUrl={shareUrl}
                 shareTitle={item.title ?? ''}
@@ -381,7 +392,7 @@ export default function ArticleReader({ locale, identifier, isPublic }: ArticleR
                                 setOpeningInsight((current) => (current === insightKey ? null : current))
                               }, 1800)
                             }}
-                            className="inline-flex min-h-9 items-center justify-center rounded-full border border-[#2378E8] px-4 text-center text-[13px] font-medium text-[#2378E8] transition-colors hover:bg-[#F2F7FF] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2378E8] focus-visible:ring-offset-2"
+                            className="inline-flex min-h-7 items-center justify-center rounded-full border border-[#2378E8] px-2 py-0.5 text-center text-[13px] font-medium text-[#2378E8] transition-colors hover:bg-[#F2F7FF] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2378E8] focus-visible:ring-offset-2"
                           >
                             {openingInsight === insightKey ? (
                               <>

@@ -31,6 +31,7 @@ import { useToast } from "@/components/toast/ToastContext";
 import KnowledgeTab from "./components/KnowledgeTab";
 import AboutTab from "./components/AboutTab";
 import MeetTab from "./components/MeetTab";
+import PostsTab from "./components/PostsTab";
 import ProfileShare from "./components/ProfileShare";
 import FacebookSocialIcon from "@/app/components/icons/social/FacebookSocialIcon";
 import InstagramSocialIcon from "@/app/components/icons/social/InstagramSocialIcon";
@@ -297,7 +298,9 @@ function ProfilePageContent() {
 
   // Get entity type from search params (safe for SSR)
   const entityParam = searchParams.get("entity");
-  const activeTab = searchParams.get("tab") || "knowledge";
+  const activeTab =
+    searchParams.get("tab") ||
+    (entityParam === "insighter" ? "posts" : "knowledge");
   const isViewingInsighterEntity = enterpriseType === "insighter";
 
   const logProfileResponse = (
@@ -1810,6 +1813,14 @@ function ProfilePageContent() {
                 }}
               >
                 <Tabs.List className="border-b border-gray-200 dark:border-slate-700 bg-gray-50 dark:bg-slate-800/80 flex flex-wrap items-center">
+                  {isViewingInsighterEntity && (
+                    <Tabs.Tab
+                      value="posts"
+                      className="text-base font-medium px-8 py-4 transition"
+                    >
+                      {t("feedPosts")}
+                    </Tabs.Tab>
+                  )}
                   <Tabs.Tab
                     value="knowledge"
                     className="text-base font-medium px-8 py-4 transition"
@@ -1889,6 +1900,12 @@ function ProfilePageContent() {
                       formatKnowledgeItems={formatKnowledgeItems}
                     />
                   </Tabs.Panel>
+
+                  {isViewingInsighterEntity && (
+                    <Tabs.Panel value="posts">
+                      <PostsTab uuid={uuid} locale={locale} />
+                    </Tabs.Panel>
+                  )}
 
                   <Tabs.Panel value="about">
                     <AboutTab

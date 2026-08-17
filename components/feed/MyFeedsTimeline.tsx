@@ -1,6 +1,6 @@
 'use client'
 
-import { Badge, Menu, Modal } from '@mantine/core'
+import { Badge, Menu, Modal, Tooltip } from '@mantine/core'
 import {
   IconArticle,
   IconBriefcase,
@@ -10,6 +10,8 @@ import {
   IconFileDescription,
   IconLoader2,
   IconPhoto,
+  IconPlayerPlayFilled,
+  IconRadar,
   IconTrash,
   IconUsers,
   IconVideo,
@@ -25,8 +27,9 @@ import DataIcon from '@/components/icons/DataIcon'
 import InsightIcon from '@/components/icons/InsightIcon'
 import ManualIcon from '@/components/icons/ManualIcon'
 import ReportIcon from '@/components/icons/ReportIcon'
-import { publicBaseUrl } from '@/app/config'
+import { dashboardUrl, publicBaseUrl } from '@/app/config'
 import FeedShare from '@/components/feed/FeedShare'
+import FeedSaveButton from '@/components/feed/FeedSaveButton'
 import RoleUpgradeCard from '@/components/feed/RoleUpgradeCard'
 import TopDocumentsCard from '@/components/feed/TopDocumentsCard'
 import { useToast } from '@/components/toast/ToastContext'
@@ -40,6 +43,7 @@ import { isFirstWordArabic } from '@/app/utils/textUtils'
 import {
   deleteFeedItem,
   getMyFeeds,
+  setCommunityFeedItemTracked,
   type FeedItem,
   type FeedItemMedia,
   type FeedItemRelatedInsight,
@@ -81,8 +85,16 @@ const copyByLocale = {
     previousImage: 'Previous image',
     nextImage: 'Next image',
     closeImagePreview: 'Close image preview',
+    playVideo: 'Tap to play',
     meet: 'Meet',
-    requestService: 'Request Service',
+    requestService: 'Service',
+    track: 'Track',
+    untrack: 'Untrack',
+    tracking: 'Updating…',
+    trackFailed: 'Unable to update tracking for this post.',
+    trackTooltip: 'Track this post to see more content like it in your feed.',
+    untrackTooltip: 'Untrack this post to stop seeing more content like it in your feed.',
+    ownPostTracking: 'You cannot track your own post.',
   },
   ar: {
     title: 'منشوراتي',
@@ -115,8 +127,16 @@ const copyByLocale = {
     previousImage: 'الصورة السابقة',
     nextImage: 'الصورة التالية',
     closeImagePreview: 'إغلاق معاينة الصورة',
+    playVideo: 'اضغط للتشغيل',
     meet: 'اجتماع',
-    requestService: 'طلب خدمة',
+    requestService: 'خدمة',
+    track: 'تتبّع',
+    untrack: 'إلغاء التتبّع',
+    tracking: 'جارٍ التحديث…',
+    trackFailed: 'تعذر تحديث تتبّع هذا المنشور.',
+    trackTooltip: 'تتبّع هذا المنشور لرؤية المزيد من المحتوى المشابه له في موجزك.',
+    untrackTooltip: 'ألغِ تتبّع هذا المنشور للتوقف عن رؤية المزيد من المحتوى المشابه له في موجزك.',
+    ownPostTracking: 'لا يمكنك تتبّع منشورك الخاص.',
   },
 } as const
 
@@ -262,7 +282,7 @@ function ImageGallery({
     <>
       {isSingleImage && (
         <div
-          className={`-mx-5 mt-5 overflow-hidden border-y border-[#E0E7F0] bg-[#F6F9FD] sm:-mx-6 ${
+          className={`-mx-5 mt-5 overflow-hidden border-b border-[#E0E7F0] bg-[#F6F9FD] sm:-mx-6 ${
             flushBottom ? '-mb-5 rounded-b-lg sm:-mb-6' : ''
           }`}
         >
@@ -285,7 +305,7 @@ function ImageGallery({
 
       {isTwoImageLayout && (
         <div
-          className={`-mx-5 mt-5 grid grid-cols-2 gap-1.5 overflow-hidden border-y border-[#E0E7F0] bg-white sm:-mx-6 ${
+          className={`-mx-5 mt-5 grid grid-cols-2 items-stretch gap-1.5 overflow-hidden border-b border-[#E0E7F0] bg-white sm:-mx-6 ${
             flushBottom ? '-mb-5 rounded-b-lg sm:-mb-6' : ''
           }`}
           dir={isArabic ? 'rtl' : 'ltr'}
@@ -296,13 +316,13 @@ function ImageGallery({
               type="button"
               onClick={() => setActiveImageIndex(index)}
               aria-label={`${copy.openImage}: ${copy.imageCount(index + 1, media.length)}`}
-              className="relative aspect-square cursor-zoom-in overflow-hidden rounded-md bg-[#101724] focus-visible:z-10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[#2378E8]"
+              className="relative flex h-[240px] cursor-zoom-in items-center justify-center overflow-hidden rounded-md bg-[#101724] focus-visible:z-10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[#2378E8] sm:h-[300px]"
             >
               <img
                 src={item.url ?? ''}
                 alt={item.name || imageAlt}
                 loading="lazy"
-                className="h-full w-full object-contain"
+                className="feed-media-contain block h-full w-full object-contain"
               />
             </button>
           ))}
@@ -311,7 +331,7 @@ function ImageGallery({
 
       {hasInlineCarousel && (
         <div
-          className={`relative -mx-5 mt-5 overflow-hidden border-y border-[#D9E2ED] bg-[#E9EEF5] py-1.5 sm:-mx-6 ${
+          className={`relative -mx-5 mt-5 overflow-hidden border-b border-[#D9E2ED] bg-[#E9EEF5] py-1.5 sm:-mx-6 ${
             flushBottom ? '-mb-5 rounded-b-lg sm:-mb-6' : ''
           }`}
           dir={isArabic ? 'rtl' : 'ltr'}
@@ -332,7 +352,7 @@ function ImageGallery({
                 goToCarouselImage(carouselIndex + (isArabic ? -1 : 1))
               }
             }}
-            className="flex snap-x snap-mandatory gap-1.5 overflow-x-auto pe-[8%] ps-0 [scrollbar-width:none] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[#2378E8] [&::-webkit-scrollbar]:hidden sm:pe-[12%]"
+            className="flex snap-x snap-mandatory items-start gap-1.5 overflow-x-auto pe-[8%] ps-0 [scrollbar-width:none] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[#2378E8] [&::-webkit-scrollbar]:hidden sm:pe-[12%]"
           >
             {media.map((item, index) => (
               <button
@@ -341,13 +361,13 @@ function ImageGallery({
                 data-feed-image-index={index}
                 onClick={() => setActiveImageIndex(index)}
                 aria-label={`${copy.openImage}: ${copy.imageCount(index + 1, media.length)}`}
-                className="relative aspect-[4/3] w-[84%] shrink-0 snap-center cursor-zoom-in overflow-hidden rounded-md bg-[#101724] shadow-sm focus-visible:z-10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-white sm:w-[76%]"
+                className="relative flex h-[280px] w-[84%] shrink-0 snap-center items-center justify-center cursor-zoom-in overflow-hidden rounded-md bg-[#101724] shadow-sm focus-visible:z-10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-white sm:h-[340px] sm:w-[76%]"
               >
                 <img
                   src={item.url ?? ''}
                   alt={item.name || imageAlt}
                   loading="lazy"
-                  className="h-full w-full object-contain"
+                  className="feed-media-contain block h-full w-full object-contain"
                 />
               </button>
             ))}
@@ -443,14 +463,49 @@ function ImageGallery({
   )
 }
 
-function VideoPlayer({ media, title, flushBottom = false }: { media: FeedItemMedia; title: string; flushBottom?: boolean }) {
+type MuxPlayerElement = HTMLElement & {
+  muted: boolean
+  play: () => Promise<void>
+  pause: () => void
+}
+
+function VideoPlayer({
+  media,
+  title,
+  playLabel,
+  flushBottom = false,
+}: {
+  media: FeedItemMedia
+  title: string
+  playLabel: string
+  flushBottom?: boolean
+}) {
   const containerRef = useRef<HTMLDivElement | null>(null)
   const [shouldPreload, setShouldPreload] = useState(false)
   const [isInViewport, setIsInViewport] = useState(false)
+  const [autoplayBlocked, setAutoplayBlocked] = useState(false)
+
+  const playMuted = useCallback(async () => {
+    const player = containerRef.current?.querySelector('mux-player') as MuxPlayerElement | null
+    if (!player) return
+
+    // WebKit requires the underlying media property to be muted before play().
+    player.muted = true
+
+    try {
+      await player.play()
+      setAutoplayBlocked(false)
+    } catch (error) {
+      setAutoplayBlocked(true)
+      console.warn('Mux autoplay was blocked by the browser.', error)
+    }
+  }, [])
 
   useEffect(() => {
     const container = containerRef.current
     if (!container || !media.provider_playback_id) return
+
+    setAutoplayBlocked(false)
 
     // Mount and buffer roughly one screen before the card becomes visible.
     // Keeping this window bounded avoids loading every video in a long feed.
@@ -473,20 +528,17 @@ function VideoPlayer({ media, title, flushBottom = false }: { media: FeedItemMed
   }, [media.provider_playback_id])
 
   useEffect(() => {
-    const player = containerRef.current?.querySelector('mux-player') as
-      | (HTMLElement & { play: () => Promise<void>; pause: () => void })
-      | null
+    const player = containerRef.current?.querySelector('mux-player') as MuxPlayerElement | null
 
     if (!player) return
 
     if (isInViewport) {
-      void player.play().catch(() => {
-        // Autoplay can still be blocked by browser or device policy.
-      })
+      void playMuted()
     } else {
       player.pause()
+      setAutoplayBlocked(false)
     }
-  }, [isInViewport, shouldPreload])
+  }, [isInViewport, playMuted, shouldPreload])
 
   if (media.provider_playback_id) {
     // Reserve the box at the video's real aspect ratio so it doesn't collapse
@@ -505,6 +557,7 @@ function VideoPlayer({ media, title, flushBottom = false }: { media: FeedItemMed
       >
         <div
           ref={containerRef}
+          className="relative"
           style={{
             aspectRatio,
             maxHeight: 'min(650px, 70dvh)',
@@ -520,6 +573,7 @@ function VideoPlayer({ media, title, flushBottom = false }: { media: FeedItemMed
               metadata-video-title={title}
               accent-color="#2378E8"
               disable-tracking=""
+              autoplay={isInViewport ? 'muted' : false}
               preload="auto"
               max-resolution="720p"
               muted
@@ -527,6 +581,19 @@ function VideoPlayer({ media, title, flushBottom = false }: { media: FeedItemMed
               playsinline
               style={{ width: '100%', height: '100%', display: 'block' }}
             />
+          )}
+          {autoplayBlocked && isInViewport && (
+            <button
+              type="button"
+              onClick={() => void playMuted()}
+              aria-label={playLabel}
+              className="absolute inset-0 z-10 flex items-center justify-center bg-black/25 text-white transition-colors hover:bg-black/35 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-white"
+            >
+              <span className="inline-flex items-center gap-2 rounded-full bg-black/75 px-5 py-3 text-sm font-semibold shadow-xl backdrop-blur-sm">
+                <IconPlayerPlayFilled aria-hidden className="h-5 w-5" />
+                {playLabel}
+              </span>
+            </button>
           )}
         </div>
       </div>
@@ -615,7 +682,7 @@ function ArticlePreview({
 }
 
 function RelatedInsightIcon({ type }: { type: string }) {
-  switch (type) {
+  switch (type.trim().toLowerCase()) {
     case 'report':
       return <ReportIcon width={16} height={16} />
     case 'manual':
@@ -635,17 +702,22 @@ export function FeedCard({
   item,
   locale,
   onDelete,
+  onSaveChange,
   articleAccess = 'owner',
 }: {
   item: FeedItem
   locale: string
   onDelete?: (item: FeedItem) => void
+  onSaveChange?: (item: FeedItem, isSaved: boolean) => void
   articleAccess?: 'community' | 'owner'
 }) {
   const isArabic = locale === 'ar'
   const copy = copyByLocale[isArabic ? 'ar' : 'en']
+  const toast = useToast()
   const { user } = useUserProfile()
   const [openingInsight, setOpeningInsight] = useState<string | null>(null)
+  const [isTracked, setIsTracked] = useState(item.is_tracked === true)
+  const [isUpdatingTrack, setIsUpdatingTrack] = useState(false)
   const date = formatPostDate(item.published_at ?? item.created_at, locale)
   const isArticle = item.content_type === 'article'
   const isPostTitleArabic = isFirstWordArabic(item.title ?? '')
@@ -694,8 +766,32 @@ export function FeedCard({
     : ''
   const shareUrl = isArticle
     ? `${publicBaseUrl}/${locale}/article/${item.slug ?? item.uuid}`
-    : `${publicBaseUrl}/${locale}/post/${item.uuid}`
+    : `${publicBaseUrl}/${locale}/post/${item.slug ?? item.uuid}`
   const shareTitle = item.title?.trim() || stripHtml(item.body ?? '').slice(0, 120) || insighter?.name || ''
+
+  useEffect(() => {
+    setIsTracked(item.is_tracked === true)
+  }, [item.is_tracked, item.uuid])
+
+  const updateTracking = async () => {
+    if (isUpdatingTrack || isOwnPost) return
+
+    if (!user) {
+      const returnUrl = encodeURIComponent(window.location.href)
+      window.location.assign(`${dashboardUrl}/auth/login?returnUrl=${returnUrl}`)
+      return
+    }
+
+    setIsUpdatingTrack(true)
+    try {
+      const result = await setCommunityFeedItemTracked(item.uuid, !isTracked, locale)
+      setIsTracked(result.is_tracked)
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : copy.trackFailed)
+    } finally {
+      setIsUpdatingTrack(false)
+    }
+  }
 
   return (
     <article className="relative overflow-visible rounded-lg border border-[#D9E3EF] bg-white px-5 py-5 sm:px-6">
@@ -751,32 +847,67 @@ export function FeedCard({
           )}
         </div>
 
-        {onDelete && (
+        {(onDelete || articleAccess === 'community') && (
           <div className="flex shrink-0 items-center gap-2">
-            <span className={`inline-block rounded-full px-2.5 py-1 text-[11px] font-semibold ${statusTone}`}>
-              {item.status_label}
-            </span>
+            {articleAccess === 'community' && (
+              <Tooltip
+                label={isOwnPost ? copy.ownPostTracking : isTracked ? copy.untrackTooltip : copy.trackTooltip}
+                position="bottom"
+                openDelay={300}
+                withArrow
+              >
+                <span className="inline-flex">
+                  <button
+                    type="button"
+                    onClick={() => void updateTracking()}
+                    disabled={isUpdatingTrack || isOwnPost}
+                    aria-pressed={isTracked}
+                    aria-label={isUpdatingTrack ? copy.tracking : isTracked ? copy.untrack : copy.track}
+                    className={`inline-flex min-h-9 items-center justify-center gap-1.5 rounded-full px-3 text-[12px] font-semibold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2378E8] focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-55 ${
+                      isTracked
+                        ? 'bg-[#2378E8] text-white hover:bg-[#1B64C5]'
+                        : 'bg-[#F2F7FF] text-[#36506F] hover:bg-[#E6F0FD] hover:text-[#2378E8]'
+                    }`}
+                  >
+                    {isUpdatingTrack ? (
+                      <IconLoader2 aria-hidden className="h-4 w-4 animate-spin" stroke={2} />
+                    ) : (
+                      <IconRadar aria-hidden className="h-4 w-4" stroke={1.9} />
+                    )}
+                    <span>{isTracked ? copy.untrack : copy.track}</span>
+                  </button>
+                </span>
+              </Tooltip>
+            )}
 
-            <Menu shadow="md" width={170} position={isArabic ? 'bottom-start' : 'bottom-end'}>
-              <Menu.Target>
-                <button
-                  type="button"
-                  aria-label={copy.postActions}
-                  className="flex h-9 w-9 items-center justify-center rounded-full text-[#8FA0B7] transition-colors hover:bg-[#F1F5FA] hover:text-[#253247] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2378E8]"
-                >
-                  <IconDots aria-hidden className="h-5 w-5" stroke={2.2} />
-                </button>
-              </Menu.Target>
-              <Menu.Dropdown>
-                <Menu.Item
-                  color="red"
-                  leftSection={<IconTrash aria-hidden className="h-4 w-4" stroke={1.8} />}
-                  onClick={() => onDelete(item)}
-                >
-                  {copy.delete}
-                </Menu.Item>
-              </Menu.Dropdown>
-            </Menu>
+            {onDelete && (
+              <span className={`inline-block rounded-full px-2.5 py-1 text-[11px] font-semibold ${statusTone}`}>
+                {item.status_label}
+              </span>
+            )}
+
+            {onDelete && (
+              <Menu shadow="md" width={170} position={isArabic ? 'bottom-start' : 'bottom-end'}>
+                <Menu.Target>
+                  <button
+                    type="button"
+                    aria-label={copy.postActions}
+                    className="flex h-9 w-9 items-center justify-center rounded-full text-[#8FA0B7] transition-colors hover:bg-[#F1F5FA] hover:text-[#253247] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2378E8]"
+                  >
+                    <IconDots aria-hidden className="h-5 w-5" stroke={2.2} />
+                  </button>
+                </Menu.Target>
+                <Menu.Dropdown>
+                  <Menu.Item
+                    color="red"
+                    leftSection={<IconTrash aria-hidden className="h-4 w-4" stroke={1.8} />}
+                    onClick={() => onDelete(item)}
+                  >
+                    {copy.delete}
+                  </Menu.Item>
+                </Menu.Dropdown>
+              </Menu>
+            )}
           </div>
         )}
       </div>
@@ -809,7 +940,14 @@ export function FeedCard({
         />
       )}
 
-      {!isArticle && videoMedia && <VideoPlayer media={videoMedia} title={item.title ?? item.body ?? 'Video'} flushBottom={isMediaLast} />}
+      {!isArticle && videoMedia && (
+        <VideoPlayer
+          media={videoMedia}
+          title={item.title ?? item.body ?? 'Video'}
+          playLabel={copy.playVideo}
+          flushBottom={isMediaLast}
+        />
+      )}
       {!isArticle && imageMedia.length > 0 && <ImageGallery media={imageMedia} imageAlt={copy.imageAlt} locale={locale} flushBottom={isMediaLast} />}
 
       {attachments.length > 0 && (
@@ -892,7 +1030,7 @@ export function FeedCard({
                         setOpeningInsight((current) => (current === insightKey ? null : current))
                       }, 1800)
                     }}
-                    className="inline-flex min-h-9 items-center justify-center rounded-full border border-[#2378E8] px-4 text-center text-[13px] font-medium text-[#2378E8] transition-colors hover:bg-[#F2F7FF] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2378E8] focus-visible:ring-offset-2"
+                    className="inline-flex min-h-7 items-center justify-center rounded-full border border-[#2378E8] px-2 py-0.5 text-center text-[13px] font-medium text-[#2378E8] transition-colors hover:bg-[#F2F7FF] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2378E8] focus-visible:ring-offset-2"
                   >
                     {openingInsight === insightKey ? (
                       <>
@@ -914,7 +1052,7 @@ export function FeedCard({
 
       {showEngagementActions && insighter && (
         <div
-          className="mt-4 flex items-center justify-around border-t border-[#EEF2F7] pt-2"
+          className="mt-4 flex items-center justify-around pt-2"
           dir={isArabic ? 'rtl' : 'ltr'}
         >
           {!isOwnPost && (
@@ -938,6 +1076,16 @@ export function FeedCard({
               <span>{copy.requestService}</span>
             </Link>
           )}
+
+          <FeedSaveButton
+            uuid={item.uuid}
+            identifier={item.slug ?? item.uuid}
+            contentType={item.content_type}
+            initialIsSaved={item.is_saved}
+            locale={locale}
+            layout="action"
+            onChange={(isSaved) => onSaveChange?.(item, isSaved)}
+          />
 
           <FeedShare
             shareUrl={shareUrl}

@@ -1,14 +1,17 @@
 'use client'
 
 import {
+  IconCheck,
+  IconChevronDown,
   IconLoader2,
   IconLock,
   IconPhoto,
   IconSearch,
 } from '@tabler/icons-react'
+import { Listbox, ListboxButton, ListboxOption, ListboxOptions } from '@headlessui/react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { Fragment, useCallback, useEffect, useRef, useState } from 'react'
 import { dashboardUrl, publicBaseUrl } from '@/app/config'
 import { useToast } from '@/components/toast/ToastContext'
 import { useUserProfile } from '@/components/ui/header/hooks/useUserProfile'
@@ -27,7 +30,6 @@ import { useFeedSearchInsights } from './FeedSearchInsightsContext'
 import RoleUpgradeCard from './RoleUpgradeCard'
 import TopDocumentsCard from './TopDocumentsCard'
 import RelatedDocumentsCard from './RelatedDocumentsCard'
-import { Fragment } from 'react'
 
 type CommunityFeedTimelineProps = {
   locale: string
@@ -59,6 +61,8 @@ const copyByLocale = {
     allContent: 'All content',
     posts: 'Posts',
     articles: 'White Papers',
+    searchFilters: 'Search filters…',
+    noFilterMatches: 'No matching filters.',
     noMatchesTitle: 'No feed matches found',
     noMatchesDescription: 'Try a broader keyword or remove one of the filters.',
     noMoreMatches: 'You’ve reached the end of these results.',
@@ -86,6 +90,8 @@ const copyByLocale = {
     allContent: 'كل المحتوى',
     posts: 'منشورات',
     articles: 'أوراق بيضاء',
+    searchFilters: 'ابحث في عوامل التصفية…',
+    noFilterMatches: 'لا توجد عوامل تصفية مطابقة.',
     noMatchesTitle: 'لم نجد نتائج في الموجز',
     noMatchesDescription: 'جرّب كلمة أوسع أو أزل أحد عوامل التصفية.',
     noMoreMatches: 'وصلت إلى نهاية هذه النتائج.',
@@ -134,6 +140,87 @@ function GuestFeedGate({ locale, isSearching = false }: { locale: string; isSear
   )
 }
 
+type SearchableFilterOption = {
+  value: string
+  label: string
+}
+
+function SearchableFilterDropdown({
+  value,
+  options,
+  placeholder,
+  searchPlaceholder,
+  noMatchesLabel,
+  isLoading = false,
+  onChange,
+}: {
+  value: string
+  options: SearchableFilterOption[]
+  placeholder: string
+  searchPlaceholder: string
+  noMatchesLabel: string
+  isLoading?: boolean
+  onChange: (value: string) => void
+}) {
+  const [query, setQuery] = useState('')
+  const selectedOption = options.find((option) => option.value === value)
+  const normalizedQuery = query.trim().toLocaleLowerCase()
+  const visibleOptions = normalizedQuery
+    ? options.filter((option) => option.label.toLocaleLowerCase().includes(normalizedQuery))
+    : options
+
+  return (
+    <Listbox
+      value={value}
+      onChange={(nextValue) => {
+        onChange(nextValue)
+        setQuery('')
+      }}
+    >
+      <div className="relative min-w-0">
+        <ListboxButton
+          aria-label={placeholder}
+          disabled={isLoading}
+          className="flex min-h-9 w-full items-center gap-2 rounded-md border border-[#D7E1EE] bg-white px-2.5 text-start text-[12px] font-medium text-[#475569] outline-none transition-colors hover:border-[#B8CBE2] focus-visible:border-[#2378E8] focus-visible:ring-2 focus-visible:ring-[#2378E8]/15 disabled:cursor-wait disabled:opacity-60 sm:text-[13px]"
+        >
+          <span className="min-w-0 flex-1 truncate">{selectedOption?.label ?? placeholder}</span>
+          <IconChevronDown aria-hidden className="h-4 w-4 shrink-0 text-[#64748B]" stroke={2} />
+        </ListboxButton>
+        <ListboxOptions className="absolute left-0 top-[calc(100%+6px)] z-50 w-full min-w-[12rem] rounded-md border border-[#D7E1EE] bg-white p-1.5 shadow-[0_12px_30px_rgba(27,56,93,0.16)] focus:outline-none">
+          <div className="border-b border-[#E7EDF4] pb-1.5">
+            <input
+              value={query}
+              onChange={(event) => setQuery(event.target.value)}
+              onClick={(event) => event.stopPropagation()}
+              onKeyDown={(event) => event.stopPropagation()}
+              placeholder={searchPlaceholder}
+              className="h-8 w-full rounded border border-[#D7E1EE] bg-[#F8FAFC] px-2 text-[12px] text-[#334155] outline-none placeholder:text-[#94A3B8] focus:border-[#2378E8] focus:ring-2 focus:ring-[#2378E8]/15"
+            />
+          </div>
+          <div className="max-h-52 overflow-y-auto pt-1.5">
+            {isLoading ? (
+              <div className="px-2 py-2 text-[12px] text-[#64748B]">…</div>
+            ) : visibleOptions.length ? (
+              visibleOptions.map((option) => (
+                <ListboxOption
+                  key={option.value || '__all'}
+                  value={option.value}
+                  className="flex cursor-pointer items-center gap-2 rounded px-2 py-2 text-[12px] text-[#475569] data-[focus]:bg-[#EDF4FD] data-[focus]:text-[#2378E8] sm:text-[13px]"
+                >
+                  <span className="min-w-0 flex-1 truncate">{option.label}</span>
+                  {option.value === value && <IconCheck aria-hidden className="h-4 w-4 shrink-0 text-[#2378E8]" stroke={2.25} />}
+                </ListboxOption>
+              ))
+            ) : (
+              <div className="px-2 py-2 text-[12px] text-[#64748B]">{noMatchesLabel}</div>
+            )}
+          </div>
+        </ListboxOptions>
+      </div>
+    </Listbox>
+  )
+}
+
 function FeedSearchHeader({
   locale,
   keyword,
@@ -167,30 +254,30 @@ function FeedSearchHeader({
       </div>
 
       <div className="grid grid-cols-2 gap-2.5 md:w-80 md:shrink-0">
-        <select
-          value={industry ?? ''}
-          disabled={isLoading}
-          onChange={(event) => updateFilters(event.target.value ? Number(event.target.value) : null, contentType ?? null)}
-          aria-label={copy.allIndustries}
-          className="min-h-9 w-full rounded-md border border-[#D7E1EE] bg-white px-2.5 text-[12px] font-medium text-[#475569] outline-none transition-colors focus:border-[#2378E8] focus:ring-2 focus:ring-[#2378E8]/15 disabled:cursor-wait disabled:opacity-60 sm:text-[13px]"
-        >
-          <option value="">{copy.allIndustries}</option>
-          {industries.map((item) => (
-            <option key={item.id} value={item.id}>
-              {item.name}
-            </option>
-          ))}
-        </select>
-        <select
+        <SearchableFilterDropdown
+          value={industry ? String(industry) : ''}
+          options={[
+            { value: '', label: copy.allIndustries },
+            ...industries.map((item) => ({ value: String(item.id), label: item.name })),
+          ]}
+          placeholder={copy.allIndustries}
+          searchPlaceholder={copy.searchFilters}
+          noMatchesLabel={copy.noFilterMatches}
+          isLoading={isLoading}
+          onChange={(nextValue) => updateFilters(nextValue ? Number(nextValue) : null, contentType ?? null)}
+        />
+        <SearchableFilterDropdown
           value={contentType ?? ''}
-          onChange={(event) => updateFilters(industry ?? null, (event.target.value || null) as 'post' | 'article' | null)}
-          aria-label={copy.allContent}
-          className="min-h-9 w-full rounded-md border border-[#D7E1EE] bg-white px-2.5 text-[12px] font-medium text-[#475569] outline-none transition-colors focus:border-[#2378E8] focus:ring-2 focus:ring-[#2378E8]/15 sm:text-[13px]"
-        >
-          <option value="">{copy.allContent}</option>
-          <option value="post">{copy.posts}</option>
-          <option value="article">{copy.articles}</option>
-        </select>
+          options={[
+            { value: '', label: copy.allContent },
+            { value: 'post', label: copy.posts },
+            { value: 'article', label: copy.articles },
+          ]}
+          placeholder={copy.allContent}
+          searchPlaceholder={copy.searchFilters}
+          noMatchesLabel={copy.noFilterMatches}
+          onChange={(nextValue) => updateFilters(industry ?? null, (nextValue || null) as 'post' | 'article' | null)}
+        />
       </div>
     </div>
   )

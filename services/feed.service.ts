@@ -73,6 +73,7 @@ export interface FeedItemStats {
   opens_count: number
   saves_count: number
   shares_count: number
+  tracks_count: number
   watch_seconds_total: number
 }
 
@@ -106,8 +107,22 @@ export interface FeedItem {
   related_insights: FeedItemRelatedInsight[]
   media: FeedItemMedia[]
   stats: FeedItemStats
+  is_tracked?: boolean
+  is_saved?: boolean
   created_at: string | null
   updated_at: string | null
+}
+
+export interface CommunityFeedTrackState {
+  uuid: string
+  is_tracked: boolean
+  tracks_count: number
+  applies_from_next_session: boolean
+}
+
+export interface CommunityFeedSaveState {
+  uuid: string
+  is_saved: boolean
 }
 
 export interface LibraryKnowledgeItem {
@@ -152,6 +167,28 @@ export interface CommunityFeedMeta {
 export interface CommunityFeedPage {
   data: FeedItem[]
   meta: CommunityFeedMeta
+}
+
+export interface InsighterProfileFeedMeta {
+  has_more: boolean
+  next_cursor: string | null
+  limit: number
+}
+
+export interface InsighterProfileFeedPage {
+  data: FeedItem[]
+  meta: InsighterProfileFeedMeta
+}
+
+export interface SavedCommunityFeedMeta {
+  has_more: boolean
+  next_cursor: string | null
+  per_page: number
+}
+
+export interface SavedCommunityFeedPage {
+  data: FeedItem[]
+  meta: SavedCommunityFeedMeta
 }
 
 export interface CommunityFeedSearchInsight {
@@ -376,7 +413,7 @@ export async function getCommunityFeedArticle(
   const response = await fetch(
     getApiUrl(`/api/platform/community/feed/articles/${encodeURIComponent(slug)}`),
     {
-      headers: publicHeaders(locale),
+      headers: authHeaders(locale),
       cache: 'no-store',
       signal,
     },
@@ -391,14 +428,14 @@ export async function getCommunityFeedArticle(
 }
 
 export async function getCommunityFeedPost(
-  uuid: string,
+  slug: string,
   locale: string,
   signal?: AbortSignal,
 ): Promise<FeedItem> {
   const response = await fetch(
-    getApiUrl(`/api/platform/community/feed/posts/${encodeURIComponent(uuid)}`),
+    getApiUrl(`/api/platform/community/feed/posts/${encodeURIComponent(slug)}`),
     {
-      headers: publicHeaders(locale),
+      headers: authHeaders(locale),
       cache: 'no-store',
       signal,
     },
@@ -526,6 +563,124 @@ export async function getCommunityFeed(
     locale,
     signal,
   )
+}
+
+export async function getInsighterProfileFeed(
+  uuid: string,
+  locale: string,
+  cursor?: string | null,
+  signal?: AbortSignal,
+): Promise<InsighterProfileFeedPage> {
+  const params = new URLSearchParams({ limit: '10' })
+  if (cursor) params.set('cursor', cursor)
+
+  const response = await fetch(
+    getApiUrl(
+      `/api/platform/insighter/profile/${encodeURIComponent(uuid)}/feed?${params.toString()}`,
+    ),
+    {
+      headers: authHeaders(locale),
+      cache: 'no-store',
+      signal,
+    },
+  )
+
+  if (!response.ok) {
+    await parseErrorMessage(response, 'Unable to load this insighter’s posts.')
+  }
+
+  const body = await response.json()
+
+  return {
+    data: body.data ?? [],
+    meta: {
+      has_more: Boolean(body.meta?.next_cursor),
+      next_cursor: body.meta?.next_cursor ?? null,
+      limit: body.meta?.per_page ?? 10,
+    },
+  }
+}
+
+export async function getSavedCommunityFeed(
+  locale: string,
+  cursor?: string | null,
+  signal?: AbortSignal,
+): Promise<SavedCommunityFeedPage> {
+  const params = new URLSearchParams({ limit: '10' })
+  if (cursor) params.set('cursor', cursor)
+
+  const response = await fetch(
+    getApiUrl(`/api/platform/community/feed/saved?${params.toString()}`),
+    {
+      headers: authHeaders(locale),
+      cache: 'no-store',
+      signal,
+    },
+  )
+
+  if (!response.ok) {
+    await parseErrorMessage(response, 'Unable to load your saved posts.')
+  }
+
+  const body = await response.json()
+  const nextCursor = body.meta?.next_cursor ?? null
+
+  return {
+    data: body.data ?? [],
+    meta: {
+      has_more: Boolean(nextCursor),
+      next_cursor: nextCursor,
+      per_page: body.meta?.per_page ?? 10,
+    },
+  }
+}
+
+export async function setCommunityFeedItemTracked(
+  uuid: string,
+  isTracked: boolean,
+  locale: string,
+): Promise<CommunityFeedTrackState> {
+  const response = await fetch(
+    getApiUrl(`/api/platform/community/feed/track/${encodeURIComponent(uuid)}`),
+    {
+      method: isTracked ? 'PUT' : 'DELETE',
+      headers: authHeaders(locale),
+    },
+  )
+
+  if (!response.ok) {
+    await parseErrorMessage(
+      response,
+      isTracked ? 'Unable to track this post.' : 'Unable to untrack this post.',
+    )
+  }
+
+  const body = await response.json()
+  return body.data
+}
+
+export async function setCommunityFeedItemSaved(
+  uuid: string,
+  isSaved: boolean,
+  locale: string,
+): Promise<CommunityFeedSaveState> {
+  const response = await fetch(
+    getApiUrl(`/api/platform/community/feed/save/${encodeURIComponent(uuid)}`),
+    {
+      method: isSaved ? 'PUT' : 'DELETE',
+      headers: authHeaders(locale),
+    },
+  )
+
+  if (!response.ok) {
+    await parseErrorMessage(
+      response,
+      isSaved ? 'Unable to save this post.' : 'Unable to remove this post from saved posts.',
+    )
+  }
+
+  const body = await response.json()
+  return body.data
 }
 
 export async function searchCommunityFeed(
