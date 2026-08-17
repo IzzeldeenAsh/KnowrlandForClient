@@ -484,6 +484,9 @@ function VideoPlayer({
   const [shouldPreload, setShouldPreload] = useState(false)
   const [isInViewport, setIsInViewport] = useState(false)
   const [autoplayBlocked, setAutoplayBlocked] = useState(false)
+  // Bumped to remount the player after a decode failure (see the error effect).
+  const [playerEpoch, setPlayerEpoch] = useState(0)
+  const decodeRetriesRef = useRef(0)
 
   const playMuted = useCallback(async () => {
     const player = containerRef.current?.querySelector('mux-player') as MuxPlayerElement | null
@@ -538,7 +541,31 @@ function VideoPlayer({
       player.pause()
       setAutoplayBlocked(false)
     }
-  }, [isInViewport, playMuted, shouldPreload])
+  }, [isInViewport, playMuted, shouldPreload, playerEpoch])
+
+  useEffect(() => {
+    if (!shouldPreload) return
+
+    const player = containerRef.current?.querySelector('mux-player') as
+      | (MuxPlayerElement & { error?: { code?: number } })
+      | null
+    if (!player) return
+
+    const handleError = (event: Event) => {
+      const detail = (event as CustomEvent<{ code?: number } | undefined>).detail
+      const code = detail?.code ?? player.error?.code
+      // MEDIA_ERR_DECODE (3): iPad WebKit has a small pool of hardware decoder
+      // instances and can transiently fail a stream when the feed holds several
+      // players at once. Remounting the player recovers playback.
+      if (code === MediaError.MEDIA_ERR_DECODE && decodeRetriesRef.current < 2) {
+        decodeRetriesRef.current += 1
+        setPlayerEpoch((epoch) => epoch + 1)
+      }
+    }
+
+    player.addEventListener('error', handleError)
+    return () => player.removeEventListener('error', handleError)
+  }, [shouldPreload, playerEpoch])
 
   if (media.provider_playback_id) {
     // Reserve the box at the video's real aspect ratio so it doesn't collapse
@@ -568,13 +595,18 @@ function VideoPlayer({
         >
           {shouldPreload && (
             <mux-player
+              key={playerEpoch}
               playback-id={media.provider_playback_id}
               stream-type="on-demand"
               metadata-video-title={title}
               accent-color="#2378E8"
               disable-tracking=""
               autoplay={isInViewport ? 'muted' : false}
-              preload="auto"
+              // On WebKit (every iPad browser, including Chrome) the MSE path
+              // via ManagedMediaSource throws decode errors; native HLS does
+              // not. Browsers without native HLS still fall back to MSE.
+              prefer-playback="native"
+              preload={isInViewport ? 'auto' : 'metadata'}
               max-resolution="720p"
               muted
               loop
