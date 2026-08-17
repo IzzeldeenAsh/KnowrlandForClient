@@ -473,6 +473,18 @@ type MuxPlayerElement = HTMLElement & {
 // WebKit fails streams with MEDIA_ERR_DECODE when a feed keeps several of them
 // busy. Allow only one feed video to play at a time: claiming playback pauses
 // whichever video currently holds it.
+// Pick the HLS engine per browser engine, not per platform. Apple WebKit
+// (Safari, plus every WebKit-based iOS browser — navigator.vendor is "Apple
+// Computer, Inc." there) plays HLS natively and reliably, while its MSE path
+// (ManagedMediaSource) throws decode errors. Chromium (vendor "Google Inc."),
+// including Blink-based Chrome on iPadOS and Android, claims native HLS
+// support but its demuxer fails on Mux streams with
+// DEMUXER_ERROR_COULD_NOT_PARSE — it needs hls.js/MSE, as does Firefox.
+function preferredHlsPlayback(): 'native' | 'mse' {
+  if (typeof navigator === 'undefined') return 'mse'
+  return navigator.vendor?.includes('Apple') ? 'native' : 'mse'
+}
+
 let pauseActiveFeedVideo: (() => void) | null = null
 
 function claimFeedPlayback(pause: () => void) {
@@ -631,10 +643,7 @@ function VideoPlayer({
               accent-color="#2378E8"
               disable-tracking=""
               autoplay={isInViewport ? 'muted' : false}
-              // On WebKit (every iPad browser, including Chrome) the MSE path
-              // via ManagedMediaSource throws decode errors; native HLS does
-              // not. Browsers without native HLS still fall back to MSE.
-              prefer-playback="native"
+              prefer-playback={preferredHlsPlayback()}
               preload={isInViewport ? 'auto' : 'metadata'}
               max-resolution="720p"
               muted
