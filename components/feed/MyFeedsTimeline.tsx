@@ -515,14 +515,18 @@ function VideoPlayer({
   const [playerEpoch, setPlayerEpoch] = useState(0)
   const decodeRetriesRef = useRef(0)
   const fatalErrorRef = useRef(false)
+  // When HLS playback is impossible in this browser (e.g. Blink-based Chrome
+  // on iPadOS fails both natively and via MSE), fall back to the progressive
+  // MP4 static rendition that Mux generates alongside the stream.
+  const [useMp4Fallback, setUseMp4Fallback] = useState(false)
 
   const pauseSelf = useCallback(() => {
-    const player = containerRef.current?.querySelector('mux-player') as MuxPlayerElement | null
+    const player = containerRef.current?.querySelector('mux-player, video') as MuxPlayerElement | null
     player?.pause()
   }, [])
 
   const playMuted = useCallback(async () => {
-    const player = containerRef.current?.querySelector('mux-player') as MuxPlayerElement | null
+    const player = containerRef.current?.querySelector('mux-player, video') as MuxPlayerElement | null
     if (!player) return
 
     // WebKit requires the underlying media property to be muted before play().
@@ -579,13 +583,13 @@ function VideoPlayer({
       releaseFeedPlayback(pauseSelf)
       setAutoplayBlocked(false)
     }
-  }, [isInViewport, playMuted, pauseSelf, shouldPreload, playerEpoch])
+  }, [isInViewport, playMuted, pauseSelf, shouldPreload, playerEpoch, useMp4Fallback])
 
   // Release the shared playback slot when the card unmounts entirely.
   useEffect(() => () => releaseFeedPlayback(pauseSelf), [pauseSelf])
 
   useEffect(() => {
-    if (!shouldPreload) return
+    if (!shouldPreload || useMp4Fallback) return
 
     const player = containerRef.current?.querySelector('mux-player') as MuxPlayerElement | null
     if (!player) return
@@ -595,18 +599,22 @@ function VideoPlayer({
     const handleError = (event: Event) => {
       fatalErrorRef.current = true
       const code = (event as CustomEvent<{ code?: number } | undefined>).detail?.code
-      // MEDIA_ERR_DECODE (3): iPad WebKit has a small pool of hardware decoder
-      // instances and can transiently fail a stream when the feed holds several
-      // players at once. Remounting the player recovers playback.
+      // MEDIA_ERR_DECODE (3): decoder pools on tablets are small and a stream
+      // can fail transiently while several players exist. Remounting recovers.
       if (code === MediaError.MEDIA_ERR_DECODE && decodeRetriesRef.current < 2) {
         decodeRetriesRef.current += 1
         setPlayerEpoch((epoch) => epoch + 1)
+      } else {
+        // Retries exhausted or a non-decode fatal error: HLS won't play in
+        // this browser. Switch to the progressive MP4 rendition.
+        setUseMp4Fallback(true)
+        fatalErrorRef.current = false
       }
     }
 
     player.addEventListener('error', handleError)
     return () => player.removeEventListener('error', handleError)
-  }, [shouldPreload, playerEpoch])
+  }, [shouldPreload, playerEpoch, useMp4Fallback])
 
   if (media.provider_playback_id) {
     // Reserve the box at the video's real aspect ratio so it doesn't collapse
@@ -634,7 +642,26 @@ function VideoPlayer({
               : { width: '100%' }),
           }}
         >
-          {shouldPreload && (
+          {shouldPreload && useMp4Fallback && (
+            <video
+              key={`mp4-${playerEpoch}`}
+              src={`https://stream.mux.com/${media.provider_playback_id}/highest.mp4`}
+              autoPlay={isInViewport}
+              muted
+              loop
+              playsInline
+              controls
+              preload={isInViewport ? 'auto' : 'metadata'}
+              onError={() => {
+                // MP4 rendition missing or also unplayable — surface the
+                // overlay; tapping it restarts the HLS player from scratch.
+                fatalErrorRef.current = true
+                setAutoplayBlocked(true)
+              }}
+              style={{ width: '100%', height: '100%', display: 'block', objectFit: 'contain' }}
+            />
+          )}
+          {shouldPreload && !useMp4Fallback && (
             <mux-player
               key={playerEpoch}
               playback-id={media.provider_playback_id}
@@ -658,8 +685,11 @@ function VideoPlayer({
               onClick={() => {
                 if (fatalErrorRef.current) {
                   // play() on failed media just rejects again; remount the
-                  // player and let the playback effect restart it.
+                  // player from scratch and let the playback effect restart it.
+                  fatalErrorRef.current = false
                   decodeRetriesRef.current = 0
+                  setUseMp4Fallback(false)
+                  setAutoplayBlocked(false)
                   setPlayerEpoch((epoch) => epoch + 1)
                 } else {
                   void playMuted()
