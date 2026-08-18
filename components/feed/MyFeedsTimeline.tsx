@@ -572,7 +572,7 @@ function VideoPlayer({
   }, [media.provider_playback_id])
 
   useEffect(() => {
-    const player = containerRef.current?.querySelector('mux-player') as MuxPlayerElement | null
+    const player = containerRef.current?.querySelector('mux-player, video') as MuxPlayerElement | null
 
     if (!player) return
 
@@ -646,7 +646,11 @@ function VideoPlayer({
             <video
               key={`mp4-${playerEpoch}`}
               src={`https://stream.mux.com/${media.provider_playback_id}/highest.mp4`}
-              autoPlay={isInViewport}
+              // Keep the autoplay attribute present from the initial mount.
+              // WebKit decides whether a video may autoplay at that point; adding
+              // it later after the card enters view can leave an iPhone/iPad
+              // showing its native "Tap to play" prompt.
+              autoPlay
               muted
               loop
               playsInline
@@ -669,7 +673,10 @@ function VideoPlayer({
               metadata-video-title={title}
               accent-color="#2378E8"
               disable-tracking=""
-              autoplay={isInViewport ? 'muted' : false}
+              // Mux passes this through to the underlying media element. It must
+              // be present on first render (together with muted + playsinline)
+              // for iOS/iPadOS to permit autoplay without a user gesture.
+              autoplay="muted"
               prefer-playback={preferredHlsPlayback()}
               preload={isInViewport ? 'auto' : 'metadata'}
               max-resolution="720p"
