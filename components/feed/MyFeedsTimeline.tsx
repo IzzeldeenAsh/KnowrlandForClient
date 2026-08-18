@@ -296,7 +296,7 @@ function ImageGallery({
               src={media[0].url ?? ''}
               alt={media[0].name || imageAlt}
               loading="lazy"
-              className="block h-auto max-w-full object-contain"
+              className="feed-media-contain block h-auto max-w-full object-contain"
               style={{ maxHeight: 'min(650px, 70dvh)' }}
             />
           </button>
