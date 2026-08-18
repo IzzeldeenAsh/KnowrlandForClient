@@ -41,7 +41,7 @@ export default async function Feed({ params, searchParams }: FeedProps) {
   return (
     <FeedSearchInsightsProvider>
       <div dir={isRTL ? 'rtl' : 'ltr'} className="bg-[#EEF2FA] text-slate-900 min-h-screen">
-        <div className="mx-auto max-w-7xl px-0 py-6 sm:px-4 lg:px-8">
+        <div className="mx-auto max-w-7xl px-4 py-4 sm:px-6 sm:py-6 lg:px-8">
           <div className="grid grid-cols-1 gap-6 xl:grid-cols-[280px_minmax(0,1fr)_300px]">
             {/* Left column - dashboard navigation with the feed profile card */}
             <aside className="hidden xl:block">

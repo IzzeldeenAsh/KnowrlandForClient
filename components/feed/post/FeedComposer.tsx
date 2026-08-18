@@ -132,7 +132,7 @@ export default function FeedComposer({ locale }: FeedComposerProps) {
 
   if (!isAuthResolved) {
     return (
-      <div className="px-4 sm:px-6 xl:px-0">
+      <div>
         <div className="h-[128px] animate-pulse rounded-lg border border-[#DCE4EF] bg-[#F8FAFD]" />
       </div>
     )
@@ -165,7 +165,7 @@ export default function FeedComposer({ locale }: FeedComposerProps) {
 
   return (
     <>
-      <div className="px-4 sm:px-6 xl:px-0">
+      <div>
         <div className="overflow-hidden rounded-lg border border-[#DCE4EF] bg-white">
           <div className="flex min-h-[68px] items-center gap-4 px-4">
             <div className="h-10 w-10 shrink-0 overflow-hidden rounded-full bg-[#E7F0FD]">

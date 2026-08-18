@@ -241,7 +241,7 @@ function FeedSearchHeader({
   }
 
   return (
-    <div className="space-y-2.5 px-4 py-1 sm:px-6 xl:px-1 md:flex md:items-end md:justify-between md:gap-4 md:space-y-0">
+    <div className="space-y-2.5 py-1 md:flex md:items-end md:justify-between md:gap-4 md:space-y-0">
       <div className="min-w-0">
         <span className="inline-flex items-center gap-1.5 text-[10px] font-semibold uppercase tracking-[0.1em] text-[#64748B]">
           <IconSearch aria-hidden className="h-3.5 w-3.5 text-[#2378E8]" stroke={2} />

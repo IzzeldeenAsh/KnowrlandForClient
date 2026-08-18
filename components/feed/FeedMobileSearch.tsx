@@ -44,7 +44,7 @@ export default function FeedMobileSearch({ locale }: { locale: string }) {
   if (pathname !== `/${locale}`) return null
 
   return (
-    <form onSubmit={submit} className="px-4 sm:px-6 xl:hidden" role="search">
+    <form onSubmit={submit} className="xl:hidden" role="search">
       <label className="sr-only" htmlFor={`feed-mobile-search-${locale}`}>
         {locale === 'ar' ? 'البحث في الموجز' : 'Search the feed'}
       </label>

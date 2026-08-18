@@ -911,10 +911,10 @@ export function FeedCard({
 
   return (
     <article className="relative overflow-visible rounded-lg border border-[#D9E3EF] bg-white px-5 py-5 sm:px-6">
-      <div className="flex min-h-9 items-start justify-between gap-2 sm:gap-4">
-        <div className="min-w-0">
+      <div className="flex min-h-9 items-start justify-between gap-3 sm:gap-4 max-[420px]:flex-col">
+        <div className="min-w-0 flex-1">
           {insighter && (
-            <div className="flex items-center gap-3">
+            <div className="flex min-w-0 items-center gap-3">
               <div className="h-10 w-10 shrink-0 overflow-hidden rounded-full bg-[#E7F0FE]">
                 {insighter.profile_photo_url ? (
                   <img
@@ -964,7 +964,7 @@ export function FeedCard({
         </div>
 
         {(onDelete || articleAccess === 'community') && (
-          <div className="flex shrink-0 items-center gap-2">
+          <div className="flex shrink-0 items-center gap-2 max-[420px]:self-end">
             {articleAccess === 'community' && (
               <Tooltip
                 label={isOwnPost ? copy.ownPostTracking : isTracked ? copy.untrackTooltip : copy.trackTooltip}
