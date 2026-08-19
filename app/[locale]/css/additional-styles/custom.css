@@ -78,3 +78,46 @@
 .animate-infinite-scroll-rtl {
   animation: infinite-scroll-rtl 25s linear infinite;
 }
+
+@keyframes track-signal-wave {
+  0% {
+    opacity: 0;
+    transform: scale(0.55);
+  }
+  18% {
+    opacity: 1;
+  }
+  60% {
+    opacity: 0.9;
+  }
+  100% {
+    opacity: 0;
+    transform: scale(2.15);
+  }
+}
+
+.track-signal-wave {
+  opacity: 0;
+  transform-box: view-box;
+  transform-origin: 12px 12px;
+  animation: track-signal-wave 1.85s cubic-bezier(0.22, 0.61, 0.36, 1) infinite;
+}
+
+.track-signal-wave--far {
+  animation-delay: -0.925s;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .track-signal-wave {
+    animation: none;
+    opacity: 1;
+  }
+
+  .track-signal-wave--near {
+    transform: scale(1);
+  }
+
+  .track-signal-wave--far {
+    transform: scale(2.15);
+  }
+}

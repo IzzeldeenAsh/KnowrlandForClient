@@ -30,19 +30,6 @@ export default function InsightIcon({ width = 50, height = 50 }: InsightIconProp
         d="M18.221 27.7283V33.6341C18.221 34.7935 17.279 35.7355 16.1014 35.7355C14.942 35.7355 14 34.7935 14 33.6341V27.7283C14 26.5689 14.942 25.6268 16.1014 25.6268C17.279 25.6268 18.221 26.5689 18.221 27.7283Z"
         fill="white"
       />
-      <defs>
-        <linearGradient
-          id="paint0_linear_125_119"
-          x1="24.9896"
-          y1="4.16669"
-          x2="24.9896"
-          y2="45.8334"
-          gradientUnits="userSpaceOnUse"
-        >
-          <stop stopColor="#066FE8" />
-          <stop offset="1" stopColor="#027DF8" />
-        </linearGradient>
-      </defs>
     </svg>
   );
 }

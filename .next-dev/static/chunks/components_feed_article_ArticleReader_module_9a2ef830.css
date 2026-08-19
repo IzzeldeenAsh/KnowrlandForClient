@@ -171,14 +171,14 @@
 }
 
 .ArticleReader-module__lP8bda__heroActions {
-  flex-direction: column;
+  flex-direction: row;
   flex: none;
   align-items: center;
   gap: 13px;
   display: flex;
 }
 
-.ArticleReader-module__lP8bda__shareButton {
+.ArticleReader-module__lP8bda__shareButton, .ArticleReader-module__lP8bda__heroActionButton {
   color: #0d1a2c;
   cursor: pointer;
   background: rgba(255, 255, 255, .96);
@@ -193,10 +193,16 @@
   display: inline-flex;
 }
 
-.ArticleReader-module__lP8bda__shareButton:hover {
-  color: #07111f;
-  background: #47b4e5;
+.ArticleReader-module__lP8bda__heroActionButton {
+  color: #c77d10 !important;
+  background: rgba(255, 255, 255, .96) !important;
+  border-color: rgba(255, 255, 255, .66) !important;
+}
+
+.ArticleReader-module__lP8bda__shareButton:hover, .ArticleReader-module__lP8bda__heroActionButton:hover {
   transform: translateY(-2px);
+  color: #fff !important;
+  background: #47b4e5 !important;
 }
 
 .ArticleReader-module__lP8bda__shareButton:focus-visible {
@@ -219,10 +225,11 @@
   outline: 2px solid #47b4e5;
 }
 
-.ArticleReader-module__lP8bda__shareButton svg {
+.ArticleReader-module__lP8bda__shareButton svg, .ArticleReader-module__lP8bda__heroActionButton svg {
   stroke-width: 2px;
   width: 20px;
   height: 20px;
+  color: currentColor !important;
 }
 
 .ArticleReader-module__lP8bda__heroMetaRow {
@@ -344,6 +351,21 @@
 
 .ArticleReader-module__lP8bda__heroReadTime {
   color: #fff;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 3px;
+}
+
+.ArticleReader-module__lP8bda__heroReadTimeLabel {
+  align-items: center;
+  gap: 7px;
+  display: inline-flex;
+}
+
+.ArticleReader-module__lP8bda__heroReadTimeLabel svg {
+  color: #67c4ee;
+  width: 15px;
+  height: 15px;
 }
 
 .ArticleReader-module__lP8bda__contentShell {
@@ -1151,7 +1173,7 @@
     right: -.42em;
   }
 
-  .ArticleReader-module__lP8bda__shareButton {
+  .ArticleReader-module__lP8bda__shareButton, .ArticleReader-module__lP8bda__heroActionButton {
     flex-basis: 42px;
     width: 42px;
     height: 42px;

@@ -6,7 +6,6 @@ import {
   IconArticle,
   IconBuildingSkyscraper,
   IconClock,
-  IconFileDescription,
   IconLoader2,
 } from '@tabler/icons-react'
 import { Badge } from '@mantine/core'
@@ -17,6 +16,7 @@ import { useEffect, useMemo, useState } from 'react'
 import { publicBaseUrl } from '@/app/config'
 import FeedSaveButton from '@/components/feed/FeedSaveButton'
 import FeedShare from '@/components/feed/FeedShare'
+import KnowledgeTypeIcon from '@/components/icons/KnowledgeTypeIcon'
 import {
   getCommunityFeedArticle,
   getFeedItem,
@@ -39,6 +39,7 @@ const copyByLocale = {
     notArticle: 'This content is not a White Paper.',
     tryAgain: 'Try again',
     minuteRead: 'min read',
+    readTime: 'Read time',
     published: 'Published',
     publisher: 'Publisher',
     viewInsight: 'View',
@@ -51,6 +52,7 @@ const copyByLocale = {
     notArticle: 'هذا المحتوى ليس ورقة بيضاء.',
     tryAgain: 'حاول مرة أخرى',
     minuteRead: 'دقيقة قراءة',
+    readTime: 'مدة القراءة',
     published: 'نُشر',
     publisher: 'الناشر',
     viewInsight: 'عرض',
@@ -276,6 +278,7 @@ export default function ArticleReader({ locale, identifier, isPublic }: ArticleR
                   initialIsSaved={item.is_saved}
                   locale={locale}
                   tone="hero"
+                  className={styles.heroActionButton}
                 />
               )}
               <FeedShare
@@ -320,7 +323,10 @@ export default function ArticleReader({ locale, identifier, isPublic }: ArticleR
             )}
 
             <div className={`${styles.heroMetaItem} ${styles.heroReadTime}`}>
-              <IconClock aria-hidden />
+              <span className={styles.heroReadTimeLabel}>
+                <IconClock aria-hidden />
+                <span className={styles.heroMetaLabel}>{copy.readTime}</span>
+              </span>
               <strong>{readingMinutes} {copy.minuteRead}</strong>
             </div>
           </div>
@@ -357,7 +363,7 @@ export default function ArticleReader({ locale, identifier, isPublic }: ArticleR
                       >
                         <div>
                           <div className="flex items-center gap-2">
-                            <IconFileDescription aria-hidden className="h-4 w-4 text-[#67B5F6]" />
+                            <KnowledgeTypeIcon type={insight.type} size={16} />
                             <span className="rounded-full bg-[#0B315D]/80 px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-[0.05em] text-[#67B5F6] backdrop-blur-sm">
                               {insight.type}
                             </span>

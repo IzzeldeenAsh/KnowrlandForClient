@@ -30,19 +30,6 @@ export default function ManualIcon({ width = 50, height = 50 }: ManualIconProps)
         d="M27.0833 23.4375H16.6667C15.8125 23.4375 15.1042 22.7292 15.1042 21.875C15.1042 21.0208 15.8125 20.3125 16.6667 20.3125H27.0833C27.9375 20.3125 28.6458 21.0208 28.6458 21.875C28.6458 22.7292 27.9375 23.4375 27.0833 23.4375Z"
         fill="white"
       />
-      <defs>
-        <linearGradient
-          id="paint0_linear_125_176"
-          x1="25"
-          y1="4.16669"
-          x2="25"
-          y2="37.1875"
-          gradientUnits="userSpaceOnUse"
-        >
-          <stop stopColor="#066FE8" />
-          <stop offset="1" stopColor="#027DF8" />
-        </linearGradient>
-      </defs>
     </svg>
   );
 }

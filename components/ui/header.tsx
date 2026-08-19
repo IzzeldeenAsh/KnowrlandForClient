@@ -3,7 +3,7 @@ import Link from 'next/link'
 import Logo from './logo'
 import MobileMenu from './mobile-menu'
 import { useEffect, useLayoutEffect, useRef, useState } from 'react'
-import { IconChevronDown, IconLanguage, IconSearch, IconX } from '@tabler/icons-react'
+import { IconChevronDown, IconHome, IconLanguage, IconSearch, IconX } from '@tabler/icons-react'
 import { HoverCard, Group, Text, Anchor, Divider, SimpleGrid, Button, TextInput } from '@mantine/core'
 import { UserProfile } from './header/components/UserProfile'
 import { useTranslations } from 'next-intl'
@@ -515,7 +515,7 @@ export default function Header() {
 
   return (
     <>
-      <div ref={headerShellRef} className="sticky top-0 z-50">
+      <div ref={headerShellRef} className="fixed inset-x-0 top-0 z-50">
        
 
         <header
@@ -683,7 +683,7 @@ export default function Header() {
                     <TextInput
                       id={`header-search-${currentLocale}`}
                       placeholder={isFeedPage
-                        ? (currentLocale === 'ar' ? 'ابحث في الموجز...' : 'Search the feed...')
+                        ? (currentLocale === 'ar' ? 'ابحث في الموجز...' : 'Search ..')
                         : (currentLocale === 'ar' ? 'البحث...' : 'Search...')}
                       aria-label={isFeedPage
                         ? (currentLocale === 'ar' ? 'البحث في الموجز' : 'Search the feed')
@@ -733,6 +733,19 @@ export default function Header() {
 
               {/* Desktop sign in links */}
               <ul className="flex justify-end items-center flex-shrink-0">
+                {/* Feed navigation stays available on tablet and mobile. */}
+                {isFeedPage && (
+                  <li className="xl:hidden me-1">
+                    <Link
+                      href={`/${currentLocale}/landing`}
+                      aria-label={currentLocale === 'ar' ? 'الصفحة الرئيسية' : 'Home'}
+                      className="flex items-center rounded-md p-2 text-slate-300 transition-all duration-200 hover:bg-[#3B8AEF]/20 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#67B5F6]"
+                    >
+                      <IconHome aria-hidden size={18} stroke={1.9} />
+                    </Link>
+                  </li>
+                )}
+
                 {/* Language Switch Button */}
                 <li className="mx-1 md:mx-2">
                   <div className="flex items-center">
@@ -834,7 +847,7 @@ export default function Header() {
                   >
                     <TextInput
                       id={`header-search-${currentLocale}`}
-                      placeholder={currentLocale === 'ar' ? 'ابحث في الموجز...' : 'Search the feed...'}
+                      placeholder={currentLocale === 'ar' ? 'ابحث في الموجز...' : 'Search ..'}
                       aria-label={currentLocale === 'ar' ? 'البحث في الموجز' : 'Search the feed'}
                       value={searchQuery}
                       onChange={(event) => setSearchQuery(event.currentTarget.value)}
@@ -906,6 +919,9 @@ export default function Header() {
           </div>
         </header>
       </div>
+      {/* Keep page content below the fixed header while the menu toggle remains
+          reachable during long feed scrolls. */}
+      <div aria-hidden="true" className="h-16 md:h-20" />
     </>
   )
 }

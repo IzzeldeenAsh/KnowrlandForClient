@@ -28,6 +28,7 @@ import {
 import { useEffect, useState, type ReactNode } from 'react'
 import { dashboardUrl } from '@/app/config'
 import { useUserProfile } from '@/components/ui/header/hooks/useUserProfile'
+import SmallLogo from '@/public/images/smallLogo.png'
 
 type FeedSidebarProps = {
   locale: string
@@ -89,7 +90,7 @@ const copyByLocale: Record<'en' | 'ar', SidebarCopy> = {
   en: {
     overview: 'Dashboard',
     posts: 'Posts',
-    communityPosts: 'Community Posts',
+    communityPosts: 'Feed',
     myPosts: 'My Posts',
     savedPosts: 'Saved Posts',
     insights: 'Insights',
@@ -277,9 +278,11 @@ function SidebarLegalFooter({ locale }: { locale: string }) {
   ]
 
   return (
-    <footer className="px-2 py-1 text-[11px] leading-5 text-[#718096]" dir={isArabic ? 'rtl' : 'ltr'}>
-      <p className="m-0 whitespace-nowrap">{isArabic ? '© 2026 إنسايتا بيزنس' : '© 2026 Insighta Business'}</p>
-      <ul className="mt-3 space-y-1.5">
+    <footer
+      className="mt-4 flex-shrink-0 border-t border-[#E4EAF3] px-2 pb-1 pt-3 text-[11px] leading-5 text-[#718096]"
+      dir={isArabic ? 'rtl' : 'ltr'}
+    >
+      <ul className="flex flex-wrap gap-x-3 gap-y-1">
         {legalLinks.map((link) => (
           <li key={link.href}>
             <Link
@@ -291,6 +294,10 @@ function SidebarLegalFooter({ locale }: { locale: string }) {
           </li>
         ))}
       </ul>
+      <p className="m-0 mt-2 flex items-center gap-1.5 whitespace-nowrap">
+        <Image src={SmallLogo} alt="" aria-hidden width={14} height={14} className="shrink-0 rounded-[3px]" />
+        {isArabic ? '© 2026 إنسايتا بيزنس' : '© 2026 Insighta Business'}
+      </p>
     </footer>
   )
 }
@@ -398,7 +405,8 @@ export default function FeedSidebar({ locale, hideProfileCard = false }: FeedSid
   const dashboardBase = `${dashboardUrl}/app/insighter-dashboard`
 
   return (
-    <nav aria-label={isArabic ? 'قائمة الحساب' : 'Account menu'} className={hideProfileCard ? 'space-y-2' : 'space-y-4'}>
+    <nav aria-label={isArabic ? 'قائمة الحساب' : 'Account menu'} className="flex flex-col">
+    <div className={`pe-1 ${hideProfileCard ? 'space-y-2' : 'space-y-4'}`}>
       {!hideProfileCard && (
       <section className="relative flex h-[216px] flex-col items-center overflow-hidden rounded-lg border border-[#D9E3EF] bg-[#F8FAFD] px-5 pb-[22px] pt-6 text-center">
         <svg
@@ -466,14 +474,6 @@ export default function FeedSidebar({ locale, hideProfileCard = false }: FeedSid
         />
       </DashboardSection>
 
-      <DashboardSection title={copy.marketplace} icon={IconShoppingBag} compact={hideProfileCard}>
-        <SidebarItem href={`${dashboardBase}/my-orders`} icon={IconShoppingBag} label={copy.myPurchases} compact={hideProfileCard} />
-        {isProvider && <SidebarItem href={`${dashboardBase}/sales`} icon={IconChartLine} label={copy.sales} compact={hideProfileCard} />}
-        {(isInsighter || isCompany) && (
-          <SidebarItem href={`${dashboardBase}/wallet`} icon={IconWallet} label={copy.wallet} compact={hideProfileCard} />
-        )}
-      </DashboardSection>
-
       <DashboardSection title={copy.insights} icon={IconBook} compact={hideProfileCard}>
         {!isPureClient && (
           <SidebarItem href={`${dashboardBase}/my-knowledge`} icon={IconBook} label={copy.myKnowledge} compact={hideProfileCard} />
@@ -508,6 +508,11 @@ export default function FeedSidebar({ locale, hideProfileCard = false }: FeedSid
               compact={hideProfileCard}
             />
           )}
+          <SidebarItem href={`${dashboardBase}/my-orders`} icon={IconShoppingBag} label={copy.myPurchases} compact={hideProfileCard} />
+          {isProvider && <SidebarItem href={`${dashboardBase}/sales`} icon={IconChartLine} label={copy.sales} compact={hideProfileCard} />}
+          {(isInsighter || isCompany) && (
+            <SidebarItem href={`${dashboardBase}/wallet`} icon={IconWallet} label={copy.wallet} compact={hideProfileCard} />
+          )}
         </DashboardSection>
       )}
 
@@ -534,6 +539,7 @@ export default function FeedSidebar({ locale, hideProfileCard = false }: FeedSid
         )}
       </DashboardSection>
       </div>
+    </div>
       <SidebarLegalFooter locale={locale} />
     </nav>
   )

@@ -22,6 +22,7 @@ type FeedSaveButtonProps = {
   locale: string
   tone?: 'card' | 'hero'
   layout?: 'icon' | 'action'
+  className?: string
   onChange?: (isSaved: boolean) => void
 }
 
@@ -56,6 +57,7 @@ export default function FeedSaveButton({
   locale,
   tone = 'card',
   layout = 'icon',
+  className,
   onChange,
 }: FeedSaveButtonProps) {
   const copy = copyByLocale[locale === 'ar' ? 'ar' : 'en']
@@ -148,7 +150,7 @@ export default function FeedSaveButton({
         disabled={isUpdating}
         aria-label={label}
         aria-pressed={isSaved}
-        className={buttonClasses}
+        className={`${buttonClasses} ${className ?? ''}`}
       >
         {isUpdating ? (
           <IconLoader2 aria-hidden className="h-[18px] w-[18px] animate-spin" stroke={2} />

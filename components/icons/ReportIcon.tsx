@@ -1,4 +1,4 @@
-import React from 'react';
+import { useId } from 'react';
 
 interface ReportIconProps {
   width?: number;
@@ -6,6 +6,8 @@ interface ReportIconProps {
 }
 
 export default function ReportIcon({ width = 50, height = 50 }: ReportIconProps) {
+  const gradientId = useId().replace(/:/g, '');
+
   return (
     <svg
       width={width}
@@ -21,7 +23,7 @@ export default function ReportIcon({ width = 50, height = 50 }: ReportIconProps)
       />
       <path
         d="M31.375 40.3958C30.0833 41.2708 28.4583 42 26.4792 42.6458L23.1875 43.7292C14.9167 46.3958 10.5625 44.1667 7.87501 35.8958L5.20834 27.6667C2.54168 19.3958 4.75001 15.0208 13.0208 12.3542L16.3125 11.2708C17.1667 11 17.9792 10.7708 18.75 10.625C18.125 11.8958 17.625 13.4375 17.2083 15.2083L15.1667 23.9375C13.125 32.6458 15.8125 36.9375 24.5 39L28 39.8333C29.2083 40.125 30.3333 40.3125 31.375 40.3958Z"
-        fill="url(#paint0_linear_125_52)"
+        fill={`url(#${gradientId})`}
       />
       <path
         d="M36.4375 21.8959C36.3125 21.8959 36.1875 21.875 36.0416 21.8542L25.9375 19.2917C25.1041 19.0834 24.6041 18.2292 24.8125 17.3959C25.0208 16.5625 25.875 16.0625 26.7083 16.2709L36.8125 18.8334C37.6458 19.0417 38.1458 19.8959 37.9375 20.7292C37.7708 21.4167 37.125 21.8959 36.4375 21.8959Z"
@@ -33,7 +35,7 @@ export default function ReportIcon({ width = 50, height = 50 }: ReportIconProps)
       />
       <defs>
         <linearGradient
-          id="paint0_linear_125_52"
+          id={gradientId}
           x1="17.7562"
           y1="10.625"
           x2="17.7562"

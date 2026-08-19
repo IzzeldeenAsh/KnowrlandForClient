@@ -54,7 +54,7 @@ export default function FeedMobileSearch({ locale }: { locale: string }) {
           type="search"
           value={query}
           onChange={(event) => setQuery(event.target.value)}
-          placeholder={locale === 'ar' ? 'ابحث في الموجز...' : 'Search the feed...'}
+          placeholder={locale === 'ar' ? 'ابحث في الموجز...' : 'Search ..'}
           dir={locale === 'ar' ? 'rtl' : 'ltr'}
           className={`h-11 w-full rounded-lg border border-[#D7E1EE] bg-white px-4 text-[14px] text-[#1E293B] shadow-sm outline-none transition-colors placeholder:text-[#94A3B8] focus:border-[#2378E8] focus:ring-2 focus:ring-[#2378E8]/15 ${locale === 'ar' ? 'pl-20' : 'pr-20'}`}
         />

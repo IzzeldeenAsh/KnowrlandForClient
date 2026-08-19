@@ -1,4 +1,6 @@
 {
+  "/[locale]/(default)/landing/page": "app/[locale]/(default)/landing/page.js",
   "/[locale]/(default)/page": "app/[locale]/(default)/page.js",
+  "/[locale]/article/[uuid]/page": "app/[locale]/article/[uuid]/page.js",
   "/manifest.webmanifest/route": "app/manifest.webmanifest/route.js"
 }

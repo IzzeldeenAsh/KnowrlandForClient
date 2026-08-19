@@ -1,13 +1,8 @@
 'use client'
 
-import type { ReactNode } from 'react'
 import Link from 'next/link'
 import { IconExternalLink } from '@tabler/icons-react'
-import CourseIcon from '@/components/icons/CourseIcon'
-import DataIcon from '@/components/icons/DataIcon'
-import InsightIcon from '@/components/icons/InsightIcon'
-import ManualIcon from '@/components/icons/ManualIcon'
-import ReportIcon from '@/components/icons/ReportIcon'
+import KnowledgeTypeIcon from '@/components/icons/KnowledgeTypeIcon'
 
 export type DocumentsListItem = {
   id: string
@@ -27,26 +22,6 @@ type DocumentsListCardProps = {
   hasError?: boolean
   openInNewTabLabel: string
   className?: string
-}
-
-function getTypeIcon(type: string): ReactNode {
-  const iconProps = { width: 20, height: 20 }
-
-  switch (type.toLowerCase()) {
-    case 'report':
-      return <ReportIcon {...iconProps} />
-    case 'manual':
-      return <ManualIcon {...iconProps} />
-    case 'data':
-      return <DataIcon {...iconProps} />
-    case 'course':
-    case 'article':
-      return <CourseIcon {...iconProps} />
-    case 'statistic':
-    case 'insight':
-    default:
-      return <InsightIcon {...iconProps} />
-  }
 }
 
 function getTypeLabel(type: string, isRTL: boolean): string {
@@ -124,7 +99,7 @@ export default function DocumentsListCard({
                   className="group flex items-center gap-3 rounded-lg px-2 py-3 transition-colors hover:bg-slate-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
                 >
                   <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-slate-50 ring-1 ring-inset ring-slate-100 transition-colors group-hover:bg-white">
-                    {getTypeIcon(item.type)}
+                    <KnowledgeTypeIcon type={item.type} size={20} />
                   </span>
 
                   <span className={`min-w-0 flex-1 ${isTitleRTL ? 'text-right' : 'text-left'}`}>

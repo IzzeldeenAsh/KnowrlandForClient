@@ -13,6 +13,12 @@ type FeedComposerProps = {
   locale: string
 }
 
+function resolveDraftMode(mediaType: FeedItem['media_type'] | undefined): PostModalMode {
+  if (mediaType === 'video') return 'video'
+  if (mediaType === 'image') return 'image'
+  return 'post'
+}
+
 const copyByLocale = {
   en: {
     placeholder: 'Share your insights...',
@@ -95,7 +101,7 @@ export default function FeedComposer({ locale }: FeedComposerProps) {
     void (async () => {
       const currentDraft = await refreshDraft().catch(() => null)
       setAutoAttachKnowledgeId(id)
-      setModalMode(currentDraft?.media_type === 'video' ? 'video' : 'post')
+      setModalMode(resolveDraftMode(currentDraft?.media_type))
     })()
   }, [isAuthResolved, canPost, refreshDraft, router])
 
@@ -115,9 +121,7 @@ export default function FeedComposer({ locale }: FeedComposerProps) {
       }
 
       setModalMode(
-        currentDraft
-          ? currentDraft.media_type === 'video' ? 'video' : 'post'
-          : requestedMode as PostModalMode,
+        currentDraft ? resolveDraftMode(currentDraft.media_type) : (requestedMode as PostModalMode),
       )
     } catch (error) {
       toast.error(error instanceof Error ? error.message : copy.checkingDraft)
@@ -132,7 +136,7 @@ export default function FeedComposer({ locale }: FeedComposerProps) {
 
   if (!isAuthResolved) {
     return (
-      <div>
+      <div className="min-w-0">
         <div className="h-[128px] animate-pulse rounded-lg border border-[#DCE4EF] bg-[#F8FAFD]" />
       </div>
     )
@@ -153,7 +157,7 @@ export default function FeedComposer({ locale }: FeedComposerProps) {
       label: copy.image,
       icon: IconPhoto,
       color: '#1EAB5A',
-      onClick: () => void openComposer('post'),
+      onClick: () => void openComposer('image'),
     },
     {
       label: copy.article,
@@ -190,17 +194,17 @@ export default function FeedComposer({ locale }: FeedComposerProps) {
               {copy.placeholder}
             </button>
           </div>
-          <div className="grid min-h-[60px] grid-cols-3 border-t border-[#E4EAF2] px-2">
+          <div className="grid min-h-[60px] grid-cols-3 border-t border-[#E4EAF2] px-1 sm:px-2">
             {composerActions.map(({ label, icon: ActionIcon, color, onClick }) => (
               <button
                 key={label}
                 type="button"
                 onClick={onClick}
                 disabled={!onClick}
-                className="flex min-w-0 items-center justify-center gap-2 px-2 text-[14px] font-normal text-[#5D6D89] transition-colors hover:bg-[#F7F9FC] focus-visible:outline-[1px] focus-visible:outline-offset-[-1px] focus-visible:outline-[#B7D2F4] disabled:cursor-default disabled:hover:bg-transparent"
+                className="flex min-w-0 items-center justify-center gap-1 px-1 text-center text-[11px] font-normal leading-tight text-[#5D6D89] transition-colors hover:bg-[#F7F9FC] focus-visible:outline-[1px] focus-visible:outline-offset-[-1px] focus-visible:outline-[#B7D2F4] disabled:cursor-default disabled:hover:bg-transparent sm:gap-2 sm:px-2 sm:text-[14px]"
               >
-                <ActionIcon aria-hidden className="h-5 w-5 shrink-0" stroke={1.9} style={{ color }} />
-                <span className="truncate">{label}</span>
+                <ActionIcon aria-hidden className="h-[18px] w-[18px] shrink-0 sm:h-5 sm:w-5" stroke={1.9} style={{ color }} />
+                <span className="min-w-0 break-words">{label}</span>
               </button>
             ))}
           </div>

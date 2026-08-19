@@ -25,6 +25,7 @@ import AnalyticsProvider from '@/app/analytics-provider';
 import { generateOrganizationSchema, generateWebSiteSchema } from '@/utils/seo';
 import { publicBaseUrl } from '@/app/config';
 import FloatingFeedButton from '@/components/feed/FloatingFeedButton';
+import FloatingBackToTopButton from '@/components/ui/FloatingBackToTopButton';
 
 
 const almarai = Almarai({
@@ -211,6 +212,7 @@ export default async function RootLayout({
                     <Suspense fallback={null}>
                       <FloatingFeedButton locale={locale} />
                     </Suspense>
+                    <FloatingBackToTopButton locale={locale} />
                     <ConditionalAuthBanner />
                   </RoleGuard>
                 </GlobalProfileProvider>

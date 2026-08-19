@@ -1,9 +1,10 @@
 'use client'
 
 import { useState, useRef, useEffect } from 'react'
+import { createPortal } from 'react-dom'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { IconLanguage } from '@tabler/icons-react'
+import { IconLanguage, IconMenu2, IconX } from '@tabler/icons-react'
 import { useTranslations } from 'next-intl'
 import { useLoading } from '@/components/context/LoadingContext'
 import { getCookieDomain as sharedGetCookieDomain, isSharedCookieHost } from '@/lib/cookieDomain'
@@ -16,6 +17,7 @@ interface MobileMenuProps {
 
 export default function MobileMenu({ isHomePage = true }: MobileMenuProps) {
   const [mobileNavOpen, setMobileNavOpen] = useState<boolean>(false)
+  const [portalReady, setPortalReady] = useState(false)
   const { setIsLoading } = useLoading();
   const t = useTranslations('Header');
   const pathname = usePathname();
@@ -111,6 +113,10 @@ export default function MobileMenu({ isHomePage = true }: MobileMenuProps) {
   const trigger = useRef<HTMLButtonElement>(null)
   const mobileNav = useRef<HTMLDivElement>(null)
 
+  useEffect(() => {
+    setPortalReady(true)
+  }, [])
+
   // close the mobile menu on click outside
   useEffect(() => {
     const clickHandler = ({ target }: { target: EventTarget | null }): void => {
@@ -132,47 +138,55 @@ export default function MobileMenu({ isHomePage = true }: MobileMenuProps) {
     return () => document.removeEventListener('keydown', keyHandler)
   })
 
-  return (
+  useEffect(() => {
+    if (!mobileNavOpen) return
+
+    const previousOverflow = document.body.style.overflow
+    document.body.style.overflow = 'hidden'
+    return () => {
+      document.body.style.overflow = previousOverflow
+    }
+  }, [mobileNavOpen])
+
+  const feedSidebarToggleClass = showFeedSidebar
+    ? `fixed bottom-[calc(var(--auth-banner-offset,0px)+max(1rem,env(safe-area-inset-bottom)))] z-[1002] h-10 w-10 rounded-full border border-white/30 bg-[#2378E8] text-white hover:-translate-y-0.5 hover:bg-[#1769C2] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#67B5F6] focus-visible:ring-offset-2 xl:hidden ${
+        isRtl ? 'left-4' : 'right-4'
+      }`
+    : 'h-8 w-8'
+
+  const menuTrigger = (
+    <button
+      ref={trigger}
+      type="button"
+      className={`group inline-flex ${feedSidebarToggleClass} ${showFeedSidebar ? '' : menuTextColorClass} items-center justify-center text-center transition`}
+      aria-label={showFeedSidebar
+        ? (isRtl ? 'فتح الشريط الجانبي' : 'Open sidebar')
+        : (isRtl ? 'فتح القائمة' : 'Open menu')}
+      aria-controls="mobile-nav"
+      aria-expanded={mobileNavOpen}
+      onClick={(event) => {
+        event.preventDefault()
+        event.stopPropagation()
+        setMobileNavOpen((isOpen) => !isOpen)
+      }}
+    >
+      {mobileNavOpen ? (
+        <IconX aria-hidden className="h-[22px] w-[22px]" stroke={2.2} />
+      ) : (
+        <IconMenu2 aria-hidden className="h-[22px] w-[22px]" stroke={2.2} />
+      )}
+    </button>
+  )
+
+  const mobileMenu = (
     <div className="xl:hidden flex items-center ml-4">
-      {/* Hamburger button */}
-      <button
-        ref={trigger}
-        className={`group inline-flex w-8 h-8 ${menuTextColorClass} text-center items-center justify-center transition`}
-        aria-controls="mobile-nav"
-        aria-expanded={mobileNavOpen}
-        onClick={() => setMobileNavOpen(!mobileNavOpen)}
-      >
-        <span className="sr-only">Menu</span>
-        <svg className="w-4 h-4 fill-current pointer-events-none" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg">
-          <rect 
-            className="origin-center transition-all duration-300 ease-[cubic-bezier(.5,.85,.25,1.1)] -translate-y-[5px] group-[[aria-expanded=true]]:rotate-[315deg] group-[[aria-expanded=true]]:translate-y-0"
-            y="7" 
-            width="16" 
-            height="2" 
-            rx="1"
-          />
-          <rect 
-            className="origin-center group-[[aria-expanded=true]]:rotate-45 transition-all duration-300 ease-[cubic-bezier(.5,.85,.25,1.8)]"
-            y="7" 
-            width="16" 
-            height="2" 
-            rx="1"
-          />
-          <rect 
-            className="origin-center transition-all duration-300 ease-[cubic-bezier(.5,.85,.25,1.1)] translate-y-[5px] group-[[aria-expanded=true]]:rotate-[135deg] group-[[aria-expanded=true]]:translate-y-0"
-            y="7" 
-            width="16" 
-            height="2" 
-            rx="1"
-          />
-        </svg>
-      </button>
+      {menuTrigger}
 
       {mobileNavOpen && (
         <button
           type="button"
           aria-label={isRtl ? 'إغلاق القائمة' : 'Close menu'}
-          className="fixed inset-x-0 bottom-0 top-16 z-40 bg-slate-950/45 backdrop-blur-[1px] md:top-20"
+          className="fixed inset-0 z-[1000] bg-slate-950/45 backdrop-blur-[1px]"
           onClick={() => setMobileNavOpen(false)}
         />
       )}
@@ -182,7 +196,7 @@ export default function MobileMenu({ isHomePage = true }: MobileMenuProps) {
         id="mobile-nav"
         ref={mobileNav}
         aria-hidden={!mobileNavOpen}
-        className={`fixed bottom-0 top-16 z-50 w-[min(22rem,calc(100vw-2.5rem))] overflow-y-auto bg-[#EEF2FA] transition-transform duration-300 ease-out md:top-20 sm:w-[22rem] ${
+        className={`fixed inset-y-0 z-[1001] w-[min(22rem,calc(100vw-2.5rem))] overflow-y-auto bg-[#EEF2FA] transition-transform duration-300 ease-out sm:w-[22rem] ${
           isRtl
             ? `right-0 shadow-[-12px_0_32px_rgba(15,23,42,0.2)] ${mobileNavOpen ? 'translate-x-0' : 'translate-x-full'}`
             : `left-0 shadow-[12px_0_32px_rgba(15,23,42,0.2)] ${mobileNavOpen ? 'translate-x-0' : '-translate-x-full'}`
@@ -237,4 +251,8 @@ export default function MobileMenu({ isHomePage = true }: MobileMenuProps) {
       </nav>
     </div>
   )
+
+  return showFeedSidebar && portalReady
+    ? createPortal(mobileMenu, document.body)
+    : mobileMenu
 }

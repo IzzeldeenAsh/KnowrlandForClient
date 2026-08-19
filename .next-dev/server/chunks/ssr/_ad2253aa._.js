@@ -29,8 +29,12 @@ __turbopack_context__.s([
     ()=>getFeedDraft,
     "getFeedItem",
     ()=>getFeedItem,
+    "getInsighterProfileFeed",
+    ()=>getInsighterProfileFeed,
     "getMyFeeds",
     ()=>getMyFeeds,
+    "getSavedCommunityFeed",
+    ()=>getSavedCommunityFeed,
     "initVideoPost",
     ()=>initVideoPost,
     "publishArticle",
@@ -49,6 +53,10 @@ __turbopack_context__.s([
     ()=>saveVideoPostDraft,
     "searchCommunityFeed",
     ()=>searchCommunityFeed,
+    "setCommunityFeedItemSaved",
+    ()=>setCommunityFeedItemSaved,
+    "setCommunityFeedItemTracked",
+    ()=>setCommunityFeedItemTracked,
     "uploadVideoToProvider",
     ()=>uploadVideoToProvider
 ]);
@@ -167,7 +175,7 @@ async function getFeedItem(uuid, locale) {
 }
 async function getCommunityFeedArticle(slug, locale, signal) {
     const response = await fetch((0, __TURBOPACK__imported__module__$5b$project$5d2f$app$2f$config$2e$ts__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["getApiUrl"])(`/api/platform/community/feed/articles/${encodeURIComponent(slug)}`), {
-        headers: publicHeaders(locale),
+        headers: authHeaders(locale),
         cache: 'no-store',
         signal
     });
@@ -177,9 +185,9 @@ async function getCommunityFeedArticle(slug, locale, signal) {
     const body = await response.json();
     return body.data;
 }
-async function getCommunityFeedPost(uuid, locale, signal) {
-    const response = await fetch((0, __TURBOPACK__imported__module__$5b$project$5d2f$app$2f$config$2e$ts__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["getApiUrl"])(`/api/platform/community/feed/posts/${encodeURIComponent(uuid)}`), {
-        headers: publicHeaders(locale),
+async function getCommunityFeedPost(slug, locale, signal) {
+    const response = await fetch((0, __TURBOPACK__imported__module__$5b$project$5d2f$app$2f$config$2e$ts__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["getApiUrl"])(`/api/platform/community/feed/posts/${encodeURIComponent(slug)}`), {
+        headers: authHeaders(locale),
         cache: 'no-store',
         signal
     });
@@ -273,6 +281,75 @@ async function getCommunityFeed(locale, cursor, signal) {
     });
     if (cursor) params.set('cursor', cursor);
     return requestCommunityFeed(`/api/platform/community/feed?${params.toString()}`, locale, signal);
+}
+async function getInsighterProfileFeed(uuid, locale, cursor, signal) {
+    const params = new URLSearchParams({
+        limit: '10'
+    });
+    if (cursor) params.set('cursor', cursor);
+    const response = await fetch((0, __TURBOPACK__imported__module__$5b$project$5d2f$app$2f$config$2e$ts__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["getApiUrl"])(`/api/platform/insighter/profile/${encodeURIComponent(uuid)}/feed?${params.toString()}`), {
+        headers: authHeaders(locale),
+        cache: 'no-store',
+        signal
+    });
+    if (!response.ok) {
+        await parseErrorMessage(response, 'Unable to load this insighter’s posts.');
+    }
+    const body = await response.json();
+    return {
+        data: body.data ?? [],
+        meta: {
+            has_more: Boolean(body.meta?.next_cursor),
+            next_cursor: body.meta?.next_cursor ?? null,
+            limit: body.meta?.per_page ?? 10
+        }
+    };
+}
+async function getSavedCommunityFeed(locale, cursor, signal) {
+    const params = new URLSearchParams({
+        limit: '10'
+    });
+    if (cursor) params.set('cursor', cursor);
+    const response = await fetch((0, __TURBOPACK__imported__module__$5b$project$5d2f$app$2f$config$2e$ts__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["getApiUrl"])(`/api/platform/community/feed/saved?${params.toString()}`), {
+        headers: authHeaders(locale),
+        cache: 'no-store',
+        signal
+    });
+    if (!response.ok) {
+        await parseErrorMessage(response, 'Unable to load your saved posts.');
+    }
+    const body = await response.json();
+    const nextCursor = body.meta?.next_cursor ?? null;
+    return {
+        data: body.data ?? [],
+        meta: {
+            has_more: Boolean(nextCursor),
+            next_cursor: nextCursor,
+            per_page: body.meta?.per_page ?? 10
+        }
+    };
+}
+async function setCommunityFeedItemTracked(uuid, isTracked, locale) {
+    const response = await fetch((0, __TURBOPACK__imported__module__$5b$project$5d2f$app$2f$config$2e$ts__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["getApiUrl"])(`/api/platform/community/feed/track/${encodeURIComponent(uuid)}`), {
+        method: isTracked ? 'PUT' : 'DELETE',
+        headers: authHeaders(locale)
+    });
+    if (!response.ok) {
+        await parseErrorMessage(response, isTracked ? 'Unable to track this post.' : 'Unable to untrack this post.');
+    }
+    const body = await response.json();
+    return body.data;
+}
+async function setCommunityFeedItemSaved(uuid, isSaved, locale) {
+    const response = await fetch((0, __TURBOPACK__imported__module__$5b$project$5d2f$app$2f$config$2e$ts__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["getApiUrl"])(`/api/platform/community/feed/save/${encodeURIComponent(uuid)}`), {
+        method: isSaved ? 'PUT' : 'DELETE',
+        headers: authHeaders(locale)
+    });
+    if (!response.ok) {
+        await parseErrorMessage(response, isSaved ? 'Unable to save this post.' : 'Unable to remove this post from saved posts.');
+    }
+    const body = await response.json();
+    return body.data;
 }
 async function searchCommunityFeed(locale, search, signal) {
     const params = new URLSearchParams({

@@ -125,11 +125,12 @@
   display: flex;
   align-items: center;
   gap: 13px;
-  flex-direction: column;
+  flex-direction: row;
   flex: 0 0 auto;
 }
 
-.shareButton {
+.shareButton,
+.heroActionButton {
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -144,10 +145,17 @@
   transition: transform 180ms ease, background 180ms ease, color 180ms ease;
 }
 
-.shareButton:hover {
+.heroActionButton {
+  border-color: rgba(255, 255, 255, 0.66) !important;
+  background: rgba(255, 255, 255, 0.96) !important;
+  color: #c77d10 !important;
+}
+
+.shareButton:hover,
+.heroActionButton:hover {
   transform: translateY(-2px);
-  background: #47b4e5;
-  color: #07111f;
+  background: #47b4e5 !important;
+  color: #fff !important;
 }
 
 .shareButton:focus-visible,
@@ -158,10 +166,12 @@
   outline-offset: 3px;
 }
 
-.shareButton svg {
+.shareButton svg,
+.heroActionButton svg {
   width: 20px;
   height: 20px;
   stroke-width: 2;
+  color: currentColor !important;
 }
 
 .heroMetaRow {
@@ -258,7 +268,22 @@
 }
 
 .heroReadTime {
+  align-items: flex-start;
+  gap: 3px;
+  flex-direction: column;
   color: #fff;
+}
+
+.heroReadTimeLabel {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+}
+
+.heroReadTimeLabel svg {
+  width: 15px;
+  height: 15px;
+  color: #67c4ee;
 }
 
 .contentShell {
@@ -834,7 +859,8 @@
     height: 0.23em;
   }
 
-  .shareButton {
+  .shareButton,
+  .heroActionButton {
     width: 42px;
     height: 42px;
     flex-basis: 42px;

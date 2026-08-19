@@ -4,6 +4,7 @@ import { Badge, Menu, Modal, Tooltip } from '@mantine/core'
 import {
   IconArticle,
   IconBriefcase,
+  IconCalendarUser,
   IconChevronLeft,
   IconChevronRight,
   IconDots,
@@ -11,9 +12,7 @@ import {
   IconLoader2,
   IconPhoto,
   IconPlayerPlayFilled,
-  IconRadar,
   IconTrash,
-  IconUsers,
   IconVideo,
   IconX,
 } from '@tabler/icons-react'
@@ -22,11 +21,7 @@ import { arSA, enUS } from 'date-fns/locale'
 import Link from 'next/link'
 import { Fragment, useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import '@mux/mux-player'
-import CourseIcon from '@/components/icons/CourseIcon'
-import DataIcon from '@/components/icons/DataIcon'
-import InsightIcon from '@/components/icons/InsightIcon'
-import ManualIcon from '@/components/icons/ManualIcon'
-import ReportIcon from '@/components/icons/ReportIcon'
+import KnowledgeTypeIcon from '@/components/icons/KnowledgeTypeIcon'
 import { dashboardUrl, publicBaseUrl } from '@/app/config'
 import FeedShare from '@/components/feed/FeedShare'
 import FeedSaveButton from '@/components/feed/FeedSaveButton'
@@ -89,7 +84,7 @@ const copyByLocale = {
     meet: 'Meet',
     requestService: 'Service',
     track: 'Track',
-    untrack: 'Untrack',
+    untrack: 'Tracked',
     tracking: 'Updating…',
     trackFailed: 'Unable to update tracking for this post.',
     trackTooltip: 'Track this post to see more content like it in your feed.',
@@ -282,7 +277,7 @@ function ImageGallery({
     <>
       {isSingleImage && (
         <div
-          className={`-mx-5 mt-5 overflow-hidden border-b border-[#E0E7F0] bg-[#F6F9FD] sm:-mx-6 ${
+          className={`-mx-5 mt-5 overflow-hidden bg-[#F6F9FD] sm:-mx-6 ${
             flushBottom ? '-mb-5 rounded-b-lg sm:-mb-6' : ''
           }`}
         >
@@ -305,7 +300,7 @@ function ImageGallery({
 
       {isTwoImageLayout && (
         <div
-          className={`-mx-5 mt-5 grid grid-cols-2 items-stretch gap-1.5 overflow-hidden border-b border-[#E0E7F0] bg-white sm:-mx-6 ${
+          className={`-mx-5 mt-5 grid grid-cols-2 items-stretch gap-1.5 overflow-hidden bg-white sm:-mx-6 ${
             flushBottom ? '-mb-5 rounded-b-lg sm:-mb-6' : ''
           }`}
           dir={isArabic ? 'rtl' : 'ltr'}
@@ -331,7 +326,7 @@ function ImageGallery({
 
       {hasInlineCarousel && (
         <div
-          className={`relative -mx-5 mt-5 overflow-hidden border-b border-[#D9E2ED] bg-[#E9EEF5] py-1.5 sm:-mx-6 ${
+          className={`relative -mx-5 mt-5 overflow-hidden bg-[#E9EEF5] pt-1.5 sm:-mx-6 ${
             flushBottom ? '-mb-5 rounded-b-lg sm:-mb-6' : ''
           }`}
           dir={isArabic ? 'rtl' : 'ltr'}
@@ -797,21 +792,44 @@ function ArticlePreview({
   )
 }
 
-function RelatedInsightIcon({ type }: { type: string }) {
-  switch (type.trim().toLowerCase()) {
-    case 'report':
-      return <ReportIcon width={16} height={16} />
-    case 'manual':
-      return <ManualIcon width={16} height={16} />
-    case 'statistic':
-      return <InsightIcon width={16} height={16} />
-    case 'data':
-      return <DataIcon width={16} height={16} />
-    case 'course':
-      return <CourseIcon width={16} height={16} />
-    default:
-      return <InsightIcon width={16} height={16} />
-  }
+function TrackSignalIcon({ animated }: { animated: boolean }) {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.5"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      className="h-4 w-4 sm:h-[18px] sm:w-[18px]"
+      aria-hidden
+    >
+      <circle cx="12" cy="12" r="1.5" />
+      {animated ? (
+        <>
+          <circle
+            cx="12"
+            cy="12"
+            r="4.5"
+            vectorEffect="non-scaling-stroke"
+            className="track-signal-wave track-signal-wave--near"
+          />
+          <circle
+            cx="12"
+            cy="12"
+            r="4.5"
+            vectorEffect="non-scaling-stroke"
+            className="track-signal-wave track-signal-wave--far"
+          />
+        </>
+      ) : (
+        <>
+          <circle cx="12" cy="12" r="4.5" />
+          <circle cx="12" cy="12" r="8.5" />
+        </>
+      )}
+    </svg>
+  )
 }
 
 export function FeedCard({
@@ -911,8 +929,8 @@ export function FeedCard({
 
   return (
     <article className="relative overflow-visible rounded-lg border border-[#D9E3EF] bg-white px-5 py-5 sm:px-6">
-      <div className="flex min-h-9 items-start justify-between gap-3 sm:gap-4 max-[420px]:flex-col">
-        <div className="min-w-0 flex-1">
+      <div className="flex min-h-9 items-start justify-between gap-3 sm:gap-4">
+        <div className={`min-w-0 flex-1 ${articleAccess === 'community' ? 'pe-[76px] sm:pe-0' : ''}`}>
           {insighter && (
             <div className="flex min-w-0 items-center gap-3">
               <div className="h-10 w-10 shrink-0 overflow-hidden rounded-full bg-[#E7F0FE]">
@@ -937,7 +955,7 @@ export function FeedCard({
                 >
                   {insighter.name}
                 </Link>
-                <div className="flex flex-nowrap items-center gap-x-1.5 text-[12.5px] text-[#7A8BA4]">
+                <div className="flex min-w-0 flex-col items-start gap-y-0.5 text-[12px] text-[#7A8BA4] sm:flex-row sm:items-center sm:gap-x-1.5 sm:text-[12.5px]">
                   {item.industry && (
                     <Link
                       href={`/${locale}/sub-industry/${item.industry.id}/${item.industry.slug}`}
@@ -948,7 +966,7 @@ export function FeedCard({
                       {item.industry.name}
                     </Link>
                   )}
-                  {date && item.industry && <span aria-hidden className="shrink-0">·</span>}
+                  {date && item.industry && <span aria-hidden className="hidden shrink-0 sm:inline">·</span>}
                   {date && (
                     <time
                       dateTime={item.published_at ?? item.created_at ?? undefined}
@@ -964,7 +982,7 @@ export function FeedCard({
         </div>
 
         {(onDelete || articleAccess === 'community') && (
-          <div className="flex shrink-0 items-center gap-2 max-[420px]:self-end">
+          <div className={`flex shrink-0 items-center gap-2 ${articleAccess === 'community' ? 'absolute end-4 top-4 sm:static' : ''}`}>
             {articleAccess === 'community' && (
               <Tooltip
                 label={isOwnPost ? copy.ownPostTracking : isTracked ? copy.untrackTooltip : copy.trackTooltip}
@@ -979,16 +997,18 @@ export function FeedCard({
                     disabled={isUpdatingTrack || isOwnPost}
                     aria-pressed={isTracked}
                     aria-label={isUpdatingTrack ? copy.tracking : isTracked ? copy.untrack : copy.track}
-                    className={`inline-flex min-h-9 items-center justify-center gap-1.5 rounded-full px-3 text-[12px] font-semibold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2378E8] focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-55 ${
+                    className={`inline-flex min-h-[28px] items-center justify-center gap-1 rounded-full border px-2 py-0.5 text-[11px] font-semibold transition-[background-color,border-color,color,box-shadow] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#64748B] focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-55 sm:min-h-[34px] sm:gap-1.5 sm:px-3 sm:py-0 sm:text-[12px] ${
                       isTracked
-                        ? 'bg-[#2378E8] text-white hover:bg-[#1B64C5]'
-                        : 'bg-[#F2F7FF] text-[#36506F] hover:bg-[#E6F0FD] hover:text-[#2378E8]'
+                        ? 'border-[#A9CBF7] bg-[#F2F7FF] text-[#2378E8] shadow-sm hover:border-[#83B3F2] hover:bg-[#E7F1FE]'
+                        : 'border-[#B8C4D3] bg-white text-[#36506F] hover:border-[#7F91A8] hover:bg-[#F5F7FA] hover:text-[#253247]'
                     }`}
                   >
                     {isUpdatingTrack ? (
                       <IconLoader2 aria-hidden className="h-4 w-4 animate-spin" stroke={2} />
                     ) : (
-                      <IconRadar aria-hidden className="h-4 w-4" stroke={1.9} />
+                      <span className="flex h-4 w-4 shrink-0 items-center justify-center sm:h-5 sm:w-5" aria-hidden>
+                        <TrackSignalIcon animated={isTracked} />
+                      </span>
                     )}
                     <span>{isTracked ? copy.untrack : copy.track}</span>
                   </button>
@@ -1084,7 +1104,7 @@ export function FeedCard({
       )}
 
       {item.related_insights.length > 0 && (
-        <div className={`-mx-5 ${hasPostMedia ? 'mt-0' : 'mt-5'} divide-y divide-[#E7EDF5] overflow-hidden border-t border-[#E7EDF5] sm:-mx-6 ${
+        <div className={`-mx-5 ${hasPostMedia ? 'mt-0' : 'mt-5'} divide-y divide-[#E7EDF5] overflow-hidden sm:-mx-6 ${
           showEngagementActions ? 'border-b' : '-mb-5 rounded-b-lg sm:-mb-6'
         }`}>
           {item.related_insights.map((insight) => {
@@ -1105,7 +1125,7 @@ export function FeedCard({
               >
                 <div>
                   <div className="flex items-center gap-2">
-                    <RelatedInsightIcon type={insight.type} />
+                    <KnowledgeTypeIcon type={insight.type} size={16} />
                     <span className="rounded-full bg-[#0B315D]/80 px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-[0.05em] text-[#67B5F6] backdrop-blur-sm">
                       {insight.type}
                     </span>
@@ -1119,8 +1139,8 @@ export function FeedCard({
                 </div>
               </Link>
 
-              <div className="flex min-h-[130px] min-w-0 flex-1 flex-col justify-center bg-white px-4 py-4 sm:min-h-[155px] sm:px-5">
-                <div className="min-w-0">
+              <div className="flex min-h-[130px] min-w-0 flex-1 flex-col bg-white px-4 py-4 sm:min-h-[155px] sm:px-5 sm:py-4">
+                <div className="flex min-h-[98px] min-w-0 flex-1 flex-col sm:min-h-[123px]">
                   {insight.description && (
                     <p
                       dir="auto"
@@ -1129,7 +1149,7 @@ export function FeedCard({
                       {stripHtml(insight.description)}
                     </p>
                   )}
-                  <div className="mt-3 flex items-center justify-between gap-3" dir={locale === 'ar' ? 'rtl' : 'ltr'}>
+                  <div className="mt-auto flex items-center justify-between gap-4 pt-4" dir={locale === 'ar' ? 'rtl' : 'ltr'}>
                     {insightPrice ? (
                       <Badge color={insightPrice.isFree ? 'green' : 'yellow'} variant="light" className="shrink-0 font-semibold">
                         <span dir={insightPrice.isFree ? 'auto' : 'ltr'} lang={insightPrice.isFree ? undefined : 'en'}>{insightPrice.label}</span>
@@ -1146,7 +1166,7 @@ export function FeedCard({
                         setOpeningInsight((current) => (current === insightKey ? null : current))
                       }, 1800)
                     }}
-                    className="inline-flex min-h-7 items-center justify-center rounded-full border border-[#2378E8] px-2 py-0.5 text-center text-[13px] font-medium text-[#2378E8] transition-colors hover:bg-[#F2F7FF] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2378E8] focus-visible:ring-offset-2"
+                    className="inline-flex min-h-7 min-w-16 items-center justify-center rounded-full border border-[#2378E8] px-2 py-0 text-center text-[13px] font-medium text-[#2378E8] transition-colors hover:bg-[#F2F7FF] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2378E8] focus-visible:ring-offset-2"
                   >
                     {openingInsight === insightKey ? (
                       <>
@@ -1178,7 +1198,7 @@ export function FeedCard({
               rel="noopener noreferrer"
               className="inline-flex flex-1 items-center justify-center gap-2 rounded-md px-2 py-2.5 text-[14px] font-medium text-[#5A6B85] transition-colors hover:bg-[#F5F8FC] hover:text-[#101724] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2378E8]"
             >
-              <IconUsers aria-hidden className="h-[18px] w-[18px] text-[#2378E8]" stroke={1.8} />
+              <IconCalendarUser aria-hidden className="h-[18px] w-[18px] text-[#2378E8]" stroke={1.8} />
               <span>{copy.meet}</span>
             </Link>
           )}
@@ -1193,15 +1213,17 @@ export function FeedCard({
             </Link>
           )}
 
-          <FeedSaveButton
-            uuid={item.uuid}
-            identifier={item.slug ?? item.uuid}
-            contentType={item.content_type}
-            initialIsSaved={item.is_saved}
-            locale={locale}
-            layout="action"
-            onChange={(isSaved) => onSaveChange?.(item, isSaved)}
-          />
+          {!isOwnPost && (
+            <FeedSaveButton
+              uuid={item.uuid}
+              identifier={item.slug ?? item.uuid}
+              contentType={item.content_type}
+              initialIsSaved={item.is_saved}
+              locale={locale}
+              layout="action"
+              onChange={(isSaved) => onSaveChange?.(item, isSaved)}
+            />
+          )}
 
           <FeedShare
             shareUrl={shareUrl}

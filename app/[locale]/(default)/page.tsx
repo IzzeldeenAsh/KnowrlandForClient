@@ -51,7 +51,7 @@ export default async function Feed({ params, searchParams }: FeedProps) {
             </aside>
 
             {/* Center column - composer + feed */}
-            <section className="grid gap-4">
+            <section className="grid min-w-0 gap-4">
               <FeedMobileSearch locale={locale} />
               {!isSearching && !showSavedPosts && <FeedComposer locale={locale} />}
 

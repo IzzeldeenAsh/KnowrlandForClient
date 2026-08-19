@@ -45,7 +45,7 @@ import ImageCropEditor from './ImageCropEditor'
 import { type IndustryOption } from './IndustrySelectModal'
 import KnowledgeLibraryDrawer from './KnowledgeLibraryDrawer'
 
-export type PostModalMode = 'post' | 'video'
+export type PostModalMode = 'post' | 'video' | 'image'
 
 type PostModalProps = {
   locale: string
@@ -96,6 +96,7 @@ const copyByLocale = {
   en: {
     titlePost: 'Create a post',
     titleVideo: 'Create a video post',
+    titleImage: 'Create an image post',
     close: 'Close post composer',
     selectIndustry: 'Select industry',
     step1Label: 'Step 1 of 2 · Write your post',
@@ -107,6 +108,9 @@ const copyByLocale = {
     uploadTitle: 'Upload your video',
     uploadHint: 'MP4 or MOV, up to 10 minutes. The video must finish uploading before you can write a description.',
     selectVideo: 'Select video',
+    imageUploadTitle: 'Upload your images',
+    imageUploadHint: 'JPG, PNG, or GIF, up to 5MB each. Add at least one image before you can write a description.',
+    selectImages: 'Select images',
     uploading: 'Uploading…',
     uploadedProcessing: 'Upload finished — preparing your video',
     processingHint: 'This usually takes under a minute. You can write your description now and publish once it finishes.',
@@ -161,6 +165,7 @@ const copyByLocale = {
   ar: {
     titlePost: 'إنشاء منشور',
     titleVideo: 'إنشاء منشور فيديو',
+    titleImage: 'إنشاء منشور صور',
     close: 'إغلاق محرر المنشور',
     selectIndustry: 'اختر المجال',
     step1Label: 'الخطوة 1 من 2 · اكتب منشورك',
@@ -172,6 +177,9 @@ const copyByLocale = {
     uploadTitle: 'ارفع الفيديو',
     uploadHint: 'MP4 أو MOV، بحد أقصى 10 دقائق. يجب اكتمال رفع الفيديو قبل كتابة الوصف.',
     selectVideo: 'اختر فيديو',
+    imageUploadTitle: 'ارفع الصور',
+    imageUploadHint: 'JPG أو PNG أو GIF، بحد أقصى 5 ميجابايت لكل صورة. أضف صورة واحدة على الأقل قبل كتابة الوصف.',
+    selectImages: 'اختر صوراً',
     uploading: 'جارٍ الرفع…',
     uploadedProcessing: 'انتهى الرفع — جارٍ تجهيز الفيديو',
     processingHint: 'يستغرق ذلك عادةً أقل من دقيقة. يمكنك كتابة الوصف الآن والنشر بعد اكتمال التجهيز.',
@@ -313,15 +321,19 @@ export default function PostModal({
   const industryButtonRef = useRef<HTMLButtonElement>(null)
   const videoSelectButtonRef = useRef<HTMLButtonElement>(null)
   const videoFieldRef = useRef<HTMLDivElement>(null)
+  const imageFieldRef = useRef<HTMLDivElement>(null)
   const bodyInputRef = useRef<HTMLTextAreaElement>(null)
 
   const hasVideo = videoPhase !== 'none'
   const hasImages = images.length > 0
   const isVideoFlow = mode === 'video' || hasVideo
+  const isImageFlow = !isVideoFlow && (mode === 'image' || hasImages)
   // The description stays editable while the provider finishes preparing the
   // video, so the wait is never dead time.
   const isAwaitingProcessing = videoPhase === 'processing' || videoPhase === 'stalled'
-  const bodyLocked = isVideoFlow && !isAwaitingProcessing && videoPhase !== 'ready'
+  const bodyLocked =
+    (isVideoFlow && !isAwaitingProcessing && videoPhase !== 'ready') ||
+    (isImageFlow && !hasImages)
   const industryInvalid = touchedFields.industry && industry === null
   const videoInvalid = touchedFields.video && isVideoFlow && videoPhase !== 'ready'
   // Distinguish "no video yet" from "video uploaded, provider still working":
@@ -951,7 +963,7 @@ export default function PostModal({
   const footerIconClass =
     'flex h-9 w-9 items-center justify-center rounded-md text-[#5A6B84] transition-colors hover:bg-[#F3F6FB] focus-visible:outline-[1px] focus-visible:outline-offset-1 focus-visible:outline-[#B7D2F4]'
 
-  const title = isVideoFlow ? copy.titleVideo : copy.titlePost
+  const title = isVideoFlow ? copy.titleVideo : isImageFlow ? copy.titleImage : copy.titlePost
 
   return (
     <>
@@ -1041,7 +1053,7 @@ export default function PostModal({
               aria-describedby={bodyInvalid ? 'feed-post-body-error' : undefined}
               data-dirty={dirtyFields.body || undefined}
               placeholder={copy.bodyPlaceholder}
-              rows={isVideoFlow ? 5 : 7}
+              rows={isVideoFlow || isImageFlow ? 5 : 7}
               className={`w-full resize-none rounded-md border bg-white px-3 py-2.5 text-[15px] leading-relaxed text-[#1C2433] placeholder:text-[#94A3B8] focus-visible:outline-none ${
                 bodyInvalid
                   ? 'border-[#C23B32]'
@@ -1172,6 +1184,32 @@ export default function PostModal({
                 {videoErrorMessage}
               </p>
             )}
+          </div>
+        )}
+
+        {/* Image area */}
+        {isImageFlow && !hasImages && (
+          <div
+            ref={imageFieldRef}
+            tabIndex={-1}
+            className="mt-4 focus-visible:outline-[1px] focus-visible:outline-offset-1 focus-visible:outline-[#B7D2F4]"
+          >
+            <div className="flex flex-col items-center rounded-md border border-dashed border-[#C9DCF6] bg-[#F8FAFD] px-6 py-10 text-center">
+              <div className="flex h-14 w-14 items-center justify-center rounded-md bg-[#EDF3FC]">
+                <IconPhoto aria-hidden stroke={1.6} className="h-6 w-6 text-[#1EAB5A]" />
+              </div>
+              <h3 className="mt-4 text-[17px] font-bold text-[#0B1220]">{copy.imageUploadTitle}</h3>
+              <p className="mx-auto mt-2 max-w-sm text-[13.5px] leading-6 text-[#64748B]">
+                {copy.imageUploadHint}
+              </p>
+              <button
+                type="button"
+                onClick={() => imageInputRef.current?.click()}
+                className="mt-5 min-h-10 rounded-md bg-[#1EAB5A] px-6 py-2.5 text-[14px] font-medium text-white transition-colors hover:bg-[#178A48] focus-visible:outline-[1px] focus-visible:outline-offset-1 focus-visible:outline-[#B7D2F4]"
+              >
+                {copy.selectImages}
+              </button>
+            </div>
           </div>
         )}
 
@@ -1387,7 +1425,7 @@ export default function PostModal({
             )}
             {step === 1 ? (
               <>
-                {!isVideoFlow && !hasVideo && (
+                {!isVideoFlow && !hasVideo && (hasImages || !isImageFlow) && (
                   <button
                     type="button"
                     aria-label="Add images"
