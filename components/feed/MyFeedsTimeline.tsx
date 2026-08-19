@@ -928,7 +928,7 @@ export function FeedCard({
   }
 
   return (
-    <article className="relative overflow-visible rounded-lg border border-[#D9E3EF] bg-white px-5 py-5 sm:px-6">
+    <article className="relative min-w-0 max-w-full overflow-hidden rounded-lg border border-[#D9E3EF] bg-white px-5 py-5 sm:px-6">
       <div className="flex min-h-9 items-start justify-between gap-3 sm:gap-4">
         <div className={`min-w-0 flex-1 ${articleAccess === 'community' ? 'pe-[76px] sm:pe-0' : ''}`}>
           {insighter && (
@@ -1188,7 +1188,7 @@ export function FeedCard({
 
       {showEngagementActions && insighter && (
         <div
-          className="mt-4 flex items-center justify-around pt-2"
+          className="mt-4 flex min-w-0 items-center justify-around pt-2"
           dir={isArabic ? 'rtl' : 'ltr'}
         >
           {!isOwnPost && (
@@ -1196,9 +1196,9 @@ export function FeedCard({
               href={meetHref}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex flex-1 items-center justify-center gap-2 rounded-md px-2 py-2.5 text-[14px] font-medium text-[#5A6B85] transition-colors hover:bg-[#F5F8FC] hover:text-[#101724] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2378E8]"
+              className="inline-flex min-w-0 flex-1 items-center justify-center gap-1 rounded-md px-1 py-2.5 text-[12px] font-medium text-[#5A6B85] transition-colors hover:bg-[#F5F8FC] hover:text-[#101724] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2378E8] sm:gap-2 sm:px-2 sm:text-[14px]"
             >
-              <IconCalendarUser aria-hidden className="h-[18px] w-[18px] text-[#2378E8]" stroke={1.8} />
+              <IconCalendarUser aria-hidden className="h-4 w-4 shrink-0 text-[#2378E8] sm:h-[18px] sm:w-[18px]" stroke={1.8} />
               <span>{copy.meet}</span>
             </Link>
           )}
@@ -1206,9 +1206,9 @@ export function FeedCard({
           {!isOwnPost && (
             <Link
               href={requestServiceHref}
-              className="inline-flex flex-1 items-center justify-center gap-2 rounded-md px-2 py-2.5 text-[14px] font-medium text-[#5A6B85] transition-colors hover:bg-[#F5F8FC] hover:text-[#101724] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2378E8]"
+              className="inline-flex min-w-0 flex-1 items-center justify-center gap-1 rounded-md px-1 py-2.5 text-[12px] font-medium text-[#5A6B85] transition-colors hover:bg-[#F5F8FC] hover:text-[#101724] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2378E8] sm:gap-2 sm:px-2 sm:text-[14px]"
             >
-              <IconBriefcase aria-hidden className="h-[18px] w-[18px] text-[#16A34A]" stroke={1.8} />
+              <IconBriefcase aria-hidden className="h-4 w-4 shrink-0 text-[#16A34A] sm:h-[18px] sm:w-[18px]" stroke={1.8} />
               <span>{copy.requestService}</span>
             </Link>
           )}

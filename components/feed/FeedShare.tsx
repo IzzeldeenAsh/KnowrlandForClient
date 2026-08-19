@@ -123,9 +123,9 @@ const FeedShare = ({
         type="button"
         onClick={handleShare}
         aria-label={t.share}
-        className={triggerClassName ?? 'inline-flex flex-1 items-center justify-center gap-2 rounded-md px-2 py-2.5 text-[14px] font-medium text-[#5A6B85] transition-colors hover:bg-[#F5F8FC] hover:text-[#101724] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2378E8]'}
+        className={triggerClassName ?? 'inline-flex min-w-0 flex-1 items-center justify-center gap-1 rounded-md px-1 py-2.5 text-[12px] font-medium text-[#5A6B85] transition-colors hover:bg-[#F5F8FC] hover:text-[#101724] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2378E8] sm:gap-2 sm:px-2 sm:text-[14px]'}
       >
-        <IconShare3 aria-hidden className="h-[18px] w-[18px] text-[#E0398A]" stroke={1.8} />
+        <IconShare3 aria-hidden className="h-4 w-4 shrink-0 text-[#E0398A] sm:h-[18px] sm:w-[18px]" stroke={1.8} />
         {!hideTriggerLabel && <span>{t.share}</span>}
       </button>
 

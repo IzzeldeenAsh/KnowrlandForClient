@@ -512,10 +512,10 @@ export default function CommunityFeedTimeline({
   }
 
   return (
-    <div className="space-y-4">
+    <div className="min-w-0 space-y-4">
       {searchHeader}
 
-      <section aria-label={copy.title}>
+      <section aria-label={copy.title} className="min-w-0">
 
         {items.length === 0 ? (
           <div className="rounded-lg border border-[#DCE4EF] bg-white px-6 py-14 text-center">
@@ -534,7 +534,7 @@ export default function CommunityFeedTimeline({
             </p>
           </div>
         ) : (
-          <div className="space-y-4">
+          <div className="min-w-0 space-y-4">
             {items.map((item, index) => {
               // The right-column widgets are hidden below xl, so weave them
               // between posts (LinkedIn-style) on mobile/tablet. Positions clamp

@@ -135,7 +135,7 @@ export default function FeedSaveButton({
       ? 'border-[#BBD5F5] bg-[#EAF3FF] text-[#2378E8] hover:bg-[#DDEBFD]'
       : 'border-transparent bg-[#F2F7FF] text-[#5B6F8A] hover:bg-[#E6F0FD] hover:text-[#2378E8]'
   const buttonClasses = layout === 'action'
-    ? `inline-flex min-h-10 flex-1 items-center justify-center gap-2 rounded-md px-2 py-2.5 text-[14px] font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2378E8] disabled:cursor-wait disabled:opacity-65 ${
+    ? `inline-flex min-h-10 min-w-0 flex-1 items-center justify-center gap-1 rounded-md px-1 py-2.5 text-[12px] font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2378E8] disabled:cursor-wait disabled:opacity-65 sm:gap-2 sm:px-2 sm:text-[14px] ${
         isSaved
           ? 'bg-[#EDF4FD] text-[#2378E8] hover:bg-[#E2EEFC]'
           : 'text-[#5A6B85] hover:bg-[#F5F8FC] hover:text-[#101724]'
@@ -157,7 +157,7 @@ export default function FeedSaveButton({
         ) : (
           <IconBookmark
             aria-hidden
-            className="h-[18px] w-[18px] text-[#C77D10]"
+            className="h-4 w-4 shrink-0 text-[#C77D10] sm:h-[18px] sm:w-[18px]"
             stroke={isSaved ? 2 : 1.8}
             fill={isSaved ? 'currentColor' : 'none'}
           />
