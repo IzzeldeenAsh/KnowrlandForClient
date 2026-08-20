@@ -16,6 +16,7 @@ import { useEffect, useMemo, useState } from 'react'
 import { publicBaseUrl } from '@/app/config'
 import FeedSaveButton from '@/components/feed/FeedSaveButton'
 import FeedShare from '@/components/feed/FeedShare'
+import MatchedRelatedDocumentsCard from '@/components/feed/MatchedRelatedDocumentsCard'
 import KnowledgeTypeIcon from '@/components/icons/KnowledgeTypeIcon'
 import {
   getCommunityFeedArticle,
@@ -44,6 +45,7 @@ const copyByLocale = {
     publisher: 'Publisher',
     viewInsight: 'View',
     openingInsight: 'Opening…',
+    relatedDocuments: 'Related documents',
   },
   ar: {
     back: 'العودة إلى الموجز',
@@ -57,6 +59,7 @@ const copyByLocale = {
     publisher: 'الناشر',
     viewInsight: 'عرض',
     openingInsight: 'جارٍ الفتح…',
+    relatedDocuments: 'مستندات ذات صلة',
   },
 } as const
 
@@ -418,6 +421,13 @@ export default function ArticleReader({ locale, identifier, isPublic }: ArticleR
               </div>
             )}
           </div>
+
+          <aside className={styles.articleRail} aria-label={copy.relatedDocuments}>
+            <MatchedRelatedDocumentsCard
+              locale={locale}
+              insights={item.matched_related_insights}
+            />
+          </aside>
         </article>
       </main>
     </div>

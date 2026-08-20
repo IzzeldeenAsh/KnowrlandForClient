@@ -74,7 +74,7 @@ export default async function Feed({ params, searchParams }: FeedProps) {
               <div className="no-scrollbar sticky top-[calc(var(--app-header-height,88px)+24px)] max-h-[calc(100vh-var(--app-header-height,88px)-48px)] space-y-4 overflow-y-auto pe-1">
                 <RoleUpgradeCard locale={locale} />
                 {isSearching ? (
-                  <RelatedDocumentsCard locale={locale} />
+                  <RelatedDocumentsCard locale={locale} keyword={keyword} />
                 ) : (
                   <TopDocumentsCard locale={locale} />
                 )}

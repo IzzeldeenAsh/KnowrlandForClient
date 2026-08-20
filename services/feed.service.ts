@@ -105,6 +105,7 @@ export interface FeedItem {
   tags: FeedTag[]
   industry: FeedItemIndustry | null
   related_insights: FeedItemRelatedInsight[]
+  matched_related_insights?: FeedItemRelatedInsight[]
   media: FeedItemMedia[]
   stats: FeedItemStats
   is_tracked?: boolean

@@ -342,7 +342,7 @@ export default function CommunityFeedTimeline({
             signal,
           )
           setItems(result.feed)
-          setRelatedDocuments(result.insights.slice(0, 5))
+          setRelatedDocuments(result.insights.slice(0, 3))
           setMeta(result.meta)
         } else {
           const result = isAuthenticated
@@ -559,7 +559,7 @@ export default function CommunityFeedTimeline({
                   )}
                   {index === documentsIndex &&
                     (isSearching ? (
-                      <RelatedDocumentsCard locale={locale} className="xl:hidden" />
+                      <RelatedDocumentsCard locale={locale} keyword={normalizedKeyword} className="xl:hidden" />
                     ) : (
                       <TopDocumentsCard locale={locale} className="xl:hidden" />
                     ))}

@@ -809,7 +809,7 @@ function FeedSaveButton(param) {
     };
     const label = isUpdating ? copy.updating : isSaved ? copy.unsave : copy.save;
     const toneClasses = tone === 'hero' ? isSaved ? 'border-white/50 bg-white text-[#155FBB] shadow-sm hover:bg-[#F3F8FF]' : 'border-white/35 bg-[#071426]/35 text-white backdrop-blur-sm hover:bg-[#071426]/55' : isSaved ? 'border-[#BBD5F5] bg-[#EAF3FF] text-[#2378E8] hover:bg-[#DDEBFD]' : 'border-transparent bg-[#F2F7FF] text-[#5B6F8A] hover:bg-[#E6F0FD] hover:text-[#2378E8]';
-    const buttonClasses = layout === 'action' ? "inline-flex min-h-10 flex-1 items-center justify-center gap-2 rounded-md px-2 py-2.5 text-[14px] font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2378E8] disabled:cursor-wait disabled:opacity-65 ".concat(isSaved ? 'bg-[#EDF4FD] text-[#2378E8] hover:bg-[#E2EEFC]' : 'text-[#5A6B85] hover:bg-[#F5F8FC] hover:text-[#101724]') : "inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-full border transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2378E8] focus-visible:ring-offset-2 disabled:cursor-wait disabled:opacity-65 ".concat(toneClasses);
+    const buttonClasses = layout === 'action' ? "inline-flex min-h-10 min-w-0 flex-1 items-center justify-center gap-1 rounded-md px-1 py-2.5 text-[12px] font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2378E8] disabled:cursor-wait disabled:opacity-65 sm:gap-2 sm:px-2 sm:text-[14px] ".concat(isSaved ? 'bg-[#EDF4FD] text-[#2378E8] hover:bg-[#E2EEFC]' : 'text-[#5A6B85] hover:bg-[#F5F8FC] hover:text-[#101724]') : "inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-full border transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2378E8] focus-visible:ring-offset-2 disabled:cursor-wait disabled:opacity-65 ".concat(toneClasses);
     return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mantine$2f$core$2f$esm$2f$components$2f$Tooltip$2f$Tooltip$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__["Tooltip"], {
         label: label,
         position: "bottom",
@@ -833,7 +833,7 @@ function FeedSaveButton(param) {
                     columnNumber: 11
                 }, this) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$tabler$2f$icons$2d$react$2f$dist$2f$esm$2f$icons$2f$IconBookmark$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__IconBookmark$3e$__["IconBookmark"], {
                     "aria-hidden": true,
-                    className: "h-[18px] w-[18px] text-[#C77D10]",
+                    className: "h-4 w-4 shrink-0 text-[#C77D10] sm:h-[18px] sm:w-[18px]",
                     stroke: isSaved ? 2 : 1.8,
                     fill: isSaved ? 'currentColor' : 'none'
                 }, void 0, false, {
@@ -965,11 +965,11 @@ const FeedShare = (param)=>{
                 type: "button",
                 onClick: handleShare,
                 "aria-label": t.share,
-                className: triggerClassName !== null && triggerClassName !== void 0 ? triggerClassName : 'inline-flex flex-1 items-center justify-center gap-2 rounded-md px-2 py-2.5 text-[14px] font-medium text-[#5A6B85] transition-colors hover:bg-[#F5F8FC] hover:text-[#101724] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2378E8]',
+                className: triggerClassName !== null && triggerClassName !== void 0 ? triggerClassName : 'inline-flex min-w-0 flex-1 items-center justify-center gap-1 rounded-md px-1 py-2.5 text-[12px] font-medium text-[#5A6B85] transition-colors hover:bg-[#F5F8FC] hover:text-[#101724] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2378E8] sm:gap-2 sm:px-2 sm:text-[14px]',
                 children: [
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$tabler$2f$icons$2d$react$2f$dist$2f$esm$2f$icons$2f$IconShare3$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__IconShare3$3e$__["IconShare3"], {
                         "aria-hidden": true,
-                        className: "h-[18px] w-[18px] text-[#E0398A]",
+                        className: "h-4 w-4 shrink-0 text-[#E0398A] sm:h-[18px] sm:w-[18px]",
                         stroke: 1.8
                     }, void 0, false, {
                         fileName: "[project]/components/feed/FeedShare.tsx",

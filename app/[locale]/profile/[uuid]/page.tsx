@@ -18,6 +18,7 @@ import {
   IconCalendarTime,
   IconClock,
   IconBriefcase,
+  IconArticle,
 } from "@tabler/icons-react";
 
 import Toast from "@/components/toast/Toast";
@@ -258,6 +259,7 @@ function ProfilePageContent() {
   interface InsighterStatistics {
     total_meeting: number;
     total_published?: number;
+    total_feed?: number;
   }
   const [insighterStatistics, setInsighterStatistics] =
     useState<InsighterStatistics | null>(null);
@@ -1468,7 +1470,7 @@ function ProfilePageContent() {
                   </div>
 
                   {/* Profile Info */}
-                  <div className="flex-1">
+                  <div className="w-full flex-1">
                     <div className="flex flex-col md:flex-row h-full justify-between items-center">
                       <div>
                         {/* Name and Badges */}
@@ -1734,9 +1736,9 @@ function ProfilePageContent() {
                       </div>
 
                       {/* Stats Section */}
-                      <div className={`flex justify-center gap-4 mt-5`}>
-                        <div className="text-start bg-gradient-to-br from-white to-emerald-50 dark:from-slate-700 dark:to-slate-600 p-3 rounded-lg hover:shadow-md transition-all duration-300 transform hover:-translate-y-1 border border-gray-100 dark:border-slate-600 group">
-                          <div className="flex items-center mb-2">
+                      <div className="mx-auto mt-5 flex w-full max-w-md flex-col justify-center gap-3 sm:max-w-none sm:flex-row sm:flex-wrap sm:gap-4 md:mx-0 md:w-auto">
+                        <div className="flex w-full items-center justify-between text-start bg-gradient-to-br from-white to-emerald-50 dark:from-slate-700 dark:to-slate-600 p-3 rounded-lg hover:shadow-md transition-all duration-300 transform hover:-translate-y-1 border border-gray-100 dark:border-slate-600 group sm:block sm:w-36">
+                          <div className="flex items-center sm:mb-2">
                             <div className="p-1.5 bg-emerald-100 dark:bg-emerald-900/30 rounded-full me-2 group-hover:scale-110 transition-transform">
                               <IconFileReport
                                 size={18}
@@ -1751,7 +1753,7 @@ function ProfilePageContent() {
                               }}
                             />
                           </div>
-                          <p className="bg-clip-text text-transparent bg-gradient-to-r from-emerald-600 to-teal-500 font-bold text-4xl">
+                          <p className="bg-clip-text text-transparent bg-gradient-to-r from-emerald-600 to-teal-500 font-bold text-3xl sm:text-4xl">
                             {isViewingInsighterEntity
                               ? (insighterStatistics?.total_published ??
                                 knowledgeData?.meta.total ??
@@ -1760,8 +1762,8 @@ function ProfilePageContent() {
                           </p>
                         </div>
                         {isViewingInsighterEntity && (
-                          <div className="text-start bg-gradient-to-br from-white to-blue-50 dark:from-slate-700 dark:to-slate-600 p-3 rounded-lg hover:shadow-md transition-all duration-300 transform hover:-translate-y-1 border border-gray-100 dark:border-slate-600 group">
-                            <div className="flex items-center mb-2">
+                          <div className="flex w-full items-center justify-between text-start bg-gradient-to-br from-white to-blue-50 dark:from-slate-700 dark:to-slate-600 p-3 rounded-lg hover:shadow-md transition-all duration-300 transform hover:-translate-y-1 border border-gray-100 dark:border-slate-600 group sm:block sm:w-36">
+                            <div className="flex items-center sm:mb-2">
                               <div className="p-1.5 bg-blue-100 dark:bg-blue-900/30 rounded-full me-2 group-hover:scale-110 transition-transform">
                                 <IconBrandHipchat
                                   size={18}
@@ -1776,8 +1778,30 @@ function ProfilePageContent() {
                                 }}
                               />
                             </div>
-                            <p className="bg-clip-text text-transparent bg-gradient-to-r from-blue-500 to-teal-500 font-bold text-4xl">
+                            <p className="bg-clip-text text-transparent bg-gradient-to-r from-blue-500 to-teal-500 font-bold text-3xl sm:text-4xl">
                               {insighterStatistics?.total_meeting ?? 0}
+                            </p>
+                          </div>
+                        )}
+                        {isViewingInsighterEntity && (
+                          <div className="flex w-full items-center justify-between text-start bg-gradient-to-br from-white to-amber-50 dark:from-slate-700 dark:to-slate-600 p-3 rounded-lg hover:shadow-md transition-all duration-300 transform hover:-translate-y-1 border border-gray-100 dark:border-slate-600 group sm:block sm:w-36">
+                            <div className="flex items-center sm:mb-2">
+                              <div className="p-1.5 bg-amber-100 dark:bg-amber-900/30 rounded-full me-2 group-hover:scale-110 transition-transform">
+                                <IconArticle
+                                  size={18}
+                                  className="text-amber-600 dark:text-amber-400"
+                                  stroke={2}
+                                />
+                              </div>
+                              <span
+                                className="text-xs font-medium text-amber-700 dark:text-amber-300"
+                                dangerouslySetInnerHTML={{
+                                  __html: t("totalFeed"),
+                                }}
+                              />
+                            </div>
+                            <p className="bg-clip-text text-transparent bg-gradient-to-r from-amber-600 to-orange-500 font-bold text-3xl sm:text-4xl">
+                              {insighterStatistics?.total_feed ?? 0}
                             </p>
                           </div>
                         )}

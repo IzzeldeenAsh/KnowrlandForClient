@@ -8,7 +8,7 @@
   "static/chunks/node_modules_hls_js_dist_hls_mjs_3305f6ee._.js",
   "static/chunks/node_modules_media-chrome_dist_3d4abed5._.js",
   "static/chunks/node_modules_@mux_mux-player_dist_2e075f70._.js",
-  "static/chunks/node_modules_20eee709._.js"
+  "static/chunks/node_modules_48117daf._.js"
 ],
     source: "dynamic"
 });

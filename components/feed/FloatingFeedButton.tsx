@@ -2,7 +2,7 @@
 
 import { IconListDetails } from '@tabler/icons-react'
 import Link from 'next/link'
-import { usePathname, useSearchParams } from 'next/navigation'
+import { usePathname } from 'next/navigation'
 
 type FloatingFeedButtonProps = {
   locale: string
@@ -10,13 +10,15 @@ type FloatingFeedButtonProps = {
 
 export default function FloatingFeedButton({ locale }: FloatingFeedButtonProps) {
   const pathname = usePathname()
-  const searchParams = useSearchParams()
   const normalizedPathname = pathname.replace(/\/+$/, '') || '/'
   const feedPath = `/${locale}`
-  const isOnCommunityFeed =
-    normalizedPathname === feedPath && searchParams.get('view') !== 'my-feeds'
+  const isFeedPage = normalizedPathname === feedPath
+  const isPostDetailPage = normalizedPathname.startsWith(`${feedPath}/post/`)
 
-  if (isOnCommunityFeed) return null
+  // The feed itself (including My Posts and Saved Posts) already provides its
+  // navigation. On a post detail page this control competes with the floating
+  // menu button, particularly on mobile.
+  if (isFeedPage || isPostDetailPage) return null
 
   const isArabic = locale === 'ar'
   const label = isArabic ? 'العودة إلى الموجز' : 'Back to Feed'

@@ -2529,7 +2529,7 @@ function MobileMenu(param) {
     }["MobileMenu.useEffect"], [
         mobileNavOpen
     ]);
-    const feedSidebarToggleClass = showFeedSidebar ? "fixed bottom-[calc(var(--auth-banner-offset,0px)+max(1rem,env(safe-area-inset-bottom)))] z-[1002] h-10 w-10 rounded-full border border-white/30 bg-[#2378E8] text-white hover:-translate-y-0.5 hover:bg-[#1769C2] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#67B5F6] focus-visible:ring-offset-2 xl:hidden ".concat(isRtl ? 'left-4' : 'right-4') : 'h-8 w-8';
+    const feedSidebarToggleClass = showFeedSidebar ? "fixed bottom-[calc(var(--auth-banner-offset,0px)+max(1rem,env(safe-area-inset-bottom)))] z-[1002] h-10 w-10 rounded-full border border-[#82B9FF]/55 bg-[#BFE5FF]/25 text-[#2378E8] shadow-lg shadow-blue-950/15 backdrop-blur-[1px] hover:-translate-y-0.5 hover:border-[#82B9FF]/75 hover:bg-[#BFE5FF]/35 hover:text-[#1D4ED8] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#67B5F6] focus-visible:ring-offset-2 xl:hidden ".concat(isRtl ? 'left-4' : 'right-4') : 'h-8 w-8';
     const menuTrigger = /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
         ref: trigger,
         type: "button",
@@ -2591,8 +2591,7 @@ function MobileMenu(param) {
                         if (e.target.closest('a')) setMobileNavOpen(false);
                     },
                     children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$feed$2f$FeedSidebar$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"], {
-                        locale: currentLocale,
-                        hideProfileCard: true
+                        locale: currentLocale
                     }, void 0, false, {
                         fileName: "[project]/components/ui/mobile-menu.tsx",
                         lineNumber: 214,
@@ -8943,11 +8942,14 @@ function FloatingFeedButton(param) {
     let { locale } = param;
     _s();
     const pathname = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$navigation$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["usePathname"])();
-    const searchParams = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$navigation$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useSearchParams"])();
     const normalizedPathname = pathname.replace(/\/+$/, '') || '/';
     const feedPath = "/".concat(locale);
-    const isOnCommunityFeed = normalizedPathname === feedPath && searchParams.get('view') !== 'my-feeds';
-    if (isOnCommunityFeed) return null;
+    const isFeedPage = normalizedPathname === feedPath;
+    const isPostDetailPage = normalizedPathname.startsWith("".concat(feedPath, "/post/"));
+    // The feed itself (including My Posts and Saved Posts) already provides its
+    // navigation. On a post detail page this control competes with the floating
+    // menu button, particularly on mobile.
+    if (isFeedPage || isPostDetailPage) return null;
     const isArabic = locale === 'ar';
     const label = isArabic ? 'العودة إلى الموجز' : 'Back to Feed';
     return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$client$2f$app$2d$dir$2f$link$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"], {
@@ -8964,27 +8966,26 @@ function FloatingFeedButton(param) {
                 stroke: 2.1
             }, void 0, false, {
                 fileName: "[project]/components/feed/FloatingFeedButton.tsx",
-                lineNumber: 36,
+                lineNumber: 38,
                 columnNumber: 7
             }, this),
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
                 children: label
             }, void 0, false, {
                 fileName: "[project]/components/feed/FloatingFeedButton.tsx",
-                lineNumber: 37,
+                lineNumber: 39,
                 columnNumber: 7
             }, this)
         ]
     }, void 0, true, {
         fileName: "[project]/components/feed/FloatingFeedButton.tsx",
-        lineNumber: 25,
+        lineNumber: 27,
         columnNumber: 5
     }, this);
 }
-_s(FloatingFeedButton, "AxA9T5G2Po78UC4hL8ljCdvMciE=", false, function() {
+_s(FloatingFeedButton, "xbyQPtUVMO7MNj7WjJlpdWqRcTo=", false, function() {
     return [
-        __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$navigation$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["usePathname"],
-        __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$navigation$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useSearchParams"]
+        __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$navigation$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["usePathname"]
     ];
 });
 _c = FloatingFeedButton;
@@ -9042,7 +9043,7 @@ function FloatingBackToTopButton(param) {
         onClick: scrollToTop,
         "aria-label": label,
         title: label,
-        className: "fixed bottom-[calc(var(--auth-banner-offset,0px)+max(1rem,env(safe-area-inset-bottom)))] z-[1001] inline-flex h-10 w-10 items-center justify-center rounded-full border border-[#6AA6F5] bg-gradient-to-br from-[#2378E8] to-[#2B9DEA] text-white transition duration-200 hover:-translate-y-0.5 hover:scale-105 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2378E8] focus-visible:ring-offset-2 active:translate-y-0 active:scale-95 motion-reduce:transition-none ".concat(isArabic ? 'right-4' : 'left-4'),
+        className: "fixed bottom-[calc(var(--auth-banner-offset,0px)+max(1rem,env(safe-area-inset-bottom)))] z-[1001] inline-flex h-10 w-10 items-center justify-center rounded-full border border-[#82B9FF]/55 bg-[#BFE5FF]/25 text-[#2378E8] shadow-lg shadow-blue-950/15 backdrop-blur-[1px] transition duration-200 hover:-translate-y-0.5 hover:scale-105 hover:border-[#82B9FF]/75 hover:bg-[#BFE5FF]/35 hover:text-[#1D4ED8] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2378E8] focus-visible:ring-offset-2 active:translate-y-0 active:scale-95 motion-reduce:transition-none ".concat(isArabic ? 'right-4' : 'left-4'),
         children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$tabler$2f$icons$2d$react$2f$dist$2f$esm$2f$icons$2f$IconArrowUp$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__IconArrowUp$3e$__["IconArrowUp"], {
             "aria-hidden": true,
             className: "h-[22px] w-[22px]",

@@ -149,7 +149,7 @@ export default function MobileMenu({ isHomePage = true }: MobileMenuProps) {
   }, [mobileNavOpen])
 
   const feedSidebarToggleClass = showFeedSidebar
-    ? `fixed bottom-[calc(var(--auth-banner-offset,0px)+max(1rem,env(safe-area-inset-bottom)))] z-[1002] h-10 w-10 rounded-full border border-white/30 bg-[#2378E8] text-white hover:-translate-y-0.5 hover:bg-[#1769C2] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#67B5F6] focus-visible:ring-offset-2 xl:hidden ${
+    ? `fixed bottom-[calc(var(--auth-banner-offset,0px)+max(1rem,env(safe-area-inset-bottom)))] z-[1002] h-10 w-10 rounded-full border border-[#82B9FF]/55 bg-[#BFE5FF]/25 text-[#2378E8] shadow-lg shadow-blue-950/15 backdrop-blur-[1px] hover:-translate-y-0.5 hover:border-[#82B9FF]/75 hover:bg-[#BFE5FF]/35 hover:text-[#1D4ED8] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#67B5F6] focus-visible:ring-offset-2 xl:hidden ${
         isRtl ? 'left-4' : 'right-4'
       }`
     : 'h-8 w-8'
@@ -211,7 +211,7 @@ export default function MobileMenu({ isHomePage = true }: MobileMenuProps) {
               if ((e.target as HTMLElement).closest('a')) setMobileNavOpen(false)
             }}
           >
-            <FeedSidebar locale={currentLocale} hideProfileCard />
+            <FeedSidebar locale={currentLocale} />
           </div>
         ) : (
         <ul className={`min-h-full px-5 py-6 ${menuBgStyle} bg-opacity-95`}>

@@ -5,9 +5,9 @@ import { cache } from 'react'
 import { getApiUrl, publicBaseUrl } from '@/app/config'
 import FeedMobileSearch from '@/components/feed/FeedMobileSearch'
 import FeedSidebar from '@/components/feed/FeedSidebar'
+import MatchedRelatedDocumentsCard from '@/components/feed/MatchedRelatedDocumentsCard'
 import { FeedCard } from '@/components/feed/MyFeedsTimeline'
 import RoleUpgradeCard from '@/components/feed/RoleUpgradeCard'
-import TopDocumentsCard from '@/components/feed/TopDocumentsCard'
 import type { FeedItem } from '@/services/feed.service'
 
 type PostPageProps = {
@@ -196,13 +196,18 @@ export default async function PostPage({ params }: PostPageProps) {
             <div className="mt-4">
               <FeedCard item={post} locale={locale} articleAccess="community" />
             </div>
+            <MatchedRelatedDocumentsCard
+              locale={locale}
+              insights={post.matched_related_insights}
+              className="mt-4 xl:hidden"
+            />
           </section>
 
           {/* Match the feed's contextual right rail instead of leaving the detail view isolated. */}
           <aside className="hidden xl:block">
             <div className="no-scrollbar sticky top-[calc(var(--app-header-height,88px)+24px)] max-h-[calc(100vh-var(--app-header-height,88px)-48px)] space-y-4 overflow-y-auto pe-1">
               <RoleUpgradeCard locale={locale} />
-              <TopDocumentsCard locale={locale} />
+              <MatchedRelatedDocumentsCard locale={locale} insights={post.matched_related_insights} />
             </div>
           </aside>
         </div>

@@ -482,6 +482,19 @@ function preferredHlsPlayback(): 'native' | 'mse' {
 
 let pauseActiveFeedVideo: (() => void) | null = null
 
+// Sound is a feed-level preference, as it is on other social feeds. When a
+// viewer unmutes (or mutes) one post, mounted players and videos mounted later
+// in the same feed session inherit that choice.
+let areFeedVideosMuted = true
+const feedVideoMuteListeners = new Set<(muted: boolean) => void>()
+
+function setFeedVideosMuted(muted: boolean) {
+  if (areFeedVideosMuted === muted) return
+
+  areFeedVideosMuted = muted
+  feedVideoMuteListeners.forEach((listener) => listener(muted))
+}
+
 function claimFeedPlayback(pause: () => void) {
   if (pauseActiveFeedVideo && pauseActiveFeedVideo !== pause) pauseActiveFeedVideo()
   pauseActiveFeedVideo = pause
@@ -506,6 +519,7 @@ function VideoPlayer({
   const [shouldPreload, setShouldPreload] = useState(false)
   const [isInViewport, setIsInViewport] = useState(false)
   const [autoplayBlocked, setAutoplayBlocked] = useState(false)
+  const [isMuted, setIsMuted] = useState(areFeedVideosMuted)
   // Bumped to remount the player after a decode failure (see the error effect).
   const [playerEpoch, setPlayerEpoch] = useState(0)
   const decodeRetriesRef = useRef(0)
@@ -520,12 +534,13 @@ function VideoPlayer({
     player?.pause()
   }, [])
 
-  const playMuted = useCallback(async () => {
+  const playVideo = useCallback(async () => {
     const player = containerRef.current?.querySelector('mux-player, video') as MuxPlayerElement | null
     if (!player) return
 
-    // WebKit requires the underlying media property to be muted before play().
-    player.muted = true
+    // Read the module-level value here so an intersection callback can never
+    // start with a stale sound preference from an earlier render.
+    player.muted = areFeedVideosMuted
     claimFeedPlayback(pauseSelf)
 
     try {
@@ -536,6 +551,13 @@ function VideoPlayer({
       console.warn('Mux autoplay was blocked by the browser.', error)
     }
   }, [pauseSelf])
+
+  useEffect(() => {
+    feedVideoMuteListeners.add(setIsMuted)
+    return () => {
+      feedVideoMuteListeners.delete(setIsMuted)
+    }
+  }, [])
 
   useEffect(() => {
     const container = containerRef.current
@@ -572,13 +594,27 @@ function VideoPlayer({
     if (!player) return
 
     if (isInViewport) {
-      void playMuted()
+      void playVideo()
     } else {
       player.pause()
       releaseFeedPlayback(pauseSelf)
       setAutoplayBlocked(false)
     }
-  }, [isInViewport, playMuted, pauseSelf, shouldPreload, playerEpoch, useMp4Fallback])
+  }, [isInViewport, playVideo, pauseSelf, shouldPreload, playerEpoch, useMp4Fallback])
+
+  // Keep every mounted player synchronized, including paused videos further
+  // up or down the feed. `volumechange` captures changes made through either
+  // the Mux controls or the browser's native MP4 controls.
+  useEffect(() => {
+    const player = containerRef.current?.querySelector('mux-player, video') as MuxPlayerElement | null
+    if (!player) return
+
+    player.muted = isMuted
+
+    const handleVolumeChange = () => setFeedVideosMuted(player.muted)
+    player.addEventListener('volumechange', handleVolumeChange)
+    return () => player.removeEventListener('volumechange', handleVolumeChange)
+  }, [isMuted, playerEpoch, shouldPreload, useMp4Fallback])
 
   // Release the shared playback slot when the card unmounts entirely.
   useEffect(() => () => releaseFeedPlayback(pauseSelf), [pauseSelf])
@@ -646,7 +682,7 @@ function VideoPlayer({
               // it later after the card enters view can leave an iPhone/iPad
               // showing its native "Tap to play" prompt.
               autoPlay
-              muted
+              muted={isMuted}
               loop
               playsInline
               controls
@@ -670,12 +706,13 @@ function VideoPlayer({
               disable-tracking=""
               // Mux passes this through to the underlying media element. It must
               // be present on first render (together with muted + playsinline)
-              // for iOS/iPadOS to permit autoplay without a user gesture.
-              autoplay="muted"
+              // for iOS/iPadOS to permit initial autoplay. Keep autoplay stable:
+              // changing it when sound is toggled can restart nearby players.
+              autoplay
               prefer-playback={preferredHlsPlayback()}
               preload={isInViewport ? 'auto' : 'metadata'}
               max-resolution="720p"
-              muted
+              muted={isMuted}
               loop
               playsinline
               style={{ width: '100%', height: '100%', display: 'block' }}
@@ -694,7 +731,7 @@ function VideoPlayer({
                   setAutoplayBlocked(false)
                   setPlayerEpoch((epoch) => epoch + 1)
                 } else {
-                  void playMuted()
+                  void playVideo()
                 }
               }}
               aria-label={playLabel}
@@ -797,7 +834,7 @@ function TrackSignalIcon({ animated }: { animated: boolean }) {
     <svg
       viewBox="0 0 24 24"
       fill="none"
-      stroke="currentColor"
+      stroke={animated ? '#1D4ED8' : 'currentColor'}
       strokeWidth="1.5"
       strokeLinecap="round"
       strokeLinejoin="round"
@@ -813,6 +850,7 @@ function TrackSignalIcon({ animated }: { animated: boolean }) {
             r="4.5"
             vectorEffect="non-scaling-stroke"
             className="track-signal-wave track-signal-wave--near"
+            style={{ stroke: '#1D4ED8' }}
           />
           <circle
             cx="12"
@@ -820,6 +858,7 @@ function TrackSignalIcon({ animated }: { animated: boolean }) {
             r="4.5"
             vectorEffect="non-scaling-stroke"
             className="track-signal-wave track-signal-wave--far"
+            style={{ stroke: '#1D4ED8' }}
           />
         </>
       ) : (
@@ -997,16 +1036,12 @@ export function FeedCard({
                     disabled={isUpdatingTrack || isOwnPost}
                     aria-pressed={isTracked}
                     aria-label={isUpdatingTrack ? copy.tracking : isTracked ? copy.untrack : copy.track}
-                    className={`inline-flex min-h-[28px] items-center justify-center gap-1 rounded-full border px-2 py-0.5 text-[11px] font-semibold transition-[background-color,border-color,color,box-shadow] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#64748B] focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-55 sm:min-h-[34px] sm:gap-1.5 sm:px-3 sm:py-0 sm:text-[12px] ${
-                      isTracked
-                        ? 'border-[#A9CBF7] bg-[#F2F7FF] text-[#2378E8] shadow-sm hover:border-[#83B3F2] hover:bg-[#E7F1FE]'
-                        : 'border-[#B8C4D3] bg-white text-[#36506F] hover:border-[#7F91A8] hover:bg-[#F5F7FA] hover:text-[#253247]'
-                    }`}
+                    className="inline-flex min-h-[28px] items-center justify-center gap-1 rounded-full border border-black bg-white px-2 py-0.5 text-[11px] font-semibold text-black transition-[background-color,border-color,color,box-shadow] hover:border-black hover:bg-white hover:text-black focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#64748B] focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-55 sm:min-h-[34px] sm:gap-1.5 sm:px-3 sm:py-0 sm:text-[12px]"
                   >
                     {isUpdatingTrack ? (
                       <IconLoader2 aria-hidden className="h-4 w-4 animate-spin" stroke={2} />
                     ) : (
-                      <span className="flex h-4 w-4 shrink-0 items-center justify-center sm:h-5 sm:w-5" aria-hidden>
+                      <span className={`flex h-4 w-4 shrink-0 items-center justify-center ${isTracked ? 'text-[#1D4ED8]' : 'text-[#A5B0BF]'} sm:h-5 sm:w-5`} aria-hidden>
                         <TrackSignalIcon animated={isTracked} />
                       </span>
                     )}
