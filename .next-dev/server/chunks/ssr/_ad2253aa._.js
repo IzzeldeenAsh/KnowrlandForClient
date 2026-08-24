@@ -425,7 +425,10 @@ async function saveVideoPost(uuid, payload, status, locale) {
             status,
             industry_id: payload.industryId,
             tags: payload.tags,
-            related_insights: payload.relatedInsights
+            related_insights: payload.relatedInsights,
+            ...status === 'published' && payload.authorType ? {
+                author_type: payload.authorType
+            } : {}
         })
     });
     if (!response.ok) {
@@ -444,7 +447,10 @@ async function saveImageTextPost(payload, status, locale, uuid) {
         industry_id: payload.industryId,
         status,
         tags: payload.tags,
-        related_insights: payload.relatedInsights
+        related_insights: payload.relatedInsights,
+        ...status === 'published' && payload.authorType ? {
+            author_type: payload.authorType
+        } : {}
     };
     if (uuid) {
         // Send metadata as JSON first so empty tag/insight arrays are preserved.
@@ -470,6 +476,9 @@ async function saveImageTextPost(payload, status, locale, uuid) {
     formData.append('body', payload.body);
     formData.append('industry_id', String(payload.industryId));
     formData.append('status', status);
+    if (status === 'published' && payload.authorType) {
+        formData.append('author_type', payload.authorType);
+    }
     if (!uuid) {
         payload.tags.forEach((tagId, index)=>formData.append(`tags[${index}]`, String(tagId)));
         payload.relatedInsights.forEach((knowledgeId, index)=>formData.append(`related_insights[${index}]`, String(knowledgeId)));
@@ -505,7 +514,10 @@ async function saveArticle(payload, status, locale, uuid) {
         status,
         tags: payload.tags,
         related_insights: payload.relatedInsights,
-        remove_cover: payload.removeCover === true
+        remove_cover: payload.removeCover === true,
+        ...status === 'published' && payload.authorType ? {
+            author_type: payload.authorType
+        } : {}
     };
     if (uuid) {
         const uploadCoverBeforePublishing = status === 'published' && !!payload.coverImage;
@@ -544,7 +556,10 @@ async function saveArticle(payload, status, locale, uuid) {
                     'Content-Type': 'application/json'
                 },
                 body: JSON.stringify({
-                    status: 'published'
+                    status: 'published',
+                    ...payload.authorType ? {
+                        author_type: payload.authorType
+                    } : {}
                 })
             });
             if (!publishResponse.ok) {
@@ -557,6 +572,9 @@ async function saveArticle(payload, status, locale, uuid) {
     formData.append('title', payload.title);
     formData.append('body', payload.body);
     formData.append('status', status);
+    if (status === 'published' && payload.authorType) {
+        formData.append('author_type', payload.authorType);
+    }
     if (payload.industryId !== null) {
         formData.append('industry_id', String(payload.industryId));
     }
@@ -1540,10 +1558,13 @@ const copyByLocale = {
         loading: 'Loading…',
         publish: 'Publish',
         publishing: 'Publishing…',
+        saveChanges: 'Save changes',
+        savingChanges: 'Saving…',
         cover: 'Add a cover image',
         coverHint: 'Recommended 1920 × 1080 · JPG, PNG or WebP · 5 MB max',
         replaceCover: 'Replace cover image',
         removeCover: 'Remove cover',
+        coverLocked: 'The published cover image cannot be changed.',
         title: 'Title',
         titlePlaceholder: 'Title',
         bodyPlaceholder: 'Write here. Share the expertise only you can bring…',
@@ -1552,8 +1573,8 @@ const copyByLocale = {
         industry: 'Industry',
         selectIndustry: 'Select an industry',
         tags: 'Tags',
-        addTags: 'Add suggested tags',
-        addTagPlaceholder: 'Type a tag and press Enter',
+        addTags: 'Select Tag',
+        addTagPlaceholder: 'Add suggested',
         addTagError: 'Unable to add the tag.',
         noTags: 'No suggested tags are available for this industry.',
         industryFirst: 'Select an industry first',
@@ -1569,8 +1590,10 @@ const copyByLocale = {
         largeCover: 'The cover image must be 5 MB or smaller.',
         smallCover: 'The cover image must be at least 552 × 276 pixels.',
         published: 'Your White Paper has been published.',
+        updated: 'Your White Paper has been updated.',
         loadFailed: 'Unable to load your White Paper draft.',
         draftSavedRedirecting: 'Draft saved. Taking you to publishing…',
+        changesSavedRedirecting: 'Changes saved. Taking you to publishing…',
         newKnowledgeAttached: 'Your new knowledge item has been attached.',
         newKnowledgeMissing: 'We could not find the item you just published. Try adding it from your library.',
         existingPost: 'You already have a post draft in progress.',
@@ -1584,10 +1607,13 @@ const copyByLocale = {
         loading: 'جارٍ التحميل…',
         publish: 'نشر',
         publishing: 'جارٍ النشر…',
+        saveChanges: 'حفظ التعديلات',
+        savingChanges: 'جارٍ الحفظ…',
         cover: 'أضف صورة غلاف',
         coverHint: 'المقاس المقترح 1920 × 1080 · JPG أو PNG أو WebP · بحد أقصى 5 م.ب',
         replaceCover: 'استبدال صورة الغلاف',
         removeCover: 'إزالة الغلاف',
+        coverLocked: 'لا يمكن تغيير صورة غلاف الورقة المنشورة.',
         title: 'العنوان',
         titlePlaceholder: 'العنوان',
         bodyPlaceholder: 'اكتب هنا وشارك الخبرة التي تميزك…',
@@ -1613,8 +1639,10 @@ const copyByLocale = {
         largeCover: 'يجب ألا يزيد حجم صورة الغلاف على 5 ميجابايت.',
         smallCover: 'يجب ألا تقل أبعاد صورة الغلاف عن 552 × 276 بكسل.',
         published: 'تم نشر ورقتك البيضاء.',
+        updated: 'تم تحديث ورقتك البيضاء.',
         loadFailed: 'تعذر تحميل مسودة الورقة البيضاء.',
         draftSavedRedirecting: 'تم حفظ المسودة. سيتم نقلك إلى النشر…',
+        changesSavedRedirecting: 'تم حفظ التعديلات. سيتم نقلك إلى النشر…',
         newKnowledgeAttached: 'تم إرفاق عنصر المعرفة الجديد.',
         newKnowledgeMissing: 'تعذر العثور على العنصر الذي نشرته للتو. حاول إضافته من مكتبتك.',
         existingPost: 'لديك مسودة منشور قيد التحرير.',
@@ -1660,6 +1688,7 @@ function ArticleEditor({ locale }) {
     const coverInputRef = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useRef"])(null);
     const coverObjectUrlRef = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useRef"])(null);
     const [draftUuid, setDraftUuid] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useState"])(null);
+    const [isEditingPublished, setIsEditingPublished] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useState"])(false);
     const [blockingDraft, setBlockingDraft] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useState"])(null);
     const [title, setTitle] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useState"])('');
     const [body, setBody] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useState"])('');
@@ -1723,13 +1752,16 @@ function ArticleEditor({ locale }) {
             return;
         }
         const controller = new AbortController();
-        (0, __TURBOPACK__imported__module__$5b$project$5d2f$services$2f$feed$2e$service$2e$ts__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["getFeedDraft"])(locale, controller.signal).then((draft)=>{
+        const editUuid = new URLSearchParams(window.location.search).get('edit');
+        const loadItem = editUuid ? (0, __TURBOPACK__imported__module__$5b$project$5d2f$services$2f$feed$2e$service$2e$ts__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["getFeedItem"])(editUuid, locale) : (0, __TURBOPACK__imported__module__$5b$project$5d2f$services$2f$feed$2e$service$2e$ts__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["getFeedDraft"])(locale, controller.signal);
+        loadItem.then((draft)=>{
             if (!draft) return;
             if (draft.content_type !== 'article') {
                 setBlockingDraft(draft);
                 return;
             }
             setDraftUuid(draft.uuid);
+            setIsEditingPublished(draft.status === 'published');
             setTitle(draft.title ?? '');
             setBody(draft.body ?? '');
             setIndustry(draft.industry ? {
@@ -1809,7 +1841,7 @@ function ArticleEditor({ locale }) {
         setIsPublishing(true);
         try {
             await (0, __TURBOPACK__imported__module__$5b$project$5d2f$services$2f$feed$2e$service$2e$ts__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["publishArticle"])(payload, locale, draftUuid ?? undefined);
-            toast.success(copy.published);
+            toast.success(isEditingPublished ? copy.updated : copy.published);
             router.push(`/${locale}?view=my-feeds`);
         } catch (error) {
             toast.error(error instanceof Error ? error.message : copy.loadFailed);
@@ -1828,14 +1860,14 @@ function ArticleEditor({ locale }) {
         }
         setLibraryDrawerOpened(false);
         try {
-            const uuid = await (0, __TURBOPACK__imported__module__$5b$project$5d2f$services$2f$feed$2e$service$2e$ts__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["saveArticleDraft"])(payload, locale, draftUuid ?? undefined);
+            const uuid = isEditingPublished ? await (0, __TURBOPACK__imported__module__$5b$project$5d2f$services$2f$feed$2e$service$2e$ts__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["publishArticle"])(payload, locale, draftUuid ?? undefined) : await (0, __TURBOPACK__imported__module__$5b$project$5d2f$services$2f$feed$2e$service$2e$ts__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["saveArticleDraft"])(payload, locale, draftUuid ?? undefined);
             setDraftUuid(uuid);
-            toast.success(copy.draftSavedRedirecting);
+            toast.success(isEditingPublished ? copy.changesSavedRedirecting : copy.draftSavedRedirecting);
         } catch (error) {
             toast.error(error instanceof Error ? error.message : copy.loadFailed);
             return;
         }
-        const returnUrl = `${window.location.origin}${window.location.pathname}`;
+        const returnUrl = `${window.location.origin}${window.location.pathname}${window.location.search}`;
         window.location.href = `${"TURBOPACK compile-time value", "http://localhost:4200"}/app/add-knowledge/stepper` + `?return_url=${encodeURIComponent(returnUrl)}`;
     };
     // On return from publishing, fetch the new item and attach it to the article.
@@ -1884,6 +1916,7 @@ function ArticleEditor({ locale }) {
         router
     ]);
     const handleCoverChange = async (file)=>{
+        if (isEditingPublished) return;
         if (!file) return;
         if (![
             'image/jpeg',
@@ -1958,12 +1991,12 @@ function ArticleEditor({ locale }) {
                 className: "h-7 w-7 animate-spin text-[#2378E8]"
             }, void 0, false, {
                 fileName: "[project]/components/feed/article/ArticleEditor.tsx",
-                lineNumber: 430,
+                lineNumber: 451,
                 columnNumber: 9
             }, this)
         }, void 0, false, {
             fileName: "[project]/components/feed/article/ArticleEditor.tsx",
-            lineNumber: 429,
+            lineNumber: 450,
             columnNumber: 7
         }, this);
     }
@@ -1979,7 +2012,7 @@ function ArticleEditor({ locale }) {
                         stroke: 1.5
                     }, void 0, false, {
                         fileName: "[project]/components/feed/article/ArticleEditor.tsx",
-                        lineNumber: 439,
+                        lineNumber: 460,
                         columnNumber: 11
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("h1", {
@@ -1987,7 +2020,7 @@ function ArticleEditor({ locale }) {
                         children: blockingDraft ? copy.existingPost : copy.accessTitle
                     }, void 0, false, {
                         fileName: "[project]/components/feed/article/ArticleEditor.tsx",
-                        lineNumber: 440,
+                        lineNumber: 461,
                         columnNumber: 11
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -1995,7 +2028,7 @@ function ArticleEditor({ locale }) {
                         children: blockingDraft ? copy.continuePost : copy.accessBody
                     }, void 0, false, {
                         fileName: "[project]/components/feed/article/ArticleEditor.tsx",
-                        lineNumber: 443,
+                        lineNumber: 464,
                         columnNumber: 11
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
@@ -2005,18 +2038,18 @@ function ArticleEditor({ locale }) {
                         children: copy.returnToFeed
                     }, void 0, false, {
                         fileName: "[project]/components/feed/article/ArticleEditor.tsx",
-                        lineNumber: 446,
+                        lineNumber: 467,
                         columnNumber: 11
                     }, this)
                 ]
             }, void 0, true, {
                 fileName: "[project]/components/feed/article/ArticleEditor.tsx",
-                lineNumber: 438,
+                lineNumber: 459,
                 columnNumber: 9
             }, this)
         }, void 0, false, {
             fileName: "[project]/components/feed/article/ArticleEditor.tsx",
-            lineNumber: 437,
+            lineNumber: 458,
             columnNumber: 7
         }, this);
     }
@@ -2041,19 +2074,19 @@ function ArticleEditor({ locale }) {
                                         className: "h-full w-full object-cover"
                                     }, void 0, false, {
                                         fileName: "[project]/components/feed/article/ArticleEditor.tsx",
-                                        lineNumber: 462,
+                                        lineNumber: 483,
                                         columnNumber: 42
                                     }, this) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
                                         className: "flex h-full items-center justify-center text-xs font-medium text-[#2378E8]",
                                         children: initials
                                     }, void 0, false, {
                                         fileName: "[project]/components/feed/article/ArticleEditor.tsx",
-                                        lineNumber: 462,
+                                        lineNumber: 483,
                                         columnNumber: 127
                                     }, this)
                                 }, void 0, false, {
                                     fileName: "[project]/components/feed/article/ArticleEditor.tsx",
-                                    lineNumber: 461,
+                                    lineNumber: 482,
                                     columnNumber: 13
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -2064,7 +2097,7 @@ function ArticleEditor({ locale }) {
                                             children: user?.name
                                         }, void 0, false, {
                                             fileName: "[project]/components/feed/article/ArticleEditor.tsx",
-                                            lineNumber: 465,
+                                            lineNumber: 486,
                                             columnNumber: 15
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -2072,19 +2105,19 @@ function ArticleEditor({ locale }) {
                                             children: copy.individualArticle
                                         }, void 0, false, {
                                             fileName: "[project]/components/feed/article/ArticleEditor.tsx",
-                                            lineNumber: 466,
+                                            lineNumber: 487,
                                             columnNumber: 15
                                         }, this)
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/components/feed/article/ArticleEditor.tsx",
-                                    lineNumber: 464,
+                                    lineNumber: 485,
                                     columnNumber: 13
                                 }, this)
                             ]
                         }, void 0, true, {
                             fileName: "[project]/components/feed/article/ArticleEditor.tsx",
-                            lineNumber: 460,
+                            lineNumber: 481,
                             columnNumber: 11
                         }, this),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
@@ -2097,25 +2130,25 @@ function ArticleEditor({ locale }) {
                                     className: "me-2 h-4 w-4 animate-spin"
                                 }, void 0, false, {
                                     fileName: "[project]/components/feed/article/ArticleEditor.tsx",
-                                    lineNumber: 473,
+                                    lineNumber: 494,
                                     columnNumber: 30
                                 }, this),
-                                isPublishing ? copy.publishing : copy.publish
+                                isPublishing ? isEditingPublished ? copy.savingChanges : copy.publishing : isEditingPublished ? copy.saveChanges : copy.publish
                             ]
                         }, void 0, true, {
                             fileName: "[project]/components/feed/article/ArticleEditor.tsx",
-                            lineNumber: 472,
+                            lineNumber: 493,
                             columnNumber: 11
                         }, this)
                     ]
                 }, void 0, true, {
                     fileName: "[project]/components/feed/article/ArticleEditor.tsx",
-                    lineNumber: 459,
+                    lineNumber: 480,
                     columnNumber: 9
                 }, this)
             }, void 0, false, {
                 fileName: "[project]/components/feed/article/ArticleEditor.tsx",
-                lineNumber: 458,
+                lineNumber: 479,
                 columnNumber: 7
             }, this),
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("main", {
@@ -2128,11 +2161,12 @@ function ArticleEditor({ locale }) {
                                 ref: coverInputRef,
                                 type: "file",
                                 accept: "image/jpeg,image/png,image/webp",
+                                disabled: isEditingPublished,
                                 className: "hidden",
                                 onChange: (event)=>void handleCoverChange(event.currentTarget.files?.[0])
                             }, void 0, false, {
                                 fileName: "[project]/components/feed/article/ArticleEditor.tsx",
-                                lineNumber: 480,
+                                lineNumber: 504,
                                 columnNumber: 13
                             }, this),
                             coverPreview ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -2144,10 +2178,17 @@ function ArticleEditor({ locale }) {
                                         className: "h-full w-full object-cover"
                                     }, void 0, false, {
                                         fileName: "[project]/components/feed/article/ArticleEditor.tsx",
-                                        lineNumber: 483,
+                                        lineNumber: 507,
                                         columnNumber: 17
                                     }, this),
-                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                    isEditingPublished ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                        className: "absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/70 to-transparent p-4 pt-14 text-end text-xs font-medium text-white",
+                                        children: copy.coverLocked
+                                    }, void 0, false, {
+                                        fileName: "[project]/components/feed/article/ArticleEditor.tsx",
+                                        lineNumber: 509,
+                                        columnNumber: 19
+                                    }, this) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                                         className: "absolute inset-x-0 bottom-0 flex justify-end gap-2 bg-gradient-to-t from-black/65 to-transparent p-4 pt-16 opacity-100 sm:opacity-0 sm:transition-opacity sm:group-hover:opacity-100",
                                         children: [
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
@@ -2157,8 +2198,8 @@ function ArticleEditor({ locale }) {
                                                 children: copy.replaceCover
                                             }, void 0, false, {
                                                 fileName: "[project]/components/feed/article/ArticleEditor.tsx",
-                                                lineNumber: 485,
-                                                columnNumber: 19
+                                                lineNumber: 514,
+                                                columnNumber: 21
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
                                                 type: "button",
@@ -2171,24 +2212,25 @@ function ArticleEditor({ locale }) {
                                                 children: copy.removeCover
                                             }, void 0, false, {
                                                 fileName: "[project]/components/feed/article/ArticleEditor.tsx",
-                                                lineNumber: 486,
-                                                columnNumber: 19
+                                                lineNumber: 515,
+                                                columnNumber: 21
                                             }, this)
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/components/feed/article/ArticleEditor.tsx",
-                                        lineNumber: 484,
-                                        columnNumber: 17
+                                        lineNumber: 513,
+                                        columnNumber: 19
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/components/feed/article/ArticleEditor.tsx",
-                                lineNumber: 482,
+                                lineNumber: 506,
                                 columnNumber: 15
                             }, this) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
                                 type: "button",
+                                disabled: isEditingPublished,
                                 onClick: ()=>coverInputRef.current?.click(),
-                                className: "flex min-h-[174px] w-full flex-col items-center justify-center border-b border-dashed border-[#CBD7E5] bg-[#F8FAFC] px-6 text-center transition-colors hover:bg-[#F2F6FA]",
+                                className: "flex min-h-[174px] w-full flex-col items-center justify-center border-b border-dashed border-[#CBD7E5] bg-[#F8FAFC] px-6 text-center transition-colors hover:bg-[#F2F6FA] disabled:cursor-not-allowed disabled:hover:bg-[#F8FAFC]",
                                 children: [
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
                                         className: "flex h-11 w-11 items-center justify-center rounded-full bg-white text-[#2378E8] shadow-sm",
@@ -2196,34 +2238,34 @@ function ArticleEditor({ locale }) {
                                             className: "h-5 w-5"
                                         }, void 0, false, {
                                             fileName: "[project]/components/feed/article/ArticleEditor.tsx",
-                                            lineNumber: 491,
+                                            lineNumber: 521,
                                             columnNumber: 125
                                         }, this)
                                     }, void 0, false, {
                                         fileName: "[project]/components/feed/article/ArticleEditor.tsx",
-                                        lineNumber: 491,
+                                        lineNumber: 521,
                                         columnNumber: 17
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
                                         className: "mt-3 text-sm font-medium text-[#26364C]",
-                                        children: copy.cover
+                                        children: isEditingPublished ? copy.coverLocked : copy.cover
                                     }, void 0, false, {
                                         fileName: "[project]/components/feed/article/ArticleEditor.tsx",
-                                        lineNumber: 492,
+                                        lineNumber: 522,
                                         columnNumber: 17
                                     }, this),
-                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                    !isEditingPublished && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
                                         className: "mt-1 text-xs text-[#8291A5]",
                                         children: copy.coverHint
                                     }, void 0, false, {
                                         fileName: "[project]/components/feed/article/ArticleEditor.tsx",
-                                        lineNumber: 493,
-                                        columnNumber: 17
+                                        lineNumber: 523,
+                                        columnNumber: 41
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/components/feed/article/ArticleEditor.tsx",
-                                lineNumber: 490,
+                                lineNumber: 520,
                                 columnNumber: 15
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -2235,7 +2277,7 @@ function ArticleEditor({ locale }) {
                                         children: copy.title
                                     }, void 0, false, {
                                         fileName: "[project]/components/feed/article/ArticleEditor.tsx",
-                                        lineNumber: 498,
+                                        lineNumber: 528,
                                         columnNumber: 15
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("textarea", {
@@ -2248,7 +2290,7 @@ function ArticleEditor({ locale }) {
                                         className: "mt-10 w-full resize-none overflow-hidden border-0 bg-transparent text-2xl font-medium leading-tight tracking-[-0.015em] text-[#101827] outline-none placeholder:font-normal placeholder:text-[#A5B0BF] sm:text-[32px]"
                                     }, void 0, false, {
                                         fileName: "[project]/components/feed/article/ArticleEditor.tsx",
-                                        lineNumber: 499,
+                                        lineNumber: 529,
                                         columnNumber: 15
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -2263,147 +2305,147 @@ function ArticleEditor({ locale }) {
                                                             children: [
                                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mantine$2f$tiptap$2f$esm$2f$RichTextEditor$2e$mjs__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["RichTextEditor"].Bold, {}, void 0, false, {
                                                                     fileName: "[project]/components/feed/article/ArticleEditor.tsx",
-                                                                    lineNumber: 503,
+                                                                    lineNumber: 533,
                                                                     columnNumber: 51
                                                                 }, this),
                                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mantine$2f$tiptap$2f$esm$2f$RichTextEditor$2e$mjs__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["RichTextEditor"].Italic, {}, void 0, false, {
                                                                     fileName: "[project]/components/feed/article/ArticleEditor.tsx",
-                                                                    lineNumber: 503,
+                                                                    lineNumber: 533,
                                                                     columnNumber: 74
                                                                 }, this),
                                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mantine$2f$tiptap$2f$esm$2f$RichTextEditor$2e$mjs__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["RichTextEditor"].Underline, {}, void 0, false, {
                                                                     fileName: "[project]/components/feed/article/ArticleEditor.tsx",
-                                                                    lineNumber: 503,
+                                                                    lineNumber: 533,
                                                                     columnNumber: 99
                                                                 }, this),
                                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mantine$2f$tiptap$2f$esm$2f$RichTextEditor$2e$mjs__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["RichTextEditor"].Strikethrough, {}, void 0, false, {
                                                                     fileName: "[project]/components/feed/article/ArticleEditor.tsx",
-                                                                    lineNumber: 503,
+                                                                    lineNumber: 533,
                                                                     columnNumber: 127
                                                                 }, this)
                                                             ]
                                                         }, void 0, true, {
                                                             fileName: "[project]/components/feed/article/ArticleEditor.tsx",
-                                                            lineNumber: 503,
+                                                            lineNumber: 533,
                                                             columnNumber: 21
                                                         }, this),
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mantine$2f$tiptap$2f$esm$2f$RichTextEditor$2e$mjs__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["RichTextEditor"].ControlsGroup, {
                                                             children: [
                                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mantine$2f$tiptap$2f$esm$2f$RichTextEditor$2e$mjs__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["RichTextEditor"].H1, {}, void 0, false, {
                                                                     fileName: "[project]/components/feed/article/ArticleEditor.tsx",
-                                                                    lineNumber: 504,
+                                                                    lineNumber: 534,
                                                                     columnNumber: 51
                                                                 }, this),
                                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mantine$2f$tiptap$2f$esm$2f$RichTextEditor$2e$mjs__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["RichTextEditor"].H2, {}, void 0, false, {
                                                                     fileName: "[project]/components/feed/article/ArticleEditor.tsx",
-                                                                    lineNumber: 504,
+                                                                    lineNumber: 534,
                                                                     columnNumber: 72
                                                                 }, this),
                                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mantine$2f$tiptap$2f$esm$2f$RichTextEditor$2e$mjs__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["RichTextEditor"].H3, {}, void 0, false, {
                                                                     fileName: "[project]/components/feed/article/ArticleEditor.tsx",
-                                                                    lineNumber: 504,
+                                                                    lineNumber: 534,
                                                                     columnNumber: 93
                                                                 }, this)
                                                             ]
                                                         }, void 0, true, {
                                                             fileName: "[project]/components/feed/article/ArticleEditor.tsx",
-                                                            lineNumber: 504,
+                                                            lineNumber: 534,
                                                             columnNumber: 21
                                                         }, this),
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mantine$2f$tiptap$2f$esm$2f$RichTextEditor$2e$mjs__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["RichTextEditor"].ControlsGroup, {
                                                             children: [
                                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mantine$2f$tiptap$2f$esm$2f$RichTextEditor$2e$mjs__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["RichTextEditor"].BulletList, {}, void 0, false, {
                                                                     fileName: "[project]/components/feed/article/ArticleEditor.tsx",
-                                                                    lineNumber: 505,
+                                                                    lineNumber: 535,
                                                                     columnNumber: 51
                                                                 }, this),
                                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mantine$2f$tiptap$2f$esm$2f$RichTextEditor$2e$mjs__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["RichTextEditor"].OrderedList, {}, void 0, false, {
                                                                     fileName: "[project]/components/feed/article/ArticleEditor.tsx",
-                                                                    lineNumber: 505,
+                                                                    lineNumber: 535,
                                                                     columnNumber: 80
                                                                 }, this),
                                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mantine$2f$tiptap$2f$esm$2f$RichTextEditor$2e$mjs__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["RichTextEditor"].Blockquote, {}, void 0, false, {
                                                                     fileName: "[project]/components/feed/article/ArticleEditor.tsx",
-                                                                    lineNumber: 505,
+                                                                    lineNumber: 535,
                                                                     columnNumber: 110
                                                                 }, this),
                                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mantine$2f$tiptap$2f$esm$2f$RichTextEditor$2e$mjs__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["RichTextEditor"].Hr, {}, void 0, false, {
                                                                     fileName: "[project]/components/feed/article/ArticleEditor.tsx",
-                                                                    lineNumber: 505,
+                                                                    lineNumber: 535,
                                                                     columnNumber: 139
                                                                 }, this)
                                                             ]
                                                         }, void 0, true, {
                                                             fileName: "[project]/components/feed/article/ArticleEditor.tsx",
-                                                            lineNumber: 505,
+                                                            lineNumber: 535,
                                                             columnNumber: 21
                                                         }, this),
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mantine$2f$tiptap$2f$esm$2f$RichTextEditor$2e$mjs__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["RichTextEditor"].ControlsGroup, {
                                                             children: [
                                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mantine$2f$tiptap$2f$esm$2f$RichTextEditor$2e$mjs__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["RichTextEditor"].Link, {}, void 0, false, {
                                                                     fileName: "[project]/components/feed/article/ArticleEditor.tsx",
-                                                                    lineNumber: 506,
+                                                                    lineNumber: 536,
                                                                     columnNumber: 51
                                                                 }, this),
                                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mantine$2f$tiptap$2f$esm$2f$RichTextEditor$2e$mjs__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["RichTextEditor"].Unlink, {}, void 0, false, {
                                                                     fileName: "[project]/components/feed/article/ArticleEditor.tsx",
-                                                                    lineNumber: 506,
+                                                                    lineNumber: 536,
                                                                     columnNumber: 74
                                                                 }, this),
                                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mantine$2f$tiptap$2f$esm$2f$RichTextEditor$2e$mjs__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["RichTextEditor"].Code, {}, void 0, false, {
                                                                     fileName: "[project]/components/feed/article/ArticleEditor.tsx",
-                                                                    lineNumber: 506,
+                                                                    lineNumber: 536,
                                                                     columnNumber: 99
                                                                 }, this),
                                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mantine$2f$tiptap$2f$esm$2f$RichTextEditor$2e$mjs__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["RichTextEditor"].CodeBlock, {}, void 0, false, {
                                                                     fileName: "[project]/components/feed/article/ArticleEditor.tsx",
-                                                                    lineNumber: 506,
+                                                                    lineNumber: 536,
                                                                     columnNumber: 122
                                                                 }, this)
                                                             ]
                                                         }, void 0, true, {
                                                             fileName: "[project]/components/feed/article/ArticleEditor.tsx",
-                                                            lineNumber: 506,
+                                                            lineNumber: 536,
                                                             columnNumber: 21
                                                         }, this),
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mantine$2f$tiptap$2f$esm$2f$RichTextEditor$2e$mjs__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["RichTextEditor"].ControlsGroup, {
                                                             children: [
                                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mantine$2f$tiptap$2f$esm$2f$RichTextEditor$2e$mjs__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["RichTextEditor"].Undo, {}, void 0, false, {
                                                                     fileName: "[project]/components/feed/article/ArticleEditor.tsx",
-                                                                    lineNumber: 507,
+                                                                    lineNumber: 537,
                                                                     columnNumber: 51
                                                                 }, this),
                                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mantine$2f$tiptap$2f$esm$2f$RichTextEditor$2e$mjs__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["RichTextEditor"].Redo, {}, void 0, false, {
                                                                     fileName: "[project]/components/feed/article/ArticleEditor.tsx",
-                                                                    lineNumber: 507,
+                                                                    lineNumber: 537,
                                                                     columnNumber: 74
                                                                 }, this)
                                                             ]
                                                         }, void 0, true, {
                                                             fileName: "[project]/components/feed/article/ArticleEditor.tsx",
-                                                            lineNumber: 507,
+                                                            lineNumber: 537,
                                                             columnNumber: 21
                                                         }, this)
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/components/feed/article/ArticleEditor.tsx",
-                                                    lineNumber: 502,
+                                                    lineNumber: 532,
                                                     columnNumber: 19
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mantine$2f$tiptap$2f$esm$2f$RichTextEditor$2e$mjs__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["RichTextEditor"].Content, {}, void 0, false, {
                                                     fileName: "[project]/components/feed/article/ArticleEditor.tsx",
-                                                    lineNumber: 509,
+                                                    lineNumber: 539,
                                                     columnNumber: 19
                                                 }, this)
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/components/feed/article/ArticleEditor.tsx",
-                                            lineNumber: 501,
+                                            lineNumber: 531,
                                             columnNumber: 17
                                         }, this)
                                     }, void 0, false, {
                                         fileName: "[project]/components/feed/article/ArticleEditor.tsx",
-                                        lineNumber: 500,
+                                        lineNumber: 530,
                                         columnNumber: 15
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -2415,19 +2457,19 @@ function ArticleEditor({ locale }) {
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/components/feed/article/ArticleEditor.tsx",
-                                        lineNumber: 512,
+                                        lineNumber: 542,
                                         columnNumber: 15
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/components/feed/article/ArticleEditor.tsx",
-                                lineNumber: 497,
+                                lineNumber: 527,
                                 columnNumber: 13
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "[project]/components/feed/article/ArticleEditor.tsx",
-                        lineNumber: 479,
+                        lineNumber: 503,
                         columnNumber: 11
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("aside", {
@@ -2440,7 +2482,7 @@ function ArticleEditor({ locale }) {
                                     children: copy.settings
                                 }, void 0, false, {
                                     fileName: "[project]/components/feed/article/ArticleEditor.tsx",
-                                    lineNumber: 518,
+                                    lineNumber: 548,
                                     columnNumber: 15
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -2448,7 +2490,7 @@ function ArticleEditor({ locale }) {
                                     children: copy.settingsHint
                                 }, void 0, false, {
                                     fileName: "[project]/components/feed/article/ArticleEditor.tsx",
-                                    lineNumber: 519,
+                                    lineNumber: 549,
                                     columnNumber: 15
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -2459,7 +2501,7 @@ function ArticleEditor({ locale }) {
                                             children: copy.industry
                                         }, void 0, false, {
                                             fileName: "[project]/components/feed/article/ArticleEditor.tsx",
-                                            lineNumber: 522,
+                                            lineNumber: 552,
                                             columnNumber: 17
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
@@ -2472,26 +2514,26 @@ function ArticleEditor({ locale }) {
                                                     children: industry?.name ?? copy.selectIndustry
                                                 }, void 0, false, {
                                                     fileName: "[project]/components/feed/article/ArticleEditor.tsx",
-                                                    lineNumber: 524,
+                                                    lineNumber: 554,
                                                     columnNumber: 19
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$tabler$2f$icons$2d$react$2f$dist$2f$esm$2f$icons$2f$IconChevronDown$2e$mjs__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__$3c$export__default__as__IconChevronDown$3e$__["IconChevronDown"], {
                                                     className: "h-4 w-4 text-[#8291A5]"
                                                 }, void 0, false, {
                                                     fileName: "[project]/components/feed/article/ArticleEditor.tsx",
-                                                    lineNumber: 524,
+                                                    lineNumber: 554,
                                                     columnNumber: 92
                                                 }, this)
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/components/feed/article/ArticleEditor.tsx",
-                                            lineNumber: 523,
+                                            lineNumber: 553,
                                             columnNumber: 17
                                         }, this)
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/components/feed/article/ArticleEditor.tsx",
-                                    lineNumber: 521,
+                                    lineNumber: 551,
                                     columnNumber: 15
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -2502,7 +2544,7 @@ function ArticleEditor({ locale }) {
                                             children: copy.tags
                                         }, void 0, false, {
                                             fileName: "[project]/components/feed/article/ArticleEditor.tsx",
-                                            lineNumber: 529,
+                                            lineNumber: 559,
                                             columnNumber: 17
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -2518,18 +2560,18 @@ function ArticleEditor({ locale }) {
                                                             className: "h-3 w-3"
                                                         }, void 0, false, {
                                                             fileName: "[project]/components/feed/article/ArticleEditor.tsx",
-                                                            lineNumber: 530,
+                                                            lineNumber: 560,
                                                             columnNumber: 342
                                                         }, this)
                                                     ]
                                                 }, tag.id, true, {
                                                     fileName: "[project]/components/feed/article/ArticleEditor.tsx",
-                                                    lineNumber: 530,
+                                                    lineNumber: 560,
                                                     columnNumber: 89
                                                 }, this))
                                         }, void 0, false, {
                                             fileName: "[project]/components/feed/article/ArticleEditor.tsx",
-                                            lineNumber: 530,
+                                            lineNumber: 560,
                                             columnNumber: 17
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -2550,7 +2592,7 @@ function ArticleEditor({ locale }) {
                                                     className: "h-9 min-w-0 flex-1 rounded-md border border-[#D6E0EC] bg-white px-3 text-xs text-[#26364C] outline-none placeholder:text-[#A5B0BF] disabled:cursor-not-allowed disabled:bg-[#F3F5F8]"
                                                 }, void 0, false, {
                                                     fileName: "[project]/components/feed/article/ArticleEditor.tsx",
-                                                    lineNumber: 532,
+                                                    lineNumber: 562,
                                                     columnNumber: 19
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
@@ -2562,24 +2604,24 @@ function ArticleEditor({ locale }) {
                                                         className: "h-3.5 w-3.5 animate-spin"
                                                     }, void 0, false, {
                                                         fileName: "[project]/components/feed/article/ArticleEditor.tsx",
-                                                        lineNumber: 547,
+                                                        lineNumber: 577,
                                                         columnNumber: 36
                                                     }, this) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$tabler$2f$icons$2d$react$2f$dist$2f$esm$2f$icons$2f$IconPlus$2e$mjs__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__$3c$export__default__as__IconPlus$3e$__["IconPlus"], {
                                                         className: "h-3.5 w-3.5"
                                                     }, void 0, false, {
                                                         fileName: "[project]/components/feed/article/ArticleEditor.tsx",
-                                                        lineNumber: 547,
+                                                        lineNumber: 577,
                                                         columnNumber: 91
                                                     }, this)
                                                 }, void 0, false, {
                                                     fileName: "[project]/components/feed/article/ArticleEditor.tsx",
-                                                    lineNumber: 546,
+                                                    lineNumber: 576,
                                                     columnNumber: 19
                                                 }, this)
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/components/feed/article/ArticleEditor.tsx",
-                                            lineNumber: 531,
+                                            lineNumber: 561,
                                             columnNumber: 17
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
@@ -2592,14 +2634,14 @@ function ArticleEditor({ locale }) {
                                                     className: "h-4 w-4"
                                                 }, void 0, false, {
                                                     fileName: "[project]/components/feed/article/ArticleEditor.tsx",
-                                                    lineNumber: 550,
+                                                    lineNumber: 580,
                                                     columnNumber: 227
                                                 }, this),
                                                 industry ? copy.addTags : copy.industryFirst
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/components/feed/article/ArticleEditor.tsx",
-                                            lineNumber: 550,
+                                            lineNumber: 580,
                                             columnNumber: 17
                                         }, this),
                                         tagsOpened && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -2617,18 +2659,18 @@ function ArticleEditor({ locale }) {
                                                     ]
                                                 }, tag.id, true, {
                                                     fileName: "[project]/components/feed/article/ArticleEditor.tsx",
-                                                    lineNumber: 551,
+                                                    lineNumber: 581,
                                                     columnNumber: 230
                                                 }, this))
                                         }, void 0, false, {
                                             fileName: "[project]/components/feed/article/ArticleEditor.tsx",
-                                            lineNumber: 551,
+                                            lineNumber: 581,
                                             columnNumber: 32
                                         }, this)
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/components/feed/article/ArticleEditor.tsx",
-                                    lineNumber: 528,
+                                    lineNumber: 558,
                                     columnNumber: 15
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -2639,7 +2681,7 @@ function ArticleEditor({ locale }) {
                                             children: copy.related
                                         }, void 0, false, {
                                             fileName: "[project]/components/feed/article/ArticleEditor.tsx",
-                                            lineNumber: 555,
+                                            lineNumber: 585,
                                             columnNumber: 17
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -2647,7 +2689,7 @@ function ArticleEditor({ locale }) {
                                             children: copy.relatedHint
                                         }, void 0, false, {
                                             fileName: "[project]/components/feed/article/ArticleEditor.tsx",
-                                            lineNumber: 556,
+                                            lineNumber: 586,
                                             columnNumber: 17
                                         }, this),
                                         relatedInsights.map((item)=>/*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -2657,7 +2699,7 @@ function ArticleEditor({ locale }) {
                                                         className: "h-4 w-4 shrink-0 text-[#2378E8]"
                                                     }, void 0, false, {
                                                         fileName: "[project]/components/feed/article/ArticleEditor.tsx",
-                                                        lineNumber: 557,
+                                                        lineNumber: 587,
                                                         columnNumber: 142
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -2665,7 +2707,7 @@ function ArticleEditor({ locale }) {
                                                         children: item.title
                                                     }, void 0, false, {
                                                         fileName: "[project]/components/feed/article/ArticleEditor.tsx",
-                                                        lineNumber: 557,
+                                                        lineNumber: 587,
                                                         columnNumber: 209
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
@@ -2675,18 +2717,18 @@ function ArticleEditor({ locale }) {
                                                             className: "h-3.5 w-3.5 text-[#8997A9]"
                                                         }, void 0, false, {
                                                             fileName: "[project]/components/feed/article/ArticleEditor.tsx",
-                                                            lineNumber: 557,
+                                                            lineNumber: 587,
                                                             columnNumber: 428
                                                         }, this)
                                                     }, void 0, false, {
                                                         fileName: "[project]/components/feed/article/ArticleEditor.tsx",
-                                                        lineNumber: 557,
+                                                        lineNumber: 587,
                                                         columnNumber: 305
                                                     }, this)
                                                 ]
                                             }, item.id, true, {
                                                 fileName: "[project]/components/feed/article/ArticleEditor.tsx",
-                                                lineNumber: 557,
+                                                lineNumber: 587,
                                                 columnNumber: 48
                                             }, this)),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
@@ -2696,30 +2738,30 @@ function ArticleEditor({ locale }) {
                                             children: copy.chooseInsights
                                         }, void 0, false, {
                                             fileName: "[project]/components/feed/article/ArticleEditor.tsx",
-                                            lineNumber: 558,
+                                            lineNumber: 588,
                                             columnNumber: 17
                                         }, this)
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/components/feed/article/ArticleEditor.tsx",
-                                    lineNumber: 554,
+                                    lineNumber: 584,
                                     columnNumber: 15
                                 }, this)
                             ]
                         }, void 0, true, {
                             fileName: "[project]/components/feed/article/ArticleEditor.tsx",
-                            lineNumber: 517,
+                            lineNumber: 547,
                             columnNumber: 13
                         }, this)
                     }, void 0, false, {
                         fileName: "[project]/components/feed/article/ArticleEditor.tsx",
-                        lineNumber: 516,
+                        lineNumber: 546,
                         columnNumber: 11
                     }, this)
                 ]
             }, void 0, true, {
                 fileName: "[project]/components/feed/article/ArticleEditor.tsx",
-                lineNumber: 478,
+                lineNumber: 502,
                 columnNumber: 7
             }, this),
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$feed$2f$post$2f$IndustrySelectModal$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["default"], {
@@ -2738,7 +2780,7 @@ function ArticleEditor({ locale }) {
                 }
             }, void 0, false, {
                 fileName: "[project]/components/feed/article/ArticleEditor.tsx",
-                lineNumber: 565,
+                lineNumber: 595,
                 columnNumber: 7
             }, this),
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$feed$2f$post$2f$KnowledgeLibraryDrawer$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["default"], {
@@ -2755,13 +2797,13 @@ function ArticleEditor({ locale }) {
                 }
             }, void 0, false, {
                 fileName: "[project]/components/feed/article/ArticleEditor.tsx",
-                lineNumber: 566,
+                lineNumber: 596,
                 columnNumber: 7
             }, this)
         ]
     }, void 0, true, {
         fileName: "[project]/components/feed/article/ArticleEditor.tsx",
-        lineNumber: 457,
+        lineNumber: 478,
         columnNumber: 5
     }, this);
 }

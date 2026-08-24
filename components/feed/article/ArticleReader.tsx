@@ -43,6 +43,7 @@ const copyByLocale = {
     readTime: 'Read time',
     published: 'Published',
     publisher: 'Publisher',
+    by: 'By',
     viewInsight: 'View',
     openingInsight: 'Opening…',
     relatedDocuments: 'Related documents',
@@ -57,6 +58,7 @@ const copyByLocale = {
     readTime: 'مدة القراءة',
     published: 'نُشر',
     publisher: 'الناشر',
+    by: 'بواسطة',
     viewInsight: 'عرض',
     openingInsight: 'جارٍ الفتح…',
     relatedDocuments: 'مستندات ذات صلة',
@@ -247,6 +249,21 @@ export default function ArticleReader({ locale, identifier, isPublic }: ArticleR
     .map((part) => part[0])
     .join('')
     .toUpperCase() || 'I'
+  const isPublishedAsCompany = item.author_profile_type === 'company' && Boolean(insighter?.company)
+  const publisherName = isPublishedAsCompany
+    ? insighter?.company?.legal_name || insighter?.company?.name || insighter?.name || ''
+    : insighter?.name || ''
+  const publisherPhoto = isPublishedAsCompany ? insighter?.company?.logo : insighter?.profile_photo_url
+  const publisherInitials = publisherName
+    .split(' ')
+    .filter(Boolean)
+    .slice(0, 2)
+    .map((part) => part[0])
+    .join('')
+    .toUpperCase() || 'I'
+  const publisherHref = isPublishedAsCompany
+    ? `/${locale}/profile/${insighter?.company?.uuid}`
+    : `/${locale}/profile/${insighter?.uuid}?entity=insighter`
 
   const shareUrl = `${publicBaseUrl}/${locale}/article/${item.slug ?? identifier}`
 
@@ -287,8 +304,8 @@ export default function ArticleReader({ locale, identifier, isPublic }: ArticleR
               <FeedShare
                 shareUrl={shareUrl}
                 shareTitle={item.title ?? ''}
-                authorName={insighter?.name ?? 'Insighta'}
-                authorPhotoUrl={insighter?.profile_photo_url}
+                authorName={publisherName || 'Insighta'}
+                authorPhotoUrl={publisherPhoto}
                 locale={locale}
                 shareKind="white-paper"
                 triggerClassName={styles.shareButton}
@@ -301,18 +318,27 @@ export default function ArticleReader({ locale, identifier, isPublic }: ArticleR
             {insighter && (
               <div className={`${styles.heroMetaItem} ${styles.heroAuthor}`}>
                 <Link
-                  href={`/${locale}/profile/${insighter.uuid}?entity=insighter`}
+                  href={publisherHref}
                   target="_blank"
                   rel="noopener noreferrer"
                   className={styles.heroAuthorLink}
                 >
-                  <div className={styles.authorAvatar}>
-                    {insighter.profile_photo_url ? <img src={insighter.profile_photo_url} alt={insighter.name} /> : <span>{initials}</span>}
+                  <div className={`${styles.authorAvatar} relative`}>
+                    {publisherPhoto ? <img src={publisherPhoto} alt={publisherName} className={isPublishedAsCompany ? '!object-contain !p-1' : undefined} /> : <span>{publisherInitials}</span>}
+                    {isPublishedAsCompany && (
+                      <span className="absolute -bottom-1 -end-1 flex h-5 w-5 items-center justify-center overflow-hidden rounded-full border-2 border-white bg-[#E7F0FE]">
+                        {insighter.profile_photo_url ? (
+                          <img src={insighter.profile_photo_url} alt={insighter.name} className="!h-full !w-full !object-cover !object-top !p-0" />
+                        ) : (
+                          <span className="text-[6px] font-bold text-[#2378E8]">{initials}</span>
+                        )}
+                      </span>
+                    )}
                   </div>
                   <div className={styles.heroAuthorText}>
                     <span className={styles.heroMetaLabel}>{copy.publisher}</span>
-                    <strong>{insighter.name}</strong>
-                    {insighter.company && <small>{insighter.company.legal_name ?? insighter.company.name}</small>}
+                    <strong>{publisherName}</strong>
+                    {isPublishedAsCompany && <small>{copy.by} {insighter.name}</small>}
                   </div>
                 </Link>
               </div>

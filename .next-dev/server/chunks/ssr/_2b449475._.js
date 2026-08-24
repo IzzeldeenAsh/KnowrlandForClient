@@ -425,7 +425,10 @@ async function saveVideoPost(uuid, payload, status, locale) {
             status,
             industry_id: payload.industryId,
             tags: payload.tags,
-            related_insights: payload.relatedInsights
+            related_insights: payload.relatedInsights,
+            ...status === 'published' && payload.authorType ? {
+                author_type: payload.authorType
+            } : {}
         })
     });
     if (!response.ok) {
@@ -444,7 +447,10 @@ async function saveImageTextPost(payload, status, locale, uuid) {
         industry_id: payload.industryId,
         status,
         tags: payload.tags,
-        related_insights: payload.relatedInsights
+        related_insights: payload.relatedInsights,
+        ...status === 'published' && payload.authorType ? {
+            author_type: payload.authorType
+        } : {}
     };
     if (uuid) {
         // Send metadata as JSON first so empty tag/insight arrays are preserved.
@@ -470,6 +476,9 @@ async function saveImageTextPost(payload, status, locale, uuid) {
     formData.append('body', payload.body);
     formData.append('industry_id', String(payload.industryId));
     formData.append('status', status);
+    if (status === 'published' && payload.authorType) {
+        formData.append('author_type', payload.authorType);
+    }
     if (!uuid) {
         payload.tags.forEach((tagId, index)=>formData.append(`tags[${index}]`, String(tagId)));
         payload.relatedInsights.forEach((knowledgeId, index)=>formData.append(`related_insights[${index}]`, String(knowledgeId)));
@@ -505,7 +514,10 @@ async function saveArticle(payload, status, locale, uuid) {
         status,
         tags: payload.tags,
         related_insights: payload.relatedInsights,
-        remove_cover: payload.removeCover === true
+        remove_cover: payload.removeCover === true,
+        ...status === 'published' && payload.authorType ? {
+            author_type: payload.authorType
+        } : {}
     };
     if (uuid) {
         const uploadCoverBeforePublishing = status === 'published' && !!payload.coverImage;
@@ -544,7 +556,10 @@ async function saveArticle(payload, status, locale, uuid) {
                     'Content-Type': 'application/json'
                 },
                 body: JSON.stringify({
-                    status: 'published'
+                    status: 'published',
+                    ...payload.authorType ? {
+                        author_type: payload.authorType
+                    } : {}
                 })
             });
             if (!publishResponse.ok) {
@@ -557,6 +572,9 @@ async function saveArticle(payload, status, locale, uuid) {
     formData.append('title', payload.title);
     formData.append('body', payload.body);
     formData.append('status', status);
+    if (status === 'published' && payload.authorType) {
+        formData.append('author_type', payload.authorType);
+    }
     if (payload.industryId !== null) {
         formData.append('industry_id', String(payload.industryId));
     }
@@ -1848,8 +1866,10 @@ __turbopack_context__.s([
 ]);
 var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/next/dist/server/route-modules/app-page/vendored/ssr/react-jsx-dev-runtime.js [app-ssr] (ecmascript)");
 var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$client$2f$app$2d$dir$2f$link$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/next/dist/client/app-dir/link.js [app-ssr] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$tabler$2f$icons$2d$react$2f$dist$2f$esm$2f$icons$2f$IconArrowRight$2e$mjs__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__$3c$export__default__as__IconArrowRight$3e$__ = __turbopack_context__.i("[project]/node_modules/@tabler/icons-react/dist/esm/icons/IconArrowRight.mjs [app-ssr] (ecmascript) <export default as IconArrowRight>");
 var __TURBOPACK__imported__module__$5b$project$5d2f$components$2f$icons$2f$KnowledgeTypeIcon$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/components/icons/KnowledgeTypeIcon.tsx [app-ssr] (ecmascript)");
 'use client';
+;
 ;
 ;
 ;
@@ -1903,27 +1923,27 @@ function LoadingList() {
                                 className: "block h-4 w-16 rounded-full bg-white/10"
                             }, void 0, false, {
                                 fileName: "[project]/components/feed/DocumentsListCard.tsx",
-                                lineNumber: 56,
+                                lineNumber: 62,
                                 columnNumber: 13
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
                                 className: "mt-3 block h-3 w-4/5 rounded bg-white/10"
                             }, void 0, false, {
                                 fileName: "[project]/components/feed/DocumentsListCard.tsx",
-                                lineNumber: 57,
+                                lineNumber: 63,
                                 columnNumber: 13
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
                                 className: "mt-2 block h-3 w-3/5 rounded bg-white/10"
                             }, void 0, false, {
                                 fileName: "[project]/components/feed/DocumentsListCard.tsx",
-                                lineNumber: 58,
+                                lineNumber: 64,
                                 columnNumber: 13
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "[project]/components/feed/DocumentsListCard.tsx",
-                        lineNumber: 55,
+                        lineNumber: 61,
                         columnNumber: 11
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -1933,31 +1953,31 @@ function LoadingList() {
                                 className: "h-5 w-5 rounded-full bg-slate-100"
                             }, void 0, false, {
                                 fileName: "[project]/components/feed/DocumentsListCard.tsx",
-                                lineNumber: 61,
+                                lineNumber: 67,
                                 columnNumber: 13
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
                                 className: "h-2.5 w-24 rounded bg-slate-100"
                             }, void 0, false, {
                                 fileName: "[project]/components/feed/DocumentsListCard.tsx",
-                                lineNumber: 62,
+                                lineNumber: 68,
                                 columnNumber: 13
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "[project]/components/feed/DocumentsListCard.tsx",
-                        lineNumber: 60,
+                        lineNumber: 66,
                         columnNumber: 11
                     }, this)
                 ]
             }, index, true, {
                 fileName: "[project]/components/feed/DocumentsListCard.tsx",
-                lineNumber: 54,
+                lineNumber: 60,
                 columnNumber: 9
             }, this))
     }, void 0, false, {
         fileName: "[project]/components/feed/DocumentsListCard.tsx",
-        lineNumber: 52,
+        lineNumber: 58,
         columnNumber: 5
     }, this);
 }
@@ -1982,8 +2002,9 @@ function getPriceLabel(item, isRTL) {
         isFree: false
     };
 }
-function DocumentsListCard({ locale, title, documents, isLoading, emptyText, unavailableText = emptyText, hasError = false, openInNewTabLabel, viewAllHref, viewAllLabel, viewAllDescription, className }) {
+function DocumentsListCard({ locale, title, documents, isLoading, emptyText, unavailableText = emptyText, hasError = false, openInNewTabLabel, viewAllHref, viewAllLabel, viewAllDescription, emptySearchCta, className }) {
     const isRTL = locale === 'ar';
+    const showEmptySearchCta = !isLoading && !hasError && documents.length === 0 && Boolean(emptySearchCta);
     return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("section", {
         className: className,
         dir: isRTL ? 'rtl' : 'ltr',
@@ -1993,12 +2014,12 @@ function DocumentsListCard({ locale, title, documents, isLoading, emptyText, una
                 children: title
             }, void 0, false, {
                 fileName: "[project]/components/feed/DocumentsListCard.tsx",
-                lineNumber: 120,
+                lineNumber: 128,
                 columnNumber: 7
             }, this),
             isLoading ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(LoadingList, {}, void 0, false, {
                 fileName: "[project]/components/feed/DocumentsListCard.tsx",
-                lineNumber: 123,
+                lineNumber: 131,
                 columnNumber: 9
             }, this) : hasError ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
                 className: "mt-3 rounded-[4px] border border-slate-200 bg-white px-4 py-5 text-xs leading-5 text-slate-500",
@@ -2006,16 +2027,75 @@ function DocumentsListCard({ locale, title, documents, isLoading, emptyText, una
                 children: unavailableText
             }, void 0, false, {
                 fileName: "[project]/components/feed/DocumentsListCard.tsx",
-                lineNumber: 125,
+                lineNumber: 133,
                 columnNumber: 9
-            }, this) : documents.length === 0 ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
+            }, this) : documents.length === 0 ? emptySearchCta ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$client$2f$app$2d$dir$2f$link$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["default"], {
+                href: viewAllHref,
+                "aria-label": emptySearchCta.action,
+                className: "group relative mt-3 block overflow-hidden rounded-md border border-[#C7DCFA] bg-[radial-gradient(circle_at_88%_12%,rgba(120,202,255,0.32),transparent_30%),radial-gradient(circle_at_8%_100%,rgba(113,160,255,0.2),transparent_33%),linear-gradient(135deg,#F9FCFF,#EAF3FF)] px-5 py-4 transition-colors duration-200 hover:border-[#91BCF4] hover:bg-[#E7F2FF] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2378E8] focus-visible:ring-offset-2",
+                children: [
+                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                        "aria-hidden": true,
+                        className: "absolute -end-5 -top-6 h-24 w-24 rounded-full border border-white/70 bg-white/35"
+                    }, void 0, false, {
+                        fileName: "[project]/components/feed/DocumentsListCard.tsx",
+                        lineNumber: 143,
+                        columnNumber: 13
+                    }, this),
+                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                        "aria-hidden": true,
+                        className: "absolute -bottom-9 -start-7 h-20 w-20 rounded-full border border-[#A9CCFA]/45"
+                    }, void 0, false, {
+                        fileName: "[project]/components/feed/DocumentsListCard.tsx",
+                        lineNumber: 144,
+                        columnNumber: 13
+                    }, this),
+                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                        className: "relative block",
+                        children: [
+                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                className: "block text-[19px] font-semibold leading-6 tracking-[-0.02em] text-[#101724]",
+                                children: emptySearchCta.title
+                            }, void 0, false, {
+                                fileName: "[project]/components/feed/DocumentsListCard.tsx",
+                                lineNumber: 146,
+                                columnNumber: 15
+                            }, this),
+                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                className: "mt-1 block text-[13px] font-medium leading-5 text-[#527197]",
+                                children: emptySearchCta.description
+                            }, void 0, false, {
+                                fileName: "[project]/components/feed/DocumentsListCard.tsx",
+                                lineNumber: 147,
+                                columnNumber: 15
+                            }, this)
+                        ]
+                    }, void 0, true, {
+                        fileName: "[project]/components/feed/DocumentsListCard.tsx",
+                        lineNumber: 145,
+                        columnNumber: 13
+                    }, this),
+                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                        className: "relative mt-4 block text-[12px] font-bold text-[#2378E8]",
+                        children: emptySearchCta.action
+                    }, void 0, false, {
+                        fileName: "[project]/components/feed/DocumentsListCard.tsx",
+                        lineNumber: 149,
+                        columnNumber: 13
+                    }, this)
+                ]
+            }, void 0, true, {
+                fileName: "[project]/components/feed/DocumentsListCard.tsx",
+                lineNumber: 138,
+                columnNumber: 11
+            }, this) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
                 className: "mt-3 rounded-[4px] border border-slate-200 bg-white px-4 py-5 text-xs leading-5 text-slate-500",
                 role: "status",
                 children: emptyText
             }, void 0, false, {
                 fileName: "[project]/components/feed/DocumentsListCard.tsx",
-                lineNumber: 129,
-                columnNumber: 9
+                lineNumber: 152,
+                columnNumber: 11
             }, this) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("ul", {
                 className: "mt-2 space-y-1.5",
                 children: documents.map((item)=>{
@@ -2042,7 +2122,7 @@ function DocumentsListCard({ locale, title, documents, isLoading, emptyText, una
                                                     size: 16
                                                 }, void 0, false, {
                                                     fileName: "[project]/components/feed/DocumentsListCard.tsx",
-                                                    lineNumber: 150,
+                                                    lineNumber: 174,
                                                     columnNumber: 23
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -2050,13 +2130,13 @@ function DocumentsListCard({ locale, title, documents, isLoading, emptyText, una
                                                     children: typeLabel
                                                 }, void 0, false, {
                                                     fileName: "[project]/components/feed/DocumentsListCard.tsx",
-                                                    lineNumber: 151,
+                                                    lineNumber: 175,
                                                     columnNumber: 23
                                                 }, this)
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/components/feed/DocumentsListCard.tsx",
-                                            lineNumber: 149,
+                                            lineNumber: 173,
                                             columnNumber: 21
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -2065,13 +2145,13 @@ function DocumentsListCard({ locale, title, documents, isLoading, emptyText, una
                                             children: item.title
                                         }, void 0, false, {
                                             fileName: "[project]/components/feed/DocumentsListCard.tsx",
-                                            lineNumber: 155,
+                                            lineNumber: 179,
                                             columnNumber: 21
                                         }, this)
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/components/feed/DocumentsListCard.tsx",
-                                    lineNumber: 148,
+                                    lineNumber: 172,
                                     columnNumber: 19
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -2089,12 +2169,12 @@ function DocumentsListCard({ locale, title, documents, isLoading, emptyText, una
                                                             className: "h-full w-full object-cover object-top"
                                                         }, void 0, false, {
                                                             fileName: "[project]/components/feed/DocumentsListCard.tsx",
-                                                            lineNumber: 169,
+                                                            lineNumber: 193,
                                                             columnNumber: 31
                                                         }, this) : getInitials(item.publisher.name)
                                                     }, void 0, false, {
                                                         fileName: "[project]/components/feed/DocumentsListCard.tsx",
-                                                        lineNumber: 167,
+                                                        lineNumber: 191,
                                                         columnNumber: 27
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -2102,21 +2182,14 @@ function DocumentsListCard({ locale, title, documents, isLoading, emptyText, una
                                                         children: item.publisher.name
                                                     }, void 0, false, {
                                                         fileName: "[project]/components/feed/DocumentsListCard.tsx",
-                                                        lineNumber: 174,
+                                                        lineNumber: 198,
                                                         columnNumber: 27
                                                     }, this)
                                                 ]
-                                            }, void 0, true) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
-                                                className: "text-[10px] font-medium text-slate-500",
-                                                children: isRTL ? 'مستند ذو صلة' : 'Related document'
-                                            }, void 0, false, {
-                                                fileName: "[project]/components/feed/DocumentsListCard.tsx",
-                                                lineNumber: 179,
-                                                columnNumber: 25
-                                            }, this)
+                                            }, void 0, true) : null
                                         }, void 0, false, {
                                             fileName: "[project]/components/feed/DocumentsListCard.tsx",
-                                            lineNumber: 164,
+                                            lineNumber: 188,
                                             columnNumber: 21
                                         }, this),
                                         price && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -2125,76 +2198,95 @@ function DocumentsListCard({ locale, title, documents, isLoading, emptyText, una
                                             children: price.label
                                         }, void 0, false, {
                                             fileName: "[project]/components/feed/DocumentsListCard.tsx",
-                                            lineNumber: 186,
+                                            lineNumber: 206,
                                             columnNumber: 23
                                         }, this)
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/components/feed/DocumentsListCard.tsx",
-                                    lineNumber: 163,
+                                    lineNumber: 187,
                                     columnNumber: 19
                                 }, this)
                             ]
                         }, void 0, true, {
                             fileName: "[project]/components/feed/DocumentsListCard.tsx",
-                            lineNumber: 141,
+                            lineNumber: 165,
                             columnNumber: 17
                         }, this)
                     }, item.id, false, {
                         fileName: "[project]/components/feed/DocumentsListCard.tsx",
-                        lineNumber: 140,
+                        lineNumber: 164,
                         columnNumber: 15
                     }, this);
                 })
             }, void 0, false, {
                 fileName: "[project]/components/feed/DocumentsListCard.tsx",
-                lineNumber: 133,
+                lineNumber: 157,
                 columnNumber: 9
             }, this),
-            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                className: "mt-1.5",
+            !showEmptySearchCta && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                className: "mt-3",
                 children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$client$2f$app$2d$dir$2f$link$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["default"], {
                     href: viewAllHref,
                     "aria-label": `${viewAllLabel} — ${viewAllDescription}`,
-                    className: "flex min-h-9 w-full items-center justify-center rounded-[4px] border border-blue-200 bg-blue-50/70 px-4 py-1.5 text-center transition-colors duration-200 hover:border-blue-300 hover:bg-blue-100/70 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2378E8] focus-visible:ring-offset-2",
-                    children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
-                        children: [
-                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
-                                className: `block text-[11px] font-semibold leading-3 text-transparent bg-clip-text ${isRTL ? 'bg-gradient-to-l from-blue-700 via-sky-600 to-cyan-500' : 'bg-gradient-to-r from-blue-700 via-sky-600 to-cyan-500'}`,
-                                children: viewAllLabel
+                    className: "group flex min-h-[52px] w-full items-center justify-between gap-3 rounded-md border border-slate-200 bg-white px-3.5 py-2.5 text-start shadow-[0_1px_2px_rgba(15,23,42,0.03)] transition-all duration-200 hover:-translate-y-px hover:border-blue-200 hover:bg-blue-50/40 hover:shadow-[0_4px_12px_rgba(35,120,232,0.1)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2378E8] focus-visible:ring-offset-2",
+                    children: [
+                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                            className: "min-w-0",
+                            children: [
+                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                    className: "block text-[11px] font-bold leading-4 text-slate-800",
+                                    children: viewAllLabel
+                                }, void 0, false, {
+                                    fileName: "[project]/components/feed/DocumentsListCard.tsx",
+                                    lineNumber: 228,
+                                    columnNumber: 13
+                                }, this),
+                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                    className: "block truncate text-[10px] font-medium leading-4 text-slate-500",
+                                    children: viewAllDescription
+                                }, void 0, false, {
+                                    fileName: "[project]/components/feed/DocumentsListCard.tsx",
+                                    lineNumber: 231,
+                                    columnNumber: 13
+                                }, this)
+                            ]
+                        }, void 0, true, {
+                            fileName: "[project]/components/feed/DocumentsListCard.tsx",
+                            lineNumber: 227,
+                            columnNumber: 11
+                        }, this),
+                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                            className: "flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-[#EAF3FF] text-[#2378E8] transition-colors duration-200 group-hover:bg-[#2378E8] group-hover:text-white",
+                            children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$tabler$2f$icons$2d$react$2f$dist$2f$esm$2f$icons$2f$IconArrowRight$2e$mjs__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__$3c$export__default__as__IconArrowRight$3e$__["IconArrowRight"], {
+                                "aria-hidden": true,
+                                className: `h-3.5 w-3.5 ${isRTL ? 'rotate-180' : ''}`,
+                                stroke: 2.1
                             }, void 0, false, {
                                 fileName: "[project]/components/feed/DocumentsListCard.tsx",
-                                lineNumber: 208,
-                                columnNumber: 13
-                            }, this),
-                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
-                                className: "mt-0.5 block text-[10px] font-medium leading-3 text-blue-500",
-                                children: viewAllDescription
-                            }, void 0, false, {
-                                fileName: "[project]/components/feed/DocumentsListCard.tsx",
-                                lineNumber: 211,
+                                lineNumber: 234,
                                 columnNumber: 13
                             }, this)
-                        ]
-                    }, void 0, true, {
-                        fileName: "[project]/components/feed/DocumentsListCard.tsx",
-                        lineNumber: 207,
-                        columnNumber: 11
-                    }, this)
-                }, void 0, false, {
+                        }, void 0, false, {
+                            fileName: "[project]/components/feed/DocumentsListCard.tsx",
+                            lineNumber: 233,
+                            columnNumber: 11
+                        }, this)
+                    ]
+                }, void 0, true, {
                     fileName: "[project]/components/feed/DocumentsListCard.tsx",
-                    lineNumber: 202,
+                    lineNumber: 222,
                     columnNumber: 9
                 }, this)
             }, void 0, false, {
                 fileName: "[project]/components/feed/DocumentsListCard.tsx",
-                lineNumber: 201,
-                columnNumber: 7
+                lineNumber: 221,
+                columnNumber: 31
             }, this)
         ]
     }, void 0, true, {
         fileName: "[project]/components/feed/DocumentsListCard.tsx",
-        lineNumber: 119,
+        lineNumber: 127,
         columnNumber: 5
     }, this);
 }
@@ -2368,6 +2460,7 @@ const copyByLocale = {
         readTime: 'Read time',
         published: 'Published',
         publisher: 'Publisher',
+        by: 'By',
         viewInsight: 'View',
         openingInsight: 'Opening…',
         relatedDocuments: 'Related documents'
@@ -2382,6 +2475,7 @@ const copyByLocale = {
         readTime: 'مدة القراءة',
         published: 'نُشر',
         publisher: 'الناشر',
+        by: 'بواسطة',
         viewInsight: 'عرض',
         openingInsight: 'جارٍ الفتح…',
         relatedDocuments: 'مستندات ذات صلة'
@@ -2480,25 +2574,25 @@ function ArticleSkeleton({ label }) {
                             className: __TURBOPACK__imported__module__$5b$project$5d2f$components$2f$feed$2f$article$2f$ArticleReader$2e$module$2e$css__$5b$app$2d$ssr$5d$__$28$css__module$29$__["default"].skeletonTitle
                         }, void 0, false, {
                             fileName: "[project]/components/feed/article/ArticleReader.tsx",
-                            lineNumber: 156,
+                            lineNumber: 158,
                             columnNumber: 11
                         }, this),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                             className: __TURBOPACK__imported__module__$5b$project$5d2f$components$2f$feed$2f$article$2f$ArticleReader$2e$module$2e$css__$5b$app$2d$ssr$5d$__$28$css__module$29$__["default"].skeletonTitleShort
                         }, void 0, false, {
                             fileName: "[project]/components/feed/article/ArticleReader.tsx",
-                            lineNumber: 157,
+                            lineNumber: 159,
                             columnNumber: 11
                         }, this)
                     ]
                 }, void 0, true, {
                     fileName: "[project]/components/feed/article/ArticleReader.tsx",
-                    lineNumber: 155,
+                    lineNumber: 157,
                     columnNumber: 9
                 }, this)
             }, void 0, false, {
                 fileName: "[project]/components/feed/article/ArticleReader.tsx",
-                lineNumber: 154,
+                lineNumber: 156,
                 columnNumber: 7
             }, this),
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -2508,22 +2602,12 @@ function ArticleSkeleton({ label }) {
                         className: __TURBOPACK__imported__module__$5b$project$5d2f$components$2f$feed$2f$article$2f$ArticleReader$2e$module$2e$css__$5b$app$2d$ssr$5d$__$28$css__module$29$__["default"].skeletonSide
                     }, void 0, false, {
                         fileName: "[project]/components/feed/article/ArticleReader.tsx",
-                        lineNumber: 161,
+                        lineNumber: 163,
                         columnNumber: 9
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                         className: __TURBOPACK__imported__module__$5b$project$5d2f$components$2f$feed$2f$article$2f$ArticleReader$2e$module$2e$css__$5b$app$2d$ssr$5d$__$28$css__module$29$__["default"].skeletonLines,
                         children: [
-                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {}, void 0, false, {
-                                fileName: "[project]/components/feed/article/ArticleReader.tsx",
-                                lineNumber: 163,
-                                columnNumber: 11
-                            }, this),
-                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {}, void 0, false, {
-                                fileName: "[project]/components/feed/article/ArticleReader.tsx",
-                                lineNumber: 164,
-                                columnNumber: 11
-                            }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {}, void 0, false, {
                                 fileName: "[project]/components/feed/article/ArticleReader.tsx",
                                 lineNumber: 165,
@@ -2533,23 +2617,33 @@ function ArticleSkeleton({ label }) {
                                 fileName: "[project]/components/feed/article/ArticleReader.tsx",
                                 lineNumber: 166,
                                 columnNumber: 11
+                            }, this),
+                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {}, void 0, false, {
+                                fileName: "[project]/components/feed/article/ArticleReader.tsx",
+                                lineNumber: 167,
+                                columnNumber: 11
+                            }, this),
+                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {}, void 0, false, {
+                                fileName: "[project]/components/feed/article/ArticleReader.tsx",
+                                lineNumber: 168,
+                                columnNumber: 11
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "[project]/components/feed/article/ArticleReader.tsx",
-                        lineNumber: 162,
+                        lineNumber: 164,
                         columnNumber: 9
                     }, this)
                 ]
             }, void 0, true, {
                 fileName: "[project]/components/feed/article/ArticleReader.tsx",
-                lineNumber: 160,
+                lineNumber: 162,
                 columnNumber: 7
             }, this)
         ]
     }, void 0, true, {
         fileName: "[project]/components/feed/article/ArticleReader.tsx",
-        lineNumber: 153,
+        lineNumber: 155,
         columnNumber: 5
     }, this);
 }
@@ -2603,7 +2697,7 @@ function ArticleReader({ locale, identifier, isPublic }) {
         label: copy.loading
     }, void 0, false, {
         fileName: "[project]/components/feed/article/ArticleReader.tsx",
-        lineNumber: 219,
+        lineNumber: 221,
         columnNumber: 25
     }, this);
     if (error || !item) {
@@ -2618,7 +2712,7 @@ function ArticleReader({ locale, identifier, isPublic }) {
                         stroke: 1.4
                     }, void 0, false, {
                         fileName: "[project]/components/feed/article/ArticleReader.tsx",
-                        lineNumber: 225,
+                        lineNumber: 227,
                         columnNumber: 11
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("h1", {
@@ -2626,7 +2720,7 @@ function ArticleReader({ locale, identifier, isPublic }) {
                         children: error ?? copy.loadFailed
                     }, void 0, false, {
                         fileName: "[project]/components/feed/article/ArticleReader.tsx",
-                        lineNumber: 226,
+                        lineNumber: 228,
                         columnNumber: 11
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -2638,7 +2732,7 @@ function ArticleReader({ locale, identifier, isPublic }) {
                                 children: copy.back
                             }, void 0, false, {
                                 fileName: "[project]/components/feed/article/ArticleReader.tsx",
-                                lineNumber: 228,
+                                lineNumber: 230,
                                 columnNumber: 13
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
@@ -2648,24 +2742,24 @@ function ArticleReader({ locale, identifier, isPublic }) {
                                 children: copy.tryAgain
                             }, void 0, false, {
                                 fileName: "[project]/components/feed/article/ArticleReader.tsx",
-                                lineNumber: 231,
+                                lineNumber: 233,
                                 columnNumber: 13
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "[project]/components/feed/article/ArticleReader.tsx",
-                        lineNumber: 227,
+                        lineNumber: 229,
                         columnNumber: 11
                     }, this)
                 ]
             }, void 0, true, {
                 fileName: "[project]/components/feed/article/ArticleReader.tsx",
-                lineNumber: 224,
+                lineNumber: 226,
                 columnNumber: 9
             }, this)
         }, void 0, false, {
             fileName: "[project]/components/feed/article/ArticleReader.tsx",
-            lineNumber: 223,
+            lineNumber: 225,
             columnNumber: 7
         }, this);
     }
@@ -2673,6 +2767,11 @@ function ArticleReader({ locale, identifier, isPublic }) {
     const publishedDate = formatArticleDate(item.published_at ?? item.created_at, locale);
     const insighter = item.insighter;
     const initials = insighter?.name.split(' ').filter(Boolean).slice(0, 2).map((part)=>part[0]).join('').toUpperCase() || 'I';
+    const isPublishedAsCompany = item.author_profile_type === 'company' && Boolean(insighter?.company);
+    const publisherName = isPublishedAsCompany ? insighter?.company?.legal_name || insighter?.company?.name || insighter?.name || '' : insighter?.name || '';
+    const publisherPhoto = isPublishedAsCompany ? insighter?.company?.logo : insighter?.profile_photo_url;
+    const publisherInitials = publisherName.split(' ').filter(Boolean).slice(0, 2).map((part)=>part[0]).join('').toUpperCase() || 'I';
+    const publisherHref = isPublishedAsCompany ? `/${locale}/profile/${insighter?.company?.uuid}` : `/${locale}/profile/${insighter?.uuid}?entity=insighter`;
     const shareUrl = `${__TURBOPACK__imported__module__$5b$project$5d2f$app$2f$config$2e$ts__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["publicBaseUrl"]}/${locale}/article/${item.slug ?? identifier}`;
     return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
         dir: isArabic ? 'rtl' : 'ltr',
@@ -2688,7 +2787,7 @@ function ArticleReader({ locale, identifier, isPublic }) {
                         className: __TURBOPACK__imported__module__$5b$project$5d2f$components$2f$feed$2f$article$2f$ArticleReader$2e$module$2e$css__$5b$app$2d$ssr$5d$__$28$css__module$29$__["default"].heroShade
                     }, void 0, false, {
                         fileName: "[project]/components/feed/article/ArticleReader.tsx",
-                        lineNumber: 259,
+                        lineNumber: 276,
                         columnNumber: 9
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -2709,20 +2808,20 @@ function ArticleReader({ locale, identifier, isPublic }) {
                                                         "aria-hidden": true
                                                     }, void 0, false, {
                                                         fileName: "[project]/components/feed/article/ArticleReader.tsx",
-                                                        lineNumber: 269,
+                                                        lineNumber: 286,
                                                         columnNumber: 19
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
                                                         children: truncateLabel(item.industry.name)
                                                     }, void 0, false, {
                                                         fileName: "[project]/components/feed/article/ArticleReader.tsx",
-                                                        lineNumber: 270,
+                                                        lineNumber: 287,
                                                         columnNumber: 19
                                                     }, this)
                                                 ]
                                             }, void 0, true, {
                                                 fileName: "[project]/components/feed/article/ArticleReader.tsx",
-                                                lineNumber: 264,
+                                                lineNumber: 281,
                                                 columnNumber: 17
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("h1", {
@@ -2730,13 +2829,13 @@ function ArticleReader({ locale, identifier, isPublic }) {
                                                 children: item.title
                                             }, void 0, false, {
                                                 fileName: "[project]/components/feed/article/ArticleReader.tsx",
-                                                lineNumber: 273,
+                                                lineNumber: 290,
                                                 columnNumber: 15
                                             }, this)
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/components/feed/article/ArticleReader.tsx",
-                                        lineNumber: 262,
+                                        lineNumber: 279,
                                         columnNumber: 13
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -2752,33 +2851,33 @@ function ArticleReader({ locale, identifier, isPublic }) {
                                                 className: __TURBOPACK__imported__module__$5b$project$5d2f$components$2f$feed$2f$article$2f$ArticleReader$2e$module$2e$css__$5b$app$2d$ssr$5d$__$28$css__module$29$__["default"].heroActionButton
                                             }, void 0, false, {
                                                 fileName: "[project]/components/feed/article/ArticleReader.tsx",
-                                                lineNumber: 277,
+                                                lineNumber: 294,
                                                 columnNumber: 17
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$feed$2f$FeedShare$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["default"], {
                                                 shareUrl: shareUrl,
                                                 shareTitle: item.title ?? '',
-                                                authorName: insighter?.name ?? 'Insighta',
-                                                authorPhotoUrl: insighter?.profile_photo_url,
+                                                authorName: publisherName || 'Insighta',
+                                                authorPhotoUrl: publisherPhoto,
                                                 locale: locale,
                                                 shareKind: "white-paper",
                                                 triggerClassName: __TURBOPACK__imported__module__$5b$project$5d2f$components$2f$feed$2f$article$2f$ArticleReader$2e$module$2e$css__$5b$app$2d$ssr$5d$__$28$css__module$29$__["default"].shareButton,
                                                 hideTriggerLabel: true
                                             }, void 0, false, {
                                                 fileName: "[project]/components/feed/article/ArticleReader.tsx",
-                                                lineNumber: 287,
+                                                lineNumber: 304,
                                                 columnNumber: 15
                                             }, this)
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/components/feed/article/ArticleReader.tsx",
-                                        lineNumber: 275,
+                                        lineNumber: 292,
                                         columnNumber: 13
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/components/feed/article/ArticleReader.tsx",
-                                lineNumber: 261,
+                                lineNumber: 278,
                                 columnNumber: 11
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -2787,30 +2886,56 @@ function ArticleReader({ locale, identifier, isPublic }) {
                                     insighter && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                                         className: `${__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$feed$2f$article$2f$ArticleReader$2e$module$2e$css__$5b$app$2d$ssr$5d$__$28$css__module$29$__["default"].heroMetaItem} ${__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$feed$2f$article$2f$ArticleReader$2e$module$2e$css__$5b$app$2d$ssr$5d$__$28$css__module$29$__["default"].heroAuthor}`,
                                         children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$client$2f$app$2d$dir$2f$link$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["default"], {
-                                            href: `/${locale}/profile/${insighter.uuid}?entity=insighter`,
+                                            href: publisherHref,
                                             target: "_blank",
                                             rel: "noopener noreferrer",
                                             className: __TURBOPACK__imported__module__$5b$project$5d2f$components$2f$feed$2f$article$2f$ArticleReader$2e$module$2e$css__$5b$app$2d$ssr$5d$__$28$css__module$29$__["default"].heroAuthorLink,
                                             children: [
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                                    className: __TURBOPACK__imported__module__$5b$project$5d2f$components$2f$feed$2f$article$2f$ArticleReader$2e$module$2e$css__$5b$app$2d$ssr$5d$__$28$css__module$29$__["default"].authorAvatar,
-                                                    children: insighter.profile_photo_url ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("img", {
-                                                        src: insighter.profile_photo_url,
-                                                        alt: insighter.name
-                                                    }, void 0, false, {
-                                                        fileName: "[project]/components/feed/article/ArticleReader.tsx",
-                                                        lineNumber: 310,
-                                                        columnNumber: 52
-                                                    }, this) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
-                                                        children: initials
-                                                    }, void 0, false, {
-                                                        fileName: "[project]/components/feed/article/ArticleReader.tsx",
-                                                        lineNumber: 310,
-                                                        columnNumber: 117
-                                                    }, this)
-                                                }, void 0, false, {
+                                                    className: `${__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$feed$2f$article$2f$ArticleReader$2e$module$2e$css__$5b$app$2d$ssr$5d$__$28$css__module$29$__["default"].authorAvatar} relative`,
+                                                    children: [
+                                                        publisherPhoto ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("img", {
+                                                            src: publisherPhoto,
+                                                            alt: publisherName,
+                                                            className: isPublishedAsCompany ? '!object-contain !p-1' : undefined
+                                                        }, void 0, false, {
+                                                            fileName: "[project]/components/feed/article/ArticleReader.tsx",
+                                                            lineNumber: 327,
+                                                            columnNumber: 39
+                                                        }, this) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                                            children: publisherInitials
+                                                        }, void 0, false, {
+                                                            fileName: "[project]/components/feed/article/ArticleReader.tsx",
+                                                            lineNumber: 327,
+                                                            columnNumber: 160
+                                                        }, this),
+                                                        isPublishedAsCompany && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                                            className: "absolute -bottom-1 -end-1 flex h-5 w-5 items-center justify-center overflow-hidden rounded-full border-2 border-white bg-[#E7F0FE]",
+                                                            children: insighter.profile_photo_url ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("img", {
+                                                                src: insighter.profile_photo_url,
+                                                                alt: insighter.name,
+                                                                className: "!h-full !w-full !object-cover !object-top !p-0"
+                                                            }, void 0, false, {
+                                                                fileName: "[project]/components/feed/article/ArticleReader.tsx",
+                                                                lineNumber: 331,
+                                                                columnNumber: 27
+                                                            }, this) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                                                className: "text-[6px] font-bold text-[#2378E8]",
+                                                                children: initials
+                                                            }, void 0, false, {
+                                                                fileName: "[project]/components/feed/article/ArticleReader.tsx",
+                                                                lineNumber: 333,
+                                                                columnNumber: 27
+                                                            }, this)
+                                                        }, void 0, false, {
+                                                            fileName: "[project]/components/feed/article/ArticleReader.tsx",
+                                                            lineNumber: 329,
+                                                            columnNumber: 23
+                                                        }, this)
+                                                    ]
+                                                }, void 0, true, {
                                                     fileName: "[project]/components/feed/article/ArticleReader.tsx",
-                                                    lineNumber: 309,
+                                                    lineNumber: 326,
                                                     columnNumber: 19
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -2821,38 +2946,42 @@ function ArticleReader({ locale, identifier, isPublic }) {
                                                             children: copy.publisher
                                                         }, void 0, false, {
                                                             fileName: "[project]/components/feed/article/ArticleReader.tsx",
-                                                            lineNumber: 313,
+                                                            lineNumber: 339,
                                                             columnNumber: 21
                                                         }, this),
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("strong", {
-                                                            children: insighter.name
+                                                            children: publisherName
                                                         }, void 0, false, {
                                                             fileName: "[project]/components/feed/article/ArticleReader.tsx",
-                                                            lineNumber: 314,
+                                                            lineNumber: 340,
                                                             columnNumber: 21
                                                         }, this),
-                                                        insighter.company && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("small", {
-                                                            children: insighter.company.legal_name ?? insighter.company.name
-                                                        }, void 0, false, {
+                                                        isPublishedAsCompany && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("small", {
+                                                            children: [
+                                                                copy.by,
+                                                                " ",
+                                                                insighter.name
+                                                            ]
+                                                        }, void 0, true, {
                                                             fileName: "[project]/components/feed/article/ArticleReader.tsx",
-                                                            lineNumber: 315,
-                                                            columnNumber: 43
+                                                            lineNumber: 341,
+                                                            columnNumber: 46
                                                         }, this)
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/components/feed/article/ArticleReader.tsx",
-                                                    lineNumber: 312,
+                                                    lineNumber: 338,
                                                     columnNumber: 19
                                                 }, this)
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/components/feed/article/ArticleReader.tsx",
-                                            lineNumber: 303,
+                                            lineNumber: 320,
                                             columnNumber: 17
                                         }, this)
                                     }, void 0, false, {
                                         fileName: "[project]/components/feed/article/ArticleReader.tsx",
-                                        lineNumber: 302,
+                                        lineNumber: 319,
                                         columnNumber: 15
                                     }, this),
                                     publishedDate && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("time", {
@@ -2864,20 +2993,20 @@ function ArticleReader({ locale, identifier, isPublic }) {
                                                 children: copy.published
                                             }, void 0, false, {
                                                 fileName: "[project]/components/feed/article/ArticleReader.tsx",
-                                                lineNumber: 323,
+                                                lineNumber: 349,
                                                 columnNumber: 17
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("strong", {
                                                 children: publishedDate
                                             }, void 0, false, {
                                                 fileName: "[project]/components/feed/article/ArticleReader.tsx",
-                                                lineNumber: 324,
+                                                lineNumber: 350,
                                                 columnNumber: 17
                                             }, this)
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/components/feed/article/ArticleReader.tsx",
-                                        lineNumber: 322,
+                                        lineNumber: 348,
                                         columnNumber: 15
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -2890,7 +3019,7 @@ function ArticleReader({ locale, identifier, isPublic }) {
                                                         "aria-hidden": true
                                                     }, void 0, false, {
                                                         fileName: "[project]/components/feed/article/ArticleReader.tsx",
-                                                        lineNumber: 330,
+                                                        lineNumber: 356,
                                                         columnNumber: 17
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -2898,13 +3027,13 @@ function ArticleReader({ locale, identifier, isPublic }) {
                                                         children: copy.readTime
                                                     }, void 0, false, {
                                                         fileName: "[project]/components/feed/article/ArticleReader.tsx",
-                                                        lineNumber: 331,
+                                                        lineNumber: 357,
                                                         columnNumber: 17
                                                     }, this)
                                                 ]
                                             }, void 0, true, {
                                                 fileName: "[project]/components/feed/article/ArticleReader.tsx",
-                                                lineNumber: 329,
+                                                lineNumber: 355,
                                                 columnNumber: 15
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("strong", {
@@ -2915,31 +3044,31 @@ function ArticleReader({ locale, identifier, isPublic }) {
                                                 ]
                                             }, void 0, true, {
                                                 fileName: "[project]/components/feed/article/ArticleReader.tsx",
-                                                lineNumber: 333,
+                                                lineNumber: 359,
                                                 columnNumber: 15
                                             }, this)
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/components/feed/article/ArticleReader.tsx",
-                                        lineNumber: 328,
+                                        lineNumber: 354,
                                         columnNumber: 13
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/components/feed/article/ArticleReader.tsx",
-                                lineNumber: 300,
+                                lineNumber: 317,
                                 columnNumber: 11
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "[project]/components/feed/article/ArticleReader.tsx",
-                        lineNumber: 260,
+                        lineNumber: 277,
                         columnNumber: 9
                     }, this)
                 ]
             }, void 0, true, {
                 fileName: "[project]/components/feed/article/ArticleReader.tsx",
-                lineNumber: 255,
+                lineNumber: 272,
                 columnNumber: 7
             }, this),
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("main", {
@@ -2953,14 +3082,14 @@ function ArticleReader({ locale, identifier, isPublic }) {
                                 "aria-hidden": true
                             }, void 0, false, {
                                 fileName: "[project]/components/feed/article/ArticleReader.tsx",
-                                lineNumber: 341,
+                                lineNumber: 367,
                                 columnNumber: 11
                             }, this),
                             copy.back
                         ]
                     }, void 0, true, {
                         fileName: "[project]/components/feed/article/ArticleReader.tsx",
-                        lineNumber: 340,
+                        lineNumber: 366,
                         columnNumber: 9
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("article", {
@@ -2977,7 +3106,7 @@ function ArticleReader({ locale, identifier, isPublic }) {
                                         }
                                     }, void 0, false, {
                                         fileName: "[project]/components/feed/article/ArticleReader.tsx",
-                                        lineNumber: 347,
+                                        lineNumber: 373,
                                         columnNumber: 13
                                     }, this),
                                     item.related_insights.length > 0 && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -3004,7 +3133,7 @@ function ArticleReader({ locale, identifier, isPublic }) {
                                                                             size: 16
                                                                         }, void 0, false, {
                                                                             fileName: "[project]/components/feed/article/ArticleReader.tsx",
-                                                                            lineNumber: 369,
+                                                                            lineNumber: 395,
                                                                             columnNumber: 29
                                                                         }, this),
                                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -3012,13 +3141,13 @@ function ArticleReader({ locale, identifier, isPublic }) {
                                                                             children: insight.type
                                                                         }, void 0, false, {
                                                                             fileName: "[project]/components/feed/article/ArticleReader.tsx",
-                                                                            lineNumber: 370,
+                                                                            lineNumber: 396,
                                                                             columnNumber: 29
                                                                         }, this)
                                                                     ]
                                                                 }, void 0, true, {
                                                                     fileName: "[project]/components/feed/article/ArticleReader.tsx",
-                                                                    lineNumber: 368,
+                                                                    lineNumber: 394,
                                                                     columnNumber: 27
                                                                 }, this),
                                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("h2", {
@@ -3027,18 +3156,18 @@ function ArticleReader({ locale, identifier, isPublic }) {
                                                                     children: insight.title
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/components/feed/article/ArticleReader.tsx",
-                                                                    lineNumber: 374,
+                                                                    lineNumber: 400,
                                                                     columnNumber: 27
                                                                 }, this)
                                                             ]
                                                         }, void 0, true, {
                                                             fileName: "[project]/components/feed/article/ArticleReader.tsx",
-                                                            lineNumber: 367,
+                                                            lineNumber: 393,
                                                             columnNumber: 25
                                                         }, this)
                                                     }, void 0, false, {
                                                         fileName: "[project]/components/feed/article/ArticleReader.tsx",
-                                                        lineNumber: 360,
+                                                        lineNumber: 386,
                                                         columnNumber: 23
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -3052,7 +3181,7 @@ function ArticleReader({ locale, identifier, isPublic }) {
                                                                     children: plainText(insight.description)
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/components/feed/article/ArticleReader.tsx",
-                                                                    lineNumber: 383,
+                                                                    lineNumber: 409,
                                                                     columnNumber: 29
                                                                 }, this),
                                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -3069,16 +3198,16 @@ function ArticleReader({ locale, identifier, isPublic }) {
                                                                                 children: insightPrice.label
                                                                             }, void 0, false, {
                                                                                 fileName: "[project]/components/feed/article/ArticleReader.tsx",
-                                                                                lineNumber: 390,
+                                                                                lineNumber: 416,
                                                                                 columnNumber: 33
                                                                             }, this)
                                                                         }, void 0, false, {
                                                                             fileName: "[project]/components/feed/article/ArticleReader.tsx",
-                                                                            lineNumber: 389,
+                                                                            lineNumber: 415,
                                                                             columnNumber: 31
                                                                         }, this) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {}, void 0, false, {
                                                                             fileName: "[project]/components/feed/article/ArticleReader.tsx",
-                                                                            lineNumber: 392,
+                                                                            lineNumber: 418,
                                                                             columnNumber: 33
                                                                         }, this),
                                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$client$2f$app$2d$dir$2f$link$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["default"], {
@@ -3101,7 +3230,7 @@ function ArticleReader({ locale, identifier, isPublic }) {
                                                                                         stroke: 2
                                                                                     }, void 0, false, {
                                                                                         fileName: "[project]/components/feed/article/ArticleReader.tsx",
-                                                                                        lineNumber: 408,
+                                                                                        lineNumber: 434,
                                                                                         columnNumber: 33
                                                                                     }, this),
                                                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -3109,49 +3238,49 @@ function ArticleReader({ locale, identifier, isPublic }) {
                                                                                         children: copy.openingInsight
                                                                                     }, void 0, false, {
                                                                                         fileName: "[project]/components/feed/article/ArticleReader.tsx",
-                                                                                        lineNumber: 409,
+                                                                                        lineNumber: 435,
                                                                                         columnNumber: 33
                                                                                     }, this)
                                                                                 ]
                                                                             }, void 0, true) : copy.viewInsight
                                                                         }, void 0, false, {
                                                                             fileName: "[project]/components/feed/article/ArticleReader.tsx",
-                                                                            lineNumber: 393,
+                                                                            lineNumber: 419,
                                                                             columnNumber: 27
                                                                         }, this)
                                                                     ]
                                                                 }, void 0, true, {
                                                                     fileName: "[project]/components/feed/article/ArticleReader.tsx",
-                                                                    lineNumber: 387,
+                                                                    lineNumber: 413,
                                                                     columnNumber: 27
                                                                 }, this)
                                                             ]
                                                         }, void 0, true, {
                                                             fileName: "[project]/components/feed/article/ArticleReader.tsx",
-                                                            lineNumber: 381,
+                                                            lineNumber: 407,
                                                             columnNumber: 25
                                                         }, this)
                                                     }, void 0, false, {
                                                         fileName: "[project]/components/feed/article/ArticleReader.tsx",
-                                                        lineNumber: 380,
+                                                        lineNumber: 406,
                                                         columnNumber: 23
                                                     }, this)
                                                 ]
                                             }, insightKey, true, {
                                                 fileName: "[project]/components/feed/article/ArticleReader.tsx",
-                                                lineNumber: 356,
+                                                lineNumber: 382,
                                                 columnNumber: 21
                                             }, this);
                                         })
                                     }, void 0, false, {
                                         fileName: "[project]/components/feed/article/ArticleReader.tsx",
-                                        lineNumber: 350,
+                                        lineNumber: 376,
                                         columnNumber: 15
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/components/feed/article/ArticleReader.tsx",
-                                lineNumber: 346,
+                                lineNumber: 372,
                                 columnNumber: 11
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("aside", {
@@ -3162,30 +3291,30 @@ function ArticleReader({ locale, identifier, isPublic }) {
                                     insights: item.matched_related_insights
                                 }, void 0, false, {
                                     fileName: "[project]/components/feed/article/ArticleReader.tsx",
-                                    lineNumber: 426,
+                                    lineNumber: 452,
                                     columnNumber: 13
                                 }, this)
                             }, void 0, false, {
                                 fileName: "[project]/components/feed/article/ArticleReader.tsx",
-                                lineNumber: 425,
+                                lineNumber: 451,
                                 columnNumber: 11
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "[project]/components/feed/article/ArticleReader.tsx",
-                        lineNumber: 345,
+                        lineNumber: 371,
                         columnNumber: 9
                     }, this)
                 ]
             }, void 0, true, {
                 fileName: "[project]/components/feed/article/ArticleReader.tsx",
-                lineNumber: 339,
+                lineNumber: 365,
                 columnNumber: 7
             }, this)
         ]
     }, void 0, true, {
         fileName: "[project]/components/feed/article/ArticleReader.tsx",
-        lineNumber: 254,
+        lineNumber: 271,
         columnNumber: 5
     }, this);
 }

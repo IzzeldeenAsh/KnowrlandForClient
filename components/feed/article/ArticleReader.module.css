@@ -840,7 +840,7 @@
 
 @media (max-width: 640px) {
   .hero {
-    min-height: 410px;
+    min-height: 0;
     background-position: 56% center;
   }
 
@@ -855,7 +855,9 @@
   }
 
   .heroTitleRow {
-    gap: 16px;
+    align-items: stretch;
+    gap: 20px;
+    flex-direction: column;
   }
 
   .heroContent {
@@ -864,8 +866,11 @@
   }
 
   .heroContent h1 {
-    font-size: clamp(2rem, 10vw, 3rem);
+    max-width: none;
+    font-size: clamp(1.8rem, 8.5vw, 2.35rem);
+    line-height: 1.12;
     letter-spacing: -0.035em;
+    text-wrap: pretty;
   }
 
   .heroContent h1::before {
@@ -881,27 +886,64 @@
     flex-basis: 42px;
   }
 
-  .heroMetaRow {
-    width: auto;
-    margin-top: 24px;
-    margin-inline: -22px;
-    overflow-x: auto;
-    border-inline: 0;
-    padding-inline: 22px;
-    scrollbar-width: none;
+  .heroActions {
+    align-self: flex-end;
+    gap: 10px;
   }
 
-  .heroMetaRow::-webkit-scrollbar {
-    display: none;
+  .heroMetaRow {
+    display: grid;
+    grid-template-columns: minmax(0, 1.35fr) minmax(0, 0.92fr) minmax(0, 0.73fr);
+    align-items: end;
+    gap: 8px;
+    width: 100%;
+    margin-top: 22px;
+    padding: 0;
+    box-sizing: border-box;
   }
 
   .heroMetaItem {
-    flex: 0 0 auto;
-    padding-block: 11px;
+    min-width: 0;
+    padding: 0;
+    white-space: normal;
   }
 
   .heroAuthor {
-    flex-basis: auto;
+    grid-column: auto;
+  }
+
+  .heroAuthorLink {
+    max-width: 100%;
+    gap: 6px;
+  }
+
+  .heroMetaItem strong {
+    font-size: 10px;
+    line-height: 1.3;
+  }
+
+  .heroMetaLabel {
+    font-size: 8px;
+    letter-spacing: 0.08em;
+  }
+
+  .heroAuthor .authorAvatar {
+    width: 30px;
+    height: 30px;
+    flex-basis: 30px;
+  }
+
+  .heroAuthorText small {
+    font-size: 8px;
+  }
+
+  .heroReadTimeLabel {
+    gap: 4px;
+  }
+
+  .heroReadTimeLabel svg {
+    width: 12px;
+    height: 12px;
   }
 
   .contentShell {
@@ -953,7 +995,7 @@
   }
 
   .skeletonHero {
-    min-height: 410px;
+    min-height: 470px;
   }
 
   .skeletonInner {

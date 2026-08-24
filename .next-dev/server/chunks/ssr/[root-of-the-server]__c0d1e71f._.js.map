@@ -1,0 +1,7 @@
+{
+  "version": 3,
+  "sources": [],
+  "sections": [
+    {"offset": {"line": 3, "column": 0}, "map": {"version":3,"sources":[],"names":[],"mappings":"","debugId":null}},
+    {"offset": {"line": 43, "column": 0}, "map": {"version":3,"sources":["file:///Users/izzeddinashour/Desktop/Production-KNOLDG/KnowrlandForClient/app/%5Blocale%5D/dashboard/page.tsx"],"sourcesContent":["import { redirect } from 'next/navigation';\n\nexport default async function DashboardPage({ params }: { params: Promise<{ locale: string }> }) {\n  const { locale } = await params;\n  redirect(`/${locale}/dashboard/users/clients`);\n}\n\n"],"names":[],"mappings":";;;;AAAA;AAAA;;AAEe,eAAe,cAAc,EAAE,MAAM,EAA2C;IAC7F,MAAM,EAAE,MAAM,EAAE,GAAG,MAAM;IACzB,IAAA,iMAAQ,EAAC,CAAC,CAAC,EAAE,OAAO,wBAAwB,CAAC;AAC/C","debugId":null}}]
+}

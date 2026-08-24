@@ -212,7 +212,9 @@ export default async function RootLayout({
                     <Suspense fallback={null}>
                       <FloatingFeedButton locale={locale} />
                     </Suspense>
-                    <FloatingBackToTopButton locale={locale} />
+                    <Suspense fallback={null}>
+                      <FloatingBackToTopButton locale={locale} />
+                    </Suspense>
                     <ConditionalAuthBanner />
                   </RoleGuard>
                 </GlobalProfileProvider>

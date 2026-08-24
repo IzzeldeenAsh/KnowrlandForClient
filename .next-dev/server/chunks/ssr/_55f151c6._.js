@@ -553,7 +553,10 @@ async function saveVideoPost(uuid, payload, status, locale) {
             status,
             industry_id: payload.industryId,
             tags: payload.tags,
-            related_insights: payload.relatedInsights
+            related_insights: payload.relatedInsights,
+            ...status === 'published' && payload.authorType ? {
+                author_type: payload.authorType
+            } : {}
         })
     });
     if (!response.ok) {
@@ -572,7 +575,10 @@ async function saveImageTextPost(payload, status, locale, uuid) {
         industry_id: payload.industryId,
         status,
         tags: payload.tags,
-        related_insights: payload.relatedInsights
+        related_insights: payload.relatedInsights,
+        ...status === 'published' && payload.authorType ? {
+            author_type: payload.authorType
+        } : {}
     };
     if (uuid) {
         // Send metadata as JSON first so empty tag/insight arrays are preserved.
@@ -598,6 +604,9 @@ async function saveImageTextPost(payload, status, locale, uuid) {
     formData.append('body', payload.body);
     formData.append('industry_id', String(payload.industryId));
     formData.append('status', status);
+    if (status === 'published' && payload.authorType) {
+        formData.append('author_type', payload.authorType);
+    }
     if (!uuid) {
         payload.tags.forEach((tagId, index)=>formData.append(`tags[${index}]`, String(tagId)));
         payload.relatedInsights.forEach((knowledgeId, index)=>formData.append(`related_insights[${index}]`, String(knowledgeId)));
@@ -633,7 +642,10 @@ async function saveArticle(payload, status, locale, uuid) {
         status,
         tags: payload.tags,
         related_insights: payload.relatedInsights,
-        remove_cover: payload.removeCover === true
+        remove_cover: payload.removeCover === true,
+        ...status === 'published' && payload.authorType ? {
+            author_type: payload.authorType
+        } : {}
     };
     if (uuid) {
         const uploadCoverBeforePublishing = status === 'published' && !!payload.coverImage;
@@ -672,7 +684,10 @@ async function saveArticle(payload, status, locale, uuid) {
                     'Content-Type': 'application/json'
                 },
                 body: JSON.stringify({
-                    status: 'published'
+                    status: 'published',
+                    ...payload.authorType ? {
+                        author_type: payload.authorType
+                    } : {}
                 })
             });
             if (!publishResponse.ok) {
@@ -685,6 +700,9 @@ async function saveArticle(payload, status, locale, uuid) {
     formData.append('title', payload.title);
     formData.append('body', payload.body);
     formData.append('status', status);
+    if (status === 'published' && payload.authorType) {
+        formData.append('author_type', payload.authorType);
+    }
     if (payload.industryId !== null) {
         formData.append('industry_id', String(payload.industryId));
     }

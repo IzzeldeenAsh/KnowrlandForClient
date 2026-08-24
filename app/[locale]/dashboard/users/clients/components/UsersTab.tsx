@@ -1,17 +1,24 @@
 'use client';
 
 import { Tooltip } from '@mantine/core';
-import { IconBrandWhatsapp } from '@tabler/icons-react';
+import { IconBrandWhatsapp, IconMail } from '@tabler/icons-react';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { getAuthToken } from '@/lib/authToken';
 import { useToast } from '@/components/toast/ToastContext';
 import { buildAuthHeaders, parseApiError } from '../../../_config/api';
 import { ClientAction, ClientRecord } from '../../../types';
+import { richTextToPlainText } from '../../../contact-messages/components/ContactMessageReplyEditor';
 import ClientActionModal from './ClientActionModal';
+import ClientEmailModal from './ClientEmailModal';
 
 type ActionModalState = {
   isOpen: boolean;
   action: ClientAction;
+  client: ClientRecord | null;
+};
+
+type EmailModalState = {
+  isOpen: boolean;
   client: ClientRecord | null;
 };
 
@@ -250,6 +257,14 @@ export default function UsersTab() {
   const [staffNotes, setStaffNotes] = useState<string>('');
   const [submitError, setSubmitError] = useState<string>('');
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
+  const [emailModalState, setEmailModalState] = useState<EmailModalState>({
+    isOpen: false,
+    client: null,
+  });
+  const [emailSubject, setEmailSubject] = useState<string>('');
+  const [emailMessage, setEmailMessage] = useState<string>('');
+  const [emailSubmitError, setEmailSubmitError] = useState<string>('');
+  const [isEmailSubmitting, setIsEmailSubmitting] = useState<boolean>(false);
 
   const fetchClients = useCallback(async (signal?: AbortSignal) => {
     setIsLoading(true);
@@ -365,6 +380,84 @@ export default function UsersTab() {
     });
     setStaffNotes('');
     setSubmitError('');
+  };
+
+  const openEmailModal = (client: ClientRecord) => {
+    setEmailModalState({ isOpen: true, client });
+    setEmailSubject('');
+    setEmailMessage('');
+    setEmailSubmitError('');
+    setIsEmailSubmitting(false);
+  };
+
+  const resetEmailComposer = () => {
+    setEmailModalState({ isOpen: false, client: null });
+    setEmailSubject('');
+    setEmailMessage('');
+    setEmailSubmitError('');
+    setIsEmailSubmitting(false);
+  };
+
+  const closeEmailModal = () => {
+    if (isEmailSubmitting) return;
+    resetEmailComposer();
+  };
+
+  const submitEmail = async () => {
+    const client = emailModalState.client;
+    const trimmedSubject = emailSubject.trim();
+    const trimmedMessage = emailMessage.trim();
+
+    if (!client) {
+      setEmailSubmitError('Select a client before sending.');
+      return;
+    }
+    if (!trimmedSubject || !richTextToPlainText(trimmedMessage)) {
+      setEmailSubmitError('Subject and message are required.');
+      return;
+    }
+
+    setEmailSubmitError('');
+    setIsEmailSubmitting(true);
+
+    try {
+      const token = getAuthToken();
+      if (!token) {
+        setEmailSubmitError('Missing auth token. Please sign in again.');
+        setIsEmailSubmitting(false);
+        return;
+      }
+
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/api/admin/account/client/send-email`,
+        {
+          method: 'POST',
+          headers: buildAuthHeaders(token),
+          body: JSON.stringify({
+            user_id: client.id,
+            subject: trimmedSubject,
+            message: trimmedMessage,
+          }),
+        }
+      );
+
+      if (!response.ok) {
+        throw await parseApiError(response);
+      }
+
+      resetEmailComposer();
+      success(`Email queued for ${client.name}.`, '', 6000);
+    } catch (requestError) {
+      handleServerErrors(requestError);
+      const message =
+        requestError && typeof requestError === 'object' && 'message' in requestError
+          ? String((requestError as { message?: unknown }).message ?? 'Unable to queue the email right now.')
+          : requestError instanceof Error
+            ? requestError.message
+            : 'Unable to queue the email right now.';
+      setEmailSubmitError(message);
+      setIsEmailSubmitting(false);
+    }
   };
 
   const closeActionModal = () => {
@@ -658,6 +751,16 @@ export default function UsersTab() {
                         <div className="flex flex-wrap items-center gap-2">
                           <button
                             type="button"
+                            onClick={() => openEmailModal(client)}
+                            disabled={client.email === '-'}
+                            className={`${ROW_ACTION_BUTTON_CLASS} inline-flex items-center gap-1 border-blue-300 text-blue-700 hover:bg-blue-50 disabled:cursor-not-allowed disabled:opacity-40`}
+                            title={client.email === '-' ? 'This client has no email address' : undefined}
+                          >
+                            <IconMail size={12} aria-hidden="true" />
+                            Email
+                          </button>
+                          <button
+                            type="button"
                             onClick={() => openActionModal(client, 'delete')}
                             className={`${ROW_ACTION_BUTTON_CLASS} border-red-300 text-red-700 hover:bg-red-50`}
                           >
@@ -683,6 +786,19 @@ export default function UsersTab() {
         onClose={closeActionModal}
         onSubmit={submitAction}
         onStaffNotesChange={setStaffNotes}
+      />
+      <ClientEmailModal
+        isOpen={emailModalState.isOpen}
+        clientName={emailModalState.client?.name ?? ''}
+        clientEmail={emailModalState.client?.email ?? ''}
+        subject={emailSubject}
+        message={emailMessage}
+        submitError={emailSubmitError}
+        isSubmitting={isEmailSubmitting}
+        onClose={closeEmailModal}
+        onSubmit={submitEmail}
+        onSubjectChange={setEmailSubject}
+        onMessageChange={setEmailMessage}
       />
     </div>
   );

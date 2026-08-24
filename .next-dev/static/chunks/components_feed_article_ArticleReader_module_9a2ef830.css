@@ -1106,7 +1106,7 @@
 @media (max-width: 640px) {
   .ArticleReader-module__lP8bda__hero {
     background-position: 56%;
-    min-height: 410px;
+    min-height: 0;
   }
 
   .ArticleReader-module__lP8bda__heroShade {
@@ -1118,7 +1118,9 @@
   }
 
   .ArticleReader-module__lP8bda__heroTitleRow {
-    gap: 16px;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 20px;
   }
 
   .ArticleReader-module__lP8bda__heroContent {
@@ -1157,7 +1159,10 @@
 
   .ArticleReader-module__lP8bda__heroContent h1 {
     letter-spacing: -.035em;
-    font-size: max(2rem, min(10vw, 3rem));
+    text-wrap: pretty;
+    max-width: none;
+    font-size: max(1.8rem, min(8.5vw, 2.35rem));
+    line-height: 1.12;
   }
 
   .ArticleReader-module__lP8bda__heroContent h1:before {
@@ -1195,31 +1200,64 @@
     height: 42px;
   }
 
-  .ArticleReader-module__lP8bda__heroMetaRow {
-    margin-top: 24px;
-    scrollbar-width: none;
-    border-left: 0;
-    border-right: 0;
-    width: auto;
-    margin-left: -22px;
-    margin-right: -22px;
-    padding-left: 22px;
-    padding-right: 22px;
-    overflow-x: auto;
+  .ArticleReader-module__lP8bda__heroActions {
+    align-self: flex-end;
+    gap: 10px;
   }
 
-  .ArticleReader-module__lP8bda__heroMetaRow::-webkit-scrollbar {
-    display: none;
+  .ArticleReader-module__lP8bda__heroMetaRow {
+    box-sizing: border-box;
+    grid-template-columns: minmax(0, 1.35fr) minmax(0, .92fr) minmax(0, .73fr);
+    align-items: end;
+    gap: 8px;
+    width: 100%;
+    margin-top: 22px;
+    padding: 0;
+    display: grid;
   }
 
   .ArticleReader-module__lP8bda__heroMetaItem {
-    flex: none;
-    padding-top: 11px;
-    padding-bottom: 11px;
+    white-space: normal;
+    min-width: 0;
+    padding: 0;
   }
 
   .ArticleReader-module__lP8bda__heroAuthor {
-    flex-basis: auto;
+    grid-column: auto;
+  }
+
+  .ArticleReader-module__lP8bda__heroAuthorLink {
+    gap: 6px;
+    max-width: 100%;
+  }
+
+  .ArticleReader-module__lP8bda__heroMetaItem strong {
+    font-size: 10px;
+    line-height: 1.3;
+  }
+
+  .ArticleReader-module__lP8bda__heroMetaLabel {
+    letter-spacing: .08em;
+    font-size: 8px;
+  }
+
+  .ArticleReader-module__lP8bda__heroAuthor .ArticleReader-module__lP8bda__authorAvatar {
+    flex-basis: 30px;
+    width: 30px;
+    height: 30px;
+  }
+
+  .ArticleReader-module__lP8bda__heroAuthorText small {
+    font-size: 8px;
+  }
+
+  .ArticleReader-module__lP8bda__heroReadTimeLabel {
+    gap: 4px;
+  }
+
+  .ArticleReader-module__lP8bda__heroReadTimeLabel svg {
+    width: 12px;
+    height: 12px;
   }
 
   .ArticleReader-module__lP8bda__contentShell {
@@ -1279,7 +1317,7 @@
   }
 
   .ArticleReader-module__lP8bda__skeletonHero {
-    min-height: 410px;
+    min-height: 470px;
   }
 
   .ArticleReader-module__lP8bda__skeletonInner {

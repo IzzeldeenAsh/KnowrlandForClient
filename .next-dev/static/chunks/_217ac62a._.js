@@ -2239,7 +2239,18 @@ function FeedSidebar(param) {
                                         fileName: "[project]/components/feed/FeedSidebar.tsx",
                                         lineNumber: 504,
                                         columnNumber: 13
-                                    }, this),
+                                    }, this)
+                                ]
+                            }, void 0, true, {
+                                fileName: "[project]/components/feed/FeedSidebar.tsx",
+                                lineNumber: 498,
+                                columnNumber: 9
+                            }, this),
+                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(DashboardSection, {
+                                title: copy.marketplace,
+                                icon: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$tabler$2f$icons$2d$react$2f$dist$2f$esm$2f$icons$2f$IconShoppingBag$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__IconShoppingBag$3e$__["IconShoppingBag"],
+                                compact: hideProfileCard,
+                                children: [
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(SidebarItem, {
                                         href: "".concat(dashboardBase, "/my-orders"),
                                         icon: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$tabler$2f$icons$2d$react$2f$dist$2f$esm$2f$icons$2f$IconShoppingBag$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__IconShoppingBag$3e$__["IconShoppingBag"],
@@ -2247,8 +2258,8 @@ function FeedSidebar(param) {
                                         compact: hideProfileCard
                                     }, void 0, false, {
                                         fileName: "[project]/components/feed/FeedSidebar.tsx",
-                                        lineNumber: 511,
-                                        columnNumber: 11
+                                        lineNumber: 515,
+                                        columnNumber: 9
                                     }, this),
                                     isProvider && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(SidebarItem, {
                                         href: "".concat(dashboardBase, "/sales"),
@@ -2257,8 +2268,8 @@ function FeedSidebar(param) {
                                         compact: hideProfileCard
                                     }, void 0, false, {
                                         fileName: "[project]/components/feed/FeedSidebar.tsx",
-                                        lineNumber: 512,
-                                        columnNumber: 26
+                                        lineNumber: 516,
+                                        columnNumber: 24
                                     }, this),
                                     (isInsighter || isCompany) && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(SidebarItem, {
                                         href: "".concat(dashboardBase, "/wallet"),
@@ -2267,14 +2278,14 @@ function FeedSidebar(param) {
                                         compact: hideProfileCard
                                     }, void 0, false, {
                                         fileName: "[project]/components/feed/FeedSidebar.tsx",
-                                        lineNumber: 514,
-                                        columnNumber: 13
+                                        lineNumber: 518,
+                                        columnNumber: 11
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/components/feed/FeedSidebar.tsx",
-                                lineNumber: 498,
-                                columnNumber: 9
+                                lineNumber: 514,
+                                columnNumber: 7
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(DashboardSection, {
                                 title: copy.settings,
@@ -2288,7 +2299,7 @@ function FeedSidebar(param) {
                                         compact: hideProfileCard
                                     }, void 0, false, {
                                         fileName: "[project]/components/feed/FeedSidebar.tsx",
-                                        lineNumber: 520,
+                                        lineNumber: 523,
                                         columnNumber: 9
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(SidebarItem, {
@@ -2298,7 +2309,7 @@ function FeedSidebar(param) {
                                         compact: hideProfileCard
                                     }, void 0, false, {
                                         fileName: "[project]/components/feed/FeedSidebar.tsx",
-                                        lineNumber: 526,
+                                        lineNumber: 529,
                                         columnNumber: 9
                                     }, this),
                                     (isInsighter || isCompany) && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(SidebarItem, {
@@ -2308,13 +2319,13 @@ function FeedSidebar(param) {
                                         compact: hideProfileCard
                                     }, void 0, false, {
                                         fileName: "[project]/components/feed/FeedSidebar.tsx",
-                                        lineNumber: 533,
+                                        lineNumber: 536,
                                         columnNumber: 11
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/components/feed/FeedSidebar.tsx",
-                                lineNumber: 519,
+                                lineNumber: 522,
                                 columnNumber: 7
                             }, this)
                         ]
@@ -2333,7 +2344,7 @@ function FeedSidebar(param) {
                 locale: locale
             }, void 0, false, {
                 fileName: "[project]/components/feed/FeedSidebar.tsx",
-                lineNumber: 543,
+                lineNumber: 546,
                 columnNumber: 7
             }, this)
         ]
@@ -8930,60 +8941,212 @@ __turbopack_context__.s([
 ]);
 var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/next/dist/compiled/react/jsx-dev-runtime.js [app-client] (ecmascript)");
 var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$tabler$2f$icons$2d$react$2f$dist$2f$esm$2f$icons$2f$IconListDetails$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__IconListDetails$3e$__ = __turbopack_context__.i("[project]/node_modules/@tabler/icons-react/dist/esm/icons/IconListDetails.mjs [app-client] (ecmascript) <export default as IconListDetails>");
+var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$tabler$2f$icons$2d$react$2f$dist$2f$esm$2f$icons$2f$IconX$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__IconX$3e$__ = __turbopack_context__.i("[project]/node_modules/@tabler/icons-react/dist/esm/icons/IconX.mjs [app-client] (ecmascript) <export default as IconX>");
 var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$client$2f$app$2d$dir$2f$link$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/next/dist/client/app-dir/link.js [app-client] (ecmascript)");
 var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$navigation$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/next/navigation.js [app-client] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/next/dist/compiled/react/index.js [app-client] (ecmascript)");
 ;
 var _s = __turbopack_context__.k.signature();
 'use client';
 ;
 ;
 ;
+;
+const STORAGE_KEY = 'floating-feed-button-position';
+const VIEWPORT_MARGIN = 12;
+const DRAG_THRESHOLD = 5;
 function FloatingFeedButton(param) {
     let { locale } = param;
     _s();
     const pathname = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$navigation$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["usePathname"])();
+    const buttonRef = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useRef"])(null);
+    const dragRef = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useRef"])(null);
+    const draggedRef = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useRef"])(false);
+    const [position, setPosition] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])(null);
+    const [isDragging, setIsDragging] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])(false);
+    const [isDismissed, setIsDismissed] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])(false);
     const normalizedPathname = pathname.replace(/\/+$/, '') || '/';
     const feedPath = "/".concat(locale);
     const isFeedPage = normalizedPathname === feedPath;
     const isPostDetailPage = normalizedPathname.startsWith("".concat(feedPath, "/post/"));
+    const isArabic = locale === 'ar';
+    const label = isArabic ? 'العودة إلى الموجز' : 'Back to Feed';
+    const dragLabel = isArabic ? 'اسحب لتغيير موضع زر العودة إلى الموجز' : 'Drag to reposition the Back to Feed button';
+    const clampPosition = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useCallback"])({
+        "FloatingFeedButton.useCallback[clampPosition]": (next)=>{
+            const button = buttonRef.current;
+            if (!button) return next;
+            return {
+                x: Math.min(Math.max(next.x, VIEWPORT_MARGIN), Math.max(VIEWPORT_MARGIN, window.innerWidth - button.offsetWidth - VIEWPORT_MARGIN)),
+                y: Math.min(Math.max(next.y, VIEWPORT_MARGIN), Math.max(VIEWPORT_MARGIN, window.innerHeight - button.offsetHeight - VIEWPORT_MARGIN))
+            };
+        }
+    }["FloatingFeedButton.useCallback[clampPosition]"], []);
+    (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useEffect"])({
+        "FloatingFeedButton.useEffect": ()=>{
+            const savedPosition = window.localStorage.getItem(STORAGE_KEY);
+            if (!savedPosition) return;
+            try {
+                const parsed = JSON.parse(savedPosition);
+                if (Number.isFinite(parsed.x) && Number.isFinite(parsed.y)) {
+                    setPosition(clampPosition(parsed));
+                }
+            } catch (e) {
+                window.localStorage.removeItem(STORAGE_KEY);
+            }
+        }
+    }["FloatingFeedButton.useEffect"], [
+        clampPosition
+    ]);
+    (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useEffect"])({
+        "FloatingFeedButton.useEffect": ()=>{
+            const keepInsideViewport = {
+                "FloatingFeedButton.useEffect.keepInsideViewport": ()=>{
+                    setPosition({
+                        "FloatingFeedButton.useEffect.keepInsideViewport": (current)=>current ? clampPosition(current) : current
+                    }["FloatingFeedButton.useEffect.keepInsideViewport"]);
+                }
+            }["FloatingFeedButton.useEffect.keepInsideViewport"];
+            window.addEventListener('resize', keepInsideViewport);
+            return ({
+                "FloatingFeedButton.useEffect": ()=>window.removeEventListener('resize', keepInsideViewport)
+            })["FloatingFeedButton.useEffect"];
+        }
+    }["FloatingFeedButton.useEffect"], [
+        clampPosition
+    ]);
+    const handlePointerDown = (event)=>{
+        if (event.pointerType === 'mouse' && event.button !== 0) return;
+        const rect = event.currentTarget.getBoundingClientRect();
+        dragRef.current = {
+            pointerId: event.pointerId,
+            startX: event.clientX,
+            startY: event.clientY,
+            originX: rect.left,
+            originY: rect.top
+        };
+        draggedRef.current = false;
+        event.currentTarget.setPointerCapture(event.pointerId);
+    };
+    const handlePointerMove = (event)=>{
+        const drag = dragRef.current;
+        if (!drag || drag.pointerId !== event.pointerId) return;
+        const deltaX = event.clientX - drag.startX;
+        const deltaY = event.clientY - drag.startY;
+        if (!draggedRef.current && Math.hypot(deltaX, deltaY) < DRAG_THRESHOLD) return;
+        draggedRef.current = true;
+        setIsDragging(true);
+        setPosition(clampPosition({
+            x: drag.originX + deltaX,
+            y: drag.originY + deltaY
+        }));
+        event.preventDefault();
+    };
+    const finishDrag = (event)=>{
+        var _dragRef_current;
+        if (((_dragRef_current = dragRef.current) === null || _dragRef_current === void 0 ? void 0 : _dragRef_current.pointerId) !== event.pointerId) return;
+        dragRef.current = null;
+        setIsDragging(false);
+        if (event.currentTarget.hasPointerCapture(event.pointerId)) {
+            event.currentTarget.releasePointerCapture(event.pointerId);
+        }
+        if (draggedRef.current) {
+            const rect = event.currentTarget.getBoundingClientRect();
+            const finalPosition = clampPosition({
+                x: rect.left,
+                y: rect.top
+            });
+            setPosition(finalPosition);
+            window.localStorage.setItem(STORAGE_KEY, JSON.stringify(finalPosition));
+        }
+    };
+    const positionStyle = position ? {
+        left: position.x,
+        top: position.y,
+        right: 'auto',
+        bottom: 'auto'
+    } : {};
     // The feed itself (including My Posts and Saved Posts) already provides its
     // navigation. On a post detail page this control competes with the floating
     // menu button, particularly on mobile.
-    if (isFeedPage || isPostDetailPage) return null;
-    const isArabic = locale === 'ar';
-    const label = isArabic ? 'العودة إلى الموجز' : 'Back to Feed';
-    return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$client$2f$app$2d$dir$2f$link$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"], {
-        href: feedPath,
-        "aria-label": label,
-        style: {
-            fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif'
-        },
-        className: "fixed bottom-[calc(var(--auth-banner-offset,0px)+1.5rem)] z-40 inline-flex min-h-12 items-center gap-2 rounded-full border border-[#FFB37A] bg-gradient-to-r from-[#FF8A3D] to-[#FF6B35] px-5 text-[13px] font-semibold text-white backdrop-blur-md transition duration-200 hover:-translate-y-0.5 hover:scale-[1.03] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FF6B35] focus-visible:ring-offset-2 active:translate-y-0 active:scale-100 ".concat(isArabic ? 'left-5 sm:left-7' : 'right-5 sm:right-7'),
+    if (isFeedPage || isPostDetailPage || isDismissed) return null;
+    return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+        ref: buttonRef,
+        onPointerDown: handlePointerDown,
+        onPointerMove: handlePointerMove,
+        onPointerUp: finishDrag,
+        onPointerCancel: finishDrag,
+        style: positionStyle,
+        className: "fixed bottom-[calc(var(--auth-banner-offset,0px)+1.5rem)] z-40 touch-none select-none ".concat(isDragging ? 'cursor-grabbing scale-[1.02] shadow-xl transition-none' : 'cursor-grab', " ").concat(isArabic ? 'left-5 sm:left-7' : 'right-5 sm:right-7'),
         children: [
-            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$tabler$2f$icons$2d$react$2f$dist$2f$esm$2f$icons$2f$IconListDetails$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__IconListDetails$3e$__["IconListDetails"], {
-                "aria-hidden": true,
-                className: "h-[18px] w-[18px]",
-                stroke: 2.1
-            }, void 0, false, {
+            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$client$2f$app$2d$dir$2f$link$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"], {
+                href: feedPath,
+                draggable: false,
+                "aria-label": label,
+                title: dragLabel,
+                onDragStart: (event)=>event.preventDefault(),
+                onClick: (event)=>{
+                    if (draggedRef.current) {
+                        event.preventDefault();
+                        draggedRef.current = false;
+                    }
+                },
+                style: {
+                    fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif'
+                },
+                className: "inline-flex min-h-12 items-center gap-2 rounded-full border border-[#FFB37A] bg-gradient-to-r from-[#FF8A3D] to-[#FF6B35] px-5 text-[13px] font-semibold text-white backdrop-blur-md transition duration-200 hover:-translate-y-0.5 hover:scale-[1.03] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FF6B35] focus-visible:ring-offset-2 active:translate-y-0 active:scale-100",
+                children: [
+                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$tabler$2f$icons$2d$react$2f$dist$2f$esm$2f$icons$2f$IconListDetails$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__IconListDetails$3e$__["IconListDetails"], {
+                        "aria-hidden": true,
+                        className: "h-[18px] w-[18px]",
+                        stroke: 2.1
+                    }, void 0, false, {
+                        fileName: "[project]/components/feed/FloatingFeedButton.tsx",
+                        lineNumber: 178,
+                        columnNumber: 9
+                    }, this),
+                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                        children: label
+                    }, void 0, false, {
+                        fileName: "[project]/components/feed/FloatingFeedButton.tsx",
+                        lineNumber: 179,
+                        columnNumber: 9
+                    }, this)
+                ]
+            }, void 0, true, {
                 fileName: "[project]/components/feed/FloatingFeedButton.tsx",
-                lineNumber: 38,
+                lineNumber: 160,
                 columnNumber: 7
             }, this),
-            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
-                children: label
+            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
+                type: "button",
+                "aria-label": isArabic ? 'إخفاء زر العودة إلى الموجز' : 'Hide Back to Feed button',
+                title: isArabic ? 'إخفاء' : 'Hide',
+                onPointerDown: (event)=>event.stopPropagation(),
+                onClick: ()=>setIsDismissed(true),
+                className: "absolute -top-2 z-10 flex h-6 w-6 cursor-pointer items-center justify-center rounded-full border border-slate-300 bg-white text-slate-600 shadow-md transition hover:scale-110 hover:border-slate-400 hover:text-slate-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FF6B35] focus-visible:ring-offset-1 ".concat(isArabic ? '-left-2' : '-right-2'),
+                children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$tabler$2f$icons$2d$react$2f$dist$2f$esm$2f$icons$2f$IconX$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__IconX$3e$__["IconX"], {
+                    "aria-hidden": true,
+                    className: "h-3.5 w-3.5",
+                    stroke: 2.4
+                }, void 0, false, {
+                    fileName: "[project]/components/feed/FloatingFeedButton.tsx",
+                    lineNumber: 191,
+                    columnNumber: 9
+                }, this)
             }, void 0, false, {
                 fileName: "[project]/components/feed/FloatingFeedButton.tsx",
-                lineNumber: 39,
+                lineNumber: 181,
                 columnNumber: 7
             }, this)
         ]
     }, void 0, true, {
         fileName: "[project]/components/feed/FloatingFeedButton.tsx",
-        lineNumber: 27,
+        lineNumber: 145,
         columnNumber: 5
     }, this);
 }
-_s(FloatingFeedButton, "xbyQPtUVMO7MNj7WjJlpdWqRcTo=", false, function() {
+_s(FloatingFeedButton, "VBzCDniFKR9oRaiZ+Yr5nzQsaCM=", false, function() {
     return [
         __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$navigation$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["usePathname"]
     ];
@@ -9004,18 +9167,34 @@ __turbopack_context__.s([
 ]);
 var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/next/dist/compiled/react/jsx-dev-runtime.js [app-client] (ecmascript)");
 var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$tabler$2f$icons$2d$react$2f$dist$2f$esm$2f$icons$2f$IconArrowUp$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__IconArrowUp$3e$__ = __turbopack_context__.i("[project]/node_modules/@tabler/icons-react/dist/esm/icons/IconArrowUp.mjs [app-client] (ecmascript) <export default as IconArrowUp>");
+var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$navigation$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/next/navigation.js [app-client] (ecmascript)");
 var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/next/dist/compiled/react/index.js [app-client] (ecmascript)");
 ;
 var _s = __turbopack_context__.k.signature();
 'use client';
 ;
 ;
+;
 function FloatingBackToTopButton(param) {
     let { locale } = param;
     _s();
     const [isVisible, setIsVisible] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])(false);
+    const [postsColumnCenter, setPostsColumnCenter] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])(null);
+    const pathname = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$navigation$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["usePathname"])();
+    const searchParams = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$navigation$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useSearchParams"])();
+    const normalizedPathname = pathname.replace(/\/$/, '') || '/';
+    const feedPath = "/".concat(locale);
+    const feedView = searchParams.get('view');
+    const isFeedTimeline = normalizedPathname === feedPath && !feedView;
+    const isMyPosts = normalizedPathname === feedPath && feedView === 'my-feeds';
+    const isPostPage = normalizedPathname.startsWith("".concat(feedPath, "/post/"));
+    const isAllowedPage = isFeedTimeline || isMyPosts || isPostPage;
     (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useEffect"])({
         "FloatingBackToTopButton.useEffect": ()=>{
+            if (!isAllowedPage) {
+                setIsVisible(false);
+                return;
+            }
             const updateVisibility = {
                 "FloatingBackToTopButton.useEffect.updateVisibility": ()=>setIsVisible(window.scrollY > 320)
             }["FloatingBackToTopButton.useEffect.updateVisibility"];
@@ -9027,8 +9206,45 @@ function FloatingBackToTopButton(param) {
                 "FloatingBackToTopButton.useEffect": ()=>window.removeEventListener('scroll', updateVisibility)
             })["FloatingBackToTopButton.useEffect"];
         }
-    }["FloatingBackToTopButton.useEffect"], []);
-    if (!isVisible) return null;
+    }["FloatingBackToTopButton.useEffect"], [
+        isAllowedPage
+    ]);
+    (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useEffect"])({
+        "FloatingBackToTopButton.useEffect": ()=>{
+            if (!isAllowedPage) {
+                setPostsColumnCenter(null);
+                return;
+            }
+            const postsColumn = document.querySelector('[data-feed-posts-column]');
+            if (!postsColumn) {
+                setPostsColumnCenter(null);
+                return;
+            }
+            const updatePosition = {
+                "FloatingBackToTopButton.useEffect.updatePosition": ()=>{
+                    const { left, width } = postsColumn.getBoundingClientRect();
+                    setPostsColumnCenter(left + width / 2);
+                }
+            }["FloatingBackToTopButton.useEffect.updatePosition"];
+            updatePosition();
+            window.addEventListener('resize', updatePosition, {
+                passive: true
+            });
+            const resizeObserver = new ResizeObserver(updatePosition);
+            resizeObserver.observe(postsColumn);
+            return ({
+                "FloatingBackToTopButton.useEffect": ()=>{
+                    window.removeEventListener('resize', updatePosition);
+                    resizeObserver.disconnect();
+                }
+            })["FloatingBackToTopButton.useEffect"];
+        }
+    }["FloatingBackToTopButton.useEffect"], [
+        isAllowedPage,
+        normalizedPathname,
+        feedView
+    ]);
+    if (!isAllowedPage || !isVisible) return null;
     const isArabic = locale === 'ar';
     const label = isArabic ? 'العودة إلى أعلى الصفحة' : 'Back to top';
     const scrollToTop = ()=>{
@@ -9043,23 +9259,31 @@ function FloatingBackToTopButton(param) {
         onClick: scrollToTop,
         "aria-label": label,
         title: label,
-        className: "fixed bottom-[calc(var(--auth-banner-offset,0px)+max(1rem,env(safe-area-inset-bottom)))] z-[1001] inline-flex h-10 w-10 items-center justify-center rounded-full border border-[#82B9FF]/55 bg-[#BFE5FF]/25 text-[#2378E8] shadow-lg shadow-blue-950/15 backdrop-blur-[1px] transition duration-200 hover:-translate-y-0.5 hover:scale-105 hover:border-[#82B9FF]/75 hover:bg-[#BFE5FF]/35 hover:text-[#1D4ED8] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2378E8] focus-visible:ring-offset-2 active:translate-y-0 active:scale-95 motion-reduce:transition-none ".concat(isArabic ? 'right-4' : 'left-4'),
+        style: postsColumnCenter === null ? undefined : {
+            left: postsColumnCenter
+        },
+        className: "fixed bottom-[calc(var(--auth-banner-offset,0px)+max(1rem,env(safe-area-inset-bottom)))] left-1/2 z-[1001] inline-flex h-10 w-10 -translate-x-1/2 items-center justify-center rounded-full border border-[#82B9FF]/55 bg-[#BFE5FF]/25 text-[#2378E8] shadow-lg shadow-blue-950/15 backdrop-blur-[1px] transition duration-200 hover:-translate-y-0.5 hover:scale-105 hover:border-[#82B9FF]/75 hover:bg-[#BFE5FF]/35 hover:text-[#1D4ED8] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2378E8] focus-visible:ring-offset-2 active:translate-y-0 active:scale-95 motion-reduce:transition-none",
         children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$tabler$2f$icons$2d$react$2f$dist$2f$esm$2f$icons$2f$IconArrowUp$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__IconArrowUp$3e$__["IconArrowUp"], {
             "aria-hidden": true,
             className: "h-[22px] w-[22px]",
             stroke: 2.2
         }, void 0, false, {
             fileName: "[project]/components/ui/FloatingBackToTopButton.tsx",
-            lineNumber: 41,
+            lineNumber: 86,
             columnNumber: 7
         }, this)
     }, void 0, false, {
         fileName: "[project]/components/ui/FloatingBackToTopButton.tsx",
-        lineNumber: 32,
+        lineNumber: 78,
         columnNumber: 5
     }, this);
 }
-_s(FloatingBackToTopButton, "J3yJOyGdBT4L7hs1p1XQYVGMdrY=");
+_s(FloatingBackToTopButton, "6+oyyK8dsn2PiXyJYTwlYcpJwt0=", false, function() {
+    return [
+        __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$navigation$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["usePathname"],
+        __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$navigation$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useSearchParams"]
+    ];
+});
 _c = FloatingBackToTopButton;
 var _c;
 __turbopack_context__.k.register(_c, "FloatingBackToTopButton");

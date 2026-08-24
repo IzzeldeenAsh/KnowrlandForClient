@@ -164,7 +164,7 @@ export default async function PostPage({ params }: PostPageProps) {
             </div>
           </aside>
 
-          <section className="min-w-0">
+          <section data-feed-posts-column className="min-w-0">
             <FeedMobileSearch locale={locale} />
 
             <div className="mt-4 flex min-h-[60px] items-center gap-3 rounded-lg border border-[#D9E3EF] bg-white px-4 sm:px-5">

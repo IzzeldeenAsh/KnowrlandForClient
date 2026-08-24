@@ -1,5 +1,6 @@
 'use client'
 
+import { Modal } from '@mantine/core'
 import { RichTextEditor } from '@mantine/tiptap'
 import LinkExtension from '@tiptap/extension-link'
 import Placeholder from '@tiptap/extension-placeholder'
@@ -20,11 +21,13 @@ import { useRouter } from 'next/navigation'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { useToast } from '@/components/toast/ToastContext'
 import { useUserProfile } from '@/components/ui/header/hooks/useUserProfile'
+import PublishAsSelector, { type PublishAuthorType } from '../PublishAsSelector'
 import {
   createSuggestTag,
   fetchIndustryTags,
   fetchLibraryKnowledgeById,
   getFeedDraft,
+  getFeedItem,
   publishArticle,
   saveArticleDraft,
   type FeedItem,
@@ -46,10 +49,13 @@ const copyByLocale = {
     loading: 'Loading…',
     publish: 'Publish',
     publishing: 'Publishing…',
+    saveChanges: 'Save changes',
+    savingChanges: 'Saving…',
     cover: 'Add a cover image',
     coverHint: 'Recommended 1920 × 1080 · JPG, PNG or WebP · 5 MB max',
     replaceCover: 'Replace cover image',
     removeCover: 'Remove cover',
+    coverLocked: 'The published cover image cannot be changed.',
     title: 'Title',
     titlePlaceholder: 'Title',
     bodyPlaceholder: 'Write here. Share the expertise only you can bring…',
@@ -75,8 +81,10 @@ const copyByLocale = {
     largeCover: 'The cover image must be 5 MB or smaller.',
     smallCover: 'The cover image must be at least 552 × 276 pixels.',
     published: 'Your White Paper has been published.',
+    updated: 'Your White Paper has been updated.',
     loadFailed: 'Unable to load your White Paper draft.',
     draftSavedRedirecting: 'Draft saved. Taking you to publishing…',
+    changesSavedRedirecting: 'Changes saved. Taking you to publishing…',
     newKnowledgeAttached: 'Your new knowledge item has been attached.',
     newKnowledgeMissing: 'We could not find the item you just published. Try adding it from your library.',
     existingPost: 'You already have a post draft in progress.',
@@ -84,16 +92,21 @@ const copyByLocale = {
     returnToFeed: 'Return to feed',
     accessTitle: 'White Paper publishing is available to Insighters.',
     accessBody: 'Sign in with an Insighter or company account to write a White Paper.',
+    publishAsTitle: 'Publish as',
+    backToEditing: 'Back to editing',
   },
   ar: {
     individualArticle: 'ورقة بيضاء فردية',
     loading: 'جارٍ التحميل…',
     publish: 'نشر',
     publishing: 'جارٍ النشر…',
+    saveChanges: 'حفظ التعديلات',
+    savingChanges: 'جارٍ الحفظ…',
     cover: 'أضف صورة غلاف',
     coverHint: 'المقاس المقترح 1920 × 1080 · JPG أو PNG أو WebP · بحد أقصى 5 م.ب',
     replaceCover: 'استبدال صورة الغلاف',
     removeCover: 'إزالة الغلاف',
+    coverLocked: 'لا يمكن تغيير صورة غلاف الورقة المنشورة.',
     title: 'العنوان',
     titlePlaceholder: 'العنوان',
     bodyPlaceholder: 'اكتب هنا وشارك الخبرة التي تميزك…',
@@ -119,8 +132,10 @@ const copyByLocale = {
     largeCover: 'يجب ألا يزيد حجم صورة الغلاف على 5 ميجابايت.',
     smallCover: 'يجب ألا تقل أبعاد صورة الغلاف عن 552 × 276 بكسل.',
     published: 'تم نشر ورقتك البيضاء.',
+    updated: 'تم تحديث ورقتك البيضاء.',
     loadFailed: 'تعذر تحميل مسودة الورقة البيضاء.',
     draftSavedRedirecting: 'تم حفظ المسودة. سيتم نقلك إلى النشر…',
+    changesSavedRedirecting: 'تم حفظ التعديلات. سيتم نقلك إلى النشر…',
     newKnowledgeAttached: 'تم إرفاق عنصر المعرفة الجديد.',
     newKnowledgeMissing: 'تعذر العثور على العنصر الذي نشرته للتو. حاول إضافته من مكتبتك.',
     existingPost: 'لديك مسودة منشور قيد التحرير.',
@@ -128,6 +143,8 @@ const copyByLocale = {
     returnToFeed: 'العودة إلى الخلاصة',
     accessTitle: 'نشر الأوراق البيضاء متاح للمستشارين.',
     accessBody: 'سجّل الدخول بحساب مستشار أو شركة لكتابة ورقة بيضاء.',
+    publishAsTitle: 'النشر باسم',
+    backToEditing: 'العودة إلى التحرير',
   },
 } as const
 
@@ -167,6 +184,7 @@ export default function ArticleEditor({ locale }: ArticleEditorProps) {
   const coverObjectUrlRef = useRef<string | null>(null)
 
   const [draftUuid, setDraftUuid] = useState<string | null>(null)
+  const [isEditingPublished, setIsEditingPublished] = useState(false)
   const [blockingDraft, setBlockingDraft] = useState<FeedItem | null>(null)
   const [title, setTitle] = useState('')
   const [body, setBody] = useState('')
@@ -179,6 +197,8 @@ export default function ArticleEditor({ locale }: ArticleEditorProps) {
   const [removeCover, setRemoveCover] = useState(false)
   const [isLoading, setIsLoading] = useState(true)
   const [isPublishing, setIsPublishing] = useState(false)
+  const [publishAsOpened, setPublishAsOpened] = useState(false)
+  const [authorType, setAuthorType] = useState<PublishAuthorType | null>(null)
   const [industryModalOpened, setIndustryModalOpened] = useState(false)
   const [libraryDrawerOpened, setLibraryDrawerOpened] = useState(false)
   const [tagsOpened, setTagsOpened] = useState(false)
@@ -186,6 +206,11 @@ export default function ArticleEditor({ locale }: ArticleEditorProps) {
   const [isAddingTag, setIsAddingTag] = useState(false)
 
   const canPublish = !!user && roles.some((role) => ['insighter', 'company', 'company-insighter'].includes(role))
+  const companyName = user?.company?.legal_name?.trim() || ''
+  const canChoosePublisher =
+    !isEditingPublished &&
+    !!companyName &&
+    roles.some((role) => role === 'company' || role === 'company-insighter')
 
   const editor = useEditor({
     immediatelyRender: false,
@@ -212,7 +237,12 @@ export default function ArticleEditor({ locale }: ArticleEditorProps) {
     }
 
     const controller = new AbortController()
-    getFeedDraft(locale, controller.signal)
+    const editUuid = new URLSearchParams(window.location.search).get('edit')
+    const loadItem = editUuid
+      ? getFeedItem(editUuid, locale)
+      : getFeedDraft(locale, controller.signal)
+
+    loadItem
       .then((draft) => {
         if (!draft) return
         if (draft.content_type !== 'article') {
@@ -221,6 +251,7 @@ export default function ArticleEditor({ locale }: ArticleEditorProps) {
         }
 
         setDraftUuid(draft.uuid)
+        setIsEditingPublished(draft.status === 'published')
         setTitle(draft.title ?? '')
         setBody(draft.body ?? '')
         setIndustry(draft.industry ? { id: draft.industry.id, name: draft.industry.name } : null)
@@ -282,18 +313,32 @@ export default function ArticleEditor({ locale }: ArticleEditorProps) {
     return true
   }
 
-  const handlePublish = async () => {
-    if (isPublishing || !validateForPublish()) return
+  const handlePublish = async (selectedAuthorType?: PublishAuthorType) => {
+    if (isPublishing) return
     setIsPublishing(true)
     try {
-      await publishArticle(payload, locale, draftUuid ?? undefined)
-      toast.success(copy.published)
+      await publishArticle(
+        { ...payload, authorType: selectedAuthorType },
+        locale,
+        draftUuid ?? undefined,
+      )
+      toast.success(isEditingPublished ? copy.updated : copy.published)
+      setPublishAsOpened(false)
       router.push(`/${locale}?view=my-feeds`)
     } catch (error) {
       toast.error(error instanceof Error ? error.message : copy.loadFailed)
     } finally {
       setIsPublishing(false)
     }
+  }
+
+  const requestPublish = () => {
+    if (isPublishing || !validateForPublish()) return
+    if (canChoosePublisher) {
+      setPublishAsOpened(true)
+      return
+    }
+    void handlePublish(isEditingPublished ? undefined : 'insighter')
   }
 
   // Empty-library CTA: save the article as a draft, then head to the knowledge
@@ -307,15 +352,17 @@ export default function ArticleEditor({ locale }: ArticleEditorProps) {
     }
     setLibraryDrawerOpened(false)
     try {
-      const uuid = await saveArticleDraft(payload, locale, draftUuid ?? undefined)
+      const uuid = isEditingPublished
+        ? await publishArticle(payload, locale, draftUuid ?? undefined)
+        : await saveArticleDraft(payload, locale, draftUuid ?? undefined)
       setDraftUuid(uuid)
-      toast.success(copy.draftSavedRedirecting)
+      toast.success(isEditingPublished ? copy.changesSavedRedirecting : copy.draftSavedRedirecting)
     } catch (error) {
       toast.error(error instanceof Error ? error.message : copy.loadFailed)
       return
     }
 
-    const returnUrl = `${window.location.origin}${window.location.pathname}`
+    const returnUrl = `${window.location.origin}${window.location.pathname}${window.location.search}`
     window.location.href =
       `${process.env.NEXT_PUBLIC_DASHBOARD_URL}/app/add-knowledge/stepper` +
       `?return_url=${encodeURIComponent(returnUrl)}`
@@ -365,6 +412,7 @@ export default function ArticleEditor({ locale }: ArticleEditorProps) {
   }, [isAuthResolved, canPublish, locale, copy, toast, router])
 
   const handleCoverChange = async (file: File | undefined) => {
+    if (isEditingPublished) return
     if (!file) return
     if (!['image/jpeg', 'image/png', 'image/webp'].includes(file.type)) {
       toast.error(copy.wrongCover)
@@ -469,28 +517,37 @@ export default function ArticleEditor({ locale }: ArticleEditorProps) {
             </div>
           </div>
 
-          <button type="button" onClick={() => void handlePublish()} disabled={isPublishing} className="inline-flex min-h-10 items-center rounded-full bg-[#2378E8] px-5 text-[13px] font-medium text-white hover:bg-[#1769C2] disabled:opacity-55">
-            {isPublishing && <IconLoader2 className="me-2 h-4 w-4 animate-spin" />}{isPublishing ? copy.publishing : copy.publish}
+          <button type="button" onClick={requestPublish} disabled={isPublishing} className="inline-flex min-h-10 items-center rounded-full bg-[#2378E8] px-5 text-[13px] font-medium text-white hover:bg-[#1769C2] disabled:opacity-55">
+            {isPublishing && <IconLoader2 className="me-2 h-4 w-4 animate-spin" />}
+            {isPublishing
+              ? isEditingPublished ? copy.savingChanges : copy.publishing
+              : isEditingPublished ? copy.saveChanges : copy.publish}
           </button>
         </div>
       </div>
 
       <main className="mx-auto grid max-w-[1180px] gap-7 px-4 py-8 lg:grid-cols-[minmax(0,1fr)_300px] lg:px-8 lg:py-10">
           <section className="overflow-hidden rounded-xl border border-[#DCE4EF] bg-white shadow-[0_14px_38px_rgba(29,48,75,0.06)]">
-            <input ref={coverInputRef} type="file" accept="image/jpeg,image/png,image/webp" className="hidden" onChange={(event) => void handleCoverChange(event.currentTarget.files?.[0])} />
+            <input ref={coverInputRef} type="file" accept="image/jpeg,image/png,image/webp" disabled={isEditingPublished} className="hidden" onChange={(event) => void handleCoverChange(event.currentTarget.files?.[0])} />
             {coverPreview ? (
               <div className="group relative h-[clamp(150px,20vw,240px)] overflow-hidden bg-[#E9EEF5]">
                 <img src={coverPreview} alt="" className="h-full w-full object-cover" />
-                <div className="absolute inset-x-0 bottom-0 flex justify-end gap-2 bg-gradient-to-t from-black/65 to-transparent p-4 pt-16 opacity-100 sm:opacity-0 sm:transition-opacity sm:group-hover:opacity-100">
-                  <button type="button" onClick={() => coverInputRef.current?.click()} className="rounded-full bg-white px-4 py-2 text-xs font-medium text-[#1E2A3D]">{copy.replaceCover}</button>
-                  <button type="button" onClick={() => { setCoverFile(null); setCoverPreview(null); setRemoveCover(true) }} className="rounded-full bg-white/90 px-4 py-2 text-xs font-medium text-[#A9322B]">{copy.removeCover}</button>
-                </div>
+                {isEditingPublished ? (
+                  <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/70 to-transparent p-4 pt-14 text-end text-xs font-medium text-white">
+                    {copy.coverLocked}
+                  </div>
+                ) : (
+                  <div className="absolute inset-x-0 bottom-0 flex justify-end gap-2 bg-gradient-to-t from-black/65 to-transparent p-4 pt-16 opacity-100 sm:opacity-0 sm:transition-opacity sm:group-hover:opacity-100">
+                    <button type="button" onClick={() => coverInputRef.current?.click()} className="rounded-full bg-white px-4 py-2 text-xs font-medium text-[#1E2A3D]">{copy.replaceCover}</button>
+                    <button type="button" onClick={() => { setCoverFile(null); setCoverPreview(null); setRemoveCover(true) }} className="rounded-full bg-white/90 px-4 py-2 text-xs font-medium text-[#A9322B]">{copy.removeCover}</button>
+                  </div>
+                )}
               </div>
             ) : (
-              <button type="button" onClick={() => coverInputRef.current?.click()} className="flex min-h-[174px] w-full flex-col items-center justify-center border-b border-dashed border-[#CBD7E5] bg-[#F8FAFC] px-6 text-center transition-colors hover:bg-[#F2F6FA]">
+              <button type="button" disabled={isEditingPublished} onClick={() => coverInputRef.current?.click()} className="flex min-h-[174px] w-full flex-col items-center justify-center border-b border-dashed border-[#CBD7E5] bg-[#F8FAFC] px-6 text-center transition-colors hover:bg-[#F2F6FA] disabled:cursor-not-allowed disabled:hover:bg-[#F8FAFC]">
                 <span className="flex h-11 w-11 items-center justify-center rounded-full bg-white text-[#2378E8] shadow-sm"><IconPhoto className="h-5 w-5" /></span>
-                <span className="mt-3 text-sm font-medium text-[#26364C]">{copy.cover}</span>
-                <span className="mt-1 text-xs text-[#8291A5]">{copy.coverHint}</span>
+                <span className="mt-3 text-sm font-medium text-[#26364C]">{isEditingPublished ? copy.coverLocked : copy.cover}</span>
+                {!isEditingPublished && <span className="mt-1 text-xs text-[#8291A5]">{copy.coverHint}</span>}
               </button>
             )}
 
@@ -561,6 +618,70 @@ export default function ArticleEditor({ locale }: ArticleEditorProps) {
 
           </aside>
       </main>
+
+      <Modal
+        opened={publishAsOpened}
+        onClose={() => !isPublishing && setPublishAsOpened(false)}
+        size={680}
+        radius={12}
+        centered
+        zIndex={300}
+        withCloseButton={false}
+        aria-labelledby="article-publish-as-title"
+        styles={{
+          content: { border: '1px solid #DCE4EF', boxShadow: '0 24px 70px rgba(20, 39, 68, 0.18)' },
+          body: { padding: 24 },
+        }}
+      >
+        <div className="flex items-start justify-between gap-4">
+          <div>
+            <h2 id="article-publish-as-title" className="text-[21px] font-bold tracking-[-0.015em] text-[#101827]">
+              {copy.publishAsTitle}
+            </h2>
+          </div>
+          <button
+            type="button"
+            aria-label={copy.backToEditing}
+            onClick={() => setPublishAsOpened(false)}
+            disabled={isPublishing}
+            className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-[#6B7B91] transition-colors hover:bg-[#F1F5F9] hover:text-[#172236] disabled:opacity-50"
+          >
+            <IconX className="h-5 w-5" />
+          </button>
+        </div>
+
+        <div className="mt-5">
+          <PublishAsSelector
+            locale={locale}
+            companyName={companyName}
+            companyLogo={user?.company?.logo}
+            insighterName={user?.name || initials}
+            insighterPhoto={user?.profile_photo_url}
+            value={authorType}
+            onChange={setAuthorType}
+          />
+        </div>
+
+        <div className="mt-6 flex items-center justify-end gap-3 border-t border-[#E8EDF3] pt-4">
+          <button
+            type="button"
+            onClick={() => setPublishAsOpened(false)}
+            disabled={isPublishing}
+            className="min-h-10 rounded-full px-4 text-[13px] font-medium text-[#64758C] hover:bg-[#F2F5F8] disabled:opacity-50"
+          >
+            {copy.backToEditing}
+          </button>
+          <button
+            type="button"
+            onClick={() => void handlePublish(authorType ?? undefined)}
+            disabled={isPublishing || authorType === null}
+            className="inline-flex min-h-10 items-center rounded-full bg-[#2378E8] px-6 text-[13px] font-medium text-white hover:bg-[#1769C2] disabled:cursor-not-allowed disabled:bg-[#9BBCE7]"
+          >
+            {isPublishing && <IconLoader2 className="me-2 h-4 w-4 animate-spin" />}
+            {isPublishing ? copy.publishing : copy.publish}
+          </button>
+        </div>
+      </Modal>
 
       <IndustrySelectModal locale={locale} opened={industryModalOpened} selectedId={industry?.id ?? null} onClose={() => setIndustryModalOpened(false)} onSelect={(option) => { if (option.id !== industry?.id) { setSelectedTags([]); setIndustryTags([]) }; setIndustry(option); setIndustryModalOpened(false) }} />
       <KnowledgeLibraryDrawer locale={locale} opened={libraryDrawerOpened} selected={relatedInsights} onClose={() => setLibraryDrawerOpened(false)} onConfirm={(items) => { setRelatedInsights(items); setLibraryDrawerOpened(false) }} onPublishNew={() => { void handlePublishNewKnowledge() }} />

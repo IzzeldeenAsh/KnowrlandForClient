@@ -83,7 +83,9 @@ export interface FeedItemInsighter {
   profile_photo_url: string | null
   roles: string[]
   country: { id: number; name: string; flag: string } | null
-  company: { uuid: string; legal_name?: string; name?: string } | null
+  has_meet_service?: boolean
+  has_request_service?: boolean
+  company: { uuid: string; legal_name?: string; name?: string; logo?: string | null } | null
 }
 
 export interface FeedItem {
@@ -100,6 +102,7 @@ export interface FeedItem {
   status_label: string
   language: 'english' | 'arabic'
   published_at: string | null
+  author_profile_type?: 'company' | 'insighter' | null
   metadata: Record<string, unknown> | unknown[] | null
   insighter: FeedItemInsighter | null
   tags: FeedTag[]
@@ -254,6 +257,7 @@ export interface PublishPostPayload {
   industryId: number
   tags: number[]
   relatedInsights: number[]
+  authorType?: 'company' | 'insighter'
 }
 
 export interface ImageMediaEntry {
@@ -273,6 +277,7 @@ export interface ArticlePayload {
   relatedInsights: number[]
   coverImage?: File | null
   removeCover?: boolean
+  authorType?: 'company' | 'insighter'
 }
 
 // ---------- Helpers ----------
@@ -788,6 +793,7 @@ async function saveVideoPost(
       industry_id: payload.industryId,
       tags: payload.tags,
       related_insights: payload.relatedInsights,
+      ...(status === 'published' && payload.authorType ? { author_type: payload.authorType } : {}),
     }),
   })
 
@@ -826,6 +832,7 @@ async function saveImageTextPost(
     status,
     tags: payload.tags,
     related_insights: payload.relatedInsights,
+    ...(status === 'published' && payload.authorType ? { author_type: payload.authorType } : {}),
   }
 
   if (uuid) {
@@ -855,6 +862,9 @@ async function saveImageTextPost(
   formData.append('body', payload.body)
   formData.append('industry_id', String(payload.industryId))
   formData.append('status', status)
+  if (status === 'published' && payload.authorType) {
+    formData.append('author_type', payload.authorType)
+  }
   if (!uuid) {
     payload.tags.forEach((tagId, index) => formData.append(`tags[${index}]`, String(tagId)))
     payload.relatedInsights.forEach((knowledgeId, index) =>
@@ -918,6 +928,7 @@ async function saveArticle(
     tags: payload.tags,
     related_insights: payload.relatedInsights,
     remove_cover: payload.removeCover === true,
+    ...(status === 'published' && payload.authorType ? { author_type: payload.authorType } : {}),
   }
 
   if (uuid) {
@@ -958,7 +969,10 @@ async function saveArticle(
       const publishResponse = await fetch(getApiUrl(`/api/insighter/feed/article/${uuid}`), {
         method: 'PUT',
         headers: { ...authHeaders(locale), 'Content-Type': 'application/json' },
-        body: JSON.stringify({ status: 'published' }),
+        body: JSON.stringify({
+          status: 'published',
+          ...(payload.authorType ? { author_type: payload.authorType } : {}),
+        }),
       })
 
       if (!publishResponse.ok) {
@@ -973,6 +987,9 @@ async function saveArticle(
   formData.append('title', payload.title)
   formData.append('body', payload.body)
   formData.append('status', status)
+  if (status === 'published' && payload.authorType) {
+    formData.append('author_type', payload.authorType)
+  }
   if (payload.industryId !== null) {
     formData.append('industry_id', String(payload.industryId))
   }

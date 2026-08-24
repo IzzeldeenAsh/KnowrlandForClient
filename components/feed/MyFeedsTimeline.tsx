@@ -8,6 +8,7 @@ import {
   IconChevronLeft,
   IconChevronRight,
   IconDots,
+  IconEdit,
   IconFileDescription,
   IconLoader2,
   IconPhoto,
@@ -19,6 +20,7 @@ import {
 import { formatDistanceToNow, isValid } from 'date-fns'
 import { arSA, enUS } from 'date-fns/locale'
 import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 import { Fragment, useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import '@mux/mux-player'
 import KnowledgeTypeIcon from '@/components/icons/KnowledgeTypeIcon'
@@ -37,12 +39,14 @@ import {
 import { isFirstWordArabic } from '@/app/utils/textUtils'
 import {
   deleteFeedItem,
+  getFeedItem,
   getMyFeeds,
   setCommunityFeedItemTracked,
   type FeedItem,
   type FeedItemMedia,
   type FeedItemRelatedInsight,
 } from '@/services/feed.service'
+import PostModal, { type PostModalMode } from '@/components/feed/post/PostModal'
 
 type MyFeedsTimelineProps = {
   locale: string
@@ -64,6 +68,9 @@ const copyByLocale = {
     viewInsight: 'View',
     openingInsight: 'Opening…',
     delete: 'Delete post',
+    edit: 'Edit post',
+    editArticle: 'Edit White Paper',
+    editFailed: 'Unable to open this post for editing.',
     deleteTitle: 'Delete this post?',
     deleteDescription: 'This permanently removes the post and its uploaded media.',
     cancel: 'Cancel',
@@ -90,6 +97,7 @@ const copyByLocale = {
     trackTooltip: 'Track this post to see more content like it in your feed.',
     untrackTooltip: 'Untrack this post to stop seeing more content like it in your feed.',
     ownPostTracking: 'You cannot track your own post.',
+    by: 'By',
   },
   ar: {
     title: 'منشوراتي',
@@ -106,6 +114,9 @@ const copyByLocale = {
     viewInsight: 'عرض',
     openingInsight: 'جارٍ الفتح…',
     delete: 'حذف المنشور',
+    edit: 'تعديل المنشور',
+    editArticle: 'تعديل الورقة البيضاء',
+    editFailed: 'تعذر فتح المنشور للتعديل.',
     deleteTitle: 'حذف هذا المنشور؟',
     deleteDescription: 'سيؤدي هذا إلى حذف المنشور والوسائط المرفوعة نهائياً.',
     cancel: 'إلغاء',
@@ -132,6 +143,7 @@ const copyByLocale = {
     trackTooltip: 'تتبّع هذا المنشور لرؤية المزيد من المحتوى المشابه له في موجزك.',
     untrackTooltip: 'ألغِ تتبّع هذا المنشور للتوقف عن رؤية المزيد من المحتوى المشابه له في موجزك.',
     ownPostTracking: 'لا يمكنك تتبّع منشورك الخاص.',
+    by: 'بواسطة',
   },
 } as const
 
@@ -875,12 +887,14 @@ export function FeedCard({
   item,
   locale,
   onDelete,
+  onEdit,
   onSaveChange,
   articleAccess = 'owner',
 }: {
   item: FeedItem
   locale: string
   onDelete?: (item: FeedItem) => void
+  onEdit?: (item: FeedItem) => void
   onSaveChange?: (item: FeedItem, isSaved: boolean) => void
   articleAccess?: 'community' | 'owner'
 }) {
@@ -921,11 +935,30 @@ export function FeedCard({
         .join('')
         .toUpperCase()
     : ''
+  const isPublishedAsCompany = item.author_profile_type === 'company' && Boolean(insighter?.company)
+  const publisherName = isPublishedAsCompany
+    ? insighter?.company?.legal_name || insighter?.company?.name || insighter?.name || ''
+    : insighter?.name || ''
+  const publisherAvatar = isPublishedAsCompany
+    ? insighter?.company?.logo
+    : insighter?.profile_photo_url
+  const publisherInitials = publisherName
+    .split(' ')
+    .filter(Boolean)
+    .slice(0, 2)
+    .map((part) => part[0])
+    .join('')
+    .toUpperCase()
+  const publisherHref = isPublishedAsCompany
+    ? `/${locale}/profile/${insighter?.company?.uuid}`
+    : `/${locale}/profile/${insighter?.uuid}?entity=insighter`
 
   // Community-feed engagement actions (Meet / Request Service / Share) are only
   // meaningful when viewing someone else's published post in the public feed.
   // `showEngagementActions` is derived above (near the media flags).
   const isOwnPost = Boolean(user?.uuid && insighter && user.uuid === insighter.uuid)
+  const canMeet = insighter?.has_meet_service === true
+  const canRequestService = insighter?.has_request_service === true
   const meetHref = insighter
     ? `/${locale}/profile/${insighter.uuid}?entity=insighter&tab=meet`
     : ''
@@ -972,28 +1005,49 @@ export function FeedCard({
         <div className={`min-w-0 flex-1 ${articleAccess === 'community' ? 'pe-[76px] sm:pe-0' : ''}`}>
           {insighter && (
             <div className="flex min-w-0 items-center gap-3">
-              <div className="h-10 w-10 shrink-0 overflow-hidden rounded-full bg-[#E7F0FE]">
-                {insighter.profile_photo_url ? (
+              <div className="relative h-10 w-10 shrink-0">
+                <div className="h-10 w-10 overflow-hidden rounded-full bg-[#E7F0FE]">
+                {publisherAvatar ? (
                   <img
-                    src={insighter.profile_photo_url}
-                    alt={insighter.name}
-                    className="h-full w-full object-cover"
+                    src={publisherAvatar}
+                    alt={publisherName}
+                    className={`h-full w-full ${isPublishedAsCompany ? 'object-contain p-1' : 'object-cover object-top'}`}
                   />
                 ) : (
                   <div className="flex h-full w-full items-center justify-center text-[13px] font-bold text-[#2378E8]">
-                    {initials || 'I'}
+                    {publisherInitials || 'I'}
+                  </div>
+                )}
+                </div>
+                {isPublishedAsCompany && (
+                  <div className="absolute -bottom-1 -end-1 h-[19px] w-[19px] overflow-hidden rounded-full border-2 border-white bg-[#E7F0FE]">
+                    {insighter.profile_photo_url ? (
+                      <img src={insighter.profile_photo_url} alt={insighter.name} className="h-full w-full object-cover object-top" />
+                    ) : (
+                      <span className="flex h-full w-full items-center justify-center text-[6px] font-bold text-[#2378E8]">{initials || 'I'}</span>
+                    )}
                   </div>
                 )}
               </div>
               <div className="min-w-0">
                 <Link
-                  href={`/${locale}/profile/${insighter.uuid}?entity=insighter`}
+                  href={publisherHref}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="block truncate text-[14px] font-semibold text-[#101724] transition-colors hover:text-[#2378E8] hover:underline focus-visible:rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2378E8] focus-visible:ring-offset-1"
                 >
-                  {insighter.name}
+                  {publisherName}
                 </Link>
+                {isPublishedAsCompany && (
+                  <Link
+                    href={`/${locale}/profile/${insighter.uuid}?entity=insighter`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="block truncate text-[11px] text-[#7A8BA4] hover:text-[#2378E8] hover:underline"
+                  >
+                    {copy.by} {insighter.name}
+                  </Link>
+                )}
                 <div className="flex min-w-0 flex-col items-start gap-y-0.5 text-[12px] text-[#7A8BA4] sm:flex-row sm:items-center sm:gap-x-1.5 sm:text-[12.5px]">
                   {item.industry && (
                     <Link
@@ -1020,7 +1074,7 @@ export function FeedCard({
           )}
         </div>
 
-        {(onDelete || articleAccess === 'community') && (
+        {(onDelete || onEdit || articleAccess === 'community') && (
           <div className={`flex shrink-0 items-center gap-2 ${articleAccess === 'community' ? 'absolute end-4 top-4 sm:static' : ''}`}>
             {articleAccess === 'community' && (
               <Tooltip
@@ -1051,13 +1105,13 @@ export function FeedCard({
               </Tooltip>
             )}
 
-            {onDelete && (
+            {(onDelete || onEdit) && (
               <span className={`inline-block rounded-full px-2.5 py-1 text-[11px] font-semibold ${statusTone}`}>
                 {item.status_label}
               </span>
             )}
 
-            {onDelete && (
+            {(onDelete || onEdit) && (
               <Menu shadow="md" width={170} position={isArabic ? 'bottom-start' : 'bottom-end'}>
                 <Menu.Target>
                   <button
@@ -1069,13 +1123,23 @@ export function FeedCard({
                   </button>
                 </Menu.Target>
                 <Menu.Dropdown>
-                  <Menu.Item
-                    color="red"
-                    leftSection={<IconTrash aria-hidden className="h-4 w-4" stroke={1.8} />}
-                    onClick={() => onDelete(item)}
-                  >
-                    {copy.delete}
-                  </Menu.Item>
+                  {onEdit && (
+                    <Menu.Item
+                      leftSection={<IconEdit aria-hidden className="h-4 w-4" stroke={1.8} />}
+                      onClick={() => onEdit(item)}
+                    >
+                      {isArticle ? copy.editArticle : copy.edit}
+                    </Menu.Item>
+                  )}
+                  {onDelete && (
+                    <Menu.Item
+                      color="red"
+                      leftSection={<IconTrash aria-hidden className="h-4 w-4" stroke={1.8} />}
+                      onClick={() => onDelete(item)}
+                    >
+                      {copy.delete}
+                    </Menu.Item>
+                  )}
                 </Menu.Dropdown>
               </Menu>
             )}
@@ -1226,7 +1290,7 @@ export function FeedCard({
           className="mt-4 flex min-w-0 items-center justify-around pt-2"
           dir={isArabic ? 'rtl' : 'ltr'}
         >
-          {!isOwnPost && (
+          {!isOwnPost && canMeet && (
             <Link
               href={meetHref}
               target="_blank"
@@ -1238,7 +1302,7 @@ export function FeedCard({
             </Link>
           )}
 
-          {!isOwnPost && (
+          {!isOwnPost && canRequestService && (
             <Link
               href={requestServiceHref}
               className="inline-flex min-w-0 flex-1 items-center justify-center gap-1 rounded-md px-1 py-2.5 text-[12px] font-medium text-[#5A6B85] transition-colors hover:bg-[#F5F8FC] hover:text-[#101724] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2378E8] sm:gap-2 sm:px-2 sm:text-[14px]"
@@ -1278,6 +1342,7 @@ export default function MyFeedsTimeline({ locale }: MyFeedsTimelineProps) {
   const isArabic = locale === 'ar'
   const copy = copyByLocale[isArabic ? 'ar' : 'en']
   const toast = useToast()
+  const router = useRouter()
   const { user, roles, isAuthResolved } = useUserProfile()
   const [items, setItems] = useState<FeedItem[]>([])
   const [page, setPage] = useState(1)
@@ -1287,6 +1352,7 @@ export default function MyFeedsTimeline({ locale }: MyFeedsTimelineProps) {
   const [isLoadingMore, setIsLoadingMore] = useState(false)
   const [loadError, setLoadError] = useState(false)
   const [deleteCandidate, setDeleteCandidate] = useState<FeedItem | null>(null)
+  const [editCandidate, setEditCandidate] = useState<FeedItem | null>(null)
   const [isDeleting, setIsDeleting] = useState(false)
 
   const canViewOwnFeeds = useMemo(
@@ -1351,6 +1417,25 @@ export default function MyFeedsTimeline({ locale }: MyFeedsTimelineProps) {
       setIsLoadingMore(false)
     }
   }
+
+  const editItem = async (item: FeedItem) => {
+    if (item.content_type === 'article') {
+      router.push(`/${locale}/article/write?edit=${encodeURIComponent(item.uuid)}`)
+      return
+    }
+
+    try {
+      setEditCandidate(await getFeedItem(item.uuid, locale))
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : copy.editFailed)
+    }
+  }
+
+  const editMode: PostModalMode = editCandidate?.media_type === 'video'
+    ? 'video'
+    : editCandidate?.media_type === 'image'
+      ? 'image'
+      : 'post'
 
   const confirmDelete = async () => {
     if (!deleteCandidate || isDeleting) return
@@ -1422,7 +1507,7 @@ export default function MyFeedsTimeline({ locale }: MyFeedsTimelineProps) {
 
             return (
               <Fragment key={item.uuid}>
-                <FeedCard item={item} locale={locale} onDelete={setDeleteCandidate} />
+                <FeedCard item={item} locale={locale} onEdit={(feedItem) => void editItem(feedItem)} onDelete={setDeleteCandidate} />
                 {index === upgradeIndex && (
                   <RoleUpgradeCard locale={locale} className="xl:hidden" />
                 )}
@@ -1482,6 +1567,27 @@ export default function MyFeedsTimeline({ locale }: MyFeedsTimelineProps) {
           </button>
         </div>
       </Modal>
+
+      <PostModal
+        locale={locale}
+        mode={editMode}
+        opened={editCandidate !== null}
+        draft={editCandidate}
+        onClose={() => setEditCandidate(null)}
+        onDraftSaved={() => {
+          setEditCandidate(null)
+          void loadFirstPage()
+        }}
+        onDraftDiscarded={() => {
+          setEditCandidate(null)
+          void loadFirstPage()
+        }}
+        onPublished={() => {
+          setEditCandidate(null)
+          void loadFirstPage()
+          window.dispatchEvent(new Event('feed:published'))
+        }}
+      />
     </section>
   )
 }

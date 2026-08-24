@@ -508,13 +508,16 @@ export default function FeedSidebar({ locale, hideProfileCard = false }: FeedSid
               compact={hideProfileCard}
             />
           )}
-          <SidebarItem href={`${dashboardBase}/my-orders`} icon={IconShoppingBag} label={copy.myPurchases} compact={hideProfileCard} />
-          {isProvider && <SidebarItem href={`${dashboardBase}/sales`} icon={IconChartLine} label={copy.sales} compact={hideProfileCard} />}
-          {(isInsighter || isCompany) && (
-            <SidebarItem href={`${dashboardBase}/wallet`} icon={IconWallet} label={copy.wallet} compact={hideProfileCard} />
-          )}
         </DashboardSection>
       )}
+
+      <DashboardSection title={copy.marketplace} icon={IconShoppingBag} compact={hideProfileCard}>
+        <SidebarItem href={`${dashboardBase}/my-orders`} icon={IconShoppingBag} label={copy.myPurchases} compact={hideProfileCard} />
+        {isProvider && <SidebarItem href={`${dashboardBase}/sales`} icon={IconChartLine} label={copy.sales} compact={hideProfileCard} />}
+        {(isInsighter || isCompany) && (
+          <SidebarItem href={`${dashboardBase}/wallet`} icon={IconWallet} label={copy.wallet} compact={hideProfileCard} />
+        )}
+      </DashboardSection>
 
       <DashboardSection title={copy.settings} icon={IconSettings2} compact={hideProfileCard}>
         <SidebarItem

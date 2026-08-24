@@ -21,6 +21,7 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 import '@mux/mux-player'
 import { useToast } from '@/components/toast/ToastContext'
 import { useUserProfile } from '@/components/ui/header/hooks/useUserProfile'
+import PublishAsSelector, { type PublishAuthorType } from '../PublishAsSelector'
 import {
   checkVideoUploadStatus,
   createSuggestTag,
@@ -97,10 +98,14 @@ const copyByLocale = {
     titlePost: 'Create a post',
     titleVideo: 'Create a video post',
     titleImage: 'Create an image post',
+    editPost: 'Edit post',
     close: 'Close post composer',
     selectIndustry: 'Select industry',
-    step1Label: 'Step 1 of 2 · Write your post',
-    step2Label: 'Step 2 of 2 · Categorize',
+    step1Label: 'Step 1 · Write your post',
+    step2Label: 'Step 2 · Categorize',
+    step3Label: 'Final step · Choose publisher',
+    publishAsTitle: 'Publish as',
+    choosePublisher: 'Choose a publisher before continuing.',
     next: 'Next',
     back: 'Back',
     description: 'Post description',
@@ -111,6 +116,7 @@ const copyByLocale = {
     imageUploadTitle: 'Upload your images',
     imageUploadHint: 'JPG, PNG, or GIF, up to 5MB each. Add at least one image before you can write a description.',
     selectImages: 'Select images',
+    addImages: 'Add +',
     uploading: 'Uploading…',
     uploadedProcessing: 'Upload finished — preparing your video',
     processingHint: 'This usually takes under a minute. You can write your description now and publish once it finishes.',
@@ -134,6 +140,8 @@ const copyByLocale = {
     shareFromLibrary: 'Attach from Insighta library',
     publish: 'Post',
     publishing: 'Publishing…',
+    saveChanges: 'Save changes',
+    savingChanges: 'Saving…',
     saveDraft: 'Save draft',
     savingDraft: 'Saving…',
     draftSaved: 'Your draft has been saved.',
@@ -150,11 +158,13 @@ const copyByLocale = {
     draftDiscardFailed: 'Unable to discard your draft.',
     savedVideo: 'Saved video',
     publishedToast: 'Your post has been published.',
+    updatedToast: 'Your post has been updated.',
     videoTooLong: 'The video must be 10 minutes or shorter.',
     videoWrongType: 'Only MP4 or MOV videos are supported.',
     imageTooLarge: (name: string) => `"${name}" is larger than 5MB and was skipped.`,
     tooManyImages: `You can attach up to ${MAX_IMAGES} images.`,
     replacingSavedImages: 'New images will replace the images saved in this draft.',
+    mediaLocked: 'Published media cannot be changed.',
     videoUploadFailed: 'Video upload failed. Please try again.',
     industryFirst: 'Select an industry first',
     industryRequired: 'Select an industry.',
@@ -166,10 +176,14 @@ const copyByLocale = {
     titlePost: 'إنشاء منشور',
     titleVideo: 'إنشاء منشور فيديو',
     titleImage: 'إنشاء منشور صور',
+    editPost: 'تعديل المنشور',
     close: 'إغلاق محرر المنشور',
     selectIndustry: 'اختر المجال',
-    step1Label: 'الخطوة 1 من 2 · اكتب منشورك',
-    step2Label: 'الخطوة 2 من 2 · التصنيف',
+    step1Label: 'الخطوة 1 · اكتب منشورك',
+    step2Label: 'الخطوة 2 · التصنيف',
+    step3Label: 'الخطوة الأخيرة · اختر الناشر',
+    publishAsTitle: 'النشر باسم',
+    choosePublisher: 'اختر هوية الناشر قبل المتابعة.',
     next: 'التالي',
     back: 'رجوع',
     description: 'وصف المنشور',
@@ -180,6 +194,7 @@ const copyByLocale = {
     imageUploadTitle: 'ارفع الصور',
     imageUploadHint: 'JPG أو PNG أو GIF، بحد أقصى 5 ميجابايت لكل صورة. أضف صورة واحدة على الأقل قبل كتابة الوصف.',
     selectImages: 'اختر صوراً',
+    addImages: '+ إضافة',
     uploading: 'جارٍ الرفع…',
     uploadedProcessing: 'انتهى الرفع — جارٍ تجهيز الفيديو',
     processingHint: 'يستغرق ذلك عادةً أقل من دقيقة. يمكنك كتابة الوصف الآن والنشر بعد اكتمال التجهيز.',
@@ -203,6 +218,8 @@ const copyByLocale = {
     shareFromLibrary: 'مشاركة من المكتبة',
     publish: 'نشر',
     publishing: 'جارٍ النشر…',
+    saveChanges: 'حفظ التعديلات',
+    savingChanges: 'جارٍ الحفظ…',
     saveDraft: 'حفظ كمسودة',
     savingDraft: 'جارٍ الحفظ…',
     draftSaved: 'تم حفظ المسودة.',
@@ -219,11 +236,13 @@ const copyByLocale = {
     draftDiscardFailed: 'تعذر حذف المسودة.',
     savedVideo: 'فيديو محفوظ',
     publishedToast: 'تم نشر منشورك.',
+    updatedToast: 'تم تحديث منشورك.',
     videoTooLong: 'يجب ألا تتجاوز مدة الفيديو 10 دقائق.',
     videoWrongType: 'يدعم النظام فيديوهات MP4 أو MOV فقط.',
     imageTooLarge: (name: string) => `تم تخطي "${name}" لأن حجمه أكبر من 5 ميجابايت.`,
     tooManyImages: `يمكنك إرفاق حتى ${MAX_IMAGES} صورة.`,
     replacingSavedImages: 'ستحل الصور الجديدة محل الصور المحفوظة في هذه المسودة.',
+    mediaLocked: 'لا يمكن تغيير وسائط المنشور بعد نشره.',
     videoUploadFailed: 'فشل رفع الفيديو. حاول مرة أخرى.',
     industryFirst: 'اختر المجال أولاً',
     industryRequired: 'اختر مجالاً.',
@@ -269,12 +288,14 @@ export default function PostModal({
 }: PostModalProps) {
   const isArabic = locale === 'ar'
   const copy = copyByLocale[isArabic ? 'ar' : 'en']
+  const isEditingPublished = draft?.status === 'published'
   const toast = useToast()
-  const { user } = useUserProfile()
+  const { user, roles } = useUserProfile()
 
   // --- Post content state ---
   // Two-step flow: 1 = write the post, 2 = categorize (industry + tags)
-  const [step, setStep] = useState<1 | 2>(1)
+  const [step, setStep] = useState<1 | 2 | 3>(1)
+  const [authorType, setAuthorType] = useState<PublishAuthorType | null>(null)
   const [body, setBody] = useState('')
   const [industry, setIndustry] = useState<IndustryOption | null>(null)
   const [selectedTags, setSelectedTags] = useState<FeedTag[]>([])
@@ -347,6 +368,11 @@ export default function PostModal({
   const fullName = user
     ? `${user.first_name ?? ''} ${user.last_name ?? ''}`.trim() || user.name
     : ''
+  const companyName = user?.company?.legal_name?.trim() || ''
+  const canChoosePublisher =
+    !isEditingPublished &&
+    !!companyName &&
+    roles.some((role) => role === 'company' || role === 'company-insighter')
 
   const stopPolling = useCallback(() => {
     if (pollTimerRef.current !== null) {
@@ -360,6 +386,7 @@ export default function PostModal({
     abortUploadRef.current = null
     stopPolling()
     setStep(1)
+    setAuthorType(null)
     setBody('')
     setIndustry(null)
     setSelectedTags([])
@@ -513,6 +540,8 @@ export default function PostModal({
   }
 
   const startVideoUpload = async (file: File) => {
+    if (isEditingPublished) return
+
     setDirtyFields((previous) => ({ ...previous, video: true }))
     setTouchedFields((previous) => ({ ...previous, video: false }))
 
@@ -567,6 +596,8 @@ export default function PostModal({
   }
 
   const cancelOrRemoveVideo = () => {
+    if (isEditingPublished) return
+
     abortUploadRef.current?.()
     abortUploadRef.current = null
     stopPolling()
@@ -581,6 +612,7 @@ export default function PostModal({
   // --- Image handling ---
 
   const beginImageCrop = (files: FileList | null) => {
+    if (isEditingPublished) return
     if (!files || files.length === 0) return
 
     const hasSavedImages = images.some((image) => image.file === null)
@@ -640,6 +672,8 @@ export default function PostModal({
   }
 
   const removeImage = (index: number) => {
+    if (isEditingPublished) return
+
     setImages((previous) => {
       if (previous[index].previewUrl.startsWith('blob:')) {
         URL.revokeObjectURL(previous[index].previewUrl)
@@ -762,10 +796,36 @@ export default function PostModal({
     setStep(2)
   }
 
+  const continueToPublisher = () => {
+    if (isPublishing || isSavingDraft || isDiscardingDraft) return
+
+    const missingIndustry = industry === null
+    setTouchedFields((previous) => ({ ...previous, industry: true }))
+    setDirtyFields((previous) => ({ ...previous, industry: true }))
+
+    if (missingIndustry) {
+      window.requestAnimationFrame(() => industryButtonRef.current?.focus())
+      return
+    }
+
+    if (canChoosePublisher) {
+      setStep(3)
+      return
+    }
+
+    void handlePublish(isEditingPublished ? undefined : 'insighter')
+  }
+
   // --- Publish ---
 
-  const handlePublish = async () => {
+  const handlePublish = async (selectedAuthorType?: PublishAuthorType) => {
     if (isPublishing || isSavingDraft || isDiscardingDraft) return
+
+    if (canChoosePublisher && !selectedAuthorType) {
+      toast.error(copy.choosePublisher)
+      setStep(3)
+      return
+    }
 
     const missingIndustry = industry === null
     const missingVideo = isVideoFlow && videoPhase !== 'ready'
@@ -794,6 +854,7 @@ export default function PostModal({
         industryId: industry.id,
         tags: selectedTags.map((tag) => tag.id),
         relatedInsights: relatedInsights.map((item) => item.id),
+        authorType: selectedAuthorType,
       }
 
       if (isVideoFlow && videoUuidRef.current) {
@@ -811,7 +872,7 @@ export default function PostModal({
         )
       }
 
-      toast.success(copy.publishedToast)
+      toast.success(isEditingPublished ? copy.updatedToast : copy.publishedToast)
       onPublished()
       onClose()
     } catch (error) {
@@ -963,7 +1024,13 @@ export default function PostModal({
   const footerIconClass =
     'flex h-9 w-9 items-center justify-center rounded-md text-[#5A6B84] transition-colors hover:bg-[#F3F6FB] focus-visible:outline-[1px] focus-visible:outline-offset-1 focus-visible:outline-[#B7D2F4]'
 
-  const title = isVideoFlow ? copy.titleVideo : isImageFlow ? copy.titleImage : copy.titlePost
+  const title = isEditingPublished
+    ? copy.editPost
+    : isVideoFlow
+      ? copy.titleVideo
+      : isImageFlow
+        ? copy.titleImage
+        : copy.titlePost
 
   return (
     <>
@@ -997,7 +1064,13 @@ export default function PostModal({
           noValidate
           onSubmit={(event) => {
             event.preventDefault()
-            void handlePublish()
+            if (step === 1) {
+              handleNext()
+            } else if (step === 2) {
+              continueToPublisher()
+            } else {
+              void handlePublish(authorType ?? undefined)
+            }
           }}
         >
           {/* Author + step indicator */}
@@ -1019,7 +1092,7 @@ export default function PostModal({
             <div className="min-w-0 flex-1">
               <div className="truncate text-[15px] font-bold text-[#0B1220]">{fullName}</div>
               <div className="mt-0.5 truncate text-[12.5px] font-medium text-[#5A6B84]">
-                {step === 1 ? copy.step1Label : copy.step2Label}
+                {step === 1 ? copy.step1Label : step === 2 ? copy.step2Label : copy.step3Label}
               </div>
             </div>
           </div>
@@ -1087,17 +1160,21 @@ export default function PostModal({
                 <p className="mx-auto mt-2 max-w-sm text-[13.5px] leading-6 text-[#64748B]">
                   {copy.uploadHint}
                 </p>
-                <button
-                  ref={videoSelectButtonRef}
-                  type="button"
-                  onClick={() => videoInputRef.current?.click()}
-                  aria-invalid={videoInvalid || undefined}
-                  aria-describedby={videoInvalid ? 'feed-post-video-error' : undefined}
-                  data-dirty={dirtyFields.video || undefined}
-                  className="mt-5 min-h-10 rounded-md bg-[#1D74E0] px-6 py-2.5 text-[14px] font-medium text-white transition-colors hover:bg-[#155CB8] focus-visible:outline-[1px] focus-visible:outline-offset-1 focus-visible:outline-[#B7D2F4]"
-                >
-                  {copy.selectVideo}
-                </button>
+                {isEditingPublished ? (
+                  <p className="mt-4 text-[12.5px] font-medium text-[#64748B]">{copy.mediaLocked}</p>
+                ) : (
+                  <button
+                    ref={videoSelectButtonRef}
+                    type="button"
+                    onClick={() => videoInputRef.current?.click()}
+                    aria-invalid={videoInvalid || undefined}
+                    aria-describedby={videoInvalid ? 'feed-post-video-error' : undefined}
+                    data-dirty={dirtyFields.video || undefined}
+                    className="mt-5 min-h-10 rounded-md bg-[#1D74E0] px-6 py-2.5 text-[14px] font-medium text-white transition-colors hover:bg-[#155CB8] focus-visible:outline-[1px] focus-visible:outline-offset-1 focus-visible:outline-[#B7D2F4]"
+                  >
+                    {copy.selectVideo}
+                  </button>
+                )}
               </div>
             ) : (
               <div className="rounded-md border border-[#E5EAF2] p-4">
@@ -1144,15 +1221,17 @@ export default function PostModal({
                       )}
                     </div>
                   </div>
-                  <button
-                    type="button"
-                    onClick={cancelOrRemoveVideo}
-                    className="min-h-10 shrink-0 px-1 text-[14px] font-medium text-[#5A6B84] transition-colors hover:text-[#0B1220] focus-visible:outline-[1px] focus-visible:outline-offset-1 focus-visible:outline-[#B7D2F4]"
-                  >
-                    {videoPhase === 'uploading' || videoPhase === 'initializing'
-                      ? copy.cancel
-                      : copy.remove}
-                  </button>
+                  {!isEditingPublished && (
+                    <button
+                      type="button"
+                      onClick={cancelOrRemoveVideo}
+                      className="min-h-10 shrink-0 px-1 text-[14px] font-medium text-[#5A6B84] transition-colors hover:text-[#0B1220] focus-visible:outline-[1px] focus-visible:outline-offset-1 focus-visible:outline-[#B7D2F4]"
+                    >
+                      {videoPhase === 'uploading' || videoPhase === 'initializing'
+                        ? copy.cancel
+                        : copy.remove}
+                    </button>
+                  )}
                 </div>
                 {(videoPhase === 'uploading' || videoPhase === 'initializing') && (
                   <Progress value={uploadPercent} size={6} radius="xl" color="#1D74E0" className="mt-3" />
@@ -1202,13 +1281,17 @@ export default function PostModal({
               <p className="mx-auto mt-2 max-w-sm text-[13.5px] leading-6 text-[#64748B]">
                 {copy.imageUploadHint}
               </p>
-              <button
-                type="button"
-                onClick={() => imageInputRef.current?.click()}
-                className="mt-5 min-h-10 rounded-md bg-[#1EAB5A] px-6 py-2.5 text-[14px] font-medium text-white transition-colors hover:bg-[#178A48] focus-visible:outline-[1px] focus-visible:outline-offset-1 focus-visible:outline-[#B7D2F4]"
-              >
-                {copy.selectImages}
-              </button>
+              {isEditingPublished ? (
+                <p className="mt-4 text-[12.5px] font-medium text-[#64748B]">{copy.mediaLocked}</p>
+              ) : (
+                <button
+                  type="button"
+                  onClick={() => imageInputRef.current?.click()}
+                  className="mt-5 min-h-10 rounded-md bg-[#1EAB5A] px-6 py-2.5 text-[14px] font-medium text-white transition-colors hover:bg-[#178A48] focus-visible:outline-[1px] focus-visible:outline-offset-1 focus-visible:outline-[#B7D2F4]"
+                >
+                  {copy.selectImages}
+                </button>
+              )}
             </div>
           </div>
         )}
@@ -1263,6 +1346,18 @@ export default function PostModal({
                 </span>
               </div>
             ))}
+            {!isEditingPublished && images.length < MAX_IMAGES && (
+              <button
+                type="button"
+                aria-label={copy.addImages}
+                onClick={() => imageInputRef.current?.click()}
+                className="group flex aspect-square items-center justify-center rounded-md border border-dashed border-[#B8CBE4] bg-[#F8FAFD] text-[#5A6B84] transition-colors hover:border-[#1EAB5A] hover:bg-[#F2FBF6] hover:text-[#178A48] focus-visible:outline-[2px] focus-visible:outline-offset-2 focus-visible:outline-[#8FB9EA]"
+              >
+                <span className="flex items-center gap-1 text-[13px] font-semibold sm:text-[14px]">
+                  {copy.addImages}
+                </span>
+              </button>
+            )}
           </div>
         )}
 
@@ -1296,6 +1391,26 @@ export default function PostModal({
         )}
         </div>
         {/* ===== End step 1 ===== */}
+
+        {/* ===== Step 3: choose the public publisher identity ===== */}
+        {step === 3 && canChoosePublisher && (
+          <div className="mt-6">
+            <h3 className="text-[20px] font-bold tracking-[-0.015em] text-[#101827]">
+              {copy.publishAsTitle}
+            </h3>
+            <div className="mt-3">
+              <PublishAsSelector
+                locale={locale}
+                companyName={companyName}
+                companyLogo={user?.company?.logo}
+                insighterName={fullName}
+                insighterPhoto={user?.profile_photo_url}
+                value={authorType}
+                onChange={setAuthorType}
+              />
+            </div>
+          </div>
+        )}
 
         {/* ===== Step 2: categorize (industry + tags) ===== */}
         {step === 2 && (
@@ -1412,7 +1527,7 @@ export default function PostModal({
         {/* Footer */}
         <div className="mt-4 flex flex-wrap items-center justify-between gap-3 border-t border-[#EDF1F7] pt-3.5">
           <div className="flex min-w-0 items-center gap-1">
-            {draft && (
+            {draft && !isEditingPublished && (
               <button
                 type="button"
                 onClick={() => setDiscardConfirmOpened(true)}
@@ -1425,7 +1540,7 @@ export default function PostModal({
             )}
             {step === 1 ? (
               <>
-                {!isVideoFlow && !hasVideo && (hasImages || !isImageFlow) && (
+                {!isEditingPublished && !isVideoFlow && !hasVideo && (hasImages || !isImageFlow) && (
                   <button
                     type="button"
                     aria-label="Add images"
@@ -1435,7 +1550,7 @@ export default function PostModal({
                     <IconPhoto aria-hidden stroke={1.7} className="h-5 w-5 text-[#1EAB5A]" />
                   </button>
                 )}
-                {mode === 'post' && !hasImages && !hasVideo && (
+                {!isEditingPublished && mode === 'post' && !hasImages && !hasVideo && (
                   <button
                     type="button"
                     aria-label="Add video"
@@ -1461,7 +1576,7 @@ export default function PostModal({
             ) : (
               <button
                 type="button"
-                onClick={() => setStep(1)}
+                onClick={() => setStep(step === 3 ? 2 : 1)}
                 disabled={isPublishing || isSavingDraft || isDiscardingDraft}
                 className="inline-flex min-h-10 items-center gap-1.5 rounded-md px-3 text-[14px] font-medium text-[#5A6B84] transition-colors hover:bg-[#F3F6FB] focus-visible:outline-[1px] focus-visible:outline-offset-1 focus-visible:outline-[#B7D2F4] disabled:opacity-50"
               >
@@ -1487,25 +1602,31 @@ export default function PostModal({
               </button>
             ) : (
               <>
-                <button
-                  type="button"
-                  onClick={() => void handleSaveDraft()}
-                  disabled={isPublishing || isSavingDraft || isDiscardingDraft}
-                  aria-busy={isSavingDraft}
-                  className="inline-flex min-h-10 items-center justify-center rounded-md border border-[#C9DCF6] bg-white px-4 py-2.5 text-[14px] font-medium text-[#1D74E0] transition-colors hover:bg-[#F2F7FF] focus-visible:outline-[1px] focus-visible:outline-offset-1 focus-visible:outline-[#B7D2F4] disabled:cursor-wait disabled:opacity-55"
-                >
-                  {isSavingDraft && (
-                    <IconLoader2 aria-hidden className="me-1.5 h-4 w-4 animate-spin" stroke={2} />
-                  )}
-                  {isSavingDraft ? copy.savingDraft : copy.saveDraft}
-                </button>
+                {!isEditingPublished && step === 2 && (
+                  <button
+                    type="button"
+                    onClick={() => void handleSaveDraft()}
+                    disabled={isPublishing || isSavingDraft || isDiscardingDraft}
+                    aria-busy={isSavingDraft}
+                    className="inline-flex min-h-10 items-center justify-center rounded-md border border-[#C9DCF6] bg-white px-4 py-2.5 text-[14px] font-medium text-[#1D74E0] transition-colors hover:bg-[#F2F7FF] focus-visible:outline-[1px] focus-visible:outline-offset-1 focus-visible:outline-[#B7D2F4] disabled:cursor-wait disabled:opacity-55"
+                  >
+                    {isSavingDraft && (
+                      <IconLoader2 aria-hidden className="me-1.5 h-4 w-4 animate-spin" stroke={2} />
+                    )}
+                    {isSavingDraft ? copy.savingDraft : copy.saveDraft}
+                  </button>
+                )}
                 <button
                   type="submit"
-                  disabled={isPublishing || isSavingDraft || isDiscardingDraft}
+                  disabled={isPublishing || isSavingDraft || isDiscardingDraft || (step === 3 && authorType === null)}
                   aria-busy={isPublishing}
                   className="min-h-10 rounded-md bg-[#1D74E0] px-6 py-2.5 text-[14px] font-medium text-white transition-colors hover:bg-[#155CB8] focus-visible:outline-[1px] focus-visible:outline-offset-1 focus-visible:outline-[#B7D2F4] disabled:cursor-wait disabled:bg-[#93B9E8]"
                 >
-                  {isPublishing ? copy.publishing : copy.publish}
+                  {step === 2 && canChoosePublisher
+                    ? copy.next
+                    : isPublishing
+                      ? isEditingPublished ? copy.savingChanges : copy.publishing
+                      : isEditingPublished ? copy.saveChanges : copy.publish}
                 </button>
               </>
             )}
@@ -1518,6 +1639,7 @@ export default function PostModal({
           type="file"
           aria-label={copy.selectVideo}
           accept="video/mp4,video/quicktime,.mp4,.mov"
+          disabled={isEditingPublished}
           className="hidden"
           onChange={(event) => {
             const file = event.currentTarget.files?.[0]
@@ -1531,6 +1653,7 @@ export default function PostModal({
           aria-label={isArabic ? 'إضافة صور' : 'Add images'}
           accept="image/*"
           multiple
+          disabled={isEditingPublished}
           className="hidden"
           onChange={(event) => {
             beginImageCrop(event.currentTarget.files)
