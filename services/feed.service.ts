@@ -1031,6 +1031,25 @@ export async function fetchIndustryTags(industryId: number, locale: string): Pro
   return (body.data ?? []).map((tag: FeedTag) => ({ id: tag.id, name: tag.name }))
 }
 
+export async function fetchCommonTags(locale: string): Promise<FeedTag[]> {
+  const response = await fetch(getApiUrl('/api/common/setting/tag/common/list'), {
+    headers: authHeaders(locale),
+  })
+  if (!response.ok) return []
+  const body = await response.json()
+  return (body.data ?? []).map((tag: FeedTag) => ({ id: tag.id, name: tag.name }))
+}
+
+export async function searchTags(keyword: string, locale: string): Promise<FeedTag[]> {
+  const params = new URLSearchParams({ keyword, limit: '20' })
+  const response = await fetch(getApiUrl(`/api/common/setting/tag/search?${params}`), {
+    headers: authHeaders(locale),
+  })
+  if (!response.ok) return []
+  const body = await response.json()
+  return (body.data ?? []).map((tag: FeedTag) => ({ id: tag.id, name: tag.name }))
+}
+
 // Create a custom tag under an industry (mirrors the Angular add-knowledge
 // step-4 "Add Tag" flow) and return it so the caller can select it right away.
 export async function createSuggestTag(

@@ -3,6 +3,7 @@ import { getApiUrl } from '@/app/config'
 export const SUPPORTED_ONBOARDING_PROMPTS = [
   'country',
   'community_feed_industries',
+  'whatsapp',
 ] as const
 
 export type OnboardingPromptKey = (typeof SUPPORTED_ONBOARDING_PROMPTS)[number]
@@ -105,6 +106,25 @@ export async function updateFeedIndustryPreferences(
 
   if (!response.ok) {
     throw new Error(await getErrorMessage(response, 'Unable to save your industries.'))
+  }
+}
+
+export async function updateWhatsappNumber(
+  payload: { whatsappCountryCode: string; whatsappNumber: string },
+  options: ApiOptions,
+): Promise<void> {
+  const response = await fetch(getApiUrl('/api/account/profile/notification/channel'), {
+    method: 'POST',
+    headers: onboardingHeaders(options),
+    body: JSON.stringify({
+      whatsapp_status: 'active',
+      whatsapp_country_code: payload.whatsappCountryCode,
+      whatsapp_number: payload.whatsappNumber,
+    }),
+  })
+
+  if (!response.ok) {
+    throw new Error(await getErrorMessage(response, 'Unable to save your WhatsApp number.'))
   }
 }
 

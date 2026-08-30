@@ -11,10 +11,8 @@ import {
   IconArticle,
   IconChevronDown,
   IconFileDescription,
-  IconHash,
   IconLoader2,
   IconPhoto,
-  IconPlus,
   IconX,
 } from '@tabler/icons-react'
 import { useRouter } from 'next/navigation'
@@ -22,9 +20,8 @@ import { useEffect, useMemo, useRef, useState } from 'react'
 import { useToast } from '@/components/toast/ToastContext'
 import { useUserProfile } from '@/components/ui/header/hooks/useUserProfile'
 import PublishAsSelector, { type PublishAuthorType } from '../PublishAsSelector'
+import TagSelector from '../TagSelector'
 import {
-  createSuggestTag,
-  fetchIndustryTags,
   fetchLibraryKnowledgeById,
   getFeedDraft,
   getFeedItem,
@@ -64,10 +61,11 @@ const copyByLocale = {
     industry: 'Industry',
     selectIndustry: 'Select an industry',
     tags: 'Tags',
-    addTags: 'Select Tag',
-    addTagPlaceholder: 'Add suggested',
+    addTagPlaceholder: 'Search or initiate a new tag',
+    addTag: 'Add',
     addTagError: 'Unable to add the tag.',
-    noTags: 'No suggested tags are available for this industry.',
+    noTags: 'No tags are available.',
+    addTagHint: 'Press Enter to create a new tag.',
     industryFirst: 'Select an industry first',
     related: 'Related insights',
     relatedHint: 'Connect published work from your library.',
@@ -92,7 +90,7 @@ const copyByLocale = {
     returnToFeed: 'Return to feed',
     accessTitle: 'White Paper publishing is available to Insighters.',
     accessBody: 'Sign in with an Insighter or company account to write a White Paper.',
-    publishAsTitle: 'Publish as',
+    publishAsTitle: 'Post as',
     backToEditing: 'Back to editing',
   },
   ar: {
@@ -115,10 +113,11 @@ const copyByLocale = {
     industry: 'المجال',
     selectIndustry: 'اختر مجالاً',
     tags: 'الوسوم',
-    addTags: 'أضف وسوماً مقترحة',
-    addTagPlaceholder: 'اكتب وسماً واضغط Enter',
+    addTagPlaceholder: 'ابحث أو أضف وسمًا جديدًا',
+    addTag: 'إضافة',
     addTagError: 'تعذر إضافة الوسم.',
-    noTags: 'لا توجد وسوم مقترحة لهذا المجال.',
+    noTags: 'لا توجد وسوم متاحة.',
+    addTagHint: 'اضغط Enter لإضافة وسم جديد.',
     industryFirst: 'اختر المجال أولاً',
     related: 'الرؤى المرتبطة',
     relatedHint: 'اربط أعمالاً منشورة من مكتبتك.',
@@ -190,7 +189,6 @@ export default function ArticleEditor({ locale }: ArticleEditorProps) {
   const [body, setBody] = useState('')
   const [industry, setIndustry] = useState<IndustryOption | null>(null)
   const [selectedTags, setSelectedTags] = useState<FeedTag[]>([])
-  const [industryTags, setIndustryTags] = useState<FeedTag[]>([])
   const [relatedInsights, setRelatedInsights] = useState<LibraryKnowledgeItem[]>([])
   const [coverFile, setCoverFile] = useState<File | null>(null)
   const [coverPreview, setCoverPreview] = useState<string | null>(null)
@@ -201,9 +199,6 @@ export default function ArticleEditor({ locale }: ArticleEditorProps) {
   const [authorType, setAuthorType] = useState<PublishAuthorType | null>(null)
   const [industryModalOpened, setIndustryModalOpened] = useState(false)
   const [libraryDrawerOpened, setLibraryDrawerOpened] = useState(false)
-  const [tagsOpened, setTagsOpened] = useState(false)
-  const [newTagName, setNewTagName] = useState('')
-  const [isAddingTag, setIsAddingTag] = useState(false)
 
   const canPublish = !!user && roles.some((role) => ['insighter', 'company', 'company-insighter'].includes(role))
   const companyName = user?.company?.legal_name?.trim() || ''
@@ -441,37 +436,6 @@ export default function ArticleEditor({ locale }: ArticleEditorProps) {
     setRemoveCover(false)
   }
 
-  const openTags = async () => {
-    setTagsOpened((current) => !current)
-    if (!industry || industryTags.length > 0) return
-    setIndustryTags(await fetchIndustryTags(industry.id, locale))
-  }
-
-  const addNewTag = async () => {
-    const name = newTagName.trim()
-    if (!name || !industry || isAddingTag) return
-
-    const normalized = name.toLowerCase()
-    const existing = industryTags.find((tag) => tag.name.trim().toLowerCase() === normalized)
-    if (existing) {
-      if (!selectedTags.some((tag) => tag.id === existing.id)) setSelectedTags((current) => [...current, existing])
-      setNewTagName('')
-      return
-    }
-
-    setIsAddingTag(true)
-    try {
-      const created = await createSuggestTag(industry.id, name, locale)
-      setIndustryTags((current) => [created, ...current])
-      setSelectedTags((current) => [...current, created])
-      setNewTagName('')
-    } catch (error) {
-      toast.error(error instanceof Error ? error.message : copy.addTagError)
-    } finally {
-      setIsAddingTag(false)
-    }
-  }
-
   if (isLoading || !isAuthResolved) {
     return (
       <div className="flex min-h-[70vh] items-center justify-center bg-[#F3F5F8]">
@@ -584,28 +548,13 @@ export default function ArticleEditor({ locale }: ArticleEditorProps) {
 
               <div className="mt-5 border-t border-[#EDF1F5] pt-5">
                 <label className="text-[11px] font-medium uppercase tracking-[0.08em] text-[#64758C]">{copy.tags}</label>
-                <div className="mt-2 flex flex-wrap gap-1.5">{selectedTags.map((tag) => <button key={tag.id} type="button" onClick={() => setSelectedTags((current) => current.filter((item) => item.id !== tag.id))} className="inline-flex items-center gap-1 rounded-full bg-[#EDF4FD] px-2.5 py-1 text-xs font-medium text-[#2378E8]">#{tag.name}<IconX className="h-3 w-3" /></button>)}</div>
-                <div className="mt-3 flex gap-2">
-                  <input
-                    type="text"
-                    value={newTagName}
-                    onChange={(event) => setNewTagName(event.currentTarget.value)}
-                    onKeyDown={(event) => {
-                      if (event.key === 'Enter') {
-                        event.preventDefault()
-                        void addNewTag()
-                      }
-                    }}
-                    disabled={!industry}
-                    placeholder={industry ? copy.addTagPlaceholder : copy.industryFirst}
-                    className="h-9 min-w-0 flex-1 rounded-md border border-[#D6E0EC] bg-white px-3 text-xs text-[#26364C] outline-none placeholder:text-[#A5B0BF] disabled:cursor-not-allowed disabled:bg-[#F3F5F8]"
-                  />
-                  <button type="button" onClick={() => void addNewTag()} disabled={!industry || !newTagName.trim() || isAddingTag} className="inline-flex h-9 shrink-0 items-center justify-center rounded-md bg-[#2378E8] px-3 text-white disabled:opacity-50">
-                    {isAddingTag ? <IconLoader2 className="h-3.5 w-3.5 animate-spin" /> : <IconPlus className="h-3.5 w-3.5" />}
-                  </button>
-                </div>
-                <button type="button" onClick={() => void openTags()} disabled={!industry} className="mt-3 inline-flex items-center gap-2 text-xs font-medium text-[#2378E8] disabled:cursor-not-allowed disabled:text-[#9AA7B7]"><IconHash className="h-4 w-4" />{industry ? copy.addTags : copy.industryFirst}</button>
-                {tagsOpened && <div className="mt-3 flex max-h-44 flex-wrap gap-2 overflow-y-auto rounded-lg bg-[#F7F9FC] p-3">{!industry ? copy.industryFirst : industryTags.length === 0 ? copy.noTags : industryTags.map((tag) => <button key={tag.id} type="button" onClick={() => setSelectedTags((current) => current.some((item) => item.id === tag.id) ? current.filter((item) => item.id !== tag.id) : [...current, tag])} className={`rounded-full border px-2.5 py-1 text-xs ${selectedTags.some((item) => item.id === tag.id) ? 'border-[#2378E8] text-[#2378E8]' : 'border-[#D6E0EC] bg-white text-[#65758A]'}`}>#{tag.name}</button>)}</div>}
+                <TagSelector
+                  locale={locale}
+                  industryId={industry?.id ?? null}
+                  selectedTags={selectedTags}
+                  onChange={setSelectedTags}
+                  disabled={!industry}
+                />
               </div>
 
               <div className="mt-5 border-t border-[#EDF1F5] pt-5">
@@ -683,7 +632,7 @@ export default function ArticleEditor({ locale }: ArticleEditorProps) {
         </div>
       </Modal>
 
-      <IndustrySelectModal locale={locale} opened={industryModalOpened} selectedId={industry?.id ?? null} onClose={() => setIndustryModalOpened(false)} onSelect={(option) => { if (option.id !== industry?.id) { setSelectedTags([]); setIndustryTags([]) }; setIndustry(option); setIndustryModalOpened(false) }} />
+      <IndustrySelectModal locale={locale} opened={industryModalOpened} selectedId={industry?.id ?? null} onClose={() => setIndustryModalOpened(false)} onSelect={(option) => { setIndustry(option); setIndustryModalOpened(false) }} />
       <KnowledgeLibraryDrawer locale={locale} opened={libraryDrawerOpened} selected={relatedInsights} onClose={() => setLibraryDrawerOpened(false)} onConfirm={(items) => { setRelatedInsights(items); setLibraryDrawerOpened(false) }} onPublishNew={() => { void handlePublishNewKnowledge() }} />
     </div>
   )

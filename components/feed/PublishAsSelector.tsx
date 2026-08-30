@@ -50,15 +50,13 @@ export default function PublishAsSelector({
         legend: 'اختر الهوية التي ستظهر على المنشور',
         company: 'النشر باسم الشركة',
         insighter: 'النشر باسم المستشار',
-        by: 'بواسطة',
         companyHint: 'سيظهر شعار الشركة كهوية رئيسية.',
         insighterHint: 'سيظهر ملفك الشخصي كهوية رئيسية.',
       }
     : {
         legend: 'Choose the identity that will appear on this publication',
-        company: 'Publish as company',
-        insighter: 'Publish as Insighter',
-        by: 'By',
+        company: 'Post as company',
+        insighter: 'Post as Insighter',
         companyHint: 'The company logo will be the primary identity.',
         insighterHint: 'Your expert profile will be the primary identity.',
       }
@@ -101,12 +99,9 @@ export default function PublishAsSelector({
 
               <span className="mt-5 flex min-h-[72px] items-center gap-3">
                 {isCompany ? (
-                  <span className="relative h-16 w-16 shrink-0">
+                  <span className="h-16 w-16 shrink-0">
                     <span className="flex h-full w-full items-center justify-center overflow-hidden rounded-full border border-[#DCE5EF] bg-white p-2 text-[#2378E8]">
                       {companyLogo ? <Image src={companyLogo} alt={companyName} width={64} height={64} unoptimized className="h-full w-full rounded-full object-cover" /> : <IconBuilding aria-hidden className="h-7 w-7" stroke={1.6} />}
-                    </span>
-                    <span className="absolute -bottom-2 -end-2 rounded-full bg-white p-0.5 shadow-[0_0_0_1px_#DCE5EF]">
-                      <Avatar src={insighterPhoto} name={insighterName} size="small" />
                     </span>
                   </span>
                 ) : (
@@ -116,11 +111,6 @@ export default function PublishAsSelector({
                   <strong className="block line-clamp-2 text-[15px] leading-5 text-[#172236]">
                     {isCompany ? companyName : insighterName}
                   </strong>
-                  {isCompany && (
-                    <span className="mt-1 block min-w-0 truncate text-[11.5px] text-[#718198]">
-                      <span className="truncate">{copy.by} {insighterName}</span>
-                    </span>
-                  )}
                 </span>
               </span>
 

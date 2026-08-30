@@ -43,7 +43,6 @@ const copyByLocale = {
     readTime: 'Read time',
     published: 'Published',
     publisher: 'Publisher',
-    by: 'By',
     viewInsight: 'View',
     openingInsight: 'Opening…',
     relatedDocuments: 'Related documents',
@@ -58,7 +57,6 @@ const copyByLocale = {
     readTime: 'مدة القراءة',
     published: 'نُشر',
     publisher: 'الناشر',
-    by: 'بواسطة',
     viewInsight: 'عرض',
     openingInsight: 'جارٍ الفتح…',
     relatedDocuments: 'مستندات ذات صلة',
@@ -242,13 +240,6 @@ export default function ArticleReader({ locale, identifier, isPublic }: ArticleR
   const cover = item.media.find((media) => media.media_type === 'image' && media.url)
   const publishedDate = formatArticleDate(item.published_at ?? item.created_at, locale)
   const insighter = item.insighter
-  const initials = insighter?.name
-    .split(' ')
-    .filter(Boolean)
-    .slice(0, 2)
-    .map((part) => part[0])
-    .join('')
-    .toUpperCase() || 'I'
   const isPublishedAsCompany = item.author_profile_type === 'company' && Boolean(insighter?.company)
   const publisherName = isPublishedAsCompany
     ? insighter?.company?.legal_name || insighter?.company?.name || insighter?.name || ''
@@ -323,22 +314,12 @@ export default function ArticleReader({ locale, identifier, isPublic }: ArticleR
                   rel="noopener noreferrer"
                   className={styles.heroAuthorLink}
                 >
-                  <div className={`${styles.authorAvatar} relative`}>
+                  <div className={styles.authorAvatar}>
                     {publisherPhoto ? <img src={publisherPhoto} alt={publisherName} className={isPublishedAsCompany ? '!object-contain !p-1' : undefined} /> : <span>{publisherInitials}</span>}
-                    {isPublishedAsCompany && (
-                      <span className="absolute -bottom-1 -end-1 flex h-5 w-5 items-center justify-center overflow-hidden rounded-full border-2 border-white bg-[#E7F0FE]">
-                        {insighter.profile_photo_url ? (
-                          <img src={insighter.profile_photo_url} alt={insighter.name} className="!h-full !w-full !object-cover !object-top !p-0" />
-                        ) : (
-                          <span className="text-[6px] font-bold text-[#2378E8]">{initials}</span>
-                        )}
-                      </span>
-                    )}
                   </div>
                   <div className={styles.heroAuthorText}>
                     <span className={styles.heroMetaLabel}>{copy.publisher}</span>
                     <strong>{publisherName}</strong>
-                    {isPublishedAsCompany && <small>{copy.by} {insighter.name}</small>}
                   </div>
                 </Link>
               </div>

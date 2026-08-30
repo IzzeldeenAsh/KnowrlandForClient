@@ -47,6 +47,17 @@
   bottom: 2rem;
 }
 
+.onboarding-module__G1ujJG__whatsappShade {
+  z-index: 1;
+  pointer-events: none;
+  background: radial-gradient(circle at 78% 22%, rgba(37, 211, 102, .34), rgba(0, 0, 0, 0) 42%), radial-gradient(circle at 12% 88%, rgba(18, 140, 126, .28), rgba(0, 0, 0, 0) 46%), linear-gradient(150deg, rgba(6, 46, 33, .15), rgba(4, 33, 24, .62));
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+}
+
 .onboarding-module__G1ujJG__stepEnter {
   animation: .26s cubic-bezier(.22, .8, .3, 1) both onboarding-module__G1ujJG__step-in;
 }

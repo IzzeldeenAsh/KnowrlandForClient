@@ -9,7 +9,6 @@ import {
   IconFolderOpen,
   IconLoader2,
   IconPhoto,
-  IconPlus,
   IconTrash,
   IconVideo,
   IconX,
@@ -24,9 +23,7 @@ import { useUserProfile } from '@/components/ui/header/hooks/useUserProfile'
 import PublishAsSelector, { type PublishAuthorType } from '../PublishAsSelector'
 import {
   checkVideoUploadStatus,
-  createSuggestTag,
   deleteFeedItem,
-  fetchIndustryTags,
   fetchLibraryKnowledgeById,
   getFeedDraft,
   getFeedItem,
@@ -45,6 +42,7 @@ import IndustryField from './IndustryField'
 import ImageCropEditor from './ImageCropEditor'
 import { type IndustryOption } from './IndustrySelectModal'
 import KnowledgeLibraryDrawer from './KnowledgeLibraryDrawer'
+import TagSelector from '../TagSelector'
 
 export type PostModalMode = 'post' | 'video' | 'image'
 
@@ -104,7 +102,7 @@ const copyByLocale = {
     step1Label: 'Step 1 · Write your post',
     step2Label: 'Step 2 · Categorize',
     step3Label: 'Final step · Choose publisher',
-    publishAsTitle: 'Publish as',
+    publishAsTitle: 'Post as',
     choosePublisher: 'Choose a publisher before continuing.',
     next: 'Next',
     back: 'Back',
@@ -129,13 +127,13 @@ const copyByLocale = {
     remove: 'Remove',
     addTags: 'Add Tags',
     tagsCount: (count: number) => `Tags · ${count}`,
-    suggestedTags: 'Suggested tags',
+    suggestedTags: 'Tags',
     optionalBadge: 'Optional',
     tagsHint: 'Tags are optional — they help the right experts find your insight.',
-    noTags: 'No tags available for this industry yet.',
-    addTagPlaceholder: 'Initiate a new tag…',
+    noTags: 'No tags available yet.',
+    addTagPlaceholder: 'Search or initiate a new tag',
     addTag: 'Add',
-    addTagHint: 'Type a tag and press Enter, or tap a chip below to select it.',
+    addTagHint: 'Press Enter to create a new tag.',
     addTagError: 'Unable to add the tag.',
     shareFromLibrary: 'Attach from Insighta library',
     publish: 'Post',
@@ -207,13 +205,13 @@ const copyByLocale = {
     remove: 'إزالة',
     addTags: 'إضافة وسوم',
     tagsCount: (count: number) => `وسوم · ${count}`,
-    suggestedTags: 'وسوم مقترحة',
+    suggestedTags: 'الوسوم',
     optionalBadge: 'اختياري',
     tagsHint: 'الوسوم اختيارية — تساعد الخبراء المناسبين في العثور على رؤيتك.',
-    noTags: 'لا توجد وسوم متاحة لهذا المجال بعد.',
-    addTagPlaceholder: 'أضف وسمًا جديدًا…',
+    noTags: 'لا توجد وسوم متاحة بعد.',
+    addTagPlaceholder: 'ابحث أو أضف وسمًا جديدًا',
     addTag: 'إضافة',
-    addTagHint: 'اكتب وسمًا واضغط Enter، أو اضغط على وسم بالأسفل لتحديده.',
+    addTagHint: 'اضغط Enter لإضافة وسم جديد.',
     addTagError: 'تعذر إضافة الوسم.',
     shareFromLibrary: 'مشاركة من المكتبة',
     publish: 'نشر',
@@ -320,10 +318,6 @@ export default function PostModal({
 
   // --- Sub-panel state ---
   const [libraryDrawerOpened, setLibraryDrawerOpened] = useState(false)
-  const [industryTags, setIndustryTags] = useState<FeedTag[]>([])
-  const [isLoadingTags, setIsLoadingTags] = useState(false)
-  const [newTagName, setNewTagName] = useState('')
-  const [isAddingTag, setIsAddingTag] = useState(false)
 
   // --- Video state ---
   const [videoPhase, setVideoPhase] = useState<VideoPhase>('none')
@@ -390,7 +384,6 @@ export default function PostModal({
     setBody('')
     setIndustry(null)
     setSelectedTags([])
-    setNewTagName('')
     setRelatedInsights([])
     setImages((previous) => {
       previous.forEach((image) => {
@@ -692,78 +685,11 @@ export default function PostModal({
     })
   }
 
-  // --- Tags ---
-
-  const toggleTag = (tag: FeedTag) => {
-    setSelectedTags((previous) =>
-      previous.some((selected) => selected.id === tag.id)
-        ? previous.filter((selected) => selected.id !== tag.id)
-        : [...previous, tag],
-    )
-  }
-
-  // "Add Tag" flow (mirrors Angular add-knowledge step 4): if the typed name
-  // already exists in the industry's tags, just select it; otherwise create a
-  // custom tag via the API and select it.
-  const addNewTag = async () => {
-    const name = newTagName.trim()
-    if (!name || !industry || isAddingTag) return
-
-    const normalized = name.toLowerCase()
-    const existing = industryTags.find((tag) => tag.name.trim().toLowerCase() === normalized)
-    if (existing) {
-      if (!selectedTags.some((tag) => tag.id === existing.id)) toggleTag(existing)
-      setNewTagName('')
-      return
-    }
-
-    setIsAddingTag(true)
-    try {
-      const created = await createSuggestTag(industry.id, name, locale)
-      setIndustryTags((previous) => [created, ...previous])
-      setSelectedTags((previous) => [...previous, created])
-      setNewTagName('')
-    } catch (error) {
-      toast.error(error instanceof Error ? error.message : copy.addTagError)
-    } finally {
-      setIsAddingTag(false)
-    }
-  }
-
   const handleIndustrySelect = (option: IndustryOption) => {
-    if (option.id !== industry?.id) {
-      // Tags belong to an industry: reset them on change
-      setSelectedTags([])
-      setIndustryTags([])
-      setNewTagName('')
-    }
     setIndustry(option)
     setTouchedFields((previous) => ({ ...previous, industry: true }))
     setDirtyFields((previous) => ({ ...previous, industry: true }))
   }
-
-  // Load suggested tags once an industry is chosen on step 2. Tags reset to []
-  // on industry change (see handleIndustrySelect), which retriggers this fetch.
-  useEffect(() => {
-    if (step !== 2 || !industry || industryTags.length > 0) return
-
-    let cancelled = false
-    setIsLoadingTags(true)
-    fetchIndustryTags(industry.id, locale)
-      .then((tags) => {
-        if (!cancelled) setIndustryTags(tags)
-      })
-      .catch(() => {
-        if (!cancelled) setIndustryTags([])
-      })
-      .finally(() => {
-        if (!cancelled) setIsLoadingTags(false)
-      })
-
-    return () => {
-      cancelled = true
-    }
-  }, [step, industry, industryTags.length, locale])
 
   // --- Step navigation ---
 
@@ -1436,92 +1362,18 @@ export default function PostModal({
 
         {/* Tags: only surfaced once an industry is chosen */}
         {step === 2 && industry && (
-          <>
-            {selectedTags.length > 0 && (
-              <div className="mt-3 flex flex-wrap gap-2">
-                {selectedTags.map((tag) => (
-                  <button
-                    key={tag.id}
-                    type="button"
-                    onClick={() => toggleTag(tag)}
-                    className="inline-flex items-center gap-1.5 rounded-full bg-[#EDF3FC] px-3 py-1.5 text-[13px] font-medium text-[#1D74E0] transition-colors hover:bg-[#E0ECFB]"
-                  >
-                    #{tag.name}
-                    <IconX aria-hidden className="h-3.5 w-3.5" stroke={2} />
-                  </button>
-                ))}
-              </div>
-            )}
-
-            <div className="mt-3 rounded-md border border-[#E5EAF2] bg-[#FAFCFE] p-4">
-              <div className="flex items-center gap-2">
-                <span className="text-[11.5px] font-semibold uppercase tracking-wide text-[#5A6B84]">
-                  {copy.suggestedTags}
-                </span>
-                <span className="inline-flex items-center rounded-full bg-[#FF8A3D] px-2.5 py-0.5 text-[10.5px] font-bold uppercase tracking-wide text-white">
-                  {copy.optionalBadge}
-                </span>
-              </div>
-
-              {/* Add a custom tag (mirrors Angular add-knowledge step 4) */}
-              <div className="mt-3 flex gap-2">
-                <input
-                  type="text"
-                  value={newTagName}
-                  onChange={(event) => setNewTagName(event.currentTarget.value)}
-                  onKeyDown={(event) => {
-                    if (event.key === 'Enter') {
-                      event.preventDefault()
-                      addNewTag()
-                    }
-                  }}
-                  placeholder={copy.addTagPlaceholder}
-                  className="h-10 min-w-0 flex-1 rounded-md border border-[#D6E0EC] bg-white px-3 text-[13.5px] text-[#1C2433] transition-colors placeholder:text-[#94A3B8] focus-visible:border-[#8FB9EA] focus-visible:outline-none"
-                />
-                <button
-                  type="button"
-                  onClick={addNewTag}
-                  disabled={!newTagName.trim() || isAddingTag}
-                  className="inline-flex h-10 shrink-0 items-center gap-1.5 rounded-md bg-[#1D74E0] px-4 text-[13.5px] font-semibold text-white transition-colors hover:bg-[#1A67C8] disabled:opacity-50"
-                >
-                  {isAddingTag ? (
-                    <IconLoader2 aria-hidden className="h-4 w-4 animate-spin" stroke={2} />
-                  ) : (
-                    <IconPlus aria-hidden className="h-4 w-4" stroke={2.2} />
-                  )}
-                  {copy.addTag}
-                </button>
-              </div>
-              <p className="mt-2 text-[12px] text-[#94A3B8]">{copy.addTagHint}</p>
-
-            <div className="mt-3 flex max-h-48 flex-wrap gap-2 overflow-y-auto">
-              {isLoadingTags ? (
-                <span className="text-[13px] text-[#94A3B8]">…</span>
-              ) : industryTags.length === 0 ? (
-                <span className="text-[13px] text-[#94A3B8]">{copy.noTags}</span>
-              ) : (
-                industryTags.map((tag) => {
-                  const isSelected = selectedTags.some((selected) => selected.id === tag.id)
-                  return (
-                    <button
-                      key={tag.id}
-                      type="button"
-                      onClick={() => toggleTag(tag)}
-                      className={`rounded-full border px-3.5 py-1.5 text-[13.5px] transition-colors ${
-                        isSelected
-                          ? 'border-[#1D74E0] font-medium text-[#1D74E0]'
-                          : 'border-[#E5EAF2] bg-white text-[#5A6B84] hover:border-[#C9DCF6]'
-                      }`}
-                    >
-                      #{tag.name}
-                    </button>
-                  )
-                })
-              )}
+          <div className="mt-4">
+            <div className="flex items-center gap-2">
+              <span className="text-[11.5px] font-semibold uppercase tracking-wide text-[#5A6B84]">{copy.suggestedTags}</span>
+              <span className="text-[11px] font-medium text-[#9099A6]">{copy.optionalBadge}</span>
             </div>
-              <p className="mt-3 text-[12.5px] text-[#94A3B8]">{copy.tagsHint}</p>
-            </div>
-          </>
+            <TagSelector
+              locale={locale}
+              industryId={industry.id}
+              selectedTags={selectedTags}
+              onChange={setSelectedTags}
+            />
+          </div>
         )}
 
         {/* Footer */}

@@ -24,7 +24,6 @@ import RoleGuard from '@/components/auth/RoleGuard';
 import AnalyticsProvider from '@/app/analytics-provider';
 import { generateOrganizationSchema, generateWebSiteSchema } from '@/utils/seo';
 import { publicBaseUrl } from '@/app/config';
-import FloatingFeedButton from '@/components/feed/FloatingFeedButton';
 import FloatingBackToTopButton from '@/components/ui/FloatingBackToTopButton';
 
 
@@ -209,9 +208,6 @@ export default async function RootLayout({
                     >
                       {children}
                     </div>
-                    <Suspense fallback={null}>
-                      <FloatingFeedButton locale={locale} />
-                    </Suspense>
                     <Suspense fallback={null}>
                       <FloatingBackToTopButton locale={locale} />
                     </Suspense>

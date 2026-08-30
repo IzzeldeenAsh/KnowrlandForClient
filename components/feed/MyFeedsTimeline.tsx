@@ -97,7 +97,6 @@ const copyByLocale = {
     trackTooltip: 'Track this post to see more content like it in your feed.',
     untrackTooltip: 'Untrack this post to stop seeing more content like it in your feed.',
     ownPostTracking: 'You cannot track your own post.',
-    by: 'By',
   },
   ar: {
     title: 'منشوراتي',
@@ -143,7 +142,6 @@ const copyByLocale = {
     trackTooltip: 'تتبّع هذا المنشور لرؤية المزيد من المحتوى المشابه له في موجزك.',
     untrackTooltip: 'ألغِ تتبّع هذا المنشور للتوقف عن رؤية المزيد من المحتوى المشابه له في موجزك.',
     ownPostTracking: 'لا يمكنك تتبّع منشورك الخاص.',
-    by: 'بواسطة',
   },
 } as const
 
@@ -926,15 +924,6 @@ export function FeedCard({
         ? 'bg-[#FFF0EE] text-[#B53B32]'
         : 'bg-[#FFF5E5] text-[#A96710]'
   const insighter = item.insighter
-  const initials = insighter
-    ? insighter.name
-        .split(' ')
-        .filter(Boolean)
-        .slice(0, 2)
-        .map((part) => part[0])
-        .join('')
-        .toUpperCase()
-    : ''
   const isPublishedAsCompany = item.author_profile_type === 'company' && Boolean(insighter?.company)
   const publisherName = isPublishedAsCompany
     ? insighter?.company?.legal_name || insighter?.company?.name || insighter?.name || ''
@@ -1005,7 +994,7 @@ export function FeedCard({
         <div className={`min-w-0 flex-1 ${articleAccess === 'community' ? 'pe-[76px] sm:pe-0' : ''}`}>
           {insighter && (
             <div className="flex min-w-0 items-center gap-3">
-              <div className="relative h-10 w-10 shrink-0">
+              <div className="h-10 w-10 shrink-0">
                 <div className="h-10 w-10 overflow-hidden rounded-full bg-[#E7F0FE]">
                 {publisherAvatar ? (
                   <img
@@ -1019,15 +1008,6 @@ export function FeedCard({
                   </div>
                 )}
                 </div>
-                {isPublishedAsCompany && (
-                  <div className="absolute -bottom-1 -end-1 h-[19px] w-[19px] overflow-hidden rounded-full border-2 border-white bg-[#E7F0FE]">
-                    {insighter.profile_photo_url ? (
-                      <img src={insighter.profile_photo_url} alt={insighter.name} className="h-full w-full object-cover object-top" />
-                    ) : (
-                      <span className="flex h-full w-full items-center justify-center text-[6px] font-bold text-[#2378E8]">{initials || 'I'}</span>
-                    )}
-                  </div>
-                )}
               </div>
               <div className="min-w-0">
                 <Link
@@ -1038,16 +1018,6 @@ export function FeedCard({
                 >
                   {publisherName}
                 </Link>
-                {isPublishedAsCompany && (
-                  <Link
-                    href={`/${locale}/profile/${insighter.uuid}?entity=insighter`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="block truncate text-[11px] text-[#7A8BA4] hover:text-[#2378E8] hover:underline"
-                  >
-                    {copy.by} {insighter.name}
-                  </Link>
-                )}
                 <div className="flex min-w-0 flex-col items-start gap-y-0.5 text-[12px] text-[#7A8BA4] sm:flex-row sm:items-center sm:gap-x-1.5 sm:text-[12.5px]">
                   {item.industry && (
                     <Link

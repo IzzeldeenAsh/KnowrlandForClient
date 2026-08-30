@@ -20,7 +20,6 @@ import {
   IconMessage2,
   IconSettings2,
   IconShoppingBag,
-  IconSparkles,
   IconUserEdit,
   IconWallet,
   type Icon,
@@ -64,6 +63,7 @@ type SidebarCopy = {
   manager: string
   client: string
   at: string
+  guestEyebrow: string
   guestTitle: string
   guestDescription: string
   createAccount: string
@@ -115,9 +115,10 @@ const copyByLocale: Record<'en' | 'ar', SidebarCopy> = {
     manager: 'Manager',
     client: 'Client',
     at: 'at',
+    guestEyebrow: 'Insighta Business',
     guestTitle: 'New to Insighta?',
-    guestDescription: 'Join to build your own personalized business feed.',
-    createAccount: 'Create account',
+    guestDescription: 'Join free and follow the experts, reports, and insights that move your industry.',
+    createAccount: 'Create free account',
     logIn: 'Log in',
   },
   ar: {
@@ -148,9 +149,10 @@ const copyByLocale: Record<'en' | 'ar', SidebarCopy> = {
     manager: 'مدير',
     client: 'عميل',
     at: 'في',
+    guestEyebrow: 'إنسايتا بيزنس',
     guestTitle: 'جديد على إنسايتا؟',
-    guestDescription: 'انضم إلينا لتحصل على موجز أعمال مصمم حسب اهتماماتك.',
-    createAccount: 'إنشاء حساب',
+    guestDescription: 'انضم مجاناً وتابع الخبراء والتقارير والرؤى التي تحرّك قطاعك.',
+    createAccount: 'إنشاء حساب مجاني',
     logIn: 'تسجيل الدخول',
   },
 }
@@ -341,24 +343,40 @@ function GuestSidebar({ locale }: FeedSidebarProps) {
   const signupUrl = `${dashboardUrl}/auth/sign-up?returnUrl=${encodedReturnUrl}`
 
   return (
-    <section aria-labelledby="feed-auth-title" className="overflow-hidden rounded-lg border border-[#D7E1EC] bg-white p-5">
-      <div aria-hidden className="mb-5 flex h-10 w-10 items-center justify-center rounded-md bg-[#EAF3FF] text-[#2378E8]">
-        <IconSparkles stroke={1.8} className="h-5 w-5" />
-      </div>
-      <h2 id="feed-auth-title" className="text-[20px] font-extrabold leading-tight tracking-[-0.02em] text-[#101724]">
+    <section
+      aria-labelledby="feed-auth-title"
+      dir={isArabic ? 'rtl' : 'ltr'}
+      className="relative overflow-hidden rounded-lg px-[22px] pb-[22px] pt-6"
+      style={{ background: 'linear-gradient(150deg, #2475E8 0%, #2A9BD8 55%, #2BC0D5 100%)' }}
+    >
+      <Image
+        src={SmallLogo}
+        alt=""
+        aria-hidden
+        width={150}
+        height={150}
+        className="pointer-events-none absolute -top-[30px] -end-[34px] h-[150px] w-[150px] opacity-[0.16] brightness-0 invert"
+      />
+      <p className="relative text-[10.5px] font-bold uppercase tracking-[0.16em] text-white/80">
+        {copy.guestEyebrow}
+      </p>
+      <h2
+        id="feed-auth-title"
+        className="relative mt-3 text-balance text-[24px] font-extrabold leading-[1.12] tracking-[-0.02em] text-white"
+      >
         {copy.guestTitle}
       </h2>
-      <p className="mt-2 text-[14px] leading-6 text-[#5E6C7D]">{copy.guestDescription}</p>
-      <div className="mt-5 space-y-2.5">
+      <p className="relative mt-2.5 text-[13.5px] leading-[1.55] text-white/90">{copy.guestDescription}</p>
+      <div className="relative mt-5 space-y-2.5">
         <Link
           href={signupUrl}
-          className="flex h-10 items-center justify-center rounded-md bg-gradient-to-r from-[#2475E8] to-[#2BC0D5] px-4 text-[13px] font-semibold text-white transition duration-150 hover:brightness-105 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2378E8] focus-visible:ring-offset-2 active:scale-[0.99]"
+          className="flex h-11 items-center justify-center rounded-lg bg-white px-4 text-[14px] font-bold text-[#2378E8] transition duration-150 hover:bg-[#F3F8FF] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-[#2A9BD8] active:scale-[0.99]"
         >
           {copy.createAccount}
         </Link>
         <Link
           href={loginUrl}
-          className="flex h-10 items-center justify-center rounded-md border border-[#2378E8] px-4 text-[13px] font-semibold text-[#2378E8] transition duration-150 hover:bg-[#F3F8FF] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2378E8] focus-visible:ring-offset-2 active:scale-[0.99]"
+          className="flex h-11 items-center justify-center rounded-lg border border-white/55 bg-white/10 px-4 text-[14px] font-bold text-white transition duration-150 hover:bg-white/20 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-[#2A9BD8] active:scale-[0.99]"
         >
           {copy.logIn}
         </Link>

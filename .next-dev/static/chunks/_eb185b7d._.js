@@ -603,13 +603,16 @@ __turbopack_context__.s([
     "updateFeedIndustryPreferences",
     ()=>updateFeedIndustryPreferences,
     "updateOnboardingCountry",
-    ()=>updateOnboardingCountry
+    ()=>updateOnboardingCountry,
+    "updateWhatsappNumber",
+    ()=>updateWhatsappNumber
 ]);
 var __TURBOPACK__imported__module__$5b$project$5d2f$app$2f$config$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/app/config.ts [app-client] (ecmascript)");
 ;
 const SUPPORTED_ONBOARDING_PROMPTS = [
     'country',
-    'community_feed_industries'
+    'community_feed_industries',
+    'whatsapp'
 ];
 const onboardingHeaders = (param)=>{
     let { token, locale } = param;
@@ -666,6 +669,20 @@ async function updateFeedIndustryPreferences(industryIds, options) {
     });
     if (!response.ok) {
         throw new Error(await getErrorMessage(response, 'Unable to save your industries.'));
+    }
+}
+async function updateWhatsappNumber(payload, options) {
+    const response = await fetch((0, __TURBOPACK__imported__module__$5b$project$5d2f$app$2f$config$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["getApiUrl"])('/api/account/profile/notification/channel'), {
+        method: 'POST',
+        headers: onboardingHeaders(options),
+        body: JSON.stringify({
+            whatsapp_status: 'active',
+            whatsapp_country_code: payload.whatsappCountryCode,
+            whatsapp_number: payload.whatsappNumber
+        })
+    });
+    if (!response.ok) {
+        throw new Error(await getErrorMessage(response, 'Unable to save your WhatsApp number.'));
     }
 }
 async function skipOnboardingPrompt(promptKey, options) {
@@ -752,15 +769,6 @@ function QueryParamAuthCallback() {
     }
     const returnUrl = searchParams.get('returnUrl');
     const locale = params.locale || 'en';
-    const shouldPromptAddChannels = searchParams.get('promptAddChannels') === '1';
-    const storePromptPendingFlag = ()=>{
-        if (!shouldPromptAddChannels) return;
-        try {
-            localStorage.setItem('postSignupPrompt:addChannels:pending', '1');
-        } catch (e) {
-        // ignore
-        }
-    };
     // If still no token, try to get it from cookie
     if (!token) {
         token = (0, __TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$authToken$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["getTokenFromCookie"])('token');
@@ -958,7 +966,6 @@ function QueryParamAuthCallback() {
     };
     // Helper function to handle redirects
     const handleRedirect = async (userData)=>{
-        storePromptPendingFlag();
         console.log('[callback] Handling redirect for user:', userData.email);
         console.log('[callback] User roles:', userData.roles);
         console.log('[callback] Return URL from params:', returnUrl);
@@ -998,7 +1005,7 @@ function QueryParamAuthCallback() {
         console.log('[callback] Final return URL:', finalReturnUrl);
         const isUsableReturnUrl = Boolean(finalReturnUrl && finalReturnUrl !== '/' && !finalReturnUrl.includes('/login') && !finalReturnUrl.includes('/auth/'));
         const isProfessionalRole = userData.roles && (userData.roles.includes('insighter') || userData.roles.includes('company') || userData.roles.includes('company-insighter'));
-        const defaultDestination = isProfessionalRole ? '/app/insighter-dashboard/my-dashboard' : "/".concat(preferredLanguage, "/home").concat(shouldPromptAddChannels ? '?promptAddChannels=1' : '');
+        const defaultDestination = isProfessionalRole ? '/app/insighter-dashboard/my-dashboard' : "/".concat(preferredLanguage, "/home");
         const intendedDestination = isUsableReturnUrl && finalReturnUrl ? finalReturnUrl : defaultDestination;
         // Every successful login checks the server-owned onboarding state. If the
         // check is temporarily unavailable, fail open so authentication is never blocked.
@@ -1047,11 +1054,6 @@ function QueryParamAuthCallback() {
             console.log('[callback] Redirecting to Angular insighter dashboard');
             window.location.href = "".concat((0, __TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$authRedirect$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["getAngularAppOrigin"])(), "/app/insighter-dashboard/my-dashboard");
         } else {
-            // Redirect to home page using current locale (optionally open post-signup prompt)
-            if (shouldPromptAddChannels) {
-                router.push("/".concat(preferredLanguage, "/home?promptAddChannels=1"));
-                return;
-            }
             console.log('[callback] Redirecting to home page:', "/".concat(preferredLanguage, "/home"));
             router.push("/".concat(preferredLanguage, "/home"));
         }
@@ -1152,7 +1154,7 @@ function QueryParamAuthCallback() {
                 message: currentLocale === 'ar' ? 'جاري تسجيل الدخول...' : 'Signing you in...'
             }, void 0, false, {
                 fileName: "[project]/app/[locale]/callback/page.tsx",
-                lineNumber: 520,
+                lineNumber: 504,
                 columnNumber: 9
             }, this),
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$agreements$2f$AgreementModal$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"], {
@@ -1169,7 +1171,7 @@ function QueryParamAuthCallback() {
                 locale: locale
             }, void 0, false, {
                 fileName: "[project]/app/[locale]/callback/page.tsx",
-                lineNumber: 522,
+                lineNumber: 506,
                 columnNumber: 7
             }, this)
         ]

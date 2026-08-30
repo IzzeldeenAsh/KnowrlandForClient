@@ -7,7 +7,6 @@ import { useToast } from '@/components/toast/ToastContext';
 import PageIllustration from "@/components/page-illustration";
 import type { KnowledgeItem } from '../topic/[id]/[slug]/KnowledgeGrid';
 import type { SearchResultItem } from './SearchResultsGrid';
-import NotificationChannelsPromptModal from '@/components/onboarding/NotificationChannelsPromptModal';
 
 // Import components
 import SearchBar from './components/SearchBar';
@@ -41,7 +40,6 @@ interface YearRange {
 export default function HomePage() {
   const searchParams = useSearchParams();
   const router = useRouter();
-  const PROMPT_ADD_CHANNELS_KEY = 'promptAddChannels';
   // Initialize state with URL parameters if available
   const initialQuery = searchParams.get('keyword') || '';
   const initialType = (searchParams.get('search_type') as 'knowledge' | 'insighter') || 'knowledge';
@@ -1014,8 +1012,6 @@ export default function HomePage() {
     // CRITICAL: Skip if only the page parameter changed (pagination request)
     // Check if this is only a page parameter change
     const currentUrlParams = new URLSearchParams(window.location.search);
-    // Ignore internal onboarding prompt flag so it doesn't get stripped by URL sync logic
-    currentUrlParams.delete(PROMPT_ADD_CHANNELS_KEY);
     const expectedUrlParams = new URLSearchParams();
 
     // Build expected URL params based on current state
@@ -1703,7 +1699,6 @@ export default function HomePage() {
   return (
     <main ref={mainRef} className='h-full min-h-0 flex flex-col bg-gray-50'>
       <style dangerouslySetInnerHTML={{ __html: customScrollbarStyle }} />
-      <NotificationChannelsPromptModal locale={locale} />
 
       {/* Global Loading Overlay */}
 

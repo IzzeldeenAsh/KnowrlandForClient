@@ -1,7 +1,7 @@
 'use client';
 
 import { Tooltip } from '@mantine/core';
-import { IconBrandWhatsapp, IconBriefcase, IconFileCheck, IconFileX, IconFilter, IconMail, IconX } from '@tabler/icons-react';
+import { IconBrandWhatsapp, IconBriefcase, IconFileCheck, IconFileX, IconFilter, IconMail, IconVideo, IconX } from '@tabler/icons-react';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { getAuthToken } from '@/lib/authToken';
 import { useToast } from '@/components/toast/ToastContext';
@@ -23,6 +23,7 @@ type InsighterRecord = {
   verified: boolean;
   profilePhotoUrl: string | null;
   receiveProjectServices: ProjectServicesStatus;
+  hasMeetService: boolean;
   publishedInsightAtLeastOne: boolean;
 };
 
@@ -311,6 +312,7 @@ function normalizeInsighters(payload: unknown): InsighterRecord[] {
         verified?: boolean | number | string;
         profile_photo_url?: string | null;
         receive_project_services?: string | null;
+        has_meet_service?: boolean | number | string | null;
         published_insight_at_least_one?: boolean | number | string | null;
       };
 
@@ -342,6 +344,11 @@ function normalizeInsighters(payload: unknown): InsighterRecord[] {
             ? row.profile_photo_url
             : null,
         receiveProjectServices: normalizeProjectServices(row.receive_project_services),
+        hasMeetService:
+          row.has_meet_service === true ||
+          row.has_meet_service === 1 ||
+          row.has_meet_service === '1' ||
+          row.has_meet_service === 'true',
         publishedInsightAtLeastOne:
           row.published_insight_at_least_one === true ||
           row.published_insight_at_least_one === 1 ||
@@ -1028,6 +1035,21 @@ export default function InsightersTab() {
                                 aria-label={`${insighter.name} is available for project services`}
                               >
                                 <IconBriefcase size={15} />
+                              </span>
+                            </Tooltip>
+                          ) : null}
+                          {insighter.hasMeetService ? (
+                            <Tooltip
+                              label="Meetings feature activated"
+                              withArrow
+                              position="top"
+                              openDelay={100}
+                            >
+                              <span
+                                className="inline-flex h-7 w-7 items-center justify-center rounded-full bg-indigo-50 text-indigo-600 ring-1 ring-indigo-200"
+                                aria-label={`${insighter.name} has the meetings feature activated`}
+                              >
+                                <IconVideo size={15} />
                               </span>
                             </Tooltip>
                           ) : null}
