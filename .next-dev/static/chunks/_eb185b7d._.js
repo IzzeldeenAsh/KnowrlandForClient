@@ -503,8 +503,12 @@ __turbopack_context__.s([
     "toAngularAppUrl",
     ()=>toAngularAppUrl
 ]);
-var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$build$2f$polyfills$2f$process$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = /*#__PURE__*/ __turbopack_context__.i("[project]/node_modules/next/dist/build/polyfills/process.js [app-client] (ecmascript)");
-const DEFAULT_LOCAL_ANGULAR_APP_URL = ("TURBOPACK compile-time value", "http://localhost:4200") || "".concat(("TURBOPACK compile-time value", "http://localhost:4200"));
+var __TURBOPACK__imported__module__$5b$project$5d2f$app$2f$config$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/app/config.ts [app-client] (ecmascript)");
+;
+// Env-driven, with the production dashboard as a fail-safe fallback. The old
+// `process.env.X || \`${process.env.X}\`` form fell back to the string
+// "undefined" whenever the env var was missing.
+const DEFAULT_LOCAL_ANGULAR_APP_URL = __TURBOPACK__imported__module__$5b$project$5d2f$app$2f$config$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["dashboardUrl"];
 const ANGULAR_ROUTE_PREFIXES = [
     "/app/",
     "/admin-dashboard/"
@@ -588,16 +592,30 @@ if (typeof globalThis.$RefreshHelpers$ === 'object' && globalThis.$RefreshHelper
 "use strict";
 
 __turbopack_context__.s([
+    "INSIGHTER_PROMPT_ROLES",
+    ()=>INSIGHTER_PROMPT_ROLES,
+    "SUPPORTED_INSIGHTER_PROMPTS",
+    ()=>SUPPORTED_INSIGHTER_PROMPTS,
     "SUPPORTED_ONBOARDING_PROMPTS",
     ()=>SUPPORTED_ONBOARDING_PROMPTS,
+    "fetchInsighterPromptStatuses",
+    ()=>fetchInsighterPromptStatuses,
     "fetchOnboardingIndustryTree",
     ()=>fetchOnboardingIndustryTree,
     "fetchOnboardingPromptStatuses",
     ()=>fetchOnboardingPromptStatuses,
+    "getVisibleInsighterPrompts",
+    ()=>getVisibleInsighterPrompts,
     "getVisibleSupportedPrompts",
     ()=>getVisibleSupportedPrompts,
+    "hasInsighterPromptRole",
+    ()=>hasInsighterPromptRole,
+    "isSupportedInsighterPrompt",
+    ()=>isSupportedInsighterPrompt,
     "isSupportedOnboardingPrompt",
     ()=>isSupportedOnboardingPrompt,
+    "skipInsighterPrompt",
+    ()=>skipInsighterPrompt,
     "skipOnboardingPrompt",
     ()=>skipOnboardingPrompt,
     "updateFeedIndustryPreferences",
@@ -614,6 +632,15 @@ const SUPPORTED_ONBOARDING_PROMPTS = [
     'community_feed_industries',
     'whatsapp'
 ];
+const SUPPORTED_INSIGHTER_PROMPTS = [
+    'session_availability',
+    'project_settings'
+];
+const INSIGHTER_PROMPT_ROLES = [
+    'insighter',
+    'company',
+    'company-insighter'
+];
 const onboardingHeaders = (param)=>{
     let { token, locale } = param;
     return {
@@ -628,6 +655,41 @@ async function getErrorMessage(response, fallback) {
     const payload = await response.json().catch(()=>null);
     const validationMessages = (payload === null || payload === void 0 ? void 0 : payload.errors) ? Object.values(payload.errors).flat().filter((message)=>typeof message === 'string') : [];
     return validationMessages[0] || (payload === null || payload === void 0 ? void 0 : payload.message) || fallback;
+}
+function isSupportedInsighterPrompt(promptKey) {
+    return SUPPORTED_INSIGHTER_PROMPTS.includes(promptKey);
+}
+function getVisibleInsighterPrompts(prompts) {
+    return prompts.filter((prompt)=>prompt.should_show && isSupportedInsighterPrompt(prompt.prompt_key));
+}
+function hasInsighterPromptRole(roles) {
+    return (roles !== null && roles !== void 0 ? roles : []).some((role)=>INSIGHTER_PROMPT_ROLES.includes(role));
+}
+async function fetchInsighterPromptStatuses(options) {
+    try {
+        const response = await fetch((0, __TURBOPACK__imported__module__$5b$project$5d2f$app$2f$config$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["getApiUrl"])('/api/insighter/onboarding/prompts/status'), {
+            method: 'POST',
+            headers: onboardingHeaders(options),
+            cache: 'no-store'
+        });
+        if (!response.ok) return [];
+        const payload = await response.json();
+        return Array.isArray(payload === null || payload === void 0 ? void 0 : payload.data) ? payload.data : [];
+    } catch (e) {
+        return [];
+    }
+}
+async function skipInsighterPrompt(promptKey, options) {
+    const response = await fetch((0, __TURBOPACK__imported__module__$5b$project$5d2f$app$2f$config$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["getApiUrl"])('/api/insighter/onboarding/prompts/skip'), {
+        method: 'POST',
+        headers: onboardingHeaders(options),
+        body: JSON.stringify({
+            prompt_key: promptKey
+        })
+    });
+    if (!response.ok) {
+        throw new Error(await getErrorMessage(response, 'Unable to skip this step.'));
+    }
 }
 function isSupportedOnboardingPrompt(promptKey) {
     return SUPPORTED_ONBOARDING_PROMPTS.includes(promptKey);
@@ -1005,7 +1067,7 @@ function QueryParamAuthCallback() {
         console.log('[callback] Final return URL:', finalReturnUrl);
         const isUsableReturnUrl = Boolean(finalReturnUrl && finalReturnUrl !== '/' && !finalReturnUrl.includes('/login') && !finalReturnUrl.includes('/auth/'));
         const isProfessionalRole = userData.roles && (userData.roles.includes('insighter') || userData.roles.includes('company') || userData.roles.includes('company-insighter'));
-        const defaultDestination = isProfessionalRole ? '/app/insighter-dashboard/my-dashboard' : "/".concat(preferredLanguage, "/home");
+        const defaultDestination = isProfessionalRole ? '/app/insighter-dashboard/my-dashboard' : "/".concat(preferredLanguage);
         const intendedDestination = isUsableReturnUrl && finalReturnUrl ? finalReturnUrl : defaultDestination;
         // Every successful login checks the server-owned onboarding state. If the
         // check is temporarily unavailable, fail open so authentication is never blocked.
@@ -1016,7 +1078,13 @@ function QueryParamAuthCallback() {
                     token: authToken,
                     locale: preferredLanguage || 'en'
                 });
-                if ((0, __TURBOPACK__imported__module__$5b$project$5d2f$services$2f$onboarding$2e$service$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["getVisibleSupportedPrompts"])(prompts).length > 0) {
+                // Insighter setup covers (availability / project settings) are offered on
+                // the same page, so they count towards sending the user there.
+                const insighterPrompts = (0, __TURBOPACK__imported__module__$5b$project$5d2f$services$2f$onboarding$2e$service$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["hasInsighterPromptRole"])(userData.roles) ? await (0, __TURBOPACK__imported__module__$5b$project$5d2f$services$2f$onboarding$2e$service$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["fetchInsighterPromptStatuses"])({
+                    token: authToken,
+                    locale: preferredLanguage || 'en'
+                }) : [];
+                if ((0, __TURBOPACK__imported__module__$5b$project$5d2f$services$2f$onboarding$2e$service$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["getVisibleSupportedPrompts"])(prompts).length > 0 || (0, __TURBOPACK__imported__module__$5b$project$5d2f$services$2f$onboarding$2e$service$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["getVisibleInsighterPrompts"])(insighterPrompts).length > 0) {
                     if (storedReturnUrl) clearReturnUrlCookie();
                     window.location.replace("/".concat(preferredLanguage, "/onboarding?redirect=").concat(encodeURIComponent(intendedDestination)));
                     return;
@@ -1054,8 +1122,8 @@ function QueryParamAuthCallback() {
             console.log('[callback] Redirecting to Angular insighter dashboard');
             window.location.href = "".concat((0, __TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$authRedirect$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["getAngularAppOrigin"])(), "/app/insighter-dashboard/my-dashboard");
         } else {
-            console.log('[callback] Redirecting to home page:', "/".concat(preferredLanguage, "/home"));
-            router.push("/".concat(preferredLanguage, "/home"));
+            console.log('[callback] Redirecting to feed page:', "/".concat(preferredLanguage));
+            router.push("/".concat(preferredLanguage));
         }
     };
     // Helper function to clear return URL cookie
@@ -1154,7 +1222,7 @@ function QueryParamAuthCallback() {
                 message: currentLocale === 'ar' ? 'جاري تسجيل الدخول...' : 'Signing you in...'
             }, void 0, false, {
                 fileName: "[project]/app/[locale]/callback/page.tsx",
-                lineNumber: 504,
+                lineNumber: 516,
                 columnNumber: 9
             }, this),
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$agreements$2f$AgreementModal$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"], {
@@ -1171,7 +1239,7 @@ function QueryParamAuthCallback() {
                 locale: locale
             }, void 0, false, {
                 fileName: "[project]/app/[locale]/callback/page.tsx",
-                lineNumber: 506,
+                lineNumber: 518,
                 columnNumber: 7
             }, this)
         ]

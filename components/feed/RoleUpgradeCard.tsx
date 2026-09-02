@@ -80,6 +80,7 @@ export default function RoleUpgradeCard({ locale, className }: RoleUpgradeCardPr
   const variant = isInsighterOnly ? 'insighter' : 'client'
   const copy = copyByLocale[isArabic ? 'ar' : 'en'][variant]
   const insighterRegistrationUrl = `${dashboardUrl}/app/insighter-register/vertical`
+  const companyUpgradeUrl = `${dashboardUrl}/app/insighter-dashboard/account-settings/company-account`
   const actionClassName = 'mt-5 inline-flex min-h-10 w-full items-center justify-center gap-2 rounded-md bg-[#176FD1] px-4 text-[13px] font-semibold text-white transition-colors hover:bg-[#105EBA] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#176FD1] focus-visible:ring-offset-2'
 
   return (
@@ -141,25 +142,17 @@ export default function RoleUpgradeCard({ locale, className }: RoleUpgradeCardPr
         ))}
       </ul>
 
-      {isClientOnly ? (
-        <a href={insighterRegistrationUrl} className={actionClassName}>
-          {copy.action}
-          <IconArrowRight
-            aria-hidden
-            className={`h-4 w-4 ${isArabic ? 'rotate-180' : ''}`}
-            stroke={1.9}
-          />
-        </a>
-      ) : (
-        <button type="button" className={actionClassName}>
-          {copy.action}
-          <IconArrowRight
-            aria-hidden
-            className={`h-4 w-4 ${isArabic ? 'rotate-180' : ''}`}
-            stroke={1.9}
-          />
-        </button>
-      )}
+      <a
+        href={isClientOnly ? insighterRegistrationUrl : companyUpgradeUrl}
+        className={actionClassName}
+      >
+        {copy.action}
+        <IconArrowRight
+          aria-hidden
+          className={`h-4 w-4 ${isArabic ? 'rotate-180' : ''}`}
+          stroke={1.9}
+        />
+      </a>
     </section>
   )
 }

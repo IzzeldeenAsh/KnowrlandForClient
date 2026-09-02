@@ -4,6 +4,7 @@ import React from 'react';
 import { Modal, Button, Text, Stack, Box, Divider, Group } from '@mantine/core';
 import { IconLogin, IconUserPlus, IconDownload, IconShoppingBag, IconBellRinging, IconSparkles } from '@tabler/icons-react';
 import Image from 'next/image';
+import { dashboardUrl } from '@/app/config';
 
 interface AuthModalProps {
   opened: boolean;
@@ -15,24 +16,10 @@ interface AuthModalProps {
   loginReturnUrl?: string | null;
 }
 
-// Helper function to get the Angular app URL based on current domain
-const getAngularAppUrl = (): string => {
-  if (typeof window === 'undefined') return `${process.env.NEXT_PUBLIC_DASHBOARD_URL}`;
-
-  const hostname = window.location.hostname;
-  const protocol = window.location.protocol;
-
-  // Production domains
-  if (hostname.includes('foresighta.co')) {
-    return `${process.env.NEXT_PUBLIC_DASHBOARD_URL}`;
-  }
-  if (hostname.includes('insightabusiness.com')) {
-    return `${process.env.NEXT_PUBLIC_DASHBOARD_URL}`;
-  }
-
-  // Local development
-  return `${process.env.NEXT_PUBLIC_DASHBOARD_URL}`;
-};
+// The Angular dashboard URL for the current environment. Every branch of the
+// old hostname switch returned the same env-driven value, so there is nothing
+// to branch on.
+const getAngularAppUrl = (): string => dashboardUrl;
 
 const AuthModal: React.FC<AuthModalProps> = ({
   opened,

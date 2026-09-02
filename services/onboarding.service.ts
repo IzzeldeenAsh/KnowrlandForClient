@@ -9,6 +9,22 @@ export const SUPPORTED_ONBOARDING_PROMPTS = [
 export type OnboardingPromptKey = (typeof SUPPORTED_ONBOARDING_PROMPTS)[number]
 export type OnboardingPromptStatusValue = 'pending' | 'completed' | 'skipped'
 
+/**
+ * Insighter-scoped prompts (App\Enums\InsighterOnboardingPromptKeyEnum), a
+ * separate table and separate endpoints from the account prompts above. Only
+ * the two covered by the post-login covers are listed; `whatsapp` is already
+ * handled by the account prompt of the same name.
+ */
+export const SUPPORTED_INSIGHTER_PROMPTS = [
+  'session_availability',
+  'project_settings',
+] as const
+
+export type InsighterPromptKey = (typeof SUPPORTED_INSIGHTER_PROMPTS)[number]
+
+/** Roles allowed to call the insighter prompt endpoints. */
+export const INSIGHTER_PROMPT_ROLES = ['insighter', 'company', 'company-insighter']
+
 export interface OnboardingPromptStatus {
   prompt_key: string
   status: OnboardingPromptStatusValue
@@ -48,6 +64,61 @@ async function getErrorMessage(response: Response, fallback: string): Promise<st
     : []
 
   return validationMessages[0] || payload?.message || fallback
+}
+
+export function isSupportedInsighterPrompt(promptKey: string): promptKey is InsighterPromptKey {
+  return SUPPORTED_INSIGHTER_PROMPTS.includes(promptKey as InsighterPromptKey)
+}
+
+export function getVisibleInsighterPrompts(
+  prompts: OnboardingPromptStatus[],
+): OnboardingPromptStatus[] {
+  return prompts.filter(
+    (prompt) => prompt.should_show && isSupportedInsighterPrompt(prompt.prompt_key),
+  )
+}
+
+export function hasInsighterPromptRole(roles: string[] | null | undefined): boolean {
+  return (roles ?? []).some((role) => INSIGHTER_PROMPT_ROLES.includes(role))
+}
+
+/**
+ * Insighter prompts sit behind `role:insighter|company|company-insighter`, so a
+ * client user gets a 403 here. Callers must role-gate first; this resolves to an
+ * empty list rather than throwing so a failed check never blocks the login.
+ */
+export async function fetchInsighterPromptStatuses(
+  options: ApiOptions,
+): Promise<OnboardingPromptStatus[]> {
+  try {
+    const response = await fetch(getApiUrl('/api/insighter/onboarding/prompts/status'), {
+      method: 'POST',
+      headers: onboardingHeaders(options),
+      cache: 'no-store',
+    })
+
+    if (!response.ok) return []
+
+    const payload = await response.json()
+    return Array.isArray(payload?.data) ? payload.data : []
+  } catch {
+    return []
+  }
+}
+
+export async function skipInsighterPrompt(
+  promptKey: InsighterPromptKey,
+  options: ApiOptions,
+): Promise<void> {
+  const response = await fetch(getApiUrl('/api/insighter/onboarding/prompts/skip'), {
+    method: 'POST',
+    headers: onboardingHeaders(options),
+    body: JSON.stringify({ prompt_key: promptKey }),
+  })
+
+  if (!response.ok) {
+    throw new Error(await getErrorMessage(response, 'Unable to skip this step.'))
+  }
 }
 
 export function isSupportedOnboardingPrompt(promptKey: string): promptKey is OnboardingPromptKey {

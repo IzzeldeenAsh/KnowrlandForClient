@@ -151,7 +151,6 @@ __turbopack_context__.s([
     "default",
     ()=>__TURBOPACK__default__export__
 ]);
-var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$build$2f$polyfills$2f$process$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = /*#__PURE__*/ __turbopack_context__.i("[project]/node_modules/next/dist/build/polyfills/process.js [app-client] (ecmascript)");
 var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/next/dist/compiled/react/jsx-dev-runtime.js [app-client] (ecmascript)");
 var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mantine$2f$core$2f$esm$2f$components$2f$Modal$2f$Modal$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/@mantine/core/esm/components/Modal/Modal.mjs [app-client] (ecmascript)");
 var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mantine$2f$core$2f$esm$2f$components$2f$Button$2f$Button$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/@mantine/core/esm/components/Button/Button.mjs [app-client] (ecmascript)");
@@ -167,27 +166,17 @@ var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$tabler$2f$
 var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$tabler$2f$icons$2d$react$2f$dist$2f$esm$2f$icons$2f$IconBellRinging$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__IconBellRinging$3e$__ = __turbopack_context__.i("[project]/node_modules/@tabler/icons-react/dist/esm/icons/IconBellRinging.mjs [app-client] (ecmascript) <export default as IconBellRinging>");
 var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$tabler$2f$icons$2d$react$2f$dist$2f$esm$2f$icons$2f$IconSparkles$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__IconSparkles$3e$__ = __turbopack_context__.i("[project]/node_modules/@tabler/icons-react/dist/esm/icons/IconSparkles.mjs [app-client] (ecmascript) <export default as IconSparkles>");
 var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$image$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/next/image.js [app-client] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$app$2f$config$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/app/config.ts [app-client] (ecmascript)");
 'use client';
 ;
 ;
 ;
 ;
-// Helper function to get the Angular app URL based on current domain
-const getAngularAppUrl = ()=>{
-    if ("TURBOPACK compile-time falsy", 0) //TURBOPACK unreachable
-    ;
-    const hostname = window.location.hostname;
-    const protocol = window.location.protocol;
-    // Production domains
-    if (hostname.includes('foresighta.co')) {
-        return "".concat(("TURBOPACK compile-time value", "http://localhost:4200"));
-    }
-    if (hostname.includes('insightabusiness.com')) {
-        return "".concat(("TURBOPACK compile-time value", "http://localhost:4200"));
-    }
-    // Local development
-    return "".concat(("TURBOPACK compile-time value", "http://localhost:4200"));
-};
+;
+// The Angular dashboard URL for the current environment. Every branch of the
+// old hostname switch returned the same env-driven value, so there is nothing
+// to branch on.
+const getAngularAppUrl = ()=>__TURBOPACK__imported__module__$5b$project$5d2f$app$2f$config$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["dashboardUrl"];
 const AuthModal = (param)=>{
     let { opened, onClose, locale, guestCheckoutUrl = null, disableGuestCheckout = false, loginReturnUrl = null } = param;
     const isRTL = locale === 'ar';
@@ -229,7 +218,7 @@ const AuthModal = (param)=>{
             children: translations.titleDisableGuestCheckout
         }, void 0, false, {
             fileName: "[project]/app/[locale]/knowledge/[type]/[slug]/AuthModal.tsx",
-            lineNumber: 94,
+            lineNumber: 81,
             columnNumber: 7
         }, void 0) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mantine$2f$core$2f$esm$2f$components$2f$Text$2f$Text$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__["Text"], {
             size: "lg",
@@ -237,7 +226,7 @@ const AuthModal = (param)=>{
             children: translations.title
         }, void 0, false, {
             fileName: "[project]/app/[locale]/knowledge/[type]/[slug]/AuthModal.tsx",
-            lineNumber: 95,
+            lineNumber: 82,
             columnNumber: 7
         }, void 0),
         centered: true,
@@ -269,12 +258,12 @@ const AuthModal = (param)=>{
                         priority: true
                     }, void 0, false, {
                         fileName: "[project]/app/[locale]/knowledge/[type]/[slug]/AuthModal.tsx",
-                        lineNumber: 110,
+                        lineNumber: 97,
                         columnNumber: 11
                     }, ("TURBOPACK compile-time value", void 0))
                 }, void 0, false, {
                     fileName: "[project]/app/[locale]/knowledge/[type]/[slug]/AuthModal.tsx",
-                    lineNumber: 109,
+                    lineNumber: 96,
                     columnNumber: 9
                 }, ("TURBOPACK compile-time value", void 0)),
                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mantine$2f$core$2f$esm$2f$components$2f$Text$2f$Text$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__["Text"], {
@@ -284,7 +273,7 @@ const AuthModal = (param)=>{
                     children: translations.message
                 }, void 0, false, {
                     fileName: "[project]/app/[locale]/knowledge/[type]/[slug]/AuthModal.tsx",
-                    lineNumber: 119,
+                    lineNumber: 106,
                     columnNumber: 9
                 }, ("TURBOPACK compile-time value", void 0)),
                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -295,7 +284,7 @@ const AuthModal = (param)=>{
                                 size: 18
                             }, void 0, false, {
                                 fileName: "[project]/app/[locale]/knowledge/[type]/[slug]/AuthModal.tsx",
-                                lineNumber: 124,
+                                lineNumber: 111,
                                 columnNumber: 26
                             }, void 0),
                             onClick: handleLogIn,
@@ -305,7 +294,7 @@ const AuthModal = (param)=>{
                             children: translations.logIn
                         }, void 0, false, {
                             fileName: "[project]/app/[locale]/knowledge/[type]/[slug]/AuthModal.tsx",
-                            lineNumber: 123,
+                            lineNumber: 110,
                             columnNumber: 11
                         }, ("TURBOPACK compile-time value", void 0)),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mantine$2f$core$2f$esm$2f$components$2f$Button$2f$Button$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__["Button"], {
@@ -313,7 +302,7 @@ const AuthModal = (param)=>{
                                 size: 18
                             }, void 0, false, {
                                 fileName: "[project]/app/[locale]/knowledge/[type]/[slug]/AuthModal.tsx",
-                                lineNumber: 134,
+                                lineNumber: 121,
                                 columnNumber: 26
                             }, void 0),
                             onClick: handleSignUp,
@@ -322,13 +311,13 @@ const AuthModal = (param)=>{
                             children: translations.signUp
                         }, void 0, false, {
                             fileName: "[project]/app/[locale]/knowledge/[type]/[slug]/AuthModal.tsx",
-                            lineNumber: 133,
+                            lineNumber: 120,
                             columnNumber: 11
                         }, ("TURBOPACK compile-time value", void 0))
                     ]
                 }, void 0, true, {
                     fileName: "[project]/app/[locale]/knowledge/[type]/[slug]/AuthModal.tsx",
-                    lineNumber: 122,
+                    lineNumber: 109,
                     columnNumber: 1
                 }, ("TURBOPACK compile-time value", void 0)),
                 !disableGuestCheckout && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mantine$2f$core$2f$esm$2f$core$2f$Box$2f$Box$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__["Box"], {
@@ -345,7 +334,7 @@ const AuthModal = (param)=>{
                             children: translations.benefitsTitle
                         }, void 0, false, {
                             fileName: "[project]/app/[locale]/knowledge/[type]/[slug]/AuthModal.tsx",
-                            lineNumber: 153,
+                            lineNumber: 140,
                             columnNumber: 11
                         }, ("TURBOPACK compile-time value", void 0)),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mantine$2f$core$2f$esm$2f$components$2f$Stack$2f$Stack$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__["Stack"], {
@@ -372,12 +361,12 @@ const AuthModal = (param)=>{
                                                 size: 18
                                             }, void 0, false, {
                                                 fileName: "[project]/app/[locale]/knowledge/[type]/[slug]/AuthModal.tsx",
-                                                lineNumber: 172,
+                                                lineNumber: 159,
                                                 columnNumber: 17
                                             }, ("TURBOPACK compile-time value", void 0))
                                         }, void 0, false, {
                                             fileName: "[project]/app/[locale]/knowledge/[type]/[slug]/AuthModal.tsx",
-                                            lineNumber: 159,
+                                            lineNumber: 146,
                                             columnNumber: 15
                                         }, ("TURBOPACK compile-time value", void 0)),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mantine$2f$core$2f$esm$2f$components$2f$Text$2f$Text$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__["Text"], {
@@ -385,13 +374,13 @@ const AuthModal = (param)=>{
                                             children: translations.benefit1
                                         }, void 0, false, {
                                             fileName: "[project]/app/[locale]/knowledge/[type]/[slug]/AuthModal.tsx",
-                                            lineNumber: 174,
+                                            lineNumber: 161,
                                             columnNumber: 15
                                         }, ("TURBOPACK compile-time value", void 0))
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/app/[locale]/knowledge/[type]/[slug]/AuthModal.tsx",
-                                    lineNumber: 158,
+                                    lineNumber: 145,
                                     columnNumber: 13
                                 }, ("TURBOPACK compile-time value", void 0)),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mantine$2f$core$2f$esm$2f$components$2f$Group$2f$Group$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__["Group"], {
@@ -415,12 +404,12 @@ const AuthModal = (param)=>{
                                                 size: 18
                                             }, void 0, false, {
                                                 fileName: "[project]/app/[locale]/knowledge/[type]/[slug]/AuthModal.tsx",
-                                                lineNumber: 191,
+                                                lineNumber: 178,
                                                 columnNumber: 17
                                             }, ("TURBOPACK compile-time value", void 0))
                                         }, void 0, false, {
                                             fileName: "[project]/app/[locale]/knowledge/[type]/[slug]/AuthModal.tsx",
-                                            lineNumber: 178,
+                                            lineNumber: 165,
                                             columnNumber: 15
                                         }, ("TURBOPACK compile-time value", void 0)),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mantine$2f$core$2f$esm$2f$components$2f$Text$2f$Text$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__["Text"], {
@@ -428,13 +417,13 @@ const AuthModal = (param)=>{
                                             children: translations.benefit2
                                         }, void 0, false, {
                                             fileName: "[project]/app/[locale]/knowledge/[type]/[slug]/AuthModal.tsx",
-                                            lineNumber: 193,
+                                            lineNumber: 180,
                                             columnNumber: 15
                                         }, ("TURBOPACK compile-time value", void 0))
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/app/[locale]/knowledge/[type]/[slug]/AuthModal.tsx",
-                                    lineNumber: 177,
+                                    lineNumber: 164,
                                     columnNumber: 13
                                 }, ("TURBOPACK compile-time value", void 0)),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mantine$2f$core$2f$esm$2f$components$2f$Group$2f$Group$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__["Group"], {
@@ -458,12 +447,12 @@ const AuthModal = (param)=>{
                                                 size: 18
                                             }, void 0, false, {
                                                 fileName: "[project]/app/[locale]/knowledge/[type]/[slug]/AuthModal.tsx",
-                                                lineNumber: 210,
+                                                lineNumber: 197,
                                                 columnNumber: 17
                                             }, ("TURBOPACK compile-time value", void 0))
                                         }, void 0, false, {
                                             fileName: "[project]/app/[locale]/knowledge/[type]/[slug]/AuthModal.tsx",
-                                            lineNumber: 197,
+                                            lineNumber: 184,
                                             columnNumber: 15
                                         }, ("TURBOPACK compile-time value", void 0)),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mantine$2f$core$2f$esm$2f$components$2f$Text$2f$Text$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__["Text"], {
@@ -471,13 +460,13 @@ const AuthModal = (param)=>{
                                             children: translations.benefit3
                                         }, void 0, false, {
                                             fileName: "[project]/app/[locale]/knowledge/[type]/[slug]/AuthModal.tsx",
-                                            lineNumber: 212,
+                                            lineNumber: 199,
                                             columnNumber: 15
                                         }, ("TURBOPACK compile-time value", void 0))
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/app/[locale]/knowledge/[type]/[slug]/AuthModal.tsx",
-                                    lineNumber: 196,
+                                    lineNumber: 183,
                                     columnNumber: 13
                                 }, ("TURBOPACK compile-time value", void 0)),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mantine$2f$core$2f$esm$2f$components$2f$Group$2f$Group$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__["Group"], {
@@ -501,12 +490,12 @@ const AuthModal = (param)=>{
                                                 size: 18
                                             }, void 0, false, {
                                                 fileName: "[project]/app/[locale]/knowledge/[type]/[slug]/AuthModal.tsx",
-                                                lineNumber: 229,
+                                                lineNumber: 216,
                                                 columnNumber: 17
                                             }, ("TURBOPACK compile-time value", void 0))
                                         }, void 0, false, {
                                             fileName: "[project]/app/[locale]/knowledge/[type]/[slug]/AuthModal.tsx",
-                                            lineNumber: 216,
+                                            lineNumber: 203,
                                             columnNumber: 15
                                         }, ("TURBOPACK compile-time value", void 0)),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mantine$2f$core$2f$esm$2f$components$2f$Text$2f$Text$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__["Text"], {
@@ -514,25 +503,25 @@ const AuthModal = (param)=>{
                                             children: translations.benefit4
                                         }, void 0, false, {
                                             fileName: "[project]/app/[locale]/knowledge/[type]/[slug]/AuthModal.tsx",
-                                            lineNumber: 231,
+                                            lineNumber: 218,
                                             columnNumber: 15
                                         }, ("TURBOPACK compile-time value", void 0))
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/app/[locale]/knowledge/[type]/[slug]/AuthModal.tsx",
-                                    lineNumber: 215,
+                                    lineNumber: 202,
                                     columnNumber: 13
                                 }, ("TURBOPACK compile-time value", void 0))
                             ]
                         }, void 0, true, {
                             fileName: "[project]/app/[locale]/knowledge/[type]/[slug]/AuthModal.tsx",
-                            lineNumber: 157,
+                            lineNumber: 144,
                             columnNumber: 11
                         }, ("TURBOPACK compile-time value", void 0))
                     ]
                 }, void 0, true, {
                     fileName: "[project]/app/[locale]/knowledge/[type]/[slug]/AuthModal.tsx",
-                    lineNumber: 145,
+                    lineNumber: 132,
                     columnNumber: 9
                 }, ("TURBOPACK compile-time value", void 0)),
                 !disableGuestCheckout && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mantine$2f$core$2f$esm$2f$components$2f$Stack$2f$Stack$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__["Stack"], {
@@ -553,7 +542,7 @@ const AuthModal = (param)=>{
                                 }
                             }, void 0, false, {
                                 fileName: "[project]/app/[locale]/knowledge/[type]/[slug]/AuthModal.tsx",
-                                lineNumber: 240,
+                                lineNumber: 227,
                                 columnNumber: 15
                             }, ("TURBOPACK compile-time value", void 0)),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mantine$2f$core$2f$esm$2f$components$2f$Button$2f$Button$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__["Button"], {
@@ -565,7 +554,7 @@ const AuthModal = (param)=>{
                                 children: translations.buyAsGuest
                             }, void 0, false, {
                                 fileName: "[project]/app/[locale]/knowledge/[type]/[slug]/AuthModal.tsx",
-                                lineNumber: 253,
+                                lineNumber: 240,
                                 columnNumber: 15
                             }, ("TURBOPACK compile-time value", void 0)),
                             disableGuestCheckout && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mantine$2f$core$2f$esm$2f$components$2f$Text$2f$Text$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__["Text"], {
@@ -575,25 +564,25 @@ const AuthModal = (param)=>{
                                 children: translations.guestDisabledNote
                             }, void 0, false, {
                                 fileName: "[project]/app/[locale]/knowledge/[type]/[slug]/AuthModal.tsx",
-                                lineNumber: 264,
+                                lineNumber: 251,
                                 columnNumber: 17
                             }, ("TURBOPACK compile-time value", void 0))
                         ]
                     }, void 0, true)
                 }, void 0, false, {
                     fileName: "[project]/app/[locale]/knowledge/[type]/[slug]/AuthModal.tsx",
-                    lineNumber: 237,
+                    lineNumber: 224,
                     columnNumber: 9
                 }, ("TURBOPACK compile-time value", void 0))
             ]
         }, void 0, true, {
             fileName: "[project]/app/[locale]/knowledge/[type]/[slug]/AuthModal.tsx",
-            lineNumber: 106,
+            lineNumber: 93,
             columnNumber: 7
         }, ("TURBOPACK compile-time value", void 0))
     }, void 0, false, {
         fileName: "[project]/app/[locale]/knowledge/[type]/[slug]/AuthModal.tsx",
-        lineNumber: 89,
+        lineNumber: 76,
         columnNumber: 5
     }, ("TURBOPACK compile-time value", void 0));
 };

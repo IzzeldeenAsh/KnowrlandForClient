@@ -53,6 +53,7 @@ module.exports = {
         'shine': 'shine 5s linear 500ms infinite',
         'float': 'float 2s ease-in-out infinite',
         'infinite-scroll': 'infinite-scroll 40s linear infinite',
+        'caret-blink': 'caret-blink 1.1s steps(1, end) infinite',
       },
       keyframes: {
         'endless': {
@@ -73,6 +74,10 @@ module.exports = {
         'infinite-scroll': {
           from: { transform: 'translateX(0)' },
           to: { transform: 'translateX(-100%)' },
+        },
+        'caret-blink': {
+          '0%, 49%': { opacity: '1' },
+          '50%, 100%': { opacity: '0' },
         }        
       }
     },

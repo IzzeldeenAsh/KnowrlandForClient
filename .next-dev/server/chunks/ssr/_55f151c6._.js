@@ -38,13 +38,16 @@ __turbopack_context__.s([
     "updateFeedIndustryPreferences",
     ()=>updateFeedIndustryPreferences,
     "updateOnboardingCountry",
-    ()=>updateOnboardingCountry
+    ()=>updateOnboardingCountry,
+    "updateWhatsappNumber",
+    ()=>updateWhatsappNumber
 ]);
 var __TURBOPACK__imported__module__$5b$project$5d2f$app$2f$config$2e$ts__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/app/config.ts [app-ssr] (ecmascript)");
 ;
 const SUPPORTED_ONBOARDING_PROMPTS = [
     'country',
-    'community_feed_industries'
+    'community_feed_industries',
+    'whatsapp'
 ];
 const onboardingHeaders = ({ token, locale })=>({
         Authorization: `Bearer ${token}`,
@@ -100,6 +103,20 @@ async function updateFeedIndustryPreferences(industryIds, options) {
         throw new Error(await getErrorMessage(response, 'Unable to save your industries.'));
     }
 }
+async function updateWhatsappNumber(payload, options) {
+    const response = await fetch((0, __TURBOPACK__imported__module__$5b$project$5d2f$app$2f$config$2e$ts__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["getApiUrl"])('/api/account/profile/notification/channel'), {
+        method: 'POST',
+        headers: onboardingHeaders(options),
+        body: JSON.stringify({
+            whatsapp_status: 'active',
+            whatsapp_country_code: payload.whatsappCountryCode,
+            whatsapp_number: payload.whatsappNumber
+        })
+    });
+    if (!response.ok) {
+        throw new Error(await getErrorMessage(response, 'Unable to save your WhatsApp number.'));
+    }
+}
 async function skipOnboardingPrompt(promptKey, options) {
     const response = await fetch((0, __TURBOPACK__imported__module__$5b$project$5d2f$app$2f$config$2e$ts__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["getApiUrl"])('/api/account/profile/onboarding/prompts/skip'), {
         method: 'POST',
@@ -139,6 +156,8 @@ __turbopack_context__.s([
     ()=>createSuggestTag,
     "deleteFeedItem",
     ()=>deleteFeedItem,
+    "fetchCommonTags",
+    ()=>fetchCommonTags,
     "fetchIndustryTags",
     ()=>fetchIndustryTags,
     "fetchLibraryKnowledgeById",
@@ -181,6 +200,8 @@ __turbopack_context__.s([
     ()=>saveVideoPostDraft,
     "searchCommunityFeed",
     ()=>searchCommunityFeed,
+    "searchTags",
+    ()=>searchTags,
     "setCommunityFeedItemSaved",
     ()=>setCommunityFeedItemSaved,
     "setCommunityFeedItemTracked",
@@ -724,6 +745,32 @@ async function saveArticle(payload, status, locale, uuid) {
 }
 async function fetchIndustryTags(industryId, locale) {
     const response = await fetch((0, __TURBOPACK__imported__module__$5b$project$5d2f$app$2f$config$2e$ts__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["getApiUrl"])(`/api/common/setting/tag/industry/${industryId}`), {
+        headers: authHeaders(locale)
+    });
+    if (!response.ok) return [];
+    const body = await response.json();
+    return (body.data ?? []).map((tag)=>({
+            id: tag.id,
+            name: tag.name
+        }));
+}
+async function fetchCommonTags(locale) {
+    const response = await fetch((0, __TURBOPACK__imported__module__$5b$project$5d2f$app$2f$config$2e$ts__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["getApiUrl"])('/api/common/setting/tag/common/list'), {
+        headers: authHeaders(locale)
+    });
+    if (!response.ok) return [];
+    const body = await response.json();
+    return (body.data ?? []).map((tag)=>({
+            id: tag.id,
+            name: tag.name
+        }));
+}
+async function searchTags(keyword, locale) {
+    const params = new URLSearchParams({
+        keyword,
+        limit: '20'
+    });
+    const response = await fetch((0, __TURBOPACK__imported__module__$5b$project$5d2f$app$2f$config$2e$ts__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["getApiUrl"])(`/api/common/setting/tag/search?${params}`), {
         headers: authHeaders(locale)
     });
     if (!response.ok) return [];

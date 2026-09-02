@@ -10,8 +10,11 @@ import { getAuthToken, getTokenFromCookie } from '@/lib/authToken';
 import { getAngularAppOrigin, isAngularRouteUrl, toAngularAppUrl } from '@/lib/authRedirect';
 import { sharedCookieAttributes } from '@/lib/cookieDomain';
 import {
+  fetchInsighterPromptStatuses,
   fetchOnboardingPromptStatuses,
+  getVisibleInsighterPrompts,
   getVisibleSupportedPrompts,
+  hasInsighterPromptRole,
 } from '@/services/onboarding.service';
 interface ProfileResponse {
   data: {
@@ -362,7 +365,7 @@ export default function AuthCallback() {
         userData.roles.includes('company-insighter'));
     const defaultDestination = isProfessionalRole
       ? '/app/insighter-dashboard/my-dashboard'
-      : `/${locale}/home`;
+      : `/${locale}`;
     const intendedDestination = isUsableReturnUrl && finalReturnUrl
       ? finalReturnUrl
       : defaultDestination;
@@ -374,7 +377,16 @@ export default function AuthCallback() {
       try {
         const prompts = await fetchOnboardingPromptStatuses({ token: authToken, locale });
 
-        if (getVisibleSupportedPrompts(prompts).length > 0) {
+        // Insighter setup covers (availability / project settings) are offered on
+        // the same page, so they count towards sending the user there.
+        const insighterPrompts = hasInsighterPromptRole(userData.roles)
+          ? await fetchInsighterPromptStatuses({ token: authToken, locale: locale })
+          : [];
+
+        if (
+          getVisibleSupportedPrompts(prompts).length > 0 ||
+          getVisibleInsighterPrompts(insighterPrompts).length > 0
+        ) {
           if (storedReturnUrl) clearReturnUrlCookie();
           window.location.replace(
             `/${locale}/onboarding?redirect=${encodeURIComponent(intendedDestination)}`,
@@ -418,8 +430,8 @@ export default function AuthCallback() {
       console.log('[token-callback] Redirecting to Angular insighter dashboard');
       window.location.href = `${getAngularAppOrigin()}/app/insighter-dashboard/my-dashboard`;
     } else {
-      // Default: redirect to app home page
-      router.push(`/${locale}/home`);
+      // Default: redirect to the feed page
+      router.push(`/${locale}`);
     }
   };
   // Helper function to clear return URL cookie

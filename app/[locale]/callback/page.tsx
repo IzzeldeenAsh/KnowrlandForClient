@@ -10,8 +10,11 @@ import { getAuthToken, getTokenFromCookie } from '@/lib/authToken';
 import { getAngularAppOrigin, isAngularRouteUrl, toAngularAppUrl } from '@/lib/authRedirect';
 import { sharedCookieAttributes } from '@/lib/cookieDomain';
 import {
+  fetchInsighterPromptStatuses,
   fetchOnboardingPromptStatuses,
+  getVisibleInsighterPrompts,
   getVisibleSupportedPrompts,
+  hasInsighterPromptRole,
 } from '@/services/onboarding.service';
 interface ProfileResponse {
   data: {
@@ -327,7 +330,7 @@ export default function QueryParamAuthCallback() {
         userData.roles.includes('company-insighter'));
     const defaultDestination = isProfessionalRole
       ? '/app/insighter-dashboard/my-dashboard'
-      : `/${preferredLanguage}/home`;
+      : `/${preferredLanguage}`;
     const intendedDestination = isUsableReturnUrl && finalReturnUrl
       ? finalReturnUrl
       : defaultDestination;
@@ -342,7 +345,16 @@ export default function QueryParamAuthCallback() {
           locale: preferredLanguage || 'en',
         });
 
-        if (getVisibleSupportedPrompts(prompts).length > 0) {
+        // Insighter setup covers (availability / project settings) are offered on
+        // the same page, so they count towards sending the user there.
+        const insighterPrompts = hasInsighterPromptRole(userData.roles)
+          ? await fetchInsighterPromptStatuses({ token: authToken, locale: preferredLanguage || 'en' })
+          : [];
+
+        if (
+          getVisibleSupportedPrompts(prompts).length > 0 ||
+          getVisibleInsighterPrompts(insighterPrompts).length > 0
+        ) {
           if (storedReturnUrl) clearReturnUrlCookie();
           window.location.replace(
             `/${preferredLanguage}/onboarding?redirect=${encodeURIComponent(intendedDestination)}`,
@@ -388,8 +400,8 @@ export default function QueryParamAuthCallback() {
       console.log('[callback] Redirecting to Angular insighter dashboard');
       window.location.href = `${getAngularAppOrigin()}/app/insighter-dashboard/my-dashboard`;
     } else {
-      console.log('[callback] Redirecting to home page:', `/${preferredLanguage}/home`);
-      router.push(`/${preferredLanguage}/home`);
+      console.log('[callback] Redirecting to feed page:', `/${preferredLanguage}`);
+      router.push(`/${preferredLanguage}`);
     }
   };
   // Helper function to clear return URL cookie

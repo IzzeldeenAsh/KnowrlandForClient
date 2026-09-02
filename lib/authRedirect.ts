@@ -1,5 +1,9 @@
-const DEFAULT_LOCAL_ANGULAR_APP_URL =
-  process.env.NEXT_PUBLIC_DASHBOARD_URL || `${process.env.NEXT_PUBLIC_DASHBOARD_URL}`;
+import { dashboardUrl } from "@/app/config";
+
+// Env-driven, with the production dashboard as a fail-safe fallback. The old
+// `process.env.X || \`${process.env.X}\`` form fell back to the string
+// "undefined" whenever the env var was missing.
+const DEFAULT_LOCAL_ANGULAR_APP_URL = dashboardUrl;
 
 const ANGULAR_ROUTE_PREFIXES = [
   "/app/",

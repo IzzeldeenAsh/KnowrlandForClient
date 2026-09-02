@@ -21,14 +21,16 @@ function resolveDraftMode(mediaType: FeedItem['media_type'] | undefined): PostMo
 
 const copyByLocale = {
   en: {
-    placeholder: 'Share your insights...',
+    startPost: 'Start a post',
+    startPostHint: 'share your insights',
     video: 'Video',
     image: 'Image',
     article: 'White Paper',
     checkingDraft: 'Checking your draft…',
   },
   ar: {
-    placeholder: 'شارك رؤاك...',
+    startPost: 'ابدأ منشورًا',
+    startPostHint: 'شارك رؤاك أو فيديو أو صورة أو ورقة بيضاء',
     video: 'فيديو',
     image: 'صورة',
     article: 'ورقة بيضاء',
@@ -189,9 +191,16 @@ export default function FeedComposer({ locale }: FeedComposerProps) {
               type="button"
               onClick={() => void openComposer('post')}
               disabled={isCheckingDraft}
-              className="min-w-0 flex-1 py-3 text-start text-[14px] font-normal text-[#8A99B1] transition-colors hover:text-[#667791] focus-visible:outline-[1px] focus-visible:outline-offset-[-1px] focus-visible:outline-[#B7D2F4]"
+              className="group min-w-0 flex-1 cursor-pointer rounded-full border border-[#DCE4EF] bg-[#F4F7FB] px-4 py-[9px] text-start transition-colors hover:border-[#B7D2F4] hover:bg-[#EAF1FA] focus-visible:outline-[1px] focus-visible:outline-offset-[1px] focus-visible:outline-[#B7D2F4] disabled:cursor-default"
             >
-              {copy.placeholder}
+              <span className="block truncate text-[16px] font-medium leading-[1.5] text-[#2E3D57] sm:text-[17px]">
+                <span
+                  aria-hidden
+                  className="mr-[3px] inline-block h-[1.05em] w-[2px] shrink-0 translate-y-[3px] rounded-[1px] bg-[#2378E8] animate-caret-blink motion-reduce:animate-none rtl:ml-[3px] rtl:mr-0"
+                />
+                {copy.startPost}
+                <span className="hidden text-[13px] font-normal text-[#8A99B1] sm:inline"> — {copy.startPostHint}</span>
+              </span>
             </button>
           </div>
           <div className="grid min-h-[60px] grid-cols-3 border-t border-[#E4EAF2] px-1 sm:px-2">
@@ -200,7 +209,7 @@ export default function FeedComposer({ locale }: FeedComposerProps) {
                 key={label}
                 type="button"
                 onClick={onClick}
-                disabled={!onClick}
+                disabled={isCheckingDraft}
                 className="flex min-w-0 items-center justify-center gap-1 px-1 text-center text-[11px] font-normal leading-tight text-[#5D6D89] transition-colors hover:bg-[#F7F9FC] focus-visible:outline-[1px] focus-visible:outline-offset-[-1px] focus-visible:outline-[#B7D2F4] disabled:cursor-default disabled:hover:bg-transparent sm:gap-2 sm:px-2 sm:text-[14px]"
               >
                 <ActionIcon aria-hidden className="h-[18px] w-[18px] shrink-0 sm:h-5 sm:w-5" stroke={1.9} style={{ color }} />

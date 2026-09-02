@@ -48,7 +48,7 @@ export function UserProfile({ isHome }: { isHome: boolean }) {
   const [dashboardOpen, setDashboardOpen] = useState(false);
   const [settingsOpen, setSettingsOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
-  const profileRef = useRef<HTMLDivElement>(null);
+  const profileRef = useRef<HTMLButtonElement>(null);
   const openRafIdRef = useRef<number | null>(null);
   const [menuPosition, setMenuPosition] = useState<MenuPosition>({
     top: 0,
@@ -260,10 +260,15 @@ export function UserProfile({ isHome }: { isHome: boolean }) {
 
   return (
     <>
-      <div className="relative" ref={profileRef}>
-        <div
-          className="flex items-center cursor-pointer"
+      <div className="relative">
+        <button
+          type="button"
+          ref={profileRef}
           onClick={() => (menuOpen ? closeMenu() : openMenu())}
+          aria-haspopup="true"
+          aria-expanded={menuOpen}
+          aria-label={t("myProfile")}
+          className="flex items-center justify-center -m-2 p-2 rounded-full border-0 bg-transparent cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-400/60"
         >
           {/* {roles.includes('company') && user.company?.logo ? (
             <div className="w-8 h-8 md:w-10 md:h-10 rounded-full overflow-hidden">
@@ -309,7 +314,7 @@ export function UserProfile({ isHome }: { isHome: boolean }) {
               {getInitials(user.first_name, user.last_name)}
             </div>
           )}
-        </div>
+        </button>
       </div>
 
       {menuMounted && (

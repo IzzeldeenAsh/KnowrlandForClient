@@ -26,6 +26,8 @@ import {
 } from '@tabler/icons-react'
 import { useEffect, useState, type ReactNode } from 'react'
 import { dashboardUrl } from '@/app/config'
+import { getAuthToken } from '@/lib/authToken'
+import { fetchReceiveProjectServicesActive } from '@/services/project-account.service'
 import { useUserProfile } from '@/components/ui/header/hooks/useUserProfile'
 import SmallLogo from '@/public/images/smallLogo.png'
 
@@ -74,6 +76,7 @@ type SidebarItemProps = {
   href: string
   icon: Icon
   label: string
+  badge?: string
   isActive?: boolean
   compact?: boolean
 }
@@ -98,7 +101,7 @@ const copyByLocale: Record<'en' | 'ar', SidebarCopy> = {
     myDownloads: 'My Downloads',
     readLater: 'Read Later',
     meetings: 'Sessions',
-    mySchedule: 'My Schedule',
+    mySchedule: 'Session Settings',
     projects: 'Projects',
     clientProjects: 'Client Projects',
     myProjects: 'My Projects',
@@ -132,7 +135,7 @@ const copyByLocale: Record<'en' | 'ar', SidebarCopy> = {
     myDownloads: 'تحميلاتي',
     readLater: 'اقرأ لاحقاً',
     meetings: 'الجلسات الاستشارية',
-    mySchedule: 'جدولي الاستشاري',
+    mySchedule: 'إعدادات الجلسات',
     projects: 'المشاريع',
     clientProjects: 'مشاريع العملاء',
     myProjects: 'مشاريعي',
@@ -157,7 +160,7 @@ const copyByLocale: Record<'en' | 'ar', SidebarCopy> = {
   },
 }
 
-function SidebarItem({ href, icon: ItemIcon, label, isActive = false, compact = false }: SidebarItemProps) {
+function SidebarItem({ href, icon: ItemIcon, label, badge, isActive = false, compact = false }: SidebarItemProps) {
   return (
     <Link
       href={href}
@@ -184,6 +187,11 @@ function SidebarItem({ href, icon: ItemIcon, label, isActive = false, compact = 
         <ItemIcon aria-hidden stroke={1.75} className="h-[18px] w-[18px]" />
       </span>
       <span className="min-w-0 flex-1">{label}</span>
+      {badge && (
+        <span className="shrink-0 rounded-full bg-[#FFF0D5] px-2 py-0.5 text-[10px] font-bold leading-4 text-[#A85A00]">
+          {badge}
+        </span>
+      )}
     </Link>
   )
 }
@@ -403,6 +411,35 @@ export default function FeedSidebar({ locale, hideProfileCard = false }: FeedSid
   const isProvider = isInsighter || isCompany || isCompanyInsighter
   const hasProjectAccess = isProvider || isPureClient
 
+  // `/account/profile` omits `receive_project_services_active`, so read the real
+  // state from the project account settings endpoint. `null` = not known yet,
+  // which keeps the badge hidden instead of flashing it on every load.
+  const [projectServicesActive, setProjectServicesActive] = useState<boolean | null>(null)
+
+  useEffect(() => {
+    if (!isProvider) {
+      setProjectServicesActive(null)
+      return
+    }
+
+    const token = getAuthToken()
+    if (!token) return
+
+    let cancelled = false
+    fetchReceiveProjectServicesActive(token, locale)
+      .then((active) => {
+        if (!cancelled) setProjectServicesActive(active)
+      })
+      .catch(() => {
+        // Don't nag the user because a request failed.
+        if (!cancelled) setProjectServicesActive(true)
+      })
+
+    return () => {
+      cancelled = true
+    }
+  }, [isProvider, locale])
+
   if (!isAuthResolved || isLoading) {
     return <SidebarSkeleton />
   }
@@ -411,6 +448,9 @@ export default function FeedSidebar({ locale, hideProfileCard = false }: FeedSid
     return <GuestSidebar locale={locale} />
   }
 
+  const needsMeetingSetup = isProvider && user.has_meet_service !== true
+  const needsProjectSetup = isProvider && projectServicesActive === false
+  const setupNowLabel = isArabic ? 'الإعداد الآن!' : 'Setup Now!'
   const initials = `${user.first_name?.[0] ?? ''}${user.last_name?.[0] ?? ''}`.toUpperCase()
   const fullName = `${user.first_name ?? ''} ${user.last_name ?? ''}`.trim() || user.name
   const roleLabel = isCompanyInsighter
@@ -507,6 +547,7 @@ export default function FeedSidebar({ locale, hideProfileCard = false }: FeedSid
             href={`${dashboardBase}/account-settings/consulting-schedule`}
             icon={IconCalendarCog}
             label={copy.mySchedule}
+            badge={needsMeetingSetup ? setupNowLabel : undefined}
             compact={hideProfileCard}
           />
         )}
@@ -523,6 +564,7 @@ export default function FeedSidebar({ locale, hideProfileCard = false }: FeedSid
               href={`${dashboardBase}/account-settings/project-settings`}
               icon={IconSettings2}
               label={copy.projectSettings}
+              badge={needsProjectSetup ? setupNowLabel : undefined}
               compact={hideProfileCard}
             />
           )}

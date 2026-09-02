@@ -203,8 +203,12 @@ __turbopack_context__.s([
     "toAngularAppUrl",
     ()=>toAngularAppUrl
 ]);
-var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$build$2f$polyfills$2f$process$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = /*#__PURE__*/ __turbopack_context__.i("[project]/node_modules/next/dist/build/polyfills/process.js [app-client] (ecmascript)");
-const DEFAULT_LOCAL_ANGULAR_APP_URL = ("TURBOPACK compile-time value", "http://localhost:4200") || "".concat(("TURBOPACK compile-time value", "http://localhost:4200"));
+var __TURBOPACK__imported__module__$5b$project$5d2f$app$2f$config$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/app/config.ts [app-client] (ecmascript)");
+;
+// Env-driven, with the production dashboard as a fail-safe fallback. The old
+// `process.env.X || \`${process.env.X}\`` form fell back to the string
+// "undefined" whenever the env var was missing.
+const DEFAULT_LOCAL_ANGULAR_APP_URL = __TURBOPACK__imported__module__$5b$project$5d2f$app$2f$config$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["dashboardUrl"];
 const ANGULAR_ROUTE_PREFIXES = [
     "/app/",
     "/admin-dashboard/"
@@ -288,16 +292,30 @@ if (typeof globalThis.$RefreshHelpers$ === 'object' && globalThis.$RefreshHelper
 "use strict";
 
 __turbopack_context__.s([
+    "INSIGHTER_PROMPT_ROLES",
+    ()=>INSIGHTER_PROMPT_ROLES,
+    "SUPPORTED_INSIGHTER_PROMPTS",
+    ()=>SUPPORTED_INSIGHTER_PROMPTS,
     "SUPPORTED_ONBOARDING_PROMPTS",
     ()=>SUPPORTED_ONBOARDING_PROMPTS,
+    "fetchInsighterPromptStatuses",
+    ()=>fetchInsighterPromptStatuses,
     "fetchOnboardingIndustryTree",
     ()=>fetchOnboardingIndustryTree,
     "fetchOnboardingPromptStatuses",
     ()=>fetchOnboardingPromptStatuses,
+    "getVisibleInsighterPrompts",
+    ()=>getVisibleInsighterPrompts,
     "getVisibleSupportedPrompts",
     ()=>getVisibleSupportedPrompts,
+    "hasInsighterPromptRole",
+    ()=>hasInsighterPromptRole,
+    "isSupportedInsighterPrompt",
+    ()=>isSupportedInsighterPrompt,
     "isSupportedOnboardingPrompt",
     ()=>isSupportedOnboardingPrompt,
+    "skipInsighterPrompt",
+    ()=>skipInsighterPrompt,
     "skipOnboardingPrompt",
     ()=>skipOnboardingPrompt,
     "updateFeedIndustryPreferences",
@@ -314,6 +332,15 @@ const SUPPORTED_ONBOARDING_PROMPTS = [
     'community_feed_industries',
     'whatsapp'
 ];
+const SUPPORTED_INSIGHTER_PROMPTS = [
+    'session_availability',
+    'project_settings'
+];
+const INSIGHTER_PROMPT_ROLES = [
+    'insighter',
+    'company',
+    'company-insighter'
+];
 const onboardingHeaders = (param)=>{
     let { token, locale } = param;
     return {
@@ -328,6 +355,41 @@ async function getErrorMessage(response, fallback) {
     const payload = await response.json().catch(()=>null);
     const validationMessages = (payload === null || payload === void 0 ? void 0 : payload.errors) ? Object.values(payload.errors).flat().filter((message)=>typeof message === 'string') : [];
     return validationMessages[0] || (payload === null || payload === void 0 ? void 0 : payload.message) || fallback;
+}
+function isSupportedInsighterPrompt(promptKey) {
+    return SUPPORTED_INSIGHTER_PROMPTS.includes(promptKey);
+}
+function getVisibleInsighterPrompts(prompts) {
+    return prompts.filter((prompt)=>prompt.should_show && isSupportedInsighterPrompt(prompt.prompt_key));
+}
+function hasInsighterPromptRole(roles) {
+    return (roles !== null && roles !== void 0 ? roles : []).some((role)=>INSIGHTER_PROMPT_ROLES.includes(role));
+}
+async function fetchInsighterPromptStatuses(options) {
+    try {
+        const response = await fetch((0, __TURBOPACK__imported__module__$5b$project$5d2f$app$2f$config$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["getApiUrl"])('/api/insighter/onboarding/prompts/status'), {
+            method: 'POST',
+            headers: onboardingHeaders(options),
+            cache: 'no-store'
+        });
+        if (!response.ok) return [];
+        const payload = await response.json();
+        return Array.isArray(payload === null || payload === void 0 ? void 0 : payload.data) ? payload.data : [];
+    } catch (e) {
+        return [];
+    }
+}
+async function skipInsighterPrompt(promptKey, options) {
+    const response = await fetch((0, __TURBOPACK__imported__module__$5b$project$5d2f$app$2f$config$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["getApiUrl"])('/api/insighter/onboarding/prompts/skip'), {
+        method: 'POST',
+        headers: onboardingHeaders(options),
+        body: JSON.stringify({
+            prompt_key: promptKey
+        })
+    });
+    if (!response.ok) {
+        throw new Error(await getErrorMessage(response, 'Unable to skip this step.'));
+    }
 }
 function isSupportedOnboardingPrompt(promptKey) {
     return SUPPORTED_ONBOARDING_PROMPTS.includes(promptKey);
@@ -486,6 +548,34 @@ const promptOrder = [
 function onlyDigits(value) {
     return (value !== null && value !== void 0 ? value : '').replace(/\D/g, '');
 }
+// Same per-country digit grouping used by the phone mask in
+// /app/insighter-dashboard/account-settings/notification-settings.
+const PHONE_MASKS = {
+    default: '000-000-0000',
+    '1': '000-000-0000',
+    '44': '0000-000000',
+    '966': '0-0000-0000',
+    '971': '0-0000-0000',
+    '20': '00-0000-0000',
+    '962': '0-0000-0000',
+    '961': '0-0000-0000',
+    '33': '00-00-00-00-00',
+    '49': '0000-0000000',
+    '39': '000-0000000'
+};
+function formatWithMask(digits, mask) {
+    let formatted = '';
+    let digitIndex = 0;
+    for(let i = 0; i < mask.length && digitIndex < digits.length; i++){
+        if (mask[i] === '0') {
+            formatted += digits[digitIndex];
+            digitIndex++;
+        } else {
+            formatted += mask[i];
+        }
+    }
+    return formatted;
+}
 const designPreviewCountries = [
     [
         'Jordan',
@@ -593,6 +683,13 @@ const copyByLocale = {
         unknownError: 'Something went wrong. Please try again.',
         whatsappTitle: 'Stay connected on WhatsApp',
         whatsappBody: 'Add your WhatsApp number to get important updates, alerts, and support right where you already chat.',
+        whatsappBenefits: [
+            'Receive related insights tailored to your interests.',
+            'Instant session booking confirmations and details.',
+            'Session reminders so you never miss a meeting.',
+            'Service request updates with clear status tracking.',
+            'Other important updates based on your activity.'
+        ],
         whatsappNumberLabel: 'WhatsApp number',
         whatsappNumberPlaceholder: 'Phone number',
         whatsappCountrySearch: 'Search country code',
@@ -629,6 +726,13 @@ const copyByLocale = {
         unknownError: 'حدث خطأ ما. يرجى المحاولة مرة أخرى.',
         whatsappTitle: 'ابقَ على تواصل عبر واتساب',
         whatsappBody: 'أضِف رقم واتساب الخاص بك لتصلك التحديثات والتنبيهات المهمة والدعم في المكان الذي تتحدث فيه بالفعل.',
+        whatsappBenefits: [
+            'تلقّي رؤى ذات صلة مخصّصة لاهتماماتك.',
+            'تأكيدات فورية لحجز الجلسات مع كل التفاصيل.',
+            'تذكيرات بالجلسات حتى لا يفوتك أي اجتماع.',
+            'تحديثات لطلبات الخدمة مع تتبّع واضح للحالة.',
+            'تحديثات مهمة أخرى بحسب نشاطك.'
+        ],
         whatsappNumberLabel: 'رقم واتساب',
         whatsappNumberPlaceholder: 'رقم الهاتف',
         whatsappCountrySearch: 'ابحث عن رمز الدولة',
@@ -706,6 +810,8 @@ function OnboardingPage() {
     const activeBody = activePrompt === 'community_feed_industries' ? copy.industriesBody : activePrompt === 'whatsapp' ? copy.whatsappBody : copy.countryBody;
     const activeRequirement = (currentStatus === null || currentStatus === void 0 ? void 0 : currentStatus.cannot_skip) ? copy.required : copy.optional;
     const whatsappDialCode = onlyDigits(whatsappCountry === null || whatsappCountry === void 0 ? void 0 : whatsappCountry.international_code);
+    const whatsappPhoneMask = PHONE_MASKS[whatsappDialCode] || PHONE_MASKS.default;
+    const whatsappMaskedNumber = formatWithMask(whatsappNumber, whatsappPhoneMask);
     const navigateAfterOnboarding = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useCallback"])({
         "OnboardingPage.useCallback[navigateAfterOnboarding]": ()=>{
             if (redirectStartedRef.current) return;
@@ -746,13 +852,33 @@ function OnboardingPage() {
                 window.location.replace("".concat((0, __TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$authRedirect$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["getAngularAppOrigin"])(), "/app/insighter-dashboard/my-dashboard"));
                 return;
             }
-            router.replace("/".concat(locale, "/home"));
+            router.replace("/".concat(locale));
         }
     }["OnboardingPage.useCallback[navigateAfterOnboarding]"], [
         locale,
         roles,
         router,
         searchParams
+    ]);
+    /**
+   * The Insighter setup covers are shown at the destination, not here — this
+   * only decides whether the destination URL should carry the marker that asks
+   * for them. Checked at most once per visit.
+   */ const resolveInsighterSetupMarker = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useCallback"])({
+        "OnboardingPage.useCallback[resolveInsighterSetupMarker]": async ()=>{
+            if (insighterSetupCheckedRef.current) return false;
+            insighterSetupCheckedRef.current = true;
+            const token = (0, __TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$authToken$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["getAuthToken"])();
+            if (!token || !(0, __TURBOPACK__imported__module__$5b$project$5d2f$services$2f$onboarding$2e$service$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["hasInsighterPromptRole"])(roles)) return false;
+            const prompts = await (0, __TURBOPACK__imported__module__$5b$project$5d2f$services$2f$onboarding$2e$service$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["fetchInsighterPromptStatuses"])({
+                token,
+                locale
+            });
+            return (0, __TURBOPACK__imported__module__$5b$project$5d2f$services$2f$onboarding$2e$service$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["getVisibleInsighterPrompts"])(prompts).length > 0;
+        }
+    }["OnboardingPage.useCallback[resolveInsighterSetupMarker]"], [
+        locale,
+        roles
     ]);
     const applyStatuses = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useCallback"])({
         "OnboardingPage.useCallback[applyStatuses]": (nextStatuses)=>{
@@ -1090,21 +1216,21 @@ function OnboardingPage() {
                             priority: true
                         }, void 0, false, {
                             fileName: "[project]/app/[locale]/onboarding/page.tsx",
-                            lineNumber: 529,
+                            lineNumber: 595,
                             columnNumber: 11
                         }, this),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                             className: __TURBOPACK__imported__module__$5b$project$5d2f$app$2f5b$locale$5d2f$onboarding$2f$onboarding$2e$module$2e$css__$5b$app$2d$client$5d$__$28$css__module$29$__["default"].visualShade
                         }, void 0, false, {
                             fileName: "[project]/app/[locale]/onboarding/page.tsx",
-                            lineNumber: 537,
+                            lineNumber: 603,
                             columnNumber: 11
                         }, this),
                         activePrompt === 'whatsapp' && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                             className: __TURBOPACK__imported__module__$5b$project$5d2f$app$2f5b$locale$5d2f$onboarding$2f$onboarding$2e$module$2e$css__$5b$app$2d$client$5d$__$28$css__module$29$__["default"].whatsappShade
                         }, void 0, false, {
                             fileName: "[project]/app/[locale]/onboarding/page.tsx",
-                            lineNumber: 538,
+                            lineNumber: 604,
                             columnNumber: 43
                         }, this),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$image$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"], {
@@ -1116,7 +1242,7 @@ function OnboardingPage() {
                             priority: true
                         }, void 0, false, {
                             fileName: "[project]/app/[locale]/onboarding/page.tsx",
-                            lineNumber: 539,
+                            lineNumber: 605,
                             columnNumber: 11
                         }, this),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1131,12 +1257,12 @@ function OnboardingPage() {
                                             stroke: 2
                                         }, void 0, false, {
                                             fileName: "[project]/app/[locale]/onboarding/page.tsx",
-                                            lineNumber: 552,
+                                            lineNumber: 618,
                                             columnNumber: 21
                                         }, this)
                                     }, void 0, false, {
                                         fileName: "[project]/app/[locale]/onboarding/page.tsx",
-                                        lineNumber: 551,
+                                        lineNumber: 617,
                                         columnNumber: 19
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -1144,7 +1270,7 @@ function OnboardingPage() {
                                         children: activeRequirement
                                     }, void 0, false, {
                                         fileName: "[project]/app/[locale]/onboarding/page.tsx",
-                                        lineNumber: 555,
+                                        lineNumber: 621,
                                         columnNumber: 17
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("h1", {
@@ -1152,32 +1278,71 @@ function OnboardingPage() {
                                         children: activeTitle
                                     }, void 0, false, {
                                         fileName: "[project]/app/[locale]/onboarding/page.tsx",
-                                        lineNumber: 558,
+                                        lineNumber: 624,
                                         columnNumber: 17
                                     }, this),
-                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
+                                    activePrompt !== 'whatsapp' && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
                                         className: "mt-4 max-w-[305px] text-[11px] leading-[1.7] text-white/72 sm:text-xs",
                                         children: activeBody
                                     }, void 0, false, {
                                         fileName: "[project]/app/[locale]/onboarding/page.tsx",
-                                        lineNumber: 561,
-                                        columnNumber: 17
+                                        lineNumber: 628,
+                                        columnNumber: 19
+                                    }, this),
+                                    activePrompt === 'whatsapp' && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("ul", {
+                                        className: "mt-5 flex max-w-[320px] flex-col gap-3",
+                                        children: copy.whatsappBenefits.map((benefit)=>/*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("li", {
+                                                className: "flex items-center gap-2.5 text-xs leading-[1.5] text-white/95 sm:text-sm",
+                                                children: [
+                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                                        className: "flex h-4 w-4 flex-shrink-0 items-center justify-center rounded-full bg-[#25D366]/25",
+                                                        children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$tabler$2f$icons$2d$react$2f$dist$2f$esm$2f$icons$2f$IconCheck$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__IconCheck$3e$__["IconCheck"], {
+                                                            size: 11,
+                                                            stroke: 3,
+                                                            className: "text-[#25D366]"
+                                                        }, void 0, false, {
+                                                            fileName: "[project]/app/[locale]/onboarding/page.tsx",
+                                                            lineNumber: 637,
+                                                            columnNumber: 27
+                                                        }, this)
+                                                    }, void 0, false, {
+                                                        fileName: "[project]/app/[locale]/onboarding/page.tsx",
+                                                        lineNumber: 636,
+                                                        columnNumber: 25
+                                                    }, this),
+                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                                        children: benefit
+                                                    }, void 0, false, {
+                                                        fileName: "[project]/app/[locale]/onboarding/page.tsx",
+                                                        lineNumber: 639,
+                                                        columnNumber: 25
+                                                    }, this)
+                                                ]
+                                            }, benefit, true, {
+                                                fileName: "[project]/app/[locale]/onboarding/page.tsx",
+                                                lineNumber: 635,
+                                                columnNumber: 23
+                                            }, this))
+                                    }, void 0, false, {
+                                        fileName: "[project]/app/[locale]/onboarding/page.tsx",
+                                        lineNumber: 633,
+                                        columnNumber: 19
                                     }, this)
                                 ]
                             }, activePrompt, true, {
                                 fileName: "[project]/app/[locale]/onboarding/page.tsx",
-                                lineNumber: 549,
+                                lineNumber: 615,
                                 columnNumber: 15
                             }, this)
                         }, void 0, false, {
                             fileName: "[project]/app/[locale]/onboarding/page.tsx",
-                            lineNumber: 547,
+                            lineNumber: 613,
                             columnNumber: 11
                         }, this)
                     ]
                 }, void 0, true, {
                     fileName: "[project]/app/[locale]/onboarding/page.tsx",
-                    lineNumber: 528,
+                    lineNumber: 594,
                     columnNumber: 9
                 }, this),
                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("section", {
@@ -1195,7 +1360,7 @@ function OnboardingPage() {
                                         size: 22
                                     }, void 0, false, {
                                         fileName: "[project]/app/[locale]/onboarding/page.tsx",
-                                        lineNumber: 574,
+                                        lineNumber: 654,
                                         columnNumber: 17
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -1203,18 +1368,18 @@ function OnboardingPage() {
                                         children: copy.loading
                                     }, void 0, false, {
                                         fileName: "[project]/app/[locale]/onboarding/page.tsx",
-                                        lineNumber: 575,
+                                        lineNumber: 655,
                                         columnNumber: 17
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/app/[locale]/onboarding/page.tsx",
-                                lineNumber: 573,
+                                lineNumber: 653,
                                 columnNumber: 15
                             }, this)
                         }, void 0, false, {
                             fileName: "[project]/app/[locale]/onboarding/page.tsx",
-                            lineNumber: 572,
+                            lineNumber: 652,
                             columnNumber: 13
                         }, this) : pageError ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                             className: "grid flex-1 place-items-center",
@@ -1226,7 +1391,7 @@ function OnboardingPage() {
                                         size: 25
                                     }, void 0, false, {
                                         fileName: "[project]/app/[locale]/onboarding/page.tsx",
-                                        lineNumber: 581,
+                                        lineNumber: 661,
                                         columnNumber: 17
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("h2", {
@@ -1234,7 +1399,7 @@ function OnboardingPage() {
                                         children: copy.errorTitle
                                     }, void 0, false, {
                                         fileName: "[project]/app/[locale]/onboarding/page.tsx",
-                                        lineNumber: 582,
+                                        lineNumber: 662,
                                         columnNumber: 17
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -1242,7 +1407,7 @@ function OnboardingPage() {
                                         children: pageError
                                     }, void 0, false, {
                                         fileName: "[project]/app/[locale]/onboarding/page.tsx",
-                                        lineNumber: 583,
+                                        lineNumber: 663,
                                         columnNumber: 17
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
@@ -1252,18 +1417,18 @@ function OnboardingPage() {
                                         children: copy.retry
                                     }, void 0, false, {
                                         fileName: "[project]/app/[locale]/onboarding/page.tsx",
-                                        lineNumber: 584,
+                                        lineNumber: 664,
                                         columnNumber: 17
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/app/[locale]/onboarding/page.tsx",
-                                lineNumber: 580,
+                                lineNumber: 660,
                                 columnNumber: 15
                             }, this)
                         }, void 0, false, {
                             fileName: "[project]/app/[locale]/onboarding/page.tsx",
-                            lineNumber: 579,
+                            lineNumber: 659,
                             columnNumber: 13
                         }, this) : activePrompt === 'country' ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                             className: "".concat(__TURBOPACK__imported__module__$5b$project$5d2f$app$2f5b$locale$5d2f$onboarding$2f$onboarding$2e$module$2e$css__$5b$app$2d$client$5d$__$28$css__module$29$__["default"].stepEnter, " flex min-h-0 flex-1 flex-col"),
@@ -1277,7 +1442,7 @@ function OnboardingPage() {
                                             children: copy.countrySearch
                                         }, void 0, false, {
                                             fileName: "[project]/app/[locale]/onboarding/page.tsx",
-                                            lineNumber: 596,
+                                            lineNumber: 676,
                                             columnNumber: 17
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1288,7 +1453,7 @@ function OnboardingPage() {
                                                     size: 16
                                                 }, void 0, false, {
                                                     fileName: "[project]/app/[locale]/onboarding/page.tsx",
-                                                    lineNumber: 600,
+                                                    lineNumber: 680,
                                                     columnNumber: 19
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("input", {
@@ -1299,13 +1464,13 @@ function OnboardingPage() {
                                                     className: "h-10 w-full rounded-lg border border-[#d9dee3] bg-white ps-9 pe-3 text-xs text-[#25343f] outline-none transition placeholder:text-[#929ca5] focus:border-[#69a2ce] focus:ring-2 focus:ring-[#e4f0f8]"
                                                 }, void 0, false, {
                                                     fileName: "[project]/app/[locale]/onboarding/page.tsx",
-                                                    lineNumber: 604,
+                                                    lineNumber: 684,
                                                     columnNumber: 19
                                                 }, this)
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/app/[locale]/onboarding/page.tsx",
-                                            lineNumber: 599,
+                                            lineNumber: 679,
                                             columnNumber: 17
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1317,21 +1482,21 @@ function OnboardingPage() {
                                                 children: copy.countriesLoading
                                             }, void 0, false, {
                                                 fileName: "[project]/app/[locale]/onboarding/page.tsx",
-                                                lineNumber: 619,
+                                                lineNumber: 699,
                                                 columnNumber: 21
                                             }, this) : !isDesignPreview && countriesError ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
                                                 className: "py-8 text-center text-xs text-[#a14b38]",
                                                 children: copy.unknownError
                                             }, void 0, false, {
                                                 fileName: "[project]/app/[locale]/onboarding/page.tsx",
-                                                lineNumber: 621,
+                                                lineNumber: 701,
                                                 columnNumber: 21
                                             }, this) : filteredCountries.length === 0 ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
                                                 className: "py-8 text-center text-xs text-[#687784]",
                                                 children: copy.countryEmpty
                                             }, void 0, false, {
                                                 fileName: "[project]/app/[locale]/onboarding/page.tsx",
-                                                lineNumber: 623,
+                                                lineNumber: 703,
                                                 columnNumber: 21
                                             }, this) : filteredCountries.map((country)=>{
                                                 var _country_names;
@@ -1353,7 +1518,7 @@ function OnboardingPage() {
                                                             children: countryEmoji(country.iso2)
                                                         }, void 0, false, {
                                                             fileName: "[project]/app/[locale]/onboarding/page.tsx",
-                                                            lineNumber: 644,
+                                                            lineNumber: 724,
                                                             columnNumber: 27
                                                         }, this),
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -1361,7 +1526,7 @@ function OnboardingPage() {
                                                             children: label
                                                         }, void 0, false, {
                                                             fileName: "[project]/app/[locale]/onboarding/page.tsx",
-                                                            lineNumber: 645,
+                                                            lineNumber: 725,
                                                             columnNumber: 27
                                                         }, this),
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -1369,7 +1534,7 @@ function OnboardingPage() {
                                                             children: country.iso2
                                                         }, void 0, false, {
                                                             fileName: "[project]/app/[locale]/onboarding/page.tsx",
-                                                            lineNumber: 646,
+                                                            lineNumber: 726,
                                                             columnNumber: 27
                                                         }, this),
                                                         isSelected && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$tabler$2f$icons$2d$react$2f$dist$2f$esm$2f$icons$2f$IconCheck$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__IconCheck$3e$__["IconCheck"], {
@@ -1377,25 +1542,25 @@ function OnboardingPage() {
                                                             stroke: 2.3
                                                         }, void 0, false, {
                                                             fileName: "[project]/app/[locale]/onboarding/page.tsx",
-                                                            lineNumber: 647,
+                                                            lineNumber: 727,
                                                             columnNumber: 42
                                                         }, this)
                                                     ]
                                                 }, country.id, true, {
                                                     fileName: "[project]/app/[locale]/onboarding/page.tsx",
-                                                    lineNumber: 629,
+                                                    lineNumber: 709,
                                                     columnNumber: 25
                                                 }, this);
                                             })
                                         }, void 0, false, {
                                             fileName: "[project]/app/[locale]/onboarding/page.tsx",
-                                            lineNumber: 613,
+                                            lineNumber: 693,
                                             columnNumber: 17
                                         }, this)
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/app/[locale]/onboarding/page.tsx",
-                                    lineNumber: 595,
+                                    lineNumber: 675,
                                     columnNumber: 15
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1407,7 +1572,7 @@ function OnboardingPage() {
                                             children: fieldError
                                         }, void 0, false, {
                                             fileName: "[project]/app/[locale]/onboarding/page.tsx",
-                                            lineNumber: 656,
+                                            lineNumber: 736,
                                             columnNumber: 17
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
@@ -1421,7 +1586,7 @@ function OnboardingPage() {
                                                     size: 14
                                                 }, void 0, false, {
                                                     fileName: "[project]/app/[locale]/onboarding/page.tsx",
-                                                    lineNumber: 663,
+                                                    lineNumber: 743,
                                                     columnNumber: 35
                                                 }, this) : null,
                                                 isSubmitting ? copy.saving : primaryActionLabel,
@@ -1429,31 +1594,31 @@ function OnboardingPage() {
                                                     size: 14
                                                 }, void 0, false, {
                                                     fileName: "[project]/app/[locale]/onboarding/page.tsx",
-                                                    lineNumber: 665,
+                                                    lineNumber: 745,
                                                     columnNumber: 49
                                                 }, this) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$tabler$2f$icons$2d$react$2f$dist$2f$esm$2f$icons$2f$IconArrowRight$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__IconArrowRight$3e$__["IconArrowRight"], {
                                                     size: 14
                                                 }, void 0, false, {
                                                     fileName: "[project]/app/[locale]/onboarding/page.tsx",
-                                                    lineNumber: 665,
+                                                    lineNumber: 745,
                                                     columnNumber: 79
                                                 }, this))
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/app/[locale]/onboarding/page.tsx",
-                                            lineNumber: 657,
+                                            lineNumber: 737,
                                             columnNumber: 17
                                         }, this)
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/app/[locale]/onboarding/page.tsx",
-                                    lineNumber: 655,
+                                    lineNumber: 735,
                                     columnNumber: 15
                                 }, this)
                             ]
                         }, "country", true, {
                             fileName: "[project]/app/[locale]/onboarding/page.tsx",
-                            lineNumber: 594,
+                            lineNumber: 674,
                             columnNumber: 13
                         }, this) : activePrompt === 'community_feed_industries' ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                             className: "".concat(__TURBOPACK__imported__module__$5b$project$5d2f$app$2f5b$locale$5d2f$onboarding$2f$onboarding$2e$module$2e$css__$5b$app$2d$client$5d$__$28$css__module$29$__["default"].stepEnter, " flex min-h-0 flex-1 flex-col"),
@@ -1472,7 +1637,7 @@ function OnboardingPage() {
                                                             size: 16
                                                         }, void 0, false, {
                                                             fileName: "[project]/app/[locale]/onboarding/page.tsx",
-                                                            lineNumber: 674,
+                                                            lineNumber: 754,
                                                             columnNumber: 21
                                                         }, this),
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("input", {
@@ -1483,13 +1648,13 @@ function OnboardingPage() {
                                                             className: "h-10 w-full rounded-lg border border-[#d9dee3] bg-white ps-9 pe-3 text-xs text-[#25343f] outline-none transition placeholder:text-[#929ca5] focus:border-[#69a2ce] focus:ring-2 focus:ring-[#e4f0f8]"
                                                         }, void 0, false, {
                                                             fileName: "[project]/app/[locale]/onboarding/page.tsx",
-                                                            lineNumber: 678,
+                                                            lineNumber: 758,
                                                             columnNumber: 21
                                                         }, this)
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/app/[locale]/onboarding/page.tsx",
-                                                    lineNumber: 673,
+                                                    lineNumber: 753,
                                                     columnNumber: 19
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -1501,13 +1666,13 @@ function OnboardingPage() {
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/app/[locale]/onboarding/page.tsx",
-                                                    lineNumber: 686,
+                                                    lineNumber: 766,
                                                     columnNumber: 19
                                                 }, this)
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/app/[locale]/onboarding/page.tsx",
-                                            lineNumber: 672,
+                                            lineNumber: 752,
                                             columnNumber: 17
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1517,7 +1682,7 @@ function OnboardingPage() {
                                                 children: copy.industriesLoading
                                             }, void 0, false, {
                                                 fileName: "[project]/app/[locale]/onboarding/page.tsx",
-                                                lineNumber: 693,
+                                                lineNumber: 773,
                                                 columnNumber: 21
                                             }, this) : industriesError ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                                                 className: "py-8 text-center",
@@ -1527,7 +1692,7 @@ function OnboardingPage() {
                                                         children: industriesError
                                                     }, void 0, false, {
                                                         fileName: "[project]/app/[locale]/onboarding/page.tsx",
-                                                        lineNumber: 696,
+                                                        lineNumber: 776,
                                                         columnNumber: 23
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
@@ -1537,20 +1702,20 @@ function OnboardingPage() {
                                                         children: copy.retry
                                                     }, void 0, false, {
                                                         fileName: "[project]/app/[locale]/onboarding/page.tsx",
-                                                        lineNumber: 697,
+                                                        lineNumber: 777,
                                                         columnNumber: 23
                                                     }, this)
                                                 ]
                                             }, void 0, true, {
                                                 fileName: "[project]/app/[locale]/onboarding/page.tsx",
-                                                lineNumber: 695,
+                                                lineNumber: 775,
                                                 columnNumber: 21
                                             }, this) : filteredIndustryGroups.length === 0 ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
                                                 className: "py-8 text-center text-xs text-[#687784]",
                                                 children: copy.industriesEmpty
                                             }, void 0, false, {
                                                 fileName: "[project]/app/[locale]/onboarding/page.tsx",
-                                                lineNumber: 702,
+                                                lineNumber: 782,
                                                 columnNumber: 21
                                             }, this) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                                                 className: "space-y-4 pb-1",
@@ -1563,7 +1728,7 @@ function OnboardingPage() {
                                                                 children: group.label
                                                             }, void 0, false, {
                                                                 fileName: "[project]/app/[locale]/onboarding/page.tsx",
-                                                                lineNumber: 707,
+                                                                lineNumber: 787,
                                                                 columnNumber: 27
                                                             }, this),
                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1581,42 +1746,42 @@ function OnboardingPage() {
                                                                                 stroke: 2.4
                                                                             }, void 0, false, {
                                                                                 fileName: "[project]/app/[locale]/onboarding/page.tsx",
-                                                                                lineNumber: 725,
+                                                                                lineNumber: 805,
                                                                                 columnNumber: 48
                                                                             }, this),
                                                                             industry.label
                                                                         ]
                                                                     }, industry.id, true, {
                                                                         fileName: "[project]/app/[locale]/onboarding/page.tsx",
-                                                                        lineNumber: 714,
+                                                                        lineNumber: 794,
                                                                         columnNumber: 33
                                                                     }, this);
                                                                 })
                                                             }, void 0, false, {
                                                                 fileName: "[project]/app/[locale]/onboarding/page.tsx",
-                                                                lineNumber: 710,
+                                                                lineNumber: 790,
                                                                 columnNumber: 27
                                                             }, this)
                                                         ]
                                                     }, group.id, true, {
                                                         fileName: "[project]/app/[locale]/onboarding/page.tsx",
-                                                        lineNumber: 706,
+                                                        lineNumber: 786,
                                                         columnNumber: 25
                                                     }, this))
                                             }, void 0, false, {
                                                 fileName: "[project]/app/[locale]/onboarding/page.tsx",
-                                                lineNumber: 704,
+                                                lineNumber: 784,
                                                 columnNumber: 21
                                             }, this)
                                         }, void 0, false, {
                                             fileName: "[project]/app/[locale]/onboarding/page.tsx",
-                                            lineNumber: 691,
+                                            lineNumber: 771,
                                             columnNumber: 17
                                         }, this)
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/app/[locale]/onboarding/page.tsx",
-                                    lineNumber: 671,
+                                    lineNumber: 751,
                                     columnNumber: 15
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1633,7 +1798,7 @@ function OnboardingPage() {
                                                     children: copy.skip
                                                 }, void 0, false, {
                                                     fileName: "[project]/app/[locale]/onboarding/page.tsx",
-                                                    lineNumber: 740,
+                                                    lineNumber: 820,
                                                     columnNumber: 19
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -1642,13 +1807,13 @@ function OnboardingPage() {
                                                     children: fieldError
                                                 }, void 0, false, {
                                                     fileName: "[project]/app/[locale]/onboarding/page.tsx",
-                                                    lineNumber: 748,
+                                                    lineNumber: 828,
                                                     columnNumber: 19
                                                 }, this)
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/app/[locale]/onboarding/page.tsx",
-                                            lineNumber: 739,
+                                            lineNumber: 819,
                                             columnNumber: 17
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
@@ -1662,7 +1827,7 @@ function OnboardingPage() {
                                                     size: 14
                                                 }, void 0, false, {
                                                     fileName: "[project]/app/[locale]/onboarding/page.tsx",
-                                                    lineNumber: 756,
+                                                    lineNumber: 836,
                                                     columnNumber: 36
                                                 }, this),
                                                 isSubmitting ? copy.saving : primaryActionLabel,
@@ -1670,31 +1835,31 @@ function OnboardingPage() {
                                                     size: 14
                                                 }, void 0, false, {
                                                     fileName: "[project]/app/[locale]/onboarding/page.tsx",
-                                                    lineNumber: 758,
+                                                    lineNumber: 838,
                                                     columnNumber: 49
                                                 }, this) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$tabler$2f$icons$2d$react$2f$dist$2f$esm$2f$icons$2f$IconArrowRight$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__IconArrowRight$3e$__["IconArrowRight"], {
                                                     size: 14
                                                 }, void 0, false, {
                                                     fileName: "[project]/app/[locale]/onboarding/page.tsx",
-                                                    lineNumber: 758,
+                                                    lineNumber: 838,
                                                     columnNumber: 79
                                                 }, this))
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/app/[locale]/onboarding/page.tsx",
-                                            lineNumber: 750,
+                                            lineNumber: 830,
                                             columnNumber: 17
                                         }, this)
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/app/[locale]/onboarding/page.tsx",
-                                    lineNumber: 738,
+                                    lineNumber: 818,
                                     columnNumber: 15
                                 }, this)
                             ]
                         }, "industries", true, {
                             fileName: "[project]/app/[locale]/onboarding/page.tsx",
-                            lineNumber: 670,
+                            lineNumber: 750,
                             columnNumber: 13
                         }, this) : activePrompt === 'whatsapp' ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                             className: "".concat(__TURBOPACK__imported__module__$5b$project$5d2f$app$2f5b$locale$5d2f$onboarding$2f$onboarding$2e$module$2e$css__$5b$app$2d$client$5d$__$28$css__module$29$__["default"].stepEnter, " flex min-h-0 flex-1 flex-col"),
@@ -1708,7 +1873,7 @@ function OnboardingPage() {
                                             children: copy.whatsappNumberLabel
                                         }, void 0, false, {
                                             fileName: "[project]/app/[locale]/onboarding/page.tsx",
-                                            lineNumber: 765,
+                                            lineNumber: 845,
                                             columnNumber: 17
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1723,7 +1888,7 @@ function OnboardingPage() {
                                                             className: "text-[#25D366]"
                                                         }, void 0, false, {
                                                             fileName: "[project]/app/[locale]/onboarding/page.tsx",
-                                                            lineNumber: 776,
+                                                            lineNumber: 856,
                                                             columnNumber: 21
                                                         }, this),
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -1731,7 +1896,7 @@ function OnboardingPage() {
                                                             children: whatsappCountry ? countryEmoji(whatsappCountry.iso2) : '🌐'
                                                         }, void 0, false, {
                                                             fileName: "[project]/app/[locale]/onboarding/page.tsx",
-                                                            lineNumber: 777,
+                                                            lineNumber: 857,
                                                             columnNumber: 21
                                                         }, this),
                                                         "+",
@@ -1739,7 +1904,7 @@ function OnboardingPage() {
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/app/[locale]/onboarding/page.tsx",
-                                                    lineNumber: 772,
+                                                    lineNumber: 852,
                                                     columnNumber: 19
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("input", {
@@ -1747,22 +1912,23 @@ function OnboardingPage() {
                                                     dir: "ltr",
                                                     inputMode: "numeric",
                                                     autoComplete: "tel-national",
-                                                    value: whatsappNumber,
+                                                    value: whatsappMaskedNumber,
                                                     onChange: (event)=>{
-                                                        setWhatsappNumber(onlyDigits(event.currentTarget.value).slice(0, 14));
+                                                        const maxDigits = whatsappPhoneMask.split('').filter((char)=>char === '0').length;
+                                                        setWhatsappNumber(onlyDigits(event.currentTarget.value).slice(0, maxDigits));
                                                         setFieldError(null);
                                                     },
                                                     placeholder: copy.whatsappNumberPlaceholder,
                                                     className: "h-11 flex-1 border-0 bg-transparent px-3 text-xs text-[#25343f] outline-none placeholder:text-[#929ca5] focus:border-0 focus:outline-none focus:ring-0"
                                                 }, void 0, false, {
                                                     fileName: "[project]/app/[locale]/onboarding/page.tsx",
-                                                    lineNumber: 780,
+                                                    lineNumber: 860,
                                                     columnNumber: 19
                                                 }, this)
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/app/[locale]/onboarding/page.tsx",
-                                            lineNumber: 771,
+                                            lineNumber: 851,
                                             columnNumber: 17
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1773,7 +1939,7 @@ function OnboardingPage() {
                                                     size: 16
                                                 }, void 0, false, {
                                                     fileName: "[project]/app/[locale]/onboarding/page.tsx",
-                                                    lineNumber: 796,
+                                                    lineNumber: 877,
                                                     columnNumber: 19
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("input", {
@@ -1784,13 +1950,13 @@ function OnboardingPage() {
                                                     className: "h-10 w-full rounded-lg border border-[#d9dee3] bg-white ps-9 pe-3 text-xs text-[#25343f] outline-none transition placeholder:text-[#929ca5] focus:border-[#57c489] focus:ring-2 focus:ring-[#dcf5e7]"
                                                 }, void 0, false, {
                                                     fileName: "[project]/app/[locale]/onboarding/page.tsx",
-                                                    lineNumber: 800,
+                                                    lineNumber: 881,
                                                     columnNumber: 19
                                                 }, this)
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/app/[locale]/onboarding/page.tsx",
-                                            lineNumber: 795,
+                                            lineNumber: 876,
                                             columnNumber: 17
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1802,21 +1968,21 @@ function OnboardingPage() {
                                                 children: copy.countriesLoading
                                             }, void 0, false, {
                                                 fileName: "[project]/app/[locale]/onboarding/page.tsx",
-                                                lineNumber: 815,
+                                                lineNumber: 896,
                                                 columnNumber: 21
                                             }, this) : !isDesignPreview && countriesError ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
                                                 className: "py-8 text-center text-xs text-[#a14b38]",
                                                 children: copy.unknownError
                                             }, void 0, false, {
                                                 fileName: "[project]/app/[locale]/onboarding/page.tsx",
-                                                lineNumber: 817,
+                                                lineNumber: 898,
                                                 columnNumber: 21
                                             }, this) : filteredWhatsappCountries.length === 0 ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
                                                 className: "py-8 text-center text-xs text-[#687784]",
                                                 children: copy.whatsappCountryEmpty
                                             }, void 0, false, {
                                                 fileName: "[project]/app/[locale]/onboarding/page.tsx",
-                                                lineNumber: 819,
+                                                lineNumber: 900,
                                                 columnNumber: 21
                                             }, this) : filteredWhatsappCountries.map((country)=>{
                                                 var _country_names;
@@ -1838,7 +2004,7 @@ function OnboardingPage() {
                                                             children: countryEmoji(country.iso2)
                                                         }, void 0, false, {
                                                             fileName: "[project]/app/[locale]/onboarding/page.tsx",
-                                                            lineNumber: 840,
+                                                            lineNumber: 921,
                                                             columnNumber: 27
                                                         }, this),
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -1846,7 +2012,7 @@ function OnboardingPage() {
                                                             children: label
                                                         }, void 0, false, {
                                                             fileName: "[project]/app/[locale]/onboarding/page.tsx",
-                                                            lineNumber: 841,
+                                                            lineNumber: 922,
                                                             columnNumber: 27
                                                         }, this),
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -1858,7 +2024,7 @@ function OnboardingPage() {
                                                             ]
                                                         }, void 0, true, {
                                                             fileName: "[project]/app/[locale]/onboarding/page.tsx",
-                                                            lineNumber: 842,
+                                                            lineNumber: 923,
                                                             columnNumber: 27
                                                         }, this),
                                                         isSelected && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$tabler$2f$icons$2d$react$2f$dist$2f$esm$2f$icons$2f$IconCheck$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__IconCheck$3e$__["IconCheck"], {
@@ -1866,25 +2032,25 @@ function OnboardingPage() {
                                                             stroke: 2.3
                                                         }, void 0, false, {
                                                             fileName: "[project]/app/[locale]/onboarding/page.tsx",
-                                                            lineNumber: 845,
+                                                            lineNumber: 926,
                                                             columnNumber: 42
                                                         }, this)
                                                     ]
                                                 }, country.id, true, {
                                                     fileName: "[project]/app/[locale]/onboarding/page.tsx",
-                                                    lineNumber: 825,
+                                                    lineNumber: 906,
                                                     columnNumber: 25
                                                 }, this);
                                             })
                                         }, void 0, false, {
                                             fileName: "[project]/app/[locale]/onboarding/page.tsx",
-                                            lineNumber: 809,
+                                            lineNumber: 890,
                                             columnNumber: 17
                                         }, this)
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/app/[locale]/onboarding/page.tsx",
-                                    lineNumber: 764,
+                                    lineNumber: 844,
                                     columnNumber: 15
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1901,7 +2067,7 @@ function OnboardingPage() {
                                                     children: copy.skip
                                                 }, void 0, false, {
                                                     fileName: "[project]/app/[locale]/onboarding/page.tsx",
-                                                    lineNumber: 855,
+                                                    lineNumber: 936,
                                                     columnNumber: 19
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -1910,13 +2076,13 @@ function OnboardingPage() {
                                                     children: fieldError
                                                 }, void 0, false, {
                                                     fileName: "[project]/app/[locale]/onboarding/page.tsx",
-                                                    lineNumber: 863,
+                                                    lineNumber: 944,
                                                     columnNumber: 19
                                                 }, this)
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/app/[locale]/onboarding/page.tsx",
-                                            lineNumber: 854,
+                                            lineNumber: 935,
                                             columnNumber: 17
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
@@ -1930,7 +2096,7 @@ function OnboardingPage() {
                                                     size: 14
                                                 }, void 0, false, {
                                                     fileName: "[project]/app/[locale]/onboarding/page.tsx",
-                                                    lineNumber: 871,
+                                                    lineNumber: 952,
                                                     columnNumber: 36
                                                 }, this),
                                                 isSubmitting ? copy.saving : copy.whatsappSave,
@@ -1938,50 +2104,50 @@ function OnboardingPage() {
                                                     size: 15
                                                 }, void 0, false, {
                                                     fileName: "[project]/app/[locale]/onboarding/page.tsx",
-                                                    lineNumber: 873,
+                                                    lineNumber: 954,
                                                     columnNumber: 37
                                                 }, this)
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/app/[locale]/onboarding/page.tsx",
-                                            lineNumber: 865,
+                                            lineNumber: 946,
                                             columnNumber: 17
                                         }, this)
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/app/[locale]/onboarding/page.tsx",
-                                    lineNumber: 853,
+                                    lineNumber: 934,
                                     columnNumber: 15
                                 }, this)
                             ]
                         }, "whatsapp", true, {
                             fileName: "[project]/app/[locale]/onboarding/page.tsx",
-                            lineNumber: 763,
+                            lineNumber: 843,
                             columnNumber: 13
                         }, this) : null
                     }, void 0, false, {
                         fileName: "[project]/app/[locale]/onboarding/page.tsx",
-                        lineNumber: 570,
+                        lineNumber: 650,
                         columnNumber: 11
                     }, this)
                 }, void 0, false, {
                     fileName: "[project]/app/[locale]/onboarding/page.tsx",
-                    lineNumber: 569,
+                    lineNumber: 649,
                     columnNumber: 9
                 }, this)
             ]
         }, void 0, true, {
             fileName: "[project]/app/[locale]/onboarding/page.tsx",
-            lineNumber: 527,
+            lineNumber: 593,
             columnNumber: 7
         }, this)
     }, void 0, false, {
         fileName: "[project]/app/[locale]/onboarding/page.tsx",
-        lineNumber: 526,
+        lineNumber: 592,
         columnNumber: 5
     }, this);
 }
-_s(OnboardingPage, "JBdE9pwCk4xXgTQzKUm0vNtk0/s=", false, function() {
+_s(OnboardingPage, "aflTDff4BVY5g+wx4gIsjVm6BsM=", false, function() {
     return [
         __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2d$intl$2f$dist$2f$index$2e$react$2d$client$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useLocale"],
         __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$navigation$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useRouter"],

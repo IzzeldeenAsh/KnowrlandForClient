@@ -20,9 +20,12 @@ import { getAuthToken } from '@/lib/authToken'
 import InsightaLogoWhiteAr from '@/public/images/ANSIGHTAAr-.png'
 import InsightaLogoWhiteEn from '@/public/images/Business-white.png'
 import {
+  fetchInsighterPromptStatuses,
   fetchOnboardingIndustryTree,
   fetchOnboardingPromptStatuses,
+  getVisibleInsighterPrompts,
   getVisibleSupportedPrompts,
+  hasInsighterPromptRole,
   skipOnboardingPrompt,
   updateFeedIndustryPreferences,
   updateOnboardingCountry,
@@ -31,6 +34,7 @@ import {
   type OnboardingPromptKey,
   type OnboardingPromptStatus,
 } from '@/services/onboarding.service'
+import { INSIGHTER_SETUP_QUERY_KEY } from '@/components/onboarding/InsighterSetupCover'
 import styles from './onboarding.module.css'
 
 type IndustryOption = { id: number; label: string }
@@ -40,6 +44,36 @@ const promptOrder: OnboardingPromptKey[] = ['country', 'community_feed_industrie
 
 function onlyDigits(value: string | null | undefined): string {
   return (value ?? '').replace(/\D/g, '')
+}
+
+// Same per-country digit grouping used by the phone mask in
+// /app/insighter-dashboard/account-settings/notification-settings.
+const PHONE_MASKS: Record<string, string> = {
+  default: '000-000-0000',
+  '1': '000-000-0000', // US/CA
+  '44': '0000-000000', // UK
+  '966': '0-0000-0000', // SA
+  '971': '0-0000-0000', // AE
+  '20': '00-0000-0000', // EG
+  '962': '0-0000-0000', // JO
+  '961': '0-0000-0000', // LB
+  '33': '00-00-00-00-00', // FR
+  '49': '0000-0000000', // DE
+  '39': '000-0000000', // IT
+}
+
+function formatWithMask(digits: string, mask: string): string {
+  let formatted = ''
+  let digitIndex = 0
+  for (let i = 0; i < mask.length && digitIndex < digits.length; i++) {
+    if (mask[i] === '0') {
+      formatted += digits[digitIndex]
+      digitIndex++
+    } else {
+      formatted += mask[i]
+    }
+  }
+  return formatted
 }
 
 const designPreviewCountries: Country[] = [
@@ -93,6 +127,13 @@ const copyByLocale = {
     unknownError: 'Something went wrong. Please try again.',
     whatsappTitle: 'Stay connected on WhatsApp',
     whatsappBody: 'Add your WhatsApp number to get important updates, alerts, and support right where you already chat.',
+    whatsappBenefits: [
+      'Receive related insights tailored to your interests.',
+      'Instant session booking confirmations and details.',
+      'Session reminders so you never miss a meeting.',
+      'Service request updates with clear status tracking.',
+      'Other important updates based on your activity.',
+    ],
     whatsappNumberLabel: 'WhatsApp number',
     whatsappNumberPlaceholder: 'Phone number',
     whatsappCountrySearch: 'Search country code',
@@ -129,6 +170,13 @@ const copyByLocale = {
     unknownError: 'حدث خطأ ما. يرجى المحاولة مرة أخرى.',
     whatsappTitle: 'ابقَ على تواصل عبر واتساب',
     whatsappBody: 'أضِف رقم واتساب الخاص بك لتصلك التحديثات والتنبيهات المهمة والدعم في المكان الذي تتحدث فيه بالفعل.',
+    whatsappBenefits: [
+      'تلقّي رؤى ذات صلة مخصّصة لاهتماماتك.',
+      'تأكيدات فورية لحجز الجلسات مع كل التفاصيل.',
+      'تذكيرات بالجلسات حتى لا يفوتك أي اجتماع.',
+      'تحديثات لطلبات الخدمة مع تتبّع واضح للحالة.',
+      'تحديثات مهمة أخرى بحسب نشاطك.',
+    ],
     whatsappNumberLabel: 'رقم واتساب',
     whatsappNumberPlaceholder: 'رقم الهاتف',
     whatsappCountrySearch: 'ابحث عن رمز الدولة',
@@ -201,6 +249,7 @@ export default function OnboardingPage() {
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [isFinishing, setIsFinishing] = useState(false)
   const redirectStartedRef = useRef(false)
+  const insighterSetupCheckedRef = useRef(false)
 
   const visiblePrompts = useMemo(
     () => (statuses ? sortVisiblePrompts(statuses) : []),
@@ -223,56 +272,95 @@ export default function OnboardingPage() {
         : copy.countryBody
   const activeRequirement = currentStatus?.cannot_skip ? copy.required : copy.optional
   const whatsappDialCode = onlyDigits(whatsappCountry?.international_code)
+  const whatsappPhoneMask = PHONE_MASKS[whatsappDialCode] || PHONE_MASKS.default
+  const whatsappMaskedNumber = formatWithMask(whatsappNumber, whatsappPhoneMask)
+
+  /**
+   * The Insighter setup covers are shown at the destination, not here — this
+   * only decides whether the destination URL should carry the marker that asks
+   * for them. Checked at most once per visit.
+   */
+  const resolveInsighterSetupMarker = useCallback(async (): Promise<boolean> => {
+    if (insighterSetupCheckedRef.current) return false
+    insighterSetupCheckedRef.current = true
+
+    const token = getAuthToken()
+    if (!token || !hasInsighterPromptRole(roles)) return false
+
+    const prompts = await fetchInsighterPromptStatuses({ token, locale })
+    return getVisibleInsighterPrompts(prompts).length > 0
+  }, [locale, roles])
 
   const navigateAfterOnboarding = useCallback(() => {
     if (redirectStartedRef.current) return
     redirectStartedRef.current = true
     setIsFinishing(true)
 
-    const requestedDestination = searchParams.get('redirect') || searchParams.get('returnUrl')
-    const unsafeDestination = requestedDestination?.trim() ?? ''
-    const blockedDestination = /(^|\/)(auth|callback|onboarding|update-country)(\/|\?|$)/i.test(
-      unsafeDestination,
-    )
-    const destination = !unsafeDestination || blockedDestination ? null : unsafeDestination
+    void (async () => {
+      // Decided before the redirect so the marker can ride along on the
+      // destination URL — the covers are rendered wherever the user lands, not
+      // stacked on top of this page.
+      const wantsSetupCovers = await resolveInsighterSetupMarker()
 
-    if (destination) {
-      try {
-        const parsed = new URL(destination, window.location.origin)
-        const allowedHost =
-          parsed.hostname === window.location.hostname ||
-          parsed.hostname === 'localhost' ||
-          parsed.hostname === '127.0.0.1' ||
-          parsed.hostname.endsWith('.insightabusiness.com') ||
-          parsed.hostname.endsWith('.foresighta.co') ||
-          parsed.hostname === 'insightabusiness.com' ||
-          parsed.hostname === 'foresighta.co'
+      /** Adds the marker to whichever URL we end up sending the user to. */
+      const withMarker = (url: string): string => {
+        if (!wantsSetupCovers) return url
+        try {
+          const parsed = new URL(url, window.location.origin)
+          parsed.searchParams.set(INSIGHTER_SETUP_QUERY_KEY, '1')
+          return url.startsWith('http') ? parsed.toString() : `${parsed.pathname}${parsed.search}${parsed.hash}`
+        } catch {
+          return url
+        }
+      }
 
-        if (allowedHost && /^https?:$/.test(parsed.protocol)) {
-          if (isAngularRouteUrl(parsed.toString())) {
-            window.location.replace(toAngularAppUrl(parsed.toString()))
+      const requestedDestination = searchParams.get('redirect') || searchParams.get('returnUrl')
+      const unsafeDestination = requestedDestination?.trim() ?? ''
+      const blockedDestination = /(^|\/)(auth|callback|onboarding|update-country)(\/|\?|$)/i.test(
+        unsafeDestination,
+      )
+      const destination = !unsafeDestination || blockedDestination ? null : unsafeDestination
+
+      if (destination) {
+        try {
+          const parsed = new URL(destination, window.location.origin)
+          const allowedHost =
+            parsed.hostname === window.location.hostname ||
+            parsed.hostname === 'localhost' ||
+            parsed.hostname === '127.0.0.1' ||
+            parsed.hostname.endsWith('.insightabusiness.com') ||
+            parsed.hostname.endsWith('.foresighta.co') ||
+            parsed.hostname === 'insightabusiness.com' ||
+            parsed.hostname === 'foresighta.co'
+
+          if (allowedHost && /^https?:$/.test(parsed.protocol)) {
+            if (isAngularRouteUrl(parsed.toString())) {
+              window.location.replace(withMarker(toAngularAppUrl(parsed.toString())))
+              return
+            }
+
+            if (parsed.origin === window.location.origin) {
+              router.replace(withMarker(`${parsed.pathname}${parsed.search}${parsed.hash}`))
+            } else {
+              window.location.replace(withMarker(parsed.toString()))
+            }
             return
           }
-
-          if (parsed.origin === window.location.origin) {
-            router.replace(`${parsed.pathname}${parsed.search}${parsed.hash}`)
-          } else {
-            window.location.replace(parsed.toString())
-          }
-          return
+        } catch {
+          // Continue to the role-based destination.
         }
-      } catch {
-        // Continue to the role-based destination.
       }
-    }
 
-    if (roles.some((role) => ['insighter', 'company', 'company-insighter'].includes(role))) {
-      window.location.replace(`${getAngularAppOrigin()}/app/insighter-dashboard/my-dashboard`)
-      return
-    }
+      if (roles.some((role) => ['insighter', 'company', 'company-insighter'].includes(role))) {
+        window.location.replace(
+          withMarker(`${getAngularAppOrigin()}/app/insighter-dashboard/my-dashboard`),
+        )
+        return
+      }
 
-    router.replace(`/${locale}/home`)
-  }, [locale, roles, router, searchParams])
+      router.replace(withMarker(`/${locale}`))
+    })()
+  }, [locale, resolveInsighterSetupMarker, roles, router, searchParams])
 
   const applyStatuses = useCallback(
     (nextStatuses: OnboardingPromptStatus[]) => {
@@ -558,9 +646,23 @@ export default function OnboardingPage() {
                 <h1 className="mt-4 max-w-[330px] text-[29px] font-semibold leading-[1.06] tracking-[-0.04em] sm:text-[35px]">
                   {activeTitle}
                 </h1>
-                <p className="mt-4 max-w-[305px] text-[11px] leading-[1.7] text-white/72 sm:text-xs">
-                  {activeBody}
-                </p>
+                {activePrompt !== 'whatsapp' && (
+                  <p className="mt-4 max-w-[305px] text-[11px] leading-[1.7] text-white/72 sm:text-xs">
+                    {activeBody}
+                  </p>
+                )}
+                {activePrompt === 'whatsapp' && (
+                  <ul className="mt-5 flex max-w-[320px] flex-col gap-3">
+                    {copy.whatsappBenefits.map((benefit) => (
+                      <li key={benefit} className="flex items-center gap-2.5 text-xs leading-[1.5] text-white/95 sm:text-sm">
+                        <span className="flex h-4 w-4 flex-shrink-0 items-center justify-center rounded-full bg-[#25D366]/25">
+                          <IconCheck size={11} stroke={3} className="text-[#25D366]" />
+                        </span>
+                        <span>{benefit}</span>
+                      </li>
+                    ))}
+                  </ul>
+                )}
               </div>
             )}
           </div>
@@ -782,9 +884,10 @@ export default function OnboardingPage() {
                     dir="ltr"
                     inputMode="numeric"
                     autoComplete="tel-national"
-                    value={whatsappNumber}
+                    value={whatsappMaskedNumber}
                     onChange={(event) => {
-                      setWhatsappNumber(onlyDigits(event.currentTarget.value).slice(0, 14))
+                      const maxDigits = whatsappPhoneMask.split('').filter((char) => char === '0').length
+                      setWhatsappNumber(onlyDigits(event.currentTarget.value).slice(0, maxDigits))
                       setFieldError(null)
                     }}
                     placeholder={copy.whatsappNumberPlaceholder}
@@ -878,6 +981,7 @@ export default function OnboardingPage() {
           </div>
         </section>
       </section>
+
     </main>
   )
 }

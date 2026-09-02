@@ -186,7 +186,7 @@ export default function KnowledgeLibraryDrawer({
                           : 'border-[#18304F] hover:border-[#315C8E]'
                       } ${isDisabled ? 'cursor-not-allowed opacity-45' : 'cursor-pointer'}`}
                       style={{
-                        backgroundImage: 'url("https://foresighta.co/images/test2.png")',
+                        backgroundImage: 'url("/images/test2.png")',
                         backgroundPosition: 'center',
                         backgroundRepeat: 'no-repeat',
                         backgroundSize: 'cover',

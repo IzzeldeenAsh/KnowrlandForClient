@@ -1,0 +1,391 @@
+/* [project]/components/onboarding/insighterSetupCover.module.css [app-client] (css) */
+.insighterSetupCover-module__MQErDa__backdrop {
+  z-index: 1055;
+  background: rgba(16, 23, 36, .55);
+  justify-content: center;
+  align-items: center;
+  padding: 40px 20px;
+  display: flex;
+  position: fixed;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  overflow-y: auto;
+}
+
+.insighterSetupCover-module__MQErDa__cover {
+  text-align: center;
+  background: #fff;
+  border: 1px solid #eceff3;
+  border-radius: 20px;
+  width: 476px;
+  max-width: 100%;
+  margin: auto;
+  padding: 24px 28px;
+  animation: .3s ease-out both insighterSetupCover-module__MQErDa__cover-enter;
+  position: relative;
+}
+
+.insighterSetupCover-module__MQErDa__close {
+  z-index: 2;
+  top: 18px;
+  color: #6b7885;
+  background: #f1f5f9;
+  border: 0;
+  border-radius: 50%;
+  justify-content: center;
+  align-items: center;
+  width: 34px;
+  height: 34px;
+  display: flex;
+  position: absolute;
+}
+
+.insighterSetupCover-module__MQErDa__close:not(:-webkit-any(:lang(ae), :lang(ar), :lang(arc), :lang(bcc), :lang(bqi), :lang(ckb), :lang(dv), :lang(fa), :lang(glk), :lang(he), :lang(ku), :lang(mzn), :lang(nqo), :lang(pnb), :lang(ps), :lang(sd), :lang(ug), :lang(ur), :lang(yi))) {
+  right: 18px;
+}
+
+.insighterSetupCover-module__MQErDa__close:not(:-moz-any(:lang(ae), :lang(ar), :lang(arc), :lang(bcc), :lang(bqi), :lang(ckb), :lang(dv), :lang(fa), :lang(glk), :lang(he), :lang(ku), :lang(mzn), :lang(nqo), :lang(pnb), :lang(ps), :lang(sd), :lang(ug), :lang(ur), :lang(yi))) {
+  right: 18px;
+}
+
+.insighterSetupCover-module__MQErDa__close:not(:is(:lang(ae), :lang(ar), :lang(arc), :lang(bcc), :lang(bqi), :lang(ckb), :lang(dv), :lang(fa), :lang(glk), :lang(he), :lang(ku), :lang(mzn), :lang(nqo), :lang(pnb), :lang(ps), :lang(sd), :lang(ug), :lang(ur), :lang(yi))) {
+  right: 18px;
+}
+
+.insighterSetupCover-module__MQErDa__close:-webkit-any(:lang(ae), :lang(ar), :lang(arc), :lang(bcc), :lang(bqi), :lang(ckb), :lang(dv), :lang(fa), :lang(glk), :lang(he), :lang(ku), :lang(mzn), :lang(nqo), :lang(pnb), :lang(ps), :lang(sd), :lang(ug), :lang(ur), :lang(yi)) {
+  left: 18px;
+}
+
+.insighterSetupCover-module__MQErDa__close:-moz-any(:lang(ae), :lang(ar), :lang(arc), :lang(bcc), :lang(bqi), :lang(ckb), :lang(dv), :lang(fa), :lang(glk), :lang(he), :lang(ku), :lang(mzn), :lang(nqo), :lang(pnb), :lang(ps), :lang(sd), :lang(ug), :lang(ur), :lang(yi)) {
+  left: 18px;
+}
+
+.insighterSetupCover-module__MQErDa__close:is(:lang(ae), :lang(ar), :lang(arc), :lang(bcc), :lang(bqi), :lang(ckb), :lang(dv), :lang(fa), :lang(glk), :lang(he), :lang(ku), :lang(mzn), :lang(nqo), :lang(pnb), :lang(ps), :lang(sd), :lang(ug), :lang(ur), :lang(yi)) {
+  left: 18px;
+}
+
+.insighterSetupCover-module__MQErDa__close:hover {
+  color: #101724;
+  background: #e6ecf3;
+}
+
+.insighterSetupCover-module__MQErDa__close:disabled {
+  cursor: default;
+  opacity: .55;
+}
+
+.insighterSetupCover-module__MQErDa__close svg {
+  width: 16px;
+  height: 16px;
+}
+
+.insighterSetupCover-module__MQErDa__panel {
+  background: radial-gradient(120% 90% at 18% 12%, #dcebff 0%, rgba(220, 235, 255, 0) 62%), radial-gradient(115% 95% at 88% 84%, #d3f4f1 0%, rgba(211, 244, 241, 0) 60%), linear-gradient(150deg, #f3f8ff 0%, #eefafa 100%);
+  border-radius: 14px;
+  justify-content: center;
+  align-items: center;
+  height: 252px;
+  display: flex;
+  position: relative;
+  overflow: hidden;
+}
+
+.insighterSetupCover-module__MQErDa__blob {
+  opacity: .5;
+  filter: blur(34px);
+  border-radius: 50%;
+  position: absolute;
+}
+
+.insighterSetupCover-module__MQErDa__blobOne {
+  top: -32px;
+  background: #9cc6ff;
+  width: 170px;
+  height: 170px;
+}
+
+.insighterSetupCover-module__MQErDa__blobOne:not(:-webkit-any(:lang(ae), :lang(ar), :lang(arc), :lang(bcc), :lang(bqi), :lang(ckb), :lang(dv), :lang(fa), :lang(glk), :lang(he), :lang(ku), :lang(mzn), :lang(nqo), :lang(pnb), :lang(ps), :lang(sd), :lang(ug), :lang(ur), :lang(yi))) {
+  left: -36px;
+}
+
+.insighterSetupCover-module__MQErDa__blobOne:not(:-moz-any(:lang(ae), :lang(ar), :lang(arc), :lang(bcc), :lang(bqi), :lang(ckb), :lang(dv), :lang(fa), :lang(glk), :lang(he), :lang(ku), :lang(mzn), :lang(nqo), :lang(pnb), :lang(ps), :lang(sd), :lang(ug), :lang(ur), :lang(yi))) {
+  left: -36px;
+}
+
+.insighterSetupCover-module__MQErDa__blobOne:not(:is(:lang(ae), :lang(ar), :lang(arc), :lang(bcc), :lang(bqi), :lang(ckb), :lang(dv), :lang(fa), :lang(glk), :lang(he), :lang(ku), :lang(mzn), :lang(nqo), :lang(pnb), :lang(ps), :lang(sd), :lang(ug), :lang(ur), :lang(yi))) {
+  left: -36px;
+}
+
+.insighterSetupCover-module__MQErDa__blobOne:-webkit-any(:lang(ae), :lang(ar), :lang(arc), :lang(bcc), :lang(bqi), :lang(ckb), :lang(dv), :lang(fa), :lang(glk), :lang(he), :lang(ku), :lang(mzn), :lang(nqo), :lang(pnb), :lang(ps), :lang(sd), :lang(ug), :lang(ur), :lang(yi)) {
+  right: -36px;
+}
+
+.insighterSetupCover-module__MQErDa__blobOne:-moz-any(:lang(ae), :lang(ar), :lang(arc), :lang(bcc), :lang(bqi), :lang(ckb), :lang(dv), :lang(fa), :lang(glk), :lang(he), :lang(ku), :lang(mzn), :lang(nqo), :lang(pnb), :lang(ps), :lang(sd), :lang(ug), :lang(ur), :lang(yi)) {
+  right: -36px;
+}
+
+.insighterSetupCover-module__MQErDa__blobOne:is(:lang(ae), :lang(ar), :lang(arc), :lang(bcc), :lang(bqi), :lang(ckb), :lang(dv), :lang(fa), :lang(glk), :lang(he), :lang(ku), :lang(mzn), :lang(nqo), :lang(pnb), :lang(ps), :lang(sd), :lang(ug), :lang(ur), :lang(yi)) {
+  right: -36px;
+}
+
+.insighterSetupCover-module__MQErDa__blobTwo {
+  bottom: -36px;
+  background: #8fe4dd;
+  width: 155px;
+  height: 155px;
+}
+
+.insighterSetupCover-module__MQErDa__blobTwo:not(:-webkit-any(:lang(ae), :lang(ar), :lang(arc), :lang(bcc), :lang(bqi), :lang(ckb), :lang(dv), :lang(fa), :lang(glk), :lang(he), :lang(ku), :lang(mzn), :lang(nqo), :lang(pnb), :lang(ps), :lang(sd), :lang(ug), :lang(ur), :lang(yi))) {
+  right: -32px;
+}
+
+.insighterSetupCover-module__MQErDa__blobTwo:not(:-moz-any(:lang(ae), :lang(ar), :lang(arc), :lang(bcc), :lang(bqi), :lang(ckb), :lang(dv), :lang(fa), :lang(glk), :lang(he), :lang(ku), :lang(mzn), :lang(nqo), :lang(pnb), :lang(ps), :lang(sd), :lang(ug), :lang(ur), :lang(yi))) {
+  right: -32px;
+}
+
+.insighterSetupCover-module__MQErDa__blobTwo:not(:is(:lang(ae), :lang(ar), :lang(arc), :lang(bcc), :lang(bqi), :lang(ckb), :lang(dv), :lang(fa), :lang(glk), :lang(he), :lang(ku), :lang(mzn), :lang(nqo), :lang(pnb), :lang(ps), :lang(sd), :lang(ug), :lang(ur), :lang(yi))) {
+  right: -32px;
+}
+
+.insighterSetupCover-module__MQErDa__blobTwo:-webkit-any(:lang(ae), :lang(ar), :lang(arc), :lang(bcc), :lang(bqi), :lang(ckb), :lang(dv), :lang(fa), :lang(glk), :lang(he), :lang(ku), :lang(mzn), :lang(nqo), :lang(pnb), :lang(ps), :lang(sd), :lang(ug), :lang(ur), :lang(yi)) {
+  left: -32px;
+}
+
+.insighterSetupCover-module__MQErDa__blobTwo:-moz-any(:lang(ae), :lang(ar), :lang(arc), :lang(bcc), :lang(bqi), :lang(ckb), :lang(dv), :lang(fa), :lang(glk), :lang(he), :lang(ku), :lang(mzn), :lang(nqo), :lang(pnb), :lang(ps), :lang(sd), :lang(ug), :lang(ur), :lang(yi)) {
+  left: -32px;
+}
+
+.insighterSetupCover-module__MQErDa__blobTwo:is(:lang(ae), :lang(ar), :lang(arc), :lang(bcc), :lang(bqi), :lang(ckb), :lang(dv), :lang(fa), :lang(glk), :lang(he), :lang(ku), :lang(mzn), :lang(nqo), :lang(pnb), :lang(ps), :lang(sd), :lang(ug), :lang(ur), :lang(yi)) {
+  left: -32px;
+}
+
+.insighterSetupCover-module__MQErDa__art {
+  width: 100%;
+  height: 100%;
+  display: block;
+  position: relative;
+  transform: scale(1.42);
+  -o-object-fit: contain !important;
+  object-fit: contain !important;
+  -o-object-position: center !important;
+  object-position: center !important;
+}
+
+.insighterSetupCover-module__MQErDa__title {
+  color: #101724;
+  letter-spacing: -.03em;
+  margin: 21px 0 0;
+  font-size: 25px;
+  font-weight: 800;
+  line-height: 1.12;
+}
+
+.insighterSetupCover-module__MQErDa__lede {
+  color: #6b7885;
+  max-width: 348px;
+  margin: 10px auto 0;
+  font-size: 13.5px;
+  line-height: 1.6;
+}
+
+.insighterSetupCover-module__MQErDa__list {
+  text-align: start;
+  flex-direction: column;
+  gap: 11px;
+  max-width: 350px;
+  margin: 20px auto 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+}
+
+.insighterSetupCover-module__MQErDa__list li {
+  align-items: flex-start;
+  gap: 11px;
+  display: flex;
+}
+
+.insighterSetupCover-module__MQErDa__list li > span:last-child {
+  color: #33414f;
+  font-size: 12.5px;
+  line-height: 1.5;
+}
+
+.insighterSetupCover-module__MQErDa__tick {
+  color: #2378e8;
+  background: #e6f0fe;
+  border-radius: 50%;
+  flex-shrink: 0;
+  justify-content: center;
+  align-items: center;
+  width: 18px;
+  height: 18px;
+  margin-top: 1px;
+  display: flex;
+}
+
+.insighterSetupCover-module__MQErDa__tick svg {
+  width: 10px;
+  height: 10px;
+}
+
+.insighterSetupCover-module__MQErDa__cta {
+  color: #fff;
+  cursor: pointer;
+  background: linear-gradient(90deg, #2475e8 0%, #2bc0d5 100%);
+  border: 0;
+  border-radius: 12px;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+  height: 45px;
+  margin: 25px auto 0;
+  padding: 0 27px;
+  font-size: 13.5px;
+  font-weight: 700;
+  display: inline-flex;
+}
+
+.insighterSetupCover-module__MQErDa__cta:hover {
+  filter: brightness(1.05);
+}
+
+.insighterSetupCover-module__MQErDa__cta svg {
+  width: 16px;
+  height: 16px;
+}
+
+.insighterSetupCover-module__MQErDa__skip {
+  color: #8ca0b8;
+  cursor: pointer;
+  background: none;
+  border: 0;
+  margin: 12px auto 0;
+  font-size: 12.5px;
+  display: block;
+}
+
+.insighterSetupCover-module__MQErDa__skip:hover {
+  color: #5e6c7d;
+}
+
+.insighterSetupCover-module__MQErDa__skip:disabled {
+  cursor: default;
+  opacity: .55;
+}
+
+.insighterSetupCover-module__MQErDa__profile {
+  text-align: center;
+  width: 204px;
+  position: relative;
+}
+
+.insighterSetupCover-module__MQErDa__avatar {
+  color: #2378e8;
+  background: #e7f0fe;
+  border-radius: 50%;
+  justify-content: center;
+  align-items: center;
+  width: 64px;
+  height: 64px;
+  margin: 0 auto;
+  font-size: 20px;
+  font-weight: 800;
+  display: flex;
+  overflow: hidden;
+}
+
+.insighterSetupCover-module__MQErDa__avatar img {
+  width: 100%;
+  height: 100%;
+  -o-object-fit: cover !important;
+  object-fit: cover !important;
+  -o-object-position: center !important;
+  object-position: center !important;
+}
+
+.insighterSetupCover-module__MQErDa__name {
+  justify-content: center;
+  align-items: center;
+  gap: 6px;
+  margin: 13px 0 0;
+  display: flex;
+}
+
+.insighterSetupCover-module__MQErDa__displayName {
+  color: #101724;
+  letter-spacing: -.01em;
+  white-space: nowrap;
+  font-size: 14px;
+  font-weight: 800;
+}
+
+.insighterSetupCover-module__MQErDa__verified {
+  flex-shrink: 0;
+  width: 16px;
+  height: 16px;
+}
+
+.insighterSetupCover-module__MQErDa__geo {
+  color: #6b7885;
+  margin: 6px 0 0;
+  font-size: 13px;
+  display: block;
+}
+
+.insighterSetupCover-module__MQErDa__requestWrap {
+  justify-content: center;
+  margin: 18px 0 0;
+  display: flex;
+}
+
+.insighterSetupCover-module__MQErDa__request {
+  color: #fff;
+  background: linear-gradient(90deg, #3b82f6 0%, #2dd4bf 100%);
+  border-radius: 10px;
+  align-items: center;
+  gap: 8px;
+  height: 35px;
+  padding: 0 15px;
+  font-size: 12px;
+  font-weight: 700;
+  display: inline-flex;
+  box-shadow: 0 10px 24px -7px rgba(45, 150, 220, .6);
+}
+
+.insighterSetupCover-module__MQErDa__request svg {
+  width: 15px;
+  height: 15px;
+}
+
+@keyframes insighterSetupCover-module__MQErDa__cover-enter {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .insighterSetupCover-module__MQErDa__cover {
+    animation: none;
+  }
+}
+
+@media (max-width: 40rem) {
+  .insighterSetupCover-module__MQErDa__cover {
+    padding: 22px 17px;
+  }
+
+  .insighterSetupCover-module__MQErDa__panel {
+    height: 186px;
+  }
+}
+
+/*# sourceMappingURL=components_onboarding_insighterSetupCover_module_d265fcbe.css.map*/

@@ -1047,7 +1047,7 @@ const copyByLocale = {
         myDownloads: 'My Downloads',
         readLater: 'Read Later',
         meetings: 'Sessions',
-        mySchedule: 'My Schedule',
+        mySchedule: 'Session Settings',
         projects: 'Projects',
         clientProjects: 'Client Projects',
         myProjects: 'My Projects',
@@ -1081,7 +1081,7 @@ const copyByLocale = {
         myDownloads: 'تحميلاتي',
         readLater: 'اقرأ لاحقاً',
         meetings: 'الجلسات الاستشارية',
-        mySchedule: 'جدولي الاستشاري',
+        mySchedule: 'إعدادات الجلسات',
         projects: 'المشاريع',
         clientProjects: 'مشاريع العملاء',
         myProjects: 'مشاريعي',
@@ -1105,7 +1105,7 @@ const copyByLocale = {
         logIn: 'تسجيل الدخول'
     }
 };
-function SidebarItem({ href, icon: ItemIcon, label, isActive = false, compact = false }) {
+function SidebarItem({ href, icon: ItemIcon, label, badge, isActive = false, compact = false }) {
     return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$client$2f$app$2d$dir$2f$link$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["default"], {
         href: href,
         "aria-current": isActive ? 'page' : undefined,
@@ -1119,12 +1119,12 @@ function SidebarItem({ href, icon: ItemIcon, label, isActive = false, compact = 
                     className: "h-[18px] w-[18px]"
                 }, void 0, false, {
                     fileName: "[project]/components/feed/FeedSidebar.tsx",
-                    lineNumber: 184,
+                    lineNumber: 185,
                     columnNumber: 9
                 }, this)
             }, void 0, false, {
                 fileName: "[project]/components/feed/FeedSidebar.tsx",
-                lineNumber: 179,
+                lineNumber: 180,
                 columnNumber: 7
             }, this),
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -1132,13 +1132,21 @@ function SidebarItem({ href, icon: ItemIcon, label, isActive = false, compact = 
                 children: label
             }, void 0, false, {
                 fileName: "[project]/components/feed/FeedSidebar.tsx",
-                lineNumber: 186,
+                lineNumber: 187,
                 columnNumber: 7
+            }, this),
+            badge && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                className: "shrink-0 rounded-full bg-[#FFF0D5] px-2 py-0.5 text-[10px] font-bold leading-4 text-[#A85A00]",
+                children: badge
+            }, void 0, false, {
+                fileName: "[project]/components/feed/FeedSidebar.tsx",
+                lineNumber: 189,
+                columnNumber: 9
             }, this)
         ]
     }, void 0, true, {
         fileName: "[project]/components/feed/FeedSidebar.tsx",
-        lineNumber: 162,
+        lineNumber: 163,
         columnNumber: 5
     }, this);
 }
@@ -1149,7 +1157,7 @@ function DashboardLink({ href, label, compact = false }) {
         children: [
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(DashboardIcon, {}, void 0, false, {
                 fileName: "[project]/components/feed/FeedSidebar.tsx",
-                lineNumber: 199,
+                lineNumber: 205,
                 columnNumber: 7
             }, this),
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -1157,13 +1165,13 @@ function DashboardLink({ href, label, compact = false }) {
                 children: label
             }, void 0, false, {
                 fileName: "[project]/components/feed/FeedSidebar.tsx",
-                lineNumber: 200,
+                lineNumber: 206,
                 columnNumber: 7
             }, this)
         ]
     }, void 0, true, {
         fileName: "[project]/components/feed/FeedSidebar.tsx",
-        lineNumber: 193,
+        lineNumber: 199,
         columnNumber: 5
     }, this);
 }
@@ -1190,7 +1198,7 @@ function DashboardIcon() {
                         shapeRendering: "crispEdges"
                     }, void 0, false, {
                         fileName: "[project]/components/feed/FeedSidebar.tsx",
-                        lineNumber: 209,
+                        lineNumber: 215,
                         columnNumber: 9
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("path", {
@@ -1198,7 +1206,7 @@ function DashboardIcon() {
                         fill: "#FFC657"
                     }, void 0, false, {
                         fileName: "[project]/components/feed/FeedSidebar.tsx",
-                        lineNumber: 210,
+                        lineNumber: 216,
                         columnNumber: 9
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("path", {
@@ -1206,7 +1214,7 @@ function DashboardIcon() {
                         fill: "#FFE0A6"
                     }, void 0, false, {
                         fileName: "[project]/components/feed/FeedSidebar.tsx",
-                        lineNumber: 211,
+                        lineNumber: 217,
                         columnNumber: 9
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("path", {
@@ -1214,7 +1222,7 @@ function DashboardIcon() {
                         fill: "#1072FF"
                     }, void 0, false, {
                         fileName: "[project]/components/feed/FeedSidebar.tsx",
-                        lineNumber: 212,
+                        lineNumber: 218,
                         columnNumber: 9
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("path", {
@@ -1222,7 +1230,7 @@ function DashboardIcon() {
                         fill: "#CBE1FF"
                     }, void 0, false, {
                         fileName: "[project]/components/feed/FeedSidebar.tsx",
-                        lineNumber: 213,
+                        lineNumber: 219,
                         columnNumber: 9
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("path", {
@@ -1230,7 +1238,7 @@ function DashboardIcon() {
                         fill: "#1072FF"
                     }, void 0, false, {
                         fileName: "[project]/components/feed/FeedSidebar.tsx",
-                        lineNumber: 214,
+                        lineNumber: 220,
                         columnNumber: 9
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("path", {
@@ -1238,7 +1246,7 @@ function DashboardIcon() {
                         fill: "#CBE1FF"
                     }, void 0, false, {
                         fileName: "[project]/components/feed/FeedSidebar.tsx",
-                        lineNumber: 215,
+                        lineNumber: 221,
                         columnNumber: 9
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("path", {
@@ -1246,7 +1254,7 @@ function DashboardIcon() {
                         fill: "#FFC657"
                     }, void 0, false, {
                         fileName: "[project]/components/feed/FeedSidebar.tsx",
-                        lineNumber: 216,
+                        lineNumber: 222,
                         columnNumber: 9
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("path", {
@@ -1254,13 +1262,13 @@ function DashboardIcon() {
                         fill: "#FFE0A6"
                     }, void 0, false, {
                         fileName: "[project]/components/feed/FeedSidebar.tsx",
-                        lineNumber: 217,
+                        lineNumber: 223,
                         columnNumber: 9
                     }, this)
                 ]
             }, void 0, true, {
                 fileName: "[project]/components/feed/FeedSidebar.tsx",
-                lineNumber: 208,
+                lineNumber: 214,
                 columnNumber: 7
             }, this),
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("defs", {
@@ -1278,7 +1286,7 @@ function DashboardIcon() {
                             result: "BackgroundImageFix"
                         }, void 0, false, {
                             fileName: "[project]/components/feed/FeedSidebar.tsx",
-                            lineNumber: 221,
+                            lineNumber: 227,
                             columnNumber: 11
                         }, this),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("feColorMatrix", {
@@ -1288,21 +1296,21 @@ function DashboardIcon() {
                             result: "hardAlpha"
                         }, void 0, false, {
                             fileName: "[project]/components/feed/FeedSidebar.tsx",
-                            lineNumber: 222,
+                            lineNumber: 228,
                             columnNumber: 11
                         }, this),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("feOffset", {
                             dy: "1.31"
                         }, void 0, false, {
                             fileName: "[project]/components/feed/FeedSidebar.tsx",
-                            lineNumber: 223,
+                            lineNumber: 229,
                             columnNumber: 11
                         }, this),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("feGaussianBlur", {
                             stdDeviation: "1.875"
                         }, void 0, false, {
                             fileName: "[project]/components/feed/FeedSidebar.tsx",
-                            lineNumber: 224,
+                            lineNumber: 230,
                             columnNumber: 11
                         }, this),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("feComposite", {
@@ -1310,7 +1318,7 @@ function DashboardIcon() {
                             operator: "out"
                         }, void 0, false, {
                             fileName: "[project]/components/feed/FeedSidebar.tsx",
-                            lineNumber: 225,
+                            lineNumber: 231,
                             columnNumber: 11
                         }, this),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("feColorMatrix", {
@@ -1318,7 +1326,7 @@ function DashboardIcon() {
                             values: "0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.12 0"
                         }, void 0, false, {
                             fileName: "[project]/components/feed/FeedSidebar.tsx",
-                            lineNumber: 226,
+                            lineNumber: 232,
                             columnNumber: 11
                         }, this),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("feBlend", {
@@ -1327,7 +1335,7 @@ function DashboardIcon() {
                             result: "effect1_dropShadow"
                         }, void 0, false, {
                             fileName: "[project]/components/feed/FeedSidebar.tsx",
-                            lineNumber: 227,
+                            lineNumber: 233,
                             columnNumber: 11
                         }, this),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("feBlend", {
@@ -1337,24 +1345,24 @@ function DashboardIcon() {
                             result: "shape"
                         }, void 0, false, {
                             fileName: "[project]/components/feed/FeedSidebar.tsx",
-                            lineNumber: 228,
+                            lineNumber: 234,
                             columnNumber: 11
                         }, this)
                     ]
                 }, void 0, true, {
                     fileName: "[project]/components/feed/FeedSidebar.tsx",
-                    lineNumber: 220,
+                    lineNumber: 226,
                     columnNumber: 9
                 }, this)
             }, void 0, false, {
                 fileName: "[project]/components/feed/FeedSidebar.tsx",
-                lineNumber: 219,
+                lineNumber: 225,
                 columnNumber: 7
             }, this)
         ]
     }, void 0, true, {
         fileName: "[project]/components/feed/FeedSidebar.tsx",
-        lineNumber: 207,
+        lineNumber: 213,
         columnNumber: 5
     }, this);
 }
@@ -1382,12 +1390,12 @@ function DashboardSection({ title, icon: SectionIcon, children, compact = false,
                             className: compact ? 'h-4 w-4' : 'h-5 w-5'
                         }, void 0, false, {
                             fileName: "[project]/components/feed/FeedSidebar.tsx",
-                            lineNumber: 255,
+                            lineNumber: 261,
                             columnNumber: 11
                         }, this)
                     }, void 0, false, {
                         fileName: "[project]/components/feed/FeedSidebar.tsx",
-                        lineNumber: 254,
+                        lineNumber: 260,
                         columnNumber: 9
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("h2", {
@@ -1395,7 +1403,7 @@ function DashboardSection({ title, icon: SectionIcon, children, compact = false,
                         children: title
                     }, void 0, false, {
                         fileName: "[project]/components/feed/FeedSidebar.tsx",
-                        lineNumber: 257,
+                        lineNumber: 263,
                         columnNumber: 9
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$tabler$2f$icons$2d$react$2f$dist$2f$esm$2f$icons$2f$IconChevronDown$2e$mjs__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__$3c$export__default__as__IconChevronDown$3e$__["IconChevronDown"], {
@@ -1405,26 +1413,26 @@ function DashboardSection({ title, icon: SectionIcon, children, compact = false,
                         stroke: 2
                     }, void 0, false, {
                         fileName: "[project]/components/feed/FeedSidebar.tsx",
-                        lineNumber: 260,
+                        lineNumber: 266,
                         columnNumber: 9
                     }, this)
                 ]
             }, void 0, true, {
                 fileName: "[project]/components/feed/FeedSidebar.tsx",
-                lineNumber: 244,
+                lineNumber: 250,
                 columnNumber: 7
             }, this),
             isExpanded && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                 children: children
             }, void 0, false, {
                 fileName: "[project]/components/feed/FeedSidebar.tsx",
-                lineNumber: 267,
+                lineNumber: 273,
                 columnNumber: 22
             }, this)
         ]
     }, void 0, true, {
         fileName: "[project]/components/feed/FeedSidebar.tsx",
-        lineNumber: 243,
+        lineNumber: 249,
         columnNumber: 5
     }, this);
 }
@@ -1462,17 +1470,17 @@ function SidebarLegalFooter({ locale }) {
                             children: link.label
                         }, void 0, false, {
                             fileName: "[project]/components/feed/FeedSidebar.tsx",
-                            lineNumber: 290,
+                            lineNumber: 296,
                             columnNumber: 13
                         }, this)
                     }, link.href, false, {
                         fileName: "[project]/components/feed/FeedSidebar.tsx",
-                        lineNumber: 289,
+                        lineNumber: 295,
                         columnNumber: 11
                     }, this))
             }, void 0, false, {
                 fileName: "[project]/components/feed/FeedSidebar.tsx",
-                lineNumber: 287,
+                lineNumber: 293,
                 columnNumber: 7
             }, this),
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -1487,20 +1495,20 @@ function SidebarLegalFooter({ locale }) {
                         className: "shrink-0 rounded-[3px]"
                     }, void 0, false, {
                         fileName: "[project]/components/feed/FeedSidebar.tsx",
-                        lineNumber: 300,
+                        lineNumber: 306,
                         columnNumber: 9
                     }, this),
                     isArabic ? '© 2026 إنسايتا بيزنس' : '© 2026 Insighta Business'
                 ]
             }, void 0, true, {
                 fileName: "[project]/components/feed/FeedSidebar.tsx",
-                lineNumber: 299,
+                lineNumber: 305,
                 columnNumber: 7
             }, this)
         ]
     }, void 0, true, {
         fileName: "[project]/components/feed/FeedSidebar.tsx",
-        lineNumber: 283,
+        lineNumber: 289,
         columnNumber: 5
     }, this);
 }
@@ -1516,27 +1524,27 @@ function SidebarSkeleton() {
                         className: "h-24 w-24 rounded-full bg-slate-200"
                     }, void 0, false, {
                         fileName: "[project]/components/feed/FeedSidebar.tsx",
-                        lineNumber: 311,
+                        lineNumber: 317,
                         columnNumber: 9
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                         className: "mt-4 h-5 w-32 rounded-full bg-slate-200"
                     }, void 0, false, {
                         fileName: "[project]/components/feed/FeedSidebar.tsx",
-                        lineNumber: 312,
+                        lineNumber: 318,
                         columnNumber: 9
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                         className: "mt-3 h-[23px] w-20 rounded bg-slate-200"
                     }, void 0, false, {
                         fileName: "[project]/components/feed/FeedSidebar.tsx",
-                        lineNumber: 313,
+                        lineNumber: 319,
                         columnNumber: 9
                     }, this)
                 ]
             }, void 0, true, {
                 fileName: "[project]/components/feed/FeedSidebar.tsx",
-                lineNumber: 310,
+                lineNumber: 316,
                 columnNumber: 7
             }, this),
             [
@@ -1552,12 +1560,12 @@ function SidebarSkeleton() {
                                 className: "h-4 w-20 rounded bg-slate-200"
                             }, void 0, false, {
                                 fileName: "[project]/components/feed/FeedSidebar.tsx",
-                                lineNumber: 318,
+                                lineNumber: 324,
                                 columnNumber: 13
                             }, this)
                         }, void 0, false, {
                             fileName: "[project]/components/feed/FeedSidebar.tsx",
-                            lineNumber: 317,
+                            lineNumber: 323,
                             columnNumber: 11
                         }, this),
                         Array.from({
@@ -1569,32 +1577,32 @@ function SidebarSkeleton() {
                                         className: "h-[18px] w-[18px] animate-pulse rounded bg-slate-100"
                                     }, void 0, false, {
                                         fileName: "[project]/components/feed/FeedSidebar.tsx",
-                                        lineNumber: 322,
+                                        lineNumber: 328,
                                         columnNumber: 15
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                                         className: "h-3 w-24 animate-pulse rounded bg-slate-100"
                                     }, void 0, false, {
                                         fileName: "[project]/components/feed/FeedSidebar.tsx",
-                                        lineNumber: 323,
+                                        lineNumber: 329,
                                         columnNumber: 15
                                     }, this)
                                 ]
                             }, rowIndex, true, {
                                 fileName: "[project]/components/feed/FeedSidebar.tsx",
-                                lineNumber: 321,
+                                lineNumber: 327,
                                 columnNumber: 13
                             }, this))
                     ]
                 }, sectionIndex, true, {
                     fileName: "[project]/components/feed/FeedSidebar.tsx",
-                    lineNumber: 316,
+                    lineNumber: 322,
                     columnNumber: 9
                 }, this))
         ]
     }, void 0, true, {
         fileName: "[project]/components/feed/FeedSidebar.tsx",
-        lineNumber: 309,
+        lineNumber: 315,
         columnNumber: 5
     }, this);
 }
@@ -1625,7 +1633,7 @@ function GuestSidebar({ locale }) {
                 className: "pointer-events-none absolute -top-[30px] -end-[34px] h-[150px] w-[150px] opacity-[0.16] brightness-0 invert"
             }, void 0, false, {
                 fileName: "[project]/components/feed/FeedSidebar.tsx",
-                lineNumber: 352,
+                lineNumber: 358,
                 columnNumber: 7
             }, this),
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -1633,7 +1641,7 @@ function GuestSidebar({ locale }) {
                 children: copy.guestEyebrow
             }, void 0, false, {
                 fileName: "[project]/components/feed/FeedSidebar.tsx",
-                lineNumber: 360,
+                lineNumber: 366,
                 columnNumber: 7
             }, this),
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("h2", {
@@ -1642,7 +1650,7 @@ function GuestSidebar({ locale }) {
                 children: copy.guestTitle
             }, void 0, false, {
                 fileName: "[project]/components/feed/FeedSidebar.tsx",
-                lineNumber: 363,
+                lineNumber: 369,
                 columnNumber: 7
             }, this),
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -1650,7 +1658,7 @@ function GuestSidebar({ locale }) {
                 children: copy.guestDescription
             }, void 0, false, {
                 fileName: "[project]/components/feed/FeedSidebar.tsx",
-                lineNumber: 369,
+                lineNumber: 375,
                 columnNumber: 7
             }, this),
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1662,7 +1670,7 @@ function GuestSidebar({ locale }) {
                         children: copy.createAccount
                     }, void 0, false, {
                         fileName: "[project]/components/feed/FeedSidebar.tsx",
-                        lineNumber: 371,
+                        lineNumber: 377,
                         columnNumber: 9
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$client$2f$app$2d$dir$2f$link$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["default"], {
@@ -1671,19 +1679,19 @@ function GuestSidebar({ locale }) {
                         children: copy.logIn
                     }, void 0, false, {
                         fileName: "[project]/components/feed/FeedSidebar.tsx",
-                        lineNumber: 377,
+                        lineNumber: 383,
                         columnNumber: 9
                     }, this)
                 ]
             }, void 0, true, {
                 fileName: "[project]/components/feed/FeedSidebar.tsx",
-                lineNumber: 370,
+                lineNumber: 376,
                 columnNumber: 7
             }, this)
         ]
     }, void 0, true, {
         fileName: "[project]/components/feed/FeedSidebar.tsx",
-        lineNumber: 346,
+        lineNumber: 352,
         columnNumber: 5
     }, this);
 }
@@ -1708,7 +1716,7 @@ function FeedSidebar({ locale, hideProfileCard = false }) {
     if (!isAuthResolved || isLoading) {
         return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(SidebarSkeleton, {}, void 0, false, {
             fileName: "[project]/components/feed/FeedSidebar.tsx",
-            lineNumber: 407,
+            lineNumber: 413,
             columnNumber: 12
         }, this);
     }
@@ -1717,10 +1725,13 @@ function FeedSidebar({ locale, hideProfileCard = false }) {
             locale: locale
         }, void 0, false, {
             fileName: "[project]/components/feed/FeedSidebar.tsx",
-            lineNumber: 411,
+            lineNumber: 417,
             columnNumber: 12
         }, this);
     }
+    const needsMeetingSetup = isProvider && user.has_meet_service !== true;
+    const needsProjectSetup = isProvider && user.receive_project_services_active !== true;
+    const setupNowLabel = isArabic ? 'الإعداد الآن!' : 'Setup Now!';
     const initials = `${user.first_name?.[0] ?? ''}${user.last_name?.[0] ?? ''}`.toUpperCase();
     const fullName = `${user.first_name ?? ''} ${user.last_name ?? ''}`.trim() || user.name;
     const roleLabel = isCompanyInsighter ? `${copy.insighter} ${copy.at} ${user.company?.legal_name ?? ''}`.trim() : isInsighter ? copy.insighter : isCompany ? `${user.company?.legal_name ?? ''} · ${copy.manager}`.replace(/^ · /, '') : copy.client;
@@ -1748,7 +1759,7 @@ function FeedSidebar({ locale, hideProfileCard = false }) {
                                         strokeWidth: "1.35"
                                     }, void 0, false, {
                                         fileName: "[project]/components/feed/FeedSidebar.tsx",
-                                        lineNumber: 437,
+                                        lineNumber: 446,
                                         columnNumber: 11
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("path", {
@@ -1757,7 +1768,7 @@ function FeedSidebar({ locale, hideProfileCard = false }) {
                                         strokeWidth: "1.35"
                                     }, void 0, false, {
                                         fileName: "[project]/components/feed/FeedSidebar.tsx",
-                                        lineNumber: 438,
+                                        lineNumber: 447,
                                         columnNumber: 11
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("path", {
@@ -1766,7 +1777,7 @@ function FeedSidebar({ locale, hideProfileCard = false }) {
                                         strokeWidth: "1.35"
                                     }, void 0, false, {
                                         fileName: "[project]/components/feed/FeedSidebar.tsx",
-                                        lineNumber: 439,
+                                        lineNumber: 448,
                                         columnNumber: 11
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("path", {
@@ -1775,7 +1786,7 @@ function FeedSidebar({ locale, hideProfileCard = false }) {
                                         strokeWidth: "1.35"
                                     }, void 0, false, {
                                         fileName: "[project]/components/feed/FeedSidebar.tsx",
-                                        lineNumber: 440,
+                                        lineNumber: 449,
                                         columnNumber: 11
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("path", {
@@ -1784,7 +1795,7 @@ function FeedSidebar({ locale, hideProfileCard = false }) {
                                         strokeWidth: "1.35"
                                     }, void 0, false, {
                                         fileName: "[project]/components/feed/FeedSidebar.tsx",
-                                        lineNumber: 441,
+                                        lineNumber: 450,
                                         columnNumber: 11
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("path", {
@@ -1793,7 +1804,7 @@ function FeedSidebar({ locale, hideProfileCard = false }) {
                                         strokeWidth: "1.35"
                                     }, void 0, false, {
                                         fileName: "[project]/components/feed/FeedSidebar.tsx",
-                                        lineNumber: 442,
+                                        lineNumber: 451,
                                         columnNumber: 11
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("path", {
@@ -1802,7 +1813,7 @@ function FeedSidebar({ locale, hideProfileCard = false }) {
                                         strokeWidth: "1.35"
                                     }, void 0, false, {
                                         fileName: "[project]/components/feed/FeedSidebar.tsx",
-                                        lineNumber: 443,
+                                        lineNumber: 452,
                                         columnNumber: 11
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("path", {
@@ -1811,13 +1822,13 @@ function FeedSidebar({ locale, hideProfileCard = false }) {
                                         strokeWidth: "1.35"
                                     }, void 0, false, {
                                         fileName: "[project]/components/feed/FeedSidebar.tsx",
-                                        lineNumber: 444,
+                                        lineNumber: 453,
                                         columnNumber: 11
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/components/feed/FeedSidebar.tsx",
-                                lineNumber: 430,
+                                lineNumber: 439,
                                 columnNumber: 9
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1830,19 +1841,19 @@ function FeedSidebar({ locale, hideProfileCard = false }) {
                                     className: "object-cover"
                                 }, void 0, false, {
                                     fileName: "[project]/components/feed/FeedSidebar.tsx",
-                                    lineNumber: 449,
+                                    lineNumber: 458,
                                     columnNumber: 13
                                 }, this) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                                     className: "flex h-full w-full items-center justify-center text-[24px] font-extrabold text-[#2378E8]",
                                     children: initials || 'I'
                                 }, void 0, false, {
                                     fileName: "[project]/components/feed/FeedSidebar.tsx",
-                                    lineNumber: 451,
+                                    lineNumber: 460,
                                     columnNumber: 13
                                 }, this)
                             }, void 0, false, {
                                 fileName: "[project]/components/feed/FeedSidebar.tsx",
-                                lineNumber: 447,
+                                lineNumber: 456,
                                 columnNumber: 9
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("h2", {
@@ -1850,7 +1861,7 @@ function FeedSidebar({ locale, hideProfileCard = false }) {
                                 children: fullName
                             }, void 0, false, {
                                 fileName: "[project]/components/feed/FeedSidebar.tsx",
-                                lineNumber: 456,
+                                lineNumber: 465,
                                 columnNumber: 9
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -1858,13 +1869,13 @@ function FeedSidebar({ locale, hideProfileCard = false }) {
                                 children: roleLabel
                             }, void 0, false, {
                                 fileName: "[project]/components/feed/FeedSidebar.tsx",
-                                lineNumber: 457,
+                                lineNumber: 466,
                                 columnNumber: 9
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "[project]/components/feed/FeedSidebar.tsx",
-                        lineNumber: 429,
+                        lineNumber: 438,
                         columnNumber: 7
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(DashboardLink, {
@@ -1873,7 +1884,7 @@ function FeedSidebar({ locale, hideProfileCard = false }) {
                         compact: hideProfileCard
                     }, void 0, false, {
                         fileName: "[project]/components/feed/FeedSidebar.tsx",
-                        lineNumber: 463,
+                        lineNumber: 472,
                         columnNumber: 7
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1893,7 +1904,7 @@ function FeedSidebar({ locale, hideProfileCard = false }) {
                                         compact: hideProfileCard
                                     }, void 0, false, {
                                         fileName: "[project]/components/feed/FeedSidebar.tsx",
-                                        lineNumber: 472,
+                                        lineNumber: 481,
                                         columnNumber: 9
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(SidebarItem, {
@@ -1904,7 +1915,7 @@ function FeedSidebar({ locale, hideProfileCard = false }) {
                                         compact: hideProfileCard
                                     }, void 0, false, {
                                         fileName: "[project]/components/feed/FeedSidebar.tsx",
-                                        lineNumber: 479,
+                                        lineNumber: 488,
                                         columnNumber: 9
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(SidebarItem, {
@@ -1915,13 +1926,13 @@ function FeedSidebar({ locale, hideProfileCard = false }) {
                                         compact: hideProfileCard
                                     }, void 0, false, {
                                         fileName: "[project]/components/feed/FeedSidebar.tsx",
-                                        lineNumber: 486,
+                                        lineNumber: 495,
                                         columnNumber: 9
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/components/feed/FeedSidebar.tsx",
-                                lineNumber: 466,
+                                lineNumber: 475,
                                 columnNumber: 7
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(DashboardSection, {
@@ -1936,7 +1947,7 @@ function FeedSidebar({ locale, hideProfileCard = false }) {
                                         compact: hideProfileCard
                                     }, void 0, false, {
                                         fileName: "[project]/components/feed/FeedSidebar.tsx",
-                                        lineNumber: 497,
+                                        lineNumber: 506,
                                         columnNumber: 11
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(SidebarItem, {
@@ -1946,7 +1957,7 @@ function FeedSidebar({ locale, hideProfileCard = false }) {
                                         compact: hideProfileCard
                                     }, void 0, false, {
                                         fileName: "[project]/components/feed/FeedSidebar.tsx",
-                                        lineNumber: 499,
+                                        lineNumber: 508,
                                         columnNumber: 9
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(SidebarItem, {
@@ -1956,13 +1967,13 @@ function FeedSidebar({ locale, hideProfileCard = false }) {
                                         compact: hideProfileCard
                                     }, void 0, false, {
                                         fileName: "[project]/components/feed/FeedSidebar.tsx",
-                                        lineNumber: 500,
+                                        lineNumber: 509,
                                         columnNumber: 9
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/components/feed/FeedSidebar.tsx",
-                                lineNumber: 495,
+                                lineNumber: 504,
                                 columnNumber: 7
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(DashboardSection, {
@@ -1977,23 +1988,24 @@ function FeedSidebar({ locale, hideProfileCard = false }) {
                                         compact: hideProfileCard
                                     }, void 0, false, {
                                         fileName: "[project]/components/feed/FeedSidebar.tsx",
-                                        lineNumber: 504,
+                                        lineNumber: 513,
                                         columnNumber: 9
                                     }, this),
                                     !isPureClient && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(SidebarItem, {
                                         href: `${dashboardBase}/account-settings/consulting-schedule`,
                                         icon: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$tabler$2f$icons$2d$react$2f$dist$2f$esm$2f$icons$2f$IconCalendarCog$2e$mjs__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__$3c$export__default__as__IconCalendarCog$3e$__["IconCalendarCog"],
                                         label: copy.mySchedule,
+                                        badge: needsMeetingSetup ? setupNowLabel : undefined,
                                         compact: hideProfileCard
                                     }, void 0, false, {
                                         fileName: "[project]/components/feed/FeedSidebar.tsx",
-                                        lineNumber: 506,
+                                        lineNumber: 515,
                                         columnNumber: 11
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/components/feed/FeedSidebar.tsx",
-                                lineNumber: 503,
+                                lineNumber: 512,
                                 columnNumber: 7
                             }, this),
                             hasProjectAccess && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(DashboardSection, {
@@ -2008,7 +2020,7 @@ function FeedSidebar({ locale, hideProfileCard = false }) {
                                         compact: hideProfileCard
                                     }, void 0, false, {
                                         fileName: "[project]/components/feed/FeedSidebar.tsx",
-                                        lineNumber: 518,
+                                        lineNumber: 528,
                                         columnNumber: 13
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(SidebarItem, {
@@ -2018,23 +2030,24 @@ function FeedSidebar({ locale, hideProfileCard = false }) {
                                         compact: hideProfileCard
                                     }, void 0, false, {
                                         fileName: "[project]/components/feed/FeedSidebar.tsx",
-                                        lineNumber: 520,
+                                        lineNumber: 530,
                                         columnNumber: 11
                                     }, this),
                                     !isPureClient && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(SidebarItem, {
                                         href: `${dashboardBase}/account-settings/project-settings`,
                                         icon: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$tabler$2f$icons$2d$react$2f$dist$2f$esm$2f$icons$2f$IconSettings2$2e$mjs__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__$3c$export__default__as__IconSettings2$3e$__["IconSettings2"],
                                         label: copy.projectSettings,
+                                        badge: needsProjectSetup ? setupNowLabel : undefined,
                                         compact: hideProfileCard
                                     }, void 0, false, {
                                         fileName: "[project]/components/feed/FeedSidebar.tsx",
-                                        lineNumber: 522,
+                                        lineNumber: 532,
                                         columnNumber: 13
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/components/feed/FeedSidebar.tsx",
-                                lineNumber: 516,
+                                lineNumber: 526,
                                 columnNumber: 9
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(DashboardSection, {
@@ -2049,7 +2062,7 @@ function FeedSidebar({ locale, hideProfileCard = false }) {
                                         compact: hideProfileCard
                                     }, void 0, false, {
                                         fileName: "[project]/components/feed/FeedSidebar.tsx",
-                                        lineNumber: 533,
+                                        lineNumber: 544,
                                         columnNumber: 9
                                     }, this),
                                     isProvider && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(SidebarItem, {
@@ -2059,7 +2072,7 @@ function FeedSidebar({ locale, hideProfileCard = false }) {
                                         compact: hideProfileCard
                                     }, void 0, false, {
                                         fileName: "[project]/components/feed/FeedSidebar.tsx",
-                                        lineNumber: 534,
+                                        lineNumber: 545,
                                         columnNumber: 24
                                     }, this),
                                     (isInsighter || isCompany) && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(SidebarItem, {
@@ -2069,13 +2082,13 @@ function FeedSidebar({ locale, hideProfileCard = false }) {
                                         compact: hideProfileCard
                                     }, void 0, false, {
                                         fileName: "[project]/components/feed/FeedSidebar.tsx",
-                                        lineNumber: 536,
+                                        lineNumber: 547,
                                         columnNumber: 11
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/components/feed/FeedSidebar.tsx",
-                                lineNumber: 532,
+                                lineNumber: 543,
                                 columnNumber: 7
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(DashboardSection, {
@@ -2090,7 +2103,7 @@ function FeedSidebar({ locale, hideProfileCard = false }) {
                                         compact: hideProfileCard
                                     }, void 0, false, {
                                         fileName: "[project]/components/feed/FeedSidebar.tsx",
-                                        lineNumber: 541,
+                                        lineNumber: 552,
                                         columnNumber: 9
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(SidebarItem, {
@@ -2100,7 +2113,7 @@ function FeedSidebar({ locale, hideProfileCard = false }) {
                                         compact: hideProfileCard
                                     }, void 0, false, {
                                         fileName: "[project]/components/feed/FeedSidebar.tsx",
-                                        lineNumber: 547,
+                                        lineNumber: 558,
                                         columnNumber: 9
                                     }, this),
                                     (isInsighter || isCompany) && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(SidebarItem, {
@@ -2110,38 +2123,38 @@ function FeedSidebar({ locale, hideProfileCard = false }) {
                                         compact: hideProfileCard
                                     }, void 0, false, {
                                         fileName: "[project]/components/feed/FeedSidebar.tsx",
-                                        lineNumber: 554,
+                                        lineNumber: 565,
                                         columnNumber: 11
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/components/feed/FeedSidebar.tsx",
-                                lineNumber: 540,
+                                lineNumber: 551,
                                 columnNumber: 7
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "[project]/components/feed/FeedSidebar.tsx",
-                        lineNumber: 465,
+                        lineNumber: 474,
                         columnNumber: 7
                     }, this)
                 ]
             }, void 0, true, {
                 fileName: "[project]/components/feed/FeedSidebar.tsx",
-                lineNumber: 427,
+                lineNumber: 436,
                 columnNumber: 5
             }, this),
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(SidebarLegalFooter, {
                 locale: locale
             }, void 0, false, {
                 fileName: "[project]/components/feed/FeedSidebar.tsx",
-                lineNumber: 564,
+                lineNumber: 575,
                 columnNumber: 7
             }, this)
         ]
     }, void 0, true, {
         fileName: "[project]/components/feed/FeedSidebar.tsx",
-        lineNumber: 426,
+        lineNumber: 435,
         columnNumber: 5
     }, this);
 }
@@ -2782,10 +2795,14 @@ function UserProfile({ isHome }) {
         children: [
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                 className: "relative",
-                ref: profileRef,
-                children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                    className: "flex items-center cursor-pointer",
+                children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
+                    type: "button",
+                    ref: profileRef,
                     onClick: ()=>menuOpen ? closeMenu() : openMenu(),
+                    "aria-haspopup": "true",
+                    "aria-expanded": menuOpen,
+                    "aria-label": t("myProfile"),
+                    className: "flex items-center justify-center -m-2 p-2 rounded-full border-0 bg-transparent cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-400/60",
                     children: user.profile_photo_url ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                         className: "w-8 h-8 md:w-10 md:h-10 rounded-full overflow-hidden",
                         children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$image$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["default"], {
@@ -2797,19 +2814,19 @@ function UserProfile({ isHome }) {
                             className: "w-full h-full object-cover object-top"
                         }, void 0, false, {
                             fileName: "[project]/components/ui/header/components/UserProfile.tsx",
-                            lineNumber: 298,
+                            lineNumber: 303,
                             columnNumber: 15
                         }, this)
                     }, void 0, false, {
                         fileName: "[project]/components/ui/header/components/UserProfile.tsx",
-                        lineNumber: 297,
+                        lineNumber: 302,
                         columnNumber: 13
                     }, this) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                         className: "w-8 h-8 md:w-10 md:h-10 rounded-full bg-white flex items-center justify-center text-blue-600 text-sm font-medium border border-gray-200",
                         children: getInitials(user.first_name, user.last_name)
                     }, void 0, false, {
                         fileName: "[project]/components/ui/header/components/UserProfile.tsx",
-                        lineNumber: 308,
+                        lineNumber: 313,
                         columnNumber: 13
                     }, this)
                 }, void 0, false, {
@@ -2851,19 +2868,19 @@ function UserProfile({ isHome }) {
                                         className: "w-full h-full object-cover object-top"
                                     }, void 0, false, {
                                         fileName: "[project]/components/ui/header/components/UserProfile.tsx",
-                                        lineNumber: 365,
+                                        lineNumber: 370,
                                         columnNumber: 21
                                     }, this)
                                 }, void 0, false, {
                                     fileName: "[project]/components/ui/header/components/UserProfile.tsx",
-                                    lineNumber: 364,
+                                    lineNumber: 369,
                                     columnNumber: 19
                                 }, this) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                                     className: "w-10 h-10 rounded-full bg-white flex items-center justify-center text-blue-600 text-sm font-medium flex-shrink-0 border border-gray-200",
                                     children: getInitials(user.first_name, user.last_name)
                                 }, void 0, false, {
                                     fileName: "[project]/components/ui/header/components/UserProfile.tsx",
-                                    lineNumber: 375,
+                                    lineNumber: 380,
                                     columnNumber: 19
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -2880,12 +2897,12 @@ function UserProfile({ isHome }) {
                                                 ]
                                             }, void 0, true, {
                                                 fileName: "[project]/components/ui/header/components/UserProfile.tsx",
-                                                lineNumber: 382,
+                                                lineNumber: 387,
                                                 columnNumber: 19
                                             }, this)
                                         }, void 0, false, {
                                             fileName: "[project]/components/ui/header/components/UserProfile.tsx",
-                                            lineNumber: 381,
+                                            lineNumber: 386,
                                             columnNumber: 17
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -2896,7 +2913,7 @@ function UserProfile({ isHome }) {
                                                     children: t("insighter")
                                                 }, void 0, false, {
                                                     fileName: "[project]/components/ui/header/components/UserProfile.tsx",
-                                                    lineNumber: 389,
+                                                    lineNumber: 394,
                                                     columnNumber: 21
                                                 }, this),
                                                 roles.includes("company-insighter") && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["Fragment"], {
@@ -2913,12 +2930,12 @@ function UserProfile({ isHome }) {
                                                             ]
                                                         }, void 0, true, {
                                                             fileName: "[project]/components/ui/header/components/UserProfile.tsx",
-                                                            lineNumber: 397,
+                                                            lineNumber: 402,
                                                             columnNumber: 27
                                                         }, this)
                                                     }, void 0, false, {
                                                         fileName: "[project]/components/ui/header/components/UserProfile.tsx",
-                                                        lineNumber: 396,
+                                                        lineNumber: 401,
                                                         columnNumber: 25
                                                     }, this)
                                                 }, void 0, false),
@@ -2930,7 +2947,7 @@ function UserProfile({ isHome }) {
                                                             children: user.company?.legal_name
                                                         }, void 0, false, {
                                                             fileName: "[project]/components/ui/header/components/UserProfile.tsx",
-                                                            lineNumber: 408,
+                                                            lineNumber: 413,
                                                             columnNumber: 25
                                                         }, this),
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -2938,13 +2955,13 @@ function UserProfile({ isHome }) {
                                                             children: t("manager")
                                                         }, void 0, false, {
                                                             fileName: "[project]/components/ui/header/components/UserProfile.tsx",
-                                                            lineNumber: 411,
+                                                            lineNumber: 416,
                                                             columnNumber: 25
                                                         }, this)
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/components/ui/header/components/UserProfile.tsx",
-                                                    lineNumber: 406,
+                                                    lineNumber: 411,
                                                     columnNumber: 23
                                                 }, this),
                                                 roles.includes("client") && !roles.some((role)=>[
@@ -2956,30 +2973,30 @@ function UserProfile({ isHome }) {
                                                     children: t("client")
                                                 }, void 0, false, {
                                                     fileName: "[project]/components/ui/header/components/UserProfile.tsx",
-                                                    lineNumber: 422,
+                                                    lineNumber: 427,
                                                     columnNumber: 23
                                                 }, this)
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/components/ui/header/components/UserProfile.tsx",
-                                            lineNumber: 387,
+                                            lineNumber: 392,
                                             columnNumber: 17
                                         }, this)
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/components/ui/header/components/UserProfile.tsx",
-                                    lineNumber: 380,
+                                    lineNumber: 385,
                                     columnNumber: 15
                                 }, this)
                             ]
                         }, void 0, true, {
                             fileName: "[project]/components/ui/header/components/UserProfile.tsx",
-                            lineNumber: 334,
+                            lineNumber: 339,
                             columnNumber: 13
                         }, this)
                     }, void 0, false, {
                         fileName: "[project]/components/ui/header/components/UserProfile.tsx",
-                        lineNumber: 333,
+                        lineNumber: 338,
                         columnNumber: 11
                     }, this),
                     !isFeedPage && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -3012,7 +3029,7 @@ function UserProfile({ isHome }) {
                                                     "shape-rendering": "crispEdges"
                                                 }, void 0, false, {
                                                     fileName: "[project]/components/ui/header/components/UserProfile.tsx",
-                                                    lineNumber: 442,
+                                                    lineNumber: 447,
                                                     columnNumber: 19
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("path", {
@@ -3020,7 +3037,7 @@ function UserProfile({ isHome }) {
                                                     fill: "#FFC657"
                                                 }, void 0, false, {
                                                     fileName: "[project]/components/ui/header/components/UserProfile.tsx",
-                                                    lineNumber: 443,
+                                                    lineNumber: 448,
                                                     columnNumber: 19
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("path", {
@@ -3028,7 +3045,7 @@ function UserProfile({ isHome }) {
                                                     fill: "#FFE0A6"
                                                 }, void 0, false, {
                                                     fileName: "[project]/components/ui/header/components/UserProfile.tsx",
-                                                    lineNumber: 444,
+                                                    lineNumber: 449,
                                                     columnNumber: 19
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("path", {
@@ -3036,7 +3053,7 @@ function UserProfile({ isHome }) {
                                                     fill: "#1072FF"
                                                 }, void 0, false, {
                                                     fileName: "[project]/components/ui/header/components/UserProfile.tsx",
-                                                    lineNumber: 445,
+                                                    lineNumber: 450,
                                                     columnNumber: 19
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("path", {
@@ -3044,7 +3061,7 @@ function UserProfile({ isHome }) {
                                                     fill: "#CBE1FF"
                                                 }, void 0, false, {
                                                     fileName: "[project]/components/ui/header/components/UserProfile.tsx",
-                                                    lineNumber: 446,
+                                                    lineNumber: 451,
                                                     columnNumber: 19
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("path", {
@@ -3052,7 +3069,7 @@ function UserProfile({ isHome }) {
                                                     fill: "#1072FF"
                                                 }, void 0, false, {
                                                     fileName: "[project]/components/ui/header/components/UserProfile.tsx",
-                                                    lineNumber: 447,
+                                                    lineNumber: 452,
                                                     columnNumber: 19
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("path", {
@@ -3060,7 +3077,7 @@ function UserProfile({ isHome }) {
                                                     fill: "#CBE1FF"
                                                 }, void 0, false, {
                                                     fileName: "[project]/components/ui/header/components/UserProfile.tsx",
-                                                    lineNumber: 448,
+                                                    lineNumber: 453,
                                                     columnNumber: 19
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("path", {
@@ -3068,7 +3085,7 @@ function UserProfile({ isHome }) {
                                                     fill: "#FFC657"
                                                 }, void 0, false, {
                                                     fileName: "[project]/components/ui/header/components/UserProfile.tsx",
-                                                    lineNumber: 449,
+                                                    lineNumber: 454,
                                                     columnNumber: 19
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("path", {
@@ -3076,13 +3093,13 @@ function UserProfile({ isHome }) {
                                                     fill: "#FFE0A6"
                                                 }, void 0, false, {
                                                     fileName: "[project]/components/ui/header/components/UserProfile.tsx",
-                                                    lineNumber: 450,
+                                                    lineNumber: 455,
                                                     columnNumber: 19
                                                 }, this)
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/components/ui/header/components/UserProfile.tsx",
-                                            lineNumber: 441,
+                                            lineNumber: 446,
                                             columnNumber: 17
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("defs", {
@@ -3100,7 +3117,7 @@ function UserProfile({ isHome }) {
                                                         result: "BackgroundImageFix"
                                                     }, void 0, false, {
                                                         fileName: "[project]/components/ui/header/components/UserProfile.tsx",
-                                                        lineNumber: 454,
+                                                        lineNumber: 459,
                                                         columnNumber: 21
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("feColorMatrix", {
@@ -3110,21 +3127,21 @@ function UserProfile({ isHome }) {
                                                         result: "hardAlpha"
                                                     }, void 0, false, {
                                                         fileName: "[project]/components/ui/header/components/UserProfile.tsx",
-                                                        lineNumber: 455,
+                                                        lineNumber: 460,
                                                         columnNumber: 21
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("feOffset", {
                                                         dy: "1.31"
                                                     }, void 0, false, {
                                                         fileName: "[project]/components/ui/header/components/UserProfile.tsx",
-                                                        lineNumber: 456,
+                                                        lineNumber: 461,
                                                         columnNumber: 21
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("feGaussianBlur", {
                                                         stdDeviation: "1.875"
                                                     }, void 0, false, {
                                                         fileName: "[project]/components/ui/header/components/UserProfile.tsx",
-                                                        lineNumber: 457,
+                                                        lineNumber: 462,
                                                         columnNumber: 21
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("feComposite", {
@@ -3132,7 +3149,7 @@ function UserProfile({ isHome }) {
                                                         operator: "out"
                                                     }, void 0, false, {
                                                         fileName: "[project]/components/ui/header/components/UserProfile.tsx",
-                                                        lineNumber: 458,
+                                                        lineNumber: 463,
                                                         columnNumber: 21
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("feColorMatrix", {
@@ -3140,7 +3157,7 @@ function UserProfile({ isHome }) {
                                                         values: "0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.12 0"
                                                     }, void 0, false, {
                                                         fileName: "[project]/components/ui/header/components/UserProfile.tsx",
-                                                        lineNumber: 459,
+                                                        lineNumber: 464,
                                                         columnNumber: 21
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("feBlend", {
@@ -3149,7 +3166,7 @@ function UserProfile({ isHome }) {
                                                         result: "effect1_dropShadow_667_189"
                                                     }, void 0, false, {
                                                         fileName: "[project]/components/ui/header/components/UserProfile.tsx",
-                                                        lineNumber: 460,
+                                                        lineNumber: 465,
                                                         columnNumber: 21
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("feBlend", {
@@ -3159,36 +3176,36 @@ function UserProfile({ isHome }) {
                                                         result: "shape"
                                                     }, void 0, false, {
                                                         fileName: "[project]/components/ui/header/components/UserProfile.tsx",
-                                                        lineNumber: 461,
+                                                        lineNumber: 466,
                                                         columnNumber: 21
                                                     }, this)
                                                 ]
                                             }, void 0, true, {
                                                 fileName: "[project]/components/ui/header/components/UserProfile.tsx",
-                                                lineNumber: 453,
+                                                lineNumber: 458,
                                                 columnNumber: 19
                                             }, this)
                                         }, void 0, false, {
                                             fileName: "[project]/components/ui/header/components/UserProfile.tsx",
-                                            lineNumber: 452,
+                                            lineNumber: 457,
                                             columnNumber: 17
                                         }, this)
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/components/ui/header/components/UserProfile.tsx",
-                                    lineNumber: 440,
+                                    lineNumber: 445,
                                     columnNumber: 15
                                 }, this),
                                 t("dashboard")
                             ]
                         }, void 0, true, {
                             fileName: "[project]/components/ui/header/components/UserProfile.tsx",
-                            lineNumber: 434,
+                            lineNumber: 439,
                             columnNumber: 13
                         }, this)
                     }, void 0, false, {
                         fileName: "[project]/components/ui/header/components/UserProfile.tsx",
-                        lineNumber: 433,
+                        lineNumber: 438,
                         columnNumber: 11
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -3209,7 +3226,7 @@ function UserProfile({ isHome }) {
                                                 children: t("addInsight")
                                             }, void 0, false, {
                                                 fileName: "[project]/components/ui/header/components/UserProfile.tsx",
-                                                lineNumber: 479,
+                                                lineNumber: 484,
                                                 columnNumber: 21
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$client$2f$app$2d$dir$2f$link$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["default"], {
@@ -3224,7 +3241,7 @@ function UserProfile({ isHome }) {
                                                         children: t("insightBase")
                                                     }, void 0, false, {
                                                         fileName: "[project]/components/ui/header/components/UserProfile.tsx",
-                                                        lineNumber: 493,
+                                                        lineNumber: 498,
                                                         columnNumber: 23
                                                     }, this),
                                                     unpublishedDraftCount > 0 && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -3238,13 +3255,13 @@ function UserProfile({ isHome }) {
                                                         ]
                                                     }, void 0, true, {
                                                         fileName: "[project]/components/ui/header/components/UserProfile.tsx",
-                                                        lineNumber: 495,
+                                                        lineNumber: 500,
                                                         columnNumber: 25
                                                     }, this)
                                                 ]
                                             }, void 0, true, {
                                                 fileName: "[project]/components/ui/header/components/UserProfile.tsx",
-                                                lineNumber: 487,
+                                                lineNumber: 492,
                                                 columnNumber: 21
                                             }, this)
                                         ]
@@ -3259,13 +3276,13 @@ function UserProfile({ isHome }) {
                                         children: t("myCompany")
                                     }, void 0, false, {
                                         fileName: "[project]/components/ui/header/components/UserProfile.tsx",
-                                        lineNumber: 504,
+                                        lineNumber: 509,
                                         columnNumber: 17
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/components/ui/header/components/UserProfile.tsx",
-                                lineNumber: 474,
+                                lineNumber: 479,
                                 columnNumber: 13
                             }, this),
                             !isClient$() && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$client$2f$app$2d$dir$2f$link$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["default"], {
@@ -3278,7 +3295,7 @@ function UserProfile({ isHome }) {
                                 children: t("myInsighterPage")
                             }, void 0, false, {
                                 fileName: "[project]/components/ui/header/components/UserProfile.tsx",
-                                lineNumber: 515,
+                                lineNumber: 520,
                                 columnNumber: 31
                             }, this),
                             !isFeedPage && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$client$2f$app$2d$dir$2f$link$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["default"], {
@@ -3291,7 +3308,7 @@ function UserProfile({ isHome }) {
                                 children: isRtl ? "التحميلات" : "My Downloads"
                             }, void 0, false, {
                                 fileName: "[project]/components/ui/header/components/UserProfile.tsx",
-                                lineNumber: 524,
+                                lineNumber: 529,
                                 columnNumber: 13
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$client$2f$app$2d$dir$2f$link$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["default"], {
@@ -3304,7 +3321,7 @@ function UserProfile({ isHome }) {
                                 children: t("myProfile")
                             }, void 0, false, {
                                 fileName: "[project]/components/ui/header/components/UserProfile.tsx",
-                                lineNumber: 541,
+                                lineNumber: 546,
                                 columnNumber: 13
                             }, this),
                             !isFeedPage && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$client$2f$app$2d$dir$2f$link$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["default"], {
@@ -3317,7 +3334,7 @@ function UserProfile({ isHome }) {
                                 children: t("settings")
                             }, void 0, false, {
                                 fileName: "[project]/components/ui/header/components/UserProfile.tsx",
-                                lineNumber: 550,
+                                lineNumber: 555,
                                 columnNumber: 13
                             }, this),
                             !isFeedPage && roles.includes("client") && !roles.includes("insighter") && !roles.includes("company") && !roles.includes("company-insighter") && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["Fragment"], {
@@ -3332,7 +3349,7 @@ function UserProfile({ isHome }) {
                                         children: t("becomeInsighter")
                                     }, void 0, false, {
                                         fileName: "[project]/components/ui/header/components/UserProfile.tsx",
-                                        lineNumber: 577,
+                                        lineNumber: 582,
                                         columnNumber: 19
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -3344,7 +3361,7 @@ function UserProfile({ isHome }) {
                                         children: t("becomeInsighterDescription")
                                     }, void 0, false, {
                                         fileName: "[project]/components/ui/header/components/UserProfile.tsx",
-                                        lineNumber: 585,
+                                        lineNumber: 590,
                                         columnNumber: 19
                                     }, this)
                                 ]
@@ -3365,12 +3382,12 @@ function UserProfile({ isHome }) {
                                             className: "w-full h-auto rounded-md"
                                         }, void 0, false, {
                                             fileName: "[project]/components/ui/header/components/UserProfile.tsx",
-                                            lineNumber: 601,
+                                            lineNumber: 606,
                                             columnNumber: 19
                                         }, this)
                                     }, void 0, false, {
                                         fileName: "[project]/components/ui/header/components/UserProfile.tsx",
-                                        lineNumber: 596,
+                                        lineNumber: 601,
                                         columnNumber: 17
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
@@ -3385,25 +3402,25 @@ function UserProfile({ isHome }) {
                                         children: t("signOut")
                                     }, void 0, false, {
                                         fileName: "[project]/components/ui/header/components/UserProfile.tsx",
-                                        lineNumber: 612,
+                                        lineNumber: 617,
                                         columnNumber: 15
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/components/ui/header/components/UserProfile.tsx",
-                                lineNumber: 594,
+                                lineNumber: 599,
                                 columnNumber: 13
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "[project]/components/ui/header/components/UserProfile.tsx",
-                        lineNumber: 472,
+                        lineNumber: 477,
                         columnNumber: 11
                     }, this)
                 ]
             }, void 0, true, {
                 fileName: "[project]/components/ui/header/components/UserProfile.tsx",
-                lineNumber: 316,
+                lineNumber: 321,
                 columnNumber: 9
             }, this)
         ]
@@ -3703,30 +3720,49 @@ const SvgIcon = ({ src, className = '', color })=>{
  *
  * These events are broadcast by the same Laravel backend that the Angular app
  * (KNOLDG-APP) listens to. On click we navigate to the Angular dashboard pages
- * (same tab), so the base URL is hardcoded to localhost:4200.
+ * (same tab), on the dashboard host for the current environment.
  *
  * Routing is keyed on `event_name` first (the most reliable signal — some events
  * share a `sub_type`). For REST history, which carries no `event_name`, we fall
  * back to `sub_type` + the user's role.
  *
- * `param` carries the routing id: a UUID for most events, an integer id for
- * `order.project` and `project.service.started`.
+ * `param` carries the routing id, and every details route below expects the
+ * *project* UUID — the pages resolve it against Project (GET
+ * /insighter/project/show/{project} and /account/project/show/{project}), so a
+ * match / proposal / offer UUID there 404s. `order.project` is the exception:
+ * it wants the *order* UUID, matched against the sales list.
+ *
+ * DEPLOY ORDER: `project.match.invited`, `project.proposal.offer`,
+ * `project.insighter.offer.technical-decision` and
+ * `project.insighter.offer.not-selected` only resolve once the backend sends
+ * the project UUID in `param`. Ship this after that backend change.
+ * `project.service.started` and `order.project` already work — their numeric
+ * ids resolve through the backend's route binding.
  */ __turbopack_context__.s([
     "DASHBOARD",
     ()=>DASHBOARD,
     "routeForNotification",
     ()=>routeForNotification
 ]);
-const DASHBOARD = `${("TURBOPACK compile-time value", "http://localhost:4200")}`;
-// `project.discussion.message` always lands on the production dashboard host,
-// regardless of the host the backend baked into `param` (it may be localhost in
-// dev). See `discussionUrlFromParam`.
-const PROD_DASHBOARD = 'https://app.foresighta.co';
+var __TURBOPACK__imported__module__$5b$project$5d2f$app$2f$config$2e$ts__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/app/config.ts [app-ssr] (ecmascript)");
+;
+const DASHBOARD = __TURBOPACK__imported__module__$5b$project$5d2f$app$2f$config$2e$ts__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["dashboardUrl"];
 // Dashboard list pages (used as guards when `param` is missing).
 const INSIGHTER_ON_WORK = `${DASHBOARD}/app/insighter-dashboard/on-work-projects`;
 const CLIENT_PROJECTS = `${DASHBOARD}/app/insighter-dashboard/projects-created`;
 const PROJECT_OFFERS = `${DASHBOARD}/app/insighter-dashboard/project-offers`;
-const SALES = `${DASHBOARD}/app/insighter-dashboard/sales?tab=2`;
+// tab=4 is the sales page's `sold-projects` tab; tab=2 is `sold-details`
+// (knowledge sales). `order.project` is a project-service sale, so it belongs
+// on tab 4 — it was landing on the knowledge tab.
+const PROJECT_SALES = `${DASHBOARD}/app/insighter-dashboard/sales?tab=4`;
+/**
+ * Project sale → sold-projects tab, deep-linked to the order's details dialog
+ * via `?order=`. `param` is the *order* reference, not a project one; the
+ * dashboard fetches that single order, and the backend route binding takes
+ * either its UUID or its numeric id.
+ */ function projectSaleUrl(param) {
+    return hasParam(param) ? `${PROJECT_SALES}&order=${encodeURIComponent(String(param))}` : PROJECT_SALES;
+}
 /**
  * Roles that view a project from the insighter (worker) side. Everyone else is
  * treated as the client side.
@@ -3741,23 +3777,61 @@ function isInsighterSide(roles = []) {
 function hasParam(param) {
     return param !== undefined && param !== null && param !== '';
 }
+const UUID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+/**
+ * Path + query of a backend-supplied `url` (absolute or relative). Returns an
+ * empty path when there is nothing usable.
+ */ function partsFromBackendUrl(rawUrl) {
+    if (!hasParam(rawUrl)) return {
+        path: '',
+        search: ''
+    };
+    const raw = String(rawUrl).trim();
+    try {
+        // Usually absolute, on whichever host the backend was configured with.
+        const parsed = new URL(raw);
+        return {
+            path: parsed.pathname === '/' ? '' : parsed.pathname,
+            search: parsed.search
+        };
+    } catch  {
+        const [path = '', search = ''] = raw.split('#')[0].split('?');
+        const normalized = path.startsWith('/') ? path : `/${path}`;
+        return {
+            path: !path || normalized === '/' ? '' : normalized,
+            search: search ? `?${search}` : ''
+        };
+    }
+}
+/**
+ * The backend's `url` names the right *page* (proposal vs project stage, client
+ * vs insighter side) but can end in the wrong id — a proposal-match UUID on a
+ * page that resolves its id against Project. `param` carries the correct
+ * project UUID on these events, so keep the path and swap the trailing id.
+ */ function pathWithParamId(path, param) {
+    if (!hasParam(param)) return path;
+    const segments = path.split('/').filter(Boolean);
+    const last = segments[segments.length - 1];
+    // Only drop a trailing *id*; a path that ends on the page itself (no id) keeps
+    // all of its segments.
+    if (last && (UUID_PATTERN.test(last) || /^\d+$/.test(last))) segments.pop();
+    segments.push(String(param));
+    return `/${segments.join('/')}`;
+}
 /**
  * `project.discussion.message` is special: the backend resolves the exact
- * destination (proposal vs project stage, client vs insighter side) and ships
- * the full URL in `param`. We don't re-derive the route here — we just take its
- * path, pin it to the production dashboard host, and force the discussion tab.
- */ function discussionUrlFromParam(param) {
-    const raw = hasParam(param) ? String(param).trim() : '';
-    let path = '';
-    try {
-        // `param` is usually a full URL (localhost or prod) — keep only its path.
-        path = new URL(raw).pathname;
-    } catch  {
-        // Not an absolute URL: treat as a path and drop any existing query/hash.
-        path = raw.split(/[?#]/)[0];
-        if (path && !path.startsWith('/')) path = `/${path}`;
+ * destination and ships the full URL in `url`. We don't re-derive the route —
+ * we take its path, swap in `param` as the id, pin it to this environment's
+ * dashboard host, and force the discussion tab.
+ *
+ * Falls back to the role-based project route for notifications predating the
+ * backend `url` field.
+ */ function discussionUrl(notification, roles) {
+    const { path } = partsFromBackendUrl(notification.url);
+    if (!path) {
+        return roleBasedProjectUrl(notification.param, roles);
     }
-    return `${PROD_DASHBOARD}${path}?tab=discussion`;
+    return `${DASHBOARD}${pathWithParamId(path, notification.param)}?tab=discussion`;
 }
 /** insighter → on-work details, client → projects-created details (role-based events). */ function roleBasedProjectUrl(param, roles) {
     if (isInsighterSide(roles)) {
@@ -3766,19 +3840,15 @@ function hasParam(param) {
     return hasParam(param) ? `${CLIENT_PROJECTS}/${param}` : CLIENT_PROJECTS;
 }
 /**
- * Returns the target dashboard URL for a project notification, or `null` if the
- * notification isn't one of the project events (caller should fall back to its
- * existing routing).
- */ function dashboardUrlFromBackendUrl(rawUrl) {
-    if (!hasParam(rawUrl)) return null;
-    const raw = String(rawUrl).trim();
-    try {
-        const parsed = new URL(raw);
-        return `${DASHBOARD}${parsed.pathname}${parsed.search}`;
-    } catch  {
-        const path = raw.startsWith('/') ? raw : `/${raw}`;
-        return `${DASHBOARD}${path}`;
+ * `project.insighter.cancelled` also ships a full URL whose trailing id may be a
+ * proposal-match UUID — same treatment as the discussion route: keep the page,
+ * use `param` as the id.
+ */ function cancelledProjectUrl(notification) {
+    const { path, search } = partsFromBackendUrl(notification.url);
+    if (!path) {
+        return hasParam(notification.param) ? `${INSIGHTER_ON_WORK}/details/${notification.param}` : INSIGHTER_ON_WORK;
     }
+    return `${DASHBOARD}${pathWithParamId(path, notification.param)}${search}`;
 }
 function routeForNotification(notification, roles = []) {
     const param = notification.param;
@@ -3787,7 +3857,7 @@ function routeForNotification(notification, roles = []) {
         case 'project.match.invited':
             return hasParam(param) ? `${PROJECT_OFFERS}/details/${param}` : PROJECT_OFFERS;
         case 'project.proposal.offer':
-            return CLIENT_PROJECTS;
+            return hasParam(param) ? `${CLIENT_PROJECTS}/${param}` : CLIENT_PROJECTS;
         case 'project.insighter.closed':
         case 'project.insighter.contract':
         case 'project.review.submission.reviewed':
@@ -3798,43 +3868,43 @@ function routeForNotification(notification, roles = []) {
         case 'project.review.submission':
             return hasParam(param) ? `${CLIENT_PROJECTS}/${param}` : CLIENT_PROJECTS;
         case 'project.service.started':
-            return INSIGHTER_ON_WORK;
+            return hasParam(param) ? `${INSIGHTER_ON_WORK}/details/${param}` : INSIGHTER_ON_WORK;
         case 'order.project':
-            return SALES;
+            return projectSaleUrl(param);
         case 'project.file.uploaded':
             return roleBasedProjectUrl(param, roles);
         case 'project.discussion.message':
-            return discussionUrlFromParam(param);
+            return discussionUrl(notification, roles);
         case 'project.insighter.offer.technical-decision':
         case 'project.insighter.offer.not-selected':
-            return PROJECT_OFFERS;
+            return hasParam(param) ? `${PROJECT_OFFERS}/details/${param}` : PROJECT_OFFERS;
         case 'project.insighter.cancelled':
-            return dashboardUrlFromBackendUrl(notification.url) ?? INSIGHTER_ON_WORK;
+            return cancelledProjectUrl(notification);
     }
     // 2) REST-history fallback (no event_name): route by sub_type + role.
     switch(notification.sub_type){
         case 'project_proposal':
             return hasParam(param) ? `${PROJECT_OFFERS}/details/${param}` : PROJECT_OFFERS;
         case 'project_proposal_offer':
-            return CLIENT_PROJECTS;
+            return hasParam(param) ? `${CLIENT_PROJECTS}/${param}` : CLIENT_PROJECTS;
         case 'project_review_submission_reviewed':
             return hasParam(param) ? `${INSIGHTER_ON_WORK}/details/${param}` : INSIGHTER_ON_WORK;
         case 'project_review_submission':
             return hasParam(param) ? `${CLIENT_PROJECTS}/${param}` : CLIENT_PROJECTS;
         case 'project_offer_technical_decision':
         case 'project_offer_not_selected':
-            return PROJECT_OFFERS;
+            return hasParam(param) ? `${PROJECT_OFFERS}/details/${param}` : PROJECT_OFFERS;
         case 'project_cancelled':
-            return dashboardUrlFromBackendUrl(notification.url) ?? INSIGHTER_ON_WORK;
+            return cancelledProjectUrl(notification);
         case 'project_service':
-            return INSIGHTER_ON_WORK;
+            return hasParam(param) ? `${INSIGHTER_ON_WORK}/details/${param}` : INSIGHTER_ON_WORK;
         case 'project_file_uploaded':
         // `project_closed` and `project` are ambiguous (client vs insighter) — role decides.
         case 'project_closed':
         case 'project':
             return roleBasedProjectUrl(param, roles);
         case 'project_discussion':
-            return discussionUrlFromParam(param);
+            return discussionUrl(notification, roles);
     }
     return null;
 }
@@ -4593,7 +4663,7 @@ function NotificationsInner({ notifications, parent, roles = [], onNotificationC
             void onNotificationClick(notification.id).catch(()=>{});
             return;
         }
-        // Case 1b: Project notifications → Angular dashboard (localhost:4200).
+        // Case 1b: Project notifications → Angular dashboard for this environment.
         // Keyed on event_name first, with sub_type + role fallback for REST history.
         const projectUrl = (0, __TURBOPACK__imported__module__$5b$project$5d2f$utils$2f$notificationRoute$2e$ts__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["routeForNotification"])(notification, roles);
         if (projectUrl) {

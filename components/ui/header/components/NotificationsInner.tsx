@@ -665,7 +665,7 @@ export default function NotificationsInner({
         return
       }
 
-      // Case 1b: Project notifications → Angular dashboard (localhost:4200).
+      // Case 1b: Project notifications → Angular dashboard for this environment.
       // Keyed on event_name first, with sub_type + role fallback for REST history.
       const projectUrl = routeForNotification(notification, roles)
       if (projectUrl) {

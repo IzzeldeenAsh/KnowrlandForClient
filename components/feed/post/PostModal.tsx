@@ -9,12 +9,13 @@ import {
   IconFolderOpen,
   IconLoader2,
   IconPhoto,
+  IconPlus,
   IconTrash,
   IconVideo,
   IconX,
 } from '@tabler/icons-react'
 import Image from 'next/image'
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 // Registers the <mux-player> custom element; self-hosted via npm (no CSP
 // script-src change needed, unlike the CDN <script> embed Mux's docs default to).
 import '@mux/mux-player'
@@ -114,7 +115,7 @@ const copyByLocale = {
     imageUploadTitle: 'Upload your images',
     imageUploadHint: 'JPG, PNG, or GIF, up to 5MB each. Add at least one image before you can write a description.',
     selectImages: 'Select images',
-    addImages: 'Add +',
+    addImages: 'Add more images',
     uploading: 'Uploading…',
     uploadedProcessing: 'Upload finished — preparing your video',
     processingHint: 'This usually takes under a minute. You can write your description now and publish once it finishes.',
@@ -151,6 +152,16 @@ const copyByLocale = {
     discardTitle: 'Discard this draft?',
     discardDescription: 'This permanently removes the draft and its uploaded media.',
     keepEditing: 'Keep editing',
+    exitTitle: 'Save this post as a draft?',
+    exitDescription: 'The post you started will be here when you return.',
+    exitDiscard: 'Discard',
+    exitSaveDraft: 'Save as draft',
+    exitSaveBlocked: 'Finish the highlighted fields to save this post as a draft.',
+    editExitTitle: 'Discard your changes?',
+    editExitDescription: 'The edits you made to this post will be lost.',
+    discardChanges: 'Discard changes',
+    exitUploadingTitle: 'Leave while your video uploads?',
+    exitUploadingDescription: 'Your video has not finished uploading. Leaving now cancels it.',
     discarding: 'Discarding…',
     draftDiscarded: 'Your draft has been discarded.',
     draftDiscardFailed: 'Unable to discard your draft.',
@@ -192,7 +203,7 @@ const copyByLocale = {
     imageUploadTitle: 'ارفع الصور',
     imageUploadHint: 'JPG أو PNG أو GIF، بحد أقصى 5 ميجابايت لكل صورة. أضف صورة واحدة على الأقل قبل كتابة الوصف.',
     selectImages: 'اختر صوراً',
-    addImages: '+ إضافة',
+    addImages: 'إضافة المزيد من الصور',
     uploading: 'جارٍ الرفع…',
     uploadedProcessing: 'انتهى الرفع — جارٍ تجهيز الفيديو',
     processingHint: 'يستغرق ذلك عادةً أقل من دقيقة. يمكنك كتابة الوصف الآن والنشر بعد اكتمال التجهيز.',
@@ -229,6 +240,16 @@ const copyByLocale = {
     discardTitle: 'حذف هذه المسودة؟',
     discardDescription: 'سيؤدي هذا إلى حذف المسودة والوسائط المرفوعة نهائياً.',
     keepEditing: 'متابعة التعديل',
+    exitTitle: 'حفظ المنشور كمسودة؟',
+    exitDescription: 'سيكون المنشور الذي بدأته بانتظارك عند عودتك.',
+    exitDiscard: 'تجاهل',
+    exitSaveDraft: 'حفظ كمسودة',
+    exitSaveBlocked: 'أكمل الحقول المطلوبة لحفظ المنشور كمسودة.',
+    editExitTitle: 'تجاهل التعديلات؟',
+    editExitDescription: 'ستفقد التعديلات التي أجريتها على هذا المنشور.',
+    discardChanges: 'تجاهل التعديلات',
+    exitUploadingTitle: 'المغادرة أثناء رفع الفيديو؟',
+    exitUploadingDescription: 'لم يكتمل رفع الفيديو بعد. المغادرة الآن ستُلغيه.',
     discarding: 'جارٍ الحذف…',
     draftDiscarded: 'تم حذف المسودة.',
     draftDiscardFailed: 'تعذر حذف المسودة.',
@@ -272,6 +293,37 @@ function isSupportedVideoFile(file: File): boolean {
   return /\.(mp4|mov)$/i.test(file.name)
 }
 
+// Fingerprint of everything the author can change, so closing the composer can
+// tell "nothing typed yet" from "work that would be lost". The video phase is
+// deliberately left out: it moves on its own while the provider prepares the
+// upload, and that is not an edit.
+function contentFingerprint(input: {
+  body: string
+  industryId: number | null
+  tagIds: number[]
+  insightIds: number[]
+  imageKeys: string[]
+  videoFileName: string
+}): string {
+  return JSON.stringify([
+    input.body.trim(),
+    input.industryId,
+    [...input.tagIds].sort((a, b) => a - b),
+    [...input.insightIds].sort((a, b) => a - b),
+    input.imageKeys,
+    input.videoFileName,
+  ])
+}
+
+const EMPTY_FINGERPRINT = contentFingerprint({
+  body: '',
+  industryId: null,
+  tagIds: [],
+  insightIds: [],
+  imageKeys: [],
+  videoFileName: '',
+})
+
 export default function PostModal({
   locale,
   mode,
@@ -305,6 +357,7 @@ export default function PostModal({
   const [isSavingDraft, setIsSavingDraft] = useState(false)
   const [isDiscardingDraft, setIsDiscardingDraft] = useState(false)
   const [discardConfirmOpened, setDiscardConfirmOpened] = useState(false)
+  const [exitConfirmOpened, setExitConfirmOpened] = useState(false)
   const [touchedFields, setTouchedFields] = useState<RequiredFieldState>({
     industry: false,
     video: false,
@@ -327,6 +380,9 @@ export default function PostModal({
   // backend has persisted it — see MuxWebhookService::mergeMuxAssetData.
   const [videoPlaybackId, setVideoPlaybackId] = useState<string | null>(null)
   const videoUuidRef = useRef<string | null>(null)
+  // What the composer looked like when it opened — empty for a new post, the
+  // saved draft/post for an edit. Anything else means unsaved work.
+  const baselineFingerprintRef = useRef<string>(EMPTY_FINGERPRINT)
   const abortUploadRef = useRef<(() => void) | null>(null)
   const pollTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   const replaceSavedImagesRef = useRef(false)
@@ -355,6 +411,24 @@ export default function PostModal({
   // only the first is something the user can act on.
   const videoErrorMessage = isAwaitingProcessing ? copy.videoStillProcessing : copy.videoRequired
   const bodyInvalid = touchedFields.body && body.trim() === ''
+
+  const currentFingerprint = useMemo(
+    () =>
+      contentFingerprint({
+        body,
+        industryId: industry?.id ?? null,
+        tagIds: selectedTags.map((tag) => tag.id),
+        insightIds: relatedInsights.map((item) => item.id),
+        imageKeys: images.map((image) => image.previewUrl),
+        videoFileName,
+      }),
+    [body, industry, selectedTags, relatedInsights, images, videoFileName],
+  )
+  const hasUnsavedChanges = currentFingerprint !== baselineFingerprintRef.current
+  // Bytes are still in flight: a draft saved now would point at an incomplete
+  // upload, so the exit prompt offers only "discard" or "keep editing".
+  const isUploadInFlight = videoPhase === 'initializing' || videoPhase === 'uploading'
+  const canSaveAsDraftOnExit = !isEditingPublished && !isUploadInFlight
 
   const initials = user
     ? `${user.first_name?.[0] ?? ''}${user.last_name?.[0] ?? ''}`.toUpperCase() || 'I'
@@ -403,6 +477,8 @@ export default function PostModal({
     setIsSavingDraft(false)
     setIsDiscardingDraft(false)
     setDiscardConfirmOpened(false)
+    setExitConfirmOpened(false)
+    baselineFingerprintRef.current = EMPTY_FINGERPRINT
     setTouchedFields({ industry: false, video: false, body: false })
     setDirtyFields({ industry: false, video: false, body: false })
   }, [stopPolling])
@@ -486,34 +562,34 @@ export default function PostModal({
         : null,
     )
     setSelectedTags(draft.tags)
-    setRelatedInsights(
-      draft.related_insights.flatMap((item) =>
-        typeof item.id === 'number'
-          ? [{
-              id: item.id,
-              type: item.type,
-              title: item.title,
-              slug: item.slug,
-              status: 'published',
-              published_at: null,
-            }]
-          : [],
-      ),
+    const savedInsights = draft.related_insights.flatMap((item) =>
+      typeof item.id === 'number'
+        ? [{
+            id: item.id,
+            type: item.type,
+            title: item.title,
+            slug: item.slug,
+            status: 'published' as const,
+            published_at: null,
+          }]
+        : [],
     )
-    setImages(
-      draft.media
-        .filter((item) => item.media_type === 'image' && item.url)
-        .map((item) => ({
-          file: null,
-          name: item.name ?? copy.description,
-          previewUrl: item.url as string,
-        })),
-    )
+    setRelatedInsights(savedInsights)
+    const savedImages = draft.media
+      .filter((item) => item.media_type === 'image' && item.url)
+      .map((item) => ({
+        file: null,
+        name: item.name ?? copy.description,
+        previewUrl: item.url as string,
+      }))
+    setImages(savedImages)
 
+    let savedVideoFileName = ''
     if (draft.media_type === 'video') {
       const media = draft.media.find((item) => item.media_type === 'video')
       videoUuidRef.current = draft.uuid
-      setVideoFileName(media?.name ?? copy.savedVideo)
+      savedVideoFileName = media?.name ?? copy.savedVideo
+      setVideoFileName(savedVideoFileName)
       setVideoPlaybackId(media?.provider_playback_id ?? null)
 
       if (media?.provider_processing_status === 'ready') {
@@ -525,6 +601,15 @@ export default function PostModal({
         setVideoPhase('error')
       }
     }
+
+    baselineFingerprintRef.current = contentFingerprint({
+      body: draft.body ?? '',
+      industryId: draft.industry?.id ?? null,
+      tagIds: draft.tags.map((tag) => tag.id),
+      insightIds: savedInsights.map((item) => item.id),
+      imageKeys: savedImages.map((image) => image.previewUrl),
+      videoFileName: savedVideoFileName,
+    })
   }, [copy.description, copy.savedVideo, draft, opened, pollProcessingStatus, resetAll])
 
   const recheckProcessingStatus = () => {
@@ -932,11 +1017,15 @@ export default function PostModal({
   }, [opened, autoAttachKnowledgeId, locale, copy, toast, onAutoAttachHandled])
 
   const handleDiscardDraft = async () => {
-    if (!draft || isPublishing || isSavingDraft || isDiscardingDraft) return
+    if (isEditingPublished || isPublishing || isSavingDraft || isDiscardingDraft) return
+    // A video upload creates the draft server-side before the parent has re-read
+    // it, so fall back to the uuid this composer initialized.
+    const discardUuid = draft?.uuid ?? videoUuidRef.current
+    if (!discardUuid) return
 
     setIsDiscardingDraft(true)
     try {
-      await deleteFeedItem(draft.uuid, locale)
+      await deleteFeedItem(discardUuid, locale)
       toast.success(copy.draftDiscarded)
       setDiscardConfirmOpened(false)
       onDraftDiscarded()
@@ -945,6 +1034,46 @@ export default function PostModal({
     } finally {
       setIsDiscardingDraft(false)
     }
+  }
+
+  // Closing the composer (X, overlay click, Escape) must not silently throw away
+  // what the author typed: offer to keep it as a draft first.
+  const requestClose = () => {
+    if (isPublishing || isSavingDraft || isDiscardingDraft) return
+    if (exitConfirmOpened || discardConfirmOpened) return
+    if (!hasUnsavedChanges) {
+      onClose()
+      return
+    }
+    setExitConfirmOpened(true)
+  }
+
+  const handleExitSaveDraft = async () => {
+    const savedDraft = await persistDraft()
+    if (!savedDraft) {
+      // persistDraft already moved the author to the step holding the first
+      // missing field — close the prompt so they can see it.
+      setExitConfirmOpened(false)
+      toast.error(copy.exitSaveBlocked)
+      return
+    }
+    setExitConfirmOpened(false)
+    toast.success(copy.draftSaved)
+    onDraftSaved(savedDraft)
+  }
+
+  // A saved draft lives on the server, so discarding has to delete it; an
+  // unsaved composer just closes.
+  const handleExitDiscard = async () => {
+    // Keep the prompt on screen while the delete runs so the button can show its
+    // pending state; handleDiscardDraft closes the composer once it succeeds.
+    if (!isEditingPublished && (draft || videoUuidRef.current)) {
+      await handleDiscardDraft()
+      setExitConfirmOpened(false)
+      return
+    }
+    setExitConfirmOpened(false)
+    onClose()
   }
 
   const footerIconClass =
@@ -962,7 +1091,7 @@ export default function PostModal({
     <>
       <Modal
         opened={opened}
-        onClose={onClose}
+        onClose={requestClose}
         size={640}
         radius={8}
         centered
@@ -980,7 +1109,7 @@ export default function PostModal({
         <button
           type="button"
           aria-label={copy.close}
-          onClick={onClose}
+          onClick={requestClose}
           className="absolute end-0 top-0 z-10 flex h-10 w-10 items-center justify-center rounded-md text-[#5A6472] transition-colors hover:bg-[#F3F6FB] hover:text-[#0B1220] focus-visible:outline-[1px] focus-visible:outline-offset-1 focus-visible:outline-[#B7D2F4]"
         >
           <IconX aria-hidden className="h-5 w-5" stroke={1.8} />
@@ -1277,11 +1406,9 @@ export default function PostModal({
                 type="button"
                 aria-label={copy.addImages}
                 onClick={() => imageInputRef.current?.click()}
-                className="group flex aspect-square items-center justify-center rounded-md border border-dashed border-[#B8CBE4] bg-[#F8FAFD] text-[#5A6B84] transition-colors hover:border-[#1EAB5A] hover:bg-[#F2FBF6] hover:text-[#178A48] focus-visible:outline-[2px] focus-visible:outline-offset-2 focus-visible:outline-[#8FB9EA]"
+                className="group flex aspect-square items-center justify-center rounded-md border border-dashed border-[#1EAB5A] bg-[#F2FBF6] text-[#1EAB5A] transition-colors hover:border-[#178A48] hover:bg-[#E6F7ED] hover:text-[#178A48] focus-visible:outline-[2px] focus-visible:outline-offset-2 focus-visible:outline-[#8FB9EA]"
               >
-                <span className="flex items-center gap-1 text-[13px] font-semibold sm:text-[14px]">
-                  {copy.addImages}
-                </span>
+                <IconPlus aria-hidden stroke={2.5} className="h-10 w-10 sm:h-12 sm:w-12" />
               </button>
             )}
           </div>
@@ -1525,6 +1652,70 @@ export default function PostModal({
         onCancel={cancelImageCrop}
         onApply={applyCroppedImage}
       />
+
+      <Modal
+        opened={exitConfirmOpened}
+        onClose={() => {
+          if (!isSavingDraft && !isDiscardingDraft) setExitConfirmOpened(false)
+        }}
+        title={
+          isUploadInFlight
+            ? copy.exitUploadingTitle
+            : isEditingPublished
+              ? copy.editExitTitle
+              : copy.exitTitle
+        }
+        centered
+        size="sm"
+        radius={8}
+        zIndex={500}
+        closeButtonProps={{ 'aria-label': copy.keepEditing }}
+        styles={{ title: { fontSize: 17, fontWeight: 700, color: '#0B1220' } }}
+      >
+        <p className="text-[14px] leading-6 text-[#5D6D89]">
+          {isUploadInFlight
+            ? copy.exitUploadingDescription
+            : isEditingPublished
+              ? copy.editExitDescription
+              : copy.exitDescription}
+        </p>
+        <div className="mt-5 flex justify-end gap-2">
+          <button
+            type="button"
+            onClick={() => void handleExitDiscard()}
+            disabled={isSavingDraft || isDiscardingDraft}
+            className="inline-flex min-h-10 items-center rounded-md border border-[#DCE4EF] px-4 text-[14px] font-medium text-[#5D6D89] transition-colors hover:bg-[#F7F9FC] focus-visible:outline-[1px] focus-visible:outline-offset-1 focus-visible:outline-[#B7D2F4] disabled:opacity-50"
+          >
+            {isDiscardingDraft && (
+              <IconLoader2 aria-hidden className="me-1.5 h-4 w-4 animate-spin" stroke={2} />
+            )}
+            {isEditingPublished ? copy.discardChanges : copy.exitDiscard}
+          </button>
+          {canSaveAsDraftOnExit ? (
+            <button
+              type="button"
+              onClick={() => void handleExitSaveDraft()}
+              disabled={isSavingDraft || isDiscardingDraft}
+              aria-busy={isSavingDraft}
+              className="inline-flex min-h-10 items-center rounded-md bg-[#1D74E0] px-4 text-[14px] font-medium text-white transition-colors hover:bg-[#155CB8] focus-visible:outline-[1px] focus-visible:outline-offset-1 focus-visible:outline-[#B7D2F4] disabled:cursor-wait disabled:bg-[#93B9E8]"
+            >
+              {isSavingDraft && (
+                <IconLoader2 aria-hidden className="me-1.5 h-4 w-4 animate-spin" stroke={2} />
+              )}
+              {isSavingDraft ? copy.savingDraft : copy.exitSaveDraft}
+            </button>
+          ) : (
+            <button
+              type="button"
+              onClick={() => setExitConfirmOpened(false)}
+              disabled={isDiscardingDraft}
+              className="min-h-10 rounded-md bg-[#1D74E0] px-4 text-[14px] font-medium text-white transition-colors hover:bg-[#155CB8] focus-visible:outline-[1px] focus-visible:outline-offset-1 focus-visible:outline-[#B7D2F4] disabled:opacity-50"
+            >
+              {copy.keepEditing}
+            </button>
+          )}
+        </div>
+      </Modal>
 
       <Modal
         opened={discardConfirmOpened}
