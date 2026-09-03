@@ -563,6 +563,8 @@ const toAngularAppUrl = (url)=>{
 __turbopack_context__.s([
     "INSIGHTER_PROMPT_ROLES",
     ()=>INSIGHTER_PROMPT_ROLES,
+    "INSIGHTER_SETUP_QUERY_KEY",
+    ()=>INSIGHTER_SETUP_QUERY_KEY,
     "SUPPORTED_INSIGHTER_PROMPTS",
     ()=>SUPPORTED_INSIGHTER_PROMPTS,
     "SUPPORTED_ONBOARDING_PROMPTS",
@@ -592,7 +594,9 @@ __turbopack_context__.s([
     "updateOnboardingCountry",
     ()=>updateOnboardingCountry,
     "updateWhatsappNumber",
-    ()=>updateWhatsappNumber
+    ()=>updateWhatsappNumber,
+    "withInsighterSetupMarker",
+    ()=>withInsighterSetupMarker
 ]);
 var __TURBOPACK__imported__module__$5b$project$5d2f$app$2f$config$2e$ts__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/app/config.ts [app-ssr] (ecmascript)");
 ;
@@ -605,6 +609,17 @@ const SUPPORTED_INSIGHTER_PROMPTS = [
     'session_availability',
     'project_settings'
 ];
+const INSIGHTER_SETUP_QUERY_KEY = 'insighterSetup';
+function withInsighterSetupMarker(url) {
+    try {
+        const baseUrl = ("TURBOPACK compile-time truthy", 1) ? 'http://localhost' : "TURBOPACK unreachable";
+        const parsed = new URL(url, baseUrl);
+        parsed.searchParams.set(INSIGHTER_SETUP_QUERY_KEY, '1');
+        return /^https?:\/\//i.test(url) ? parsed.toString() : `${parsed.pathname}${parsed.search}${parsed.hash}`;
+    } catch  {
+        return url;
+    }
+}
 const INSIGHTER_PROMPT_ROLES = [
     'insighter',
     'company',
@@ -772,8 +787,6 @@ __turbopack_context__.v({
 "use strict";
 
 __turbopack_context__.s([
-    "INSIGHTER_SETUP_QUERY_KEY",
-    ()=>INSIGHTER_SETUP_QUERY_KEY,
     "INSIGHTER_STAGE_ORDER",
     ()=>INSIGHTER_STAGE_ORDER,
     "INSIGHTER_STAGE_PATH",
@@ -788,7 +801,6 @@ var __TURBOPACK__imported__module__$5b$project$5d2f$components$2f$onboarding$2f$
 'use client';
 ;
 ;
-const INSIGHTER_SETUP_QUERY_KEY = 'insighterSetup';
 const INSIGHTER_STAGE_ORDER = [
     'meeting',
     'project'
@@ -829,12 +841,12 @@ const TickIcon = ()=>/*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$projec
             d: "M4 12.5 9.5 18 20 7"
         }, void 0, false, {
             fileName: "[project]/components/onboarding/InsighterSetupCover.tsx",
-            lineNumber: 72,
+            lineNumber: 64,
             columnNumber: 5
         }, ("TURBOPACK compile-time value", void 0))
     }, void 0, false, {
         fileName: "[project]/components/onboarding/InsighterSetupCover.tsx",
-        lineNumber: 71,
+        lineNumber: 63,
         columnNumber: 3
     }, ("TURBOPACK compile-time value", void 0));
 const BriefcaseIcon = ()=>/*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("svg", {
@@ -849,12 +861,12 @@ const BriefcaseIcon = ()=>/*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$p
             d: "M9 7V5.5A1.5 1.5 0 0 1 10.5 4h3A1.5 1.5 0 0 1 15 5.5V7m-10 0h14a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V8a1 1 0 0 1 1-1Zm0 4h14"
         }, void 0, false, {
             fileName: "[project]/components/onboarding/InsighterSetupCover.tsx",
-            lineNumber: 78,
+            lineNumber: 70,
             columnNumber: 5
         }, ("TURBOPACK compile-time value", void 0))
     }, void 0, false, {
         fileName: "[project]/components/onboarding/InsighterSetupCover.tsx",
-        lineNumber: 77,
+        lineNumber: 69,
         columnNumber: 3
     }, ("TURBOPACK compile-time value", void 0));
 function InsighterSetupCover({ stage, locale, profile, onPrimary, onSkip, isSkipping }) {
@@ -937,17 +949,17 @@ function InsighterSetupCover({ stage, locale, profile, onPrimary, onSkip, isSkip
                             d: "M6 6l12 12M18 6L6 18"
                         }, void 0, false, {
                             fileName: "[project]/components/onboarding/InsighterSetupCover.tsx",
-                            lineNumber: 161,
+                            lineNumber: 153,
                             columnNumber: 13
                         }, this)
                     }, void 0, false, {
                         fileName: "[project]/components/onboarding/InsighterSetupCover.tsx",
-                        lineNumber: 160,
+                        lineNumber: 152,
                         columnNumber: 11
                     }, this)
                 }, void 0, false, {
                     fileName: "[project]/components/onboarding/InsighterSetupCover.tsx",
-                    lineNumber: 159,
+                    lineNumber: 151,
                     columnNumber: 9
                 }, this),
                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -959,7 +971,7 @@ function InsighterSetupCover({ stage, locale, profile, onPrimary, onSkip, isSkip
                                 "aria-hidden": "true"
                             }, void 0, false, {
                                 fileName: "[project]/components/onboarding/InsighterSetupCover.tsx",
-                                lineNumber: 168,
+                                lineNumber: 160,
                                 columnNumber: 15
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -967,7 +979,7 @@ function InsighterSetupCover({ stage, locale, profile, onPrimary, onSkip, isSkip
                                 "aria-hidden": "true"
                             }, void 0, false, {
                                 fileName: "[project]/components/onboarding/InsighterSetupCover.tsx",
-                                lineNumber: 169,
+                                lineNumber: 161,
                                 columnNumber: 15
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("img", {
@@ -976,7 +988,7 @@ function InsighterSetupCover({ stage, locale, profile, onPrimary, onSkip, isSkip
                                 alt: copy.meeting.art
                             }, void 0, false, {
                                 fileName: "[project]/components/onboarding/InsighterSetupCover.tsx",
-                                lineNumber: 171,
+                                lineNumber: 163,
                                 columnNumber: 15
                             }, this)
                         ]
@@ -991,12 +1003,12 @@ function InsighterSetupCover({ stage, locale, profile, onPrimary, onSkip, isSkip
                                     alt: ""
                                 }, void 0, false, {
                                     fileName: "[project]/components/onboarding/InsighterSetupCover.tsx",
-                                    lineNumber: 178,
+                                    lineNumber: 170,
                                     columnNumber: 19
                                 }, this) : initials(profile)
                             }, void 0, false, {
                                 fileName: "[project]/components/onboarding/InsighterSetupCover.tsx",
-                                lineNumber: 175,
+                                lineNumber: 167,
                                 columnNumber: 15
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -1007,7 +1019,7 @@ function InsighterSetupCover({ stage, locale, profile, onPrimary, onSkip, isSkip
                                         children: displayName(profile)
                                     }, void 0, false, {
                                         fileName: "[project]/components/onboarding/InsighterSetupCover.tsx",
-                                        lineNumber: 184,
+                                        lineNumber: 176,
                                         columnNumber: 17
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("svg", {
@@ -1020,7 +1032,7 @@ function InsighterSetupCover({ stage, locale, profile, onPrimary, onSkip, isSkip
                                                 d: "M12 1.6l2.6 2 3.2-.3 1 3.1 2.7 1.8-1.2 3 1.2 3-2.7 1.8-1 3.1-3.2-.3-2.6 2-2.6-2-3.2.3-1-3.1L3.5 15l1.2-3-1.2-3 2.7-1.8 1-3.1 3.2.3z"
                                             }, void 0, false, {
                                                 fileName: "[project]/components/onboarding/InsighterSetupCover.tsx",
-                                                lineNumber: 186,
+                                                lineNumber: 178,
                                                 columnNumber: 19
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("path", {
@@ -1032,19 +1044,19 @@ function InsighterSetupCover({ stage, locale, profile, onPrimary, onSkip, isSkip
                                                 strokeLinejoin: "round"
                                             }, void 0, false, {
                                                 fileName: "[project]/components/onboarding/InsighterSetupCover.tsx",
-                                                lineNumber: 187,
+                                                lineNumber: 179,
                                                 columnNumber: 19
                                             }, this)
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/components/onboarding/InsighterSetupCover.tsx",
-                                        lineNumber: 185,
+                                        lineNumber: 177,
                                         columnNumber: 17
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/components/onboarding/InsighterSetupCover.tsx",
-                                lineNumber: 183,
+                                lineNumber: 175,
                                 columnNumber: 15
                             }, this),
                             geo && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -1052,7 +1064,7 @@ function InsighterSetupCover({ stage, locale, profile, onPrimary, onSkip, isSkip
                                 children: geo
                             }, void 0, false, {
                                 fileName: "[project]/components/onboarding/InsighterSetupCover.tsx",
-                                lineNumber: 190,
+                                lineNumber: 182,
                                 columnNumber: 23
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -1062,30 +1074,30 @@ function InsighterSetupCover({ stage, locale, profile, onPrimary, onSkip, isSkip
                                     children: [
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(BriefcaseIcon, {}, void 0, false, {
                                             fileName: "[project]/components/onboarding/InsighterSetupCover.tsx",
-                                            lineNumber: 193,
+                                            lineNumber: 185,
                                             columnNumber: 19
                                         }, this),
                                         copy.project.requestService
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/components/onboarding/InsighterSetupCover.tsx",
-                                    lineNumber: 192,
+                                    lineNumber: 184,
                                     columnNumber: 17
                                 }, this)
                             }, void 0, false, {
                                 fileName: "[project]/components/onboarding/InsighterSetupCover.tsx",
-                                lineNumber: 191,
+                                lineNumber: 183,
                                 columnNumber: 15
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "[project]/components/onboarding/InsighterSetupCover.tsx",
-                        lineNumber: 174,
+                        lineNumber: 166,
                         columnNumber: 13
                     }, this)
                 }, void 0, false, {
                     fileName: "[project]/components/onboarding/InsighterSetupCover.tsx",
-                    lineNumber: 165,
+                    lineNumber: 157,
                     columnNumber: 9
                 }, this),
                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("h2", {
@@ -1093,7 +1105,7 @@ function InsighterSetupCover({ stage, locale, profile, onPrimary, onSkip, isSkip
                     children: stageCopy.title
                 }, void 0, false, {
                     fileName: "[project]/components/onboarding/InsighterSetupCover.tsx",
-                    lineNumber: 201,
+                    lineNumber: 193,
                     columnNumber: 9
                 }, this),
                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -1101,7 +1113,7 @@ function InsighterSetupCover({ stage, locale, profile, onPrimary, onSkip, isSkip
                     children: stageCopy.lede
                 }, void 0, false, {
                     fileName: "[project]/components/onboarding/InsighterSetupCover.tsx",
-                    lineNumber: 202,
+                    lineNumber: 194,
                     columnNumber: 9
                 }, this),
                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("ul", {
@@ -1112,30 +1124,30 @@ function InsighterSetupCover({ stage, locale, profile, onPrimary, onSkip, isSkip
                                     className: __TURBOPACK__imported__module__$5b$project$5d2f$components$2f$onboarding$2f$insighterSetupCover$2e$module$2e$css__$5b$app$2d$ssr$5d$__$28$css__module$29$__["default"].tick,
                                     children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(TickIcon, {}, void 0, false, {
                                         fileName: "[project]/components/onboarding/InsighterSetupCover.tsx",
-                                        lineNumber: 207,
+                                        lineNumber: 199,
                                         columnNumber: 17
                                     }, this)
                                 }, void 0, false, {
                                     fileName: "[project]/components/onboarding/InsighterSetupCover.tsx",
-                                    lineNumber: 206,
+                                    lineNumber: 198,
                                     columnNumber: 15
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
                                     children: point
                                 }, void 0, false, {
                                     fileName: "[project]/components/onboarding/InsighterSetupCover.tsx",
-                                    lineNumber: 209,
+                                    lineNumber: 201,
                                     columnNumber: 15
                                 }, this)
                             ]
                         }, point, true, {
                             fileName: "[project]/components/onboarding/InsighterSetupCover.tsx",
-                            lineNumber: 205,
+                            lineNumber: 197,
                             columnNumber: 13
                         }, this))
                 }, void 0, false, {
                     fileName: "[project]/components/onboarding/InsighterSetupCover.tsx",
-                    lineNumber: 203,
+                    lineNumber: 195,
                     columnNumber: 9
                 }, this),
                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
@@ -1155,23 +1167,23 @@ function InsighterSetupCover({ stage, locale, profile, onPrimary, onSkip, isSkip
                                 d: "M8 3v3m8-3v3M4 9h16M5 5h14a1 1 0 0 1 1 1v13a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1Z"
                             }, void 0, false, {
                                 fileName: "[project]/components/onboarding/InsighterSetupCover.tsx",
-                                lineNumber: 217,
+                                lineNumber: 209,
                                 columnNumber: 15
                             }, this)
                         }, void 0, false, {
                             fileName: "[project]/components/onboarding/InsighterSetupCover.tsx",
-                            lineNumber: 216,
+                            lineNumber: 208,
                             columnNumber: 13
                         }, this) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(BriefcaseIcon, {}, void 0, false, {
                             fileName: "[project]/components/onboarding/InsighterSetupCover.tsx",
-                            lineNumber: 220,
+                            lineNumber: 212,
                             columnNumber: 13
                         }, this),
                         stageCopy.cta
                     ]
                 }, void 0, true, {
                     fileName: "[project]/components/onboarding/InsighterSetupCover.tsx",
-                    lineNumber: 214,
+                    lineNumber: 206,
                     columnNumber: 9
                 }, this),
                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
@@ -1182,18 +1194,18 @@ function InsighterSetupCover({ stage, locale, profile, onPrimary, onSkip, isSkip
                     children: copy.skip
                 }, void 0, false, {
                     fileName: "[project]/components/onboarding/InsighterSetupCover.tsx",
-                    lineNumber: 224,
+                    lineNumber: 216,
                     columnNumber: 9
                 }, this)
             ]
         }, void 0, true, {
             fileName: "[project]/components/onboarding/InsighterSetupCover.tsx",
-            lineNumber: 158,
+            lineNumber: 150,
             columnNumber: 7
         }, this)
     }, void 0, false, {
         fileName: "[project]/components/onboarding/InsighterSetupCover.tsx",
-        lineNumber: 157,
+        lineNumber: 149,
         columnNumber: 5
     }, this);
 }
@@ -1231,13 +1243,13 @@ function InsighterSetupCoverHost({ locale }) {
     const [activeStage, setActiveStage] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useState"])(null);
     const [isSkipping, setIsSkipping] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useState"])(false);
     const [hasChecked, setHasChecked] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useState"])(false);
-    const isRequested = searchParams.get(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$onboarding$2f$InsighterSetupCover$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["INSIGHTER_SETUP_QUERY_KEY"]) === '1';
+    const isRequested = searchParams.get(__TURBOPACK__imported__module__$5b$project$5d2f$services$2f$onboarding$2e$service$2e$ts__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["INSIGHTER_SETUP_QUERY_KEY"]) === '1';
     const previewStage = ("TURBOPACK compile-time truthy", 1) ? searchParams.get('designPreview') : "TURBOPACK unreachable";
     const isPreview = previewStage === 'meeting' || previewStage === 'project';
     /** Drop the marker so a refresh or a back-navigation doesn't re-open the covers. */ const clearMarker = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useCallback"])(()=>{
         const params = new URLSearchParams(searchParams.toString());
-        if (!params.has(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$onboarding$2f$InsighterSetupCover$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["INSIGHTER_SETUP_QUERY_KEY"])) return;
-        params.delete(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$onboarding$2f$InsighterSetupCover$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["INSIGHTER_SETUP_QUERY_KEY"]);
+        if (!params.has(__TURBOPACK__imported__module__$5b$project$5d2f$services$2f$onboarding$2e$service$2e$ts__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["INSIGHTER_SETUP_QUERY_KEY"])) return;
+        params.delete(__TURBOPACK__imported__module__$5b$project$5d2f$services$2f$onboarding$2e$service$2e$ts__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["INSIGHTER_SETUP_QUERY_KEY"]);
         router.replace(params.toString() ? `${pathname}?${params.toString()}` : pathname, {
             scroll: false
         });

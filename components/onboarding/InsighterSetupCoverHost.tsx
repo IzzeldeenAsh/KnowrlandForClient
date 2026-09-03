@@ -9,10 +9,10 @@ import {
   fetchInsighterPromptStatuses,
   getVisibleInsighterPrompts,
   hasInsighterPromptRole,
+  INSIGHTER_SETUP_QUERY_KEY,
   skipInsighterPrompt,
 } from '@/services/onboarding.service'
 import InsighterSetupCover, {
-  INSIGHTER_SETUP_QUERY_KEY,
   INSIGHTER_STAGE_ORDER,
   INSIGHTER_STAGE_PATH,
   INSIGHTER_STAGE_PROMPT,

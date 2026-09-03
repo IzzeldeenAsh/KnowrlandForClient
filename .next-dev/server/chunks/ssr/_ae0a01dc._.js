@@ -572,6 +572,8 @@ const toAngularAppUrl = (url)=>{
 __turbopack_context__.s([
     "INSIGHTER_PROMPT_ROLES",
     ()=>INSIGHTER_PROMPT_ROLES,
+    "INSIGHTER_SETUP_QUERY_KEY",
+    ()=>INSIGHTER_SETUP_QUERY_KEY,
     "SUPPORTED_INSIGHTER_PROMPTS",
     ()=>SUPPORTED_INSIGHTER_PROMPTS,
     "SUPPORTED_ONBOARDING_PROMPTS",
@@ -601,7 +603,9 @@ __turbopack_context__.s([
     "updateOnboardingCountry",
     ()=>updateOnboardingCountry,
     "updateWhatsappNumber",
-    ()=>updateWhatsappNumber
+    ()=>updateWhatsappNumber,
+    "withInsighterSetupMarker",
+    ()=>withInsighterSetupMarker
 ]);
 var __TURBOPACK__imported__module__$5b$project$5d2f$app$2f$config$2e$ts__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/app/config.ts [app-ssr] (ecmascript)");
 ;
@@ -614,6 +618,17 @@ const SUPPORTED_INSIGHTER_PROMPTS = [
     'session_availability',
     'project_settings'
 ];
+const INSIGHTER_SETUP_QUERY_KEY = 'insighterSetup';
+function withInsighterSetupMarker(url) {
+    try {
+        const baseUrl = ("TURBOPACK compile-time truthy", 1) ? 'http://localhost' : "TURBOPACK unreachable";
+        const parsed = new URL(url, baseUrl);
+        parsed.searchParams.set(INSIGHTER_SETUP_QUERY_KEY, '1');
+        return /^https?:\/\//i.test(url) ? parsed.toString() : `${parsed.pathname}${parsed.search}${parsed.hash}`;
+    } catch  {
+        return url;
+    }
+}
 const INSIGHTER_PROMPT_ROLES = [
     'insighter',
     'company',
@@ -1032,15 +1047,32 @@ function QueryParamAuthCallback() {
                     token: authToken,
                     locale: preferredLanguage || 'en'
                 });
-                // Insighter setup covers (availability / project settings) are offered on
-                // the same page, so they count towards sending the user there.
+                // Insighter setup covers (availability / project settings) are shown on
+                // the final destination rather than on the account-onboarding page.
                 const insighterPrompts = (0, __TURBOPACK__imported__module__$5b$project$5d2f$services$2f$onboarding$2e$service$2e$ts__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["hasInsighterPromptRole"])(userData.roles) ? await (0, __TURBOPACK__imported__module__$5b$project$5d2f$services$2f$onboarding$2e$service$2e$ts__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["fetchInsighterPromptStatuses"])({
                     token: authToken,
                     locale: preferredLanguage || 'en'
                 }) : [];
-                if ((0, __TURBOPACK__imported__module__$5b$project$5d2f$services$2f$onboarding$2e$service$2e$ts__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["getVisibleSupportedPrompts"])(prompts).length > 0 || (0, __TURBOPACK__imported__module__$5b$project$5d2f$services$2f$onboarding$2e$service$2e$ts__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["getVisibleInsighterPrompts"])(insighterPrompts).length > 0) {
+                const visibleAccountPrompts = (0, __TURBOPACK__imported__module__$5b$project$5d2f$services$2f$onboarding$2e$service$2e$ts__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["getVisibleSupportedPrompts"])(prompts);
+                const visibleInsighterPrompts = (0, __TURBOPACK__imported__module__$5b$project$5d2f$services$2f$onboarding$2e$service$2e$ts__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["getVisibleInsighterPrompts"])(insighterPrompts);
+                if (visibleAccountPrompts.length > 0) {
                     if (storedReturnUrl) clearReturnUrlCookie();
                     window.location.replace(`/${preferredLanguage}/onboarding?redirect=${encodeURIComponent(intendedDestination)}`);
+                    return;
+                }
+                // Insighter prompts are displayed as covers on the destination page.
+                // Going through /onboarding when there are no account prompts causes a
+                // visible loading-page flash before that page immediately redirects.
+                if (visibleInsighterPrompts.length > 0) {
+                    if (storedReturnUrl) clearReturnUrlCookie();
+                    const markedDestination = (0, __TURBOPACK__imported__module__$5b$project$5d2f$services$2f$onboarding$2e$service$2e$ts__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["withInsighterSetupMarker"])(intendedDestination);
+                    if ((0, __TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$authRedirect$2e$ts__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["isAngularRouteUrl"])(markedDestination)) {
+                        window.location.replace((0, __TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$authRedirect$2e$ts__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["toAngularAppUrl"])(markedDestination));
+                    } else if (markedDestination.startsWith('http')) {
+                        window.location.replace(markedDestination);
+                    } else {
+                        router.replace(markedDestination);
+                    }
                     return;
                 }
             } catch (error) {
@@ -1174,7 +1206,7 @@ function QueryParamAuthCallback() {
                 message: currentLocale === 'ar' ? 'جاري تسجيل الدخول...' : 'Signing you in...'
             }, void 0, false, {
                 fileName: "[project]/app/[locale]/callback/page.tsx",
-                lineNumber: 516,
+                lineNumber: 534,
                 columnNumber: 9
             }, this),
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$agreements$2f$AgreementModal$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["default"], {
@@ -1191,7 +1223,7 @@ function QueryParamAuthCallback() {
                 locale: locale
             }, void 0, false, {
                 fileName: "[project]/app/[locale]/callback/page.tsx",
-                lineNumber: 518,
+                lineNumber: 536,
                 columnNumber: 7
             }, this)
         ]

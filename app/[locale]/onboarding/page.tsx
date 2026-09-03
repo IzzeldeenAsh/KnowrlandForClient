@@ -26,6 +26,7 @@ import {
   getVisibleInsighterPrompts,
   getVisibleSupportedPrompts,
   hasInsighterPromptRole,
+  withInsighterSetupMarker,
   skipOnboardingPrompt,
   updateFeedIndustryPreferences,
   updateOnboardingCountry,
@@ -34,7 +35,6 @@ import {
   type OnboardingPromptKey,
   type OnboardingPromptStatus,
 } from '@/services/onboarding.service'
-import { INSIGHTER_SETUP_QUERY_KEY } from '@/components/onboarding/InsighterSetupCover'
 import styles from './onboarding.module.css'
 
 type IndustryOption = { id: number; label: string }
@@ -304,14 +304,7 @@ export default function OnboardingPage() {
 
       /** Adds the marker to whichever URL we end up sending the user to. */
       const withMarker = (url: string): string => {
-        if (!wantsSetupCovers) return url
-        try {
-          const parsed = new URL(url, window.location.origin)
-          parsed.searchParams.set(INSIGHTER_SETUP_QUERY_KEY, '1')
-          return url.startsWith('http') ? parsed.toString() : `${parsed.pathname}${parsed.search}${parsed.hash}`
-        } catch {
-          return url
-        }
+        return wantsSetupCovers ? withInsighterSetupMarker(url) : url
       }
 
       const requestedDestination = searchParams.get('redirect') || searchParams.get('returnUrl')

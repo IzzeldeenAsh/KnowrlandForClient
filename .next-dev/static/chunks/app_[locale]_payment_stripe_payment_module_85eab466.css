@@ -1,0 +1,89 @@
+/* [project]/app/[locale]/payment/stripe/payment.module.css [app-client] (css) */
+@keyframes payment-module__QMnevG__checkmark {
+  0% {
+    stroke-dashoffset: 100px;
+    opacity: 0;
+  }
+
+  20% {
+    opacity: 1;
+  }
+
+  100% {
+    stroke-dashoffset: 0;
+  }
+}
+
+@keyframes payment-module__QMnevG__circleExpand {
+  0% {
+    opacity: 0;
+    transform: scale(0);
+  }
+
+  50% {
+    transform: scale(1.1);
+  }
+
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes payment-module__QMnevG__fadeInUp {
+  0% {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes payment-module__QMnevG__pulse {
+  0%, 100% {
+    transform: scale(1);
+  }
+
+  50% {
+    transform: scale(1.05);
+  }
+}
+
+.payment-module__QMnevG__successContainer {
+  animation: .6s ease-out payment-module__QMnevG__fadeInUp;
+}
+
+.payment-module__QMnevG__checkmarkCircle {
+  animation: .6s ease-out payment-module__QMnevG__circleExpand;
+}
+
+.payment-module__QMnevG__checkmarkPath {
+  stroke-dasharray: 100;
+  stroke-dashoffset: 100px;
+  animation: .8s ease-out .4s forwards payment-module__QMnevG__checkmark;
+}
+
+.payment-module__QMnevG__successTitle {
+  animation: .6s ease-out .6s both payment-module__QMnevG__fadeInUp;
+}
+
+.payment-module__QMnevG__successSubtitle {
+  animation: .6s ease-out .8s both payment-module__QMnevG__fadeInUp;
+}
+
+.payment-module__QMnevG__successDescription {
+  animation: .6s ease-out 1s both payment-module__QMnevG__fadeInUp;
+}
+
+.payment-module__QMnevG__progressSection {
+  animation: .6s ease-out 1.2s both payment-module__QMnevG__fadeInUp;
+}
+
+.payment-module__QMnevG__documentsAddedText, .payment-module__QMnevG__downloadButton {
+  animation: .4s ease-out payment-module__QMnevG__fadeInUp;
+}
+
+/*# sourceMappingURL=app_%5Blocale%5D_payment_stripe_payment_module_85eab466.css.map*/

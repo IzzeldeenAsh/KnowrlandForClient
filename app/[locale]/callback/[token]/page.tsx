@@ -15,6 +15,7 @@ import {
   getVisibleInsighterPrompts,
   getVisibleSupportedPrompts,
   hasInsighterPromptRole,
+  withInsighterSetupMarker,
 } from '@/services/onboarding.service';
 interface ProfileResponse {
   data: {
@@ -377,20 +378,37 @@ export default function AuthCallback() {
       try {
         const prompts = await fetchOnboardingPromptStatuses({ token: authToken, locale });
 
-        // Insighter setup covers (availability / project settings) are offered on
-        // the same page, so they count towards sending the user there.
+        // Insighter setup covers (availability / project settings) are shown on
+        // the final destination rather than on the account-onboarding page.
         const insighterPrompts = hasInsighterPromptRole(userData.roles)
           ? await fetchInsighterPromptStatuses({ token: authToken, locale: locale })
           : [];
 
-        if (
-          getVisibleSupportedPrompts(prompts).length > 0 ||
-          getVisibleInsighterPrompts(insighterPrompts).length > 0
-        ) {
+        const visibleAccountPrompts = getVisibleSupportedPrompts(prompts);
+        const visibleInsighterPrompts = getVisibleInsighterPrompts(insighterPrompts);
+
+        if (visibleAccountPrompts.length > 0) {
           if (storedReturnUrl) clearReturnUrlCookie();
           window.location.replace(
             `/${locale}/onboarding?redirect=${encodeURIComponent(intendedDestination)}`,
           );
+          return;
+        }
+
+        // Insighter prompts are displayed as covers on the destination page.
+        // Going through /onboarding when there are no account prompts causes a
+        // visible loading-page flash before that page immediately redirects.
+        if (visibleInsighterPrompts.length > 0) {
+          if (storedReturnUrl) clearReturnUrlCookie();
+          const markedDestination = withInsighterSetupMarker(intendedDestination);
+
+          if (isAngularRouteUrl(markedDestination)) {
+            window.location.replace(toAngularAppUrl(markedDestination));
+          } else if (markedDestination.startsWith('http')) {
+            window.location.replace(markedDestination);
+          } else {
+            router.replace(markedDestination);
+          }
           return;
         }
       } catch (error) {

@@ -5,14 +5,6 @@ import styles from './insighterSetupCover.module.css'
 
 export type InsighterSetupStage = 'meeting' | 'project'
 
-/**
- * Query param the post-login onboarding flow puts on the destination URL to ask
- * that destination to show the covers. They are deliberately not rendered on the
- * onboarding page itself — the redirect completes first, then whichever app the
- * user lands in (Next.js here, Angular for /app routes) offers them.
- */
-export const INSIGHTER_SETUP_QUERY_KEY = 'insighterSetup'
-
 /** Covers offered, in order. */
 export const INSIGHTER_STAGE_ORDER: InsighterSetupStage[] = ['meeting', 'project']
 

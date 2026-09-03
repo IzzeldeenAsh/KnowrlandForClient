@@ -22,6 +22,27 @@ export const SUPPORTED_INSIGHTER_PROMPTS = [
 
 export type InsighterPromptKey = (typeof SUPPORTED_INSIGHTER_PROMPTS)[number]
 
+/** Requests the pending Insighter setup covers on the post-login destination. */
+export const INSIGHTER_SETUP_QUERY_KEY = 'insighterSetup'
+
+/**
+ * Marks the eventual destination so its host can show the Insighter setup
+ * covers without briefly mounting the account-onboarding page first.
+ */
+export function withInsighterSetupMarker(url: string): string {
+  try {
+    const baseUrl = typeof window === 'undefined' ? 'http://localhost' : window.location.origin
+    const parsed = new URL(url, baseUrl)
+    parsed.searchParams.set(INSIGHTER_SETUP_QUERY_KEY, '1')
+
+    return /^https?:\/\//i.test(url)
+      ? parsed.toString()
+      : `${parsed.pathname}${parsed.search}${parsed.hash}`
+  } catch {
+    return url
+  }
+}
+
 /** Roles allowed to call the insighter prompt endpoints. */
 export const INSIGHTER_PROMPT_ROLES = ['insighter', 'company', 'company-insighter']
 
