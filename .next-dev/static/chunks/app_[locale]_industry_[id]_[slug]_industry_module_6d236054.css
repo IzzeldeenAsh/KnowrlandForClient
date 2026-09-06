@@ -1,0 +1,85 @@
+/* [project]/app/[locale]/industry/[id]/[slug]/industry.module.css [app-client] (css) */
+.industry-module__Sg67Ra__statsContainer {
+  max-width: 320px;
+}
+
+.industry-module__Sg67Ra__statsCard {
+  -webkit-backdrop-filter: blur(16px);
+  background: rgba(255, 255, 255, .15);
+  border: 1px solid rgba(255, 255, 255, .2);
+  border-radius: .75rem;
+  flex: 1;
+  width: 105px;
+  padding: 1rem 1.25rem;
+  transition: all .2s ease-in-out;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 4px 24px -1px rgba(0, 0, 0, .1), 0 2px 16px -1px rgba(0, 0, 0, .06);
+}
+
+.industry-module__Sg67Ra__statsCard:before {
+  content: "";
+  opacity: .5;
+  z-index: -1;
+  background-image: url("https://res.cloudinary.com/dsiku9ipv/image/upload/v1728124322/Artboard_4_cfvh6d.png");
+  background-position: 20%;
+  background-size: 200%;
+  transition: opacity .2s ease-in-out;
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+}
+
+.industry-module__Sg67Ra__statsCard:after {
+  content: "";
+  opacity: 0;
+  z-index: 0;
+  background: linear-gradient(125deg, rgba(255, 255, 255, .2), rgba(255, 255, 255, .1), rgba(0, 0, 0, 0));
+  transition: opacity .2s ease-in-out;
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+}
+
+.industry-module__Sg67Ra__statsCard:hover {
+  border: 1px solid rgba(255, 255, 255, .3);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 32px -3px rgba(0, 0, 0, .15), 0 4px 16px -2px rgba(0, 0, 0, .1);
+}
+
+.industry-module__Sg67Ra__statsCard:hover:before {
+  opacity: .25;
+}
+
+.industry-module__Sg67Ra__statsCard:hover:after {
+  opacity: 1;
+}
+
+.industry-module__Sg67Ra__statsNumber {
+  background: linear-gradient(135deg, #3b82f6, #2dd4bf);
+  color: rgba(0, 0, 0, 0);
+  z-index: 1;
+  -webkit-background-clip: text;
+  margin-bottom: .25rem;
+  font-size: 1.75rem;
+  font-weight: 700;
+  line-height: 1;
+  position: relative;
+  top: 4px;
+}
+
+.industry-module__Sg67Ra__statsLabel {
+  color: #6b7280;
+  text-transform: uppercase;
+  letter-spacing: .025em;
+  z-index: 1;
+  font-size: .75rem;
+  font-weight: 500;
+  position: relative;
+}
+
+/*# sourceMappingURL=app_%5Blocale%5D_industry_%5Bid%5D_%5Bslug%5D_industry_module_6d236054.css.map*/

@@ -547,9 +547,19 @@ export default function Header() {
               <nav className="hidden xl:flex flex-1 overflow-visible min-w-0">
                 <ul className="flex justify-start items-center w-full gap-0.5 md:gap-1">
                   <li>
-                    <Link className={navItemClass(isActiveNav('feed'))} href={`/${currentLocale}`}>
+                    <Link
+                      className="relative mx-1 flex items-center gap-2 rounded-md bg-gradient-to-r from-amber-500 to-yellow-400 px-3 py-2 text-xs font-bold text-white shadow-[0_7px_18px_rgba(245,158,11,0.2)] transition-all duration-200 ease-in-out hover:-translate-y-px hover:brightness-105 md:text-sm"
+                      href={`/${currentLocale}`}
+                    >
+                      <svg aria-hidden width="16" height="16" viewBox="0 0 24 24" fill="currentColor" className="shrink-0">
+                        <rect x="3" y="4" width="6" height="6" rx="1" />
+                        <rect x="3" y="14" width="6" height="6" rx="1" />
+                        <rect x="13" y="4" width="8" height="2" rx="1" />
+                        <rect x="13" y="8" width="5" height="2" rx="1" />
+                        <rect x="13" y="14" width="8" height="2" rx="1" />
+                        <rect x="13" y="18" width="5" height="2" rx="1" />
+                      </svg>
                       {t('navigation.feed')}
-                      <NavUnderline active={isActiveNav('feed')} />
                     </Link>
                   </li>
                   <li>

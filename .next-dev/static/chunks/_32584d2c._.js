@@ -12151,6 +12151,11 @@ function BecomeInsighterCard(param) {
             backgroundOpacity: 0.58,
             blur: 6
         },
+        transitionProps: {
+            transition: 'fade-up',
+            duration: 420,
+            timingFunction: 'cubic-bezier(0.22, 1, 0.36, 1)'
+        },
         styles: {
             content: {
                 overflow: 'hidden',
@@ -12173,7 +12178,7 @@ function BecomeInsighterCard(param) {
                             className: "absolute -end-12 -top-20 h-52 w-52 rounded-full bg-[#39D3C8]/25 blur-2xl"
                         }, void 0, false, {
                             fileName: "[project]/components/feed/post/BecomeInsighterCard.tsx",
-                            lineNumber: 83,
+                            lineNumber: 88,
                             columnNumber: 11
                         }, this),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -12181,7 +12186,7 @@ function BecomeInsighterCard(param) {
                             className: "absolute -bottom-24 -start-10 h-52 w-52 rounded-full bg-[#2E8FF0]/35 blur-3xl"
                         }, void 0, false, {
                             fileName: "[project]/components/feed/post/BecomeInsighterCard.tsx",
-                            lineNumber: 87,
+                            lineNumber: 92,
                             columnNumber: 11
                         }, this),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -12189,7 +12194,7 @@ function BecomeInsighterCard(param) {
                             className: "absolute inset-0 opacity-[0.16] [background-image:radial-gradient(circle_at_center,white_1px,transparent_1px)] [background-size:18px_18px]"
                         }, void 0, false, {
                             fileName: "[project]/components/feed/post/BecomeInsighterCard.tsx",
-                            lineNumber: 91,
+                            lineNumber: 96,
                             columnNumber: 11
                         }, this),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
@@ -12203,12 +12208,12 @@ function BecomeInsighterCard(param) {
                                 stroke: 1.8
                             }, void 0, false, {
                                 fileName: "[project]/components/feed/post/BecomeInsighterCard.tsx",
-                                lineNumber: 102,
+                                lineNumber: 107,
                                 columnNumber: 13
                             }, this)
                         }, void 0, false, {
                             fileName: "[project]/components/feed/post/BecomeInsighterCard.tsx",
-                            lineNumber: 96,
+                            lineNumber: 101,
                             columnNumber: 11
                         }, this),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -12223,14 +12228,14 @@ function BecomeInsighterCard(param) {
                                             stroke: 2
                                         }, void 0, false, {
                                             fileName: "[project]/components/feed/post/BecomeInsighterCard.tsx",
-                                            lineNumber: 107,
+                                            lineNumber: 112,
                                             columnNumber: 15
                                         }, this),
                                         copy.eyebrow
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/components/feed/post/BecomeInsighterCard.tsx",
-                                    lineNumber: 106,
+                                    lineNumber: 111,
                                     columnNumber: 13
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -12242,7 +12247,7 @@ function BecomeInsighterCard(param) {
                                             children: copy.title
                                         }, void 0, false, {
                                             fileName: "[project]/components/feed/post/BecomeInsighterCard.tsx",
-                                            lineNumber: 112,
+                                            lineNumber: 117,
                                             columnNumber: 15
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -12250,25 +12255,25 @@ function BecomeInsighterCard(param) {
                                             children: copy.description
                                         }, void 0, false, {
                                             fileName: "[project]/components/feed/post/BecomeInsighterCard.tsx",
-                                            lineNumber: 115,
+                                            lineNumber: 120,
                                             columnNumber: 15
                                         }, this)
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/components/feed/post/BecomeInsighterCard.tsx",
-                                    lineNumber: 111,
+                                    lineNumber: 116,
                                     columnNumber: 13
                                 }, this)
                             ]
                         }, void 0, true, {
                             fileName: "[project]/components/feed/post/BecomeInsighterCard.tsx",
-                            lineNumber: 105,
+                            lineNumber: 110,
                             columnNumber: 11
                         }, this)
                     ]
                 }, void 0, true, {
                     fileName: "[project]/components/feed/post/BecomeInsighterCard.tsx",
-                    lineNumber: 82,
+                    lineNumber: 87,
                     columnNumber: 9
                 }, this),
                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -12279,7 +12284,7 @@ function BecomeInsighterCard(param) {
                             children: copy.benefitsTitle
                         }, void 0, false, {
                             fileName: "[project]/components/feed/post/BecomeInsighterCard.tsx",
-                            lineNumber: 123,
+                            lineNumber: 128,
                             columnNumber: 11
                         }, this),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("ul", {
@@ -12297,31 +12302,31 @@ function BecomeInsighterCard(param) {
                                                 stroke: 1.9
                                             }, void 0, false, {
                                                 fileName: "[project]/components/feed/post/BecomeInsighterCard.tsx",
-                                                lineNumber: 133,
+                                                lineNumber: 138,
                                                 columnNumber: 19
                                             }, this)
                                         }, void 0, false, {
                                             fileName: "[project]/components/feed/post/BecomeInsighterCard.tsx",
-                                            lineNumber: 132,
+                                            lineNumber: 137,
                                             columnNumber: 17
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
                                             children: text
                                         }, void 0, false, {
                                             fileName: "[project]/components/feed/post/BecomeInsighterCard.tsx",
-                                            lineNumber: 135,
+                                            lineNumber: 140,
                                             columnNumber: 17
                                         }, this)
                                     ]
                                 }, text, true, {
                                     fileName: "[project]/components/feed/post/BecomeInsighterCard.tsx",
-                                    lineNumber: 128,
+                                    lineNumber: 133,
                                     columnNumber: 15
                                 }, this);
                             })
                         }, void 0, false, {
                             fileName: "[project]/components/feed/post/BecomeInsighterCard.tsx",
-                            lineNumber: 126,
+                            lineNumber: 131,
                             columnNumber: 11
                         }, this),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$client$2f$app$2d$dir$2f$link$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"], {
@@ -12335,13 +12340,13 @@ function BecomeInsighterCard(param) {
                                     stroke: 2
                                 }, void 0, false, {
                                     fileName: "[project]/components/feed/post/BecomeInsighterCard.tsx",
-                                    lineNumber: 145,
+                                    lineNumber: 150,
                                     columnNumber: 13
                                 }, this)
                             ]
                         }, void 0, true, {
                             fileName: "[project]/components/feed/post/BecomeInsighterCard.tsx",
-                            lineNumber: 140,
+                            lineNumber: 145,
                             columnNumber: 11
                         }, this),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -12349,19 +12354,19 @@ function BecomeInsighterCard(param) {
                             children: copy.note
                         }, void 0, false, {
                             fileName: "[project]/components/feed/post/BecomeInsighterCard.tsx",
-                            lineNumber: 151,
+                            lineNumber: 156,
                             columnNumber: 11
                         }, this)
                     ]
                 }, void 0, true, {
                     fileName: "[project]/components/feed/post/BecomeInsighterCard.tsx",
-                    lineNumber: 122,
+                    lineNumber: 127,
                     columnNumber: 9
                 }, this)
             ]
         }, void 0, true, {
             fileName: "[project]/components/feed/post/BecomeInsighterCard.tsx",
-            lineNumber: 81,
+            lineNumber: 86,
             columnNumber: 7
         }, this)
     }, void 0, false, {
@@ -12413,16 +12418,14 @@ function resolveDraftMode(mediaType) {
 }
 const copyByLocale = {
     en: {
-        startPost: 'Start a post',
-        startPostHint: 'share your insights',
+        startPost: 'Start a post, share your insight',
         video: 'Video',
         image: 'Image',
         article: 'White Paper',
         checkingDraft: 'Checking your draft…'
     },
     ar: {
-        startPost: 'ابدأ منشورًا',
-        startPostHint: 'شارك رؤاك أو فيديو أو صورة أو ورقة بيضاء',
+        startPost: 'ابدأ منشورًا، شارك رؤاك',
         video: 'فيديو',
         image: 'صورة',
         article: 'ورقة بيضاء',
@@ -12553,12 +12556,12 @@ function FeedComposer(param) {
                 className: "h-[128px] animate-pulse rounded-lg border border-[#DCE4EF] bg-[#F8FAFD]"
             }, void 0, false, {
                 fileName: "[project]/components/feed/post/FeedComposer.tsx",
-                lineNumber: 142,
+                lineNumber: 140,
                 columnNumber: 9
             }, this)
         }, void 0, false, {
             fileName: "[project]/components/feed/post/FeedComposer.tsx",
-            lineNumber: 141,
+            lineNumber: 139,
             columnNumber: 7
         }, this);
     }
@@ -12602,19 +12605,19 @@ function FeedComposer(param) {
                                         className: "h-full w-full object-cover"
                                     }, void 0, false, {
                                         fileName: "[project]/components/feed/post/FeedComposer.tsx",
-                                        lineNumber: 179,
+                                        lineNumber: 177,
                                         columnNumber: 17
                                     }, this) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                                         className: "flex h-full w-full items-center justify-center text-[13px] font-bold text-[#2378E8]",
                                         children: initials
                                     }, void 0, false, {
                                         fileName: "[project]/components/feed/post/FeedComposer.tsx",
-                                        lineNumber: 185,
+                                        lineNumber: 183,
                                         columnNumber: 17
                                     }, this)
                                 }, void 0, false, {
                                     fileName: "[project]/components/feed/post/FeedComposer.tsx",
-                                    lineNumber: 177,
+                                    lineNumber: 175,
                                     columnNumber: 13
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
@@ -12623,43 +12626,22 @@ function FeedComposer(param) {
                                     disabled: isCheckingDraft,
                                     className: "group min-w-0 flex-1 cursor-pointer rounded-full border border-[#DCE4EF] bg-[#F4F7FB] px-4 py-[9px] text-start transition-colors hover:border-[#B7D2F4] hover:bg-[#EAF1FA] focus-visible:outline-[1px] focus-visible:outline-offset-[1px] focus-visible:outline-[#B7D2F4] disabled:cursor-default",
                                     children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
-                                        className: "block truncate text-[16px] font-medium leading-[1.5] text-[#2E3D57] sm:text-[17px]",
-                                        children: [
-                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
-                                                "aria-hidden": true,
-                                                className: "mr-[3px] inline-block h-[1.05em] w-[2px] shrink-0 translate-y-[3px] rounded-[1px] bg-[#2378E8] animate-caret-blink motion-reduce:animate-none rtl:ml-[3px] rtl:mr-0"
-                                            }, void 0, false, {
-                                                fileName: "[project]/components/feed/post/FeedComposer.tsx",
-                                                lineNumber: 197,
-                                                columnNumber: 17
-                                            }, this),
-                                            copy.startPost,
-                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
-                                                className: "hidden text-[13px] font-normal text-[#8A99B1] sm:inline",
-                                                children: [
-                                                    " — ",
-                                                    copy.startPostHint
-                                                ]
-                                            }, void 0, true, {
-                                                fileName: "[project]/components/feed/post/FeedComposer.tsx",
-                                                lineNumber: 202,
-                                                columnNumber: 17
-                                            }, this)
-                                        ]
-                                    }, void 0, true, {
+                                        className: "block truncate text-[11px] font-medium leading-tight text-[#2E3D57] sm:text-[14px]",
+                                        children: copy.startPost
+                                    }, void 0, false, {
                                         fileName: "[project]/components/feed/post/FeedComposer.tsx",
-                                        lineNumber: 196,
+                                        lineNumber: 194,
                                         columnNumber: 15
                                     }, this)
                                 }, void 0, false, {
                                     fileName: "[project]/components/feed/post/FeedComposer.tsx",
-                                    lineNumber: 190,
+                                    lineNumber: 188,
                                     columnNumber: 13
                                 }, this)
                             ]
                         }, void 0, true, {
                             fileName: "[project]/components/feed/post/FeedComposer.tsx",
-                            lineNumber: 176,
+                            lineNumber: 174,
                             columnNumber: 11
                         }, this),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -12681,7 +12663,7 @@ function FeedComposer(param) {
                                             }
                                         }, void 0, false, {
                                             fileName: "[project]/components/feed/post/FeedComposer.tsx",
-                                            lineNumber: 215,
+                                            lineNumber: 208,
                                             columnNumber: 17
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -12689,30 +12671,30 @@ function FeedComposer(param) {
                                             children: label
                                         }, void 0, false, {
                                             fileName: "[project]/components/feed/post/FeedComposer.tsx",
-                                            lineNumber: 216,
+                                            lineNumber: 209,
                                             columnNumber: 17
                                         }, this)
                                     ]
                                 }, label, true, {
                                     fileName: "[project]/components/feed/post/FeedComposer.tsx",
-                                    lineNumber: 208,
+                                    lineNumber: 201,
                                     columnNumber: 15
                                 }, this);
                             })
                         }, void 0, false, {
                             fileName: "[project]/components/feed/post/FeedComposer.tsx",
-                            lineNumber: 206,
+                            lineNumber: 199,
                             columnNumber: 11
                         }, this)
                     ]
                 }, void 0, true, {
                     fileName: "[project]/components/feed/post/FeedComposer.tsx",
-                    lineNumber: 175,
+                    lineNumber: 173,
                     columnNumber: 9
                 }, this)
             }, void 0, false, {
                 fileName: "[project]/components/feed/post/FeedComposer.tsx",
-                lineNumber: 174,
+                lineNumber: 172,
                 columnNumber: 7
             }, this),
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$feed$2f$post$2f$PostModal$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"], {
@@ -12741,7 +12723,7 @@ function FeedComposer(param) {
                 }
             }, void 0, false, {
                 fileName: "[project]/components/feed/post/FeedComposer.tsx",
-                lineNumber: 223,
+                lineNumber: 216,
                 columnNumber: 7
             }, this),
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$feed$2f$post$2f$BecomeInsighterCard$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"], {
@@ -12750,7 +12732,7 @@ function FeedComposer(param) {
                 onClose: ()=>setIsUpgradeCardOpen(false)
             }, void 0, false, {
                 fileName: "[project]/components/feed/post/FeedComposer.tsx",
-                lineNumber: 249,
+                lineNumber: 242,
                 columnNumber: 7
             }, this)
         ]

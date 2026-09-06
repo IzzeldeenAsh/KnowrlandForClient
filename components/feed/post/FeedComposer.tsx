@@ -21,16 +21,14 @@ function resolveDraftMode(mediaType: FeedItem['media_type'] | undefined): PostMo
 
 const copyByLocale = {
   en: {
-    startPost: 'Start a post',
-    startPostHint: 'share your insights',
+    startPost: 'Start a post, share your insight',
     video: 'Video',
     image: 'Image',
     article: 'White Paper',
     checkingDraft: 'Checking your draft…',
   },
   ar: {
-    startPost: 'ابدأ منشورًا',
-    startPostHint: 'شارك رؤاك أو فيديو أو صورة أو ورقة بيضاء',
+    startPost: 'ابدأ منشورًا، شارك رؤاك',
     video: 'فيديو',
     image: 'صورة',
     article: 'ورقة بيضاء',
@@ -193,13 +191,8 @@ export default function FeedComposer({ locale }: FeedComposerProps) {
               disabled={isCheckingDraft}
               className="group min-w-0 flex-1 cursor-pointer rounded-full border border-[#DCE4EF] bg-[#F4F7FB] px-4 py-[9px] text-start transition-colors hover:border-[#B7D2F4] hover:bg-[#EAF1FA] focus-visible:outline-[1px] focus-visible:outline-offset-[1px] focus-visible:outline-[#B7D2F4] disabled:cursor-default"
             >
-              <span className="block truncate text-[16px] font-medium leading-[1.5] text-[#2E3D57] sm:text-[17px]">
-                <span
-                  aria-hidden
-                  className="mr-[3px] inline-block h-[1.05em] w-[2px] shrink-0 translate-y-[3px] rounded-[1px] bg-[#2378E8] animate-caret-blink motion-reduce:animate-none rtl:ml-[3px] rtl:mr-0"
-                />
+              <span className="block truncate text-[11px] font-medium leading-tight text-[#2E3D57] sm:text-[14px]">
                 {copy.startPost}
-                <span className="hidden text-[13px] font-normal text-[#8A99B1] sm:inline"> — {copy.startPostHint}</span>
               </span>
             </button>
           </div>

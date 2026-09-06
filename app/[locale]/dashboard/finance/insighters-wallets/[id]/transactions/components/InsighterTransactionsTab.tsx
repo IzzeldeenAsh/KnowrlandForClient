@@ -180,6 +180,10 @@ export default function InsighterTransactionsTab({ insighterId }: { insighterId:
         tx.order?.service,
         tx.order?.user?.name,
         tx.order?.user?.email,
+        tx.payment?.invoice_no,
+        tx.payment?.type,
+        tx.payment?.provider,
+        tx.payment?.amount,
       ]
         .map((v) => String(v ?? ''))
         .join(' ')
@@ -275,7 +279,7 @@ export default function InsighterTransactionsTab({ insighterId }: { insighterId:
 
       <div className="mt-4 rounded-md border border-slate-200 bg-white p-4 shadow-sm">
         <div className="overflow-x-auto rounded-md border border-slate-200 bg-white shadow-sm">
-          <table className="w-full min-w-[1150px] border-collapse text-xs text-slate-700">
+          <table className="w-full min-w-[1320px] border-collapse text-xs text-slate-700">
             <thead className="bg-slate-50 text-[11px] font-semibold uppercase text-slate-500">
               <tr>
                 <th className="w-[220px] border-b border-slate-200 px-3 py-2 text-left">Service</th>
@@ -283,6 +287,7 @@ export default function InsighterTransactionsTab({ insighterId }: { insighterId:
                 <th className="w-[190px] border-b border-slate-200 px-3 py-2 text-left">Date</th>
                 <th className="w-[150px] border-b border-slate-200 px-3 py-2 text-left">Transaction</th>
                 <th className="w-[150px] border-b border-slate-200 px-3 py-2 text-left">Amount</th>
+                <th className="w-[180px] border-b border-slate-200 px-3 py-2 text-left">Payment</th>
                 <th className="w-[170px] border-b border-slate-200 px-3 py-2 text-left">Order Amount</th>
                 <th className="w-[120px] border-b border-slate-200 px-3 py-2 text-right">Details</th>
               </tr>
@@ -290,19 +295,19 @@ export default function InsighterTransactionsTab({ insighterId }: { insighterId:
             <tbody>
               {isLoading ? (
                 <tr>
-                  <td colSpan={7} className="px-3 py-6 text-center text-xs text-slate-500">
+                  <td colSpan={8} className="px-3 py-6 text-center text-xs text-slate-500">
                     Loading...
                   </td>
                 </tr>
               ) : error ? (
                 <tr>
-                  <td colSpan={7} className="px-3 py-6 text-center text-xs text-red-600">
+                  <td colSpan={8} className="px-3 py-6 text-center text-xs text-red-600">
                     {error}
                   </td>
                 </tr>
               ) : filteredTransactions.length === 0 ? (
                 <tr>
-                  <td colSpan={7} className="px-3 py-6 text-center text-xs text-slate-500">
+                  <td colSpan={8} className="px-3 py-6 text-center text-xs text-slate-500">
                     No transactions found.
                   </td>
                 </tr>
@@ -329,6 +334,21 @@ export default function InsighterTransactionsTab({ insighterId }: { insighterId:
                         {tx.amount > 0 ? '+' : ''}
                         {formatCurrency(tx.amount)}
                       </span>
+                    </td>
+                    <td className="border-b border-slate-100 px-3 py-2">
+                      {Number.isFinite(tx.payment?.amount as number) ? (
+                        <div className="flex flex-col">
+                          <span className="font-semibold text-slate-900">{formatCurrency(tx.payment?.amount as number)}</span>
+                          <span className="mt-0.5 truncate text-[10px] text-slate-500">
+                            {[toTitle(tx.payment?.type ?? ''), toTitle(tx.payment?.provider ?? '')].filter(Boolean).join(' \u00b7 ') || '-'}
+                          </span>
+                          {normalizeText(tx.payment?.invoice_no) ? (
+                            <span className="truncate font-mono text-[10px] text-slate-400">{normalizeText(tx.payment?.invoice_no)}</span>
+                          ) : null}
+                        </div>
+                      ) : (
+                        <span className="text-slate-500">-</span>
+                      )}
                     </td>
                     <td className="border-b border-slate-100 px-3 py-2">
                       {Number.isFinite(tx.order?.amount as number) ? (

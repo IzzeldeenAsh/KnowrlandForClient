@@ -63,9 +63,12 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  height: 252px;
+  width: calc(100% + 56px);
+  height: auto;
+  aspect-ratio: 4 / 3;
+  margin: -24px -28px 0;
   overflow: hidden;
-  border-radius: 14px;
+  border-radius: 19px 19px 0 0;
   background:
     radial-gradient(120% 90% at 18% 12%, #dcebff 0%, rgba(220, 235, 255, 0) 62%),
     radial-gradient(115% 95% at 88% 84%, #d3f4f1 0%, rgba(211, 244, 241, 0) 60%),
@@ -100,11 +103,9 @@
   display: block;
   width: 100%;
   height: 100%;
-  /* `!important` overrides the global `img { object-fit: cover; object-position: top }`
-     in app/[locale]/css/style.css, which otherwise crops the artwork. */
-  object-fit: contain !important;
+  /* Override the global image position while filling the shorter hero panel. */
+  object-fit: cover !important;
   object-position: center !important;
-  transform: scale(1.42);
 }
 
 .title {
@@ -317,6 +318,7 @@
   }
 
   .panel {
-    height: 186px;
+    width: calc(100% + 34px);
+    margin: -22px -17px 0;
   }
 }

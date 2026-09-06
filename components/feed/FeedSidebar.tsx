@@ -18,6 +18,7 @@ import {
   IconFolders,
   IconListDetails,
   IconMessage2,
+  IconPlus,
   IconSettings2,
   IconShoppingBag,
   IconUserEdit,
@@ -27,6 +28,7 @@ import {
 import { useEffect, useState, type ReactNode } from 'react'
 import { dashboardUrl } from '@/app/config'
 import { getAuthToken } from '@/lib/authToken'
+import { fetchHasPublishedKnowledge } from '@/services/insighter-knowledge.service'
 import { fetchReceiveProjectServicesActive } from '@/services/project-account.service'
 import { useUserProfile } from '@/components/ui/header/hooks/useUserProfile'
 import SmallLogo from '@/public/images/smallLogo.png'
@@ -44,6 +46,7 @@ type SidebarCopy = {
   myPosts: string
   savedPosts: string
   insights: string
+  addInsight: string
   myKnowledge: string
   myDownloads: string
   readLater: string
@@ -77,6 +80,7 @@ type SidebarItemProps = {
   icon: Icon
   label: string
   badge?: string
+  badgeIcon?: Icon
   isActive?: boolean
   compact?: boolean
 }
@@ -85,6 +89,9 @@ type DashboardSectionProps = {
   title: string
   icon: Icon
   children: ReactNode
+  /** Mirrored from the item inside, so the nudge is visible while collapsed. */
+  badge?: string
+  badgeIcon?: Icon
   compact?: boolean
   defaultExpanded?: boolean
 }
@@ -97,6 +104,7 @@ const copyByLocale: Record<'en' | 'ar', SidebarCopy> = {
     myPosts: 'My Posts',
     savedPosts: 'Saved Posts',
     insights: 'Insights',
+    addInsight: 'Add Now',
     myKnowledge: 'My Library',
     myDownloads: 'My Downloads',
     readLater: 'Read Later',
@@ -131,6 +139,7 @@ const copyByLocale: Record<'en' | 'ar', SidebarCopy> = {
     myPosts: 'منشوراتي',
     savedPosts: 'المنشورات المحفوظة',
     insights: 'الرؤى',
+    addInsight: 'أضف الآن',
     myKnowledge: 'مكتبتي',
     myDownloads: 'تحميلاتي',
     readLater: 'اقرأ لاحقاً',
@@ -160,7 +169,7 @@ const copyByLocale: Record<'en' | 'ar', SidebarCopy> = {
   },
 }
 
-function SidebarItem({ href, icon: ItemIcon, label, badge, isActive = false, compact = false }: SidebarItemProps) {
+function SidebarItem({ href, icon: ItemIcon, label, badge, badgeIcon, isActive = false, compact = false }: SidebarItemProps) {
   return (
     <Link
       href={href}
@@ -187,12 +196,17 @@ function SidebarItem({ href, icon: ItemIcon, label, badge, isActive = false, com
         <ItemIcon aria-hidden stroke={1.75} className="h-[18px] w-[18px]" />
       </span>
       <span className="min-w-0 flex-1">{label}</span>
-      {badge && (
-        <span className="shrink-0 rounded-full bg-[#FFF0D5] px-2 py-0.5 text-[10px] font-bold leading-4 text-[#A85A00]">
-          {badge}
-        </span>
-      )}
+      {badge && <SetupBadge label={badge} icon={badgeIcon} />}
     </Link>
+  )
+}
+
+function SetupBadge({ label, icon: BadgeIcon }: { label: string; icon?: Icon }) {
+  return (
+    <span className="inline-flex shrink-0 items-center gap-1 rounded-[5px] bg-gradient-to-br from-[#FFF6E4] via-[#FFEBC9] to-[#FFDCAE] px-[7px] py-[3px] text-[10px] font-bold leading-4 tracking-[0.01em] text-[#A85A00]">
+      {BadgeIcon && <BadgeIcon aria-hidden stroke={3} className="h-[11px] w-[11px]" />}
+      {label}
+    </span>
   )
 }
 
@@ -240,7 +254,7 @@ function DashboardIcon() {
   )
 }
 
-function DashboardSection({ title, icon: SectionIcon, children, compact = false, defaultExpanded = false }: DashboardSectionProps) {
+function DashboardSection({ title, icon: SectionIcon, children, badge, badgeIcon, compact = false, defaultExpanded = false }: DashboardSectionProps) {
   const [isExpanded, setIsExpanded] = useState(defaultExpanded)
 
   useEffect(() => {
@@ -265,6 +279,7 @@ function DashboardSection({ title, icon: SectionIcon, children, compact = false,
         <h2 className={`m-0 min-w-0 flex-1 font-semibold leading-6 text-[#364152] ${compact ? 'text-[12px]' : 'text-[16px]'}`}>
           {title}
         </h2>
+        {badge && <SetupBadge label={badge} icon={badgeIcon} />}
         <IconChevronDown
           aria-hidden
           className={`shrink-0 text-[#718096] transition-transform duration-200 ${isExpanded ? 'rotate-180' : ''}`}
@@ -440,6 +455,34 @@ export default function FeedSidebar({ locale, hideProfileCard = false }: FeedSid
     }
   }, [isProvider, locale])
 
+  // Same story for the published-insight nudge: the profile payload has no
+  // knowledge counters, so read them from the knowledge statistics endpoint.
+  const [hasPublishedInsight, setHasPublishedInsight] = useState<boolean | null>(null)
+
+  useEffect(() => {
+    if (!isProvider) {
+      setHasPublishedInsight(null)
+      return
+    }
+
+    const token = getAuthToken()
+    if (!token) return
+
+    let cancelled = false
+    fetchHasPublishedKnowledge(token, locale)
+      .then((published) => {
+        if (!cancelled) setHasPublishedInsight(published)
+      })
+      .catch(() => {
+        // Don't nag the user because a request failed.
+        if (!cancelled) setHasPublishedInsight(true)
+      })
+
+    return () => {
+      cancelled = true
+    }
+  }, [isProvider, locale])
+
   if (!isAuthResolved || isLoading) {
     return <SidebarSkeleton />
   }
@@ -450,7 +493,9 @@ export default function FeedSidebar({ locale, hideProfileCard = false }: FeedSid
 
   const needsMeetingSetup = isProvider && user.has_meet_service !== true
   const needsProjectSetup = isProvider && projectServicesActive === false
+  const needsInsightSetup = isProvider && hasPublishedInsight === false
   const setupNowLabel = isArabic ? 'الإعداد الآن!' : 'Setup Now!'
+  const addNowLabel = isArabic ? 'أضف الآن!' : 'Add Now!'
   const initials = `${user.first_name?.[0] ?? ''}${user.last_name?.[0] ?? ''}`.toUpperCase()
   const fullName = `${user.first_name ?? ''} ${user.last_name ?? ''}`.trim() || user.name
   const roleLabel = isCompanyInsighter
@@ -532,7 +577,21 @@ export default function FeedSidebar({ locale, hideProfileCard = false }: FeedSid
         />
       </DashboardSection>
 
-      <DashboardSection title={copy.insights} icon={IconBook} compact={hideProfileCard}>
+      <DashboardSection
+        title={copy.insights}
+        icon={IconBook}
+        badge={needsInsightSetup ? addNowLabel : undefined}
+        badgeIcon={IconPlus}
+        compact={hideProfileCard}
+      >
+        {needsInsightSetup && (
+          <SidebarItem
+            href={`${dashboardUrl}/app/add-knowledge/stepper`}
+            icon={IconPlus}
+            label={copy.addInsight}
+            compact={hideProfileCard}
+          />
+        )}
         {!isPureClient && (
           <SidebarItem href={`${dashboardBase}/my-knowledge`} icon={IconBook} label={copy.myKnowledge} compact={hideProfileCard} />
         )}
@@ -540,21 +599,32 @@ export default function FeedSidebar({ locale, hideProfileCard = false }: FeedSid
         <SidebarItem href={`${dashboardBase}/read-later`} icon={IconBookmark} label={copy.readLater} compact={hideProfileCard} />
       </DashboardSection>
 
-      <DashboardSection title={copy.meetings} icon={IconCalendar} compact={hideProfileCard}>
+      <DashboardSection
+        title={copy.meetings}
+        icon={IconCalendar}
+        badge={needsMeetingSetup ? setupNowLabel : undefined}
+        compact={hideProfileCard}
+      >
         <SidebarItem href={`${dashboardBase}/my-meetings`} icon={IconCalendar} label={copy.meetings} compact={hideProfileCard} />
-        {!isPureClient && (
+        {/* Only a nudge: once availability exists the entry lives in the dashboard. */}
+        {needsMeetingSetup && (
           <SidebarItem
             href={`${dashboardBase}/account-settings/consulting-schedule`}
             icon={IconCalendarCog}
             label={copy.mySchedule}
-            badge={needsMeetingSetup ? setupNowLabel : undefined}
+            badge={setupNowLabel}
             compact={hideProfileCard}
           />
         )}
       </DashboardSection>
 
       {hasProjectAccess && (
-        <DashboardSection title={copy.projects} icon={IconBriefcase} compact={hideProfileCard}>
+        <DashboardSection
+          title={copy.projects}
+          icon={IconBriefcase}
+          badge={needsProjectSetup ? setupNowLabel : undefined}
+          compact={hideProfileCard}
+        >
           {!isPureClient && (
             <SidebarItem href={`${dashboardBase}/project-offers`} icon={IconBriefcase} label={copy.clientProjects} compact={hideProfileCard} />
           )}

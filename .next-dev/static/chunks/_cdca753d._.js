@@ -26,16 +26,32 @@ if (typeof globalThis.$RefreshHelpers$ === 'object' && globalThis.$RefreshHelper
 "use strict";
 
 __turbopack_context__.s([
+    "INSIGHTER_PROMPT_ROLES",
+    ()=>INSIGHTER_PROMPT_ROLES,
+    "INSIGHTER_SETUP_QUERY_KEY",
+    ()=>INSIGHTER_SETUP_QUERY_KEY,
+    "SUPPORTED_INSIGHTER_PROMPTS",
+    ()=>SUPPORTED_INSIGHTER_PROMPTS,
     "SUPPORTED_ONBOARDING_PROMPTS",
     ()=>SUPPORTED_ONBOARDING_PROMPTS,
+    "fetchInsighterPromptStatuses",
+    ()=>fetchInsighterPromptStatuses,
     "fetchOnboardingIndustryTree",
     ()=>fetchOnboardingIndustryTree,
     "fetchOnboardingPromptStatuses",
     ()=>fetchOnboardingPromptStatuses,
+    "getVisibleInsighterPrompts",
+    ()=>getVisibleInsighterPrompts,
     "getVisibleSupportedPrompts",
     ()=>getVisibleSupportedPrompts,
+    "hasInsighterPromptRole",
+    ()=>hasInsighterPromptRole,
+    "isSupportedInsighterPrompt",
+    ()=>isSupportedInsighterPrompt,
     "isSupportedOnboardingPrompt",
     ()=>isSupportedOnboardingPrompt,
+    "skipInsighterPrompt",
+    ()=>skipInsighterPrompt,
     "skipOnboardingPrompt",
     ()=>skipOnboardingPrompt,
     "updateFeedIndustryPreferences",
@@ -43,7 +59,9 @@ __turbopack_context__.s([
     "updateOnboardingCountry",
     ()=>updateOnboardingCountry,
     "updateWhatsappNumber",
-    ()=>updateWhatsappNumber
+    ()=>updateWhatsappNumber,
+    "withInsighterSetupMarker",
+    ()=>withInsighterSetupMarker
 ]);
 var __TURBOPACK__imported__module__$5b$project$5d2f$app$2f$config$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/app/config.ts [app-client] (ecmascript)");
 ;
@@ -51,6 +69,26 @@ const SUPPORTED_ONBOARDING_PROMPTS = [
     'country',
     'community_feed_industries',
     'whatsapp'
+];
+const SUPPORTED_INSIGHTER_PROMPTS = [
+    'session_availability',
+    'project_settings'
+];
+const INSIGHTER_SETUP_QUERY_KEY = 'insighterSetup';
+function withInsighterSetupMarker(url) {
+    try {
+        const baseUrl = ("TURBOPACK compile-time falsy", 0) ? "TURBOPACK unreachable" : window.location.origin;
+        const parsed = new URL(url, baseUrl);
+        parsed.searchParams.set(INSIGHTER_SETUP_QUERY_KEY, '1');
+        return /^https?:\/\//i.test(url) ? parsed.toString() : "".concat(parsed.pathname).concat(parsed.search).concat(parsed.hash);
+    } catch (e) {
+        return url;
+    }
+}
+const INSIGHTER_PROMPT_ROLES = [
+    'insighter',
+    'company',
+    'company-insighter'
 ];
 const onboardingHeaders = (param)=>{
     let { token, locale } = param;
@@ -66,6 +104,41 @@ async function getErrorMessage(response, fallback) {
     const payload = await response.json().catch(()=>null);
     const validationMessages = (payload === null || payload === void 0 ? void 0 : payload.errors) ? Object.values(payload.errors).flat().filter((message)=>typeof message === 'string') : [];
     return validationMessages[0] || (payload === null || payload === void 0 ? void 0 : payload.message) || fallback;
+}
+function isSupportedInsighterPrompt(promptKey) {
+    return SUPPORTED_INSIGHTER_PROMPTS.includes(promptKey);
+}
+function getVisibleInsighterPrompts(prompts) {
+    return prompts.filter((prompt)=>prompt.should_show && isSupportedInsighterPrompt(prompt.prompt_key));
+}
+function hasInsighterPromptRole(roles) {
+    return (roles !== null && roles !== void 0 ? roles : []).some((role)=>INSIGHTER_PROMPT_ROLES.includes(role));
+}
+async function fetchInsighterPromptStatuses(options) {
+    try {
+        const response = await fetch((0, __TURBOPACK__imported__module__$5b$project$5d2f$app$2f$config$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["getApiUrl"])('/api/insighter/onboarding/prompts/status'), {
+            method: 'POST',
+            headers: onboardingHeaders(options),
+            cache: 'no-store'
+        });
+        if (!response.ok) return [];
+        const payload = await response.json();
+        return Array.isArray(payload === null || payload === void 0 ? void 0 : payload.data) ? payload.data : [];
+    } catch (e) {
+        return [];
+    }
+}
+async function skipInsighterPrompt(promptKey, options) {
+    const response = await fetch((0, __TURBOPACK__imported__module__$5b$project$5d2f$app$2f$config$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["getApiUrl"])('/api/insighter/onboarding/prompts/skip'), {
+        method: 'POST',
+        headers: onboardingHeaders(options),
+        body: JSON.stringify({
+            prompt_key: promptKey
+        })
+    });
+    if (!response.ok) {
+        throw new Error(await getErrorMessage(response, 'Unable to skip this step.'));
+    }
 }
 function isSupportedOnboardingPrompt(promptKey) {
     return SUPPORTED_ONBOARDING_PROMPTS.includes(promptKey);
