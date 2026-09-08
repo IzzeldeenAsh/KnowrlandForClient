@@ -23,6 +23,7 @@ export interface User {
   sms_number?: string | null;
   insighter_status?: string | null;
   has_meet_service?: boolean;
+  has_request_service?: boolean;
   receive_project_services_active?: boolean;
   client_status?: string | null;
   certifications?: ProfileCertification[];

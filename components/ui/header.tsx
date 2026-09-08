@@ -548,7 +548,7 @@ export default function Header() {
                 <ul className="flex justify-start items-center w-full gap-0.5 md:gap-1">
                   <li>
                     <Link
-                      className="relative mx-1 flex items-center gap-2 rounded-md bg-gradient-to-r from-amber-500 to-yellow-400 px-3 py-2 text-xs font-bold text-white shadow-[0_7px_18px_rgba(245,158,11,0.2)] transition-all duration-200 ease-in-out hover:-translate-y-px hover:brightness-105 md:text-sm"
+                      className="relative mx-1 flex items-center gap-2 rounded-md bg-gradient-to-r from-amber-500 to-yellow-400 px-3 py-1 text-xs font-bold text-white shadow-[0_7px_18px_rgba(245,158,11,0.2)] transition-all duration-200 ease-in-out hover:-translate-y-px hover:brightness-105 md:text-sm"
                       href={`/${currentLocale}`}
                     >
                       <svg aria-hidden width="16" height="16" viewBox="0 0 24 24" fill="currentColor" className="shrink-0">
@@ -743,25 +743,39 @@ export default function Header() {
 
               {/* Desktop sign in links */}
               <ul className="flex justify-end items-center flex-shrink-0">
-                {/* Feed navigation stays available on tablet and mobile. */}
-                {isFeedPage && (
-                  <li className="xl:hidden me-1">
-                    <Link
-                      href={`/${currentLocale}/landing`}
-                      aria-label={currentLocale === 'ar' ? 'الصفحة الرئيسية' : 'Home'}
-                      className="flex items-center rounded-md p-2 text-slate-300 transition-all duration-200 hover:bg-[#3B8AEF]/20 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#67B5F6]"
-                    >
-                      <IconHome aria-hidden size={18} stroke={1.9} />
-                    </Link>
-                  </li>
-                )}
+                {/* Feed + Home icons — mobile/tablet only, mirrors the Angular mobile header. */}
+                <li className="xl:hidden">
+                  <Link
+                    href={`/${currentLocale}`}
+                    aria-label={t('navigation.feed')}
+                    className="flex h-9 w-9 items-center justify-center rounded-md text-slate-300 transition-all duration-200 hover:bg-[#3B8AEF]/20 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#67B5F6]"
+                  >
+                    <svg aria-hidden width="18" height="18" viewBox="0 0 24 24" fill="currentColor" className="shrink-0">
+                      <rect x="3" y="4" width="6" height="6" rx="1" />
+                      <rect x="3" y="14" width="6" height="6" rx="1" />
+                      <rect x="13" y="4" width="8" height="2" rx="1" />
+                      <rect x="13" y="8" width="5" height="2" rx="1" />
+                      <rect x="13" y="14" width="8" height="2" rx="1" />
+                      <rect x="13" y="18" width="5" height="2" rx="1" />
+                    </svg>
+                  </Link>
+                </li>
+                <li className="xl:hidden">
+                  <Link
+                    href={`/${currentLocale}/landing`}
+                    aria-label={currentLocale === 'ar' ? 'الصفحة الرئيسية' : 'Home'}
+                    className="flex h-9 w-9 items-center justify-center rounded-md text-slate-300 transition-all duration-200 hover:bg-[#3B8AEF]/20 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#67B5F6]"
+                  >
+                    <IconHome aria-hidden size={18} stroke={1.9} />
+                  </Link>
+                </li>
 
                 {/* Language Switch Button */}
                 <li className="mx-1 md:mx-2">
                   <div className="flex items-center">
                     <button
                       onClick={() => switchLocale(currentLocale === 'en' ? 'ar' : 'en')}
-                      className={`flex items-center px-2 md:px-3 py-2 rounded-md text-slate-300 hover:text-white hover:bg-[#3B8AEF]/20 transition-all duration-300 ease-in-out group`}
+                      className={`flex h-9 w-9 items-center justify-center rounded-md text-slate-300 hover:text-white hover:bg-[#3B8AEF]/20 transition-all duration-300 ease-in-out group lg:h-auto lg:w-auto lg:px-3 lg:py-2`}
                     >
                       <IconLanguage size={18} className={`${isScrolled ? 'text-white' : 'text-gray-200'}`} />
                       <span className={`hidden lg:inline text-sm font-medium whitespace-nowrap ml-1 ${isScrolled ? 'text-white' : 'text-gray-200'}`}>

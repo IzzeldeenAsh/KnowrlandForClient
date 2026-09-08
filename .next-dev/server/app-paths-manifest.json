@@ -1,7 +1,7 @@
 {
   "/[locale]/(default)/landing/page": "app/[locale]/(default)/landing/page.js",
   "/[locale]/(default)/page": "app/[locale]/(default)/page.js",
-  "/[locale]/article/[uuid]/page": "app/[locale]/article/[uuid]/page.js",
-  "/[locale]/sub-industry/[id]/[slug]/page": "app/[locale]/sub-industry/[id]/[slug]/page.js",
+  "/[locale]/callback/page": "app/[locale]/callback/page.js",
+  "/[locale]/onboarding/page": "app/[locale]/onboarding/page.js",
   "/manifest.webmanifest/route": "app/manifest.webmanifest/route.js"
 }

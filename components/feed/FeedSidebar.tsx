@@ -29,7 +29,6 @@ import { useEffect, useState, type ReactNode } from 'react'
 import { dashboardUrl } from '@/app/config'
 import { getAuthToken } from '@/lib/authToken'
 import { fetchHasPublishedKnowledge } from '@/services/insighter-knowledge.service'
-import { fetchReceiveProjectServicesActive } from '@/services/project-account.service'
 import { useUserProfile } from '@/components/ui/header/hooks/useUserProfile'
 import SmallLogo from '@/public/images/smallLogo.png'
 
@@ -203,7 +202,7 @@ function SidebarItem({ href, icon: ItemIcon, label, badge, badgeIcon, isActive =
 
 function SetupBadge({ label, icon: BadgeIcon }: { label: string; icon?: Icon }) {
   return (
-    <span className="inline-flex shrink-0 items-center gap-1 rounded-[5px] bg-gradient-to-br from-[#FFF6E4] via-[#FFEBC9] to-[#FFDCAE] px-[7px] py-[3px] text-[10px] font-bold leading-4 tracking-[0.01em] text-[#A85A00]">
+    <span className="inline-flex shrink-0 items-center gap-1 rounded-full bg-gradient-to-br from-[#FFF6E4] via-[#FFEBC9] to-[#FFDCAE] px-2 py-[3px] text-[10px] font-bold leading-4 tracking-[0.01em] text-[#A85A00]">
       {BadgeIcon && <BadgeIcon aria-hidden stroke={3} className="h-[11px] w-[11px]" />}
       {label}
     </span>
@@ -426,36 +425,7 @@ export default function FeedSidebar({ locale, hideProfileCard = false }: FeedSid
   const isProvider = isInsighter || isCompany || isCompanyInsighter
   const hasProjectAccess = isProvider || isPureClient
 
-  // `/account/profile` omits `receive_project_services_active`, so read the real
-  // state from the project account settings endpoint. `null` = not known yet,
-  // which keeps the badge hidden instead of flashing it on every load.
-  const [projectServicesActive, setProjectServicesActive] = useState<boolean | null>(null)
-
-  useEffect(() => {
-    if (!isProvider) {
-      setProjectServicesActive(null)
-      return
-    }
-
-    const token = getAuthToken()
-    if (!token) return
-
-    let cancelled = false
-    fetchReceiveProjectServicesActive(token, locale)
-      .then((active) => {
-        if (!cancelled) setProjectServicesActive(active)
-      })
-      .catch(() => {
-        // Don't nag the user because a request failed.
-        if (!cancelled) setProjectServicesActive(true)
-      })
-
-    return () => {
-      cancelled = true
-    }
-  }, [isProvider, locale])
-
-  // Same story for the published-insight nudge: the profile payload has no
+  // The published-insight nudge: the profile payload has no
   // knowledge counters, so read them from the knowledge statistics endpoint.
   const [hasPublishedInsight, setHasPublishedInsight] = useState<boolean | null>(null)
 
@@ -492,7 +462,7 @@ export default function FeedSidebar({ locale, hideProfileCard = false }: FeedSid
   }
 
   const needsMeetingSetup = isProvider && user.has_meet_service !== true
-  const needsProjectSetup = isProvider && projectServicesActive === false
+  const needsProjectSetup = isProvider && user.has_request_service !== true
   const needsInsightSetup = isProvider && hasPublishedInsight === false
   const setupNowLabel = isArabic ? 'الإعداد الآن!' : 'Setup Now!'
   const addNowLabel = isArabic ? 'أضف الآن!' : 'Add Now!'
@@ -606,13 +576,14 @@ export default function FeedSidebar({ locale, hideProfileCard = false }: FeedSid
         compact={hideProfileCard}
       >
         <SidebarItem href={`${dashboardBase}/my-meetings`} icon={IconCalendar} label={copy.meetings} compact={hideProfileCard} />
-        {/* Only a nudge: once availability exists the entry lives in the dashboard. */}
-        {needsMeetingSetup && (
+        {/* Providers keep a permanent way back to their schedule; the badge only
+            nudges until availability exists. */}
+        {isProvider && (
           <SidebarItem
             href={`${dashboardBase}/account-settings/consulting-schedule`}
             icon={IconCalendarCog}
             label={copy.mySchedule}
-            badge={setupNowLabel}
+            badge={needsMeetingSetup ? setupNowLabel : undefined}
             compact={hideProfileCard}
           />
         )}

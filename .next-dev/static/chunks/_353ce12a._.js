@@ -1230,58 +1230,6 @@ if (typeof globalThis.$RefreshHelpers$ === 'object' && globalThis.$RefreshHelper
     __turbopack_context__.k.registerExports(__turbopack_context__.m, globalThis.$RefreshHelpers$);
 }
 }),
-"[project]/services/project-account.service.ts [app-client] (ecmascript)", ((__turbopack_context__) => {
-"use strict";
-
-__turbopack_context__.s([
-    "clearReceiveProjectServicesCache",
-    ()=>clearReceiveProjectServicesCache,
-    "fetchReceiveProjectServicesActive",
-    ()=>fetchReceiveProjectServicesActive
-]);
-var __TURBOPACK__imported__module__$5b$project$5d2f$app$2f$config$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/app/config.ts [app-client] (ecmascript)");
-;
-let cachedToken = null;
-let cachedRequest = null;
-function clearReceiveProjectServicesCache() {
-    cachedToken = null;
-    cachedRequest = null;
-}
-function fetchReceiveProjectServicesActive(token, locale) {
-    if (cachedRequest && cachedToken === token) {
-        return cachedRequest;
-    }
-    const request = (async ()=>{
-        const response = await fetch((0, __TURBOPACK__imported__module__$5b$project$5d2f$app$2f$config$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["getApiUrl"])('/api/insighter/project/account/settings'), {
-            headers: {
-                Authorization: "Bearer ".concat(token),
-                Accept: 'application/json',
-                'Accept-Language': locale
-            },
-            cache: 'no-store'
-        });
-        if (!response.ok) {
-            throw new Error("Unable to read project account settings (".concat(response.status, ")."));
-        }
-        const payload = await response.json();
-        var _payload_data;
-        const settings = (_payload_data = payload === null || payload === void 0 ? void 0 : payload.data) !== null && _payload_data !== void 0 ? _payload_data : {};
-        return settings.receive_project_services === 'active';
-    })();
-    cachedToken = token;
-    cachedRequest = request;
-    // Don't cache a rejected request - let the next mount retry.
-    request.catch(()=>{
-        if (cachedRequest === request) {
-            clearReceiveProjectServicesCache();
-        }
-    });
-    return request;
-}
-if (typeof globalThis.$RefreshHelpers$ === 'object' && globalThis.$RefreshHelpers !== null) {
-    __turbopack_context__.k.registerExports(__turbopack_context__.m, globalThis.$RefreshHelpers$);
-}
-}),
 "[project]/components/feed/FeedSidebar.tsx [app-client] (ecmascript)", ((__turbopack_context__) => {
 "use strict";
 
@@ -1316,13 +1264,11 @@ var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist
 var __TURBOPACK__imported__module__$5b$project$5d2f$app$2f$config$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/app/config.ts [app-client] (ecmascript)");
 var __TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$authToken$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/lib/authToken.ts [app-client] (ecmascript)");
 var __TURBOPACK__imported__module__$5b$project$5d2f$services$2f$insighter$2d$knowledge$2e$service$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/services/insighter-knowledge.service.ts [app-client] (ecmascript)");
-var __TURBOPACK__imported__module__$5b$project$5d2f$services$2f$project$2d$account$2e$service$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/services/project-account.service.ts [app-client] (ecmascript)");
 var __TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$header$2f$hooks$2f$useUserProfile$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/components/ui/header/hooks/useUserProfile.ts [app-client] (ecmascript)");
 var __TURBOPACK__imported__module__$5b$project$5d2f$public$2f$images$2f$smallLogo$2e$png$2e$mjs__$7b$__IMAGE__$3d3e$__$225b$project$5d2f$public$2f$images$2f$smallLogo$2e$png__$28$static__in__ecmascript$2922$__$7d$__$5b$app$2d$client$5d$__$28$structured__image__object__with__data__url$2c$__ecmascript$29$__ = __turbopack_context__.i('[project]/public/images/smallLogo.png.mjs { IMAGE => "[project]/public/images/smallLogo.png (static in ecmascript)" } [app-client] (structured image object with data url, ecmascript)');
 ;
 var _s = __turbopack_context__.k.signature(), _s1 = __turbopack_context__.k.signature(), _s2 = __turbopack_context__.k.signature(), _s3 = __turbopack_context__.k.signature();
 'use client';
-;
 ;
 ;
 ;
@@ -1421,12 +1367,12 @@ function SidebarItem(param) {
                     className: "h-[18px] w-[18px]"
                 }, void 0, false, {
                     fileName: "[project]/components/feed/FeedSidebar.tsx",
-                    lineNumber: 196,
+                    lineNumber: 195,
                     columnNumber: 9
                 }, this)
             }, void 0, false, {
                 fileName: "[project]/components/feed/FeedSidebar.tsx",
-                lineNumber: 191,
+                lineNumber: 190,
                 columnNumber: 7
             }, this),
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -1434,7 +1380,7 @@ function SidebarItem(param) {
                 children: label
             }, void 0, false, {
                 fileName: "[project]/components/feed/FeedSidebar.tsx",
-                lineNumber: 198,
+                lineNumber: 197,
                 columnNumber: 7
             }, this),
             badge && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(SetupBadge, {
@@ -1442,13 +1388,13 @@ function SidebarItem(param) {
                 icon: badgeIcon
             }, void 0, false, {
                 fileName: "[project]/components/feed/FeedSidebar.tsx",
-                lineNumber: 199,
+                lineNumber: 198,
                 columnNumber: 17
             }, this)
         ]
     }, void 0, true, {
         fileName: "[project]/components/feed/FeedSidebar.tsx",
-        lineNumber: 174,
+        lineNumber: 173,
         columnNumber: 5
     }, this);
 }
@@ -1456,7 +1402,7 @@ _c = SidebarItem;
 function SetupBadge(param) {
     let { label, icon: BadgeIcon } = param;
     return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
-        className: "inline-flex shrink-0 items-center gap-1 rounded-[5px] bg-gradient-to-br from-[#FFF6E4] via-[#FFEBC9] to-[#FFDCAE] px-[7px] py-[3px] text-[10px] font-bold leading-4 tracking-[0.01em] text-[#A85A00]",
+        className: "inline-flex shrink-0 items-center gap-1 rounded-full bg-gradient-to-br from-[#FFF6E4] via-[#FFEBC9] to-[#FFDCAE] px-2 py-[3px] text-[10px] font-bold leading-4 tracking-[0.01em] text-[#A85A00]",
         children: [
             BadgeIcon && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(BadgeIcon, {
                 "aria-hidden": true,
@@ -1464,14 +1410,14 @@ function SetupBadge(param) {
                 className: "h-[11px] w-[11px]"
             }, void 0, false, {
                 fileName: "[project]/components/feed/FeedSidebar.tsx",
-                lineNumber: 207,
+                lineNumber: 206,
                 columnNumber: 21
             }, this),
             label
         ]
     }, void 0, true, {
         fileName: "[project]/components/feed/FeedSidebar.tsx",
-        lineNumber: 206,
+        lineNumber: 205,
         columnNumber: 5
     }, this);
 }
@@ -1484,7 +1430,7 @@ function DashboardLink(param) {
         children: [
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(DashboardIcon, {}, void 0, false, {
                 fileName: "[project]/components/feed/FeedSidebar.tsx",
-                lineNumber: 221,
+                lineNumber: 220,
                 columnNumber: 7
             }, this),
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -1492,13 +1438,13 @@ function DashboardLink(param) {
                 children: label
             }, void 0, false, {
                 fileName: "[project]/components/feed/FeedSidebar.tsx",
-                lineNumber: 222,
+                lineNumber: 221,
                 columnNumber: 7
             }, this)
         ]
     }, void 0, true, {
         fileName: "[project]/components/feed/FeedSidebar.tsx",
-        lineNumber: 215,
+        lineNumber: 214,
         columnNumber: 5
     }, this);
 }
@@ -1526,7 +1472,7 @@ function DashboardIcon() {
                         shapeRendering: "crispEdges"
                     }, void 0, false, {
                         fileName: "[project]/components/feed/FeedSidebar.tsx",
-                        lineNumber: 231,
+                        lineNumber: 230,
                         columnNumber: 9
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("path", {
@@ -1534,7 +1480,7 @@ function DashboardIcon() {
                         fill: "#FFC657"
                     }, void 0, false, {
                         fileName: "[project]/components/feed/FeedSidebar.tsx",
-                        lineNumber: 232,
+                        lineNumber: 231,
                         columnNumber: 9
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("path", {
@@ -1542,7 +1488,7 @@ function DashboardIcon() {
                         fill: "#FFE0A6"
                     }, void 0, false, {
                         fileName: "[project]/components/feed/FeedSidebar.tsx",
-                        lineNumber: 233,
+                        lineNumber: 232,
                         columnNumber: 9
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("path", {
@@ -1550,7 +1496,7 @@ function DashboardIcon() {
                         fill: "#1072FF"
                     }, void 0, false, {
                         fileName: "[project]/components/feed/FeedSidebar.tsx",
-                        lineNumber: 234,
+                        lineNumber: 233,
                         columnNumber: 9
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("path", {
@@ -1558,7 +1504,7 @@ function DashboardIcon() {
                         fill: "#CBE1FF"
                     }, void 0, false, {
                         fileName: "[project]/components/feed/FeedSidebar.tsx",
-                        lineNumber: 235,
+                        lineNumber: 234,
                         columnNumber: 9
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("path", {
@@ -1566,7 +1512,7 @@ function DashboardIcon() {
                         fill: "#1072FF"
                     }, void 0, false, {
                         fileName: "[project]/components/feed/FeedSidebar.tsx",
-                        lineNumber: 236,
+                        lineNumber: 235,
                         columnNumber: 9
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("path", {
@@ -1574,7 +1520,7 @@ function DashboardIcon() {
                         fill: "#CBE1FF"
                     }, void 0, false, {
                         fileName: "[project]/components/feed/FeedSidebar.tsx",
-                        lineNumber: 237,
+                        lineNumber: 236,
                         columnNumber: 9
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("path", {
@@ -1582,7 +1528,7 @@ function DashboardIcon() {
                         fill: "#FFC657"
                     }, void 0, false, {
                         fileName: "[project]/components/feed/FeedSidebar.tsx",
-                        lineNumber: 238,
+                        lineNumber: 237,
                         columnNumber: 9
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("path", {
@@ -1590,13 +1536,13 @@ function DashboardIcon() {
                         fill: "#FFE0A6"
                     }, void 0, false, {
                         fileName: "[project]/components/feed/FeedSidebar.tsx",
-                        lineNumber: 239,
+                        lineNumber: 238,
                         columnNumber: 9
                     }, this)
                 ]
             }, void 0, true, {
                 fileName: "[project]/components/feed/FeedSidebar.tsx",
-                lineNumber: 230,
+                lineNumber: 229,
                 columnNumber: 7
             }, this),
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("defs", {
@@ -1614,7 +1560,7 @@ function DashboardIcon() {
                             result: "BackgroundImageFix"
                         }, void 0, false, {
                             fileName: "[project]/components/feed/FeedSidebar.tsx",
-                            lineNumber: 243,
+                            lineNumber: 242,
                             columnNumber: 11
                         }, this),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("feColorMatrix", {
@@ -1624,21 +1570,21 @@ function DashboardIcon() {
                             result: "hardAlpha"
                         }, void 0, false, {
                             fileName: "[project]/components/feed/FeedSidebar.tsx",
-                            lineNumber: 244,
+                            lineNumber: 243,
                             columnNumber: 11
                         }, this),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("feOffset", {
                             dy: "1.31"
                         }, void 0, false, {
                             fileName: "[project]/components/feed/FeedSidebar.tsx",
-                            lineNumber: 245,
+                            lineNumber: 244,
                             columnNumber: 11
                         }, this),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("feGaussianBlur", {
                             stdDeviation: "1.875"
                         }, void 0, false, {
                             fileName: "[project]/components/feed/FeedSidebar.tsx",
-                            lineNumber: 246,
+                            lineNumber: 245,
                             columnNumber: 11
                         }, this),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("feComposite", {
@@ -1646,7 +1592,7 @@ function DashboardIcon() {
                             operator: "out"
                         }, void 0, false, {
                             fileName: "[project]/components/feed/FeedSidebar.tsx",
-                            lineNumber: 247,
+                            lineNumber: 246,
                             columnNumber: 11
                         }, this),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("feColorMatrix", {
@@ -1654,7 +1600,7 @@ function DashboardIcon() {
                             values: "0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.12 0"
                         }, void 0, false, {
                             fileName: "[project]/components/feed/FeedSidebar.tsx",
-                            lineNumber: 248,
+                            lineNumber: 247,
                             columnNumber: 11
                         }, this),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("feBlend", {
@@ -1663,7 +1609,7 @@ function DashboardIcon() {
                             result: "effect1_dropShadow"
                         }, void 0, false, {
                             fileName: "[project]/components/feed/FeedSidebar.tsx",
-                            lineNumber: 249,
+                            lineNumber: 248,
                             columnNumber: 11
                         }, this),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("feBlend", {
@@ -1673,24 +1619,24 @@ function DashboardIcon() {
                             result: "shape"
                         }, void 0, false, {
                             fileName: "[project]/components/feed/FeedSidebar.tsx",
-                            lineNumber: 250,
+                            lineNumber: 249,
                             columnNumber: 11
                         }, this)
                     ]
                 }, void 0, true, {
                     fileName: "[project]/components/feed/FeedSidebar.tsx",
-                    lineNumber: 242,
+                    lineNumber: 241,
                     columnNumber: 9
                 }, this)
             }, void 0, false, {
                 fileName: "[project]/components/feed/FeedSidebar.tsx",
-                lineNumber: 241,
+                lineNumber: 240,
                 columnNumber: 7
             }, this)
         ]
     }, void 0, true, {
         fileName: "[project]/components/feed/FeedSidebar.tsx",
-        lineNumber: 229,
+        lineNumber: 228,
         columnNumber: 5
     }, this);
 }
@@ -1723,12 +1669,12 @@ function DashboardSection(param) {
                             className: compact ? 'h-4 w-4' : 'h-5 w-5'
                         }, void 0, false, {
                             fileName: "[project]/components/feed/FeedSidebar.tsx",
-                            lineNumber: 277,
+                            lineNumber: 276,
                             columnNumber: 11
                         }, this)
                     }, void 0, false, {
                         fileName: "[project]/components/feed/FeedSidebar.tsx",
-                        lineNumber: 276,
+                        lineNumber: 275,
                         columnNumber: 9
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("h2", {
@@ -1736,7 +1682,7 @@ function DashboardSection(param) {
                         children: title
                     }, void 0, false, {
                         fileName: "[project]/components/feed/FeedSidebar.tsx",
-                        lineNumber: 279,
+                        lineNumber: 278,
                         columnNumber: 9
                     }, this),
                     badge && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(SetupBadge, {
@@ -1744,7 +1690,7 @@ function DashboardSection(param) {
                         icon: badgeIcon
                     }, void 0, false, {
                         fileName: "[project]/components/feed/FeedSidebar.tsx",
-                        lineNumber: 282,
+                        lineNumber: 281,
                         columnNumber: 19
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$tabler$2f$icons$2d$react$2f$dist$2f$esm$2f$icons$2f$IconChevronDown$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__IconChevronDown$3e$__["IconChevronDown"], {
@@ -1754,26 +1700,26 @@ function DashboardSection(param) {
                         stroke: 2
                     }, void 0, false, {
                         fileName: "[project]/components/feed/FeedSidebar.tsx",
-                        lineNumber: 283,
+                        lineNumber: 282,
                         columnNumber: 9
                     }, this)
                 ]
             }, void 0, true, {
                 fileName: "[project]/components/feed/FeedSidebar.tsx",
-                lineNumber: 266,
+                lineNumber: 265,
                 columnNumber: 7
             }, this),
             isExpanded && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                 children: children
             }, void 0, false, {
                 fileName: "[project]/components/feed/FeedSidebar.tsx",
-                lineNumber: 290,
+                lineNumber: 289,
                 columnNumber: 22
             }, this)
         ]
     }, void 0, true, {
         fileName: "[project]/components/feed/FeedSidebar.tsx",
-        lineNumber: 265,
+        lineNumber: 264,
         columnNumber: 5
     }, this);
 }
@@ -1815,17 +1761,17 @@ function SidebarLegalFooter(param) {
                             children: link.label
                         }, void 0, false, {
                             fileName: "[project]/components/feed/FeedSidebar.tsx",
-                            lineNumber: 313,
+                            lineNumber: 312,
                             columnNumber: 13
                         }, this)
                     }, link.href, false, {
                         fileName: "[project]/components/feed/FeedSidebar.tsx",
-                        lineNumber: 312,
+                        lineNumber: 311,
                         columnNumber: 11
                     }, this))
             }, void 0, false, {
                 fileName: "[project]/components/feed/FeedSidebar.tsx",
-                lineNumber: 310,
+                lineNumber: 309,
                 columnNumber: 7
             }, this),
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -1840,20 +1786,20 @@ function SidebarLegalFooter(param) {
                         className: "shrink-0 rounded-[3px]"
                     }, void 0, false, {
                         fileName: "[project]/components/feed/FeedSidebar.tsx",
-                        lineNumber: 323,
+                        lineNumber: 322,
                         columnNumber: 9
                     }, this),
                     isArabic ? '© 2026 إنسايتا بيزنس' : '© 2026 Insighta Business'
                 ]
             }, void 0, true, {
                 fileName: "[project]/components/feed/FeedSidebar.tsx",
-                lineNumber: 322,
+                lineNumber: 321,
                 columnNumber: 7
             }, this)
         ]
     }, void 0, true, {
         fileName: "[project]/components/feed/FeedSidebar.tsx",
-        lineNumber: 306,
+        lineNumber: 305,
         columnNumber: 5
     }, this);
 }
@@ -1875,27 +1821,27 @@ function SidebarSkeleton() {
                         className: "h-24 w-24 rounded-full bg-slate-200"
                     }, void 0, false, {
                         fileName: "[project]/components/feed/FeedSidebar.tsx",
-                        lineNumber: 334,
+                        lineNumber: 333,
                         columnNumber: 9
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                         className: "mt-4 h-5 w-32 rounded-full bg-slate-200"
                     }, void 0, false, {
                         fileName: "[project]/components/feed/FeedSidebar.tsx",
-                        lineNumber: 335,
+                        lineNumber: 334,
                         columnNumber: 9
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                         className: "mt-3 h-[23px] w-20 rounded bg-slate-200"
                     }, void 0, false, {
                         fileName: "[project]/components/feed/FeedSidebar.tsx",
-                        lineNumber: 336,
+                        lineNumber: 335,
                         columnNumber: 9
                     }, this)
                 ]
             }, void 0, true, {
                 fileName: "[project]/components/feed/FeedSidebar.tsx",
-                lineNumber: 333,
+                lineNumber: 332,
                 columnNumber: 7
             }, this),
             [
@@ -1911,12 +1857,12 @@ function SidebarSkeleton() {
                                 className: "h-4 w-20 rounded bg-slate-200"
                             }, void 0, false, {
                                 fileName: "[project]/components/feed/FeedSidebar.tsx",
-                                lineNumber: 341,
+                                lineNumber: 340,
                                 columnNumber: 13
                             }, this)
                         }, void 0, false, {
                             fileName: "[project]/components/feed/FeedSidebar.tsx",
-                            lineNumber: 340,
+                            lineNumber: 339,
                             columnNumber: 11
                         }, this),
                         Array.from({
@@ -1928,32 +1874,32 @@ function SidebarSkeleton() {
                                         className: "h-[18px] w-[18px] animate-pulse rounded bg-slate-100"
                                     }, void 0, false, {
                                         fileName: "[project]/components/feed/FeedSidebar.tsx",
-                                        lineNumber: 345,
+                                        lineNumber: 344,
                                         columnNumber: 15
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                                         className: "h-3 w-24 animate-pulse rounded bg-slate-100"
                                     }, void 0, false, {
                                         fileName: "[project]/components/feed/FeedSidebar.tsx",
-                                        lineNumber: 346,
+                                        lineNumber: 345,
                                         columnNumber: 15
                                     }, this)
                                 ]
                             }, rowIndex, true, {
                                 fileName: "[project]/components/feed/FeedSidebar.tsx",
-                                lineNumber: 344,
+                                lineNumber: 343,
                                 columnNumber: 13
                             }, this))
                     ]
                 }, sectionIndex, true, {
                     fileName: "[project]/components/feed/FeedSidebar.tsx",
-                    lineNumber: 339,
+                    lineNumber: 338,
                     columnNumber: 9
                 }, this))
         ]
     }, void 0, true, {
         fileName: "[project]/components/feed/FeedSidebar.tsx",
-        lineNumber: 332,
+        lineNumber: 331,
         columnNumber: 5
     }, this);
 }
@@ -1989,7 +1935,7 @@ function GuestSidebar(param) {
                 className: "pointer-events-none absolute -top-[30px] -end-[34px] h-[150px] w-[150px] opacity-[0.16] brightness-0 invert"
             }, void 0, false, {
                 fileName: "[project]/components/feed/FeedSidebar.tsx",
-                lineNumber: 375,
+                lineNumber: 374,
                 columnNumber: 7
             }, this),
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -1997,7 +1943,7 @@ function GuestSidebar(param) {
                 children: copy.guestEyebrow
             }, void 0, false, {
                 fileName: "[project]/components/feed/FeedSidebar.tsx",
-                lineNumber: 383,
+                lineNumber: 382,
                 columnNumber: 7
             }, this),
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("h2", {
@@ -2006,7 +1952,7 @@ function GuestSidebar(param) {
                 children: copy.guestTitle
             }, void 0, false, {
                 fileName: "[project]/components/feed/FeedSidebar.tsx",
-                lineNumber: 386,
+                lineNumber: 385,
                 columnNumber: 7
             }, this),
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -2014,7 +1960,7 @@ function GuestSidebar(param) {
                 children: copy.guestDescription
             }, void 0, false, {
                 fileName: "[project]/components/feed/FeedSidebar.tsx",
-                lineNumber: 392,
+                lineNumber: 391,
                 columnNumber: 7
             }, this),
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -2026,7 +1972,7 @@ function GuestSidebar(param) {
                         children: copy.createAccount
                     }, void 0, false, {
                         fileName: "[project]/components/feed/FeedSidebar.tsx",
-                        lineNumber: 394,
+                        lineNumber: 393,
                         columnNumber: 9
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$client$2f$app$2d$dir$2f$link$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"], {
@@ -2035,19 +1981,19 @@ function GuestSidebar(param) {
                         children: copy.logIn
                     }, void 0, false, {
                         fileName: "[project]/components/feed/FeedSidebar.tsx",
-                        lineNumber: 400,
+                        lineNumber: 399,
                         columnNumber: 9
                     }, this)
                 ]
             }, void 0, true, {
                 fileName: "[project]/components/feed/FeedSidebar.tsx",
-                lineNumber: 393,
+                lineNumber: 392,
                 columnNumber: 7
             }, this)
         ]
     }, void 0, true, {
         fileName: "[project]/components/feed/FeedSidebar.tsx",
-        lineNumber: 369,
+        lineNumber: 368,
         columnNumber: 5
     }, this);
 }
@@ -2074,40 +2020,7 @@ function FeedSidebar(param) {
         ].includes(role));
     const isProvider = isInsighter || isCompany || isCompanyInsighter;
     const hasProjectAccess = isProvider || isPureClient;
-    // `/account/profile` omits `receive_project_services_active`, so read the real
-    // state from the project account settings endpoint. `null` = not known yet,
-    // which keeps the badge hidden instead of flashing it on every load.
-    const [projectServicesActive, setProjectServicesActive] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])(null);
-    (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useEffect"])({
-        "FeedSidebar.useEffect": ()=>{
-            if (!isProvider) {
-                setProjectServicesActive(null);
-                return;
-            }
-            const token = (0, __TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$authToken$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["getAuthToken"])();
-            if (!token) return;
-            let cancelled = false;
-            (0, __TURBOPACK__imported__module__$5b$project$5d2f$services$2f$project$2d$account$2e$service$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["fetchReceiveProjectServicesActive"])(token, locale).then({
-                "FeedSidebar.useEffect": (active)=>{
-                    if (!cancelled) setProjectServicesActive(active);
-                }
-            }["FeedSidebar.useEffect"]).catch({
-                "FeedSidebar.useEffect": ()=>{
-                    // Don't nag the user because a request failed.
-                    if (!cancelled) setProjectServicesActive(true);
-                }
-            }["FeedSidebar.useEffect"]);
-            return ({
-                "FeedSidebar.useEffect": ()=>{
-                    cancelled = true;
-                }
-            })["FeedSidebar.useEffect"];
-        }
-    }["FeedSidebar.useEffect"], [
-        isProvider,
-        locale
-    ]);
-    // Same story for the published-insight nudge: the profile payload has no
+    // The published-insight nudge: the profile payload has no
     // knowledge counters, so read them from the knowledge statistics endpoint.
     const [hasPublishedInsight, setHasPublishedInsight] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])(null);
     (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useEffect"])({
@@ -2142,7 +2055,7 @@ function FeedSidebar(param) {
     if (!isAuthResolved || isLoading) {
         return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(SidebarSkeleton, {}, void 0, false, {
             fileName: "[project]/components/feed/FeedSidebar.tsx",
-            lineNumber: 487,
+            lineNumber: 457,
             columnNumber: 12
         }, this);
     }
@@ -2151,12 +2064,12 @@ function FeedSidebar(param) {
             locale: locale
         }, void 0, false, {
             fileName: "[project]/components/feed/FeedSidebar.tsx",
-            lineNumber: 491,
+            lineNumber: 461,
             columnNumber: 12
         }, this);
     }
     const needsMeetingSetup = isProvider && user.has_meet_service !== true;
-    const needsProjectSetup = isProvider && projectServicesActive === false;
+    const needsProjectSetup = isProvider && user.has_request_service !== true;
     const needsInsightSetup = isProvider && hasPublishedInsight === false;
     const setupNowLabel = isArabic ? 'الإعداد الآن!' : 'Setup Now!';
     const addNowLabel = isArabic ? 'أضف الآن!' : 'Add Now!';
@@ -2190,7 +2103,7 @@ function FeedSidebar(param) {
                                         strokeWidth: "1.35"
                                     }, void 0, false, {
                                         fileName: "[project]/components/feed/FeedSidebar.tsx",
-                                        lineNumber: 522,
+                                        lineNumber: 492,
                                         columnNumber: 11
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("path", {
@@ -2199,7 +2112,7 @@ function FeedSidebar(param) {
                                         strokeWidth: "1.35"
                                     }, void 0, false, {
                                         fileName: "[project]/components/feed/FeedSidebar.tsx",
-                                        lineNumber: 523,
+                                        lineNumber: 493,
                                         columnNumber: 11
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("path", {
@@ -2208,7 +2121,7 @@ function FeedSidebar(param) {
                                         strokeWidth: "1.35"
                                     }, void 0, false, {
                                         fileName: "[project]/components/feed/FeedSidebar.tsx",
-                                        lineNumber: 524,
+                                        lineNumber: 494,
                                         columnNumber: 11
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("path", {
@@ -2217,7 +2130,7 @@ function FeedSidebar(param) {
                                         strokeWidth: "1.35"
                                     }, void 0, false, {
                                         fileName: "[project]/components/feed/FeedSidebar.tsx",
-                                        lineNumber: 525,
+                                        lineNumber: 495,
                                         columnNumber: 11
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("path", {
@@ -2226,7 +2139,7 @@ function FeedSidebar(param) {
                                         strokeWidth: "1.35"
                                     }, void 0, false, {
                                         fileName: "[project]/components/feed/FeedSidebar.tsx",
-                                        lineNumber: 526,
+                                        lineNumber: 496,
                                         columnNumber: 11
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("path", {
@@ -2235,7 +2148,7 @@ function FeedSidebar(param) {
                                         strokeWidth: "1.35"
                                     }, void 0, false, {
                                         fileName: "[project]/components/feed/FeedSidebar.tsx",
-                                        lineNumber: 527,
+                                        lineNumber: 497,
                                         columnNumber: 11
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("path", {
@@ -2244,7 +2157,7 @@ function FeedSidebar(param) {
                                         strokeWidth: "1.35"
                                     }, void 0, false, {
                                         fileName: "[project]/components/feed/FeedSidebar.tsx",
-                                        lineNumber: 528,
+                                        lineNumber: 498,
                                         columnNumber: 11
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("path", {
@@ -2253,13 +2166,13 @@ function FeedSidebar(param) {
                                         strokeWidth: "1.35"
                                     }, void 0, false, {
                                         fileName: "[project]/components/feed/FeedSidebar.tsx",
-                                        lineNumber: 529,
+                                        lineNumber: 499,
                                         columnNumber: 11
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/components/feed/FeedSidebar.tsx",
-                                lineNumber: 515,
+                                lineNumber: 485,
                                 columnNumber: 9
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -2272,19 +2185,19 @@ function FeedSidebar(param) {
                                     className: "object-cover"
                                 }, void 0, false, {
                                     fileName: "[project]/components/feed/FeedSidebar.tsx",
-                                    lineNumber: 534,
+                                    lineNumber: 504,
                                     columnNumber: 13
                                 }, this) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                                     className: "flex h-full w-full items-center justify-center text-[24px] font-extrabold text-[#2378E8]",
                                     children: initials || 'I'
                                 }, void 0, false, {
                                     fileName: "[project]/components/feed/FeedSidebar.tsx",
-                                    lineNumber: 536,
+                                    lineNumber: 506,
                                     columnNumber: 13
                                 }, this)
                             }, void 0, false, {
                                 fileName: "[project]/components/feed/FeedSidebar.tsx",
-                                lineNumber: 532,
+                                lineNumber: 502,
                                 columnNumber: 9
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("h2", {
@@ -2292,7 +2205,7 @@ function FeedSidebar(param) {
                                 children: fullName
                             }, void 0, false, {
                                 fileName: "[project]/components/feed/FeedSidebar.tsx",
-                                lineNumber: 541,
+                                lineNumber: 511,
                                 columnNumber: 9
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -2300,13 +2213,13 @@ function FeedSidebar(param) {
                                 children: roleLabel
                             }, void 0, false, {
                                 fileName: "[project]/components/feed/FeedSidebar.tsx",
-                                lineNumber: 542,
+                                lineNumber: 512,
                                 columnNumber: 9
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "[project]/components/feed/FeedSidebar.tsx",
-                        lineNumber: 514,
+                        lineNumber: 484,
                         columnNumber: 7
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(DashboardLink, {
@@ -2315,7 +2228,7 @@ function FeedSidebar(param) {
                         compact: hideProfileCard
                     }, void 0, false, {
                         fileName: "[project]/components/feed/FeedSidebar.tsx",
-                        lineNumber: 548,
+                        lineNumber: 518,
                         columnNumber: 7
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -2335,7 +2248,7 @@ function FeedSidebar(param) {
                                         compact: hideProfileCard
                                     }, void 0, false, {
                                         fileName: "[project]/components/feed/FeedSidebar.tsx",
-                                        lineNumber: 557,
+                                        lineNumber: 527,
                                         columnNumber: 9
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(SidebarItem, {
@@ -2346,7 +2259,7 @@ function FeedSidebar(param) {
                                         compact: hideProfileCard
                                     }, void 0, false, {
                                         fileName: "[project]/components/feed/FeedSidebar.tsx",
-                                        lineNumber: 564,
+                                        lineNumber: 534,
                                         columnNumber: 9
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(SidebarItem, {
@@ -2357,13 +2270,13 @@ function FeedSidebar(param) {
                                         compact: hideProfileCard
                                     }, void 0, false, {
                                         fileName: "[project]/components/feed/FeedSidebar.tsx",
-                                        lineNumber: 571,
+                                        lineNumber: 541,
                                         columnNumber: 9
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/components/feed/FeedSidebar.tsx",
-                                lineNumber: 551,
+                                lineNumber: 521,
                                 columnNumber: 7
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(DashboardSection, {
@@ -2380,7 +2293,7 @@ function FeedSidebar(param) {
                                         compact: hideProfileCard
                                     }, void 0, false, {
                                         fileName: "[project]/components/feed/FeedSidebar.tsx",
-                                        lineNumber: 588,
+                                        lineNumber: 558,
                                         columnNumber: 11
                                     }, this),
                                     !isPureClient && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(SidebarItem, {
@@ -2390,7 +2303,7 @@ function FeedSidebar(param) {
                                         compact: hideProfileCard
                                     }, void 0, false, {
                                         fileName: "[project]/components/feed/FeedSidebar.tsx",
-                                        lineNumber: 596,
+                                        lineNumber: 566,
                                         columnNumber: 11
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(SidebarItem, {
@@ -2400,7 +2313,7 @@ function FeedSidebar(param) {
                                         compact: hideProfileCard
                                     }, void 0, false, {
                                         fileName: "[project]/components/feed/FeedSidebar.tsx",
-                                        lineNumber: 598,
+                                        lineNumber: 568,
                                         columnNumber: 9
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(SidebarItem, {
@@ -2410,13 +2323,13 @@ function FeedSidebar(param) {
                                         compact: hideProfileCard
                                     }, void 0, false, {
                                         fileName: "[project]/components/feed/FeedSidebar.tsx",
-                                        lineNumber: 599,
+                                        lineNumber: 569,
                                         columnNumber: 9
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/components/feed/FeedSidebar.tsx",
-                                lineNumber: 580,
+                                lineNumber: 550,
                                 columnNumber: 7
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(DashboardSection, {
@@ -2432,24 +2345,24 @@ function FeedSidebar(param) {
                                         compact: hideProfileCard
                                     }, void 0, false, {
                                         fileName: "[project]/components/feed/FeedSidebar.tsx",
-                                        lineNumber: 608,
+                                        lineNumber: 578,
                                         columnNumber: 9
                                     }, this),
-                                    needsMeetingSetup && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(SidebarItem, {
+                                    isProvider && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(SidebarItem, {
                                         href: "".concat(dashboardBase, "/account-settings/consulting-schedule"),
                                         icon: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$tabler$2f$icons$2d$react$2f$dist$2f$esm$2f$icons$2f$IconCalendarCog$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__IconCalendarCog$3e$__["IconCalendarCog"],
                                         label: copy.mySchedule,
-                                        badge: setupNowLabel,
+                                        badge: needsMeetingSetup ? setupNowLabel : undefined,
                                         compact: hideProfileCard
                                     }, void 0, false, {
                                         fileName: "[project]/components/feed/FeedSidebar.tsx",
-                                        lineNumber: 611,
+                                        lineNumber: 582,
                                         columnNumber: 11
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/components/feed/FeedSidebar.tsx",
-                                lineNumber: 602,
+                                lineNumber: 572,
                                 columnNumber: 7
                             }, this),
                             hasProjectAccess && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(DashboardSection, {
@@ -2465,7 +2378,7 @@ function FeedSidebar(param) {
                                         compact: hideProfileCard
                                     }, void 0, false, {
                                         fileName: "[project]/components/feed/FeedSidebar.tsx",
-                                        lineNumber: 629,
+                                        lineNumber: 600,
                                         columnNumber: 13
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(SidebarItem, {
@@ -2475,7 +2388,7 @@ function FeedSidebar(param) {
                                         compact: hideProfileCard
                                     }, void 0, false, {
                                         fileName: "[project]/components/feed/FeedSidebar.tsx",
-                                        lineNumber: 631,
+                                        lineNumber: 602,
                                         columnNumber: 11
                                     }, this),
                                     !isPureClient && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(SidebarItem, {
@@ -2486,13 +2399,13 @@ function FeedSidebar(param) {
                                         compact: hideProfileCard
                                     }, void 0, false, {
                                         fileName: "[project]/components/feed/FeedSidebar.tsx",
-                                        lineNumber: 633,
+                                        lineNumber: 604,
                                         columnNumber: 13
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/components/feed/FeedSidebar.tsx",
-                                lineNumber: 622,
+                                lineNumber: 593,
                                 columnNumber: 9
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(DashboardSection, {
@@ -2507,7 +2420,7 @@ function FeedSidebar(param) {
                                         compact: hideProfileCard
                                     }, void 0, false, {
                                         fileName: "[project]/components/feed/FeedSidebar.tsx",
-                                        lineNumber: 645,
+                                        lineNumber: 616,
                                         columnNumber: 9
                                     }, this),
                                     isProvider && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(SidebarItem, {
@@ -2517,7 +2430,7 @@ function FeedSidebar(param) {
                                         compact: hideProfileCard
                                     }, void 0, false, {
                                         fileName: "[project]/components/feed/FeedSidebar.tsx",
-                                        lineNumber: 646,
+                                        lineNumber: 617,
                                         columnNumber: 24
                                     }, this),
                                     (isInsighter || isCompany) && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(SidebarItem, {
@@ -2527,13 +2440,13 @@ function FeedSidebar(param) {
                                         compact: hideProfileCard
                                     }, void 0, false, {
                                         fileName: "[project]/components/feed/FeedSidebar.tsx",
-                                        lineNumber: 648,
+                                        lineNumber: 619,
                                         columnNumber: 11
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/components/feed/FeedSidebar.tsx",
-                                lineNumber: 644,
+                                lineNumber: 615,
                                 columnNumber: 7
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(DashboardSection, {
@@ -2548,7 +2461,7 @@ function FeedSidebar(param) {
                                         compact: hideProfileCard
                                     }, void 0, false, {
                                         fileName: "[project]/components/feed/FeedSidebar.tsx",
-                                        lineNumber: 653,
+                                        lineNumber: 624,
                                         columnNumber: 9
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(SidebarItem, {
@@ -2558,7 +2471,7 @@ function FeedSidebar(param) {
                                         compact: hideProfileCard
                                     }, void 0, false, {
                                         fileName: "[project]/components/feed/FeedSidebar.tsx",
-                                        lineNumber: 659,
+                                        lineNumber: 630,
                                         columnNumber: 9
                                     }, this),
                                     (isInsighter || isCompany) && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(SidebarItem, {
@@ -2568,42 +2481,42 @@ function FeedSidebar(param) {
                                         compact: hideProfileCard
                                     }, void 0, false, {
                                         fileName: "[project]/components/feed/FeedSidebar.tsx",
-                                        lineNumber: 666,
+                                        lineNumber: 637,
                                         columnNumber: 11
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/components/feed/FeedSidebar.tsx",
-                                lineNumber: 652,
+                                lineNumber: 623,
                                 columnNumber: 7
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "[project]/components/feed/FeedSidebar.tsx",
-                        lineNumber: 550,
+                        lineNumber: 520,
                         columnNumber: 7
                     }, this)
                 ]
             }, void 0, true, {
                 fileName: "[project]/components/feed/FeedSidebar.tsx",
-                lineNumber: 512,
+                lineNumber: 482,
                 columnNumber: 5
             }, this),
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(SidebarLegalFooter, {
                 locale: locale
             }, void 0, false, {
                 fileName: "[project]/components/feed/FeedSidebar.tsx",
-                lineNumber: 676,
+                lineNumber: 647,
                 columnNumber: 7
             }, this)
         ]
     }, void 0, true, {
         fileName: "[project]/components/feed/FeedSidebar.tsx",
-        lineNumber: 511,
+        lineNumber: 481,
         columnNumber: 5
     }, this);
 }
-_s3(FeedSidebar, "w8rgWMyCNkyx1+T+tPPv0POYv/w=", false, function() {
+_s3(FeedSidebar, "8x2XazchK/jHV/mlAuz7LXk8xuQ=", false, function() {
     return [
         __TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$header$2f$hooks$2f$useUserProfile$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useUserProfile"],
         __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$navigation$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useSearchParams"]
@@ -9540,4 +9453,4 @@ if (typeof globalThis.$RefreshHelpers$ === 'object' && globalThis.$RefreshHelper
 }),
 ]);
 
-//# sourceMappingURL=_05b1eea8._.js.map
+//# sourceMappingURL=_353ce12a._.js.map
