@@ -205,7 +205,10 @@ export default function ArticleEditor({ locale }: ArticleEditorProps) {
   const canChoosePublisher =
     !isEditingPublished &&
     !!companyName &&
-    roles.some((role) => role === 'company' || role === 'company-insighter')
+    // Company-insighters always publish under their own name, so they skip the
+    // publisher step; only the company account itself gets the choice.
+    roles.some((role) => role === 'company') &&
+    !roles.some((role) => role === 'company-insighter')
 
   const editor = useEditor({
     immediatelyRender: false,
