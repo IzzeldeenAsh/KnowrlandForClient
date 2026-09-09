@@ -97,6 +97,8 @@ const copyByLocale = {
     trackTooltip: 'Track this post to see more content like it in your feed.',
     untrackTooltip: 'Untrack this post to stop seeing more content like it in your feed.',
     ownPostTracking: 'You cannot track your own post.',
+    readMore: 'Read more',
+    readLess: 'Read less',
   },
   ar: {
     title: 'منشوراتي',
@@ -142,6 +144,8 @@ const copyByLocale = {
     trackTooltip: 'تتبّع هذا المنشور لرؤية المزيد من المحتوى المشابه له في موجزك.',
     untrackTooltip: 'ألغِ تتبّع هذا المنشور للتوقف عن رؤية المزيد من المحتوى المشابه له في موجزك.',
     ownPostTracking: 'لا يمكنك تتبّع منشورك الخاص.',
+    readMore: 'قراءة المزيد',
+    readLess: 'قراءة أقل',
   },
 } as const
 
@@ -903,6 +907,9 @@ export function FeedCard({
   const [openingInsight, setOpeningInsight] = useState<string | null>(null)
   const [isTracked, setIsTracked] = useState(item.is_tracked === true)
   const [isUpdatingTrack, setIsUpdatingTrack] = useState(false)
+  const [isBodyExpanded, setIsBodyExpanded] = useState(false)
+  const [isBodyOverflowing, setIsBodyOverflowing] = useState(false)
+  const bodyContentRef = useRef<HTMLParagraphElement>(null)
   const date = formatPostDate(item.published_at ?? item.created_at, locale)
   const isArticle = item.content_type === 'article'
   const isPostTitleArabic = isFirstWordArabic(item.title ?? '')
@@ -914,6 +921,8 @@ export function FeedCard({
     (media) => media.media_type === 'attachment' && media.url,
   )
   const hasPostMedia = Boolean(videoMedia) || imageMedia.length > 0
+  const hasRichContent =
+    isArticle || hasPostMedia || attachments.length > 0 || item.related_insights.length > 0
   const showEngagementActions = articleAccess === 'community' && Boolean(item.insighter)
   const isMediaLast =
     attachments.length === 0 && item.related_insights.length === 0 && !showEngagementActions
@@ -967,6 +976,29 @@ export function FeedCard({
   useEffect(() => {
     setIsTracked(item.is_tracked === true)
   }, [item.is_tracked, item.uuid])
+
+  useEffect(() => {
+    setIsBodyExpanded(false)
+  }, [item.body, item.uuid])
+
+  useEffect(() => {
+    const bodyContent = bodyContentRef.current
+    if (!bodyContent) {
+      setIsBodyOverflowing(false)
+      return
+    }
+
+    const collapsedBodyHeight = 200
+    const measureOverflow = () => {
+      setIsBodyOverflowing(bodyContent.scrollHeight > collapsedBodyHeight + 1)
+    }
+
+    measureOverflow()
+    const resizeObserver = new ResizeObserver(measureOverflow)
+    resizeObserver.observe(bodyContent)
+
+    return () => resizeObserver.disconnect()
+  }, [item.body])
 
   const updateTracking = async () => {
     if (isUpdatingTrack || isOwnPost) return
@@ -1120,19 +1152,37 @@ export function FeedCard({
       {!isArticle && item.title && (
         <h2
           dir={isPostTitleArabic ? 'rtl' : 'ltr'}
-          className={`mt-4 text-[19px] font-bold leading-7 tracking-[-0.02em] text-[#101724] ${isPostTitleArabic ? 'text-right' : 'text-left'}`}
+          className={`mt-4 text-[17px] font-bold leading-6 tracking-[-0.02em] text-[#101724] ${isPostTitleArabic ? 'text-right' : 'text-left'}`}
         >
           {item.title}
         </h2>
       )}
 
       {!isArticle && item.body && (
-        <p
-          dir={isPostBodyArabic ? 'rtl' : 'ltr'}
-          className={`${item.title ? 'mt-2' : 'mt-4'} whitespace-pre-wrap text-[13px] leading-[1.2rem] text-[#1C2433] sm:text-[16px] sm:leading-7 ${isPostBodyArabic ? 'text-right' : 'text-left'}`}
-        >
-          {item.body}
-        </p>
+        <div className={item.title ? 'mt-1.5' : 'mt-4'}>
+          <div
+            className={`overflow-hidden ${isBodyExpanded ? 'max-h-none' : 'max-h-[200px]'}`}
+          >
+            <p
+              ref={bodyContentRef}
+              dir={isPostBodyArabic ? 'rtl' : 'ltr'}
+              className={`whitespace-pre-wrap text-[14px] leading-5 text-[#1C2433] ${isPostBodyArabic ? 'text-right' : 'text-left'}`}
+            >
+              {item.body}
+            </p>
+          </div>
+
+          {isBodyOverflowing && (
+            <button
+              type="button"
+              aria-expanded={isBodyExpanded}
+              onClick={() => setIsBodyExpanded((expanded) => !expanded)}
+              className={`mt-1.5 block text-[12px] font-semibold text-[#2378E8] transition-colors hover:text-[#155DB8] hover:underline focus-visible:rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2378E8] focus-visible:ring-offset-2 ${isPostBodyArabic ? 'ms-auto' : ''}`}
+            >
+              {isBodyExpanded ? copy.readLess : copy.readMore}
+            </button>
+          )}
+        </div>
       )}
 
       {isArticle && (
@@ -1257,7 +1307,7 @@ export function FeedCard({
 
       {showEngagementActions && insighter && (
         <div
-          className="mt-4 flex min-w-0 items-center justify-around pt-2"
+          className={`-mx-5 flex min-w-0 items-center justify-around border-t border-[#E7EDF5] px-5 pt-2 sm:-mx-6 sm:px-6 ${hasRichContent ? 'mt-0' : 'mt-4'}`}
           dir={isArabic ? 'rtl' : 'ltr'}
         >
           {!isOwnPost && canMeet && (

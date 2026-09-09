@@ -546,7 +546,7 @@ export default function Header() {
               {/* Desktop navigation */}
               <nav className="hidden xl:flex flex-1 overflow-visible min-w-0">
                 <ul className="flex justify-start items-center w-full gap-0.5 md:gap-1">
-                  <li>
+                  <li className="relative flex items-center">
                     <Link
                       className="relative mx-1 flex items-center gap-2 rounded-md bg-gradient-to-r from-amber-500 to-yellow-400 px-3 py-1 text-xs font-bold text-white shadow-[0_7px_18px_rgba(245,158,11,0.2)] transition-all duration-200 ease-in-out hover:-translate-y-px hover:brightness-105 md:text-sm"
                       href={`/${currentLocale}`}

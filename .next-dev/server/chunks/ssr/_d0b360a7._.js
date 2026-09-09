@@ -5573,7 +5573,9 @@ function PostModal({ locale, mode, opened, draft, onClose, onDraftSaved, onDraft
     const initials = user ? `${user.first_name?.[0] ?? ''}${user.last_name?.[0] ?? ''}`.toUpperCase() || 'I' : 'I';
     const fullName = user ? `${user.first_name ?? ''} ${user.last_name ?? ''}`.trim() || user.name : '';
     const companyName = user?.company?.legal_name?.trim() || '';
-    const canChoosePublisher = !isEditingPublished && !!companyName && roles.some((role)=>role === 'company' || role === 'company-insighter');
+    const canChoosePublisher = !isEditingPublished && !!companyName && // Company-insighters always publish under their own name, so they skip the
+    // publisher step; only the company account itself gets the choice.
+    roles.some((role)=>role === 'company') && !roles.some((role)=>role === 'company-insighter');
     const stopPolling = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useCallback"])(()=>{
         if (pollTimerRef.current !== null) {
             clearTimeout(pollTimerRef.current);
@@ -6230,7 +6232,7 @@ function PostModal({ locale, mode, opened, draft, onClose, onDraftSaved, onDraft
                         children: title
                     }, void 0, false, {
                         fileName: "[project]/components/feed/post/PostModal.tsx",
-                        lineNumber: 1106,
+                        lineNumber: 1109,
                         columnNumber: 9
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
@@ -6244,12 +6246,12 @@ function PostModal({ locale, mode, opened, draft, onClose, onDraftSaved, onDraft
                             stroke: 1.8
                         }, void 0, false, {
                             fileName: "[project]/components/feed/post/PostModal.tsx",
-                            lineNumber: 1115,
+                            lineNumber: 1118,
                             columnNumber: 11
                         }, this)
                     }, void 0, false, {
                         fileName: "[project]/components/feed/post/PostModal.tsx",
-                        lineNumber: 1109,
+                        lineNumber: 1112,
                         columnNumber: 9
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("form", {
@@ -6279,12 +6281,12 @@ function PostModal({ locale, mode, opened, draft, onClose, onDraftSaved, onDraft
                                             className: "h-full w-full object-cover"
                                         }, void 0, false, {
                                             fileName: "[project]/components/feed/post/PostModal.tsx",
-                                            lineNumber: 1135,
+                                            lineNumber: 1138,
                                             columnNumber: 17
                                         }, this) : initials
                                     }, void 0, false, {
                                         fileName: "[project]/components/feed/post/PostModal.tsx",
-                                        lineNumber: 1133,
+                                        lineNumber: 1136,
                                         columnNumber: 13
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -6295,7 +6297,7 @@ function PostModal({ locale, mode, opened, draft, onClose, onDraftSaved, onDraft
                                                 children: fullName
                                             }, void 0, false, {
                                                 fileName: "[project]/components/feed/post/PostModal.tsx",
-                                                lineNumber: 1148,
+                                                lineNumber: 1151,
                                                 columnNumber: 15
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -6303,19 +6305,19 @@ function PostModal({ locale, mode, opened, draft, onClose, onDraftSaved, onDraft
                                                 children: step === 1 ? copy.step1Label : step === 2 ? copy.step2Label : copy.step3Label
                                             }, void 0, false, {
                                                 fileName: "[project]/components/feed/post/PostModal.tsx",
-                                                lineNumber: 1149,
+                                                lineNumber: 1152,
                                                 columnNumber: 15
                                             }, this)
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/components/feed/post/PostModal.tsx",
-                                        lineNumber: 1147,
+                                        lineNumber: 1150,
                                         columnNumber: 13
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/components/feed/post/PostModal.tsx",
-                                lineNumber: 1132,
+                                lineNumber: 1135,
                                 columnNumber: 11
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -6330,7 +6332,7 @@ function PostModal({ locale, mode, opened, draft, onClose, onDraftSaved, onDraft
                                                 children: copy.description
                                             }, void 0, false, {
                                                 fileName: "[project]/components/feed/post/PostModal.tsx",
-                                                lineNumber: 1160,
+                                                lineNumber: 1163,
                                                 columnNumber: 13
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("textarea", {
@@ -6364,7 +6366,7 @@ function PostModal({ locale, mode, opened, draft, onClose, onDraftSaved, onDraft
                                                 className: `w-full resize-none rounded-md border bg-white px-3 py-2.5 text-[15px] leading-relaxed text-[#1C2433] placeholder:text-[#94A3B8] focus-visible:outline-none ${bodyInvalid ? 'border-[#C23B32]' : 'border-[#E5EAF2] focus-visible:border-[#8FB9EA]'}`
                                             }, void 0, false, {
                                                 fileName: "[project]/components/feed/post/PostModal.tsx",
-                                                lineNumber: 1163,
+                                                lineNumber: 1166,
                                                 columnNumber: 13
                                             }, this),
                                             bodyInvalid && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -6373,13 +6375,13 @@ function PostModal({ locale, mode, opened, draft, onClose, onDraftSaved, onDraft
                                                 children: copy.bodyRequired
                                             }, void 0, false, {
                                                 fileName: "[project]/components/feed/post/PostModal.tsx",
-                                                lineNumber: 1192,
+                                                lineNumber: 1195,
                                                 columnNumber: 15
                                             }, this)
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/components/feed/post/PostModal.tsx",
-                                        lineNumber: 1159,
+                                        lineNumber: 1162,
                                         columnNumber: 11
                                     }, this),
                                     isVideoFlow && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -6401,12 +6403,12 @@ function PostModal({ locale, mode, opened, draft, onClose, onDraftSaved, onDraft
                                                             className: "h-6 w-6 text-[#1D74E0]"
                                                         }, void 0, false, {
                                                             fileName: "[project]/components/feed/post/PostModal.tsx",
-                                                            lineNumber: 1212,
+                                                            lineNumber: 1215,
                                                             columnNumber: 19
                                                         }, this)
                                                     }, void 0, false, {
                                                         fileName: "[project]/components/feed/post/PostModal.tsx",
-                                                        lineNumber: 1211,
+                                                        lineNumber: 1214,
                                                         columnNumber: 17
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("h3", {
@@ -6414,7 +6416,7 @@ function PostModal({ locale, mode, opened, draft, onClose, onDraftSaved, onDraft
                                                         children: copy.uploadTitle
                                                     }, void 0, false, {
                                                         fileName: "[project]/components/feed/post/PostModal.tsx",
-                                                        lineNumber: 1214,
+                                                        lineNumber: 1217,
                                                         columnNumber: 17
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -6422,7 +6424,7 @@ function PostModal({ locale, mode, opened, draft, onClose, onDraftSaved, onDraft
                                                         children: copy.uploadHint
                                                     }, void 0, false, {
                                                         fileName: "[project]/components/feed/post/PostModal.tsx",
-                                                        lineNumber: 1215,
+                                                        lineNumber: 1218,
                                                         columnNumber: 17
                                                     }, this),
                                                     isEditingPublished ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -6430,7 +6432,7 @@ function PostModal({ locale, mode, opened, draft, onClose, onDraftSaved, onDraft
                                                         children: copy.mediaLocked
                                                     }, void 0, false, {
                                                         fileName: "[project]/components/feed/post/PostModal.tsx",
-                                                        lineNumber: 1219,
+                                                        lineNumber: 1222,
                                                         columnNumber: 19
                                                     }, this) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
                                                         ref: videoSelectButtonRef,
@@ -6443,13 +6445,13 @@ function PostModal({ locale, mode, opened, draft, onClose, onDraftSaved, onDraft
                                                         children: copy.selectVideo
                                                     }, void 0, false, {
                                                         fileName: "[project]/components/feed/post/PostModal.tsx",
-                                                        lineNumber: 1221,
+                                                        lineNumber: 1224,
                                                         columnNumber: 19
                                                     }, this)
                                                 ]
                                             }, void 0, true, {
                                                 fileName: "[project]/components/feed/post/PostModal.tsx",
-                                                lineNumber: 1210,
+                                                lineNumber: 1213,
                                                 columnNumber: 15
                                             }, this) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                                                 className: "rounded-md border border-[#E5EAF2] p-4",
@@ -6471,12 +6473,12 @@ function PostModal({ locale, mode, opened, draft, onClose, onDraftSaved, onDraft
                                                             }
                                                         }, void 0, false, {
                                                             fileName: "[project]/components/feed/post/PostModal.tsx",
-                                                            lineNumber: 1238,
+                                                            lineNumber: 1241,
                                                             columnNumber: 21
                                                         }, this)
                                                     }, void 0, false, {
                                                         fileName: "[project]/components/feed/post/PostModal.tsx",
-                                                        lineNumber: 1237,
+                                                        lineNumber: 1240,
                                                         columnNumber: 19
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -6490,12 +6492,12 @@ function PostModal({ locale, mode, opened, draft, onClose, onDraftSaved, onDraft
                                                                     className: "h-5 w-5 text-white"
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/components/feed/post/PostModal.tsx",
-                                                                    lineNumber: 1253,
+                                                                    lineNumber: 1256,
                                                                     columnNumber: 23
                                                                 }, this)
                                                             }, void 0, false, {
                                                                 fileName: "[project]/components/feed/post/PostModal.tsx",
-                                                                lineNumber: 1252,
+                                                                lineNumber: 1255,
                                                                 columnNumber: 21
                                                             }, this),
                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -6506,7 +6508,7 @@ function PostModal({ locale, mode, opened, draft, onClose, onDraftSaved, onDraft
                                                                         children: videoFileName
                                                                     }, void 0, false, {
                                                                         fileName: "[project]/components/feed/post/PostModal.tsx",
-                                                                        lineNumber: 1257,
+                                                                        lineNumber: 1260,
                                                                         columnNumber: 21
                                                                     }, this),
                                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -6521,7 +6523,7 @@ function PostModal({ locale, mode, opened, draft, onClose, onDraftSaved, onDraft
                                                                                     className: "h-4 w-4 text-[#1BC653]"
                                                                                 }, void 0, false, {
                                                                                     fileName: "[project]/components/feed/post/PostModal.tsx",
-                                                                                    lineNumber: 1267,
+                                                                                    lineNumber: 1270,
                                                                                     columnNumber: 27
                                                                                 }, this),
                                                                                 copy.uploadComplete
@@ -6529,13 +6531,13 @@ function PostModal({ locale, mode, opened, draft, onClose, onDraftSaved, onDraft
                                                                         }, void 0, true) : videoPhase === 'processing' ? copy.uploadedProcessing : videoPhase === 'stalled' ? copy.stalled : `${copy.uploading} ${uploadPercent}%`
                                                                     }, void 0, false, {
                                                                         fileName: "[project]/components/feed/post/PostModal.tsx",
-                                                                        lineNumber: 1260,
+                                                                        lineNumber: 1263,
                                                                         columnNumber: 21
                                                                     }, this)
                                                                 ]
                                                             }, void 0, true, {
                                                                 fileName: "[project]/components/feed/post/PostModal.tsx",
-                                                                lineNumber: 1256,
+                                                                lineNumber: 1259,
                                                                 columnNumber: 19
                                                             }, this),
                                                             !isEditingPublished && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
@@ -6545,13 +6547,13 @@ function PostModal({ locale, mode, opened, draft, onClose, onDraftSaved, onDraft
                                                                 children: videoPhase === 'uploading' || videoPhase === 'initializing' ? copy.cancel : copy.remove
                                                             }, void 0, false, {
                                                                 fileName: "[project]/components/feed/post/PostModal.tsx",
-                                                                lineNumber: 1280,
+                                                                lineNumber: 1283,
                                                                 columnNumber: 21
                                                             }, this)
                                                         ]
                                                     }, void 0, true, {
                                                         fileName: "[project]/components/feed/post/PostModal.tsx",
-                                                        lineNumber: 1250,
+                                                        lineNumber: 1253,
                                                         columnNumber: 17
                                                     }, this),
                                                     (videoPhase === 'uploading' || videoPhase === 'initializing') && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mantine$2f$core$2f$esm$2f$components$2f$Progress$2f$Progress$2e$mjs__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["Progress"], {
@@ -6562,7 +6564,7 @@ function PostModal({ locale, mode, opened, draft, onClose, onDraftSaved, onDraft
                                                         className: "mt-3"
                                                     }, void 0, false, {
                                                         fileName: "[project]/components/feed/post/PostModal.tsx",
-                                                        lineNumber: 1292,
+                                                        lineNumber: 1295,
                                                         columnNumber: 19
                                                     }, this),
                                                     videoPhase === 'processing' && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["Fragment"], {
@@ -6577,7 +6579,7 @@ function PostModal({ locale, mode, opened, draft, onClose, onDraftSaved, onDraft
                                                                 className: "mt-3"
                                                             }, void 0, false, {
                                                                 fileName: "[project]/components/feed/post/PostModal.tsx",
-                                                                lineNumber: 1296,
+                                                                lineNumber: 1299,
                                                                 columnNumber: 21
                                                             }, this),
                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -6585,7 +6587,7 @@ function PostModal({ locale, mode, opened, draft, onClose, onDraftSaved, onDraft
                                                                 children: copy.processingHint
                                                             }, void 0, false, {
                                                                 fileName: "[project]/components/feed/post/PostModal.tsx",
-                                                                lineNumber: 1297,
+                                                                lineNumber: 1300,
                                                                 columnNumber: 21
                                                             }, this)
                                                         ]
@@ -6598,7 +6600,7 @@ function PostModal({ locale, mode, opened, draft, onClose, onDraftSaved, onDraft
                                                                 children: copy.stalledHint
                                                             }, void 0, false, {
                                                                 fileName: "[project]/components/feed/post/PostModal.tsx",
-                                                                lineNumber: 1304,
+                                                                lineNumber: 1307,
                                                                 columnNumber: 21
                                                             }, this),
                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
@@ -6608,19 +6610,19 @@ function PostModal({ locale, mode, opened, draft, onClose, onDraftSaved, onDraft
                                                                 children: copy.checkAgain
                                                             }, void 0, false, {
                                                                 fileName: "[project]/components/feed/post/PostModal.tsx",
-                                                                lineNumber: 1305,
+                                                                lineNumber: 1308,
                                                                 columnNumber: 21
                                                             }, this)
                                                         ]
                                                     }, void 0, true, {
                                                         fileName: "[project]/components/feed/post/PostModal.tsx",
-                                                        lineNumber: 1303,
+                                                        lineNumber: 1306,
                                                         columnNumber: 19
                                                     }, this)
                                                 ]
                                             }, void 0, true, {
                                                 fileName: "[project]/components/feed/post/PostModal.tsx",
-                                                lineNumber: 1235,
+                                                lineNumber: 1238,
                                                 columnNumber: 15
                                             }, this),
                                             videoInvalid && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -6629,13 +6631,13 @@ function PostModal({ locale, mode, opened, draft, onClose, onDraftSaved, onDraft
                                                 children: videoErrorMessage
                                             }, void 0, false, {
                                                 fileName: "[project]/components/feed/post/PostModal.tsx",
-                                                lineNumber: 1317,
+                                                lineNumber: 1320,
                                                 columnNumber: 15
                                             }, this)
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/components/feed/post/PostModal.tsx",
-                                        lineNumber: 1201,
+                                        lineNumber: 1204,
                                         columnNumber: 11
                                     }, this),
                                     isImageFlow && !hasImages && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -6653,12 +6655,12 @@ function PostModal({ locale, mode, opened, draft, onClose, onDraftSaved, onDraft
                                                         className: "h-6 w-6 text-[#1EAB5A]"
                                                     }, void 0, false, {
                                                         fileName: "[project]/components/feed/post/PostModal.tsx",
-                                                        lineNumber: 1333,
+                                                        lineNumber: 1336,
                                                         columnNumber: 17
                                                     }, this)
                                                 }, void 0, false, {
                                                     fileName: "[project]/components/feed/post/PostModal.tsx",
-                                                    lineNumber: 1332,
+                                                    lineNumber: 1335,
                                                     columnNumber: 15
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("h3", {
@@ -6666,7 +6668,7 @@ function PostModal({ locale, mode, opened, draft, onClose, onDraftSaved, onDraft
                                                     children: copy.imageUploadTitle
                                                 }, void 0, false, {
                                                     fileName: "[project]/components/feed/post/PostModal.tsx",
-                                                    lineNumber: 1335,
+                                                    lineNumber: 1338,
                                                     columnNumber: 15
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -6674,7 +6676,7 @@ function PostModal({ locale, mode, opened, draft, onClose, onDraftSaved, onDraft
                                                     children: copy.imageUploadHint
                                                 }, void 0, false, {
                                                     fileName: "[project]/components/feed/post/PostModal.tsx",
-                                                    lineNumber: 1336,
+                                                    lineNumber: 1339,
                                                     columnNumber: 15
                                                 }, this),
                                                 isEditingPublished ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -6682,7 +6684,7 @@ function PostModal({ locale, mode, opened, draft, onClose, onDraftSaved, onDraft
                                                     children: copy.mediaLocked
                                                 }, void 0, false, {
                                                     fileName: "[project]/components/feed/post/PostModal.tsx",
-                                                    lineNumber: 1340,
+                                                    lineNumber: 1343,
                                                     columnNumber: 17
                                                 }, this) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
                                                     type: "button",
@@ -6691,18 +6693,18 @@ function PostModal({ locale, mode, opened, draft, onClose, onDraftSaved, onDraft
                                                     children: copy.selectImages
                                                 }, void 0, false, {
                                                     fileName: "[project]/components/feed/post/PostModal.tsx",
-                                                    lineNumber: 1342,
+                                                    lineNumber: 1345,
                                                     columnNumber: 17
                                                 }, this)
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/components/feed/post/PostModal.tsx",
-                                            lineNumber: 1331,
+                                            lineNumber: 1334,
                                             columnNumber: 13
                                         }, this)
                                     }, void 0, false, {
                                         fileName: "[project]/components/feed/post/PostModal.tsx",
-                                        lineNumber: 1326,
+                                        lineNumber: 1329,
                                         columnNumber: 11
                                     }, this),
                                     hasImages && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -6719,7 +6721,7 @@ function PostModal({ locale, mode, opened, draft, onClose, onDraftSaved, onDraft
                                                             className: "object-cover"
                                                         }, void 0, false, {
                                                             fileName: "[project]/components/feed/post/PostModal.tsx",
-                                                            lineNumber: 1362,
+                                                            lineNumber: 1365,
                                                             columnNumber: 17
                                                         }, this),
                                                         image.file && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -6734,7 +6736,7 @@ function PostModal({ locale, mode, opened, draft, onClose, onDraftSaved, onDraft
                                                                     children: isArabic ? '→' : '←'
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/components/feed/post/PostModal.tsx",
-                                                                    lineNumber: 1371,
+                                                                    lineNumber: 1374,
                                                                     columnNumber: 19
                                                                 }, this),
                                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
@@ -6748,12 +6750,12 @@ function PostModal({ locale, mode, opened, draft, onClose, onDraftSaved, onDraft
                                                                         stroke: 2
                                                                     }, void 0, false, {
                                                                         fileName: "[project]/components/feed/post/PostModal.tsx",
-                                                                        lineNumber: 1386,
+                                                                        lineNumber: 1389,
                                                                         columnNumber: 21
                                                                     }, this)
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/components/feed/post/PostModal.tsx",
-                                                                    lineNumber: 1380,
+                                                                    lineNumber: 1383,
                                                                     columnNumber: 19
                                                                 }, this),
                                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
@@ -6765,13 +6767,13 @@ function PostModal({ locale, mode, opened, draft, onClose, onDraftSaved, onDraft
                                                                     children: isArabic ? '←' : '→'
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/components/feed/post/PostModal.tsx",
-                                                                    lineNumber: 1388,
+                                                                    lineNumber: 1391,
                                                                     columnNumber: 19
                                                                 }, this)
                                                             ]
                                                         }, void 0, true, {
                                                             fileName: "[project]/components/feed/post/PostModal.tsx",
-                                                            lineNumber: 1370,
+                                                            lineNumber: 1373,
                                                             columnNumber: 17
                                                         }, this),
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -6779,13 +6781,13 @@ function PostModal({ locale, mode, opened, draft, onClose, onDraftSaved, onDraft
                                                             children: index + 1
                                                         }, void 0, false, {
                                                             fileName: "[project]/components/feed/post/PostModal.tsx",
-                                                            lineNumber: 1399,
+                                                            lineNumber: 1402,
                                                             columnNumber: 17
                                                         }, this)
                                                     ]
                                                 }, image.previewUrl, true, {
                                                     fileName: "[project]/components/feed/post/PostModal.tsx",
-                                                    lineNumber: 1358,
+                                                    lineNumber: 1361,
                                                     columnNumber: 15
                                                 }, this)),
                                             !isEditingPublished && images.length < MAX_IMAGES && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
@@ -6799,18 +6801,18 @@ function PostModal({ locale, mode, opened, draft, onClose, onDraftSaved, onDraft
                                                     className: "h-10 w-10 sm:h-12 sm:w-12"
                                                 }, void 0, false, {
                                                     fileName: "[project]/components/feed/post/PostModal.tsx",
-                                                    lineNumber: 1411,
+                                                    lineNumber: 1414,
                                                     columnNumber: 17
                                                 }, this)
                                             }, void 0, false, {
                                                 fileName: "[project]/components/feed/post/PostModal.tsx",
-                                                lineNumber: 1405,
+                                                lineNumber: 1408,
                                                 columnNumber: 15
                                             }, this)
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/components/feed/post/PostModal.tsx",
-                                        lineNumber: 1356,
+                                        lineNumber: 1359,
                                         columnNumber: 11
                                     }, this),
                                     relatedInsights.length > 0 && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -6826,12 +6828,12 @@ function PostModal({ locale, mode, opened, draft, onClose, onDraftSaved, onDraft
                                                             className: "h-4 w-4 text-[#1D74E0]"
                                                         }, void 0, false, {
                                                             fileName: "[project]/components/feed/post/PostModal.tsx",
-                                                            lineNumber: 1426,
+                                                            lineNumber: 1429,
                                                             columnNumber: 19
                                                         }, this)
                                                     }, void 0, false, {
                                                         fileName: "[project]/components/feed/post/PostModal.tsx",
-                                                        lineNumber: 1425,
+                                                        lineNumber: 1428,
                                                         columnNumber: 17
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -6839,7 +6841,7 @@ function PostModal({ locale, mode, opened, draft, onClose, onDraftSaved, onDraft
                                                         children: item.title
                                                     }, void 0, false, {
                                                         fileName: "[project]/components/feed/post/PostModal.tsx",
-                                                        lineNumber: 1428,
+                                                        lineNumber: 1431,
                                                         columnNumber: 17
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
@@ -6853,29 +6855,29 @@ function PostModal({ locale, mode, opened, draft, onClose, onDraftSaved, onDraft
                                                             stroke: 1.8
                                                         }, void 0, false, {
                                                             fileName: "[project]/components/feed/post/PostModal.tsx",
-                                                            lineNumber: 1439,
+                                                            lineNumber: 1442,
                                                             columnNumber: 19
                                                         }, this)
                                                     }, void 0, false, {
                                                         fileName: "[project]/components/feed/post/PostModal.tsx",
-                                                        lineNumber: 1431,
+                                                        lineNumber: 1434,
                                                         columnNumber: 17
                                                     }, this)
                                                 ]
                                             }, item.id, true, {
                                                 fileName: "[project]/components/feed/post/PostModal.tsx",
-                                                lineNumber: 1421,
+                                                lineNumber: 1424,
                                                 columnNumber: 15
                                             }, this))
                                     }, void 0, false, {
                                         fileName: "[project]/components/feed/post/PostModal.tsx",
-                                        lineNumber: 1419,
+                                        lineNumber: 1422,
                                         columnNumber: 11
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/components/feed/post/PostModal.tsx",
-                                lineNumber: 1156,
+                                lineNumber: 1159,
                                 columnNumber: 9
                             }, this),
                             step === 3 && canChoosePublisher && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -6886,7 +6888,7 @@ function PostModal({ locale, mode, opened, draft, onClose, onDraftSaved, onDraft
                                         children: copy.publishAsTitle
                                     }, void 0, false, {
                                         fileName: "[project]/components/feed/post/PostModal.tsx",
-                                        lineNumber: 1451,
+                                        lineNumber: 1454,
                                         columnNumber: 13
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -6901,18 +6903,18 @@ function PostModal({ locale, mode, opened, draft, onClose, onDraftSaved, onDraft
                                             onChange: setAuthorType
                                         }, void 0, false, {
                                             fileName: "[project]/components/feed/post/PostModal.tsx",
-                                            lineNumber: 1455,
+                                            lineNumber: 1458,
                                             columnNumber: 15
                                         }, this)
                                     }, void 0, false, {
                                         fileName: "[project]/components/feed/post/PostModal.tsx",
-                                        lineNumber: 1454,
+                                        lineNumber: 1457,
                                         columnNumber: 13
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/components/feed/post/PostModal.tsx",
-                                lineNumber: 1450,
+                                lineNumber: 1453,
                                 columnNumber: 11
                             }, this),
                             step === 2 && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -6931,7 +6933,7 @@ function PostModal({ locale, mode, opened, draft, onClose, onDraftSaved, onDraft
                                                 }))
                                     }, void 0, false, {
                                         fileName: "[project]/components/feed/post/PostModal.tsx",
-                                        lineNumber: 1471,
+                                        lineNumber: 1474,
                                         columnNumber: 13
                                     }, this),
                                     industryInvalid && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -6940,13 +6942,13 @@ function PostModal({ locale, mode, opened, draft, onClose, onDraftSaved, onDraft
                                         children: copy.industryRequired
                                     }, void 0, false, {
                                         fileName: "[project]/components/feed/post/PostModal.tsx",
-                                        lineNumber: 1483,
+                                        lineNumber: 1486,
                                         columnNumber: 15
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/components/feed/post/PostModal.tsx",
-                                lineNumber: 1470,
+                                lineNumber: 1473,
                                 columnNumber: 11
                             }, this),
                             step === 2 && industry && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -6960,7 +6962,7 @@ function PostModal({ locale, mode, opened, draft, onClose, onDraftSaved, onDraft
                                                 children: copy.suggestedTags
                                             }, void 0, false, {
                                                 fileName: "[project]/components/feed/post/PostModal.tsx",
-                                                lineNumber: 1494,
+                                                lineNumber: 1497,
                                                 columnNumber: 15
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -6968,13 +6970,13 @@ function PostModal({ locale, mode, opened, draft, onClose, onDraftSaved, onDraft
                                                 children: copy.optionalBadge
                                             }, void 0, false, {
                                                 fileName: "[project]/components/feed/post/PostModal.tsx",
-                                                lineNumber: 1495,
+                                                lineNumber: 1498,
                                                 columnNumber: 15
                                             }, this)
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/components/feed/post/PostModal.tsx",
-                                        lineNumber: 1493,
+                                        lineNumber: 1496,
                                         columnNumber: 13
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$feed$2f$TagSelector$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["default"], {
@@ -6984,13 +6986,13 @@ function PostModal({ locale, mode, opened, draft, onClose, onDraftSaved, onDraft
                                         onChange: setSelectedTags
                                     }, void 0, false, {
                                         fileName: "[project]/components/feed/post/PostModal.tsx",
-                                        lineNumber: 1497,
+                                        lineNumber: 1500,
                                         columnNumber: 13
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/components/feed/post/PostModal.tsx",
-                                lineNumber: 1492,
+                                lineNumber: 1495,
                                 columnNumber: 11
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -7011,7 +7013,7 @@ function PostModal({ locale, mode, opened, draft, onClose, onDraftSaved, onDraft
                                                         stroke: 1.8
                                                     }, void 0, false, {
                                                         fileName: "[project]/components/feed/post/PostModal.tsx",
-                                                        lineNumber: 1516,
+                                                        lineNumber: 1519,
                                                         columnNumber: 17
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -7019,13 +7021,13 @@ function PostModal({ locale, mode, opened, draft, onClose, onDraftSaved, onDraft
                                                         children: copy.discardDraft
                                                     }, void 0, false, {
                                                         fileName: "[project]/components/feed/post/PostModal.tsx",
-                                                        lineNumber: 1517,
+                                                        lineNumber: 1520,
                                                         columnNumber: 17
                                                     }, this)
                                                 ]
                                             }, void 0, true, {
                                                 fileName: "[project]/components/feed/post/PostModal.tsx",
-                                                lineNumber: 1510,
+                                                lineNumber: 1513,
                                                 columnNumber: 15
                                             }, this),
                                             step === 1 ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["Fragment"], {
@@ -7041,12 +7043,12 @@ function PostModal({ locale, mode, opened, draft, onClose, onDraftSaved, onDraft
                                                             className: "h-5 w-5 text-[#1EAB5A]"
                                                         }, void 0, false, {
                                                             fileName: "[project]/components/feed/post/PostModal.tsx",
-                                                            lineNumber: 1529,
+                                                            lineNumber: 1532,
                                                             columnNumber: 21
                                                         }, this)
                                                     }, void 0, false, {
                                                         fileName: "[project]/components/feed/post/PostModal.tsx",
-                                                        lineNumber: 1523,
+                                                        lineNumber: 1526,
                                                         columnNumber: 19
                                                     }, this),
                                                     !isEditingPublished && mode === 'post' && !hasImages && !hasVideo && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
@@ -7060,12 +7062,12 @@ function PostModal({ locale, mode, opened, draft, onClose, onDraftSaved, onDraft
                                                             className: "h-5 w-5 text-[#E8513E]"
                                                         }, void 0, false, {
                                                             fileName: "[project]/components/feed/post/PostModal.tsx",
-                                                            lineNumber: 1539,
+                                                            lineNumber: 1542,
                                                             columnNumber: 21
                                                         }, this)
                                                     }, void 0, false, {
                                                         fileName: "[project]/components/feed/post/PostModal.tsx",
-                                                        lineNumber: 1533,
+                                                        lineNumber: 1536,
                                                         columnNumber: 19
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
@@ -7079,7 +7081,7 @@ function PostModal({ locale, mode, opened, draft, onClose, onDraftSaved, onDraft
                                                                 className: "h-4.5 w-4.5"
                                                             }, void 0, false, {
                                                                 fileName: "[project]/components/feed/post/PostModal.tsx",
-                                                                lineNumber: 1551,
+                                                                lineNumber: 1554,
                                                                 columnNumber: 19
                                                             }, this),
                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -7087,13 +7089,13 @@ function PostModal({ locale, mode, opened, draft, onClose, onDraftSaved, onDraft
                                                                 children: copy.shareFromLibrary
                                                             }, void 0, false, {
                                                                 fileName: "[project]/components/feed/post/PostModal.tsx",
-                                                                lineNumber: 1552,
+                                                                lineNumber: 1555,
                                                                 columnNumber: 19
                                                             }, this)
                                                         ]
                                                     }, void 0, true, {
                                                         fileName: "[project]/components/feed/post/PostModal.tsx",
-                                                        lineNumber: 1542,
+                                                        lineNumber: 1545,
                                                         columnNumber: 17
                                                     }, this)
                                                 ]
@@ -7109,7 +7111,7 @@ function PostModal({ locale, mode, opened, draft, onClose, onDraftSaved, onDraft
                                                         stroke: 2
                                                     }, void 0, false, {
                                                         fileName: "[project]/components/feed/post/PostModal.tsx",
-                                                        lineNumber: 1563,
+                                                        lineNumber: 1566,
                                                         columnNumber: 19
                                                     }, this) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$tabler$2f$icons$2d$react$2f$dist$2f$esm$2f$icons$2f$IconChevronLeft$2e$mjs__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__$3c$export__default__as__IconChevronLeft$3e$__["IconChevronLeft"], {
                                                         "aria-hidden": true,
@@ -7117,20 +7119,20 @@ function PostModal({ locale, mode, opened, draft, onClose, onDraftSaved, onDraft
                                                         stroke: 2
                                                     }, void 0, false, {
                                                         fileName: "[project]/components/feed/post/PostModal.tsx",
-                                                        lineNumber: 1565,
+                                                        lineNumber: 1568,
                                                         columnNumber: 19
                                                     }, this),
                                                     copy.back
                                                 ]
                                             }, void 0, true, {
                                                 fileName: "[project]/components/feed/post/PostModal.tsx",
-                                                lineNumber: 1556,
+                                                lineNumber: 1559,
                                                 columnNumber: 15
                                             }, this)
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/components/feed/post/PostModal.tsx",
-                                        lineNumber: 1508,
+                                        lineNumber: 1511,
                                         columnNumber: 11
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -7143,7 +7145,7 @@ function PostModal({ locale, mode, opened, draft, onClose, onDraftSaved, onDraft
                                             children: copy.next
                                         }, void 0, false, {
                                             fileName: "[project]/components/feed/post/PostModal.tsx",
-                                            lineNumber: 1574,
+                                            lineNumber: 1577,
                                             columnNumber: 15
                                         }, this) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["Fragment"], {
                                             children: [
@@ -7160,14 +7162,14 @@ function PostModal({ locale, mode, opened, draft, onClose, onDraftSaved, onDraft
                                                             stroke: 2
                                                         }, void 0, false, {
                                                             fileName: "[project]/components/feed/post/PostModal.tsx",
-                                                            lineNumber: 1593,
+                                                            lineNumber: 1596,
                                                             columnNumber: 23
                                                         }, this),
                                                         isSavingDraft ? copy.savingDraft : copy.saveDraft
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/components/feed/post/PostModal.tsx",
-                                                    lineNumber: 1585,
+                                                    lineNumber: 1588,
                                                     columnNumber: 19
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
@@ -7178,20 +7180,20 @@ function PostModal({ locale, mode, opened, draft, onClose, onDraftSaved, onDraft
                                                     children: step === 2 && canChoosePublisher ? copy.next : isPublishing ? isEditingPublished ? copy.savingChanges : copy.publishing : isEditingPublished ? copy.saveChanges : copy.publish
                                                 }, void 0, false, {
                                                     fileName: "[project]/components/feed/post/PostModal.tsx",
-                                                    lineNumber: 1598,
+                                                    lineNumber: 1601,
                                                     columnNumber: 17
                                                 }, this)
                                             ]
                                         }, void 0, true)
                                     }, void 0, false, {
                                         fileName: "[project]/components/feed/post/PostModal.tsx",
-                                        lineNumber: 1572,
+                                        lineNumber: 1575,
                                         columnNumber: 11
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/components/feed/post/PostModal.tsx",
-                                lineNumber: 1507,
+                                lineNumber: 1510,
                                 columnNumber: 9
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("input", {
@@ -7208,7 +7210,7 @@ function PostModal({ locale, mode, opened, draft, onClose, onDraftSaved, onDraft
                                 }
                             }, void 0, false, {
                                 fileName: "[project]/components/feed/post/PostModal.tsx",
-                                lineNumber: 1616,
+                                lineNumber: 1619,
                                 columnNumber: 9
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("input", {
@@ -7225,19 +7227,19 @@ function PostModal({ locale, mode, opened, draft, onClose, onDraftSaved, onDraft
                                 }
                             }, void 0, false, {
                                 fileName: "[project]/components/feed/post/PostModal.tsx",
-                                lineNumber: 1629,
+                                lineNumber: 1632,
                                 columnNumber: 9
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "[project]/components/feed/post/PostModal.tsx",
-                        lineNumber: 1118,
+                        lineNumber: 1121,
                         columnNumber: 9
                     }, this)
                 ]
             }, void 0, true, {
                 fileName: "[project]/components/feed/post/PostModal.tsx",
-                lineNumber: 1092,
+                lineNumber: 1095,
                 columnNumber: 7
             }, this),
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$feed$2f$post$2f$ImageCropEditor$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["default"], {
@@ -7250,7 +7252,7 @@ function PostModal({ locale, mode, opened, draft, onClose, onDraftSaved, onDraft
                 onApply: applyCroppedImage
             }, imageCropQueue[0] ? `${imageCropQueue[0].name}-${imageCropQueue[0].lastModified}-${imageCropQueue.length}` : 'closed', false, {
                 fileName: "[project]/components/feed/post/PostModal.tsx",
-                lineNumber: 1645,
+                lineNumber: 1648,
                 columnNumber: 7
             }, this),
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mantine$2f$core$2f$esm$2f$components$2f$Modal$2f$Modal$2e$mjs__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["Modal"], {
@@ -7279,7 +7281,7 @@ function PostModal({ locale, mode, opened, draft, onClose, onDraftSaved, onDraft
                         children: isUploadInFlight ? copy.exitUploadingDescription : isEditingPublished ? copy.editExitDescription : copy.exitDescription
                     }, void 0, false, {
                         fileName: "[project]/components/feed/post/PostModal.tsx",
-                        lineNumber: 1675,
+                        lineNumber: 1678,
                         columnNumber: 9
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -7297,14 +7299,14 @@ function PostModal({ locale, mode, opened, draft, onClose, onDraftSaved, onDraft
                                         stroke: 2
                                     }, void 0, false, {
                                         fileName: "[project]/components/feed/post/PostModal.tsx",
-                                        lineNumber: 1690,
+                                        lineNumber: 1693,
                                         columnNumber: 15
                                     }, this),
                                     isEditingPublished ? copy.discardChanges : copy.exitDiscard
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/components/feed/post/PostModal.tsx",
-                                lineNumber: 1683,
+                                lineNumber: 1686,
                                 columnNumber: 11
                             }, this),
                             canSaveAsDraftOnExit ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
@@ -7320,14 +7322,14 @@ function PostModal({ locale, mode, opened, draft, onClose, onDraftSaved, onDraft
                                         stroke: 2
                                     }, void 0, false, {
                                         fileName: "[project]/components/feed/post/PostModal.tsx",
-                                        lineNumber: 1703,
+                                        lineNumber: 1706,
                                         columnNumber: 17
                                     }, this),
                                     isSavingDraft ? copy.savingDraft : copy.exitSaveDraft
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/components/feed/post/PostModal.tsx",
-                                lineNumber: 1695,
+                                lineNumber: 1698,
                                 columnNumber: 13
                             }, this) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
                                 type: "button",
@@ -7337,19 +7339,19 @@ function PostModal({ locale, mode, opened, draft, onClose, onDraftSaved, onDraft
                                 children: copy.keepEditing
                             }, void 0, false, {
                                 fileName: "[project]/components/feed/post/PostModal.tsx",
-                                lineNumber: 1708,
+                                lineNumber: 1711,
                                 columnNumber: 13
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "[project]/components/feed/post/PostModal.tsx",
-                        lineNumber: 1682,
+                        lineNumber: 1685,
                         columnNumber: 9
                     }, this)
                 ]
             }, void 0, true, {
                 fileName: "[project]/components/feed/post/PostModal.tsx",
-                lineNumber: 1656,
+                lineNumber: 1659,
                 columnNumber: 7
             }, this),
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mantine$2f$core$2f$esm$2f$components$2f$Modal$2f$Modal$2e$mjs__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["Modal"], {
@@ -7368,7 +7370,7 @@ function PostModal({ locale, mode, opened, draft, onClose, onDraftSaved, onDraft
                         children: copy.discardDescription
                     }, void 0, false, {
                         fileName: "[project]/components/feed/post/PostModal.tsx",
-                        lineNumber: 1731,
+                        lineNumber: 1734,
                         columnNumber: 9
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -7382,7 +7384,7 @@ function PostModal({ locale, mode, opened, draft, onClose, onDraftSaved, onDraft
                                 children: copy.keepEditing
                             }, void 0, false, {
                                 fileName: "[project]/components/feed/post/PostModal.tsx",
-                                lineNumber: 1733,
+                                lineNumber: 1736,
                                 columnNumber: 11
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
@@ -7397,26 +7399,26 @@ function PostModal({ locale, mode, opened, draft, onClose, onDraftSaved, onDraft
                                         stroke: 2
                                     }, void 0, false, {
                                         fileName: "[project]/components/feed/post/PostModal.tsx",
-                                        lineNumber: 1748,
+                                        lineNumber: 1751,
                                         columnNumber: 15
                                     }, this),
                                     isDiscardingDraft ? copy.discarding : copy.discardDraft
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/components/feed/post/PostModal.tsx",
-                                lineNumber: 1741,
+                                lineNumber: 1744,
                                 columnNumber: 11
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "[project]/components/feed/post/PostModal.tsx",
-                        lineNumber: 1732,
+                        lineNumber: 1735,
                         columnNumber: 9
                     }, this)
                 ]
             }, void 0, true, {
                 fileName: "[project]/components/feed/post/PostModal.tsx",
-                lineNumber: 1720,
+                lineNumber: 1723,
                 columnNumber: 7
             }, this),
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$feed$2f$post$2f$KnowledgeLibraryDrawer$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["default"], {
@@ -7434,7 +7436,7 @@ function PostModal({ locale, mode, opened, draft, onClose, onDraftSaved, onDraft
                 }
             }, void 0, false, {
                 fileName: "[project]/components/feed/post/PostModal.tsx",
-                lineNumber: 1755,
+                lineNumber: 1758,
                 columnNumber: 7
             }, this)
         ]
@@ -7557,7 +7559,9 @@ const copyByLocale = {
         trackFailed: 'Unable to update tracking for this post.',
         trackTooltip: 'Track this post to see more content like it in your feed.',
         untrackTooltip: 'Untrack this post to stop seeing more content like it in your feed.',
-        ownPostTracking: 'You cannot track your own post.'
+        ownPostTracking: 'You cannot track your own post.',
+        readMore: 'Read more',
+        readLess: 'Read less'
     },
     ar: {
         title: 'منشوراتي',
@@ -7602,7 +7606,9 @@ const copyByLocale = {
         trackFailed: 'تعذر تحديث تتبّع هذا المنشور.',
         trackTooltip: 'تتبّع هذا المنشور لرؤية المزيد من المحتوى المشابه له في موجزك.',
         untrackTooltip: 'ألغِ تتبّع هذا المنشور للتوقف عن رؤية المزيد من المحتوى المشابه له في موجزك.',
-        ownPostTracking: 'لا يمكنك تتبّع منشورك الخاص.'
+        ownPostTracking: 'لا يمكنك تتبّع منشورك الخاص.',
+        readMore: 'قراءة المزيد',
+        readLess: 'قراءة أقل'
     }
 };
 function stripHtml(html) {
@@ -7656,52 +7662,52 @@ function FeedSkeleton() {
                                 className: "h-4 w-40 rounded bg-slate-100"
                             }, void 0, false, {
                                 fileName: "[project]/components/feed/MyFeedsTimeline.tsx",
-                                lineNumber: 193,
+                                lineNumber: 197,
                                 columnNumber: 13
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                                 className: "h-8 w-8 rounded bg-slate-100"
                             }, void 0, false, {
                                 fileName: "[project]/components/feed/MyFeedsTimeline.tsx",
-                                lineNumber: 194,
+                                lineNumber: 198,
                                 columnNumber: 13
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "[project]/components/feed/MyFeedsTimeline.tsx",
-                        lineNumber: 192,
+                        lineNumber: 196,
                         columnNumber: 11
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                         className: "mt-6 h-4 w-full rounded bg-slate-100"
                     }, void 0, false, {
                         fileName: "[project]/components/feed/MyFeedsTimeline.tsx",
-                        lineNumber: 196,
+                        lineNumber: 200,
                         columnNumber: 11
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                         className: "mt-3 h-4 w-3/4 rounded bg-slate-100"
                     }, void 0, false, {
                         fileName: "[project]/components/feed/MyFeedsTimeline.tsx",
-                        lineNumber: 197,
+                        lineNumber: 201,
                         columnNumber: 11
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                         className: "mt-5 aspect-[16/6] rounded-md bg-slate-100"
                     }, void 0, false, {
                         fileName: "[project]/components/feed/MyFeedsTimeline.tsx",
-                        lineNumber: 198,
+                        lineNumber: 202,
                         columnNumber: 11
                     }, this)
                 ]
             }, item, true, {
                 fileName: "[project]/components/feed/MyFeedsTimeline.tsx",
-                lineNumber: 191,
+                lineNumber: 195,
                 columnNumber: 9
             }, this))
     }, void 0, false, {
         fileName: "[project]/components/feed/MyFeedsTimeline.tsx",
-        lineNumber: 189,
+        lineNumber: 193,
         columnNumber: 5
     }, this);
 }
@@ -7782,17 +7788,17 @@ function ImageGallery({ media, imageAlt, locale, flushBottom = false }) {
                         }
                     }, void 0, false, {
                         fileName: "[project]/components/feed/MyFeedsTimeline.tsx",
-                        lineNumber: 300,
+                        lineNumber: 304,
                         columnNumber: 13
                     }, this)
                 }, void 0, false, {
                     fileName: "[project]/components/feed/MyFeedsTimeline.tsx",
-                    lineNumber: 294,
+                    lineNumber: 298,
                     columnNumber: 11
                 }, this)
             }, void 0, false, {
                 fileName: "[project]/components/feed/MyFeedsTimeline.tsx",
-                lineNumber: 289,
+                lineNumber: 293,
                 columnNumber: 9
             }, this),
             isTwoImageLayout && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -7810,17 +7816,17 @@ function ImageGallery({ media, imageAlt, locale, flushBottom = false }) {
                             className: "feed-media-contain block h-full w-full object-contain"
                         }, void 0, false, {
                             fileName: "[project]/components/feed/MyFeedsTimeline.tsx",
-                            lineNumber: 326,
+                            lineNumber: 330,
                             columnNumber: 15
                         }, this)
                     }, item.id, false, {
                         fileName: "[project]/components/feed/MyFeedsTimeline.tsx",
-                        lineNumber: 319,
+                        lineNumber: 323,
                         columnNumber: 13
                     }, this))
             }, void 0, false, {
                 fileName: "[project]/components/feed/MyFeedsTimeline.tsx",
-                lineNumber: 312,
+                lineNumber: 316,
                 columnNumber: 9
             }, this),
             hasInlineCarousel && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -7857,17 +7863,17 @@ function ImageGallery({ media, imageAlt, locale, flushBottom = false }) {
                                     className: "feed-media-contain block h-full w-full object-contain"
                                 }, void 0, false, {
                                     fileName: "[project]/components/feed/MyFeedsTimeline.tsx",
-                                    lineNumber: 371,
+                                    lineNumber: 375,
                                     columnNumber: 17
                                 }, this)
                             }, item.id, false, {
                                 fileName: "[project]/components/feed/MyFeedsTimeline.tsx",
-                                lineNumber: 363,
+                                lineNumber: 367,
                                 columnNumber: 15
                             }, this))
                     }, void 0, false, {
                         fileName: "[project]/components/feed/MyFeedsTimeline.tsx",
-                        lineNumber: 344,
+                        lineNumber: 348,
                         columnNumber: 11
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -7880,7 +7886,7 @@ function ImageGallery({ media, imageAlt, locale, flushBottom = false }) {
                         ]
                     }, void 0, true, {
                         fileName: "[project]/components/feed/MyFeedsTimeline.tsx",
-                        lineNumber: 381,
+                        lineNumber: 385,
                         columnNumber: 11
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
@@ -7894,19 +7900,19 @@ function ImageGallery({ media, imageAlt, locale, flushBottom = false }) {
                             className: "h-5 w-5"
                         }, void 0, false, {
                             fileName: "[project]/components/feed/MyFeedsTimeline.tsx",
-                            lineNumber: 395,
+                            lineNumber: 399,
                             columnNumber: 25
                         }, this) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$tabler$2f$icons$2d$react$2f$dist$2f$esm$2f$icons$2f$IconChevronLeft$2e$mjs__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__$3c$export__default__as__IconChevronLeft$3e$__["IconChevronLeft"], {
                             "aria-hidden": true,
                             className: "h-5 w-5"
                         }, void 0, false, {
                             fileName: "[project]/components/feed/MyFeedsTimeline.tsx",
-                            lineNumber: 395,
+                            lineNumber: 399,
                             columnNumber: 80
                         }, this)
                     }, void 0, false, {
                         fileName: "[project]/components/feed/MyFeedsTimeline.tsx",
-                        lineNumber: 388,
+                        lineNumber: 392,
                         columnNumber: 11
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
@@ -7920,25 +7926,25 @@ function ImageGallery({ media, imageAlt, locale, flushBottom = false }) {
                             className: "h-5 w-5"
                         }, void 0, false, {
                             fileName: "[project]/components/feed/MyFeedsTimeline.tsx",
-                            lineNumber: 404,
+                            lineNumber: 408,
                             columnNumber: 25
                         }, this) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$tabler$2f$icons$2d$react$2f$dist$2f$esm$2f$icons$2f$IconChevronRight$2e$mjs__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__$3c$export__default__as__IconChevronRight$3e$__["IconChevronRight"], {
                             "aria-hidden": true,
                             className: "h-5 w-5"
                         }, void 0, false, {
                             fileName: "[project]/components/feed/MyFeedsTimeline.tsx",
-                            lineNumber: 404,
+                            lineNumber: 408,
                             columnNumber: 79
                         }, this)
                     }, void 0, false, {
                         fileName: "[project]/components/feed/MyFeedsTimeline.tsx",
-                        lineNumber: 397,
+                        lineNumber: 401,
                         columnNumber: 11
                     }, this)
                 ]
             }, void 0, true, {
                 fileName: "[project]/components/feed/MyFeedsTimeline.tsx",
-                lineNumber: 338,
+                lineNumber: 342,
                 columnNumber: 9
             }, this),
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mantine$2f$core$2f$esm$2f$components$2f$Modal$2f$Modal$2e$mjs__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["Modal"], {
@@ -7977,12 +7983,12 @@ function ImageGallery({ media, imageAlt, locale, flushBottom = false }) {
                                 stroke: 2.2
                             }, void 0, false, {
                                 fileName: "[project]/components/feed/MyFeedsTimeline.tsx",
-                                lineNumber: 432,
+                                lineNumber: 436,
                                 columnNumber: 15
                             }, this)
                         }, void 0, false, {
                             fileName: "[project]/components/feed/MyFeedsTimeline.tsx",
-                            lineNumber: 426,
+                            lineNumber: 430,
                             columnNumber: 13
                         }, this),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("img", {
@@ -7994,7 +8000,7 @@ function ImageGallery({ media, imageAlt, locale, flushBottom = false }) {
                             }
                         }, void 0, false, {
                             fileName: "[project]/components/feed/MyFeedsTimeline.tsx",
-                            lineNumber: 434,
+                            lineNumber: 438,
                             columnNumber: 13
                         }, this),
                         isCarousel && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["Fragment"], {
@@ -8009,19 +8015,19 @@ function ImageGallery({ media, imageAlt, locale, flushBottom = false }) {
                                         className: "h-6 w-6"
                                     }, void 0, false, {
                                         fileName: "[project]/components/feed/MyFeedsTimeline.tsx",
-                                        lineNumber: 449,
+                                        lineNumber: 453,
                                         columnNumber: 31
                                     }, this) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$tabler$2f$icons$2d$react$2f$dist$2f$esm$2f$icons$2f$IconChevronLeft$2e$mjs__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__$3c$export__default__as__IconChevronLeft$3e$__["IconChevronLeft"], {
                                         "aria-hidden": true,
                                         className: "h-6 w-6"
                                     }, void 0, false, {
                                         fileName: "[project]/components/feed/MyFeedsTimeline.tsx",
-                                        lineNumber: 449,
+                                        lineNumber: 453,
                                         columnNumber: 86
                                     }, this)
                                 }, void 0, false, {
                                     fileName: "[project]/components/feed/MyFeedsTimeline.tsx",
-                                    lineNumber: 443,
+                                    lineNumber: 447,
                                     columnNumber: 17
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
@@ -8034,19 +8040,19 @@ function ImageGallery({ media, imageAlt, locale, flushBottom = false }) {
                                         className: "h-6 w-6"
                                     }, void 0, false, {
                                         fileName: "[project]/components/feed/MyFeedsTimeline.tsx",
-                                        lineNumber: 457,
+                                        lineNumber: 461,
                                         columnNumber: 31
                                     }, this) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$tabler$2f$icons$2d$react$2f$dist$2f$esm$2f$icons$2f$IconChevronRight$2e$mjs__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__$3c$export__default__as__IconChevronRight$3e$__["IconChevronRight"], {
                                         "aria-hidden": true,
                                         className: "h-6 w-6"
                                     }, void 0, false, {
                                         fileName: "[project]/components/feed/MyFeedsTimeline.tsx",
-                                        lineNumber: 457,
+                                        lineNumber: 461,
                                         columnNumber: 85
                                     }, this)
                                 }, void 0, false, {
                                     fileName: "[project]/components/feed/MyFeedsTimeline.tsx",
-                                    lineNumber: 451,
+                                    lineNumber: 455,
                                     columnNumber: 17
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -8055,7 +8061,7 @@ function ImageGallery({ media, imageAlt, locale, flushBottom = false }) {
                                     children: copy.imageCount((activeImageIndex ?? 0) + 1, media.length)
                                 }, void 0, false, {
                                     fileName: "[project]/components/feed/MyFeedsTimeline.tsx",
-                                    lineNumber: 459,
+                                    lineNumber: 463,
                                     columnNumber: 17
                                 }, this)
                             ]
@@ -8063,12 +8069,12 @@ function ImageGallery({ media, imageAlt, locale, flushBottom = false }) {
                     ]
                 }, void 0, true, {
                     fileName: "[project]/components/feed/MyFeedsTimeline.tsx",
-                    lineNumber: 425,
+                    lineNumber: 429,
                     columnNumber: 11
                 }, this)
             }, void 0, false, {
                 fileName: "[project]/components/feed/MyFeedsTimeline.tsx",
-                lineNumber: 409,
+                lineNumber: 413,
                 columnNumber: 7
             }, this)
         ]
@@ -8289,7 +8295,7 @@ function VideoPlayer({ media, title, playLabel, flushBottom = false }) {
                         }
                     }, `mp4-${playerEpoch}`, false, {
                         fileName: "[project]/components/feed/MyFeedsTimeline.tsx",
-                        lineNumber: 687,
+                        lineNumber: 691,
                         columnNumber: 13
                     }, this),
                     shouldPreload && !useMp4Fallback && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("mux-player", {
@@ -8316,7 +8322,7 @@ function VideoPlayer({ media, title, playLabel, flushBottom = false }) {
                         }
                     }, playerEpoch, false, {
                         fileName: "[project]/components/feed/MyFeedsTimeline.tsx",
-                        lineNumber: 710,
+                        lineNumber: 714,
                         columnNumber: 13
                     }, this),
                     autoplayBlocked && isInViewport && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
@@ -8344,30 +8350,30 @@ function VideoPlayer({ media, title, playLabel, flushBottom = false }) {
                                     className: "h-5 w-5"
                                 }, void 0, false, {
                                     fileName: "[project]/components/feed/MyFeedsTimeline.tsx",
-                                    lineNumber: 751,
+                                    lineNumber: 755,
                                     columnNumber: 17
                                 }, this),
                                 playLabel
                             ]
                         }, void 0, true, {
                             fileName: "[project]/components/feed/MyFeedsTimeline.tsx",
-                            lineNumber: 750,
+                            lineNumber: 754,
                             columnNumber: 15
                         }, this)
                     }, void 0, false, {
                         fileName: "[project]/components/feed/MyFeedsTimeline.tsx",
-                        lineNumber: 732,
+                        lineNumber: 736,
                         columnNumber: 13
                     }, this)
                 ]
             }, void 0, true, {
                 fileName: "[project]/components/feed/MyFeedsTimeline.tsx",
-                lineNumber: 675,
+                lineNumber: 679,
                 columnNumber: 9
             }, this)
         }, void 0, false, {
             fileName: "[project]/components/feed/MyFeedsTimeline.tsx",
-            lineNumber: 672,
+            lineNumber: 676,
             columnNumber: 7
         }, this));
     }
@@ -8379,12 +8385,12 @@ function VideoPlayer({ media, title, playLabel, flushBottom = false }) {
             stroke: 1.5
         }, void 0, false, {
             fileName: "[project]/components/feed/MyFeedsTimeline.tsx",
-            lineNumber: 763,
+            lineNumber: 767,
             columnNumber: 7
         }, this)
     }, void 0, false, {
         fileName: "[project]/components/feed/MyFeedsTimeline.tsx",
-        lineNumber: 762,
+        lineNumber: 766,
         columnNumber: 5
     }, this);
 }
@@ -8408,12 +8414,12 @@ function ArticlePreview({ item, cover, locale, isPublic, flushBottom = false }) 
                     className: "h-full w-full object-cover transition-transform duration-500 group-hover:scale-[1.015]"
                 }, void 0, false, {
                     fileName: "[project]/components/feed/MyFeedsTimeline.tsx",
-                    lineNumber: 801,
+                    lineNumber: 805,
                     columnNumber: 11
                 }, this)
             }, void 0, false, {
                 fileName: "[project]/components/feed/MyFeedsTimeline.tsx",
-                lineNumber: 800,
+                lineNumber: 804,
                 columnNumber: 9
             }, this) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                 className: "flex aspect-[1.91/1] w-full items-center justify-center bg-[linear-gradient(135deg,#EAF1F8_0%,#DCE8F4_100%)] text-[#6C829E]",
@@ -8423,12 +8429,12 @@ function ArticlePreview({ item, cover, locale, isPublic, flushBottom = false }) 
                     stroke: 1.3
                 }, void 0, false, {
                     fileName: "[project]/components/feed/MyFeedsTimeline.tsx",
-                    lineNumber: 810,
+                    lineNumber: 814,
                     columnNumber: 11
                 }, this)
             }, void 0, false, {
                 fileName: "[project]/components/feed/MyFeedsTimeline.tsx",
-                lineNumber: 809,
+                lineNumber: 813,
                 columnNumber: 9
             }, this),
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -8443,20 +8449,20 @@ function ArticlePreview({ item, cover, locale, isPublic, flushBottom = false }) 
                                 stroke: 1.8
                             }, void 0, false, {
                                 fileName: "[project]/components/feed/MyFeedsTimeline.tsx",
-                                lineNumber: 816,
+                                lineNumber: 820,
                                 columnNumber: 11
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
                                 children: copy.article
                             }, void 0, false, {
                                 fileName: "[project]/components/feed/MyFeedsTimeline.tsx",
-                                lineNumber: 817,
+                                lineNumber: 821,
                                 columnNumber: 11
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "[project]/components/feed/MyFeedsTimeline.tsx",
-                        lineNumber: 815,
+                        lineNumber: 819,
                         columnNumber: 9
                     }, this),
                     item.title && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("h2", {
@@ -8465,7 +8471,7 @@ function ArticlePreview({ item, cover, locale, isPublic, flushBottom = false }) 
                         children: item.title
                     }, void 0, false, {
                         fileName: "[project]/components/feed/MyFeedsTimeline.tsx",
-                        lineNumber: 821,
+                        lineNumber: 825,
                         columnNumber: 11
                     }, this),
                     articleText && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -8474,19 +8480,19 @@ function ArticlePreview({ item, cover, locale, isPublic, flushBottom = false }) 
                         children: articleText
                     }, void 0, false, {
                         fileName: "[project]/components/feed/MyFeedsTimeline.tsx",
-                        lineNumber: 830,
+                        lineNumber: 834,
                         columnNumber: 11
                     }, this)
                 ]
             }, void 0, true, {
                 fileName: "[project]/components/feed/MyFeedsTimeline.tsx",
-                lineNumber: 814,
+                lineNumber: 818,
                 columnNumber: 7
             }, this)
         ]
     }, void 0, true, {
         fileName: "[project]/components/feed/MyFeedsTimeline.tsx",
-        lineNumber: 788,
+        lineNumber: 792,
         columnNumber: 5
     }, this);
 }
@@ -8507,7 +8513,7 @@ function TrackSignalIcon({ animated }) {
                 r: "1.5"
             }, void 0, false, {
                 fileName: "[project]/components/feed/MyFeedsTimeline.tsx",
-                lineNumber: 854,
+                lineNumber: 858,
                 columnNumber: 7
             }, this),
             animated ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["Fragment"], {
@@ -8523,7 +8529,7 @@ function TrackSignalIcon({ animated }) {
                         }
                     }, void 0, false, {
                         fileName: "[project]/components/feed/MyFeedsTimeline.tsx",
-                        lineNumber: 857,
+                        lineNumber: 861,
                         columnNumber: 11
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("circle", {
@@ -8537,7 +8543,7 @@ function TrackSignalIcon({ animated }) {
                         }
                     }, void 0, false, {
                         fileName: "[project]/components/feed/MyFeedsTimeline.tsx",
-                        lineNumber: 865,
+                        lineNumber: 869,
                         columnNumber: 11
                     }, this)
                 ]
@@ -8549,7 +8555,7 @@ function TrackSignalIcon({ animated }) {
                         r: "4.5"
                     }, void 0, false, {
                         fileName: "[project]/components/feed/MyFeedsTimeline.tsx",
-                        lineNumber: 876,
+                        lineNumber: 880,
                         columnNumber: 11
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("circle", {
@@ -8558,7 +8564,7 @@ function TrackSignalIcon({ animated }) {
                         r: "8.5"
                     }, void 0, false, {
                         fileName: "[project]/components/feed/MyFeedsTimeline.tsx",
-                        lineNumber: 877,
+                        lineNumber: 881,
                         columnNumber: 11
                     }, this)
                 ]
@@ -8566,7 +8572,7 @@ function TrackSignalIcon({ animated }) {
         ]
     }, void 0, true, {
         fileName: "[project]/components/feed/MyFeedsTimeline.tsx",
-        lineNumber: 844,
+        lineNumber: 848,
         columnNumber: 5
     }, this);
 }
@@ -8578,6 +8584,9 @@ function FeedCard({ item, locale, onDelete, onEdit, onSaveChange, articleAccess 
     const [openingInsight, setOpeningInsight] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useState"])(null);
     const [isTracked, setIsTracked] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useState"])(item.is_tracked === true);
     const [isUpdatingTrack, setIsUpdatingTrack] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useState"])(false);
+    const [isBodyExpanded, setIsBodyExpanded] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useState"])(false);
+    const [isBodyOverflowing, setIsBodyOverflowing] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useState"])(false);
+    const bodyContentRef = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useRef"])(null);
     const date = formatPostDate(item.published_at ?? item.created_at, locale);
     const isArticle = item.content_type === 'article';
     const isPostTitleArabic = (0, __TURBOPACK__imported__module__$5b$project$5d2f$app$2f$utils$2f$textUtils$2e$ts__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["isFirstWordArabic"])(item.title ?? '');
@@ -8587,6 +8596,7 @@ function FeedCard({ item, locale, onDelete, onEdit, onSaveChange, articleAccess 
     const videoMedia = item.media.find((media)=>media.media_type === 'video');
     const attachments = item.media.filter((media)=>media.media_type === 'attachment' && media.url);
     const hasPostMedia = Boolean(videoMedia) || imageMedia.length > 0;
+    const hasRichContent = isArticle || hasPostMedia || attachments.length > 0 || item.related_insights.length > 0;
     const showEngagementActions = articleAccess === 'community' && Boolean(item.insighter);
     const isMediaLast = attachments.length === 0 && item.related_insights.length === 0 && !showEngagementActions;
     const statusTone = item.status === 'published' ? 'bg-[#EAF8F1] text-[#168A55]' : item.status === 'failed' ? 'bg-[#FFF0EE] text-[#B53B32]' : 'bg-[#FFF5E5] text-[#A96710]';
@@ -8616,6 +8626,29 @@ function FeedCard({ item, locale, onDelete, onEdit, onSaveChange, articleAccess 
     }, [
         item.is_tracked,
         item.uuid
+    ]);
+    (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useEffect"])(()=>{
+        setIsBodyExpanded(false);
+    }, [
+        item.body,
+        item.uuid
+    ]);
+    (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useEffect"])(()=>{
+        const bodyContent = bodyContentRef.current;
+        if (!bodyContent) {
+            setIsBodyOverflowing(false);
+            return;
+        }
+        const collapsedBodyHeight = 200;
+        const measureOverflow = ()=>{
+            setIsBodyOverflowing(bodyContent.scrollHeight > collapsedBodyHeight + 1);
+        };
+        measureOverflow();
+        const resizeObserver = new ResizeObserver(measureOverflow);
+        resizeObserver.observe(bodyContent);
+        return ()=>resizeObserver.disconnect();
+    }, [
+        item.body
     ]);
     const updateTracking = async ()=>{
         if (isUpdatingTrack || isOwnPost) return;
@@ -8655,24 +8688,24 @@ function FeedCard({ item, locale, onDelete, onEdit, onSaveChange, articleAccess 
                                             className: `h-full w-full ${isPublishedAsCompany ? 'object-contain p-1' : 'object-cover object-top'}`
                                         }, void 0, false, {
                                             fileName: "[project]/components/feed/MyFeedsTimeline.tsx",
-                                            lineNumber: 1000,
+                                            lineNumber: 1032,
                                             columnNumber: 19
                                         }, this) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                                             className: "flex h-full w-full items-center justify-center text-[13px] font-bold text-[#2378E8]",
                                             children: publisherInitials || 'I'
                                         }, void 0, false, {
                                             fileName: "[project]/components/feed/MyFeedsTimeline.tsx",
-                                            lineNumber: 1006,
+                                            lineNumber: 1038,
                                             columnNumber: 19
                                         }, this)
                                     }, void 0, false, {
                                         fileName: "[project]/components/feed/MyFeedsTimeline.tsx",
-                                        lineNumber: 998,
+                                        lineNumber: 1030,
                                         columnNumber: 17
                                     }, this)
                                 }, void 0, false, {
                                     fileName: "[project]/components/feed/MyFeedsTimeline.tsx",
-                                    lineNumber: 997,
+                                    lineNumber: 1029,
                                     columnNumber: 15
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -8686,7 +8719,7 @@ function FeedCard({ item, locale, onDelete, onEdit, onSaveChange, articleAccess 
                                             children: publisherName
                                         }, void 0, false, {
                                             fileName: "[project]/components/feed/MyFeedsTimeline.tsx",
-                                            lineNumber: 1013,
+                                            lineNumber: 1045,
                                             columnNumber: 17
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -8700,7 +8733,7 @@ function FeedCard({ item, locale, onDelete, onEdit, onSaveChange, articleAccess 
                                                     children: item.industry.name
                                                 }, void 0, false, {
                                                     fileName: "[project]/components/feed/MyFeedsTimeline.tsx",
-                                                    lineNumber: 1023,
+                                                    lineNumber: 1055,
                                                     columnNumber: 21
                                                 }, this),
                                                 date && item.industry && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -8709,7 +8742,7 @@ function FeedCard({ item, locale, onDelete, onEdit, onSaveChange, articleAccess 
                                                     children: "·"
                                                 }, void 0, false, {
                                                     fileName: "[project]/components/feed/MyFeedsTimeline.tsx",
-                                                    lineNumber: 1032,
+                                                    lineNumber: 1064,
                                                     columnNumber: 45
                                                 }, this),
                                                 date && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("time", {
@@ -8718,30 +8751,30 @@ function FeedCard({ item, locale, onDelete, onEdit, onSaveChange, articleAccess 
                                                     children: date
                                                 }, void 0, false, {
                                                     fileName: "[project]/components/feed/MyFeedsTimeline.tsx",
-                                                    lineNumber: 1034,
+                                                    lineNumber: 1066,
                                                     columnNumber: 21
                                                 }, this)
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/components/feed/MyFeedsTimeline.tsx",
-                                            lineNumber: 1021,
+                                            lineNumber: 1053,
                                             columnNumber: 17
                                         }, this)
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/components/feed/MyFeedsTimeline.tsx",
-                                    lineNumber: 1012,
+                                    lineNumber: 1044,
                                     columnNumber: 15
                                 }, this)
                             ]
                         }, void 0, true, {
                             fileName: "[project]/components/feed/MyFeedsTimeline.tsx",
-                            lineNumber: 996,
+                            lineNumber: 1028,
                             columnNumber: 13
                         }, this)
                     }, void 0, false, {
                         fileName: "[project]/components/feed/MyFeedsTimeline.tsx",
-                        lineNumber: 994,
+                        lineNumber: 1026,
                         columnNumber: 9
                     }, this),
                     (onDelete || onEdit || articleAccess === 'community') && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -8768,7 +8801,7 @@ function FeedCard({ item, locale, onDelete, onEdit, onSaveChange, articleAccess 
                                                 stroke: 2
                                             }, void 0, false, {
                                                 fileName: "[project]/components/feed/MyFeedsTimeline.tsx",
-                                                lineNumber: 1066,
+                                                lineNumber: 1098,
                                                 columnNumber: 23
                                             }, this) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
                                                 className: `flex h-4 w-4 shrink-0 items-center justify-center ${isTracked ? 'text-[#1D4ED8]' : 'text-[#A5B0BF]'} sm:h-5 sm:w-5`,
@@ -8777,35 +8810,35 @@ function FeedCard({ item, locale, onDelete, onEdit, onSaveChange, articleAccess 
                                                     animated: isTracked
                                                 }, void 0, false, {
                                                     fileName: "[project]/components/feed/MyFeedsTimeline.tsx",
-                                                    lineNumber: 1069,
+                                                    lineNumber: 1101,
                                                     columnNumber: 25
                                                 }, this)
                                             }, void 0, false, {
                                                 fileName: "[project]/components/feed/MyFeedsTimeline.tsx",
-                                                lineNumber: 1068,
+                                                lineNumber: 1100,
                                                 columnNumber: 23
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
                                                 children: isTracked ? copy.untrack : copy.track
                                             }, void 0, false, {
                                                 fileName: "[project]/components/feed/MyFeedsTimeline.tsx",
-                                                lineNumber: 1072,
+                                                lineNumber: 1104,
                                                 columnNumber: 21
                                             }, this)
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/components/feed/MyFeedsTimeline.tsx",
-                                        lineNumber: 1057,
+                                        lineNumber: 1089,
                                         columnNumber: 19
                                     }, this)
                                 }, void 0, false, {
                                     fileName: "[project]/components/feed/MyFeedsTimeline.tsx",
-                                    lineNumber: 1056,
+                                    lineNumber: 1088,
                                     columnNumber: 17
                                 }, this)
                             }, void 0, false, {
                                 fileName: "[project]/components/feed/MyFeedsTimeline.tsx",
-                                lineNumber: 1050,
+                                lineNumber: 1082,
                                 columnNumber: 15
                             }, this),
                             (onDelete || onEdit) && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -8813,7 +8846,7 @@ function FeedCard({ item, locale, onDelete, onEdit, onSaveChange, articleAccess 
                                 children: item.status_label
                             }, void 0, false, {
                                 fileName: "[project]/components/feed/MyFeedsTimeline.tsx",
-                                lineNumber: 1079,
+                                lineNumber: 1111,
                                 columnNumber: 15
                             }, this),
                             (onDelete || onEdit) && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mantine$2f$core$2f$esm$2f$components$2f$Menu$2f$Menu$2e$mjs__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["Menu"], {
@@ -8832,17 +8865,17 @@ function FeedCard({ item, locale, onDelete, onEdit, onSaveChange, articleAccess 
                                                 stroke: 2.2
                                             }, void 0, false, {
                                                 fileName: "[project]/components/feed/MyFeedsTimeline.tsx",
-                                                lineNumber: 1092,
+                                                lineNumber: 1124,
                                                 columnNumber: 21
                                             }, this)
                                         }, void 0, false, {
                                             fileName: "[project]/components/feed/MyFeedsTimeline.tsx",
-                                            lineNumber: 1087,
+                                            lineNumber: 1119,
                                             columnNumber: 19
                                         }, this)
                                     }, void 0, false, {
                                         fileName: "[project]/components/feed/MyFeedsTimeline.tsx",
-                                        lineNumber: 1086,
+                                        lineNumber: 1118,
                                         columnNumber: 17
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mantine$2f$core$2f$esm$2f$components$2f$Menu$2f$Menu$2e$mjs__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["Menu"].Dropdown, {
@@ -8854,14 +8887,14 @@ function FeedCard({ item, locale, onDelete, onEdit, onSaveChange, articleAccess 
                                                     stroke: 1.8
                                                 }, void 0, false, {
                                                     fileName: "[project]/components/feed/MyFeedsTimeline.tsx",
-                                                    lineNumber: 1098,
+                                                    lineNumber: 1130,
                                                     columnNumber: 36
                                                 }, void 0),
                                                 onClick: ()=>onEdit(item),
                                                 children: isArticle ? copy.editArticle : copy.edit
                                             }, void 0, false, {
                                                 fileName: "[project]/components/feed/MyFeedsTimeline.tsx",
-                                                lineNumber: 1097,
+                                                lineNumber: 1129,
                                                 columnNumber: 21
                                             }, this),
                                             onDelete && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mantine$2f$core$2f$esm$2f$components$2f$Menu$2f$Menu$2e$mjs__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["Menu"].Item, {
@@ -8872,56 +8905,84 @@ function FeedCard({ item, locale, onDelete, onEdit, onSaveChange, articleAccess 
                                                     stroke: 1.8
                                                 }, void 0, false, {
                                                     fileName: "[project]/components/feed/MyFeedsTimeline.tsx",
-                                                    lineNumber: 1107,
+                                                    lineNumber: 1139,
                                                     columnNumber: 36
                                                 }, void 0),
                                                 onClick: ()=>onDelete(item),
                                                 children: copy.delete
                                             }, void 0, false, {
                                                 fileName: "[project]/components/feed/MyFeedsTimeline.tsx",
-                                                lineNumber: 1105,
+                                                lineNumber: 1137,
                                                 columnNumber: 21
                                             }, this)
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/components/feed/MyFeedsTimeline.tsx",
-                                        lineNumber: 1095,
+                                        lineNumber: 1127,
                                         columnNumber: 17
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/components/feed/MyFeedsTimeline.tsx",
-                                lineNumber: 1085,
+                                lineNumber: 1117,
                                 columnNumber: 15
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "[project]/components/feed/MyFeedsTimeline.tsx",
-                        lineNumber: 1048,
+                        lineNumber: 1080,
                         columnNumber: 11
                     }, this)
                 ]
             }, void 0, true, {
                 fileName: "[project]/components/feed/MyFeedsTimeline.tsx",
-                lineNumber: 993,
+                lineNumber: 1025,
                 columnNumber: 7
             }, this),
             !isArticle && item.title && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("h2", {
                 dir: isPostTitleArabic ? 'rtl' : 'ltr',
-                className: `mt-4 text-[19px] font-bold leading-7 tracking-[-0.02em] text-[#101724] ${isPostTitleArabic ? 'text-right' : 'text-left'}`,
+                className: `mt-4 text-[17px] font-bold leading-6 tracking-[-0.02em] text-[#101724] ${isPostTitleArabic ? 'text-right' : 'text-left'}`,
                 children: item.title
             }, void 0, false, {
                 fileName: "[project]/components/feed/MyFeedsTimeline.tsx",
-                lineNumber: 1121,
+                lineNumber: 1153,
                 columnNumber: 9
             }, this),
-            !isArticle && item.body && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
-                dir: isPostBodyArabic ? 'rtl' : 'ltr',
-                className: `${item.title ? 'mt-2' : 'mt-4'} whitespace-pre-wrap text-[13px] leading-[1.2rem] text-[#1C2433] sm:text-[16px] sm:leading-7 ${isPostBodyArabic ? 'text-right' : 'text-left'}`,
-                children: item.body
-            }, void 0, false, {
+            !isArticle && item.body && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                className: item.title ? 'mt-1.5' : 'mt-4',
+                children: [
+                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                        className: `overflow-hidden ${isBodyExpanded ? 'max-h-none' : 'max-h-[200px]'}`,
+                        children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
+                            ref: bodyContentRef,
+                            dir: isPostBodyArabic ? 'rtl' : 'ltr',
+                            className: `whitespace-pre-wrap text-[14px] leading-5 text-[#1C2433] ${isPostBodyArabic ? 'text-right' : 'text-left'}`,
+                            children: item.body
+                        }, void 0, false, {
+                            fileName: "[project]/components/feed/MyFeedsTimeline.tsx",
+                            lineNumber: 1166,
+                            columnNumber: 13
+                        }, this)
+                    }, void 0, false, {
+                        fileName: "[project]/components/feed/MyFeedsTimeline.tsx",
+                        lineNumber: 1163,
+                        columnNumber: 11
+                    }, this),
+                    isBodyOverflowing && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
+                        type: "button",
+                        "aria-expanded": isBodyExpanded,
+                        onClick: ()=>setIsBodyExpanded((expanded)=>!expanded),
+                        className: `mt-1.5 block text-[12px] font-semibold text-[#2378E8] transition-colors hover:text-[#155DB8] hover:underline focus-visible:rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2378E8] focus-visible:ring-offset-2 ${isPostBodyArabic ? 'ms-auto' : ''}`,
+                        children: isBodyExpanded ? copy.readLess : copy.readMore
+                    }, void 0, false, {
+                        fileName: "[project]/components/feed/MyFeedsTimeline.tsx",
+                        lineNumber: 1176,
+                        columnNumber: 13
+                    }, this)
+                ]
+            }, void 0, true, {
                 fileName: "[project]/components/feed/MyFeedsTimeline.tsx",
-                lineNumber: 1130,
+                lineNumber: 1162,
                 columnNumber: 9
             }, this),
             isArticle && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(ArticlePreview, {
@@ -8932,7 +8993,7 @@ function FeedCard({ item, locale, onDelete, onEdit, onSaveChange, articleAccess 
                 flushBottom: isMediaLast
             }, void 0, false, {
                 fileName: "[project]/components/feed/MyFeedsTimeline.tsx",
-                lineNumber: 1139,
+                lineNumber: 1189,
                 columnNumber: 9
             }, this),
             !isArticle && videoMedia && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(VideoPlayer, {
@@ -8942,7 +9003,7 @@ function FeedCard({ item, locale, onDelete, onEdit, onSaveChange, articleAccess 
                 flushBottom: isMediaLast
             }, void 0, false, {
                 fileName: "[project]/components/feed/MyFeedsTimeline.tsx",
-                lineNumber: 1149,
+                lineNumber: 1199,
                 columnNumber: 9
             }, this),
             !isArticle && imageMedia.length > 0 && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(ImageGallery, {
@@ -8952,7 +9013,7 @@ function FeedCard({ item, locale, onDelete, onEdit, onSaveChange, articleAccess 
                 flushBottom: isMediaLast
             }, void 0, false, {
                 fileName: "[project]/components/feed/MyFeedsTimeline.tsx",
-                lineNumber: 1156,
+                lineNumber: 1206,
                 columnNumber: 47
             }, this),
             attachments.length > 0 && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -8969,7 +9030,7 @@ function FeedCard({ item, locale, onDelete, onEdit, onSaveChange, articleAccess 
                                 stroke: 1.7
                             }, void 0, false, {
                                 fileName: "[project]/components/feed/MyFeedsTimeline.tsx",
-                                lineNumber: 1168,
+                                lineNumber: 1218,
                                 columnNumber: 15
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -8977,18 +9038,18 @@ function FeedCard({ item, locale, onDelete, onEdit, onSaveChange, articleAccess 
                                 children: attachment.name ?? copy.attachment
                             }, void 0, false, {
                                 fileName: "[project]/components/feed/MyFeedsTimeline.tsx",
-                                lineNumber: 1169,
+                                lineNumber: 1219,
                                 columnNumber: 15
                             }, this)
                         ]
                     }, attachment.id, true, {
                         fileName: "[project]/components/feed/MyFeedsTimeline.tsx",
-                        lineNumber: 1161,
+                        lineNumber: 1211,
                         columnNumber: 13
                     }, this))
             }, void 0, false, {
                 fileName: "[project]/components/feed/MyFeedsTimeline.tsx",
-                lineNumber: 1159,
+                lineNumber: 1209,
                 columnNumber: 9
             }, this),
             item.related_insights.length > 0 && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -9015,7 +9076,7 @@ function FeedCard({ item, locale, onDelete, onEdit, onSaveChange, articleAccess 
                                                     size: 16
                                                 }, void 0, false, {
                                                     fileName: "[project]/components/feed/MyFeedsTimeline.tsx",
-                                                    lineNumber: 1197,
+                                                    lineNumber: 1247,
                                                     columnNumber: 21
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -9023,13 +9084,13 @@ function FeedCard({ item, locale, onDelete, onEdit, onSaveChange, articleAccess 
                                                     children: insight.type
                                                 }, void 0, false, {
                                                     fileName: "[project]/components/feed/MyFeedsTimeline.tsx",
-                                                    lineNumber: 1198,
+                                                    lineNumber: 1248,
                                                     columnNumber: 21
                                                 }, this)
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/components/feed/MyFeedsTimeline.tsx",
-                                            lineNumber: 1196,
+                                            lineNumber: 1246,
                                             columnNumber: 19
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("h3", {
@@ -9038,18 +9099,18 @@ function FeedCard({ item, locale, onDelete, onEdit, onSaveChange, articleAccess 
                                             children: insight.title
                                         }, void 0, false, {
                                             fileName: "[project]/components/feed/MyFeedsTimeline.tsx",
-                                            lineNumber: 1202,
+                                            lineNumber: 1252,
                                             columnNumber: 19
                                         }, this)
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/components/feed/MyFeedsTimeline.tsx",
-                                    lineNumber: 1195,
+                                    lineNumber: 1245,
                                     columnNumber: 17
                                 }, this)
                             }, void 0, false, {
                                 fileName: "[project]/components/feed/MyFeedsTimeline.tsx",
-                                lineNumber: 1188,
+                                lineNumber: 1238,
                                 columnNumber: 15
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -9063,7 +9124,7 @@ function FeedCard({ item, locale, onDelete, onEdit, onSaveChange, articleAccess 
                                             children: stripHtml(insight.description)
                                         }, void 0, false, {
                                             fileName: "[project]/components/feed/MyFeedsTimeline.tsx",
-                                            lineNumber: 1214,
+                                            lineNumber: 1264,
                                             columnNumber: 21
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -9080,16 +9141,16 @@ function FeedCard({ item, locale, onDelete, onEdit, onSaveChange, articleAccess 
                                                         children: insightPrice.label
                                                     }, void 0, false, {
                                                         fileName: "[project]/components/feed/MyFeedsTimeline.tsx",
-                                                        lineNumber: 1224,
+                                                        lineNumber: 1274,
                                                         columnNumber: 25
                                                     }, this)
                                                 }, void 0, false, {
                                                     fileName: "[project]/components/feed/MyFeedsTimeline.tsx",
-                                                    lineNumber: 1223,
+                                                    lineNumber: 1273,
                                                     columnNumber: 23
                                                 }, this) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {}, void 0, false, {
                                                     fileName: "[project]/components/feed/MyFeedsTimeline.tsx",
-                                                    lineNumber: 1226,
+                                                    lineNumber: 1276,
                                                     columnNumber: 25
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$client$2f$app$2d$dir$2f$link$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["default"], {
@@ -9112,7 +9173,7 @@ function FeedCard({ item, locale, onDelete, onEdit, onSaveChange, articleAccess 
                                                                 stroke: 2
                                                             }, void 0, false, {
                                                                 fileName: "[project]/components/feed/MyFeedsTimeline.tsx",
-                                                                lineNumber: 1242,
+                                                                lineNumber: 1292,
                                                                 columnNumber: 25
                                                             }, this),
                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -9120,47 +9181,47 @@ function FeedCard({ item, locale, onDelete, onEdit, onSaveChange, articleAccess 
                                                                 children: copy.openingInsight
                                                             }, void 0, false, {
                                                                 fileName: "[project]/components/feed/MyFeedsTimeline.tsx",
-                                                                lineNumber: 1243,
+                                                                lineNumber: 1293,
                                                                 columnNumber: 25
                                                             }, this)
                                                         ]
                                                     }, void 0, true) : copy.viewInsight
                                                 }, void 0, false, {
                                                     fileName: "[project]/components/feed/MyFeedsTimeline.tsx",
-                                                    lineNumber: 1227,
+                                                    lineNumber: 1277,
                                                     columnNumber: 19
                                                 }, this)
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/components/feed/MyFeedsTimeline.tsx",
-                                            lineNumber: 1221,
+                                            lineNumber: 1271,
                                             columnNumber: 19
                                         }, this)
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/components/feed/MyFeedsTimeline.tsx",
-                                    lineNumber: 1212,
+                                    lineNumber: 1262,
                                     columnNumber: 17
                                 }, this)
                             }, void 0, false, {
                                 fileName: "[project]/components/feed/MyFeedsTimeline.tsx",
-                                lineNumber: 1211,
+                                lineNumber: 1261,
                                 columnNumber: 15
                             }, this)
                         ]
                     }, `${insight.type}-${insight.slug}`, true, {
                         fileName: "[project]/components/feed/MyFeedsTimeline.tsx",
-                        lineNumber: 1184,
+                        lineNumber: 1234,
                         columnNumber: 13
                     }, this);
                 })
             }, void 0, false, {
                 fileName: "[project]/components/feed/MyFeedsTimeline.tsx",
-                lineNumber: 1176,
+                lineNumber: 1226,
                 columnNumber: 9
             }, this),
             showEngagementActions && insighter && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                className: "mt-4 flex min-w-0 items-center justify-around pt-2",
+                className: `-mx-5 flex min-w-0 items-center justify-around border-t border-[#E7EDF5] px-5 pt-2 sm:-mx-6 sm:px-6 ${hasRichContent ? 'mt-0' : 'mt-4'}`,
                 dir: isArabic ? 'rtl' : 'ltr',
                 children: [
                     !isOwnPost && canMeet && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$client$2f$app$2d$dir$2f$link$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["default"], {
@@ -9175,20 +9236,20 @@ function FeedCard({ item, locale, onDelete, onEdit, onSaveChange, articleAccess 
                                 stroke: 1.8
                             }, void 0, false, {
                                 fileName: "[project]/components/feed/MyFeedsTimeline.tsx",
-                                lineNumber: 1270,
+                                lineNumber: 1320,
                                 columnNumber: 15
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
                                 children: copy.meet
                             }, void 0, false, {
                                 fileName: "[project]/components/feed/MyFeedsTimeline.tsx",
-                                lineNumber: 1271,
+                                lineNumber: 1321,
                                 columnNumber: 15
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "[project]/components/feed/MyFeedsTimeline.tsx",
-                        lineNumber: 1264,
+                        lineNumber: 1314,
                         columnNumber: 13
                     }, this),
                     !isOwnPost && canRequestService && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$client$2f$app$2d$dir$2f$link$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["default"], {
@@ -9201,20 +9262,20 @@ function FeedCard({ item, locale, onDelete, onEdit, onSaveChange, articleAccess 
                                 stroke: 1.8
                             }, void 0, false, {
                                 fileName: "[project]/components/feed/MyFeedsTimeline.tsx",
-                                lineNumber: 1280,
+                                lineNumber: 1330,
                                 columnNumber: 15
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
                                 children: copy.requestService
                             }, void 0, false, {
                                 fileName: "[project]/components/feed/MyFeedsTimeline.tsx",
-                                lineNumber: 1281,
+                                lineNumber: 1331,
                                 columnNumber: 15
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "[project]/components/feed/MyFeedsTimeline.tsx",
-                        lineNumber: 1276,
+                        lineNumber: 1326,
                         columnNumber: 13
                     }, this),
                     !isOwnPost && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$feed$2f$FeedSaveButton$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["default"], {
@@ -9227,7 +9288,7 @@ function FeedCard({ item, locale, onDelete, onEdit, onSaveChange, articleAccess 
                         onChange: (isSaved)=>onSaveChange?.(item, isSaved)
                     }, void 0, false, {
                         fileName: "[project]/components/feed/MyFeedsTimeline.tsx",
-                        lineNumber: 1286,
+                        lineNumber: 1336,
                         columnNumber: 13
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$feed$2f$FeedShare$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["default"], {
@@ -9239,19 +9300,19 @@ function FeedCard({ item, locale, onDelete, onEdit, onSaveChange, articleAccess 
                         shareKind: isArticle ? 'white-paper' : 'post'
                     }, void 0, false, {
                         fileName: "[project]/components/feed/MyFeedsTimeline.tsx",
-                        lineNumber: 1297,
+                        lineNumber: 1347,
                         columnNumber: 11
                     }, this)
                 ]
             }, void 0, true, {
                 fileName: "[project]/components/feed/MyFeedsTimeline.tsx",
-                lineNumber: 1259,
+                lineNumber: 1309,
                 columnNumber: 9
             }, this)
         ]
     }, void 0, true, {
         fileName: "[project]/components/feed/MyFeedsTimeline.tsx",
-        lineNumber: 992,
+        lineNumber: 1024,
         columnNumber: 5
     }, this);
 }
@@ -9370,12 +9431,12 @@ function MyFeedsTimeline({ locale }) {
             "aria-label": copy.loading,
             children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(FeedSkeleton, {}, void 0, false, {
                 fileName: "[project]/components/feed/MyFeedsTimeline.tsx",
-                lineNumber: 1430,
+                lineNumber: 1480,
                 columnNumber: 9
             }, this)
         }, void 0, false, {
             fileName: "[project]/components/feed/MyFeedsTimeline.tsx",
-            lineNumber: 1429,
+            lineNumber: 1479,
             columnNumber: 7
         }, this);
     }
@@ -9388,7 +9449,7 @@ function MyFeedsTimeline({ locale }) {
                     children: copy.loadError
                 }, void 0, false, {
                     fileName: "[project]/components/feed/MyFeedsTimeline.tsx",
-                    lineNumber: 1438,
+                    lineNumber: 1488,
                     columnNumber: 9
                 }, this),
                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
@@ -9398,13 +9459,13 @@ function MyFeedsTimeline({ locale }) {
                     children: copy.tryAgain
                 }, void 0, false, {
                     fileName: "[project]/components/feed/MyFeedsTimeline.tsx",
-                    lineNumber: 1439,
+                    lineNumber: 1489,
                     columnNumber: 9
                 }, this)
             ]
         }, void 0, true, {
             fileName: "[project]/components/feed/MyFeedsTimeline.tsx",
-            lineNumber: 1437,
+            lineNumber: 1487,
             columnNumber: 7
         }, this);
     }
@@ -9420,7 +9481,7 @@ function MyFeedsTimeline({ locale }) {
                         children: copy.title
                     }, void 0, false, {
                         fileName: "[project]/components/feed/MyFeedsTimeline.tsx",
-                        lineNumber: 1453,
+                        lineNumber: 1503,
                         columnNumber: 9
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -9428,13 +9489,13 @@ function MyFeedsTimeline({ locale }) {
                         children: copy.count(total)
                     }, void 0, false, {
                         fileName: "[project]/components/feed/MyFeedsTimeline.tsx",
-                        lineNumber: 1456,
+                        lineNumber: 1506,
                         columnNumber: 9
                     }, this)
                 ]
             }, void 0, true, {
                 fileName: "[project]/components/feed/MyFeedsTimeline.tsx",
-                lineNumber: 1452,
+                lineNumber: 1502,
                 columnNumber: 7
             }, this),
             items.length === 0 ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -9448,12 +9509,12 @@ function MyFeedsTimeline({ locale }) {
                             stroke: 1.7
                         }, void 0, false, {
                             fileName: "[project]/components/feed/MyFeedsTimeline.tsx",
-                            lineNumber: 1462,
+                            lineNumber: 1512,
                             columnNumber: 13
                         }, this)
                     }, void 0, false, {
                         fileName: "[project]/components/feed/MyFeedsTimeline.tsx",
-                        lineNumber: 1461,
+                        lineNumber: 1511,
                         columnNumber: 11
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("h2", {
@@ -9461,7 +9522,7 @@ function MyFeedsTimeline({ locale }) {
                         children: copy.emptyTitle
                     }, void 0, false, {
                         fileName: "[project]/components/feed/MyFeedsTimeline.tsx",
-                        lineNumber: 1464,
+                        lineNumber: 1514,
                         columnNumber: 11
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -9469,13 +9530,13 @@ function MyFeedsTimeline({ locale }) {
                         children: copy.emptyDescription
                     }, void 0, false, {
                         fileName: "[project]/components/feed/MyFeedsTimeline.tsx",
-                        lineNumber: 1465,
+                        lineNumber: 1515,
                         columnNumber: 11
                     }, this)
                 ]
             }, void 0, true, {
                 fileName: "[project]/components/feed/MyFeedsTimeline.tsx",
-                lineNumber: 1460,
+                lineNumber: 1510,
                 columnNumber: 9
             }, this) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                 className: "space-y-4",
@@ -9494,7 +9555,7 @@ function MyFeedsTimeline({ locale }) {
                                 onDelete: setDeleteCandidate
                             }, void 0, false, {
                                 fileName: "[project]/components/feed/MyFeedsTimeline.tsx",
-                                lineNumber: 1480,
+                                lineNumber: 1530,
                                 columnNumber: 17
                             }, this),
                             index === upgradeIndex && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$feed$2f$RoleUpgradeCard$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["default"], {
@@ -9502,7 +9563,7 @@ function MyFeedsTimeline({ locale }) {
                                 className: "xl:hidden"
                             }, void 0, false, {
                                 fileName: "[project]/components/feed/MyFeedsTimeline.tsx",
-                                lineNumber: 1482,
+                                lineNumber: 1532,
                                 columnNumber: 19
                             }, this),
                             index === documentsIndex && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$feed$2f$TopDocumentsCard$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["default"], {
@@ -9510,19 +9571,19 @@ function MyFeedsTimeline({ locale }) {
                                 className: "xl:hidden"
                             }, void 0, false, {
                                 fileName: "[project]/components/feed/MyFeedsTimeline.tsx",
-                                lineNumber: 1485,
+                                lineNumber: 1535,
                                 columnNumber: 19
                             }, this)
                         ]
                     }, item.uuid, true, {
                         fileName: "[project]/components/feed/MyFeedsTimeline.tsx",
-                        lineNumber: 1479,
+                        lineNumber: 1529,
                         columnNumber: 15
                     }, this);
                 })
             }, void 0, false, {
                 fileName: "[project]/components/feed/MyFeedsTimeline.tsx",
-                lineNumber: 1470,
+                lineNumber: 1520,
                 columnNumber: 9
             }, this),
             page < lastPage && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
@@ -9533,7 +9594,7 @@ function MyFeedsTimeline({ locale }) {
                 children: isLoadingMore ? copy.loadingMore : copy.loadMore
             }, void 0, false, {
                 fileName: "[project]/components/feed/MyFeedsTimeline.tsx",
-                lineNumber: 1494,
+                lineNumber: 1544,
                 columnNumber: 9
             }, this),
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mantine$2f$core$2f$esm$2f$components$2f$Modal$2f$Modal$2e$mjs__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["Modal"], {
@@ -9564,7 +9625,7 @@ function MyFeedsTimeline({ locale }) {
                         children: copy.deleteDescription
                     }, void 0, false, {
                         fileName: "[project]/components/feed/MyFeedsTimeline.tsx",
-                        lineNumber: 1520,
+                        lineNumber: 1570,
                         columnNumber: 9
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -9578,7 +9639,7 @@ function MyFeedsTimeline({ locale }) {
                                 children: copy.cancel
                             }, void 0, false, {
                                 fileName: "[project]/components/feed/MyFeedsTimeline.tsx",
-                                lineNumber: 1522,
+                                lineNumber: 1572,
                                 columnNumber: 11
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
@@ -9589,19 +9650,19 @@ function MyFeedsTimeline({ locale }) {
                                 children: isDeleting ? copy.deleting : copy.delete
                             }, void 0, false, {
                                 fileName: "[project]/components/feed/MyFeedsTimeline.tsx",
-                                lineNumber: 1530,
+                                lineNumber: 1580,
                                 columnNumber: 11
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "[project]/components/feed/MyFeedsTimeline.tsx",
-                        lineNumber: 1521,
+                        lineNumber: 1571,
                         columnNumber: 9
                     }, this)
                 ]
             }, void 0, true, {
                 fileName: "[project]/components/feed/MyFeedsTimeline.tsx",
-                lineNumber: 1504,
+                lineNumber: 1554,
                 columnNumber: 7
             }, this),
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$feed$2f$post$2f$PostModal$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["default"], {
@@ -9625,13 +9686,13 @@ function MyFeedsTimeline({ locale }) {
                 }
             }, void 0, false, {
                 fileName: "[project]/components/feed/MyFeedsTimeline.tsx",
-                lineNumber: 1541,
+                lineNumber: 1591,
                 columnNumber: 7
             }, this)
         ]
     }, void 0, true, {
         fileName: "[project]/components/feed/MyFeedsTimeline.tsx",
-        lineNumber: 1451,
+        lineNumber: 1501,
         columnNumber: 5
     }, this);
 }
