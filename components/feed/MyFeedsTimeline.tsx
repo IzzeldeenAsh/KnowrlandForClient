@@ -21,7 +21,15 @@ import { formatDistanceToNow, isValid } from 'date-fns'
 import { arSA, enUS } from 'date-fns/locale'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
-import { Fragment, useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import {
+  Fragment,
+  useCallback,
+  useEffect,
+  useLayoutEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react'
 import '@mux/mux-player'
 import KnowledgeTypeIcon from '@/components/icons/KnowledgeTypeIcon'
 import { dashboardUrl, publicBaseUrl } from '@/app/config'
@@ -47,6 +55,9 @@ import {
   type FeedItemRelatedInsight,
 } from '@/services/feed.service'
 import PostModal, { type PostModalMode } from '@/components/feed/post/PostModal'
+
+// useLayoutEffect warns when a client component is pre-rendered on the server.
+const useBrowserLayoutEffect = typeof window === 'undefined' ? useEffect : useLayoutEffect
 
 type MyFeedsTimelineProps = {
   locale: string
@@ -530,8 +541,16 @@ function VideoPlayer({
   flushBottom?: boolean
 }) {
   const containerRef = useRef<HTMLDivElement | null>(null)
+  // Hold the media element itself rather than querying for it when a pause is
+  // needed: the element is unmounted as soon as the card leaves the preload
+  // window, and a fast scroll can drop it in the same commit that flips
+  // `isInViewport`, leaving a DOM query with nothing to pause.
+  const playerRef = useRef<MuxPlayerElement | null>(null)
   const [shouldPreload, setShouldPreload] = useState(false)
   const [isInViewport, setIsInViewport] = useState(false)
+  // Mirrors `isInViewport` for listeners that must read it without being
+  // re-subscribed on every change.
+  const isInViewportRef = useRef(false)
   const [autoplayBlocked, setAutoplayBlocked] = useState(false)
   const [isMuted, setIsMuted] = useState(areFeedVideosMuted)
   // Bumped to remount the player after a decode failure (see the error effect).
@@ -544,12 +563,27 @@ function VideoPlayer({
   const [useMp4Fallback, setUseMp4Fallback] = useState(false)
 
   const pauseSelf = useCallback(() => {
-    const player = containerRef.current?.querySelector('mux-player, video') as MuxPlayerElement | null
-    player?.pause()
+    playerRef.current?.pause()
   }, [])
 
+  // React detaches a callback ref while the element is still alive, so this is
+  // the last moment a player that is about to be unmounted can be stopped —
+  // otherwise a card scrolled past quickly enough to leave the preload window
+  // in the same commit keeps its audio going.
+  const attachPlayer = useCallback(
+    (node: HTMLElement | null) => {
+      const previous = playerRef.current
+      if (!node && previous) {
+        previous.pause()
+        releaseFeedPlayback(pauseSelf)
+      }
+      playerRef.current = node as MuxPlayerElement | null
+    },
+    [pauseSelf],
+  )
+
   const playVideo = useCallback(async () => {
-    const player = containerRef.current?.querySelector('mux-player, video') as MuxPlayerElement | null
+    const player = playerRef.current
     if (!player) return
 
     // Read the module-level value here so an intersection callback can never
@@ -561,6 +595,10 @@ function VideoPlayer({
       await player.play()
       setAutoplayBlocked(false)
     } catch (error) {
+      // Scrolling away pauses the video, which rejects a play() that is still
+      // pending. That is not a blocked autoplay, so don't offer the overlay.
+      if (!isInViewportRef.current) return
+
       setAutoplayBlocked(true)
       console.warn('Mux autoplay was blocked by the browser.', error)
     }
@@ -589,7 +627,12 @@ function VideoPlayer({
     // Require the card to be mostly visible before it counts as "in viewport"
     // so barely-visible videos at the screen edges don't compete for playback.
     const playbackObserver = new IntersectionObserver(
-      ([entry]) => setIsInViewport(entry.isIntersecting),
+      ([entry]) => {
+        // Kept in a ref as well so the play guard below sees the change
+        // immediately, before React has committed the state update.
+        isInViewportRef.current = entry.isIntersecting
+        setIsInViewport(entry.isIntersecting)
+      },
       { threshold: 0.5 },
     )
 
@@ -603,7 +646,7 @@ function VideoPlayer({
   }, [media.provider_playback_id])
 
   useEffect(() => {
-    const player = containerRef.current?.querySelector('mux-player, video') as MuxPlayerElement | null
+    const player = playerRef.current
 
     if (!player) return
 
@@ -616,11 +659,34 @@ function VideoPlayer({
     }
   }, [isInViewport, playVideo, pauseSelf, shouldPreload, playerEpoch, useMp4Fallback])
 
+  // Mux keeps its own autoplay handler running for the life of the player: it
+  // calls play() on every `loadstart` the media element fires, which for HLS
+  // happens once the stream is attached — long after mount, and possibly long
+  // after the card was scrolled past and paused. The browser's own autoplay
+  // flag would stay cleared after a pause, but Mux's handler does not, so a
+  // video that was still loading when it left the screen would start playing
+  // (with sound) off-screen. Pause anything that starts while off-screen.
+  useEffect(() => {
+    const player = playerRef.current
+    if (!player) return
+
+    const pauseIfOffscreen = () => {
+      if (!isInViewportRef.current) player.pause()
+    }
+
+    player.addEventListener('play', pauseIfOffscreen)
+    player.addEventListener('playing', pauseIfOffscreen)
+    return () => {
+      player.removeEventListener('play', pauseIfOffscreen)
+      player.removeEventListener('playing', pauseIfOffscreen)
+    }
+  }, [shouldPreload, playerEpoch, useMp4Fallback])
+
   // Keep every mounted player synchronized, including paused videos further
   // up or down the feed. `volumechange` captures changes made through either
   // the Mux controls or the browser's native MP4 controls.
   useEffect(() => {
-    const player = containerRef.current?.querySelector('mux-player, video') as MuxPlayerElement | null
+    const player = playerRef.current
     if (!player) return
 
     player.muted = isMuted
@@ -630,13 +696,20 @@ function VideoPlayer({
     return () => player.removeEventListener('volumechange', handleVolumeChange)
   }, [isMuted, playerEpoch, shouldPreload, useMp4Fallback])
 
-  // Release the shared playback slot when the card unmounts entirely.
-  useEffect(() => () => releaseFeedPlayback(pauseSelf), [pauseSelf])
+  // Stop playback and release the shared slot when the card unmounts entirely
+  // — a route change or the feed dropping the item off the list.
+  useEffect(
+    () => () => {
+      playerRef.current?.pause()
+      releaseFeedPlayback(pauseSelf)
+    },
+    [pauseSelf],
+  )
 
   useEffect(() => {
     if (!shouldPreload || useMp4Fallback) return
 
-    const player = containerRef.current?.querySelector('mux-player') as MuxPlayerElement | null
+    const player = playerRef.current
     if (!player) return
 
     fatalErrorRef.current = false
@@ -690,6 +763,7 @@ function VideoPlayer({
           {shouldPreload && useMp4Fallback && (
             <video
               key={`mp4-${playerEpoch}`}
+              ref={attachPlayer}
               src={`https://stream.mux.com/${media.provider_playback_id}/highest.mp4`}
               // Keep the autoplay attribute present from the initial mount.
               // WebKit decides whether a video may autoplay at that point; adding
@@ -713,6 +787,7 @@ function VideoPlayer({
           {shouldPreload && !useMp4Fallback && (
             <mux-player
               key={playerEpoch}
+              ref={attachPlayer}
               playback-id={media.provider_playback_id}
               stream-type="on-demand"
               metadata-video-title={title}
@@ -910,6 +985,8 @@ export function FeedCard({
   const [isBodyExpanded, setIsBodyExpanded] = useState(false)
   const [isBodyOverflowing, setIsBodyOverflowing] = useState(false)
   const bodyContentRef = useRef<HTMLParagraphElement>(null)
+  const cardRef = useRef<HTMLElement>(null)
+  const isCollapsingBodyRef = useRef(false)
   const date = formatPostDate(item.published_at ?? item.created_at, locale)
   const isArticle = item.content_type === 'article'
   const isPostTitleArabic = isFirstWordArabic(item.title ?? '')
@@ -988,9 +1065,11 @@ export function FeedCard({
       return
     }
 
-    const collapsedBodyHeight = 200
     const measureOverflow = () => {
-      setIsBodyOverflowing(bodyContent.scrollHeight > collapsedBodyHeight + 1)
+      // While expanded the clamp is off, so the element can no longer tell us
+      // whether the collapsed state would crop. Keep the last measurement.
+      if (isBodyExpanded) return
+      setIsBodyOverflowing(bodyContent.scrollHeight > bodyContent.clientHeight + 1)
     }
 
     measureOverflow()
@@ -998,7 +1077,20 @@ export function FeedCard({
     resizeObserver.observe(bodyContent)
 
     return () => resizeObserver.disconnect()
-  }, [item.body])
+  }, [item.body, isBodyExpanded])
+
+  const toggleBodyExpanded = () => {
+    isCollapsingBodyRef.current = isBodyExpanded
+    setIsBodyExpanded((expanded) => !expanded)
+  }
+
+  // Collapsing a long post removes content above the viewport, which would
+  // otherwise leave the reader parked on the next post.
+  useBrowserLayoutEffect(() => {
+    if (isBodyExpanded || !isCollapsingBodyRef.current) return
+    isCollapsingBodyRef.current = false
+    cardRef.current?.scrollIntoView({ block: 'nearest', behavior: 'instant' })
+  }, [isBodyExpanded])
 
   const updateTracking = async () => {
     if (isUpdatingTrack || isOwnPost) return
@@ -1021,7 +1113,10 @@ export function FeedCard({
   }
 
   return (
-    <article className="relative min-w-0 max-w-full overflow-hidden rounded-lg border border-[#D9E3EF] bg-white px-5 py-5 sm:px-6">
+    <article
+      ref={cardRef}
+      className="relative min-w-0 max-w-full scroll-mt-20 overflow-hidden rounded-lg border border-[#D9E3EF] bg-white px-5 py-5 sm:px-6 md:scroll-mt-24"
+    >
       <div className="flex min-h-9 items-start justify-between gap-3 sm:gap-4">
         <div className={`min-w-0 flex-1 ${articleAccess === 'community' ? 'pe-[76px] sm:pe-0' : ''}`}>
           {insighter && (
@@ -1032,7 +1127,7 @@ export function FeedCard({
                   <img
                     src={publisherAvatar}
                     alt={publisherName}
-                    className={`h-full w-full ${isPublishedAsCompany ? 'object-contain p-1' : 'object-cover object-top'}`}
+                    className={`h-full w-full object-cover ${isPublishedAsCompany ? '' : 'object-top'}`}
                   />
                 ) : (
                   <div className="flex h-full w-full items-center justify-center text-[13px] font-bold text-[#2378E8]">
@@ -1160,27 +1255,27 @@ export function FeedCard({
 
       {!isArticle && item.body && (
         <div className={item.title ? 'mt-1.5' : 'mt-4'}>
-          <div
-            className={`overflow-hidden ${isBodyExpanded ? 'max-h-none' : 'max-h-[200px]'}`}
+          <p
+            ref={bodyContentRef}
+            dir={isPostBodyArabic ? 'rtl' : 'ltr'}
+            className={`whitespace-pre-wrap text-start text-[14px] leading-5 text-[#1C2433] ${
+              isBodyExpanded ? 'line-clamp-none' : 'line-clamp-[10]'
+            }`}
           >
-            <p
-              ref={bodyContentRef}
-              dir={isPostBodyArabic ? 'rtl' : 'ltr'}
-              className={`whitespace-pre-wrap text-[14px] leading-5 text-[#1C2433] ${isPostBodyArabic ? 'text-right' : 'text-left'}`}
-            >
-              {item.body}
-            </p>
-          </div>
+            {item.body}
+          </p>
 
           {isBodyOverflowing && (
-            <button
-              type="button"
-              aria-expanded={isBodyExpanded}
-              onClick={() => setIsBodyExpanded((expanded) => !expanded)}
-              className={`mt-1.5 block text-[12px] font-semibold text-[#2378E8] transition-colors hover:text-[#155DB8] hover:underline focus-visible:rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2378E8] focus-visible:ring-offset-2 ${isPostBodyArabic ? 'ms-auto' : ''}`}
-            >
-              {isBodyExpanded ? copy.readLess : copy.readMore}
-            </button>
+            <div dir={isPostBodyArabic ? 'rtl' : 'ltr'} className="mt-1.5 flex">
+              <button
+                type="button"
+                aria-expanded={isBodyExpanded}
+                onClick={toggleBodyExpanded}
+                className="text-[12px] font-semibold text-[#2378E8] transition-colors hover:text-[#155DB8] hover:underline focus-visible:rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2378E8] focus-visible:ring-offset-2"
+              >
+                {isBodyExpanded ? copy.readLess : copy.readMore}
+              </button>
+            </div>
           )}
         </div>
       )}

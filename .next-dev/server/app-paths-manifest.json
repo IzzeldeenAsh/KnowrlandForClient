@@ -1,5 +1,6 @@
 {
   "/[locale]/(default)/page": "app/[locale]/(default)/page.js",
-  "/[locale]/callback/page": "app/[locale]/callback/page.js",
+  "/[locale]/knowledge/[type]/[slug]/page": "app/[locale]/knowledge/[type]/[slug]/page.js",
+  "/[locale]/profile/[uuid]/page": "app/[locale]/profile/[uuid]/page.js",
   "/manifest.webmanifest/route": "app/manifest.webmanifest/route.js"
 }

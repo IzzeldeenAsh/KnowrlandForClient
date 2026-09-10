@@ -750,7 +750,14 @@ export default function Header() {
                     aria-label={t('navigation.feed')}
                     className="flex h-9 w-9 items-center justify-center rounded-md text-slate-300 transition-all duration-200 hover:bg-[#3B8AEF]/20 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#67B5F6]"
                   >
-                    <svg aria-hidden width="18" height="18" viewBox="0 0 24 24" fill="currentColor" className="shrink-0">
+                    <svg aria-hidden width="18" height="18" viewBox="0 0 24 24" fill="url(#next-mobile-feed-icon-gradient)" className="shrink-0">
+                      <defs>
+                        <linearGradient id="next-mobile-feed-icon-gradient" x1="3" y1="4" x2="21" y2="20" gradientUnits="userSpaceOnUse">
+                          <stop stopColor="#fb923c" />
+                          <stop offset="0.55" stopColor="#f97316" />
+                          <stop offset="1" stopColor="#ea580c" />
+                        </linearGradient>
+                      </defs>
                       <rect x="3" y="4" width="6" height="6" rx="1" />
                       <rect x="3" y="14" width="6" height="6" rx="1" />
                       <rect x="13" y="4" width="8" height="2" rx="1" />

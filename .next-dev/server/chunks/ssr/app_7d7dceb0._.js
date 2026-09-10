@@ -7446,7 +7446,8 @@ function ProfilePageContent() {
         [__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$project$2f$specifiedInsighterProject$2e$ts__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["specifiedInsighterProfileUuidQueryParam"]]: specifiedInsighterProfileUuid
     });
     const specifiedInsighterProjectHref = `/${locale}/project/wizard/project-type?${specifiedInsighterProjectParams.toString()}`;
-    const requestServiceButtonLabel = isCompanyInsighter && profileData?.company?.legal_name ? locale === "ar" ? `طلب خدمة من ${profileData.company.legal_name}` : `Request Service from ${profileData.company.legal_name}` : locale === "ar" ? "طلب خدمة" : "Request Service";
+    const requestServiceButtonLabel = locale === "ar" ? "طلب خدمة" : "Request Service";
+    const requestServiceButtonClass = "group inline-flex items-center gap-2 rounded-full border border-transparent bg-[linear-gradient(#ffffff,#ffffff)_padding-box,linear-gradient(90deg,#38bdf8,#3b82f6,#2dd4bf)_border-box] px-3.5 py-2 text-xs font-semibold text-sky-600 shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md focus:outline-none focus:ring-2 focus:ring-sky-300 focus:ring-offset-2 dark:bg-[linear-gradient(#0f172a,#0f172a)_padding-box,linear-gradient(90deg,#38bdf8,#3b82f6,#2dd4bf)_border-box] dark:text-sky-300";
     // Function to handle pagination
     const handlePageChange = (page)=>{
         setKnowledgePage(page);
@@ -7562,7 +7563,7 @@ function ProfilePageContent() {
                             fill: "currentColor"
                         }, void 0, false, {
                             fileName: "[project]/app/[locale]/profile/[uuid]/page.tsx",
-                            lineNumber: 1151,
+                            lineNumber: 1146,
                             columnNumber: 11
                         }, this),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("path", {
@@ -7570,7 +7571,7 @@ function ProfilePageContent() {
                             fill: "currentColor"
                         }, void 0, false, {
                             fileName: "[project]/app/[locale]/profile/[uuid]/page.tsx",
-                            lineNumber: 1155,
+                            lineNumber: 1150,
                             columnNumber: 11
                         }, this),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("path", {
@@ -7578,13 +7579,13 @@ function ProfilePageContent() {
                             fill: "currentColor"
                         }, void 0, false, {
                             fileName: "[project]/app/[locale]/profile/[uuid]/page.tsx",
-                            lineNumber: 1159,
+                            lineNumber: 1154,
                             columnNumber: 11
                         }, this)
                     ]
                 }, void 0, true, {
                     fileName: "[project]/app/[locale]/profile/[uuid]/page.tsx",
-                    lineNumber: 1142,
+                    lineNumber: 1137,
                     columnNumber: 9
                 }, this),
             filterClass: __TURBOPACK__imported__module__$5b$project$5d2f$app$2f5b$locale$5d2f$profile$2f5b$uuid$5d2f$profile$2e$module$2e$css__$5b$app$2d$ssr$5d$__$28$css__module$29$__["default"].filterAllActive
@@ -7605,7 +7606,7 @@ function ProfilePageContent() {
                             fill: "currentColor"
                         }, void 0, false, {
                             fileName: "[project]/app/[locale]/profile/[uuid]/page.tsx",
-                            lineNumber: 1180,
+                            lineNumber: 1175,
                             columnNumber: 11
                         }, this),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("path", {
@@ -7613,7 +7614,7 @@ function ProfilePageContent() {
                             fill: "currentColor"
                         }, void 0, false, {
                             fileName: "[project]/app/[locale]/profile/[uuid]/page.tsx",
-                            lineNumber: 1184,
+                            lineNumber: 1179,
                             columnNumber: 11
                         }, this),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("path", {
@@ -7621,7 +7622,7 @@ function ProfilePageContent() {
                             fill: "currentColor"
                         }, void 0, false, {
                             fileName: "[project]/app/[locale]/profile/[uuid]/page.tsx",
-                            lineNumber: 1188,
+                            lineNumber: 1183,
                             columnNumber: 11
                         }, this),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("path", {
@@ -7629,13 +7630,13 @@ function ProfilePageContent() {
                             fill: "currentColor"
                         }, void 0, false, {
                             fileName: "[project]/app/[locale]/profile/[uuid]/page.tsx",
-                            lineNumber: 1192,
+                            lineNumber: 1187,
                             columnNumber: 11
                         }, this)
                     ]
                 }, void 0, true, {
                     fileName: "[project]/app/[locale]/profile/[uuid]/page.tsx",
-                    lineNumber: 1171,
+                    lineNumber: 1166,
                     columnNumber: 9
                 }, this),
             filterClass: __TURBOPACK__imported__module__$5b$project$5d2f$app$2f5b$locale$5d2f$profile$2f5b$uuid$5d2f$profile$2e$module$2e$css__$5b$app$2d$ssr$5d$__$28$css__module$29$__["default"].filterDataActive
@@ -7655,12 +7656,12 @@ function ProfilePageContent() {
                         fill: "currentColor"
                     }, void 0, false, {
                         fileName: "[project]/app/[locale]/profile/[uuid]/page.tsx",
-                        lineNumber: 1213,
+                        lineNumber: 1208,
                         columnNumber: 11
                     }, this)
                 }, void 0, false, {
                     fileName: "[project]/app/[locale]/profile/[uuid]/page.tsx",
-                    lineNumber: 1204,
+                    lineNumber: 1199,
                     columnNumber: 9
                 }, this),
             filterClass: __TURBOPACK__imported__module__$5b$project$5d2f$app$2f5b$locale$5d2f$profile$2f5b$uuid$5d2f$profile$2e$module$2e$css__$5b$app$2d$ssr$5d$__$28$css__module$29$__["default"].filterInsightActive
@@ -7681,7 +7682,7 @@ function ProfilePageContent() {
                             fill: "currentColor"
                         }, void 0, false, {
                             fileName: "[project]/app/[locale]/profile/[uuid]/page.tsx",
-                            lineNumber: 1234,
+                            lineNumber: 1229,
                             columnNumber: 11
                         }, this),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("path", {
@@ -7689,7 +7690,7 @@ function ProfilePageContent() {
                             fill: "currentColor"
                         }, void 0, false, {
                             fileName: "[project]/app/[locale]/profile/[uuid]/page.tsx",
-                            lineNumber: 1238,
+                            lineNumber: 1233,
                             columnNumber: 11
                         }, this),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("path", {
@@ -7697,7 +7698,7 @@ function ProfilePageContent() {
                             fill: "white"
                         }, void 0, false, {
                             fileName: "[project]/app/[locale]/profile/[uuid]/page.tsx",
-                            lineNumber: 1242,
+                            lineNumber: 1237,
                             columnNumber: 11
                         }, this),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("path", {
@@ -7705,13 +7706,13 @@ function ProfilePageContent() {
                             fill: "white"
                         }, void 0, false, {
                             fileName: "[project]/app/[locale]/profile/[uuid]/page.tsx",
-                            lineNumber: 1246,
+                            lineNumber: 1241,
                             columnNumber: 11
                         }, this)
                     ]
                 }, void 0, true, {
                     fileName: "[project]/app/[locale]/profile/[uuid]/page.tsx",
-                    lineNumber: 1225,
+                    lineNumber: 1220,
                     columnNumber: 9
                 }, this),
             filterClass: __TURBOPACK__imported__module__$5b$project$5d2f$app$2f5b$locale$5d2f$profile$2f5b$uuid$5d2f$profile$2e$module$2e$css__$5b$app$2d$ssr$5d$__$28$css__module$29$__["default"].filterReportActive
@@ -7732,7 +7733,7 @@ function ProfilePageContent() {
                             fill: "currentColor"
                         }, void 0, false, {
                             fileName: "[project]/app/[locale]/profile/[uuid]/page.tsx",
-                            lineNumber: 1267,
+                            lineNumber: 1262,
                             columnNumber: 11
                         }, this),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("path", {
@@ -7740,7 +7741,7 @@ function ProfilePageContent() {
                             fill: "currentColor"
                         }, void 0, false, {
                             fileName: "[project]/app/[locale]/profile/[uuid]/page.tsx",
-                            lineNumber: 1271,
+                            lineNumber: 1266,
                             columnNumber: 11
                         }, this),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("path", {
@@ -7748,7 +7749,7 @@ function ProfilePageContent() {
                             fill: "white"
                         }, void 0, false, {
                             fileName: "[project]/app/[locale]/profile/[uuid]/page.tsx",
-                            lineNumber: 1275,
+                            lineNumber: 1270,
                             columnNumber: 11
                         }, this),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("path", {
@@ -7756,13 +7757,13 @@ function ProfilePageContent() {
                             fill: "white"
                         }, void 0, false, {
                             fileName: "[project]/app/[locale]/profile/[uuid]/page.tsx",
-                            lineNumber: 1279,
+                            lineNumber: 1274,
                             columnNumber: 11
                         }, this)
                     ]
                 }, void 0, true, {
                     fileName: "[project]/app/[locale]/profile/[uuid]/page.tsx",
-                    lineNumber: 1258,
+                    lineNumber: 1253,
                     columnNumber: 9
                 }, this),
             filterClass: __TURBOPACK__imported__module__$5b$project$5d2f$app$2f5b$locale$5d2f$profile$2f5b$uuid$5d2f$profile$2e$module$2e$css__$5b$app$2d$ssr$5d$__$28$css__module$29$__["default"].filterManualActive
@@ -7783,7 +7784,7 @@ function ProfilePageContent() {
                             fill: "currentColor"
                         }, void 0, false, {
                             fileName: "[project]/app/[locale]/profile/[uuid]/page.tsx",
-                            lineNumber: 1300,
+                            lineNumber: 1295,
                             columnNumber: 11
                         }, this),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("path", {
@@ -7791,13 +7792,13 @@ function ProfilePageContent() {
                             fill: "currentColor"
                         }, void 0, false, {
                             fileName: "[project]/app/[locale]/profile/[uuid]/page.tsx",
-                            lineNumber: 1304,
+                            lineNumber: 1299,
                             columnNumber: 11
                         }, this)
                     ]
                 }, void 0, true, {
                     fileName: "[project]/app/[locale]/profile/[uuid]/page.tsx",
-                    lineNumber: 1291,
+                    lineNumber: 1286,
                     columnNumber: 9
                 }, this),
             filterClass: __TURBOPACK__imported__module__$5b$project$5d2f$app$2f5b$locale$5d2f$profile$2f5b$uuid$5d2f$profile$2e$module$2e$css__$5b$app$2d$ssr$5d$__$28$css__module$29$__["default"].filterCourseActive
@@ -7820,12 +7821,12 @@ function ProfilePageContent() {
                         onClose: ()=>setShowToast(false)
                     }, void 0, false, {
                         fileName: "[project]/app/[locale]/profile/[uuid]/page.tsx",
-                        lineNumber: 1325,
+                        lineNumber: 1320,
                         columnNumber: 13
                     }, this)
                 }, void 0, false, {
                     fileName: "[project]/app/[locale]/profile/[uuid]/page.tsx",
-                    lineNumber: 1324,
+                    lineNumber: 1319,
                     columnNumber: 11
                 }, this),
                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mantine$2f$core$2f$esm$2f$components$2f$Modal$2f$Modal$2e$mjs__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["Modal"], {
@@ -7840,7 +7841,7 @@ function ProfilePageContent() {
                             children: locale === "ar" ? "لا يمكنك طلب خدمة من نفسك." : "You can't request a service from yourself."
                         }, void 0, false, {
                             fileName: "[project]/app/[locale]/profile/[uuid]/page.tsx",
-                            lineNumber: 1339,
+                            lineNumber: 1334,
                             columnNumber: 11
                         }, this),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mantine$2f$core$2f$esm$2f$components$2f$Group$2f$Group$2e$mjs__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["Group"], {
@@ -7852,18 +7853,18 @@ function ProfilePageContent() {
                                 children: locale === "ar" ? "حسنًا" : "OK"
                             }, void 0, false, {
                                 fileName: "[project]/app/[locale]/profile/[uuid]/page.tsx",
-                                lineNumber: 1345,
+                                lineNumber: 1340,
                                 columnNumber: 13
                             }, this)
                         }, void 0, false, {
                             fileName: "[project]/app/[locale]/profile/[uuid]/page.tsx",
-                            lineNumber: 1344,
+                            lineNumber: 1339,
                             columnNumber: 11
                         }, this)
                     ]
                 }, void 0, true, {
                     fileName: "[project]/app/[locale]/profile/[uuid]/page.tsx",
-                    lineNumber: 1333,
+                    lineNumber: 1328,
                     columnNumber: 9
                 }, this),
                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -7889,32 +7890,32 @@ function ProfilePageContent() {
                                 priority: true
                             }, void 0, false, {
                                 fileName: "[project]/app/[locale]/profile/[uuid]/page.tsx",
-                                lineNumber: 1360,
+                                lineNumber: 1355,
                                 columnNumber: 13
                             }, this)
                         }, void 0, false, {
                             fileName: "[project]/app/[locale]/profile/[uuid]/page.tsx",
-                            lineNumber: 1355,
+                            lineNumber: 1350,
                             columnNumber: 11
                         }, this),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                             className: "absolute top-0 right-0 w-1/3 h-96 bg-gradient-radial from-blue-100/40 to-transparent dark:from-blue-900/10 rounded-full blur-3xl -translate-y-1/4 translate-x-1/4"
                         }, void 0, false, {
                             fileName: "[project]/app/[locale]/profile/[uuid]/page.tsx",
-                            lineNumber: 1370,
+                            lineNumber: 1365,
                             columnNumber: 11
                         }, this),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                             className: "absolute bottom-0 left-0 w-1/4 h-64 bg-gradient-radial from-pink-100/30 to-transparent dark:from-pink-900/10 rounded-full blur-3xl translate-y-1/4 -translate-x-1/4"
                         }, void 0, false, {
                             fileName: "[project]/app/[locale]/profile/[uuid]/page.tsx",
-                            lineNumber: 1371,
+                            lineNumber: 1366,
                             columnNumber: 11
                         }, this)
                     ]
                 }, void 0, true, {
                     fileName: "[project]/app/[locale]/profile/[uuid]/page.tsx",
-                    lineNumber: 1354,
+                    lineNumber: 1349,
                     columnNumber: 9
                 }, this),
                 loading ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -7923,12 +7924,12 @@ function ProfilePageContent() {
                         className: "animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-blue-500"
                     }, void 0, false, {
                         fileName: "[project]/app/[locale]/profile/[uuid]/page.tsx",
-                        lineNumber: 1376,
+                        lineNumber: 1371,
                         columnNumber: 13
                     }, this)
                 }, void 0, false, {
                     fileName: "[project]/app/[locale]/profile/[uuid]/page.tsx",
-                    lineNumber: 1375,
+                    lineNumber: 1370,
                     columnNumber: 11
                 }, this) : profileData ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                     className: "w-full z-10",
@@ -7958,17 +7959,17 @@ function ProfilePageContent() {
                                             priority: true
                                         }, void 0, false, {
                                             fileName: "[project]/app/[locale]/profile/[uuid]/page.tsx",
-                                            lineNumber: 1389,
+                                            lineNumber: 1384,
                                             columnNumber: 19
                                         }, this)
                                     }, void 0, false, {
                                         fileName: "[project]/app/[locale]/profile/[uuid]/page.tsx",
-                                        lineNumber: 1384,
+                                        lineNumber: 1379,
                                         columnNumber: 17
                                     }, this)
                                 }, void 0, false, {
                                     fileName: "[project]/app/[locale]/profile/[uuid]/page.tsx",
-                                    lineNumber: 1383,
+                                    lineNumber: 1378,
                                     columnNumber: 15
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -7991,12 +7992,12 @@ function ProfilePageContent() {
                                                                 className: "w-full h-full rounded-full   object-cover"
                                                             }, void 0, false, {
                                                                 fileName: "[project]/app/[locale]/profile/[uuid]/page.tsx",
-                                                                lineNumber: 1410,
+                                                                lineNumber: 1405,
                                                                 columnNumber: 27
                                                             }, this)
                                                         }, void 0, false, {
                                                             fileName: "[project]/app/[locale]/profile/[uuid]/page.tsx",
-                                                            lineNumber: 1409,
+                                                            lineNumber: 1404,
                                                             columnNumber: 25
                                                         }, this) : profileData.profile_photo_url ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$image$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["default"], {
                                                             src: profileData.profile_photo_url,
@@ -8006,7 +8007,7 @@ function ProfilePageContent() {
                                                             className: "w-full h-full rounded-full object-cover object-top"
                                                         }, void 0, false, {
                                                             fileName: "[project]/app/[locale]/profile/[uuid]/page.tsx",
-                                                            lineNumber: 1421,
+                                                            lineNumber: 1416,
                                                             columnNumber: 25
                                                         }, this) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                                                             className: "w-full h-full bg-gray-100 dark:bg-slate-700 flex items-center justify-center rounded-full",
@@ -8018,12 +8019,12 @@ function ProfilePageContent() {
                                                                 ]
                                                             }, void 0, true, {
                                                                 fileName: "[project]/app/[locale]/profile/[uuid]/page.tsx",
-                                                                lineNumber: 1430,
+                                                                lineNumber: 1425,
                                                                 columnNumber: 27
                                                             }, this)
                                                         }, void 0, false, {
                                                             fileName: "[project]/app/[locale]/profile/[uuid]/page.tsx",
-                                                            lineNumber: 1429,
+                                                            lineNumber: 1424,
                                                             columnNumber: 25
                                                         }, this),
                                                         isCompanyInsighter && profileData.company?.logo && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -8038,17 +8039,17 @@ function ProfilePageContent() {
                                                                     className: "w-full h-full object-cover"
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/app/[locale]/profile/[uuid]/page.tsx",
-                                                                    lineNumber: 1439,
+                                                                    lineNumber: 1434,
                                                                     columnNumber: 29
                                                                 }, this)
                                                             }, void 0, false, {
                                                                 fileName: "[project]/app/[locale]/profile/[uuid]/page.tsx",
-                                                                lineNumber: 1438,
+                                                                lineNumber: 1433,
                                                                 columnNumber: 27
                                                             }, this)
                                                         }, void 0, false, {
                                                             fileName: "[project]/app/[locale]/profile/[uuid]/page.tsx",
-                                                            lineNumber: 1437,
+                                                            lineNumber: 1432,
                                                             columnNumber: 25
                                                         }, this),
                                                         isCompany && enterpriseType === "insighter" && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -8061,7 +8062,7 @@ function ProfilePageContent() {
                                                                 className: "w-full h-full object-cover border-3 border-white rounded-full object-top"
                                                             }, void 0, false, {
                                                                 fileName: "[project]/app/[locale]/profile/[uuid]/page.tsx",
-                                                                lineNumber: 1452,
+                                                                lineNumber: 1447,
                                                                 columnNumber: 29
                                                             }, this) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                                                                 className: "w-full h-full bg-gray-100 dark:bg-slate-700 flex items-center justify-center rounded-full",
@@ -8073,28 +8074,28 @@ function ProfilePageContent() {
                                                                     ]
                                                                 }, void 0, true, {
                                                                     fileName: "[project]/app/[locale]/profile/[uuid]/page.tsx",
-                                                                    lineNumber: 1461,
+                                                                    lineNumber: 1456,
                                                                     columnNumber: 31
                                                                 }, this)
                                                             }, void 0, false, {
                                                                 fileName: "[project]/app/[locale]/profile/[uuid]/page.tsx",
-                                                                lineNumber: 1460,
+                                                                lineNumber: 1455,
                                                                 columnNumber: 29
                                                             }, this)
                                                         }, void 0, false, {
                                                             fileName: "[project]/app/[locale]/profile/[uuid]/page.tsx",
-                                                            lineNumber: 1450,
+                                                            lineNumber: 1445,
                                                             columnNumber: 25
                                                         }, this)
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/app/[locale]/profile/[uuid]/page.tsx",
-                                                    lineNumber: 1407,
+                                                    lineNumber: 1402,
                                                     columnNumber: 21
                                                 }, this)
                                             }, void 0, false, {
                                                 fileName: "[project]/app/[locale]/profile/[uuid]/page.tsx",
-                                                lineNumber: 1406,
+                                                lineNumber: 1401,
                                                 columnNumber: 19
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -8117,12 +8118,12 @@ function ProfilePageContent() {
                                                                                 ]
                                                                             }, void 0, true, {
                                                                                 fileName: "[project]/app/[locale]/profile/[uuid]/page.tsx",
-                                                                                lineNumber: 1481,
+                                                                                lineNumber: 1476,
                                                                                 columnNumber: 31
                                                                             }, this)
                                                                         }, void 0, false, {
                                                                             fileName: "[project]/app/[locale]/profile/[uuid]/page.tsx",
-                                                                            lineNumber: 1480,
+                                                                            lineNumber: 1475,
                                                                             columnNumber: 29
                                                                         }, this),
                                                                         enterpriseType !== "insighter" && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("h1", {
@@ -8130,14 +8131,14 @@ function ProfilePageContent() {
                                                                             children: profileData.company?.legal_name || ""
                                                                         }, void 0, false, {
                                                                             fileName: "[project]/app/[locale]/profile/[uuid]/page.tsx",
-                                                                            lineNumber: 1488,
+                                                                            lineNumber: 1483,
                                                                             columnNumber: 29
                                                                         }, this),
                                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$tabler$2f$icons$2d$react$2f$dist$2f$esm$2f$icons$2f$IconRosetteDiscountCheckFilled$2e$mjs__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__$3c$export__default__as__IconRosetteDiscountCheckFilled$3e$__["IconRosetteDiscountCheckFilled"], {
                                                                             className: "w-5 h-5 text-blue-500"
                                                                         }, void 0, false, {
                                                                             fileName: "[project]/app/[locale]/profile/[uuid]/page.tsx",
-                                                                            lineNumber: 1492,
+                                                                            lineNumber: 1487,
                                                                             columnNumber: 27
                                                                         }, this),
                                                                         isCompany && enterpriseType === "insighter" && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -8146,7 +8147,7 @@ function ProfilePageContent() {
                                                                             children: userProfileT("company")
                                                                         }, void 0, false, {
                                                                             fileName: "[project]/app/[locale]/profile/[uuid]/page.tsx",
-                                                                            lineNumber: 1495,
+                                                                            lineNumber: 1490,
                                                                             columnNumber: 29
                                                                         }, this),
                                                                         isInsighter && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -8154,7 +8155,7 @@ function ProfilePageContent() {
                                                                             children: userProfileT("insighter")
                                                                         }, void 0, false, {
                                                                             fileName: "[project]/app/[locale]/profile/[uuid]/page.tsx",
-                                                                            lineNumber: 1504,
+                                                                            lineNumber: 1499,
                                                                             columnNumber: 29
                                                                         }, this),
                                                                         isCompanyInsighter && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -8163,13 +8164,13 @@ function ProfilePageContent() {
                                                                             children: userProfileT("company")
                                                                         }, void 0, false, {
                                                                             fileName: "[project]/app/[locale]/profile/[uuid]/page.tsx",
-                                                                            lineNumber: 1509,
+                                                                            lineNumber: 1504,
                                                                             columnNumber: 29
                                                                         }, this)
                                                                     ]
                                                                 }, void 0, true, {
                                                                     fileName: "[project]/app/[locale]/profile/[uuid]/page.tsx",
-                                                                    lineNumber: 1477,
+                                                                    lineNumber: 1472,
                                                                     columnNumber: 25
                                                                 }, this),
                                                                 isCompany && enterpriseType === "insighter" && profileData.company?.legal_name && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -8182,13 +8183,13 @@ function ProfilePageContent() {
                                                                             children: profileData.company.legal_name
                                                                         }, void 0, false, {
                                                                             fileName: "[project]/app/[locale]/profile/[uuid]/page.tsx",
-                                                                            lineNumber: 1522,
+                                                                            lineNumber: 1517,
                                                                             columnNumber: 29
                                                                         }, this)
                                                                     ]
                                                                 }, void 0, true, {
                                                                     fileName: "[project]/app/[locale]/profile/[uuid]/page.tsx",
-                                                                    lineNumber: 1520,
+                                                                    lineNumber: 1515,
                                                                     columnNumber: 27
                                                                 }, this),
                                                                 isCompanyInsighter && profileData.company?.legal_name && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -8199,12 +8200,12 @@ function ProfilePageContent() {
                                                                         children: profileData.company.legal_name
                                                                     }, void 0, false, {
                                                                         fileName: "[project]/app/[locale]/profile/[uuid]/page.tsx",
-                                                                        lineNumber: 1532,
+                                                                        lineNumber: 1527,
                                                                         columnNumber: 29
                                                                     }, this)
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/app/[locale]/profile/[uuid]/page.tsx",
-                                                                    lineNumber: 1531,
+                                                                    lineNumber: 1526,
                                                                     columnNumber: 27
                                                                 }, this),
                                                                 (profileData?.country || !enterpriseType && profileData?.company?.manager_country) && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -8219,7 +8220,7 @@ function ProfilePageContent() {
                                                                                 className: "object-contain"
                                                                             }, void 0, false, {
                                                                                 fileName: "[project]/app/[locale]/profile/[uuid]/page.tsx",
-                                                                                lineNumber: 1553,
+                                                                                lineNumber: 1548,
                                                                                 columnNumber: 37
                                                                             }, this) : profileData.company.manager_country.iso2 ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
                                                                                 className: "text-xl",
@@ -8228,7 +8229,7 @@ function ProfilePageContent() {
                                                                                 children: countryCodeToFlagEmoji(profileData.company.manager_country.iso2)
                                                                             }, void 0, false, {
                                                                                 fileName: "[project]/app/[locale]/profile/[uuid]/page.tsx",
-                                                                                lineNumber: 1571,
+                                                                                lineNumber: 1566,
                                                                                 columnNumber: 37
                                                                             }, this) : null,
                                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -8236,7 +8237,7 @@ function ProfilePageContent() {
                                                                                 children: isRTL ? profileData.company.manager_country.name.ar || profileData.company.manager_country.name.en : profileData.company.manager_country.name.en || profileData.company.manager_country.name.ar
                                                                             }, void 0, false, {
                                                                                 fileName: "[project]/app/[locale]/profile/[uuid]/page.tsx",
-                                                                                lineNumber: 1591,
+                                                                                lineNumber: 1586,
                                                                                 columnNumber: 35
                                                                             }, this)
                                                                         ]
@@ -8250,7 +8251,7 @@ function ProfilePageContent() {
                                                                                 className: "object-contain"
                                                                             }, void 0, false, {
                                                                                 fileName: "[project]/app/[locale]/profile/[uuid]/page.tsx",
-                                                                                lineNumber: 1604,
+                                                                                lineNumber: 1599,
                                                                                 columnNumber: 37
                                                                             }, this) : profileData?.country_code ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
                                                                                 className: "text-xl",
@@ -8259,7 +8260,7 @@ function ProfilePageContent() {
                                                                                 children: countryCodeToFlagEmoji(profileData.country_code)
                                                                             }, void 0, false, {
                                                                                 fileName: "[project]/app/[locale]/profile/[uuid]/page.tsx",
-                                                                                lineNumber: 1612,
+                                                                                lineNumber: 1607,
                                                                                 columnNumber: 37
                                                                             }, this) : null,
                                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -8267,14 +8268,14 @@ function ProfilePageContent() {
                                                                                 children: getCountryDisplayName(profileData?.country ?? "")
                                                                             }, void 0, false, {
                                                                                 fileName: "[project]/app/[locale]/profile/[uuid]/page.tsx",
-                                                                                lineNumber: 1622,
+                                                                                lineNumber: 1617,
                                                                                 columnNumber: 35
                                                                             }, this)
                                                                         ]
                                                                     }, void 0, true)
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/app/[locale]/profile/[uuid]/page.tsx",
-                                                                    lineNumber: 1547,
+                                                                    lineNumber: 1542,
                                                                     columnNumber: 29
                                                                 }, this),
                                                                 isCompany && !enterpriseType && profileData?.insighter_company && profileData.insighter_company.length > 0 && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -8301,22 +8302,22 @@ function ProfilePageContent() {
                                                                                                 children: !insighter.profile_photo_url ? initials : null
                                                                                             }, void 0, false, {
                                                                                                 fileName: "[project]/app/[locale]/profile/[uuid]/page.tsx",
-                                                                                                lineNumber: 1667,
+                                                                                                lineNumber: 1662,
                                                                                                 columnNumber: 45
                                                                                             }, this)
                                                                                         }, void 0, false, {
                                                                                             fileName: "[project]/app/[locale]/profile/[uuid]/page.tsx",
-                                                                                            lineNumber: 1664,
+                                                                                            lineNumber: 1659,
                                                                                             columnNumber: 43
                                                                                         }, this)
                                                                                     }, void 0, false, {
                                                                                         fileName: "[project]/app/[locale]/profile/[uuid]/page.tsx",
-                                                                                        lineNumber: 1660,
+                                                                                        lineNumber: 1655,
                                                                                         columnNumber: 41
                                                                                     }, this)
                                                                                 }, insighter.id, false, {
                                                                                     fileName: "[project]/app/[locale]/profile/[uuid]/page.tsx",
-                                                                                    lineNumber: 1649,
+                                                                                    lineNumber: 1644,
                                                                                     columnNumber: 39
                                                                                 }, this);
                                                                             }),
@@ -8345,23 +8346,23 @@ function ProfilePageContent() {
                                                                                     ]
                                                                                 }, void 0, true, {
                                                                                     fileName: "[project]/app/[locale]/profile/[uuid]/page.tsx",
-                                                                                    lineNumber: 1701,
+                                                                                    lineNumber: 1696,
                                                                                     columnNumber: 37
                                                                                 }, this)
                                                                             }, void 0, false, {
                                                                                 fileName: "[project]/app/[locale]/profile/[uuid]/page.tsx",
-                                                                                lineNumber: 1683,
+                                                                                lineNumber: 1678,
                                                                                 columnNumber: 35
                                                                             }, this)
                                                                         ]
                                                                     }, void 0, true, {
                                                                         fileName: "[project]/app/[locale]/profile/[uuid]/page.tsx",
-                                                                        lineNumber: 1636,
+                                                                        lineNumber: 1631,
                                                                         columnNumber: 31
                                                                     }, this)
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/app/[locale]/profile/[uuid]/page.tsx",
-                                                                    lineNumber: 1635,
+                                                                    lineNumber: 1630,
                                                                     columnNumber: 29
                                                                 }, this),
                                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -8369,62 +8370,64 @@ function ProfilePageContent() {
                                                                     children: shouldShowRequestServiceButton && isRequestingOwnService ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
                                                                         type: "button",
                                                                         onClick: ()=>setSelfServiceRequestModalOpen(true),
-                                                                        className: "inline-flex items-center gap-2 rounded-md bg-gradient-to-r from-blue-500 to-teal-400 px-3 py-2 text-xs font-medium text-white transition-all duration-200 hover:-translate-y-0.5 hover:from-blue-600 hover:to-teal-500 hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-sky-300",
+                                                                        className: requestServiceButtonClass,
                                                                         children: [
                                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$tabler$2f$icons$2d$react$2f$dist$2f$esm$2f$icons$2f$IconBriefcase$2e$mjs__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__$3c$export__default__as__IconBriefcase$3e$__["IconBriefcase"], {
                                                                                 size: 16,
-                                                                                stroke: 2
+                                                                                stroke: 2,
+                                                                                className: "transition-colors group-hover:text-teal-500"
                                                                             }, void 0, false, {
                                                                                 fileName: "[project]/app/[locale]/profile/[uuid]/page.tsx",
-                                                                                lineNumber: 1723,
+                                                                                lineNumber: 1718,
                                                                                 columnNumber: 31
                                                                             }, this),
                                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
                                                                                 children: requestServiceButtonLabel
                                                                             }, void 0, false, {
                                                                                 fileName: "[project]/app/[locale]/profile/[uuid]/page.tsx",
-                                                                                lineNumber: 1724,
+                                                                                lineNumber: 1719,
                                                                                 columnNumber: 31
                                                                             }, this)
                                                                         ]
                                                                     }, void 0, true, {
                                                                         fileName: "[project]/app/[locale]/profile/[uuid]/page.tsx",
-                                                                        lineNumber: 1718,
+                                                                        lineNumber: 1713,
                                                                         columnNumber: 29
                                                                     }, this) : canRequestSpecifiedInsighterProject ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$client$2f$app$2d$dir$2f$link$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["default"], {
                                                                         href: specifiedInsighterProjectHref,
-                                                                        className: "inline-flex items-center gap-2 rounded-md bg-gradient-to-r from-blue-500 to-teal-400 px-3 py-2 text-xs font-medium text-white transition-all duration-200 hover:-translate-y-0.5 hover:from-blue-600 hover:to-teal-500 hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-sky-300",
+                                                                        className: requestServiceButtonClass,
                                                                         children: [
                                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$tabler$2f$icons$2d$react$2f$dist$2f$esm$2f$icons$2f$IconBriefcase$2e$mjs__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__$3c$export__default__as__IconBriefcase$3e$__["IconBriefcase"], {
                                                                                 size: 16,
-                                                                                stroke: 2
+                                                                                stroke: 2,
+                                                                                className: "transition-colors group-hover:text-teal-500"
                                                                             }, void 0, false, {
                                                                                 fileName: "[project]/app/[locale]/profile/[uuid]/page.tsx",
-                                                                                lineNumber: 1731,
+                                                                                lineNumber: 1726,
                                                                                 columnNumber: 31
                                                                             }, this),
                                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
                                                                                 children: requestServiceButtonLabel
                                                                             }, void 0, false, {
                                                                                 fileName: "[project]/app/[locale]/profile/[uuid]/page.tsx",
-                                                                                lineNumber: 1732,
+                                                                                lineNumber: 1727,
                                                                                 columnNumber: 31
                                                                             }, this)
                                                                         ]
                                                                     }, void 0, true, {
                                                                         fileName: "[project]/app/[locale]/profile/[uuid]/page.tsx",
-                                                                        lineNumber: 1727,
+                                                                        lineNumber: 1722,
                                                                         columnNumber: 29
                                                                     }, this) : null
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/app/[locale]/profile/[uuid]/page.tsx",
-                                                                    lineNumber: 1716,
+                                                                    lineNumber: 1711,
                                                                     columnNumber: 25
                                                                 }, this)
                                                             ]
                                                         }, void 0, true, {
                                                             fileName: "[project]/app/[locale]/profile/[uuid]/page.tsx",
-                                                            lineNumber: 1475,
+                                                            lineNumber: 1470,
                                                             columnNumber: 23
                                                         }, this),
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -8444,12 +8447,12 @@ function ProfilePageContent() {
                                                                                         stroke: 2
                                                                                     }, void 0, false, {
                                                                                         fileName: "[project]/app/[locale]/profile/[uuid]/page.tsx",
-                                                                                        lineNumber: 1743,
+                                                                                        lineNumber: 1738,
                                                                                         columnNumber: 31
                                                                                     }, this)
                                                                                 }, void 0, false, {
                                                                                     fileName: "[project]/app/[locale]/profile/[uuid]/page.tsx",
-                                                                                    lineNumber: 1742,
+                                                                                    lineNumber: 1737,
                                                                                     columnNumber: 29
                                                                                 }, this),
                                                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -8459,13 +8462,13 @@ function ProfilePageContent() {
                                                                                     }
                                                                                 }, void 0, false, {
                                                                                     fileName: "[project]/app/[locale]/profile/[uuid]/page.tsx",
-                                                                                    lineNumber: 1749,
+                                                                                    lineNumber: 1744,
                                                                                     columnNumber: 29
                                                                                 }, this)
                                                                             ]
                                                                         }, void 0, true, {
                                                                             fileName: "[project]/app/[locale]/profile/[uuid]/page.tsx",
-                                                                            lineNumber: 1741,
+                                                                            lineNumber: 1736,
                                                                             columnNumber: 27
                                                                         }, this),
                                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -8473,13 +8476,13 @@ function ProfilePageContent() {
                                                                             children: isViewingInsighterEntity ? insighterStatistics?.total_published ?? knowledgeData?.meta.total ?? 0 : allKnowledgeTotal ?? knowledgeData?.meta.total ?? 0
                                                                         }, void 0, false, {
                                                                             fileName: "[project]/app/[locale]/profile/[uuid]/page.tsx",
-                                                                            lineNumber: 1756,
+                                                                            lineNumber: 1751,
                                                                             columnNumber: 27
                                                                         }, this)
                                                                     ]
                                                                 }, void 0, true, {
                                                                     fileName: "[project]/app/[locale]/profile/[uuid]/page.tsx",
-                                                                    lineNumber: 1740,
+                                                                    lineNumber: 1735,
                                                                     columnNumber: 25
                                                                 }, this),
                                                                 isViewingInsighterEntity && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -8496,12 +8499,12 @@ function ProfilePageContent() {
                                                                                         stroke: 2
                                                                                     }, void 0, false, {
                                                                                         fileName: "[project]/app/[locale]/profile/[uuid]/page.tsx",
-                                                                                        lineNumber: 1768,
+                                                                                        lineNumber: 1763,
                                                                                         columnNumber: 33
                                                                                     }, this)
                                                                                 }, void 0, false, {
                                                                                     fileName: "[project]/app/[locale]/profile/[uuid]/page.tsx",
-                                                                                    lineNumber: 1767,
+                                                                                    lineNumber: 1762,
                                                                                     columnNumber: 31
                                                                                 }, this),
                                                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -8511,13 +8514,13 @@ function ProfilePageContent() {
                                                                                     }
                                                                                 }, void 0, false, {
                                                                                     fileName: "[project]/app/[locale]/profile/[uuid]/page.tsx",
-                                                                                    lineNumber: 1774,
+                                                                                    lineNumber: 1769,
                                                                                     columnNumber: 31
                                                                                 }, this)
                                                                             ]
                                                                         }, void 0, true, {
                                                                             fileName: "[project]/app/[locale]/profile/[uuid]/page.tsx",
-                                                                            lineNumber: 1766,
+                                                                            lineNumber: 1761,
                                                                             columnNumber: 29
                                                                         }, this),
                                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -8525,13 +8528,13 @@ function ProfilePageContent() {
                                                                             children: insighterStatistics?.total_meeting ?? 0
                                                                         }, void 0, false, {
                                                                             fileName: "[project]/app/[locale]/profile/[uuid]/page.tsx",
-                                                                            lineNumber: 1781,
+                                                                            lineNumber: 1776,
                                                                             columnNumber: 29
                                                                         }, this)
                                                                     ]
                                                                 }, void 0, true, {
                                                                     fileName: "[project]/app/[locale]/profile/[uuid]/page.tsx",
-                                                                    lineNumber: 1765,
+                                                                    lineNumber: 1760,
                                                                     columnNumber: 27
                                                                 }, this),
                                                                 isViewingInsighterEntity && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -8548,12 +8551,12 @@ function ProfilePageContent() {
                                                                                         stroke: 2
                                                                                     }, void 0, false, {
                                                                                         fileName: "[project]/app/[locale]/profile/[uuid]/page.tsx",
-                                                                                        lineNumber: 1790,
+                                                                                        lineNumber: 1785,
                                                                                         columnNumber: 33
                                                                                     }, this)
                                                                                 }, void 0, false, {
                                                                                     fileName: "[project]/app/[locale]/profile/[uuid]/page.tsx",
-                                                                                    lineNumber: 1789,
+                                                                                    lineNumber: 1784,
                                                                                     columnNumber: 31
                                                                                 }, this),
                                                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -8563,13 +8566,13 @@ function ProfilePageContent() {
                                                                                     }
                                                                                 }, void 0, false, {
                                                                                     fileName: "[project]/app/[locale]/profile/[uuid]/page.tsx",
-                                                                                    lineNumber: 1796,
+                                                                                    lineNumber: 1791,
                                                                                     columnNumber: 31
                                                                                 }, this)
                                                                             ]
                                                                         }, void 0, true, {
                                                                             fileName: "[project]/app/[locale]/profile/[uuid]/page.tsx",
-                                                                            lineNumber: 1788,
+                                                                            lineNumber: 1783,
                                                                             columnNumber: 29
                                                                         }, this),
                                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -8577,47 +8580,47 @@ function ProfilePageContent() {
                                                                             children: insighterStatistics?.total_feed ?? 0
                                                                         }, void 0, false, {
                                                                             fileName: "[project]/app/[locale]/profile/[uuid]/page.tsx",
-                                                                            lineNumber: 1803,
+                                                                            lineNumber: 1798,
                                                                             columnNumber: 29
                                                                         }, this)
                                                                     ]
                                                                 }, void 0, true, {
                                                                     fileName: "[project]/app/[locale]/profile/[uuid]/page.tsx",
-                                                                    lineNumber: 1787,
+                                                                    lineNumber: 1782,
                                                                     columnNumber: 27
                                                                 }, this)
                                                             ]
                                                         }, void 0, true, {
                                                             fileName: "[project]/app/[locale]/profile/[uuid]/page.tsx",
-                                                            lineNumber: 1739,
+                                                            lineNumber: 1734,
                                                             columnNumber: 23
                                                         }, this)
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/app/[locale]/profile/[uuid]/page.tsx",
-                                                    lineNumber: 1474,
+                                                    lineNumber: 1469,
                                                     columnNumber: 21
                                                 }, this)
                                             }, void 0, false, {
                                                 fileName: "[project]/app/[locale]/profile/[uuid]/page.tsx",
-                                                lineNumber: 1473,
+                                                lineNumber: 1468,
                                                 columnNumber: 19
                                             }, this)
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/app/[locale]/profile/[uuid]/page.tsx",
-                                        lineNumber: 1404,
+                                        lineNumber: 1399,
                                         columnNumber: 17
                                     }, this)
                                 }, void 0, false, {
                                     fileName: "[project]/app/[locale]/profile/[uuid]/page.tsx",
-                                    lineNumber: 1402,
+                                    lineNumber: 1397,
                                     columnNumber: 15
                                 }, this)
                             ]
                         }, void 0, true, {
                             fileName: "[project]/app/[locale]/profile/[uuid]/page.tsx",
-                            lineNumber: 1381,
+                            lineNumber: 1376,
                             columnNumber: 13
                         }, this),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -8650,7 +8653,7 @@ function ProfilePageContent() {
                                                 children: t("feedPosts")
                                             }, void 0, false, {
                                                 fileName: "[project]/app/[locale]/profile/[uuid]/page.tsx",
-                                                lineNumber: 1841,
+                                                lineNumber: 1836,
                                                 columnNumber: 21
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mantine$2f$core$2f$esm$2f$components$2f$Tabs$2f$Tabs$2e$mjs__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["Tabs"].Tab, {
@@ -8659,7 +8662,7 @@ function ProfilePageContent() {
                                                 children: t("posts")
                                             }, void 0, false, {
                                                 fileName: "[project]/app/[locale]/profile/[uuid]/page.tsx",
-                                                lineNumber: 1848,
+                                                lineNumber: 1843,
                                                 columnNumber: 19
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mantine$2f$core$2f$esm$2f$components$2f$Tabs$2f$Tabs$2e$mjs__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["Tabs"].Tab, {
@@ -8668,7 +8671,7 @@ function ProfilePageContent() {
                                                 children: isCompanyInsighter ? t("aboutMe") : isCompany && !enterpriseType ? t("aboutCompany") : isCompany && enterpriseType ? t("aboutManager") : enterpriseType === "insighter" ? t("aboutMe") : null
                                             }, void 0, false, {
                                                 fileName: "[project]/app/[locale]/profile/[uuid]/page.tsx",
-                                                lineNumber: 1854,
+                                                lineNumber: 1849,
                                                 columnNumber: 19
                                             }, this),
                                             isCompany && !enterpriseType && profileData.insighter_company && profileData.insighter_company.length > 0 && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mantine$2f$core$2f$esm$2f$components$2f$Tabs$2f$Tabs$2e$mjs__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["Tabs"].Tab, {
@@ -8677,7 +8680,7 @@ function ProfilePageContent() {
                                                 children: locale === "ar" ? "خبراء الشركة" : "Company Insighters"
                                             }, void 0, false, {
                                                 fileName: "[project]/app/[locale]/profile/[uuid]/page.tsx",
-                                                lineNumber: 1875,
+                                                lineNumber: 1870,
                                                 columnNumber: 23
                                             }, this),
                                             (isInsighter || isCompanyInsighter || isCompany) && enterpriseType === "insighter" && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mantine$2f$core$2f$esm$2f$components$2f$Tabs$2f$Tabs$2e$mjs__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["Tabs"].Tab, {
@@ -8690,7 +8693,7 @@ function ProfilePageContent() {
                                                 ]
                                             }, void 0, true, {
                                                 fileName: "[project]/app/[locale]/profile/[uuid]/page.tsx",
-                                                lineNumber: 1885,
+                                                lineNumber: 1880,
                                                 columnNumber: 23
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -8701,18 +8704,18 @@ function ProfilePageContent() {
                                                     locale: locale
                                                 }, void 0, false, {
                                                     fileName: "[project]/app/[locale]/profile/[uuid]/page.tsx",
-                                                    lineNumber: 1893,
+                                                    lineNumber: 1888,
                                                     columnNumber: 21
                                                 }, this)
                                             }, void 0, false, {
                                                 fileName: "[project]/app/[locale]/profile/[uuid]/page.tsx",
-                                                lineNumber: 1892,
+                                                lineNumber: 1887,
                                                 columnNumber: 19
                                             }, this)
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/app/[locale]/profile/[uuid]/page.tsx",
-                                        lineNumber: 1839,
+                                        lineNumber: 1834,
                                         columnNumber: 17
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -8727,7 +8730,7 @@ function ProfilePageContent() {
                                                             className: "animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-blue-500"
                                                         }, void 0, false, {
                                                             fileName: "[project]/app/[locale]/profile/[uuid]/page.tsx",
-                                                            lineNumber: 1905,
+                                                            lineNumber: 1900,
                                                             columnNumber: 25
                                                         }, this),
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -8735,18 +8738,18 @@ function ProfilePageContent() {
                                                             children: locale === "ar" ? "جارٍ التحميل..." : "Loading..."
                                                         }, void 0, false, {
                                                             fileName: "[project]/app/[locale]/profile/[uuid]/page.tsx",
-                                                            lineNumber: 1906,
+                                                            lineNumber: 1901,
                                                             columnNumber: 25
                                                         }, this)
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/app/[locale]/profile/[uuid]/page.tsx",
-                                                    lineNumber: 1904,
+                                                    lineNumber: 1899,
                                                     columnNumber: 23
                                                 }, this)
                                             }, void 0, false, {
                                                 fileName: "[project]/app/[locale]/profile/[uuid]/page.tsx",
-                                                lineNumber: 1903,
+                                                lineNumber: 1898,
                                                 columnNumber: 21
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mantine$2f$core$2f$esm$2f$components$2f$Tabs$2f$Tabs$2e$mjs__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["Tabs"].Panel, {
@@ -8764,12 +8767,12 @@ function ProfilePageContent() {
                                                     formatKnowledgeItems: formatKnowledgeItems
                                                 }, void 0, false, {
                                                     fileName: "[project]/app/[locale]/profile/[uuid]/page.tsx",
-                                                    lineNumber: 1914,
+                                                    lineNumber: 1909,
                                                     columnNumber: 21
                                                 }, this)
                                             }, void 0, false, {
                                                 fileName: "[project]/app/[locale]/profile/[uuid]/page.tsx",
-                                                lineNumber: 1913,
+                                                lineNumber: 1908,
                                                 columnNumber: 19
                                             }, this),
                                             isViewingInsighterEntity && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mantine$2f$core$2f$esm$2f$components$2f$Tabs$2f$Tabs$2e$mjs__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["Tabs"].Panel, {
@@ -8779,12 +8782,12 @@ function ProfilePageContent() {
                                                     locale: locale
                                                 }, void 0, false, {
                                                     fileName: "[project]/app/[locale]/profile/[uuid]/page.tsx",
-                                                    lineNumber: 1930,
+                                                    lineNumber: 1925,
                                                     columnNumber: 23
                                                 }, this)
                                             }, void 0, false, {
                                                 fileName: "[project]/app/[locale]/profile/[uuid]/page.tsx",
-                                                lineNumber: 1929,
+                                                lineNumber: 1924,
                                                 columnNumber: 21
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mantine$2f$core$2f$esm$2f$components$2f$Tabs$2f$Tabs$2e$mjs__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["Tabs"].Panel, {
@@ -8798,12 +8801,12 @@ function ProfilePageContent() {
                                                     enterpriseType: enterpriseType
                                                 }, void 0, false, {
                                                     fileName: "[project]/app/[locale]/profile/[uuid]/page.tsx",
-                                                    lineNumber: 1935,
+                                                    lineNumber: 1930,
                                                     columnNumber: 21
                                                 }, this)
                                             }, void 0, false, {
                                                 fileName: "[project]/app/[locale]/profile/[uuid]/page.tsx",
-                                                lineNumber: 1934,
+                                                lineNumber: 1929,
                                                 columnNumber: 19
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mantine$2f$core$2f$esm$2f$components$2f$Tabs$2f$Tabs$2e$mjs__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["Tabs"].Panel, {
@@ -8822,12 +8825,12 @@ function ProfilePageContent() {
                                                                 ]
                                                             }, void 0, true, {
                                                                 fileName: "[project]/app/[locale]/profile/[uuid]/page.tsx",
-                                                                lineNumber: 1953,
+                                                                lineNumber: 1948,
                                                                 columnNumber: 27
                                                             }, this)
                                                         }, void 0, false, {
                                                             fileName: "[project]/app/[locale]/profile/[uuid]/page.tsx",
-                                                            lineNumber: 1952,
+                                                            lineNumber: 1947,
                                                             columnNumber: 25
                                                         }, this),
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -8856,19 +8859,19 @@ function ProfilePageContent() {
                                                                                             className: "object-cover rounded-full object-top"
                                                                                         }, void 0, false, {
                                                                                             fileName: "[project]/app/[locale]/profile/[uuid]/page.tsx",
-                                                                                            lineNumber: 1988,
+                                                                                            lineNumber: 1983,
                                                                                             columnNumber: 41
                                                                                         }, this) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
                                                                                             className: "text-xl font-semibold text-blue-600",
                                                                                             children: getInitials(insighter.name)
                                                                                         }, void 0, false, {
                                                                                             fileName: "[project]/app/[locale]/profile/[uuid]/page.tsx",
-                                                                                            lineNumber: 1995,
+                                                                                            lineNumber: 1990,
                                                                                             columnNumber: 41
                                                                                         }, this)
                                                                                     }, void 0, false, {
                                                                                         fileName: "[project]/app/[locale]/profile/[uuid]/page.tsx",
-                                                                                        lineNumber: 1981,
+                                                                                        lineNumber: 1976,
                                                                                         columnNumber: 37
                                                                                     }, this),
                                                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -8885,20 +8888,20 @@ function ProfilePageContent() {
                                                                                                                 children: insighter.name
                                                                                                             }, void 0, false, {
                                                                                                                 fileName: "[project]/app/[locale]/profile/[uuid]/page.tsx",
-                                                                                                                lineNumber: 2004,
+                                                                                                                lineNumber: 1999,
                                                                                                                 columnNumber: 43
                                                                                                             }, this),
                                                                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$tabler$2f$icons$2d$react$2f$dist$2f$esm$2f$icons$2f$IconRosetteDiscountCheckFilled$2e$mjs__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__$3c$export__default__as__IconRosetteDiscountCheckFilled$3e$__["IconRosetteDiscountCheckFilled"], {
                                                                                                                 className: "w-4 h-4 text-blue-500 flex-shrink-0"
                                                                                                             }, void 0, false, {
                                                                                                                 fileName: "[project]/app/[locale]/profile/[uuid]/page.tsx",
-                                                                                                                lineNumber: 2007,
+                                                                                                                lineNumber: 2002,
                                                                                                                 columnNumber: 43
                                                                                                             }, this)
                                                                                                         ]
                                                                                                     }, void 0, true, {
                                                                                                         fileName: "[project]/app/[locale]/profile/[uuid]/page.tsx",
-                                                                                                        lineNumber: 2003,
+                                                                                                        lineNumber: 1998,
                                                                                                         columnNumber: 41
                                                                                                     }, this),
                                                                                                     isOwner && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -8907,13 +8910,13 @@ function ProfilePageContent() {
                                                                                                         children: managerLabel
                                                                                                     }, void 0, false, {
                                                                                                         fileName: "[project]/app/[locale]/profile/[uuid]/page.tsx",
-                                                                                                        lineNumber: 2010,
+                                                                                                        lineNumber: 2005,
                                                                                                         columnNumber: 43
                                                                                                     }, this)
                                                                                                 ]
                                                                                             }, void 0, true, {
                                                                                                 fileName: "[project]/app/[locale]/profile/[uuid]/page.tsx",
-                                                                                                lineNumber: 2002,
+                                                                                                lineNumber: 1997,
                                                                                                 columnNumber: 39
                                                                                             }, this),
                                                                                             insighter.country && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -8927,7 +8930,7 @@ function ProfilePageContent() {
                                                                                                         className: "object-contain"
                                                                                                     }, void 0, false, {
                                                                                                         fileName: "[project]/app/[locale]/profile/[uuid]/page.tsx",
-                                                                                                        lineNumber: 2022,
+                                                                                                        lineNumber: 2017,
                                                                                                         columnNumber: 45
                                                                                                     }, this),
                                                                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -8935,25 +8938,25 @@ function ProfilePageContent() {
                                                                                                         children: insighter.country.name
                                                                                                     }, void 0, false, {
                                                                                                         fileName: "[project]/app/[locale]/profile/[uuid]/page.tsx",
-                                                                                                        lineNumber: 2030,
+                                                                                                        lineNumber: 2025,
                                                                                                         columnNumber: 43
                                                                                                     }, this)
                                                                                                 ]
                                                                                             }, void 0, true, {
                                                                                                 fileName: "[project]/app/[locale]/profile/[uuid]/page.tsx",
-                                                                                                lineNumber: 2020,
+                                                                                                lineNumber: 2015,
                                                                                                 columnNumber: 41
                                                                                             }, this)
                                                                                         ]
                                                                                     }, void 0, true, {
                                                                                         fileName: "[project]/app/[locale]/profile/[uuid]/page.tsx",
-                                                                                        lineNumber: 2001,
+                                                                                        lineNumber: 1996,
                                                                                         columnNumber: 37
                                                                                     }, this)
                                                                                 ]
                                                                             }, void 0, true, {
                                                                                 fileName: "[project]/app/[locale]/profile/[uuid]/page.tsx",
-                                                                                lineNumber: 1980,
+                                                                                lineNumber: 1975,
                                                                                 columnNumber: 35
                                                                             }, this),
                                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -8968,12 +8971,12 @@ function ProfilePageContent() {
                                                                                             children: locale === "ar" ? "حجز مقابلة" : "Meet"
                                                                                         }, void 0, false, {
                                                                                             fileName: "[project]/app/[locale]/profile/[uuid]/page.tsx",
-                                                                                            lineNumber: 2043,
+                                                                                            lineNumber: 2038,
                                                                                             columnNumber: 39
                                                                                         }, this)
                                                                                     }, void 0, false, {
                                                                                         fileName: "[project]/app/[locale]/profile/[uuid]/page.tsx",
-                                                                                        lineNumber: 2038,
+                                                                                        lineNumber: 2033,
                                                                                         columnNumber: 37
                                                                                     }, this),
                                                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$client$2f$app$2d$dir$2f$link$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["default"], {
@@ -8985,48 +8988,48 @@ function ProfilePageContent() {
                                                                                             children: locale === "ar" ? "عرض المستندات المنشورة" : "View Published Insights"
                                                                                         }, void 0, false, {
                                                                                             fileName: "[project]/app/[locale]/profile/[uuid]/page.tsx",
-                                                                                            lineNumber: 2052,
+                                                                                            lineNumber: 2047,
                                                                                             columnNumber: 39
                                                                                         }, this)
                                                                                     }, void 0, false, {
                                                                                         fileName: "[project]/app/[locale]/profile/[uuid]/page.tsx",
-                                                                                        lineNumber: 2047,
+                                                                                        lineNumber: 2042,
                                                                                         columnNumber: 37
                                                                                     }, this)
                                                                                 ]
                                                                             }, void 0, true, {
                                                                                 fileName: "[project]/app/[locale]/profile/[uuid]/page.tsx",
-                                                                                lineNumber: 2037,
+                                                                                lineNumber: 2032,
                                                                                 columnNumber: 35
                                                                             }, this)
                                                                         ]
                                                                     }, insighter.uuid, true, {
                                                                         fileName: "[project]/app/[locale]/profile/[uuid]/page.tsx",
-                                                                        lineNumber: 1966,
+                                                                        lineNumber: 1961,
                                                                         columnNumber: 33
                                                                     }, this);
                                                                 })())
                                                         }, void 0, false, {
                                                             fileName: "[project]/app/[locale]/profile/[uuid]/page.tsx",
-                                                            lineNumber: 1958,
+                                                            lineNumber: 1953,
                                                             columnNumber: 25
                                                         }, this)
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/app/[locale]/profile/[uuid]/page.tsx",
-                                                    lineNumber: 1951,
+                                                    lineNumber: 1946,
                                                     columnNumber: 23
                                                 }, this) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                                                     className: "py-10 text-center text-gray-500",
                                                     children: locale === "ar" ? "لا يوجد خبراء للشركة حتى الآن" : "No company insighters available yet."
                                                 }, void 0, false, {
                                                     fileName: "[project]/app/[locale]/profile/[uuid]/page.tsx",
-                                                    lineNumber: 2066,
+                                                    lineNumber: 2061,
                                                     columnNumber: 23
                                                 }, this)
                                             }, void 0, false, {
                                                 fileName: "[project]/app/[locale]/profile/[uuid]/page.tsx",
-                                                lineNumber: 1946,
+                                                lineNumber: 1941,
                                                 columnNumber: 19
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mantine$2f$core$2f$esm$2f$components$2f$Tabs$2f$Tabs$2e$mjs__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["Tabs"].Panel, {
@@ -9058,35 +9061,35 @@ function ProfilePageContent() {
                                                     getDayName: getDayName
                                                 }, void 0, false, {
                                                     fileName: "[project]/app/[locale]/profile/[uuid]/page.tsx",
-                                                    lineNumber: 2076,
+                                                    lineNumber: 2071,
                                                     columnNumber: 21
                                                 }, this)
                                             }, void 0, false, {
                                                 fileName: "[project]/app/[locale]/profile/[uuid]/page.tsx",
-                                                lineNumber: 2075,
+                                                lineNumber: 2070,
                                                 columnNumber: 19
                                             }, this)
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/app/[locale]/profile/[uuid]/page.tsx",
-                                        lineNumber: 1901,
+                                        lineNumber: 1896,
                                         columnNumber: 17
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/app/[locale]/profile/[uuid]/page.tsx",
-                                lineNumber: 1822,
+                                lineNumber: 1817,
                                 columnNumber: 15
                             }, this)
                         }, void 0, false, {
                             fileName: "[project]/app/[locale]/profile/[uuid]/page.tsx",
-                            lineNumber: 1816,
+                            lineNumber: 1811,
                             columnNumber: 13
                         }, this)
                     ]
                 }, void 0, true, {
                     fileName: "[project]/app/[locale]/profile/[uuid]/page.tsx",
-                    lineNumber: 1379,
+                    lineNumber: 1374,
                     columnNumber: 11
                 }, this) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                     className: "flex justify-center items-center min-h-[60vh]",
@@ -9108,17 +9111,17 @@ function ProfilePageContent() {
                                         d: "M12 4.354v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"
                                     }, void 0, false, {
                                         fileName: "[project]/app/[locale]/profile/[uuid]/page.tsx",
-                                        lineNumber: 2119,
+                                        lineNumber: 2114,
                                         columnNumber: 19
                                     }, this)
                                 }, void 0, false, {
                                     fileName: "[project]/app/[locale]/profile/[uuid]/page.tsx",
-                                    lineNumber: 2112,
+                                    lineNumber: 2107,
                                     columnNumber: 17
                                 }, this)
                             }, void 0, false, {
                                 fileName: "[project]/app/[locale]/profile/[uuid]/page.tsx",
-                                lineNumber: 2111,
+                                lineNumber: 2106,
                                 columnNumber: 15
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -9126,41 +9129,41 @@ function ProfilePageContent() {
                                 children: t("profileNotFound")
                             }, void 0, false, {
                                 fileName: "[project]/app/[locale]/profile/[uuid]/page.tsx",
-                                lineNumber: 2127,
+                                lineNumber: 2122,
                                 columnNumber: 15
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "[project]/app/[locale]/profile/[uuid]/page.tsx",
-                        lineNumber: 2110,
+                        lineNumber: 2105,
                         columnNumber: 13
                     }, this)
                 }, void 0, false, {
                     fileName: "[project]/app/[locale]/profile/[uuid]/page.tsx",
-                    lineNumber: 2109,
+                    lineNumber: 2104,
                     columnNumber: 11
                 }, this),
                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                     className: "flex-grow"
                 }, void 0, false, {
                     fileName: "[project]/app/[locale]/profile/[uuid]/page.tsx",
-                    lineNumber: 2134,
+                    lineNumber: 2129,
                     columnNumber: 9
                 }, this),
                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$footer$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["default"], {}, void 0, false, {
                     fileName: "[project]/app/[locale]/profile/[uuid]/page.tsx",
-                    lineNumber: 2135,
+                    lineNumber: 2130,
                     columnNumber: 9
                 }, this)
             ]
         }, void 0, true, {
             fileName: "[project]/app/[locale]/profile/[uuid]/page.tsx",
-            lineNumber: 1321,
+            lineNumber: 1316,
             columnNumber: 7
         }, this)
     }, void 0, false, {
         fileName: "[project]/app/[locale]/profile/[uuid]/page.tsx",
-        lineNumber: 1320,
+        lineNumber: 1315,
         columnNumber: 5
     }, this);
 }
@@ -9172,22 +9175,22 @@ function ProfilePage() {
                 className: "animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-blue-500"
             }, void 0, false, {
                 fileName: "[project]/app/[locale]/profile/[uuid]/page.tsx",
-                lineNumber: 2146,
+                lineNumber: 2141,
                 columnNumber: 11
             }, void 0)
         }, void 0, false, {
             fileName: "[project]/app/[locale]/profile/[uuid]/page.tsx",
-            lineNumber: 2145,
+            lineNumber: 2140,
             columnNumber: 9
         }, void 0),
         children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(ProfilePageContent, {}, void 0, false, {
             fileName: "[project]/app/[locale]/profile/[uuid]/page.tsx",
-            lineNumber: 2150,
+            lineNumber: 2145,
             columnNumber: 7
         }, this)
     }, void 0, false, {
         fileName: "[project]/app/[locale]/profile/[uuid]/page.tsx",
-        lineNumber: 2143,
+        lineNumber: 2138,
         columnNumber: 5
     }, this);
 }

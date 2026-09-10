@@ -82,7 +82,6 @@ const FeedShare = ({
   const shareToSocial = (platform: string) => {
     const url = encodeURIComponent(shareUrl)
     const message = encodeURIComponent(customShareMessage)
-    const title = encodeURIComponent(shareTitle || authorName)
 
     let socialUrl = ''
 
@@ -94,7 +93,10 @@ const FeedShare = ({
         socialUrl = `https://twitter.com/intent/tweet?text=${message}&url=${url}`
         break
       case 'linkedin':
-        socialUrl = `https://www.linkedin.com/sharing/share-offsite/?url=${url}&title=${title}&summary=${message}`
+        // LinkedIn's share-offsite endpoint ignores `title` and `summary`, so
+        // the message entered in our modal never reaches its composer. The
+        // feed composer accepts the post text and shared URL explicitly.
+        socialUrl = `https://www.linkedin.com/feed/?shareActive=true&shareUrl=${url}&text=${message}`
         break
       case 'whatsapp':
         socialUrl = `https://api.whatsapp.com/send?text=${message}%20${url}`

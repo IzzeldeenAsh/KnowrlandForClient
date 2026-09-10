@@ -315,7 +315,7 @@ export default function ArticleReader({ locale, identifier, isPublic }: ArticleR
                   className={styles.heroAuthorLink}
                 >
                   <div className={styles.authorAvatar}>
-                    {publisherPhoto ? <img src={publisherPhoto} alt={publisherName} className={isPublishedAsCompany ? '!object-contain !p-1' : undefined} /> : <span>{publisherInitials}</span>}
+                    {publisherPhoto ? <img src={publisherPhoto} alt={publisherName} /> : <span>{publisherInitials}</span>}
                   </div>
                   <div className={styles.heroAuthorText}>
                     <span className={styles.heroMetaLabel}>{copy.publisher}</span>

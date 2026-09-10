@@ -13,7 +13,6 @@ type CompanyInsighter = {
 type ServiceTarget = {
   specifiedInsighterUuid: string;
   receiveProjectServicesActive: boolean;
-  labelName: string;
 };
 
 type KnowledgeAuthorActionsProps = {
@@ -46,10 +45,6 @@ export default function KnowledgeAuthorActions({
     Boolean(insighter.company?.uuid);
   const isIndividualInsighterInsight =
     roles.includes("insighter") && !insighter.company?.uuid;
-  const companyLegalName = insighter.company?.legal_name?.trim() || "";
-  const requestServiceLabelName =
-    serviceTarget?.labelName || companyLegalName || insighter.name || "";
-
   useEffect(() => {
     const companyUuid = insighter.company?.uuid;
     const insighterUuid = insighter.uuid;
@@ -95,7 +90,6 @@ export default function KnowledgeAuthorActions({
               specifiedInsighterUuid: targetUuid,
               receiveProjectServicesActive:
                 payload.data?.receive_project_services_active === true,
-              labelName: payload.data?.name?.trim() || insighter.name?.trim() || "",
             });
           }
           return;
@@ -133,7 +127,6 @@ export default function KnowledgeAuthorActions({
             specifiedInsighterUuid: ownerUuid,
             receiveProjectServicesActive:
               payload.data?.receive_project_services_active === true,
-            labelName: companyLegalName,
           });
         }
       } catch {
@@ -147,9 +140,7 @@ export default function KnowledgeAuthorActions({
       cancelled = true;
     };
   }, [
-    companyLegalName,
     insighter.company?.uuid,
-    insighter.name,
     insighter.uuid,
     isIndividualInsighterInsight,
     locale,
@@ -159,7 +150,6 @@ export default function KnowledgeAuthorActions({
 
   const canRequestService =
     (isCompanyMemberInsight || isIndividualInsighterInsight) &&
-    Boolean(requestServiceLabelName) &&
     serviceTarget?.receiveProjectServicesActive === true &&
     Boolean(serviceTarget.specifiedInsighterUuid);
   const serviceInsighterUuid = serviceTarget?.specifiedInsighterUuid || "";
@@ -171,16 +161,11 @@ export default function KnowledgeAuthorActions({
     locale === "en"
       ? `Meet ${insighter.name.toLowerCase()}`
       : `قابل الخبير ${insighter.name.toLowerCase()}`;
-  const requestServiceLabel =
-    isCompanyMemberInsight && requestServiceLabelName
-      ? isRTL
-        ? `طلب خدمة من ${requestServiceLabelName}`
-        : `Request Service from ${requestServiceLabelName}`
-      : isRTL
-        ? "طلب خدمة"
-        : "Request Service";
+  const requestServiceLabel = isRTL ? "طلب خدمة" : "Request Service";
   const buttonClass =
     "inline-flex max-h-[34px] items-center justify-center gap-2 rounded-md bg-[rgb(56_159_227)] px-3 py-1.5 text-center text-sm font-semibold text-white transition-colors hover:bg-[rgb(42_139_203)] focus:outline-none focus:ring-2 focus:ring-blue-200";
+  const requestServiceButtonClass =
+    "group inline-flex max-h-[34px] items-center justify-center gap-2 rounded-full border border-transparent bg-[linear-gradient(#ffffff,#ffffff)_padding-box,linear-gradient(90deg,#38bdf8,#3b82f6,#2dd4bf)_border-box] px-3.5 py-1.5 text-center text-sm font-semibold text-sky-600 shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md focus:outline-none focus:ring-2 focus:ring-sky-300 focus:ring-offset-2 dark:bg-[linear-gradient(#0f172a,#0f172a)_padding-box,linear-gradient(90deg,#38bdf8,#3b82f6,#2dd4bf)_border-box] dark:text-sky-300";
 
   return (
     <div className={`flex flex-wrap items-center gap-2 ${className}`}>
@@ -189,8 +174,8 @@ export default function KnowledgeAuthorActions({
         <span className="capitalize">{meetLabel}</span>
       </Link>
       {canRequestService && (
-        <Link href={serviceHref} className={buttonClass}>
-          <IconBriefcase size={16} stroke={2} />
+        <Link href={serviceHref} className={requestServiceButtonClass}>
+          <IconBriefcase size={16} stroke={2} className="transition-colors group-hover:text-teal-500" />
           <span className="relative font-semibold">{requestServiceLabel}</span>
         </Link>
       )}
