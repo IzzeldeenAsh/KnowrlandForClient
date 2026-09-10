@@ -179,6 +179,7 @@ export default function ArticleEditor({ locale }: ArticleEditorProps) {
   const router = useRouter()
   const toast = useToast()
   const { user, roles, isAuthResolved } = useUserProfile()
+  const usesCompanyLibrary = roles.includes('company')
   const coverInputRef = useRef<HTMLInputElement>(null)
   const coverObjectUrlRef = useRef<string | null>(null)
 
@@ -387,7 +388,7 @@ export default function ArticleEditor({ locale }: ArticleEditorProps) {
     let cancelled = false
     void (async () => {
       try {
-        const item = await fetchLibraryKnowledgeById(id, locale)
+        const item = await fetchLibraryKnowledgeById(id, locale, 5, usesCompanyLibrary)
         if (cancelled) return
         if (item) {
           setRelatedInsights((previous) =>
@@ -407,7 +408,7 @@ export default function ArticleEditor({ locale }: ArticleEditorProps) {
     return () => {
       cancelled = true
     }
-  }, [isAuthResolved, canPublish, locale, copy, toast, router])
+  }, [isAuthResolved, canPublish, locale, usesCompanyLibrary, copy, toast, router])
 
   const handleCoverChange = async (file: File | undefined) => {
     if (isEditingPublished) return
@@ -636,7 +637,7 @@ export default function ArticleEditor({ locale }: ArticleEditorProps) {
       </Modal>
 
       <IndustrySelectModal locale={locale} opened={industryModalOpened} selectedId={industry?.id ?? null} onClose={() => setIndustryModalOpened(false)} onSelect={(option) => { setIndustry(option); setIndustryModalOpened(false) }} />
-      <KnowledgeLibraryDrawer locale={locale} opened={libraryDrawerOpened} selected={relatedInsights} onClose={() => setLibraryDrawerOpened(false)} onConfirm={(items) => { setRelatedInsights(items); setLibraryDrawerOpened(false) }} onPublishNew={() => { void handlePublishNewKnowledge() }} />
+      <KnowledgeLibraryDrawer locale={locale} opened={libraryDrawerOpened} isCompany={usesCompanyLibrary} selected={relatedInsights} onClose={() => setLibraryDrawerOpened(false)} onSelectionChange={setRelatedInsights} onPublishNew={() => { void handlePublishNewKnowledge() }} />
     </div>
   )
 }

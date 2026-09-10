@@ -341,6 +341,7 @@ export default function PostModal({
   const isEditingPublished = draft?.status === 'published'
   const toast = useToast()
   const { user, roles } = useUserProfile()
+  const usesCompanyLibrary = roles.includes('company')
 
   // --- Post content state ---
   // Two-step flow: 1 = write the post, 2 = categorize (industry + tags)
@@ -995,7 +996,12 @@ export default function PostModal({
     let cancelled = false
     void (async () => {
       try {
-        const item = await fetchLibraryKnowledgeById(autoAttachKnowledgeId, locale)
+        const item = await fetchLibraryKnowledgeById(
+          autoAttachKnowledgeId,
+          locale,
+          5,
+          usesCompanyLibrary,
+        )
         if (cancelled) return
         if (item) {
           setRelatedInsights((previous) =>
@@ -1017,7 +1023,15 @@ export default function PostModal({
     return () => {
       cancelled = true
     }
-  }, [opened, autoAttachKnowledgeId, locale, copy, toast, onAutoAttachHandled])
+  }, [
+    opened,
+    autoAttachKnowledgeId,
+    locale,
+    usesCompanyLibrary,
+    copy,
+    toast,
+    onAutoAttachHandled,
+  ])
 
   const handleDiscardDraft = async () => {
     if (isEditingPublished || isPublishing || isSavingDraft || isDiscardingDraft) return
@@ -1758,12 +1772,10 @@ export default function PostModal({
       <KnowledgeLibraryDrawer
         locale={locale}
         opened={libraryDrawerOpened}
+        isCompany={usesCompanyLibrary}
         selected={relatedInsights}
         onClose={() => setLibraryDrawerOpened(false)}
-        onConfirm={(items) => {
-          setRelatedInsights(items)
-          setLibraryDrawerOpened(false)
-        }}
+        onSelectionChange={setRelatedInsights}
         onPublishNew={() => {
           setLibraryDrawerOpened(false)
           void handlePublishNewKnowledge()

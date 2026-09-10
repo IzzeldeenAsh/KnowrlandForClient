@@ -13,9 +13,10 @@ const MAX_LIBRARY_ATTACHMENTS = 3
 type KnowledgeLibraryDrawerProps = {
   locale: string
   opened: boolean
+  isCompany: boolean
   selected: LibraryKnowledgeItem[]
   onClose: () => void
-  onConfirm: (items: LibraryKnowledgeItem[]) => void
+  onSelectionChange: (items: LibraryKnowledgeItem[]) => void
   // Empty-state CTA: save the post as a draft and send the user off to publish a
   // new knowledge item, then return here to attach it automatically.
   onPublishNew: () => void
@@ -32,7 +33,7 @@ const copyByLocale = {
       'Publish documents, reports, or data to your library, then attach them to your posts. Save a draft and continue to publishing whenever you are ready.',
     emptyCta: 'Save and start publish',
     loadMore: 'Load more',
-    attach: 'Attach',
+    done: 'Done',
     selectedCount: (count: number) => `${count} of ${MAX_LIBRARY_ATTACHMENTS} selected`,
     limitReached: `You can attach up to ${MAX_LIBRARY_ATTACHMENTS} items. Unselect one to choose another.`,
     error: 'Unable to load your library.',
@@ -48,7 +49,7 @@ const copyByLocale = {
       'انشر المستندات أو التقارير أو البيانات في مكتبتك، ثم أرفقها بمنشوراتك. احفظ مسودة وتابع النشر متى كنت جاهزًا.',
     emptyCta: 'احفظ وابدأ النشر',
     loadMore: 'تحميل المزيد',
-    attach: 'إرفاق',
+    done: 'تم',
     selectedCount: (count: number) => `${count} من ${MAX_LIBRARY_ATTACHMENTS} محدد`,
     limitReached: `يمكنك إرفاق حتى ${MAX_LIBRARY_ATTACHMENTS} عناصر. ألغِ تحديد أحدها لاختيار غيره.`,
     error: 'تعذر تحميل مكتبتك.',
@@ -59,9 +60,10 @@ const copyByLocale = {
 export default function KnowledgeLibraryDrawer({
   locale,
   opened,
+  isCompany,
   selected,
   onClose,
-  onConfirm,
+  onSelectionChange,
   onPublishNew,
 }: KnowledgeLibraryDrawerProps) {
   const isArabic = locale === 'ar'
@@ -72,16 +74,13 @@ export default function KnowledgeLibraryDrawer({
   const [lastPage, setLastPage] = useState(1)
   const [isLoading, setIsLoading] = useState(false)
   const [loadError, setLoadError] = useState(false)
-  const [pendingSelection, setPendingSelection] = useState<Map<number, LibraryKnowledgeItem>>(
-    new Map(),
-  )
 
   const loadPage = useCallback(
     async (pageToLoad: number, append: boolean) => {
       setIsLoading(true)
       setLoadError(false)
       try {
-        const result = await fetchPublishedLibraryKnowledge(pageToLoad, locale)
+        const result = await fetchPublishedLibraryKnowledge(pageToLoad, locale, isCompany)
         setItems((previous) => (append ? [...previous, ...result.data] : result.data))
         setPage(result.meta.current_page)
         setLastPage(result.meta.last_page)
@@ -91,30 +90,23 @@ export default function KnowledgeLibraryDrawer({
         setIsLoading(false)
       }
     },
-    [locale],
+    [isCompany, locale],
   )
 
-  // Reset to the parent's confirmed selection each time the drawer opens
+  // Refresh the appropriate library each time the drawer opens. Selection is
+  // controlled by the parent so every checkbox change is attached immediately.
   useEffect(() => {
     if (!opened) return
-    setPendingSelection(new Map(selected.map((item) => [item.id, item])))
     loadPage(1, false)
-  }, [opened, selected, loadPage])
+  }, [opened, loadPage])
 
   const toggleItem = (item: LibraryKnowledgeItem) => {
-    setPendingSelection((previous) => {
-      // Deselecting is always allowed; adding is capped at the max.
-      if (!previous.has(item.id) && previous.size >= MAX_LIBRARY_ATTACHMENTS) {
-        return previous
-      }
-      const next = new Map(previous)
-      if (next.has(item.id)) {
-        next.delete(item.id)
-      } else {
-        next.set(item.id, item)
-      }
-      return next
-    })
+    const next = new Map(selected.map((selectedItem) => [selectedItem.id, selectedItem]))
+    // Deselecting is always allowed; adding is capped at the max.
+    if (!next.has(item.id) && next.size >= MAX_LIBRARY_ATTACHMENTS) return
+    if (next.has(item.id)) next.delete(item.id)
+    else next.set(item.id, item)
+    onSelectionChange(Array.from(next.values()))
   }
 
   return (
@@ -174,9 +166,9 @@ export default function KnowledgeLibraryDrawer({
           ) : (
             <ul className="space-y-3">
               {items.map((item) => {
-                const isChecked = pendingSelection.has(item.id)
+                const isChecked = selected.some((selectedItem) => selectedItem.id === item.id)
                 const isDisabled =
-                  !isChecked && pendingSelection.size >= MAX_LIBRARY_ATTACHMENTS
+                  !isChecked && selected.length >= MAX_LIBRARY_ATTACHMENTS
                 return (
                   <li key={item.id}>
                     <label
@@ -234,22 +226,22 @@ export default function KnowledgeLibraryDrawer({
           )}
         </div>
 
-        {/* Selection footer is only meaningful when there is something to attach. */}
+        {/* Changes are already attached; this button simply closes the drawer. */}
         {items.length > 0 && (
           <div className="flex items-center justify-between border-t border-[#DCE4EF] bg-white pt-3">
             <span className="min-w-0 pe-3 text-[12.5px] text-[#5A6B84]">
-              {pendingSelection.size >= MAX_LIBRARY_ATTACHMENTS ? (
+              {selected.length >= MAX_LIBRARY_ATTACHMENTS ? (
                 <span className="font-medium text-[#B26A00]">{copy.limitReached}</span>
               ) : (
-                copy.selectedCount(pendingSelection.size)
+                copy.selectedCount(selected.length)
               )}
             </span>
             <button
               type="button"
-              onClick={() => onConfirm(Array.from(pendingSelection.values()))}
+              onClick={onClose}
               className="min-h-10 rounded-md bg-[#1D74E0] px-5 py-2 text-[13.5px] font-medium text-white transition-colors hover:bg-[#155CB8] focus-visible:outline-[1px] focus-visible:outline-offset-1 focus-visible:outline-[#B7D2F4]"
             >
-              {copy.attach}
+              {copy.done}
             </button>
           </div>
         )}

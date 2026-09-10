@@ -134,8 +134,9 @@ export interface LibraryKnowledgeItem {
   type: string
   title: string
   slug: string
-  status: string
-  published_at: string | null
+  status?: string
+  published_at?: string | null
+  description?: string | null
 }
 
 export interface PaginatedMeta {
@@ -1074,9 +1075,13 @@ export async function createSuggestTag(
 export async function fetchPublishedLibraryKnowledge(
   page: number,
   locale: string,
+  isCompany = false,
 ): Promise<LibraryKnowledgePage> {
   const params = new URLSearchParams({ page: String(page), status: 'published' })
-  const response = await fetch(getApiUrl(`/api/insighter/library/knowledge?${params}`), {
+  const path = isCompany
+    ? '/api/company/library/knowledge/list'
+    : `/api/insighter/library/knowledge?${params}`
+  const response = await fetch(getApiUrl(path), {
     headers: authHeaders(locale),
   })
 
@@ -1085,16 +1090,24 @@ export async function fetchPublishedLibraryKnowledge(
   }
 
   const body = await response.json()
+  const data = (body.data ?? []).map((item: LibraryKnowledgeItem) => ({
+    id: item.id,
+    type: item.type,
+    title: item.title,
+    slug: item.slug,
+    status: item.status,
+    published_at: item.published_at,
+    description: item.description,
+  }))
+
   return {
-    data: (body.data ?? []).map((item: LibraryKnowledgeItem) => ({
-      id: item.id,
-      type: item.type,
-      title: item.title,
-      slug: item.slug,
-      status: item.status,
-      published_at: item.published_at,
-    })),
-    meta: body.meta ?? { current_page: page, last_page: page, per_page: 10, total: 0 },
+    data,
+    meta: body.meta ?? {
+      current_page: page,
+      last_page: page,
+      per_page: data.length,
+      total: data.length,
+    },
   }
 }
 
@@ -1106,9 +1119,10 @@ export async function fetchLibraryKnowledgeById(
   id: number,
   locale: string,
   maxPages = 5,
+  isCompany = false,
 ): Promise<LibraryKnowledgeItem | null> {
   for (let page = 1; page <= maxPages; page += 1) {
-    const result = await fetchPublishedLibraryKnowledge(page, locale)
+    const result = await fetchPublishedLibraryKnowledge(page, locale, isCompany)
     const match = result.data.find((item) => item.id === id)
     if (match) return match
     if (page >= result.meta.last_page) break
