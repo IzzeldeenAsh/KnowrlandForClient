@@ -2,5 +2,6 @@
   "/[locale]/(default)/page": "app/[locale]/(default)/page.js",
   "/[locale]/knowledge/[type]/[slug]/page": "app/[locale]/knowledge/[type]/[slug]/page.js",
   "/[locale]/profile/[uuid]/page": "app/[locale]/profile/[uuid]/page.js",
+  "/[locale]/project/wizard/[step]/page": "app/[locale]/project/wizard/[step]/page.js",
   "/manifest.webmanifest/route": "app/manifest.webmanifest/route.js"
 }

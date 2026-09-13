@@ -29,6 +29,8 @@ import {
   useMemo,
   useRef,
   useState,
+  type CSSProperties,
+  type ReactNode,
 } from 'react'
 import '@mux/mux-player'
 import KnowledgeTypeIcon from '@/components/icons/KnowledgeTypeIcon'
@@ -170,6 +172,162 @@ function stripHtml(html: string): string {
 
   const doc = new DOMParser().parseFromString(html, 'text/html')
   return (doc.body.textContent ?? '').replace(/\s+/g, ' ').trim()
+}
+
+// Keep the pattern compatible with the project's ES5 TypeScript target while
+// supporting Latin, Arabic, and other non-ASCII hashtag characters.
+const feedTextTokenPattern = /(https?:\/\/[^\s<>()]+|www\.[^\s<>()]+|(?:[A-Za-z0-9-]+\.)+[A-Za-z]{2,}(?:\/[^\s<>()]*)?)|(^|[^A-Za-z0-9_])#([A-Za-z0-9_\-\u00C0-\uFFFF]+)/g
+
+function renderInteractiveFeedText(
+  value: string,
+  onHashtagClick: (hashtag: string) => void,
+): ReactNode[] {
+  const nodes: ReactNode[] = []
+  let lastIndex = 0
+  let tokenIndex = 0
+
+  let match: RegExpExecArray | null
+  while ((match = feedTextTokenPattern.exec(value)) !== null) {
+    const start = match.index ?? 0
+    if (start > lastIndex) nodes.push(value.slice(lastIndex, start))
+
+    const rawUrl = match[1]
+    if (rawUrl) {
+      // A sentence-ending punctuation mark is not part of a URL, but should
+      // remain visible after the clickable link.
+      const url = rawUrl.replace(/[.,!?;:]+$/, '')
+      const trailingText = rawUrl.slice(url.length)
+      const href = /^https?:\/\//i.test(url) ? url : `https://${url}`
+
+      nodes.push(
+        <a
+          key={`link-${tokenIndex}`}
+          href={href}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="font-medium text-[#2378E8] underline decoration-[#2378E8]/40 underline-offset-2 transition-colors hover:text-[#155DB8] hover:decoration-current focus-visible:rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2378E8]"
+        >
+          {url}
+        </a>,
+      )
+      if (trailingText) nodes.push(trailingText)
+    } else {
+      const prefix = match[2] ?? ''
+      const hashtag = match[3]
+      if (prefix) nodes.push(prefix)
+      if (hashtag) {
+        nodes.push(
+          <button
+            key={`hashtag-${tokenIndex}`}
+            type="button"
+            onClick={() => onHashtagClick(hashtag)}
+            className="inline rounded-sm border-0 bg-transparent p-0 font-medium text-[#2378E8] underline decoration-[#2378E8]/40 underline-offset-2 transition-colors hover:text-[#155DB8] hover:decoration-current focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2378E8]"
+            aria-label={`Search the feed for #${hashtag}`}
+          >
+            #{hashtag}
+          </button>,
+        )
+      }
+    }
+
+    lastIndex = start + match[0].length
+    tokenIndex += 1
+  }
+
+  if (lastIndex < value.length) nodes.push(value.slice(lastIndex))
+  return nodes
+}
+
+function toHashtagToken(name: string): string {
+  return name
+    .trim()
+    // Replace spaces and punctuation (including &) with one separator so a
+    // tag from the API is always rendered as a single clickable hashtag.
+    .replace(/[^A-Za-z0-9_\-\u00C0-\uFFFF]+/g, '_')
+    .replace(/_+/g, '_')
+    .replace(/^_+|_+$/g, '')
+}
+
+const richPostAllowedTags = new Set(['p', 'br', 'strong', 'b', 'em', 'i', 'u', 'ul', 'ol', 'li', 'a'])
+
+function sanitizeAndLinkifyRichPostHtml(html: string, locale: string): string {
+  if (typeof document === 'undefined') return ''
+
+  const parsed = new DOMParser().parseFromString(html, 'text/html')
+  parsed.body
+    .querySelectorAll('script, style, iframe, object, embed, form, input, button, svg, math')
+    .forEach((node) => node.remove())
+
+  Array.from(parsed.body.querySelectorAll('*')).forEach((element) => {
+    const tagName = element.tagName.toLowerCase()
+    if (!richPostAllowedTags.has(tagName)) {
+      element.replaceWith(...Array.from(element.childNodes))
+      return
+    }
+
+    const href = tagName === 'a' ? element.getAttribute('href')?.trim() ?? '' : ''
+    Array.from(element.attributes).forEach((attribute) => element.removeAttribute(attribute.name))
+
+    if (tagName === 'a' && /^(https?:|mailto:)/i.test(href)) {
+      element.setAttribute('href', href)
+      element.setAttribute('target', '_blank')
+      element.setAttribute('rel', 'noopener noreferrer')
+    } else if (tagName === 'a') {
+      element.replaceWith(...Array.from(element.childNodes))
+    }
+  })
+
+  const textNodes: Text[] = []
+  const walker = document.createTreeWalker(parsed.body, NodeFilter.SHOW_TEXT)
+  let textNode = walker.nextNode()
+  while (textNode) {
+    if (!textNode.parentElement?.closest('a')) textNodes.push(textNode as Text)
+    textNode = walker.nextNode()
+  }
+
+  textNodes.forEach((node) => {
+    const value = node.nodeValue ?? ''
+    feedTextTokenPattern.lastIndex = 0
+    let match: RegExpExecArray | null
+    let lastIndex = 0
+    let hasToken = false
+    const fragment = document.createDocumentFragment()
+
+    while ((match = feedTextTokenPattern.exec(value)) !== null) {
+      hasToken = true
+      const start = match.index ?? 0
+      if (start > lastIndex) fragment.append(value.slice(lastIndex, start))
+
+      const rawUrl = match[1]
+      if (rawUrl) {
+        const url = rawUrl.replace(/[.,!?;:]+$/, '')
+        const anchor = document.createElement('a')
+        anchor.href = /^https?:\/\//i.test(url) ? url : `https://${url}`
+        anchor.target = '_blank'
+        anchor.rel = 'noopener noreferrer'
+        anchor.textContent = url
+        fragment.append(anchor, rawUrl.slice(url.length))
+      } else {
+        const prefix = match[2] ?? ''
+        const hashtag = match[3]
+        if (prefix) fragment.append(prefix)
+        if (hashtag) {
+          const anchor = document.createElement('a')
+          anchor.href = `/${locale}?keyword=${encodeURIComponent(hashtag.replace(/_/g, ' '))}`
+          anchor.textContent = `#${hashtag}`
+          fragment.append(anchor)
+        }
+      }
+
+      lastIndex = start + match[0].length
+    }
+
+    if (!hasToken) return
+    if (lastIndex < value.length) fragment.append(value.slice(lastIndex))
+    node.replaceWith(fragment)
+  })
+
+  return parsed.body.innerHTML
 }
 
 function getInsightPrice(price: FeedItemRelatedInsight['price'], freeLabel: string) {
@@ -533,12 +691,10 @@ function VideoPlayer({
   media,
   title,
   playLabel,
-  flushBottom = false,
 }: {
   media: FeedItemMedia
   title: string
   playLabel: string
-  flushBottom?: boolean
 }) {
   const containerRef = useRef<HTMLDivElement | null>(null)
   // Hold the media element itself rather than querying for it when a pause is
@@ -735,30 +891,27 @@ function VideoPlayer({
   }, [shouldPreload, playerEpoch, useMp4Fallback])
 
   if (media.provider_playback_id) {
-    // Reserve the box at the video's real aspect ratio so it doesn't collapse
-    // to a tiny height before Mux loads metadata (avoids the layout shift where
-    // the player snaps to full size on scroll/playback). Falls back to 16/9.
-    const aspectRatio =
-      media.width && media.height ? `${media.width} / ${media.height}` : '16 / 9'
-    // Portrait videos are bound by height (the maxHeight cap) so the width is
-    // derived and the box stays narrow; landscape videos fill the card width.
+    // A portrait frame keeps vertical clips full-width, as in social feeds.
+    // `cover` removes letterboxed side bars while retaining a familiar 2:3
+    // mobile viewing area. Landscape clips keep their natural widescreen frame.
     const isPortrait = !!(media.width && media.height && media.height > media.width)
+    const frameClass = isPortrait ? 'aspect-[2/3] sm:aspect-[4/5]' : 'aspect-video'
+    const playerStyle = {
+      width: '100%',
+      height: '100%',
+      display: 'block',
+      objectFit: 'cover',
+      '--media-object-fit': 'cover',
+      '--media-object-position': 'center center',
+    } as CSSProperties
 
     return (
-      // Full-width black band that letterboxes and centers the video box.
       <div
-        className={`-mx-5 mt-5 flex justify-center overflow-hidden bg-black sm:-mx-6 ${flushBottom ? '-mb-5 rounded-b-lg sm:-mb-6' : ''}`}
+        className="-mx-2 mt-5 overflow-hidden rounded-[18px] border border-[#D7E6F6] bg-[#EAF3FC] shadow-[0_10px_26px_rgba(15,23,42,0.1)] sm:-mx-3"
       >
         <div
           ref={containerRef}
-          className="relative"
-          style={{
-            aspectRatio,
-            maxHeight: 'min(650px, 70dvh)',
-            ...(isPortrait
-              ? { height: 'min(650px, 70dvh)', width: 'auto', maxWidth: '100%' }
-              : { width: '100%' }),
-          }}
+          className={`relative w-full overflow-hidden ${frameClass}`}
         >
           {shouldPreload && useMp4Fallback && (
             <video
@@ -781,7 +934,7 @@ function VideoPlayer({
                 fatalErrorRef.current = true
                 setAutoplayBlocked(true)
               }}
-              style={{ width: '100%', height: '100%', display: 'block', objectFit: 'contain' }}
+              style={playerStyle}
             />
           )}
           {shouldPreload && !useMp4Fallback && (
@@ -804,7 +957,7 @@ function VideoPlayer({
               muted={isMuted}
               loop
               playsinline
-              style={{ width: '100%', height: '100%', display: 'block' }}
+              style={playerStyle}
             />
           )}
           {autoplayBlocked && isInViewport && (
@@ -978,19 +1131,22 @@ export function FeedCard({
   const isArabic = locale === 'ar'
   const copy = copyByLocale[isArabic ? 'ar' : 'en']
   const toast = useToast()
+  const router = useRouter()
   const { user } = useUserProfile()
   const [openingInsight, setOpeningInsight] = useState<string | null>(null)
   const [isTracked, setIsTracked] = useState(item.is_tracked === true)
   const [isUpdatingTrack, setIsUpdatingTrack] = useState(false)
   const [isBodyExpanded, setIsBodyExpanded] = useState(false)
   const [isBodyOverflowing, setIsBodyOverflowing] = useState(false)
-  const bodyContentRef = useRef<HTMLParagraphElement>(null)
+  const bodyContentRef = useRef<HTMLDivElement>(null)
   const cardRef = useRef<HTMLElement>(null)
   const isCollapsingBodyRef = useRef(false)
   const date = formatPostDate(item.published_at ?? item.created_at, locale)
   const isArticle = item.content_type === 'article'
   const isPostTitleArabic = isFirstWordArabic(item.title ?? '')
-  const isPostBodyArabic = isFirstWordArabic(item.body ?? '')
+  const postBodyText = stripHtml(item.body ?? '')
+  const isPostBodyArabic = isFirstWordArabic(postBodyText)
+  const isRichPostBody = /<\/?[a-z][^>]*>/i.test(item.body ?? '')
   const imageMedia = item.media.filter((media) => media.media_type === 'image' && media.url)
   const articleCover = isArticle ? imageMedia[0] : undefined
   const videoMedia = item.media.find((media) => media.media_type === 'video')
@@ -1049,6 +1205,13 @@ export function FeedCard({
     ? `${publicBaseUrl}/${locale}/article/${item.slug ?? item.uuid}`
     : `${publicBaseUrl}/${locale}/post/${item.slug ?? item.uuid}`
   const shareTitle = item.title?.trim() || stripHtml(item.body ?? '').slice(0, 120) || insighter?.name || ''
+  const tagHashtags = item.tags
+    .map((tag) => toHashtagToken(tag.name))
+    .filter(Boolean)
+    .map((tagName) => `#${tagName}`)
+  const handleHashtagClick = (hashtag: string) => {
+    router.push(`/${locale}?keyword=${encodeURIComponent(hashtag.replace(/_/g, ' '))}`)
+  }
 
   useEffect(() => {
     setIsTracked(item.is_tracked === true)
@@ -1249,21 +1412,27 @@ export function FeedCard({
           dir={isPostTitleArabic ? 'rtl' : 'ltr'}
           className={`mt-4 text-[17px] font-bold leading-6 tracking-[-0.02em] text-[#101724] ${isPostTitleArabic ? 'text-right' : 'text-left'}`}
         >
-          {item.title}
+          {renderInteractiveFeedText(item.title, handleHashtagClick)}
         </h2>
       )}
 
       {!isArticle && item.body && (
         <div className={item.title ? 'mt-1.5' : 'mt-4'}>
-          <p
+          <div
             ref={bodyContentRef}
             dir={isPostBodyArabic ? 'rtl' : 'ltr'}
-            className={`whitespace-pre-wrap text-start text-[14px] leading-5 text-[#1C2433] ${
+            className={`text-start text-[14px] leading-5 text-[#1C2433] [&_a]:font-medium [&_a]:text-[#2378E8] [&_a]:underline [&_a]:decoration-[#2378E8]/40 [&_a]:underline-offset-2 [&_a:hover]:text-[#155DB8] [&_p]:m-0 [&_p+p]:mt-2 [&_ul]:my-2 [&_ul]:list-disc [&_ul]:ps-5 [&_ol]:my-2 [&_ol]:list-decimal [&_ol]:ps-5 ${
+              isRichPostBody ? '' : 'whitespace-pre-wrap'
+            } ${
               isBodyExpanded ? 'line-clamp-none' : 'line-clamp-[10]'
             }`}
           >
-            {item.body}
-          </p>
+            {isRichPostBody ? (
+              <div dangerouslySetInnerHTML={{ __html: sanitizeAndLinkifyRichPostHtml(item.body, locale) }} />
+            ) : (
+              renderInteractiveFeedText(item.body, handleHashtagClick)
+            )}
+          </div>
 
           {isBodyOverflowing && (
             <div dir={isPostBodyArabic ? 'rtl' : 'ltr'} className="mt-1.5 flex">
@@ -1277,6 +1446,15 @@ export function FeedCard({
               </button>
             </div>
           )}
+        </div>
+      )}
+
+      {!isArticle && tagHashtags.length > 0 && (
+        <div
+          dir={isPostBodyArabic ? 'rtl' : 'ltr'}
+          className="mt-2 whitespace-pre-wrap text-start text-[13px] leading-5 text-[#1C2433]"
+        >
+          {renderInteractiveFeedText(tagHashtags.join(' '), handleHashtagClick)}
         </div>
       )}
 
@@ -1295,7 +1473,6 @@ export function FeedCard({
           media={videoMedia}
           title={item.title ?? item.body ?? 'Video'}
           playLabel={copy.playVideo}
-          flushBottom={isMediaLast}
         />
       )}
       {!isArticle && imageMedia.length > 0 && <ImageGallery media={imageMedia} imageAlt={copy.imageAlt} locale={locale} flushBottom={isMediaLast} />}
@@ -1335,7 +1512,7 @@ export function FeedCard({
                 target="_blank"
                 rel="noreferrer"
                 aria-label={`${copy.viewInsight}: ${insight.title}`}
-                className="flex min-h-[155px] w-full min-w-0 flex-col bg-[#071426] bg-[url('/images/test2.png')] bg-cover bg-center px-4 py-4 text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[#67B5F6] sm:w-[36%] sm:max-w-[280px] sm:flex-none"
+                className="flex min-h-[118px] w-full min-w-0 flex-col bg-[#071426] bg-[url('/images/test2.png')] bg-cover bg-center px-4 py-2.5 text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[#67B5F6] sm:min-h-[155px] sm:w-[36%] sm:max-w-[280px] sm:flex-none sm:py-4"
               >
                 <div>
                   <div className="flex items-center gap-2">
@@ -1346,7 +1523,7 @@ export function FeedCard({
                   </div>
                   <h3
                     dir="auto"
-                    className="mt-4 line-clamp-3 text-start text-[15px] font-semibold leading-6 text-white transition-colors group-hover:text-[#A8D5FF] sm:text-[16px]"
+                    className="mt-2.5 line-clamp-2 text-start text-[15px] font-semibold leading-6 text-white transition-colors group-hover:text-[#A8D5FF] sm:mt-4 sm:line-clamp-3 sm:text-[16px]"
                   >
                     {insight.title}
                   </h3>

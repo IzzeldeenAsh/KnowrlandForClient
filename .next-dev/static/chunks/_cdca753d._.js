@@ -905,39 +905,44 @@ async function createSuggestTag(industryId, name, locale) {
     };
 }
 async function fetchPublishedLibraryKnowledge(page, locale) {
+    let isCompany = arguments.length > 2 && arguments[2] !== void 0 ? arguments[2] : false;
     const params = new URLSearchParams({
         page: String(page),
         status: 'published'
     });
-    const response = await fetch((0, __TURBOPACK__imported__module__$5b$project$5d2f$app$2f$config$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["getApiUrl"])("/api/insighter/library/knowledge?".concat(params)), {
+    const path = isCompany ? '/api/company/library/knowledge/list' : "/api/insighter/library/knowledge?".concat(params);
+    const response = await fetch((0, __TURBOPACK__imported__module__$5b$project$5d2f$app$2f$config$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["getApiUrl"])(path), {
         headers: authHeaders(locale)
     });
     if (!response.ok) {
         await parseErrorMessage(response, 'Unable to load your library.');
     }
     const body = await response.json();
-    var _body_data, _body_meta;
+    var _body_data;
+    const data = ((_body_data = body.data) !== null && _body_data !== void 0 ? _body_data : []).map((item)=>({
+            id: item.id,
+            type: item.type,
+            title: item.title,
+            slug: item.slug,
+            status: item.status,
+            published_at: item.published_at,
+            description: item.description
+        }));
+    var _body_meta;
     return {
-        data: ((_body_data = body.data) !== null && _body_data !== void 0 ? _body_data : []).map((item)=>({
-                id: item.id,
-                type: item.type,
-                title: item.title,
-                slug: item.slug,
-                status: item.status,
-                published_at: item.published_at
-            })),
+        data,
         meta: (_body_meta = body.meta) !== null && _body_meta !== void 0 ? _body_meta : {
             current_page: page,
             last_page: page,
-            per_page: 10,
-            total: 0
+            per_page: data.length,
+            total: data.length
         }
     };
 }
 async function fetchLibraryKnowledgeById(id, locale) {
-    let maxPages = arguments.length > 2 && arguments[2] !== void 0 ? arguments[2] : 5;
+    let maxPages = arguments.length > 2 && arguments[2] !== void 0 ? arguments[2] : 5, isCompany = arguments.length > 3 && arguments[3] !== void 0 ? arguments[3] : false;
     for(let page = 1; page <= maxPages; page += 1){
-        const result = await fetchPublishedLibraryKnowledge(page, locale);
+        const result = await fetchPublishedLibraryKnowledge(page, locale, isCompany);
         const match = result.data.find((item)=>item.id === id);
         if (match) return match;
         if (page >= result.meta.last_page) break;

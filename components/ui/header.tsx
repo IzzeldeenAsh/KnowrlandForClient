@@ -20,6 +20,7 @@ import { stopNotificationPolling } from '@/services/notifications.service';
 import { getAuthToken } from '@/lib/authToken'
 import { getCookieDomain as sharedGetCookieDomain, isSharedCookieHost } from '@/lib/cookieDomain'
 import { copyProjectWizardStorageLocale } from '@/components/project/wizardStorage'
+import { FEED_REFRESH_REQUESTED_EVENT } from '@/components/feed/feedEvents'
 
 interface Industry {
   id: number;
@@ -311,6 +312,24 @@ export default function Header() {
     router.push(`/${currentLocale}`);
   };
 
+  const handleFeedClick = (event: React.MouseEvent<HTMLAnchorElement>) => {
+    // Preserve regular navigation when coming from another page or a filtered
+    // feed view. A repeat click on the main feed behaves like Facebook/X:
+    // return to the newest post and request a fresh first page.
+    if (!isFeedPage || currentSearchParams.toString()) return;
+
+    event.preventDefault();
+
+    const feedStart = document.querySelector<HTMLElement>('[data-community-feed-start]');
+    if (feedStart) {
+      feedStart.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    } else {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    window.dispatchEvent(new Event(FEED_REFRESH_REQUESTED_EVENT));
+  };
+
   const hasSearchQuery = searchQuery.trim().length > 0;
 
   const isProjectRoute = (): boolean => {
@@ -550,6 +569,7 @@ export default function Header() {
                     <Link
                       className="relative mx-1 flex items-center gap-2 rounded-md bg-gradient-to-r from-amber-500 to-yellow-400 px-3 py-1 text-xs font-bold text-white shadow-[0_7px_18px_rgba(245,158,11,0.2)] transition-all duration-200 ease-in-out hover:-translate-y-px hover:brightness-105 md:text-sm"
                       href={`/${currentLocale}`}
+                      onClick={handleFeedClick}
                     >
                       <svg aria-hidden width="16" height="16" viewBox="0 0 24 24" fill="currentColor" className="shrink-0">
                         <rect x="3" y="4" width="6" height="6" rx="1" />
@@ -748,14 +768,15 @@ export default function Header() {
                   <Link
                     href={`/${currentLocale}`}
                     aria-label={t('navigation.feed')}
+                    onClick={handleFeedClick}
                     className="flex h-9 w-9 items-center justify-center rounded-md text-slate-300 transition-all duration-200 hover:bg-[#3B8AEF]/20 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#67B5F6]"
                   >
                     <svg aria-hidden width="18" height="18" viewBox="0 0 24 24" fill="url(#next-mobile-feed-icon-gradient)" className="shrink-0">
                       <defs>
                         <linearGradient id="next-mobile-feed-icon-gradient" x1="3" y1="4" x2="21" y2="20" gradientUnits="userSpaceOnUse">
-                          <stop stopColor="#fb923c" />
-                          <stop offset="0.55" stopColor="#f97316" />
-                          <stop offset="1" stopColor="#ea580c" />
+                          <stop stopColor="#fef08a" />
+                          <stop offset="0.55" stopColor="#facc15" />
+                          <stop offset="1" stopColor="#eab308" />
                         </linearGradient>
                       </defs>
                       <rect x="3" y="4" width="6" height="6" rx="1" />

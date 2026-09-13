@@ -30,6 +30,10 @@ import { useFeedSearchInsights } from './FeedSearchInsightsContext'
 import RoleUpgradeCard from './RoleUpgradeCard'
 import TopDocumentsCard from './TopDocumentsCard'
 import RelatedDocumentsCard from './RelatedDocumentsCard'
+import {
+  FEED_REFRESH_COMPLETED_EVENT,
+  FEED_REFRESH_REQUESTED_EVENT,
+} from './feedEvents'
 
 type CommunityFeedTimelineProps = {
   locale: string
@@ -359,6 +363,7 @@ export default function CommunityFeedTimeline({
         if (!signal?.aborted) {
           setIsLoading(false)
           setRelatedDocumentsLoading(false)
+          window.dispatchEvent(new Event(FEED_REFRESH_COMPLETED_EVENT))
         }
       }
     },
@@ -374,11 +379,19 @@ export default function CommunityFeedTimeline({
   }, [isAuthResolved, loadFirstPage])
 
   useEffect(() => {
-    if (!isAuthenticated) return
-
     const refresh = () => void loadFirstPage()
-    window.addEventListener('feed:published', refresh)
-    return () => window.removeEventListener('feed:published', refresh)
+
+    if (isAuthenticated) {
+      window.addEventListener('feed:published', refresh)
+    }
+    window.addEventListener(FEED_REFRESH_REQUESTED_EVENT, refresh)
+
+    return () => {
+      if (isAuthenticated) {
+        window.removeEventListener('feed:published', refresh)
+      }
+      window.removeEventListener(FEED_REFRESH_REQUESTED_EVENT, refresh)
+    }
   }, [isAuthenticated, loadFirstPage])
 
   // Search results are finite; the community feed is what keeps the page

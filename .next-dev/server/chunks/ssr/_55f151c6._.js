@@ -877,38 +877,41 @@ async function createSuggestTag(industryId, name, locale) {
         name
     };
 }
-async function fetchPublishedLibraryKnowledge(page, locale) {
+async function fetchPublishedLibraryKnowledge(page, locale, isCompany = false) {
     const params = new URLSearchParams({
         page: String(page),
         status: 'published'
     });
-    const response = await fetch((0, __TURBOPACK__imported__module__$5b$project$5d2f$app$2f$config$2e$ts__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["getApiUrl"])(`/api/insighter/library/knowledge?${params}`), {
+    const path = isCompany ? '/api/company/library/knowledge/list' : `/api/insighter/library/knowledge?${params}`;
+    const response = await fetch((0, __TURBOPACK__imported__module__$5b$project$5d2f$app$2f$config$2e$ts__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["getApiUrl"])(path), {
         headers: authHeaders(locale)
     });
     if (!response.ok) {
         await parseErrorMessage(response, 'Unable to load your library.');
     }
     const body = await response.json();
+    const data = (body.data ?? []).map((item)=>({
+            id: item.id,
+            type: item.type,
+            title: item.title,
+            slug: item.slug,
+            status: item.status,
+            published_at: item.published_at,
+            description: item.description
+        }));
     return {
-        data: (body.data ?? []).map((item)=>({
-                id: item.id,
-                type: item.type,
-                title: item.title,
-                slug: item.slug,
-                status: item.status,
-                published_at: item.published_at
-            })),
+        data,
         meta: body.meta ?? {
             current_page: page,
             last_page: page,
-            per_page: 10,
-            total: 0
+            per_page: data.length,
+            total: data.length
         }
     };
 }
-async function fetchLibraryKnowledgeById(id, locale, maxPages = 5) {
+async function fetchLibraryKnowledgeById(id, locale, maxPages = 5, isCompany = false) {
     for(let page = 1; page <= maxPages; page += 1){
-        const result = await fetchPublishedLibraryKnowledge(page, locale);
+        const result = await fetchPublishedLibraryKnowledge(page, locale, isCompany);
         const match = result.data.find((item)=>item.id === id);
         if (match) return match;
         if (page >= result.meta.last_page) break;

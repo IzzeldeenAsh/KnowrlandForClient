@@ -1,6 +1,11 @@
 'use client'
 
 import { Modal, Progress } from '@mantine/core'
+import { RichTextEditor } from '@mantine/tiptap'
+import LinkExtension from '@tiptap/extension-link'
+import Placeholder from '@tiptap/extension-placeholder'
+import Underline from '@tiptap/extension-underline'
+import StarterKit from '@tiptap/starter-kit'
 import {
   IconChevronLeft,
   IconChevronRight,
@@ -16,6 +21,7 @@ import {
 } from '@tabler/icons-react'
 import Image from 'next/image'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { useEditor } from '@tiptap/react'
 // Registers the <mux-player> custom element; self-hosted via npm (no CSP
 // script-src change needed, unlike the CDN <script> embed Mux's docs default to).
 import '@mux/mux-player'
@@ -293,6 +299,17 @@ function isSupportedVideoFile(file: File): boolean {
   return /\.(mp4|mov)$/i.test(file.name)
 }
 
+function richTextToPlainText(html: string): string {
+  if (!html) return ''
+  if (typeof document === 'undefined') {
+    return html.replace(/<[^>]*>/g, ' ').replace(/&nbsp;/g, ' ').replace(/\s+/g, ' ').trim()
+  }
+
+  const container = document.createElement('div')
+  container.innerHTML = html
+  return (container.textContent ?? '').replace(/\s+/g, ' ').trim()
+}
+
 // Fingerprint of everything the author can change, so closing the composer can
 // tell "nothing typed yet" from "work that would be lost". The video phase is
 // deliberately left out: it moves on its own while the provider prepares the
@@ -394,7 +411,6 @@ export default function PostModal({
   const videoSelectButtonRef = useRef<HTMLButtonElement>(null)
   const videoFieldRef = useRef<HTMLDivElement>(null)
   const imageFieldRef = useRef<HTMLDivElement>(null)
-  const bodyInputRef = useRef<HTMLTextAreaElement>(null)
 
   const hasVideo = videoPhase !== 'none'
   const hasImages = images.length > 0
@@ -406,12 +422,44 @@ export default function PostModal({
   const bodyLocked =
     (isVideoFlow && !isAwaitingProcessing && videoPhase !== 'ready') ||
     (isImageFlow && !hasImages)
+
+  const bodyEditor = useEditor({
+    immediatelyRender: false,
+    extensions: [
+      StarterKit.configure({
+        heading: false,
+        blockquote: false,
+        code: false,
+        codeBlock: false,
+        horizontalRule: false,
+        strike: false,
+      }),
+      Underline,
+      LinkExtension.configure({ autolink: true, openOnClick: false, defaultProtocol: 'https' }),
+      Placeholder.configure({ placeholder: copy.bodyPlaceholder }),
+    ],
+    content: '',
+    onUpdate: ({ editor }) => {
+      setBody(editor.getHTML())
+      setDirtyFields((previous) => ({ ...previous, body: true }))
+    },
+  })
+
+  useEffect(() => {
+    if (!bodyEditor || bodyEditor.getHTML() === body) return
+    bodyEditor.commands.setContent(body, { emitUpdate: false })
+  }, [body, bodyEditor])
+
+  useEffect(() => {
+    bodyEditor?.setEditable(!bodyLocked)
+  }, [bodyEditor, bodyLocked])
+
   const industryInvalid = touchedFields.industry && industry === null
   const videoInvalid = touchedFields.video && isVideoFlow && videoPhase !== 'ready'
   // Distinguish "no video yet" from "video uploaded, provider still working":
   // only the first is something the user can act on.
   const videoErrorMessage = isAwaitingProcessing ? copy.videoStillProcessing : copy.videoRequired
-  const bodyInvalid = touchedFields.body && body.trim() === ''
+  const bodyInvalid = touchedFields.body && richTextToPlainText(body) === ''
 
   const currentFingerprint = useMemo(
     () =>
@@ -789,7 +837,7 @@ export default function PostModal({
       if (missingVideo) {
         ;(videoSelectButtonRef.current ?? videoFieldRef.current)?.focus()
       } else {
-        bodyInputRef.current?.focus()
+        bodyEditor?.commands.focus()
       }
     })
   }
@@ -798,7 +846,7 @@ export default function PostModal({
     if (isPublishing || isSavingDraft || isDiscardingDraft) return
 
     const missingVideo = isVideoFlow && videoPhase !== 'ready'
-    const missingBody = body.trim() === ''
+    const missingBody = richTextToPlainText(body) === ''
 
     setTouchedFields((previous) => ({ ...previous, video: isVideoFlow, body: true }))
     setDirtyFields((previous) => ({ ...previous, video: isVideoFlow, body: true }))
@@ -844,7 +892,7 @@ export default function PostModal({
 
     const missingIndustry = industry === null
     const missingVideo = isVideoFlow && videoPhase !== 'ready'
-    const missingBody = body.trim() === ''
+    const missingBody = richTextToPlainText(body) === ''
 
     setTouchedFields({ industry: true, video: isVideoFlow, body: true })
     setDirtyFields({ industry: true, video: isVideoFlow, body: true })
@@ -906,7 +954,7 @@ export default function PostModal({
 
     const missingIndustry = industry === null
     const missingVideo = isVideoFlow && videoUuidRef.current === null
-    const missingBody = body.trim() === ''
+    const missingBody = richTextToPlainText(body) === ''
 
     setTouchedFields({ industry: true, video: isVideoFlow, body: true })
     setDirtyFields({ industry: true, video: isVideoFlow, body: true })
@@ -1177,34 +1225,50 @@ export default function PostModal({
             <label htmlFor="feed-post-body" className="sr-only">
               {copy.description}
             </label>
-            <textarea
-              ref={bodyInputRef}
-              id="feed-post-body"
-              name="body"
-              required
-              value={body}
-              onChange={(event) => {
-                setBody(event.currentTarget.value)
-                setDirtyFields((previous) => ({ ...previous, body: true }))
-              }}
-              onBlur={() => setTouchedFields((previous) => ({ ...previous, body: true }))}
-              onKeyDown={(event) => {
-                if (event.key === 'Enter' && (event.ctrlKey || event.metaKey)) {
-                  event.preventDefault()
-                  event.currentTarget.form?.requestSubmit()
-                }
-              }}
+            <RichTextEditor
+              editor={bodyEditor}
               aria-invalid={bodyInvalid || undefined}
               aria-describedby={bodyInvalid ? 'feed-post-body-error' : undefined}
               data-dirty={dirtyFields.body || undefined}
-              placeholder={copy.bodyPlaceholder}
-              rows={isVideoFlow || isImageFlow ? 5 : 7}
-              className={`w-full resize-none rounded-md border bg-white px-3 py-2.5 text-[15px] leading-relaxed text-[#1C2433] placeholder:text-[#94A3B8] focus-visible:outline-none ${
+              onBlurCapture={() => setTouchedFields((previous) => ({ ...previous, body: true }))}
+              onKeyDown={(event) => {
+                if (event.key === 'Enter' && (event.ctrlKey || event.metaKey)) {
+                  event.preventDefault()
+                  event.currentTarget.closest('form')?.requestSubmit()
+                }
+              }}
+              className={`overflow-hidden rounded-md border bg-white shadow-none ${
                 bodyInvalid
                   ? 'border-[#C23B32]'
-                  : 'border-[#E5EAF2] focus-visible:border-[#8FB9EA]'
+                  : 'border-[#E5EAF2] focus-within:border-[#8FB9EA]'
               }`}
-            />
+            >
+              <RichTextEditor.Toolbar sticky={false} className="border-b border-[#E5EAF2] bg-[#F8FAFD] px-1 py-1">
+                <RichTextEditor.ControlsGroup>
+                  <RichTextEditor.Bold />
+                  <RichTextEditor.Italic />
+                  <RichTextEditor.Underline />
+                </RichTextEditor.ControlsGroup>
+                <RichTextEditor.ControlsGroup>
+                  <RichTextEditor.BulletList />
+                  <RichTextEditor.OrderedList />
+                </RichTextEditor.ControlsGroup>
+                <RichTextEditor.ControlsGroup>
+                  <RichTextEditor.Link />
+                  <RichTextEditor.Unlink />
+                </RichTextEditor.ControlsGroup>
+                <RichTextEditor.ControlsGroup>
+                  <RichTextEditor.Undo />
+                  <RichTextEditor.Redo />
+                </RichTextEditor.ControlsGroup>
+              </RichTextEditor.Toolbar>
+              <RichTextEditor.Content
+                id="feed-post-body"
+                className={`bg-white px-3 py-2.5 text-[15px] leading-relaxed text-[#1C2433] [&_.ProseMirror]:min-h-[120px] [&_.ProseMirror]:outline-none [&_.ProseMirror_p]:m-0 [&_.ProseMirror_p+p]:mt-2 [&_.ProseMirror_ul]:my-2 [&_.ProseMirror_ul]:list-disc [&_.ProseMirror_ul]:ps-5 [&_.ProseMirror_ol]:my-2 [&_.ProseMirror_ol]:list-decimal [&_.ProseMirror_ol]:ps-5 [&_.ProseMirror_a]:text-[#2378E8] [&_.ProseMirror_a]:underline [&_.ProseMirror_p.is-editor-empty:first-child::before]:text-[#94A3B8] ${
+                  isVideoFlow || isImageFlow ? '[&_.ProseMirror]:min-h-[88px]' : ''
+                }`}
+              />
+            </RichTextEditor>
             {bodyInvalid && (
               <p id="feed-post-body-error" className="mt-1.5 text-[12px] font-medium text-[#A9322B]">
                 {copy.bodyRequired}

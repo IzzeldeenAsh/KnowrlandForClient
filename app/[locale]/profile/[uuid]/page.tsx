@@ -1009,7 +1009,9 @@ function ProfilePageContent() {
   const specifiedInsighterProjectHref = `/${locale}/project/wizard/project-type?${specifiedInsighterProjectParams.toString()}`;
   const requestServiceButtonLabel = locale === "ar" ? "طلب خدمة" : "Request Service";
   const requestServiceButtonClass =
-    "group inline-flex items-center gap-2 rounded-full border border-transparent bg-[linear-gradient(#ffffff,#ffffff)_padding-box,linear-gradient(90deg,#38bdf8,#3b82f6,#2dd4bf)_border-box] px-3.5 py-2 text-xs font-semibold text-sky-600 shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md focus:outline-none focus:ring-2 focus:ring-sky-300 focus:ring-offset-2 dark:bg-[linear-gradient(#0f172a,#0f172a)_padding-box,linear-gradient(90deg,#38bdf8,#3b82f6,#2dd4bf)_border-box] dark:text-sky-300";
+    "group relative isolate inline-flex items-center gap-2 overflow-hidden rounded-full bg-gradient-to-r from-blue-700 via-sky-600 to-cyan-500 px-3.5 py-2 text-xs font-semibold text-sky-600 shadow-sm transition-all duration-200 before:pointer-events-none before:absolute before:inset-px before:z-0 before:rounded-full before:bg-white before:content-[''] hover:-translate-y-0.5 hover:shadow-md focus:outline-none focus:ring-2 focus:ring-sky-300 focus:ring-offset-2 dark:text-sky-300 dark:before:bg-slate-900";
+  const requestServiceButtonTextClass =
+    "relative z-10 bg-gradient-to-r from-blue-700 via-sky-600 to-cyan-500 bg-clip-text font-semibold text-transparent";
 
   // Function to handle pagination
   const handlePageChange = (page: number) => {
@@ -1715,16 +1717,16 @@ function ProfilePageContent() {
                               onClick={() => setSelfServiceRequestModalOpen(true)}
                               className={requestServiceButtonClass}
                             >
-                              <IconBriefcase size={16} stroke={2} className="transition-colors group-hover:text-teal-500" />
-                              <span>{requestServiceButtonLabel}</span>
+                              <IconBriefcase size={16} stroke={2} className="relative z-10 transition-colors group-hover:text-teal-500" />
+                              <span className={requestServiceButtonTextClass}>{requestServiceButtonLabel}</span>
                             </button>
                           ) : canRequestSpecifiedInsighterProject ? (
                             <Link
                               href={specifiedInsighterProjectHref}
                               className={requestServiceButtonClass}
                             >
-                              <IconBriefcase size={16} stroke={2} className="transition-colors group-hover:text-teal-500" />
-                              <span>{requestServiceButtonLabel}</span>
+                              <IconBriefcase size={16} stroke={2} className="relative z-10 transition-colors group-hover:text-teal-500" />
+                              <span className={requestServiceButtonTextClass}>{requestServiceButtonLabel}</span>
                             </Link>
                           ) : null}
                         </div>

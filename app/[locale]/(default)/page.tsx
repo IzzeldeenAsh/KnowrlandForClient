@@ -8,6 +8,7 @@ import RoleUpgradeCard from '@/components/feed/RoleUpgradeCard'
 import RelatedDocumentsCard from '@/components/feed/RelatedDocumentsCard'
 import { FeedSearchInsightsProvider } from '@/components/feed/FeedSearchInsightsContext'
 import TopDocumentsCard from '@/components/feed/TopDocumentsCard'
+import FeedPullToRefresh from '@/components/feed/FeedPullToRefresh'
 
 export const metadata = {
   title: 'Feed - Insighta Business',
@@ -41,6 +42,7 @@ export default async function Feed({ params, searchParams }: FeedProps) {
   return (
     <FeedSearchInsightsProvider>
       <div dir={isRTL ? 'rtl' : 'ltr'} className="bg-[#EEF2FA] text-slate-900 min-h-screen">
+        <FeedPullToRefresh locale={locale} />
         <div className="mx-auto w-full max-w-7xl px-4 py-4 sm:px-6 sm:py-6 lg:px-8">
           <div className="grid min-w-0 grid-cols-1 gap-6 xl:grid-cols-[280px_minmax(0,1fr)_300px]">
             {/* Left column - dashboard navigation with the feed profile card */}
@@ -63,12 +65,17 @@ export default async function Feed({ params, searchParams }: FeedProps) {
               ) : showMyFeeds ? (
                 <MyFeedsTimeline locale={locale} />
               ) : (
-                <CommunityFeedTimeline
-                  locale={locale}
-                  keyword={keyword}
-                  industry={industry}
-                  contentType={contentType}
-                />
+                <div
+                  data-community-feed-start
+                  className="scroll-mt-[calc(var(--app-header-height,88px)+16px)]"
+                >
+                  <CommunityFeedTimeline
+                    locale={locale}
+                    keyword={keyword}
+                    industry={industry}
+                    contentType={contentType}
+                  />
+                </div>
               )}
             </section>
 

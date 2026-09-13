@@ -157,26 +157,23 @@ export default function KnowledgeAuthorActions({
     ? `/${locale}/project/wizard/project-type?fresh=1&${specifiedInsighterQueryParam}=${encodeURIComponent(serviceInsighterUuid)}`
     : "";
   const meetHref = `/${locale}/profile/${insighter.uuid}?entity=insighter&tab=meet`;
-  const meetLabel =
-    locale === "en"
-      ? `Meet ${insighter.name.toLowerCase()}`
-      : `قابل الخبير ${insighter.name.toLowerCase()}`;
+  const meetLabel = locale === "en" ? "Meet" : "لقاء";
   const requestServiceLabel = isRTL ? "طلب خدمة" : "Request Service";
   const buttonClass =
-    "inline-flex max-h-[34px] items-center justify-center gap-2 rounded-md bg-[rgb(56_159_227)] px-3 py-1.5 text-center text-sm font-semibold text-white transition-colors hover:bg-[rgb(42_139_203)] focus:outline-none focus:ring-2 focus:ring-blue-200";
-  const requestServiceButtonClass =
-    "group inline-flex max-h-[34px] items-center justify-center gap-2 rounded-full border border-transparent bg-[linear-gradient(#ffffff,#ffffff)_padding-box,linear-gradient(90deg,#38bdf8,#3b82f6,#2dd4bf)_border-box] px-3.5 py-1.5 text-center text-sm font-semibold text-sky-600 shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md focus:outline-none focus:ring-2 focus:ring-sky-300 focus:ring-offset-2 dark:bg-[linear-gradient(#0f172a,#0f172a)_padding-box,linear-gradient(90deg,#38bdf8,#3b82f6,#2dd4bf)_border-box] dark:text-sky-300";
+    "group relative isolate inline-flex max-h-[34px] items-center justify-center gap-2 overflow-hidden rounded-full bg-gradient-to-r from-blue-700 via-sky-600 to-cyan-500 px-3.5 py-1.5 text-center text-sm font-semibold text-sky-600 shadow-sm transition-all duration-200 before:pointer-events-none before:absolute before:inset-px before:z-0 before:rounded-full before:bg-white before:content-[''] hover:-translate-y-0.5 hover:shadow-md focus:outline-none focus:ring-2 focus:ring-sky-300 focus:ring-offset-2 dark:text-sky-300 dark:before:bg-slate-900";
+  const buttonTextClass =
+    "relative z-10 bg-gradient-to-r from-blue-700 via-sky-600 to-cyan-500 bg-clip-text font-semibold text-transparent";
 
   return (
     <div className={`flex flex-wrap items-center gap-2 ${className}`}>
       <Link href={meetHref} className={buttonClass}>
-        <IconCalendarTime size={16} stroke={2} />
-        <span className="capitalize">{meetLabel}</span>
+        <IconCalendarTime size={16} stroke={2} className="relative z-10 transition-colors group-hover:text-cyan-500" />
+        <span className={`${buttonTextClass} capitalize`}>{meetLabel}</span>
       </Link>
       {canRequestService && (
-        <Link href={serviceHref} className={requestServiceButtonClass}>
-          <IconBriefcase size={16} stroke={2} className="transition-colors group-hover:text-teal-500" />
-          <span className="relative font-semibold">{requestServiceLabel}</span>
+        <Link href={serviceHref} className={buttonClass}>
+          <IconBriefcase size={16} stroke={2} className="relative z-10 transition-colors group-hover:text-teal-500" />
+          <span className={buttonTextClass}>{requestServiceLabel}</span>
         </Link>
       )}
     </div>

@@ -4168,6 +4168,11 @@ input[type="search"]::-webkit-search-results-decoration {
   margin-bottom: auto;
 }
 
+.-mx-2 {
+  margin-left: -.5rem;
+  margin-right: -.5rem;
+}
+
 .-mb-16 {
   margin-bottom: -4rem;
 }
@@ -4803,6 +4808,10 @@ input[type="search"]::-webkit-search-results-decoration {
   aspect-ratio: 16 / 9;
 }
 
+.aspect-\[2\/3\] {
+  aspect-ratio: 2 / 3;
+}
+
 .h-1 {
   height: .25rem;
 }
@@ -5330,6 +5339,10 @@ input[type="search"]::-webkit-search-results-decoration {
 
 .min-h-screen {
   min-height: 100vh;
+}
+
+.min-h-\[118px\] {
+  min-height: 118px;
 }
 
 .\!w-full {
@@ -6330,6 +6343,10 @@ input[type="search"]::-webkit-search-results-decoration {
 
 .scroll-mt-20 {
   scroll-margin-top: 5rem;
+}
+
+.scroll-mt-\[calc\(var\(--app-header-height\,88px\)\+16px\)\] {
+  scroll-margin-top: calc(var(--app-header-height, 88px)  + 16px);
 }
 
 .list-decimal {
@@ -7685,6 +7702,15 @@ input[type="search"]::-webkit-search-results-decoration {
   border-color: rgba(255, 255, 255, .9);
 }
 
+.border-\[\#8FC7FF\]\/80 {
+  border-color: rgba(143, 199, 255, .8);
+}
+
+.border-\[\#D7E6F6\] {
+  --tw-border-opacity: 1;
+  border-color: rgba(215, 230, 246, var(--tw-border-opacity, 1));
+}
+
 .border-b-\[\#F1F1F1\] {
   --tw-border-opacity: 1;
   border-bottom-color: rgba(241, 241, 241, var(--tw-border-opacity, 1));
@@ -8786,6 +8812,15 @@ input[type="search"]::-webkit-search-results-decoration {
   background-color: rgba(234, 179, 8, var(--tw-bg-opacity, 1));
 }
 
+.bg-\[\#F4F9FF\]\/95 {
+  background-color: rgba(244, 249, 255, .95);
+}
+
+.bg-\[\#EAF3FC\] {
+  --tw-bg-opacity: 1;
+  background-color: rgba(234, 243, 252, var(--tw-bg-opacity, 1));
+}
+
 .bg-opacity-20 {
   --tw-bg-opacity: .2;
 }
@@ -8796,6 +8831,10 @@ input[type="search"]::-webkit-search-results-decoration {
 
 .bg-opacity-95 {
   --tw-bg-opacity: .95;
+}
+
+.bg-\[linear-gradient\(\#ffffff\,\#ffffff\)_padding-box\,linear-gradient\(90deg\,\#38bdf8\,\#3b82f6\,\#2dd4bf\)_border-box\] {
+  background-image: linear-gradient(#fff, #fff) padding-box, linear-gradient(90deg, #38bdf8, #3b82f6, #2dd4bf) border-box;
 }
 
 .bg-\[linear-gradient\(135deg\,\#EAF1F8_0\%\,\#DCE8F4_100\%\)\] {
@@ -8862,8 +8901,8 @@ input[type="search"]::-webkit-search-results-decoration {
   background-image: linear-gradient(to top right, var(--tw-gradient-stops));
 }
 
-.bg-\[linear-gradient\(\#ffffff\,\#ffffff\)_padding-box\,linear-gradient\(90deg\,\#38bdf8\,\#3b82f6\,\#2dd4bf\)_border-box\] {
-  background-image: linear-gradient(#fff, #fff) padding-box, linear-gradient(90deg, #38bdf8, #3b82f6, #2dd4bf) border-box;
+.bg-\[linear-gradient\(\#ffffff\,\#ffffff\)_padding-box\,linear-gradient\(90deg\,\#1d4ed8\,\#0284c7\,\#06b6d4\)_border-box\] {
+  background-image: linear-gradient(#fff, #fff) padding-box, linear-gradient(90deg, #1d4ed8, #0284c7, #06b6d4) border-box;
 }
 
 .from-\[\#2196F3\] {
@@ -9136,6 +9175,18 @@ input[type="search"]::-webkit-search-results-decoration {
   --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to);
 }
 
+.from-amber-300 {
+  --tw-gradient-from: #fcd34d var(--tw-gradient-from-position);
+  --tw-gradient-to: rgba(252, 211, 77, 0) var(--tw-gradient-to-position);
+  --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to);
+}
+
+.from-\[\#67B5F6\] {
+  --tw-gradient-from: #67b5f6 var(--tw-gradient-from-position);
+  --tw-gradient-to: rgba(103, 181, 246, 0) var(--tw-gradient-to-position);
+  --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to);
+}
+
 .via-\[\#36B7C8\] {
   --tw-gradient-to: rgba(54, 183, 200, 0) var(--tw-gradient-to-position);
   --tw-gradient-stops: var(--tw-gradient-from), #36b7c8 var(--tw-gradient-via-position), var(--tw-gradient-to);
@@ -9366,6 +9417,14 @@ input[type="search"]::-webkit-search-results-decoration {
 
 .to-yellow-400 {
   --tw-gradient-to: #facc15 var(--tw-gradient-to-position);
+}
+
+.to-yellow-500 {
+  --tw-gradient-to: #eab308 var(--tw-gradient-to-position);
+}
+
+.to-\[\#2378E8\] {
+  --tw-gradient-to: #2378e8 var(--tw-gradient-to-position);
 }
 
 .bg-\[length\:100\%_100\%\] {
@@ -11784,6 +11843,16 @@ input[type="search"]::-webkit-search-results-decoration {
   color: rgba(133, 77, 14, var(--tw-text-opacity, 1));
 }
 
+.text-\[\#0F1629\] {
+  --tw-text-opacity: 1;
+  color: rgba(15, 22, 41, var(--tw-text-opacity, 1));
+}
+
+.text-\[\#1D5FAF\] {
+  --tw-text-opacity: 1;
+  color: rgba(29, 95, 175, var(--tw-text-opacity, 1));
+}
+
 .underline {
   -webkit-text-decoration-line: underline;
   text-decoration-line: underline;
@@ -11792,6 +11861,11 @@ input[type="search"]::-webkit-search-results-decoration {
 .line-through {
   -webkit-text-decoration-line: line-through;
   text-decoration-line: line-through;
+}
+
+.decoration-\[\#2378E8\]\/40 {
+  -webkit-text-decoration-color: rgba(35, 120, 232, .4);
+  text-decoration-color: rgba(35, 120, 232, .4);
 }
 
 .decoration-white\/80 {
@@ -12093,6 +12167,24 @@ input[type="search"]::-webkit-search-results-decoration {
 .shadow-xl {
   --tw-shadow: 0 20px 25px -5px rgba(0, 0, 0, .1), 0 8px 10px -6px rgba(0, 0, 0, .1);
   --tw-shadow-colored: 0 20px 25px -5px var(--tw-shadow-color), 0 8px 10px -6px var(--tw-shadow-color);
+  box-shadow: var(--tw-ring-offset-shadow, 0 0 rgba(0, 0, 0, 0)), var(--tw-ring-shadow, 0 0 rgba(0, 0, 0, 0)), var(--tw-shadow);
+}
+
+.shadow-\[0_8px_28px_rgba\(15\,23\,42\,0\.16\)\] {
+  --tw-shadow: 0 8px 28px rgba(15, 23, 42, .16);
+  --tw-shadow-colored: 0 8px 28px var(--tw-shadow-color);
+  box-shadow: var(--tw-ring-offset-shadow, 0 0 rgba(0, 0, 0, 0)), var(--tw-ring-shadow, 0 0 rgba(0, 0, 0, 0)), var(--tw-shadow);
+}
+
+.shadow-\[0_8px_28px_rgba\(35\,120\,232\,0\.2\)\] {
+  --tw-shadow: 0 8px 28px rgba(35, 120, 232, .2);
+  --tw-shadow-colored: 0 8px 28px var(--tw-shadow-color);
+  box-shadow: var(--tw-ring-offset-shadow, 0 0 rgba(0, 0, 0, 0)), var(--tw-ring-shadow, 0 0 rgba(0, 0, 0, 0)), var(--tw-shadow);
+}
+
+.shadow-\[0_10px_26px_rgba\(15\,23\,42\,0\.1\)\] {
+  --tw-shadow: 0 10px 26px rgba(15, 23, 42, .1);
+  --tw-shadow-colored: 0 10px 26px var(--tw-shadow-color);
   box-shadow: var(--tw-ring-offset-shadow, 0 0 rgba(0, 0, 0, 0)), var(--tw-ring-shadow, 0 0 rgba(0, 0, 0, 0)), var(--tw-shadow);
 }
 
@@ -12415,6 +12507,12 @@ input[type="search"]::-webkit-search-results-decoration {
   backdrop-filter: var(--tw-backdrop-blur) var(--tw-backdrop-brightness) var(--tw-backdrop-contrast) var(--tw-backdrop-grayscale) var(--tw-backdrop-hue-rotate) var(--tw-backdrop-invert) var(--tw-backdrop-opacity) var(--tw-backdrop-saturate) var(--tw-backdrop-sepia);
 }
 
+.backdrop-blur {
+  --tw-backdrop-blur: blur(8px);
+  -webkit-backdrop-filter: var(--tw-backdrop-blur) var(--tw-backdrop-brightness) var(--tw-backdrop-contrast) var(--tw-backdrop-grayscale) var(--tw-backdrop-hue-rotate) var(--tw-backdrop-invert) var(--tw-backdrop-opacity) var(--tw-backdrop-saturate) var(--tw-backdrop-sepia);
+  backdrop-filter: var(--tw-backdrop-blur) var(--tw-backdrop-brightness) var(--tw-backdrop-contrast) var(--tw-backdrop-grayscale) var(--tw-backdrop-hue-rotate) var(--tw-backdrop-invert) var(--tw-backdrop-opacity) var(--tw-backdrop-saturate) var(--tw-backdrop-sepia);
+}
+
 .transition {
   transition-property: color, background-color, border-color, -webkit-text-decoration-color, text-decoration-color, fill, stroke, opacity, box-shadow, transform, filter, -webkit-backdrop-filter, backdrop-filter;
   transition-duration: .15s;
@@ -12465,6 +12563,12 @@ input[type="search"]::-webkit-search-results-decoration {
 
 .transition-transform {
   transition-property: transform;
+  transition-duration: .15s;
+  transition-timing-function: cubic-bezier(.4, 0, .2, 1);
+}
+
+.transition-\[opacity\,transform\] {
+  transition-property: opacity, transform;
   transition-duration: .15s;
   transition-timing-function: cubic-bezier(.4, 0, .2, 1);
 }
@@ -13460,6 +13564,14 @@ img.feed-media-contain {
   right: 0;
 }
 
+.before\:inset-px:before {
+  content: var(--tw-content);
+  top: 1px;
+  bottom: 1px;
+  left: 1px;
+  right: 1px;
+}
+
 .before\:inset-y-0:before {
   content: var(--tw-content);
   top: 0;
@@ -13504,6 +13616,11 @@ img.feed-media-contain {
 .before\:z-30:before {
   content: var(--tw-content);
   z-index: 30;
+}
+
+.before\:z-0:before {
+  content: var(--tw-content);
+  z-index: 0;
 }
 
 .before\:h-1\.5:before {
@@ -14961,6 +15078,11 @@ img.feed-media-contain {
   text-decoration-line: underline;
 }
 
+.hover\:decoration-current:hover {
+  -webkit-text-decoration-color: currentColor;
+  text-decoration-color: currentColor;
+}
+
 .hover\:decoration-white:hover {
   -webkit-text-decoration-color: #fff;
   text-decoration-color: #fff;
@@ -15722,14 +15844,19 @@ img.feed-media-contain {
   color: rgba(203, 213, 225, var(--tw-text-opacity, 1));
 }
 
+.group:hover .group-hover\:text-teal-500 {
+  --tw-text-opacity: 1;
+  color: rgba(20, 184, 166, var(--tw-text-opacity, 1));
+}
+
 .group:hover .group-hover\:text-white {
   --tw-text-opacity: 1;
   color: rgba(255, 255, 255, var(--tw-text-opacity, 1));
 }
 
-.group:hover .group-hover\:text-teal-500 {
+.group:hover .group-hover\:text-cyan-500 {
   --tw-text-opacity: 1;
-  color: rgba(20, 184, 166, var(--tw-text-opacity, 1));
+  color: rgba(6, 182, 212, var(--tw-text-opacity, 1));
 }
 
 .group\/slide:hover .group-hover\/slide\:opacity-100, .group:hover .group-hover\:opacity-100 {
@@ -16109,6 +16236,10 @@ img.feed-media-contain {
   background-image: linear-gradient(#0f172a, #0f172a) padding-box, linear-gradient(90deg, #38bdf8, #3b82f6, #2dd4bf) border-box;
 }
 
+.dark\:bg-\[linear-gradient\(\#0f172a\,\#0f172a\)_padding-box\,linear-gradient\(90deg\,\#1d4ed8\,\#0284c7\,\#06b6d4\)_border-box\]:is(.dark *) {
+  background-image: linear-gradient(#0f172a, #0f172a) padding-box, linear-gradient(90deg, #1d4ed8, #0284c7, #06b6d4) border-box;
+}
+
 .dark\:from-blue-700:is(.dark *) {
   --tw-gradient-from: #1d4ed8 var(--tw-gradient-from-position);
   --tw-gradient-to: rgba(29, 78, 216, 0) var(--tw-gradient-to-position);
@@ -16242,6 +16373,11 @@ img.feed-media-contain {
   color: rgba(252, 165, 165, var(--tw-text-opacity, 1));
 }
 
+.dark\:text-sky-300:is(.dark *) {
+  --tw-text-opacity: 1;
+  color: rgba(125, 211, 252, var(--tw-text-opacity, 1));
+}
+
 .dark\:text-slate-200:is(.dark *) {
   --tw-text-opacity: 1;
   color: rgba(226, 232, 240, var(--tw-text-opacity, 1));
@@ -16267,11 +16403,6 @@ img.feed-media-contain {
   color: rgba(253, 224, 71, var(--tw-text-opacity, 1));
 }
 
-.dark\:text-sky-300:is(.dark *) {
-  --tw-text-opacity: 1;
-  color: rgba(125, 211, 252, var(--tw-text-opacity, 1));
-}
-
 .dark\:placeholder-gray-400:is(.dark *)::-moz-placeholder {
   --tw-placeholder-opacity: 1;
   color: rgba(156, 163, 175, var(--tw-placeholder-opacity, 1));
@@ -16292,6 +16423,12 @@ img.feed-media-contain {
 
 .dark\:ring-white\/10:is(.dark *) {
   --tw-ring-color: rgba(255, 255, 255, .1);
+}
+
+.dark\:before\:bg-slate-900:is(.dark *):before {
+  content: var(--tw-content);
+  --tw-bg-opacity: 1;
+  background-color: rgba(15, 23, 42, var(--tw-bg-opacity, 1));
 }
 
 .dark\:hover\:border-blue-500:hover:is(.dark *) {
@@ -16463,6 +16600,11 @@ img.feed-media-contain {
     margin-right: -1.5rem;
   }
 
+  .sm\:-mx-3 {
+    margin-left: -.75rem;
+    margin-right: -.75rem;
+  }
+
   .sm\:-mb-6 {
     margin-bottom: -1.5rem;
   }
@@ -16523,6 +16665,17 @@ img.feed-media-contain {
     margin-top: 2rem;
   }
 
+  .sm\:mt-4 {
+    margin-top: 1rem;
+  }
+
+  .sm\:line-clamp-3 {
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    display: -webkit-box;
+    overflow: hidden;
+  }
+
   .sm\:block {
     display: block;
   }
@@ -16541,6 +16694,10 @@ img.feed-media-contain {
 
   .sm\:hidden {
     display: none;
+  }
+
+  .sm\:aspect-\[4\/5\] {
+    aspect-ratio: 4 / 5;
   }
 
   .sm\:h-12 {
@@ -18531,6 +18688,136 @@ img.feed-media-contain {
   order: 1;
 }
 
+.\[\&_\.ProseMirror\]\:min-h-\[120px\] .ProseMirror {
+  min-height: 120px;
+}
+
+.\[\&_\.ProseMirror\]\:min-h-\[88px\] .ProseMirror {
+  min-height: 88px;
+}
+
+.\[\&_\.ProseMirror\]\:outline-none .ProseMirror {
+  outline-offset: 2px;
+  outline: 2px solid rgba(0, 0, 0, 0);
+}
+
+.\[\&_\.ProseMirror_a\]\:text-\[\#2378E8\] .ProseMirror a {
+  --tw-text-opacity: 1;
+  color: rgba(35, 120, 232, var(--tw-text-opacity, 1));
+}
+
+.\[\&_\.ProseMirror_a\]\:underline .ProseMirror a {
+  -webkit-text-decoration-line: underline;
+  text-decoration-line: underline;
+}
+
+.\[\&_\.ProseMirror_ol\]\:my-2 .ProseMirror ol {
+  margin-top: .5rem;
+  margin-bottom: .5rem;
+}
+
+.\[\&_\.ProseMirror_ol\]\:list-decimal .ProseMirror ol {
+  list-style-type: decimal;
+}
+
+.\[\&_\.ProseMirror_ol\]\:ps-5 .ProseMirror ol:not(:-webkit-any(:lang(ae), :lang(ar), :lang(arc), :lang(bcc), :lang(bqi), :lang(ckb), :lang(dv), :lang(fa), :lang(glk), :lang(he), :lang(ku), :lang(mzn), :lang(nqo), :lang(pnb), :lang(ps), :lang(sd), :lang(ug), :lang(ur), :lang(yi))) {
+  padding-left: 1.25rem;
+}
+
+.\[\&_\.ProseMirror_ol\]\:ps-5 .ProseMirror ol:not(:-moz-any(:lang(ae), :lang(ar), :lang(arc), :lang(bcc), :lang(bqi), :lang(ckb), :lang(dv), :lang(fa), :lang(glk), :lang(he), :lang(ku), :lang(mzn), :lang(nqo), :lang(pnb), :lang(ps), :lang(sd), :lang(ug), :lang(ur), :lang(yi))) {
+  padding-left: 1.25rem;
+}
+
+.\[\&_\.ProseMirror_ol\]\:ps-5 .ProseMirror ol:not(:is(:lang(ae), :lang(ar), :lang(arc), :lang(bcc), :lang(bqi), :lang(ckb), :lang(dv), :lang(fa), :lang(glk), :lang(he), :lang(ku), :lang(mzn), :lang(nqo), :lang(pnb), :lang(ps), :lang(sd), :lang(ug), :lang(ur), :lang(yi))) {
+  padding-left: 1.25rem;
+}
+
+.\[\&_\.ProseMirror_ol\]\:ps-5 .ProseMirror ol:-webkit-any(:lang(ae), :lang(ar), :lang(arc), :lang(bcc), :lang(bqi), :lang(ckb), :lang(dv), :lang(fa), :lang(glk), :lang(he), :lang(ku), :lang(mzn), :lang(nqo), :lang(pnb), :lang(ps), :lang(sd), :lang(ug), :lang(ur), :lang(yi)) {
+  padding-right: 1.25rem;
+}
+
+.\[\&_\.ProseMirror_ol\]\:ps-5 .ProseMirror ol:-moz-any(:lang(ae), :lang(ar), :lang(arc), :lang(bcc), :lang(bqi), :lang(ckb), :lang(dv), :lang(fa), :lang(glk), :lang(he), :lang(ku), :lang(mzn), :lang(nqo), :lang(pnb), :lang(ps), :lang(sd), :lang(ug), :lang(ur), :lang(yi)) {
+  padding-right: 1.25rem;
+}
+
+.\[\&_\.ProseMirror_ol\]\:ps-5 .ProseMirror ol:is(:lang(ae), :lang(ar), :lang(arc), :lang(bcc), :lang(bqi), :lang(ckb), :lang(dv), :lang(fa), :lang(glk), :lang(he), :lang(ku), :lang(mzn), :lang(nqo), :lang(pnb), :lang(ps), :lang(sd), :lang(ug), :lang(ur), :lang(yi)) {
+  padding-right: 1.25rem;
+}
+
+.\[\&_\.ProseMirror_p\+p\]\:mt-2 .ProseMirror p + p {
+  margin-top: .5rem;
+}
+
+.\[\&_\.ProseMirror_p\.is-editor-empty\:first-child\:\:before\]\:text-\[\#94A3B8\] .ProseMirror p.is-editor-empty:first-child:before {
+  --tw-text-opacity: 1;
+  color: rgba(148, 163, 184, var(--tw-text-opacity, 1));
+}
+
+.\[\&_\.ProseMirror_p\]\:m-0 .ProseMirror p {
+  margin: 0;
+}
+
+.\[\&_\.ProseMirror_ul\]\:my-2 .ProseMirror ul {
+  margin-top: .5rem;
+  margin-bottom: .5rem;
+}
+
+.\[\&_\.ProseMirror_ul\]\:list-disc .ProseMirror ul {
+  list-style-type: disc;
+}
+
+.\[\&_\.ProseMirror_ul\]\:ps-5 .ProseMirror ul:not(:-webkit-any(:lang(ae), :lang(ar), :lang(arc), :lang(bcc), :lang(bqi), :lang(ckb), :lang(dv), :lang(fa), :lang(glk), :lang(he), :lang(ku), :lang(mzn), :lang(nqo), :lang(pnb), :lang(ps), :lang(sd), :lang(ug), :lang(ur), :lang(yi))) {
+  padding-left: 1.25rem;
+}
+
+.\[\&_\.ProseMirror_ul\]\:ps-5 .ProseMirror ul:not(:-moz-any(:lang(ae), :lang(ar), :lang(arc), :lang(bcc), :lang(bqi), :lang(ckb), :lang(dv), :lang(fa), :lang(glk), :lang(he), :lang(ku), :lang(mzn), :lang(nqo), :lang(pnb), :lang(ps), :lang(sd), :lang(ug), :lang(ur), :lang(yi))) {
+  padding-left: 1.25rem;
+}
+
+.\[\&_\.ProseMirror_ul\]\:ps-5 .ProseMirror ul:not(:is(:lang(ae), :lang(ar), :lang(arc), :lang(bcc), :lang(bqi), :lang(ckb), :lang(dv), :lang(fa), :lang(glk), :lang(he), :lang(ku), :lang(mzn), :lang(nqo), :lang(pnb), :lang(ps), :lang(sd), :lang(ug), :lang(ur), :lang(yi))) {
+  padding-left: 1.25rem;
+}
+
+.\[\&_\.ProseMirror_ul\]\:ps-5 .ProseMirror ul:-webkit-any(:lang(ae), :lang(ar), :lang(arc), :lang(bcc), :lang(bqi), :lang(ckb), :lang(dv), :lang(fa), :lang(glk), :lang(he), :lang(ku), :lang(mzn), :lang(nqo), :lang(pnb), :lang(ps), :lang(sd), :lang(ug), :lang(ur), :lang(yi)) {
+  padding-right: 1.25rem;
+}
+
+.\[\&_\.ProseMirror_ul\]\:ps-5 .ProseMirror ul:-moz-any(:lang(ae), :lang(ar), :lang(arc), :lang(bcc), :lang(bqi), :lang(ckb), :lang(dv), :lang(fa), :lang(glk), :lang(he), :lang(ku), :lang(mzn), :lang(nqo), :lang(pnb), :lang(ps), :lang(sd), :lang(ug), :lang(ur), :lang(yi)) {
+  padding-right: 1.25rem;
+}
+
+.\[\&_\.ProseMirror_ul\]\:ps-5 .ProseMirror ul:is(:lang(ae), :lang(ar), :lang(arc), :lang(bcc), :lang(bqi), :lang(ckb), :lang(dv), :lang(fa), :lang(glk), :lang(he), :lang(ku), :lang(mzn), :lang(nqo), :lang(pnb), :lang(ps), :lang(sd), :lang(ug), :lang(ur), :lang(yi)) {
+  padding-right: 1.25rem;
+}
+
+.\[\&_a\:hover\]\:text-\[\#155DB8\] a:hover {
+  --tw-text-opacity: 1;
+  color: rgba(21, 93, 184, var(--tw-text-opacity, 1));
+}
+
+.\[\&_a\]\:font-medium a {
+  font-weight: 500;
+}
+
+.\[\&_a\]\:text-\[\#2378E8\] a {
+  --tw-text-opacity: 1;
+  color: rgba(35, 120, 232, var(--tw-text-opacity, 1));
+}
+
+.\[\&_a\]\:underline a {
+  -webkit-text-decoration-line: underline;
+  text-decoration-line: underline;
+}
+
+.\[\&_a\]\:decoration-\[\#2378E8\]\/40 a {
+  -webkit-text-decoration-color: rgba(35, 120, 232, .4);
+  text-decoration-color: rgba(35, 120, 232, .4);
+}
+
+.\[\&_a\]\:underline-offset-2 a {
+  text-underline-offset: 2px;
+}
+
 .\[\&_img\]\:max-w-none img {
   max-width: none;
 }
@@ -18538,6 +18825,80 @@ img.feed-media-contain {
 .\[\&_li\]\:mx-8 li {
   margin-left: 2rem;
   margin-right: 2rem;
+}
+
+.\[\&_ol\]\:my-2 ol {
+  margin-top: .5rem;
+  margin-bottom: .5rem;
+}
+
+.\[\&_ol\]\:list-decimal ol {
+  list-style-type: decimal;
+}
+
+.\[\&_ol\]\:ps-5 ol:not(:-webkit-any(:lang(ae), :lang(ar), :lang(arc), :lang(bcc), :lang(bqi), :lang(ckb), :lang(dv), :lang(fa), :lang(glk), :lang(he), :lang(ku), :lang(mzn), :lang(nqo), :lang(pnb), :lang(ps), :lang(sd), :lang(ug), :lang(ur), :lang(yi))) {
+  padding-left: 1.25rem;
+}
+
+.\[\&_ol\]\:ps-5 ol:not(:-moz-any(:lang(ae), :lang(ar), :lang(arc), :lang(bcc), :lang(bqi), :lang(ckb), :lang(dv), :lang(fa), :lang(glk), :lang(he), :lang(ku), :lang(mzn), :lang(nqo), :lang(pnb), :lang(ps), :lang(sd), :lang(ug), :lang(ur), :lang(yi))) {
+  padding-left: 1.25rem;
+}
+
+.\[\&_ol\]\:ps-5 ol:not(:is(:lang(ae), :lang(ar), :lang(arc), :lang(bcc), :lang(bqi), :lang(ckb), :lang(dv), :lang(fa), :lang(glk), :lang(he), :lang(ku), :lang(mzn), :lang(nqo), :lang(pnb), :lang(ps), :lang(sd), :lang(ug), :lang(ur), :lang(yi))) {
+  padding-left: 1.25rem;
+}
+
+.\[\&_ol\]\:ps-5 ol:-webkit-any(:lang(ae), :lang(ar), :lang(arc), :lang(bcc), :lang(bqi), :lang(ckb), :lang(dv), :lang(fa), :lang(glk), :lang(he), :lang(ku), :lang(mzn), :lang(nqo), :lang(pnb), :lang(ps), :lang(sd), :lang(ug), :lang(ur), :lang(yi)) {
+  padding-right: 1.25rem;
+}
+
+.\[\&_ol\]\:ps-5 ol:-moz-any(:lang(ae), :lang(ar), :lang(arc), :lang(bcc), :lang(bqi), :lang(ckb), :lang(dv), :lang(fa), :lang(glk), :lang(he), :lang(ku), :lang(mzn), :lang(nqo), :lang(pnb), :lang(ps), :lang(sd), :lang(ug), :lang(ur), :lang(yi)) {
+  padding-right: 1.25rem;
+}
+
+.\[\&_ol\]\:ps-5 ol:is(:lang(ae), :lang(ar), :lang(arc), :lang(bcc), :lang(bqi), :lang(ckb), :lang(dv), :lang(fa), :lang(glk), :lang(he), :lang(ku), :lang(mzn), :lang(nqo), :lang(pnb), :lang(ps), :lang(sd), :lang(ug), :lang(ur), :lang(yi)) {
+  padding-right: 1.25rem;
+}
+
+.\[\&_p\+p\]\:mt-2 p + p {
+  margin-top: .5rem;
+}
+
+.\[\&_p\]\:m-0 p {
+  margin: 0;
+}
+
+.\[\&_ul\]\:my-2 ul {
+  margin-top: .5rem;
+  margin-bottom: .5rem;
+}
+
+.\[\&_ul\]\:list-disc ul {
+  list-style-type: disc;
+}
+
+.\[\&_ul\]\:ps-5 ul:not(:-webkit-any(:lang(ae), :lang(ar), :lang(arc), :lang(bcc), :lang(bqi), :lang(ckb), :lang(dv), :lang(fa), :lang(glk), :lang(he), :lang(ku), :lang(mzn), :lang(nqo), :lang(pnb), :lang(ps), :lang(sd), :lang(ug), :lang(ur), :lang(yi))) {
+  padding-left: 1.25rem;
+}
+
+.\[\&_ul\]\:ps-5 ul:not(:-moz-any(:lang(ae), :lang(ar), :lang(arc), :lang(bcc), :lang(bqi), :lang(ckb), :lang(dv), :lang(fa), :lang(glk), :lang(he), :lang(ku), :lang(mzn), :lang(nqo), :lang(pnb), :lang(ps), :lang(sd), :lang(ug), :lang(ur), :lang(yi))) {
+  padding-left: 1.25rem;
+}
+
+.\[\&_ul\]\:ps-5 ul:not(:is(:lang(ae), :lang(ar), :lang(arc), :lang(bcc), :lang(bqi), :lang(ckb), :lang(dv), :lang(fa), :lang(glk), :lang(he), :lang(ku), :lang(mzn), :lang(nqo), :lang(pnb), :lang(ps), :lang(sd), :lang(ug), :lang(ur), :lang(yi))) {
+  padding-left: 1.25rem;
+}
+
+.\[\&_ul\]\:ps-5 ul:-webkit-any(:lang(ae), :lang(ar), :lang(arc), :lang(bcc), :lang(bqi), :lang(ckb), :lang(dv), :lang(fa), :lang(glk), :lang(he), :lang(ku), :lang(mzn), :lang(nqo), :lang(pnb), :lang(ps), :lang(sd), :lang(ug), :lang(ur), :lang(yi)) {
+  padding-right: 1.25rem;
+}
+
+.\[\&_ul\]\:ps-5 ul:-moz-any(:lang(ae), :lang(ar), :lang(arc), :lang(bcc), :lang(bqi), :lang(ckb), :lang(dv), :lang(fa), :lang(glk), :lang(he), :lang(ku), :lang(mzn), :lang(nqo), :lang(pnb), :lang(ps), :lang(sd), :lang(ug), :lang(ur), :lang(yi)) {
+  padding-right: 1.25rem;
+}
+
+.\[\&_ul\]\:ps-5 ul:is(:lang(ae), :lang(ar), :lang(arc), :lang(bcc), :lang(bqi), :lang(ckb), :lang(dv), :lang(fa), :lang(glk), :lang(he), :lang(ku), :lang(mzn), :lang(nqo), :lang(pnb), :lang(ps), :lang(sd), :lang(ug), :lang(ur), :lang(yi)) {
+  padding-right: 1.25rem;
 }
 
 /*# sourceMappingURL=app_%5Blocale%5D_css_style_css_bad6b30c._.single.css.map*/

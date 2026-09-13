@@ -9747,10 +9747,10 @@ function KnowledgeAuthorActions(param) {
     const serviceInsighterUuid = (serviceTarget === null || serviceTarget === void 0 ? void 0 : serviceTarget.specifiedInsighterUuid) || "";
     const serviceHref = canRequestService ? "/".concat(locale, "/project/wizard/project-type?fresh=1&").concat(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$project$2f$specifiedInsighterProject$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["specifiedInsighterQueryParam"], "=").concat(encodeURIComponent(serviceInsighterUuid)) : "";
     const meetHref = "/".concat(locale, "/profile/").concat(insighter.uuid, "?entity=insighter&tab=meet");
-    const meetLabel = locale === "en" ? "Meet ".concat(insighter.name.toLowerCase()) : "قابل الخبير ".concat(insighter.name.toLowerCase());
+    const meetLabel = locale === "en" ? "Meet" : "لقاء";
     const requestServiceLabel = isRTL ? "طلب خدمة" : "Request Service";
-    const buttonClass = "inline-flex max-h-[34px] items-center justify-center gap-2 rounded-md bg-[rgb(56_159_227)] px-3 py-1.5 text-center text-sm font-semibold text-white transition-colors hover:bg-[rgb(42_139_203)] focus:outline-none focus:ring-2 focus:ring-blue-200";
-    const requestServiceButtonClass = "group inline-flex max-h-[34px] items-center justify-center gap-2 rounded-full border border-transparent bg-[linear-gradient(#ffffff,#ffffff)_padding-box,linear-gradient(90deg,#38bdf8,#3b82f6,#2dd4bf)_border-box] px-3.5 py-1.5 text-center text-sm font-semibold text-sky-600 shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md focus:outline-none focus:ring-2 focus:ring-sky-300 focus:ring-offset-2 dark:bg-[linear-gradient(#0f172a,#0f172a)_padding-box,linear-gradient(90deg,#38bdf8,#3b82f6,#2dd4bf)_border-box] dark:text-sky-300";
+    const buttonClass = "group relative isolate inline-flex max-h-[34px] items-center justify-center gap-2 overflow-hidden rounded-full bg-gradient-to-r from-blue-700 via-sky-600 to-cyan-500 px-3.5 py-1.5 text-center text-sm font-semibold text-sky-600 shadow-sm transition-all duration-200 before:pointer-events-none before:absolute before:inset-px before:z-0 before:rounded-full before:bg-white before:content-[''] hover:-translate-y-0.5 hover:shadow-md focus:outline-none focus:ring-2 focus:ring-sky-300 focus:ring-offset-2 dark:text-sky-300 dark:before:bg-slate-900";
+    const buttonTextClass = "relative z-10 bg-gradient-to-r from-blue-700 via-sky-600 to-cyan-500 bg-clip-text font-semibold text-transparent";
     return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
         className: "flex flex-wrap items-center gap-2 ".concat(className),
         children: [
@@ -9760,57 +9760,58 @@ function KnowledgeAuthorActions(param) {
                 children: [
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$tabler$2f$icons$2d$react$2f$dist$2f$esm$2f$icons$2f$IconCalendarTime$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__IconCalendarTime$3e$__["IconCalendarTime"], {
                         size: 16,
-                        stroke: 2
+                        stroke: 2,
+                        className: "relative z-10 transition-colors group-hover:text-cyan-500"
                     }, void 0, false, {
                         fileName: "[project]/app/[locale]/knowledge/[type]/[slug]/KnowledgeAuthorActions.tsx",
-                        lineNumber: 173,
+                        lineNumber: 170,
                         columnNumber: 9
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
-                        className: "capitalize",
+                        className: "".concat(buttonTextClass, " capitalize"),
                         children: meetLabel
                     }, void 0, false, {
                         fileName: "[project]/app/[locale]/knowledge/[type]/[slug]/KnowledgeAuthorActions.tsx",
-                        lineNumber: 174,
+                        lineNumber: 171,
                         columnNumber: 9
                     }, this)
                 ]
             }, void 0, true, {
                 fileName: "[project]/app/[locale]/knowledge/[type]/[slug]/KnowledgeAuthorActions.tsx",
-                lineNumber: 172,
+                lineNumber: 169,
                 columnNumber: 7
             }, this),
             canRequestService && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$client$2f$app$2d$dir$2f$link$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"], {
                 href: serviceHref,
-                className: requestServiceButtonClass,
+                className: buttonClass,
                 children: [
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$tabler$2f$icons$2d$react$2f$dist$2f$esm$2f$icons$2f$IconBriefcase$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__IconBriefcase$3e$__["IconBriefcase"], {
                         size: 16,
                         stroke: 2,
-                        className: "transition-colors group-hover:text-teal-500"
+                        className: "relative z-10 transition-colors group-hover:text-teal-500"
                     }, void 0, false, {
                         fileName: "[project]/app/[locale]/knowledge/[type]/[slug]/KnowledgeAuthorActions.tsx",
-                        lineNumber: 178,
+                        lineNumber: 175,
                         columnNumber: 11
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
-                        className: "relative font-semibold",
+                        className: buttonTextClass,
                         children: requestServiceLabel
                     }, void 0, false, {
                         fileName: "[project]/app/[locale]/knowledge/[type]/[slug]/KnowledgeAuthorActions.tsx",
-                        lineNumber: 179,
+                        lineNumber: 176,
                         columnNumber: 11
                     }, this)
                 ]
             }, void 0, true, {
                 fileName: "[project]/app/[locale]/knowledge/[type]/[slug]/KnowledgeAuthorActions.tsx",
-                lineNumber: 177,
+                lineNumber: 174,
                 columnNumber: 9
             }, this)
         ]
     }, void 0, true, {
         fileName: "[project]/app/[locale]/knowledge/[type]/[slug]/KnowledgeAuthorActions.tsx",
-        lineNumber: 171,
+        lineNumber: 168,
         columnNumber: 5
     }, this);
 }

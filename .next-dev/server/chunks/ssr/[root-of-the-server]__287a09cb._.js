@@ -534,11 +534,19 @@ async function Feed({ params, searchParams }) {
                                     fileName: "[project]/app/[locale]/(default)/page.tsx",
                                     lineNumber: 64,
                                     columnNumber: 17
-                                }, this) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$rsc$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$feed$2f$CommunityFeedTimeline$2e$tsx__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["default"], {
-                                    locale: locale,
-                                    keyword: keyword,
-                                    industry: industry,
-                                    contentType: contentType
+                                }, this) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$rsc$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                    "data-community-feed-start": true,
+                                    className: "scroll-mt-[calc(var(--app-header-height,88px)+16px)]",
+                                    children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$rsc$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$feed$2f$CommunityFeedTimeline$2e$tsx__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["default"], {
+                                        locale: locale,
+                                        keyword: keyword,
+                                        industry: industry,
+                                        contentType: contentType
+                                    }, void 0, false, {
+                                        fileName: "[project]/app/[locale]/(default)/page.tsx",
+                                        lineNumber: 70,
+                                        columnNumber: 19
+                                    }, this)
                                 }, void 0, false, {
                                     fileName: "[project]/app/[locale]/(default)/page.tsx",
                                     lineNumber: 66,
@@ -559,7 +567,7 @@ async function Feed({ params, searchParams }) {
                                         locale: locale
                                     }, void 0, false, {
                                         fileName: "[project]/app/[locale]/(default)/page.tsx",
-                                        lineNumber: 78,
+                                        lineNumber: 83,
                                         columnNumber: 17
                                     }, this),
                                     isSearching ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$rsc$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$feed$2f$RelatedDocumentsCard$2e$tsx__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["default"], {
@@ -567,24 +575,24 @@ async function Feed({ params, searchParams }) {
                                         keyword: keyword
                                     }, void 0, false, {
                                         fileName: "[project]/app/[locale]/(default)/page.tsx",
-                                        lineNumber: 80,
+                                        lineNumber: 85,
                                         columnNumber: 19
                                     }, this) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$rsc$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$feed$2f$TopDocumentsCard$2e$tsx__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["default"], {
                                         locale: locale
                                     }, void 0, false, {
                                         fileName: "[project]/app/[locale]/(default)/page.tsx",
-                                        lineNumber: 82,
+                                        lineNumber: 87,
                                         columnNumber: 19
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/app/[locale]/(default)/page.tsx",
-                                lineNumber: 77,
+                                lineNumber: 82,
                                 columnNumber: 15
                             }, this)
                         }, void 0, false, {
                             fileName: "[project]/app/[locale]/(default)/page.tsx",
-                            lineNumber: 76,
+                            lineNumber: 81,
                             columnNumber: 13
                         }, this)
                     ]
