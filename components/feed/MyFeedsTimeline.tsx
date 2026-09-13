@@ -1209,6 +1209,7 @@ export function FeedCard({
     .map((tag) => toHashtagToken(tag.name))
     .filter(Boolean)
     .map((tagName) => `#${tagName}`)
+  const tagHashtagsKey = tagHashtags.join(' ')
   const handleHashtagClick = (hashtag: string) => {
     router.push(`/${locale}?keyword=${encodeURIComponent(hashtag.replace(/_/g, ' '))}`)
   }
@@ -1219,7 +1220,7 @@ export function FeedCard({
 
   useEffect(() => {
     setIsBodyExpanded(false)
-  }, [item.body, item.uuid])
+  }, [item.body, item.uuid, tagHashtagsKey])
 
   useEffect(() => {
     const bodyContent = bodyContentRef.current
@@ -1240,7 +1241,7 @@ export function FeedCard({
     resizeObserver.observe(bodyContent)
 
     return () => resizeObserver.disconnect()
-  }, [item.body, isBodyExpanded])
+  }, [item.body, isBodyExpanded, tagHashtagsKey])
 
   const toggleBodyExpanded = () => {
     isCollapsingBodyRef.current = isBodyExpanded
@@ -1416,7 +1417,7 @@ export function FeedCard({
         </h2>
       )}
 
-      {!isArticle && item.body && (
+      {!isArticle && (item.body || tagHashtags.length > 0) && (
         <div className={item.title ? 'mt-1.5' : 'mt-4'}>
           <div
             ref={bodyContentRef}
@@ -1427,10 +1428,18 @@ export function FeedCard({
               isBodyExpanded ? 'line-clamp-none' : 'line-clamp-[10]'
             }`}
           >
-            {isRichPostBody ? (
-              <div dangerouslySetInnerHTML={{ __html: sanitizeAndLinkifyRichPostHtml(item.body, locale) }} />
-            ) : (
-              renderInteractiveFeedText(item.body, handleHashtagClick)
+            {item.body && (
+              isRichPostBody ? (
+                <div dangerouslySetInnerHTML={{ __html: sanitizeAndLinkifyRichPostHtml(item.body, locale) }} />
+              ) : (
+                renderInteractiveFeedText(item.body, handleHashtagClick)
+              )
+            )}
+
+            {tagHashtags.length > 0 && (
+              <div className={item.body ? 'mt-2' : ''}>
+                {renderInteractiveFeedText(tagHashtagsKey, handleHashtagClick)}
+              </div>
             )}
           </div>
 
@@ -1446,15 +1455,6 @@ export function FeedCard({
               </button>
             </div>
           )}
-        </div>
-      )}
-
-      {!isArticle && tagHashtags.length > 0 && (
-        <div
-          dir={isPostBodyArabic ? 'rtl' : 'ltr'}
-          className="mt-2 whitespace-pre-wrap text-start text-[13px] leading-5 text-[#1C2433]"
-        >
-          {renderInteractiveFeedText(tagHashtags.join(' '), handleHashtagClick)}
         </div>
       )}
 
