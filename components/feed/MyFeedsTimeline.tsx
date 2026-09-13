@@ -29,7 +29,6 @@ import {
   useMemo,
   useRef,
   useState,
-  type CSSProperties,
   type ReactNode,
 } from 'react'
 import '@mux/mux-player'
@@ -691,10 +690,12 @@ function VideoPlayer({
   media,
   title,
   playLabel,
+  flushBottom = false,
 }: {
   media: FeedItemMedia
   title: string
   playLabel: string
+  flushBottom?: boolean
 }) {
   const containerRef = useRef<HTMLDivElement | null>(null)
   // Hold the media element itself rather than querying for it when a pause is
@@ -891,28 +892,30 @@ function VideoPlayer({
   }, [shouldPreload, playerEpoch, useMp4Fallback])
 
   if (media.provider_playback_id) {
-    // Keep the frame at the uploaded video's real ratio. A fixed desktop
-    // portrait frame crops the top and bottom of a video as the feed widens.
-    // Instead, portrait clips are height-capped and centred on large screens.
+    // Reserve the box at the video's real aspect ratio so it doesn't collapse
+    // to a tiny height before Mux loads metadata (avoids the layout shift where
+    // the player snaps to full size on scroll/playback). Falls back to 16/9.
+    const aspectRatio =
+      media.width && media.height ? `${media.width} / ${media.height}` : '16 / 9'
+    // Portrait videos are bound by height (the maxHeight cap) so the width is
+    // derived and the box stays narrow; landscape videos fill the card width.
     const isPortrait = !!(media.width && media.height && media.height > media.width)
-    const aspectRatio = media.width && media.height ? `${media.width} / ${media.height}` : '16 / 9'
-    const frameClass = isPortrait
-      ? 'w-full md:h-[min(720px,72dvh)] md:w-auto md:max-w-full md:flex-none'
-      : 'w-full'
-    const playerStyle = {
-      width: '100%',
-      height: '100%',
-      display: 'block',
-      objectFit: 'contain',
-      '--media-object-fit': 'contain',
-    } as CSSProperties
 
     return (
-      <div className="mt-5 flex justify-center">
+      // Full-width black band that letterboxes and centers the video box.
+      <div
+        className={`-mx-5 mt-5 flex justify-center overflow-hidden bg-black sm:-mx-6 ${flushBottom ? '-mb-5 rounded-b-lg sm:-mb-6' : ''}`}
+      >
         <div
           ref={containerRef}
-          className={`relative shrink-0 overflow-hidden rounded-[18px] border border-[#D7E6F6] bg-[#EAF3FC] shadow-[0_10px_26px_rgba(15,23,42,0.1)] ${frameClass}`}
-          style={{ aspectRatio }}
+          className="relative"
+          style={{
+            aspectRatio,
+            maxHeight: 'min(650px, 70dvh)',
+            ...(isPortrait
+              ? { height: 'min(650px, 70dvh)', width: 'auto', maxWidth: '100%' }
+              : { width: '100%' }),
+          }}
         >
           {shouldPreload && useMp4Fallback && (
             <video
@@ -935,7 +938,7 @@ function VideoPlayer({
                 fatalErrorRef.current = true
                 setAutoplayBlocked(true)
               }}
-              style={playerStyle}
+              style={{ width: '100%', height: '100%', display: 'block', objectFit: 'contain' }}
             />
           )}
           {shouldPreload && !useMp4Fallback && (
@@ -958,7 +961,7 @@ function VideoPlayer({
               muted={isMuted}
               loop
               playsinline
-              style={playerStyle}
+              style={{ width: '100%', height: '100%', display: 'block' }}
             />
           )}
           {autoplayBlocked && isInViewport && (
@@ -1474,6 +1477,7 @@ export function FeedCard({
           media={videoMedia}
           title={item.title ?? item.body ?? 'Video'}
           playLabel={copy.playVideo}
+          flushBottom={isMediaLast}
         />
       )}
       {!isArticle && imageMedia.length > 0 && <ImageGallery media={imageMedia} imageAlt={copy.imageAlt} locale={locale} flushBottom={isMediaLast} />}
