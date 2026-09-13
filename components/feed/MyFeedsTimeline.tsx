@@ -891,27 +891,28 @@ function VideoPlayer({
   }, [shouldPreload, playerEpoch, useMp4Fallback])
 
   if (media.provider_playback_id) {
-    // A portrait frame keeps vertical clips full-width, as in social feeds.
-    // `cover` removes letterboxed side bars while retaining a familiar 2:3
-    // mobile viewing area. Landscape clips keep their natural widescreen frame.
+    // Keep the frame at the uploaded video's real ratio. A fixed desktop
+    // portrait frame crops the top and bottom of a video as the feed widens.
+    // Instead, portrait clips are height-capped and centred on large screens.
     const isPortrait = !!(media.width && media.height && media.height > media.width)
-    const frameClass = isPortrait ? 'aspect-[2/3] sm:aspect-[4/5]' : 'aspect-video'
+    const aspectRatio = media.width && media.height ? `${media.width} / ${media.height}` : '16 / 9'
+    const frameClass = isPortrait
+      ? 'w-full md:h-[min(720px,72dvh)] md:w-auto md:max-w-full md:flex-none'
+      : 'w-full'
     const playerStyle = {
       width: '100%',
       height: '100%',
       display: 'block',
-      objectFit: 'cover',
-      '--media-object-fit': 'cover',
-      '--media-object-position': 'center center',
+      objectFit: 'contain',
+      '--media-object-fit': 'contain',
     } as CSSProperties
 
     return (
-      <div
-        className="-mx-2 mt-5 overflow-hidden rounded-[18px] border border-[#D7E6F6] bg-[#EAF3FC] shadow-[0_10px_26px_rgba(15,23,42,0.1)] sm:-mx-3"
-      >
+      <div className="mt-5 flex justify-center">
         <div
           ref={containerRef}
-          className={`relative w-full overflow-hidden ${frameClass}`}
+          className={`relative shrink-0 overflow-hidden rounded-[18px] border border-[#D7E6F6] bg-[#EAF3FC] shadow-[0_10px_26px_rgba(15,23,42,0.1)] ${frameClass}`}
+          style={{ aspectRatio }}
         >
           {shouldPreload && useMp4Fallback && (
             <video
