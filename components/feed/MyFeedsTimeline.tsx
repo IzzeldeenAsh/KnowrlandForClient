@@ -900,15 +900,28 @@ function VideoPlayer({
     // Portrait videos are bound by height (the maxHeight cap) so the width is
     // derived and the box stays narrow; landscape videos fill the card width.
     const isPortrait = !!(media.width && media.height && media.height > media.width)
+    // Fills the letterbox bars with a blurred still from the video itself
+    // (the LinkedIn treatment) instead of flat black. A second <video> would
+    // double the decoder usage the rest of this component works to keep down,
+    // so this is a still frame: a tiny Mux thumbnail, which the blur hides the
+    // low resolution of.
+    const blurBackdrop = `https://image.mux.com/${media.provider_playback_id}/thumbnail.jpg?width=320`
 
     return (
       // Full-width black band that letterboxes and centers the video box.
       <div
-        className={`-mx-5 mt-5 flex justify-center overflow-hidden bg-black sm:-mx-6 ${flushBottom ? '-mb-5 rounded-b-lg sm:-mb-6' : ''}`}
+        className={`relative -mx-5 mt-5 flex justify-center overflow-hidden bg-black sm:-mx-6 ${flushBottom ? '-mb-5 rounded-b-lg sm:-mb-6' : ''}`}
       >
         <div
+          aria-hidden
+          // Scaled up so the blur's soft, semi-transparent edges stay outside
+          // the band rather than showing as a lighter frame around it.
+          className="pointer-events-none absolute inset-0 scale-125 bg-cover bg-center opacity-60 blur-2xl"
+          style={{ backgroundImage: `url("${blurBackdrop}")` }}
+        />
+        <div
           ref={containerRef}
-          className="relative"
+          className="relative z-[1]"
           style={{
             aspectRatio,
             maxHeight: 'min(650px, 70dvh)',
@@ -1161,8 +1174,9 @@ export function FeedCard({
   const hasRichContent =
     isArticle || hasPostMedia || attachments.length > 0 || item.related_insights.length > 0
   const showEngagementActions = articleAccess === 'community' && Boolean(item.insighter)
+  const showShareAction = Boolean(item.insighter)
   const isMediaLast =
-    attachments.length === 0 && item.related_insights.length === 0 && !showEngagementActions
+    attachments.length === 0 && item.related_insights.length === 0 && !showShareAction
   const statusTone =
     item.status === 'published'
       ? 'bg-[#EAF8F1] text-[#168A55]'
@@ -1501,7 +1515,7 @@ export function FeedCard({
 
       {item.related_insights.length > 0 && (
         <div className={`-mx-5 ${hasPostMedia ? 'mt-0' : 'mt-5'} divide-y divide-[#E7EDF5] overflow-hidden sm:-mx-6 ${
-          showEngagementActions ? 'border-b' : '-mb-5 rounded-b-lg sm:-mb-6'
+          showShareAction ? 'border-b' : '-mb-5 rounded-b-lg sm:-mb-6'
         }`}>
           {item.related_insights.map((insight) => {
             const insightKey = `${insight.type}-${insight.slug}`
@@ -1582,12 +1596,12 @@ export function FeedCard({
         </div>
       )}
 
-      {showEngagementActions && insighter && (
+      {showShareAction && insighter && (
         <div
           className={`-mx-5 flex min-w-0 items-center justify-around border-t border-[#E7EDF5] px-5 pt-2 sm:-mx-6 sm:px-6 ${hasRichContent ? 'mt-0' : 'mt-4'}`}
           dir={isArabic ? 'rtl' : 'ltr'}
         >
-          {!isOwnPost && canMeet && (
+          {showEngagementActions && !isOwnPost && canMeet && (
             <Link
               href={meetHref}
               target="_blank"
@@ -1599,7 +1613,7 @@ export function FeedCard({
             </Link>
           )}
 
-          {!isOwnPost && canRequestService && (
+          {showEngagementActions && !isOwnPost && canRequestService && (
             <Link
               href={requestServiceHref}
               className="inline-flex min-w-0 flex-1 items-center justify-center gap-1 rounded-md px-1 py-2.5 text-[12px] font-medium text-[#5A6B85] transition-colors hover:bg-[#F5F8FC] hover:text-[#101724] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2378E8] sm:gap-2 sm:px-2 sm:text-[14px]"
@@ -1609,7 +1623,7 @@ export function FeedCard({
             </Link>
           )}
 
-          {!isOwnPost && (
+          {showEngagementActions && !isOwnPost && (
             <FeedSaveButton
               uuid={item.uuid}
               identifier={item.slug ?? item.uuid}

@@ -11,7 +11,7 @@ import {
   IconChevronRight,
   IconCircleCheck,
   IconFileDescription,
-  IconFolderOpen,
+  IconLink,
   IconLoader2,
   IconPhoto,
   IconPlus,
@@ -1623,13 +1623,13 @@ export default function PostModal({
                 <button
                   type="button"
                   onClick={() => setLibraryDrawerOpened(true)}
-                  className={`flex h-9 items-center gap-1.5 rounded-lg px-2.5 text-[14px] font-medium transition-colors focus-visible:outline-[1px] focus-visible:outline-offset-1 focus-visible:outline-[#B7D2F4] ${
+                  className={`flex h-9 items-center gap-1.5 rounded-lg border px-2.5 text-[14px] font-medium transition-colors focus-visible:outline-[1px] focus-visible:outline-offset-1 focus-visible:outline-[#B7D2F4] ${
                     relatedInsights.length > 0
-                      ? 'bg-[#EDF3FC] text-[#1D74E0]'
-                      : 'text-[#5A6B84] hover:bg-[#F3F6FB]'
+                      ? 'border-[#8FB9EA] bg-[#EDF3FC] text-[#1D74E0]'
+                      : 'border-[#C9DCF6] text-[#5A6B84] hover:bg-[#F3F6FB]'
                   }`}
                 >
-                  <IconFolderOpen aria-hidden stroke={1.7} className="h-4.5 w-4.5" />
+                  <IconLink aria-hidden stroke={1.7} className="h-4.5 w-4.5" />
                   <span className="hidden sm:inline">{copy.shareFromLibrary}</span>
                 </button>
               </>

@@ -453,7 +453,7 @@ export default async function KnowledgePage({ params }: Props) {
                             </Link>
                           </span>
                         </span>
-                        <div className="flex flex-col ps-4 sm:ps-8 mt-2 sm:mt-0">
+                        <div className="flex flex-col ps-4 sm:ps-8">
                           <span className="text-gray-500 text-sm">{translations.publishedBy}</span>
                           <div className="flex items-center gap-2">
                             <div className="relative w-[18px] h-[18px] sm:w-[20px] sm:h-[20px]">
@@ -519,7 +519,7 @@ export default async function KnowledgePage({ params }: Props) {
                         </span>
                       </>
                     )}
-                  <div className="flex flex-col ps-4 sm:ps-8 mt-2 sm:mt-0">
+                  <div className="flex flex-col ps-4 sm:ps-8">
                     <span className="text-gray-500 text-sm">{translations.published}</span>
                     <span className="text-sm font-bold text-gray-700" style={{ direction: isRTL ? 'ltr' : 'ltr' }}>
                       {knowledge.published_at === null
@@ -539,7 +539,7 @@ export default async function KnowledgePage({ params }: Props) {
                     </span>
                   </div>
                   {knowledge.review && knowledge.review.length > 0 && (
-                    <div className="flex flex-col ps-4 sm:ps-8 mt-2 sm:mt-0">
+                    <div className="flex flex-col ps-4 sm:ps-8">
                       <span className="text-gray-500 text-sm">{translations.rating}</span>
                       <div className="flex items-center">
                         {(() => {
