@@ -3,7 +3,7 @@ import Link from 'next/link'
 import Logo from './logo'
 import MobileMenu from './mobile-menu'
 import { useEffect, useLayoutEffect, useRef, useState } from 'react'
-import { IconChevronDown, IconHome, IconLanguage, IconSearch, IconX } from '@tabler/icons-react'
+import { IconChevronDown, IconLanguage, IconSearch, IconX } from '@tabler/icons-react'
 import { HoverCard, Group, Text, Anchor, Divider, SimpleGrid, Button, TextInput } from '@mantine/core'
 import { UserProfile } from './header/components/UserProfile'
 import { useTranslations } from 'next-intl'
@@ -794,7 +794,7 @@ export default function Header() {
                     aria-label={currentLocale === 'ar' ? 'الصفحة الرئيسية' : 'Home'}
                     className="flex h-9 w-9 items-center justify-center rounded-md text-slate-300 transition-all duration-200 hover:bg-[#3B8AEF]/20 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#67B5F6]"
                   >
-                    <IconHome aria-hidden size={18} stroke={1.9} />
+                    <i className="ki-outline ki-home-2 text-[17.6px] leading-none" aria-hidden="true" />
                   </Link>
                 </li>
 

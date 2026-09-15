@@ -608,6 +608,42 @@ export async function getInsighterProfileFeed(
   }
 }
 
+export async function getCompanyProfileFeed(
+  uuid: string,
+  locale: string,
+  cursor?: string | null,
+  signal?: AbortSignal,
+): Promise<InsighterProfileFeedPage> {
+  const params = new URLSearchParams({ limit: '10' })
+  if (cursor) params.set('cursor', cursor)
+
+  const response = await fetch(
+    getApiUrl(
+      `/api/platform/company/profile/${encodeURIComponent(uuid)}/feed?${params.toString()}`,
+    ),
+    {
+      headers: authHeaders(locale),
+      cache: 'no-store',
+      signal,
+    },
+  )
+
+  if (!response.ok) {
+    await parseErrorMessage(response, 'Unable to load this company’s posts.')
+  }
+
+  const body = await response.json()
+
+  return {
+    data: body.data ?? [],
+    meta: {
+      has_more: Boolean(body.meta?.next_cursor),
+      next_cursor: body.meta?.next_cursor ?? null,
+      limit: body.meta?.per_page ?? 10,
+    },
+  }
+}
+
 export async function getSavedCommunityFeed(
   locale: string,
   cursor?: string | null,
@@ -1076,11 +1112,16 @@ export async function fetchPublishedLibraryKnowledge(
   page: number,
   locale: string,
   isCompany = false,
+  keyword = '',
 ): Promise<LibraryKnowledgePage> {
-  const params = new URLSearchParams({ page: String(page), status: 'published' })
+  // Both list endpoints are already scoped to published items, paginated and
+  // ordered newest-first, and accept an optional `keyword` title filter.
+  const params = new URLSearchParams({ page: String(page) })
+  const trimmedKeyword = keyword.trim()
+  if (trimmedKeyword) params.set('keyword', trimmedKeyword)
   const path = isCompany
-    ? '/api/company/library/knowledge/list'
-    : `/api/insighter/library/knowledge?${params}`
+    ? `/api/company/library/knowledge/list?${params}`
+    : `/api/insighter/library/knowledge/list?${params}`
   const response = await fetch(getApiUrl(path), {
     headers: authHeaders(locale),
   })

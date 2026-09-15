@@ -271,6 +271,8 @@ __turbopack_context__.s([
     ()=>getCommunityFeedPost,
     "getCommunityFeedPreview",
     ()=>getCommunityFeedPreview,
+    "getCompanyProfileFeed",
+    ()=>getCompanyProfileFeed,
     "getFeedDraft",
     ()=>getFeedDraft,
     "getFeedItem",
@@ -547,6 +549,31 @@ async function getInsighterProfileFeed(uuid, locale, cursor, signal) {
     });
     if (!response.ok) {
         await parseErrorMessage(response, 'Unable to load this insighter’s posts.');
+    }
+    const body = await response.json();
+    var _body_data, _body_meta_next_cursor, _body_meta_per_page;
+    return {
+        data: (_body_data = body.data) !== null && _body_data !== void 0 ? _body_data : [],
+        meta: {
+            has_more: Boolean((_body_meta = body.meta) === null || _body_meta === void 0 ? void 0 : _body_meta.next_cursor),
+            next_cursor: (_body_meta_next_cursor = (_body_meta1 = body.meta) === null || _body_meta1 === void 0 ? void 0 : _body_meta1.next_cursor) !== null && _body_meta_next_cursor !== void 0 ? _body_meta_next_cursor : null,
+            limit: (_body_meta_per_page = (_body_meta2 = body.meta) === null || _body_meta2 === void 0 ? void 0 : _body_meta2.per_page) !== null && _body_meta_per_page !== void 0 ? _body_meta_per_page : 10
+        }
+    };
+}
+async function getCompanyProfileFeed(uuid, locale, cursor, signal) {
+    var _body_meta, _body_meta1, _body_meta2;
+    const params = new URLSearchParams({
+        limit: '10'
+    });
+    if (cursor) params.set('cursor', cursor);
+    const response = await fetch((0, __TURBOPACK__imported__module__$5b$project$5d2f$app$2f$config$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["getApiUrl"])("/api/platform/company/profile/".concat(encodeURIComponent(uuid), "/feed?").concat(params.toString())), {
+        headers: authHeaders(locale),
+        cache: 'no-store',
+        signal
+    });
+    if (!response.ok) {
+        await parseErrorMessage(response, 'Unable to load this company’s posts.');
     }
     const body = await response.json();
     var _body_data, _body_meta_next_cursor, _body_meta_per_page;
@@ -922,39 +949,47 @@ async function createSuggestTag(industryId, name, locale) {
     };
 }
 async function fetchPublishedLibraryKnowledge(page, locale) {
+    let isCompany = arguments.length > 2 && arguments[2] !== void 0 ? arguments[2] : false, keyword = arguments.length > 3 && arguments[3] !== void 0 ? arguments[3] : '';
+    // Both list endpoints are already scoped to published items, paginated and
+    // ordered newest-first, and accept an optional `keyword` title filter.
     const params = new URLSearchParams({
-        page: String(page),
-        status: 'published'
+        page: String(page)
     });
-    const response = await fetch((0, __TURBOPACK__imported__module__$5b$project$5d2f$app$2f$config$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["getApiUrl"])("/api/insighter/library/knowledge?".concat(params)), {
+    const trimmedKeyword = keyword.trim();
+    if (trimmedKeyword) params.set('keyword', trimmedKeyword);
+    const path = isCompany ? "/api/company/library/knowledge/list?".concat(params) : "/api/insighter/library/knowledge/list?".concat(params);
+    const response = await fetch((0, __TURBOPACK__imported__module__$5b$project$5d2f$app$2f$config$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["getApiUrl"])(path), {
         headers: authHeaders(locale)
     });
     if (!response.ok) {
         await parseErrorMessage(response, 'Unable to load your library.');
     }
     const body = await response.json();
-    var _body_data, _body_meta;
+    var _body_data;
+    const data = ((_body_data = body.data) !== null && _body_data !== void 0 ? _body_data : []).map((item)=>({
+            id: item.id,
+            type: item.type,
+            title: item.title,
+            slug: item.slug,
+            status: item.status,
+            published_at: item.published_at,
+            description: item.description
+        }));
+    var _body_meta;
     return {
-        data: ((_body_data = body.data) !== null && _body_data !== void 0 ? _body_data : []).map((item)=>({
-                id: item.id,
-                type: item.type,
-                title: item.title,
-                slug: item.slug,
-                status: item.status,
-                published_at: item.published_at
-            })),
+        data,
         meta: (_body_meta = body.meta) !== null && _body_meta !== void 0 ? _body_meta : {
             current_page: page,
             last_page: page,
-            per_page: 10,
-            total: 0
+            per_page: data.length,
+            total: data.length
         }
     };
 }
 async function fetchLibraryKnowledgeById(id, locale) {
-    let maxPages = arguments.length > 2 && arguments[2] !== void 0 ? arguments[2] : 5;
+    let maxPages = arguments.length > 2 && arguments[2] !== void 0 ? arguments[2] : 5, isCompany = arguments.length > 3 && arguments[3] !== void 0 ? arguments[3] : false;
     for(let page = 1; page <= maxPages; page += 1){
-        const result = await fetchPublishedLibraryKnowledge(page, locale);
+        const result = await fetchPublishedLibraryKnowledge(page, locale, isCompany);
         const match = result.data.find((item)=>item.id === id);
         if (match) return match;
         if (page >= result.meta.last_page) break;
@@ -1840,6 +1875,8 @@ __turbopack_context__.s([
 ]);
 var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/next/dist/compiled/react/jsx-dev-runtime.js [app-client] (ecmascript)");
 var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mantine$2f$core$2f$esm$2f$components$2f$Drawer$2f$Drawer$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/@mantine/core/esm/components/Drawer/Drawer.mjs [app-client] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$tabler$2f$icons$2d$react$2f$dist$2f$esm$2f$icons$2f$IconSearch$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__IconSearch$3e$__ = __turbopack_context__.i("[project]/node_modules/@tabler/icons-react/dist/esm/icons/IconSearch.mjs [app-client] (ecmascript) <export default as IconSearch>");
+var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$tabler$2f$icons$2d$react$2f$dist$2f$esm$2f$icons$2f$IconX$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__IconX$3e$__ = __turbopack_context__.i("[project]/node_modules/@tabler/icons-react/dist/esm/icons/IconX.mjs [app-client] (ecmascript) <export default as IconX>");
 var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/next/dist/compiled/react/index.js [app-client] (ecmascript)");
 var __TURBOPACK__imported__module__$5b$project$5d2f$services$2f$feed$2e$service$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/services/feed.service.ts [app-client] (ecmascript)");
 ;
@@ -1848,8 +1885,11 @@ var _s = __turbopack_context__.k.signature();
 ;
 ;
 ;
+;
 // A post can attach at most this many knowledge items from the library.
 const MAX_LIBRARY_ATTACHMENTS = 3;
+// Wait this long after the last keystroke before asking the API for results.
+const SEARCH_DEBOUNCE_MS = 300;
 const copyByLocale = {
     en: {
         title: 'Share from your library',
@@ -1859,8 +1899,13 @@ const copyByLocale = {
         emptyTitle: 'Start building your library',
         emptyBody: 'Publish documents, reports, or data to your library, then attach them to your posts. Save a draft and continue to publishing whenever you are ready.',
         emptyCta: 'Save and start publish',
+        searchLabel: 'Search your library',
+        searchPlaceholder: 'Search by title…',
+        clearSearch: 'Clear search',
+        noResultsTitle: 'No matching knowledge',
+        noResultsBody: (keyword)=>"Nothing in your library matches “".concat(keyword, "”."),
         loadMore: 'Load more',
-        attach: 'Attach',
+        done: 'Done',
         selectedCount: (count)=>"".concat(count, " of ").concat(MAX_LIBRARY_ATTACHMENTS, " selected"),
         limitReached: "You can attach up to ".concat(MAX_LIBRARY_ATTACHMENTS, " items. Unselect one to choose another."),
         error: 'Unable to load your library.',
@@ -1874,8 +1919,13 @@ const copyByLocale = {
         emptyTitle: 'ابدأ ببناء مكتبتك',
         emptyBody: 'انشر المستندات أو التقارير أو البيانات في مكتبتك، ثم أرفقها بمنشوراتك. احفظ مسودة وتابع النشر متى كنت جاهزًا.',
         emptyCta: 'احفظ وابدأ النشر',
+        searchLabel: 'ابحث في مكتبتك',
+        searchPlaceholder: 'ابحث بالعنوان…',
+        clearSearch: 'مسح البحث',
+        noResultsTitle: 'لا توجد نتائج مطابقة',
+        noResultsBody: (keyword)=>'لا يوجد في مكتبتك ما يطابق "'.concat(keyword, '".'),
         loadMore: 'تحميل المزيد',
-        attach: 'إرفاق',
+        done: 'تم',
         selectedCount: (count)=>"".concat(count, " من ").concat(MAX_LIBRARY_ATTACHMENTS, " محدد"),
         limitReached: "يمكنك إرفاق حتى ".concat(MAX_LIBRARY_ATTACHMENTS, " عناصر. ألغِ تحديد أحدها لاختيار غيره."),
         error: 'تعذر تحميل مكتبتك.',
@@ -1883,22 +1933,36 @@ const copyByLocale = {
     }
 };
 function KnowledgeLibraryDrawer(param) {
-    let { locale, opened, selected, onClose, onConfirm, onPublishNew } = param;
+    let { locale, opened, isCompany, selected, onClose, onSelectionChange, onPublishNew } = param;
     _s();
     const isArabic = locale === 'ar';
     const copy = copyByLocale[isArabic ? 'ar' : 'en'];
     const [items, setItems] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])([]);
     const [page, setPage] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])(1);
     const [lastPage, setLastPage] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])(1);
-    const [isLoading, setIsLoading] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])(false);
+    const [isRefreshing, setIsRefreshing] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])(false);
+    const [isLoadingMore, setIsLoadingMore] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])(false);
     const [loadError, setLoadError] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])(false);
-    const [pendingSelection, setPendingSelection] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])(new Map());
+    const [hasLoaded, setHasLoaded] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])(false);
+    // Tracks whether the *unfiltered* library is empty, so a search that returns
+    // nothing shows "no matches" instead of the "start your library" CTA.
+    const [isLibraryEmpty, setIsLibraryEmpty] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])(false);
+    const [query, setQuery] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])('');
+    const [searchKeyword, setSearchKeyword] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])('');
+    // Only the newest request may write to state; typing fast can resolve pages
+    // out of order otherwise.
+    const requestIdRef = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useRef"])(0);
+    const isLoading = isRefreshing || isLoadingMore;
     const loadPage = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useCallback"])({
-        "KnowledgeLibraryDrawer.useCallback[loadPage]": async (pageToLoad, append)=>{
-            setIsLoading(true);
+        "KnowledgeLibraryDrawer.useCallback[loadPage]": async (pageToLoad, append, keyword)=>{
+            const requestId = requestIdRef.current + 1;
+            requestIdRef.current = requestId;
+            if (append) setIsLoadingMore(true);
+            else setIsRefreshing(true);
             setLoadError(false);
             try {
-                const result = await (0, __TURBOPACK__imported__module__$5b$project$5d2f$services$2f$feed$2e$service$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["fetchPublishedLibraryKnowledge"])(pageToLoad, locale);
+                const result = await (0, __TURBOPACK__imported__module__$5b$project$5d2f$services$2f$feed$2e$service$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["fetchPublishedLibraryKnowledge"])(pageToLoad, locale, isCompany, keyword);
+                if (requestIdRef.current !== requestId) return;
                 setItems({
                     "KnowledgeLibraryDrawer.useCallback[loadPage]": (previous)=>append ? [
                             ...previous,
@@ -1907,47 +1971,75 @@ function KnowledgeLibraryDrawer(param) {
                 }["KnowledgeLibraryDrawer.useCallback[loadPage]"]);
                 setPage(result.meta.current_page);
                 setLastPage(result.meta.last_page);
+                if (!append && !keyword) setIsLibraryEmpty(result.data.length === 0);
+                if (!append) setHasLoaded(true);
             } catch (e) {
+                if (requestIdRef.current !== requestId) return;
                 setLoadError(true);
             } finally{
-                setIsLoading(false);
+                if (requestIdRef.current === requestId) {
+                    setIsRefreshing(false);
+                    setIsLoadingMore(false);
+                }
             }
         }
     }["KnowledgeLibraryDrawer.useCallback[loadPage]"], [
+        isCompany,
         locale
     ]);
-    // Reset to the parent's confirmed selection each time the drawer opens
+    // Debounce typing into the keyword the API is actually asked for.
+    (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useEffect"])({
+        "KnowledgeLibraryDrawer.useEffect": ()=>{
+            const timeoutId = window.setTimeout({
+                "KnowledgeLibraryDrawer.useEffect.timeoutId": ()=>setSearchKeyword(query.trim())
+            }["KnowledgeLibraryDrawer.useEffect.timeoutId"], SEARCH_DEBOUNCE_MS);
+            return ({
+                "KnowledgeLibraryDrawer.useEffect": ()=>window.clearTimeout(timeoutId)
+            })["KnowledgeLibraryDrawer.useEffect"];
+        }
+    }["KnowledgeLibraryDrawer.useEffect"], [
+        query
+    ]);
+    // Refresh the appropriate library each time the drawer opens, and start over
+    // from page one whenever the search keyword changes. Selection is controlled
+    // by the parent so every checkbox change is attached immediately.
     (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useEffect"])({
         "KnowledgeLibraryDrawer.useEffect": ()=>{
             if (!opened) return;
-            setPendingSelection(new Map(selected.map({
-                "KnowledgeLibraryDrawer.useEffect": (item)=>[
-                        item.id,
-                        item
-                    ]
-            }["KnowledgeLibraryDrawer.useEffect"])));
-            loadPage(1, false);
+            loadPage(1, false, searchKeyword);
         }
     }["KnowledgeLibraryDrawer.useEffect"], [
         opened,
-        selected,
+        searchKeyword,
         loadPage
     ]);
+    // Closing resets the search so the next open starts from the full library.
+    (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useEffect"])({
+        "KnowledgeLibraryDrawer.useEffect": ()=>{
+            if (opened) return;
+            setQuery('');
+            setSearchKeyword('');
+            setHasLoaded(false);
+        }
+    }["KnowledgeLibraryDrawer.useEffect"], [
+        opened
+    ]);
     const toggleItem = (item)=>{
-        setPendingSelection((previous)=>{
-            // Deselecting is always allowed; adding is capped at the max.
-            if (!previous.has(item.id) && previous.size >= MAX_LIBRARY_ATTACHMENTS) {
-                return previous;
-            }
-            const next = new Map(previous);
-            if (next.has(item.id)) {
-                next.delete(item.id);
-            } else {
-                next.set(item.id, item);
-            }
-            return next;
-        });
+        const next = new Map(selected.map((selectedItem)=>[
+                selectedItem.id,
+                selectedItem
+            ]));
+        // Deselecting is always allowed; adding is capped at the max.
+        if (!next.has(item.id) && next.size >= MAX_LIBRARY_ATTACHMENTS) return;
+        if (next.has(item.id)) next.delete(item.id);
+        else next.set(item.id, item);
+        onSelectionChange(Array.from(next.values()));
     };
+    const showEmptyLibrary = hasLoaded && !loadError && isLibraryEmpty && !searchKeyword;
+    const showNoResults = hasLoaded && !loadError && !isRefreshing && items.length === 0 && searchKeyword !== '';
+    // Hide the search field (and the footer) only when there is no library to
+    // search through at all.
+    const showSearch = hasLoaded && !loadError && !showEmptyLibrary;
     return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mantine$2f$core$2f$esm$2f$components$2f$Drawer$2f$Drawer$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__["Drawer"], {
         opened: opened,
         onClose: onClose,
@@ -1974,7 +2066,7 @@ function KnowledgeLibraryDrawer(param) {
                     children: copy.title
                 }, void 0, false, {
                     fileName: "[project]/components/feed/post/KnowledgeLibraryDrawer.tsx",
-                    lineNumber: 143,
+                    lineNumber: 201,
                     columnNumber: 11
                 }, void 0),
                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -1982,18 +2074,86 @@ function KnowledgeLibraryDrawer(param) {
                     children: copy.subtitle
                 }, void 0, false, {
                     fileName: "[project]/components/feed/post/KnowledgeLibraryDrawer.tsx",
-                    lineNumber: 144,
+                    lineNumber: 202,
                     columnNumber: 11
                 }, void 0)
             ]
         }, void 0, true, {
             fileName: "[project]/components/feed/post/KnowledgeLibraryDrawer.tsx",
-            lineNumber: 142,
+            lineNumber: 200,
             columnNumber: 9
         }, void 0),
         children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
             className: "flex h-[calc(100vh-120px)] flex-col",
             children: [
+                showSearch && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                    className: "pb-3",
+                    children: [
+                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("label", {
+                            className: "sr-only",
+                            htmlFor: "knowledge-library-search",
+                            children: copy.searchLabel
+                        }, void 0, false, {
+                            fileName: "[project]/components/feed/post/KnowledgeLibraryDrawer.tsx",
+                            lineNumber: 211,
+                            columnNumber: 13
+                        }, this),
+                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                            className: "relative",
+                            children: [
+                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("input", {
+                                    id: "knowledge-library-search",
+                                    type: "search",
+                                    value: query,
+                                    onChange: (event)=>setQuery(event.target.value),
+                                    placeholder: copy.searchPlaceholder,
+                                    dir: isArabic ? 'rtl' : 'ltr',
+                                    className: "h-10 w-full rounded-lg border border-[#D7E1EE] bg-white px-3 text-[13.5px] text-[#1E293B] outline-none transition-colors placeholder:text-[#94A3B8] focus:border-[#2378E8] focus:ring-2 focus:ring-[#2378E8]/15 ".concat(isArabic ? 'pl-16' : 'pr-16')
+                                }, void 0, false, {
+                                    fileName: "[project]/components/feed/post/KnowledgeLibraryDrawer.tsx",
+                                    lineNumber: 215,
+                                    columnNumber: 15
+                                }, this),
+                                query.length > 0 && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
+                                    type: "button",
+                                    onClick: ()=>setQuery(''),
+                                    "aria-label": copy.clearSearch,
+                                    className: "absolute top-1/2 flex h-7 w-7 -translate-y-1/2 items-center justify-center rounded-md text-[#94A3B8] transition-colors hover:bg-[#F1F5F9] hover:text-[#475569] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2378E8] ".concat(isArabic ? 'left-9' : 'right-9'),
+                                    children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$tabler$2f$icons$2d$react$2f$dist$2f$esm$2f$icons$2f$IconX$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__IconX$3e$__["IconX"], {
+                                        "aria-hidden": true,
+                                        className: "h-4 w-4",
+                                        stroke: 2
+                                    }, void 0, false, {
+                                        fileName: "[project]/components/feed/post/KnowledgeLibraryDrawer.tsx",
+                                        lineNumber: 235,
+                                        columnNumber: 19
+                                    }, this)
+                                }, void 0, false, {
+                                    fileName: "[project]/components/feed/post/KnowledgeLibraryDrawer.tsx",
+                                    lineNumber: 227,
+                                    columnNumber: 17
+                                }, this),
+                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$tabler$2f$icons$2d$react$2f$dist$2f$esm$2f$icons$2f$IconSearch$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__IconSearch$3e$__["IconSearch"], {
+                                    "aria-hidden": true,
+                                    className: "pointer-events-none absolute top-1/2 h-[18px] w-[18px] -translate-y-1/2 text-[#64748B] ".concat(isArabic ? 'left-3' : 'right-3'),
+                                    stroke: 2
+                                }, void 0, false, {
+                                    fileName: "[project]/components/feed/post/KnowledgeLibraryDrawer.tsx",
+                                    lineNumber: 238,
+                                    columnNumber: 15
+                                }, this)
+                            ]
+                        }, void 0, true, {
+                            fileName: "[project]/components/feed/post/KnowledgeLibraryDrawer.tsx",
+                            lineNumber: 214,
+                            columnNumber: 13
+                        }, this)
+                    ]
+                }, void 0, true, {
+                    fileName: "[project]/components/feed/post/KnowledgeLibraryDrawer.tsx",
+                    lineNumber: 210,
+                    columnNumber: 11
+                }, this),
                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                     className: "flex-1 overscroll-contain overflow-y-auto pe-1",
                     "aria-busy": isLoading,
@@ -2003,9 +2163,9 @@ function KnowledgeLibraryDrawer(param) {
                             children: copy.error
                         }, void 0, false, {
                             fileName: "[project]/components/feed/post/KnowledgeLibraryDrawer.tsx",
-                            lineNumber: 156,
+                            lineNumber: 254,
                             columnNumber: 13
-                        }, this) : items.length === 0 && !isLoading ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                        }, this) : showEmptyLibrary ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                             className: "flex flex-col items-center px-6 py-12 text-center",
                             children: [
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(LibraryEmptyIllustration, {
@@ -2013,7 +2173,7 @@ function KnowledgeLibraryDrawer(param) {
                                     "aria-hidden": true
                                 }, void 0, false, {
                                     fileName: "[project]/components/feed/post/KnowledgeLibraryDrawer.tsx",
-                                    lineNumber: 159,
+                                    lineNumber: 257,
                                     columnNumber: 15
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("h3", {
@@ -2021,7 +2181,7 @@ function KnowledgeLibraryDrawer(param) {
                                     children: copy.emptyTitle
                                 }, void 0, false, {
                                     fileName: "[project]/components/feed/post/KnowledgeLibraryDrawer.tsx",
-                                    lineNumber: 160,
+                                    lineNumber: 258,
                                     columnNumber: 15
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -2029,7 +2189,7 @@ function KnowledgeLibraryDrawer(param) {
                                     children: copy.emptyBody
                                 }, void 0, false, {
                                     fileName: "[project]/components/feed/post/KnowledgeLibraryDrawer.tsx",
-                                    lineNumber: 163,
+                                    lineNumber: 261,
                                     columnNumber: 15
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
@@ -2039,24 +2199,57 @@ function KnowledgeLibraryDrawer(param) {
                                     children: copy.emptyCta
                                 }, void 0, false, {
                                     fileName: "[project]/components/feed/post/KnowledgeLibraryDrawer.tsx",
-                                    lineNumber: 166,
+                                    lineNumber: 264,
                                     columnNumber: 15
                                 }, this)
                             ]
                         }, void 0, true, {
                             fileName: "[project]/components/feed/post/KnowledgeLibraryDrawer.tsx",
-                            lineNumber: 158,
+                            lineNumber: 256,
+                            columnNumber: 13
+                        }, this) : showNoResults ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                            className: "flex flex-col items-center px-6 py-12 text-center",
+                            children: [
+                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$tabler$2f$icons$2d$react$2f$dist$2f$esm$2f$icons$2f$IconSearch$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__IconSearch$3e$__["IconSearch"], {
+                                    "aria-hidden": true,
+                                    className: "h-8 w-8 text-[#B7C6DA]",
+                                    stroke: 1.6
+                                }, void 0, false, {
+                                    fileName: "[project]/components/feed/post/KnowledgeLibraryDrawer.tsx",
+                                    lineNumber: 274,
+                                    columnNumber: 15
+                                }, this),
+                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("h3", {
+                                    className: "mt-4 text-[14.5px] font-bold text-[#0B1220]",
+                                    children: copy.noResultsTitle
+                                }, void 0, false, {
+                                    fileName: "[project]/components/feed/post/KnowledgeLibraryDrawer.tsx",
+                                    lineNumber: 275,
+                                    columnNumber: 15
+                                }, this),
+                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
+                                    className: "mt-2 max-w-[19rem] text-[13px] leading-6 text-[#5A6B84]",
+                                    children: copy.noResultsBody(searchKeyword)
+                                }, void 0, false, {
+                                    fileName: "[project]/components/feed/post/KnowledgeLibraryDrawer.tsx",
+                                    lineNumber: 278,
+                                    columnNumber: 15
+                                }, this)
+                            ]
+                        }, void 0, true, {
+                            fileName: "[project]/components/feed/post/KnowledgeLibraryDrawer.tsx",
+                            lineNumber: 273,
                             columnNumber: 13
                         }, this) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("ul", {
-                            className: "space-y-3",
+                            className: "space-y-3 ".concat(isRefreshing ? 'opacity-50' : ''),
                             children: items.map((item)=>{
-                                const isChecked = pendingSelection.has(item.id);
-                                const isDisabled = !isChecked && pendingSelection.size >= MAX_LIBRARY_ATTACHMENTS;
+                                const isChecked = selected.some((selectedItem)=>selectedItem.id === item.id);
+                                const isDisabled = !isChecked && selected.length >= MAX_LIBRARY_ATTACHMENTS;
                                 return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("li", {
                                     children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("label", {
                                         className: "relative flex min-h-[116px] items-end overflow-hidden rounded-md border bg-[#061326] p-4 transition-colors focus-within:border-[#8FB9EA] ".concat(isChecked ? 'border-[#5EA5FF]' : 'border-[#18304F] hover:border-[#315C8E]', " ").concat(isDisabled ? 'cursor-not-allowed opacity-45' : 'cursor-pointer'),
                                         style: {
-                                            backgroundImage: 'url("https://foresighta.co/images/test2.png")',
+                                            backgroundImage: 'url("/images/test2.png")',
                                             backgroundPosition: 'center',
                                             backgroundRepeat: 'no-repeat',
                                             backgroundSize: 'cover'
@@ -2070,7 +2263,7 @@ function KnowledgeLibraryDrawer(param) {
                                                 className: "absolute end-3 top-3 h-5 w-5 shrink-0 accent-[#2378E8] disabled:cursor-not-allowed"
                                             }, void 0, false, {
                                                 fileName: "[project]/components/feed/post/KnowledgeLibraryDrawer.tsx",
-                                                lineNumber: 195,
+                                                lineNumber: 303,
                                                 columnNumber: 23
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -2081,7 +2274,7 @@ function KnowledgeLibraryDrawer(param) {
                                                         children: item.type
                                                     }, void 0, false, {
                                                         fileName: "[project]/components/feed/post/KnowledgeLibraryDrawer.tsx",
-                                                        lineNumber: 203,
+                                                        lineNumber: 311,
                                                         columnNumber: 25
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -2089,7 +2282,7 @@ function KnowledgeLibraryDrawer(param) {
                                                         children: item.title
                                                     }, void 0, false, {
                                                         fileName: "[project]/components/feed/post/KnowledgeLibraryDrawer.tsx",
-                                                        lineNumber: 206,
+                                                        lineNumber: 314,
                                                         columnNumber: 25
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -2097,30 +2290,30 @@ function KnowledgeLibraryDrawer(param) {
                                                         children: item.published_at ? item.published_at.slice(0, 10) : ''
                                                     }, void 0, false, {
                                                         fileName: "[project]/components/feed/post/KnowledgeLibraryDrawer.tsx",
-                                                        lineNumber: 209,
+                                                        lineNumber: 317,
                                                         columnNumber: 25
                                                     }, this)
                                                 ]
                                             }, void 0, true, {
                                                 fileName: "[project]/components/feed/post/KnowledgeLibraryDrawer.tsx",
-                                                lineNumber: 202,
+                                                lineNumber: 310,
                                                 columnNumber: 23
                                             }, this)
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/components/feed/post/KnowledgeLibraryDrawer.tsx",
-                                        lineNumber: 182,
+                                        lineNumber: 290,
                                         columnNumber: 21
                                     }, this)
                                 }, item.id, false, {
                                     fileName: "[project]/components/feed/post/KnowledgeLibraryDrawer.tsx",
-                                    lineNumber: 181,
+                                    lineNumber: 289,
                                     columnNumber: 19
                                 }, this);
                             })
                         }, void 0, false, {
                             fileName: "[project]/components/feed/post/KnowledgeLibraryDrawer.tsx",
-                            lineNumber: 175,
+                            lineNumber: 283,
                             columnNumber: 13
                         }, this),
                         isLoading && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -2129,72 +2322,72 @@ function KnowledgeLibraryDrawer(param) {
                             children: copy.loading
                         }, void 0, false, {
                             fileName: "[project]/components/feed/post/KnowledgeLibraryDrawer.tsx",
-                            lineNumber: 221,
+                            lineNumber: 329,
                             columnNumber: 13
                         }, this),
-                        !isLoading && !loadError && page < lastPage && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
+                        !isLoading && !loadError && items.length > 0 && page < lastPage && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
                             type: "button",
-                            onClick: ()=>loadPage(page + 1, true),
+                            onClick: ()=>loadPage(page + 1, true, searchKeyword),
                             className: "mt-3 min-h-10 w-full rounded border border-[#C9DCF6] py-2 text-[13px] font-medium text-[#1D74E0] transition-colors hover:bg-[#F3F6FB] focus-visible:border-[#8FB9EA] focus-visible:outline-none",
                             children: copy.loadMore
                         }, void 0, false, {
                             fileName: "[project]/components/feed/post/KnowledgeLibraryDrawer.tsx",
-                            lineNumber: 227,
+                            lineNumber: 335,
                             columnNumber: 13
                         }, this)
                     ]
                 }, void 0, true, {
                     fileName: "[project]/components/feed/post/KnowledgeLibraryDrawer.tsx",
-                    lineNumber: 151,
+                    lineNumber: 249,
                     columnNumber: 9
                 }, this),
-                items.length > 0 && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                showSearch && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                     className: "flex items-center justify-between border-t border-[#DCE4EF] bg-white pt-3",
                     children: [
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
                             className: "min-w-0 pe-3 text-[12.5px] text-[#5A6B84]",
-                            children: pendingSelection.size >= MAX_LIBRARY_ATTACHMENTS ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                            children: selected.length >= MAX_LIBRARY_ATTACHMENTS ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
                                 className: "font-medium text-[#B26A00]",
                                 children: copy.limitReached
                             }, void 0, false, {
                                 fileName: "[project]/components/feed/post/KnowledgeLibraryDrawer.tsx",
-                                lineNumber: 242,
+                                lineNumber: 350,
                                 columnNumber: 17
-                            }, this) : copy.selectedCount(pendingSelection.size)
+                            }, this) : copy.selectedCount(selected.length)
                         }, void 0, false, {
                             fileName: "[project]/components/feed/post/KnowledgeLibraryDrawer.tsx",
-                            lineNumber: 240,
+                            lineNumber: 348,
                             columnNumber: 13
                         }, this),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
                             type: "button",
-                            onClick: ()=>onConfirm(Array.from(pendingSelection.values())),
+                            onClick: onClose,
                             className: "min-h-10 rounded-md bg-[#1D74E0] px-5 py-2 text-[13.5px] font-medium text-white transition-colors hover:bg-[#155CB8] focus-visible:outline-[1px] focus-visible:outline-offset-1 focus-visible:outline-[#B7D2F4]",
-                            children: copy.attach
+                            children: copy.done
                         }, void 0, false, {
                             fileName: "[project]/components/feed/post/KnowledgeLibraryDrawer.tsx",
-                            lineNumber: 247,
+                            lineNumber: 355,
                             columnNumber: 13
                         }, this)
                     ]
                 }, void 0, true, {
                     fileName: "[project]/components/feed/post/KnowledgeLibraryDrawer.tsx",
-                    lineNumber: 239,
+                    lineNumber: 347,
                     columnNumber: 11
                 }, this)
             ]
         }, void 0, true, {
             fileName: "[project]/components/feed/post/KnowledgeLibraryDrawer.tsx",
-            lineNumber: 150,
+            lineNumber: 208,
             columnNumber: 7
         }, this)
     }, void 0, false, {
         fileName: "[project]/components/feed/post/KnowledgeLibraryDrawer.tsx",
-        lineNumber: 121,
+        lineNumber: 179,
         columnNumber: 5
     }, this);
 }
-_s(KnowledgeLibraryDrawer, "3ob6oyzEpkQvW0tygGdF2nVRT+U=");
+_s(KnowledgeLibraryDrawer, "+e6hnAiCSjxr4mhwdWoYV/87zpA=");
 _c = KnowledgeLibraryDrawer;
 // Stacked-documents illustration for the empty library state. Self-contained
 // SVG so it stays crisp at any size and follows the feed's blue palette.
@@ -2214,7 +2407,7 @@ function LibraryEmptyIllustration(param) {
                 fill: "#EAF2FD"
             }, void 0, false, {
                 fileName: "[project]/components/feed/post/KnowledgeLibraryDrawer.tsx",
-                lineNumber: 275,
+                lineNumber: 383,
                 columnNumber: 7
             }, this),
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("rect", {
@@ -2227,7 +2420,7 @@ function LibraryEmptyIllustration(param) {
                 transform: "rotate(-8 45 46)"
             }, void 0, false, {
                 fileName: "[project]/components/feed/post/KnowledgeLibraryDrawer.tsx",
-                lineNumber: 277,
+                lineNumber: 385,
                 columnNumber: 7
             }, this),
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("rect", {
@@ -2240,7 +2433,7 @@ function LibraryEmptyIllustration(param) {
                 stroke: "#B7D2F4"
             }, void 0, false, {
                 fileName: "[project]/components/feed/post/KnowledgeLibraryDrawer.tsx",
-                lineNumber: 287,
+                lineNumber: 395,
                 columnNumber: 7
             }, this),
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("rect", {
@@ -2252,7 +2445,7 @@ function LibraryEmptyIllustration(param) {
                 fill: "#DCE7F6"
             }, void 0, false, {
                 fileName: "[project]/components/feed/post/KnowledgeLibraryDrawer.tsx",
-                lineNumber: 288,
+                lineNumber: 396,
                 columnNumber: 7
             }, this),
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("rect", {
@@ -2264,7 +2457,7 @@ function LibraryEmptyIllustration(param) {
                 fill: "#DCE7F6"
             }, void 0, false, {
                 fileName: "[project]/components/feed/post/KnowledgeLibraryDrawer.tsx",
-                lineNumber: 289,
+                lineNumber: 397,
                 columnNumber: 7
             }, this),
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("rect", {
@@ -2276,7 +2469,7 @@ function LibraryEmptyIllustration(param) {
                 fill: "#DCE7F6"
             }, void 0, false, {
                 fileName: "[project]/components/feed/post/KnowledgeLibraryDrawer.tsx",
-                lineNumber: 290,
+                lineNumber: 398,
                 columnNumber: 7
             }, this),
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("circle", {
@@ -2286,7 +2479,7 @@ function LibraryEmptyIllustration(param) {
                 fill: "#1D74E0"
             }, void 0, false, {
                 fileName: "[project]/components/feed/post/KnowledgeLibraryDrawer.tsx",
-                lineNumber: 292,
+                lineNumber: 400,
                 columnNumber: 7
             }, this),
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("path", {
@@ -2296,13 +2489,13 @@ function LibraryEmptyIllustration(param) {
                 strokeLinecap: "round"
             }, void 0, false, {
                 fileName: "[project]/components/feed/post/KnowledgeLibraryDrawer.tsx",
-                lineNumber: 293,
+                lineNumber: 401,
                 columnNumber: 7
             }, this)
         ]
     }, void 0, true, {
         fileName: "[project]/components/feed/post/KnowledgeLibraryDrawer.tsx",
-        lineNumber: 268,
+        lineNumber: 376,
         columnNumber: 5
     }, this);
 }
@@ -2339,6 +2532,7 @@ var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$tiptap$2f$
 var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$tabler$2f$icons$2d$react$2f$dist$2f$esm$2f$icons$2f$IconArticle$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__IconArticle$3e$__ = __turbopack_context__.i("[project]/node_modules/@tabler/icons-react/dist/esm/icons/IconArticle.mjs [app-client] (ecmascript) <export default as IconArticle>");
 var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$tabler$2f$icons$2d$react$2f$dist$2f$esm$2f$icons$2f$IconChevronDown$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__IconChevronDown$3e$__ = __turbopack_context__.i("[project]/node_modules/@tabler/icons-react/dist/esm/icons/IconChevronDown.mjs [app-client] (ecmascript) <export default as IconChevronDown>");
 var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$tabler$2f$icons$2d$react$2f$dist$2f$esm$2f$icons$2f$IconFileDescription$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__IconFileDescription$3e$__ = __turbopack_context__.i("[project]/node_modules/@tabler/icons-react/dist/esm/icons/IconFileDescription.mjs [app-client] (ecmascript) <export default as IconFileDescription>");
+var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$tabler$2f$icons$2d$react$2f$dist$2f$esm$2f$icons$2f$IconLink$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__IconLink$3e$__ = __turbopack_context__.i("[project]/node_modules/@tabler/icons-react/dist/esm/icons/IconLink.mjs [app-client] (ecmascript) <export default as IconLink>");
 var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$tabler$2f$icons$2d$react$2f$dist$2f$esm$2f$icons$2f$IconLoader2$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__IconLoader2$3e$__ = __turbopack_context__.i("[project]/node_modules/@tabler/icons-react/dist/esm/icons/IconLoader2.mjs [app-client] (ecmascript) <export default as IconLoader2>");
 var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$tabler$2f$icons$2d$react$2f$dist$2f$esm$2f$icons$2f$IconPhoto$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__IconPhoto$3e$__ = __turbopack_context__.i("[project]/node_modules/@tabler/icons-react/dist/esm/icons/IconPhoto.mjs [app-client] (ecmascript) <export default as IconPhoto>");
 var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$tabler$2f$icons$2d$react$2f$dist$2f$esm$2f$icons$2f$IconX$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__IconX$3e$__ = __turbopack_context__.i("[project]/node_modules/@tabler/icons-react/dist/esm/icons/IconX.mjs [app-client] (ecmascript) <export default as IconX>");
@@ -2403,8 +2597,7 @@ const copyByLocale = {
         addTagHint: 'Press Enter to create a new tag.',
         industryFirst: 'Select an industry first',
         related: 'Related insights',
-        relatedHint: 'Connect published work from your library.',
-        chooseInsights: 'Choose from library',
+        shareFromLibrary: 'Attach from Insighta library',
         titleRequired: 'Add a title before continuing.',
         bodyRequired: 'Write some White Paper content before continuing.',
         industryRequired: 'Select an industry before continuing.',
@@ -2455,8 +2648,7 @@ const copyByLocale = {
         addTagHint: 'اضغط Enter لإضافة وسم جديد.',
         industryFirst: 'اختر المجال أولاً',
         related: 'الرؤى المرتبطة',
-        relatedHint: 'اربط أعمالاً منشورة من مكتبتك.',
-        chooseInsights: 'اختر من المكتبة',
+        shareFromLibrary: 'مشاركة من المكتبة',
         titleRequired: 'أضف عنواناً قبل المتابعة.',
         bodyRequired: 'اكتب محتوى الورقة البيضاء قبل المتابعة.',
         industryRequired: 'اختر مجالاً قبل المتابعة.',
@@ -2518,6 +2710,7 @@ function ArticleEditor(param) {
     const router = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$navigation$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useRouter"])();
     const toast = (0, __TURBOPACK__imported__module__$5b$project$5d2f$components$2f$toast$2f$ToastContext$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useToast"])();
     const { user, roles, isAuthResolved } = (0, __TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$header$2f$hooks$2f$useUserProfile$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useUserProfile"])();
+    const usesCompanyLibrary = roles.includes('company');
     const coverInputRef = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useRef"])(null);
     const coverObjectUrlRef = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useRef"])(null);
     const [draftUuid, setDraftUuid] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])(null);
@@ -2543,7 +2736,9 @@ function ArticleEditor(param) {
             'company-insighter'
         ].includes(role));
     const companyName = (user === null || user === void 0 ? void 0 : (_user_company = user.company) === null || _user_company === void 0 ? void 0 : (_user_company_legal_name = _user_company.legal_name) === null || _user_company_legal_name === void 0 ? void 0 : _user_company_legal_name.trim()) || '';
-    const canChoosePublisher = !isEditingPublished && !!companyName && roles.some((role)=>role === 'company' || role === 'company-insighter');
+    const canChoosePublisher = !isEditingPublished && !!companyName && // Company-insighters always publish under their own name, so they skip the
+    // publisher step; only the company account itself gets the choice.
+    roles.some((role)=>role === 'company') && !roles.some((role)=>role === 'company-insighter');
     const editor = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$tiptap$2f$react$2f$dist$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$locals$3e$__["useEditor"])({
         immediatelyRender: false,
         extensions: [
@@ -2774,7 +2969,7 @@ function ArticleEditor(param) {
             void ({
                 "ArticleEditor.useEffect": async ()=>{
                     try {
-                        const item = await (0, __TURBOPACK__imported__module__$5b$project$5d2f$services$2f$feed$2e$service$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["fetchLibraryKnowledgeById"])(id, locale);
+                        const item = await (0, __TURBOPACK__imported__module__$5b$project$5d2f$services$2f$feed$2e$service$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["fetchLibraryKnowledgeById"])(id, locale, 5, usesCompanyLibrary);
                         if (cancelled) return;
                         if (item) {
                             setRelatedInsights({
@@ -2804,6 +2999,7 @@ function ArticleEditor(param) {
         isAuthResolved,
         canPublish,
         locale,
+        usesCompanyLibrary,
         copy,
         toast,
         router
@@ -2848,12 +3044,12 @@ function ArticleEditor(param) {
                 className: "h-7 w-7 animate-spin text-[#2378E8]"
             }, void 0, false, {
                 fileName: "[project]/components/feed/article/ArticleEditor.tsx",
-                lineNumber: 442,
+                lineNumber: 445,
                 columnNumber: 9
             }, this)
         }, void 0, false, {
             fileName: "[project]/components/feed/article/ArticleEditor.tsx",
-            lineNumber: 441,
+            lineNumber: 444,
             columnNumber: 7
         }, this);
     }
@@ -2869,7 +3065,7 @@ function ArticleEditor(param) {
                         stroke: 1.5
                     }, void 0, false, {
                         fileName: "[project]/components/feed/article/ArticleEditor.tsx",
-                        lineNumber: 451,
+                        lineNumber: 454,
                         columnNumber: 11
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("h1", {
@@ -2877,7 +3073,7 @@ function ArticleEditor(param) {
                         children: blockingDraft ? copy.existingPost : copy.accessTitle
                     }, void 0, false, {
                         fileName: "[project]/components/feed/article/ArticleEditor.tsx",
-                        lineNumber: 452,
+                        lineNumber: 455,
                         columnNumber: 11
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -2885,7 +3081,7 @@ function ArticleEditor(param) {
                         children: blockingDraft ? copy.continuePost : copy.accessBody
                     }, void 0, false, {
                         fileName: "[project]/components/feed/article/ArticleEditor.tsx",
-                        lineNumber: 455,
+                        lineNumber: 458,
                         columnNumber: 11
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
@@ -2895,18 +3091,18 @@ function ArticleEditor(param) {
                         children: copy.returnToFeed
                     }, void 0, false, {
                         fileName: "[project]/components/feed/article/ArticleEditor.tsx",
-                        lineNumber: 458,
+                        lineNumber: 461,
                         columnNumber: 11
                     }, this)
                 ]
             }, void 0, true, {
                 fileName: "[project]/components/feed/article/ArticleEditor.tsx",
-                lineNumber: 450,
+                lineNumber: 453,
                 columnNumber: 9
             }, this)
         }, void 0, false, {
             fileName: "[project]/components/feed/article/ArticleEditor.tsx",
-            lineNumber: 449,
+            lineNumber: 452,
             columnNumber: 7
         }, this);
     }
@@ -2933,19 +3129,19 @@ function ArticleEditor(param) {
                                         className: "h-full w-full object-cover"
                                     }, void 0, false, {
                                         fileName: "[project]/components/feed/article/ArticleEditor.tsx",
-                                        lineNumber: 474,
+                                        lineNumber: 477,
                                         columnNumber: 42
                                     }, this) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
                                         className: "flex h-full items-center justify-center text-xs font-medium text-[#2378E8]",
                                         children: initials
                                     }, void 0, false, {
                                         fileName: "[project]/components/feed/article/ArticleEditor.tsx",
-                                        lineNumber: 474,
+                                        lineNumber: 477,
                                         columnNumber: 127
                                     }, this)
                                 }, void 0, false, {
                                     fileName: "[project]/components/feed/article/ArticleEditor.tsx",
-                                    lineNumber: 473,
+                                    lineNumber: 476,
                                     columnNumber: 13
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -2956,7 +3152,7 @@ function ArticleEditor(param) {
                                             children: user === null || user === void 0 ? void 0 : user.name
                                         }, void 0, false, {
                                             fileName: "[project]/components/feed/article/ArticleEditor.tsx",
-                                            lineNumber: 477,
+                                            lineNumber: 480,
                                             columnNumber: 15
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -2964,19 +3160,19 @@ function ArticleEditor(param) {
                                             children: copy.individualArticle
                                         }, void 0, false, {
                                             fileName: "[project]/components/feed/article/ArticleEditor.tsx",
-                                            lineNumber: 478,
+                                            lineNumber: 481,
                                             columnNumber: 15
                                         }, this)
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/components/feed/article/ArticleEditor.tsx",
-                                    lineNumber: 476,
+                                    lineNumber: 479,
                                     columnNumber: 13
                                 }, this)
                             ]
                         }, void 0, true, {
                             fileName: "[project]/components/feed/article/ArticleEditor.tsx",
-                            lineNumber: 472,
+                            lineNumber: 475,
                             columnNumber: 11
                         }, this),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
@@ -2989,25 +3185,25 @@ function ArticleEditor(param) {
                                     className: "me-2 h-4 w-4 animate-spin"
                                 }, void 0, false, {
                                     fileName: "[project]/components/feed/article/ArticleEditor.tsx",
-                                    lineNumber: 485,
+                                    lineNumber: 488,
                                     columnNumber: 30
                                 }, this),
                                 isPublishing ? isEditingPublished ? copy.savingChanges : copy.publishing : isEditingPublished ? copy.saveChanges : copy.publish
                             ]
                         }, void 0, true, {
                             fileName: "[project]/components/feed/article/ArticleEditor.tsx",
-                            lineNumber: 484,
+                            lineNumber: 487,
                             columnNumber: 11
                         }, this)
                     ]
                 }, void 0, true, {
                     fileName: "[project]/components/feed/article/ArticleEditor.tsx",
-                    lineNumber: 471,
+                    lineNumber: 474,
                     columnNumber: 9
                 }, this)
             }, void 0, false, {
                 fileName: "[project]/components/feed/article/ArticleEditor.tsx",
-                lineNumber: 470,
+                lineNumber: 473,
                 columnNumber: 7
             }, this),
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("main", {
@@ -3028,7 +3224,7 @@ function ArticleEditor(param) {
                                 }
                             }, void 0, false, {
                                 fileName: "[project]/components/feed/article/ArticleEditor.tsx",
-                                lineNumber: 495,
+                                lineNumber: 498,
                                 columnNumber: 13
                             }, this),
                             coverPreview ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -3040,7 +3236,7 @@ function ArticleEditor(param) {
                                         className: "h-full w-full object-cover"
                                     }, void 0, false, {
                                         fileName: "[project]/components/feed/article/ArticleEditor.tsx",
-                                        lineNumber: 498,
+                                        lineNumber: 501,
                                         columnNumber: 17
                                     }, this),
                                     isEditingPublished ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -3048,7 +3244,7 @@ function ArticleEditor(param) {
                                         children: copy.coverLocked
                                     }, void 0, false, {
                                         fileName: "[project]/components/feed/article/ArticleEditor.tsx",
-                                        lineNumber: 500,
+                                        lineNumber: 503,
                                         columnNumber: 19
                                     }, this) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                                         className: "absolute inset-x-0 bottom-0 flex justify-end gap-2 bg-gradient-to-t from-black/65 to-transparent p-4 pt-16 opacity-100 sm:opacity-0 sm:transition-opacity sm:group-hover:opacity-100",
@@ -3063,7 +3259,7 @@ function ArticleEditor(param) {
                                                 children: copy.replaceCover
                                             }, void 0, false, {
                                                 fileName: "[project]/components/feed/article/ArticleEditor.tsx",
-                                                lineNumber: 505,
+                                                lineNumber: 508,
                                                 columnNumber: 21
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
@@ -3077,19 +3273,19 @@ function ArticleEditor(param) {
                                                 children: copy.removeCover
                                             }, void 0, false, {
                                                 fileName: "[project]/components/feed/article/ArticleEditor.tsx",
-                                                lineNumber: 506,
+                                                lineNumber: 509,
                                                 columnNumber: 21
                                             }, this)
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/components/feed/article/ArticleEditor.tsx",
-                                        lineNumber: 504,
+                                        lineNumber: 507,
                                         columnNumber: 19
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/components/feed/article/ArticleEditor.tsx",
-                                lineNumber: 497,
+                                lineNumber: 500,
                                 columnNumber: 15
                             }, this) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
                                 type: "button",
@@ -3106,12 +3302,12 @@ function ArticleEditor(param) {
                                             className: "h-5 w-5"
                                         }, void 0, false, {
                                             fileName: "[project]/components/feed/article/ArticleEditor.tsx",
-                                            lineNumber: 512,
+                                            lineNumber: 515,
                                             columnNumber: 125
                                         }, this)
                                     }, void 0, false, {
                                         fileName: "[project]/components/feed/article/ArticleEditor.tsx",
-                                        lineNumber: 512,
+                                        lineNumber: 515,
                                         columnNumber: 17
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -3119,7 +3315,7 @@ function ArticleEditor(param) {
                                         children: isEditingPublished ? copy.coverLocked : copy.cover
                                     }, void 0, false, {
                                         fileName: "[project]/components/feed/article/ArticleEditor.tsx",
-                                        lineNumber: 513,
+                                        lineNumber: 516,
                                         columnNumber: 17
                                     }, this),
                                     !isEditingPublished && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -3127,13 +3323,13 @@ function ArticleEditor(param) {
                                         children: copy.coverHint
                                     }, void 0, false, {
                                         fileName: "[project]/components/feed/article/ArticleEditor.tsx",
-                                        lineNumber: 514,
+                                        lineNumber: 517,
                                         columnNumber: 41
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/components/feed/article/ArticleEditor.tsx",
-                                lineNumber: 511,
+                                lineNumber: 514,
                                 columnNumber: 15
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -3145,7 +3341,7 @@ function ArticleEditor(param) {
                                         children: copy.title
                                     }, void 0, false, {
                                         fileName: "[project]/components/feed/article/ArticleEditor.tsx",
-                                        lineNumber: 519,
+                                        lineNumber: 522,
                                         columnNumber: 15
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("textarea", {
@@ -3158,7 +3354,7 @@ function ArticleEditor(param) {
                                         className: "mt-10 w-full resize-none overflow-hidden border-0 bg-transparent text-2xl font-medium leading-tight tracking-[-0.015em] text-[#101827] outline-none placeholder:font-normal placeholder:text-[#A5B0BF] sm:text-[32px]"
                                     }, void 0, false, {
                                         fileName: "[project]/components/feed/article/ArticleEditor.tsx",
-                                        lineNumber: 520,
+                                        lineNumber: 523,
                                         columnNumber: 15
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -3173,102 +3369,23 @@ function ArticleEditor(param) {
                                                             children: [
                                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mantine$2f$tiptap$2f$esm$2f$RichTextEditor$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__["RichTextEditor"].Bold, {}, void 0, false, {
                                                                     fileName: "[project]/components/feed/article/ArticleEditor.tsx",
-                                                                    lineNumber: 524,
+                                                                    lineNumber: 527,
                                                                     columnNumber: 51
                                                                 }, this),
                                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mantine$2f$tiptap$2f$esm$2f$RichTextEditor$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__["RichTextEditor"].Italic, {}, void 0, false, {
                                                                     fileName: "[project]/components/feed/article/ArticleEditor.tsx",
-                                                                    lineNumber: 524,
+                                                                    lineNumber: 527,
                                                                     columnNumber: 74
                                                                 }, this),
                                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mantine$2f$tiptap$2f$esm$2f$RichTextEditor$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__["RichTextEditor"].Underline, {}, void 0, false, {
                                                                     fileName: "[project]/components/feed/article/ArticleEditor.tsx",
-                                                                    lineNumber: 524,
+                                                                    lineNumber: 527,
                                                                     columnNumber: 99
                                                                 }, this),
                                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mantine$2f$tiptap$2f$esm$2f$RichTextEditor$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__["RichTextEditor"].Strikethrough, {}, void 0, false, {
                                                                     fileName: "[project]/components/feed/article/ArticleEditor.tsx",
-                                                                    lineNumber: 524,
+                                                                    lineNumber: 527,
                                                                     columnNumber: 127
-                                                                }, this)
-                                                            ]
-                                                        }, void 0, true, {
-                                                            fileName: "[project]/components/feed/article/ArticleEditor.tsx",
-                                                            lineNumber: 524,
-                                                            columnNumber: 21
-                                                        }, this),
-                                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mantine$2f$tiptap$2f$esm$2f$RichTextEditor$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__["RichTextEditor"].ControlsGroup, {
-                                                            children: [
-                                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mantine$2f$tiptap$2f$esm$2f$RichTextEditor$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__["RichTextEditor"].H1, {}, void 0, false, {
-                                                                    fileName: "[project]/components/feed/article/ArticleEditor.tsx",
-                                                                    lineNumber: 525,
-                                                                    columnNumber: 51
-                                                                }, this),
-                                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mantine$2f$tiptap$2f$esm$2f$RichTextEditor$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__["RichTextEditor"].H2, {}, void 0, false, {
-                                                                    fileName: "[project]/components/feed/article/ArticleEditor.tsx",
-                                                                    lineNumber: 525,
-                                                                    columnNumber: 72
-                                                                }, this),
-                                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mantine$2f$tiptap$2f$esm$2f$RichTextEditor$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__["RichTextEditor"].H3, {}, void 0, false, {
-                                                                    fileName: "[project]/components/feed/article/ArticleEditor.tsx",
-                                                                    lineNumber: 525,
-                                                                    columnNumber: 93
-                                                                }, this)
-                                                            ]
-                                                        }, void 0, true, {
-                                                            fileName: "[project]/components/feed/article/ArticleEditor.tsx",
-                                                            lineNumber: 525,
-                                                            columnNumber: 21
-                                                        }, this),
-                                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mantine$2f$tiptap$2f$esm$2f$RichTextEditor$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__["RichTextEditor"].ControlsGroup, {
-                                                            children: [
-                                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mantine$2f$tiptap$2f$esm$2f$RichTextEditor$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__["RichTextEditor"].BulletList, {}, void 0, false, {
-                                                                    fileName: "[project]/components/feed/article/ArticleEditor.tsx",
-                                                                    lineNumber: 526,
-                                                                    columnNumber: 51
-                                                                }, this),
-                                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mantine$2f$tiptap$2f$esm$2f$RichTextEditor$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__["RichTextEditor"].OrderedList, {}, void 0, false, {
-                                                                    fileName: "[project]/components/feed/article/ArticleEditor.tsx",
-                                                                    lineNumber: 526,
-                                                                    columnNumber: 80
-                                                                }, this),
-                                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mantine$2f$tiptap$2f$esm$2f$RichTextEditor$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__["RichTextEditor"].Blockquote, {}, void 0, false, {
-                                                                    fileName: "[project]/components/feed/article/ArticleEditor.tsx",
-                                                                    lineNumber: 526,
-                                                                    columnNumber: 110
-                                                                }, this),
-                                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mantine$2f$tiptap$2f$esm$2f$RichTextEditor$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__["RichTextEditor"].Hr, {}, void 0, false, {
-                                                                    fileName: "[project]/components/feed/article/ArticleEditor.tsx",
-                                                                    lineNumber: 526,
-                                                                    columnNumber: 139
-                                                                }, this)
-                                                            ]
-                                                        }, void 0, true, {
-                                                            fileName: "[project]/components/feed/article/ArticleEditor.tsx",
-                                                            lineNumber: 526,
-                                                            columnNumber: 21
-                                                        }, this),
-                                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mantine$2f$tiptap$2f$esm$2f$RichTextEditor$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__["RichTextEditor"].ControlsGroup, {
-                                                            children: [
-                                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mantine$2f$tiptap$2f$esm$2f$RichTextEditor$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__["RichTextEditor"].Link, {}, void 0, false, {
-                                                                    fileName: "[project]/components/feed/article/ArticleEditor.tsx",
-                                                                    lineNumber: 527,
-                                                                    columnNumber: 51
-                                                                }, this),
-                                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mantine$2f$tiptap$2f$esm$2f$RichTextEditor$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__["RichTextEditor"].Unlink, {}, void 0, false, {
-                                                                    fileName: "[project]/components/feed/article/ArticleEditor.tsx",
-                                                                    lineNumber: 527,
-                                                                    columnNumber: 74
-                                                                }, this),
-                                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mantine$2f$tiptap$2f$esm$2f$RichTextEditor$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__["RichTextEditor"].Code, {}, void 0, false, {
-                                                                    fileName: "[project]/components/feed/article/ArticleEditor.tsx",
-                                                                    lineNumber: 527,
-                                                                    columnNumber: 99
-                                                                }, this),
-                                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mantine$2f$tiptap$2f$esm$2f$RichTextEditor$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__["RichTextEditor"].CodeBlock, {}, void 0, false, {
-                                                                    fileName: "[project]/components/feed/article/ArticleEditor.tsx",
-                                                                    lineNumber: 527,
-                                                                    columnNumber: 122
                                                                 }, this)
                                                             ]
                                                         }, void 0, true, {
@@ -3278,42 +3395,121 @@ function ArticleEditor(param) {
                                                         }, this),
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mantine$2f$tiptap$2f$esm$2f$RichTextEditor$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__["RichTextEditor"].ControlsGroup, {
                                                             children: [
-                                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mantine$2f$tiptap$2f$esm$2f$RichTextEditor$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__["RichTextEditor"].Undo, {}, void 0, false, {
+                                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mantine$2f$tiptap$2f$esm$2f$RichTextEditor$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__["RichTextEditor"].H1, {}, void 0, false, {
                                                                     fileName: "[project]/components/feed/article/ArticleEditor.tsx",
                                                                     lineNumber: 528,
                                                                     columnNumber: 51
                                                                 }, this),
-                                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mantine$2f$tiptap$2f$esm$2f$RichTextEditor$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__["RichTextEditor"].Redo, {}, void 0, false, {
+                                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mantine$2f$tiptap$2f$esm$2f$RichTextEditor$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__["RichTextEditor"].H2, {}, void 0, false, {
                                                                     fileName: "[project]/components/feed/article/ArticleEditor.tsx",
                                                                     lineNumber: 528,
-                                                                    columnNumber: 74
+                                                                    columnNumber: 72
+                                                                }, this),
+                                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mantine$2f$tiptap$2f$esm$2f$RichTextEditor$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__["RichTextEditor"].H3, {}, void 0, false, {
+                                                                    fileName: "[project]/components/feed/article/ArticleEditor.tsx",
+                                                                    lineNumber: 528,
+                                                                    columnNumber: 93
                                                                 }, this)
                                                             ]
                                                         }, void 0, true, {
                                                             fileName: "[project]/components/feed/article/ArticleEditor.tsx",
                                                             lineNumber: 528,
                                                             columnNumber: 21
+                                                        }, this),
+                                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mantine$2f$tiptap$2f$esm$2f$RichTextEditor$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__["RichTextEditor"].ControlsGroup, {
+                                                            children: [
+                                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mantine$2f$tiptap$2f$esm$2f$RichTextEditor$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__["RichTextEditor"].BulletList, {}, void 0, false, {
+                                                                    fileName: "[project]/components/feed/article/ArticleEditor.tsx",
+                                                                    lineNumber: 529,
+                                                                    columnNumber: 51
+                                                                }, this),
+                                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mantine$2f$tiptap$2f$esm$2f$RichTextEditor$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__["RichTextEditor"].OrderedList, {}, void 0, false, {
+                                                                    fileName: "[project]/components/feed/article/ArticleEditor.tsx",
+                                                                    lineNumber: 529,
+                                                                    columnNumber: 80
+                                                                }, this),
+                                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mantine$2f$tiptap$2f$esm$2f$RichTextEditor$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__["RichTextEditor"].Blockquote, {}, void 0, false, {
+                                                                    fileName: "[project]/components/feed/article/ArticleEditor.tsx",
+                                                                    lineNumber: 529,
+                                                                    columnNumber: 110
+                                                                }, this),
+                                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mantine$2f$tiptap$2f$esm$2f$RichTextEditor$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__["RichTextEditor"].Hr, {}, void 0, false, {
+                                                                    fileName: "[project]/components/feed/article/ArticleEditor.tsx",
+                                                                    lineNumber: 529,
+                                                                    columnNumber: 139
+                                                                }, this)
+                                                            ]
+                                                        }, void 0, true, {
+                                                            fileName: "[project]/components/feed/article/ArticleEditor.tsx",
+                                                            lineNumber: 529,
+                                                            columnNumber: 21
+                                                        }, this),
+                                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mantine$2f$tiptap$2f$esm$2f$RichTextEditor$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__["RichTextEditor"].ControlsGroup, {
+                                                            children: [
+                                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mantine$2f$tiptap$2f$esm$2f$RichTextEditor$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__["RichTextEditor"].Link, {}, void 0, false, {
+                                                                    fileName: "[project]/components/feed/article/ArticleEditor.tsx",
+                                                                    lineNumber: 530,
+                                                                    columnNumber: 51
+                                                                }, this),
+                                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mantine$2f$tiptap$2f$esm$2f$RichTextEditor$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__["RichTextEditor"].Unlink, {}, void 0, false, {
+                                                                    fileName: "[project]/components/feed/article/ArticleEditor.tsx",
+                                                                    lineNumber: 530,
+                                                                    columnNumber: 74
+                                                                }, this),
+                                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mantine$2f$tiptap$2f$esm$2f$RichTextEditor$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__["RichTextEditor"].Code, {}, void 0, false, {
+                                                                    fileName: "[project]/components/feed/article/ArticleEditor.tsx",
+                                                                    lineNumber: 530,
+                                                                    columnNumber: 99
+                                                                }, this),
+                                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mantine$2f$tiptap$2f$esm$2f$RichTextEditor$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__["RichTextEditor"].CodeBlock, {}, void 0, false, {
+                                                                    fileName: "[project]/components/feed/article/ArticleEditor.tsx",
+                                                                    lineNumber: 530,
+                                                                    columnNumber: 122
+                                                                }, this)
+                                                            ]
+                                                        }, void 0, true, {
+                                                            fileName: "[project]/components/feed/article/ArticleEditor.tsx",
+                                                            lineNumber: 530,
+                                                            columnNumber: 21
+                                                        }, this),
+                                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mantine$2f$tiptap$2f$esm$2f$RichTextEditor$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__["RichTextEditor"].ControlsGroup, {
+                                                            children: [
+                                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mantine$2f$tiptap$2f$esm$2f$RichTextEditor$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__["RichTextEditor"].Undo, {}, void 0, false, {
+                                                                    fileName: "[project]/components/feed/article/ArticleEditor.tsx",
+                                                                    lineNumber: 531,
+                                                                    columnNumber: 51
+                                                                }, this),
+                                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mantine$2f$tiptap$2f$esm$2f$RichTextEditor$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__["RichTextEditor"].Redo, {}, void 0, false, {
+                                                                    fileName: "[project]/components/feed/article/ArticleEditor.tsx",
+                                                                    lineNumber: 531,
+                                                                    columnNumber: 74
+                                                                }, this)
+                                                            ]
+                                                        }, void 0, true, {
+                                                            fileName: "[project]/components/feed/article/ArticleEditor.tsx",
+                                                            lineNumber: 531,
+                                                            columnNumber: 21
                                                         }, this)
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/components/feed/article/ArticleEditor.tsx",
-                                                    lineNumber: 523,
+                                                    lineNumber: 526,
                                                     columnNumber: 19
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mantine$2f$tiptap$2f$esm$2f$RichTextEditor$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__["RichTextEditor"].Content, {}, void 0, false, {
                                                     fileName: "[project]/components/feed/article/ArticleEditor.tsx",
-                                                    lineNumber: 530,
+                                                    lineNumber: 533,
                                                     columnNumber: 19
                                                 }, this)
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/components/feed/article/ArticleEditor.tsx",
-                                            lineNumber: 522,
+                                            lineNumber: 525,
                                             columnNumber: 17
                                         }, this)
                                     }, void 0, false, {
                                         fileName: "[project]/components/feed/article/ArticleEditor.tsx",
-                                        lineNumber: 521,
+                                        lineNumber: 524,
                                         columnNumber: 15
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -3325,19 +3521,19 @@ function ArticleEditor(param) {
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/components/feed/article/ArticleEditor.tsx",
-                                        lineNumber: 533,
+                                        lineNumber: 536,
                                         columnNumber: 15
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/components/feed/article/ArticleEditor.tsx",
-                                lineNumber: 518,
+                                lineNumber: 521,
                                 columnNumber: 13
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "[project]/components/feed/article/ArticleEditor.tsx",
-                        lineNumber: 494,
+                        lineNumber: 497,
                         columnNumber: 11
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("aside", {
@@ -3350,7 +3546,7 @@ function ArticleEditor(param) {
                                     children: copy.settings
                                 }, void 0, false, {
                                     fileName: "[project]/components/feed/article/ArticleEditor.tsx",
-                                    lineNumber: 539,
+                                    lineNumber: 542,
                                     columnNumber: 15
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -3358,7 +3554,7 @@ function ArticleEditor(param) {
                                     children: copy.settingsHint
                                 }, void 0, false, {
                                     fileName: "[project]/components/feed/article/ArticleEditor.tsx",
-                                    lineNumber: 540,
+                                    lineNumber: 543,
                                     columnNumber: 15
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -3369,7 +3565,7 @@ function ArticleEditor(param) {
                                             children: copy.industry
                                         }, void 0, false, {
                                             fileName: "[project]/components/feed/article/ArticleEditor.tsx",
-                                            lineNumber: 543,
+                                            lineNumber: 546,
                                             columnNumber: 17
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
@@ -3382,26 +3578,26 @@ function ArticleEditor(param) {
                                                     children: (_industry_name = industry === null || industry === void 0 ? void 0 : industry.name) !== null && _industry_name !== void 0 ? _industry_name : copy.selectIndustry
                                                 }, void 0, false, {
                                                     fileName: "[project]/components/feed/article/ArticleEditor.tsx",
-                                                    lineNumber: 545,
+                                                    lineNumber: 548,
                                                     columnNumber: 19
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$tabler$2f$icons$2d$react$2f$dist$2f$esm$2f$icons$2f$IconChevronDown$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__IconChevronDown$3e$__["IconChevronDown"], {
                                                     className: "h-4 w-4 text-[#8291A5]"
                                                 }, void 0, false, {
                                                     fileName: "[project]/components/feed/article/ArticleEditor.tsx",
-                                                    lineNumber: 545,
+                                                    lineNumber: 548,
                                                     columnNumber: 92
                                                 }, this)
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/components/feed/article/ArticleEditor.tsx",
-                                            lineNumber: 544,
+                                            lineNumber: 547,
                                             columnNumber: 17
                                         }, this)
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/components/feed/article/ArticleEditor.tsx",
-                                    lineNumber: 542,
+                                    lineNumber: 545,
                                     columnNumber: 15
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -3412,7 +3608,7 @@ function ArticleEditor(param) {
                                             children: copy.tags
                                         }, void 0, false, {
                                             fileName: "[project]/components/feed/article/ArticleEditor.tsx",
-                                            lineNumber: 550,
+                                            lineNumber: 553,
                                             columnNumber: 17
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$feed$2f$TagSelector$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"], {
@@ -3423,13 +3619,13 @@ function ArticleEditor(param) {
                                             disabled: !industry
                                         }, void 0, false, {
                                             fileName: "[project]/components/feed/article/ArticleEditor.tsx",
-                                            lineNumber: 551,
+                                            lineNumber: 554,
                                             columnNumber: 17
                                         }, this)
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/components/feed/article/ArticleEditor.tsx",
-                                    lineNumber: 549,
+                                    lineNumber: 552,
                                     columnNumber: 15
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -3440,15 +3636,7 @@ function ArticleEditor(param) {
                                             children: copy.related
                                         }, void 0, false, {
                                             fileName: "[project]/components/feed/article/ArticleEditor.tsx",
-                                            lineNumber: 561,
-                                            columnNumber: 17
-                                        }, this),
-                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
-                                            className: "mt-1 text-xs leading-5 text-[#8492A5]",
-                                            children: copy.relatedHint
-                                        }, void 0, false, {
-                                            fileName: "[project]/components/feed/article/ArticleEditor.tsx",
-                                            lineNumber: 562,
+                                            lineNumber: 564,
                                             columnNumber: 17
                                         }, this),
                                         relatedInsights.map((item)=>/*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -3458,7 +3646,7 @@ function ArticleEditor(param) {
                                                         className: "h-4 w-4 shrink-0 text-[#2378E8]"
                                                     }, void 0, false, {
                                                         fileName: "[project]/components/feed/article/ArticleEditor.tsx",
-                                                        lineNumber: 563,
+                                                        lineNumber: 565,
                                                         columnNumber: 142
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -3466,7 +3654,7 @@ function ArticleEditor(param) {
                                                         children: item.title
                                                     }, void 0, false, {
                                                         fileName: "[project]/components/feed/article/ArticleEditor.tsx",
-                                                        lineNumber: 563,
+                                                        lineNumber: 565,
                                                         columnNumber: 209
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
@@ -3476,51 +3664,68 @@ function ArticleEditor(param) {
                                                             className: "h-3.5 w-3.5 text-[#8997A9]"
                                                         }, void 0, false, {
                                                             fileName: "[project]/components/feed/article/ArticleEditor.tsx",
-                                                            lineNumber: 563,
+                                                            lineNumber: 565,
                                                             columnNumber: 428
                                                         }, this)
                                                     }, void 0, false, {
                                                         fileName: "[project]/components/feed/article/ArticleEditor.tsx",
-                                                        lineNumber: 563,
+                                                        lineNumber: 565,
                                                         columnNumber: 305
                                                     }, this)
                                                 ]
                                             }, item.id, true, {
                                                 fileName: "[project]/components/feed/article/ArticleEditor.tsx",
-                                                lineNumber: 563,
+                                                lineNumber: 565,
                                                 columnNumber: 48
                                             }, this)),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
                                             type: "button",
                                             onClick: ()=>setLibraryDrawerOpened(true),
-                                            className: "mt-3 text-xs font-medium text-[#2378E8]",
-                                            children: copy.chooseInsights
-                                        }, void 0, false, {
+                                            className: "mt-3 flex h-9 items-center gap-1.5 rounded-lg border px-2.5 text-[14px] font-medium transition-colors focus-visible:outline-[1px] focus-visible:outline-offset-1 focus-visible:outline-[#B7D2F4] ".concat(relatedInsights.length > 0 ? 'border-[#8FB9EA] bg-[#EDF3FC] text-[#1D74E0]' : 'border-[#C9DCF6] text-[#5A6B84] hover:bg-[#F3F6FB]'),
+                                            children: [
+                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$tabler$2f$icons$2d$react$2f$dist$2f$esm$2f$icons$2f$IconLink$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__IconLink$3e$__["IconLink"], {
+                                                    "aria-hidden": true,
+                                                    stroke: 1.7,
+                                                    className: "h-4.5 w-4.5"
+                                                }, void 0, false, {
+                                                    fileName: "[project]/components/feed/article/ArticleEditor.tsx",
+                                                    lineNumber: 575,
+                                                    columnNumber: 19
+                                                }, this),
+                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                                    children: copy.shareFromLibrary
+                                                }, void 0, false, {
+                                                    fileName: "[project]/components/feed/article/ArticleEditor.tsx",
+                                                    lineNumber: 576,
+                                                    columnNumber: 19
+                                                }, this)
+                                            ]
+                                        }, void 0, true, {
                                             fileName: "[project]/components/feed/article/ArticleEditor.tsx",
-                                            lineNumber: 564,
+                                            lineNumber: 566,
                                             columnNumber: 17
                                         }, this)
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/components/feed/article/ArticleEditor.tsx",
-                                    lineNumber: 560,
+                                    lineNumber: 563,
                                     columnNumber: 15
                                 }, this)
                             ]
                         }, void 0, true, {
                             fileName: "[project]/components/feed/article/ArticleEditor.tsx",
-                            lineNumber: 538,
+                            lineNumber: 541,
                             columnNumber: 13
                         }, this)
                     }, void 0, false, {
                         fileName: "[project]/components/feed/article/ArticleEditor.tsx",
-                        lineNumber: 537,
+                        lineNumber: 540,
                         columnNumber: 11
                     }, this)
                 ]
             }, void 0, true, {
                 fileName: "[project]/components/feed/article/ArticleEditor.tsx",
-                lineNumber: 493,
+                lineNumber: 496,
                 columnNumber: 7
             }, this),
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mantine$2f$core$2f$esm$2f$components$2f$Modal$2f$Modal$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__["Modal"], {
@@ -3552,12 +3757,12 @@ function ArticleEditor(param) {
                                     children: copy.publishAsTitle
                                 }, void 0, false, {
                                     fileName: "[project]/components/feed/article/ArticleEditor.tsx",
-                                    lineNumber: 587,
+                                    lineNumber: 600,
                                     columnNumber: 13
                                 }, this)
                             }, void 0, false, {
                                 fileName: "[project]/components/feed/article/ArticleEditor.tsx",
-                                lineNumber: 586,
+                                lineNumber: 599,
                                 columnNumber: 11
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
@@ -3570,18 +3775,18 @@ function ArticleEditor(param) {
                                     className: "h-5 w-5"
                                 }, void 0, false, {
                                     fileName: "[project]/components/feed/article/ArticleEditor.tsx",
-                                    lineNumber: 598,
+                                    lineNumber: 611,
                                     columnNumber: 13
                                 }, this)
                             }, void 0, false, {
                                 fileName: "[project]/components/feed/article/ArticleEditor.tsx",
-                                lineNumber: 591,
+                                lineNumber: 604,
                                 columnNumber: 11
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "[project]/components/feed/article/ArticleEditor.tsx",
-                        lineNumber: 585,
+                        lineNumber: 598,
                         columnNumber: 9
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -3596,12 +3801,12 @@ function ArticleEditor(param) {
                             onChange: setAuthorType
                         }, void 0, false, {
                             fileName: "[project]/components/feed/article/ArticleEditor.tsx",
-                            lineNumber: 603,
+                            lineNumber: 616,
                             columnNumber: 11
                         }, this)
                     }, void 0, false, {
                         fileName: "[project]/components/feed/article/ArticleEditor.tsx",
-                        lineNumber: 602,
+                        lineNumber: 615,
                         columnNumber: 9
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -3615,7 +3820,7 @@ function ArticleEditor(param) {
                                 children: copy.backToEditing
                             }, void 0, false, {
                                 fileName: "[project]/components/feed/article/ArticleEditor.tsx",
-                                lineNumber: 615,
+                                lineNumber: 628,
                                 columnNumber: 11
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
@@ -3628,26 +3833,26 @@ function ArticleEditor(param) {
                                         className: "me-2 h-4 w-4 animate-spin"
                                     }, void 0, false, {
                                         fileName: "[project]/components/feed/article/ArticleEditor.tsx",
-                                        lineNumber: 629,
+                                        lineNumber: 642,
                                         columnNumber: 30
                                     }, this),
                                     isPublishing ? copy.publishing : copy.publish
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/components/feed/article/ArticleEditor.tsx",
-                                lineNumber: 623,
+                                lineNumber: 636,
                                 columnNumber: 11
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "[project]/components/feed/article/ArticleEditor.tsx",
-                        lineNumber: 614,
+                        lineNumber: 627,
                         columnNumber: 9
                     }, this)
                 ]
             }, void 0, true, {
                 fileName: "[project]/components/feed/article/ArticleEditor.tsx",
-                lineNumber: 571,
+                lineNumber: 584,
                 columnNumber: 7
             }, this),
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$feed$2f$post$2f$IndustrySelectModal$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"], {
@@ -3661,30 +3866,28 @@ function ArticleEditor(param) {
                 }
             }, void 0, false, {
                 fileName: "[project]/components/feed/article/ArticleEditor.tsx",
-                lineNumber: 635,
+                lineNumber: 648,
                 columnNumber: 7
             }, this),
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$feed$2f$post$2f$KnowledgeLibraryDrawer$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"], {
                 locale: locale,
                 opened: libraryDrawerOpened,
+                isCompany: usesCompanyLibrary,
                 selected: relatedInsights,
                 onClose: ()=>setLibraryDrawerOpened(false),
-                onConfirm: (items)=>{
-                    setRelatedInsights(items);
-                    setLibraryDrawerOpened(false);
-                },
+                onSelectionChange: setRelatedInsights,
                 onPublishNew: ()=>{
                     void handlePublishNewKnowledge();
                 }
             }, void 0, false, {
                 fileName: "[project]/components/feed/article/ArticleEditor.tsx",
-                lineNumber: 636,
+                lineNumber: 649,
                 columnNumber: 7
             }, this)
         ]
     }, void 0, true, {
         fileName: "[project]/components/feed/article/ArticleEditor.tsx",
-        lineNumber: 469,
+        lineNumber: 472,
         columnNumber: 5
     }, this);
 }

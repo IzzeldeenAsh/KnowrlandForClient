@@ -11,6 +11,7 @@ import {
   IconArticle,
   IconChevronDown,
   IconFileDescription,
+  IconLink,
   IconLoader2,
   IconPhoto,
   IconX,
@@ -68,8 +69,7 @@ const copyByLocale = {
     addTagHint: 'Press Enter to create a new tag.',
     industryFirst: 'Select an industry first',
     related: 'Related insights',
-    relatedHint: 'Connect published work from your library.',
-    chooseInsights: 'Choose from library',
+    shareFromLibrary: 'Attach from Insighta library',
     titleRequired: 'Add a title before continuing.',
     bodyRequired: 'Write some White Paper content before continuing.',
     industryRequired: 'Select an industry before continuing.',
@@ -120,8 +120,7 @@ const copyByLocale = {
     addTagHint: 'اضغط Enter لإضافة وسم جديد.',
     industryFirst: 'اختر المجال أولاً',
     related: 'الرؤى المرتبطة',
-    relatedHint: 'اربط أعمالاً منشورة من مكتبتك.',
-    chooseInsights: 'اختر من المكتبة',
+    shareFromLibrary: 'مشاركة من المكتبة',
     titleRequired: 'أضف عنواناً قبل المتابعة.',
     bodyRequired: 'اكتب محتوى الورقة البيضاء قبل المتابعة.',
     industryRequired: 'اختر مجالاً قبل المتابعة.',
@@ -563,9 +562,19 @@ export default function ArticleEditor({ locale }: ArticleEditorProps) {
 
               <div className="mt-5 border-t border-[#EDF1F5] pt-5">
                 <label className="text-[11px] font-medium uppercase tracking-[0.08em] text-[#64758C]">{copy.related}</label>
-                <p className="mt-1 text-xs leading-5 text-[#8492A5]">{copy.relatedHint}</p>
                 {relatedInsights.map((item) => <div key={item.id} className="mt-2 flex items-center gap-2 rounded-lg bg-[#F6F9FC] px-3 py-2"><IconFileDescription className="h-4 w-4 shrink-0 text-[#2378E8]" /><span className="min-w-0 flex-1 truncate text-xs font-medium text-[#35445A]">{item.title}</span><button type="button" onClick={() => setRelatedInsights((current) => current.filter((related) => related.id !== item.id))}><IconX className="h-3.5 w-3.5 text-[#8997A9]" /></button></div>)}
-                <button type="button" onClick={() => setLibraryDrawerOpened(true)} className="mt-3 text-xs font-medium text-[#2378E8]">{copy.chooseInsights}</button>
+                <button
+                  type="button"
+                  onClick={() => setLibraryDrawerOpened(true)}
+                  className={`mt-3 flex h-9 items-center gap-1.5 rounded-lg border px-2.5 text-[14px] font-medium transition-colors focus-visible:outline-[1px] focus-visible:outline-offset-1 focus-visible:outline-[#B7D2F4] ${
+                    relatedInsights.length > 0
+                      ? 'border-[#8FB9EA] bg-[#EDF3FC] text-[#1D74E0]'
+                      : 'border-[#C9DCF6] text-[#5A6B84] hover:bg-[#F3F6FB]'
+                  }`}
+                >
+                  <IconLink aria-hidden stroke={1.7} className="h-4.5 w-4.5" />
+                  <span>{copy.shareFromLibrary}</span>
+                </button>
               </div>
             </section>
 

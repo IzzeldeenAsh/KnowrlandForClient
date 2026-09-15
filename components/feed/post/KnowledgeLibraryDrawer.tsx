@@ -1,7 +1,8 @@
 'use client'
 
 import { Drawer } from '@mantine/core'
-import { useCallback, useEffect, useState, type SVGProps } from 'react'
+import { IconSearch, IconX } from '@tabler/icons-react'
+import { useCallback, useEffect, useRef, useState, type SVGProps } from 'react'
 import {
   fetchPublishedLibraryKnowledge,
   type LibraryKnowledgeItem,
@@ -9,6 +10,9 @@ import {
 
 // A post can attach at most this many knowledge items from the library.
 const MAX_LIBRARY_ATTACHMENTS = 3
+
+// Wait this long after the last keystroke before asking the API for results.
+const SEARCH_DEBOUNCE_MS = 300
 
 type KnowledgeLibraryDrawerProps = {
   locale: string
@@ -32,6 +36,11 @@ const copyByLocale = {
     emptyBody:
       'Publish documents, reports, or data to your library, then attach them to your posts. Save a draft and continue to publishing whenever you are ready.',
     emptyCta: 'Save and start publish',
+    searchLabel: 'Search your library',
+    searchPlaceholder: 'Search by title…',
+    clearSearch: 'Clear search',
+    noResultsTitle: 'No matching knowledge',
+    noResultsBody: (keyword: string) => `Nothing in your library matches “${keyword}”.`,
     loadMore: 'Load more',
     done: 'Done',
     selectedCount: (count: number) => `${count} of ${MAX_LIBRARY_ATTACHMENTS} selected`,
@@ -48,6 +57,11 @@ const copyByLocale = {
     emptyBody:
       'انشر المستندات أو التقارير أو البيانات في مكتبتك، ثم أرفقها بمنشوراتك. احفظ مسودة وتابع النشر متى كنت جاهزًا.',
     emptyCta: 'احفظ وابدأ النشر',
+    searchLabel: 'ابحث في مكتبتك',
+    searchPlaceholder: 'ابحث بالعنوان…',
+    clearSearch: 'مسح البحث',
+    noResultsTitle: 'لا توجد نتائج مطابقة',
+    noResultsBody: (keyword: string) => `لا يوجد في مكتبتك ما يطابق "${keyword}".`,
     loadMore: 'تحميل المزيد',
     done: 'تم',
     selectedCount: (count: number) => `${count} من ${MAX_LIBRARY_ATTACHMENTS} محدد`,
@@ -72,33 +86,78 @@ export default function KnowledgeLibraryDrawer({
   const [items, setItems] = useState<LibraryKnowledgeItem[]>([])
   const [page, setPage] = useState(1)
   const [lastPage, setLastPage] = useState(1)
-  const [isLoading, setIsLoading] = useState(false)
+  const [isRefreshing, setIsRefreshing] = useState(false)
+  const [isLoadingMore, setIsLoadingMore] = useState(false)
   const [loadError, setLoadError] = useState(false)
+  const [hasLoaded, setHasLoaded] = useState(false)
+  // Tracks whether the *unfiltered* library is empty, so a search that returns
+  // nothing shows "no matches" instead of the "start your library" CTA.
+  const [isLibraryEmpty, setIsLibraryEmpty] = useState(false)
+  const [query, setQuery] = useState('')
+  const [searchKeyword, setSearchKeyword] = useState('')
+  // Only the newest request may write to state; typing fast can resolve pages
+  // out of order otherwise.
+  const requestIdRef = useRef(0)
+
+  const isLoading = isRefreshing || isLoadingMore
 
   const loadPage = useCallback(
-    async (pageToLoad: number, append: boolean) => {
-      setIsLoading(true)
+    async (pageToLoad: number, append: boolean, keyword: string) => {
+      const requestId = requestIdRef.current + 1
+      requestIdRef.current = requestId
+      if (append) setIsLoadingMore(true)
+      else setIsRefreshing(true)
       setLoadError(false)
       try {
-        const result = await fetchPublishedLibraryKnowledge(pageToLoad, locale, isCompany)
+        const result = await fetchPublishedLibraryKnowledge(
+          pageToLoad,
+          locale,
+          isCompany,
+          keyword,
+        )
+        if (requestIdRef.current !== requestId) return
         setItems((previous) => (append ? [...previous, ...result.data] : result.data))
         setPage(result.meta.current_page)
         setLastPage(result.meta.last_page)
+        if (!append && !keyword) setIsLibraryEmpty(result.data.length === 0)
+        if (!append) setHasLoaded(true)
       } catch {
+        if (requestIdRef.current !== requestId) return
         setLoadError(true)
       } finally {
-        setIsLoading(false)
+        if (requestIdRef.current === requestId) {
+          setIsRefreshing(false)
+          setIsLoadingMore(false)
+        }
       }
     },
     [isCompany, locale],
   )
 
-  // Refresh the appropriate library each time the drawer opens. Selection is
-  // controlled by the parent so every checkbox change is attached immediately.
+  // Debounce typing into the keyword the API is actually asked for.
+  useEffect(() => {
+    const timeoutId = window.setTimeout(
+      () => setSearchKeyword(query.trim()),
+      SEARCH_DEBOUNCE_MS,
+    )
+    return () => window.clearTimeout(timeoutId)
+  }, [query])
+
+  // Refresh the appropriate library each time the drawer opens, and start over
+  // from page one whenever the search keyword changes. Selection is controlled
+  // by the parent so every checkbox change is attached immediately.
   useEffect(() => {
     if (!opened) return
-    loadPage(1, false)
-  }, [opened, loadPage])
+    loadPage(1, false, searchKeyword)
+  }, [opened, searchKeyword, loadPage])
+
+  // Closing resets the search so the next open starts from the full library.
+  useEffect(() => {
+    if (opened) return
+    setQuery('')
+    setSearchKeyword('')
+    setHasLoaded(false)
+  }, [opened])
 
   const toggleItem = (item: LibraryKnowledgeItem) => {
     const next = new Map(selected.map((selectedItem) => [selectedItem.id, selectedItem]))
@@ -108,6 +167,13 @@ export default function KnowledgeLibraryDrawer({
     else next.set(item.id, item)
     onSelectionChange(Array.from(next.values()))
   }
+
+  const showEmptyLibrary = hasLoaded && !loadError && isLibraryEmpty && !searchKeyword
+  const showNoResults =
+    hasLoaded && !loadError && !isRefreshing && items.length === 0 && searchKeyword !== ''
+  // Hide the search field (and the footer) only when there is no library to
+  // search through at all.
+  const showSearch = hasLoaded && !loadError && !showEmptyLibrary
 
   return (
     <Drawer
@@ -140,13 +206,53 @@ export default function KnowledgeLibraryDrawer({
       }
     >
       <div className="flex h-[calc(100vh-120px)] flex-col">
+        {showSearch && (
+          <div className="pb-3">
+            <label className="sr-only" htmlFor="knowledge-library-search">
+              {copy.searchLabel}
+            </label>
+            <div className="relative">
+              <input
+                id="knowledge-library-search"
+                type="search"
+                value={query}
+                onChange={(event) => setQuery(event.target.value)}
+                placeholder={copy.searchPlaceholder}
+                dir={isArabic ? 'rtl' : 'ltr'}
+                className={`h-10 w-full rounded-lg border border-[#D7E1EE] bg-white px-3 text-[13.5px] text-[#1E293B] outline-none transition-colors placeholder:text-[#94A3B8] focus:border-[#2378E8] focus:ring-2 focus:ring-[#2378E8]/15 ${
+                  isArabic ? 'pl-16' : 'pr-16'
+                }`}
+              />
+              {query.length > 0 && (
+                <button
+                  type="button"
+                  onClick={() => setQuery('')}
+                  aria-label={copy.clearSearch}
+                  className={`absolute top-1/2 flex h-7 w-7 -translate-y-1/2 items-center justify-center rounded-md text-[#94A3B8] transition-colors hover:bg-[#F1F5F9] hover:text-[#475569] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2378E8] ${
+                    isArabic ? 'left-9' : 'right-9'
+                  }`}
+                >
+                  <IconX aria-hidden className="h-4 w-4" stroke={2} />
+                </button>
+              )}
+              <IconSearch
+                aria-hidden
+                className={`pointer-events-none absolute top-1/2 h-[18px] w-[18px] -translate-y-1/2 text-[#64748B] ${
+                  isArabic ? 'left-3' : 'right-3'
+                }`}
+                stroke={2}
+              />
+            </div>
+          </div>
+        )}
+
         <div
           className="flex-1 overscroll-contain overflow-y-auto pe-1"
           aria-busy={isLoading}
         >
           {loadError ? (
             <p className="py-8 text-center text-[13px] text-[#94A3B8]">{copy.error}</p>
-          ) : items.length === 0 && !isLoading ? (
+          ) : showEmptyLibrary ? (
             <div className="flex flex-col items-center px-6 py-12 text-center">
               <LibraryEmptyIllustration className="h-28 w-28" aria-hidden />
               <h3 className="mt-5 text-[15.5px] font-bold text-[#0B1220]">
@@ -163,8 +269,18 @@ export default function KnowledgeLibraryDrawer({
                 {copy.emptyCta}
               </button>
             </div>
+          ) : showNoResults ? (
+            <div className="flex flex-col items-center px-6 py-12 text-center">
+              <IconSearch aria-hidden className="h-8 w-8 text-[#B7C6DA]" stroke={1.6} />
+              <h3 className="mt-4 text-[14.5px] font-bold text-[#0B1220]">
+                {copy.noResultsTitle}
+              </h3>
+              <p className="mt-2 max-w-[19rem] text-[13px] leading-6 text-[#5A6B84]">
+                {copy.noResultsBody(searchKeyword)}
+              </p>
+            </div>
           ) : (
-            <ul className="space-y-3">
+            <ul className={`space-y-3 ${isRefreshing ? 'opacity-50' : ''}`}>
               {items.map((item) => {
                 const isChecked = selected.some((selectedItem) => selectedItem.id === item.id)
                 const isDisabled =
@@ -215,10 +331,10 @@ export default function KnowledgeLibraryDrawer({
             </p>
           )}
 
-          {!isLoading && !loadError && page < lastPage && (
+          {!isLoading && !loadError && items.length > 0 && page < lastPage && (
             <button
               type="button"
-              onClick={() => loadPage(page + 1, true)}
+              onClick={() => loadPage(page + 1, true, searchKeyword)}
               className="mt-3 min-h-10 w-full rounded border border-[#C9DCF6] py-2 text-[13px] font-medium text-[#1D74E0] transition-colors hover:bg-[#F3F6FB] focus-visible:border-[#8FB9EA] focus-visible:outline-none"
             >
               {copy.loadMore}
@@ -227,7 +343,7 @@ export default function KnowledgeLibraryDrawer({
         </div>
 
         {/* Changes are already attached; this button simply closes the drawer. */}
-        {items.length > 0 && (
+        {showSearch && (
           <div className="flex items-center justify-between border-t border-[#DCE4EF] bg-white pt-3">
             <span className="min-w-0 pe-3 text-[12.5px] text-[#5A6B84]">
               {selected.length >= MAX_LIBRARY_ATTACHMENTS ? (

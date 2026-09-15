@@ -4,6 +4,7 @@ import { Modal, Progress } from '@mantine/core'
 import { RichTextEditor } from '@mantine/tiptap'
 import LinkExtension from '@tiptap/extension-link'
 import Placeholder from '@tiptap/extension-placeholder'
+import TextAlign from '@tiptap/extension-text-align'
 import Underline from '@tiptap/extension-underline'
 import StarterKit from '@tiptap/starter-kit'
 import {
@@ -49,6 +50,9 @@ import IndustryField from './IndustryField'
 import ImageCropEditor from './ImageCropEditor'
 import { type IndustryOption } from './IndustrySelectModal'
 import KnowledgeLibraryDrawer from './KnowledgeLibraryDrawer'
+import EmojiPicker from './EmojiPicker'
+import { AutoDirection } from './autoDirection'
+import TextEditIcon from '@/components/icons/TextEditIcon'
 import TagSelector from '../TagSelector'
 
 export type PostModalMode = 'post' | 'video' | 'image'
@@ -143,6 +147,8 @@ const copyByLocale = {
     addTagHint: 'Press Enter to create a new tag.',
     addTagError: 'Unable to add the tag.',
     shareFromLibrary: 'Attach from Insighta library',
+    formatting: 'Formatting options',
+    emoji: 'Insert emoji',
     publish: 'Post',
     publishing: 'Publishing…',
     saveChanges: 'Save changes',
@@ -231,6 +237,8 @@ const copyByLocale = {
     addTagHint: 'اضغط Enter لإضافة وسم جديد.',
     addTagError: 'تعذر إضافة الوسم.',
     shareFromLibrary: 'مشاركة من المكتبة',
+    formatting: 'خيارات التنسيق',
+    emoji: 'إدراج رمز تعبيري',
     publish: 'نشر',
     publishing: 'جارٍ النشر…',
     saveChanges: 'حفظ التعديلات',
@@ -389,6 +397,7 @@ export default function PostModal({
 
   // --- Sub-panel state ---
   const [libraryDrawerOpened, setLibraryDrawerOpened] = useState(false)
+  const [formattingOpen, setFormattingOpen] = useState(false)
 
   // --- Video state ---
   const [videoPhase, setVideoPhase] = useState<VideoPhase>('none')
@@ -435,6 +444,8 @@ export default function PostModal({
         strike: false,
       }),
       Underline,
+      TextAlign.configure({ types: ['paragraph'] }),
+      AutoDirection,
       LinkExtension.configure({ autolink: true, openOnClick: false, defaultProtocol: 'https' }),
       Placeholder.configure({ placeholder: copy.bodyPlaceholder }),
     ],
@@ -1243,6 +1254,7 @@ export default function PostModal({
                   : 'border-[#E5EAF2] focus-within:border-[#8FB9EA]'
               }`}
             >
+              {formattingOpen && (
               <RichTextEditor.Toolbar sticky={false} className="border-b border-[#E5EAF2] bg-[#F8FAFD] px-1 py-1">
                 <RichTextEditor.ControlsGroup>
                   <RichTextEditor.Bold />
@@ -1254,6 +1266,11 @@ export default function PostModal({
                   <RichTextEditor.OrderedList />
                 </RichTextEditor.ControlsGroup>
                 <RichTextEditor.ControlsGroup>
+                  <RichTextEditor.AlignLeft />
+                  <RichTextEditor.AlignCenter />
+                  <RichTextEditor.AlignRight />
+                </RichTextEditor.ControlsGroup>
+                <RichTextEditor.ControlsGroup>
                   <RichTextEditor.Link />
                   <RichTextEditor.Unlink />
                 </RichTextEditor.ControlsGroup>
@@ -1261,13 +1278,33 @@ export default function PostModal({
                   <RichTextEditor.Undo />
                   <RichTextEditor.Redo />
                 </RichTextEditor.ControlsGroup>
+                <EmojiPicker
+                  label={copy.emoji}
+                  onSelect={(emoji) => bodyEditor?.chain().focus().insertContent(emoji).run()}
+                />
               </RichTextEditor.Toolbar>
+              )}
               <RichTextEditor.Content
                 id="feed-post-body"
                 className={`bg-white px-3 py-2.5 text-[15px] leading-relaxed text-[#1C2433] [&_.ProseMirror]:min-h-[120px] [&_.ProseMirror]:outline-none [&_.ProseMirror_p]:m-0 [&_.ProseMirror_p+p]:mt-2 [&_.ProseMirror_ul]:my-2 [&_.ProseMirror_ul]:list-disc [&_.ProseMirror_ul]:ps-5 [&_.ProseMirror_ol]:my-2 [&_.ProseMirror_ol]:list-decimal [&_.ProseMirror_ol]:ps-5 [&_.ProseMirror_a]:text-[#2378E8] [&_.ProseMirror_a]:underline [&_.ProseMirror_p.is-editor-empty:first-child::before]:text-[#94A3B8] ${
                   isVideoFlow || isImageFlow ? '[&_.ProseMirror]:min-h-[88px]' : ''
                 }`}
               />
+              <div className="flex items-center bg-white px-1.5 pb-1.5">
+                <button
+                  type="button"
+                  onClick={() => setFormattingOpen((current) => !current)}
+                  aria-label={copy.formatting}
+                  aria-expanded={formattingOpen}
+                  className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-md transition-colors focus-visible:outline-[1px] focus-visible:outline-offset-1 focus-visible:outline-[#B7D2F4] ${
+                    formattingOpen
+                      ? 'bg-[#EDF3FC] text-[#1D74E0]'
+                      : 'text-[#5A6B84] hover:bg-[#F3F6FB]'
+                  }`}
+                >
+                  <TextEditIcon className="h-4 w-4" />
+                </button>
+              </div>
             </RichTextEditor>
             {bodyInvalid && (
               <p id="feed-post-body-error" className="mt-1.5 text-[12px] font-medium text-[#A9322B]">

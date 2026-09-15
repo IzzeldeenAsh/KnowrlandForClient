@@ -5,6 +5,7 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 import { FeedCard, FeedSkeleton } from '@/components/feed/MyFeedsTimeline'
 import {
   getInsighterProfileFeed,
+  getCompanyProfileFeed,
   type FeedItem,
   type InsighterProfileFeedMeta,
 } from '@/services/feed.service'
@@ -12,31 +13,55 @@ import {
 type PostsTabProps = {
   uuid: string
   locale: string
+  kind?: 'insighter' | 'company'
 }
 
 const copyByLocale = {
   en: {
-    loading: 'Loading posts…',
-    emptyTitle: 'No posts yet',
-    emptyDescription: 'Published posts and White Papers from this insighter will appear here.',
-    loadError: 'We couldn’t load this insighter’s posts.',
-    tryAgain: 'Try again',
-    loadingMore: 'Loading more posts…',
-    endOfFeed: 'You’re all caught up.',
+    insighter: {
+      loading: 'Loading posts…',
+      emptyTitle: 'No posts yet',
+      emptyDescription: 'Published posts and White Papers from this insighter will appear here.',
+      loadError: 'We couldn’t load this insighter’s posts.',
+      tryAgain: 'Try again',
+      loadingMore: 'Loading more posts…',
+      endOfFeed: 'You’re all caught up.',
+    },
+    company: {
+      loading: 'Loading posts…',
+      emptyTitle: 'No posts yet',
+      emptyDescription: 'Published posts and White Papers from this company will appear here.',
+      loadError: 'We couldn’t load this company’s posts.',
+      tryAgain: 'Try again',
+      loadingMore: 'Loading more posts…',
+      endOfFeed: 'You’re all caught up.',
+    },
   },
   ar: {
-    loading: 'جارٍ تحميل المنشورات…',
-    emptyTitle: 'لا توجد منشورات بعد',
-    emptyDescription: 'ستظهر هنا منشورات وأوراق هذا الخبير المنشورة.',
-    loadError: 'تعذر تحميل منشورات هذا الخبير.',
-    tryAgain: 'حاول مرة أخرى',
-    loadingMore: 'جارٍ تحميل المزيد من المنشورات…',
-    endOfFeed: 'لقد اطّلعت على جميع المنشورات.',
+    insighter: {
+      loading: 'جارٍ تحميل المنشورات…',
+      emptyTitle: 'لا توجد منشورات بعد',
+      emptyDescription: 'ستظهر هنا منشورات وأوراق هذا الخبير المنشورة.',
+      loadError: 'تعذر تحميل منشورات هذا الخبير.',
+      tryAgain: 'حاول مرة أخرى',
+      loadingMore: 'جارٍ تحميل المزيد من المنشورات…',
+      endOfFeed: 'لقد اطّلعت على جميع المنشورات.',
+    },
+    company: {
+      loading: 'جارٍ تحميل المنشورات…',
+      emptyTitle: 'لا توجد منشورات بعد',
+      emptyDescription: 'ستظهر هنا منشورات وأوراق هذه الشركة المنشورة.',
+      loadError: 'تعذر تحميل منشورات هذه الشركة.',
+      tryAgain: 'حاول مرة أخرى',
+      loadingMore: 'جارٍ تحميل المزيد من المنشورات…',
+      endOfFeed: 'لقد اطّلعت على جميع المنشورات.',
+    },
   },
 } as const
 
-export default function PostsTab({ uuid, locale }: PostsTabProps) {
-  const copy = copyByLocale[locale === 'ar' ? 'ar' : 'en']
+export default function PostsTab({ uuid, locale, kind = 'insighter' }: PostsTabProps) {
+  const copy = copyByLocale[locale === 'ar' ? 'ar' : 'en'][kind]
+  const fetchFeed = kind === 'company' ? getCompanyProfileFeed : getInsighterProfileFeed
   const [items, setItems] = useState<FeedItem[]>([])
   const [meta, setMeta] = useState<InsighterProfileFeedMeta | null>(null)
   const [isLoading, setIsLoading] = useState(true)
@@ -50,7 +75,7 @@ export default function PostsTab({ uuid, locale }: PostsTabProps) {
     setLoadError(false)
 
     try {
-      const result = await getInsighterProfileFeed(uuid, locale, null, signal)
+      const result = await fetchFeed(uuid, locale, null, signal)
       setItems(result.data)
       setMeta(result.meta)
     } catch (error) {
@@ -59,7 +84,7 @@ export default function PostsTab({ uuid, locale }: PostsTabProps) {
     } finally {
       if (!signal?.aborted) setIsLoading(false)
     }
-  }, [locale, uuid])
+  }, [fetchFeed, locale, uuid])
 
   useEffect(() => {
     const controller = new AbortController()
@@ -75,7 +100,7 @@ export default function PostsTab({ uuid, locale }: PostsTabProps) {
     setIsLoadingMore(true)
 
     try {
-      const result = await getInsighterProfileFeed(uuid, locale, cursor)
+      const result = await fetchFeed(uuid, locale, cursor)
       setItems((previous) => {
         const existingUuids = new Set(previous.map((item) => item.uuid))
         return [...previous, ...result.data.filter((item) => !existingUuids.has(item.uuid))]
@@ -87,7 +112,7 @@ export default function PostsTab({ uuid, locale }: PostsTabProps) {
       loadingMoreRef.current = false
       setIsLoadingMore(false)
     }
-  }, [locale, meta?.next_cursor, uuid])
+  }, [fetchFeed, locale, meta?.next_cursor, uuid])
 
   useEffect(() => {
     const sentinel = sentinelRef.current

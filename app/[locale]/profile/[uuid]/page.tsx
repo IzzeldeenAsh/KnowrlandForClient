@@ -1834,7 +1834,7 @@ function ProfilePageContent() {
                 }}
               >
                 <Tabs.List className="border-b border-gray-200 dark:border-slate-700 bg-gray-50 dark:bg-slate-800/80 flex flex-wrap items-center">
-                  {isViewingInsighterEntity && (
+                  {(isViewingInsighterEntity || (isCompany && !enterpriseType)) && (
                     <Tabs.Tab
                       value="posts"
                       className="text-base font-medium px-8 py-4 transition"
@@ -1922,9 +1922,13 @@ function ProfilePageContent() {
                     />
                   </Tabs.Panel>
 
-                  {isViewingInsighterEntity && (
+                  {(isViewingInsighterEntity || (isCompany && !enterpriseType)) && (
                     <Tabs.Panel value="posts">
-                      <PostsTab uuid={uuid} locale={locale} />
+                      <PostsTab
+                        uuid={uuid}
+                        locale={locale}
+                        kind={isViewingInsighterEntity ? "insighter" : "company"}
+                      />
                     </Tabs.Panel>
                   )}
 

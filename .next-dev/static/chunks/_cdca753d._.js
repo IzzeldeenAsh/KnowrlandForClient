@@ -254,6 +254,8 @@ __turbopack_context__.s([
     ()=>getCommunityFeedPost,
     "getCommunityFeedPreview",
     ()=>getCommunityFeedPreview,
+    "getCompanyProfileFeed",
+    ()=>getCompanyProfileFeed,
     "getFeedDraft",
     ()=>getFeedDraft,
     "getFeedItem",
@@ -530,6 +532,31 @@ async function getInsighterProfileFeed(uuid, locale, cursor, signal) {
     });
     if (!response.ok) {
         await parseErrorMessage(response, 'Unable to load this insighter’s posts.');
+    }
+    const body = await response.json();
+    var _body_data, _body_meta_next_cursor, _body_meta_per_page;
+    return {
+        data: (_body_data = body.data) !== null && _body_data !== void 0 ? _body_data : [],
+        meta: {
+            has_more: Boolean((_body_meta = body.meta) === null || _body_meta === void 0 ? void 0 : _body_meta.next_cursor),
+            next_cursor: (_body_meta_next_cursor = (_body_meta1 = body.meta) === null || _body_meta1 === void 0 ? void 0 : _body_meta1.next_cursor) !== null && _body_meta_next_cursor !== void 0 ? _body_meta_next_cursor : null,
+            limit: (_body_meta_per_page = (_body_meta2 = body.meta) === null || _body_meta2 === void 0 ? void 0 : _body_meta2.per_page) !== null && _body_meta_per_page !== void 0 ? _body_meta_per_page : 10
+        }
+    };
+}
+async function getCompanyProfileFeed(uuid, locale, cursor, signal) {
+    var _body_meta, _body_meta1, _body_meta2;
+    const params = new URLSearchParams({
+        limit: '10'
+    });
+    if (cursor) params.set('cursor', cursor);
+    const response = await fetch((0, __TURBOPACK__imported__module__$5b$project$5d2f$app$2f$config$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["getApiUrl"])("/api/platform/company/profile/".concat(encodeURIComponent(uuid), "/feed?").concat(params.toString())), {
+        headers: authHeaders(locale),
+        cache: 'no-store',
+        signal
+    });
+    if (!response.ok) {
+        await parseErrorMessage(response, 'Unable to load this company’s posts.');
     }
     const body = await response.json();
     var _body_data, _body_meta_next_cursor, _body_meta_per_page;
@@ -905,12 +932,15 @@ async function createSuggestTag(industryId, name, locale) {
     };
 }
 async function fetchPublishedLibraryKnowledge(page, locale) {
-    let isCompany = arguments.length > 2 && arguments[2] !== void 0 ? arguments[2] : false;
+    let isCompany = arguments.length > 2 && arguments[2] !== void 0 ? arguments[2] : false, keyword = arguments.length > 3 && arguments[3] !== void 0 ? arguments[3] : '';
+    // Both list endpoints are already scoped to published items, paginated and
+    // ordered newest-first, and accept an optional `keyword` title filter.
     const params = new URLSearchParams({
-        page: String(page),
-        status: 'published'
+        page: String(page)
     });
-    const path = isCompany ? '/api/company/library/knowledge/list' : "/api/insighter/library/knowledge?".concat(params);
+    const trimmedKeyword = keyword.trim();
+    if (trimmedKeyword) params.set('keyword', trimmedKeyword);
+    const path = isCompany ? "/api/company/library/knowledge/list?".concat(params) : "/api/insighter/library/knowledge/list?".concat(params);
     const response = await fetch((0, __TURBOPACK__imported__module__$5b$project$5d2f$app$2f$config$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["getApiUrl"])(path), {
         headers: authHeaders(locale)
     });

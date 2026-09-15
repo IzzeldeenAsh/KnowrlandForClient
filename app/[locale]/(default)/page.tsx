@@ -42,7 +42,7 @@ export default async function Feed({ params, searchParams }: FeedProps) {
   return (
     <FeedSearchInsightsProvider>
       <div dir={isRTL ? 'rtl' : 'ltr'} className="bg-[#EEF2FA] text-slate-900 min-h-screen">
-        <FeedPullToRefresh locale={locale} />
+        {!showMyFeeds && !showSavedPosts && <FeedPullToRefresh locale={locale} />}
         <div className="mx-auto w-full max-w-7xl px-4 py-4 sm:px-6 sm:py-6 lg:px-8">
           <div className="grid min-w-0 grid-cols-1 gap-6 xl:grid-cols-[280px_minmax(0,1fr)_300px]">
             {/* Left column - dashboard navigation with the feed profile card */}

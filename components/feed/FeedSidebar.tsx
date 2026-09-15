@@ -475,6 +475,11 @@ export default function FeedSidebar({ locale, hideProfileCard = false }: FeedSid
       : isCompany
         ? `${user.company?.legal_name ?? ''} · ${copy.manager}`.replace(/^ · /, '')
         : copy.client
+  const roleBadgeClass = isCompanyInsighter || isCompany
+    ? 'bg-[#EFF8FF] text-[#299AF8]'
+    : isInsighter
+      ? 'bg-[#DFFEE9] text-[#1BC653]'
+      : 'bg-[#dafdff] text-[#06a2b2]'
   const dashboardBase = `${dashboardUrl}/app/insighter-dashboard`
 
   return (
@@ -509,7 +514,7 @@ export default function FeedSidebar({ locale, hideProfileCard = false }: FeedSid
           )}
         </div>
         <h2 className="relative z-10 mt-4 max-w-full truncate text-[16px] font-bold text-[#101724]">{fullName}</h2>
-        <span className="relative z-10 mt-3 max-w-full rounded bg-[#DFF7F6] px-3 py-[3px] text-[11px] font-semibold leading-[17px] text-[#139A91]">
+        <span className={`relative z-10 mt-3 max-w-full rounded px-3 py-[3px] text-[11px] font-semibold leading-[17px] ${roleBadgeClass}`}>
           {roleLabel}
         </span>
       </section>

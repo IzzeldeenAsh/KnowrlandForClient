@@ -245,6 +245,8 @@ __turbopack_context__.s([
     ()=>getCommunityFeedPost,
     "getCommunityFeedPreview",
     ()=>getCommunityFeedPreview,
+    "getCompanyProfileFeed",
+    ()=>getCompanyProfileFeed,
     "getFeedDraft",
     ()=>getFeedDraft,
     "getFeedItem",
@@ -516,6 +518,29 @@ async function getInsighterProfileFeed(uuid, locale, cursor, signal) {
     });
     if (!response.ok) {
         await parseErrorMessage(response, 'Unable to load this insighter’s posts.');
+    }
+    const body = await response.json();
+    return {
+        data: body.data ?? [],
+        meta: {
+            has_more: Boolean(body.meta?.next_cursor),
+            next_cursor: body.meta?.next_cursor ?? null,
+            limit: body.meta?.per_page ?? 10
+        }
+    };
+}
+async function getCompanyProfileFeed(uuid, locale, cursor, signal) {
+    const params = new URLSearchParams({
+        limit: '10'
+    });
+    if (cursor) params.set('cursor', cursor);
+    const response = await fetch((0, __TURBOPACK__imported__module__$5b$project$5d2f$app$2f$config$2e$ts__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["getApiUrl"])(`/api/platform/company/profile/${encodeURIComponent(uuid)}/feed?${params.toString()}`), {
+        headers: authHeaders(locale),
+        cache: 'no-store',
+        signal
+    });
+    if (!response.ok) {
+        await parseErrorMessage(response, 'Unable to load this company’s posts.');
     }
     const body = await response.json();
     return {
@@ -877,12 +902,15 @@ async function createSuggestTag(industryId, name, locale) {
         name
     };
 }
-async function fetchPublishedLibraryKnowledge(page, locale, isCompany = false) {
+async function fetchPublishedLibraryKnowledge(page, locale, isCompany = false, keyword = '') {
+    // Both list endpoints are already scoped to published items, paginated and
+    // ordered newest-first, and accept an optional `keyword` title filter.
     const params = new URLSearchParams({
-        page: String(page),
-        status: 'published'
+        page: String(page)
     });
-    const path = isCompany ? '/api/company/library/knowledge/list' : `/api/insighter/library/knowledge?${params}`;
+    const trimmedKeyword = keyword.trim();
+    if (trimmedKeyword) params.set('keyword', trimmedKeyword);
+    const path = isCompany ? `/api/company/library/knowledge/list?${params}` : `/api/insighter/library/knowledge/list?${params}`;
     const response = await fetch((0, __TURBOPACK__imported__module__$5b$project$5d2f$app$2f$config$2e$ts__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["getApiUrl"])(path), {
         headers: authHeaders(locale)
     });

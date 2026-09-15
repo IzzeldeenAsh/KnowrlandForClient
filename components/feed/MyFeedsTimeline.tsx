@@ -162,15 +162,10 @@ const copyByLocale = {
 } as const
 
 function stripHtml(html: string): string {
-  if (typeof window === 'undefined') {
-    return html
-      .replace(/<[^>]*>/g, ' ')
-      .replace(/\s+/g, ' ')
-      .trim()
-  }
-
-  const doc = new DOMParser().parseFromString(html, 'text/html')
-  return (doc.body.textContent ?? '').replace(/\s+/g, ' ').trim()
+  return html
+    .replace(/<[^>]*>/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim()
 }
 
 // Keep the pattern compatible with the project's ES5 TypeScript target while
@@ -248,6 +243,8 @@ function toHashtagToken(name: string): string {
 }
 
 const richPostAllowedTags = new Set(['p', 'br', 'strong', 'b', 'em', 'i', 'u', 'ul', 'ol', 'li', 'a'])
+const richPostAllowedAlignments = new Set(['left', 'center', 'right', 'justify'])
+const richPostAllowedDirections = new Set(['auto', 'ltr', 'rtl'])
 
 function sanitizeAndLinkifyRichPostHtml(html: string, locale: string): string {
   if (typeof document === 'undefined') return ''
@@ -265,7 +262,19 @@ function sanitizeAndLinkifyRichPostHtml(html: string, locale: string): string {
     }
 
     const href = tagName === 'a' ? element.getAttribute('href')?.trim() ?? '' : ''
+    const textAlign = (element as HTMLElement).style?.textAlign?.toLowerCase() ?? ''
+    const dir = element.getAttribute('dir')?.toLowerCase() ?? ''
     Array.from(element.attributes).forEach((attribute) => element.removeAttribute(attribute.name))
+
+    // Re-apply only the editor's alignment, never the original style attribute.
+    if (richPostAllowedAlignments.has(textAlign)) {
+      ;(element as HTMLElement).style.textAlign = textAlign
+    }
+
+    // Keep per-paragraph direction so pasted Arabic reads the same as it did in the editor.
+    if (richPostAllowedDirections.has(dir)) {
+      element.setAttribute('dir', dir)
+    }
 
     if (tagName === 'a' && /^(https?:|mailto:)/i.test(href)) {
       element.setAttribute('href', href)
@@ -1514,7 +1523,7 @@ export function FeedCard({
       )}
 
       {item.related_insights.length > 0 && (
-        <div className={`-mx-5 ${hasPostMedia ? 'mt-0' : 'mt-5'} divide-y divide-[#E7EDF5] overflow-hidden sm:-mx-6 ${
+        <div className={`-mx-5 ${hasPostMedia ? 'mt-0' : 'mt-5'} divide-y divide-[#E7EDF5] overflow-hidden border-t border-[#E7EDF5] sm:-mx-6 ${
           showShareAction ? 'border-b' : '-mb-5 rounded-b-lg sm:-mb-6'
         }`}>
           {item.related_insights.map((insight) => {
@@ -1549,17 +1558,17 @@ export function FeedCard({
                 </div>
               </Link>
 
-              <div className="flex min-h-[130px] min-w-0 flex-1 flex-col bg-white px-4 py-4 sm:min-h-[155px] sm:px-5 sm:py-4">
-                <div className="flex min-h-[98px] min-w-0 flex-1 flex-col sm:min-h-[123px]">
+              <div className="flex min-w-0 flex-1 flex-col bg-white px-4 py-4 sm:min-h-[155px] sm:px-5 sm:py-4">
+                <div className="flex min-w-0 flex-1 flex-col sm:min-h-[123px]">
                   {insight.description && (
                     <p
                       dir="auto"
-                      className="line-clamp-3 text-[13px] leading-[1.2rem] text-[#667894] sm:text-[14px]"
+                      className="line-clamp-3 text-[13px] leading-[1.2rem] text-[#667894] max-sm:hidden sm:text-[14px]"
                     >
                       {stripHtml(insight.description)}
                     </p>
                   )}
-                  <div className="mt-auto flex items-center justify-between gap-4 pt-4" dir={locale === 'ar' ? 'rtl' : 'ltr'}>
+                  <div className="mt-auto flex items-center justify-between gap-4 pt-0 sm:pt-4" dir={locale === 'ar' ? 'rtl' : 'ltr'}>
                     {insightPrice ? (
                       <Badge color={insightPrice.isFree ? 'green' : 'yellow'} variant="light" className="shrink-0 font-semibold">
                         <span dir={insightPrice.isFree ? 'auto' : 'ltr'} lang={insightPrice.isFree ? undefined : 'en'}>{insightPrice.label}</span>
