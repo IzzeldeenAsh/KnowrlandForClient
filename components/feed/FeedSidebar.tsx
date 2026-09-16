@@ -237,7 +237,7 @@ function AddInsightCard({ href, label, compact = false }: { href: string; label:
   return (
     <Link
       href={href}
-      className={`group flex items-center gap-2.5 rounded-md border border-transparent bg-gradient-to-r from-[#3B82F6] to-[#06B6D4] text-start font-bold text-white transition-colors duration-200 hover:from-[#2563EB] hover:to-[#0891B2] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2378E8] focus-visible:ring-offset-2 ${
+      className={`group flex items-center gap-2.5 rounded-md bg-gradient-to-r from-[#3B82F6] to-[#06B6D4] text-start font-bold text-white transition-colors duration-200 hover:from-[#2563EB] hover:to-[#0891B2] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2378E8] focus-visible:ring-offset-2 ${
         compact ? 'min-h-10 px-2 py-1 text-[12px]' : 'min-h-[54px] px-4 py-2 text-[16px]'
       }`}
     >

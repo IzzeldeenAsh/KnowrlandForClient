@@ -212,6 +212,7 @@ export default function KnowledgeLibraryDrawer({
               {copy.searchLabel}
             </label>
             <div className="relative">
+              {/* 16px on phones - see TagSelector: a smaller focused field makes iOS zoom. */}
               <input
                 id="knowledge-library-search"
                 type="search"
@@ -219,7 +220,7 @@ export default function KnowledgeLibraryDrawer({
                 onChange={(event) => setQuery(event.target.value)}
                 placeholder={copy.searchPlaceholder}
                 dir={isArabic ? 'rtl' : 'ltr'}
-                className={`h-10 w-full rounded-lg border border-[#D7E1EE] bg-white px-3 text-[13.5px] text-[#1E293B] outline-none transition-colors placeholder:text-[#94A3B8] focus:border-[#2378E8] focus:ring-2 focus:ring-[#2378E8]/15 ${
+                className={`h-10 w-full rounded-lg border border-[#D7E1EE] bg-white px-3 text-[16px] sm:text-[13.5px] text-[#1E293B] outline-none transition-colors placeholder:text-[#94A3B8] focus:border-[#2378E8] focus:ring-2 focus:ring-[#2378E8]/15 ${
                   isArabic ? 'pl-16' : 'pr-16'
                 }`}
               />

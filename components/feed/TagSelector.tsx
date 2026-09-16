@@ -234,6 +234,8 @@ export default function TagSelector({
               </button>
             </span>
           ))}
+          {/* 16px on phones: iOS zooms the page when a focused field is
+              smaller, which pushes the dialog past the screen edge. */}
           <input
             ref={inputRef}
             type="text"
@@ -259,7 +261,7 @@ export default function TagSelector({
               }
             }}
             placeholder={copy.placeholder}
-            className="h-7 min-w-[88px] flex-1 border-0 bg-transparent px-1 text-[13px] text-[#26364C] outline-none ring-0 focus:border-0 focus:outline-none focus:ring-0 placeholder:text-[#98A4B3] sm:min-w-[150px]"
+            className="h-7 min-w-[88px] flex-1 border-0 bg-transparent px-1 text-[16px] sm:text-[13px] text-[#26364C] outline-none ring-0 focus:border-0 focus:outline-none focus:ring-0 placeholder:text-[#98A4B3] sm:min-w-[150px]"
           />
         </div>
 

@@ -1321,7 +1321,7 @@ export default function PostModal({
               )}
               <RichTextEditor.Content
                 id="feed-post-body"
-                className={`bg-white px-3 py-2.5 text-[15px] leading-relaxed text-[#1C2433] [&_.ProseMirror]:min-h-[120px] [&_.ProseMirror]:outline-none [&_.ProseMirror_p]:m-0 [&_.ProseMirror_p+p]:mt-2 [&_.ProseMirror_ul]:my-2 [&_.ProseMirror_ul]:list-disc [&_.ProseMirror_ul]:ps-5 [&_.ProseMirror_ol]:my-2 [&_.ProseMirror_ol]:list-decimal [&_.ProseMirror_ol]:ps-5 [&_.ProseMirror_a]:text-[#2378E8] [&_.ProseMirror_a]:underline [&_.ProseMirror_p.is-editor-empty:first-child::before]:text-[#94A3B8] ${
+                className={`bg-white px-3 py-2.5 text-[16px] sm:text-[15px] leading-relaxed text-[#1C2433] [&_.ProseMirror]:min-h-[120px] [&_.ProseMirror]:outline-none [&_.ProseMirror_p]:m-0 [&_.ProseMirror_p+p]:mt-2 [&_.ProseMirror_ul]:my-2 [&_.ProseMirror_ul]:list-disc [&_.ProseMirror_ul]:ps-5 [&_.ProseMirror_ol]:my-2 [&_.ProseMirror_ol]:list-decimal [&_.ProseMirror_ol]:ps-5 [&_.ProseMirror_a]:text-[#2378E8] [&_.ProseMirror_a]:underline [&_.ProseMirror_p.is-editor-empty:first-child::before]:text-[#94A3B8] ${
                   isVideoFlow || isImageFlow ? '[&_.ProseMirror]:min-h-[88px]' : ''
                 }`}
               />

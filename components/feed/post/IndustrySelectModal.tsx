@@ -200,6 +200,7 @@ export default function IndustrySelectModal({
         <label htmlFor="industry-search" className="sr-only">
           {copy.search}
         </label>
+        {/* 16px on phones - see TagSelector: a smaller focused field makes iOS zoom. */}
         <input
           id="industry-search"
           name="industry-search"
@@ -207,7 +208,7 @@ export default function IndustrySelectModal({
           value={searchTerm}
           onChange={(event) => setSearchTerm(event.currentTarget.value)}
           placeholder={copy.search}
-          className="h-10 w-full rounded-md border border-[#D6E0EC] bg-white px-3 text-[13.5px] text-[#1C2433] transition-colors placeholder:text-[#94A3B8] focus-visible:border-[#8FB9EA] focus-visible:outline-none"
+          className="h-10 w-full rounded-md border border-[#D6E0EC] bg-white px-3 text-[16px] sm:text-[13.5px] text-[#1C2433] transition-colors placeholder:text-[#94A3B8] focus-visible:border-[#8FB9EA] focus-visible:outline-none"
         />
       </div>
 
