@@ -229,26 +229,22 @@ function AddInsightAction({ href, label, compact = false }: { href: string; labe
   )
 }
 
-/** Standalone card above the Dashboard link; mirrors DashboardLink's geometry. */
+/** Standalone card above the Dashboard link; mirrors DashboardLink's geometry.
+ *  Styled to match the Angular header's `.header-primary-action` — same
+ *  blue→cyan gradient, 6px radius and bare white plus — but kept flat: no
+ *  gloss overlay, no drop shadow, no hover lift. */
 function AddInsightCard({ href, label, compact = false }: { href: string; label: string; compact?: boolean }) {
   return (
     <Link
       href={href}
-      className={`group relative isolate flex items-center gap-2.5 overflow-hidden rounded-lg border border-transparent bg-gradient-to-r from-[#3B82F6] to-[#06B6D4] text-start font-semibold text-white transition-colors duration-200 hover:from-[#2563EB] hover:to-[#0891B2] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2378E8] focus-visible:ring-offset-2 ${
+      className={`group flex items-center gap-2.5 rounded-md border border-transparent bg-gradient-to-r from-[#3B82F6] to-[#06B6D4] text-start font-bold text-white transition-colors duration-200 hover:from-[#2563EB] hover:to-[#0891B2] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2378E8] focus-visible:ring-offset-2 ${
         compact ? 'min-h-10 px-2 py-1 text-[12px]' : 'min-h-[54px] px-4 py-2 text-[16px]'
       }`}
     >
-      {/* Static gloss across the top half. */}
-      <span
-        aria-hidden
-        className="pointer-events-none absolute inset-x-0 top-0 h-1/2 bg-gradient-to-b from-white/25 to-transparent"
-      />
-      <span className="relative flex h-[33px] w-[33px] shrink-0 items-center justify-center">
-        <span className="flex h-[26px] w-[26px] items-center justify-center rounded-[7px] border border-white/70 bg-white">
-          <IconPlus aria-hidden stroke={2.6} className="h-4 w-4 text-[#2378E8]" />
-        </span>
+      <span className="flex h-[33px] w-[33px] shrink-0 items-center justify-center">
+        <IconPlus aria-hidden stroke={2.6} className={compact ? 'h-4 w-4 text-white' : 'h-5 w-5 text-white'} />
       </span>
-      <span className="relative min-w-0 flex-1">{label}</span>
+      <span className="min-w-0 flex-1">{label}</span>
     </Link>
   )
 }
