@@ -5,17 +5,17 @@
       "static/chunks/_81cd7939._.js",
       "static/chunks/node_modules_87778445._.js",
       "static/chunks/app_[locale]_topic_[id]_[slug]_knowledge-card_module_8419922f.css",
-      "static/chunks/app_[locale]_topic_[id]_[slug]_KnowledgeGrid_tsx_8ae55fa5._.js"
+      "static/chunks/app_[locale]_topic_[id]_[slug]_KnowledgeGrid_tsx_3b45a071._.js"
     ]
   },
   "[project]/app/[locale]/home/SearchResultsGrid.tsx [app-client] (ecmascript, next/dynamic entry)": {
     "id": "[project]/app/[locale]/home/SearchResultsGrid.tsx [app-client] (ecmascript, next/dynamic entry)",
     "files": [
-      "static/chunks/app_[locale]_home_SearchResultsList_tsx_391344dd._.js",
+      "static/chunks/app_[locale]_home_SearchResultsList_tsx_e955370d._.js",
       "static/chunks/_2f5ca6e4._.js",
       "static/chunks/node_modules_87778445._.js",
       "static/chunks/app_[locale]_topic_[id]_[slug]_knowledge-card_module_8419922f.css",
-      "static/chunks/app_[locale]_home_SearchResultsGrid_tsx_8ae55fa5._.js"
+      "static/chunks/app_[locale]_home_SearchResultsGrid_tsx_3b45a071._.js"
     ]
   },
   "[project]/app/[locale]/topic/[id]/[slug]/KnowledgeList.tsx [app-client] (ecmascript, next/dynamic entry)": {
@@ -23,7 +23,7 @@
     "files": [
       "static/chunks/_4c9b0d63._.js",
       "static/chunks/app_[locale]_topic_[id]_[slug]_knowledge-list_module_dc761d81.css",
-      "static/chunks/app_[locale]_topic_[id]_[slug]_KnowledgeList_tsx_8ae55fa5._.js"
+      "static/chunks/app_[locale]_topic_[id]_[slug]_KnowledgeList_tsx_3b45a071._.js"
     ]
   }
 }

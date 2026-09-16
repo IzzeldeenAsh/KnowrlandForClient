@@ -178,10 +178,8 @@ export default function MobileMenu({ isHomePage = true }: MobileMenuProps) {
     </button>
   )
 
-  const mobileMenu = (
-    <div className="xl:hidden flex items-center ml-4">
-      {menuTrigger}
-
+  const mobileMenuLayer = (
+    <>
       {mobileNavOpen && (
         <button
           type="button"
@@ -249,6 +247,13 @@ export default function MobileMenu({ isHomePage = true }: MobileMenuProps) {
         </ul>
         )}
       </nav>
+    </>
+  )
+
+  const mobileMenu = (
+    <div className="xl:hidden flex items-center ml-4">
+      {menuTrigger}
+      {portalReady ? createPortal(mobileMenuLayer, document.body) : mobileMenuLayer}
     </div>
   )
 

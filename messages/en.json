@@ -174,7 +174,8 @@
         "beta": {
             "notice": "🚀 Welcome to Insighta Beta. Some features and tools are still being refined. Stay tuned for upcoming updates!"
         },
-        "becomeInsighter": "Become an Insighter"
+        "becomeInsighter": "Become an Insighter",
+        "addInsight": "Add Insight"
     },
     "Features": {
         "tagline": "We pave the way",

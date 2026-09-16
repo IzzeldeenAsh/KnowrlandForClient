@@ -18,7 +18,12 @@ type FeedShareProps = {
   shareKind?: 'post' | 'white-paper'
   /** Optional custom styling for non-feed share triggers. */
   triggerClassName?: string
+  triggerIconClassName?: string
   hideTriggerLabel?: boolean
+  triggerLabel?: string
+  hideTrigger?: boolean
+  modalOpened?: boolean
+  onModalOpenedChange?: (opened: boolean) => void
 }
 
 const FeedShare = ({
@@ -29,21 +34,25 @@ const FeedShare = ({
   locale,
   shareKind = 'post',
   triggerClassName,
+  triggerIconClassName,
   hideTriggerLabel = false,
+  triggerLabel,
+  hideTrigger = false,
+  modalOpened,
+  onModalOpenedChange,
 }: FeedShareProps) => {
   const isRTL = locale === 'ar'
   const isWhitePaper = shareKind === 'white-paper'
 
-  const [shareModalOpened, setShareModalOpened] = useState(false)
+  const [internalModalOpened, setInternalModalOpened] = useState(false)
+  const shareModalOpened = modalOpened ?? internalModalOpened
+  const setShareModalOpened = (opened: boolean) => {
+    if (modalOpened === undefined) setInternalModalOpened(opened)
+    onModalOpenedChange?.(opened)
+  }
   const [customShareMessage, setCustomShareMessage] = useState('')
   const [linkCopied, setLinkCopied] = useState(false)
   const shareTextareaRef = useRef<HTMLTextAreaElement | null>(null)
-
-  useEffect(() => {
-    if (shareModalOpened) {
-      shareTextareaRef.current?.focus()
-    }
-  }, [shareModalOpened])
 
   const t = {
     share: isRTL ? 'مشاركة' : 'Share',
@@ -65,6 +74,15 @@ const FeedShare = ({
       : (isRTL ? 'منشور بواسطة' : 'Post by'),
     close: isRTL ? 'إغلاق' : 'Close',
   }
+
+  useEffect(() => {
+    if (shareModalOpened) {
+      setCustomShareMessage((current) => current || `${t.checkOutPost}${shareTitle || authorName}`)
+      shareTextareaRef.current?.focus()
+    }
+  // The localized default is intentionally set only when the modal opens.
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [shareModalOpened])
 
   const authorInitials = authorName
     .split(' ')
@@ -121,19 +139,25 @@ const FeedShare = ({
 
   return (
     <>
-      <button
-        type="button"
-        onClick={handleShare}
-        aria-label={t.share}
-        className={triggerClassName ?? 'inline-flex min-w-0 flex-1 items-center justify-center gap-1 rounded-md px-1 py-2.5 text-[12px] font-medium text-[#5A6B85] transition-colors hover:bg-[#F5F8FC] hover:text-[#101724] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2378E8] sm:gap-2 sm:px-2 sm:text-[14px]'}
-      >
-        <IconShare3 aria-hidden className="h-4 w-4 shrink-0 text-[#E0398A] sm:h-[18px] sm:w-[18px]" stroke={1.8} />
-        {!hideTriggerLabel && <span>{t.share}</span>}
-      </button>
+      {!hideTrigger && (
+        <button
+          type="button"
+          onClick={handleShare}
+          aria-label={t.share}
+          className={triggerClassName ?? 'inline-flex min-w-0 flex-1 items-center justify-center gap-1 rounded-md px-1 py-2.5 text-[12px] font-medium text-[#5A6B85] transition-colors hover:bg-[#F5F8FC] hover:text-[#101724] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2378E8] sm:gap-2 sm:px-2 sm:text-[14px]'}
+        >
+          <IconShare3
+            aria-hidden
+            className={triggerIconClassName ?? 'h-4 w-4 shrink-0 text-[#E0398A] sm:h-[18px] sm:w-[18px]'}
+            stroke={1.8}
+          />
+          {!hideTriggerLabel && <span>{triggerLabel ?? t.share}</span>}
+        </button>
+      )}
 
       {shareModalOpened && typeof document !== 'undefined' && createPortal(
         <div
-          className="fixed inset-0 z-[100] flex items-center justify-center bg-black/50 p-4"
+          className="fixed inset-0 z-[1000] flex items-center justify-center bg-black/50 p-4"
           onClick={() => setShareModalOpened(false)}
         >
           <div

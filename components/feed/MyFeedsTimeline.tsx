@@ -60,6 +60,10 @@ import PostModal, { type PostModalMode } from '@/components/feed/post/PostModal'
 // useLayoutEffect warns when a client component is pre-rendered on the server.
 const useBrowserLayoutEffect = typeof window === 'undefined' ? useEffect : useLayoutEffect
 
+const FEED_BODY_COLLAPSED_LINES = 10
+const FEED_BODY_MIN_WORDS_TO_COLLAPSE = 80
+const FEED_BODY_MIN_HIDDEN_LINES = 3
+
 type MyFeedsTimelineProps = {
   locale: string
 }
@@ -591,19 +595,28 @@ function ImageGallery({
         opened={activeMedia !== null}
         onClose={() => setActiveImageIndex(null)}
         centered
-        size="xl"
+        size="92vw"
         padding={0}
         yOffset={24}
         withCloseButton={false}
         overlayProps={{ backgroundOpacity: 0.72, blur: 3 }}
         classNames={{
           content: 'overflow-hidden bg-[#101724]',
-          body: 'p-0',
+          body: 'h-full p-0',
         }}
-        styles={{ content: { overflowY: 'hidden' } }}
+        styles={{
+          content: {
+            height: 'calc(100dvh - 48px)',
+            maxWidth: '1400px',
+            maxHeight: 'calc(100dvh - 48px)',
+            overflow: 'hidden',
+            backgroundColor: '#101724',
+          },
+          body: { height: '100%' },
+        }}
       >
         {activeMedia && (
-          <div className="relative flex min-h-[220px] items-center justify-center bg-[#101724]" dir={isArabic ? 'rtl' : 'ltr'}>
+          <div className="relative flex h-full w-full min-h-[220px] items-center justify-center bg-[#101724]" dir={isArabic ? 'rtl' : 'ltr'}>
             <button
               type="button"
               onClick={() => setActiveImageIndex(null)}
@@ -615,8 +628,7 @@ function ImageGallery({
             <img
               src={activeMedia.url ?? ''}
               alt={activeMedia.name || imageAlt}
-              className="block max-w-[92vw] object-contain"
-              style={{ maxHeight: 'calc(100dvh - 48px)' }}
+              className="feed-media-contain block h-full w-full"
             />
 
             {isCarousel && (
@@ -1171,6 +1183,8 @@ export function FeedCard({
   const isArticle = item.content_type === 'article'
   const isPostTitleArabic = isFirstWordArabic(item.title ?? '')
   const postBodyText = stripHtml(item.body ?? '')
+  const postBodyWordCount = postBodyText ? postBodyText.split(/\s+/).length : 0
+  const isBodyCollapseCandidate = postBodyWordCount >= FEED_BODY_MIN_WORDS_TO_COLLAPSE
   const isPostBodyArabic = isFirstWordArabic(postBodyText)
   const isRichPostBody = /<\/?[a-z][^>]*>/i.test(item.body ?? '')
   const imageMedia = item.media.filter((media) => media.media_type === 'image' && media.url)
@@ -1249,26 +1263,57 @@ export function FeedCard({
     setIsBodyExpanded(false)
   }, [item.body, item.uuid, tagHashtagsKey])
 
-  useEffect(() => {
+  useBrowserLayoutEffect(() => {
     const bodyContent = bodyContentRef.current
     if (!bodyContent) {
       setIsBodyOverflowing(false)
       return
     }
 
-    const measureOverflow = () => {
-      // While expanded the clamp is off, so the element can no longer tell us
-      // whether the collapsed state would crop. Keep the last measurement.
-      if (isBodyExpanded) return
-      setIsBodyOverflowing(bodyContent.scrollHeight > bodyContent.clientHeight + 1)
+    const measureMeaningfulOverflow = () => {
+      if (!isBodyCollapseCandidate) {
+        setIsBodyOverflowing(false)
+        return
+      }
+
+      const computedLineHeight = Number.parseFloat(window.getComputedStyle(bodyContent).lineHeight)
+      const lineHeight = Number.isFinite(computedLineHeight) ? computedLineHeight : 20
+      const collapsedHeight = lineHeight * FEED_BODY_COLLAPSED_LINES
+      const minimumExpandedHeight = collapsedHeight + lineHeight * FEED_BODY_MIN_HIDDEN_LINES
+
+      // Some browsers report a line-clamped element's scrollHeight as its
+      // clamped height. Measuring that same visible element made the card
+      // alternate between clamped and expanded states. Use a hidden,
+      // unclamped clone so the visible post height never affects the result.
+      const measurement = bodyContent.cloneNode(true) as HTMLElement
+      measurement.removeAttribute('id')
+      measurement.querySelectorAll('[id]').forEach((element) => element.removeAttribute('id'))
+      measurement.style.position = 'fixed'
+      measurement.style.inset = '0 auto auto -10000px'
+      measurement.style.width = `${bodyContent.getBoundingClientRect().width}px`
+      measurement.style.height = 'auto'
+      measurement.style.maxHeight = 'none'
+      measurement.style.overflow = 'visible'
+      measurement.style.visibility = 'hidden'
+      measurement.style.pointerEvents = 'none'
+      measurement.style.display = 'block'
+      measurement.style.setProperty('-webkit-line-clamp', 'unset')
+      measurement.style.setProperty('-webkit-box-orient', 'initial')
+      document.body.appendChild(measurement)
+      const expandedHeight = measurement.scrollHeight
+      measurement.remove()
+
+      // Requiring several hidden lines prevents a "Read more" click from
+      // revealing only a sentence fragment or a single extra line.
+      setIsBodyOverflowing(expandedHeight >= minimumExpandedHeight)
     }
 
-    measureOverflow()
-    const resizeObserver = new ResizeObserver(measureOverflow)
+    measureMeaningfulOverflow()
+    const resizeObserver = new ResizeObserver(measureMeaningfulOverflow)
     resizeObserver.observe(bodyContent)
 
     return () => resizeObserver.disconnect()
-  }, [item.body, isBodyExpanded, tagHashtagsKey])
+  }, [isBodyCollapseCandidate, item.body, tagHashtagsKey])
 
   const toggleBodyExpanded = () => {
     isCollapsingBodyRef.current = isBodyExpanded
@@ -1452,7 +1497,7 @@ export function FeedCard({
             className={`text-start text-[14px] leading-5 text-[#1C2433] [&_a]:font-medium [&_a]:text-[#2378E8] [&_a]:underline [&_a]:decoration-[#2378E8]/40 [&_a]:underline-offset-2 [&_a:hover]:text-[#155DB8] [&_p]:m-0 [&_p+p]:mt-2 [&_ul]:my-2 [&_ul]:list-disc [&_ul]:ps-5 [&_ol]:my-2 [&_ol]:list-decimal [&_ol]:ps-5 ${
               isRichPostBody ? '' : 'whitespace-pre-wrap'
             } ${
-              isBodyExpanded ? 'line-clamp-none' : 'line-clamp-[10]'
+              isBodyExpanded || !isBodyOverflowing ? 'line-clamp-none' : 'line-clamp-[10]'
             }`}
           >
             {item.body && (

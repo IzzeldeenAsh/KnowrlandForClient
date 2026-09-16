@@ -8,6 +8,7 @@ import {
   IconBell,
   IconBook,
   IconBookmark,
+  IconBookmarks,
   IconBriefcase,
   IconCalendar,
   IconCalendarCog,
@@ -103,7 +104,7 @@ const copyByLocale: Record<'en' | 'ar', SidebarCopy> = {
     myPosts: 'My Posts',
     savedPosts: 'Saved Posts',
     insights: 'Insights',
-    addInsight: 'Add Now',
+    addInsight: 'Add Insight',
     myKnowledge: 'My Library',
     myDownloads: 'My Downloads',
     readLater: 'Read Later',
@@ -138,7 +139,7 @@ const copyByLocale: Record<'en' | 'ar', SidebarCopy> = {
     myPosts: 'منشوراتي',
     savedPosts: 'المنشورات المحفوظة',
     insights: 'الرؤى',
-    addInsight: 'أضف الآن',
+    addInsight: 'إضافة رؤية',
     myKnowledge: 'مكتبتي',
     myDownloads: 'تحميلاتي',
     readLater: 'اقرأ لاحقاً',
@@ -206,6 +207,49 @@ function SetupBadge({ label, icon: BadgeIcon }: { label: string; icon?: Icon }) 
       {BadgeIcon && <BadgeIcon aria-hidden stroke={3} className="h-[11px] w-[11px]" />}
       {label}
     </span>
+  )
+}
+
+/** Same row shape as SidebarItem, but tinted so it reads as the one action in the list. */
+function AddInsightAction({ href, label, compact = false }: { href: string; label: string; compact?: boolean }) {
+  return (
+    <Link
+      href={href}
+      className={`group flex items-center gap-3 bg-gradient-to-r from-[#E6F1FE] via-[#F1F7FF] to-[#DEEDFC] text-start text-[14px] font-semibold text-[#1B5FC1] transition-colors duration-150 hover:from-[#D8E9FD] hover:to-[#D2E5FB] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[#2378E8] ${
+        compact
+          ? 'min-h-10 rounded-md border-b border-[#E2E8F0] px-2 py-2 last:border-b-0'
+          : 'min-h-11 border-b border-s-2 border-b-[#F1F1F1] border-s-transparent px-4 py-3'
+      }`}
+    >
+      <span className="flex h-6 w-8 shrink-0 items-center justify-center text-[#2378E8]">
+        <IconPlus aria-hidden stroke={2.2} className="h-[18px] w-[18px]" />
+      </span>
+      <span className="min-w-0 flex-1">{label}</span>
+    </Link>
+  )
+}
+
+/** Standalone card above the Dashboard link; mirrors DashboardLink's geometry. */
+function AddInsightCard({ href, label, compact = false }: { href: string; label: string; compact?: boolean }) {
+  return (
+    <Link
+      href={href}
+      className={`group relative isolate flex items-center gap-2.5 overflow-hidden rounded-lg border border-transparent bg-gradient-to-r from-[#3B82F6] to-[#06B6D4] text-start font-semibold text-white transition-colors duration-200 hover:from-[#2563EB] hover:to-[#0891B2] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2378E8] focus-visible:ring-offset-2 ${
+        compact ? 'min-h-10 px-2 py-1 text-[12px]' : 'min-h-[54px] px-4 py-2 text-[16px]'
+      }`}
+    >
+      {/* Static gloss across the top half. */}
+      <span
+        aria-hidden
+        className="pointer-events-none absolute inset-x-0 top-0 h-1/2 bg-gradient-to-b from-white/25 to-transparent"
+      />
+      <span className="relative flex h-[33px] w-[33px] shrink-0 items-center justify-center">
+        <span className="flex h-[26px] w-[26px] items-center justify-center rounded-[7px] border border-white/70 bg-white">
+          <IconPlus aria-hidden stroke={2.6} className="h-4 w-4 text-[#2378E8]" />
+        </span>
+      </span>
+      <span className="relative min-w-0 flex-1">{label}</span>
+    </Link>
   )
 }
 
@@ -520,6 +564,14 @@ export default function FeedSidebar({ locale, hideProfileCard = false }: FeedSid
       </section>
       )}
 
+      {isProvider && (
+        <AddInsightCard
+          href={`${dashboardUrl}/app/add-knowledge/stepper`}
+          label={copy.addInsight}
+          compact={hideProfileCard}
+        />
+      )}
+
       <DashboardLink href={`${dashboardBase}/my-dashboard`} label={copy.overview} compact={hideProfileCard} />
 
       <div className="overflow-hidden rounded-lg border border-[#D7E1EC] bg-white shadow-[0_2px_8px_rgba(27,56,93,0.04)]">
@@ -545,7 +597,7 @@ export default function FeedSidebar({ locale, hideProfileCard = false }: FeedSid
         />
         <SidebarItem
           href={`/${locale}?view=saved-posts`}
-          icon={IconBookmark}
+          icon={IconBookmarks}
           label={copy.savedPosts}
           isActive={isSavedPostsActive}
           compact={hideProfileCard}
@@ -559,10 +611,9 @@ export default function FeedSidebar({ locale, hideProfileCard = false }: FeedSid
         badgeIcon={IconPlus}
         compact={hideProfileCard}
       >
-        {needsInsightSetup && (
-          <SidebarItem
+        {isProvider && (
+          <AddInsightAction
             href={`${dashboardUrl}/app/add-knowledge/stepper`}
-            icon={IconPlus}
             label={copy.addInsight}
             compact={hideProfileCard}
           />

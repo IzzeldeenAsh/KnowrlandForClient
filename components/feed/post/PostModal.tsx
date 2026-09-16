@@ -54,6 +54,7 @@ import EmojiPicker from './EmojiPicker'
 import { AutoDirection } from './autoDirection'
 import TextEditIcon from '@/components/icons/TextEditIcon'
 import TagSelector from '../TagSelector'
+import type { PublishedPostSummary } from '../PublishSuccessModal'
 
 export type PostModalMode = 'post' | 'video' | 'image'
 
@@ -65,7 +66,7 @@ type PostModalProps = {
   onClose: () => void
   onDraftSaved: (draft: FeedItem) => void
   onDraftDiscarded: () => void
-  onPublished: () => void
+  onPublished: (publication: PublishedPostSummary) => void
   // When the composer reopens after the user published a new knowledge item,
   // this id is fetched and attached to the post automatically.
   autoAttachKnowledgeId?: number | null
@@ -398,6 +399,7 @@ export default function PostModal({
   // --- Sub-panel state ---
   const [libraryDrawerOpened, setLibraryDrawerOpened] = useState(false)
   const [formattingOpen, setFormattingOpen] = useState(false)
+  const formattingToggledRef = useRef(false)
 
   // --- Video state ---
   const [videoPhase, setVideoPhase] = useState<VideoPhase>('none')
@@ -419,7 +421,15 @@ export default function PostModal({
   const industryButtonRef = useRef<HTMLButtonElement>(null)
   const videoSelectButtonRef = useRef<HTMLButtonElement>(null)
   const videoFieldRef = useRef<HTMLDivElement>(null)
+  const bodyFieldRef = useRef<HTMLDivElement>(null)
   const imageFieldRef = useRef<HTMLDivElement>(null)
+
+  // The toolbar mounts above the content, so a long body can push it out of
+  // sight. Bring the editor's top into view whenever it is shown or hidden.
+  useEffect(() => {
+    if (!formattingToggledRef.current) return
+    bodyFieldRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+  }, [formattingOpen])
 
   const hasVideo = videoPhase !== 'none'
   const hasImages = images.length > 0
@@ -931,10 +941,12 @@ export default function PostModal({
         authorType: selectedAuthorType,
       }
 
+      let publishedUuid: string
       if (isVideoFlow && videoUuidRef.current) {
         await publishVideoPost(videoUuidRef.current, payload, locale)
+        publishedUuid = videoUuidRef.current
       } else {
-        await publishImageTextPost(
+        publishedUuid = await publishImageTextPost(
           {
             ...payload,
             media: images.flatMap((image, index) =>
@@ -946,8 +958,17 @@ export default function PostModal({
         )
       }
 
-      toast.success(isEditingPublished ? copy.updatedToast : copy.publishedToast)
-      onPublished()
+      if (isEditingPublished) toast.success(copy.updatedToast)
+      const publishAsCompany = selectedAuthorType === 'company'
+      onPublished({
+        uuid: publishedUuid,
+        title: richTextToPlainText(body).slice(0, 120),
+        authorName: publishAsCompany
+          ? companyName
+          : `${user?.first_name ?? ''} ${user?.last_name ?? ''}`.trim() || user?.name || '',
+        authorPhotoUrl: publishAsCompany ? user?.company?.logo : user?.profile_photo_url,
+        kind: 'post',
+      })
       onClose()
     } catch (error) {
       toast.error(error instanceof Error ? error.message : copy.videoUploadFailed)
@@ -1168,15 +1189,28 @@ export default function PostModal({
       <Modal
         opened={opened}
         onClose={requestClose}
-        size={640}
+        size="min(640px, calc(100vw - 24px))"
         radius={8}
         centered
         zIndex={300}
         withCloseButton={false}
         aria-labelledby="feed-post-dialog-title"
         styles={{
-          content: { boxShadow: 'none', border: '1px solid #DCE4EF' },
-          body: { position: 'relative' },
+          inner: { padding: 12 },
+          content: {
+            width: 'min(640px, calc(100vw - 24px))',
+            maxWidth: 'calc(100vw - 24px)',
+            maxHeight: 'calc(100dvh - 24px)',
+            overflowX: 'hidden',
+            boxShadow: 'none',
+            border: '1px solid #DCE4EF',
+          },
+          body: {
+            position: 'relative',
+            minWidth: 0,
+            padding: 'clamp(16px, 4vw, 24px)',
+            overflowX: 'hidden',
+          },
         }}
       >
         <h2 id="feed-post-dialog-title" className="sr-only">
@@ -1192,6 +1226,7 @@ export default function PostModal({
         </button>
 
         <form
+          className="min-w-0"
           noValidate
           onSubmit={(event) => {
             event.preventDefault()
@@ -1232,7 +1267,7 @@ export default function PostModal({
         <div className={step === 1 ? undefined : 'hidden'}>
         {/* Body: hidden until video upload allows editing, avoiding an empty locked area */}
         {!bodyLocked && (
-          <div className="mt-4">
+          <div ref={bodyFieldRef} className="mt-4 scroll-mt-4">
             <label htmlFor="feed-post-body" className="sr-only">
               {copy.description}
             </label>
@@ -1293,7 +1328,10 @@ export default function PostModal({
               <div className="flex items-center bg-white px-1.5 pb-1.5">
                 <button
                   type="button"
-                  onClick={() => setFormattingOpen((current) => !current)}
+                  onClick={() => {
+                    formattingToggledRef.current = true
+                    setFormattingOpen((current) => !current)
+                  }}
                   aria-label={copy.formatting}
                   aria-expanded={formattingOpen}
                   className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-md transition-colors focus-visible:outline-[1px] focus-visible:outline-offset-1 focus-visible:outline-[#B7D2F4] ${
@@ -1622,8 +1660,8 @@ export default function PostModal({
         )}
 
         {/* Footer */}
-        <div className="mt-4 flex flex-wrap items-center justify-between gap-3 border-t border-[#EDF1F7] pt-3.5">
-          <div className="flex min-w-0 items-center gap-1">
+        <div className="mt-4 flex min-w-0 flex-col items-stretch gap-3 border-t border-[#EDF1F7] pt-3.5 sm:flex-row sm:flex-wrap sm:items-center sm:justify-between">
+          <div className="flex min-w-0 items-center gap-1 sm:w-auto">
             {draft && !isEditingPublished && (
               <button
                 type="button"
@@ -1687,7 +1725,7 @@ export default function PostModal({
             )}
           </div>
 
-          <div className="flex items-center gap-2">
+          <div className="flex min-w-0 w-full items-center justify-end gap-2 sm:w-auto">
             {step === 1 ? (
               <button
                 type="button"
@@ -1705,7 +1743,7 @@ export default function PostModal({
                     onClick={() => void handleSaveDraft()}
                     disabled={isPublishing || isSavingDraft || isDiscardingDraft}
                     aria-busy={isSavingDraft}
-                    className="inline-flex min-h-10 items-center justify-center rounded-md border border-[#C9DCF6] bg-white px-4 py-2.5 text-[14px] font-medium text-[#1D74E0] transition-colors hover:bg-[#F2F7FF] focus-visible:outline-[1px] focus-visible:outline-offset-1 focus-visible:outline-[#B7D2F4] disabled:cursor-wait disabled:opacity-55"
+                    className="inline-flex min-h-10 min-w-0 flex-1 items-center justify-center rounded-md border border-[#C9DCF6] bg-white px-3 py-2.5 text-[14px] font-medium text-[#1D74E0] transition-colors hover:bg-[#F2F7FF] focus-visible:outline-[1px] focus-visible:outline-offset-1 focus-visible:outline-[#B7D2F4] disabled:cursor-wait disabled:opacity-55 sm:flex-none sm:px-4"
                   >
                     {isSavingDraft && (
                       <IconLoader2 aria-hidden className="me-1.5 h-4 w-4 animate-spin" stroke={2} />
@@ -1717,7 +1755,7 @@ export default function PostModal({
                   type="submit"
                   disabled={isPublishing || isSavingDraft || isDiscardingDraft || (step === 3 && authorType === null)}
                   aria-busy={isPublishing}
-                  className="min-h-10 rounded-md bg-[#1D74E0] px-6 py-2.5 text-[14px] font-medium text-white transition-colors hover:bg-[#155CB8] focus-visible:outline-[1px] focus-visible:outline-offset-1 focus-visible:outline-[#B7D2F4] disabled:cursor-wait disabled:bg-[#93B9E8]"
+                  className="min-h-10 min-w-0 flex-1 rounded-md bg-[#1D74E0] px-4 py-2.5 text-[14px] font-medium text-white transition-colors hover:bg-[#155CB8] focus-visible:outline-[1px] focus-visible:outline-offset-1 focus-visible:outline-[#B7D2F4] disabled:cursor-wait disabled:bg-[#93B9E8] sm:flex-none sm:px-6"
                 >
                   {step === 2 && canChoosePublisher
                     ? copy.next

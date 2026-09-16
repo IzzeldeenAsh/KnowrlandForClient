@@ -207,7 +207,7 @@ export default function KnowledgeLibraryDrawer({
     >
       <div className="flex h-[calc(100vh-120px)] flex-col">
         {showSearch && (
-          <div className="pb-3">
+          <div className="pb-3 pt-4">
             <label className="sr-only" htmlFor="knowledge-library-search">
               {copy.searchLabel}
             </label>

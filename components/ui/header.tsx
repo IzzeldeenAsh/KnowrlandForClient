@@ -3,7 +3,7 @@ import Link from 'next/link'
 import Logo from './logo'
 import MobileMenu from './mobile-menu'
 import { useEffect, useLayoutEffect, useRef, useState } from 'react'
-import { IconChevronDown, IconLanguage, IconSearch, IconX } from '@tabler/icons-react'
+import { IconChevronDown, IconLanguage, IconPlus, IconSearch, IconX } from '@tabler/icons-react'
 import { HoverCard, Group, Text, Anchor, Divider, SimpleGrid, Button, TextInput } from '@mantine/core'
 import { UserProfile } from './header/components/UserProfile'
 import { useTranslations } from 'next-intl'
@@ -812,6 +812,20 @@ export default function Header() {
                     </button>
                   </div>
                 </li>
+
+                {/* Add Insight - providers only; logo gradient behind a white plus. */}
+                {!shouldShowAuthSkeleton && user && (roles.includes('insighter') || roles.includes('company') || roles.includes('company-insighter')) && (
+                  <li className="mx-1 md:mx-2 xl:hidden">
+                    <Link
+                      href={`${process.env.NEXT_PUBLIC_DASHBOARD_URL}/app/add-knowledge/stepper`}
+                      aria-label={t('addInsight')}
+                      title={t('addInsight')}
+                      className="flex h-7 w-7 items-center justify-center rounded-lg bg-gradient-to-br from-[#0884d5] to-[#009f83] text-white transition-all duration-200 ease-in-out hover:-translate-y-px hover:brightness-110 lg:h-8 lg:w-8"
+                    >
+                      <IconPlus size={16} stroke={2.6} aria-hidden />
+                    </Link>
+                  </li>
+                )}
 
                 {/* Become an Insighter button - only for client role */}
                 {!shouldShowAuthSkeleton && !isProjectRoute() && !roles.includes('insighter') && !roles.includes('company') && !roles.includes('company-insighter') && (

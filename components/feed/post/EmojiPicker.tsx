@@ -121,7 +121,9 @@ export default function EmojiPicker({ onSelect, label }: EmojiPickerProps) {
         aria-label={label}
         aria-expanded={opened}
         className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-md transition-colors focus-visible:outline-[1px] focus-visible:outline-offset-1 focus-visible:outline-[#B7D2F4] ${
-          opened ? 'bg-[#EDF3FC] text-[#1D74E0]' : 'text-[#5A6B84] hover:bg-[#F3F6FB]'
+          opened
+            ? 'bg-[#FFF3D6] text-[#C97800]'
+            : 'text-[#E59A17] hover:bg-[#FFF7E6] hover:text-[#C97800]'
         }`}
       >
         <IconMoodSmile aria-hidden stroke={1.7} className="h-4 w-4" />

@@ -268,7 +268,7 @@ export function UserProfile({ isHome }: { isHome: boolean }) {
           aria-haspopup="true"
           aria-expanded={menuOpen}
           aria-label={t("myProfile")}
-          className="flex items-center justify-center -m-2 p-2 rounded-full border-0 bg-transparent cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-400/60"
+          className="group flex items-center justify-center -m-2 p-2 rounded-full border-0 bg-transparent hover:bg-transparent cursor-pointer focus:outline-none"
         >
           {/* {roles.includes('company') && user.company?.logo ? (
             <div className="w-8 h-8 md:w-10 md:h-10 rounded-full overflow-hidden">
@@ -299,7 +299,7 @@ export function UserProfile({ isHome }: { isHome: boolean }) {
           )} */}
 
           {user.profile_photo_url ? (
-            <div className="w-8 h-8 md:w-10 md:h-10 rounded-full overflow-hidden">
+            <div className="w-8 h-8 md:w-10 md:h-10 rounded-full overflow-hidden ring-2 ring-transparent ring-offset-0 transition-shadow duration-300 ease-out motion-reduce:transition-none group-hover:ring-[#3B8AEF] group-hover:shadow-[0_0_0_6px_rgba(59,138,239,0.18)] group-focus-visible:ring-[#3B8AEF] group-focus-visible:shadow-[0_0_0_6px_rgba(59,138,239,0.18)]">
               <Image
                 src={user.profile_photo_url}
                 alt={user.name}
@@ -310,7 +310,7 @@ export function UserProfile({ isHome }: { isHome: boolean }) {
               />
             </div>
           ) : (
-            <div className="w-8 h-8 md:w-10 md:h-10 rounded-full bg-white flex items-center justify-center text-blue-600 text-sm font-medium border border-gray-200">
+            <div className="w-8 h-8 md:w-10 md:h-10 rounded-full bg-white flex items-center justify-center text-blue-600 text-sm font-medium border border-gray-200 ring-2 ring-transparent ring-offset-0 transition-shadow duration-300 ease-out motion-reduce:transition-none group-hover:ring-[#3B8AEF] group-hover:shadow-[0_0_0_6px_rgba(59,138,239,0.18)] group-focus-visible:ring-[#3B8AEF] group-focus-visible:shadow-[0_0_0_6px_rgba(59,138,239,0.18)]">
               {getInitials(user.first_name, user.last_name)}
             </div>
           )}

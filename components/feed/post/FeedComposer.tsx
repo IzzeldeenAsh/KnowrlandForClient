@@ -8,6 +8,7 @@ import { useUserProfile } from '@/components/ui/header/hooks/useUserProfile'
 import { getFeedDraft, type FeedItem } from '@/services/feed.service'
 import BecomeInsighterCard from './BecomeInsighterCard'
 import PostModal, { type PostModalMode } from './PostModal'
+import PublishSuccessModal, { type PublishedPostSummary } from '../PublishSuccessModal'
 
 type FeedComposerProps = {
   locale: string
@@ -46,6 +47,7 @@ export default function FeedComposer({ locale }: FeedComposerProps) {
   const [isCheckingDraft, setIsCheckingDraft] = useState(false)
   const [autoAttachKnowledgeId, setAutoAttachKnowledgeId] = useState<number | null>(null)
   const [isUpgradeCardOpen, setIsUpgradeCardOpen] = useState(false)
+  const [publishedPost, setPublishedPost] = useState<PublishedPostSummary | null>(null)
 
   // The feed post endpoints are gated to insighter/company roles server-side
   // (routes/api/insighter.php: role:insighter|company-insighter). Guests and
@@ -233,10 +235,17 @@ export default function FeedComposer({ locale }: FeedComposerProps) {
           setModalMode(null)
           window.dispatchEvent(new Event('feed:published'))
         }}
-        onPublished={() => {
+        onPublished={(publication) => {
           setDraft(null)
+          setPublishedPost(publication)
           window.dispatchEvent(new Event('feed:published'))
         }}
+      />
+
+      <PublishSuccessModal
+        locale={locale}
+        publication={publishedPost}
+        onClose={() => setPublishedPost(null)}
       />
 
       <BecomeInsighterCard

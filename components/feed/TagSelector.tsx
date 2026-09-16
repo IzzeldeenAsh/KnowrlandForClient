@@ -203,9 +203,9 @@ export default function TagSelector({
   }
 
   return (
-    <div ref={rootRef} className="relative mt-2">
+    <div ref={rootRef} className="relative mt-2 min-w-0 max-w-full">
       <div
-        className={`flex min-h-11 w-full items-center gap-1.5 rounded-lg border bg-white px-2 py-1.5 transition-[border-color,box-shadow] ${
+        className={`flex min-h-11 w-full min-w-0 max-w-full items-center gap-1.5 overflow-hidden rounded-lg border bg-white px-2 py-1.5 transition-[border-color,box-shadow] ${
           isOpen
             ? 'border-[#7EADE8] shadow-[0_0_0_3px_rgba(35,120,232,0.10)]'
             : 'border-[#D6E0EC] hover:border-[#AFC4DE]'
@@ -259,7 +259,7 @@ export default function TagSelector({
               }
             }}
             placeholder={copy.placeholder}
-            className="h-7 min-w-[150px] flex-1 border-0 bg-transparent px-1 text-[13px] text-[#26364C] outline-none ring-0 focus:border-0 focus:outline-none focus:ring-0 placeholder:text-[#98A4B3]"
+            className="h-7 min-w-[88px] flex-1 border-0 bg-transparent px-1 text-[13px] text-[#26364C] outline-none ring-0 focus:border-0 focus:outline-none focus:ring-0 placeholder:text-[#98A4B3] sm:min-w-[150px]"
           />
         </div>
 
