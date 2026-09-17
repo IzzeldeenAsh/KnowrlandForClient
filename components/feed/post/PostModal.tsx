@@ -48,6 +48,8 @@ import {
 } from '@/services/feed.service'
 import IndustryField from './IndustryField'
 import ImageCropEditor from './ImageCropEditor'
+import { MAX_IMAGE_BYTES, MAX_VIDEO_BYTES } from './imageExport'
+import { contentFingerprint, richTextToPlainText } from './postContent'
 import { type IndustryOption } from './IndustrySelectModal'
 import KnowledgeLibraryDrawer from './KnowledgeLibraryDrawer'
 import EmojiPicker from './EmojiPicker'
@@ -98,7 +100,6 @@ interface SelectedImage {
 }
 
 const MAX_IMAGES = 20
-const MAX_IMAGE_BYTES = 5 * 1024 * 1024
 const MAX_VIDEO_SECONDS = 10 * 60
 const PROCESSING_POLL_MS = 3000
 const PROCESSING_TIMEOUT_MS = 2 * 60 * 1000
@@ -121,10 +122,10 @@ const copyByLocale = {
     description: 'Post description',
     bodyPlaceholder: 'Share your insights...',
     uploadTitle: 'Upload your video',
-    uploadHint: 'MP4 or MOV, up to 10 minutes. The video must finish uploading before you can write a description.',
+    uploadHint: 'MP4 or MOV · up to 10 minutes · up to 5 GB per video. Videos are processed for playback after upload.',
     selectVideo: 'Select video',
     imageUploadTitle: 'Upload your images',
-    imageUploadHint: 'JPG, PNG, or GIF, up to 5MB each. Add at least one image before you can write a description.',
+    imageUploadHint: 'JPG, PNG, or GIF · up to 5 MB per image · up to 20 images. Cropped images are automatically optimized to fit the limit.',
     selectImages: 'Select images',
     addImages: 'Add more images',
     uploading: 'Uploading…',
@@ -169,7 +170,7 @@ const copyByLocale = {
     exitDescription: 'The post you started will be here when you return.',
     exitDiscard: 'Discard',
     exitSaveDraft: 'Save as draft',
-    exitSaveBlocked: 'Finish the highlighted fields to save this post as a draft.',
+    exitSaveBlocked: 'Your draft could not be saved. Please try again.',
     editExitTitle: 'Discard your changes?',
     editExitDescription: 'The edits you made to this post will be lost.',
     discardChanges: 'Discard changes',
@@ -181,6 +182,10 @@ const copyByLocale = {
     savedVideo: 'Saved video',
     publishedToast: 'Your post has been published.',
     updatedToast: 'Your post has been updated.',
+    videoTooLarge: 'This video exceeds 5 GB. Choose a smaller file and try again.',
+    imageWrongType: (name: string) => `“${name}” is not a supported image. Choose a JPG, PNG, or GIF file.`,
+    emptyDraft: 'Add text, an image, a video, or a library item before saving a draft.',
+    uploadBeforeLeaving: 'Wait for the video upload to finish, or remove it before opening publishing.',
     videoTooLong: 'The video must be 10 minutes or shorter.',
     videoWrongType: 'Only MP4 or MOV videos are supported.',
     imageTooLarge: (name: string) => `"${name}" is larger than 5MB and was skipped.`,
@@ -188,6 +193,7 @@ const copyByLocale = {
     replacingSavedImages: 'New images will replace the images saved in this draft.',
     mediaLocked: 'Published media cannot be changed.',
     videoUploadFailed: 'Video upload failed. Please try again.',
+    publishFailed: 'Your post could not be published. Please try again.',
     industryFirst: 'Select an industry first',
     industryRequired: 'Select an industry.',
     videoRequired: 'Select and finish uploading a video.',
@@ -211,10 +217,10 @@ const copyByLocale = {
     description: 'وصف المنشور',
     bodyPlaceholder: 'شارك معرفة أو رؤية أو فكرة مفيدة',
     uploadTitle: 'ارفع الفيديو',
-    uploadHint: 'MP4 أو MOV، بحد أقصى 10 دقائق. يجب اكتمال رفع الفيديو قبل كتابة الوصف.',
+    uploadHint: 'MP4 أو MOV · حتى 10 دقائق · حتى 5 جيجابايت للفيديو. نجهّز الفيديو للتشغيل بعد رفعه.',
     selectVideo: 'اختر فيديو',
     imageUploadTitle: 'ارفع الصور',
-    imageUploadHint: 'JPG أو PNG أو GIF، بحد أقصى 5 ميجابايت لكل صورة. أضف صورة واحدة على الأقل قبل كتابة الوصف.',
+    imageUploadHint: 'JPG أو PNG أو GIF · حتى 5 ميجابايت للصورة · حتى 20 صورة. نحسّن الصور بعد الاقتصاص تلقائياً لتناسب الحد المسموح.',
     selectImages: 'اختر صوراً',
     addImages: 'إضافة المزيد من الصور',
     uploading: 'جارٍ الرفع…',
@@ -259,7 +265,7 @@ const copyByLocale = {
     exitDescription: 'سيكون المنشور الذي بدأته بانتظارك عند عودتك.',
     exitDiscard: 'تجاهل',
     exitSaveDraft: 'حفظ كمسودة',
-    exitSaveBlocked: 'أكمل الحقول المطلوبة لحفظ المنشور كمسودة.',
+    exitSaveBlocked: 'تعذر حفظ المسودة. حاول مجدداً.',
     editExitTitle: 'تجاهل التعديلات؟',
     editExitDescription: 'ستفقد التعديلات التي أجريتها على هذا المنشور.',
     discardChanges: 'تجاهل التعديلات',
@@ -271,6 +277,10 @@ const copyByLocale = {
     savedVideo: 'فيديو محفوظ',
     publishedToast: 'تم نشر منشورك.',
     updatedToast: 'تم تحديث منشورك.',
+    videoTooLarge: 'حجم الفيديو يتجاوز 5 جيجابايت. اختر ملفاً أصغر وحاول مجدداً.',
+    imageWrongType: (name: string) => `صيغة الصورة «${name}» غير مدعومة. اختر ملف JPG أو PNG أو GIF.`,
+    emptyDraft: 'أضف نصاً أو صورة أو فيديو أو عنصراً من المكتبة قبل حفظ المسودة.',
+    uploadBeforeLeaving: 'انتظر اكتمال رفع الفيديو أو أزله قبل الانتقال إلى النشر.',
     videoTooLong: 'يجب ألا تتجاوز مدة الفيديو 10 دقائق.',
     videoWrongType: 'يدعم النظام فيديوهات MP4 أو MOV فقط.',
     imageTooLarge: (name: string) => `تم تخطي "${name}" لأن حجمه أكبر من 5 ميجابايت.`,
@@ -278,6 +288,7 @@ const copyByLocale = {
     replacingSavedImages: 'ستحل الصور الجديدة محل الصور المحفوظة في هذه المسودة.',
     mediaLocked: 'لا يمكن تغيير وسائط المنشور بعد نشره.',
     videoUploadFailed: 'فشل رفع الفيديو. حاول مرة أخرى.',
+    publishFailed: 'تعذر نشر المنشور. حاول مجدداً.',
     industryFirst: 'اختر المجال أولاً',
     industryRequired: 'اختر مجالاً.',
     videoRequired: 'اختر فيديو وانتظر حتى يكتمل رفعه.',
@@ -306,39 +317,6 @@ function getVideoDurationSeconds(file: File): Promise<number> {
 function isSupportedVideoFile(file: File): boolean {
   if (['video/mp4', 'video/quicktime'].includes(file.type)) return true
   return /\.(mp4|mov)$/i.test(file.name)
-}
-
-function richTextToPlainText(html: string): string {
-  if (!html) return ''
-  if (typeof document === 'undefined') {
-    return html.replace(/<[^>]*>/g, ' ').replace(/&nbsp;/g, ' ').replace(/\s+/g, ' ').trim()
-  }
-
-  const container = document.createElement('div')
-  container.innerHTML = html
-  return (container.textContent ?? '').replace(/\s+/g, ' ').trim()
-}
-
-// Fingerprint of everything the author can change, so closing the composer can
-// tell "nothing typed yet" from "work that would be lost". The video phase is
-// deliberately left out: it moves on its own while the provider prepares the
-// upload, and that is not an edit.
-function contentFingerprint(input: {
-  body: string
-  industryId: number | null
-  tagIds: number[]
-  insightIds: number[]
-  imageKeys: string[]
-  videoFileName: string
-}): string {
-  return JSON.stringify([
-    input.body.trim(),
-    input.industryId,
-    [...input.tagIds].sort((a, b) => a - b),
-    [...input.insightIds].sort((a, b) => a - b),
-    input.imageKeys,
-    input.videoFileName,
-  ])
 }
 
 const EMPTY_FINGERPRINT = contentFingerprint({
@@ -398,6 +376,9 @@ export default function PostModal({
 
   // --- Sub-panel state ---
   const [libraryDrawerOpened, setLibraryDrawerOpened] = useState(false)
+  const [composerError, setComposerError] = useState<string | null>(null)
+  const [imageErrors, setImageErrors] = useState<string[]>([])
+  const [videoUploadError, setVideoUploadError] = useState<string | null>(null)
   const [formattingOpen, setFormattingOpen] = useState(false)
   const formattingToggledRef = useRef(false)
 
@@ -490,11 +471,16 @@ export default function PostModal({
         tagIds: selectedTags.map((tag) => tag.id),
         insightIds: relatedInsights.map((item) => item.id),
         imageKeys: images.map((image) => image.previewUrl),
-        videoFileName,
+        videoFileName: videoPhase === 'error' && !draft ? '' : videoFileName,
       }),
-    [body, industry, selectedTags, relatedInsights, images, videoFileName],
+    [body, industry, selectedTags, relatedInsights, images, videoFileName, videoPhase, draft],
   )
-  const hasUnsavedChanges = currentFingerprint !== baselineFingerprintRef.current
+  const hasDraftContent =
+    richTextToPlainText(body) !== '' ||
+    images.length > 0 ||
+    relatedInsights.length > 0 ||
+    (videoPhase !== 'none' && videoPhase !== 'error')
+  const hasUnsavedChanges = currentFingerprint !== baselineFingerprintRef.current && (!!draft || hasDraftContent)
   // Bytes are still in flight: a draft saved now would point at an incomplete
   // upload, so the exit prompt offers only "discard" or "keep editing".
   const isUploadInFlight = videoPhase === 'initializing' || videoPhase === 'uploading'
@@ -527,6 +513,9 @@ export default function PostModal({
     abortUploadRef.current = null
     stopPolling()
     setStep(1)
+    setComposerError(null)
+    setImageErrors([])
+    setVideoUploadError(null)
     setAuthorType(null)
     setBody('')
     setIndustry(null)
@@ -696,15 +685,20 @@ export default function PostModal({
     setDirtyFields((previous) => ({ ...previous, video: true }))
     setTouchedFields((previous) => ({ ...previous, video: false }))
 
+    setVideoUploadError(null)
+    if (file.size > MAX_VIDEO_BYTES) {
+      setVideoUploadError(copy.videoTooLarge)
+      return
+    }
     if (!isSupportedVideoFile(file)) {
-      toast.error(copy.videoWrongType)
+      setVideoUploadError(copy.videoWrongType)
       return
     }
 
     try {
       const duration = await getVideoDurationSeconds(file)
       if (duration > MAX_VIDEO_SECONDS) {
-        toast.error(copy.videoTooLong)
+        setVideoUploadError(copy.videoTooLong)
         return
       }
     } catch {
@@ -742,7 +736,7 @@ export default function PostModal({
       }
       setVideoPhase('error')
       setTouchedFields((previous) => ({ ...previous, video: true }))
-      toast.error(error instanceof Error ? error.message : copy.videoUploadFailed)
+      setVideoUploadError(error instanceof Error ? error.message : copy.videoUploadFailed)
     }
   }
 
@@ -768,21 +762,28 @@ export default function PostModal({
 
     const hasSavedImages = images.some((image) => image.file === null)
     const accepted: File[] = []
+    const errors: string[] = []
+    setImageErrors([])
     let remaining = MAX_IMAGES - (hasSavedImages ? 0 : images.length)
 
     for (const file of Array.from(files)) {
       if (remaining <= 0) {
-        toast.warning(copy.tooManyImages)
+        errors.push(copy.tooManyImages)
         break
       }
+      if (!['image/jpeg', 'image/png', 'image/gif', 'image/webp'].includes(file.type)) {
+        errors.push(copy.imageWrongType(file.name))
+        continue
+      }
       if (file.size > MAX_IMAGE_BYTES) {
-        toast.warning(copy.imageTooLarge(file.name))
+        errors.push(copy.imageTooLarge(file.name))
         continue
       }
       accepted.push(file)
       remaining -= 1
     }
 
+    setImageErrors(errors)
     if (accepted.length > 0) {
       replaceSavedImagesRef.current = hasSavedImages
       setImageCropBatchTotal(accepted.length)
@@ -792,7 +793,8 @@ export default function PostModal({
 
   const applyCroppedImage = (file: File) => {
     if (file.size > MAX_IMAGE_BYTES) {
-      toast.warning(copy.imageTooLarge(file.name))
+      setImageErrors([copy.imageTooLarge(file.name)])
+      return false
     } else {
       const selectedImage: SelectedImage = {
         file,
@@ -814,6 +816,7 @@ export default function PostModal({
     }
 
     setImageCropQueue((previous) => previous.slice(1))
+    return true
   }
 
   const cancelImageCrop = () => {
@@ -906,7 +909,7 @@ export default function PostModal({
     if (isPublishing || isSavingDraft || isDiscardingDraft) return
 
     if (canChoosePublisher && !selectedAuthorType) {
-      toast.error(copy.choosePublisher)
+      setComposerError(copy.choosePublisher)
       setStep(3)
       return
     }
@@ -931,6 +934,7 @@ export default function PostModal({
       return
     }
 
+    setComposerError(null)
     setIsPublishing(true)
     try {
       const payload = {
@@ -971,42 +975,32 @@ export default function PostModal({
       })
       onClose()
     } catch (error) {
-      toast.error(error instanceof Error ? error.message : copy.videoUploadFailed)
+      setComposerError(error instanceof Error ? error.message : copy.publishFailed)
     } finally {
       setIsPublishing(false)
     }
   }
 
-  // Validate the required fields and persist the draft. Returns the saved draft,
-  // or null if validation failed / the save errored (callers decide what to do
-  // next: close the modal, or redirect to publishing). Shared by "Save draft"
-  // and the "Save and start publish" empty-state CTA.
+  // Save unfinished content without imposing publication requirements. The
+  // caller either closes the composer or continues to library publishing.
   const persistDraft = async (): Promise<FeedItem | null> => {
     if (isPublishing || isSavingDraft || isDiscardingDraft) return null
 
-    const missingIndustry = industry === null
-    const missingVideo = isVideoFlow && videoUuidRef.current === null
-    const missingBody = richTextToPlainText(body) === ''
-
-    setTouchedFields({ industry: true, video: isVideoFlow, body: true })
-    setDirtyFields({ industry: true, video: isVideoFlow, body: true })
-
-    if (missingIndustry || missingVideo || missingBody || !industry) {
-      if (missingBody || missingVideo) {
-        setStep(1)
-        focusStep1Field(missingVideo)
-      } else {
-        setStep(2)
-        window.requestAnimationFrame(() => industryButtonRef.current?.focus())
-      }
+    setComposerError(null)
+    if (isUploadInFlight) {
+      setComposerError(copy.uploadBeforeLeaving)
+      return null
+    }
+    if (!hasDraftContent && !draft) {
+      setComposerError(copy.emptyDraft)
       return null
     }
 
     setIsSavingDraft(true)
     try {
       const payload = {
-        body: body.trim(),
-        industryId: industry.id,
+        body: richTextToPlainText(body) ? body.trim() : '',
+        industryId: industry?.id ?? null,
         tags: selectedTags.map((tag) => tag.id),
         relatedInsights: relatedInsights.map((item) => item.id),
       }
@@ -1030,7 +1024,7 @@ export default function PostModal({
       if (!savedDraft) throw new Error(copy.draftSaveFailed)
       return savedDraft
     } catch (error) {
-      toast.error(error instanceof Error ? error.message : copy.draftSaveFailed)
+      setComposerError(error instanceof Error ? error.message : copy.draftSaveFailed)
       return null
     } finally {
       setIsSavingDraft(false)
@@ -1044,16 +1038,30 @@ export default function PostModal({
     onDraftSaved(savedDraft)
   }
 
-  // Empty-library CTA: save the post as a draft, then send the user to the
+  // Empty-library CTA: preserve any started post, then send the user to the
   // knowledge stepper. The stepper redirects back to this feed with
   // ?attach_knowledge=<id> so we can reopen the composer and attach the new
   // item automatically (handled in FeedComposer + the auto-attach effect below).
   const handlePublishNewKnowledge = async () => {
-    const savedDraft = await persistDraft()
-    if (!savedDraft) return
-
-    onDraftSaved(savedDraft)
-    toast.success(copy.draftSavedRedirecting)
+    if (isUploadInFlight) {
+      setComposerError(copy.uploadBeforeLeaving)
+      return
+    }
+    if (hasDraftContent || draft) {
+      const savedDraft = await persistDraft()
+      if (!savedDraft) return
+      onDraftSaved(savedDraft)
+      toast.success(copy.draftSavedRedirecting)
+    } else if (videoUuidRef.current) {
+      // A cancelled/failed new upload must not leave an empty server draft.
+      try {
+        await deleteFeedItem(videoUuidRef.current, locale)
+        videoUuidRef.current = null
+      } catch (error) {
+        setComposerError(error instanceof Error ? error.message : copy.draftDiscardFailed)
+        return
+      }
+    }
 
     // Come back to exactly the page the composer lives on; the stepper appends
     // the published knowledge id to this URL.
@@ -1127,7 +1135,7 @@ export default function PostModal({
       setDiscardConfirmOpened(false)
       onDraftDiscarded()
     } catch (error) {
-      toast.error(error instanceof Error ? error.message : copy.draftDiscardFailed)
+      setComposerError(error instanceof Error ? error.message : copy.draftDiscardFailed)
     } finally {
       setIsDiscardingDraft(false)
     }
@@ -1139,6 +1147,10 @@ export default function PostModal({
     if (isPublishing || isSavingDraft || isDiscardingDraft) return
     if (exitConfirmOpened || discardConfirmOpened) return
     if (!hasUnsavedChanges) {
+      if (!draft && videoUuidRef.current && !hasDraftContent) {
+        void handleDiscardDraft()
+        return
+      }
       onClose()
       return
     }
@@ -1148,10 +1160,9 @@ export default function PostModal({
   const handleExitSaveDraft = async () => {
     const savedDraft = await persistDraft()
     if (!savedDraft) {
-      // persistDraft already moved the author to the step holding the first
-      // missing field — close the prompt so they can see it.
+      // Close the exit prompt so the persistent save error is visible.
       setExitConfirmOpened(false)
-      toast.error(copy.exitSaveBlocked)
+      setComposerError((error) => error || copy.exitSaveBlocked)
       return
     }
     setExitConfirmOpened(false)
@@ -1263,7 +1274,19 @@ export default function PostModal({
             </div>
           </div>
 
+        {composerError && (
+          <p role="alert" className="mt-4 rounded-md bg-red-50 p-3 text-sm text-[#A9322B]">{composerError}</p>
+        )}
+
         {/* ===== Step 1: write your post ===== */}
+        {imageErrors.length > 0 && (
+          <div role="alert" className="mt-4 rounded-md bg-red-50 p-3 text-sm text-[#A9322B]">
+            {imageErrors.map((message, index) => <p key={index}>{message}</p>)}
+          </div>
+        )}
+        {videoUploadError && (
+          <p role="alert" className="mt-4 rounded-md bg-red-50 p-3 text-sm text-[#A9322B]">{videoUploadError}</p>
+        )}
         <div className={step === 1 ? undefined : 'hidden'}>
         {/* Body: hidden until video upload allows editing, avoiding an empty locked area */}
         {!bodyLocked && (
@@ -1697,6 +1720,7 @@ export default function PostModal({
                 )}
                 <button
                   type="button"
+                  aria-label={copy.shareFromLibrary}
                   onClick={() => setLibraryDrawerOpened(true)}
                   className={`flex h-9 items-center gap-1.5 rounded-lg border px-2.5 text-[14px] font-medium transition-colors focus-visible:outline-[1px] focus-visible:outline-offset-1 focus-visible:outline-[#B7D2F4] ${
                     relatedInsights.length > 0
@@ -1913,6 +1937,7 @@ export default function PostModal({
         opened={libraryDrawerOpened}
         isCompany={usesCompanyLibrary}
         selected={relatedInsights}
+        hasDraftContent={hasDraftContent || !!draft}
         onClose={() => setLibraryDrawerOpened(false)}
         onSelectionChange={setRelatedInsights}
         onPublishNew={() => {

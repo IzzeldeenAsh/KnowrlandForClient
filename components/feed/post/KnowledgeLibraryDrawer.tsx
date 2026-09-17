@@ -24,6 +24,7 @@ type KnowledgeLibraryDrawerProps = {
   // Empty-state CTA: save the post as a draft and send the user off to publish a
   // new knowledge item, then return here to attach it automatically.
   onPublishNew: () => void
+  hasDraftContent?: boolean
 }
 
 const copyByLocale = {
@@ -34,8 +35,9 @@ const copyByLocale = {
     empty: 'No published knowledge in your library yet.',
     emptyTitle: 'Start building your library',
     emptyBody:
-      'Publish documents, reports, or data to your library, then attach them to your posts. Save a draft and continue to publishing whenever you are ready.',
-    emptyCta: 'Save and start publish',
+      'Publish documents, reports, or data to your library, then attach them to your posts. Any post you have started will be saved so you can return to it.',
+    emptyCta: 'Save draft and add a library item',
+    emptyStartCta: 'Add your first library item',
     searchLabel: 'Search your library',
     searchPlaceholder: 'Search by title…',
     clearSearch: 'Clear search',
@@ -55,8 +57,9 @@ const copyByLocale = {
     empty: 'لا توجد معرفة منشورة في مكتبتك بعد.',
     emptyTitle: 'ابدأ ببناء مكتبتك',
     emptyBody:
-      'انشر المستندات أو التقارير أو البيانات في مكتبتك، ثم أرفقها بمنشوراتك. احفظ مسودة وتابع النشر متى كنت جاهزًا.',
-    emptyCta: 'احفظ وابدأ النشر',
+      'انشر المستندات أو التقارير أو البيانات في مكتبتك، ثم أرفقها بمنشوراتك. سنحفظ المنشور الذي بدأت به لتعود إليه لاحقاً.',
+    emptyCta: 'احفظ المسودة وأضف عنصراً للمكتبة',
+    emptyStartCta: 'أضف أول عنصر إلى مكتبتك',
     searchLabel: 'ابحث في مكتبتك',
     searchPlaceholder: 'ابحث بالعنوان…',
     clearSearch: 'مسح البحث',
@@ -79,6 +82,7 @@ export default function KnowledgeLibraryDrawer({
   onClose,
   onSelectionChange,
   onPublishNew,
+  hasDraftContent = true,
 }: KnowledgeLibraryDrawerProps) {
   const isArabic = locale === 'ar'
   const copy = copyByLocale[isArabic ? 'ar' : 'en']
@@ -267,7 +271,7 @@ export default function KnowledgeLibraryDrawer({
                 onClick={onPublishNew}
                 className="mt-5 inline-flex min-h-10 items-center rounded-md bg-[#1D74E0] px-5 py-2 text-[13.5px] font-medium text-white transition-colors hover:bg-[#155CB8] focus-visible:outline-[1px] focus-visible:outline-offset-1 focus-visible:outline-[#B7D2F4]"
               >
-                {copy.emptyCta}
+                {hasDraftContent ? copy.emptyCta : copy.emptyStartCta}
               </button>
             </div>
           ) : showNoResults ? (

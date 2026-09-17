@@ -9,6 +9,7 @@ import {
   IconX,
 } from '@tabler/icons-react'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { encodeCroppedImage, MAX_IMAGE_BYTES } from './imageExport'
 
 type AspectRatio = 'original' | 'square' | '4:1' | '3:4' | '16:9'
 type Point = { x: number; y: number }
@@ -21,7 +22,7 @@ type ImageCropEditorProps = {
   position: number
   total: number
   onCancel: () => void
-  onApply: (file: File) => void
+  onApply: (file: File) => boolean
 }
 
 const aspectRatios: Array<{ id: AspectRatio; label: string; value: number | null }> = [
@@ -48,6 +49,9 @@ const copyByLocale = {
     apply: 'Apply',
     applying: 'Applying…',
     dragHint: 'Drag the image to reposition it',
+    failed: 'We could not prepare this image. Your crop is still here. Try applying it again or choose another image.',
+    loadFailed: 'This image could not be opened. Close the editor and choose a valid JPG, PNG, or GIF image.',
+    optimizing: 'Cropped images are automatically optimized to stay within 5 MB.',
   },
   ar: {
     title: 'اقتصاص الصورة',
@@ -64,6 +68,9 @@ const copyByLocale = {
     apply: 'تطبيق',
     applying: 'جارٍ التطبيق…',
     dragHint: 'اسحب الصورة لتغيير موضعها',
+    failed: 'تعذر تجهيز الصورة. احتفظنا بإعدادات الاقتصاص. حاول تطبيقها مجدداً أو اختر صورة أخرى.',
+    loadFailed: 'تعذر فتح الصورة. أغلق المحرر واختر صورة صالحة بصيغة JPG أو PNG أو GIF.',
+    optimizing: 'نحسّن الصورة بعد الاقتصاص تلقائياً ليبقى حجمها ضمن 5 ميجابايت.',
   },
 } as const
 
@@ -156,6 +163,7 @@ export default function ImageCropEditor({
   const [pan, setPan] = useState<Point>({ x: 0, y: 0 })
   const [cropSize, setCropSize] = useState<Size>({ width: 640, height: 480 })
   const [isApplying, setIsApplying] = useState(false)
+  const [error, setError] = useState<string | null>(null)
 
   const angle = quarterTurns * 90 + straighten
   const originalRatio = useMemo(() => {
@@ -170,6 +178,7 @@ export default function ImageCropEditor({
     const objectUrl = URL.createObjectURL(file)
     const nextImage = new window.Image()
     nextImage.onload = () => setImage(nextImage)
+    nextImage.onerror = () => setError(copy.loadFailed)
     nextImage.src = objectUrl
 
     setAspect('original')
@@ -180,13 +189,15 @@ export default function ImageCropEditor({
     setFlipY(false)
     setPan({ x: 0, y: 0 })
     setIsApplying(false)
+    setError(null)
 
     return () => {
       nextImage.onload = null
+      nextImage.onerror = null
       URL.revokeObjectURL(objectUrl)
       setImage(null)
     }
-  }, [file, opened])
+  }, [file, opened, copy.loadFailed])
 
   useEffect(() => {
     const stage = stageRef.current
@@ -258,8 +269,13 @@ export default function ImageCropEditor({
   const applyCrop = useCallback(async () => {
     if (!file || !image || isApplying) return
     setIsApplying(true)
+    setError(null)
 
     try {
+      if (aspect === 'original' && quarterTurns === 0 && straighten === 0 && zoom === 1 && !flipX && !flipY && pan.x === 0 && pan.y === 0 && file.size <= MAX_IMAGE_BYTES) {
+        if (!onApply(file)) setError(copy.failed)
+        return
+      }
       const longestSourceEdge = Math.max(image.naturalWidth, image.naturalHeight)
       const longestOutputEdge = Math.min(2048, longestSourceEdge)
       const outputWidth = selectedRatio >= 1
@@ -286,28 +302,21 @@ export default function ImageCropEditor({
         outputWidth / cropSize.width,
       )
 
-      const mimeType = ['image/jpeg', 'image/png', 'image/webp'].includes(file.type)
-        ? file.type
-        : 'image/jpeg'
-      const blob = await new Promise<Blob>((resolve, reject) => {
-        output.toBlob(
-          (result) => result ? resolve(result) : reject(new Error('Unable to crop the image')),
-          mimeType,
-          mimeType === 'image/png' ? undefined : 0.92,
-        )
-      })
-      onApply(new File([blob], file.name, { type: mimeType, lastModified: Date.now() }))
+      const croppedFile = await encodeCroppedImage(output, file)
+      if (!onApply(croppedFile)) setError(copy.failed)
+    } catch {
+      setError(copy.failed)
     } finally {
       setIsApplying(false)
     }
-  }, [angle, cropSize, file, flipX, flipY, image, isApplying, onApply, pan, selectedRatio, zoom])
+  }, [angle, aspect, quarterTurns, straighten, copy.failed, cropSize, file, flipX, flipY, image, isApplying, onApply, pan, selectedRatio, zoom])
 
   const toolButtonClass = 'flex h-10 w-10 items-center justify-center rounded-md border border-transparent text-[#344054] transition-colors hover:border-[#DCE4EF] hover:bg-[#F7F9FC] focus-visible:outline-[2px] focus-visible:outline-offset-2 focus-visible:outline-[#8FB9EA]'
 
   return (
     <Modal
       opened={opened}
-      onClose={onCancel}
+      onClose={() => { if (!isApplying) onCancel() }}
       centered
       size="auto"
       withCloseButton={false}
@@ -332,7 +341,7 @@ export default function ImageCropEditor({
             <h2 className="text-xl font-bold sm:text-2xl">{copy.title}</h2>
             {total > 1 && <p className="mt-0.5 text-xs text-[#667085]">{copy.imageCount(position, total)}</p>}
           </div>
-          <button type="button" aria-label={copy.close} onClick={onCancel} className={toolButtonClass}>
+          <button type="button" aria-label={copy.close} onClick={onCancel} disabled={isApplying} className={toolButtonClass}>
             <IconX aria-hidden className="h-6 w-6" stroke={1.8} />
           </button>
         </header>
@@ -413,6 +422,8 @@ export default function ImageCropEditor({
             </div>
 
             <div className="shrink-0 border-t border-[#E3E8EF] bg-white p-4 sm:px-6">
+              <p className="mb-3 text-xs leading-5 text-[#5A6B84]">{copy.optimizing}</p>
+              {error && <p role="alert" className="mb-3 rounded-md bg-red-50 p-3 text-sm text-[#A9322B]">{error}</p>}
               <button
                 type="button"
                 disabled={!image || isApplying}

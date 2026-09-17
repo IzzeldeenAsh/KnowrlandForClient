@@ -10,6 +10,7 @@
     "start": "NEXT_DIST_DIR=.next-local NODE_ENV=development next start",
     "start:prod": "NEXT_DIST_DIR=.next-local next start",
     "lint": "NEXT_DIST_DIR=.next-dev next lint",
+    "test:posting": "node --experimental-strip-types --test tests/post-composer.test.mjs",
     "security:audit": "npm audit",
     "security:fix": "npm audit fix",
     "security:check": "npm audit --audit-level=moderate && node scripts/security-check.js",

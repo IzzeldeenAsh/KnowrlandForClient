@@ -261,6 +261,9 @@ export interface PublishPostPayload {
   authorType?: 'company' | 'insighter'
 }
 
+export type DraftPostPayload = Omit<PublishPostPayload, 'industryId'> & { industryId: number | null }
+export type ImageTextDraftPayload = DraftPostPayload & { media?: ImageMediaEntry[] }
+
 export interface ImageMediaEntry {
   file: File
   sortOrder: number
@@ -809,7 +812,7 @@ export async function publishVideoPost(
 
 export async function saveVideoPostDraft(
   uuid: string,
-  payload: PublishPostPayload,
+  payload: DraftPostPayload,
   locale: string,
 ): Promise<void> {
   return saveVideoPost(uuid, payload, 'draft', locale)
@@ -817,7 +820,7 @@ export async function saveVideoPostDraft(
 
 async function saveVideoPost(
   uuid: string,
-  payload: PublishPostPayload,
+  payload: DraftPostPayload,
   status: 'draft' | 'published',
   locale: string,
 ): Promise<void> {
@@ -850,7 +853,7 @@ export async function publishImageTextPost(
 }
 
 export async function saveImageTextPostDraft(
-  payload: ImageTextPostPayload,
+  payload: ImageTextDraftPayload,
   locale: string,
   uuid?: string,
 ): Promise<string> {
@@ -858,7 +861,7 @@ export async function saveImageTextPostDraft(
 }
 
 async function saveImageTextPost(
-  payload: ImageTextPostPayload,
+  payload: ImageTextDraftPayload,
   status: 'draft' | 'published',
   locale: string,
   uuid?: string,
@@ -897,7 +900,7 @@ async function saveImageTextPost(
 
   const formData = new FormData()
   formData.append('body', payload.body)
-  formData.append('industry_id', String(payload.industryId))
+  if (payload.industryId !== null) formData.append('industry_id', String(payload.industryId))
   formData.append('status', status)
   if (status === 'published' && payload.authorType) {
     formData.append('author_type', payload.authorType)
