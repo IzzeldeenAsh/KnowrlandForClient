@@ -796,7 +796,7 @@ export default function AskInsighter({ knowledgeSlug, questions = [], is_owner =
 
   // Redirect URL for login button with returnUrl parameter
   const getLoginUrl = () => {
-    return `${process.env.NEXT_PUBLIC_DASHBOARD_URL}/auth/login?returnUrl=${encodeURIComponent(typeof window !== 'undefined' ? window.location.href : '')}`;
+    return `/${locale}/signin?returnUrl=${encodeURIComponent(typeof window !== 'undefined' ? window.location.href : '')}`;
   };
 
   // Determine if user is logged in

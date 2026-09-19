@@ -1333,7 +1333,7 @@ export function FeedCard({
 
     if (!user) {
       const returnUrl = encodeURIComponent(window.location.href)
-      window.location.assign(`${dashboardUrl}/auth/login?returnUrl=${returnUrl}`)
+      router.push(`/${locale}/signin?returnUrl=${returnUrl}`)
       return
     }
 

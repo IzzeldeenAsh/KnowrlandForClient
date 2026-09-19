@@ -39,7 +39,7 @@ export default function ProjectIntro({ locale }: ProjectIntroProps) {
     }
 
   const returnUrl = encodeURIComponent(`${publicBaseUrl}/${locale}/project`)
-  const loginUrl = `${getAngularAppOrigin()}/auth/login?returnUrl=${returnUrl}`
+  const loginUrl = `/${locale}/signin?returnUrl=${returnUrl}`
   const shouldShowLoginCta = !isLoading && !isLoggedIn
   const ctaHref = shouldShowLoginCta
     ? loginUrl

@@ -128,13 +128,13 @@ function GuestFeedGate({ locale, isSearching = false }: { locale: string; isSear
       </p>
       <div className="mx-auto mt-5 flex max-w-sm flex-col gap-2.5 sm:flex-row sm:justify-center">
         <Link
-          href={`${dashboardUrl}/auth/login?returnUrl=${encodedReturnUrl}`}
+          href={`/${locale}/signin?returnUrl=${encodedReturnUrl}`}
           className="inline-flex min-h-10 items-center justify-center rounded-md bg-[#2378E8] px-5 text-[13px] font-semibold text-white transition-colors hover:bg-[#1B64C5] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2378E8] focus-visible:ring-offset-2"
         >
           {copy.login}
         </Link>
         <Link
-          href={`${dashboardUrl}/auth/sign-up?returnUrl=${encodedReturnUrl}`}
+          href={`/${locale}/signup?returnUrl=${encodedReturnUrl}`}
           className="inline-flex min-h-10 items-center justify-center rounded-md border border-[#B8CBE2] px-5 text-[13px] font-semibold text-[#36506F] transition-colors hover:bg-[#F5F8FC] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2378E8] focus-visible:ring-offset-2"
         >
           {copy.signup}

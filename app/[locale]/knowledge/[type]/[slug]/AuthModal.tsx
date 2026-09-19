@@ -4,7 +4,7 @@ import React from 'react';
 import { Modal, Button, Text, Stack, Box, Divider, Group } from '@mantine/core';
 import { IconLogin, IconUserPlus, IconDownload, IconShoppingBag, IconBellRinging, IconSparkles } from '@tabler/icons-react';
 import Image from 'next/image';
-import { dashboardUrl } from '@/app/config';
+import { useRouter } from 'next/navigation';
 
 interface AuthModalProps {
   opened: boolean;
@@ -16,11 +16,6 @@ interface AuthModalProps {
   loginReturnUrl?: string | null;
 }
 
-// The Angular dashboard URL for the current environment. Every branch of the
-// old hostname switch returned the same env-driven value, so there is nothing
-// to branch on.
-const getAngularAppUrl = (): string => dashboardUrl;
-
 const AuthModal: React.FC<AuthModalProps> = ({
   opened,
   onClose,
@@ -30,7 +25,7 @@ const AuthModal: React.FC<AuthModalProps> = ({
   loginReturnUrl = null,
 }) => {
   const isRTL = locale === 'ar';
-  const angularAppUrl = getAngularAppUrl();
+  const router = useRouter();
 
   const translations = {
     title: isRTL ? 'الشراء' : 'Buy Now',
@@ -57,14 +52,14 @@ const AuthModal: React.FC<AuthModalProps> = ({
     const returnUrl = loginReturnUrl
       ? `${window.location.origin}${loginReturnUrl}`
       : window.location.href;
-    window.location.href = `${angularAppUrl}/auth/sign-up?returnUrl=${encodeURIComponent(returnUrl)}`;
+    router.push(`/${locale === 'ar' ? 'ar' : 'en'}/signup?returnUrl=${encodeURIComponent(returnUrl)}`);
   };
 
   const handleLogIn = () => {
     const returnUrl = loginReturnUrl
       ? `${window.location.origin}${loginReturnUrl}`
       : window.location.href;
-    window.location.href = `${angularAppUrl}/auth/login?returnUrl=${encodeURIComponent(returnUrl)}`;
+    router.push(`/${locale === 'ar' ? 'ar' : 'en'}/signin?returnUrl=${encodeURIComponent(returnUrl)}`);
   };
 
   const handleBuyAsGuest = () => {

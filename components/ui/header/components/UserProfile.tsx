@@ -249,7 +249,7 @@ export function UserProfile({ isHome }: { isHome: boolean }) {
     return (
       <>
         <Link
-          href={`${process.env.NEXT_PUBLIC_DASHBOARD_URL}/auth/login?returnUrl=${encodeURIComponent(returnUrl)}`}
+          href={`/${localeFromPath}/signin?returnUrl=${encodeURIComponent(returnUrl)}`}
           className="btn-sm bg-gray-800 text-gray-200 shadow hover:bg-gray-900"
         >
           {t("login")}

@@ -3,7 +3,7 @@
 import { Tooltip } from '@mantine/core'
 import { IconBookmark, IconLoader2 } from '@tabler/icons-react'
 import { useEffect, useState } from 'react'
-import { dashboardUrl } from '@/app/config'
+import { useRouter } from 'next/navigation'
 import { useToast } from '@/components/toast/ToastContext'
 import { useUserProfile } from '@/components/ui/header/hooks/useUserProfile'
 import {
@@ -62,6 +62,7 @@ export default function FeedSaveButton({
 }: FeedSaveButtonProps) {
   const copy = copyByLocale[locale === 'ar' ? 'ar' : 'en']
   const toast = useToast()
+  const router = useRouter()
   const { user, isAuthResolved } = useUserProfile()
   const [isSaved, setIsSaved] = useState(initialIsSaved === true)
   const [isUpdating, setIsUpdating] = useState(false)
@@ -104,7 +105,7 @@ export default function FeedSaveButton({
 
     if (!user) {
       const returnUrl = encodeURIComponent(window.location.href)
-      window.location.assign(`${dashboardUrl}/auth/login?returnUrl=${returnUrl}`)
+      router.push(`/${locale}/signin?returnUrl=${returnUrl}`)
       return
     }
 

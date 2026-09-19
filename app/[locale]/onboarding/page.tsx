@@ -15,7 +15,7 @@ import { useLocale } from 'next-intl'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { useCountries, type Country } from '@/app/lib/useCountries'
 import { useGlobalProfile } from '@/components/auth/GlobalProfileProvider'
-import { getAngularAppOrigin, isAngularRouteUrl, toAngularAppUrl } from '@/lib/authRedirect'
+import { getSafeReturnUrl, getAngularAppOrigin, isAngularRouteUrl, toAngularAppUrl } from '@/lib/authRedirect'
 import { getAuthToken } from '@/lib/authToken'
 import InsightaLogoWhiteAr from '@/public/images/ANSIGHTAAr-.png'
 import InsightaLogoWhiteEn from '@/public/images/Business-white.png'
@@ -312,7 +312,7 @@ export default function OnboardingPage() {
       const blockedDestination = /(^|\/)(auth|callback|onboarding|update-country)(\/|\?|$)/i.test(
         unsafeDestination,
       )
-      const destination = !unsafeDestination || blockedDestination ? null : unsafeDestination
+      const destination = !unsafeDestination || blockedDestination ? null : getSafeReturnUrl(unsafeDestination)
 
       if (destination) {
         try {
@@ -380,7 +380,7 @@ export default function OnboardingPage() {
     if (!token) {
       const returnUrl = typeof window === 'undefined' ? '' : window.location.href
       window.location.replace(
-        `${getAngularAppOrigin()}/auth/login?returnUrl=${encodeURIComponent(returnUrl)}`,
+        `/${locale}/signin?returnUrl=${encodeURIComponent(returnUrl)}`,
       )
       return
     }
@@ -605,7 +605,7 @@ export default function OnboardingPage() {
 
   return (
     <main className={`${styles.shell} flex min-h-screen items-center justify-center p-3 sm:p-5`}>
-      <section className={`${styles.frame} grid w-full overflow-hidden bg-white`}>
+      <section className={`${styles.frame} grid overflow-hidden bg-white`}>
         <aside className={`${styles.visualPanel} relative overflow-hidden`}>
           <Image
             src="/images/onboarding/insighta-onboarding-background.png"

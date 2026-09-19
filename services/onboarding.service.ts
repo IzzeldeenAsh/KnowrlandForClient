@@ -116,6 +116,7 @@ export async function fetchInsighterPromptStatuses(
       method: 'POST',
       headers: onboardingHeaders(options),
       cache: 'no-store',
+      signal: AbortSignal.timeout(10000),
     })
 
     if (!response.ok) return []
@@ -161,6 +162,7 @@ export async function fetchOnboardingPromptStatuses(
     method: 'POST',
     headers: onboardingHeaders(options),
     cache: 'no-store',
+      signal: AbortSignal.timeout(10000),
   })
 
   if (!response.ok) {

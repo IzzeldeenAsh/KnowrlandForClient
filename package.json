@@ -17,7 +17,9 @@
     "security:verify": "node scripts/verify-integrity.js",
     "build:stage": "NEXT_DIST_DIR=.next-local env-cmd -f .env.staging next build",
     "build:prod": "NEXT_DIST_DIR=.next-local next build",
-    "prebuild:stage": "NEXT_DIST_DIR=.next-local node scripts/check-next-dir-perms.js"
+    "prebuild:stage": "NEXT_DIST_DIR=.next-local node scripts/check-next-dir-perms.js",
+    "test:auth": "node --experimental-strip-types --test tests/auth-policy.test.mjs",
+    "test:auth:browser": "node tests/auth-browser.cjs"
   },
   "dependencies": {
     "@emotion/react": "^11.14.0",
@@ -71,6 +73,7 @@
     "env-cmd": "^11.0.0",
     "eslint": "^9.0.0",
     "eslint-config-next": "15.5.7",
+    "playwright": "^1.63.0",
     "postcss": "^8.4.32",
     "tailwindcss": "^3.3.6"
   }

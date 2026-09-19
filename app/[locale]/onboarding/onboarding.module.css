@@ -4,7 +4,9 @@
 }
 
 .frame {
-  width: min(100%, 880px);
+  width: 100%;
+  max-width: 880px;
+  margin-inline: auto;
   height: min(560px, calc(100dvh - 40px));
   min-height: 520px;
   grid-template-columns: 45% 55%;
