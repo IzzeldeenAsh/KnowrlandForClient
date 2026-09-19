@@ -40,14 +40,14 @@ export default function SignUp({ locale }: { locale: string }) {
       router.replace(authPageUrl('verify-email', locale, returnUrl) + `${returnUrl ? '&' : '?'}email=${encodeURIComponent(data.email || String(form.get('email')))}&sent=1`);
     } catch (e) { setServerError(e); setError(hasFieldErrors(e) ? '' : authErrorMessage(e, locale)); setBusy(false); }
   }
-  return <AuthShell locale={locale} title={ar ? 'إنشاء حساب في إنسايتا' : 'Create your Insighta account'} subtitle={ar ? 'ابدأ رحلتك مع المعرفة والخبراء' : 'Start your journey with insights and experts'}>
+  return <AuthShell compact locale={locale} title={ar ? 'إنشاء حساب في إنسايتا' : 'Create your Insighta account'} subtitle={ar ? 'ابدأ رحلتك مع المعرفة والخبراء' : 'Start your journey with insights and experts'}>
     <SocialButtons locale={locale} returnUrl={returnUrl} beforeStart={beforeSocial}/><AuthNotice error={error}/>
     <AuthForm locale={locale} serverError={serverError} onSubmit={submit}><fieldset disabled={busy}>
-      <div className="auth-row"><label className="auth-field" htmlFor="first_name">{ar ? 'الاسم الأول' : 'First name'}<input id="first_name" name="first_name" required minLength={2} maxLength={50} autoComplete="given-name"/><FieldError name="first_name"/></label><label className="auth-field" htmlFor="last_name">{ar ? 'اسم العائلة' : 'Last name'}<input id="last_name" name="last_name" required minLength={2} maxLength={50} autoComplete="family-name"/><FieldError name="last_name"/></label></div>
-      <label className="auth-field" htmlFor="email">{ar ? 'البريد الإلكتروني' : 'Email'}<input id="email" name="email" type="email" required maxLength={191} autoComplete="email" dir="ltr"/><FieldError name="email"/></label>
-      <PasswordInput locale={locale} label={ar ? 'كلمة المرور' : 'Password'} newPassword/>
+      <div className="auth-row"><label className="auth-field" htmlFor="first_name"><span className="auth-sr-only">{ar ? 'الاسم الأول' : 'First name'}</span><input placeholder={ar ? 'الاسم الأول' : 'First name'} id="first_name" name="first_name" required minLength={2} maxLength={50} autoComplete="given-name"/><FieldError name="first_name"/></label><label className="auth-field" htmlFor="last_name"><span className="auth-sr-only">{ar ? 'اسم العائلة' : 'Last name'}</span><input placeholder={ar ? 'اسم العائلة' : 'Last name'} id="last_name" name="last_name" required minLength={2} maxLength={50} autoComplete="family-name"/><FieldError name="last_name"/></label></div>
+      <label className="auth-field" htmlFor="email"><span className="auth-sr-only">{ar ? 'البريد الإلكتروني' : 'Email'}</span><input placeholder={ar ? 'البريد الإلكتروني' : 'Email'} id="email" name="email" type="email" required maxLength={191} autoComplete="email" dir="ltr"/><FieldError name="email"/></label>
+      <PasswordInput locale={locale} label={ar ? 'كلمة المرور' : 'Password'} newPassword hideLabel/>
       <p className="auth-hint">{ar ? '8 أحرف على الأقل تتضمن حرفاً ورقماً ورمزاً.' : 'At least 8 characters including a letter, number and symbol.'}</p>
-      <CountryInput countries={countries} locale={locale}/>
+      <CountryInput hideLabel countries={countries} locale={locale}/>
       {countriesError && <p className="auth-error" role="alert">{ar ? 'تعذر تحميل الدول. ' : 'Unable to load countries. '}<button type="button" className="auth-link" onClick={() => setRetry(x => x + 1)}>{ar ? 'إعادة المحاولة' : 'Retry'}</button></p>}
       <div className="auth-check"><input id="terms" type="checkbox" checked={accepted} onChange={e => e.target.checked ? setAgreement(true) : setAccepted(false)}/><label htmlFor="terms">{ar ? 'أوافق على ' : 'I agree to the '}<button type="button" className="auth-link" onClick={() => setAgreement(true)}>{ar ? 'اتفاقية الاستخدام' : 'terms of service'}</button></label></div>
       <SubmitButton locale={locale} busy={busy}>{ar ? 'إنشاء حساب' : 'Create account'}</SubmitButton>

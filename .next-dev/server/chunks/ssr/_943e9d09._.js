@@ -573,7 +573,7 @@ var __TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$authRedirect$2e$ts__$
 ;
 ;
 ;
-function AuthShell({ locale, title, subtitle, children }) {
+function AuthShell({ locale, title, subtitle, children, compact = false }) {
     const pathname = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$navigation$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["usePathname"])();
     const search = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$navigation$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useSearchParams"])();
     const otherLocale = locale === 'ar' ? 'en' : 'ar';
@@ -582,7 +582,7 @@ function AuthShell({ locale, title, subtitle, children }) {
     clean.delete('access_token');
     const languageUrl = pathname.replace(/^\/(ar|en)/, `/${otherLocale}`) + (clean.size ? `?${clean}` : '');
     return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("main", {
-        className: "auth-screen",
+        className: `auth-screen${compact ? ' auth-signup' : ''}`,
         dir: locale === 'ar' ? 'rtl' : 'ltr',
         children: [
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("nav", {
@@ -677,17 +677,25 @@ function AuthShell({ locale, title, subtitle, children }) {
         columnNumber: 10
     }, this);
 }
-function PasswordInput({ label, locale, name = 'password', newPassword = false }) {
+function PasswordInput({ label, locale, name = 'password', newPassword = false, hideLabel = false }) {
     const [visible, setVisible] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useState"])(false);
     return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("label", {
         className: "auth-field",
         htmlFor: name,
         children: [
-            label,
+            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                className: hideLabel ? 'auth-sr-only' : undefined,
+                children: label
+            }, void 0, false, {
+                fileName: "[project]/components/auth/pages/AuthShell.tsx",
+                lineNumber: 29,
+                columnNumber: 55
+            }, this),
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
                 className: "auth-password",
                 children: [
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("input", {
+                        placeholder: hideLabel ? label : undefined,
                         id: name,
                         name: name,
                         type: visible ? 'text' : 'password',
@@ -753,7 +761,7 @@ function PasswordInput({ label, locale, name = 'password', newPassword = false }
             }, void 0, true, {
                 fileName: "[project]/components/auth/pages/AuthShell.tsx",
                 lineNumber: 29,
-                columnNumber: 62
+                columnNumber: 126
             }, this),
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$auth$2f$pages$2f$AuthForm$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["FieldError"], {
                 name: name
@@ -859,7 +867,7 @@ var __TURBOPACK__imported__module__$5b$project$5d2f$components$2f$auth$2f$pages$
 ;
 ;
 ;
-function CountryInput({ countries, locale }) {
+function CountryInput({ countries, locale, hideLabel = false }) {
     const clearError = (0, __TURBOPACK__imported__module__$5b$project$5d2f$components$2f$auth$2f$pages$2f$AuthForm$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useClearFieldError"])();
     const ar = locale === 'ar';
     const [selected, setSelected] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useState"])();
@@ -885,7 +893,7 @@ function CountryInput({ countries, locale }) {
             columnNumber: 53
         }, this) : null;
     return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-        className: "auth-field auth-country",
+        className: `auth-field auth-country${hideLabel ? ' auth-country-compact' : ''}`,
         onBlur: (event)=>{
             if (!event.currentTarget.contains(event.relatedTarget)) {
                 setOpen(false);
@@ -894,6 +902,7 @@ function CountryInput({ countries, locale }) {
         },
         children: [
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("label", {
+                className: hideLabel ? 'auth-sr-only' : undefined,
                 htmlFor: "country_id",
                 children: ar ? 'الدولة' : 'Country'
             }, void 0, false, {
@@ -1262,6 +1271,7 @@ function SignUp({ locale }) {
         }
     }
     return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$auth$2f$pages$2f$AuthShell$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["AuthShell"], {
+        compact: true,
         locale: locale,
         title: ar ? 'إنشاء حساب في إنسايتا' : 'Create your Insighta account',
         subtitle: ar ? 'ابدأ رحلتك مع المعرفة والخبراء' : 'Start your journey with insights and experts',
@@ -1296,8 +1306,16 @@ function SignUp({ locale }) {
                                     className: "auth-field",
                                     htmlFor: "first_name",
                                     children: [
-                                        ar ? 'الاسم الأول' : 'First name',
+                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                            className: "auth-sr-only",
+                                            children: ar ? 'الاسم الأول' : 'First name'
+                                        }, void 0, false, {
+                                            fileName: "[project]/components/auth/pages/SignUp.tsx",
+                                            lineNumber: 46,
+                                            columnNumber: 84
+                                        }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("input", {
+                                            placeholder: ar ? 'الاسم الأول' : 'First name',
                                             id: "first_name",
                                             name: "first_name",
                                             required: true,
@@ -1307,14 +1325,14 @@ function SignUp({ locale }) {
                                         }, void 0, false, {
                                             fileName: "[project]/components/auth/pages/SignUp.tsx",
                                             lineNumber: 46,
-                                            columnNumber: 119
+                                            columnNumber: 157
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$auth$2f$pages$2f$AuthForm$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["FieldError"], {
                                             name: "first_name"
                                         }, void 0, false, {
                                             fileName: "[project]/components/auth/pages/SignUp.tsx",
                                             lineNumber: 46,
-                                            columnNumber: 225
+                                            columnNumber: 311
                                         }, this)
                                     ]
                                 }, void 0, true, {
@@ -1326,8 +1344,16 @@ function SignUp({ locale }) {
                                     className: "auth-field",
                                     htmlFor: "last_name",
                                     children: [
-                                        ar ? 'اسم العائلة' : 'Last name',
+                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                            className: "auth-sr-only",
+                                            children: ar ? 'اسم العائلة' : 'Last name'
+                                        }, void 0, false, {
+                                            fileName: "[project]/components/auth/pages/SignUp.tsx",
+                                            lineNumber: 46,
+                                            columnNumber: 400
+                                        }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("input", {
+                                            placeholder: ar ? 'اسم العائلة' : 'Last name',
                                             id: "last_name",
                                             name: "last_name",
                                             required: true,
@@ -1337,20 +1363,20 @@ function SignUp({ locale }) {
                                         }, void 0, false, {
                                             fileName: "[project]/components/auth/pages/SignUp.tsx",
                                             lineNumber: 46,
-                                            columnNumber: 348
+                                            columnNumber: 472
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$auth$2f$pages$2f$AuthForm$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["FieldError"], {
                                             name: "last_name"
                                         }, void 0, false, {
                                             fileName: "[project]/components/auth/pages/SignUp.tsx",
                                             lineNumber: 46,
-                                            columnNumber: 453
+                                            columnNumber: 624
                                         }, this)
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/components/auth/pages/SignUp.tsx",
                                     lineNumber: 46,
-                                    columnNumber: 264
+                                    columnNumber: 350
                                 }, this)
                             ]
                         }, void 0, true, {
@@ -1362,8 +1388,16 @@ function SignUp({ locale }) {
                             className: "auth-field",
                             htmlFor: "email",
                             children: [
-                                ar ? 'البريد الإلكتروني' : 'Email',
+                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                    className: "auth-sr-only",
+                                    children: ar ? 'البريد الإلكتروني' : 'Email'
+                                }, void 0, false, {
+                                    fileName: "[project]/components/auth/pages/SignUp.tsx",
+                                    lineNumber: 47,
+                                    columnNumber: 53
+                                }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("input", {
+                                    placeholder: ar ? 'البريد الإلكتروني' : 'Email',
                                     id: "email",
                                     name: "email",
                                     type: "email",
@@ -1374,14 +1408,14 @@ function SignUp({ locale }) {
                                 }, void 0, false, {
                                     fileName: "[project]/components/auth/pages/SignUp.tsx",
                                     lineNumber: 47,
-                                    columnNumber: 89
+                                    columnNumber: 127
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$auth$2f$pages$2f$AuthForm$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["FieldError"], {
                                     name: "email"
                                 }, void 0, false, {
                                     fileName: "[project]/components/auth/pages/SignUp.tsx",
                                     lineNumber: 47,
-                                    columnNumber: 190
+                                    columnNumber: 277
                                 }, this)
                             ]
                         }, void 0, true, {
@@ -1392,7 +1426,8 @@ function SignUp({ locale }) {
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$auth$2f$pages$2f$AuthShell$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["PasswordInput"], {
                             locale: locale,
                             label: ar ? 'كلمة المرور' : 'Password',
-                            newPassword: true
+                            newPassword: true,
+                            hideLabel: true
                         }, void 0, false, {
                             fileName: "[project]/components/auth/pages/SignUp.tsx",
                             lineNumber: 48,
@@ -1407,6 +1442,7 @@ function SignUp({ locale }) {
                             columnNumber: 7
                         }, this),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$auth$2f$pages$2f$CountryInput$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["default"], {
+                            hideLabel: true,
                             countries: countries,
                             locale: locale
                         }, void 0, false, {
