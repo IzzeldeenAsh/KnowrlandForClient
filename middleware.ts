@@ -3,7 +3,7 @@ import { NextRequest, NextResponse } from 'next/server';
 
 const intlMiddleware = createMiddleware({ locales: ['en', 'ar'], defaultLocale: 'en', localeDetection: true, localePrefix: 'always' });
 const legacyPages: Record<string, string> = {
-  login: 'signin', 'sign-up': 'signup', 'password-reset': 'reset-password',
+  login: 'signin', 'sign-up': 'signup', registration: 'signup', register: 'signup', 'password-reset': 'reset-password',
   'verify-login-email': 'verify-email', 'email-reconfirm': 'verify-email',
   'verify-email': 'verify-email', logout: 'signout', callback: 'callback',
 };

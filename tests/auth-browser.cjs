@@ -12,7 +12,7 @@ const user={id:123,uuid:'test-user',email:'qa@example.test',name:'QA User',first
  async function scenario(name,run,options={}) {
   const context=await browser.newContext({viewport:{width:1440,height:1000},...options});
   const calls=[];let mode='success';
-  await context.route('https://api.insightabusiness.com/**',async route=>{
+  await context.route(/^https:\/\/api\.(?:insightabusiness\.com|foresighta\.co)\//,async route=>{
    const req=route.request(), url=new URL(req.url()); calls.push({path:url.pathname,method:req.method(),body:req.postDataJSON?.()});
    let status=200,payload={data:[]};
    if(url.pathname.endsWith('/auth/login')) {
@@ -58,6 +58,17 @@ const user={id:123,uuid:'test-user',email:'qa@example.test',name:'QA User',first
   await page.goto('http://localhost:3000/en/onboarding');await page.getByRole('heading',{name:'Which industries are you interested in?'}).waitFor();
   const box=await page.locator('main > section').boundingBox();assert(box.width<=880);assert(Math.abs(box.x-(1440-box.width)/2)<2);
   await page.screenshot({path:'/tmp/insighta-auth-qa/onboarding-centered.png',fullPage:true,animations:'disabled'});
+ });
+ await scenario('Email link code survives sign-in without a resend',async({page,calls,setMode})=>{
+  setMode('unverified');await page.goto('http://localhost:3000/en/verify-email?code=123456');await page.waitForURL('**/en/signin?verifyEmail=1');
+  assert(!page.url().includes('123456'));await page.locator('#email').fill('qa@example.test');await page.locator('#password').fill('Password1!');await page.getByRole('button',{name:'Continue',exact:true}).click();
+  await page.waitForURL('**/en/verify-email?*');await page.waitForFunction(()=>document.querySelector('input[name=code]')?.value==='123456');
+  assert.equal(calls.filter(c=>c.path.endsWith('/account/email/resend')).length,0);
+  await page.getByRole('button',{name:'Verify email',exact:true}).click();await page.waitForURL('http://localhost:3000/en');assert.equal(await page.evaluate(()=>sessionStorage.getItem('pending-email-verification')),null);
+ });
+ await scenario('Signed-in email link fills code and scrubs the address',async({page,context})=>{
+  await context.addCookies([{name:'token',value:TOKEN,url:'http://localhost:3000'}]);await page.goto('http://localhost:3000/ar/verify-email?code=654321');
+  await page.waitForFunction(()=>document.querySelector('input[name=code]')?.value==='654321');assert(!page.url().includes('654321'));
  });
  await scenario('Inline validation and subtle field focus',async({page,calls})=>{
   await page.goto('http://localhost:3000/en/signin');await page.getByRole('button',{name:'Continue',exact:true}).click();
@@ -142,7 +153,7 @@ const user={id:123,uuid:'test-user',email:'qa@example.test',name:'QA User',first
  },{viewport:{width:390,height:844},isMobile:true});
  await scenario('Transient callback failure retains session and offers retry',async({page,context})=>{
   await context.addCookies([{name:'token',value:TOKEN,url:'http://localhost:3000'}]);
-  await context.route('https://api.insightabusiness.com/api/account/profile',route=>route.abort());
+  await context.route('**/api/account/profile',route=>route.abort());
   await page.goto('http://localhost:3000/en/callback');await page.getByRole('button',{name:'Try again',exact:true}).waitFor();
   assert((await context.cookies()).some(c=>c.name==='token'));assert(page.url().endsWith('/en/callback'));
  });

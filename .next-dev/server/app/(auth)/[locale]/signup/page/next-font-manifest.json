@@ -1,0 +1,11 @@
+{
+  "pages": {},
+  "app": {
+    "[project]/app/(auth)/[locale]/signup/page": [
+      "static/media/3571ca4c7e5b0515-s.p.d677859e.woff2",
+      "static/media/e897c2a96513d09d-s.p.38fc978e.woff2"
+    ]
+  },
+  "appUsingSizeAdjust": true,
+  "pagesUsingSizeAdjust": false
+}

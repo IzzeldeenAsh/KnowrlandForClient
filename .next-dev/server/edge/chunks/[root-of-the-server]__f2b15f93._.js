@@ -37,6 +37,8 @@ const intlMiddleware = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_
 const legacyPages = {
     login: 'signin',
     'sign-up': 'signup',
+    registration: 'signup',
+    register: 'signup',
     'password-reset': 'reset-password',
     'verify-login-email': 'verify-email',
     'email-reconfirm': 'verify-email',

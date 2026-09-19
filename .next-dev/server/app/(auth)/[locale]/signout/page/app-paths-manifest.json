@@ -1,0 +1,3 @@
+{
+  "/(auth)/[locale]/signout/page": "app/(auth)/[locale]/signout/page.js"
+}
