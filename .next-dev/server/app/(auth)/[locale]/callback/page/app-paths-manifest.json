@@ -1,0 +1,3 @@
+{
+  "/(auth)/[locale]/callback/page": "app/(auth)/[locale]/callback/page.js"
+}

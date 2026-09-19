@@ -1,0 +1,3 @@
+{
+  "/(auth)/[locale]/verify-email/page": "app/(auth)/[locale]/verify-email/page.js"
+}
