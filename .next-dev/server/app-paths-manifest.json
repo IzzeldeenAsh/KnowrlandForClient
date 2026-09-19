@@ -8,6 +8,7 @@
   "/[locale]/(default)/page": "app/[locale]/(default)/page.js",
   "/[locale]/legals/privacy/page": "app/[locale]/legals/privacy/page.js",
   "/[locale]/onboarding/page": "app/[locale]/onboarding/page.js",
+  "/_not-found/page": "app/_not-found/page.js",
   "/icon/route": "app-edge-has-no-entrypoint",
   "/manifest.webmanifest/route": "app/manifest.webmanifest/route.js"
 }

@@ -15,3 +15,7 @@ yarn-error.log
 
 .npm-cache
 .next-local
+.next-dev/app-build-manifest.json
+.next-dev/server/app-paths-manifest.json
+.next-dev/server/next-font-manifest.js
+.next-dev/server/next-font-manifest.json
