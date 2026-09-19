@@ -853,6 +853,32 @@ function AuthFooter({ locale, signup = false, returnUrl }) {
     }, this);
 }
 }),
+"[project]/lib/searchNormalize.ts [app-ssr] (ecmascript)", ((__turbopack_context__) => {
+"use strict";
+
+// Text folding shared by type-ahead filters: tolerant of hamza/alif spelling ("الاردن" = "الأردن"),
+// tashkeel, tatweel, Latin accents ("cote" = "Côte") and separators ("guinea bissau" = "Guinea-Bissau").
+__turbopack_context__.s([
+    "normalizeSearchText",
+    ()=>normalizeSearchText,
+    "normalizedIncludes",
+    ()=>normalizedIncludes
+]);
+const ARABIC_DIACRITICS_AND_TATWEEL_RE = /[\u0640\u064B-\u065F\u0670\u06D6-\u06ED]/g;
+const LATIN_COMBINING_MARKS_RE = /[\u0300-\u036F]/g;
+// Explicit class rather than \p{L}/\p{N}: the project compiles with target es5, which rejects the /u flag.
+const SEPARATORS_RE = /[\s\u00A0\-\u2010-\u2015_'\u2018\u2019`"\u201C\u201D.,;:!?()\[\]{}\/\\&+\u060C\u061B\u061F]+/g;
+function normalizeSearchText(input) {
+    if (!input) return '';
+    const folded = input.toLowerCase().normalize('NFKD').replace(LATIN_COMBINING_MARKS_RE, '').replace(ARABIC_DIACRITICS_AND_TATWEEL_RE, '').replace(/[إأآٱ]/g, 'ا').replace(/ؤ/g, 'و').replace(/[ئىی]/g, 'ي').replace(/ک/g, 'ك').replace(/ة/g, 'ه').replace(/ء/g, '').replace(SEPARATORS_RE, ' ').trim();
+    // Final alif/ha are written interchangeably ("سوريه" vs "سوريا"), so drop one while something is left to match on.
+    return folded.length > 2 ? folded.replace(/[اه]$/, '') : folded;
+}
+function normalizedIncludes(haystack, needle) {
+    if (!needle) return true;
+    return haystack.includes(needle) || haystack.replace(/ /g, '').includes(needle.replace(/ /g, ''));
+}
+}),
 "[project]/components/auth/pages/CountryInput.tsx [app-ssr] (ecmascript)", ((__turbopack_context__) => {
 "use strict";
 
@@ -863,7 +889,9 @@ __turbopack_context__.s([
 var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/next/dist/server/route-modules/app-page/vendored/ssr/react-jsx-dev-runtime.js [app-ssr] (ecmascript)");
 var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/next/dist/server/route-modules/app-page/vendored/ssr/react.js [app-ssr] (ecmascript)");
 var __TURBOPACK__imported__module__$5b$project$5d2f$components$2f$auth$2f$pages$2f$AuthForm$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/components/auth/pages/AuthForm.tsx [app-ssr] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$searchNormalize$2e$ts__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/lib/searchNormalize.ts [app-ssr] (ecmascript)");
 'use client';
+;
 ;
 ;
 ;
@@ -880,7 +908,14 @@ function CountryInput({ countries, locale, hideLabel = false }) {
         up: false,
         max: MAX
     });
-    const filtered = countries.filter((country)=>country.name.toLocaleLowerCase().includes(query.toLocaleLowerCase()));
+    const index = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useMemo"])(()=>countries.map((country)=>({
+                country,
+                search: (0, __TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$searchNormalize$2e$ts__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["normalizeSearchText"])(country.name)
+            })), [
+        countries
+    ]);
+    const needle = (0, __TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$searchNormalize$2e$ts__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["normalizeSearchText"])(query);
+    const filtered = needle ? index.filter((entry)=>(0, __TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$searchNormalize$2e$ts__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["normalizedIncludes"])(entry.search, needle)).map((entry)=>entry.country) : countries;
     // The list opens downwards, but flips above the input when the viewport has no room left below it.
     (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useLayoutEffect"])(()=>{
         if (!open) return;
@@ -932,7 +967,7 @@ function CountryInput({ countries, locale, hideLabel = false }) {
             loading: "lazy"
         }, void 0, false, {
             fileName: "[project]/components/auth/pages/CountryInput.tsx",
-            lineNumber: 29,
+            lineNumber: 32,
             columnNumber: 53
         }, this) : null;
     return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -954,7 +989,7 @@ function CountryInput({ countries, locale, hideLabel = false }) {
                 children: ar ? 'الدولة' : 'Country'
             }, void 0, false, {
                 fileName: "[project]/components/auth/pages/CountryInput.tsx",
-                lineNumber: 31,
+                lineNumber: 34,
                 columnNumber: 5
             }, this),
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1005,7 +1040,7 @@ function CountryInput({ countries, locale, hideLabel = false }) {
                         }
                     }, void 0, false, {
                         fileName: "[project]/components/auth/pages/CountryInput.tsx",
-                        lineNumber: 32,
+                        lineNumber: 35,
                         columnNumber: 94
                     }, this),
                     open && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("ul", {
@@ -1026,7 +1061,7 @@ function CountryInput({ countries, locale, hideLabel = false }) {
                                     ]
                                 }, country.id, true, {
                                     fileName: "[project]/components/auth/pages/CountryInput.tsx",
-                                    lineNumber: 37,
+                                    lineNumber: 40,
                                     columnNumber: 128
                                 }, this)),
                             !filtered.length && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("li", {
@@ -1034,19 +1069,19 @@ function CountryInput({ countries, locale, hideLabel = false }) {
                                 children: ar ? 'لا توجد نتائج' : 'No countries found'
                             }, void 0, false, {
                                 fileName: "[project]/components/auth/pages/CountryInput.tsx",
-                                lineNumber: 37,
+                                lineNumber: 40,
                                 columnNumber: 423
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "[project]/components/auth/pages/CountryInput.tsx",
-                        lineNumber: 37,
+                        lineNumber: 40,
                         columnNumber: 14
                     }, this)
                 ]
             }, void 0, true, {
                 fileName: "[project]/components/auth/pages/CountryInput.tsx",
-                lineNumber: 32,
+                lineNumber: 35,
                 columnNumber: 5
             }, this),
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("input", {
@@ -1055,20 +1090,20 @@ function CountryInput({ countries, locale, hideLabel = false }) {
                 value: selected?.id || ''
             }, void 0, false, {
                 fileName: "[project]/components/auth/pages/CountryInput.tsx",
-                lineNumber: 38,
+                lineNumber: 41,
                 columnNumber: 5
             }, this),
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$auth$2f$pages$2f$AuthForm$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["FieldError"], {
                 name: "country_id"
             }, void 0, false, {
                 fileName: "[project]/components/auth/pages/CountryInput.tsx",
-                lineNumber: 39,
+                lineNumber: 42,
                 columnNumber: 5
             }, this)
         ]
     }, void 0, true, {
         fileName: "[project]/components/auth/pages/CountryInput.tsx",
-        lineNumber: 30,
+        lineNumber: 33,
         columnNumber: 10
     }, this);
 }
@@ -1836,4 +1871,4 @@ if ((typeof exports.default === 'function' || typeof exports.default === 'object
 }),
 ];
 
-//# sourceMappingURL=_943e9d09._.js.map
+//# sourceMappingURL=_e7a153ae._.js.map
