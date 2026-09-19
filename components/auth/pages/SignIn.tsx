@@ -1,4 +1,5 @@
 'use client';
+import { readPendingVerification, clearPendingVerification } from '@/lib/pending-verification';
 import AuthForm, { FieldError, hasFieldErrors } from './AuthForm';
 import { FormEvent, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
@@ -21,8 +22,9 @@ export default function SignIn({ locale }: { locale: string }) {
       storeSession(data.token); writeAuthCookie('preferred_language', locale, 365 * 86400);
       const { token: _token, ...user } = data;
       if (user.verified === false) {
-        router.replace(authPageUrl('verify-email', locale, returnUrl) + `${returnUrl ? '&' : '?'}email=${encodeURIComponent(user.email)}&resend=1`);
+        router.replace(authPageUrl('verify-email', locale, returnUrl) + `${returnUrl ? '&' : '?'}email=${encodeURIComponent(user.email)}${search.get('verifyEmail') === '1' && readPendingVerification() ? '' : '&resend=1'}`);
       } else {
+        clearPendingVerification();
         rememberLoginUser(user);
         router.replace(`/${locale}/callback${returnUrl ? `?returnUrl=${encodeURIComponent(returnUrl)}` : ''}`);
       }

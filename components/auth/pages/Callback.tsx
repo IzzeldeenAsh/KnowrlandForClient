@@ -1,4 +1,5 @@
 'use client';
+import { clearPendingVerification } from '@/lib/pending-verification';
 import { useEffect, useRef, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import dynamic from 'next/dynamic';
@@ -33,6 +34,7 @@ export default function Callback({ locale }: { locale: string }) {
         if (!token) { router.replace(authPageUrl('signin', locale, rawReturn)); return; }
         let user: AuthUser = takeLoginUser() || (await authRequest('account/profile', locale)).data;
         if (user.verified === false) { router.replace(authPageUrl('verify-email', locale, rawReturn)); return; }
+        clearPendingVerification();
         seedProfile(user);
         writeAuthCookie('preferred_language', locale, 365 * 86400);
         // Best effort, off the navigation critical path.

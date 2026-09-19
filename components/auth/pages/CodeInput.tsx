@@ -2,9 +2,9 @@
 import { useRef, useState } from 'react';
 import { FieldError, useClearFieldError } from './AuthForm';
 const digits = (value: string) => value.replace(/[٠-٩۰-۹]/g, digit => String(digit.charCodeAt(0) - (digit <= '٩' ? 1632 : 1776))).replace(/\D/g, '');
-export default function CodeInput({ locale }: { locale: string }) {
+export default function CodeInput({ locale, initialCode = '' }: { locale: string; initialCode?: string }) {
   const clearError = useClearFieldError();
-  const [values, setValues] = useState<string[]>(Array(6).fill(''));
+  const [values, setValues] = useState<string[]>(Array.from({ length: 6 }, (_, i) => /^\d{6}$/.test(initialCode) ? initialCode[i] : ''));
   const refs = useRef<(HTMLInputElement | null)[]>([]);
   function fill(value: string, index: number) {
     clearError('code');
