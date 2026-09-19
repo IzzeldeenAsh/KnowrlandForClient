@@ -1,7 +1,7 @@
 /**
  * Shared auth token helpers.
  *
- * Cookie is the primary storage; localStorage is a backward-compatible fallback.
+ * The shared cookie is the single source of truth across both frontends.
  * This file is intentionally NOT a "use client" module so it can be imported
  * from either client or server code safely (guards prevent accessing browser APIs).
  */
@@ -34,10 +34,7 @@ export function getTokenFromCookie(cookieName: string = 'token'): string | null 
 }
 
 export function getAuthToken(): string | null {
-  const cookieToken = getTokenFromCookie('token');
-  if (cookieToken) return cookieToken;
-
-  // Backward compatibility: some flows may still have the token in localStorage.
-  if (typeof window === 'undefined') return null;
-  return localStorage.getItem('token');
+  // A missing shared cookie means logged out. Never resurrect a stale token
+  // from origin-local storage after logging out of the other frontend.
+  return getTokenFromCookie('token');
 }

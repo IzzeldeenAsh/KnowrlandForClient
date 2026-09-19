@@ -1602,7 +1602,7 @@ export default function MeetTab({
                       className="h-12 sm:h-14 text-base sm:text-lg bg-blue-600 hover:bg-blue-700"
                       onClick={() => {
                         if (!authRedirectUrl) return;
-                        const loginUrl = `${process.env.NEXT_PUBLIC_DASHBOARD_URL}/auth/login?returnUrl=${encodeURIComponent(
+                        const loginUrl = `/${locale}/signin?returnUrl=${encodeURIComponent(
                           authRedirectUrl
                         )}`;
                         window.location.href = loginUrl;
@@ -1619,7 +1619,7 @@ export default function MeetTab({
                       className="h-12 sm:h-14 text-base sm:text-lg border-blue-600 text-blue-700 hover:bg-blue-50"
                       onClick={() => {
                         if (!authRedirectUrl) return;
-                        const signupUrl = `${process.env.NEXT_PUBLIC_DASHBOARD_URL}/auth/sign-up?returnUrl=${encodeURIComponent(
+                        const signupUrl = `/${locale}/signup?returnUrl=${encodeURIComponent(
                           authRedirectUrl
                         )}`;
                         window.location.href = signupUrl;

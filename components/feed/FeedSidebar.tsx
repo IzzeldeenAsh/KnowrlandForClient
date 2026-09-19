@@ -401,8 +401,8 @@ function GuestSidebar({ locale }: FeedSidebarProps) {
   }, [])
 
   const encodedReturnUrl = encodeURIComponent(returnUrl)
-  const loginUrl = `${dashboardUrl}/auth/login?returnUrl=${encodedReturnUrl}`
-  const signupUrl = `${dashboardUrl}/auth/sign-up?returnUrl=${encodedReturnUrl}`
+  const loginUrl = `/${locale}/signin?returnUrl=${encodedReturnUrl}`
+  const signupUrl = `/${locale}/signup?returnUrl=${encodedReturnUrl}`
 
   return (
     <section

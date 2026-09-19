@@ -1,5 +1,6 @@
 // app/[locale]/layout.tsx
 import './css/style.css';
+import SiteAssets from '@/components/SiteAssets';
 import AOSProvider from "@/components/aos-provider";
 import { Almarai } from 'next/font/google';
 import { MantineProvider, createTheme } from '@mantine/core';
@@ -178,6 +179,7 @@ export default async function RootLayout({
       dir={direction}
       className={`${fontClass} ${fontFamily} antialiased tracking-tight`}
     >
+      <SiteAssets locale={locale} />
       <MantineProvider theme={theme}>
         <AOSProvider>
           <NextIntlClientProvider messages={messages}>

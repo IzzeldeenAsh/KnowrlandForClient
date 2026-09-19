@@ -8,7 +8,31 @@
     "originalSource": "/(ar|en)/:path*"
   },
   {
-    "regexp": "^(?:\\/(_next\\/data\\/[^/]{1,}))?\\/callback(\\\\.json)?[\\/#\\?]?$",
-    "originalSource": "/callback"
+    "regexp": "^(?:\\/(_next\\/data\\/[^/]{1,}))?\\/auth(?:\\/((?:[^\\/#\\?]+?)(?:\\/(?:[^\\/#\\?]+?))*))?(\\\\.json)?[\\/#\\?]?$",
+    "originalSource": "/auth/:path*"
+  },
+  {
+    "regexp": "^(?:\\/(_next\\/data\\/[^/]{1,}))?\\/callback(?:\\/((?:[^\\/#\\?]+?)(?:\\/(?:[^\\/#\\?]+?))*))?(\\\\.json)?[\\/#\\?]?$",
+    "originalSource": "/callback/:path*"
+  },
+  {
+    "regexp": "^(?:\\/(_next\\/data\\/[^/]{1,}))?\\/signin(\\\\.json)?[\\/#\\?]?$",
+    "originalSource": "/signin"
+  },
+  {
+    "regexp": "^(?:\\/(_next\\/data\\/[^/]{1,}))?\\/signup(\\\\.json)?[\\/#\\?]?$",
+    "originalSource": "/signup"
+  },
+  {
+    "regexp": "^(?:\\/(_next\\/data\\/[^/]{1,}))?\\/reset-password(\\\\.json)?[\\/#\\?]?$",
+    "originalSource": "/reset-password"
+  },
+  {
+    "regexp": "^(?:\\/(_next\\/data\\/[^/]{1,}))?\\/verify-email(\\\\.json)?[\\/#\\?]?$",
+    "originalSource": "/verify-email"
+  },
+  {
+    "regexp": "^(?:\\/(_next\\/data\\/[^/]{1,}))?\\/signout(\\\\.json)?[\\/#\\?]?$",
+    "originalSource": "/signout"
   }
 ]

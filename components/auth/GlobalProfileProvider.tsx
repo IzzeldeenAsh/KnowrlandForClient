@@ -27,28 +27,7 @@ const ProfileContext = createContext<ProfileContextType>({
 
 export const useGlobalProfile = () => useContext(ProfileContext);
 
-// Global cache for user profile to prevent duplicate API calls across all components
-let globalProfileCache: {
-  user: User | null;
-  roles: string[];
-  lastFetchTime: number;
-  isLoading: boolean;
-  pendingPromise: Promise<{ user: User | null; roles: string[] }> | null;
-  /**
-   * When the profile endpoint returns 401/403 for a token, we "block" further
-   * profile fetches for the same token to avoid hammering the API every 5s.
-   * This gets reset automatically when the token changes (login/logout).
-   */
-  authFailedToken: string | null;
-} = {
-  user: null,
-  roles: [],
-  lastFetchTime: 0,
-  isLoading: false,
-  pendingPromise: null,
-  authFailedToken: null,
-};
-
+import { globalProfileCache } from '@/lib/auth-profile-cache';
 const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes cache
 const ANGULAR_APP_URL = process.env.NEXT_PUBLIC_DASHBOARD_URL || 'https://app.insightabusiness.com';
 
@@ -145,6 +124,7 @@ export function GlobalProfileProvider({ children }: { children: React.ReactNode 
           throw new Error(`Failed to fetch profile: ${response.status}`);
         }
 
+        if (getAuthToken() !== token) throw new Error('Session changed');
         const data = await response.json();
         const profile = (data?.data ?? {}) as Partial<User>;
 
@@ -174,6 +154,7 @@ export function GlobalProfileProvider({ children }: { children: React.ReactNode 
         globalProfileCache.user = userData;
         globalProfileCache.roles = rolesFromApi;
         globalProfileCache.lastFetchTime = Date.now();
+        globalProfileCache.sessionToken = token;
 
         // Persist only for non-admin users (admin users are typically redirected to Angular).
         if (!rolesFromApi.includes('admin') && !rolesFromApi.includes('staff')) {
@@ -199,6 +180,13 @@ export function GlobalProfileProvider({ children }: { children: React.ReactNode 
     try {
       const token = getAuthToken();
       const now = Date.now();
+      if (globalProfileCache.sessionToken !== token) {
+        globalProfileCache.user = null;
+        globalProfileCache.roles = [];
+        globalProfileCache.lastFetchTime = 0;
+        globalProfileCache.authFailedToken = null;
+        globalProfileCache.sessionToken = token;
+      }
 
       // If we already got an auth failure for this exact token, do not re-call
       // the profile endpoint again (the interval would otherwise spam 401s).
@@ -212,7 +200,7 @@ export function GlobalProfileProvider({ children }: { children: React.ReactNode 
       }
 
       // Return cached data if still valid and not forced refresh
-      if (!forceRefresh && globalProfileCache.user && (now - globalProfileCache.lastFetchTime) < CACHE_DURATION) {
+      if (token && !forceRefresh && globalProfileCache.user && (now - globalProfileCache.lastFetchTime) < CACHE_DURATION) {
         setUser(globalProfileCache.user);
         setRoles(globalProfileCache.roles);
         return;
@@ -251,24 +239,14 @@ export function GlobalProfileProvider({ children }: { children: React.ReactNode 
         setRoles(result.roles);
       } catch (error) {
 
-        // Check if we have cached user data to fall back to
-        const existingUser = localStorage.getItem('user');
-        if (existingUser && !(error instanceof Error && error.message.includes('Auth failed'))) {
-          const cachedUserData = JSON.parse(existingUser);
-          globalProfileCache.user = cachedUserData;
-          setUser(cachedUserData);
-          setRoles(globalProfileCache.roles);
-        } else {
-          // Only clear auth data on actual auth failures
-          if (error instanceof Error && error.message.includes('Auth failed')) {
-            // Block further attempts for this same token until it changes.
-            globalProfileCache.authFailedToken = token;
-
-            clearAuthDataEverywhere();
-
-            resetProfileState();
-          }
+        // Only an authentication rejection invalidates the shared session.
+        // Never restore an origin-local profile belonging to an older login.
+        if (error instanceof Error && error.message.includes('Auth failed')) {
+          globalProfileCache.authFailedToken = token;
+          clearAuthDataEverywhere();
+          resetProfileState();
         }
+
       } finally {
         globalProfileCache.isLoading = false;
         globalProfileCache.pendingPromise = null;
@@ -281,14 +259,8 @@ export function GlobalProfileProvider({ children }: { children: React.ReactNode 
   };
 
   const signOut = () => {
-    clearAuthDataEverywhere();
-    globalProfileCache.authFailedToken = null;
-    resetProfileState();
-    setIsAuthResolved(true);
-
-    const timestamp = Date.now();
-    const redirectUri = `${window.location.origin}/${locale}?t=${timestamp}`;
-    window.location.href = `${ANGULAR_APP_URL}/auth/logout?redirect_uri=${encodeURIComponent(redirectUri)}`;
+    // Revoke on the logout page before removing the shared cookie.
+    window.location.assign(`/${locale}/signout`);
   };
 
   useEffect(() => {
@@ -303,6 +275,10 @@ export function GlobalProfileProvider({ children }: { children: React.ReactNode 
     // Set up auth state monitoring
     const checkAuthState = () => {
       const currentToken = getAuthToken();
+      if (globalProfileCache.sessionToken !== currentToken) {
+        void refreshProfile();
+        return;
+      }
 
       // If we had a user but token is gone, clear state
       if (globalProfileCache.user && !currentToken) {

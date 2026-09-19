@@ -124,7 +124,7 @@ export default function SavedPostsTimeline({ locale }: SavedPostsTimelineProps) 
         <h1 className="mt-4 text-[19px] font-bold text-[#101724]">{copy.loginTitle}</h1>
         <p className="mx-auto mt-2 max-w-md text-[13px] leading-6 text-[#64748B]">{copy.loginDescription}</p>
         <Link
-          href={`${dashboardUrl}/auth/login?returnUrl=${returnUrl}`}
+          href={`/${locale}/signin?returnUrl=${returnUrl}`}
           className="mt-5 inline-flex min-h-10 items-center justify-center rounded-md bg-[#2378E8] px-5 text-[13px] font-semibold text-white transition-colors hover:bg-[#1B64C5] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2378E8] focus-visible:ring-offset-2"
         >
           {copy.login}

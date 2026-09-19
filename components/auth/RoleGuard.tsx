@@ -4,7 +4,7 @@ import { useEffect } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
 import { useGlobalProfile } from '@/components/auth/GlobalProfileProvider';
 
-const ADMIN_REDIRECT_URL = `${process.env.NEXT_PUBLIC_DASHBOARD_URL}/admin-dashboard/admin/dashboard/main-dashboard/requests`;
+
 
 // List of paths that admins are allowed to access in Next.js app
 const ADMIN_ALLOWED_PATHS = [
@@ -39,7 +39,7 @@ export default function RoleGuard({ children }: { children: React.ReactNode }) {
         console.log('[RoleGuard] Current path:', pathname);
         
         // Redirect to Angular admin dashboard
-        window.location.href = ADMIN_REDIRECT_URL;
+        window.location.replace(`/${pathname.startsWith('/ar') ? 'ar' : 'en'}/dashboard`);
       }
     }
   }, [user, roles, isLoading, pathname]);

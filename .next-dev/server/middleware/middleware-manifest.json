@@ -3,11 +3,9 @@
   "middleware": {
     "/": {
       "files": [
-        "server/edge/chunks/_f7e39009._.js",
-        "server/edge/chunks/node_modules_@formatjs_intl-localematcher_lib_f4bcbf0f._.js",
-        "server/edge/chunks/node_modules_ea9f42ba._.js",
-        "server/edge/chunks/[root-of-the-server]__fa421a0b._.js",
-        "server/edge/chunks/turbopack-edge-wrapper_1769c590.js"
+        "server/edge/chunks/_7a8bae78._.js",
+        "server/edge/chunks/[root-of-the-server]__f2b15f93._.js",
+        "server/edge/chunks/turbopack-edge-wrapper_260053cf.js"
       ],
       "name": "middleware",
       "page": "/",
@@ -21,8 +19,32 @@
           "originalSource": "/(ar|en)/:path*"
         },
         {
-          "regexp": "/:nextData(_next/data/[^/]{1,})?/callback{(\\\\.json)}?",
-          "originalSource": "/callback"
+          "regexp": "/:nextData(_next/data/[^/]{1,})?/auth/:path*{(\\\\.json)}?",
+          "originalSource": "/auth/:path*"
+        },
+        {
+          "regexp": "/:nextData(_next/data/[^/]{1,})?/callback/:path*{(\\\\.json)}?",
+          "originalSource": "/callback/:path*"
+        },
+        {
+          "regexp": "/:nextData(_next/data/[^/]{1,})?/signin{(\\\\.json)}?",
+          "originalSource": "/signin"
+        },
+        {
+          "regexp": "/:nextData(_next/data/[^/]{1,})?/signup{(\\\\.json)}?",
+          "originalSource": "/signup"
+        },
+        {
+          "regexp": "/:nextData(_next/data/[^/]{1,})?/reset-password{(\\\\.json)}?",
+          "originalSource": "/reset-password"
+        },
+        {
+          "regexp": "/:nextData(_next/data/[^/]{1,})?/verify-email{(\\\\.json)}?",
+          "originalSource": "/verify-email"
+        },
+        {
+          "regexp": "/:nextData(_next/data/[^/]{1,})?/signout{(\\\\.json)}?",
+          "originalSource": "/signout"
         }
       ],
       "wasm": [],
@@ -30,9 +52,9 @@
       "env": {
         "__NEXT_BUILD_ID": "development",
         "NEXT_SERVER_ACTIONS_ENCRYPTION_KEY": "lFIL4e9GyolmTlOgfdzg6VM6ZWCd10wwv5t/Ba/ymOM=",
-        "__NEXT_PREVIEW_MODE_ID": "dd57134df6d1a81fdd75d43b62980fa3",
-        "__NEXT_PREVIEW_MODE_ENCRYPTION_KEY": "03725c29480f0ce5b87a07293e799b419c8916b75398ab7a3c161d6686dcb288",
-        "__NEXT_PREVIEW_MODE_SIGNING_KEY": "89ef8090c30d8b7f47b3dd9b2cb58f6ac1a22d3f428340d372417fed9585cef7"
+        "__NEXT_PREVIEW_MODE_ID": "48c6f7b55d6a2a4c62aca123d2eba78b",
+        "__NEXT_PREVIEW_MODE_ENCRYPTION_KEY": "7e27042a132d29e59a3fd2a9b0713cd3d5f701f86a42083c955721fcd7c33a9c",
+        "__NEXT_PREVIEW_MODE_SIGNING_KEY": "520f5a0089d11c13ec8d730b7feb0b445c8e93d338fa08725629028790472ca5"
       }
     }
   },

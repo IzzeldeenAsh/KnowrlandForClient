@@ -12,8 +12,8 @@
 export function getCookieDomain(): string | null {
   if (typeof window === 'undefined') return null;
   const hostname = window.location.hostname;
-  if (hostname.includes('insightabusiness.com')) return '.insightabusiness.com';
-  if (hostname.includes('foresighta.co')) return '.foresighta.co';
+  if ((hostname === 'insightabusiness.com' || hostname.endsWith('.insightabusiness.com'))) return '.insightabusiness.com';
+  if ((hostname === 'foresighta.co' || hostname.endsWith('.foresighta.co'))) return '.foresighta.co';
   return null;
 }
 
@@ -24,14 +24,14 @@ export function isSharedCookieHost(): boolean {
 
 /**
  * Attribute parts for cross-subdomain cookies on deployed hosts:
- * `SameSite=None; Domain=<env domain>; Secure` (Domain omitted on unknown hosts).
+ * `SameSite=Lax; Domain=<env domain>; Secure` (Domain omitted on unknown hosts).
  * Spread into the cookie-parts array that gets joined with '; '.
  */
 export function sharedCookieAttributes(): string[] {
   const domain = getCookieDomain();
   return domain
-    ? ['SameSite=None', `Domain=${domain}`, 'Secure']
-    : ['SameSite=None', 'Secure'];
+    ? ['SameSite=Lax', `Domain=${domain}`, 'Secure']
+    : ['SameSite=Lax', ...(typeof location !== 'undefined' && location.protocol === 'https:' ? ['Secure'] : [])];
 }
 
 /** `Domain=<env domain>; ` fragment for string-built cookies ('' on localhost). */

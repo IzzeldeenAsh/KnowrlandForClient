@@ -17,12 +17,13 @@ const nextConfig = {
     ],
   },
   reactStrictMode: false,
+  compress: true,
   // Avoid Next inferring a higher "workspace root" (multiple lockfiles)
   outputFileTracingRoot: __dirname,
   async headers() {
     return [
       {
-        source: "/(.*)", // all routes
+        source: "/((?!_next/static/|images/|assets/).*)", // documents and dynamic responses
         headers: [
           {
             key: "Cache-Control",

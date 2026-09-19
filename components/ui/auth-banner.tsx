@@ -1,7 +1,7 @@
 'use client';
 
 import { useTranslations } from 'next-intl';
-import { useParams } from 'next/navigation';
+import { useParams, useRouter } from 'next/navigation';
 import { useEffect, useRef } from 'react';
 
 interface AuthBannerProps {
@@ -12,6 +12,7 @@ interface AuthBannerProps {
 export default function AuthBanner({ onSignUp, onLogin }: AuthBannerProps) {
   const t = useTranslations();
   const params = useParams();
+  const router = useRouter();
   const locale = params.locale as string;
   const isRTL = locale === 'ar';
   const bannerRef = useRef<HTMLDivElement | null>(null);
@@ -42,8 +43,8 @@ export default function AuthBanner({ onSignUp, onLogin }: AuthBannerProps) {
     if (onSignUp) {
       onSignUp();
     } else {
-      // Default redirect to Angular app signup
-      window.location.href = `${process.env.NEXT_PUBLIC_DASHBOARD_URL}/auth/sign-up`;
+      // Stay in Next.js for the lightweight auth flow.
+      router.push(`/${locale}/signup`);
     }
   };
 
@@ -51,8 +52,8 @@ export default function AuthBanner({ onSignUp, onLogin }: AuthBannerProps) {
     if (onLogin) {
       onLogin();
     } else {
-      // Default redirect to Angular app login
-      window.location.href = `${process.env.NEXT_PUBLIC_DASHBOARD_URL}/auth/login?redirect_uri=${encodeURIComponent(window.location.href)}`;
+      // Preserve the destination through login.
+      router.push(`/${locale}/signin?returnUrl=${encodeURIComponent(window.location.href)}`);
     }
   };
 
